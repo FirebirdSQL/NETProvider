@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<delegate name="FbInfoMessageEventHandler" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Represents the method that will handle the <see cref="FbConnection.InfoMessage" />
+			event of an <see cref="FbConnection" />.
+			</summary>
+			<param name="sender">The source of the event.</param>
+			<param name="e">An <see cref="FbInfoMessageEventArgs" />
+			object that contains the event data.</param>
+			<remarks>
+			When you create an <see cref="FbInfoMessageEventArgs" /> delegate, 
+			you identify the method that will handle the event. To associate the 
+			event with your event handler, add an instance of the delegate to the event. The 
+			event handler is called whenever the event occurs, unless you remove the 
+			delegate.
+			</remarks>
+		</overview>
+	</delegate>
+	<class name="FbInfoMessageEventArgs" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Provides data for the InfoMessage event. This class cannot be inherited.
+			</summary>
+			<remarks>
+			The InfoMessage event contains an <see cref="FbErrorCollection" />
+			collection with warnings messages sent from the Firebird Server.
+			</remarks>
+		</overview>
+		<property name="Errors">
+			<summary>Gets the collection of warnings sent from the Firebird Server.</summary>
+			<value>The collection of warnings sent from the Firebird Server.</value>
+		</property>
+		<property name="Message">
+			<summary>Gets a value representing the complete error message sent from the Firebird Server.</summary>
+			<value>Complete error message.</value>
+		</property>
+	</class>
+</doc>

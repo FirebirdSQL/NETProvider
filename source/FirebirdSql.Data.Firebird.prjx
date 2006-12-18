@@ -1,0 +1,163 @@
+<Project name="FirebirdSql.Data.Firebird" description="" newfilesearch="None" enableviewstate="True" version="1.1" projecttype="C#">
+  <Contents>
+    <File name="./FirebirdSql.Data.Common/ArrayBase.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/ArrayDesc.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/AttachmentParams.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/BlobBase.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/BufferBase.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/CharsetCollection.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/Charset.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/DbDataType.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/DbField.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/DbStatementType.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/DbValue.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/DpbBuffer.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/EpbBuffer.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/FactoryBase.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/GlobalizationHelper.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/IAttachment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/IDbAttachment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/IscCodes.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/IscErrorCollection.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/IscError.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/IscException.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/IscExceptionHelper.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/IscHelper.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/ISvcAttacment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/ITransaction.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/RowDescriptor.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/SpbBuffer.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/StatementBase.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/StatementState.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/TransactionState.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/TypeDecoder.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/TypeEncoder.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/TypeHelper.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/WarningMessageEventArgs.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Common/Resources/isc_error_msg.resources" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/ArrayDescMarshal.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/ArrayDescMarshaler.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FbClient.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FesArray.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FesAttachment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FesBlob.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FesDbAttachment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FesFactory.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FesStatement.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FesSvcAttachment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/FesTransaction.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/XSQLDA.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Embedded/XsqldaMarshaler.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsArray.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsAttachment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsBlob.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsDbAttachment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsFactory.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsResponse.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsStatement.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsSvcAttachment.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/GdsTransaction.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Gds/XdrStream.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/AssemblyInfo.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/ClientFactory.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbCharset.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbCommandBuilderBehavior.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbCommandBuilder.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbCommand.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbConnection.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbConnectionPool.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbDataAdapter.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbDatabaseInfo.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbDataReader.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbDbConnection.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbDbSchemaType.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbDbType.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbErrorCollection.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbError.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbException.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbInfoMessageEventArgs.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbParameterCollection.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbParameter.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbRowUpdatedEventArgs.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbRowUpdatingEventArgs.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbTransaction.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/FbTransactionOptions.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbCharacterSetsSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbCheckConstraints.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbChecksByTableSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbCollationsSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbColumnPrivilegesSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbColumnsSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbDbSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbDbSchemaFactory.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbDomainsSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbForeignKeysSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbFunctionsSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbGeneratorsSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbIndexesSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbPrimaryKeysSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbProcedurePrivileges.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbProceduresSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbProviderTypesSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbRolesSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbTableConstraintsSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbTablePrivilegesSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbTablesSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbTriggersSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbUniqueKeysSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbViewColumnUsageSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbViewPrivilegesSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/DbSchema/FbViewsSchema.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Isql/CommandExecutedEventArgs.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Isql/CommandExecutingEventArgs.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Isql/FbBatchExecution.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Isql/FbConnectionString.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Isql/FbScript.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Isql/StringParser.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbBackup.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbConfiguration.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbLog.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbRestore.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbSecurity.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbServerProperties.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbService.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbServiceParameters.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbStatistical.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Services/FbValidation.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Resources/FbCommand.bmp" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Resources/FbConnection.bmp" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Resources/FbDataAdapter.bmp" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Design/FbCommandTextEditor.cs" subtype="Code" buildaction="Nothing" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Design/FbCommandTextUIEditor.cs" subtype="Code" buildaction="Nothing" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Design/FbConnectionStringEditor.cs" subtype="Code" buildaction="Nothing" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Design/FbConnectionStringUIEditor.cs" subtype="Code" buildaction="Nothing" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Design/FbParameterCollectionEditor.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./FirebirdSql.Data.Firebird/Design/FbParameterConverter.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+  </Contents>
+  <References>
+    <Reference type="Gac" refto="/home/carlos/mono/install/lib/System.dll" localcopy="True" />
+    <Reference type="Gac" refto="/home/carlos/mono/install/lib/System.Data.dll" localcopy="True" />
+    <Reference type="Gac" refto="/home/carlos/mono/install/lib/System.Xml.dll" localcopy="True" />
+    <Reference type="Gac" refto="/home/carlos/mono/install/lib/System.Drawing.dll" localcopy="True" />
+    <Reference type="Gac" refto="/home/carlos/mono/install/lib/System.Design.dll" localcopy="True" />
+  </References>
+  <DeploymentInformation target="" script="" strategy="File" />
+  <Configuration runwithwarnings="False" name="Debug">
+    <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="True" unsafecodeallowed="False" generateoverflowchecks="True" mainclass="" target="Library" definesymbols="LINUX;SINGLE_DLL;MONO" generatexmldocumentation="False" win32Icon="" />
+    <Execution commandlineparameters="" consolepause="False" />
+    <Output directory="./bin/Debug" assembly="FirebirdSql.Data.Firebird" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
+  </Configuration>
+  <Configurations active="Debug">
+    <Configuration runwithwarnings="False" name="Debug">
+      <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="True" unsafecodeallowed="False" generateoverflowchecks="True" mainclass="" target="Library" definesymbols="LINUX;SINGLE_DLL;MONO" generatexmldocumentation="False" win32Icon="" />
+      <Execution commandlineparameters="" consolepause="False" />
+      <Output directory="./bin/Debug" assembly="FirebirdSql.Data.Firebird" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
+    </Configuration>
+    <Configuration runwithwarnings="False" name="Release">
+      <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="True" unsafecodeallowed="False" generateoverflowchecks="True" mainclass="" target="Library" definesymbols="LINUX;SINGLE_DLL;MONO" generatexmldocumentation="False" win32Icon="" />
+      <Execution commandlineparameters="" consolepause="False" />
+      <Output directory="./bin/Release" assembly="FirebirdSql.Data.Firebird" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
+    </Configuration>
+  </Configurations>
+</Project>

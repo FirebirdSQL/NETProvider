@@ -1,0 +1,848 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbConnection" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>Represents an open connection to a Firebird database. This class cannot be inherited.</summary>
+			<remarks>
+				<para>A <b>FbConnection</b> object represents a individual connection to Firebird server.</para>
+				<para>If a <b>FbConnection</b> object goes out of scope, it is not closed,
+				you must explicitly close the the connection by calling	<see cref="FbConnection.Close" /> or <see cref="FbConnection.Dispose" />.	
+			</para>
+			</remarks>
+			<example>
+				<code>			
+public void InsertRow(string connectionString)
+{
+	//	If the connection string is null, use a default.
+	if(connectionString == "")
+	{
+		connectionString = "Database=C:\\PROGRAM FILES\\FIREBIRD\\EXAMPLES\\EMPLOYEE.GDB;User=SYSDBA;Password=masterkey;Dialect=3;Server=localhost";
+	}
+	
+	FbConnection connection = new FbConnection(connectionString);					
+	connection.Open();					
+	FbTransaction transaction	= connection.BeginTransaction();
+	
+	string insertQuery = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBNP', '.NET Provider', 'N/A')";
+	FbCommand command = new FbCommand(insertQuery, myConn, myTxn);	
+	
+	command.ExecuteNonQuery();
+	
+	transaction.Commit();
+	
+	connection.Close();
+}
+				</code>
+			</example>
+		</overview>
+		<event name="StateChange">
+			<summary>Occurs when the state of the connection changes.</summary>
+			<remarks>
+				<para>The <see cref="FbConnection.StateChange" /> event is raised when the connection state changes
+				from Closed to Opened, or from Opened to Closed.
+				</para>
+			</remarks>
+			<data>
+				<list type="table">
+					<listheader>
+						<term>Property</term>
+						<term>Description</term>
+					</listheader>
+					<item>
+						<description>CurrentState</description>
+						<description>The new state of the connection.</description>
+					</item>
+					<item>
+						<description>OriginalState</description>
+						<description>The original state of the connection.</description>
+					</item>
+				</list>
+			</data>
+		</event>
+		<event name="InfoMessage">
+			<summary>
+			Occurs when the Firebird Server sends a warning message.
+			</summary>
+		</event>
+		<property name="ConnectionString">
+			<summary>
+			Gets or sets the string used to open a connection to a Firebird database.
+			</summary>
+			<value>
+			The connection string that includes the source database path and name, and other 
+			parameters needed to establish the initial connection. The default value is an empty string.
+			</value>
+			<exception cref="ArgumentException">An invalid connection string argument has been supplied or a required connection string argument has not been supplied.</exception>
+			<remarks>
+				<para>
+					The following table lists the valid names for keyword values for
+					<b>ConnectionString</b> property.
+				</para>
+				<para>
+					<list type="table">
+						<listheader>
+							<term>Name</term>
+							<term>Description</term>
+							<term>Default</term>
+						</listheader>
+						<item>
+							<description>Database</description>
+							<description>Database path to establish the connection.</description>
+							<description />
+						</item>
+						<item>
+							<description>User</description>
+							<description>Firebird User account for login.</description>
+							<description />
+						</item>
+						<item>
+							<description>Password</description>
+							<description>Password for the Firebird user account.</description>
+							<description />
+						</item>
+						<item>
+							<description>Dialect</description>
+							<description>Database dialect.</description>
+							<description>3</description>
+						</item>
+						<item>
+							<description>Server or DataSource.</description>
+							<description>Server name for establish the connection.</description>
+							<description>localhost</description>
+						</item>
+						<item>
+							<description>Port</description>
+							<description>Port number in the server for establish the connection.</description>
+							<description>3050</description>
+						</item>
+						<item>
+							<description>Charset</description>
+							<description>Database Character Set.</description>
+							<description>NONE</description>
+						</item>
+						<item>
+							<description>Role</description>
+							<description>User Role.</description>
+							<description />
+						</item>
+						<item>
+							<description>Packet Size</description>
+							<description>Size (in bytes) of network packets used to communicate with an instance of Firebird Server.</description>
+							<description>8192</description>
+						</item>
+						<item>
+							<description>Connection Lifetime</description>
+							<description>
+							When a connection is returned to the pool, its creation time is compared with the current time, and the connection is destroyed
+							if that time span (in seconds) exceeds the value specified by connection lifetime.
+							</description>
+							<description>0</description>
+						</item>
+						<item>
+							<description>MinPoolSize</description>
+							<description>
+							The minimun number of connections allowed in the pool.
+							</description>
+							<description>
+							0
+							</description>
+						</item>
+						<item>
+							<description>MaxPoolSize</description>
+							<description>
+							The maximun number of connections allowed in the pool.
+							</description>
+							<description>
+							100
+							</description>
+						</item>
+						<item>
+							<description>Pooling</description>
+							<description>
+							When <b>true</b>, the <b>FbConnection</b> object is drawn from the appropriate 
+							pool, or if necessary, is created and added to the appropriate pool. Recognized 
+							values are <b>true</b>, <b>false</b>, <b>yes</b>, and <b>no</b>.
+							</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>ServerType</description>
+							<description>
+							When <b>0</b> the provider will use the GDS implementation
+							used for connections to Firebird Super or Classic servers, when
+							<b>1</b> the provider will use the GDS implementation used
+							for connections to the Firebird embedded server.
+							</description>
+							<description>0</description>
+						</item>
+					</list>
+				</para>
+				<para>
+				The following table lists the valid names for the <b>Charset</b> keyword of the 
+				<b>ConnectionString</b>:
+				</para>
+				<para>
+					<list type="table">
+						<listheader>
+							<term>Firebird Charset</term>
+							<term>Description</term>
+						</listheader>
+						<item>
+							<description>ASCII</description>
+							<description>American Standard Code for Information Interchange.</description>
+						</item>
+						<item>
+							<description>BIG_5</description>
+							<description>Big5, Traditional Chinese.</description>
+						</item>
+						<item>
+							<description>DOS437</description>
+							<description>MS-DOS United States, Australia, New Zealand, South Africa.</description>
+						</item>
+						<item>
+							<description>DOS850</description>
+							<description>MS-DOS Latin-1.</description>
+						</item>
+						<item>
+							<description>DOS860</description>
+							<description>MS-DOS Portugues.</description>
+						</item>
+						<item>
+							<description>DOS861</description>
+							<description>MS-DOS Icelandic.</description>
+						</item>
+						<item>
+							<description>DOS863</description>
+							<description>MS-DOS Canadian French.</description>
+						</item>
+						<item>
+							<description>DOS865</description>
+							<description>MS-DOS Nordic.</description>
+						</item>
+						<item>
+							<description>EUCJ_0208</description>
+							<description>JIS X 0201, 0208, 0212, EUC encoding, Japanese.</description>
+						</item>
+						<item>
+							<description>GB_2312</description>
+							<description>GB2312, EUC encoding, Simplified Chinese.</description>
+						</item>
+						<item>
+							<description>ISO8859_1</description>
+							<description>ISO 8859-1, Latin alphabet No. 1.</description>
+						</item>
+						<item>
+							<description>ISO8859_2</description>
+							<description>ISO 8859-2, Latin alphabet No. 2.</description>
+						</item>
+						<item>
+							<description>KSC_5601</description>
+							<description>Windows Korean.</description>
+						</item>
+						<item>
+							<description>ISO2022-JP</description>
+							<description>Windows Japanese.</description>
+						</item>
+						<item>
+							<description>SJIS_0208</description>
+							<description>Japanese (Shift-JIS)</description>
+						</item>
+						<item>
+							<description>UNICODE_FSS</description>
+							<description>Eight-bit Unicode Transformation Format.</description>
+						</item>
+						<item>
+							<description>WIN1250</description>
+							<description>Windows Eastern European.</description>
+						</item>
+						<item>
+							<description>WIN1251</description>
+							<description>Windows Cyrillic.</description>
+						</item>
+						<item>
+							<description>WIN1252</description>
+							<description>Windows Latin-1.</description>
+						</item>
+						<item>
+							<description>WIN1253</description>
+							<description>Windows Greek.</description>
+						</item>
+						<item>
+							<description>WIN1254</description>
+							<description>Windows Turkish.</description>
+						</item>
+						<item>
+							<description>WIN1254</description>
+							<description>Windows Hebrew.</description>
+						</item>
+						<item>
+							<description>Arabic</description>
+							<description>Windows Turkish.</description>
+						</item>
+						<item>
+							<description>WIN1257</description>
+							<description>Windows Baltic.</description>
+						</item>
+					</list>
+				</para>
+			</remarks>
+		</property>
+		<property name="ConnectionTimeout">
+			<summary>
+			Gets the time to wait while trying to establish a connection before terminating the attempt and generating an error.
+			</summary>
+			<value>
+			The time (in seconds) to wait for a connection to open. The default value is 0 seconds.
+			</value>
+			<remarks>
+				<para>A value of <b>0</b> indicates no limit.</para>
+				<para>
+					<b>Not currently supported.</b>
+				</para>
+			</remarks>
+		</property>
+		<property name="Database">
+			<summary>
+			Gets the name of the actual database or the database to be used when a connection is open.
+			</summary>
+			<value>
+			The name of the actual database or the database to be used when a connection is open. The default value is an empty string.
+			</value>
+		</property>
+		<property name="DataSource">
+			<summary>
+			Gets the name of the Firebird Server to which to connect.
+			</summary>
+			<value>
+			The name of the Firebird Server to which to connect. The default value is an empty string.
+			</value>
+		</property>
+		<property name="ServerVersion">
+			<summary>
+			Gets a string containing the version of the Firebird Server to which the client is connected.
+			</summary>
+			<exception cref="InvalidOperationException">The connection is closed.</exception>
+			<value>
+			The version of the Firebird Server to which the client is connected.
+			</value>
+		</property>
+		<property name="State">
+			<summary>
+			Gets the current state of the connection.
+			</summary>
+			<value>
+			One of the <b>System.Data.ConnectionState</b> values. The default is <b>Closed</b>.
+			</value>
+			<remarks>
+				<para>The allowed state changes are: </para>
+				<para>
+					<list type="bullet">
+						<item>
+							<description>
+							From <b>Closed</b> to <b>Open</b>, using the <see cref="Open" /> method. 
+							</description>
+						</item>
+						<item>
+							<description>
+							From <b>Open</b> to <b>Closed</b>, using the <see cref="Close" /> method or the
+							<see cref="Dispose" /> method. 
+							</description>
+						</item>
+					</list>
+				</para>
+			</remarks>
+		</property>
+		<property name="PacketSize">
+			<summary>	
+			Gets the size (in bytes) of network packets used to communicate with an instance of Firebird Server.
+			</summary>
+			<value>The size (in bytes) of network packets. The default value is 8192.</value>
+			<remarks>
+				<para>
+				<b>PacketSize</b> may be in the rane 512-32767 bytes. 
+				An exception is generated if the value is outside of this range.
+				</para>
+			</remarks>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbConnection" /> class.
+			</summary>
+		</constructor>
+		<constructor name="ctor(System.String)">
+			<summary>
+			Creates a new instance of the <see cref="FbConnection" /> class 
+			with the specified connection string.
+			</summary>
+			<param name="connectionString">Connection string.</param>
+		</constructor>
+		<method name="BeginTransaction">
+			<summary>Begins a new transaction with the default isolation level IsolationLevel.ReadCommitted.</summary>
+			<returns>An <see cref="FbTransaction" /> object.</returns>
+			<exception cref="InvalidOperationException">
+				<para>
+					A transaction is currently active. Parallel transactions are not supported.
+				</para>
+				<para>
+					Or the connection is not valid and Open.
+				</para>
+			</exception>
+			<remarks>
+			To commit or rollback the transaction, you must explicitly use the <see cref="FbTransaction.Commit" /> or 
+			<see cref="FbTransaction.Rollback" /> methods.
+			</remarks>
+			<example>
+				<code>
+public void RunFirebirdTransaction(string connectionString)
+{
+	FbConnection connection = new FbConnection(connectionString);
+	connection.Open();
+
+	// Start a new transaction
+	FbTransaction transaction = connection.BeginTransaction();;
+
+	// Creates a new FbCommand object
+	FbCommand command = new FbCommand();
+	command.Connection = connection;
+	command.Transaction = transaction;
+
+	try
+	{
+		command.CommandText = "Insert into Region (RegionID, RegionDescription) VALUES (100, 'Description')";
+		command.ExecuteNonQuery();
+		command.CommandText = "Insert into Region (RegionID, RegionDescription) VALUES (101, 'Description')";
+		command.ExecuteNonQuery();
+	    
+		transaction.Commit();
+	    
+		Console.WriteLine("Both records are written to database.");
+	}
+	catch(Exception e)
+	{
+		myTrans.Rollback();
+		Console.WriteLine(e.ToString());
+		Console.WriteLine("Neither record was written to database.");
+	}
+	finally
+	{
+		myConnection.Close();
+	}
+}
+				</code>
+			</example>
+		</method>
+		<method name="BeginTransaction(System.String)">
+			<summary>Begins a new transaction with the specified name.</summary>
+			<param name="transactionName">The name of the transaction.</param>
+			<returns>An <see cref="FbTransaction" /> object.</returns>
+			<exception cref="InvalidOperationException">
+				<para>A transaction is currently active. Parallel transactions are not supported.</para>
+				<para>Or the connection is not valid and Open.</para>
+			</exception>
+			<remarks>
+			To commit or rollback the transaction, you must explicitly use the <see cref="FbTransaction.Commit" /> or 
+			<see cref="FbTransaction.Rollback" /> methods.
+			</remarks>
+			<example>
+				<code>
+FbConnection connection = new FbConnection(connectionString);
+connection.Open();
+
+// Start a new transaction
+FbTransaction transaction = myConnection.BeginTransaction();
+
+// Creates a new FbCommand object
+FbCommand command = new FbCommand();
+command.Connection = connection;
+command.Transaction = transaction;
+
+try
+{
+	command.CommandText = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBNP', '.Net Provider', 'N/A')";
+	command.ExecuteNonQuery();
+	
+	transaction.Save("SampleTransaction");
+	
+	command.CommandText = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBN1', '.Net Provider1.', 'N/A')";	
+	command.ExecuteNonQuery();
+		
+	transaction.Commit();
+	
+	Console.WriteLine("Both records are written to database.");
+}
+catch(Exception e)
+{
+	try
+	{
+		transaction.Rollback("SampleTransaction");
+	}
+	catch (FbException ex)
+	{
+		if (transaction.Connection != null)
+		{
+			Console.WriteLine("An exception of type " + ex.GetType() +
+				" was encountered while attempting to roll back the transaction.");
+		}
+	}
+
+	Console.WriteLine("An exception of type " + e.GetType() + " was encountered while inserting the data.");
+	Console.WriteLine("Neither record was written to database.");
+}
+finally 
+{
+	connection.Close();
+}		
+				</code>
+			</example>
+		</method>
+		<method name="BeginTransaction(System.Data.IsolationLevel)">
+			<summary>Begins a new transaction with the specified isolation level.</summary>
+			<param name="level">The isolation level for the transaction.</param>
+			<returns>An <see cref="FbTransaction" /> object.</returns>
+			<exception cref="InvalidOperationException">
+				<para>A transaction is currently active. Parallel transactions are not supported.</para>
+				<para>Or the connection is not valid and Open.</para>
+			</exception>
+			<remarks>
+			To commit or rollback the transaction, you must explicitly use the <see cref="FbTransaction.Commit" /> or 
+			<see cref="FbTransaction.Rollback" /> methods.
+			</remarks>
+			<example>
+				<code>
+FbConnection connection = new FbConnection(connectionString);
+connection.Open();
+
+FbConnection connection = new FbConnection(connectionString);
+connection.Open();
+
+// Start a new transaction
+FbTransaction transaction = myConnection.BeginTransaction();
+
+// Creates a new FbCommand object
+FbCommand command = new FbCommand();
+command.Connection = connection;
+command.Transaction = transaction;
+
+try
+{
+    command.CommandText = "Insert into Region (RegionID, RegionDescription) VALUES (100, 'Description')";
+    command.ExecuteNonQuery();
+
+    command.CommandText = "Insert into Region (RegionID, RegionDescription) VALUES (101, 'Description')";
+    command.ExecuteNonQuery();
+
+    transaction.Commit();
+
+    Console.WriteLine("Both records are written to database.");
+}
+catch(Exception e)
+{
+    transaction.Rollback();
+    
+    Console.WriteLine(e.ToString());
+    Console.WriteLine("Neither record was written to database.");
+}
+finally
+{
+    connection.Close();
+}
+				</code>
+			</example>
+		</method>
+		<method name="BeginTransaction(System.Data.IsolationLevel,System.String)">
+			<summary>Begins a new transaction with the specified isolation level and transaction name.</summary>
+			<param name="level">The isolation for the transaction.</param>
+			<param name="transactionName">The name of the transaction.</param>
+			<returns>An object representing the new transaction.</returns>
+			<exception cref="InvalidOperationException">
+				<para>A transaction is currently active. Parallel transactions are not supported.</para>
+				<para>Or the connection is not valid and Open.</para>
+			</exception>
+			<remarks>
+			To commit or rollback the transaction, you must explicitly use the <see cref="FbTransaction.Commit" /> or 
+			<see cref="FbTransaction.Rollback" /> methods.
+			</remarks>
+			<example>
+				<code>
+FbConnection connection = new FbConnection(connectionString);
+connection.Open();
+
+// Start a new transaction
+FbTransaction transaction = myConnection.BeginTransaction();
+
+// Creates a new FbCommand object
+FbCommand command = new FbCommand();
+command.Connection = connection;
+command.Transaction = transaction;
+
+try
+{
+	command.CommandText = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBNP', '.Net Provider', 'N/A')";
+	command.ExecuteNonQuery();
+	
+	transaction.Save("SampleTransaction");
+	
+	command.CommandText = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBN1', '.Net Provider1.', 'N/A')";
+	command.ExecuteNonQuery();
+	
+	transaction.Commit();
+	Console.WriteLine("Both records are written to database.");
+}
+catch(Exception e)
+{
+	try
+	{
+		transaction.Rollback("SampleTransaction");
+	}
+	catch (FbException ex)
+	{
+		if (transaction.Connection != null)
+		{
+			Console.WriteLine("An exception of type " + ex.GetType() + " was encountered while attempting to roll back the transaction.");
+		}
+	}
+
+	Console.WriteLine("An exception of type " + e.GetType() + " was encountered while inserting the data.");
+	Console.WriteLine("Neither record was written to database.");
+}
+finally 
+{
+	connection.Close();
+}		
+				</code>
+			</example>
+		</method>
+		<method name="BeginTransaction(FbTransactionOptions)">
+			<summary>Begins a new transaction using the specified options.</summary>
+			<returns>An <see cref="FbTransaction" /> object.</returns>
+			<exception cref="InvalidOperationException">
+				<para>
+					A transaction is currently active. Parallel transactions are not supported.
+				</para>
+				<para>
+					Or the connection is not valid and Open.
+				</para>
+			</exception>
+			<param name="options">A <see cref="FbTransactionOptions">FbTransactionOptions</see> value.</param>
+			<remarks>
+			To commit or rollback the transaction, you must explicitly use the <see cref="FbTransaction.Commit" /> or 
+			<see cref="FbTransaction.Rollback" /> methods.
+			</remarks>
+		</method>
+		<method name="BeginTransaction(FbTransactionOptions, System.String)">
+			<summary>Begins a new transaction using the specified options and transaction name.</summary>
+			<returns>An <see cref="FbTransaction" /> object.</returns>
+			<exception cref="InvalidOperationException">
+				<para>
+					A transaction is currently active. Parallel transactions are not supported.
+				</para>
+				<para>
+					Or the connection is not valid and Open.
+				</para>
+			</exception>
+			<param name="options">A <see cref="FbTransactionOptions">FbTransactionOptions</see> value.</param>
+			<param name="transactionName">The name of the transaction.</param>
+			<remarks>
+			To commit or rollback the transaction, you must explicitly use the <see cref="FbTransaction.Commit" /> or 
+			<see cref="FbTransaction.Rollback" /> methods.
+			</remarks>
+		</method>
+		<method name="Dispose(System.Boolean)">
+			<summary>Releases the unmanaged and, optionally, the managed resources used by the <see cref="FbConnection" /> object.</summary>
+			<param name="disposing"><b>True</b> for dispose managed and unmanaged resources and <b>false</b> for dispose only the unmanaged resources.</param>
+			<remarks>
+				<para>
+				This method is called by the public <b>Dispose()</b> method and the <b>Finalize</b> method. 
+				<b>Dispose()</b> invokes the protected <b>Dispose(Boolean)</b> method with the disposing 
+				parameter set to <b>true</b>. <b>Finalize</b> invokes <b>Dispose</b> with <i>disposing</i> set to <b>false</b>.
+				</para>
+				<para>
+				When the disposing parameter is true, the method releases all resources held 
+				by any managed objects that this FbConnection references. 
+				It does this by invoking the Dispose() method of each referenced object.
+				</para>
+			</remarks>
+		</method>
+		<method name="ChangeDatabase">
+			<summary>
+			Changes the current database for an open <see cref="FbConnection" />.
+			</summary>
+			<param name="db">The name of the new database to use.</param>
+		</method>
+		<method name="Open">
+			<summary>
+			Opens a new connection to a database with the property settings specified by the <see cref="FbConnection.ConnectionString" />.
+			</summary>
+			<remarks>
+				<para>
+				The <see cref="FbConnection" /> draws an open connection from the connection pool if one is
+				available. Otherwise, it establishes a new connection to the database.
+				</para>
+				<para>
+					<b>Note:</b>
+				</para>
+				<para>
+				If a <see cref="FbConnection" /> object goes out of scope, the connection it represents does not 
+				close automatically, you need to explicitly close the connection by calling <see cref="FbConnection.Close" /> or <see cref="Dispose" /> methods.
+				</para>
+			</remarks>
+			<exception cref="InvalidOperationException">The connection is already open.</exception>
+			<exception cref="ArgumentException">If Connection string is not valid.</exception>
+			<exception cref="FbException">A connection-level error occurred while opening the connection.</exception>
+		</method>
+		<method name="Close">
+			<summary>
+			Closes the connection to the database. This is the preferred method of closing any open connection.
+			</summary>
+			<remarks>
+				<para>
+				The <see cref="Close" /> method rolls back any pending transactions and drops active statments. It then releases 
+				the connection to the connection pool, or closes the connection if connection pooling is disabled. 
+				If Close is called while handling a <see cref="StateChange" /> event, no additional <see cref="StateChange" /> events are fired.
+				</para>
+				<para>
+				<see cref="FbConnection.Close" /> can be called more than one time without generating an exception.
+				</para>
+			</remarks>
+		</method>
+		<method name="CreateCommand">
+			<summary>
+			Creates and returns a new <see cref="FbCommand" /> object associated with the current <see cref="FbConnection" /> object.
+			</summary>
+			<returns>A new <see cref="FbCommand" /> object.</returns>
+		</method>
+		<method name="GetSchema">
+			<summary>
+			Returns information about the MetaDataCollections schema.
+			</summary>
+			<returns>DataTable with the MetaDataCollections information.</returns>
+		</method>
+		<method name="GetSchema(System.String)">
+			<summary>
+			Returns information about a specific metadata collection.
+			</summary>
+			<para name="collectionName">The metadata collection name.</para>
+			<returns>DataTable with the speficied schema information.</returns>
+		</method>
+		<method name="GetDbSchemaTable(System.String, System.String[])">
+			<summary>
+			Returns information about a specific metadata collection using
+            the given restrictions.
+			</summary>
+			<para name="collectionName">The metadata collection name.</para>
+			<para name="restrictions">Restriction values</para>
+			<returns>DataTable with the speficied schema information.</returns>
+		</method>
+		<method name="GetDbSchemaTable(System.String, System.Object[])">
+			<summary>
+			Returns information about a specific database schema type using one
+			of the <see cref="FbDbSchemaType" /> values and the specified restriction values.
+			</summary>
+			<para name="schema">One of the <see cref="FbDbSchemaType" /> values</para>
+			<para name="restrictions">Restriction values</para>
+			<returns>DataTable with the speficied schema information.</returns>
+		</method>
+		<method name="CreateDatabase(System.Collections.Hashtable)">
+			<summary>
+			Creates a new database.
+			</summary>
+			<param name="values">Collection of valid keys and values.</param>
+			<remarks>
+				<para>List of valid keys:</para>
+				<para>
+					<list type="table">
+						<listheader>
+							<term>Name</term>
+							<term>Description</term>
+						</listheader>
+						<item>
+							<description>Database</description>
+							<description>Database path.</description>
+						</item>
+						<item>
+							<description>User</description>
+							<description>User name.</description>
+						</item>
+						<item>
+							<description>Password</description>
+							<description>User Password.</description>
+						</item>
+						<item>
+							<description>Dialect</description>
+							<description>Database dialect.</description>
+						</item>
+						<item>
+							<description>DataSource.</description>
+							<description>Server name.</description>
+						</item>
+						<item>
+							<description>Port</description>
+							<description>Port number.</description>
+						</item>
+						<item>
+							<description>Charset</description>
+							<description>Database Character Set.</description>
+						</item>
+						<item>
+							<description>PageSize</description>
+							<description>Database page size.</description>
+						</item>
+						<item>
+							<description>ForcedWrite</description>
+							<description>Create database using froced writes mode.</description>
+						</item>
+					</list>
+				</para>
+			</remarks>
+		</method>
+		<method name="DropDatabase(System.Collections.Hashtable)">
+			<summary>
+			Drop a existing database.
+			</summary>
+			<param name="values">Collection of valid keys and values.</param>
+			<remarks>
+				<para>List of valid keys:</para>
+				<para>
+					<list type="table">
+						<listheader>
+							<term>Name</term>
+							<term>Description</term>
+						</listheader>
+						<item>
+							<description>Database</description>
+							<description>Database path.</description>
+						</item>
+						<item>
+							<description>User</description>
+							<description>User name.</description>
+						</item>
+						<item>
+							<description>Password</description>
+							<description>User Password.</description>
+						</item>
+						<item>
+							<description>DataSource.</description>
+							<description>Server name.</description>
+						</item>
+						<item>
+							<description>Port</description>
+							<description>Port number.</description>
+						</item>
+					</list>
+				</para>
+			</remarks>
+		</method>
+		<method name="ClearAllPools">
+			<summary>
+			Clears all active connection pools, closing all active connections.
+			</summary>
+		</method>
+		<method name="ClearPool(FbConnection)">
+			<summary>
+			Clear the connection pool that owns the specified connection, 
+			closing all active connections.
+			</summary>
+			<param name="connection">A <b>FbConnection</b> instance.</param>
+		</method>
+	</class>
+</doc>

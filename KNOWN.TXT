@@ -1,0 +1,23 @@
+FB.NET - Firebird managed data provider for .NET and Mono
+=========================================================
+
+General.
+--------
+
+- Char, varchar, decimal, date, time and timestamp Array fields are returned always as unidimensional arrays.
+
+
+
+
+Problem with MSVCR70.dll
+------------------------
+
+Solution from an answer of Andrew C. Goodall in the developement list:
+
+Do a file search on the pc/server where you installed .net framework
+The dll is there but it's in a temp folder and needs to be copied to the main .net folder.
+ 
+my msvcr70.dll was in C:\WINNT\SYSTEM32\URTTemp
+I copied it to C:\WINNT\Microsoft.NET\Framework\v1.0.3705
+ 
+Then I re-installed Firebird .NET provider and all was well in the world.

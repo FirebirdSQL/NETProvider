@@ -1,0 +1,1485 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<enum name="FbDbSchemaType" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Retrieves the the type of schema table that can be used with the <see cref="FbConnection.GetDbSchemaTable" /> method.
+			</summary>
+		</overview>
+		<field name="CharacterSets">
+			<summary>
+				<para>Retrieves the character sets defined in the database.</para>
+				<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>CHARACTER_SET_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>CHARACTER_SET_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>CHARACTER_SET_NAME</description>
+								<description>The name of the character set.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>CHARACTER_SET_ID</description>
+								<description>The id of the character set.</description>
+								<description/>
+							</item>
+							<item>
+								<description>DEFAULT_COLLATION</description>
+								<description>The default collation of the character set.</description>
+								<description />
+							</item>
+							<item>
+								<description>BYTES_PER_CHARACTER</description>
+								<description>The number of bytes per character.</description>
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The character set description</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="CheckConstraints">
+			<summary>
+				<para>Retrieves the check constraints defined in the database.</para>
+				<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>CONSTRAINT_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>CONSTRAINT_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>CONSTRAINT_NAME</description>
+								<description>The name of the constraint.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>CHECK_CLAUSULE</description>
+								<description>The chek clausule of the constraint.</description>
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the check constraint</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="CheckConstraintsByTable">
+			<summary>
+				<para>Retrieves the check constraints, by table,defined in the database.</para>
+				<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>CONSTRAINT_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>CONSTRAINT_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>CONSTRAINT_NAME</description>
+								<description>The name of the constraint.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description/>
+							</item>
+							<item>
+								<description>CHECK_CLAUSULE</description>
+								<description>The clausule of the check constraint.</description>
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the check constraint</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Collations">
+			<summary>
+				<para>Retrieves the collations defined in the database.</para>
+				<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>COLLATION_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>COLLATION_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>COLLATION_NAME</description>
+								<description>The name of the collation.</description>
+								<description>1</description>
+							</item>
+							<item>
+								<description>CHARACTER_SET_NAME</description>
+								<description>The name of the character set.</description>
+								<description/>
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the collation.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="ColumnPrivileges">
+			<summary>
+			Retrieves the columns Privileges defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>TABLE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>1</description>
+							</item>
+							<item>
+								<description>COLUMN_NAME</description>
+								<description>The name of the column.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>GRANTEE</description>
+								<description>User name to who the privilege has been granted.</description>
+								<description />
+							</item>
+							<item>
+								<description>GRANTOR</description>
+								<description>User who granted the privileges on the table.</description>
+								<description />
+							</item>
+							<item>
+								<description>PRIVILEGE</description>
+								<description>Privilege type.</description>
+								<description />
+							</item>
+							<item>
+								<description>WITH_GRANT</description>
+								<description>Privilege set with the grant option.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Columns">
+			<summary>
+				<para>Retrieves the columns of tables ( including views ) defined in the database.</para>
+				<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>TABLE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>COLUMN_NAME</description>
+								<description>The name of the column.</description>
+								<description>3</description>
+							</item>
+							<item>
+								<description>COLUMN_DATA_TYPE</description>
+								<description>The data type name of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>COLUMN_SUB_TYPE</description>
+								<description>The sub type of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>COLUMN_SIZE</description>
+								<description>The maximum possible length of a value in the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>NUMERIC_PRECISION</description>
+								<description>The maximum precision of the column for numeric data types.</description>
+								<description />
+							</item>
+							<item>
+								<description>NUMERIC_SCALE</description>
+								<description>The maximum scale of the column for decimal and numeric data types.</description>
+								<description />
+							</item>
+							<item>
+								<description>ORDINAL_POSITION</description>
+								<description>The ordinal of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>COLUMN_DEFAULT</description>
+								<description>The default value of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_NULLABLE</description>
+								<description><b>True</b> if the column allows null values; otherwise <b>false</b>.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_READONLY</description>
+								<description><b>True</b> if the column cannot be modified; otherwise <b>false</b>.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_ARRAY</description>
+								<description><b>True</b> if the column has array data type; otherwise <b>false</b>.</description>
+								<description />
+							</item>
+							<item>
+								<description>CHARACTER_SET_NAME</description>
+								<description>The caracter set name of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>COLLATION_NAME</description>
+								<description>The collation name of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>Column description.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="DataTypes">
+			<summary>
+			Retrieves the data types supported by Firebird Server.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Domains">
+			<summary>
+			Retrieves the domains defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>DOMAIN_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>DOMAIN_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>DOMAIN_NAME</description>
+								<description>The name of the domain.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>DOMAIN_DATA_TYPE</description>
+								<description>The data type name of the domain.</description>
+								<description />
+							</item>
+							<item>
+								<description>DOMAIN_SUB_TYPE</description>
+								<description>The sub type of the domain.</description>
+								<description />
+							</item>
+							<item>
+								<description>DOMAIN_SIZE</description>
+								<description>The maximum possible length of a value in the domain.</description>
+								<description />
+							</item>
+							<item>
+								<description>DOMAIN_PRECISION</description>
+								<description>The maximum precision of the domain for numeric data types.</description>
+								<description />
+							</item>
+							<item>
+								<description>DOMAIN_SCALE</description>
+								<description>The maximum scale of the domain for decimal and numeric data types.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_NULLABLE</description>
+								<description><b>True</b> if the domain allows null values; otherwise <b>false</b>.</description>
+								<description />
+							</item>
+							<item>
+								<description>ARRAY_DIMENSIONS</description>
+								<description>If the data type of the domain is an array type, the number of dimensions of the array.</description>
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>Domain description.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="ForeignKeys">
+			<summary>
+			Retrieves the foreign keys defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>PK_TABLE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>PK_TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>PK_TABLE_NAME</description>
+								<description>The name of the primary key table.</description>
+								<description>2</description>
+							</item>
+                            <item>
+                                <description>FK_TABLE_CATALOG</description>
+                                <description/>
+                                <description>3</description>
+                            </item>
+                            <item>
+                                <description>FK_TABLE_SCHEMA</description>
+                                <description/>
+                                <description>4</description>
+                            </item>
+							<item>
+								<description>FK_TABLE_NAME</description>
+								<description>The name of the foreign key table.</description>
+								<description>5</description>
+							</item>
+							<item>
+								<description>PK_COLUMN_NAME</description>
+								<description>The name of the primary key column.</description>
+								<description />
+							</item>
+							<item>
+								<description>FK_COLUMN_NAME</description>
+								<description>The name of the foreign key column.</description>
+								<description />
+							</item>
+							<item>
+								<description>FK_NAME</description>
+								<description>The name of the foreign key.</description>
+								<description />
+							</item>
+							<item>
+								<description>ORDINAL_POSITION</description>
+								<description>The ordinal of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>MATCH_OPTION</description>
+								<description />
+								<description />
+							</item>
+							<item>
+								<description>UPDATE_RULE</description>
+								<description>Update rule.</description>
+								<description />
+							</item>
+							<item>
+								<description>DELETE_RULE</description>
+								<description>Delete rule.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_DEFERRABLE</description>
+								<description />
+								<description />
+							</item>
+							<item>
+								<description>DEFERRABLITY</description>
+								<description />
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Functions">
+			<summary>
+			Retrieves the external Functions defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>FUNCTION_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>FUNCTION_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>FUNCTION_NAME</description>
+								<description>The name of the function.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>IS_SYSTEM_FUNCTION</description>
+								<description>Indicates wheter the function is a system function.</description>
+								<description>1</description>
+							</item>
+							<item>
+								<description>FUNCTION_TYPE</description>
+								<description>The type of the function.</description>
+								<description />
+							</item>
+							<item>
+								<description>QUERY_NAME</description>
+								<description />
+								<description />
+							</item>
+							<item>
+								<description>FUNCTION_MODULE_NAME</description>
+								<description>The name of the function module.</description>
+								<description />
+							</item>
+							<item>
+								<description>FUNCTION_ENTRY_POINT</description>
+								<description>Entry point.</description>
+								<description />
+							</item>
+							<item>
+								<description>RETURN_ARGUMENT</description>
+								<description />
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the function.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Generators">
+			<summary>
+			Retrieves the generators defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>GENERATOR_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>GENERATOR_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>GENERATOR_NAME</description>
+								<description>The name of the generator.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>IS_SYSTEM_GENERATOR</description>
+								<description>Indcates wheter the genaror is a system generator.</description>
+								<description>1</description>
+							</item>
+							<item>
+								<description>GENERATOR_ID</description>
+								<description>The id of the generator.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Indexes">
+			<summary>
+			Retrieves the indexes defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>TABLE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>INDEX_NAME</description>
+								<description>The name of the index.</description>
+								<description>3</description>
+							</item>
+							<item>
+								<description>INDEX_TYPE</description>
+								<description>The type of the index</description>
+								<description />
+							</item>
+							<item>
+								<description>COLUMN_NAME</description>
+								<description>The name of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>ORDINAL_POSITION</description>
+								<description>The ordinal of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_INACTIVE</description>
+								<description>Indicates wheter the index is inactive.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_SYSTEM_INDEX</description>
+								<description>Indicates wheter the index is a system index.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_UNIQUE</description>
+								<description>Indicates wheter the index is aunique index.</description>
+								<description />
+							</item>
+							<item>
+								<description>INDEX_STATISTICS</description>
+								<description>The statistics of the index.</description>
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the index.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="MetaDataCollections">
+			<summary>
+			Retrieves the supported metadata collections (schemas).
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+							<item>
+								<description>CollectionName</description>
+								<description>Metadata collection name.</description>
+								<description/>
+							</item>
+							<item>
+								<description>NumberOfRestrictions</description>
+								<description>Max number of restrictions allowed for the metadata collection.</description>
+								<description/>
+							</item>
+							<item>
+								<description>NumberOfIdentifierParts</description>
+								<description>Max number of restrictions allowed for the metadata collection.</description>
+								<description/>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="PrimaryKeys">
+			<summary>
+			Retrieves the primary key columns defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+							<item>
+								<description>TABLE_CATALOG</description>
+                            </item>
+							<item>
+								<description>TABLE_SCHEMA</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>0</description>
+							</item>
+							<item>
+								<description>COLUMN_NAME</description>
+								<description>The name of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>ORDINAL_POSITION</description>
+								<description>The ordinal of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>PK_NAME</description>
+								<description>The name of the primary key.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="ProcedureParameters">
+			<summary>
+			Retrieves the parameters of stored procedures defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>PROCEDURE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>PROCEDURE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>PROCEDURE_NAME</description>
+								<description>The name of the stored procedure.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>PARAMETER_NAME</description>
+								<description>The of the stored procedure parameter</description>
+								<description></description>
+							</item>
+							<item>
+								<description>ORDINAL_POSITION</description>
+								<description>The ordinal of the parameter.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>PARAMETER_DIRECTION</description>
+								<description>The direction of the stored procedure parameter (input/output)</description>
+								<description></description>
+							</item>
+							<item>
+								<description>PARAMETER_DATA_TYPE</description>
+								<description>The data type name of the stored procedure parameter.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>PARAMETER_SUB_TYPE</description>
+								<description>The sub type of the stored procedure parameter.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>PARAMETER_SIZE</description>
+								<description>The maximum possible length of a value in the paremeter.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>NUMERIC_PRECISION</description>
+								<description>The maximum precision of the parameter for numeric data types.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>NUMERIC_SCALE</description>
+								<description>The maximum scale of the parameter for decimal and numeric data types.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>CHARACTER_SET_NAME</description>
+								<description>Character set of the parameter.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>COLLATION_NAME</description>
+								<description>Collation of the parameter.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the stored procedure parameter.</description>
+								<description></description>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="ProcedurePrivileges">
+			<summary>
+			Retrieves the privileges of stored procedures defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>PROCEDURE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>PROCEDURE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>PROCEDURE_NAME</description>
+								<description>The name of the stored procedure.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>GRANTEE</description>
+								<description>User name to who the privilege has been granted.</description>
+								<description />
+							</item>
+							<item>
+								<description>GRANTOR</description>
+								<description>User who granted the privileges on the table.</description>
+								<description />
+							</item>
+							<item>
+								<description>PRIVILEGE</description>
+								<description>Privilege type.</description>
+								<description />
+							</item>
+							<item>
+								<description>WITH_GRANT</description>
+								<description>Privilege set with the grant option.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Procedures">
+			<summary>
+			Retrieves the stored procedures defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>PROCEDURE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>PROCEDURE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>PROCEDURE_NAME</description>
+								<description>The name of the stored procedure.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>INPUTS</description>
+								<description>The number of input parameters of the stored procedure.</description>
+								<description />
+							</item>
+							<item>
+								<description>OUTPUTS</description>
+								<description>The number of output parameters of the stored procedure.</description>
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the stored procedure.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Restrictions">
+			<summary>
+			Retrieves the list of restrictions supported by each metadata collection.
+			<para>
+					<p>The list of returned columns for this collection is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+							<item>
+								<description>RestrictionName</description>
+								<description>Metadata collection name.</description>
+								<description/>
+							</item>
+							<item>
+								<description>RestrictionDefault</description>
+								<description/>
+								<description/>
+							</item>
+							<item>
+								<description>RestrictionNumber</description>
+								<description>Ordinal of the colelction srestriction.</description>
+								<description/>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Roles">
+			<summary>
+			Retrieves the user roles defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+							<item>
+								<description>ROLE_NAME</description>
+								<description>The name of the role.</description>
+								<description>0</description>
+							</item>
+							<item>
+								<description>OWNER</description>
+								<description></description>
+								<description></description>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Tables">
+			<summary>
+			Retrieves the tables defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>TABLE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>TABLE_TYPE</description>
+								<description>The type of the table.</description>
+								<description>3</description>
+							</item>
+							<item>
+								<description>IS_SYSTEM_TABLE</description>
+								<description>Indicates wheter the table is a system table.</description>
+								<description/>
+							</item>
+							<item>
+								<description>OWNER_NAME</description>
+								<description></description>
+								<description></description>
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the table.</description>
+								<description></description>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="TableConstraint">
+			<summary>
+			Retrieves the table constraints defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>TABLE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>CONSTRAINT_NAME</description>
+								<description>The name of the constraint.</description>
+								<description>3</description>
+							</item>
+							<item>
+								<description>CONSTRAINT_TYPE</description>
+								<description>The type of the constraint.</description>
+								<description>4</description>
+							</item>
+							<item>
+								<description>IS_DEFERRABLE</description>
+								<description></description>
+								<description></description>
+							</item>
+							<item>
+								<description>INITIALLY_DEFERRED</description>
+								<description></description>
+								<description></description>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="TablePrivileges">
+			<summary>
+			Retrieves the table privileges defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>TABLE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>GRANTEE</description>
+								<description>User name to who the privilege has been granted.</description>
+								<description />
+							</item>
+							<item>
+								<description>GRANTOR</description>
+								<description>User who granted the privileges on the table.</description>
+								<description />
+							</item>
+							<item>
+								<description>PRIVILEGE</description>
+								<description>Privilege type.</description>
+								<description />
+							</item>
+							<item>
+								<description>WITH_GRANT</description>
+								<description>Privilege set with the grant option.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Triggers">
+			<summary>
+			Retrieves the triggers defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>TABLE_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>TRIGGER_NAME</description>
+								<description>The name of the trigger.</description>
+								<description>3</description>
+							</item>
+							<item>
+								<description>IS_SYSTEM_TRIGGER</description>
+								<description>Indicates wheter the trigger is a system trigger.</description>
+								<description/>
+							</item>
+							<item>
+								<description>IS_INACTIVE</description>
+								<description>Indicates wheter the trigger is inactive.</description>
+								<description/>
+							</item>
+							<item>
+								<description>SEQUENCE</description>
+								<description>Execution sequence number.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>SOURCE</description>
+								<description>The source of the trigger.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the trigger.</description>
+								<description></description>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="UniqueKeys">
+			<summary>
+			Retrieves the unique key columns defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>TABLE_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>TABLE_NAME</description>
+								<description>The name of the table.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>COLUMN_NAME</description>
+								<description>The name of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>ORDINAL_POSITION</description>
+								<description>The ordinal of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>UK_NAME</description>
+								<description>The name of the unique key.</description>
+								<description/>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="ViewColumnUsage">
+			<summary>
+			Retrieves the view column usage information defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>VIEW_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>VIEW_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>VIEW_NAME</description>
+								<description>The name of the view.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>COLUMN_NAME</description>
+								<description>The name of the column.</description>
+								<description>3</description>
+							</item>
+							<item>
+								<description>COLUMN_DATA_TYPE</description>
+								<description>The data type name of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>COLUMN_SUB_TYPE</description>
+								<description>The sub type of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>COLUMN_SIZE</description>
+								<description>The maximum possible length of a value in the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>NUMERIC_PRECISION</description>
+								<description>The maximum precision of the column for numeric data types.</description>
+								<description />
+							</item>
+							<item>
+								<description>NUMERIC_SCALE</description>
+								<description>The maximum scale of the column for decimal and numeric data types.</description>
+								<description />
+							</item>
+							<item>
+								<description>ORDINAL_POSITION</description>
+								<description>The ordinal of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>COLUMN_DEFAULT</description>
+								<description>The default value of the column.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_ARRAY</description>
+								<description><b>True</b> if the column has array data type; otherwise <b>false</b>.</description>
+								<description />
+							</item>
+							<item>
+								<description>IS_NULLABLE</description>
+								<description><b>True</b> if the column allows null values; otherwise <b>false</b>.</description>
+								<description />
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the column.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="ViewPrivileges">
+			<summary>
+			Retrieves the view privileges defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>VIEW_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>VIEW_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>VIEW_NAME</description>
+								<description>The name of the view.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>GRANTEE</description>
+								<description>User name to who the privilege has been granted.</description>
+								<description />
+							</item>
+							<item>
+								<description>GRANTOR</description>
+								<description>User who granted the privileges on the table.</description>
+								<description />
+							</item>
+							<item>
+								<description>PRIVILEGE</description>
+								<description>Privilege type.</description>
+								<description />
+							</item>
+							<item>
+								<description>WITH_GRANT</description>
+								<description>Privilege set with the grant option.</description>
+								<description />
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+		<field name="Views">
+			<summary>
+			Retrieves the views defined in the database.
+			<para>
+					<p>The list of returned columns for this schema type is:</p>
+					<p>
+						<list type="table">
+							<listheader>
+								<term>Column name</term>
+								<term>Description</term>
+								<term>*</term>
+							</listheader>
+                            <item>
+                                <description>VIEW_CATALOG</description>
+                                <description/>
+                                <description>0</description>
+                            </item>
+                            <item>
+                                <description>VIEW_SCHEMA</description>
+                                <description/>
+                                <description>1</description>
+                            </item>
+							<item>
+								<description>VIEW_NAME</description>
+								<description>The name of the view.</description>
+								<description>2</description>
+							</item>
+							<item>
+								<description>DEFINITION</description>
+								<description>The SQL definition of the view.</description>
+								<description></description>
+							</item>
+							<item>
+								<description>DESCRIPTION</description>
+								<description>The description of the view.</description>
+								<description></description>
+							</item>
+						</list>
+					</p>
+				</para>
+			</summary>
+		</field>
+	</enum>
+</doc>

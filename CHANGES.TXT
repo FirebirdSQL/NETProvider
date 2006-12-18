@@ -1,0 +1,342 @@
+WHAT IS NEW - FB.NET - Firebird managed data provider for .NET and Mono
+=======================================================================
+
+
+1.6.3 ( 2004-10-15 )
+----- - ---- -- -- -
+
+(Please review the changelog for details)
+
+* Connection pooling improvements.
+
+* Allow the execution of sql statements with UNICODE
+characters when working agasint the the embedded server.
+
+
+
+1.6.2 ( 2004-09-10 )
+----- - ---- -- -- -
+
+* Bug Fixes (Please review the changelog for details)
+
+	- Fixed bug #1017108
+
+	- Fixed bug #1015453
+
+	- Fixed bug #1013031
+
+	- Fixed connection pooling that was non working properly
+
+	- Minor fixes to the unicode database support when working
+	with the embedded server.
+
+* Better fit to ADO.NET in the FbDataReader class.
+
+* Added some improvments in the database schema stuff.	
+
+
+
+1.6.1 ( 2004-08-13 )
+----- - ---- -- -- -
+
+* Bug Fixes (Please review the changelog for details)
+
+	- Fixed bug #1007104
+
+	- Fixed bug #995178
+
+	- Fixed bug #998002
+
+	- Fixed bug #1000160
+
+	- Fixed bug #1003519
+
+* Removed the limitiation of one DataReader per connection.
+(Now you can have many DataReader's per connection and only
+one per command).
+
+* Changes on Database schema support:
+    
+	* All source files has been renamed to remove
+	the Schema suffix (FbTablesSchema.cs -> FbTables.cs)
+	The same for the class names.
+
+	* There are a new 'Restrictions' schema that will
+	return the restriction columns for each schema.
+
+	* There are new columns in some schemas:
+
+		XXXX_CATALOG
+		XXXX_SCHEMA
+
+	That will make the returned schemas more
+	general and compatible with other databases
+	(what will be nice for .net 2.0 as the schema
+	support is in the System.Data.Common.DbConnection
+	class)
+
+	These new columns are restriction columns as
+	well (the value will be null always) 		
+
+	* New schemas.
+
+		- DataTypes. Returns the data types information.
+
+		- MetaDataCollections. Returns all the supported schemas, 
+		and the number of restrictions of each one
+
+		- Restrictions. Returns the restriction columns of each schema.
+
+        * New FbConnection methods.
+
+            - GetChema()
+            - GetSchema(string)
+            - GetSchema(string[])
+
+        * Changes on the names of the FbDbSchemaType elements to remove the underscore.
+
+        ** Some of the changes in the Schema Results are: **
+	
+	* Columns Schema.
+
+        	- The COLUMN_DATA_TYPE now holds the datatype name.
+
+	        - Added new IS_ARRAY column.
+           
+        	- Removed PROVIDER_TYPE, PRIMARY_KEY and UNIQUE_KEY columns.
+		(The reason is that the query with that columsn gets a lot time to be executed 
+		in databases with complex metadata)
+
+        * Tables schema.
+
+	        - The IS_SYSTEM_TABLE column now will have aloways 0/1 as values.
+
+		- Not it's no possible to filter by the IS_SYSTEM_TABLE column,
+		instead filter by TABLE_TYPE can be done using:
+
+			a. TABLE
+			b. VIEW
+			c. SYSTEM TABLE
+
+	* Domains Schema.
+
+        	- The COLUMN_DATA_TYPE now holds the datatype name.
+
+	* ProcedureParameters Schema.
+
+        	- The COLUMN_DATA_TYPE now holds the datatype name.
+
+	* ViewColumnUsage Schema.
+
+        	- The COLUMN_DATA_TYPE now holds the datatype name.
+
+        * Generators schema.
+
+	        * The IS_SYSTEM_GENERATOR column now will have always 0/1 as values.
+
+        * Functions schema.
+
+	        * The IS_SYSTEM_FUNCTION column now will have always 0/1 as values.
+
+        * Triggers schema.
+
+	        * The IS_SYSTEM_TRIGGER column now will have always 0/1 as values.
+
+	* ForeignKeys schema:
+
+		* The order of the restriction columns is changed:
+
+                    1. PK_TABLE_CATALOG
+                    2. PK_TABLE_SCHEMA
+                    3. PK_TABLE_NAME
+                    4. FK_TABLE_CATALOG
+                    5. FK_TABLE_SCHEMA
+                    6. FK_TABLE_NAME
+
+
+1.6 Final ( 2004-07-16 )
+--- ----- - ---- -- -- -
+
+* Bug Fixes (Please review the changelog for details)
+
+    - Fixed bug in FbCommand class on subsequent command
+      executions between open & close connection operations.
+      
+    - Fixed NUMERIC_SCALE value in columns, domains and 
+      procedure parameters schemas.
+
+* Improved Database schema support.
+
+* Changes in FbDataReader.GetSchema for set the numeric precision
+and scale only for numeric and decimal columns.
+
+* Added Serializable attribute to FbDbSchemaType structure.
+
+* Added Serializable attribute to FbCharset structure.
+
+
+Release Candidate 2 ( 2004-06-18 )
+------- --------- -   ---- -- --
+
+* Sources are relicensed under the IDPL v1.0 (Initial Developer's PUBLIC LICENSE Version 1.0):
+
+	http://www.ibphoenix.com/main.nfs?a=ibphoenix&l=;PAGES;NAME='ibp_idpl'
+
+ 
+
+* Bug Fixes (Please review the changelog for details)
+
+	- Fixed dataset fill using an EXECUTE PROCEDURE statement.
+
+	- Throw an exception if the Dialect set in teh connection string is not valid.
+
+	- Fix Forgn keys schema.
+
+	- Fix for min pools size handling in connection pools.
+
+	- Fix nullable parameters handling in FbCommandBuilder class.
+
+	- Fixed blob read when woring against the embedded server.
+	
+
+Release Candidate 1 ( 2004-05-24 )
+------- --------- -   ---- -- --
+
+(Please review the changelog for details)
+
+* Bug fixes (Please review the change log for details.)
+
+* Updated ISQL namespace classes with some bugfixes.
+
+* Changes on results of the database foreign keys schema.
+
+* Internal changes:
+
+	- Added new error codes and messages.
+
+	- Fixed FxCop globalization issues.
+
+	- Removed DoubleLayout and FloatLayout classes.
+
+	- Simplify decimal and numeric data types handling.
+
+	- Moved cultureAwareCompare method from collection classes
+	to a new GlobalizationHelper class.
+
+* Update NUnit test suite for run using NUnit 2.2.
+
+* The source package includes the Borland Data Provider 
+sources (Alpha 1).
+
+
+Beta 3 ( 2004-05-06 )
+---- - - ---- -- -- -
+
+(Please review the changelog for details)
+
+
+- Better fit to ADO.NET
+
+- Bug fixes.
+
+	* Firx COALESCE usage in the FbCommandbuilder class.
+
+- Fixed issues reported by FxCop.
+
+- Better handling of input parameters.
+
+- Added new FbCarset enumeration for use with FbParameter class.
+
+- Added Charset property to FbParameter class.
+
+
+Beta 2 ( 2004-04-22 )
+---- - - ---- -- -- -
+
+(Please review the changelog for details)
+
+- Bug fixes.
+
+	- Some bug fiex for the new connection pooling implementation.
+
+	- Fixed numeric and decimal data types handling.
+
+- Improved CommandBuilder implementation.
+
+- Some improvements and bugfixes in the database schema stuff.
+
+- Initial implementation of the input parameters descriptor generator
+without making calls, when possible, to the server for describe the 
+input parameters.
+
+
+Beta 1 ( 2004-03-29 )
+---- - - ---- -- -- -
+
+(Please review the changelog for details)
+
+- Better fit to ADO.NET.
+
+- Bug fixes.
+
+- Improved handling of char and varchar fields handling 
+( reading of field values and writing of parameter values )
+
+- Improved time and datetime data types handling 
+( now the millisecods are taken into account up to 3 digits, 
+with values between 0 and 999 )
+
+- Improved Columns, Domains and Procedure parameters schemas
+by adding a new PROVIDER_TYPE column ( FbDbType value )
+
+- Added new FbCommandBuilderBehabior enumeration, this allos to
+choose how the WHERE clausule will be generated in the 
+FbCommandBuilder class for the UPDATE and DELETE commands.
+
+- Added the server type comobobox to the Connection String editor 
+form.
+
+- Improved FbCommandbuilder implementation.
+
+- Improved andling of transactions.
+
+
+Alpha 1 ( 2004-03-03 )
+----- - - ---- -- -- -
+
+- Initial support for the Firebird Embedded server.
+
+- Changes on implicit transaction support, that now is handled 
+in FbCommand class.
+
+- Improved Connection Pooling implementation, now there will be
+different polls by connection string (like in SqlClient), each
+pool can have a min and max size, these can be specified in the 
+Connection string using elements:
+
+	Min Pool Size
+	Max Pool Size
+
+- New FbScript implementation.
+
+- Improved array datatype support.
+
+- Removed Firebird Events API implementation.
+
+- New build option in 4 ssemblys:
+
+(1) FirebirdSql.Data.Firebird.dll
+
+    With ADO.NET classes.
+
+(2) FirebirdSql.Data.Common.dll
+
+    With common classes for all GDS implementations
+
+(3) FirebirdSql.Data.Gds.dll
+
+    With classes for the native C# GDS implementation.
+
+(4) FirebirdSql.Data.FbClient.dll
+
+    With classes for the PInvoke GDS implementation.

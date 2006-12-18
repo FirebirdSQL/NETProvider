@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbCommand" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Represents an SQL statement or stored procedure to execute against a data source. 
+			This class cannot be inherited.
+			</summary>
+			<remarks>
+				<p>
+				It's strongly recommend to call <see cref="FbCommand.Dispose">Dispose</see> method
+				for free the memory allocated by the Firebird Server, when the command is no more needed.
+				</p>
+				<p>
+				The <b>FbCommand</b> class provides the following methods for executing commands
+				against a Firebird database:
+				</p>
+				<list type="table">
+					<listheader>
+						<term>Method</term>
+						<term>Description</term>
+					</listheader>
+					<item>
+						<description>ExecuteReader</description>
+						<description>Executes commands that return rows.</description>
+					</item>
+					<item>
+						<description>ExecuteNonQuery</description>
+						<description>Executes commands such as SQL INSERT, DELETE, UPDATE, and SET statements.</description>
+					</item>
+					<item>
+						<description>ExecuteScalar</description>
+						<description>Retrieves a single value (for example, an aggregate value) from a database.</description>
+					</item>
+				</list>	
+			</remarks>
+			<example>
+				<code>
+FbConnection connection = new FbConnection(myConnString);
+FbTransaction transaction = connection.BeginTransaction()
+FbCommand command = new FbCommand("SELECT * FROM employee", connection);
+
+connection.Open();
+FbDataReader reader = command.ExecuteReader();
+
+try 
+{
+	while (reader.Read()) 
+	{
+		Console.WriteLine(myReader.GetValue(0));
+	}
+}
+finally 
+{
+	// always call Close when done reading.
+	reader.Close();
+	// always call Close when done with connection.
+	connection.Close();
+}
+				</code>
+			</example>
+		</overview>
+		<property name="CommandText">
+			<summary>
+			Gets or sets the SQL statement or stored procedure to execute.
+			</summary>
+			<value>
+			The SQL statement or stored procedure to execute. The default value is an empty string ("").
+			</value>
+			<remarks>
+				<para>
+				When the <see cref="FbCommand.CommandType" /> property is set to <b>StoredProcedure</b>, 
+				the <b>CommandText</b> property should be set to the name of the stored procedure. 
+				The user may be required to use escape character syntax if the stored procedure name 
+				contains any special characters. The command executes this stored procedure when you call one of the Execute methods.
+				</para>
+				<para>
+				The Firebird .NET Data Provider support the question mark (?) placeholder and named 
+				parameters for passing parameters to a SQL Statement or a stored procedure.
+				</para>
+				<para>
+				For example you can do:
+				<code>
+				SELECT * FROM Customers WHERE CustomerID = @CustomerID
+				</code>
+				or
+				<code>
+				SELECT * FROM Customers WHERE CustomerID = ?
+				</code>	
+				</para>
+			</remarks>
+		</property>
+		<property name="CommandTimeout">
+			<summary>
+			Gets or sets the wait time before cancel command execution and generating an error.
+			</summary>
+			<exception cref="ArgumentException">The property value assigned is less than 0.</exception>
+			<value>
+			The time (in seconds) to wait for the command to execute. 
+			The default is 30 seconds.
+			</value>
+			<remarks>
+				<para>
+				A value of 0 indicates no limit, and should be avoided in a <b>CommandTimeout</b> 
+				because an attempt to execute a command will wait indefinitely.
+				</para>
+				<para>
+					<b>Not currently supported.</b>
+				</para>
+			</remarks>
+		</property>
+		<property name="CommandType">
+			<summary>
+			Gets or sets how the <see cref="FbCommand.CommandText" /> property is interpreted.
+			</summary>
+			<value>
+			One of the <b>CommandType</b> values. The default is <b>Text</b>.
+			</value>
+			<exception cref="ArgumentException">The value was not a valid <b>CommandType</b>.</exception>
+		</property>
+		<property name="CommandPlan">
+			<summary>
+			Gets the plan used by the server for the command.
+			</summary>
+			<remarks>
+			It's needed that the command was prepared to retrieve the command plan.
+			</remarks>
+			<value>
+			The plan used for the Firebird server for the current command. The default is an empty string.
+			</value>
+		</property>
+		<property name="Connection">
+			<summary>
+			Gets or sets the <see cref="FbConnection" /> associated with the current command.
+			</summary>
+			<value>The connection to a data source. The default is a null value.</value>
+			<exception cref="InvalidOperationException">The <b>Connection</b> property was changed while a transaction was in progress.</exception>
+			<remarks>
+				<para>
+				You cannot set the Connection, <see cref="FbCommand.CommandType" />, 
+				and <see cref="FbCommand.CommandText" /> properties if the current
+				connection is performing an execute or fetch operation.	
+				</para>
+			</remarks>
+		</property>
+		<property name="DesignTimeVisible">
+			<summary>
+			Gets or sets whether the command object should be visible in a Windows Forms Designer control.
+			</summary>
+			<value>
+			Whether the command object should be visible in a control. The default is <b>true</b>.
+			</value>
+		</property>
+		<property name="Parameters">
+			<summary>
+			Gets the <see cref="FbParameterCollection" />.
+			</summary>
+			<value>
+			The parameters of the DSQL statement or stored procedure. The default is an empty collection.
+			</value>
+		</property>
+		<property name="Transaction">
+			<summary>
+			Gets or sets the <see cref="FbTransaction" /> within which the <see cref="FbCommand" /> will be used.
+			</summary>
+			<value>An <see cref="FbTransaction" /> object. The default is a null value.</value>
+			<remarks>
+			You cannot set the Transaction property if it is already set to a 
+			specific value, and the command is in the process of executing. If you set the 
+			transaction property to an <see cref="FbTransaction" /> object that is different of the
+			<see cref="FbConnection" /> of the <see cref="FbCommand" /> object, an exception will be thrown the
+			next time you attempt to execute or prepare the command.
+			</remarks>
+		</property>
+		<property name="UpdatedRowSource">
+			<summary>
+			Gets or sets how the Update method should apply command results to the DataRow.
+			</summary>
+			<value>One of the <b>System.Data.UpdateRowSource</b> values.</value>
+			<exception cref="ArgumentException">The value entered was not one of the <b>UpdateRowSource</b> values.</exception>
+			<remarks>
+			The default UpdateRowSource value is <b>Both</b> unless the command is automatically 
+			generated, for example using the <see cref="FbCommandBuilder" />), in which case the default will be <b>None</b>.
+			</remarks>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbCommand" /> class.
+			</summary>
+		</constructor>
+		<constructor name="ctor(System.String)">
+			<summary>
+			Creates a new instance of the <see cref="FbCommand" /> class with the text of the query.
+			</summary>
+			<param name="cmdText">The text of the query.</param>
+		</constructor>
+		<constructor name="ctor(System.String,FirebirdSql.Data.Firebird.FbConnection)">
+			<summary>
+			Creates a new instance of the <see cref="FbCommand" /> class with the text of the query and an <see cref="FbConnection" /> object.
+			</summary>
+			<param name="cmdText">The text of the query.</param>
+			<param name="connection">An <see cref="FbConnection" /> object that represents the connection to a data source. </param>
+		</constructor>
+		<constructor name="ctor(System.String,FirebirdSql.Data.Firebird.FbConnection,FirebirdSql.Data.Firebird.FbTransaction)">
+			<summary>
+			Creates a new instance of the <see cref="FbCommand" /> class with the text of the query, an <see cref="FbConnection" /> object and the <see cref="FbTransaction" />.
+			</summary>
+			<param name="cmdText">The text of the query.</param>
+			<param name="connection">An <see cref="FbConnection" /> object that represents the connection to a data source. </param>
+			<param name="transaction">The transaction in which the <see cref="FbCommand" /> executes. </param>
+		</constructor>
+		<method name="Dispose(System.Boolean)">
+			<summary>
+			Releases the unmanaged and, optionally, the managed resources used by the <see cref="FbCommand" /> object.
+			</summary>
+			<param name="disposing">
+			True for dispose managed and unmanaged resources and false for dispose 
+			anly the unmanaged resources.
+			</param>
+		</method>
+		<method name="Cancel">
+			<summary>
+			Try to cancel command execution.
+			</summary>
+			<remarks>Not currently supported.</remarks>
+			<exception cref="NotSupportedException">Always.</exception>
+		</method>
+		<method name="CreateParameter">
+			<summary>
+			Creates a new instance of an <see cref="FbParameter" /> class.
+			</summary>
+			<returns>An <see cref="FbParameter" /> object.</returns>
+		</method>
+		<method name="ExecuteNonQuery">
+			<summary>
+			Executes an the query and returns the number of rows affected.
+			</summary>
+			<returns>
+			For UPDATE, INSERT, and DELETE statements, the return value is the number 
+			of rows affected by the command. For all other types of statements, the return value is -1.
+			</returns>
+			<remarks>
+				<para>
+				Although ExecuteNonQuery does not return any rows, any output 
+				parameters or return values mapped to parameters are populated with data.
+				</para>
+				<para>
+				<b>IMPORTANT</b>: To execute this method you need to have a <see cref="FbTransaction" /> associated to the command. 
+				</para>
+			</remarks>
+			<exception cref="InvalidOperationException">
+				<para>The connection does not exist. </para>
+				<para>-or-</para>
+				<para>The connection is not open.</para>
+				<para>-or-</para>
+				<para>The transaction is not valid.</para>
+			</exception>
+		</method>
+		<method name="ExecuteReader">
+			<summary>
+			Executes the query and builds an <see cref="FbDataReader" /> object.
+			</summary>
+			<returns>An <see cref="FbDataReader" /> object.</returns>
+			<exception cref="InvalidOperationException">
+				<para>The connection does not exist. </para>
+				<para>-or-</para>
+				<para>The connection is not open.</para>
+				<para>-or-</para>
+				<para>The transaction is not valid.</para>
+			</exception>
+		</method>
+		<method name="ExecuteReader(System.Data.CommandBehavior)">
+			<summary>
+			Executes the query and builds an <see cref="FbDataReader">FbDataReader</see> using one of the <b>CommandBehavior</b> values.
+			</summary>
+			<param name="behavior">One of the <see cref="System.Data.CommandBehavior" /> values.</param>
+			<returns>An <see cref="FbDataReader" /> object.</returns>
+			<exception cref="InvalidOperationException">
+				<para>The connection does not exist. </para>
+				<para>-or-</para>
+				<para>The connection is not open.</para>
+				<para>-or-</para>
+				<para>The transaction is not valid.</para>
+			</exception>
+		</method>
+		<method name="ExecuteScalar">
+			<summary>
+			Executes the query, and returns the first column of the first row in the
+			resultset returned by the query. Extra columns or rows are ignored.
+			</summary>
+			<returns>The first column of the first row in the resultset.</returns>
+			<exception cref="InvalidOperationException">
+				<para>The connection does not exist. </para>
+				<para>-or-</para>
+				<para>The connection is not open.</para>
+				<para>-or-</para>
+				<para>The transaction is not valid.</para>
+			</exception>
+		</method>
+		<method name="Prepare">
+			<summary>Creates a prepared (or compiled) version of the command.</summary>
+			<remarks>
+			<b>Prepare</b> is automatically called when the command is executed using <see cref="ExecuteNonQuery" />,
+			<see cref="ExecuteReader" />, <see cref="ExecuteReader(System.Data.CommandBehavior)" /> or <see cref="ExecuteScalar" /> methods.
+			</remarks>
+			<exception cref="InvalidOperationException">
+				<para>The connection does not exist. </para>
+				<para>-or-</para>
+				<para>The connection is not open.</para>
+				<para>-or-</para>
+				<para>The transaction is not valid.</para>
+			</exception>
+		</method>
+	</class>
+</doc>

@@ -1,0 +1,144 @@
+<gi2project version="3.7">
+	<packages>
+		<package filename="setup" main="1">
+			<components>
+				<component id="Help" name="Help">
+					<files>
+						<file src="%BuildPath%\FirebirdNETProviderSDK.chm" dst="%InstallPath%\*.*" />
+					</files>
+					<shortcuts>
+						<shortcut name="%ProgramsMenu%\%ProgramGroup%\SDK" cmdline="%InstallPath%\FirebirdNETProviderSDK.chm" />
+					</shortcuts>
+				</component>
+				<component id="Readme" name="Readme">
+					<files>
+						<file src="%ProviderPath%\README.TXT" dst="%InstallPath%\*.*" />
+					</files>
+					<shortcuts>
+						<shortcut name="%ProgramsMenu%\%ProgramGroup%\Readme" cmdline="%InstallPath%\README.TXT" />
+					</shortcuts>
+				</component>
+				<component id="Known" name="Known">
+					<files>
+						<file src="%ProviderPath%\KNOWN.TXT" dst="%InstallPath%\*.*" />
+					</files>
+					<shortcuts>
+						<shortcut name="%ProgramsMenu%\%ProgramGroup%\Known issues" cmdline="%InstallPath%\KNOWN.TXT" />
+					</shortcuts>
+				</component>
+				<component id="License" name="License">
+					<files>
+						<file src="%ProviderPath%\LICENSE.TXT" dst="%InstallPath%\*.*" />
+					</files>
+					<shortcuts>
+						<shortcut name="%ProgramsMenu%\%ProgramGroup%\License" cmdline="%InstallPath%\LICENSE.TXT" />
+					</shortcuts>
+				</component>
+				<component id="Changes" name="Changes">
+					<files>
+						<file src="%ProviderPath%\CHANGES.TXT" dst="%InstallPath%\*.*" />
+					</files>
+					<shortcuts>
+						<shortcut name="%ProgramsMenu%\%ProgramGroup%\Changes" cmdline="%InstallPath%\Changes.TXT" />
+					</shortcuts>
+				</component>
+				<component id="Main" name="Main">
+					<files>
+						<file src="%BuildPath%\FirebirdSql.Data.Firebird.dll" dst="%GAC%\FirebirdSql.Data.Firebird.dll" />
+   						<file src="%BuildPath%\FirebirdSql.Data.Firebird.dll" dst="%InstallPath%\FirebirdSql.Data.Firebird.dll" />
+						<file src="%BuildPath%\FirebirdSql.Data.Firebird.UnitTest.dll" dst="%InstallPath%\FirebirdSql.Data.Firebird.UnitTest.dll" />
+						<file src="%BuildPath%\FirebirdSql.Data.Firebird.UnitTest.dll.config" dst="%InstallPath%\FirebirdSql.Data.Firebird.UnitTest.dll.config" />
+					</files>
+					<shortcuts>
+						<shortcut name="%ProgramsMenu%\%ProgramGroup%\Uninstall %AppName%" cmdline="%InstallPath%\Uninstall.exe" />
+					</shortcuts>
+					<registry>
+                    	<reg
+                        	key="HKLM\Software\Microsoft\.NETFramework\AssemblyFolders\FirebirdSql.Data.Firebird"
+                            value="%InstallPath%"
+                            type="str"
+                            action="add"
+                        />
+                    </registry>
+	                <!-- runapps>
+	                    <runapp cmdline="%SDKInstallRoot%bin\gacutil.exe" workdir="%InstallPath%\" arg="/i FirebirdSql.Data.Firebird.dll" showcmd="hide" flags="check_exitcode" />
+	                    <runapp cmdline="%SDKInstallRoot%bin\gacutil.exe" workdir="%InstallPath%\" arg="/u FirebirdSql.Data.Firebird" showcmd="hide" whenstart="after_uninstall" flags="check_exitcode" />
+	                </runapps -->
+				</component>
+			</components>
+			<plugins>
+				<plugin id="StdUI">
+					<config>
+						<paramgroup name="Config">
+							<param name="PreInstallDialogSequence" value="DLG_LANGUAGE,DLG_WELCOME,DLG_LICENSE,DLG_README,DLG_DIR,DLG_GROUP,DLG_START" />
+							<param name="PostInstallDialogSequence"/>
+							<param name="ShowMainWindow" value="0" />
+							<param name="ShowDialogTitle" value="1" />
+							<param name="ShowDialogSubTitle" value="1" />
+							<param name="ShowFinalDialog" value="1" />
+							<param name="GradientTopColor" value="0" />
+							<param name="GradientBottomColor" value="$FF0000" />
+							<param name="StretchBanner" value="0" />
+							<!-- param name="DialogFont" value="MS Sans Serif,8" / -->
+							<param name="DialogFont" value="Tahoma,8" />
+							<param name="DialogBitmap" value="%Presetup%\banner.bmp" />
+							<!-- param name="DialogTitleFont" value="MS Sans Serif,10,$C08000,B" / -->
+							<param name="DialogTitleFont" value="Tahoma,10,$606060,B" />
+							<param name="DialogTitleShadow" value="0" />
+							<param name="DialogTitleShadowColor" value="$C0C0C0" />
+							<param name="DialogPosition" value="1,1" />
+							<!-- param name="DialogSubTitleFont" value="MS Sans Serif,8,$000000" /-->
+							<param name="DialogSubTitleFont" value="Tahoma,8,$000000" />
+						</paramgroup>
+						<paramgroup name="Labels">
+							<param name="TitleShadow" value="%AppName%,33,23,0,Times New Roman,30,$606060,B" />
+							<param name="Title" value="%AppName%,30,20,0,Times New Roman,30,$FF0000,B" />
+						</paramgroup>
+						<paramgroup name="DialogBitmaps">
+							<param name="DLG_LANGUAGE"/>
+							<param name="DLG_WELCOME"/>
+							<param name="DLG_LICENSE"/>
+							<param name="DLG_README"/>
+							<param name="DLG_DIR"/>
+							<param name="DLG_INSTALLTYPE"/>
+							<param name="DLG_FEATURES"/>
+							<param name="DLG_START"/>
+							<param name="DLG_PROGRESS"/>
+							<param name="DLG_FINISH"/>
+							<param name="DLG_NOTFINISH"/>
+							<param name="DLG_REBOOT"/>
+							<param name="DLG_PASSWORD"/>
+							<param name="DLG_GROUP"/>
+						</paramgroup>
+					</config>
+				</plugin>
+			</plugins>
+			<presetup>
+				<file src="..\presetup\banner.bmp" />
+				<file src="%ProviderPath%\README.TXT" />
+				<file src="%ProviderPath%\LICENSE.TXT" />
+			</presetup>
+		</package>
+	</packages>
+    <launchconditions>
+	    <launchcondition condition = "NETFrameworkInstalled(1.1)" msg="You need to have installed the Microsoft .NET Framework 1.1 before install the Firebird .NET Data Provider" />
+    </launchconditions>
+	<variables>
+        <!-- var name="FrameworkVersion" value="v1.1.4322" type="normal" />
+		<var name="FrameworkInstallRoot" regkey="HKLM\Software\Microsoft\.NETFramework" regparam="InstallRoot" type="reg" />
+   		<var name="SDKInstallRoot" regkey="HKLM\Software\Microsoft\.NETFramework" regparam="sdkInstallRoot" type="reg" /-->
+		<var name="AppID" value="FirebirdNETProvider1.6" />
+		<var name="AppName" value="Firebird .NET Data Provider 1.6.3 (.NET 1.1)" />
+		<var name="Password" type="normal"/>
+		<var name="CompressionLevel" value="7" type="normal" />
+        <var name="Languages" value="Bgr,Chs,Csy,Dan,Deu,Enu,Epo,Esn,Fin,Fra,Frc,Hrv,Hun,Ita,Jpn,Kor,Lth,Nld,Nor,Plk,Ptb,Ptg,Rom,Rus,Sky,Slv,Srl,Sve,Ukr" type="normal"/>
+		<var name="AutoSelectLanguage" value="1" type="normal"/>
+		<var name="Uninstall" value="1" />
+		<var name="ProgramGroup" value="Firebird .NET Data Provider 1.6" />
+		<var name="AppFolder" value="%ProgramsMenu%\%ProgramGroup%" type="normal"/>
+		<var name="InstallPath" value="%ProgramFiles%\FirebirdNETProvider1.6" type="normal"/>
+        <var name="ProviderPath" value="..\..\.." />
+        <var name="BuildPath" value="%ProviderPath%\builds\net-1.1.win32\bin\release" />
+		<var name="OutputPath" value="Output" type="normal"/>
+	</variables>
+</gi2project>

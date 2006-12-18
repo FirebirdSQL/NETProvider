@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<project name="FirebirdSql.Data.Firebird" default="build">
+    <!--
+        Required properties:
+            * build.dir             - (path) root level to build to, assemblies will go in ${build.dir}/bin
+            * build.sdk.dir			- (path) root level to build the sdk to
+            * build.debug           - (true|false) debug build?
+            * current.build.defines - framework-specific build defines
+            * htmlhelp.compiler		- Html Help Compiler location
+    -->   
+	
+	<!-- Build FirebirdSql.Data.Firebird.dll -->
+    <target name="build">
+        <csc target="library" output="${build.dir}/${nant.project.name}.dll" debug="${build.debug}" doc="${build.dir}\${nant.project.name}.xml" define="${current.build.defines}">
+            <sources>
+                <includes name="**/*.cs"/>
+            </sources>
+            
+            <references>
+                <absolute file="System.dll"/>
+                <absolute file="System.Data.dll"/>
+                <absolute file="System.Drawing.dll"/>
+                <absolute file="System.XML.dll"/>
+                <includes name="${build.dir}/FirebirdSql.Data.Common.dll" />
+                <includes name="${build.dir}/FirebirdSql.Data.Gds.dll" />
+                <includes name="${build.dir}/FirebirdSql.Data.Embedded.dll" />
+            </references>
+
+            <arg value="/resource:Resources/FbConnection.bmp,FirebirdSql.Data.Firebird.Resources.FbConnection.bmp"/>
+            <arg value="/resource:Resources/FbCommand.bmp,FirebirdSql.Data.Firebird.Resources.FbCommand.bmp"/>
+            <arg value="/resource:Resources/FbDataAdapter.bmp,FirebirdSql.Data.Firebird.Resources.FbDataAdapter.bmp"/>
+            <arg value="/optimize+" />
+        </csc>
+    </target>
+
+    <target name="mono-build">
+        <csc target="library" output="${build.dir}/${nant.project.name}.dll" debug="${build.debug}" define="${current.build.defines}">
+            <sources basedir=".">
+                <includes name="**/*.cs"/>
+                <excludes name="Design/FbConnectionStringEditor.cs" />
+                <excludes name="Design/FbConnectionStringUIEditor.cs" />
+                <excludes name="Design/FbCommandTextUIEditor.cs" />
+                <excludes name="Design/FbCommandTextEditor.cs" />
+            </sources>
+            
+            <references>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.Data.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.Drawing.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.Design.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.XML.dll"/>
+                <includes name="${build.dir}/FirebirdSql.Data.Common.dll" />
+                <includes name="${build.dir}/FirebirdSql.Data.Gds.dll" />
+                <includes name="${build.dir}/FirebirdSql.Data.Embedded.dll" />
+            </references>
+
+            <arg value="/resource:Resources/FbConnection.bmp,FirebirdSql.Data.Firebird.Resources.FbConnection.bmp"/>
+            <arg value="/resource:Resources/FbCommand.bmp,FirebirdSql.Data.Firebird.Resources.FbCommand.bmp"/>
+            <arg value="/resource:Resources/FbDataAdapter.bmp,FirebirdSql.Data.Firebird.Resources.FbDataAdapter.bmp"/>
+            <arg value="/optimize+" />
+        </csc>
+    </target>
+
+    <!-- Build help -->
+    <target name="build-help">
+        <ndoc failonerror="false">
+            <assemblies basedir="${build.dir}">
+                <includes name="${nant.project.name}.dll"/>
+            </assemblies>
+            
+            <documenters>
+                <documenter name="MSDN">
+                    <property name="OutputDirectory" value="${build.sdk.dir}" />
+                    <property name="HtmlHelpName" value="FirebirdNETProviderSDK"/>
+					<property name="IncludeFavorites" value="False" />
+					<property name="Title" value="Firebird ADO.NET Data Provider Class Library - v.${project.version}" />
+					<property name="SplitTOCs" value="False" />
+					<property name="DefaulTOC" value="" />
+					<property name="IncludeHierarchy" value="False" />
+					<property name="ShowVisualBasic" value="False" />
+					<property name="RootPageContainsNamespaces" value="False" />
+					<property name="SortTOCByNamespace" value="True" />
+					<property name="OutputTarget" value="HtmlHelp" />
+					<property name="HeaderHtml" value="" />
+					<property name="FooterHtml" value="" />
+					<property name="FilesToInclude" value="" />
+					<property name="LinkToSdkDocVersion" value="SDK_v1_1" />
+					<property name="ShowMissingSummaries" value="${build.debug}" />
+					<property name="ShowMissingRemarks" value="${build.debug}" />
+					<property name="ShowMissingParams" value="${build.debug}" />
+					<property name="ShowMissingReturns" value="${build.debug}" />
+					<property name="ShowMissingValues" value="${build.debug}" />
+					<property name="DocumentInternals" value="False" />
+					<property name="DocumentProtected" value="True" />
+					<property name="DocumentPrivates" value="False" />
+					<property name="DocumentProtectedInternalAsProtected" value="False" />
+					<property name="DocumentEmptyNamespaces" value="False" />
+					<property name="IncludeAssemblyVersion" value="False" />
+                    <property name="CopyrightText" value="Copyright (C) 2002-2004 Carlos Guzman Alvarez." />
+                    <property name="CopyrightHref" value="http://www.firebirdsql.org" />
+					<property name="ReferencesPath" value="" />
+					<property name="SkipNamespacesWithoutSummaries" value="False" />
+					<property name="UseNamespaceDocSummaries" value="False" />
+					<property name="AutoPropertyBackerSummaries" value="False" />
+					<property name="AutoDocumentConstructors" value="True" />
+					<property name="DocumentAttributes" value="False" />
+					<property name="ShowTypeIdInAttributes" value="False" />
+					<property name="DocumentedAttributes" value="" />
+					<property name="GetExternalSummaries" value="True" />
+					<property name="EditorBrowsableFilter" value="Off" />
+					<property name="UseNDocXmlFile" value="" />                
+                 </documenter>
+            </documenters>
+        </ndoc>
+
+		<!-- Rename CHM file -->
+		<copy file="${build.sdk.dir}/FirebirdNETProviderSDK.chm" tofile="${build.dir}/FirebirdNETProviderSDK.chm" />
+		
+		<!-- Clean actual sdk build directory -->
+		<delete dir="${build.sdk.dir}" failonerror="false" />		
+    </target>
+</project>

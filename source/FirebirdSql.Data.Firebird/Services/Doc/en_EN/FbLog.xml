@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbLog" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Retrieve the firebird.log file from the server if the log file exists. An error is returned if the log file does not exist.
+			This class cannot be inherited.
+			</summary>
+			<example>
+				The following example retrieve the firebird.log and displays it in Console.
+				<code>	
+FbLog logSvc = new FbLog();
+
+logSvc.UserName = "SYSDBA";
+logSvc.UserPassword = "masterkey";
+					
+logSvc.Start();
+
+string lineOutput;
+while((lineOutput = logSvc.GetNextLine()) != null)
+{
+	Console.WriteLine(lineOutput);
+}
+
+logSvc.Close();
+				</code>
+			</example>
+		</overview>
+		<method name="Start">
+			<summary>
+			Starts Firebird log service task.
+			</summary>
+		</method>
+	</class>
+</doc>

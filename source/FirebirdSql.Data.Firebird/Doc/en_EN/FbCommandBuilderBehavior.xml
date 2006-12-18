@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<doc>
+	<enum name="FbCommandBuilderBehavior" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Provides a description of how <see cref="FbCommandBuilder">FbCommandBuilder</see>
+			will do the generation of the <b>WHERE</b> clausule of <b>UPDATE</b> and <b>DELETE</b> commands 
+			</summary>
+		</overview>		
+		<field name="Default">
+			<summary>
+			<see cref="FbCommandBuilderBehavior.AllFields">AllFields</see>
+			</summary>
+		</field>		
+		<field name="AllFields">
+			<summary>
+			The <see cref="FbCommandBuilder">FbCommandBuilder</see> class will do the generation
+			of the <b>WHERE</b> clausule of <b>UPDATE</b> and <b>DELETE</b> commands using
+			all fields.
+			</summary>
+		</field>		
+		<field name="KeyFields">
+			<summary>
+			The <see cref="FbCommandBuilder">FbCommandBuilder</see> class will do the generation
+			of the <b>WHERE</b> clausule of <b>UPDATE</b> and <b>DELETE</b> commands using
+			only the key fields.
+			</summary>
+		</field>		
+		<field name="KeyAndTimestampFields">
+			<summary>
+			The <see cref="FbCommandBuilder">FbCommandBuilder</see> class will do the generation
+			of the <b>WHERE</b> clausule of <b>UPDATE</b> and <b>DELETE</b> commands using
+			only the key fields and the timestamp column specified in 
+			<see cref="FbCommandBuilder.TimestampColumnName">TimestampColumnName</see>.
+			</summary>
+		</field>		
+	</enum>	
+</doc>

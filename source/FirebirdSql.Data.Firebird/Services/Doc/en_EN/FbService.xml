@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbUserData" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Represents data of a user of security.fdb security database.
+			</summary>
+		</overview>
+		<property name="UserName">
+			<summary>
+			User name.
+			</summary>
+			<value>
+			User name to create, maximum 31 characters.
+			</value>
+		</property>
+		<property name="UserPassword">
+			<summary>
+			Password for the user.
+			</summary>
+			<value>
+			Password for the user, maximum 31 characters, only first 8 characters are significant.
+			</value>
+		</property>
+		<property name="FirstName">
+			<summary>
+			First name of person using this user name.
+			</summary>
+			<value>
+			First name of person using this user name <b>[OPTIONAL]</b>.
+			</value>
+		</property>
+		<property name="LastName">
+			<summary>
+			Last name of person using this user name.
+			</summary>
+			<value>
+			Last name of person using this user name <b>[OPTIONAL]</b>.
+			</value>
+		</property>
+		<property name="MiddleName">
+			<summary>
+			Middle name of person using this user name.
+			</summary>
+			<value>
+			Middle name of person using this user name <b>[OPTIONAL]</b>.
+			</value>
+		</property>
+		<property name="UserID">
+			<summary>
+			User ID number, defined in /etc/passwd, to assign to the user.
+			</summary>
+			<value>
+			User ID number, defined in /etc/passwd, to assign to the user <b>[OPTIONAL]</b>.
+			</value>
+		</property>
+		<property name="GroupID">
+			<summary>
+			GroupID number, defined in /etc/group, to assign to the user.
+			</summary>
+			<value>
+			GroupID number, defined in /etc/group, to assign to the user <b>[OPPTIONAL]</b>.
+			</value>
+		</property>
+		<property name="GroupName">
+			<summary>
+			Group name, as defined in /etc/group, to assign to the user in isc4.gdb <b>reserved for future implementation</b>.
+			</summary>
+			<value>
+			Group name, as defined in /etc/group, to assign to the user in isc4.gdb <b>[OPTIONAL]</b>.
+			</value>
+		</property>
+		<property name="RoleName">
+			<summary>
+			Optional SQL role to adopt when administering users <b>(reserved for future use)</b>.
+			</summary>
+			<value>
+			SQL role to adopt when administering users <b>[OPTIONAL]</b>.
+			</value>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbUserData" /> class.
+			</summary>
+		</constructor>
+	</class>
+	<struct name="FbServiceState" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Describes the current state of the connection to the Firebird Service Manager.
+			</summary>
+		</overview>
+		<field name="Closed">
+			<summary>
+			The connection is closed.
+			</summary>
+		</field>
+		<field name="Open">
+			<summary>
+			The connection is open.
+			</summary>
+		</field>
+	</struct>
+	<struct name="FbDatabasesInfo" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Retrieves information about databases on server.
+			</summary>
+		</overview>
+		<field name="ConnectionCount">
+			<summary>
+			Returns the number of databases attached to the server.
+			</summary>
+			<value>
+			Number of databases attached to the server.
+			</value>
+		</field>
+		<field name="Databases">
+			<summary>
+			Returns the list of database file paths.
+			</summary>
+			<value>
+			List of database file paths.
+			</value>
+		</field>
+	</struct>
+	<struct name="FbServerConfig" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Parameters and values in the firebird.conf file on the server.
+			</summary>
+		</overview>
+		<field name="LockMemSize">
+			<summary>
+			Bytes of shared memory allocated for lock manager. 
+			</summary>
+		</field>
+		<field name="LockSemCount">
+			<summary>
+			Number of semaphores for interprocess communication.
+			</summary>
+		</field>
+		<field name="LockSignal">
+			<summary></summary>
+		</field>
+		<field name="EventMemorySize">
+			<summary>
+			Bytes of shared memory allocated for event manager.
+			</summary>
+		</field>
+		<field name="PrioritySwitchDelay">
+			<summary></summary>
+		</field>
+		<field name="MinMemory">
+			<summary></summary>
+		</field>
+		<field name="MaxMemory">
+			<summary></summary>
+		</field>
+		<field name="LockGrantOrder">
+			<summary>
+			When a connection wants to lock an object, it gets a lock request 
+			block which specifies the object and the lock level requested. Eack
+			locked object has a lock block. Request blocks are connected to those
+			lock blocks either as requests that have been granted, or as pending
+			requests. 
+			</summary>
+			<remarks>
+				<para>
+			The settings:
+			</para>
+				<para>
+				<b>1</b> means locks are granted first come, first served.
+			</para>
+				<para>
+				<b>0</b> means emulate InterBase v3.3 behavior, where locks are granted 
+	  			as soon as they are available; can result in lock request
+				starvation.
+			</para>
+			</remarks>
+		</field>
+		<field name="AnyLockMemory">
+			<summary></summary>
+		</field>
+		<field name="AnyLockSemaphore">
+			<summary></summary>
+		</field>
+		<field name="AnyEventMemory">
+			<summary></summary>
+		</field>
+		<field name="LockHashSlots">
+			<summary>
+			Tune lock hash list; more hash slots mean shorter hash chains. Only
+			necessary under very high load. Prime number values are recommended.
+			</summary>
+		</field>
+		<field name="DeadlockTimeout">
+			<summary>
+			Determines the number of seconds that the lock manager will wait after a
+			conflict has been encountered before purging locks from dead processes 
+			and doing extra deadlock scan cycle. Engine detects deadlocks instantly 
+			in all normal cases, so this value affects things only if something goes
+			wrong. Setting it too low may degrade system performance. 	
+			</summary>
+		</field>
+		<field name="LockRequireSpins">
+			<summary>
+			In Classic, only one client process may access the lock table at any
+			time. Access to the lock table is governed by a mutex. The mutex can
+			be requested conditionally -a wait is a failure and the request must
+			be retried - or unconditionally - the request will wait until it is
+			satisfied. This parameter establishes the number of attempts that
+			will be made conditionally. Relevant only on SMP machines.
+			</summary>
+		</field>
+		<field name="ConnectionTimeout">
+			<summary>
+			Seconds to wait before concluding an attempt to connect has failed.
+			</summary>
+		</field>
+		<field name="DummyPacketInterval">
+			<summary>
+			Seconds to wait on a silent client connection before the server sends
+			dummy packets to request acknowledgment.
+			</summary>
+		</field>
+		<field name="IpcMapSize">
+			<summary>
+			Size in bytes of one client's portion of the memory mapped file used
+			for local connections.	
+			</summary>
+		</field>
+		<field name="DefaultDbCachePages">
+			<summary>
+			Number of cached database pages.
+			</summary>
+		</field>
+	</struct>
+	<class name="FbService" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Base class for Firebird Services implementation.
+			</summary>
+		</overview>
+		<property name="State">
+			<summary>
+			Gets the current state of the service.
+			</summary>
+			<value>
+			A bitwise combination of the <see cref="FbServiceState" /> values. The 
+			default is <b>Closed</b>.
+			</value>
+			<remarks>
+				<para>The allowed state changes are: </para>
+				<para>
+					<list type="bullet">
+						<item>
+							<description>
+						From <b>Closed</b> to <b>Open</b>, using the <b>Open</b> method of the 
+						service object. 
+						</description>
+						</item>
+						<item>
+							<description>
+						From <b>Open</b> to <b>Closed</b>, using either the <b>Close</b> method or the
+						<b>Dispose</b> method of the service object. 
+						</description>
+						</item>
+					</list>
+				</para>
+			</remarks>
+		</property>
+		<property name="ServerName">
+			<summary>
+			Server name for establish the connection.
+			</summary>
+		</property>
+		<property name="UserName">
+			<summary>
+			Firebird user account for login.
+			</summary>
+		</property>
+		<property name="UserPassword">
+			<summary>
+			Password for the Firebird user account.
+			</summary>
+		</property>
+		<property name="RoleName">
+			<summary>
+			User Role.
+			</summary>
+		</property>
+		<property name="ServerPort">
+			<summary>
+			Port number in the server for establish the connection.
+			</summary>
+		</property>
+		<property name="QueryBufferSize">
+			<summary>
+			Gets or sets the buffer size for service query calls.
+			</summary>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbService" /> class.
+			</summary>
+		</constructor>
+		<method name="Open">
+			<summary>
+			Opens a connection to the Firebird Services Manager.
+			</summary>
+		</method>
+		<method name="Close">
+			<summary>
+			Closes the connection to the Firebird Service Manager. This is the preferred method of 
+			closing any open connection.
+			</summary>
+		</method>
+		<method name="startTask">
+			<summary>
+			Starts the execution of a service task.
+			</summary>
+		</method>
+		<method name="queryService">
+			<summary>
+			Retrieves information about a firebird service based on a given set of information items.
+			</summary>
+			<param name="items">
+			Information items to be retrieved.	
+			</param>
+		</method>
+		<method name="queryService">
+			<summary>
+			Parses the information returned by te server of a query call.
+			</summary>
+		</method>
+		<method name="GetNextLine">
+			<summary>
+			Returns one line of output from a service task.
+			</summary>
+			<returns>
+			One line of output from a service task.
+			</returns>
+		</method>
+	</class>
+</doc>

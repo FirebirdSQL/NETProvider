@@ -1,0 +1,2787 @@
+FB.NET - Firebird managed data provider for .NET and Mono
+=========================================================
+
+2005-04-22 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/Charset.cs:
+
+		- Try to make the SupportedCharsets property thread safe.
+
+
+2005-04-11 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Make usage of the isc_dpb_overwrite parameter in CreateDatabase method.
+
+2005-04-09 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Fixed state handling on Open method.
+
+2005-01-28 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/DbField.cs:
+
+		- Fixed incorrect mapping (Thanks to Frans Bouma for his feedback.)
+
+2004-12-21 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/DbValue.cs:
+
+		- Fixed bug on long values conversion to string (Thanks to Sven Kammradt for his feedback).
+		Test case added to the test suite.
+
+2004-11-01 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbDataTypes.cs:
+
+		- Update schema information (Thanks to Viatcheslav V. Vassiliev for his feedback)
+
+2004-10-30 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Design/FbCommandTextEditor.cs:
+	* FirebirdSql.Data.Firebird/Design/FbCommandTextUIEditor.cs:
+
+		- Added changes to generate the parameters for Stored Proc commands (Alessandro Petrelli)
+
+2004-10-23 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Isql/FbBatchExecution.cs:
+
+		- Minor fix (Thanks to Viatcheslav V. Vassiliev for his
+		feedback)
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fixed Input parameter describe when the Prepare method
+		is called before the FbCommand instance has parameters assigned.
+		( test case included ) Thanks to Viatcheslav V. Vassiliev for his
+		feedback
+
+
+2004-10-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Backported changes from the 1.7 sources for the
+		GetSchemaTable method.
+
+2004-09-28 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	- Fixed FbDataAdapter documentation example (Thanks to Roland Turcan)
+
+2004-09-27 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Improve handling of parameters when they have null values.
+		Affects mainly the embedded server support. Backported from v1.7 
+		(Thanks to Pierre Arnaud for his feedback)
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Set IsNullable property for parameters of generated 
+		commands. Backported from v1.7.
+
+2004-09-25 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbField.cs:
+
+		- Fix for SetValue method on character values trimming when 
+		working with system tables. Affects only the embedded server 
+		support (Thanks to Sander Bosman for his feedback)
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- Added changes for correct prepare commands with
+		UTF-8 encoding (Backported from v1.7).
+
+2004-09-18 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/DbValue.cs:
+
+		- Minor change in GetDateTime method
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Added changes to the connection cleanup.
+
+		- Fixed connection checkout from the pol.
+
+2004-09-13 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Added changes on connection pool handling.
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cS:
+
+		- Minor improvements on pool handling.
+
+		- Fixed bug on GetConnection method when
+		timestamps are equal including the milliseconds
+		(Thanks to Alessandro Petrelli for his help ontesting the problem)
+
+2004-09-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Added better lock handling in the FbPoolManager class.
+
+2004-09-11 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Added changes for the initial implementation
+		iof a Wendell Wilkie suggestion for improve 
+		connection checkouts adn pools load.
+		(Backported from 1.7)
+
+
+<! ---------------------- Started 1.6.3 development ------------------------------------- !>
+
+2004-09-08 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Updated documentation.
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Minor fix for better detection of the datareader position.
+
+2004-09-03 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Fixedpool cleaning when the for pools with
+		connection lifetime of 0.
+		(Backported from 1.7)
+
+2004-09-02 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Added changes for try to get the connection pooling working correctly.
+		(Backported from the v1.7)
+		(Thanks to Alessandro Petrelli.  for his feedback)
+
+2004-08-26 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Fixed bug #1017108
+
+2004-08-25 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Services/FbService.cs:
+
+		- Do not throw an exception if the service is closed and
+		a new call to close is done.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumns.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomains.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParameters.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnsUsage.cs:
+
+		- Set the CHARACTER_OCTET_LENGTH to 0 if the comlumns is not a char/varchar column.
+
+	* FirebirdSql.Data.Common/StatementBase.cs:
+		
+		- Try to get the statement plan only 4 times,
+		if the plan cannot be retrieved returns null (Thanks to Claudio Valderrama)
+
+2004-08-24 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/StatementBase.cs:
+
+		- Fixed bug #1015453.
+
+	* FirebirdSql.Data.Common/DbField.cs:
+
+		- Trim trainling spaces for char fields when using the
+		embedded server and character sets with 2/3 characters per byte.
+
+2004-08-23 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumns.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomains.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParameters.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnsUsage.cs:
+
+		- Added new CHARACTER_OCTET_LENGTH column
+
+		- Fixed size for char/varchar columns
+
+2004-08-21 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* The nunit test suite will run now using UNICODE_FSS 
+	by default.
+
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumns.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomains.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParameters.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnsUsage.cs:
+
+		- Fixed NUMERIC_PRECISION value.
+	
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Do not set the numeric precision and scale if the parameter
+		is not a decimal or numeric type.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbMetaDataCollections.cs:
+
+		- Added Restrictions definition.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbMetaDataCollections.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDataTypes.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbRestrictions.cs:
+
+		- Added name to the DataTable.
+
+2004-08-20 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Fixed bug #1013031
+
+2004-08-14 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Removed Attributes form the CommandTimeout,
+		they prevents the sources to be built using .net 1.0
+		(Thanks to Mara)
+
+
+<! ---------------------- Started 1.6.2 development ------------------------------------- !>
+
+
+2004-08-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/TypeHelper.cs:
+
+		- Fixed Float to mapping (Thanks to HDV).
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbForeignKeys.cs:
+
+		- Added IS_DEFERRANLE and INITIALLY_DEFERRED columns
+
+2004-08-11 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Do not use GetMaxByteCount to calc the number of bytes for the input parameters.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumns.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomains.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParameters.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnUsage.cs:
+
+		- Improved numeric precision handling.
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+
+		- Fixed bug #1007104
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumns.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomains.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParameters.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnUsage.cs:
+
+		- Minor fix to schema queries to let them to run
+		using the embedded server.
+
+2004-08-10 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Improved input parameter descriptor generation.
+
+	* Last changes for the database schmeas support:
+
+
+		* All source files has been renamed to remove
+		the Schema suffix (FbTablesSchema.cs -> FbTables.cs)
+		The same for the class names.
+
+		* There are a new 'Restrictions' schema that will
+		return the restriction columns for each schema.
+
+		* There are new columns in some schemas:
+
+			   XXXX_CATALOG
+			   XXXX_SCHEMA
+
+		That will make the returned schemas more
+		general and compatible with other databases
+		(what will be nice for .net 2.0 as the schema
+		support is in the System.Data.Common.DbConnection
+		class)
+
+		These new columns are restriction columns as
+		well (the value will be null always) 		
+
+
+2004-08-07 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbTablesSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbMetaDataCollections.cs:
+
+		- Now it's no possible to filter by the IS_SYSTEM_TABLE column,
+		doing that using the table type restriction.
+
+2004-08-06 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbTablesSchema.cs:
+
+		- The system tables will now be filtered using the table type parameter.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+		
+		- Check connection state in GetSchema methods.	
+
+2004-08-05 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbDbSchema.cs:
+
+		- Added a little hack for the Tables schema restrictions.
+
+2004-08-04 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Backported the Database schema support changes from v1.7
+    
+        This includes:
+
+        * New FbConnection methods
+
+            - GetChema()
+            - GetSchema(string)
+            - GetSchema(string[])
+
+        * Change the names of the FbDbSchemaType elements to remove the underscore.
+
+        * Update all the classes in the FirebirdSql.Data.Firebird/DbSchema directory.
+
+        * Update the implementation of the FbCommandBuilder.DeriveParameters static method.
+
+        * Update the TypeHelper and FbParameter classes to implement the new data type helper methods.
+
+        Some of the changes in the Schema Results are:
+
+	        - Data types schema -
+
+        * New schema that will return the data types information.
+
+	        - Metadata collections -
+
+        * New schema that will return all the supported schemas, and the number of restrictions of each one.
+	
+        	- Columns Schema -
+
+        * The COLUMN_DATA_TYPE now holds the datatype name.
+
+        * New columns:
+           
+	        - IS_ARRAY
+
+        * Removed columns:
+
+	        - PROVIDER_TYPE (to known that we can search in the DataTypes schema)
+        	- PRIMARY_KEY
+	        - UNIQUE_KEY
+
+        The reason is that the query with that columsn gets a lot time to be executed in complex database (with a lot of tables, columns, etc...)
+
+        - Tables schema -
+
+	        * The IS_SYSTEM_TABLE column now will have 0/1 as values
+
+		* Not it's no possible to filter by the IS_SYSTEM_TABLE column,
+		instead filter by TABLT_TYPE can be done using:
+
+			- TABLE
+			- VIEW
+			- SYSTEM TABLE
+
+        - Generators schema -
+
+	        * The IS_SYSTEM_GENERATOR column now will have 0/1 as values
+
+        - Functions schema -
+
+	        * The IS_SYSTEM_FUNCTION column now will have 0/1 as values
+
+        - Triggers schema -
+
+	        * The IS_SYSTEM_TRIGGER column now will have 0/1 as values
+
+        - Primary keys schema -
+
+	        * Now it's possible to filter by COLUMN_NAME
+
+        - Unique keys schema -
+
+	        * Now it's possible to filter by COLUMN_NAME
+
+2004-07-30 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbService.cs:
+
+		- Fixed parsing database information buffer (Thanks to Christian for his feedback).
+
+2004-07-29 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbDbSchema.cs:
+
+		- Fixed bug #1000160
+
+
+2004-07-27 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+	* FirebirdSql.Data.Firebird/FbTransaction.cs:
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Removed limitation of one active 
+		data reader per connection, now it
+		will be one active data reader per
+		command.
+
+		NUNit tests will be commited later 
+		today.
+
+2004-07-26 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+
+		- Fixed bug #998002
+
+
+2004-07-21 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+
+		- Fixed bug #995178
+
+2004-07-20 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Updated installation script.
+	With th enew changes the assembly will be registered
+	in the HKLM\Software\Microsoft\.NETFramework\AssemblyFolders
+	registry element, this will allow the assembly to be shown by the
+	Visual Studio Add Reference dialog.
+
+
+2004-07-19 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Changed CommandTimeout property accesible only using
+		explicit interfaces (backported from 1.7).
+
+2004-07-17 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomainsSchema.cs:
+
+		- Fixed IS_NULLABLE column value.
+
+
+<! ---------------------- Started 1.6.1 development ------------------------------------- !>
+
+
+2004-07-16 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumnsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomainsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs:
+
+		- Fixed mistake in latest commit.
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Make use of the new PARAMETER_DIRECTION column.
+
+		- Remove COLUMN_SIZE reference.
+
+2004-07-15 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumnsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomainsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs:
+
+		- Report correct size for blob columns.
+
+2004-07-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbFunctionsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbIndexeschema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbGeneratorsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbTablesSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbTriggersSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbUniqueKeysSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnsUsageSchema.cs:
+
+
+		- Columns that indicates wheter an object is a system
+		object are now called IS_SYSTEM_XXXX.
+
+		- Columns that indicates wheter an object is inactive
+		are now called IS_INACTIVE. 
+		
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumnsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbForeignKeysSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbIndexesSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbPremaryKeysSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs:
+
+		- Set ORDINAL_POSITION as name for all ordinal columns.
+
+
+2004-07-11 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCharset.cs:
+
+		- Added Serializable attribute.
+
+
+2004-07-10 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbDomainsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProceduresSchema.cs:
+
+		- Added AcceptChanges call.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbProceduresSchema.cs:
+
+		- Return intputs and outputs columns null values
+		as 0.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs:
+
+		- Renamed PARAMETER_TYPE column as PARAMETER_DIRECTION
+		and set the value as ParameterDirection.Input or
+		ParameterDirection.Output.
+	
+
+2004-07-01 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/DbField.cs:
+
+		- Added new IsDecimal method.
+
+	* FirebirdSql.Data.Common/FbDataReader.cs:
+
+		- Set numeric precision and scale only for decimal/numeric datatypes.
+
+2004-06-30 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbDbSchemaType.cs:
+
+		- Added Serializable attribute.
+
+2004-06-25 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumnsSchema.cs:
+
+		- Fixed NUMERIC_SCALE column value (Thanks to Jack for his feedback).
+
+2004-06-24 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Set assembly version to 1.6.0
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fixed bug with subsequent execution of commands
+		where the connection is opened and closed (Thanks to Paul Ankho for his feedback)
+
+		Added NUnit test case.		
+
+
+<! ---------------------- Started 1.6 final development ------------------------------------- !>
+
+
+2004-06-16 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird.UnitTest/FbDataAdapter.cs:
+
+		- Added new nunit test for check dataset fill using
+		an execute procedure statement.
+
+2004-06-14 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Removed BDP Stuff, development continues on NETProvider_17 module
+
+
+2004-06-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+
+		- Fixed bug in Fetch method when working
+		with statements using EXECUTE PROCEDURE syntax.
+
+2004-06-10 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Sources of the Firebird .NET provider
+	are relicensed under the IDPL, this will
+	be done in CVS sources of 1.0, 1.5 and 1.6
+
+	Details about the IDPL license can be found here:
+	
+	http://www.ibphoenix.com/main.nfs?a=ibphoenix&l=;PAGES;NAME='ibp_idpl' 
+
+2004-06-09 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+
+		- Throw an exception if the connection string dialect
+		is not valid.
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Fixed isc_get_segment declaration.
+
+	* FirebirdSql.Data.Embedded/FesBlob.cs:
+		
+		- Fixed GetSegment method.
+
+2004-06-04 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbForeignKeysSchema.cs:
+
+		- Fix sql command.
+
+2004-06-02 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Simplify handling of input parameters with null values (Thanks to Jojakim Stahl).
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbForeignKeysSchema.cs:
+
+		- Fix order by clausule.
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Run cleanup over pooled connections
+		only when there are a number of pooled connections
+		greater than the min pool size (needs testing).
+
+2004-06-01 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Minor cleanup and improvement in DeriveParameter method.
+
+2004-05-31 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Bdp/FbResolver.cs:
+
+		- Minor fix for SELECT query build.
+
+2004-05-30 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Uncomment line.
+
+2004-05-26 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Fixed problem with nullable parameters.
+
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+
+		- minor change in the identify method.
+
+	* FirebirdSql.Data.Gds/GdsBlob.cs:
+
+		- Fix Seek method.
+
+2004-05-25 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Bdp/FbResolver.cs:
+
+		- Added initial implementation for FbResolver.GetSelectSQL.
+
+	* FirebirdSql.Data.Firebird/Isql/FbScript.cs:
+
+		- Added support for single line comments (Todd Palmer)
+
+2004-05-24 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Bdp/FbMetaData.cs:
+
+		- Added better hanlding of MetaDataProps enumeration.
+
+<! ---------------------- Started Release Candidate 2 development ------------------------------------- !>
+
+2004-05-24 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Isql/FbBatchExecution.cs:
+
+		- Throw exception when there are no statements for
+		execution (on Execute method.)
+
+2004-05-23 Abel Eduardo Pereira <sapiens@sapo.pt>
+
+	* Update of Isql namespace classes.
+
+2004-05-20 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Improved exception handling (Thanks to Mike Scott).
+
+2004-05-19 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/TypeDecoder.cs:
+	* FirebirdSql.Data.Gds/XdrStream.cs:
+
+		- Removed DoubleLayout and FloatLayout that 
+		doesn't build in the .NET compact Framework
+		because	 seems that FieldOffset attribute
+		is not supported on it (Thanks to Zsombor Cserna for his feedback).
+
+2004-05-18 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Added changes to the Borland Data Provider implementation.
+
+2004-05-17 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Bdp/FbCommand.cs:
+
+		- Added changes for allow correct execution of 
+		metadata commands using BdoCommand.ExecuteNonQuery method.
+
+	* FirebirdSql.Data.Bdp/FbConnection.cs:
+	* FirebirdSql.Data.Bdp/FbCommand.cs:
+	* FirebirdSql.Data.Bdp/FbMetaData.cs:
+	* FirebirdSql.Data.Bdp/FbResolver.cs:
+
+		- Removed Debug code.
+
+	* FirebirdSql.Data.Firebird/Services/FbSecurity.cs:
+
+		- Fix for DisplayUser abd DisplayUsers methods (Todd Palmer).
+
+	* Added new Error codes (To resource file and IscCodes class)
+
+	* Fixed most of the Globalization isssues reported by FxCop.
+
+	* Simplified Numeric/Decimal handling.
+
+
+2004-05-14 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Services/FbSecurity.cs:
+
+		- Fix for DisplayUSer method (Thanks to to Todd Palmer by his feedback).
+
+	* FirebirdSql.Data.Firebird/Services/FbService.cs:
+
+		- Fix for parseUSerData method (Thanks to to Todd Palmer by his feedback).
+	
+	* FirebirdSql.Data.Common/StatementBase.cs:
+
+		- Fixed issue with GetExecutionPlan method (Thanks to Timothy Shih for his feedback).
+
+
+2004-05-13 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+
+		- Added little fix to connection string parsing.
+
+2004-05-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandbuilder.cs:
+
+		- Updated Numeric Scale handling
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbForeignsKeySchema.cs:
+
+		- Fixed shcema result.
+
+2004-05-11 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+
+		- Fixed issue in latest changes.
+
+2004-05-10 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Simplify schema statement.
+
+	* FirebirdSql.Data.Bdp/FbCommand.cs:
+
+		- Added code for handle Array and Blob parameters.
+
+	* Change Borland Data Provider version to 1.0.0, it will be mantained
+	fixed during the alpha, beta and rc stage because it needs to be configured in xml files
+	and/or connection strings and will make deplyoment more easy.
+
+	* Added new ReadMe file for the Borland Data Provider implementation.
+
+	* FirebirdSql.Data.Bdp/FbResolver.cs:
+
+		- Added validation of schema columns information.
+
+	* FirebirdSql.Data.Bdp/FbMetaData.cs:
+
+		- Added primary key information to the GetSchemaTable result.
+
+2004-05-08 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/DbValue.cs:
+	* FirebirdSql.Data.Common/StatementBase.cs:
+	* FirebirdSql.Data.Common/FactoryBase.cs:
+	* FirebirdSql.Data.Embedded/FesAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Embedded/FesFactory.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Gds/GdsFactory.cs:
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Moved Array and Blob creation to statement classes.
+
+		- Moved Status Vector creation to FesAttacment class.
+
+2004-05-07 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Bdp/FbResolver.cs:
+
+		- Added Initial implementation of FbResolver class (not finished).
+
+	* FirebirdSql.Data.Bdp/FbMetaData.cs:
+
+		- Added Initial implementation of FbMetaData.GetSchemaTable (not finished).
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+	* FirebirdSql.Data.Common/DbField.cs:
+
+		- Moved some methods from FbDataReader to DbField class.
+
+	* FirebirdSql.Data.Bdp/BdpTypeHelper.cs:
+	* FirebirdSql.Data.Bdp/FbCursor.cs:
+
+		- Added new BdpTypeHelper class.
+
+
+	* FirebirdSql.Data.Common/GlobalizationHelper.cs:
+
+		- New class.
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+	* FirebirdSql.Data.Firebird/FbErrorCollection.cs:
+	* FirebirdSql.Data.Firebird/FbParameterCollection.cs:
+	* FirebirdSql.Data.Common/CharsetCollection.cs:
+	* FirebirdSql.Data.Common/IscErrorCollection.cs:
+
+		- Moved cultureAwareCompare method to new GlobalizationHelper class.
+
+2004-05-06 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Bdp/FbMetaData.cs:
+
+		- Added initial implementation to GetIndices method
+		for retrieve NonUnique indexes information.
+
+
+<! ---------------------- Started Release Candidate 1 development ------------------------------------- !>
+
+
+2004-05-05 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCharset.cs:
+
+		- Added new enumeration.
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+
+		- Added new Charset property.
+
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Simplify input parameter descriptor generation.
+
+		- Make use of the new FbParameter.Charset property in
+		the input parameter descriptor generation.
+
+2004-05-02 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbIndexesSchema.cs:
+
+		- Added two new columns:
+
+			* COLUMN_NAME
+
+			* COLUMN_POSITION
+
+	* FirebirdSql.Data.Bdp/FbConnection.cs:
+	* FirebirdSql.Data.Bdp/FbCommand.cs:
+	* FirebirdSql.Data.Bdp/FbCursor.cs:
+
+		- Added initial implementation of the implicit transaction
+		support to the Borland Data Provider sources.
+
+	* Added build filed for the Broaldn Data Provider implementation.
+
+	* Updated Borland Data Provider implementation.
+
+
+2004-04-28 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Fix COALESCE usage for NUMERIC and DECIMAL data types.
+
+2004-04-27 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Cleanup.
+
+		- Changed commands field to StringCollection.
+
+		- Changes on named parameters handling.
+
+2004-04-26 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Firebirdsql.Data.Common/ArrayBase.cs:
+	* Firebirdsql.Data.Common/StatementBase.cs:
+	* Firebirdsql.Data.Embedded/FesStatement.cs:
+	* Firebirdsql.Data.Gds/GdsStatement.cs:
+
+		- Renamed Drop method by Release.
+
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+	* FirebirdSql.Data.Gds/GdsAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsFactory.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Gds/GdsTransaction.cs:
+	* FirebirdSql.Data.Embedded/FesAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesDbAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesFactory.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Embedded/FesTransaction.cs:
+	* Firebirdsql.Data.Common/ArrayBase.cs:
+	* Firebirdsql.Data.Common/FactoryBase.cs:
+	* Firebirdsql.Data.Common/IDbAttachment.cs:
+	* Firebirdsql.Data.Common/ITransaction.cs:
+	* Firebirdsql.Data.Common/StatementBase.cs:
+	* Firebirdsql.Data.Firebird/FbCommand.cs:
+	* Firebirdsql.Data.Firebird/FbTransaction.cs:
+
+		- Changed BeginTransaction overloads.
+
+		- Changed statement preparation.
+
+		- Removed SetCursorName methods.
+
+		- Changed method StatementBase.Free(int option) to be protected.
+
+		- Make methods GdsStatement.Allocate and FesStatement.Allocate 
+		to be private,and allocate statement automatically on prepare.
+
+		- Prepare now takes a command text argument.
+
+		- Remove CreateStatement(...)  methods from the factories.
+
+	* Added MonoDevelop project files.
+
+2004-04-25 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Internal rework of data types and field/parameter values
+	(Not finished)
+
+2004-04-24 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Internal rework of data types and field/parameter values
+	(Not finished)
+
+2004-04-23 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Internal rework of transactions start.
+
+	* FirebirdSql.Data.Bdp/FbCursor.cs:
+	* FirebirdSql.Data.Bdp/FbCommand.cs:
+
+		- Added initial implementation of FbCursor class.
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Improved DataReader implementation:
+
+			- Make it more readable and maintenable.
+
+			- Changed open field by isClosed.
+	
+			- Changed consstructor parameters.
+
+			- Improved exception handling, now it's more close to SqlClient,
+			the sample used for test it in SqlClient was:
+
+
+			string sql = "SELECT * FROM Customers";
+
+			SqlConnection connection = new SqlConnection(connectionString);
+			connection.Open();
+
+			SqlCommand command = new SqlCommand(sql, connection);
+
+			SqlDataReader reader = command.ExecuteReader();
+			while(reader.Read())
+			{
+			}
+
+			// Add calls to reader methos ere
+						
+			reader.Close();
+
+			// Add calls to reader methos ere
+
+			connection.Close();
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Added new Close, Drop, Fetch and GetFieldsDescriptor methods.
+
+		- Removed Statement property.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+				
+		- Make use of the new FbCommand.Drop method.
+
+	* FirebirdSql.Data.Bdp/FbConnection.cs:
+
+		- Added initial error control.
+
+	* FirebirdSql.Data.Bdp/FbCommand.cs:
+	* FirebirdSql.Data.Bdp/FbCursor.cs:
+
+		- Started implementation of FbCommand and FbCursor BDP classes.
+
+2004-04-22 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Bdp/FbConnectionString.cs:
+	
+		- Added initial implementation.
+
+	* FirebirdSql.Data.Firebird/Services/FbService.cs:
+
+		- Fixed typo.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+
+		- Changes in transaction handling.
+
+		The SqlCommand.Connection documentation says:
+
+			If you set Connection while a transaction is in progress and the Transaction 
+			property is not null, an InvalidOperationException is generated. 
+
+		But after seom test using SqlClient againsy MSDE Release A that seems to be not true,
+		the exception seems to be NEVER trown.
+
+		That exception is now removed from FbCommand.Connection property.
+
+
+<! ---------------------- Started Beta 3 development ------------------------------------- !>
+
+
+2004-04-21 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	- Added changes for fix FxCop rules.
+
+2004-04-20 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Fixed some issues with connection pooling implementation.
+
+2004-04-17 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Finished changes for implementation fo command generation
+		using COALESCE.
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Allow build against Vulcan on linux.
+
+2004-04-16 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Change the commit done in the Dispose method by a rollback.
+
+		- In the dispose method drop first the statement aand make the rollback after.
+
+	* FirebirdSql.Data.Common/IDbAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesDbAttachment.cs:
+
+		- Added ServerVersion property.
+
+		- Rework of DatabaseInfo stuff.
+
+	* FirebirdSql.Data.Common/IscHelper.cs:
+
+		- New class.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Changes in ServerVersion property.
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Started the work for use COALESCE in Firebird 1.5 (not finished)
+
+	* FirebirdSql.Data.Firebird/FbDatabaseInfo.cs:		
+
+		- Rework of Database info stuff
+
+2004-04-8 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/DbField.cs:
+		
+		- Fixed DbDataType handling.
+		
+2004-04-6 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/*.cs:
+
+		- Fixed restriction count check.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnUsageSchema.cs:
+
+		- Fixed description retrieval for view columns.
+
+2004-04-4 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/*.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDbSchema.cs:
+
+		- Finish rework of the Db Schema stuff. (Needs testing)
+
+2004-04-2 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/*.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbConnection.cs:
+
+		- Complete rework of the Db Schema stuff.
+
+2004-04-1 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/*.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbConnection.cs:
+
+		- Major Cleanup in DbSchema stuff.
+
+	* FirebirdSql.Data.Firebird/DbSchema/IDbSchema.cs:	
+
+		- Removed file.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbAbstractSchema.cs:
+
+		- Renamed to FbDbSchema.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Reorganization of private and internal members.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbForeignKeySchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbPrimaryKeySchema.cs:
+
+		- Improved primary keys and foreign keys schemas.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbUniqueKeysSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDbSchemaFactory.cs:
+	* FirebirdSql.Data.Firebird/FbSchemaType.cs:
+
+		- New Schema for retrieve unique keys information.
+
+2004-03-31 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnsUsageSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewPrivileges.cs:
+
+		- Fixed views schema.
+
+2004-03-30 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/DbField.cs:
+
+		- Trim string members.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Set schema retrieval parameters as CHAR(31).
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Changes on automatic generation of input parameters
+		descriptor.
+
+2004-03-29 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbDbAbstractSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumnsSchema.cs:
+
+		- Trim string fields in schema result and bring
+		IS_NULLABLE column of the Columns Schema type
+		tyo have a correct value (Thanks to Frans Bouma for his feedback)
+
+	* FirebirdSql.Data.Common/FbAttachmentParams.cs:
+
+		- Added initialization of Min and max pool sizes.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Changed some private method names.
+
+		- Set the Regular expression used for named parameter parsing
+		as static and added use RegexOptionsCompiled.
+
+		- Build parameter descriptor in different way when working with 
+		named parameters than when working with place holders 
+		(not finished and not in use yet).
+
+<! ---------------------- Started Beta 2 development ------------------------------------- !>
+
+2004-03-28 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Common/TypeHelper.cs:
+
+		- Added new isNullable parameter
+
+2004-03-27 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Added better checkins in InternalSetOutputParameters method.
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+
+		- Do not infer datatype when setting the FbDbType property manually.
+
+	* FirebirdSql.Data.Firebird/FbCommandbuilder.cs:
+
+		- Fixed DeriveParameters method.
+
+		- Change schema retrieval
+
+	* FirebirdSql.Data.Common/TypeHelper.cs:
+
+		- New class.
+
+	* FirebirdSql.Data.Common/DbField.cs:
+
+		- moved static methods to the new TypeHelper class.		
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Rollback CommandText change.
+
+		- Added new buildParameterDescriptor method.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Make a rollback instead of a commit when disposing active commands.
+
+	* FirebirdSql.Data.Firebird/FbException.cs:	
+
+		- Implement serialization methods (Thanks to Pierre Arnaud and Matt Honeycutt for their feedback)
+
+
+2004-03-26 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	
+		- Set command Transaction in createCommand method 
+		(Thanks to Dimitry Azaraev for his feedback)
+
+		- Fix minor issue with ExecuteScalar method.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	
+		- Changes on exception hanlding.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Firebird/FbTransaction.cs:
+	
+		- Improved transaction handling. 
+		Now when a transaction is committed/roollbacked
+		the Transaction of all commands active in the 
+		transaction connection will be set to null.
+
+2004-03-25 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fix for CommandText property ( Thanks to Dmitry Azaraev for his feedback ).
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Removed non needed ServerType check in CreateDatabase method ( Thanks to Vadim Chekan )
+
+2004-03-23 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Minor improvments.
+
+2004-03-22 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Added some changes (some of them are checked against SqlClient
+		working with MSDE 2000 Release A):
+
+			1. Improved Dispose and RefreshSchema implementations,
+			Set to null the Insert, Delete and Update commands of the related
+			DataAdapter, when needed, in the RefreshSchema method.
+
+			2. Make use of the DataTableMapping.GetColumnMappingBySchemaAction method
+			and of the DataColumnMapping.GetDataColumnBySchemaAction for extract the 
+			DataColumn that matches a given parameter.
+
+			3. Improved Command generation, we can't generate always 
+			a new command, in the RowUpdating handler when the given
+			command is different than the command builder command
+			we can do the build of a new one.
+
+			4. Restrict the connection opening (when it's closed) to the
+			buildSchemaTable method.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fixed ICloneable.Clone implementation.
+
+2004-03-20 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- Updated records affected only for insert, 
+		delete and update Statements.
+
+	* FirebirdSql.Data.Common/StatementBase.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- Improved RecordsAffected update.
+
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Rollback latest changes.
+
+	* FirebirdSql.Data.Firebird/FbDbConnection.cs:
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+	* FirebirdSql.Data.Common/FbAttachmentParams.cs:
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+
+		- Improved connection string handling.
+
+2004-03-18 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Firebirdsql.Data.Firebird/FbCommandBuilder.cs:
+	* Firebirdsql.Data.Embedded/FesArray.cs:
+	* Firebirdsql.Data.Gds/GdsArray.cs:
+	* Firebirdsql.Data.Common/DbField.cs:
+
+		- Improved data type infering from the blr type.
+
+	* Firebirdsql.Data.Firebird/DbSchema/FbAbstractDbSchema.cs:
+	* Firebirdsql.Data.Firebird/DbSchema/FbColumnsSchema.cs:
+	* Firebirdsql.Data.Firebird/DbSchema/FbDomainsSchema.cs:
+	* Firebirdsql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs:
+
+		- Added new PROVIDER_TYPE column.
+
+		- Normalized names of some columns between schemas.
+
+
+2004-03-16 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandbuilder.cs:
+
+		- Changed the where clausule generation on UPDATED and DELETE commands.
+
+2004-03-15 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/XsqldaMarshaler.cs:
+
+		- Added checks for char and varchar values.
+
+	* FirebirdSql.Data.Gds/GdsBlob.cs:
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsSvcAttachment.cs:
+
+		- Changed System.Array.Copy to Buffer.BlockCopy
+
+2004-03-14 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilderBehavior.cs:
+
+		- Added Serializable attribute.
+
+		- Added doc comments.
+
+	* FirebirdSql.Data.Firebird/FbCommandbuilder.cs:
+
+		- Added doc comments.
+
+		- Changed TimestampFieldName to TimestampColumnName
+
+2004-03-13 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilderBehavior.cs:
+
+		- New file.
+
+	* FirebirdSql.Data.Firebird/FbCommandbuilder.cs:
+
+		- Initial implementation for allow different behaviors on WHERE 
+		clausule generation (Not finished).
+
+
+2004-03-11 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Bdp/FbConnection.cs:
+
+		- Added constructor logic.
+	
+		- Added initial implementations for some methods.
+
+	* Firebird.Data.Bdp/FbCursor.cs:
+	* Firebird.Data.Bdp/FbCommand.cs:
+	* Firebird.Data.Bdp/FMetaData.cs:
+	* Firebird.Data.Bdp/FbResolver.cs:
+
+		- Added constructor logic.
+
+		- Fixed namespace.		
+
+
+2004-03-10 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/TypeEncoder.cs:
+	* FirebirdSql.Data.Common/TypeDecoder.cs:
+
+		- Added canges for try to handle the milliseconds in time and 
+		timestamp values ( Reviewed in Jaybird sources )
+
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Added check of the command.Statement property on Read method 
+		(Thanks to Alessandro Petrelli for his feedback)
+
+	* FirebirdSql.Data.Gds/XdrStream.cs:
+
+		- Improved char/varchar value length check.
+
+
+2004-03-09 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Design/FbConnectionStringEditor.cs:
+
+		- Added new Server Type combobox.
+
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Fixed bug in Getbytes and GetChars when thebuffer is null (Thanks to Derek M. A. Lee-Wo for his feedback).
+
+		- Fetch one row of data when closing the reader if no rows
+		where fetched and the command is an Stored procedure, this is needed
+		for allow correct deletes when using stored proceudres with the data adapter
+		(Thanks to olegmad for his feedback)
+
+
+2004-03-06 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+
+		- Fixed minor issue with FbDbType infering. ( Thanks to olegmad for his feedback )
+
+2004-03-05 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+	* FirebirdSql.Data.Firebird/FbCommand.cs:	
+	* FirebirdSql.Data.Firebird/FbDataAdapter.cs:
+		
+		- Fixed resource image location.
+
+2004-03-04 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Check that there are a valid implicit transaction
+		in CommitImplicitTransaction and RollbackImplicitTransaction
+		metods.
+
+<! ---------------------- Started Beta 1 development ------------------------------------- !>
+
+2004-03-03 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Changed the way of commit the implicit
+		transaction of active command on connection closing.
+
+2004-03-02 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+
+		- Fix varchar array fields handling.
+
+	* FirebirdSql.Data.Common/DbDatatype.cs:
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+	* FirebirdSql.Data.Firebird/FbDbType.cs:
+
+		- Removed LongVarBinary option.
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Fixed invalid casts.
+
+	* FirebirdSql.Data.Gds/XdrStream.cs:
+		
+		- Fixed decimal/numeric read and write.
+
+	* FirebirdSql.Data.Embedded/ArrayDescMarshaler.cs:
+
+		- Changed the scale conversion to byte using
+		a classic cast.
+
+	* FirebirdSql.Data.Common/DbField.cs:
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+	* FirebirdSql.Data.Gds/GdsAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Mayor rework of the array datatype support.
+
+2004-03-01 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+	* FirebirdSql.Data.Common/DbField.cs:
+	* FirebirdSql.Data.Common/IAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	* FirebirdSql.Data.Common/FesAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsAttachment.cs:
+
+		- Mayor rework of the array datatype support.
+		( for the embedded server gds )		
+
+	* FirebirdSql.Data.Gds/XdrStream.cs:
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+	* FirebirdSql.Data.Common/Charset.cs:
+	* FirebirdSql.Data.Common/DbField.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+
+		- Mayor rework of the array datatype support.
+
+		IMPORTANT: Array data type support in the embeeded GDS
+		is pending of rework.
+
+
+2004-02-29 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/XdrStream.cs:
+
+		- Use the parameter charset instead of the connection charset
+		for write char and varcar parameter values (needs deep testing)
+
+	* FirebirdSql.Data.Gds/GdsInetWriter.cs:
+	* FirebirdSql.Data.Gds/GdsInetReader.cs:
+
+		- Removed files ( they are replaced by the new XdrStream class )
+
+	* FirebirdSql.Data.Gds/XdrStream.cs:
+
+		- Added new XdrStream class that replaces GdsInetWriter.cs and 
+		GdsInetReader.cs files. 
+		Nedds deep testing due to the amount of changes involved.
+		This class changes the way char and varcar fields are handled,
+		needs deep testing too.
+
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+	* FirebirdSql.Data.Gds/GdsAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsBlob.cs:
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Gds/GdsSvcAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsTransaction.cs:
+
+		- Added changes for make use of the new XdrStream class.
+
+
+2004-02-27 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs
+
+		- Minor improvement to NextResult method.
+
+	* FirebirdSql.Data.Gds/GdsInetReader.cs
+
+		- Read varchars trimmed out.
+
+	* FirebirdSql.Data.Gds/GdsInetWriter.cs
+
+		- Write varchars trimmed out.
+
+2004-02-25 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/GdsAttachment.cs
+
+		- Use a BufferedStream for read.
+
+	* FirebirdSql.Data.Common/StatementBase.cs
+	* FirebirdSql.Data.Gds/GdsStatement.cs
+	* FirebirdSql.Data.Emebedded/FesStatement.cs
+
+		- Reset needed members when the statement is set to closed by a 
+		transaction update.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs
+
+		- Fix for the named parameters support.
+
+2004-02-24 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Isql/FbBatchExecution.cs:
+
+		- Removed ; from the new #warning
+
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+
+		- Changes for avoid problems due to parameter conversion problems.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Added changes for better control of FbDataReader.NextResult usage.
+
+	* FirebirdSql.Data.Firebird/Design/FbConnectionStringEditor.cs:
+
+		- Do not show the connection succeful message if
+		in the finally block.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fix for the regex used for extract named parmeters
+		that it's not working in all cases ( Thanks to Zsombor Cserna by his feedback )
+
+2004-02-23 Abel Eduardo Pereira <sapiens@sapo.pt>
+
+	* FirebirdSql.Data.Firebird/Isql/FbBatchExecution.cs:
+
+		- FbBatchExecution features update.
+
+2004-02-23 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Removed the AcceptChanges call, this causes commands to
+		be bad generated if there are errors in one update to a row and
+		we try to update it one more time. ( Thanks to Janusz Mars )
+
+		- Removed status update with UpdateStatus.Continue as it's not needed.
+
+2004-02-21 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Fix DataSource property.
+
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+
+		- Fix for connection timeout and packet size decoding from the conenction string.
+
+2004-02-19 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Added general changes for allow the build in a single assembly.
+
+	* Added a new build fiel for build all the sources in a single assembly.
+
+2004-02-18 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Improved the replace of the named parameters with the placeholder ( Thanks to Chris Turchin )
+
+		- Rework named parameters extraction.
+
+	* Added new FirebirdSql.Data.Bdp directory with empty classes
+	with method signatures for a Borland Data Provider implementation.
+
+
+2004-02-16 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Updated build files for allow html help generation.
+
+	* Removed Firebird Events implementation ( it needs to be rewriten in the future )
+
+
+2004-02-15 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Added new build for for te FirebirdSql.Data.Client.UnitTest.dll assembly.
+
+	* Added target to current build files for build html help ( not finished )
+
+
+2004-02-13 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebidSql.Data.Firebird/FbCommand.cs:
+
+		- Fixed error in named parameters support ( Thanks to Zsombor Cserna )
+		Added nunit test case to FbCommandTest.cs file.
+
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+
+		- Throw exception if the connection string has an invalid character set.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Improved CreateDatabase Method for allow to control overwrite of 
+		existing database (not finished yet).
+
+2004-02-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird.UnitTest/FbArray.cs
+
+		- Close readers, noticed running the nunit test suite in linux with mono::
+
+2004-02-11 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Check that the given character set in CreateDatabase method is correct, 
+		if no throw an ArgumentException.
+
+2004-02-06 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Added two new methods for allow better handling
+		of connection pools:
+
+			public static void ClearAllPools()
+			public static void ClearPools(FbConnection connection)
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Added two new methods for allow better handling
+		of connection pools:
+
+			public static void ClearAllPools()
+			public static void ClearPools(string connectionString)
+
+		- Added Clear method to FbConnectionPool class.
+
+2004-02-05 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/ClientFactory.cs:
+
+		- Set as internal.
+
+	* Added documentation fileds from the 1.5 sources.
+
+	* FirebirdSql.Data.Firebird/services/FbService.cs:
+	* FirebirdSql.Data.Firebird/services/FbBackup.cs:
+	* FirebirdSql.Data.Firebird/services/FbConfiguration.cs:
+	* FirebirdSql.Data.Firebird/services/FbLog.cs:
+	* FirebirdSql.Data.Firebird/services/FbRestore.cs:
+	* FirebirdSql.Data.Firebird/services/FbSecurity.cs:
+	* FirebirdSql.Data.Firebird/services/FbStatistical.cs:
+	* FirebirdSql.Data.Firebird/services/FbValidation.cs:
+
+		- Set attachSpb and querySpb as private.
+
+		- Rename startSpb as StartSpb and set it as protected internal.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Added documentation comments for DropDatabase and new
+		BeginTransaction overloads.
+
+	* Updated NUnit Tests of the ADO.NET classes.
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Minor indentation changes.
+
+	* FirebirdSql.Data.Firebird/FbTransactionOptions.cs:
+
+		- Added documentation comments.
+
+	* FirebirdSql.Data.Firebird/FbDataAdapter.cs:
+
+		- Removed no needed using.
+
+	* Build System:
+
+		- Added changes to the build system for allow building
+		using mono:: ( tested on Windows using mono 0.30 )
+
+2004-02-02 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+		
+		- Minor changes on row index handling.
+
+	* FirebirdSql.Data.Client.UnitTest/BaseTest.cs:
+
+		- Added changes for insert data into the ascii and blob fields.
+
+	* FirebirdSql.Data.Client.UnitTest/BlobTest.cs:
+
+		- Added new NUnit tests for ascii and binary blob reading.
+
+2004-01-30 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fixed problem with output parameters when using implicit transactions ( Thnaks to Alessandro Petrelli )
+
+2004-01-29 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+	
+	* Added Nunit test for Execute and ExecuteImmediate methods of
+	FesStatement and GdsStatement classes.
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Common/StatementBase.cs:
+
+		- Added a new overload for the ExecuteImmediate method.
+
+		- Improved implementation of ExecuteImmediate method.
+
+	* Added new NUnit tests for GdsTransaction/FesTransaction and 
+	GdsStatement/FesStatement classes.
+		
+	* FirebirdSql.Data.Embedded/FesTransaction.cs:
+
+		- Little fix for CommitRetaining and RollbackRetaining methods.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Gds/GdsTransaction.cs:
+	* FirebirdSql.Data.Embedded/FesTransaction.cs:
+
+		- Fix for prepared statments that uses implicit transaction support.
+
+2004-01-28 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/GdsTransaction.cs:
+
+		- Fixed throw of an incorrect exception type (Thanks to Jesus for his feedback).
+
+	* FirebirdSql.Data.Common/IscException.cs:
+	
+		- Fix bug building the exception message.
+
+2004-01-24 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Changes in implicit transaction support.
+		Now, the transaction will be commited after each execution,
+		if there are any error the transaction will be automatically rollbacked,
+		in the Dispose method the transaction will be ROLLBACKED.
+		In the case of ExecuteReader the transaction will commited when the DataReader is closed.
+
+		- The FbCommand.parseParameters will ceck the length in bytes of the char/varchar 
+		paranmeters for ensure that is correct, in the case the length of the parameter 
+		value is greater than the number of bytes allowed by the parameter the provider
+		will throw an "arithmetic exception, numeric overflow, or string truncation" 
+		exception.
+
+2004-01-21 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fixed bug when trying to assign null to the Transaction property
+		( Thanks to Matt Honeycutt )
+
+2004-01-20 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/XsqldaMarshaler.cs:
+	* FirebirdSql.Data.Common/DbValue.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- changes on varchar fields marshaling and 
+		XSQLDA structure usage ( Thanks to Sander Bosman )
+
+	* FirebirdSql.Data.Firebird/FbDataAdapter.cs:
+
+		- Formatting changes.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Rollback the implicit transaction if an
+		exception occurs trying to commit it in Dispose method.
+
+
+2004-01-19 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Client.UnitTest/BlobTest.cs:
+	* FirebirdSql.Data.Client.UnitTest/StatementTest.cs:
+	* FirebirdSql.Data.Client.UnitTest/TransactionTest.cs:
+
+		- Added method declarations for new nunit tests.
+
+
+2004-01-19 Abel Eduardo Pereira <sapiens@users.sourceforge.net>
+
+	* FirebirdSql.Data.Firebird/Isql/StringParser.cs:
+
+		- Added IndexOf method.
+	
+	* FirebirdSql.Data.Firebird/Isql/CommandExecutedEventArgs.cs:
+	* FirebirdSql.Data.Firebird/Isql/CommandExecutingEventArgs.cs:
+	* FirebirdSql.Data.Firebird/Isql/FbBatchExecution.cs:
+	* FirebirdSql.Data.Firebird/Isql/FbScript.cs:
+
+		- Isql namespace classes update.
+
+
+2004-01-17 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- Fixed issue on Prepare method when the statement has no fields ( Thanks to Sander Bosman ).
+
+
+2004-01-15 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/BlobBase.cs:
+
+		- Added blob cancellation when there are an exception on 
+		reading or writing a blob field.
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+
+		- Fixed Type usage.
+
+	* FirebirdSql.Data.Common/BlobBase.cs:
+
+		- Return System Array instead of System.Object for Binary type.
+
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+
+		- Removed warnings.
+
+
+2004-01-14 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	
+		- Rollbacked latest commit.
+
+
+	* FirebirdSql.Data.Gds/GdsTransaction.cs:
+	* FirebirdSql.Data.Embedded/FesTransaction.cs:
+	* FirebirdSql.Data.Common/IscException.cs:
+
+		- Fixed handling of exceptions in transactions.
+
+2004-01-13 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+
+		- Added corect handling of Thread abort.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Added new static method: DropDatabase.
+
+	* FirebirdSql.Data.Embedded/FesDbAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+
+		- Fixed DropDatabase method.
+
+
+2004-01-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Added changes for make the Command Text split using the new FbScript
+		class.
+
+2004-01-12 Abel Eduardo Pereira <sapiens@users.sourceforge.net>
+
+	* FirebirdSql.Data.Firebird/Isql/FbScript.cs:
+	* FirebirdSql.Data.Firebird/Isql/FbBatchExecution.cs:
+	* FirebirdSql.Data.Firebird/Isql/CommandExecutingEventArgs.cs:
+	* FirebirdSql.Data.Firebird/Isql/CommandExecutedEventArgs.cs:
+	* FirebirdSql.Data.Firebird/Isql/StringParser.cs:
+
+		- Added sources of the new SQL Script parser and executor.
+
+2004-01-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbScript.cs:	
+
+		- Removed file, it's being replace by the sql script parser and executor
+		contributed by Abel Eduardo Pereira.
+
+2004-01-08 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Design/FbParameterConverter.cs:
+	* FirebirdSql.Data.Firebird/Design/FbParameterCollectionEditor.cs:
+	
+		- Added code regions.
+
+	* FirebirdSql.Data.Firebird/FbParameterCollection.cs:
+
+		- Fixed parameter name generation.
+
+		- Changed lock code.
+
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+
+		- Unified use of "this."
+
+		- Indentation changes.
+
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+
+		- Allow data source to be specified as "Data Source"
+
+2004-01-07 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbErrorCollection.cs:
+
+		- Make the errors arraylist to be syncronized.
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+	* FirebirdSql.Data.Firebird/FbParameterCollection.cs:
+		
+		- Added changes for better handling of parameter collections 
+		(checked against SqlClient provider):
+
+			- Make the parameters arraylist to be syncronized.
+
+			- Try an exception when trying to add a parameter to a 
+			FbParameterCollection instance that is already owned by 
+			a different FbParameterCollection instance.
+
+			- Generate a new parameter name when the parametr to add 
+			has no name.					
+
+			- Throw an exception when trying to add a parametr two times to 
+			the same collection.
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Removed underscore from function parameters.
+
+		- Added code regions.
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- Fix for DescribeParameters calls when the statment
+		has no params.
+
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+	* FirebirdSql.Data.Common/BlobBase.cs:
+	* FirebirdSql.Data.Common/DbEvent.cs:
+	* FirebirdSql.Data.Common/DbField.cs:
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	* FirebirdSql.Data.Embedded/FesBlob.cs:
+	* FirebirdSql.Data.Embedded/FesAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesDbAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesSvcAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Embedded/FesTransaction.cs:
+	* FirebirdSql.Data.Gds/GdsBlob.cs:
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsEvtAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsSvcAttachment.cs:
+
+		- Removed underscores on variables names:
+
+			status_vector 	-> statusVector
+			db_handle		-> dbHandle
+			tr_handle		-> trHandle
+			stmt_handle		-> stmtHandle
+			array_id		-> arrayId
+			blob_id		-> blobId
+			blob_handle		-> blobHandle
+			svc_handle		-> svcHandle
+			event_id		-> eventId
+
+	* FirebirdSql.Data.Gds/GdsSvcAttachment.cs:
+
+		- Unifed usage of "this."
+
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+
+		- Unified use of "this."
+		- Indentation changes.
+
+	* FirebirdSql.Data.Common/RowDescriptor.cs:
+	* FirebirdSql.Data.Common/DbField.cs:
+	* FirebirdSql.Data.Common/DbValue.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Embedded/XsqldaMarsaler.cs:
+	* FirebirdSql.Data.Gds/GdsInetReader.cs:
+	* FirebirdSql.Data.Gds/GdsInetWriter.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Firebird/FbDataReader.cs:
+
+		- Changed fields and propertie names of RowDescriptor and DbField 
+		classesto make them more clear.
+
+
+2004-01-03 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/*.cs:
+
+		- Unified use of "this.".
+
+		- Changes for improve code readability.
+
+	* FirebirdSql.Data.Firebird/*.*
+
+		- Changes for improve code readability.
+
+
+2004-01-02 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	
+		- Doesn't split command text when command behavior includes 
+		CommandBehavior.SingleResult.
+
+	* Updated headers of source files.
+
+	* FirebirdSql.Data.Embedded/FesFactory.cs:
+	* FirebirdSql.Data.Gds/GdsFactory.cs:
+		
+		- Make the factorys thread-safe, more info can be found here:
+		http://www.yoda.arachsys.com/csharp/singleton.html
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Added changes for make use of the new RowDescriptor indexer.
+
+	* FirebirdSql.Data.Common/StatementBase.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Simplified command execution.
+
+2004-01-01 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/StatementBase.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+
+		- Removed IsSQLDataOK method.
+
+	* FirebirdSql.Data.Common/StatementBase.cs:
+
+		- Added new abstract method: ExecuteImmediate.
+
+	* FirebirdSql.Data.Common/RowDescriptor.cs:
+
+		- Added new ToBlrArray method.
+
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+
+		- Added initial implementation of ExecuteImmediate method (needs testing).
+
+		- Removed writeBLR method.
+
+	* FirebirdSql.Data.Gds/GdsInetWriter.cs:
+
+		- Added new WriteRowDescriptor method.
+
+		- Renamed WriteParameter method to WriteDbField.
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- Added initial implementation of ExecuteImmediate method (needs testing).
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Embedded/FesTransaction.cs:
+	* FirebirdSql.Data.Embedded/FesDbAttachment.cs:
+	* FirebirdSql.Data.Embedded/FesSvcAttachment.cs:
+
+		- Unified object handle usage (needs testing).
+
+
+2003-12-31 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Added attributes to status_vector parameter of isc_attach_database.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Added synchronization code.
+
+	* FirebirdSql.Data.Firebird/FbDataAdapter.cs:
+
+		- Changed code region name.
+
+
+2003-12-30 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+	* FirebirdSql.Data.Firebird/FbTransaction.cs:
+
+		- Added initial synchronization code.
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Added isc_drop_database function definition.
+
+	* FirebirdSql.Data.Embedded/FesdbAttachment.cs:
+
+		- Added initial implementation for DropDatabase method.
+
+	* FirebirdSql.Data.Gds/GdsAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+
+		- Cleanup.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Added correct handling of Dialect on Createdatabase method.
+
+	* FirebirdSql.Data.Common/RowDescriptor.cs:
+
+		- Added indexer by index.
+
+	* FirebirdSql.Data.Common/IscException.cs:
+
+		- Cleanup.
+
+		- Unified the use of this.
+
+	* Started the work of the new NUnit test suite for GDS implementations
+
+
+2003-12-27 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Make CreateDatabase method to be less restrictive. 
+		Added correct conversions for some parameters.
+
+	* FirebirdSql.Data.Gds/GdsInetWriter.cs:
+
+		- Minor improvement in varchar array handling.
+
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+
+		- Fix for varchar array handling.
+
+	* FirebirdSql.Data.Embedded/ArrayBase.cs:
+
+		- Initial changes for the varchar arrays.
+
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+
+		- Change the class to be sealed.
+
+	* FirebirdSql.Data.Firebird/Services/FbServiceProperties.cs:
+
+		- Added getInfo method.
+
+2003-12-26 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+
+		- Fixed calc of max length for char arrays.
+
+	* Continue the rework of the Array Datatype NUnit tests.
+
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+
+		- Correct handling of char arrays (PutSlice).
+
+2003-12-25 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Continue the rework of the Array Datatype NUnit tests.
+
+	* Added new directory source/FirebirdSql.Data.Client.UnitTest
+	that will be used for the NUnit test suite of the GDS implementations.
+
+2003-12-24 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Started the rework of the Array Datatype NUnit tests.
+
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+
+		- Bring to work short arrays in the embedded GDS impementation.
+
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+
+		- Cleanup.
+
+		- Added new method : GetSystemType
+
+		- Added correct casing for method getArrayDesc.
+
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+
+		- Added initial implementation for allow updates of 
+		arrays with non C# primitive types.
+
+2003-12-23 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Removed attribute from isc_que_events.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fixed CommandBehavior handling in ExecuteReader method.
+
+	* Fixed Array datatype nunit tests for allow them to run 
+	with the embedded server.
+
+2003-12-22 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs
+
+		- Added more changes to the new Connection Pool 
+		implementation (not finished - needs testing)
+
+	* FirebirdSql.Data.Gds/GdsInetReader.cs:
+
+		- Removed checking of char count length, this is not valid for
+		system tables that are reporting a bad number of bytes.
+
+2003-12-20 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Added isc_start_multiple definition.
+
+	* FirebirdSql.Data.Embedded/FesTransaction.cs:
+
+		- New IscTeb internal structure.
+
+		- Start transactions using isc_start_multiple instead of
+		isc_start_transaction. On exeuction of a test program using 
+		the CLRSpy for try to discover possible problems, the test 
+		program crashes always (it seems to run fine without the 
+		CLRSpy loaded) when using isc_start_transaction, instead using 
+		isc_start_multiple the test program runs fine always ( with and
+		without the CLRSpy tool loaded).
+		
+	* FirebirdSql.Data.Common/IscError.cs:
+	* FirebirdSql.Data.Common/IscException.cs:
+
+		- Added changes for allow correct handling of 
+		exception messages of embedded GDS implementation.
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Added In and Out attributes to status_vector parameters 
+		in all PInvoke Function declaration.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Throw exception in CreateDatabase mthod if there are no valid keys.
+
+2003-12-19 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.FbConnection/FbConnectionPool.cs:
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+		
+		- Reworked Connection Pool implementation for allow to
+		multiple connection pools by connection string, and for have
+		limits on minumum and maximun number of connection that a single 
+		pool can handle (not finished, needs testing)
+		
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+		
+		- Added MaxPoolSize and MinPoolSize properties.
+
+	* FirebirdSql.Data.Firebird/FbConnectionPool.cs:
+
+		- Fixed minor issue in cleanup thread.
+
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+
+		- Added correct Connection Lifetime calculation (in ticks per second) 
+		(Thanks to Alessandro Petrelli for his feedback).
+
+2003-12-18 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Added new executeCommand method (private).
+
+2003-12-17 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbClient.cs:
+	* FirebirdSql.Data.Firebird/FbDbAttachment.cs:
+
+		- Added GDS32.DLL as a possible target for the embedded GDS implementation.
+
+2003-12-16 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+
+		- Set default value of SourceColumn as String.Empty.
+
+	* FirebirdSql.Data.Firebird/Design/FbParameterConverter.cs
+
+		- Added better code generation at design time.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Added new Parameters internal property
+
+	* FirebirdSql.Data.Firebird/Design/FbConnectionStringEditor.cs:
+
+		- Fixed error with connection parameters handling.
+
+2003-12-15 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/StatementBase.cs:
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- Fixed bug on Drop method. ( Thanks to Dmitry Azaraev for his feedback and help )
+
+		- Added changes for better handling of Transaction Updates.
+
+	* Firebirdsql.Data.Firebird/FbTransaction.cs:
+
+		- Changfes on default tpb building for make use of the new 
+		FbTransactionOptions flags enumeration.
+
+	* Firebirdsql.Data.Firebird/FbConnection.cs:
+
+		- Added two new overloads for BeginTransaction method.
+
+	* Firebirdsql.Data.Firebird/FbTransactionOptions.cs:
+
+		- New enum with configuration options for begin transactions.
+
+	* Firebirdsql.Data.Firebird/FbTransaction.cs:
+	* Firebirdsql.Data.Embedded/FesTransaction.cs:
+	* Firebirdsql.Data.Gds/GdsTransaction.cs:
+	* Firebirdsql.Data.Common/ITransaction.cs:
+
+		- Added changes for allow better transaction configuration.
+
+	* Firebirdsql.Data.Common/IscCodes.cs:
+
+		- Cleanup.
+
+		- Code Regions names changed.
+
+2003-12-14 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandbuilder.cs:
+
+		- Minor change in this. usage.
+
+	* FirebirdSql.Data.Embedded/FbDbAttachment.cs:
+
+		- Added better connection string handle for database creation.
+
+	* FirebirdSql.Data.Common/DbValue.cs:
+
+		- Added correct handling of null values (embedded).
+
+		- Added correct handling of varchar fields.
+
+	* FirebirdSql.Data.Embedded/XsqldaMarshaler.cs:
+
+		- Fixed decimal conversion using Convert.ToDecimal, instead of make a cast to decimal.
+
+		- BugFixes for varchar field handlign (not finished yet).
+
+	* FirebirdSql.Data.Embedded/XSQLDA.cs:
+
+		- Changed names of XSQLVAR fields for match ibase.h definition.
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+
+		- Fixed bug on stored procedure execution.
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+		
+		- Fixed bug on Prepare method.
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fix implicit transaction commit in Dispose method.
+
+	* FirebirdSql.Data.Firebird/FbTransaction.cs:
+
+		- Minor change in IDisposable implementation.
+
+2003-12-13 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/GdsEvtAttachment.cs:
+
+		- Changed class to be internal sealed.
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+		
+		- Added changes for handle stored proc execution results.
+
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+
+		- Minor change on this. usage.
+
+	* FirebirdSql.Data.Firebird.Events/FbEvent.cs:
+
+		- Added changes for use new stuff of Common and GDS implementation assemblys.
+
+	* FirebirdSql.Data.Firebird.Events/FbEventAlertEventArgs.cs:
+
+		- Removed file.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Changed the way for cancel events.
+
+	* FirebirdSql.Data.Firebird/FbDbConnection.cs:
+
+		- Removed CancelEvents method.
+
+	* FirebirdSql.Data.Gds/GdsSvcAttachment.cs:
+
+		- Cleanup.
+
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+	* FirebirdSql.Data.Gds/GdsEvtAttachment.cs:
+
+		- Changes on events implementation.
+
+	* FirebirdSql.Data.Gds/GdsFactory.cs:
+
+		- Removed methods for event attachment creation.
+
+	* FirebirdSql.Data.Embedded/FesEvtAttachment.cs:
+	
+		- Removed File.
+
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+
+		- Canged signatures of events API functions.
+
+	* FirebirdSql.Data.Embedded/FesDbAttachment.cs:
+
+		- Added partial implementation of Event handling methods (not working yet)
+
+	* FirebirdSql.Data.Embedded/FesFactory.cs:
+
+		- Removed methods for event attachment creation.
+
+	* FirebirdSql.Data.Common/EventRequestEventArgs.cs:
+
+		- Renamed to DbEventAlertEventArgs.cs.
+
+	* FirebirdSql.Data.Common/IEvtAttachment.cs:
+
+		- Removed file.
+
+	* FirebirdSql.Data.Common/DbEvent.cs:
+
+		- Added changes for simplify events implementation.
+
+	* FirebirdSql.Data.Common/Factorybase.cs:
+
+		- Removed methods for event attachment creation.
+
+	* FirebirdSql.Data.Common/BufferBase.cs:
+
+		- Changed length to be short.
+
+	* FirebirdSql.Data.Common/EventBuffer.cs:
+	
+		- Added new Append overload.
+
+	* FirebirdSql.Data.Common/IscError.cs:
+	* FirebirdSql.Data.Common/IscErrorCollection.cs:
+	* FirebirdSql.Data.Common/IscException.cs:
+		
+		- Added serializable attribute (Thanks to Dmitry Yemanov by his feedback).
+
+
+2003-12-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/GdsSvcAttachment.cs:
+
+		- Improved SPB handling for allow compatibility with embedded GDS implementation
+
+	* FirebirdSql.Data.Embedded/FesSvcAttachment.cs:
+
+		- Added initial implementation of the Firebird Services API for the
+		embedded GDS implementation.
+
+	* FirebirdSql.Data.Firebird/Services/FbRestore.cs:
+
+		- Fixed error in PageBuffers property.
+
+	* FirebirdSql.Data.Firebird/Services/FbValidation.cs:
+
+		- Added : base() to the constructor.
+
+	* FirebirdSql.Data.Firebird/Services/FbService.cs:
+	* FirebirdSql.Data.Firebird/Services/FbBackup.cs:
+	* FirebirdSql.Data.Firebird/Services/FbRestore.cs:
+	* FirebirdSql.Data.Firebird/Services/FbConfiguration.cs:
+	* FirebirdSql.Data.Firebird/Services/FbStatistical.cs:
+	* FirebirdSql.Data.Firebird/Services/FbValidation.cs:
+
+		- Added changes for use AttachmentParams class instead 
+		of individual properties.
+
+		- Database property was removed when needed.
+
+		- database field was removed when needed.
+
+	* FirebirdSql.Data.Embedded/FesAttachment.cs:
+
+		- Fixed status_vector string arguments decoding 
+		(probably the best way for doing this will be use the isc_interprete API function).
+
+	* FirebirdSql.Data.Common/AttachmentParams.cs:
+	
+		- Added new BuildDpb method.
+		
+	* FirebirdSql.Data.Embedded/FesDbAttachment.cs:
+		
+		- Removed buildDpb method.
+		
+		- Changed calls to build dpbMethod to AttachmentParams.BuildDpb.
+		
+		- Added correct connection string when the target dll
+		is the fbclient.dll.
+	
+	* FirebirdSql.Data.Gds/GdsDbAttachment.cs:
+	
+		- Changed calls to build dpbMethod to AttachmentParams.BuildDpb.
+		
+		- Removed invalid buildDpb calls.
+
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+
+		- Fixed bad conversion.
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	* FirebirdSql.Data.Embedded/ArrayDescMarshaler.cs:
+	* FirebirdSql.Data.Embedded/XSQLDAMarshaler.cs:
+
+		- Added better handling of IntPtr memory.
+
+	* FirebirdSql.Data.Common/StatementBase.cs:
+
+		- Minor changes on this. usage.
+
+		- Added new GetExecutionPlan and UpdateRecordsAffected methods.
+
+		- Added new GetRecordsAffected method.
+
+	* FirebirdSql.Data.Embedded/FesStatement.cs:
+	* FirebirdSql.Data.Gds/Gdsstatement.cs:
+
+		- GetExecutionPlan methods are now in the base class.
+		
+		- Changed the implementation of UpdateRecordsAffected.
+
+
+2003-12-11 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+
+		- Added changes for try to solve little/big endian differences between
+		embedded GDS implenmentation and pure C# implementation.
+
+	* FirebirdSql.Data.Common/ArrayDesc.cs:
+	
+		- Removed fields attributes.
+		
+	* FirebirdSql.Data.Embedded/FbClient.cs:
+	
+		- Changed ArrayDesc parameters in array functions definitions by
+		IntPtr.
+
+	* FirebirdSql.Data.Common/IArray.cs:
+	
+		- Removed file, now ArrayBase will be used as base class for 
+		array implementations.
+		
+	* FirebirdSql.Data.Common/ArrayBase.cs:
+	
+		- New abstract base class for array implementations.
+	
+	* FirebirdSql.Data.Common/ArrayBound.cs:
+	
+		- Removed file, contents are now integrated into ArrayDesc.cs.
+
+	* FirebirdSql.Data.Embedded/FesArray.cs:
+	
+		- Added changes for inherit from ArrayBase.
+		
+		- Added implementation of overriden methods.
+	
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+	
+		- Added changes for inherit from ArrayBase.
+		
+	* FirebirdSql.Data.Embedded/ArrayDescMarshal.cs:
+	* FirebirdSql.Data.Embedded/ArrayDescMarshaler.cs:
+	
+		- New classes for allow marshaling of ArrayDesc structures.
+
+2003-12-10 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+		
+	* Initial commit of the 1.6 sources.

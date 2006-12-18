@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<doc>
+	<enum name="FbDbType" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Specifies the data type of a field, property, or FbParameter.	
+			</summary>
+		</overview>
+		<field name="Array">
+			<summary>
+			Array values. This maps to System.Array.
+			</summary>
+		</field>
+		<field name="BigInt">
+			<summary>
+			Exact numeric value (SQL_INT64). This maps to Int64.
+			</summary>
+		</field>
+		<field name="Binary">
+			<summary>
+			An array of data. This maps to an Array.
+			</summary>
+		</field>
+		<field name="Binary">
+			<summary>
+			A stream of binary data (SQL_BLOB). This maps to an Array of type Byte.
+			</summary>
+		</field>
+		<field name="Char">
+			<summary>
+			A fixed-length character string (SQL_CHAR). This maps to String.
+			</summary>
+		</field>
+		<field name="Date">
+			<summary>
+			Date data (SQL_TYPE_DATE). This maps to DateTime.
+			</summary>
+		</field>
+		<field name="Decimal">
+			<summary>
+			Signed, exact, numeric value with a precision of at least p and scale s,
+			The maximum precision is 18 (SQL_DECIMAL). This maps to Decimal.
+			</summary>
+		</field>
+		<field name="Double">
+			<summary>
+			Signed, approximate, numeric value with a binary precision 53 (SQL_DOUBLE). 
+			This maps to Double.
+			</summary>
+		</field>
+		<field name="Float">
+			<summary>
+			Signed, approximate, numeric value with a binary precision 24 (SQL_FLOAT). 
+			This maps to Single.
+			</summary>
+		</field>
+		<field name="Integer">
+			<summary>
+			Exact numeric value with precision 10 and scale 0 (SQL_LONG). This maps to Int32.
+			</summary>
+		</field>
+		<field name="Numeric">
+			<summary>
+			Signed, exact, numeric value with a precision p and scale s (SQL_DECIMAL). This maps to Decimal.
+			</summary>
+		</field>
+		<field name="SmallInt">
+			<summary>
+			Exact numeric value with precision 5 and scale 0 (SQL_SHORT). This maps to Int16.
+			</summary>
+		</field>
+		<field name="Text">
+			<summary>
+			Variable length character data. Maximum length is data source–dependent (SQL_TEXT). This maps to String.
+			</summary>
+		</field>
+		<field name="Time">
+			<summary>
+			Time data (SQL_TYPE_TIME). This maps to DateTime. 
+			</summary>
+		</field>
+		<field name="TimeStamp">
+			<summary>
+			Date data (SQL_TIMESTAMP). This maps to DateTime.
+			</summary>
+		</field>
+		<field name="VarChar">
+			<summary>
+			A variable-length character string (SQL_TEXT). This maps to String.
+			</summary>
+		</field>
+	</enum>
+</doc>

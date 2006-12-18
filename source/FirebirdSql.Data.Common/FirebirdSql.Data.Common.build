@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<project name="FirebirdSql.Data.Common" default="build">
+    <!--
+        Required properties:
+            * build.dir             - (path) root level to build to, assemblies will go in ${build.dir}/bin
+            * build.debug           - (true|false) debug build?
+            * current.build.defines - framework-specific build defines
+    -->   
+	
+	<!-- Build FirebirdSql.Data.Common.dll -->
+    <target name="build">
+        <csc target="library" output="${build.dir}/${nant.project.name}.dll" debug="${build.debug}" define="${current.build.defines}">
+            <sources>
+                <includes name="**/*.cs"/>
+            </sources>
+            
+            <references>
+                <absolute file="System.dll"/>
+                <absolute file="System.Data.dll"/>
+                <absolute file="System.XML.dll"/>
+            </references>
+            
+            <arg value="/resource:Resources\isc_error_msg.resources,FirebirdSql.Data.Common.Resources.isc_error_msg.resources"/>
+            <arg value="/optimize+" />
+        </csc>
+    </target>
+
+    <target name="mono-build">
+        <csc target="library" output="${build.dir}/${nant.project.name}.dll" debug="${build.debug}" define="${current.build.defines}">
+            <sources>
+                <includes name="**/*.cs"/>
+            </sources>
+            
+            <references>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.Data.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.XML.dll"/>
+            </references>
+            
+            <arg value="/resource:Resources\isc_error_msg.resources,FirebirdSql.Data.Common.Resources.isc_error_msg.resources"/>
+            <arg value="/optimize+" />
+        </csc>
+    </target>
+    
+    <!-- Build help -->
+    <target name="build-help">
+    </target>
+</project>

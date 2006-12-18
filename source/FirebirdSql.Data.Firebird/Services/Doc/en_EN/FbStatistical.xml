@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<enum name="FbStatisticalFlags" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Specifies access flags for retrieve database statistics.
+			</summary>
+		</overview>
+		<property name="DataPages">
+			<summary>Request statistics for user data pages.</summary>
+			<value>0x01</value>
+		</property>
+		<property name="DatabaseLog">
+			<summary>Request only the information in the database log pages.</summary>
+			<value>0x02</value>
+		</property>
+		<property name="HeaderPages">
+			<summary>Request only the information in the database header page.</summary>
+			<value>0x04</value>
+		</property>
+		<property name="IndexPages">
+			<summary>Request statistics for user index pages.</summary>
+			<value>0x08</value>
+		</property>
+		<property name="SystemTablesRelations">
+			<summary>
+			Request statistics for system tables and indexes in addition to user tables and indexes.
+			</summary>
+			<value>0x10</value>
+		</property>
+	</enum>
+	<class name="FbStatistical" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Retrieve database statistics for the database specified. This class cannot be inherited.
+			</summary>
+			<example>
+			The following sample request statistics for system tables and indexes in addition to user tables and indexes and
+			displays it in Console.
+				<code>
+FbStatistical statisticalSvc = new FbStatistical();
+
+statisticalSvc.UserName = "SYSDBA";
+statisticalSvc.UserPassword = "masterkey";
+
+statisticalSvc.Database = @"C:\TESTDB.GDB";
+statisticalSvc.Options = FbStatisticalFlags.SystemTablesRelations;
+		
+statisticalSvc.Start();
+
+string lineOutput;
+while((lineOutput = statisticalSvc.GetNextLine()) != null)
+{
+	Console.WriteLine(lineOutput);
+}
+
+statisticalSvc.Close();
+				</code>
+			</example>
+		</overview>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbStatistical" /> class.
+			</summary>
+		</constructor>
+		<property name="Database">
+			<summary>
+			Path of the primary file of the database, from the server’s point of view.
+			</summary>
+			<value>Database path.</value>
+		</property>
+		<property name="Options">
+			<summary>
+			Gets a value that specifies options used for retrieve database statistics.
+			</summary>
+			<value>
+			A bitwise combination of the <see cref="FbStatisticalFlags" /> values which 
+			provides information about statistics options.
+			</value>
+		</property>
+		<method name="Start">
+			<summary>
+			Starts Firebird database statistis retrieval service task.
+			</summary>
+		</method>
+	</class>
+</doc>

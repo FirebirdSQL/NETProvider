@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<project name="FirebirdSql.Data.Firebird.UnitTest" default="build">
+    <!--
+        Required properties:
+            * build.dir             - (path) root level to build to, assemblies will go in ${build.dir}/bin
+            * build.debug           - (true|false) debug build?
+            * current.build.defines - framework-specific build defines
+            * nunit.framework.dll	- NUnit framework assembly location
+    -->   
+	
+	<!-- Build FirebirdSql.Data.Firebird.UnitTest.dll -->
+    <target name="build">
+		<!-- Copy config file to build dir -->
+        <copy todir="${build.dir}">
+            <fileset basedir=".">
+                <includes name="*.config"/>
+            </fileset>
+        </copy>
+    
+        <!-- compile FirebirdSql.Data.Firebird.UnitTest -->
+        <csc target="library" output="${build.dir}/${nant.project.name}.dll" debug="${build.debug}" define="${current.build.defines}">
+            <sources>
+                <includes name="**/*.cs"/>
+            </sources>
+            
+            <references>
+                <absolute file="System.dll"/>
+                <absolute file="System.Data.dll"/>
+                <absolute file="System.XML.dll"/>
+                <includes name="${nunit.framework.dll}"/>
+                <includes name="${build.dir}/FirebirdSql.Data.Common.dll" />
+                <includes name="${build.dir}/FirebirdSql.Data.Firebird.dll" />
+            </references>
+
+            <arg value="/optimize+" />
+        </csc>
+    </target>
+    
+    <target name="mono-build">
+    </target>
+</project>
