@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<struct name="FbValidationFlags" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Specifies access flags for database validation.
+			</summary>
+		</overview>
+		<field name="ValidateDatabase">
+			<summary>    
+			Locate and release pages that are allocated but unassigned to any data structures.
+			</summary>
+			<value>0x01</value>
+		</field>
+		<field name="SweepDatabase">
+			<summary>
+			Request database sweep to mark outdated records as free space.
+			</summary>
+			<value>0x02</value>
+		</field>
+		<field name="MendDatabase">
+			<summary>
+			Mark corrupted records as unavailable, so subsequent operations skip them.
+			</summary>
+			<value>0x04</value>
+		</field>
+		<field name="CheckDatabase">
+			<summary>
+			Request read-only validation of the database, without correcting any problems.
+			</summary>
+			<value>0x10</value>
+		</field>
+		<field name="IgnoreChecksum">
+			<summary>Ignore all checksum errors.</summary>
+			<value>0x20</value>
+		</field>
+		<field name="KillShadows">
+			<summary>Remove references to unavailable shadow files.</summary>
+			<value>0x40</value>
+		</field>
+		<field name="Full">
+			<summary>
+			Check record and page structures, releasing unassigned record fragments.
+			</summary>
+			<value>
+			0x80
+			</value>
+		</field>
+	</struct>
+	<class name="FbValidation" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Request a database validation. This class cannot be inherited.    
+			</summary>
+			<remarks>
+				<para>
+			Database validation scans internal data structures for specific types of corruption. In
+			some cases, the validation operation can repair corruption.	
+			</para>
+				<para>
+			The validation operation cannot guarantee to repair all cases of corruption. Do not rely
+			on database validation as a disaster recovery policy in lieu of making regular backups of
+			your database.
+			</para>
+			</remarks>
+			<example>
+			The following example makes a database validation for locate and release pages that are allocated but unassigned to any data structures.
+				<code>
+FbValidation validationSvc = new FbValidation();
+
+validationSvc.UserName = "SYSDBA";
+validationSvc.UserPassword = "masterkey";
+
+validationSvc.Database = @"D:\TESTDB.GDB";
+validationSvc.Options = FbValidationFlags.ValidateDatabase; 
+
+validationSvc.Start();
+
+string lineOutput;
+while((lineOutput = validationSvc.GetNextLine()) != null)
+{
+	Console.WriteLine(lineOutput);
+}
+
+validationSvc.Close();	
+				</code>
+			</example>
+		</overview>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbValidation" /> class.
+			</summary>
+		</constructor>
+		<property name="Database">
+			<summary>
+			Path of the primary file of the database, from the server’s point of view.
+			</summary>
+			<value>Database path.</value>
+		</property>
+		<method name="Execute">
+			<summary>
+			Executes Firebird database validation service task.
+			</summary>
+		</method>
+	</class>
+</doc>

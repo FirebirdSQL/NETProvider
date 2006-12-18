@@ -1,0 +1,534 @@
+WHAT IS NEW - Firebird ADO.NET Data provider for .NET and Mono 
+==============================================================
+
+
+· 1.7.1 ( 2006-03-29 ) ·
+
+(Please read the Changelog for details)
+
+
+Bug Fixes:
+
+
+	- Fixed bug #1417618 
+
+	- Minor fix on Guid datatype infer.
+
+Changes:
+
+	- Changes to try to avoid problems with IPV6.
+
+	- Added new synonym for the user identification ( userid ) in connection strings.
+
+New features:
+
+	- Added initial support for EXECUTE PROCEDURE commands in FbBatchExecution class.
+
+
+· 1.7.1 Release Candidate 4 ( 2006-02-02 ) ·
+
+(Please read the Changelog for details)
+
+	- Fixed problem with the COLUMN_SIZE column value for char 
+	and varchar columns on the ViewColumnUsage schema
+
+
+· 1.7.1 Release Candidate 3 ( 2005-10-14 ) ·
+
+(Please read the Changelog for details)
+
+	- Backported Input parameter handling from 2.0 sources.
+
+
+· 1.7.1 Release Candidate 2 ( 2005-10-10 ) ·
+
+(Please read the Changelog for details)
+
+Bug fixes:
+
+	* Fix for RecordsAffected handling.
+
+
+· 1.7.1 Release Candidate 1 ( 2005-09-04 ) ·
+
+(Please read the Changelog for details)
+
+New features:
+
+	* Support for the new INSERT ... RETURNING statement of Firebird v2.0
+	
+	* Added support to the new CREATE SEQUENCE and SET GENERATOR statements to the FbBatchExecution class.
+
+	* Add parameter information for DML statements and allow the configuration of quoted identifiers usage 
+	to the DataAdapter Configuration Wizard.
+
+Bug fixes:
+
+	* Fixed problem with mono on linux when reading port number for firebird events
+	connection (Gabriel Reid)
+
+	* Columns, ViewColumns, Stored Procedure parameters and domains schemas should now be working against Firebird v2.0
+
+	* Fixed bug on numeric and decimal array encoding.
+	
+Changes:
+
+	* Changed the named parameters parsing method ( see tracker item #1256652 )
+
+	* Check connection state on FbRemoteEvent constructor.
+
+	* Changed the way to describe input parameters on FbCommand class
+
+	* Changed implicit transactions handling for SELECT statements, now they will be discarded using
+	a hard commit.
+
+Misc:
+
+	* Updated error messages resources.
+
+
+Final ( 2005-06-03 )
+-----   ---- -- --
+
+Bug fixes (Please read the Changelog for details)
+
+	- Fixed nagle algorithm desactivation.
+		
+	- Fixes on the design time support for the FbDataAdapter class.
+
+	- Fix on the FbDataAdapter.Update method to better check the conenction
+	of the command to execute.
+
+	- Changed FbBackup file to be a class (allowing it's usage from C++)
+
+	- Fixed constructor of FbBatchExecution class.
+
+	- Fixed FbDataReader.HasRows property to return true only for
+	SELECT commands.
+
+	- Fixed Decimal and Numeric field handling.
+
+	- Fixed .NET CF 2.0 build problems.
+
+	- Fixed some bugs on string and comment handling of the FbScript class.
+
+	- Changes on CharSet.SupportedCharsets property to be thread safe.
+
+
+- Added a new ActiveUSers property to the FbDatabaseInfo class.
+
+
+
+
+Release Candidate 3 ( 2005-04-12 )
+------- --------- - - ---- -- -- -
+
+Bug fixes (Please read the Changelog for details)
+
+	- Fixed bug in DbValue.GetString method when reading 
+	Clob values several times (Thanks to Mike Scott for his feedback).
+
+	- Fixed ExecuteScalar calls for Stored Procedure execution (using
+	the sp name only).
+
+	- Fixed FbScript constructor overload that takes the file path to 
+	properly close the file after read the contents.
+
+	- Fixed comment removal in FbScript class.
+
+	- Allow access to the FbDataReader.RecordsAffected property when 
+	the reader is not closed.
+
+	- Changes to improve the FbDataAdapter.RowUpdated event handling, they
+	needs testing.
+
+	- Fixed DataSet generation in the Visual Studio Designer.
+
+	- Fixed problem with implicit transaction Commit's and Rollback's
+	when the objects are collected by the GC on FbCommand class.
+
+	- Changed all references to CurrentUICulture to CurrentCulture to
+	avoid problems with neutral cultures.
+
+	- Fixed traling balnks problem in FbConnectionStringBuilder class.
+
+	- Changed encoding of relation, field, alias and owner names, to use
+	the connection character set in GdsStatement class.
+
+- Improved error reporting on FbDataAdapter.Update calls.
+
+
+Release Candidate 2 ( 2005-03-26 )
+------- --------- - - ---- -- -- -
+
+Bug fixes (Please read the Changelog for details)
+
+	* Fixed bug inc onnection string when using DataSource parameter name.
+
+	* Fixed socket connections when using .NET Compact Framework.
+
+	* Fixed VS 2003 problems on design time.
+
+	* Changed ProtocolType used to configure the Socket to ProtocolType.Tcp
+
+	* Fixed problem with firebird exception message formatting.
+
+	* Fixed problem with GdsStatement.Transaction and FesStatement.Transaction.
+
+* Added support for Visual Studio 2002 in the FbDataAdapter wizards.
+
+
+
+Release Candidate 1 ( 2005-02-05 )
+------- --------- - - ---- -- -- -
+
+Bug fixes (Please read the Changelog for details)
+
+	* Fixed problem with 0 lowerbound array fields on the embedded server support.
+
+	* Fixed problem with stored procedure calls on FbCommand.ExecuteScalar method.
+
+	* Fixed null Guid handling.
+
+	* Try to fix performance problem with array fields on selectable statements
+	when working agsint the standalone firebird server.
+
+	* Fixed problems with the new Design time support on Visual Studio 2003.
+
+	* Fixed incorrect mapping for binary blob fields to System.Array, now it will
+	be mapped to byte[]
+
+	* Fixed char values checkings by using the field character set information
+	for the check.
+
+	* Fixed some documentation comemnts that were incorrect.
+
+* Improved comments removal on the FbScript class. (Andreas Sandner)
+
+* Integrated the BinaryEncoding class for the octets character set support (Contributed by Jim Beveridge)
+
+* Added error information to the FbDataAdapter configuration wizard.
+
+
+Beta 3 ( 2005-01-01 )
+---- - - ---- -- -- -
+
+
+Bug fixes (Please read the Changelog for details)
+
+    * Design Time support:
+
+	- Fixed DTE creation when there are more than one Visual Studio instance.
+	Reference:
+
+	- Fixed problems when trying to add more than one FbDataAdapter at design time
+	using the Wizard.
+
+    * General:
+
+	- Fixed globalization issues.
+
+	- Fixed bug on StatementBase.Release method.
+
+	- Fixed .NET Encoding class usage. 
+
+	- Fixed incorrect chck in the FbCommandBuilder class.
+
+	- Fixed FbDataReader.GetString calls when the field has BIGINT data type.
+
+
+* Initial support for Guid data type (Mapped to a CHAR(16) CHARACTER OCTETS field in firebird)
+
+* Added initial DDL autocommit support to the FbbatchExecution class.
+
+
+
+Beta 2 ( 2004-12-05 )
+---- - - ---- -- -- -
+
+( Please, see the changelog for details )
+
+
+* Better fit to ADO.NET
+
+* Bug fixes:
+
+	- Fixed FxCop issues.
+
+	- Fixed bug in the FbConnection.CreateDatabase method.
+
+	- Fixed bugs on Transaction handling.
+
+	- Fixed FbDataReader.GetBoolean method.
+
+	- Fixed exception message formatting when the resource file
+	cannot be found.
+
+	- Fixed problem with the FbConnection.CreateDatabase method.
+
+* Added a new Wizard Framework to simplify the development of design time wizards.
+
+* Added a new Configuration Wizard for the FbDataAdapter class.
+
+* Added a new DataSet generator for the FbDataAdapter class.
+
+* Improvements to the character set handling.
+
+* Improved multibyte-character set support for the embedded server.
+
+* Added a new Commit(string savePointName) overload in the FbTransaction class.
+
+* Changes on the Firebird Events implementation.
+
+
+Beta 1 ( 2004-11-05 )
+---- - - ---- -- -- -
+
+( Please, see the changelog for details )
+
+
+* Bug fixes:
+
+	- Fixed Event Parameter buffer handling.
+
+	- Fixed plan retrieval using the connection character set.
+
+	- Fixed Globalization issues.
+
+	- Documentation fixes.
+
+	- Minor fix in the FbCommandBuilder class on quotes usage.
+
+	- Fixed Input parameter describe when the Prepare method
+	  is called before the FbCommand instance has parameters assigned.
+
+	- Fixed Role usage in Connection Strings.
+
+* Added new "Isolation Level" parameter for the connection string,
+  that allows to set the default IsolationLevel for implicit transactions.
+
+* Improve handling of parameters when they have null values (embedded
+server support only.)
+
+
+* Added changes to try to handle arrays defined with lowerbound 0 correctly.
+
+
+
+NOTE: The design time support included in this release for the FbDataAdapter
+class is not complete, please, do not use it until it get finished in future 
+releases.
+
+
+Alpha 3 ( 2004-09-19 )
+------- - ---- -- -- -
+
+( Please, see the changelog for details )
+
+* Bug Fixes.
+
+	- Fixed bug #1015453.
+
+	- Fixed bug #1017108.
+
+	- Fixed execution of unicode sql commands (that doesn't use 
+	parameters) when working with the embedded server.
+
+* Improvements and bugfixes in the connection pooling implementation.
+
+* Added a new FbConnectionStringBuilder class. FbConnectionString class 
+is now internal.
+
+* Reworked the usage (internal) of database and service 
+parameter buffers and added new ones for blobs and
+transactions.
+
+* Improved information request made to the server 
+(server version, statement type and number of rows 
+affected by a insert, delete or update command)
+
+* Added some improvements in the database schema stuff.	
+
+* Added changes to the FbDataReader.GetSchemaTable method to avoid schema 
+command execution when the field doesn't belong to a firebird table.
+
+
+
+Alpha 2 ( 2004-08-22 )
+------- - ---- -- -- -
+
+( Please, see the changelog for details )
+
+* Bug Fixes.
+
+	- Fixed bug #995178
+
+	- Fixed bug #998002
+
+	- Fixed bug #1000160
+
+	- Fixed bug #1003519
+
+	- Fixed bug #1007104
+
+	- Fixed bug #1013031
+
+* Removed the limitiation of one DataReader per connection.
+(Now you can have many DataReader's per connection and only
+one per command).
+
+* Override DbDataAdapter.Update(DataRow[], TableMappingCollection)
+method in the FbDataAdapter class.
+
+* Added a new FetchSize property to the FbCommand class and
+a new "Fetch Size" parameter to the connection string.
+This allows to change the number of rows that will fetched
+when doing sending a fetch to the Firebird Server.
+
+* Reworked row fetching using a Queue instead of a object[].
+(This is an internal change that affects the native C# GDS
+implementation).
+
+* Reworked output parameter handling on stored procedure 
+execution.
+
+* Removed the support for batch queries as it was implemented 
+only using FbDataReader.NextResult and was very limited.
+
+* Changes on Database schema support:
+    
+	* All source files has been renamed to remove
+	the Schema suffix (FbTablesSchema.cs -> FbTables.cs)
+	The same for the class names.
+
+	* There are a new 'Restrictions' schema that will
+	return the restriction columns for each schema.
+
+	* There are new columns in some schemas:
+
+		XXXX_CATALOG
+		XXXX_SCHEMA
+
+	That will make the returned schemas more
+	general and compatible with other databases
+	(what will be nice for .net 2.0 as the schema
+	support is in the System.Data.Common.DbConnection
+	class)
+
+	These new columns are restriction columns as
+	well (the value will be null always) 		
+
+	* New schemas.
+
+		- DataTypes. Returns the data types information.
+
+		- MetaDataCollections. Returns all the supported schemas, 
+		and the number of restrictions of each one
+
+		- Restrictions. Returns the restriction columns of each schema.
+
+        * New FbConnection methods.
+
+            - GetChema()
+            - GetSchema(string)
+            - GetSchema(string[])
+
+        * Changes on the names of the FbDbSchemaType elements to remove the underscore.
+
+        ** Some of the changes in the Schema Results are: **
+	
+	* Columns Schema.
+
+        	- The COLUMN_DATA_TYPE now holds the datatype name.
+
+	        - Added new IS_ARRAY column.
+           
+        	- Removed PROVIDER_TYPE, PRIMARY_KEY and UNIQUE_KEY columns.
+		(The reason is that the query with that columsn gets a lot time to be executed 
+		in databases with complex metadata)
+
+        * Tables schema.
+
+	        - The IS_SYSTEM_TABLE column now will have aloways 0/1 as values.
+
+		- Not it's no possible to filter by the IS_SYSTEM_TABLE column,
+		instead filter by TABLE_TYPE can be done using:
+
+			a. TABLE
+			b. VIEW
+			c. SYSTEM TABLE
+
+	* Domains Schema.
+
+        	- The COLUMN_DATA_TYPE now holds the datatype name.
+
+	* ProcedureParameters Schema.
+
+        	- The COLUMN_DATA_TYPE now holds the datatype name.
+
+	* ViewColumnUsage Schema.
+
+        	- The COLUMN_DATA_TYPE now holds the datatype name.
+
+        * Generators schema.
+
+	        * The IS_SYSTEM_GENERATOR column now will have always 0/1 as values.
+
+        * Functions schema.
+
+	        * The IS_SYSTEM_FUNCTION column now will have always 0/1 as values.
+
+        * Triggers schema.
+
+	        * The IS_SYSTEM_TRIGGER column now will have always 0/1 as values.
+
+	* ForeignKeys schema:
+
+		* The order of the restriction columns is changed:
+
+                    1. PK_TABLE_CATALOG
+                    2. PK_TABLE_SCHEMA
+                    3. PK_TABLE_NAME
+                    4. FK_TABLE_CATALOG
+                    5. FK_TABLE_SCHEMA
+                    6. FK_TABLE_NAME
+	
+
+Alpha 1 ( 2004-07-22 )
+----- -   ---- -- --
+
+( Please, see the changelog for details )
+
+* Initial reimplementation of the Firebird 
+  Events System.
+
+* Initial changes to FbConnection, FbCommand
+  and FbTransaction classes to release resources
+  allocated in the Firebird Server without
+  the need of explicity call to Dispose 
+  (if an object goes out of scope the allocated
+  resources should be released in the object
+  destructor)
+
+* New FbConnectionString class.
+
+* The Firebird Services implementation now
+  works using connection strings.
+
+* Added the ability of create and drop 
+  databases using connection strings.
+
+* Internal rework of GDS's implementations.
+
+* The documentation package now contains
+  preliminary documentation about how the
+  Firebird wire protocol is implemented in
+  the ADO.NET provider.
+
+* Changed private methods naming to PasCal case
+  to match the MS Guidelines.
+
+* The assembly should now be available in the
+  Visual Studio Add Reference dialog box after
+  the installation (when using the installation 
+  package).

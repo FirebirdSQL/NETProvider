@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<doc>
+	<class name="FbServiceParameters" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Parameters for connection to the Firebird Service Manager.
+			</summary>
+		</overview>
+		<property name="UserName">
+			<summary>
+				Firebird User account for login.
+			</summary>
+		</property>
+		<property name="UserPassword">
+			<summary>
+				Password for the Firebird user account.
+			</summary>
+		</property>
+		<property name="DataSource">
+			<summary>
+				Server name for establish the connection.
+			</summary>
+		</property>
+		<property name="Port">
+			<summary>
+				Port number in the server for establish the connection.
+			</summary>
+		</property>		
+		<property name="Dialect">
+			<summary>
+				Database dialect.
+			</summary>
+		</property>
+		<property name="Database">
+			<summary>
+				Database path to establish the connection.
+			</summary>
+		</property>
+		<property name="Packetsize">
+			<summary>
+				Size (in bytes) of network packets used to communicate with an instance of Firebird Server.
+			</summary>
+		</property>
+		<property name="Role">
+			<summary>
+				User role.
+			</summary>
+		</property>
+		<property name="ServerType">
+			<summary>
+				When <b>0</b> the provider will use the GDS implementation
+				used for connections to Firebird Super or Classic servers, when
+				<b>1</b> the provider will use the GDS implementation used
+				for connections to the Firebird embedded server.
+			</summary>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbServiceParameter" /> class.
+			</summary>
+		</constructor>
+	</class>
+</doc>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbDatabaseInfo" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Reports requested information about a attached database. This class cannot be inherited.
+			</summary>
+		</overview>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <b>FbDatabaseInfo</b> class.
+			</summary>
+		</constructor>
+		<constructor name="ctor(FbConnection)">
+			<summary>
+			Creates a new instance of the <b>FbDatabaseInfo</b> class with an <see cref="FbConnection" /> object.
+			</summary>
+			<param name="connection">An <see cref="FbConnection" /> object.</param>
+		</constructor>
+		<property name="Connection">
+			<summary>
+			Gets or sets the <see cref="FbConnection" /> used by this instance of the <see cref="FbDatabaseInfo">FbDataseInfo</see>.
+			</summary>
+			<value>The connection to a data source. The default is a null value.</value>
+		</property>
+		<property name="IscVersion">
+			<summary>
+			Gets the version identification string of the database implementation.
+			</summary>
+		</property>
+		<property name="ServerVersion">
+			<summary>
+			Gets the version identification string of the Firebird Server.
+			</summary>
+		</property>
+		<property name="ServerClass">
+			<summary>
+			Gets wheter Firebird Server is a Super or Classic server.
+			</summary>
+		</property>
+		<property name="PageSize">
+			<summary>
+			Gets the page size of the database.
+			</summary>
+		</property>
+		<property name="OdsVersion">
+			<summary>
+			Gets the ODS major version number.
+			</summary>
+			<remarks>
+				<p>
+				• Databases with different major version numbers have different
+				physical layouts; a database engine can only access databases
+				with a particular ODS major version number.
+				</p>
+				<p>
+				• Trying to attach to a database with a different ODS number
+				results in an error.
+				</p>
+			</remarks>
+		</property>
+		<property name="OdsMinorVersion">
+			<summary>
+			Gets the On-disk structure (ODS) minor version number.
+			</summary>
+			<remarks>
+			An increase in a minor version number indicates a non-structural change, 
+			one that still allows the database to be accessed by database engines with
+			the same major version number but possibly different minor version numbers.
+			</remarks>
+		</property>
+		<property name="MaxMemory">
+			<summary>
+			Gets the Maximum amount of memory (in bytes) used at one time since the first process attached to the database.
+			</summary>
+		</property>
+		<property name="CurrentMemory">
+			<summary>
+			Gets the Amount of server memory (in bytes) currently in use.
+			</summary>
+		</property>
+		<property name="NumBuffers">
+			<summary>
+			Gets the number of memory buffers currently allocated.
+			</summary>
+		</property>
+		<property name="ReadOnly">
+			<summary>
+			Gets wheter database is in readonly mode.
+			</summary>
+		</property>
+		<property name="AllocationPages">
+			<summary>
+			Gets the number of database pages allocated.
+			</summary>
+		</property>
+		<property name="BaseLevel">
+			<summary>
+			Gets the database version (level) number.
+			</summary>
+		</property>
+		<property name="DbId">
+			<summary>
+			Gets the database file name and site name.
+			</summary>
+		</property>
+		<property name="Implementation">
+			<summary>
+			Gets the database implementation number.
+			</summary>
+		</property>
+		<property name="ForcedWrites">
+			<summary>
+			Gets the mode in which database writes are performed.
+			</summary>
+			<value>
+			<b>true</b> if database is in forced writes mode; <b>false</b> if not.
+			</value>
+		</property>
+		<property name="NoReserve">
+			<summary>
+			Gets the indicates if space is reserved on each database page for holding.
+			</summary>
+			<value>
+			<b>true</b> if the space is reserved; <b>false</b> if not.
+			</value>
+		</property>
+		<property name="SweepInterval">
+			<summary>
+			Gets the number of transactions that are committed between “sweeps” to
+			remove database record versions that are no longer needed.
+			</summary>
+		</property>
+		<property name="Fetches">
+			<summary>
+			Gets the number of reads from the memory buffer cache.
+			</summary>
+		</property>
+		<property name="Marks">
+			<summary>
+			Gets the number of writes to the memory buffer cache.
+			</summary>
+		</property>
+		<property name="Reads">
+			<summary>
+			Gets the number of page reads.
+			</summary>
+		</property>
+		<property name="Writes">
+			<summary>
+			Gets the number of page writes.
+			</summary>
+		</property>
+		<property name="BackoutCount">
+			<summary>
+			Gets the number of removals of a version of a record.
+			</summary>
+		</property>
+		<property name="DeleteCount">
+			<summary>
+			Gets the number of database deletes since the database was last attached.
+			</summary>
+		</property>
+		<property name="ExpungeCount">
+			<summary>
+			Gets the number of removals of a record and all of its ancestors, for records
+			hose deletions have been committed.
+			</summary>
+		</property>
+		<property name="InsertCount">
+			<summary>
+			Gets the number of inserts into the database since the database was last attached.
+			</summary>
+		</property>
+		<property name="PurgeCount">
+			<summary>
+			Gets the number of removals of old versions of fully mature records.
+			</summary>
+		</property>
+		<property name="ReadIdxCount">
+			<summary>
+			Gets the number of reads done via an index since the database was last attached.
+			</summary>
+		</property>
+		<property name="ReadSeqCount">
+			<summary>	
+			Gets the number of sequential sequential table scans (row reads) done on each 
+			table since the database was last attached.	
+			</summary>
+		</property>
+		<property name="UpdateCount">
+			<summary>
+			Gets the number of database updates since the database was last attached.
+			</summary>
+		</property>
+		<property name="DatabaseSizeInPages">
+			<summary>
+			Gets the database size in pages.
+			</summary>
+		</property>
+		<property name="OldestTransaction">
+			<summary>
+			Gets the number of the oldest transaction.
+			</summary>
+		</property>
+		<property name="OldestActiveTransaction">
+			<summary>
+			Gets the number of the oldest active transaction.
+			</summary>
+		</property>
+		<property name="OldestActiveSnapshot">
+			<summary>
+			Gets the number of the oldest snapshot transaction.
+			</summary>
+		</property>
+		<property name="NextTransaction">
+			<summary>
+			Gets the number of the next transction.
+			</summary>
+		</property>
+		<property name="ActiveTransactions">
+			<summary>
+			Gets the number of active transction.
+			</summary>
+		</property>
+	</class>
+</doc>

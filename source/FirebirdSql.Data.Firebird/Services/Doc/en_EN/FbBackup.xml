@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<enum name="FbBackupFlags" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Specifies access flags for database backup.
+			</summary>
+		</overview>
+		<field name="FbBackupFlags.IgnoreChecksums">
+			<summary>Ignore checksums during backup.</summary>
+			<value>0x01</value>
+		</field>
+		<field name="IgnoreLimbo">
+			<summary>Ignore limbo transactions during backup.</summary>
+			<value>0x02</value>
+		</field>
+		<field name="MetaDataOnly">
+			<summary>Output backup file for metadata only with empty tables.</summary>
+			<value>0x04</value>
+		</field>
+		<field name="NoGarbageCollect">
+			<summary>
+			Suppress normal garbage collection during backup. Improves performance on some databases.
+			</summary>
+			<value>0x08</value>
+		</field>
+		<field name="OldDescriptions">
+			<summary>
+			Output metadata in pre-4.0 format.
+			</summary>
+			<value>0x10</value>
+		</field>
+		<field name="NonTransportable">
+			<summary>
+			Output backup file format with non-XDR data format. Improves space and performance by a negligible amount.
+			</summary>
+			<value>0x20</value>
+		</field>
+		<field name="Convert">
+			<summary>Convert external table data to internal tables.</summary>
+			<value>0x40</value>
+		</field>
+		<field name="Expand">
+			<summary>No data compression.</summary>
+			<value>0x80</value>
+		</field>
+	</enum>
+	<class name="FbBackupFile">
+		<overview>
+			<summary>
+			Specifies a backup file path and length to be used in Backup or Restore process.
+			</summary>
+		</overview>
+		<property name="BackupFile">
+			<summary>
+			Path of a backup output file; you can specify multiple output files.
+			</summary>
+		</property>
+		<property name="BackupLength">
+			<summary>
+			The length of the buckup file.
+			</summary>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbBackupFile" /> struct.
+			</summary>
+		</constructor>
+	</class>
+	<class name="FbBackup">
+		<overview>
+			<summary>
+			Back up a database to a file or tape device. This class cannot be inherited.
+			</summary>
+			<remarks>
+				<p>
+			Paths of backup files are relative to the server. Since the Services Manager executes
+			backup and restore tasks on the server host, the Services Manager reads and writes
+			backup files on the server host.	
+			</p>
+				<p>
+			The username and password used to connect to the services manager will be used 
+			to connect to the database for backup. This helps add some degree of security for 
+			this operation. Only the SYSDBA user or the owner of the database will be able to 
+			backup a database.
+			</p>
+			</remarks>
+			<example>
+			The following example makes a backup of a database to a single file and display server output on Console.
+				<code>
+[STAThread]
+static void Main(string[] args)
+{
+    FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
+
+    cs.UserID   = "SYSDBA";
+    cs.Password = "masterkey";
+    cs.Database = "nunit_testdb";
+
+    FbBackup backupSvc = new FbBackup();
+                
+    backupSvc.ConnectionString = cs.ToString();
+    backupSvc.BackupFiles.Add(new FbBackupFile(@"c:\testdb.gbk", 2048));
+    backupSvc.Verbose = true;
+
+    backupSvc.Options = FbBackupFlags.IgnoreLimbo;
+
+    backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+
+    backupSvc.Execute();
+}
+
+static void ServiceOutput(object sender, ServiceOutputEventArgs e)
+{
+    Console.WriteLine(e.Message);
+}				</code>
+			</example>
+		</overview>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbBackup" /> class.
+			</summary>
+		</constructor>
+		<property name="Database">
+			<summary>
+			Gets or sets the path of the primary file of the database, from the server’s point of view.
+			</summary>
+			<value>Database path.</value>
+		</property>
+		<property name="BackupFiles">
+			<summary>
+			Gets or sets the collection of backup files.
+			</summary>
+			<value>
+			The backup files paths and lengths <see cref="FbBackupFile" />.
+			</value>
+		</property>
+		<property name="Verbose">
+			<summary>
+			Gets or sets wheter the output be sent to the client.
+			</summary>
+		</property>
+		<property name="Factor">
+			<summary>
+			Gets the Tape device blocking factor.
+			</summary>
+		</property>
+		<property name="Options">
+			<summary>
+			Gets a value that specifies options used for database backup.
+			</summary>
+			<value>
+			A bitwise combination of the <see cref="FbBackupFlags">FbBackupFlags</see> values which provides information about backup options.
+			</value>
+		</property>
+		<method name="Execute">
+			<summary>
+			Executes database backup service task.
+			</summary>
+		</method>
+	</class>
+</doc>

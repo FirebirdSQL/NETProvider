@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbConnectionStringBuilder" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Allows handling of the connection strings. See <see cref="FbConnection.ConnectionString"/>
+			</summary>
+			<example>
+				The following example builds a connection string and prints it in the console.
+				<code>
+FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
+
+cs.DataSource = "localhost";
+cs.UserID	 = "SYSDBA";
+cs.Password	 = "masterkey";
+cs.Database	 = "nunit_testdb";
+cs.Port		 = 3050;
+cs.Charset	 = "UNICODE_FSS";
+cs.Pooling	 = true;
+cs.ConnectionLifeTime = 30;
+// To use the embedded server set the ServerType to 1
+cs.ServerType = 0;
+
+Console.WriteLine(cs.ToString());
+				</code>
+			</example>
+		</overview>
+		<property name="ConnectionString">
+			<summary>Gets or sets the connection string.</summary>
+			<value>The connection string.</value>
+		</property>
+		<property name="IsValid">
+			<summary>Gets a value that indicates if the connection string is valid or not.</summary>
+			<value><b>true</b> if the connection string is valid; or <b>false</b> if not.</value>
+		</property>
+		<property name="UserID">
+			<summary>Gets or sets the firebird User account for login.</summary>
+			<value>The user name.</value>
+		</property>
+		<property name="Password">
+			<summary>Gets ort sets the password for the Firebird user account.</summary>
+			<value>The user password.</value>
+		</property>
+		<property name="DataSource">
+			<summary>
+			Gets the name of the Firebird Server to which to connect.
+			</summary>
+			<value>
+			The name of the Firebird Server to which to connect. The default value is an empty string.
+			</value>
+		</property>
+		<property name="Port">
+			<summary>
+			Gets or sets the port number in the server for establish the connection
+			</summary>
+			<value>The port number.</value>
+		</property>
+		<property name="Database">
+			<summary>
+			Gets the name of the actual database or the database to be used when a connection is open.
+			</summary>
+			<value>
+			The name of the actual database or the database to be used when a connection is open. The default value is an empty string.
+			</value>
+		</property>
+		<property name="PacketSize">
+			<summary>	
+			Gets or sets the size (in bytes) of network packets used to communicate with an instance of Firebird Server.
+			</summary>
+			<value>The size (in bytes) of network packets. The default value is 8192.</value>
+			<remarks>
+				<para>
+				<b>PacketSize</b> may be in the rane 512-32767 bytes. 
+				An exception is generated if the value is outside of this range.
+				</para>
+			</remarks>
+		</property>
+		<property name="Role">
+			<summary>Gets or sets the suer role name.</summary>
+			<value>The user role</value>
+		</property>
+		<property name="Dialect">
+			<summary>	
+			Gets or sets the database dialect.
+			</summary>
+			<value>The database dialect. Default value is 3.</value>
+		</property>
+		<property name="Charset">
+			<summary>Gets or sets the connection character set.</summary>
+			<value>The connection character set</value>
+			<remarks>
+				<para>
+					<list type="table">
+						<listheader>
+							<term>Firebird Charset</term>
+							<term>Description</term>
+						</listheader>
+						<item>
+							<description>ASCII</description>
+							<description>American Standard Code for Information Interchange.</description>
+						</item>
+						<item>
+							<description>BIG_5</description>
+							<description>Big5, Traditional Chinese.</description>
+						</item>
+						<item>
+							<description>DOS437</description>
+							<description>MS-DOS United States, Australia, New Zealand, South Africa.</description>
+						</item>
+						<item>
+							<description>DOS850</description>
+							<description>MS-DOS Latin-1.</description>
+						</item>
+						<item>
+							<description>DOS860</description>
+							<description>MS-DOS Portugues.</description>
+						</item>
+						<item>
+							<description>DOS861</description>
+							<description>MS-DOS Icelandic.</description>
+						</item>
+						<item>
+							<description>DOS863</description>
+							<description>MS-DOS Canadian French.</description>
+						</item>
+						<item>
+							<description>DOS865</description>
+							<description>MS-DOS Nordic.</description>
+						</item>
+						<item>
+							<description>EUCJ_0208</description>
+							<description>JIS X 0201, 0208, 0212, EUC encoding, Japanese.</description>
+						</item>
+						<item>
+							<description>GB_2312</description>
+							<description>GB2312, EUC encoding, Simplified Chinese.</description>
+						</item>
+						<item>
+							<description>ISO8859_1</description>
+							<description>ISO 8859-1, Latin alphabet No. 1.</description>
+						</item>
+						<item>
+							<description>ISO8859_2</description>
+							<description>ISO 8859-2, Latin alphabet No. 2.</description>
+						</item>
+						<item>
+							<description>KSC_5601</description>
+							<description>Windows Korean.</description>
+						</item>
+						<item>
+							<description>ISO2022-JP</description>
+							<description>Windows Japanese.</description>
+						</item>
+						<item>
+							<description>SJIS_0208</description>
+							<description>Japanese (Shift-JIS)</description>
+						</item>
+						<item>
+							<description>UNICODE_FSS</description>
+							<description>Eight-bit Unicode Transformation Format.</description>
+						</item>
+						<item>
+							<description>WIN1250</description>
+							<description>Windows Eastern European.</description>
+						</item>
+						<item>
+							<description>WIN1251</description>
+							<description>Windows Cyrillic.</description>
+						</item>
+						<item>
+							<description>WIN1252</description>
+							<description>Windows Latin-1.</description>
+						</item>
+						<item>
+							<description>WIN1253</description>
+							<description>Windows Greek.</description>
+						</item>
+						<item>
+							<description>WIN1254</description>
+							<description>Windows Turkish.</description>
+						</item>
+						<item>
+							<description>WIN1254</description>
+							<description>Windows Hebrew.</description>
+						</item>
+						<item>
+							<description>Arabic</description>
+							<description>Windows Turkish.</description>
+						</item>
+						<item>
+							<description>WIN1257</description>
+							<description>Windows Baltic.</description>
+						</item>
+					</list>
+				</para>
+			</remarks>
+		</property>
+		<property name="ConnectionTimeout">
+			<summary>
+			Gets the time to wait while trying to establish a connection before terminating the attempt and generating an error.
+			</summary>
+			<value>
+			The time (in seconds) to wait for a connection to open. The default value is 0 seconds.
+			</value>
+		</property>
+		<property name="Pooling">
+			<summary>
+			Gets or sets the status of the connection pooling (enabled/disabled).
+			</summary>
+			<value>
+			When <b>true</b>, the <b>FbConnection</b> object is drawn from the appropriate 
+			pool, or if necessary, is created and added to the appropriate pool. Recognized 
+			values are <b>true</b>, <b>false</b>, <b>yes</b>, and <b>no</b>.
+			</value>
+		</property>
+		<property name="ConnectionLifeTime">
+			<summary>
+			Gets or sets the lifetime of a connection in the pool.
+			</summary>
+			<value>
+			When a connection is returned to the pool, its creation time is compared with the current time, and the connection is destroyed
+			if that time span (in seconds) exceeds the value specified by connection lifetime.
+			</value>
+		</property>
+		<property name="MinPoolSize">
+			<summary>Gets or sets the minumun pool size.</summary>
+			<value>The minimun number of connections allowed in the pool. Default is 0.</value>
+		</property>
+		<property name="MaxPoolSize">
+			<summary>Gets or sets the maximun pool size.</summary>
+			<value>The maximun number of connections allowed in the pool. Default is 100.</value>
+		</property>
+		<property name="FetchSize">
+			<summary>Indicates the number of rows that will be fetched at the same time on <see cref="FbDataReader.Read"/> calls into the internal row buffer.</summary>
+			<value>The maximun number of rows to be fetched in a single call to <see cref="FbDataReader.Read"/> into the internal row buffer.</value>
+        </property>
+		<property name="ServerType">
+			<summary>Gets or sets the server type to wich we want to connect.</summary>
+			<value>The default value is 0.</value>
+			<remarks>
+			When <b>0</b> the provider will use the GDS implementation
+			used for connections to Firebird Super or Classic servers, when
+			<b>1</b> the provider will use the GDS implementation used
+			for connections to the Firebird embedded server.
+			</remarks>
+		</property>
+		<property name="IsolationLevel">
+			<summary>Gets or sets the default Isolation Leve for implicit transactions.</summary>
+			<value>An IsolationLevel.</value>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbConnectionStringBuilder" /> class.
+			</summary>
+		</constructor>
+		<constructor name="ctor(System.String)">
+			<summary>
+			Creates a new instance of the <see cref="FbConnectionStringBuilder" /> class with
+			the specified connection string.
+			</summary>
+		</constructor>
+		<method name="Load(System.String)">
+			<summary>Parsed and loads a connection string object.</summary>
+			<param name="connectionString">A valid Firebird connection string.</param>
+		</method>
+		<method name="Validate()">
+			<summary>Validates current connection string parameters.</summary>
+		</method>
+	</class>
+</doc>
