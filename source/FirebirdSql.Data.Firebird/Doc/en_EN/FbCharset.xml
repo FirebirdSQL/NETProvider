@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<doc>
+	<enum name="FbCharset" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Specifies the character set of <see cref="FbParameter" />.
+			</summary>
+		</overview>
+		<field name="Default">
+			<summary>
+			Use the connection character set.
+			</summary>
+		</field>		
+		<field name="None">
+			<summary>
+			No specific character set usage. 
+			</summary>
+			<remarks>
+			This will be mapped to the .NET default encoding.
+			</remarks>
+		</field>		
+		<field name="Ascii">
+			<summary>
+			American Standard Code for Information Interchange.
+			</summary>
+		</field>		
+		<field name="UnicodeFss">
+			<summary>
+			Eight-bit Unicode Transformation Format.
+			</summary>
+		</field>		
+		<field name="ShiftJis0208">
+			<summary>
+			Shift-JIS, Japanese.
+			</summary>
+		</field>		
+		<field name="EucJapanese0208">
+			<summary>
+			JIS X 0201, 0208, 0212, EUC encoding, Japanese.
+			</summary>
+		</field>		
+		<field name="Iso2022Japanese">
+			<summary>
+			Windows Japanese.
+			</summary>
+		</field>		
+		<field name="Dos437">
+			<summary>
+			MS-DOS United States, Australia, New Zealand, South Africa.
+			</summary>
+		</field>		
+		<field name="Dos850">
+			<summary>
+			MS-DOS Latin-1.
+			</summary>
+		</field>		
+		<field name="Dos865">
+			<summary>
+			MS-DOS Nordic.
+			</summary>
+		</field>		
+		<field name="Dos860">
+			<summary>
+			MS-DOS Portuguese.
+			</summary>
+		</field>		
+		<field name="Dos863">
+			<summary>
+			MS-DOS Canadian French.
+			</summary>
+		</field>		
+		<field name="Iso8859_1">
+			<summary>
+			ISO 8859-1, Latin alphabet No. 1.
+			</summary>
+		</field>		
+		<field name="Iso8859_2">
+			<summary>
+			ISO 8859-2, Latin alphabet No. 2.
+			</summary>
+		</field>		
+		<field name="Ksc5601">
+			<summary>
+			Windows Korean.
+			</summary>
+		</field>		
+		<field name="Dos861">
+			<summary>
+			MS-DOS Icelandic.
+			</summary>
+		</field>		
+		<field name="Windows1250">
+			<summary>
+			Windows Eastern European.
+			</summary>
+		</field>		
+		<field name="Windows1251">
+			<summary>
+			Windows Cyrillic.
+			</summary>
+		</field>		
+		<field name="Windows1252">
+			<summary>
+			Windows Latin-1.
+			</summary>
+		</field>		
+		<field name="Windows1253">
+			<summary>
+			Windows Greek.
+			</summary>
+		</field>		
+		<field name="Windows1254">
+			<summary>
+			Windows Turkish.
+			</summary>
+		</field>		
+		<field name="Big5">
+			<summary>
+			Big5, Traditional Chinese.
+			</summary>
+		</field>		
+		<field name="Gb2312">
+			<summary>
+			GB2312, EUC encoding, Simplified Chinese.
+			</summary>
+		</field>		
+		<field name="Windows1255">
+			<summary>
+			Windows Hebrew.
+			</summary>
+		</field>		
+		<field name="Windows1256">
+			<summary>
+			Windows Arabic.
+			</summary>
+		</field>		
+		<field name="Windows1257">
+			<summary>
+			Windows Baltic.
+			</summary>
+		</field>		
+	</enum>
+</doc>

@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<doc>
+	<class name="FbDataAdapter" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Represents a set of data commands and a connection to a data source that are 
+			used to fill the <b>DataSet</b> and update the data source. 
+			This class cannot be inherited.
+			</summary>
+			<remarks>
+			<para>
+			The <b>FbDataAdapter</b>, serves as a bridge between a <b>DataSet</b> and FirebirdSQL for retrieving and saving data. 
+			The <b>FbDataAdapter</b> provides this bridge by mapping <b>Fill</b>, which changes the data in the <b>DataSet</b> to 
+			match the data in the data source, and <b>Update</b>, which changes the data in the data source to match the data in 
+			the <b>DataSet</b>, using the appropriate DSQL statements against the data source.
+			</para>
+			<para>
+			<b>FbDataAdapter</b> is used in conjunction with <see cref="FbConnection" /> and <see cref="FbCommand" /> 
+			to increase performance when connecting to a FirebirdSQL Server database. 
+			</para>
+			<para>
+			The <b>FbDataAdapter</b> also includes the <see cref="FbDataAdapter.SelectCommand" />, <see cref="FbDataAdapter.InsertCommand" />, 
+			<see cref="FbDataAdapter.DeleteCommand" />, <see cref="FbDataAdapter.UpdateCommand">UpdateCommand</see>, and <b>TableMappings</b> properties to facilitate 
+			the loading and updating of data.
+			</para>
+			<para>
+			When an instance of <b>FbDataAdapter</b> is created, the read/write properties are set to initial values. 
+			</para>	    
+			</remarks>
+			<example>
+				<code>    
+public static void CreateFbDataAdapter() 
+{
+    FbConnection	conn = new FbConnection("Database=C:\\PROGRAM FILES\\FIREBIRD\\EXAMPLES\\EMPLOYEE.GDB;User=SYSDBA;Password=masterkey;Dialect=3;Server=localhost");
+    FbDataAdapter	custDA = new FbDataAdapter();
+    FbTransaction	txn	 = conn.BeginTransaction();
+
+    custDA.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+   
+    custDA.SelectCommand = new FbCommand("SELECT custno, customer FROM CUSTOMER", conn, txn);
+    custDA.InsertCommand = new FbCommand("INSERT INTO customer (CustomerID, customer) " +
+                                            "VALUES (?, ?)", conn, txn);
+    custDA.UpdateCommand = new FbCommand("UPDATE customer SET custno = ?, customer = ? " +
+                                            "WHERE custno = ?", conn, txn);
+    custDA.DeleteCommand = new FbCommand("DELETE FROM customer WHERE custno = ?", conn, txn);
+
+    custDA.InsertCommand.Parameters.Add("@custno", FbDbType.Int32, 4, "custno");
+    custDA.InsertCommand.Parameters.Add("@customer", FbDbType.VarChar, 25, "customer");
+ 
+    custDA.UpdateCommand.Parameters.Add("@custno", FbDbType.Int32, 4, "custno");
+    custDA.UpdateCommand.Parameters.Add("@customer", FbDbType.VarChar, 25, "customer");
+    custDA.UpdateCommand.Parameters.Add("@oldcustno", FbDbType.Int32, 4, "custno").SourceVersion = DataRowVersion.Original;
+
+    custDA.DeleteCommand.Parameters.Add("@oldcustno", FbDbType.Int32, 4, "custno").SourceVersion = DataRowVersion.Original;
+}    	
+				</code>
+			</example>    
+		</overview>			
+		<event name="RowUpdating">
+			<summary>
+			Occurs during an Update operation before a command is executed against the data source.
+			</summary>
+		</event>
+		<event name="RowUpdated">
+			<summary>
+			Occurs during an Update operation after a command is executed against the 
+			data source.
+			</summary>
+		</event>
+		<property name="SelectCommand">
+			<summary>
+			Gets or sets an SQL statement or stored procedure used to select records
+			in the data source.
+			</summary>
+			<value>
+			An <see cref="FbCommand" /> that is used during a fill operation to select records from 
+			data source for placement in the <b>DataSet</b>.
+			</value>
+			<remarks>	
+			<para>
+			When <b>SelectCommand</b> is assigned to a previously created <see cref="FbCommand" />, 
+			the <b>FbCommand</b> is not cloned. The <b>SelectCommand</b> maintains a reference 
+			to the previously created <b>FbCommand</b> object.
+			</para>
+			<para>
+			If the <b>SelectCommand</b> does not return any rows, no tables are added to 
+			the <b>DataSet</b>, and no exception is raised.    
+			</para>
+			</remarks>
+		</property>
+		<property name="InsertCommand">
+			<summary>
+			Gets or sets an SQL statement or stored procedure used to 
+			insert new records into the data source.
+			</summary>
+			<value>
+			An <see cref="FbCommand" /> used during an update operation to insert records in 
+			the data source that correspond to new rows in the <b>DataSet</b>.
+			</value>
+			<remarks>
+			<para>
+			During <b>Update</b>, if this property is not set and primary key information is present in the 
+			<b>DataSet</b>, the <b>InsertCommand</b> can be generated automatically if you set the 
+			<see cref="FbDataAdapter.SelectCommand" /> property and use the 
+			<see cref="FbCommandBuilder" />. 
+			Then, any additional commands that you do not set are generated by the 
+			<b>FbCommandBuilder</b>. This generation logic requires key column information 
+			to be present in the <b>DataSet</b>.
+			</para>
+			<para>
+			When <b>InsertCommand</b> is assigned to a previously created <see cref="FbCommand" />, the 
+			<b>FbCommand</b> is not cloned. The <b>InsertCommand</b> maintains a reference 
+			to the previously created <b>FbCommand</b> object.
+			</para>
+			</remarks>
+		</property>
+		<property name="UpdateCommand">
+			<summary>
+			Gets or sets an SQL statement or stored procedure used to update records 
+			in the data source.
+			</summary>
+			<value>
+			An <see cref="FbCommand" /> used during an update operation to update records in the 
+			data source that correspond to modified rows in the <b>DataSet</b>.
+			</value>
+			<remarks>
+			<para>
+			During <b>Update</b>, if this property is not set and primary key information is present in the 
+			<b>DataSet</b>, the <b>UpdateCommand</b> can be generated automatically if you set the 
+			<see cref="FbDataAdapter.SelectCommand" /> property and use the 
+			<see cref="FbCommandBuilder" />. 
+			Then, any additional commands that you do not set are generated by the 
+			<b>FbCommandBuilder</b>. This generation logic requires key column information 
+			to be present in the <b>DataSet</b>.
+			</para>
+			<para>
+			When <b>UpdateCommand</b> is assigned to a previously created <see cref="FbCommand" />, the 
+			<b>FbCommand</b> is not cloned. The <b>UpdateCommand</b> maintains a reference 
+			to the previously created <b>FbCommand</b> object.
+			</para>
+			</remarks>
+		</property>
+		<property name="P:DeleteCommand">
+			<summary>
+			Gets or sets an SQL statement or stored procedure used to delete records 
+			in the data source.
+			</summary>
+			<value>
+			An <see cref="FbCommand" /> used during an update operation to delete records in the 
+			data source that correspond to deleted rows in the <b>DataSet</b>.    
+			</value>
+			<remarks>
+			<para>
+			During <b>Update</b>, if this property is not set and primary key information is 
+			present in the <b>DataSet</b>, the <b>DeleteCommand</b> can be generated automatically 
+			if you set the <see cref="FbDataAdapter.SelectCommand" /> 
+			property and use the <see cref="FbCommandBuilder" />. 
+			Then, any additional commands that you do not set are generated by the 
+			<b>FbCommandBuilder</b>. This generation logic requires key column information 
+			to be present in the <b>DataSet</b>.
+			</para>
+			<para>
+			When <b>DeleteCommand</b> is assigned to a previously created <see cref="FbCommand" />, the 
+			<b>FbCommand</b> is not cloned. The <b>DeleteCommand</b> maintains a reference 
+			to the previously created <b>FbCommand</b> object.
+			</para>
+			</remarks>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbDataAdapter" /> class.
+			</summary>
+			<remarks>
+			When you create an instance of <see cref="FbDataAdapter" />, the following read/write properties 
+			are set to their default values, as shown in the table.
+			<list type="table">
+				<listheader>
+					<term>Properties</term>
+					<term>Default Value</term>
+				</listheader>
+				<item>
+					<description>MissingMappingAction</description>
+					<description>MissingMappingAction.Passthrough</description>
+				</item>
+				<item>
+					<description>MissingSchemaAction</description>
+					<description>MissingSchemaAction.Add</description>		
+				</item>
+			</list>
+			</remarks>
+		</constructor>
+		<constructor name="ctor(FbCommand)">
+			<summary>
+			Creates a new instance of the <see cref="FbDataAdapter" /> class with the specified SQL SELECT statement.
+			</summary>
+			<param name="selectCommand">
+			An <see cref="FbCommand" /> that is an SQL SELECT statement or stored procedure, and is set as the 
+			<see cref="FbDataAdapter.SelectCommand" /> property of the <see cref="FbDataAdapter" />.    
+			</param>
+			<remarks>
+			When you create an instance of <see cref="FbDataAdapter" />, the following read/write properties 
+			are set to their default values, as shown in the table.
+			<list type="table">
+				<listheader>
+					<term>Properties</term>
+					<term>Default Value</term>
+				</listheader>
+				<item>
+					<description>MissingMappingAction</description>
+					<description>MissingMappingAction.Passthrough</description>
+				</item>
+				<item>
+					<description>MissingSchemaAction</description>
+					<description>MissingSchemaAction.Add</description>		
+				</item>
+			</list>
+			</remarks>
+		</constructor>
+		<constructor name="ctor(System.String,FirebirdSql.Data.Firebird.FbConnection)">
+			<summary>
+			Creates a new instance of the <see cref="FbDataAdapter" /> class with an SQL SELECT 
+			statement and an <see cref="FbConnection" />.
+			</summary>
+			<param name="selectCommandText">
+			A string that is a SQL SELECT statement or stored procedure to be used by the 
+			<see cref="FbDataAdapter.SelectCommand" /> property of the <see cref="FbDataAdapter" />. 
+			</param>
+			<param name="selectConnection">
+			An <see cref="FbConnection" /> that represents the connection. 
+			</param>
+			<remarks>
+			When you create an instance of <see cref="FbDataAdapter" />, the following read/write properties 
+			are set to their default values, as shown in the table.
+			<list type="table">
+				<listheader>
+					<term>Properties</term>
+					<term>Default Value</term>
+				</listheader>
+				<item>
+					<description>MissingMappingAction</description>
+					<description>MissingMappingAction.Passthrough</description>
+				</item>
+				<item>
+					<description>MissingSchemaAction</description>
+					<description>MissingSchemaAction.Add</description>		
+				</item>
+			</list>
+			</remarks>
+		</constructor>
+		<constructor name="ctor(System.String,System.String)">
+			<summary>
+			Creates a new instance of the <see cref="FbDataAdapter" /> class with an SQL SELECT statement and a connection string.
+			</summary>
+			<param name="selectCommandText">
+			A string that is a SQL SELECT statement or stored procedure to be used by the 
+			<see cref="FbDataAdapter.SelectCommand" /> property of the <see cref="FbDataAdapter" />. 
+			</param>
+			<param name="selectConnectionString">
+			The connection string. 
+			</param>
+			<remarks>
+			When you create an instance of <see cref="FbDataAdapter" />, the following read/write properties 
+			are set to their default values, as shown in the table.
+			<list type="table">
+				<listheader>
+					<term>Properties</term>
+					<term>Default Value</term>
+				</listheader>
+				<item>
+					<description>MissingMappingAction</description>
+					<description>MissingMappingAction.Passthrough</description>
+				</item>
+				<item>
+					<description>MissingSchemaAction</description>
+					<description>MissingSchemaAction.Add</description>		
+				</item>
+			</list>
+			</remarks>
+		</constructor>
+		<method name="Dispose(System.Boolean)">
+			<summary>
+			Releases the unmanaged and, optionally, the managed resources used by the <see cref="FbDataAdapter" /> object.
+			</summary>
+			<param name="disposing">
+			True for dispose managed and unmanaged resources and false for dispose 
+			anly the unmanaged resources.
+			</param>
+		</method>
+		<method name="CreateRowUpdatedEvent(System.Data.DataRow,System.Data.IDbCommand,System.Data.StatementType,System.Data.Common.DataTableMapping)">
+			<summary>
+			Creates a new instance of the RowUpdatedEventArgs class, regardless of whether the update is successful.
+			</summary>
+			<param name="dataRow">The DataRow used to update the data source. </param>
+			<param name="command">The <see cref="FbCommand" /> executed during the update operation. </param>
+			<param name="statementType">Whether the command is an UPDATE, INSERT, DELETE, or SELECT statement. </param>
+			<param name="tableMapping">DataTableMapping object. </param>
+			<returns>A new instance of the System.Data.Common.RowUpdatedEventArgs class.</returns>
+		</method>
+		<method name="CreateRowUpdatingEvent(System.Data.DataRow,System.Data.IDbCommand,System.Data.StatementType,System.Data.Common.DataTableMapping)">
+			<summary>Creates a new instance of the RowUpdatingEventArgs class.</summary>
+			<param name="dataRow">The DataRow used to update the data source. </param>
+			<param name="command">The <see cref="FbCommand" /> executed during the update operation. </param>
+			<param name="statementType">Whether the command is an UPDATE, INSERT, DELETE, or SELECT statement. </param>
+			<param name="tableMapping"> DataTableMapping object. </param>
+			<returns>A new instance of the System.Data.Common.RowUpdatingEventArgs class.</returns>
+		</method>
+		<method name="OnRowUpdated(System.Data.Common.RowUpdatedEventArgs)">
+			<summary>
+			Raises the RowUpdated event using a RowUpdatedEventArgs object.
+			</summary>
+			<value>
+			A System.Data.Common.RowUpdatedEventArgs object that contains the event data. 
+			</value>
+		</method>		
+		<method name="OnRowUpdating(System.Data.Common.RowUpdatingEventArgs)">
+			<summary>
+			Raises the RowUpdating event using a RowUpdatingEventArgs object, whether or not the update operation is successful.
+			</summary>
+			<value>
+			A System.Data.Common.RowUpdatingEventArgs object that contains the event data. 
+			</value>
+		</method>
+	</class>
+</doc>

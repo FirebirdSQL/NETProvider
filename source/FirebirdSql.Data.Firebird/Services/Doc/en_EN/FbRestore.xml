@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<enum name="FbRestoreFlags" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Specifies access flags for database restore.
+			</summary>
+		</overview>
+		<field name="DeactivateIndexes">
+			<summary>Do not build user indexes during restore.</summary>
+			<value>0x0100</value>
+		</field>
+		<field name="NoShadow">
+			<summary>Do not recreate shadow files during restore.</summary>
+			<value>0x0200</value>
+		</field>
+		<field name="NoValidity">
+			<summary>
+			Do not enforce validity conditions (for example, NOT NULL) during restore.
+			</summary>
+			<value>0x0400</value>
+		</field>
+		<field name="IndividualCommit">
+			<summary>Commit after completing restore of each table.</summary>
+			<value>0x0800</value>
+		</field>
+		<field name="Replace">
+			<summary>Replace database, if one exists.</summary>
+			<value>0x1000</value>
+		</field>
+		<field name="Create">
+			<summary>Restore but do not overwrite an existing database.</summary>
+			<value>0x2000</value>
+		</field>
+		<field name="UseAllSpace">
+			<summary>Do not reserve 20% of each data page for future record versions.</summary>
+			<value>0x4000</value>
+		</field>
+	</enum>
+	<class name="FbRestore" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Restore a database from backup files. This class cannot be inherited.
+			</summary>
+			<remarks>
+				<para>
+			The username and password used to connect to the services manager will be used to connect to the database for restore. 
+			This helps add some degree of security for this operation.
+			</para>
+				<para>
+			Only the SYSDBA or owner of a database may use <see cref="FbRestoreFlags.Replace" /> to overwrite an existing database.
+			</para>
+			</remarks>
+			<example>
+				The following example makes a restore of a database from a single backup file and display server output on Console.
+				<code>
+[STAThread]
+static void Main(string[] args)
+{
+    FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
+
+    cs.UserID   = "SYSDBA";
+    cs.Password = "masterkey";
+    cs.Database = "nunit_testdb";
+
+    FbRestore restoreSvc = new FbRestore();
+
+    restoreSvc.ConnectionString = cs.ToString();
+    restoreSvc.BackupFiles.Add(new FbBackupFile(@"c:\testdb.gbk", 2048));
+    restoreSvc.Verbose = true;
+    restoreSvc.PageSize = 4096;
+    restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
+
+    restoreSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+
+    restoreSvc.Execute();
+}
+
+static void ServiceOutput(object sender, ServiceOutputEventArgs e)
+{
+    Console.WriteLine(e.Message);
+}
+				</code>
+			</example>
+		</overview>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbRestore" /> class.
+			</summary>
+		</constructor>
+		<property name="Database">
+			<summary>
+			Gets or sets the path of the primary file of the database, from the server’s point of view.
+			</summary>
+			<value>Database path.</value>
+		</property>
+		<property name="BackupFiles">
+			<summary>
+			Gets or sets the collections of backup files.
+			</summary>
+			<value>
+			The backup files paths and lengths <see cref="FbBackupFile" />.
+			</value>
+		</property>
+		<property name="Verbose">
+			<summary>
+			Gets or sets wheter the output be sent to the client.
+			</summary>
+		</property>
+		<property name="PageBuffers">
+			<summary>
+			Gets or sets the cache size for the restored database. 
+			</summary>
+			<value>
+			The cache size of the restored database. The default is <b>2048</b> buffer pages in the database cache.
+			</value>
+		</property>
+		<property name="PageSize">
+			<summary>
+			Gets or sets the page size for the restored database.
+			</summary>
+			<value>
+			Database page sizes can be of 1024, 2048, 4096, 8192 and 16384 bytes. 
+			</value>
+		</property>
+		<property name="Options">
+			<summary>
+			Gets or sets the options used for database restore.
+			</summary>
+			<value>
+			A bitwise combination of the <see cref="FbRestoreFlags" /> values which provides information about restore options.
+			</value>
+		</property>
+		<method name="Execute">
+			<summary>
+			Executes Firebird database restore service task.
+			</summary>
+		</method>
+	</class>
+</doc>

@@ -1,0 +1,1 @@
+nant > log.txt

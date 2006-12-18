@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbServerProperties" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Retrieve server configuration information.
+			</summary>
+		</overview>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbServerProperties" /> class.
+			</summary>
+		</constructor>
+		<property name="DatabasesInfo">
+			<summary>
+			Gets information about databases on server.
+			</summary>
+		</property>
+		<property name="ServerConfig">
+			<summary>
+			Gets the parameters and values for IB_CONFIG.
+			</summary>
+		</property>
+		<property name="Version">
+			<summary>
+			Gets the version of the services manager.
+			</summary>
+		</property>
+		<property name="ServerVersion">
+			<summary>
+			Gets the version of the Firebird server.
+			</summary>
+		</property>
+		<property name="Implementation">
+			<summary>
+			Gets the implementation of the Firebird server.
+			</summary>
+		</property>
+		<property name="Capabilities">
+			<summary>
+			Gets a bitmask representing the server's capabilities.
+			</summary>
+		</property>
+		<property name="UserDatabasePath">
+			<summary>
+			Gets the path to the security database in use by the server.
+			</summary>
+		</property>
+		<property name="RootDirectory">
+			<summary>
+			Gets the location of the Firebird root directory on the server; this is the value 
+			of the $INTERBASE system environment variable, or the contents of the registry 
+			key.
+			</summary>
+		</property>
+		<property name="LockManager">
+			<summary>
+			Gets the location of the InterBase lock manager file on the server; this is the 
+			value of the $INTERBASE_LCK system environment variable, or by default 
+			$INTERBASE/serverhostname.lck.
+			</summary>
+		</property>
+		<property name="MessageFile">
+			<summary>
+			Gets the location of the InterBase message file on the server; this is the value 
+			of the $INTERBASE_MSG system environment variable, or by default 
+			$INTERBASE/interbase.msg.
+			</summary>
+		</property>
+		<property name="LicenseInfo">
+			<summary>
+			Gets all license keys and IDs from the license file.
+			</summary>
+		</property>
+		<property name="LicenseMask">
+			<summary>
+			Gets a bitmask representing licensed options on the server.
+			</summary>
+		</property>
+	</class>
+</doc>

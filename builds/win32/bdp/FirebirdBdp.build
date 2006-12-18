@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<project name="FirebirdSql.Data.Bdp" default="release" basedir="." xmlnds="http://tempuri.org/nant-vs.xsd">
+
+    <!-- Project properties -->
+    <property name="project.name" value="Firebird BDP"/>
+    <property name="project.version" value="1.7"/>
+
+    <!-- Default Configuration -->
+    <property name="project.config" value="debug" /> <!-- debug|release -->
+    <property name="build.debug"  value="true"/>
+    <property name="build.defines" value=""/>
+    
+    <!-- Platform specific properties. These are the defaults -->
+    <property name="current.build.task" value="build" />    
+	<property name="current.build.help.task" value="build-help" />
+
+    <!-- Paths properties -->
+    <property name="base.dir" value="../../../source" />
+
+	<!-- Check for NUnit -->
+	<target name="check-nunit-framework">
+		<ifnot propertyexists="nunit.framework.dll">
+			<sysinfo />
+			<property 
+                name="nunit.framework.dll" 
+                value="${sys.os.folder.programfiles}\NUnit 2.2\bin\nunit.framework.dll"
+				readonly="false" />
+		</ifnot>
+	</target>
+    
+	<!-- Target for build in DEBUG mode -->
+    <target name="debug">
+		<property name="project.config" value="debug" />
+        <property name="build.debug" value="true"/>
+        <property name="build.defines" value="${build.defines}DEBUG;DIAMONDBACK" />
+        
+		<call target="build-all" />
+    </target>
+
+	<!-- Target for build in RELEASE mode -->
+    <target name="release">
+		<property name="project.config" value="release" />
+        <property name="build.debug" value="false"/>
+        <property name="build.defines" value="${build.defines}RELEASE;DIAMONDBACK" />
+
+		<call target="build-all" />
+    </target>
+
+	<!-- Build target for all existing platforms -->
+	<target name="build-all" depends="check-nunit-framework">
+		<!-- Build -->	
+		<call target="net-1.1"  />
+	</target>
+		
+	<target name="net-1.1">
+		<!-- .NET Framework 1.1 -->
+		<available type="Framework" resource="net-1.1" property="temp.framework.available" />
+		<ifnot propertytrue="temp.framework.available">
+			<echo message=".NET Framework 1.1 runtime is not available." />
+		</ifnot>
+		<if propertytrue="temp.framework.available">
+			<property name="nant.settings.currentframework" value="net-1.1" />
+
+			<echo message="Build using .NET Framework 1.1." />
+			<call target="build" failonerror="false" />
+		</if>
+	</target>
+	
+	<target name="build">
+		<!-- Set build directory -->
+		<property name="build.dir" value="${nant.settings.currentframework}/bin/${project.config}" />
+		
+		<!-- Clean actual build directory -->
+		<delete dir="${build.dir}" failonerror="false" />
+				
+		<!-- Create actual build directory -->
+		<mkdir dir="${build.dir}" />
+
+		<!-- Copy snk file -->
+        <copy todir=".">
+            <fileset basedir="${base.dir}/FirebirdSql.Data.Bdp">
+                <include name="*.snk" />
+            </fileset>
+        </copy>
+
+        <!-- Copy Borland Data Provider aseemblies -->
+        <copy todir="${build.dir}">
+            <fileset basedir="${base.dir}/FirebirdSql.Data.Bdp/Bdp">
+                <include name="*.dll" />
+            </fileset>
+        </copy>
+        
+        <csc 
+            target="library" 
+            output="${build.dir}/${nant.project.name}.dll" 
+            debug="${build.debug}" 
+            define="${build.defines}">
+            
+            <sources basedir="${base.dir}">
+				<include name="FirebirdSql.Data.Bdp/**/*.cs" />
+                <include name="FirebirdSql.Data.Common/**/*.cs" />
+                <include name="FirebirdSql.Data.Embedded/**/*.cs" />
+                <include name="FirebirdSql.Data.Gds/**/*.cs" />
+            </sources>
+            
+            <references>
+                <include name="System.dll"/>
+                <include name="System.Data.dll"/>
+                <include name="System.XML.dll"/>
+                <include name="System.Windows.Forms.dll"/>
+                <include name="${build.dir}/Borland.Data.Common.dll" />
+            </references>
+            
+            <arg value="/resource:${base.dir}/FirebirdSql.Data.Common/Resources/isc_error_msg.resources,FirebirdSql.Data.Common.Resources.isc_error_msg.resources"/>
+            <arg value="/optimize+" />
+        </csc>
+        
+        <call target="build-tests" failonerror="false" />
+	</target>
+    
+    <target name="build-tests">
+		<!-- Set build directory -->
+		<property name="build.dir" value="${nant.settings.currentframework}/bin/${project.config}" />
+		             
+		<!-- Copy config file to build dir -->
+        <copy 
+            file="${base.dir}/FirebirdSql.Data.Bdp.UnitTest/App.config" 
+            tofile="${build.dir}/${nant.project.name}.UnitTest.dll.config" 
+        />
+        
+        <!-- compile FirebirdSql.Data.Firebird.UnitTest -->
+        <csc 
+            target="library" 
+            output="${build.dir}/${nant.project.name}.UnitTest.dll" 
+            debug="${build.debug}" 
+            define="${build.defines}">
+            
+            <sources basedir="${base.dir}">
+                <include name="FirebirdSql.Data.Bdp.UnitTest/**/*.cs"/>
+            </sources>
+            
+            <references>
+                <include name="System.dll"/>
+                <include name="System.Data.dll"/>
+                <include name="System.XML.dll"/>
+                <include name="${nunit.framework.dll}"/>
+                <include name="${build.dir}/Borland.Data.Common.dll" />
+                <include name="${build.dir}/Borland.Data.Provider.dll" />
+            </references>
+
+            <arg value="/optimize+" />
+        </csc>
+    </target>    
+</project>

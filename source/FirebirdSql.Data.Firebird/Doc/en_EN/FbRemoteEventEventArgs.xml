@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<delegate name="FbRemoteEventEventHandler" namespace="FirebirdSql.Data.Firebird">
+		<summary>
+		Represents the method that will handle the RemoteEventCounts event of an <see cref="FbEvent" />.
+		</summary>
+		<param name="sender">The source of the event.</param>
+		<param name="e">The <see cref="FbRemoteEventEventArgs" /> that contains the event data.</param>
+	</delegate>
+	<class name="FbRemoteEventEventArgs" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Provides data for the RemoteEventCounts event. 
+			This class cannot be inherited.
+			</summary>
+		</overview>
+		<property name="Name">
+			<summary>
+			Gets the name of the remote event.
+			</summary>
+			<value>
+			The remote event name.
+			</value>
+		</property>
+		<property name="Counts">
+			<summary>
+			Gets the counts of the remote event.
+			</summary>
+			<value>
+			The remote event counts.
+			</value>
+		</property>
+		<constructor name="ctor(DataRow,IDbCommand,StatementType,DataTableMapping)">
+			<summary>
+			Initializes a new instance of the FbRowUpdatedEventArgs class.
+			</summary>
+			<param name="row">The DataRow sent through an update operation. </param>
+			<param name="command">The <see cref="FbCommand" /> executed when Update is called. </param>
+			<param name="statementType">One of the System.Data.StatementType values that specifies the type of query executed. </param>
+			<param name="tableMapping">The System.Data.Common.DataTableMapping sent through Update.</param>
+		</constructor>
+	</class>
+</doc>

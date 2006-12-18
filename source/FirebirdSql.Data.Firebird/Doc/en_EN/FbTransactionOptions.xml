@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<enum name="FbTransactionOptions" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Specifies Firebird transactions specific options that can be used with
+			<see cref="FbConnection.BeginTransaction()">BeginTransaction</see>.
+			</summary>
+		</overview>
+		<field name="Consistency">
+			<summary>
+			Table locking transaction model.
+			</summary>
+		</field>	
+		<field name="Concurrency">
+			<summary>
+			High concurrency transaction with acceptable
+			consistency. The use of this parameter takes full advantage
+			multi-generational transaction model.
+			</summary>
+		</field>	
+		<field name="Shared">
+			<summary>
+			Concurrent, shared access of a specified table among all transactions. 
+			Used with LockRead and Lock Write options to establish the lock option.
+			</summary>
+		</field>	
+		<field name="Protected">
+			<summary>
+			Concurrent, restricted access of a specified table.
+			Used with LockRead and Lock Write options to establish the lock option.		
+			</summary>
+		</field>	
+		<field name="Exclusive">
+			<summary>
+			Exclusive access of a specified table.
+			</summary>
+		</field>	
+		<field name="Wait">
+			<summary>
+			Lock resolution specifies that the transaction is to wait until locked
+			resources are released before retrying an operation.
+			</summary>
+		</field>	
+		<field name="NoWait">
+			<summary>
+			Lock resolution specifies that the transaction is not to wait for locks to be
+			released, but instead, a lock conflict error should be returned immediately.
+			</summary>
+		</field>	
+		<field name="Read">
+			<summary>
+			Read-only access mode that allows a transaction only to select data.
+			</summary>
+		</field>	
+		<field name="Write">
+			<summary>
+			Read-write access mode of that allows a transaction to select, insert,
+			update, and delete table data.
+			</summary>
+		</field>	
+		<field name="LockRead">
+			<summary>
+			Read only access of a specified table. 
+			Used with Shared, Protected and Exclusive options to establish the lock option.
+			</summary>
+		</field>	
+		<field name="LockWrite">
+			<summary>
+			Read/write access of a specified table.
+			Used with Shared, Protected and Exclusive options to establish the lock option.
+			</summary>
+		</field>	
+		<field name="ReadCommitted">
+			<summary>
+			High throughput, high concurrency transaction that can read changes
+			committed by other concurrent transactions. 
+			The use of this parameter takes full advantage multi-generational transaction model.		
+			</summary>
+		</field>	
+		<field name="Autocommit">
+		</field>	
+		<field name="RecVersion">
+			<summary>
+			Enables an ReadCommitted transaction to read the most recently
+			committed version of a record even if other, uncommitted versions are
+			pending.
+			</summary>
+		</field>	
+		<field name="NoRecVersion">
+			<summary>
+			Enables an ReadCommitted transaction to read only the latest
+			committed version of a record. If an uncommitted version of a record is
+			pending and Wait is also specified, then the transaction waits for
+			the pending record to be committed or rolled back before proceeding.
+			Otherwise, a lock conflict error is reported at once.
+			</summary>			
+		</field>	
+		<field name="RestartRequest">
+		</field>	
+		<field name="NoAutoUndo">
+		</field>	
+	</enum>
+</doc>

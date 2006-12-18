@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>   
+	<class name="FbRemoteEvent" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Represents a Firebird Event. This class cannot be inherited.
+			</summary>
+		</overview>
+		<event name="RemoteEventCounts">
+			<summary>
+			Gets or sets the event handlers that will be fired each time the event counts notification is received from server.
+			</summary>
+		</event>
+		<property name="Connection">
+			<summary>Gets or sets the <see cref="FbConnection"/> associated to the remote event.</summary>
+		</property>
+		<property name="HasChanges">
+			<summary>Incates if there are changes in the event counts since the last time they were received.</summary>
+		</property>
+		<indexer name="Item(System.Int32)">
+			<summary>
+			Gets the event name at the specified index.
+			</summary>
+		</indexer>
+		<constructor name="ctor(FbConnection)">
+			<summary>
+			Creates a new instance of the <see cref="FbRemoteEvent" /> class with the given <see cref="FbConnection" /> instance.
+			</summary>
+			<param name="connection">A <see cref="FbConnection" /> instance.</param>
+		</constructor>
+		<constructor name="ctor(FbConnection, System.Array)">
+			<summary>
+			Creates a new instance of the <see cref="FbRemoteEvent" /> class with the given <see cref="FbConnection" /> instance and
+			the given list of events.
+			</summary>
+			<param name="connection">A <see cref="FbConnection" /> instance.</param>
+			<param name="events">List of requested events.</param>
+			<exception name="ArgumentException">If the event list count is greater than 15.</exception>
+		</constructor>
+		<method name="AddEvents(System.Array)">
+			<summary>
+			Adds the specified events to the event list.
+			</summary>
+			<remarks>
+			If there are existent events in the list of requested events
+			that will be lost.
+			</remarks>
+			<param name="events">List of requested events.</param>
+			<exception name="ArgumentNullException">If the events parameter is null.</exception>
+			<exception name="ArgumentException">If the event list count is greater than 15.</exception>
+		</method>
+		<method name="QueueEvents">
+			<summary>
+				Register interest in a set of events (works in asynchronous mode).
+			</summary>
+		</method>
+		<method name="Cancel">
+			<summary>
+				Cancels interest in the registered set of events.
+			</summary>
+		</method>
+	</class>
+</doc>
