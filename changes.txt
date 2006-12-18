@@ -1,0 +1,458 @@
+WHAT IS NEW - FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
+========================================================================
+
+
+
+· v2.1.0 Beta 1 ( 2006-10-27 ) ·
+
+( Please review the changelog for details )
+
+Bug Fixes:
+
+	- Fixed bug #DNET-78
+
+	- Fixed bug #DNET-77
+
+	- Fixed bug #DNET-73
+
+	- Fixed bug #DNET-71
+
+	- Catch all exceptions when closing/releasing a command 
+	( Think on do this only for the error code 335544569 - Attempt to reclose a closed cursor )
+
+	- Make IS_NULLABLE and IS_ARRAY columns to be really boolean columns.
+	This should sholve some problems with VIsual Studio Design time support 
+	when doing generation of insert/update/delete commands.
+
+	- Fixed bug with AcceptChangesDuringUpdate usage in FbDataAdapter.
+
+
+New features:
+
+	- Initial support for single phase transctions using TransactionScope.
+
+
+Changes:
+
+	- IMPORTANT: Removed old design time support. 
+
+	- Improved FbDataAdapter.Update implementation.
+
+	- Improved generics usage in internal code.
+
+	- Improved Web providers.
+
+	- Changes on status vector handling.
+
+	- Added changes to the embedded server support to try to improve it's performance.
+
+	- Increased max buffer size for queries in the services implementation to 8192.
+
+
+· v2.0.1 ( 2006-10-27 ) ·
+
+( Please review the changelog for details )
+
+Bug Fixes:
+
+	- Fixed some problems with the Design Time dataset generator of the FbDataAdapter component.
+	
+	- Implement IDisposable in FbConnectionInternal class (#DNET-62)
+	
+	- Avoid processing of parameters that has no SourceColumn specified when
+	updating values of Input Parameters on FbDataDapter.Update calls.
+
+Changes:
+
+	- Added caching of .NET Encodings
+
+	- More changes on internal code to use Generics.
+
+	- Improived FbBatchExecution class by adding identification of unique index creation with the following sintax:
+
+		CREATE UNIQUE ASC INDEX
+		CREATE UNIQUE ASCENDING INDEX
+		CREATE UNIQUE DESC INDEX
+		CREATE UNIQUE DESCENDING INDEX
+
+	- Added new method overloads on FbParameterCollection class.	
+		
+	- Changes on database schema support:
+
+		· Procedures ·
+
+			- Added is_system_procedure field.
+
+		· Procedure Parameters ·
+
+			- Added is_nullable field.
+
+		· Views ·
+
+			- Added is_system_view field.		
+
+· v2.0.1 Release Candidate 2 ( 2006-10-03 ) ·
+
+( Please review the changelog for details )
+
+Bug Fixes:
+
+	- Initial change to try to fix bug #DNET-64.
+
+ 	- Fixed bug #DNET-60 ( For stored procedures that are returning values. )
+
+· v2.0.1 Release Candidate 1 ( 2006-09-02 ) ·
+
+( Please review the changelog for details )
+
+Bug Fixes:
+
+	- Fixed bug #DNET-60
+
+	- Fixed bug #DNET-59
+
+	- Fixed index access problems in FbCheckConstraint, FbCheckByTable, FbGenerators.cs
+	and FbTablePrivileges schemas.
+
+Changes:
+
+	- Start using Generics in the provider internal code.
+
+	- Added changes to make usage of the Update event on Commit and Rollback calls in the
+	external procdedure engine GDS implementation.
+
+
+· v2.0 Final ( 2006-06-23 ) ·
+
+( Please review the changelog for details )
+
+
+Bug Fixes:
+
+	- Bug fixes in the Membership provider
+	( FirebirdSql.Web.Providers assembly )
+
+	- Fixed character set connection string parameter
+	initialziation.
+
+	- Minor fix in FbDataAdapter.Update to try to get correct
+	exception handling.
+
+New Features:
+
+	- Added a new Role Provider implementation 
+	( FirebirdSql.Web.Providers assembly )
+
+
+· Release Candidate 5 ( 2006-06-01 ) ·
+
+
+( Please review the changelog for details )
+
+Bug Fixes:
+
+	- Fixed bug #1490166.
+
+	- Fixed bug #1489770.
+
+	- Fixed bug in Domains schema.
+
+	- Added the information of the of IscException's errors
+	to the errors collection.
+
+	- Fixed incorrect number of bytes per character in the UTF-8 
+	character set information.
+
+	- Fixed FbDataReader.GetEnumerator method to allow
+	the Reader to be closed with CommandBehavior.CloseConnection 
+
+Changes:
+
+	- Changed GetIPAdressMethod to use IPAddress.Parse
+	with the Data Source when getting an exception 
+	with Dns.GetHostEntry.
+
+	- Changes on Dispose implementations of FbDataReader, FbCommand
+	and FbConnection classes.
+
+	- Added a minor hack to the FbParameter.Size property
+	to try to ha a better detection of Clob parameters
+
+	- Added initial support for connection string property synonyms
+	in the DDEX provider.
+
+
+· Release Candidate 4 ( 2006-05-15 ) ·
+
+
+( Please review the changelog for details )
+
+Bug Fixes:
+
+
+	- Fixed bug in Domains schema.
+
+Changes:
+
+	- Changed info calls reponse length handling to handle responses
+	with a small size than the requested one.
+
+	- Changed validations on FbCommand.CommandText property.
+
+
+· Release Candidate 3 ( 2006-04-19 ) ·
+
+( Please review the changelog for details )
+
+Bug Fixes:
+
+	- Fixes in Connection Pooling implementation.
+
+	- Fixed bug on named parameters parsing ( when
+	the @ was used in quoted identifier names )
+
+	- Fixed bug in the implicit transaction support of FbCommand class.
+
+	- Fixed bug when running scripts with dashes in it 
+	(e.g. As minus signs of calculations). 
+
+	- Fixed the buffer size used in the emebdded support to request the server version.
+
+	- Fixed Stored Procedure support in the DDEX provider.
+
+Changes:
+
+	- Changed service name used in Services API to allow it to work against Firebird 2.0
+
+	- Changed column name CHARACTER_LENGTH to CHARACTER_MAX_LENGTH to allow
+	the Domains, Columns, Stored Procedure Parameters, View Columns schemas to work 
+	using Dialect  1 databases.
+
+
+· Release Candidate 2 ( 2006-04-08 ) ·
+
+Bug Fixes:
+
+	- Changed the Service maneger name sent to the server in the
+	Services API implementation to get it working with Firebird 2.0
+
+	- Added a new StoredProcedureColumn concept to the DDEX provider,
+	to try to fix a problem when dragging selectable stored procedures
+	from the Server Explorer onto a DataSet.
+
+Changes:
+
+	- Changed the way the FbParameter class infers Value data type.
+
+
+· Release Candidate 1 ( 2006-03-20 ) ·
+
+Bug Fixes:
+
+	- Fixed bug #1453414
+
+	- Fixed ViewColumns schema definitions
+
+	- Changes to try to avoid problems with IPV6
+
+	- Fixed bug in Foreign Key schema.
+
+	- Fixed bug in Guid datatype handling.
+
+	- Fixed bug when working with .NET Compact Framework
+
+Changes:
+
+	- Changes on server response handling to try to handle
+	server/user exceptions when fetching data.
+
+	- Moved classes in FirebirdSql.Data.StoredProcedureEngine to 
+	FirebirdSql.Data.Server namespace.
+
+New Features:
+
+	- Added initial support for EXECURE PROCEDURE commands in FbBatchExecution class.
+
+	- Added new Connection String parameter "Context Connection" to be used
+	with .NET stored procedure implementations for Fyracle.
+
+	- Added new UTF8 ( Firebird 2.0 only ) character set.
+
+
+· Beta 4 ( 2006-02-03 ) ·
+
+(Please read the Changelog for details)
+
+
+Bug Fixes:
+
+	- Fixed Foreign Keys schemas.
+
+	- Fixed problem with the COLUMN_SIZE column in the FbViewColumns schema.
+
+	- Bug fix in FbPoolManager when trying to return back to the pool a connection.
+
+	- Fixed DataTypes schema in the FbMetaData.xml file.
+
+New Features:
+
+	- [DDEX] Foreign keys should be now automaticalled added to DataSets at design time when 
+	dropping tables from the Server Explorer.
+
+	- Added correct support for the new .net 2.0 
+	DbParameter.SourceColumnNullMapping property (Alexander V. Leshkin)
+
+	- Initial implementation of the new extended support for char/varchar fields
+	with OCTETS character set.
+
+Changes:
+
+	- Added RemoteEventId property to FbRemoteEvent class.
+
+
+
+· Beta 3 ( 2006-01-06 ) ·
+
+(Please read the Changelog for details)
+
+
+Bug Fixes:
+
+	- Fixed problem with the FbDataAdapter design time support.
+
+	- Fixed TableAdapter integration in Visual Studio 2005 now the
+	tableadapters should have select, insert, update and delete commands when requested.	
+
+	- Fixed bugs in Indexes and Index columns schemas.
+
+
+· Beta 2 ( 2005-12-28 ) ·
+
+(Please read the Changelog for details)
+
+
+New Features:
+
+	- Added initial support for boolean input parameters.
+
+Changes:
+
+	- Raise exception when a named parameter defined in FbCommand.CommandText is not 
+	in the FbCommand.Parameters collection.
+
+	- Raise exception when there are named parameters defined in the FbCommand.CommandText 
+	the are no FbCommand.Parameters defined.
+
+	- Added new synonyms to the connection string parameters.
+
+Bug Fixes:
+	
+	- Fixed bug in the FbDataAdapter configuration wizard.
+
+	- Change on Max Pool Size check to allow reach the max pool size specified
+	(f.e right now if you have 100 as max pool size it will reach only to 99)
+
+
+· Beta 1 ( 2005-11-30 ) ·
+
+(Please read the Changelog for details)
+
+New features:
+
+	- New GDS implementation for the Firebird/Fyracle External Proceudre engine implementation.
+
+		* Added a new namespace FirebirdSql.Data.StoredProcedureEngine with two new classes:
+
+			- FbResultSet
+			- FbTriggetContext
+Changes:
+
+	- Cleanup.
+
+	- Updated to build using .NET 2.0 RTM.
+
+	- Improved connection pooling implementation.
+
+	- Changes on FbConnectionStringBuilder class to use the new FbServerType enumeration.
+
+
+· Alpha 3 ( 2005-10-17 ) ·
+
+(Please read the Changelog for details)
+
+New features:
+
+	- Implemented FbParameterCollection.AddWithValue 
+
+Bug Fixes:
+
+	- The .NET Compact Framework build should work now without problems.
+
+	- Fixed numeric and decimal array field handling.
+
+	- Fixed bug in FbCommandBuilder implementation when removing quotes.
+
+Changes:
+
+	- Cleanup.
+
+	- Changes to try to limprove locks in the connection pooling support.
+
+	- Simplified internal transaction state handling.
+
+	- Better detection of numeric and decimal fields.
+
+	- Improved parsing of ISQL commands.
+
+	- More changes in the database schema support to allow better interaction with the DDEX provider.
+
+· Alpha 2 ( 2005-08-29 ) ·
+
+(Please read the Changelog for details)
+
+New features:
+
+	* Initial Visual Studio 2005 integration of the provider using a DDEX provider
+
+	* Support for the new INSERT ... RETURNING statement of Firebird v2.0
+	
+	* Support for the new PSQL stack trace of Firebird v2.0
+	
+	* New CAS support FirebirdClientPermission and FirebirdClientPermissionAttribute classes
+	
+	* Added support to the new CREATE SEQUENCE statement to the FbBatchExecution class.
+
+Bug fixes:
+
+	* Fixed bug in decimal/numeric handling ( backported form v1.7 )
+	
+	* Fixed FbCommandBuilder.GetParameterName method
+	
+	* Fixed FbCommand.Clone method.
+	
+	* Fixed connection string databases values that contains spaces ( like c:\program files\... )
+	
+	* Columns, ViewColumns, Stored Procedure parameters and domains schemas should now be working against Firebird v2.0
+	
+Changes:
+
+	* Changed the named parameters parsing method ( see tracker item #1256652 )
+
+	* Changed Foreign Keys and Indexes schemas by splitting them into two different schemas
+	ForeignKeys and ForeignColumns, Indexes and IndexColumns.
+	
+	* Renamed FbViewColumnUsage class to FbViewColumns
+	
+	* Changed the overwrite support of FbConnection.CreateDatabase method.
+	
+	* Change to check the connection state on FbRemoteEvent class.
+	
+	* Disable the nagle algorithm on the TCP/IP GDS implementation.
+	
+	* Implicit transactions on SELECT commands will be discarded using a hard commit.
+	
+Misc:
+
+	* Updated error messages resources.
+
+	* CleanUp on IscCodes constants.
