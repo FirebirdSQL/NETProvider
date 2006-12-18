@@ -1,0 +1,71 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FirebirdSql.Data.UnitTests</RootNamespace>
+    <AssemblyName>FirebirdSql.Data.UnitTests</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.2.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="BaseTest.cs" />
+    <Compile Include="FbArrayTest.cs" />
+    <Compile Include="FbBlobTest.cs" />
+    <Compile Include="FbCommandBuilderTest.cs" />
+    <Compile Include="FbCommandTest.cs" />
+    <Compile Include="FbConnectionTest.cs" />
+    <Compile Include="FbDataAdapterTest.cs" />
+    <Compile Include="FbDatabaseInfoTest.cs" />
+    <Compile Include="FbDatabaseSchemaTest.cs" />
+    <Compile Include="FbDataReaderTest.cs" />
+    <Compile Include="FbImplicitTransactionTest.cs" />
+    <Compile Include="FbParameterCollectionTest.cs" />
+    <Compile Include="FbParameterTest.cs" />
+    <Compile Include="FbScriptTest.cs" />
+    <Compile Include="FbServicesTests.cs" />
+    <Compile Include="FbStoredProcCallsTest.cs" />
+    <Compile Include="FbTransactionTest.cs" />
+    <Compile Include="GuidTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FirebirdSql.Data.FirebirdClient.csproj">
+      <Project>{326A24F9-6259-45DB-835C-18DB80728460}</Project>
+      <Name>FirebirdSql.Data.FirebirdClient</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

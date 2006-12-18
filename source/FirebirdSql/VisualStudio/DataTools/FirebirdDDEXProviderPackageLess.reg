@@ -1,0 +1,36 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}]
+@="Firebird Data Source"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}\SupportingProviders\{92421248-F044-483A-8237-74C7FBC62971}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}]
+@=".NET Framework Data Provider for Firebird"
+"DisplayName"="Provider_DisplayName, 
+FirebirdSql.VisualStudio.DataTools.Properties.Resources"
+"ShortDisplayName"="Provider_ShortDisplayName, 
+FirebirdSql.VisualStudio.DataTools.Properties.Resources"
+"Description"="Provider_Description, 
+FirebirdSql.VisualStudio.DataTools.Properties.Resources"
+"CodeBase"="%Path%\FirebirdSql.VisualStudio.DataTools.dll"
+"InvariantName"="FirebirdSql.Data.FirebirdClient"
+"Technology"="{77AB9A9D-78B9-4ba7-91AC-873F5338F1D2}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionSupport]
+@="FirebirdSql.VisualStudio.DataTools.FbDataConnectionSupport"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionProperties]
+@="FirebirdSql.VisualStudio.DataTools.FbDataConnectionProperties"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionUIControl]
+@="FirebirdSql.VisualStudio.DataTools.FbDataConnectionUIControl"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataObjectSupport]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataSourceInformation]
+@="FirebirdSql.VisualStudio.DataTools.FbDataSourceInformation"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataViewSupport]

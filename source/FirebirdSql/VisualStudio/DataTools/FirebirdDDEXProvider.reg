@@ -1,0 +1,43 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}]
+@="Firebird Data Source"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}\SupportingProviders\{92421248-F044-483A-8237-74C7FBC62971}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}]
+@=".NET Framework Data Provider for Firebird"
+"DisplayName"="Provider_DisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources"
+"ShortDisplayName"="Provider_ShortDisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources"
+"Description"="Provider_Description, FirebirdSql.VisualStudio.DataTools.Properties.Resources"
+"FactoryService"="{AEF32AEC-2167-4438-81FF-AE6603341536}"
+"InvariantName"="FirebirdSql.Data.FirebirdClient"
+"Technology"="{77AB9A9D-78B9-4ba7-91AC-873F5338F1D2}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionSupport]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionProperties]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionUIControl]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataObjectSupport]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataSourceInformation]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataViewSupport]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\Services\{AEF32AEC-2167-4438-81FF-AE6603341536}]
+@="{8d9358ba-ccc9-4169-9fd6-a52b8aee2d50}"
+"Name"="Firebird Provider Object Factory"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\Packages\{8d9358ba-ccc9-4169-9fd6-a52b8aee2d50}]
+@="Firebird Data Package"
+"InprocServer32"="mscoree.dll"
+"Class"="FirebirdSql.VisualStudio.DataTools.DataPackage"
+"CodeBase"="D:\\desarrollo\\WorkingFolder\\FirebirdProject\\NETProvider\\NETProvider_20\\source\\FirebirdSql\\VisualStudio\\DataTools\\bin\\Debug\\FirebirdSql.VisualStudio.DataTools.dll"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\Packages\{8d9358ba-ccc9-4169-9fd6-a52b8aee2d50}\SatelliteDll]
+"DllName"="FirebirdSql.VisualStudio.DataToolsUI.dll"
+"Path"="D:\\desarrollo\\WorkingFolder\\FirebirdProject\\NETProvider\\NETProvider_20\\source\\FirebirdSql\\VisualStudio\\DataTools\\bin\\Debug\\1033\\"

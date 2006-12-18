@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSDataViewSupport xmlns="http://tempuri.org/VSDataViewSupport.xsd">
+    <DataViews>
+        <DataView name="Firebird">
+            <DisplayName>FirebirdSQL Server</DisplayName>
+            <StaticConnectionNode>
+                <InitialDisplayName>{Root.Server} ({Root.Database})</InitialDisplayName>
+                <CommandBindings>
+                    <!--
+						This command binding hooks up a command that launches the built-
+						in Visual Studio query designer.
+					-->
+                    <CommandBinding name="NewQuery" guid="501822E1-B5AF-11d0-B4DC-00A0C91506EF" cmdid="13608" handler="884DD964-5327-461f-9F06-6484DD540F8F"/>
+                </CommandBindings>
+                <Children>
+                    <StaticNode nid="Domains">
+                        <DisplayName resource="DataView_Node_Domains" />
+
+                        <Children>
+                            <Selection type="Domain">
+                                <!--
+									The selection node indicates how to represent each object
+									in the selection.
+								-->
+                                <SelectionNode nid="Domain">
+                                    <DisplayName>{Domain.Name}</DisplayName>
+                                    <Icon name="Column"/>
+                                </SelectionNode>
+                            </Selection>
+                        </Children>
+                    </StaticNode>
+
+                    <StaticNode nid="System Tables">
+                        <DisplayName resource="DataView_Node_SystemTables" />
+                        <CommandBindings>
+                            <!--
+								This command binding hooks up a command that launches the built-
+								in Visual Studio query designer.
+							-->
+                            <CommandBinding name="NewQuery" guid="501822E1-B5AF-11d0-B4DC-00A0C91506EF" cmdid="13608" handler="884DD964-5327-461f-9F06-6484DD540F8F"/>
+                        </CommandBindings>
+                        <Children>
+                            <Selection type="Table" restrictions="null,null,null,SYSTEM TABLE">
+                                <SelectionNode nid="Table">
+                                    <DisplayName>{Table.Name}</DisplayName>
+                                    <Icon name="Table"/>
+                                    <Children>
+                                        <Selection type="TableColumn" restrictions="null,null,{Table.Name}">
+                                            <SelectionNode>
+                                                <Icon name="Column"/>
+                                            </SelectionNode>
+                                        </Selection>
+                                    </Children>
+                                </SelectionNode>
+                            </Selection>
+                        </Children>
+                    </StaticNode>
+
+                    <StaticNode nid="Tables">
+                        <DisplayName resource="DataView_Node_Tables" />
+                        <CommandBindings>
+                            <!--
+								This command binding hooks up a command that launches the built-
+								in Visual Studio query designer.
+							-->
+                            <CommandBinding name="NewQuery" guid="501822E1-B5AF-11d0-B4DC-00A0C91506EF" cmdid="13608" handler="884DD964-5327-461f-9F06-6484DD540F8F"/>
+                        </CommandBindings>
+                        <Children>
+                            <Selection type="Table" restrictions="null,null,null,TABLE">
+                                <!--
+									The selection node indicates how to represent each object
+									in the selection.
+								-->
+                                <SelectionNode nid="Table">
+                                    <DisplayName>{Table.Name}</DisplayName>
+                                    <Icon name="Table"/>
+                                    <Children>
+                                        <Selection type="TableColumn" restrictions="null,null,{Table.Name}">
+                                            <SelectionNode>
+                                                <Icon name="Column"/>
+                                            </SelectionNode>
+                                        </Selection>
+                                        <Selection type="Index" restrictions="null,null,{Table.Name}">
+                                            <SelectionNode nid="Index">
+                                                <DisplayName>{Index.Name}</DisplayName>
+                                                <Icon name="Index"/>
+                                                <Children>
+                                                    <Selection type="IndexColumn" restrictions="null,null,{Index.Table},{Index.Name}">
+                                                        <SelectionNode>
+                                                            <Icon name="Column"/>
+                                                        </SelectionNode>
+                                                    </Selection>
+                                                </Children>
+                                            </SelectionNode>
+                                        </Selection>
+                                        <Selection type="ForeignKey" restrictions="null,null,{Table.Name}">
+                                            <SelectionNode nid="ForeignKey">
+                                                <DisplayName>{ForeignKey.Name}</DisplayName>
+                                                <Icon name="ForeignKey"/>
+                                                <Children>
+                                                    <Selection type="ForeignKeyColumn" restrictions="null,null,{ForeignKey.Table},{ForeignKey.Name}">
+                                                        <SelectionNode>
+                                                            <Icon name="Column"/>
+                                                        </SelectionNode>
+                                                    </Selection>
+                                                </Children>
+                                            </SelectionNode>
+                                        </Selection>
+                                    </Children>
+                                </SelectionNode>
+                            </Selection>
+                        </Children>
+                    </StaticNode>
+
+                    <StaticNode nid="Views">
+                        <DisplayName resource="DataView_Node_Views" />
+                        <CommandBindings>
+                            <!--
+								This command binding hooks up a command that launches the built-
+								in Visual Studio query designer.
+							-->
+                            <CommandBinding name="NewQuery" guid="501822E1-B5AF-11d0-B4DC-00A0C91506EF" cmdid="13608" handler="884DD964-5327-461f-9F06-6484DD540F8F"/>
+                        </CommandBindings>
+                        <Children>
+                            <Selection type="View">
+                                <!--
+									The selection node indicates how to represent each object
+									in the selection.
+								-->
+                                <SelectionNode nid="View">
+                                    <DisplayName>{View.Name}</DisplayName>
+                                    <Icon name="View"/>
+                                    <Children>
+                                        <Selection type="ViewColumn" restrictions="null,null,{View.Name}">
+                                            <SelectionNode>
+                                                <Icon name="Column"/>
+                                            </SelectionNode>
+                                        </Selection>
+                                    </Children>
+                                </SelectionNode>
+                            </Selection>
+                        </Children>
+                    </StaticNode>
+
+                    <StaticNode nid="StoredProcedures">
+                        <DisplayName resource="DataView_Node_StoredProcedures" />
+                        <Children>
+                            <Selection type="StoredProcedure">
+                                <SelectionNode nid="StoredProcedure">
+                                    <DisplayName>{StoredProcedure.Name}</DisplayName>
+                                    <Icon name="StoredProcedure"/>
+                                    <Children>
+                                        <Selection type="StoredProcedureParameter" restrictions="null,null,{StoredProcedure.Name}">
+                                            <SelectionNode>
+                                                <!-- We can change the icon based on object data -->
+                                                <Icon when="{IsOutput} = False" name="InputParameter"/>
+                                                <Icon when="{IsOutput} = True" name="OutputParameter"/>
+                                            </SelectionNode>
+                                        </Selection>
+                                    </Children>
+                                </SelectionNode>
+                            </Selection>
+                        </Children>
+                    </StaticNode>
+                </Children>
+            </StaticConnectionNode>
+        </DataView>
+    </DataViews>
+
+    <!--
+		This section specifies extensions to types defined in the data object
+		support XML file that are specific to the data view.  This includes
+		display names, categories and descriptions used in the VS properties
+		window.
+	-->
+    <TypeExtensions>
+        <TypeExtension name="Table">
+            <DisplayName resource="DataView_Type_Table"/>
+            <Identifier>
+                <Part name="Catalog">
+                    <DisplayName resource="DataView_Property_Catalog"/>
+                    <Category resource="DataView_Category_Identifier"/>
+                    <Description resource="DataView_Description_Catalog"/>
+                </Part>
+                <Part name="Schema">
+                    <DisplayName resource="DataView_Property_Schema"/>
+                    <Category resource="DataView_Category_Identifier"/>
+                    <Description resource="DataView_Description_Schema"/>
+                </Part>
+                <Part name="Name">
+                    <DisplayName resource="DataView_Property_Name"/>
+                    <Category resource="DataView_Category_Identifier"/>
+                    <Description resource="DataView_Description_Name"/>
+                </Part>
+            </Identifier>
+            <Properties>
+                <Property name="Type">
+                    <DisplayName resource="DataView_Property_TableType"/>
+                    <Category resource="DataView_Category_Misc"/>
+                </Property>
+            </Properties>
+        </TypeExtension>
+
+        <TypeExtension name="TableColumn">
+            <DisplayName resource="DataView_Type_TableColumn"/>
+            <Identifier>
+                <Part name="Catalog">
+                    <DisplayName resource="DataView_Property_Catalog"/>
+                    <Category resource="DataView_Category_Identifier"/>
+                    <Description resource="DataView_Description_Catalog"/>
+                </Part>
+                <Part name="Schema">
+                    <DisplayName resource="DataView_Property_Schema"/>
+                    <Category resource="DataView_Category_Identifier"/>
+                    <Description resource="DataView_Description_Schema"/>
+                </Part>
+                <Part name="Table">
+                    <DisplayName resource="DataView_Property_Table"/>
+                    <Category resource="DataView_Category_Identifier"/>
+                    <Description resource="DataView_Description_Table"/>
+                </Part>
+                <Part name="Name">
+                    <DisplayName resource="DataView_Property_Name"/>
+                    <Category resource="DataView_Category_Identifier"/>
+                    <Description resource="DataView_Description_Name"/>
+                </Part>
+            </Identifier>
+            <Properties>
+                <Property name="Ordinal">
+                    <DisplayName resource="DataView_Property_Ordinal"/>
+                    <Description resource="DataView_Description_Ordinal"/>
+                </Property>
+                <Property name="SystemType">
+                    <DisplayName resource="DataView_Property_SystemType"/>
+                    <Category resource="DataView_Category_DataType"/>
+                    <Description resource="DataView_Description_SystemType"/>
+                </Property>
+                <Property name="Length">
+                    <DisplayName resource="DataView_Property_Length"/>
+                    <Category resource="DataView_Category_DataType"/>
+                    <Description resource="DataView_Description_Length"/>
+                    <StandardValues>
+                        <StandardValue value="">0</StandardValue>
+                    </StandardValues>
+                </Property>
+                <Property name="Precision">
+                    <DisplayName resource="DataView_Property_Precision"/>
+                    <Category resource="DataView_Category_DataType"/>
+                    <Description resource="DataView_Description_Precision"/>
+                    <StandardValues>
+                        <StandardValue value="">0</StandardValue>
+                    </StandardValues>
+                </Property>
+                <Property name="Scale">
+                    <DisplayName resource="DataView_Property_Scale"/>
+                    <Category resource="DataView_Category_DataType"/>
+                    <Description resource="DataView_Description_Scale"/>
+                    <StandardValues>
+                        <StandardValue value="">0</StandardValue>
+                    </StandardValues>
+                </Property>
+                <Property name="Nullable">
+                    <DisplayName resource="DataView_Property_Nullable"/>
+                    <Description resource="DataView_Description_Nullable"/>
+                    <StandardValues>
+                        <StandardValue value="YES" resource="Value_Yes"/>
+                        <StandardValue value="NO" resource="Value_No"/>
+                    </StandardValues>
+                </Property>
+                <Property name="Default">
+                    <DisplayName resource="DataView_Property_Default"/>
+                    <Description resource="DataView_Description_Default"/>
+                </Property>
+                <Property name="CharacterSet">
+                    <DisplayName resource="DataView_Property_CharacterSet"/>
+                    <Description resource="DataView_Description_CharacterSet"/>
+                </Property>
+                <Property name="Collation">
+                    <DisplayName resource="DataView_Property_Collation"/>
+                    <Description resource="DataView_Description_Collation"/>
+                </Property>
+            </Properties>
+        </TypeExtension>
+    </TypeExtensions>
+
+    <!--
+		By specifying the baseName attribute we indicate the resource in the
+		assembly that contains the localized strings referenced above.
+	-->
+    <Resources baseName="FirebirdSql.VisualStudio.DataTools.Resources" />
+
+</VSDataViewSupport>

@@ -1,0 +1,1062 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSDataObjectSupport xmlns="http://tempuri.org/VSDataObjectSupport.xsd">
+	<Types>
+		<!--
+			The root type provides a single object with no identifier.  Properties
+			on this object are global to a connection.
+		-->
+		<RootType>
+			<Properties>
+				<Property name="Server" type="System.String"/>
+				<Property name="Database" type="System.String"/>
+			</Properties>
+
+			<Actions>
+				<Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator" />
+			</Actions>
+		</RootType>
+
+		<!--
+			Defines a type that represents a table column.
+		-->
+		<Type name="Domain" defaultSort="Catalog, Schema, Name">
+			<Concepts>
+				<Concept name="Domain" restrictions="{Catalog},{Schema},{Name}"/>
+			</Concepts>
+
+			<Identifier>
+				<Part name="Catalog" itemName="domain_catalog">
+					<Concepts>
+						<Concept name="Identifier0"/>
+					</Concepts>
+				</Part>
+
+				<Part name="Schema" itemName="domain_schema">
+					<Concepts>
+						<Concept name="Identifier1"/>
+					</Concepts>
+				</Part>
+
+				<Part name="Name" itemName="domain_name">
+					<Concepts>
+						<Concept name="Identifier2"/>
+					</Concepts>
+				</Part>
+			</Identifier>
+
+			<Properties>
+				<Property name="Name" type="System.String" itemName="domain_name"/>
+				<Property name="SystemType" type="System.String" itemName="domain_data_type">
+					<Concepts>
+						<!--
+							We can produce reasonable values for all data type concepts given just
+							the system type.  The default ADO .NET object concept mapper uses the
+							ADO .NET DataTypes schema collection to map underlying system type
+							to the provider specific type and framework data type.  The
+							System.Data.DbType is then inferred from the framework type.
+						-->
+						<Concept name="ProviderDataType">
+							<Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+						</Concept>
+						<Concept name="ProviderDbType">
+							<Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+						</Concept>
+						<Concept name="FrameworkDataType">
+							<Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+						</Concept>
+					</Concepts>
+				</Property>
+
+				<Property name="Length" type="System.Int32" itemName='domain_size'>
+					<Concepts>
+						<Concept name="Length"/>
+					</Concepts>
+				</Property>
+
+				<Property name="Precision" type="System.Byte" itemName="numeric_precision">
+					<Concepts>
+						<Concept name="Precision">
+							<Conversion>
+								<ChangeType type="System.Int32"/>
+							</Conversion>
+						</Concept>
+					</Concepts>
+				</Property>
+
+				<Property name="Scale" type="System.Int32" itemName="numeric_scale">
+					<Concepts>
+						<Concept name="Scale"/>
+					</Concepts>
+				</Property>
+
+				<Property name="Nullable" type="System.String" itemName="is_nullable">
+					<Concepts>
+						<!--
+							The nullable concept is defined as a boolean value but the enumeration
+							returns a 'YES' or 'NO' string.  We can do the conversion inline using
+							an expression.
+						-->
+						<Concept name="Nullable">
+							<Conversion>
+								<Calculate expr="IIF({0}='YES',true,false)" type="System.Boolean"/>
+							</Conversion>
+						</Concept>
+					</Concepts>
+				</Property>
+
+				<Property name="CharacterSet" type="System.String" itemName="character_set_name">
+					<Concepts>
+						<Concept name="CharacterSet"/>
+					</Concepts>
+				</Property>
+
+				<Property name="Collation" type="System.String" itemName="collation_name">
+					<Concepts>
+						<Concept name="CharacterSet"/>
+					</Concepts>
+				</Property>
+
+				<Property name="Description" type="System.String" itemName="description">
+					<Concepts>
+						<Concept name="Description"/>
+					</Concepts>
+				</Property>
+			</Properties>
+
+			<Actions>
+				<Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+					<Parameter value="Domains"/>
+				</Action>
+			</Actions>
+		</Type>
+
+		<!--
+			Defines a type that represents a table.
+		-->
+		<Type name="Table" defaultSort="Catalog, Schema, Name">
+			<Concepts>
+				<Concept name="Table" restrictions="{Catalog},{Schema},{Name},TABLE"/>
+			</Concepts>
+			<Identifier>
+				<!--
+					The concepts here specify which data represents the generic identifier
+					of the table (catalog, schema and name).  In this case the generic and
+					specific identifier are identical.
+				-->
+				<Part name="Catalog" itemName="table_catalog">
+					<Concepts>
+						<Concept name="Identifier0"/>
+					</Concepts>
+				</Part>
+				<Part name="Schema" itemName="table_schema">
+					<Concepts>
+						<Concept name="Identifier1"/>
+					</Concepts>
+				</Part>
+				<Part name="Name" itemName="table_name">
+					<Concepts>
+						<Concept name="Identifier2"/>
+					</Concepts>
+				</Part>
+			</Identifier>
+			<Restrictions>
+				<!--
+					Since the set of restrictions available for this type are different from
+					the set of identifier parts, we explicitly specify what data can be
+					restricted on here.
+				-->
+				<Restriction name="Catalog"/>
+				<Restriction name="Schema"/>
+				<Restriction name="Name"/>
+				<Restriction name="Type"/>
+			</Restrictions>
+			<Properties>
+				<Property name="Name" type="System.String" itemName="table_name"/>
+				<Property name="Schema" type="System.String" itemName="table_schema"/>
+				<Property name="Type" type="System.String" itemName="table_type"/>
+			</Properties>
+			<Actions>
+				<Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+					<Parameter value="Tables"/>
+				</Action>
+				<!--
+					The BuildDSRef action allows objects to be dragged from the server
+					explorer to various built in data designers.  The parameters to the
+					base DSRefBuilder implementation specify how to build the DSRef tree
+					given parts of an identifier of this object type.
+				-->
+				<Action name="BuildDSRef" guid="7C030900-E8DD-471b-8F18-D83DA7036144" handler="Microsoft.VisualStudio.Data.DSRefBuilder">
+					<Parameter>
+						<Parameter value="{2}"/>
+						<Parameter value="{1}"/>
+						<Parameter value="Table"/>
+						<Parameter/>
+						<Parameter>
+							<!-- GUID_DSRefProperty_PreciseType -->
+							<Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+								<Parameter value="101" type="System.Int32"/>
+								<!-- Table -->
+							</Parameter>
+						</Parameter>
+					</Parameter>
+				</Action>
+			</Actions>
+		</Type>
+		
+		<!--
+			Defines a type that represents a table column.
+		-->
+		<Type name="TableColumn" defaultSort="Catalog, Schema, Table, Ordinal">
+			<Concepts>
+				<Concept name="TableColumn" restrictions="{Catalog},{Schema},{Table},{Name}"/>
+			</Concepts>
+
+			<Identifier>
+				<Part name="Catalog" itemName="table_catalog">
+					<Concepts>
+						<Concept name="Identifier0"/>
+					</Concepts>
+				</Part>
+
+				<Part name="Schema" itemName="table_schema">
+					<Concepts>
+						<Concept name="Identifier1"/>
+					</Concepts>
+				</Part>
+
+				<Part name="Table" itemName="table_name">
+					<Concepts>
+						<Concept name="Identifier2"/>
+					</Concepts>
+				</Part>
+
+				<Part name="Name" itemName="column_name">
+					<Concepts>
+						<Concept name="Identifier3"/>
+					</Concepts>
+				</Part>
+			</Identifier>
+
+			<Properties>
+				<Property name="Name" type="System.String" itemName="column_name"/>
+				<Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+					<Concepts>
+						<Concept name="Ordinal">
+							<!--
+								The Ordinal concept is defined as an Int32 so we must convert it to
+								the expected type.
+							-->
+							<Conversion>
+								<ChangeType type="System.Int32"/>
+							</Conversion>
+						</Concept>
+					</Concepts>
+				</Property>
+
+				<Property name="SystemType" type="System.String" itemName="column_data_type">
+					<Concepts>
+						<Concept name="ProviderDataType">
+							<Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+						</Concept>
+						<Concept name="ProviderDbType">
+							<Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+						</Concept>
+						<Concept name="FrameworkDataType">
+							<Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+						</Concept>
+					</Concepts>
+				</Property>
+
+				<Property name="Length" type="System.Int32" itemName='column_size'>
+					<Concepts>
+						<Concept name="Length"/>
+					</Concepts>
+				</Property>
+
+				<Property name="Precision" type="System.Byte" itemName="numeric_precision">
+					<Concepts>
+						<Concept name="Precision">
+							<Conversion>
+								<ChangeType type="System.Int32"/>
+							</Conversion>
+						</Concept>
+					</Concepts>
+				</Property>
+
+				<Property name="Scale" type="System.Int32" itemName="numeric_scale">
+					<Concepts>
+						<Concept name="Scale"/>
+					</Concepts>
+				</Property>
+
+				<Property name="Nullable" type="System.Boolean" itemName="is_nullable">
+					<Concepts>
+						<Concept name="Nullable" />
+					</Concepts>
+				</Property>
+
+				<Property name="Default" type="System.String" itemName="column_default">
+					<Concepts>
+						<Concept name="Default"/>
+					</Concepts>
+				</Property>
+
+				<Property name="CharacterSet" type="System.String" itemName="character_set_name">
+					<Concepts>
+						<Concept name="CharacterSet"/>
+					</Concepts>
+				</Property>
+
+				<Property name="Collation" type="System.String" itemName="collation_name">
+					<Concepts>
+						<Concept name="CharacterSet"/>
+					</Concepts>
+				</Property>
+
+				<Property name="Description" type="System.String" itemName="description">
+					<Concepts>
+						<Concept name="Description"/>
+					</Concepts>
+				</Property>
+			</Properties>
+			
+			<Actions>
+				<Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+					<Parameter value="Columns"/>
+				</Action>
+				<Action name="BuildDSRef" guid="7C030900-E8DD-471b-8F18-D83DA7036144" handler="Microsoft.VisualStudio.Data.DSRefBuilder">
+					<Parameter>
+						<Parameter value="{2}"/>
+						<Parameter value="{1}"/>
+						<Parameter value="Table"/>
+						<Parameter/>
+						<Parameter>
+							<!-- GUID_DSRefProperty_PreciseType -->
+							<Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+								<Parameter value="101" type="System.Int32"/>
+								<!-- Table -->
+							</Parameter>
+						</Parameter>
+						<Parameter>
+							<Parameter>
+								<Parameter value="{3}"/>
+								<Parameter/>
+								<Parameter value="Field"/>
+								<Parameter/>
+								<Parameter>
+									<!-- GUID_DSRefProperty_PreciseType -->
+									<Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+										<Parameter value="102" type="System.Int32"/>
+										<!-- Table_Column -->
+									</Parameter>
+								</Parameter>
+							</Parameter>
+						</Parameter>
+					</Parameter>
+				</Action>
+			</Actions>
+		</Type>
+
+        <!--
+			Defines a type that represents a stored procedure.
+		-->
+        <Type name="StoredProcedure" defaultSort="Catalog, Schema, Name">
+            <Concepts>
+                <Concept name="StoredProcedure" restrictions="{Catalog},{Schema},{Name}"/>
+            </Concepts>
+
+            <Identifier>
+                <Part name="Catalog" itemName="procedure_catalog">
+                    <Concepts>
+                        <Concept name="Identifier0"/>
+                    </Concepts>
+                </Part>
+
+                <Part name="Schema" itemName="procedure_schema">
+                    <Concepts>
+                        <Concept name="Identifier1"/>
+                    </Concepts>
+                </Part>
+
+                <Part name="Name" itemName="procedure_name">
+                    <Concepts>
+                        <Concept name="Identifier2"/>
+                    </Concepts>
+                </Part>
+            </Identifier>
+            <Properties>
+                <Property name="Name" type="System.String" itemName="procedure_name"/>
+                <Property name="Schema" type="System.String" itemName="procedure_schema">
+                    <Concepts>
+                        <Concept name="Schema"/>
+                    </Concepts>
+                </Property>
+            </Properties>
+            <Actions>
+                <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator" >
+                    <Parameter value="Procedures"/>
+                </Action>
+                <Action name="BuildDSRef" guid="7C030900-E8DD-471b-8F18-D83DA7036144" handler="Microsoft.VisualStudio.Data.DSRefBuilder">
+                    <Parameter>
+                        <Parameter value="{2}"/>
+                        <Parameter value="{1}"/>
+                        <Parameter value="StoredProcedure"/>
+                        <Parameter/>
+                        <Parameter>
+                            <!-- GUID_DSRefProperty_PreciseType -->
+                            <Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+                                <Parameter value="401" type="System.Int32"/>
+                                <!-- Procedure -->
+                            </Parameter>
+                        </Parameter>
+                    </Parameter>
+                </Action>
+            </Actions>
+        </Type>
+
+        <!--
+			Defines a type that represents a stored procedure parameter.
+		-->
+        <Type name="StoredProcedureParameter" defaultSort="Catalog, Schema, StoredProcedure, Ordinal">
+            <Concepts>
+                <Concept 
+                    name="StoredProcedureParameter" 
+                    restrictions="{Catalog},{Schema},{StoredProcedure},{Name}"
+                    filter="Direction = 1"
+                />
+            </Concepts>
+            <Identifier>
+                <Part name="Catalog" itemName="procedure_catalog">
+                    <Concepts>
+                        <Concept name="Identifier0"/>
+                    </Concepts>
+                </Part>
+                <Part name="Schema" itemName="procedure_schema">
+                    <Concepts>
+                        <Concept name="Identifier1"/>
+                    </Concepts>
+                </Part>
+                <Part name="StoredProcedure" itemName="procedure_name">
+                    <Concepts>
+                        <Concept name="Identifier2"/>
+                    </Concepts>
+                </Part>
+                <Part name="Name" itemName="parameter_name">
+                    <Concepts>
+                        <Concept name="Identifier3"/>
+                    </Concepts>
+                </Part>
+            </Identifier>
+            <Properties>
+                <Property name="Name" type="System.String" itemName="parameter_name"/>
+                <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+                    <Concepts>
+                        <Concept name="Ordinal">
+                            <Conversion>
+                                <ChangeType type="System.Int32"/>
+                            </Conversion>
+                        </Concept>
+                    </Concepts>
+                </Property>
+                <Property name="SystemType" type="System.String" itemName="parameter_data_type">
+                    <Concepts>
+                        <Concept name="ProviderDataType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                        <Concept name="ProviderDbType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                        <Concept name="FrameworkDataType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                    </Concepts>
+                </Property>
+                <Property name="Length" type="System.Int32" itemName="parameter_size">
+                    <Concepts>
+                        <Concept name="Length"/>
+                    </Concepts>
+                </Property>
+                <Property name="Precision" type="System.Byte" itemName="numeric_precision">
+                    <Concepts>
+                        <Concept name="Precision">
+                            <Conversion>
+                                <ChangeType type="System.Int32"/>
+                            </Conversion>
+                        </Concept>
+                    </Concepts>
+                </Property>
+                <Property name="Scale" type="System.Int32" itemName="numeric_scale">
+                    <Concepts>
+                        <Concept name="Scale"/>
+                    </Concepts>
+                </Property>
+                <Property name="Direction" type="System.Int32" itemName="parameter_direction">
+                    <Concepts>
+                        <Concept name="Direction" />
+                    </Concepts>
+                </Property>
+            </Properties>
+            <Actions>
+                <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+                    <Parameter value="ProcedureParameters"/>
+                </Action>
+            </Actions>
+        </Type>
+
+        <!--
+			Defines a type that represents a stored procedure parameter.
+		-->
+        <Type name="StoredProcedureColumn" defaultSort="Catalog, Schema, StoredProcedure, Ordinal">
+            <Concepts>
+                <Concept 
+                    name="StoredProcedureColumn" 
+                    restrictions="{Catalog},{Schema},{StoredProcedure},{Name}"
+                    filter="Direction = 2"
+                />
+            </Concepts>
+            <Identifier>
+                <Part name="Catalog" itemName="procedure_catalog">
+                    <Concepts>
+                        <Concept name="Identifier0"/>
+                    </Concepts>
+                </Part>
+                <Part name="Schema" itemName="procedure_schema">
+                    <Concepts>
+                        <Concept name="Identifier1"/>
+                    </Concepts>
+                </Part>
+                <Part name="StoredProcedure" itemName="procedure_name">
+                    <Concepts>
+                        <Concept name="Identifier2"/>
+                    </Concepts>
+                </Part>
+                <Part name="Name" itemName="parameter_name">
+                    <Concepts>
+                        <Concept name="Identifier3"/>
+                    </Concepts>
+                </Part>
+            </Identifier>
+            <Properties>
+                <Property name="Name" type="System.String" itemName="parameter_name"/>
+                <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+                    <Concepts>
+                        <Concept name="Ordinal">
+                            <Conversion>
+                                <ChangeType type="System.Int32"/>
+                            </Conversion>
+                        </Concept>
+                    </Concepts>
+                </Property>
+                <Property name="SystemType" type="System.String" itemName="parameter_data_type">
+                    <Concepts>
+                        <Concept name="ProviderDataType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                        <Concept name="ProviderDbType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                        <Concept name="FrameworkDataType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                    </Concepts>
+                </Property>
+                <Property name="Length" type="System.Int32" itemName="parameter_size">
+                    <Concepts>
+                        <Concept name="Length"/>
+                    </Concepts>
+                </Property>
+                <Property name="Precision" type="System.Byte" itemName="numeric_precision">
+                    <Concepts>
+                        <Concept name="Precision">
+                            <Conversion>
+                                <ChangeType type="System.Int32"/>
+                            </Conversion>
+                        </Concept>
+                    </Concepts>
+                </Property>
+                <Property name="Scale" type="System.Int32" itemName="numeric_scale">
+                    <Concepts>
+                        <Concept name="Scale"/>
+                    </Concepts>
+                </Property>
+                <Property name="Direction" type="System.Int32" itemName="parameter_direction">
+                    <Concepts>
+                        <Concept name="Direction" />
+                    </Concepts>
+                </Property>
+            </Properties>
+            <Actions>
+                <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+                    <Parameter value="ProcedureParameters"/>
+                </Action>
+            </Actions>
+        </Type>
+
+        <!--
+			Defines a type that represents a view.
+		-->
+        <Type name="View" defaultSort="Catalog, Schema, Name">
+            <Concepts>
+                <Concept name="View" restrictions="{Catalog},{Schema},{Name}"/>
+            </Concepts>
+
+            <Identifier>
+                <Part name="Catalog" itemName="view_catalog">
+                    <Concepts>
+                        <Concept name="Identifier0"/>
+                    </Concepts>
+                </Part>
+
+                <Part name="Schema" itemName="view_schema">
+                    <Concepts>
+                        <Concept name="Identifier1"/>
+                    </Concepts>
+                </Part>
+
+                <Part name="Name" itemName="view_name">
+                    <Concepts>
+                        <Concept name="Identifier2"/>
+                    </Concepts>
+                </Part>
+            </Identifier>
+
+            <Properties>
+                <Property name="Name" type="System.String" itemName="view_name"/>
+                <Property name="Schema" type="System.String" itemName="view_schema">
+                    <Concepts>
+                        <Concept name="Schema"/>
+                    </Concepts>
+                </Property>
+            </Properties>
+
+            <Actions>
+                <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+                    <Parameter value="Views"/>
+                </Action>
+
+                <Action name="BuildDSRef" guid="7C030900-E8DD-471b-8F18-D83DA7036144" handler="Microsoft.VisualStudio.Data.DSRefBuilder">
+                    <Parameter>
+                        <Parameter value="{2}"/>
+                        <Parameter value="{1}"/>
+                        <Parameter value="View"/>
+                        <Parameter/>
+                        <Parameter>
+                            <!-- GUID_DSRefProperty_PreciseType -->
+                            <Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+                                <Parameter value="301" type="System.Int32"/>
+                                <!-- View -->
+                            </Parameter>
+                        </Parameter>
+                    </Parameter>
+                </Action>
+            </Actions>
+        </Type>
+
+        <!--
+			Defines a type that represents a view column.
+		-->
+        <Type name="ViewColumn" defaultSort="Catalog, Schema, View, Ordinal">
+            <Concepts>
+                <Concept name="ViewColumn" restrictions="{Catalog},{Schema},{View},{Name}"/>
+            </Concepts>
+
+            <Identifier>
+                <Part name="Catalog" itemName="view_catalog">
+                    <Concepts>
+                        <Concept name="Identifier0"/>
+                    </Concepts>
+                </Part>
+                <Part name="Schema" itemName="view_schema">
+                    <Concepts>
+                        <Concept name="Identifier1"/>
+                    </Concepts>
+                </Part>
+                <Part name="View" itemName="view_name">
+                    <Concepts>
+                        <Concept name="Identifier2"/>
+                    </Concepts>
+                </Part>
+                <Part name="Name" itemName="column_name">
+                    <Concepts>
+                        <Concept name="Identifier3"/>
+                    </Concepts>
+                </Part>
+            </Identifier>
+
+            <Properties>
+                <Property name="Name" type="System.String" itemName="column_name"/>
+                <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+                    <Concepts>
+                        <Concept name="Ordinal">
+                            <Conversion>
+                                <ChangeType type="System.Int32"/>
+                            </Conversion>
+                        </Concept>
+                    </Concepts>
+                </Property>
+
+                <Property name="SystemType" type="System.String" itemName="column_data_type">
+                    <Concepts>
+                        <Concept name="ProviderDataType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                        <Concept name="ProviderDbType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                        <Concept name="FrameworkDataType">
+                            <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
+                        </Concept>
+                    </Concepts>
+                </Property>
+
+                <Property name="Length" type="System.Int32" itemName='column_size'>
+                    <Concepts>
+                        <Concept name="Length"/>
+                    </Concepts>
+                </Property>
+
+                <Property name="Precision" type="System.Byte" itemName="numeric_precision">
+                    <Concepts>
+                        <Concept name="Precision">
+                            <Conversion>
+                                <ChangeType type="System.Int32"/>
+                            </Conversion>
+                        </Concept>
+                    </Concepts>
+                </Property>
+
+                <Property name="Scale" type="System.Int32" itemName="numeric_scale">
+                    <Concepts>
+                        <Concept name="Scale"/>
+                    </Concepts>
+                </Property>
+
+                <Property name="Nullable" type="System.Boolean" itemName="is_nullable">
+                    <Concepts>
+                        <Concept name="Nullable" />
+                    </Concepts>
+                </Property>
+
+                <Property name="Default" type="System.String" itemName="column_default">
+                    <Concepts>
+                        <Concept name="Default"/>
+                    </Concepts>
+                </Property>
+            </Properties>
+
+            <Actions>
+                <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+                    <Parameter value="ViewColumns"/>
+                </Action>
+                <Action name="BuildDSRef" guid="7C030900-E8DD-471b-8F18-D83DA7036144" handler="Microsoft.VisualStudio.Data.DSRefBuilder">
+                    <Parameter>
+                        <Parameter value="{2}"/>
+                        <Parameter value="{1}"/>
+                        <Parameter value="View"/>
+                        <Parameter/>
+
+                        <Parameter>
+                            <!-- GUID_DSRefProperty_PreciseType -->
+                            <Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+                                <Parameter value="301" type="System.Int32"/>
+                                <!-- View -->
+                            </Parameter>
+                        </Parameter>
+
+                        <Parameter>
+                            <Parameter>
+                                <Parameter value="{3}"/>
+                                <Parameter/>
+                                <Parameter value="Field"/>
+                                <Parameter/>
+                                <Parameter>
+                                    <!-- GUID_DSRefProperty_PreciseType -->
+                                    <Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+                                        <Parameter value="302" type="System.Int32"/>
+                                        <!-- View_Column -->
+                                    </Parameter>
+                                </Parameter>
+                            </Parameter>
+                        </Parameter>
+                    </Parameter>
+                </Action>
+            </Actions>
+        </Type>
+
+        <!--
+			Defines a type that represents an index.
+		-->
+        <Type name="Index" defaultSort="Catalog,Schema,Table,Name">
+            <Concepts>
+                <Concept name="TableUniqueKey" restrictions="{Catalog},{Schema},{Table},{Name}" filter="IsUnique = true"/>
+            </Concepts>
+            <Identifier>
+                <Part name="Catalog" itemName="table_catalog">
+                    <Concepts>
+                        <Concept name="Identifier0"/>
+                    </Concepts>
+                </Part>
+                <Part name="Schema" itemName="table_schema">
+                    <Concepts>
+                        <Concept name="Identifier1"/>
+                    </Concepts>
+                </Part>
+                <Part name="Table" itemName="table_name">
+                    <Concepts>
+                        <Concept name="Identifier2"/>
+                    </Concepts>
+                </Part>
+                <Part name="Name" itemName="index_name">
+                    <Concepts>
+                        <Concept name="Identifier3"/>
+                    </Concepts>
+                </Part>
+            </Identifier>
+            <Properties>
+                <Property name="Name" type="System.String" itemName="index_name"/>
+                <Property name="IsUnique" type="System.Boolean" itemName="is_unique"/>
+                <Property name="IsPrimary" type="System.Boolean" itemName="is_primary">
+                    <Concepts>
+                        <Concept name="IsPrimary"/>
+                    </Concepts>
+                </Property>
+            </Properties>
+            <Actions>
+                <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectEnumerator">
+                    <Parameter value="Indexes"/>
+                </Action>
+                <Action name="BuildDSRef" guid="7C030900-E8DD-471b-8F18-D83DA7036144" handler="Microsoft.VisualStudio.Data.DSRefBuilder">
+                    <Parameter>
+                        <Parameter value="{2}"/>
+                        <Parameter value="{1}"/>
+                        <Parameter value="Table"/>
+                        <Parameter/>
+                        <Parameter>
+                            <!-- GUID_DSRefProperty_Qualifier -->
+                            <Parameter value="4656BAEA-F397-11ce-BFE1-00AA0057B34E">
+                                <Parameter value="{0}"/>
+                            </Parameter>
+                            <!-- GUID_DSRefProperty_PreciseType -->
+                            <Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+                                <Parameter value="101" type="System.Int32"/>
+                                <!-- Table -->
+                            </Parameter>
+                        </Parameter>
+                        <Parameter>
+                            <Parameter>
+                                <Parameter value="{3}"/>
+                                <Parameter/>
+                                <Parameter value="Index"/>
+                            </Parameter>
+                        </Parameter>
+                    </Parameter>
+                </Action>
+            </Actions>
+        </Type>
+
+        <Type name="IndexColumn" defaultSort="Catalog,Schema,Table,Index,Ordinal">
+            <Concepts>
+                <Concept name="TableUniqueKeyColumn" restrictions="{Catalog},{Schema},{Table},{TableUniqueKey},{Name}"/>
+            </Concepts>
+            <Identifier>
+                <Part name="Catalog" itemName="table_catalog">
+                    <Concepts>
+                        <Concept name="Identifier0"/>
+                    </Concepts>
+                </Part>
+                <Part name="Schema" itemName="table_schema">
+                    <Concepts>
+                        <Concept name="Identifier1"/>
+                    </Concepts>
+                </Part>
+                <Part name="Table" itemName="table_name">
+                    <Concepts>
+                        <Concept name="Identifier2"/>
+                    </Concepts>
+                </Part>
+                <Part name="Index" itemName="index_name">
+                    <Concepts>
+                        <Concept name="Identifier3"/>
+                    </Concepts>
+                </Part>
+                <Part name="Name" itemName="column_name">
+                    <Concepts>
+                        <Concept name="Identifier4"/>
+                    </Concepts>
+                </Part>
+            </Identifier>
+            <Properties>
+                <Property name="Name" type="System.String" itemName="column_name"/>
+                <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+                    <Concepts>
+                        <Concept name="Ordinal">
+                            <!--
+								The Ordinal concept is defined as an Int32 so we must convert it to
+								the expected type.
+							-->
+                            <Conversion>
+                                <ChangeType type="System.Int32"/>
+                            </Conversion>
+                        </Concept>
+                    </Concepts>
+                </Property>
+            </Properties>
+            <Actions>
+                <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectEnumerator">
+                    <Parameter value="IndexColumns"/>
+                </Action>
+                <Action name="BuildDSRef" guid="7C030900-E8DD-471b-8F18-D83DA7036144" handler="Microsoft.VisualStudio.Data.DSRefBuilder">
+                    <Parameter>
+                        <Parameter value="{2}"/>
+                        <Parameter value="{1}"/>
+                        <Parameter value="Table"/>
+                        <Parameter/>
+                        <Parameter>
+                            <!-- GUID_DSRefProperty_Qualifier -->
+                            <Parameter value="4656BAEA-F397-11ce-BFE1-00AA0057B34E">
+                                <Parameter value="{0}"/>
+                            </Parameter>
+                            <!-- GUID_DSRefProperty_PreciseType -->
+                            <Parameter value="39A5A7E7-513F-44a4-B79D-7652CD8962D9">
+                                <Parameter value="101" type="System.Int32"/>
+                                <!-- Table -->
+                            </Parameter>
+                        </Parameter>
+                        <Parameter>
+                            <Parameter>
+                                <Parameter value="{3}"/>
+                                <Parameter/>
+                                <Parameter value="Index"/>
+                                <Parameter/>
+                                <Parameter/>
+                                <Parameter>
+                                    <Parameter>
+                                        <Parameter value="{4}"/>
+                                        <Parameter/>
+                                        <Parameter value="Field"/>
+                                    </Parameter>
+                                </Parameter>
+                            </Parameter>
+                        </Parameter>
+                    </Parameter>
+                </Action>
+            </Actions>
+        </Type>
+
+        <!--
+			Defines a type that represents a foreign key.
+		-->
+		<Type name="ForeignKey" defaultSort="Catalog, Schema, Table, Name">
+			<Concepts>
+				<Concept name="TableForeignKey" restrictions="{Catalog},{Schema},{Table},{Name}"/>
+			</Concepts>
+			<Identifier>
+				<Part name="Catalog" itemName="constraint_catalog">
+					<Concepts>
+						<Concept name="Identifier0"/>
+					</Concepts>
+				</Part>
+				<Part name="Schema" itemName="constraint_schema">
+					<Concepts>
+						<Concept name="Identifier1"/>
+					</Concepts>
+				</Part>
+				<Part name="Table" itemName="table_name">
+					<Concepts>
+						<Concept name="Identifier2"/>
+					</Concepts>
+				</Part>
+				<Part name="Name" itemName="constraint_name">
+					<Concepts>
+						<Concept name="Identifier3"/>
+					</Concepts>
+				</Part>
+			</Identifier>
+			<Properties>
+				<Property name="Name" type="System.String" itemName="constraint_name"/>
+				<Property name="ReferencedTableCatalog" type="System.String" itemName="referenced_table_catalog">
+					<Concepts>
+							<!--The ForeignKey type concept specifies that there should be property
+							concepts that fully identify the referenced table.  These concepts
+							are defined similar to the identifier concepts.  If a reference
+							concept is missing (e.g. ReferencedTableId0) it is assumed to be the
+							same as the main object identifier part.-->
+						<Concept name="ReferencedTableId0"/>
+					</Concepts>
+				</Property>
+				<Property name="ReferencedTableSchema" type="System.String" itemName="referenced_table_schema">
+					<Concepts>
+						<Concept name="ReferencedTableId1"/>
+					</Concepts>
+				</Property>
+				<Property name="ReferencedTableName" type="System.String" itemName="referenced_table_name">
+					<Concepts>
+						<Concept name="ReferencedTableId2"/>
+					</Concepts>
+				</Property>
+			</Properties>
+			<Actions>
+				<Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+					<Parameter value="ForeignKeys"/>
+				</Action>
+			</Actions>
+		</Type>
+
+		<!--		
+			Defines a type that represents a foreign key column.
+		-->
+		<Type name="ForeignKeyColumn" defaultSort="Catalog, Schema, Table, ForeignKey, Ordinal">
+			<Concepts>
+				<Concept name="TableForeignKeyColumn" restrictions="{Catalog},{Schema},{Table},{TableForeignKey},{Name}"/>
+			</Concepts>
+			<Identifier>
+				<Part name="Catalog" itemName="constraint_catalog">
+					<Concepts>
+						<Concept name="Identifier0"/>
+					</Concepts>
+				</Part>
+				<Part name="Schema" itemName="constraint_schema">
+					<Concepts>
+						<Concept name="Identifier1"/>
+					</Concepts>
+				</Part>
+				<Part name="Table" itemName="table_name">
+					<Concepts>
+						<Concept name="Identifier2"/>
+					</Concepts>
+				</Part>
+				<Part name="ForeignKey" itemName="constraint_name">
+					<Concepts>
+						<Concept name="Identifier3"/>
+					</Concepts>
+				</Part>
+				<Part name="Name" itemName="column_name">
+					<Concepts>
+						<Concept name="Identifier4"/>
+					</Concepts>
+				</Part>
+			</Identifier>
+			<Properties>
+				<Property name="Name" type="System.String" itemName="column_name"/>
+				<Property name="Ordinal" type="System.Int32" itemName="ordinal_position">
+					<Concepts>
+						<Concept name="Ordinal"/>
+					</Concepts>
+				</Property>
+				<Property name="ReferencedColumnName" type="System.String" itemName="referenced_column_name">
+					<Concepts>
+							<!--The ForeignKeyColumn type concept specifies that there should be
+							a property concept that gives the name of the referenced column
+							in the referenced table.-->
+						<Concept name="ReferencedTableColumn"/>
+					</Concepts>
+				</Property>
+			</Properties>
+			<Actions>
+				<Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
+					<Parameter value="ForeignKeyColumns"/>
+				</Action>
+			</Actions>
+		</Type>
+	</Types>
+</VSDataObjectSupport>

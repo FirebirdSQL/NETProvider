@@ -1,0 +1,341 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{326A24F9-6259-45DB-835C-18DB80728460}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FirebirdSql</RootNamespace>
+    <AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET;NET_20;VISUAL_STUDIO;EXTERNAL_ENGINE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET;NET_20;VISUAL_STUDIO</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="VSLangProj80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Data\Client\Common\ArrayBoundMarshal.cs" />
+    <Compile Include="Data\Client\Common\ArrayDescMarshal.cs" />
+    <Compile Include="Data\Client\Common\ArrayDescMarshaler.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ParamDsc.cs" />
+    <Compile Include="Data\Client\Common\XSQLDA.cs" />
+    <Compile Include="Data\Client\Common\XsqldaMarshaler.cs" />
+    <Compile Include="Data\Client\Common\XSQLVAR.cs" />
+    <Compile Include="Data\Client\Embedded\FbClient.cs" />
+    <Compile Include="Data\Client\Embedded\FesArray.cs" />
+    <Compile Include="Data\Client\Embedded\FesBlob.cs" />
+    <Compile Include="Data\Client\Embedded\FesConnection.cs" />
+    <Compile Include="Data\Client\Embedded\FesDatabase.cs" />
+    <Compile Include="Data\Client\Embedded\FesServiceManager.cs" />
+    <Compile Include="Data\Client\Embedded\FesStatement.cs" />
+    <Compile Include="Data\Client\Embedded\FesTransaction.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ExtArray.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ExtBlob.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ExtConnection.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ExtDatabase.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ExtServiceManager.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ExtStatement.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ExtTransaction.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ExtTriggerContext.cs" />
+    <Compile Include="Data\Client\ExternalEngine\ParamDscMarshaler.cs" />
+    <Compile Include="Data\Client\ExternalEngine\SafeNativeMethods.cs" />
+    <Compile Include="Data\Client\Gds\GdsArray.cs" />
+    <Compile Include="Data\Client\Gds\GdsBlob.cs" />
+    <Compile Include="Data\Client\Gds\GdsConnection.cs" />
+    <Compile Include="Data\Client\Gds\GdsDatabase.cs" />
+    <Compile Include="Data\Client\Gds\GdsEventManager.cs" />
+    <Compile Include="Data\Client\Gds\GdsFetchResponse.cs" />
+    <Compile Include="Data\Client\Gds\GdsGenericResponse.cs" />
+    <Compile Include="Data\Client\Gds\GdsServiceManager.cs" />
+    <Compile Include="Data\Client\Gds\GdsSqlResponse.cs" />
+    <Compile Include="Data\Client\Gds\GdsStatement.cs" />
+    <Compile Include="Data\Client\Gds\GdsTransaction.cs" />
+    <Compile Include="Data\Client\Gds\IResponse.cs" />
+    <Compile Include="Data\Client\Gds\XdrStream.cs" />
+    <Compile Include="Data\Common\ArrayBase.cs" />
+    <Compile Include="Data\Common\ArrayBound.cs" />
+    <Compile Include="Data\Common\ArrayDesc.cs" />
+    <Compile Include="Data\Common\BinaryEncoding.cs" />
+    <Compile Include="Data\Common\BlobBase.cs" />
+    <Compile Include="Data\Common\BlobParameterBuffer.cs" />
+    <Compile Include="Data\Common\Charset.cs" />
+    <Compile Include="Data\Common\CharsetCollection.cs" />
+    <Compile Include="Data\Common\ITriggerContext.cs" />
+    <Compile Include="Data\Common\DatabaseParameterBuffer.cs" />
+    <Compile Include="Data\Common\DbDataType.cs" />
+    <Compile Include="Data\Common\DbField.cs" />
+    <Compile Include="Data\Common\DbStatementType.cs" />
+    <Compile Include="Data\Common\DbValue.cs" />
+    <Compile Include="Data\Common\Descriptor.cs" />
+    <Compile Include="Data\Common\EventParameterBuffer.cs" />
+    <Compile Include="Data\Common\GlobalizationHelper.cs" />
+    <Compile Include="Data\Common\IDatabase.cs" />
+    <Compile Include="Data\Common\IscCodes.cs" />
+    <Compile Include="Data\Common\IscError.cs" />
+    <Compile Include="Data\Common\IscErrorCollection.cs" />
+    <Compile Include="Data\Common\IscException.cs" />
+    <Compile Include="Data\Common\IscHelper.cs" />
+    <Compile Include="Data\Common\IServiceManager.cs" />
+    <Compile Include="Data\Common\ITransaction.cs" />
+    <Compile Include="Data\Common\ParameterBuffer.cs" />
+    <Compile Include="Data\Common\RemoteEvent.cs" />
+    <Compile Include="Data\Common\RemoteEventCountsCallback.cs" />
+    <Compile Include="Data\Common\ServiceParameterBuffer.cs" />
+    <Compile Include="Data\Common\StatementBase.cs" />
+    <Compile Include="Data\Common\StatementState.cs" />
+    <Compile Include="Data\Common\StringCollection.cs" />
+    <Compile Include="Data\Common\TransactionParameterBuffer.cs" />
+    <Compile Include="Data\Common\TransactionState.cs" />
+    <Compile Include="Data\Common\TransactionUpdateEventHandler.cs" />
+    <Compile Include="Data\Common\TypeDecoder.cs" />
+    <Compile Include="Data\Common\TypeEncoder.cs" />
+    <Compile Include="Data\Common\TypeHelper.cs" />
+    <Compile Include="Data\Common\WarningMessageCallback.cs" />
+    <Compile Include="Data\Design\Command\FbCommandDesigner.cs" />
+    <Compile Include="Data\Design\Command\FbCommandTextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Data\Design\Command\FbCommandTextUIEditor.cs" />
+    <Compile Include="Data\Design\Connection\FbConnectionStringEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Data\Design\Connection\FbConnectionStringUIEditor.cs" />
+    <Compile Include="Data\Design\DataAdapter\DataSetGenerator.cs" />
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep1.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep3.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep4.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep5.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep6.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep7.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterConfigurationWizard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterDataSetGenerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterDesigner.cs" />
+    <Compile Include="Data\Design\DataAdapter\FbDataAdapterWizardSettings.cs" />
+    <Compile Include="Data\Design\DataAdapter\VSExtensibility.cs" />
+    <Compile Include="Data\Design\Parameters\FbParameterCollectionEditor.cs" />
+    <Compile Include="Data\Design\Parameters\FbParameterConverter.cs" />
+    <Compile Include="Data\FirebirdClient\ClientFactory.cs" />
+    <Compile Include="Data\FirebirdClient\EmptyPoolEventHandler.cs" />
+    <Compile Include="Data\FirebirdClient\FbCharset.cs" />
+    <Compile Include="Data\FirebirdClient\FbCommand.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Data\FirebirdClient\FbCommandBuilder.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Data\FirebirdClient\FbConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Data\FirebirdClient\FbConnectionInternal.cs" />
+    <Compile Include="Data\FirebirdClient\FbConnectionPool.cs" />
+    <Compile Include="Data\FirebirdClient\FbConnectionString.cs" />
+    <Compile Include="Data\FirebirdClient\FbConnectionStringBuilder.cs" />
+    <Compile Include="Data\FirebirdClient\FbDataAdapter.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Data\FirebirdClient\FbDatabaseInfo.cs" />
+    <Compile Include="Data\FirebirdClient\FbDataReader.cs" />
+    <Compile Include="Data\FirebirdClient\FbDbType.cs" />
+    <Compile Include="Data\FirebirdClient\FbError.cs" />
+    <Compile Include="Data\FirebirdClient\FbErrorCollection.cs" />
+    <Compile Include="Data\FirebirdClient\FbException.cs" />
+    <Compile Include="Data\FirebirdClient\FbInfoMessageEventArgs.cs" />
+    <Compile Include="Data\FirebirdClient\FbInfoMessageEventHandler.cs" />
+    <Compile Include="Data\FirebirdClient\FbParameter.cs" />
+    <Compile Include="Data\FirebirdClient\FbParameterCollection.cs" />
+    <Compile Include="Data\FirebirdClient\FbPoolManager.cs" />
+    <Compile Include="Data\Server\FbResultSet.cs" />
+    <Compile Include="Data\FirebirdClient\FbServerType.cs" />
+    <Compile Include="Data\FirebirdClient\FirebirdClientPermission.cs" />
+    <Compile Include="Data\FirebirdClient\FirebirdClientPermissionAtrribute.cs" />
+    <Compile Include="Data\FirebirdClient\FbRemoteEvent.cs" />
+    <Compile Include="Data\FirebirdClient\FbRemoteEventEventArgs.cs" />
+    <Compile Include="Data\FirebirdClient\FbRemoteEventEventHandler.cs" />
+    <Compile Include="Data\FirebirdClient\FbRowUpdatedEventArgs.cs" />
+    <Compile Include="Data\FirebirdClient\FbRowUpdatedEventHandler.cs" />
+    <Compile Include="Data\FirebirdClient\FbRowUpdatingEventArgs.cs" />
+    <Compile Include="Data\FirebirdClient\FbRowUpdatingEventHandler.cs" />
+    <Compile Include="Data\FirebirdClient\FbTransaction.cs" />
+    <Compile Include="Data\FirebirdClient\FbTransactionOptions.cs" />
+    <Compile Include="Data\FirebirdClient\FirebirdClientFactory.cs" />
+    <Compile Include="Data\Isql\CommandExecutedEventArgs.cs" />
+    <Compile Include="Data\Isql\CommandExecutedEventHandler.cs" />
+    <Compile Include="Data\Isql\CommandExecutingEventArgs.cs" />
+    <Compile Include="Data\Isql\CommandExecutingEventHandler.cs" />
+    <Compile Include="Data\Isql\FbBatchExecution.cs" />
+    <Compile Include="Data\Isql\FbScript.cs" />
+    <Compile Include="Data\Isql\SqlStatementType.cs" />
+    <Compile Include="Data\Isql\StringParser.cs" />
+    <Compile Include="Data\Schema\FbCharacterSets.cs" />
+    <Compile Include="Data\Schema\FbCheckConstraints.cs" />
+    <Compile Include="Data\Schema\FbChecksByTable.cs" />
+    <Compile Include="Data\Schema\FbCollations.cs" />
+    <Compile Include="Data\Schema\FbColumnPrivileges.cs" />
+    <Compile Include="Data\Schema\FbColumns.cs" />
+    <Compile Include="Data\Schema\FbSchema.cs" />
+    <Compile Include="Data\Schema\FbSchemaFactory.cs" />
+    <Compile Include="Data\Schema\FbDomains.cs" />
+    <Compile Include="Data\Schema\FbForeignKeyColumns.cs" />
+    <Compile Include="Data\Schema\FbForeignKeys.cs" />
+    <Compile Include="Data\Schema\FbFunctions.cs" />
+    <Compile Include="Data\Schema\FbGenerators.cs" />
+    <Compile Include="Data\Schema\FbIndexColumns.cs" />
+    <Compile Include="Data\Schema\FbIndexes.cs" />
+    <Compile Include="Data\Schema\FbPrimaryKeys.cs" />
+    <Compile Include="Data\Schema\FbProcedureParameters.cs" />
+    <Compile Include="Data\Schema\FbProcedurePrivileges.cs" />
+    <Compile Include="Data\Schema\FbProcedures.cs" />
+    <Compile Include="Data\Schema\FbRoles.cs" />
+    <Compile Include="Data\Schema\FbTableConstraints.cs" />
+    <Compile Include="Data\Schema\FbTablePrivileges.cs" />
+    <Compile Include="Data\Schema\FbTables.cs" />
+    <Compile Include="Data\Schema\FbTriggers.cs" />
+    <Compile Include="Data\Schema\FbUniqueKeys.cs" />
+    <Compile Include="Data\Schema\FbViewColumns.cs" />
+    <Compile Include="Data\Schema\FbViewPrivileges.cs" />
+    <Compile Include="Data\Schema\FbViews.cs" />
+    <Compile Include="Data\Services\FbBackup.cs" />
+    <Compile Include="Data\Services\FbBackupFile.cs" />
+    <Compile Include="Data\Services\FbBackupFlags.cs" />
+    <Compile Include="Data\Services\FbConfiguration.cs" />
+    <Compile Include="Data\Services\FbDatabasesInfo.cs" />
+    <Compile Include="Data\Services\FbLog.cs" />
+    <Compile Include="Data\Services\FbRestore.cs" />
+    <Compile Include="Data\Services\FbRestoreFlags.cs" />
+    <Compile Include="Data\Services\FbSecurity.cs" />
+    <Compile Include="Data\Services\FbServerConfig.cs" />
+    <Compile Include="Data\Services\FbServerProperties.cs" />
+    <Compile Include="Data\Services\FbService.cs" />
+    <Compile Include="Data\Services\FbServiceState.cs" />
+    <Compile Include="Data\Services\FbShutdownMode.cs" />
+    <Compile Include="Data\Services\FbStatistical.cs" />
+    <Compile Include="Data\Services\FbStatisticalFlags.cs" />
+    <Compile Include="Data\Services\FbUserData.cs" />
+    <Compile Include="Data\Services\FbValidation.cs" />
+    <Compile Include="Data\Services\FbValidationFlags.cs" />
+    <Compile Include="Data\Services\ServiceOutputEventArgs.cs" />
+    <Compile Include="Data\Services\ServiceOutputEventHandler.cs" />
+    <Compile Include="Data\Server\FbTriggerActionType.cs" />
+    <Compile Include="Data\Server\FbTriggerContext.cs" />
+    <Compile Include="Data\Server\IResultSet.cs" />
+    <Compile Include="WizardFramework\ActionStep.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WizardFramework\WelcomeStep.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WizardFramework\WizardForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WizardFramework\WizardSettings.cs" />
+    <Compile Include="WizardFramework\WizardSettingsManager.cs" />
+    <Compile Include="WizardFramework\WizardStep.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WizardFramework\WizardStepCollection.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Schema\FbMetaData.xml" />
+    <EmbeddedResource Include="Resources\FbCommand.bmp" />
+    <EmbeddedResource Include="Resources\FbConnection.bmp" />
+    <EmbeddedResource Include="Resources\FbDataAdapter.bmp" />
+    <Content Include="Resources\isc_error_msg.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Design\Command\FbCommandTextEditor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>FbCommandTextEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep1.resx">
+      <DependentUpon>FbDataAdapterConfigurationStep1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep2.resx">
+      <DependentUpon>FbDataAdapterConfigurationStep2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep3.resx">
+      <DependentUpon>FbDataAdapterConfigurationStep3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep4.resx">
+      <DependentUpon>FbDataAdapterConfigurationStep4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep5.resx">
+      <DependentUpon>FbDataAdapterConfigurationStep5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep6.resx">
+      <DependentUpon>FbDataAdapterConfigurationStep6.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Design\DataAdapter\FbDataAdapterConfigurationStep7.resx">
+      <DependentUpon>FbDataAdapterConfigurationStep7.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\isc_error_msg.resources" />
+    <EmbeddedResource Include="WizardFramework\WelcomeStep.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WelcomeStep.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WizardFramework\WizardForm.resx">
+      <DependentUpon>WizardForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FirebirdSql.Data.FirebirdClient.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>rem copy "$(TargetDir)\$(ProjectName).dll" "C:\Archivos de programa\fyracle-0.8.9\bin\assembly"
+rem copy "$(TargetDir)\$(ProjectName).pdb" "C:\Archivos de programa\fyracle-0.8.9\bin\assembly"</PostBuildEvent>
+  </PropertyGroup>
+</Project>
