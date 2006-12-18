@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbScript" mnamespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Provides a basic parser for Firebird <b>ISQL</b> scripts.
+			</summary>
+		</overview>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbScript" /> class.
+			</summary>
+		</constructor>
+		<method name="M:Parse(System.IO.FileInfo)">
+			<summary>
+			Parses the <b>ISQL</b> script file and returns an arraylist object.
+			</summary>
+			<param name="file"><b>ISQL</b> script file to be parsed.</param>
+			<returns>An arraylist with a collection of <b>ISQL</b> commands.</returns>
+		</method>
+		<method name="M:Parse(System.String,System.Text.Encoding)">
+			<summary>
+			Parses the <b>ISQL</b> script file and returns an arraylist object.
+			</summary>
+			<param name="path">Path to the <b>ISQL</b> script file to be parsed.</param>
+			<param name="encoding">Encoding used for read the <b>ISQL</b> script.</param>
+			<returns>An arraylist with a collection of <b>ISQL</b> commands</returns>
+		</method>
+		<method name="M:Parse(System.IO.FileInfo,System.Text.Encoding)">
+			<summary>
+			Parses the <b>ISQL</b> script file and returns an arraylist object.
+			</summary>
+			<param name="file"><b>ISQL</b> script file to be parsed.</param>
+			<param name="encoding">Encoding used for read the <b>ISQL</b> script.</param>
+			<returns>An arraylist with a collection of <b>ISQL</b> commands</returns>
+		</method>
+		<method name="M:Parse(System.String)">
+			<summary>
+			Parses the <b>ISQL</b> script adding each individual command to <see cref="CommandCollection" />.
+			</summary>
+			<param name="script"><b>ISQL</b> script to parse</param>
+			<returns>An arraylist with a collection of <b>ISQL</b> commands</returns>
+		</method>
+		<method name="getIsqlCommand(System.String)">
+			<summary>
+			Gets the a value indicating a <b>ISQL</b> command type found in <i>command</i>.
+			</summary>
+			<param name="command">The command text to verify.</param>
+			<returns>String.Empty if command isn't <b>ISQL</b> command; a value indicating the <b>ISQL</b> command type.</returns>
+		</method>
+		<method name="processIsqlCommand(System.String,Syetm.String)">
+			<summary>
+			Gets a command text for replacement a <b>ISQL</b> command at execution time.
+			</summary>
+			<param name="command">The command to process.</param>
+			<param name="isqlCommand">The <b>ISQL</b> command type to process.</param>
+			<returns>null if there are no replacement to do; command text for replacement a <b>ISQL</b> command at execution time.</returns>
+		</method>
+	</class>
+</doc>

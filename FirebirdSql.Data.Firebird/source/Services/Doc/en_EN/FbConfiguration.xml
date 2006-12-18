@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<enum name="FbShutdownMode" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Allowed shutdown modes.
+			</summary>
+		</overview>
+		<field name="Forced">
+			<summary>
+			Shut down the database after the specified number of seconds; 
+			to shut down the database immediately, set the shutdown interval to 0.
+			</summary>
+		</field>
+		<field name="DenyTransaction">
+			<summary>
+			Deny new transactions and shut down the database after the specified number
+			of seconds; if transactions are active after the shutdown interval has expired,
+			the shutdown will fail; to shut down the database immediately, set the
+			shutdown interval to 0.
+			</summary>
+		</field>
+		<field name="DenyConnection">
+			<summary>
+			Deny new connections and shut down the database after the specified number
+			of seconds; if connections are active after the shutdown interval has expired,
+			the shutdown will fail; to shut down the database immediately, set the
+			shutdown interval to 0
+			</summary>
+		</field>
+	</enum>
+	<class name="FbConfiguration" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Allow configuration of local or remote databases Properties.
+			</summary>
+			<example>
+			The following example changes the sweep interval, reserve space, forced writes database Properties.
+			<code>
+FbConfiguration configurationSvc = new FbConfiguration();
+
+configurationSvc.UserName = "SYSDBA";
+configurationSvc.UserPassword = "masterkey";
+
+configurationSvc.Database = @"C:\TESTDB.GDB";
+
+configurationSvc.SetSweepInterval(1000);
+configurationSvc.SetReserveSpace(true);
+configurationSvc.SetForcedWrites(true);
+				</code>
+			</example>
+		</overview>
+		<constructor name="#ctor">
+			<summary>    
+			Creates a new instance of <see cref="FbConfiguration" /> class.
+			</summary>
+		</constructor>
+		<method name="SetSqlDialect(System.Int32)">
+			<summary>
+			Sets the SQL dialect of the Firebird Database.
+			</summary>
+		</method>
+		<method name="SetSweepInterval(System.Int32)">
+			<summary>
+			Sets the number of transactions between database sweeps.
+			</summary>
+			<param name="sweepInterval">Sweep interval. To turn off database sweeps, set the sweep interval to 0.</param>
+		</method>
+		<method name="SetPageBuffers(System.Int32)">
+			<summary>
+			Sets the number of database page buffers.
+			</summary>
+			<param name="pageBuffers">Number of page buffers.</param>
+		</method>
+		<method name="DatabaseShutdown(FirebirdSql.Data.Firebird.Services.FbShutdownMode, System.Int32)">
+			<summary>
+			Make a sht down to a database.
+			</summary>
+			<param name="mode">Shutdown mode <see cref="FbShutdownMode" />.</param>
+			<param name="seconds">Seconds before the shutdown.</param>
+		</method>
+		<method name="DatabaseOnline">
+			<summary>
+			Bring a database back online.
+			</summary>
+		</method>
+		<method name="ActivateShadows">
+			<summary>
+			Activates a shadow file for database use.
+			</summary>
+		</method>
+		<method name="SetForcedWrites(System.Boolean)">
+			<summary>
+			Sets the write mode for the database.
+			</summary>
+			<param name="forcedWrites"><b>true</b> to enable forced writes mode; or false for disable it.</param>
+		</method>
+		<method name="SetReserveSpace(System.Boolean)">
+			<summary>
+			Configure the database to fill data pages when inserting new records, or reserve 20% of each page for later record deltas;
+			</summary>
+			<param name="reserveSpace"><b>true</b> to enable database to reserve space; or false for disable it.</param>
+		</method>
+		<method name="SetAccessMode(System.Boolean)">
+			<summary>
+			Set the access mode of the database.
+			</summary>
+			<param name="readOnly"><b>true</b> to set database in read only access; or false for read write access.</param>
+		</method>
+	</class>
+</doc>

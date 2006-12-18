@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbSecurity" namespace="FirebirdSql.Data.Firebird.Services">
+		<overview>
+			<summary>
+			Allow to list, add, delete, and modify users.
+			</summary>
+		</overview>
+		<property name="UsersDbPath">
+			<summary>
+			The path to the security database on the server; for example, /usr/interbase/.
+			</summary>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of <see cref="FbSecurity" /> class.
+			</summary>
+		</constructor>
+		<method name="AddUser(UserData)">
+			<summary>
+			Add a user to the isc4.gdb security database.
+			</summary>
+			<example>
+			The following example adds a user to the security database:
+				<code>
+FbSecurity securitySvc = new FbSecurity();
+
+securitySvc.UserName = "SYSDBA";
+securitySvc.UserPassword = "masterkey";
+
+FbUserData user = new FbUserData();
+
+user.UserName = "new_user";
+user.UserPassword 	= "1";
+	
+securitySvc.AddUser(user);	
+				</code>
+			</example>
+		</method>
+		<method name="DeleteUser(UserData)">
+			<summary>
+			Remove a user from the isc4.gdb security database.
+			</summary>
+			<example>
+			The following example removes a user from the security database:
+				<code>
+FbSecurity securitySvc = new FbSecurity();
+
+securitySvc.UserName = "SYSDBA";
+securitySvc.UserPassword = "masterkey";
+
+FbUserData user = new FbUserData();		
+user.UserName = "new_user";
+
+securitySvc.DeleteUser(user);
+				</code>
+			</example>
+		</method>
+		<method name="ModifyUser(UserData)">
+			<summary>
+			Modify user information in the isc4.gdb security database. 
+			</summary>
+			<remarks>
+			You cannot change the UserName property, only the Properties associated with that user name.
+			</remarks>
+		</method>
+		<method name="DisplayUsers">
+			<summary>
+			Display information for a single user or all users in the isc4.gdb security database, respectively.
+			</summary>
+			<returns>
+			An array of <see cref="FbUserData" /> objects.
+			</returns>
+		</method>
+	</class>
+</doc>

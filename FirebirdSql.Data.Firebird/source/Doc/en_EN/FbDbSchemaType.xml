@@ -1,0 +1,799 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<doc>
+	<enum name="FbDbSchemaType" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Retrieves the the type of schema table that can be used with the <see cref="FbConnection.GetDbSchemaTable" /> method.
+			</summary>
+		</overview>
+		<field name="Character_Sets">
+			<summary>
+			Retrieves the character sets defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description>CHARACTER_SET_NAME</description>
+							<description>The name of the character set.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>CHARACTER_SET_ID</description>
+							<description>The id of the character set.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>DEFAULT_COLLATION</description>
+							<description>The default collation of the character set.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>BYTES_PER_CHARACTER</description>
+							<description>The number of bytes per character.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DESCRIPTION</description>
+							<description>The character set description</description>
+							<description>false</description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Check_Constraints">
+			<summary>
+			Retrieves the check constraints defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description>CONSTRAINT_NAME</description>
+							<description>The name of the constraint.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>CHECK_CLAUSULE</description>
+							<description>The chek clausule of the constraint.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DESCRIPTION</description>
+							<description>The description of the check constraint</description>
+							<description>false</description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Check_Constraints_By_Table">
+			<summary>
+			Retrieves the check constraints, by table,defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description>TABLE_NAME</description>
+							<description>The name of the table.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>CONSTRAINT_NAME</description>
+							<description>The name of the constraint.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>CHECK_CLAUSULE</description>
+							<description>The clausule of the check constraint.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DESCRIPTION</description>
+							<description>The description of the check constraint</description>
+							<description>false</description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Collations">
+			<summary>
+			Retrieves the collations defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description>COLLATION_NAME</description>
+							<description>The name of the collation.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>CHARACTER_SET_NAME</description>
+							<description>The name of the character set.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>DESCRIPTION</description>
+							<description>The description of the collation.</description>
+							<description>false</description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Columns">
+			<summary>
+			Retrieves the columns of tables ( including views ) defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description>TABLE_NAME</description>
+							<description>The name of the table.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>COLUMN_NAME</description>
+							<description>The name of the column.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>DATA_TYPE</description>
+							<description>The data type of the column.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>SUB_DATA_TYPE</description>
+							<description>The sub type of the column.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>COLUMN_SIZE</description>
+							<description>The maximum possible length of a value in the column.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>NUMERIC_PRECISION</description>
+							<description>The maximum precision of the column for numeric data types.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>NUMERIC_SCALE</description>
+							<description>The maximum scale of the column for decimal and numeric data types.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>COLUMN_ORDINAL</description>
+							<description>The ordinal of the column.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>COLUMN_DEFAULT</description>
+							<description>The default value of the column.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>IS_NULLABLE</description>
+							<description><b>True</b> if the column allows null values; otherwise <b>false</b>.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>IS_READONLY</description>
+							<description><b>True</b> if the column cannot be modified; otherwise <b>false</b>.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>PRIMARY_KEY</description>
+							<description>Indicates wheter the column is one of a set of columns of a primary key.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>UNIQUE_KEY</description>
+							<description>Indicates wheter the column is one of a set of columns of a unique key.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>CHARACTER_SET_NAME</description>
+							<description>The caracter set name of the column.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>COLLATION_NAME</description>
+							<description>The collation name of the column.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DESCRIPTION</description>
+							<description>Column description.</description>
+							<description>false</description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Column_Privileges">
+			<summary>
+			Retrieves the columns Privileges defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description>TABLE_NAME</description>
+							<description>Table name</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>COLUMN_NAME</description>
+							<description>Column name</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>GRANTEE</description>
+							<description>User name to who the privilege has been granted.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>GRANTOR</description>
+							<description>User who granted the privileges on the table.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>PRIVILEGE</description>
+							<description>Privilege type.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>WITH_GRANT</description>
+							<description>Privilege set with the grant option.</description>
+							<description>false</description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Domains">
+			<summary>
+			Retrieves the domains defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description>DOMAIN_NAME</description>
+							<description>The name of the domain.</description>
+							<description>true</description>
+						</item>
+						<item>
+							<description>DOMAIN_DATA_TYPE</description>
+							<description>The data type of the domain.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DOMAIN_SUB_TYPE</description>
+							<description>The sub type of the domain.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DOMAIN_SIZE</description>
+							<description>The maximum possible length of a value in the domain.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DOMAIN_PRECISION</description>
+							<description>The maximum precision of the domain for numeric data types.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DOMAIN_SCALE</description>
+							<description>The maximum scale of the domain for decimal and numeric data types.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>IS_NULLABLE</description>
+							<description><b>True</b> if the domain allows null values; otherwise <b>false</b>.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>ARRAY_DIMENSIONS</description>
+							<description>If the data type of the domain is an array type, the number of dimensions of the array.</description>
+							<description>false</description>
+						</item>
+						<item>
+							<description>DESCRIPTION</description>
+							<description>domain description.</description>
+							<description>false</description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Foreign_Keys">
+			<summary>
+			Retrieves the foreign keys defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Functions">
+			<summary>
+			Retrieves the external Functions defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Generators">
+			<summary>
+			Retrieves the generators defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Indexes">
+			<summary>
+			Retrieves the indexes defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Primary_Keys">
+			<summary>
+			Retrieves the primary key columns defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Procedure_Parameters">
+			<summary>
+			Retrieves the parameters of stored procedures defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Procedure_Privileges">		
+			<summary>
+			Retrieves the privileges of stored procedures defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Procedures">
+			<summary>
+			Retrieves the stored procedures defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Provider_Types">
+			<summary>
+			Retrieves the base data types supported by Firebird Server.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Roles">
+			<summary>
+			Retrieves the user roles defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Statistics">
+			<summary>
+			Retrieves the statistics defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Tables">
+			<summary>
+			Retrieves the tables defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Table_Constraint">
+			<summary>
+			Retrieves the table constraints defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Table_Privileges">
+			<summary>
+			Retrieves the table privileges defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Table_Statistics">
+			<summary>
+			Retrieves the table statistics defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Triggers">		
+			<summary>
+			Retrieves the triggers defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Usage_Privileges">
+			<summary>
+			Retrieves the usage privileges defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="View_Column_Usage">
+			<summary>
+			Retrieves the view column usage information defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="Views">
+			<summary>
+			Retrieves the views defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+		<field name="View_Privileges">
+			<summary>
+			Retrieves the view privileges defined in the database.
+			</summary>
+			<remarks>
+				<p>The list of returned columns for this schema type is:</p>
+				<p>
+					<list type="table">
+						<listheader>
+							<term>Column name</term>
+							<term>Description</term>
+							<term>Is retriction column</term>
+						</listheader>
+						<item>
+							<description></description>
+							<description></description>
+							<description></description>
+						</item>
+					</list>
+				</p>
+			</remarks>
+		</field>
+	</enum>
+</doc>

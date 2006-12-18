@@ -1,0 +1,15 @@
+FB.NET - Firebird managed data provider for .NET and Mono
+=========================================================
+
+Tasks for v1.5:
+
+- Bug fixing.
+
+- Improving API reference documentation.
+
+
+Tasks for v2.0:
+
+- Implementation of new ADO.NET 2.0 interfaces.
+
+- Try to implement a wrapper for the Firebird client and Embedded server.

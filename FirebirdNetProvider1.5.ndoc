@@ -1,0 +1,230 @@
+<project>
+    <assemblies>
+        <assembly location="D:\desarrollo\FirebirdProject\NETProvider\NETProvider_15\build\net-1.0\FirebirdSql.Data.Firebird.dll" documentation="D:\desarrollo\FirebirdProject\NETProvider\NETProvider_15\build\net-1.0\FirebirdSql.Data.Firebird.xml" />
+    </assemblies>
+    <namespaces>
+        <namespace name="FirebirdSql.Data.Firebird"></namespace>
+        <namespace name="FirebirdSql.Data.Firebird.DbSchema"></namespace>
+        <namespace name="FirebirdSql.Data.Firebird.Design"></namespace>
+        <namespace name="FirebirdSql.Data.Firebird.Events"></namespace>
+        <namespace name="FirebirdSql.Data.Firebird.Gds"></namespace>
+        <namespace name="FirebirdSql.Data.Firebird.Isql"></namespace>
+        <namespace name="FirebirdSql.Data.Firebird.Services"></namespace>
+    </namespaces>
+    <documenters>
+        <documenter name="HtmlHelp2">
+            <property name="CharacterSet" value="Ascii" />
+            <property name="LangID" value="1033" />
+            <property name="DeleteCHM" value="False" />
+            <property name="AugmentXmlDataIslands" value="True" />
+            <property name="RegisterTitleWithNamespace" value="False" />
+            <property name="ParentCollectionNamespace" value="" />
+            <property name="RegisterTitleAsCollection" value="False" />
+            <property name="OutputDirectory" value=".\doc\sdk\htmlhelp2\" />
+            <property name="HtmlHelpName" value="Firebird .NET Data Provider SDK" />
+            <property name="IncludeFavorites" value="False" />
+            <property name="Title" value="Firebird .NET Data Provider SDK" />
+            <property name="SplitTOCs" value="False" />
+            <property name="DefaulTOC" value="" />
+            <property name="IncludeHierarchy" value="False" />
+            <property name="ShowVisualBasic" value="False" />
+            <property name="RootPageContainsNamespaces" value="False" />
+            <property name="SortTOCByNamespace" value="True" />
+            <property name="OutputTarget" value="HtmlHelp" />
+            <property name="HeaderHtml" value="" />
+            <property name="FooterHtml" value="" />
+            <property name="FilesToInclude" value="" />
+            <property name="LinkToSdkDocVersion" value="SDK_v1_0" />
+            <property name="ShowMissingSummaries" value="False" />
+            <property name="ShowMissingRemarks" value="False" />
+            <property name="ShowMissingParams" value="False" />
+            <property name="ShowMissingReturns" value="False" />
+            <property name="ShowMissingValues" value="False" />
+            <property name="DocumentInternals" value="False" />
+            <property name="DocumentProtected" value="True" />
+            <property name="DocumentPrivates" value="False" />
+            <property name="DocumentProtectedInternalAsProtected" value="False" />
+            <property name="DocumentEmptyNamespaces" value="False" />
+            <property name="IncludeAssemblyVersion" value="False" />
+            <property name="CopyrightText" value="(c) 2002-2003. Carlos Guzman Alvarez." />
+            <property name="CopyrightHref" value="http://www.firebirdsql.org" />
+            <property name="ReferencesPath" value="" />
+            <property name="SkipNamespacesWithoutSummaries" value="False" />
+            <property name="UseNamespaceDocSummaries" value="False" />
+            <property name="AutoPropertyBackerSummaries" value="False" />
+            <property name="AutoDocumentConstructors" value="True" />
+            <property name="DocumentAttributes" value="False" />
+            <property name="ShowTypeIdInAttributes" value="False" />
+            <property name="DocumentedAttributes" value="" />
+            <property name="GetExternalSummaries" value="True" />
+            <property name="EditorBrowsableFilter" value="Off" />
+            <property name="UseNDocXmlFile" value="" />
+        </documenter>
+        <documenter name="JavaDoc">
+            <property name="Title" value="Firebird .NET Data Provider SDK" />
+            <property name="OutputDirectory" value=".\doc\sdk\javadoc\" />
+            <property name="ShowMissingSummaries" value="False" />
+            <property name="ShowMissingRemarks" value="False" />
+            <property name="ShowMissingParams" value="False" />
+            <property name="ShowMissingReturns" value="False" />
+            <property name="ShowMissingValues" value="False" />
+            <property name="DocumentInternals" value="False" />
+            <property name="DocumentProtected" value="True" />
+            <property name="DocumentPrivates" value="False" />
+            <property name="DocumentProtectedInternalAsProtected" value="False" />
+            <property name="DocumentEmptyNamespaces" value="False" />
+            <property name="IncludeAssemblyVersion" value="True" />
+            <property name="CopyrightText" value="(c) 2002-2004. Carlos Guzman Alvarez." />
+            <property name="CopyrightHref" value="http://www.firebirdsql.org" />
+            <property name="ReferencesPath" value="" />
+            <property name="SkipNamespacesWithoutSummaries" value="False" />
+            <property name="UseNamespaceDocSummaries" value="False" />
+            <property name="AutoPropertyBackerSummaries" value="False" />
+            <property name="AutoDocumentConstructors" value="True" />
+            <property name="DocumentAttributes" value="False" />
+            <property name="ShowTypeIdInAttributes" value="False" />
+            <property name="DocumentedAttributes" value="" />
+            <property name="GetExternalSummaries" value="True" />
+            <property name="EditorBrowsableFilter" value="Off" />
+            <property name="UseNDocXmlFile" value="" />
+        </documenter>
+        <documenter name="LaTeX">
+            <property name="OutputDirectory" value=".\doc\sdk\latex\" />
+            <property name="TextFileFullName" value="Documentation.tex" />
+            <property name="TexFileBaseName" value="Documentation" />
+            <property name="LatexCompiler" value="" />
+            <property name="TexFileFullPath" value=".\doc\sdk\latex\Documentation.tex" />
+            <property name="ShowMissingSummaries" value="False" />
+            <property name="ShowMissingRemarks" value="False" />
+            <property name="ShowMissingParams" value="False" />
+            <property name="ShowMissingReturns" value="False" />
+            <property name="ShowMissingValues" value="False" />
+            <property name="DocumentInternals" value="False" />
+            <property name="DocumentProtected" value="True" />
+            <property name="DocumentPrivates" value="False" />
+            <property name="DocumentProtectedInternalAsProtected" value="False" />
+            <property name="DocumentEmptyNamespaces" value="False" />
+            <property name="IncludeAssemblyVersion" value="False" />
+            <property name="CopyrightText" value="(c) 2002-2004. Carlos Guzman Alvarez." />
+            <property name="CopyrightHref" value="http://www.firebirdsql.org" />
+            <property name="ReferencesPath" value="" />
+            <property name="SkipNamespacesWithoutSummaries" value="False" />
+            <property name="UseNamespaceDocSummaries" value="False" />
+            <property name="AutoPropertyBackerSummaries" value="False" />
+            <property name="AutoDocumentConstructors" value="True" />
+            <property name="DocumentAttributes" value="False" />
+            <property name="ShowTypeIdInAttributes" value="False" />
+            <property name="DocumentedAttributes" value="" />
+            <property name="GetExternalSummaries" value="True" />
+            <property name="EditorBrowsableFilter" value="Off" />
+            <property name="UseNDocXmlFile" value="" />
+        </documenter>
+        <documenter name="LinearHtml">
+            <property name="IncludeTypeMemberDetails" value="True" />
+            <property name="OutputDirectory" value=".\doc\sdk\linearhtml\" />
+            <property name="MethodParametersInTable" value="True" />
+            <property name="TypeIncludeRegexp" value="" />
+            <property name="NamespaceExcludeRegexp" value="" />
+            <property name="Title" value="Firebird .NET Data Provider SDK" />
+            <property name="IncludeHierarchy" value="True" />
+            <property name="SortTOCByNamespace" value="True" />
+            <property name="HeaderHtml" value="" />
+            <property name="FooterHtml" value="" />
+            <property name="FilesToInclude" value="" />
+            <property name="ShowMissingSummaries" value="False" />
+            <property name="ShowMissingRemarks" value="False" />
+            <property name="ShowMissingParams" value="False" />
+            <property name="ShowMissingReturns" value="False" />
+            <property name="ShowMissingValues" value="False" />
+            <property name="DocumentInternals" value="False" />
+            <property name="DocumentProtected" value="True" />
+            <property name="DocumentPrivates" value="False" />
+            <property name="DocumentProtectedInternalAsProtected" value="False" />
+            <property name="DocumentEmptyNamespaces" value="False" />
+            <property name="IncludeAssemblyVersion" value="True" />
+            <property name="CopyrightText" value="(c) 2002-2003. Carlos Guzman Alvarez." />
+            <property name="CopyrightHref" value="http://www.firebirdsql.org" />
+            <property name="ReferencesPath" value="" />
+            <property name="SkipNamespacesWithoutSummaries" value="False" />
+            <property name="UseNamespaceDocSummaries" value="False" />
+            <property name="AutoPropertyBackerSummaries" value="False" />
+            <property name="AutoDocumentConstructors" value="True" />
+            <property name="DocumentAttributes" value="True" />
+            <property name="ShowTypeIdInAttributes" value="False" />
+            <property name="DocumentedAttributes" value="" />
+            <property name="GetExternalSummaries" value="True" />
+            <property name="EditorBrowsableFilter" value="Off" />
+            <property name="UseNDocXmlFile" value="" />
+        </documenter>
+        <documenter name="MSDN">
+            <property name="OutputDirectory" value=".\doc\sdk\msdn\" />
+            <property name="HtmlHelpName" value="Firebird .NET Data Provider SDK" />
+            <property name="IncludeFavorites" value="True" />
+            <property name="Title" value="Firebird .NET Data Provider SDK" />
+            <property name="SplitTOCs" value="False" />
+            <property name="DefaulTOC" value="" />
+            <property name="IncludeHierarchy" value="False" />
+            <property name="ShowVisualBasic" value="True" />
+            <property name="RootPageTOCName" value="" />
+            <property name="RootPageFileName" value="" />
+            <property name="RootPageContainsNamespaces" value="False" />
+            <property name="SortTOCByNamespace" value="True" />
+            <property name="OutputTarget" value="HtmlHelpAndWeb" />
+            <property name="HeaderHtml" value="" />
+            <property name="FooterHtml" value="" />
+            <property name="FilesToInclude" value="" />
+            <property name="LinkToSdkDocVersion" value="SDK_v1_1" />
+            <property name="ShowMissingSummaries" value="False" />
+            <property name="ShowMissingRemarks" value="False" />
+            <property name="ShowMissingParams" value="True" />
+            <property name="ShowMissingReturns" value="True" />
+            <property name="ShowMissingValues" value="False" />
+            <property name="DocumentInternals" value="False" />
+            <property name="DocumentProtected" value="True" />
+            <property name="DocumentPrivates" value="False" />
+            <property name="DocumentProtectedInternalAsProtected" value="False" />
+            <property name="DocumentEmptyNamespaces" value="False" />
+            <property name="IncludeAssemblyVersion" value="True" />
+            <property name="CopyrightText" value="(c) 2002-2003. Carlos Guzman Alvarez." />
+            <property name="CopyrightHref" value="http://www.firebirdsql.org" />
+            <property name="ReferencesPath" value="" />
+            <property name="SkipNamespacesWithoutSummaries" value="False" />
+            <property name="UseNamespaceDocSummaries" value="False" />
+            <property name="AutoPropertyBackerSummaries" value="False" />
+            <property name="AutoDocumentConstructors" value="True" />
+            <property name="DocumentAttributes" value="True" />
+            <property name="ShowTypeIdInAttributes" value="False" />
+            <property name="DocumentedAttributes" value="" />
+            <property name="GetExternalSummaries" value="True" />
+            <property name="EditorBrowsableFilter" value="Off" />
+            <property name="UseNDocXmlFile" value="" />
+        </documenter>
+        <documenter name="XML">
+            <property name="OutputFile" value=".\doc\doc.xml" />
+            <property name="ShowMissingSummaries" value="False" />
+            <property name="ShowMissingRemarks" value="False" />
+            <property name="ShowMissingParams" value="False" />
+            <property name="ShowMissingReturns" value="False" />
+            <property name="ShowMissingValues" value="False" />
+            <property name="DocumentInternals" value="False" />
+            <property name="DocumentProtected" value="True" />
+            <property name="DocumentPrivates" value="False" />
+            <property name="DocumentProtectedInternalAsProtected" value="False" />
+            <property name="DocumentEmptyNamespaces" value="False" />
+            <property name="IncludeAssemblyVersion" value="False" />
+            <property name="CopyrightText" value="" />
+            <property name="CopyrightHref" value="" />
+            <property name="ReferencesPath" value="" />
+            <property name="SkipNamespacesWithoutSummaries" value="False" />
+            <property name="UseNamespaceDocSummaries" value="False" />
+            <property name="AutoPropertyBackerSummaries" value="False" />
+            <property name="AutoDocumentConstructors" value="True" />
+            <property name="DocumentAttributes" value="False" />
+            <property name="ShowTypeIdInAttributes" value="False" />
+            <property name="DocumentedAttributes" value="" />
+            <property name="GetExternalSummaries" value="True" />
+            <property name="EditorBrowsableFilter" value="Off" />
+            <property name="UseNDocXmlFile" value="" />
+        </documenter>
+    </documenters>
+</project>

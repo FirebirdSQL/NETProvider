@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<project name="FirebirdProvider" default="release" basedir="." xmlnds="http://tempuri.org/nant-vs.xsd">
+
+    <!-- Project properties -->
+    <property name="project.name" value=".NET Data Provider for Firebird"/>
+    <property name="project.FormalName" value="FirebirdSql.Data.Firebird"/>
+    <property name="project.version" value="1.5"/>
+
+    <!-- Build properties -->
+    <property name="build.debug"  value="true"/>
+    <property name="build.define" value="_DEBUG"/>
+
+    <!-- Paths properties -->
+    <property name="base.dir" value="."/>
+    <property name="src.dir" value="${project.FormalName}\source"/>
+    <property name="nunit.test.dir" value="FirebirdSql.Data.Firebird.UnitTest\source"/>
+            	
+    <property name="base.build.dir" value="build" />    
+    <property name="build.dir" value="${base.build.dir}" />
+    <property name="examples.dir" value="examples" />
+    <property name="install.dir" value="install" />
+            
+	<property name="resources.dir" value="${src.dir}\Resources"/>
+
+	<!-- Check for Html Help Compiler -->
+	<target name="check-htmlhelp-compiler">
+		<ifnot propertyexists="htmlhelp.compiler">
+			<readregistry property="htmlhelp.workshop.installroot" key="SOFTWARE\Microsoft\HTML Help Workshop\InstallDir"
+				hive="CurrentUser" failonerror="false" />
+			<if propertyexists="htmlhelp.workshop.installroot">
+				<property name="htmlhelp.compiler" value="${htmlhelp.workshop.installroot}\hhc.exe" readonly="false" />
+			</if>
+		</ifnot>
+		<ifnot propertyexists="htmlhelp.compiler">
+			<sysinfo />
+			<property name="htmlhelp.compiler" value="${sys.os.folder.programfiles}\HTML Help Workshop\hhc.exe"
+				readonly="false" />
+		</ifnot>
+	</target>
+
+	<!-- Check for NUnit -->
+	<target name="check-nunit-framework" depends="check-htmlhelp-compiler">
+		<ifnot propertyexists="nunit.framework.dll">
+			<sysinfo />
+			<property name="nunit.framework.dll" value="${sys.os.folder.programfiles}\NUnit V2.1\bin\nunit.framework.dll"
+				readonly="false" />
+		</ifnot>
+	</target>
+
+	<!-- Target for check build configuration -->
+	<target name="check-build-config" depends="clean">
+		<call target="check-htmlhelp-compiler" />
+		<call target="check-nunit-framework" />
+	</target>
+	
+    <!-- Target for clean destination directory -->
+    <target name="clean" description="cleans build directory">
+        <delete dir="${build.dir}" verbose="true" failonerror="false"/>
+        <delete dir="${install.dir}" verbose="true" failonerror="false"/>
+    </target>
+
+	<!-- Target for build in DEBUG mode -->
+    <target name="debug" depends="clean">
+        <property name="build.debug" value="true"/>
+
+		<call target="build-all" />
+    </target>
+
+	<!-- Target for build in RELEASE mode -->
+    <target name="release" depends="clean">
+        <property name="build.debug" value="false"/>
+		<property name="build.define" value="_RELEASE"/>
+
+		<call target="build-all" />
+    </target>
+
+	<!-- Build target for all existing platforms -->
+	<target name="build-all" depends="check-build-config">
+		<call target="net-1.0" failonerror="false" />
+		<call target="net-1.1" failonerror="false" />
+		<call target="mono-1.0" failonerror="false" />
+	</target>
+	
+	<target name="net-1.0">
+		<!-- .NET Framework 1.0 -->
+		<available type="Framework" resource="net-1.0" property="temp.framework.available" />
+		<ifnot propertytrue="temp.framework.available">
+			<echo message=".NET Framework 1.0 runtime is not available." />
+		</ifnot>
+		<if propertytrue="temp.framework.available">
+			<property name="nant.settings.currentframework" value="net-1.0" />
+			<echo message="Building using .NET Framework 1.0." />
+			<call target="build-provider" force="true" />
+			<if propertyexists="htmlhelp.compiler">
+        		<call target="build-sdk" force="true" />
+			</if>
+			<if propertyexists="nunit.framework.dll">
+        		<call target="build-nunit-tests" force="true" />
+			</if>
+			<call target="distribution" force="true" />
+		</if>
+	</target>
+
+	<target name="net-1.1">
+		<!-- .NET Framework 1.1 -->
+		<available type="Framework" resource="net-1.1" property="temp.framework.available" />
+		<ifnot propertytrue="temp.framework.available">
+			<echo message=".NET Framework 1.1 runtime is not available." />
+		</ifnot>
+		<if propertytrue="temp.framework.available">
+			<property name="nant.settings.currentframework" value="net-1.1" />
+			<echo message="Building using .NET Framework 1.1." />
+			<call target="build-provider" force="true" />
+			<if propertyexists="htmlhelp.compiler">
+        		<call target="build-sdk" force="true" />
+			</if>
+			<if propertyexists="nunit.framework.dll">
+        		<call target="build-nunit-tests" force="true" />
+			</if>
+			<call target="distribution" force="true" />
+		</if>		
+	</target>
+
+	<target name="mono-1.0">
+		<!-- Mono 1.0 -->
+		<available type="Framework" resource="mono-1.0" property="temp.framework.available" />
+		<ifnot propertytrue="temp.framework.available">
+			<echo message="Mono 1.0 runtime is not available." />
+		</ifnot>
+		<if propertytrue="temp.framework.available">
+			<property name="nant.settings.currentframework" value="mono-1.0" />			
+			<echo message="Building using Mono 1.0." />
+			<property name="build.define" value="_MONO"/>
+			<call target="build-provider-mono" force="true" />
+			<!-- call target="distribution" / -->
+		</if>		
+	</target>
+
+	<!-- Target for build Firebird Data Provider -->
+    <target name="build-provider">
+		<property name="build.dir" value="${base.build.dir}\${nant.settings.currentframework}" />
+        <mkdir dir="${build.dir}"/>
+        
+        <!-- compile FirebirdSql.Data.Firebird -->
+        <csc target="library" output="${build.dir}\${project.FormalName}.dll" debug="${build.debug}" doc="${build.dir}\${project.FormalName}.xml" define="${build.define}">
+            <sources>
+                <includes name="${src.dir}/**/*.cs"/>
+            </sources>
+            
+            <references>
+                <absolute file="System.dll"/>
+                <absolute file="System.Data.dll"/>
+                <absolute file="System.Drawing.dll"/>
+                <absolute file="System.Design.dll"/>
+                <absolute file="System.XML.dll"/>
+            </references>
+
+            <arg value="/resource:${resources.dir}\GDS\isc_error_msg.resources,FirebirdSql.Data.Firebird.Resources.GDS.isc_error_msg.resources"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbConnection.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbConnection.bmp"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbCommand.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbCommand.bmp"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbDataAdapter.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbDataAdapter.bmp"/>
+            <arg value="/optimize+" />
+        </csc>
+    </target>
+
+	<!-- Target for build Firebird Data Provider -->
+    <target name="build-provider-mono">
+		<property name="build.dir" value="${base.build.dir}\${nant.settings.currentframework}" />
+        <mkdir dir="${build.dir}"/>
+        
+        <!-- compile FirebirdSql.Data.Firebird -->
+        <csc target="library" output="${build.dir}\${project.FormalName}.dll" debug="${build.debug}" doc="${build.dir}\${project.FormalName}.xml" define="${build.define}">
+            <sources>
+                <includes name="${src.dir}/**/*.cs" />
+                <excludes name="${src.dir}/DesignTime/Connection/**" />
+                <excludes name="${src.dir}/DesignTime/Command/**" />
+            </sources>
+            
+            <references>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.Data.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.Drawing.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.Design.dll"/>
+                <includes name="${nant.settings.currentframework.frameworkassemblydirectory}/System.XML.dll"/>
+            </references>
+
+            <arg value="/resource:${resources.dir}\GDS\isc_error_msg.resources,FirebirdSql.Data.Firebird.Resources.GDS.isc_error_msg.resources"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbConnection.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbConnection.bmp"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbCommand.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbCommand.bmp"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbDataAdapter.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbDataAdapter.bmp"/>
+            <arg value="/optimize+" />
+        </csc>
+    </target>
+
+    <!-- Target for build NUnit Tests -->
+    <target name="build-nunit-tests">
+		<property name="build.dir" value="${base.build.dir}\${nant.settings.currentframework}" />
+    
+        <copy todir="${build.dir}">
+            <fileset basedir="${nunit.test.dir}\..">
+                <includes name="*.config"/>
+            </fileset>
+        </copy>
+
+        <!-- compile FirebirdSql.Data.Firebird.Tests -->
+        <csc target="library" output="${build.dir}\${project.FormalName}.UnitTest.dll">
+            <sources>
+                <includes name="${nunit.test.dir}/**/*.cs"/>
+            </sources>
+            
+            <references>
+                <absolute file="System.dll"/>
+                <absolute file="System.Data.dll"/>
+                <absolute file="System.XML.dll"/>
+                <includes name="${nunit.framework.dll}"/>
+                <includes name="${build.dir}/${project.FormalName}.dll"/>
+            </references>
+            <arg value="/optimize+" />
+        </csc>
+    </target>
+
+	<!-- Target for build API Reference documentation using NDoc -->
+    <target name="build-sdk">
+		<property name="build.dir" value="${base.build.dir}\${nant.settings.currentframework}" />
+        <property name="sdk.dir" value="${build.dir}\doc\sdk\msdn" />
+                
+        <ndoc failonerror="false">
+            <assemblies basedir="${build.dir}">
+                <includes name="${project.FormalName}.dll"/>
+            </assemblies>
+            <documenters>
+                <documenter name="MSDN">
+                    <property name="OutputDirectory" value="${sdk.dir}" />
+                    <property name="HtmlHelpName" value="Firebird .NET Data Provider SDK"/>
+                    <property name="HtmlHelpCompilerFilename" value="${htmlhelp.compiler}" />
+                    <property name="IncludeFavorites" value="true" />
+                    <property name="Title" value="Firebird .NET Data Provider SDK" />
+                    <property name="SplitTOCs" value="False" />
+                    <property name="DefaulTOC" value="" />
+                    <property name="ShowVisualBasic" value="True" />
+                    <property name="ShowMissingSummaries" value="${build.debug}" />
+					<property name="ShowMissingParams" value="${build.debug}" />
+                    <property name="ShowMissingReturns" value="${build.debug}" />
+                    <property name="ShowMissingRemarks" value="${build.debug}" />
+                    <property name="ShowMissingValues" value="${build.debug}" />
+                    <property name="DocumentAttributes" value="False" />
+                    <property name="DocumentInternals" value="False" />
+                    <property name="DocumentPrivates" value="False" />
+                    <property name="DocumentProtected" value="True" />
+                    <property name="DocumentEmptyNamespaces" value="False" />
+					<property name="SkipNamespacesWithoutSummaries" value="false" />
+					<property name="AutoPropertyBackerSummaries" value="false" />
+					<property name="AutoDocumentConstructors" value="true" />
+                    <property name="IncludeAssemblyVersion" value="True" />
+                    <property name="IncludeHierarchy" value="False" />
+					<property name="GetExternalSummaries" value="true" />
+                    <property name="CopyrightText" value="Copyright (C) 2002-2003 Carlos Guzman Alvarez." />
+                    <property name="CopyrightHref" value="http://www.firebirdsql.org" />
+                 </documenter>
+            </documenters>
+        </ndoc>
+
+		<!-- Remove everything except the help file itself from the current SDK documentation directory -->
+		<delete>
+			<fileset basedir="${sdk.dir}">
+				<includes name="**/*" />
+				<excludes name="**/*.chm" />
+				<excludes name="**/CVS" />
+			</fileset>
+		</delete>
+
+		<!-- Rename CHM file -->
+		<copy file="${sdk.dir}/Firebird .NET Data Provider SDK.chm" tofile="${sdk.dir}/FirebirdNETProviderSDK.chm" />
+		<delete file="${sdk.dir}/Firebird .NET Data Provider SDK.chm" />
+	</target>
+
+	<!-- Target for distribution directory -->
+	<target name="distribution">
+		<property name="build.dir" value="${base.build.dir}\${nant.settings.currentframework}" />	
+		<property name="dist.dir" value="${build.dir}\distribution" />
+        <property name="sdk.dir" value="${build.dir}\doc\sdk\msdn" />
+        	
+		<mkdir dir="${dist.dir}" failonerror="false"/>
+		<mkdir dir="${dist.dir}/${examples.dir}" failonerror="false"/>
+		<mkdir dir="${dist.dir}/${examples.dir}/ASP.NET" failonerror="false"/>
+		<mkdir dir="${dist.dir}/${examples.dir}/csharp" failonerror="false"/>
+				        
+        <copy todir="${dist.dir}">
+            <fileset basedir="${build.dir}">
+                <includes name="*.dll"/>
+                <includes name="*.config"/>
+            </fileset>
+        </copy>
+        
+        <copy todir="${dist.dir}/${examples.dir}/ASP.NET">
+            <fileset basedir="${examples.dir}/ASP.NET">
+                <includes name="**"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${dist.dir}/${examples.dir}/csharp">
+            <fileset basedir="${examples.dir}/csharp">
+                <includes name="**"/>
+            </fileset>
+        </copy>        
+
+		<copy file="${sdk.dir}/FirebirdNETProviderSDK.chm" tofile="${dist.dir}/FirebirdNETProviderSDK.chm" />
+        <copy todir="${dist.dir}">
+            <fileset basedir=".">
+                <includes name="*.txt"/>
+            </fileset>
+		</copy>
+	</target>
+</project>

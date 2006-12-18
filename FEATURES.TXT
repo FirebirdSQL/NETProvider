@@ -1,0 +1,115 @@
+FB.NET - Firebird managed data provider for .NET and Mono
+=========================================================
+
+List of features.
+
+- Written 100% in C#, using managed code.
+
+- Support for Firebird 1.0, Firebird 1.5 and Interbase 6.0 servers.
+
+- Firebird Services:
+
+	* Backup.
+
+	* Configuration.
+
+	* Log.
+
+	* Restore.
+
+	* Security.
+
+	* Server properties.
+
+	* Statistical.
+
+	* Validation.
+
+- Basic ISQL scripts execution.
+
+- Data types:
+
+	* Array.
+	* BigInt.
+	* Binary and Text Blobs.
+	* Char and Varchar.
+	* Date.
+	* Integer.
+	* SmallInt.
+	* Time.
+	* TimeStamp.
+
+- Connection Pooling.
+
+- Command builder.
+
+- Named parameters, an example:
+
+	FbConnection connection = new FbConnection(connectionString);
+	FbCommand command = new FbCommand("select * from table_name were field_name = @param_value");
+	FbDataReader reader = command.ExecuteReader();
+	while(reader.Read)
+	{
+		...
+	}
+	reader.Close();
+	connection.Close();
+
+- Batch command execution, an example:
+
+	FbConnection connection = new FbConnection(connectionString);
+	FbCommand command = new FbCommand("select * from table_name1;select * from table_name2");
+	FbDataReader reader = command.ExecuteReader();
+	while (reader.NextResult())
+	{
+		...
+		while (reader.Read)
+		{
+			...
+		}
+	}
+	reader.Close();
+	connection.Close();
+
+- Stored procedure execution using SQL Server-like syntax, an example:
+
+	FbConnection connection = new FbConnection(connectionString);
+	FbCommand command = new FbCommand("sp_select_data");
+	command.CommandType = CommandType.StoredProcedure;
+	FbDataReader reader = command.ExecuteReader();
+	while(reader.Read)
+	{
+		...
+	}
+	reader.Close();
+	connection.Close();
+
+- Support for metadata information retrieval.
+
+- Character sets:
+
+	* NONE
+	* ASCII
+	* UNICODE_FSS
+	* SJIS_0208
+	* EUCJ_0208
+	* ISO2022-JP
+	* DOS437
+	* DOS850
+	* DOS860
+	* DOS861
+	* DOS863
+	* DOS865
+	* ISO8859_1
+	* ISO8859_2
+	* KSC_5601
+	* WIN1250
+	* WIN1251
+	* WIN1252
+	* WIN1253
+	* WIN1254
+	* WIN1255
+	* WIN1256
+	* WIN1257
+	* BIG_5
+	* GB_2312

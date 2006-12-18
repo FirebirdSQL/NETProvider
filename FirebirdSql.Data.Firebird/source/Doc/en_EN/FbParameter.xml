@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbParameter" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Represents a parameter of a <see cref="FbCommand" />, and optionally, its mapping to 
+			DataSet columns. This class cannot be inherited.
+			</summary>
+			<remarks>
+			Parameter names are not case sensitive.
+			</remarks>
+			<example>
+				<code>
+public void AddFbParameters() 
+{
+// ...
+// create myDataSet and myDataAdapter
+// ...
+
+  myDataAdapter.SelectCommand.Parameters.Add("@CategoryName", FbDbType.VarChar, 80).Value = "toasters";
+  myDataAdapter.SelectCommand.Parameters.Add("@SerialNum", FbDbType.Integer).Value = 239;
+  myDataAdapter.Fill(myDataSet);
+
+}
+				</code>
+			</example>
+		</overview>
+		<property name="Precision">
+			<summary>
+			Gets or sets the maximum number of digits used to represent the parameter value.
+			</summary>
+		</property>
+		<property name="Scale">
+			<summary>
+			Gets or sets the number of decimal places to which parameter value is resolved.
+			</summary>
+		</property>
+		<property name="Size">
+			<summary>
+			Gets or sets the maximum size, in bytes, of the data within the column.
+			</summary>
+		</property>
+		<property name="DbType">
+			<summary>
+			Gets or sets the <b>DbType</b> of the parameter.
+			</summary>
+		</property>
+		<property name="Direction">
+			<summary>
+			Gets or sets the <b>Direction</b> of the parameter.		
+			</summary>
+		</property>
+		<property name="IsNullable">
+			<summary>
+			Gets or sets whether the parameter accepts null values.
+			</summary>
+		</property>
+		<property name="ParameterName">
+			<summary>
+			Gets or sets the name of the <see cref="FbParameter" />.
+			</summary>
+		</property>
+		<property name="SourceColumn">
+			<summary>
+			Gets or sets the name of the source column that is mapped to the DataSet 
+			and used for loading or returning the Value.
+			</summary>
+		</property>
+		<property name="SourceVersion">
+			<summary>
+			Gets or sets the <b>DataRowVersion</b> to use when loading value.
+			</summary>
+		</property>
+		<property name="Value">
+			<summary>
+			Gets or sets the value of the parameter.
+			</summary>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbParameter" /> class.
+			</summary>
+		</constructor>
+		<constructor name="ctor(System.String,FirebirdSql.Data.Firebird.FbDbType)">
+			<summary>
+			Creates a new instance of the <see cref="FbParameter" /> class.
+			</summary>
+			<param name="parameterName">The name of the parameter.</param>
+			<param name="fbType">One of the <see cref="FbDbType" /> values.</param>
+		</constructor>
+		<constructor name="ctor(System.String,System.Object)">
+			<summary>
+			Creates a new instance of the <see cref="FbParameter" /> class.
+			</summary>
+			<param name="parameterName">The name of the parameter.</param>
+			<param name="value">The value of the parameter.</param>
+		</constructor>
+		<constructor name="ctor(System.String,FirebirdSql.Data.Firebird.FbDbType,System.Int32)">
+			<summary>
+			Creates a new instance of the <see cref="FbParameter" /> class.
+			</summary>
+			<param name="parameterName">The name of the parameter.</param>
+			<param name="fbType">One of the FbDbType values.</param>
+			<param name="size">The size of the parameter (width of the column).</param>
+		</constructor>
+		<constructor name="ctor(System.String,FirebirdSql.Data.Firebird.FbDbType,System.Int32,System.String)">
+			<summary>
+			Creates a new instance of the <see cref="FbParameter" /> class.
+			</summary>
+			<param name="parameterName">The name of the parameter.</param>
+			<param name="fbType">One of the <see cref="FbDbType">FbDbType</see> values.</param>
+			<param name="size">The size of the parameter (width of the column).</param>
+			<param name="sourceColumn">The name of the source column.</param>
+		</constructor>
+		<constructor name="ctor(System.String,FbDbType,System.Int32,System.Data.ParameterDirection,System.Boolean,System.Byte,System.Byte,System.String,System.Data.DataRowVersion,System.Object)">
+			<summary>
+			Creates a new instance of the <see cref="FbParameter" /> class.
+			</summary>
+			<param name="parameterName">The name of the parameter.</param>
+			<param name="fbType">One of the <see cref="FbDbType">FbDbType</see> values.</param>
+			<param name="size">The size of the parameter (width of the column).</param>
+			<param name="direction">The direction of the parameter.</param>
+			<param name="isNullable"><b>true</b> if the parameter accepts null values; <b>false</b> if not.</param>
+			<param name="precision">Maximum number of digits used to represent the parameter value.</param>
+			<param name="scale">Number of decimal places to which parameter value is resolved.</param>
+			<param name="sourceColumn">The name of the source column.</param>
+			<param name="sourceVersion">The <b>DataRowVersion</b> to use when loading value.</param>
+			<param name="value">The value of the parameter.</param>
+		</constructor>
+		<method name="ToString">
+			<summary>
+			Returns a string with the ParameterName.
+			</summary>
+		</method>
+	</class>
+</doc>

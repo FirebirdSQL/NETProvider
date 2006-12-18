@@ -1,0 +1,174 @@
+WHAT IS NEW - FB.NET - Firebird managed data provider for .NET and Mono
+=======================================================================
+
+1.5.4 ( 2004-06-07 )
+----- - ---- -- -- - 
+
+- Bug fixes (Please review the changelog for details) :
+
+	- Removed checking of null values on input parameters in FbCommand class
+
+- Improved database schema classes.
+
+
+1.5.3 ( 2004-05-20 )
+----- - ---- -- -- - 
+
+- Bug fixes (Please review the changelog for details) :
+
+- Improved database schema classes.
+
+
+1.5.2 ( 2004-03-21 )
+----- - ---- -- -- - 
+
+- Bug fixes (Please review the changelog for details) :
+
+	- Fix for the GetBytes and GetChars methods of the FbDataReader class.
+
+	- Commit implicit transactions of active commands when
+	closing the connection.
+
+	- Fix for delete stored proc execution using the DataAdapter.
+
+- Varchars are now sent trimmed over the wire.
+
+
+1.5.1 ( 2004-02-26 )
+----- - ---- -- -- - 
+
+- Bug fixes on named parameters, FbCommandBuilder, 
+FbDataAdapter and FbDataReader.NextResult imlementations.
+( see the ChangeLog for more information )
+
+
+1.5 Final ( 2004-02-21 )
+--- ----- -  ---- -- - -
+
+- Bug fixes.
+
+- Improved named parameters support.
+
+
+Release Candidate 5 ( 2004-02-14 )
+------- --------- - - ---- -- -- -
+
+- Bug fixes.
+
+Release Candidate 4 ( 2004-02-01 )
+------- --------- - - ---- -- -- -
+
+- Bug fixes.
+
+
+Release Candidate 3 ( 2004-01-26 )
+------- --------- - - ---- -- -- -
+
+- Bug fixes.
+
+
+Release Candidate 2 ( 2003-12-29 )
+------- --------- - - ---- -- -- -
+
+- Bug fixes.
+
+
+Release Candidate 1 ( 2003-12-07 )
+------- --------- - - ---- -- -- -
+
+- Bug fixes.
+
+- Better fit to ADO.NET.
+
+- Improved blob reads.
+
+- Improved character sets handling.
+
+- Performance improvements.
+
+- Added support for Firebird-like connection strings, an example:
+
+	Database=localhost/3050:D:\TESTDB.GDB;User=SYSDBA;Password=masterkey;Dialect=3;...
+
+
+Beta 4 ( 2003-11-11 )
+---- - --------------
+
+- Bug fixes.
+
+- Improved prepared statement handling ( Thanks to Jesus for his feedback )
+
+- Improved array datatype support ( Thanks to Jesus for his feedback )
+
+- Now it's possible to use FbConnection, FbCommand and FbDataAdapter as 
+components inside #Develop.
+
+
+Beta 3 ( 2003-10-21 )
+---- - --------------
+
+- Bug fixes.
+
+- Added basic design time support for FbCommand.CommandText
+
+
+Beta 2 ( 2003-10-14 )
+---- - --------------
+
+- Bug fixes.
+
+- Better fit to ADO.NET.
+
+- Improved Command Builder implementation.
+
+- Improved Design time support for FbParameterCollection class.
+
+- Removed FbCommand.Cursor property.
+
+- Added handling of character sets by field for char and varchar datatypes.
+
+
+Beta 1 ( 2003-09-18 )
+---- - --------------
+
+- Bug fixes.
+
+- Improved NUnit test suite.
+
+- Improved FbScript class.
+
+- Improved FbDataReader.GetSchemaTable method by adding support 
+for COMPUTED columns and fixing readonly columns detection.
+
+- Improved batch command execution using regular expressions.
+
+
+Alpha 2 ( 2003-09-02 )
+------- --------------
+
+- Better fit to ADO.NET.
+
+- Bug fixes.
+
+- Improved Command Builder implementation.
+
+- Improved connection string design time support.
+
+- Improved array data type support ( Thanks to Jesus Arevalo for his feedback ).
+
+- Added SQL Server like Stored Procedure calls.
+
+
+
+Alpha 1 ( 2003-08-11 )
+------- --------------
+
+- New GDS implementation.
+
+- Reorganization of XML documentation files using a new XML file format.
+
+- Design time support for connection string ( For MS .NET only )
+
+- Support for database schema retrieval.
+
+- Support for SELECT ... FOR UPDATE statements.

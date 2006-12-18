@@ -1,0 +1,1407 @@
+FB.NET - Firebird managed data provider for .NET and Mono
+=========================================================
+
+
+2004-07-06 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Fixed bug in NExtResult method.
+
+
+
+------------------------------------------------------------------
+
+
+2004-06-12 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Gds/GdsStatement.cs:
+
+		- Fixed bug in Fetch method when working
+		with statements using EXECUTE PROCEDURE syntax.
+
+
+2004-06-10 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* Sources of the Firebird .NET provider
+	are relicensed under the IDPL, this will
+	be done in CVS sources of 1.0, 1.5 and 1.6
+
+	Details about the IDPL license can be found here:
+	
+	http://www.ibphoenix.com/main.nfs?a=ibphoenix&l=;PAGES;NAME='ibp_idpl' 
+
+
+
+
+2004-06-07 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Gds/GdsAttachPArams.cs:
+
+		- Check that the dialect is correct.	
+
+	* FirebirdSql.Data.Firebird/Gds/GdsField.cs:
+
+		- Improved GetFbTypeFromBlr
+
+2004-06-04 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbForeignKeysSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbColumsnSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbProcedureParametersSchema.cs:
+	* FirebirdSql.Data.Firebird/FbCommandBuilder.cs:
+
+		- Fix sql command and improve schema classes.
+
+
+2004-06-02 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Simplify handling of input parameters with null values (Thanks to Jojakim Stahl).
+
+
+<!----------------------- Started version 1.5.4 developement -----------------------!>
+
+2004-05-14 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/Services/FbSecurity.cs:
+
+		- Fix for DisplayUSer method (Thanks to to Todd by his feedback).
+
+	* FirebirdSql.Data.Firebird/Services/FbService.cs:
+
+		- Fix for parseUSerData method (Thanks to to Todd by his feedback).	
+
+	* FirebirdSql.Data.Firebird/Gds/GdsStatement.cs:
+
+		- Fixed issue with GetExecutionPlan method (Thanks to Timothy Shih for his feedback).
+
+2004-04-6 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnUsageSchema.cs:
+
+		- Fixed description retrieval for view columns.
+
+2004-04-1 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Backported implicit transaction fix from 1.6
+
+	* FirebirdSql.Data.Firebird/FbException.cs:
+
+		- Backported 1.6 implementation.
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbForeignKeySchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbPrimaryKeySchema.cs:
+
+		- Improved primary keys and foreign keys schemas.
+
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbUniqueKeysSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbDbSchemaFactory.cs:
+	* FirebirdSql.Data.Firebird/FbSchemaType.cs:
+
+		- New Schema for retrieve unique keys information.
+
+2004-03-31 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewsSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewColumnsUsageSchema.cs:
+	* FirebirdSql.Data.Firebird/DbSchema/FbViewPrivileges.cs:
+
+		- Fixed views schema (Thank to Frans Bouma for his feedback).
+
+2004-03-29 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* source/DbSchema/FbDbAbstractSchema.cs:
+	* source/DbSchema/FbColumnsSchema.cs:
+
+		- Trim string fields in schema result and bring
+		IS_NULLABLE column of the Columns Schema type
+		tyo have a correct value (Thanks to Frans Bouma for his feedback)
+
+2004-03-22 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Fixed ICloneable.Clone implementation (Backported from 1.6 sources).
+
+2004-03-20 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* source/FbCommandbuilder.cs:
+
+		- Rollback latest changes
+
+2004-03-16 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommandbuilder.cs:
+
+		- Changed the where clausule generation on UPDATED and DELETE commands.
+
+2004-03-10 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* source/FbDataReader.cs:
+
+		- Added check of the command.Statement property on Read method 
+		(Thanks to Alessandro Petrelli for his feedback)
+
+2004-03-09 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* source/FbDataReader.cs:
+
+		- Fixed bug in Getbytes and GetChars when thebuffer is null (Thanks to Derek M. A. Lee-Wo for his feedback).
+
+		- Fetch one row of data when closing the reader if no rows
+		where fetched and the command is an Stored procedure, this is needed
+		for allow correct deletes when using stored proceudres with the data adapter
+		(Thanks to olegmad for his feedback)
+
+2004-03-06 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbParameter.cs:
+
+		- Fixed minor issue with FbDbType infering. ( Thanks to olegmad for his feedback )
+
+2004-03-04 Carlos Guzman Alvarez  <carlosga@telefonica.net>
+
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+
+		- Check that there are a valid implicit transaction
+		in CommitImplicitTransaction and RollbackImplicitTransaction
+		metods (Backported form 1.6 sources).
+
+2004-03-03 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbConnection.cs:
+
+		- Commit implicit transactions of active commands when
+		closing the connection ( Thanks to John )
+
+2004-02-27 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/Gds/GdsInetWriter.cs
+
+		- Send varchars using WriteBuffer instead of WriteOpaque.
+
+2004-02-27 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/Gds/GdsInetReader.cs
+	* source/Gds/GdsInetWriter.cs
+
+		- Trim only spaces at the of the varchar fields values.
+
+	* source/FbCommand.cs
+
+		- Minor improvement to NextResult method (Backported from 1.6 sources).
+
+	* source/Gds/GdsInetReader.cs
+
+		- Read varchars trimmed out.
+
+	* source/Gds/GdsInetWriter.cs
+
+		- Write varchars trimmed out.
+
+
+<!----------------------- Started version 1.5.2 developement -----------------------!>
+
+
+2004-02-25 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/Gds/GdsAttachment.cs
+
+		- Use a BufferedStream for read.
+
+	* source/Gds/GdsStatement.cs
+
+		- Reset needed members when the statement is set to closed by a 
+		transaction update.
+
+	* source/FbCommand.cs
+
+		- Fix for the named parameters support (Backported form 1.6 sources).
+
+
+2004-02-24 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/Gds/GdsStatement.cs:
+
+		- Changes for avoid problems due to parameter conversion problems.
+
+	* source/FbCommand.cs:
+
+		- Added changes for better control of FbDataReader.NextResult usage.
+
+	* source/DesignTime/Connection/ConnectionStringEditor.cs:
+
+		- Do not show the connection succeful message if
+		in the finally block (Thanks to Daniel Lopez for his feedback).
+
+	* source/FbCommand.cs:
+
+		- Fix for the regex used for extract named parmeters
+		that it's not working in all cases [#] ( Thanks to Zsombor Cserna by his feedback )
+
+
+2004-02-23 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommandBuilder.cs:
+
+		- Removed the AcceptChanges call, this causes commands to
+		be bad generated if there are errors in one update to a row and
+		we try to update it one more time [#902668] ( Thanks to Janusz Mars )
+
+		- Removed status update with UpdateStatus.Continue as it's not needed.
+
+<!----------------------- Started version 1.5.1 developement -----------------------!>
+
+2004-02-21 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	( Prepare for 1.5 final. )
+
+	* source/FbConnection.cs:
+
+		- Fix DataSource property.
+
+	* source/Gds/GdsAttachParams.cs:
+
+		- Fix for connection timeout and packet size decoding from the conenction string.
+
+
+2004-02-19 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommandbuilder.cs:
+
+		- Cleanup ( return back to the orignal code )
+
+
+2004-02-18 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Improved the replace of the named parameters with the placeholder ( Thanks to Chris Turchin )
+
+		- Rework named parameters extraction.
+
+
+<!----------------------- Started version 1.5 final developement -----------------------!>
+
+2004-02-13 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Fixed error in named parameters support ( Thanks to Zsombor Cserna )
+		Added nunit test case to FbCommandTest.cs file.
+
+	* source/Gds/GdsAttachParams.cs:
+
+		- Throw exception if the connection string has an invalid character set.
+
+	* source/FbConnection.cs:
+
+		- Improved CreateDatabase Method for allow to control overwrite of 
+		existing database (not finished yet).
+
+2004-02-11 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbConnection.cs:
+
+		- Check that the given character set in CreateDatabase method is correct, 
+		if no throw an ArgumentException.
+
+	* source/FbDataReader.cs:
+	* source/FbErrorCollection.cs:
+	* source/FbDataReader.cs:
+	* source/FbParameterCollection.cs:
+	* source/GDS/GdsCharsetCollection.cs:
+	* source/GDS/GdsErrorCollection.cs:
+
+		- Removed mono:: hack. Now mono:: needs to be build with ICU support.
+
+
+<!----------------------- Started version 1.5 RC5 developement -----------------------!>
+
+2004-01-30 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Fixed problem with output parameters when using implicit transactions ( Thnaks to Alessandro Petrelli )
+
+2004-01-29 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+	* source/GDS/GdsTransaction.cs:
+
+		- Fix for prepared statments that uses implicit transaction support.
+		( backported from 1.6 sources )
+
+2004-01-28 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/Gds/GdsTransaction.cs:
+
+		- Fixed throw of an incorrect exception type (Thanks to Jesus for his feedback).
+		( Backported from the 1.6 sources )
+
+	* source/Gds/GdsException.cs:
+	
+		- Fix bug building the exception message.
+		( Backported from the 1.6 sources )
+
+
+<!----------------------- Started version 1.5 RC4 developement -----------------------!>
+
+2004-01-24 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+	* source/FbDataReader.cs:
+
+		- Changes in implicit transaction support.
+		Now, the transaction will be commited after each execution,
+		if there are any error the transaction will be automatically rollbacked,
+		in the Dispose method the transaction will be ROLLBACKED.
+		In the case of ExecuteReader the transaction will commited when the DataReader is closed.
+
+		- The FbCommand.parseParameters will ceck the length in bytes of the char/varchar 
+		paranmeters for ensure that is correct, in the case the length of the parameter 
+		value is greater than the number of bytes allowed by the parameter the provider
+		will throw an "arithmetic exception, numeric overflow, or string truncation" 
+		exception.
+
+	* source/GdsStatement.cs:
+
+		- Removed the support for implicit transactions, that now is located in the FbCommand class.
+
+
+2004-01-21 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+	* source/Gds/GdsStatement.cs:
+
+		- Fixed bug when trying to assign null to the Transaction property
+		( Thanks to Matt Honeycutt )
+
+2004-01-20 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsAttachment.cs:
+
+		- Formatting changes.
+
+	* source/GDS/GdsEvtAttachment.cs:
+
+		- Improved thread handling
+
+	* source/GDS/GdsStatement.cs:
+
+		- Added better handling of Error state when an exception occurs.
+
+		- Added changes for rollback the implicit transaction of the statement
+		when an exception occurs during commit on Drop method.
+
+
+2004-01-15 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbParameter.cs:
+
+		- Fixed Type usage (backported form 1.6 sources).
+
+2004-01-14 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsTransaction.cs:
+	* source/GDS/GdsException.cs:
+
+		- Fixed handling of exceptions in transactions.
+		(backported from 1.6 sources)
+
+2004-01-08 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/DesignTime/ParameterCollection/FbParameterConverter.cs:
+	* source/DesignTime/ParameterCollection/FbParameterCollectionEditor.cs:
+	
+		- Added code regions.
+
+	* source/FbParameterCollection.cs:
+
+		- Fixed parameter name generation.
+
+		- Changed lock code.
+
+	* source/GDS/GdsAttachmentParams.cs:
+
+		- Allow data source to be specified as "Data Source"
+
+2004-01-07 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbErrorCollection.cs:
+
+		- Make the errors arraylist to be syncronized.
+
+	* source/FbParameter.cs:
+	* source/FbParameterCollection.cs:
+		
+		- Added changes for better handling of parameter collections 
+		(checked against SqlClient provider):
+
+			- Make the parameters arraylist to be syncronized.
+
+			- Try an exception when trying to add a parameter to a 
+			FbParameterCollection instance that is already owned by 
+			a different FbParameterCollection instance.
+
+			- Generate a new parameter name when the parametr to add 
+			has no name.					
+
+			- Throw an exception when trying to add a parametr two times to 
+			the same collection.
+
+2004-01-02 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsStatement.cs:
+
+		- Removed IsSQLDataOK method.
+
+
+<!----------------------- Started version 1.5 RC3 developement -----------------------!>
+
+
+2003-12-29 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbConnection.cs:
+
+		- Fixed handling of database Dialect in CreateDatabase method
+
+2003-12-27 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbConnection.cs:
+
+		- Make CreateDatabase method to be less restrictive. 
+		Added correct conversions for some parameters.
+
+	* source/FbConnection.cs:
+
+		- Removed two overloads of CreateDatabase method, left only the one 
+		that exists in 1.6 sources, that takes a hash table as argument.
+
+2003-12-26 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/Gds/GdsInetWriter.cs:
+
+		- Fixed calc of max length for char arrays.
+
+2003-12-22 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsInetReader.cs:
+
+		- Removed checking of char count length, this is not valid for
+		system tables that are reporting a bad number of bytes.
+
+2003-12-19 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbConnectionPool.cs:
+
+		- Fixed minor issue in cleanup thread.
+
+	* source/GDS/GdsAttachParams.cs:
+
+		- Added correc Connection Lifetime calculation (in ticks per second).
+		(Thanks to Alessandro Petrelli for his feedback)
+
+2003-12-16 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbParameter.cs:
+
+		- Set default value of SourceColumn as String.Empty.
+
+	* source/DesignTime/ParameterCollection/FbParameterConverter.cs
+
+		- Added better code generation at design time.
+
+	* source/FbConnection.cs:
+
+		- Added new Parameters internal property
+
+	* source/DesignTime/Connection/ConnectionStringEditor.cs:
+
+		- Fixed error with connection parameters handling.
+
+2003-12-15 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsStatement.cs:
+
+		- Fixed bug on Drop method. ( Thanks to Dmitry Azaraev for his feedback and help )
+
+2003-12-14 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbTransaction.cs:
+
+		- Minor change in IDisposable implementation.
+
+2003-12-13 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsError.cs:
+	* source/GDS/GdsErrorCollection.cs:
+	* source/GDS/GdsException.cs:
+		
+		- Added serializable attribute (Thanks to Dmitry Yemanov by his feedback).
+
+2003-12-12 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/Services/FbRestore.cs:
+	
+		- Fixed error in PageBuffers property.
+
+	* source/Services/FbValidation.cs:
+	
+		- Added : base() to the constructor.
+		
+2003-12-09 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsInetWriter.cs:
+
+		- Fixed datetime parameters conversion (Thanks to Dmitry Azaraev for his feedback).
+
+	* source/GDS/GdsStatement.cs:
+
+		- Allow row fetching only for Select and Stored procedure commands.
+
+
+<!----------------------- Started version 1.5 RC2 developement -----------------------!>
+
+
+2003-12-06 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsAsciiBlob.cs:
+	* source/GDS/GdsBinaryBlob.cs:
+
+		- Improved blob read.
+
+
+2003-12-05 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsTransaction.cs:
+
+		- Fixed error on TPB build.
+
+	* source/GDS/GdsDbAttachment.cs:
+
+		- Simplify DPB handling.
+
+2003-12-04 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Minor change to Dispose method.
+
+	* source/FbConnectionPool.cs:
+
+		- Removed unused using.
+
+	* source/GDS/GdsAttachParams.cs:
+
+		- Cleanup.
+
+		- Allow "User Id" and "UserID" as elements in the connection string for the user name.
+
+	* source/GDS/GdsBlob.cs:
+
+		- Minor changes.
+
+	* source/GDS/GdsStatement.cs:
+
+		- Minor changes on code regions.
+
+
+2003-12-02 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	*source/GdsBuffer.cs:
+
+		- Added new abtsract class.
+
+	* source/GdsDpbBuffer.cs:
+	* source/GdsEpbBuffer:
+	* source/GdsSpbBuffer.cs:
+
+		- Now buffer classes inherits form GdsBuffer class.
+
+		- Fixed some problems with license headers.
+
+	* source/FbCommand.cs:
+
+		- Minor change on regular expression use.
+	
+	* source/FbConnection.cs:
+
+		- Changed isc_dpb_lc_ctype to isc_dpb_set_db_charset (Thanks to Claudio Valderrama)
+
+
+2003-11-29 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Improved the regular expression used for split batch commands.
+		Now statements like this ( sent by Cristiano A. Costa  ) to the
+		development list will be allowed (needs more testing):
+
+			select * from usuarios where band = 'Guns''n''Roses'
+
+
+2003-11-28 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsAttachParams.cs
+
+		- Bring to work the code, originally ported from Jaybird, for allow the use of classical
+		connections strings of Firebird, like:
+
+			Database=localhost/3050:D:\TESTDB.GDB;User=SYSDBA;Password=masterkey;Dialect=3;...
+		or
+			Database=//localhost:3050/D:\TESTDB.GDB;User=SYSDBA;Password=masterkey;Dialect=3;...
+	
+		The database value will be parsed with this format when no specific datasource element 
+		was specified.
+
+
+2003-11-27 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* The NUnit test suite is now working using a database that is created on the fly.
+
+	* source/DesignTime/DataAdapter/FbDataAdapterDesigner.cs:
+
+		- Removed file and removed designer attribute from FbDataAdapter.cs,
+		i'm working on this on a different local tree than the one i'm using for
+		1.5 release.
+
+2003-11-25 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsSlice.cs:
+	* source/GDS/GdsInetWriter.cs:
+
+		- Improved generation of the SDL array descriptor.
+
+	* source/GDS/GdsValue.cs:
+
+		- Better handling of array values.
+
+	* source/FbConnection.cs:
+	* source/FbConnectionPool.cs:
+	* source/FbDbConnection.cs:
+	* source/GdsAttachment.cs:
+	* source/GdsDbAttachment.cs:
+	* source/GdsStatement.cs:
+	* source/GDS/GdsAttachParams.cs:
+	* source/Services/FbServices.cs:
+
+		- Added better handling of connection strings.
+	
+	* source/FbConnection.cs:
+	* source/FbTransaction.cs:
+
+		- Added better exception handling.
+
+
+2003-11-24 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/DesignTime/DataAdapter/FbDataAdapterDesigner.cs:
+
+		- Empty class for implement in the future a designer for the FbDataAdapter component.
+
+	* source/FbDataAdapter.cs:
+
+		- Added designer attribute.
+
+	* source/FbConnection.cs:
+	* source/FbCommand.cs:
+	* source/FbTransaction.cs:
+
+		- Added better handling of connection active transaction, 
+		(some checks done using the ODBC data provider).
+
+
+2003-11-23 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Added new features.txt file
+
+	* NUnit test suite:
+
+		- Added triggers needed for FbEvent test to database creation routines.
+
+	* source/FbTransaction.cs:
+
+		- Minor change in code regions.
+
+2003-11-21 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsInetWriter.cs:
+
+		- Fixed character fields handling in fixNull method.
+
+2003-11-19 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Fixed typos in changelog.txt file.
+
+2003-11-19 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+	* source/FbConnection.cs:
+	* source/FbDataAdapter.cs:
+	* source/FbCommandBuilder.cs:
+
+		- Added better implementation of constructors and dispose methods.
+
+	* source/FbConnection.cs:
+	* source/FbDbConnection.cs:
+	* source/GDS/GdsDbAttachment.cs:
+	* source/GDS/GdsEvtAttachment.cs:
+
+		- Changes in sync code of the events api implementation.
+
+	* source/GDS/GdsSpbBuffer.cs:
+
+		- Minor change in ToArray method.
+
+2003-11-18 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Make char parameter length check against the FbParameter.Size value.
+
+2003-11-17 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Updated NUnit test suite.
+
+	* source/FbCommand.cs:
+		
+		- Check the commands array in InternalPrepare method.
+
+	* source/GDS/GdsAttachParams.cs:
+	* source/GDS/GdsAttachment.cs:
+	* source/GDS/GdsField.cs:
+	* source/GDS/GdsStatement.cs:
+	* source/GDS/GdsArray.cs:
+	* source/GDS/GdsAsciiBlob.cs:
+	* source/GDS/GdsCharset.cs:
+	* source/GDS/GdsCharsetCollection.cs:
+	* source/FbDbConnection.cs:
+	* source/FbConnection.cs:
+
+		- Added changes to character set support.
+
+
+2003-11-17 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+	* source/GDS/GdsStatement.cs:
+
+		- Improved row fetching by changing the GdsStatement.rows member from ArrayList to 
+		object[], this shows in first tests, reading a table of 94607 rows (using a FbDataReader), 
+		a performance improvement of 50% against the beta 4 (needs testing), prior sources are 
+		tagged as NP_1_5_RC1, this tag wil be overwritten when the rc1 release is done.
+
+	* source/FbCommand.cs:
+
+		- Removed test code.
+
+	* source/GDS/GdsStatement.cs:
+
+		- Fixed error in latest commit in Fetch method.
+
+	* source/FbCommandbuilder.cs:
+
+		- Fill the Size, Precision and Scale properties of each parameter in DeriveParameters.
+
+2003-11-16 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Reworked the nunit test suite for allow database creation in the fly (not finished yet)
+
+	* source/FbCommand.cs:
+	* source/GDS/GdsInetWriter.cs:
+	
+		- Added changes for allow better handling of query parameters, making
+		data conversions only one time.
+
+	* source/FbCommand.cs:
+
+		- Restricted batch command execution to ExecuteReader calls. 
+		Prepare, ExecuteNonQuery and ExecuteScalar calls will andle the command text
+		as a single SQL command.
+
+2003-11-15 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Changes to the character support (Thanks to Peter Jacobi and Oleg Ufaev), includes:
+
+		* source/GDS/GdsInetReader.cs
+
+			Encode strings with field character set when NONE is used as default character set.
+
+		* source/GDS/GdsField.cs
+
+			New property CharCount that will be used to retrieve the length in characters of 
+			character fields instead of use SqlLen that is the length in bytes.
+
+		* source/GDS/GdsInetReader.cs
+
+			If the length of the readed data (in characters) is greater than the CharCount of 
+			the field, return only CharCount characters ( this will be made using the Charset 
+			information for the current field ).
+
+		* source/FbDataReader.cs:
+
+			In the GetSchema method save in the ColumnSize field the real number of characters 
+			for character fields, instead of the length in bytes.
+
+2003-11-12 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbConnection.cs:
+	* source/FbConnectionPool.cs:
+
+		- Minor improvement to connection pool.
+
+
+2003-11-12 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbTransaction.cs:
+
+		- Removed set accessors of Connection and Isolation level properties for match SqlClient.
+
+	* source/FbCommand.cs:
+
+		- Fixed commandText check ( Thanks to Pierre Arnaud )
+
+		- Fixed commandText handling in  parseSPCommandText method
+
+	* source/FbConnection.cs:
+
+		- Moved internal properties to a new #region .. #endregion block.
+
+
+<!----------------------- Started version 1.5 RC1 developement -----------------------!>
+
+2003-11-10 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Fixed connection checking in dispose method.
+
+2003-11-08 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbConnection.cs:
+	* source/FbCommand.cs:
+	* source/FbDataAdapter.cs:
+
+		- Added ToolboxItem() attribute for allow components to be used in #Develop.
+
+	* source/GDS/GdsTransaction.cs:
+
+		- Changed TransactionUpdateEventHandler delegate visibility to internal.
+
+2003-11-07 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+		
+		- Improved handling of prepared statements over different transactions ( Thanks to Jesus for his feedback ).
+
+		- Added change to implicit transaction for commit it wen the Transaction 
+		property is changed ( this changes has a warning for think if this is the best way ).
+
+	* source/FbDataReader.cs:
+
+		- Improved DataReader implementation on Close method and behavior handling.
+
+	* source/GDS/GdsStatement.cs:
+		
+		- Improved handling of prepared statements over different transactions ( Thanks to Jesus for his feedback ).
+
+		- Added a event handler for GdsTransaction.Update event, this handler will set
+		the state of the statement to closed.
+
+		- Added ImplicitTransaction property.
+
+	* source/GDS/GdsTransaction.cs:
+
+		- New delegate TransactionUpdateEventHandler.
+
+		- Improved handling of prepared statements over different transactions ( Thanks to Jesus for his feedback ).
+
+		- New Update event fired when a transaction is Committed or Rollbacked.
+
+
+2003-11-06 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsArray.cs:
+	* source/GDS/GdsInetReader.cs:
+
+		- Added more precise handling of float values that sometimes have a offset of
+		0.5 ( Thanks to Jesus for his feedback )
+
+
+	* source/FbCommand.cs:
+
+		- Little improvement to named parameters regular expression ( needs testing ).
+
+2003-11-05 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Fix for stored procedure calls in ExecuteScalar method ( needs testing ).
+
+
+2003-10-28 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+	* source/FbConnection.cs:
+	* source/FbTransaction.cs:
+
+		- Added changes for unify use of "this" word.
+
+
+2003-10-25 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+
+	* source/FbCommand.cs:
+	* source/GDS/GdsArray.cs:
+	* source/GDS/GdsSlice.cs:
+	* source/GDS/GdsField.cs:
+
+		- Improved performance of array data type handling [not finished - needs testing] ( Thanks to Jesus ).
+
+	* source/GDS/GdsArray.cs:
+	* source/GDS/GdsSlice.cs:
+
+		- Added changes for partial updates of array fields [not finished - needs testing].
+
+	* source/GDS/GdsSlice.cs:
+
+		- Added correct handling of arrays that with lowerbound different than 0.
+
+	* source/GDS/GdsInetWriter.cs:
+
+		- Added handling of null values on array elements [needs testing].
+
+
+<!----------------------- Started version 1.5 Beta 4 developement -----------------------!>
+
+
+2003-10-21 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/DbSchema/FbAbstractDbSchema.cs:
+
+		- Added transaction to the command used for retrieve schema information ( Thanks to olegmad for his feedback ).
+
+
+2003-10-20 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsAttachParams.cs:
+
+		- Improved handling of character sets ( Thanks to olegmad for his feedback ).
+
+		- Added correct initialization of character set collection
+		when CharSet element of connection string is not present.
+
+	* source/GDS/GdsFields.cs:
+
+		- Improved handling of character sets.
+
+2003-10-18 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Added new class CommandTextEditor.cs.
+
+	* Added new class CommandTextUIEditor.cs.
+
+	* Improved handling of NONE character set.
+
+	* source/FbCommand.cs:
+
+		- Added design time support for CommandText property.
+
+<!----------------------- Started version 1.5 Beta 3 developement -----------------------!>
+
+2003-10-09 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Fixed problem with Sqlind handling for command parameters ( Thanks to Jerry for his feedback ).
+
+2003-10-09 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbDbConnection.cs:
+
+		- Avoid problems with empty elements on connection string.
+
+2003-10-08 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommandBuilder.cs:
+
+		- Added better handling of stored procedure name to DeriveParameters method.
+
+	* source/GDS/GdsAttachParams.cs:
+	* source/GDS/GdsInetReader.cs:
+	* source/GDS/GdsField.cs:
+	* source/GDS/GdsStatement.cs:
+	* source/GDS/GdsCharset.cs:
+	* source/GDS/GdsCharsetCollection.cs:
+	* source/FbCommand.cs:
+	
+		- Added handling of character sets by field for char and varchar datatypes.
+
+
+2003-10-07 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsStatement.cs:
+
+		- Changed GetStatementType method to be private.
+
+
+2003-10-06 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Updated linux makefile to build nunit test suite.
+
+	* source/FbConnection.cs:
+
+		- Close the active DataReader onbly if it's not closed yet.
+
+	* source/FbCommand.cs:
+
+		- Added better checkin of CommandText at NextResult method ( Thanks to Pierre Arnaud for his feedback ).
+
+		- Implemented CommandBehavior.SingleResult.
+
+	* source/GDS/GdsStatement.cs:
+
+		- Added new GdsStatementType enumeration.
+
+		- Improved close method ( nedds testing ).
+
+	* source/FbDataReader.cs:
+		
+		- Make Read method fetch rows only for Select, Select for update and stored procedure commands ( needs testing )
+
+		- Close the statement instead of drop it at FbDataReader.Close method ( needs testing. )
+
+	* source/GDS/GdsExceptionHelper.cs:
+
+		- Added minor change for allow resource file to be correct handled in mono::
+
+
+2003-10-04 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Added change for allow better handling of blob and array fields when
+	trying to access the value using FbCommand.ExecuteScalar methods or 
+	output parameters of stored procedure execution, it includes a new class
+	called GdsValue.cs ( actual CVS sources are tagged as 'NP_1_5_Pre_Beta_3'),
+	this change needs testing.
+
+
+2003-10-03 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/Services/FbService.cs:
+
+		- Added little fix to Open method for make it to work as in old 1.1 version.
+
+	* source/GDS/GdsDbAttachment.cs:
+	* source/GDS/GdsEvtAttachment.cs:
+
+		- Added some changes to sync code of firebird events system.
+
+
+2003-10-02 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Added some changes to the GDS thinking on a future abastraction of it (not finished)
+
+	* Added documentation comments to finalizers.
+
+	* source/FbCommand.cs:
+
+		- Removed CursorName stuff.
+
+
+2003-10-01 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Continue to rework build system for Windows OS ( not finished yet ).
+
+	* source/FbDatareader.cs:
+
+		- Added a fix for fieldCount in NextResult method (needs a nunit test).
+
+2003-09-30 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Reworked build system for Windows OS ( not finished yet ).
+
+	* source/DesignTime/FbParameterCollectionEditor.cs:
+
+		- Finished implementation.
+
+2003-09-29 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Moved FbParameterConverter to DesignTime directory.
+
+	* Added new FbParameterCollectionEditor class.
+
+	* source/FbConnection.cs:
+	* source/FbCommand.cs:
+
+		- Added better checking of command transaction ( matching SqlClient way )
+
+	* source/FbDataAdapter.cs:
+
+		- Commented IDataAdapter.TableMappings property code, this was added for mono compatibility
+		the bugzilla reports has beed updated (2003-09-29) telling that it's solved.
+
+	* source/FbCommabduilder.cs:
+
+		- Added change to where clausule 1 to make it compatible with Firebird.
+
+	* source/FbParameter.cs:
+
+		- Created a new design time converter ( FbParameterConverter class - Thanks to Luciano Passuello for his feedback ).
+
+		- Added attributes.		
+
+		- Added TypeConverter property to FbParameter.Value class.
+
+
+2003-09-27 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Modified toolbox images with a transparent background ( Thanks to Luciano Passuello )
+
+	* source/FbDataAdapter.cs:
+
+		- Modified Category attribute of some properties ( Thanks to Luciano Passuello )
+
+	* source/FbCommandBuilder.cs:
+
+		- Added changes for use the same format in the CommandText
+		of the generated insert, delete, update commands that is used 
+		by the SqlClient data provider ( needs testing ).
+
+2003-09-27 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbParameter.cs:
+
+		- Override ToString method and return the parameter name.
+
+	* source/FbCommand.cs:
+
+		- Added ReadOnly attribute to ConnectionTimeout property.
+
+2003-09-26 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/DbSchema/FbProcedureParametersSchema.cs:
+
+		- Added rdb$parameter_type field to ORDER BY clausule ( Thanks to Jack for his feedback )
+
+
+2003-09-25 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbDataReader.cs:
+
+		- Fixed check of blob fields SubType ( Thnaks to Fátima for her feedback ).
+
+
+<!----------------------- Started version 1.5 Beta 2 developement -----------------------!>
+
+2003-09-18 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* NUnit test suit:
+
+		- Removed no more needed files ( unused ).
+
+		- Added nunit test case for clob fields update using implicit transactions
+
+		- Added SQL file of the nunit test database.
+
+	* source/FbCommand.cs:
+
+		- Fixed problem with implicit transaction support used with blob and array fields.
+
+
+2003-09-16 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Fixed error with the ActiveCommands list handling introduced in
+		the move to the new GDS.
+
+2003-09-14 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbDataReader.cs (needs testing):
+
+		- Added handling of COMPUTED columns at schema level.
+
+		- Fixed READONLY columns handling.
+
+	* source/DbSchema/FbColumnsSchema.cs (needs testing):
+
+		* Added handling of COMPUTED columns at schema level.
+
+
+2003-09-13 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Added new NUnit test case for Database Schema features.
+
+	* source/FbCommand.cs:
+
+		- Improved batch commands processing
+
+	* source/DbSchema/FbAbstractDbSchema.cs:
+
+		- Added try...catch to method GetDbSchemaTable and fixed command Disposing.
+
+
+2003-09-09 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Added minor fix for stored proc calls using only output parameters.
+
+	* source/FbScript.cs:
+
+		- Removed constructors with parameters.
+
+		- Removed Script and Command collection properties.
+
+		- Added new overloads of Parse methods.
+
+		- Updated documentation.
+
+		- Added new NUnit test ( FbScriptTest.cs )
+
+	* FbArrayTest.cs
+
+	    - Added new NUnit test for big array fields.
+
+	* FbStoredProcCallsTest.cs:
+
+		- Added new NUnit test fixture for test of stored procs style calls.
+
+2003-09-09 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		Added regular expression to extract commands separated with ; from
+		the command text ( Thanks to Brian Davis [microsoft.public.dotnet.languages.csharp] )
+
+2003-09-07 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommandBuilder.cs:
+
+		- Added dispose call to build command methods.
+
+
+2003-09-04 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommandBuilder.cs:
+
+		- Added changes to improve generated command disposing.
+
+	* source/FbConnection.cs:
+
+		- Added a new overload for the CreateDatabase method that takes a connection string as parameter
+
+	* source/FbCommand.cs:
+
+		- Fixed bug on new syntax for stored proc calls setting Output params on execute reader calls.
+	
+
+2003-09-03 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+
+		- Fixed bug on new syntax for stored proc calls when the sp has no parameters.
+
+
+<!----------------------- Started version 1.5 Beta 1 developement -----------------------!>
+
+2003-09-02 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Fixed some mispellings in the GDS implementation ( Thanks to Alessandro Petrelli for his feedback ).
+
+	* source/GDS/GdsDbAttachment.cs:
+
+		* Added changes for better generation of the character set collection (Thanks to Evgeny Filatov for his feedback)
+
+2003-08-30 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsAttachement.cs:
+
+		- Fix problem with mono on Linux (and probably on Windows).
+
+
+2003-08-26 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs
+
+		- Fixed error in next result with empty commandtext ( Thanks to Pierre Arnaud for his feedback )
+
+
+2003-08-25 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs
+
+		* Removed test code.
+
+
+2003-08-22 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Added changes for allow cultureAwareCompare method of some classes to work with mono
+
+	* Added new test case for FbCommandBuilder class.
+
+	* source/FbConnection.cs:
+
+		- Fixed minor issue.
+
+	* source/FbCommandBuilder.cs:
+
+		- Added changes for better fit to ADO.NET.
+
+
+2003-08-18 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* Improved connection string design time support.
+
+	* source/GDS/GdsSlice.cs:
+
+		- Improved gds slice generation for big array fields.
+
+
+2003-08-15 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbCommand.cs:
+	* source/FbCommandBuilder.cs:
+	* source/GDS/GdsStatement.cs:
+
+
+		* Added new Stored proc execution format
+
+
+2003-08-14 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/GDS/GdsSlice.cs:
+
+		- Fixed error with sdl generation for array datatype management.
+
+	* source/FbCommand.cs:
+
+		- Allow ExecuteNonQuery method to work with implicit transactions (needs testing).
+
+
+	* source/GDS/GdsStatement.cs:
+
+		- Finish implicit transaction with a commit instead of a rollback.
+
+
+2003-08-12 Carlos Guzmán Álvarez  <carlosga@telefonica.net>
+
+	* source/FbParameterCollection.cs:
+
+		- Fixed error on RemoveAt method.
+
+
+	* source/FbParameter.cs:
+
+		- Fixed error on null value andling and rearrange FbDbType infering from Value property
+		to match SqlParameter behavior ( Thanks to Alessandro Petrelli for his feedback).
+
+
+
+<!----------------------- Started version 1.5 Alpha 1 developement -----------------------!>

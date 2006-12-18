@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<delegate name="FbEventAlertEventHandler" namespace="FirebirdSql.Data.Firebird.Events">
+		<summary>
+		Represents the method that will handle the <see cref="FbEvents.EventAlert" />.
+		</summary>
+		<param name="sender">The source of the event.</param>
+		<param name="e">An <see cref="FbEventAlertEventArgs" /> object that contains the event data.</param>
+		<remarks>
+		When you create an <see cref="FbEventAlertEventArgs" />
+		delegate, you identify the method that will handle the event. To associate the 
+		event with your event handler, add an instance of the delegate to the event. The 
+		event handler is called whenever the event occurs, unless you remove the 
+		delegate.
+		</remarks>
+	</delegate>
+	<class name="FbEventAlertEventArgs" namespace="FirebirdSql.Data.Firebird.Events">
+		<overview>
+			<summary>
+			Provides data for the EventAlert event. This class cannot be inherited.
+			</summary>
+			<remarks>
+			The EventAlert event contains an array with the number of counts of each event.
+			</remarks>
+		</overview>
+		<property name="Counts">
+			<summary>
+			Returns the number of times each event has occurred.
+			</summary>
+			<value>
+			The number of times each event has occurred.
+			</value>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbEventAlertEventArgs" /> class.
+			</summary>
+		</constructor>
+	</class>
+</doc>

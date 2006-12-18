@@ -1,0 +1,55 @@
+<doc>
+	<class name="FbEvent" namespace="FirebirdSql.Data.Firebird.Events">
+		<overview>
+			<summary>
+			Represents an event or a set of events that can be fired from a trigger or stored procedure. 
+			This class cannot be inherited.	
+			</summary>
+		</overview>
+		<event name="EventAlert">
+			<summary>
+			Occurs when the <b>Firebird</b> server sends a event notification.
+			</summary>
+		</event>
+		<property name="Connection">
+			<summary>
+			Gets or sets the <see cref="FbConnection" /> used by this instance of the <see cref="FbEvent" />.
+			</summary>
+			<value>The connection to a data source. The default is a null value.</value>
+		</property>
+		<constructor name="ctor">
+			<summary>
+			Creates a new instance of the <see cref="FbEvent" /> class.
+			</summary>
+		</constructor>
+		<constructor name="ctor(FirebirdSql.Data.Firebird.FbConnection)">
+			<summary>
+			Creates a new instance of the <see cref="FbEvent" /> class with the <see cref="FbConnection" /> object.
+			</summary>
+			<param name="connection">An <see cref="FbConnection" /> object that represents the connection to a data source. </param>
+		</constructor>
+		<constructor name="ctor(FirebirdSql.Data.Firebird.FbConnection,System.Array)">
+			<summary>
+			Creates a new instance of the <see cref="FbEvent" /> class with an event list and an <see cref="FbConnection" />.
+			</summary>
+			<param name="connection">An <see cref="FbConnection" /> object that represents the connection to a data source. </param>
+			<param name="events">An event list.</param>
+		</constructor>
+		<method name="RegisterEvents(System.Array)">
+			<summary>
+			Allows to register interest in a list of events.
+			</summary>
+			<param name="events">A list of event names.	</param>
+		</method>
+		<method name="QueEvents">
+			<summary>
+			Request asynchronous notification of events registered with <see cref="FbEvent.RegisterEvents" />.
+			</summary>
+		</method>
+		<method name="CancelEvents">
+			<summary>
+			Cancels interest in asynchronous notification of of events registered with <see cref="FbEvent.RegisterEvents" />.
+			</summary>
+		</method>
+	</class>
+</doc>

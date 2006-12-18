@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<class name="FbDataReader" namespace="FirebirdSql.Data.Firebird">
+		<overview>
+			<summary>
+			Provides a Way for reading a forward-only stream of rows. This class cannot be inherited.
+			</summary>
+			<remarks>
+				<para>
+				This class cannot be instatiated directly, to create a <b>FbDataReader</b>, you need to call
+				the <see cref="FbCommand.ExecuteReader" /> method of a <see cref="FbCommand" /> object.
+				</para>
+				<para>
+				Until the <b>FbDataReader</b> is closed using the <see cref="FbDataReader.Close" /> method
+				of of the <b>FbDataReader</b>, the associated <see cref="FbConnection" /> is busy
+				busy serving the <b>FbDataReader</b>, and no other operations can be performed 
+				on the <see cref="FbConnection" /> other than closing it. This is the case until the 
+				<see cref="Close" /> method is called.
+				</para>
+				<para>
+				To retrieve output parameters you must close the <b>FbDataReader</b>.
+				</para>
+				<para>
+				<see cref="FbDataReader.IsClosed" /> and <see cref="FbDataReader.RecordsAffected" />
+				are the only Properties that you can call after the <b>FbDataReader</b> is closed.
+				</para>
+			</remarks>
+			<example>
+				<code>
+public void ReadMyData(string myConnString) 
+{
+	string mySelectQuery = "SELECT dept_no, departament FROM departament";
+	
+	FbConnection	myConnection = new FblConnection(myConnString);
+	myConnection.Open();
+	
+	FbTransaction	myTxn		 = myConnection.BeginTransaction();
+	FbCommand		myCommand    = new FbCommand(mySelectQuery, myConnection, myTxn);
+	        
+	FbDataReader myReader;
+	myReader = myCommand.ExecuteReader();
+	
+	// Always call Read before accessing data.
+	while (myReader.Read()) 
+	{
+	Console.WriteLine(myReader.GetInt32(0) + ", " + myReader.GetString(1));
+	}
+	
+	// always call Close when done reading.
+	myReader.Close();
+	
+	// Close the connection when done with it.
+	myConnection.Close();
+}    
+				</code>
+			</example>
+		</overview>
+		<destructor name="Finalize">
+			<summary>
+			Attempt to free resources and perform other cleanup operations before the <b>Object</b> is reclaimed by garbage collection.	
+			</summary>
+		</destructor>
+		<method name="Close">
+			<summary>
+			Closes the <see cref="FbDataReader" /> object.
+			</summary>
+			<remarks>
+				<para>
+				You must explicitly call the <b>Close</b> method when you are 
+				using the <see cref="FbDataReader" /> to use the associated
+				<see cref="FbConnection" /> for any other purpose.
+				</para>
+				<para>
+				The <b>Close</b> method fills in the values for output parameters, return 
+				values and <b>RecordsAffected</b>, increasing the amount of time it takes to 
+				close a <b>FbDataReader</b>.
+				</para>
+			</remarks>
+		</method>
+		<method name="NextResult">
+			<summary>
+			Advances to the next result, when reading the results of batch DSQL statements.
+			</summary>
+			<returns><b>true</b> if there are more result sets; otherwise, <b>false</b>.</returns>
+			<remarks>
+				<para>
+				Used to process execution of batch DSQL statements.
+				</para>
+				<para>
+				By default, the data reader is positioned on the first result.
+				</para>
+			</remarks>
+		</method>
+		<method name="Read">
+			<summary>
+			Advances the <see cref="FbDataReader" /> to the next record.
+			</summary>
+			<returns><b>true</b> if there are more rows; otherwise, <b>false</b>.</returns>
+			<remarks>
+				<para>
+				The default position of the <see cref="FbDataReader" /> is prior to the first record. 
+				Therefore, you must call <b>Read</b> to begin accessing any data.
+				</para>
+				<para>
+				Only one <b>FbDataReader</b> per <see cref="FbConnection" /> can be open at a time, 
+				and any attempt to open another will fail until the first one is closed. 
+				Similarly, while the <b>FbDataReader</b> is in use, the associated <b>FbConnection</b> 
+				is busy serving it until you close the <see cref="FbDataReader" /> by call 
+				<see cref="FbDataReader.Close" /> method.
+				</para>
+			</remarks>
+		</method>
+		<method name="GetSchemaTable">
+			<summary>
+			Returns a DataTable that describes the column metadata of the <see cref="FbDataReader" />.
+			</summary>
+			<returns>A DataTable that describes the column metadata.</returns>
+			<exception cref="InvalidOperationException">The <see cref="FbDataReader" /> is closed.</exception>
+			<remarks>
+				<list type="table">
+					<listheader>
+						<term>DataReader Column</term>
+						<term>Description</term>
+					</listheader>
+					<item>
+						<description>ColumnName</description>
+						<description>
+						The name of the column; this might not be unique. If this cannot be
+						determined, a null value is returned. This name always reflects the
+						most recent renaming of the column in the current view or command text.
+						</description>
+					</item>
+					<item>
+						<description>ColumnOrdinal</description>
+						<description>
+						The ordinal of the column. Columns are numbered starting with one. This column
+						cannot contain a null value.
+						</description>
+					</item>
+					<item>
+						<description>ColumnSize</description>
+						<description>
+						The maximum possible length of a value in the column. For columns that
+						use a fixed-length data type, this is the size of the data type.				
+						</description>
+					</item>
+					<item>
+						<description>NumericPrecision</description>
+						<description>
+						If ProviderType is a numeric data type, this is the maximum precision
+						of the column. The precision depends on the definition of the column.
+						If ProviderType is not a numeric data type, this is a null value.
+						</description>
+					</item>
+					<item>
+						<description>NumericScale</description>
+						<description>
+						If ProviderType is is DECIMAL or NUMERIC data type,
+						the number of digits to the right of the decimal point. Otherwise, this
+						is a null value.
+						</description>
+					</item>
+					<item>
+						<description>DataType</description>
+						<description>Maps to the .NET Framework type of the column.</description>
+					</item>
+					<item>
+						<description>ProviderType</description>
+						<description>
+						The indicator of the column's data type. If the data type of the column 
+						varies from row to row, this must be Object. This column cannot contain a null value.
+						</description>
+					</item>
+					<item>
+						<description>IsLong</description>
+						<description>
+						<b>True</b> if the column contains a BLOB that contains
+						very long data; otherwise <b>false</b>.
+						</description>
+					</item>
+					<item>
+						<description>AllowDbNull</description>
+						<description>
+						<b>True</b> if the column allows null values; otherwise <b>false</b>.
+						</description>
+					</item>
+					<item>
+						<description>IsReadOnly</description>
+						<description><b>True</b> if the column cannot be modified; otherwise <b>false</b>.</description>
+					</item>
+					<item>
+						<description>IsRowVersion</description>
+						<description>
+						Set if the column contains a persistent row identifier that cannot be written to, 
+						and has no meaningful value except to identity the row.
+						</description>
+					</item>
+					<item>
+						<description>IsUnique</description>
+						<description>
+						<b>true</b> if the the column is one of a set of columns of a unique key.
+						</description>
+					</item>
+					<item>
+						<description>IsKey</description>
+						<description>
+						<b>true</b> if the the column is one of a set of columns of a primary key.
+						</description>
+					</item>
+					<item>
+						<description>IsAutoIncrement</description>
+						<description>
+						<b>true</b> if the column assigns values to new rows in fixed 
+						increments; otherwise <b>false</b>. The default of this column is 
+						<b>false</b>.
+						</description>
+					</item>
+					<item>
+						<description>IsAliased</description>
+						<description>
+						<b>True</b> if the column name is an alias; otherwise <b>false</b>.
+						</description>
+					</item>
+					<item>
+						<description>IsExpression</description>
+						<description>
+						<b>True</b> if the column is an expression; otherwise <b>false</b>.
+						</description>
+					</item>
+					<item>
+						<description>BaseSchemaName</description>
+						<description>
+						As Firebird doesn't support Schemas this column will be always <b>>NULL</b>.
+						</description>
+					</item>
+					<item>
+						<description>BaseCatalogName</description>
+						<description>
+						As Firebird doesn't support Catalogs this column will be always <b>>NULL</b>.
+						</description>
+					</item>
+					<item>
+						<description>BaseTableName</description>
+						<description>
+						The name of the table or view in the data store that contains the
+						column. A null value if the base table name cannot be determined. The
+						default of this column is a null value.
+						</description>
+					</item>
+					<item>
+						<description>BaseColumnName</description>
+						<description>
+						The name of the column in the data store. This might be different than
+						the column name returned in the ColumnName column if an alias was used.
+						A null value if the base column name cannot be determined or if the
+						rowset column is derived, but not identical to, a column in the data
+						store. The default of this column is a null value.
+						</description>
+					</item>
+				</list>
+			</remarks>
+		</method>
+		<method name="GetName(System.Int32)">
+			<summary>
+			Gets the name of the specified column.
+			</summary>
+			<param name="i">The zero-based column ordinal.</param>
+			<returns>The name of the column.</returns>
+		</method>
+		<method name="GetBaseTableName(System.Int32)">
+			<summary>
+			Gets the table name of the specified column.
+			</summary>
+			<param name="i">The zero-based column ordinal.</param>
+			<returns>The table name of the column</returns>
+		</method>
+		<method name="GetBaseColumnName(System.Int32)">
+			<summary>
+			Gets the base column name of the specified column.
+			</summary>
+			<param name="i">The zero-based column ordinal.</param>
+			<returns>The name of the column.</returns>
+		</method>
+		<method name="GetDataTypeName(System.Int32)">
+			<summary>
+			Gets the name of the source data type.		
+			</summary>
+			<param name="i">The zero-based column ordinal.</param>
+			<returns>The name of the back-end Data Type</returns>
+		</method>
+		<method name="GetFieldType(System.Int32)">
+			<summary>
+			Gets the Type that is the data type of the column.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The Type that is the data type of the object.</returns>
+		</method>
+		<method name="GetValue(System.Int32)">
+			<summary>
+			Gets the value of the specified column in its native format.
+			</summary>
+			<param name="i">The zero-based column ordinal.</param>
+			<returns>The value to return.</returns>
+			<remarks>
+			This method returns null valus as DBNull.
+			</remarks>
+		</method>
+		<method name="GetValues(System.Object[])">
+			<summary>
+			Gets all the column values in the current row.
+			</summary>
+			<param name="values">An array of type Object into which to copy the attribute columns.</param>
+			<returns>The number of instances of Object in the array.</returns>
+		</method>
+		<method name="GetOrdinal(System.String)">
+			<summary>
+			Gets the column ordinal, given the name of the column.
+			</summary>
+			<param name="name">The name of teh column.</param>
+			<returns>The zero-based column ordinal.</returns>
+		</method>
+		<method name="GetBoolean(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a Boolean.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>A Boolean that is the value of the column.</returns>
+			<remarks>Call IsDBNull to check for null values before calling this method.</remarks>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetByte(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a byte.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a byte.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetBytes(System.Int32,System.Int64,System.Byte[],System.Int32,System.Int32)">
+			<summary>
+			Reads a stream of bytes from the specified column offset into the buffer as 
+			an array, starting at the given buffer offset.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<param name="dataIndex">The index within the field where the read operation is to begin.</param>
+			<param name="buffer">The buffer into which to read the stream of bytes.</param>
+			<param name="bufferIndex">The index where buffer is to begin the write operation.</param>
+			<param name="length">The number of bytes to read. </param>
+			<returns>The actual number of bytes read.</returns>
+			<remarks>
+				<para>
+				If you pass a buffer that is a null reference, <b>GetBytes</b> returns 
+				the length of the field in bytes.
+				</para>
+				<para>
+				No conversions are performed, therefore the data retrieved must already 
+				be a byte array.
+				</para>
+			</remarks>
+		</method>
+		<method name="GetChar(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a character.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a character.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetChars(System.Int32,System.Int64,System.Char[],System.Int32,System.Int32)">
+			<summary>
+			Reads a stream of characters from the specified column offset into the 
+			buffer as an array, starting at the given buffer offset.
+			<seealso cref="GetBytes(System.Int32,System.Int64,System.Byte[],System.Int32,System.Int32)" />
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<param name="dataIndex">The index within the field where the read operation is to begin.</param>
+			<param name="buffer">The buffer into which to read the stream of bytes.</param>
+			<param name="bufferIndex">The index where buffer is to begin the write operation.</param>
+			<param name="length">The number of bytes to read. </param>
+			<returns>The actual number of characters read.</returns>
+			<remarks>
+				<para>
+				If you pass a buffer that is a null reference, <b>GetChars</b> returns 
+				the length of the field in characters.
+				</para>
+				<para>
+				No conversions are performed, therefore the data retrieved must already 
+				be a character array.
+				</para>
+			</remarks>
+		</method>
+		<method name="GetGuid(System.Int32)">
+			<summary>
+				<b>NOT SUPPORTED</b>
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a GUID.</returns>
+			<exception cref="NotSupportedException">Always.</exception>
+		</method>
+		<method name="GetInt16(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a 16-bit signed integer.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a 16-bit signed integer.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetInt32(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a 32-bit signed integer.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a 32-bit signed integer.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetInt64(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a 64-bit signed integer.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a 64-bit signed integer.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetFloat(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a single-precision floating-point number.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a single-precision floating-point number.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetDouble(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a double-precision floating point 
+			number.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a double-precision floating point number.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetString(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a string.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a string.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetDecimal(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a Decimal object.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a Decimal object.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetDateTime(System.Int32)">
+			<summary>
+			Gets the value of the specified column as a DateTime object.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>The value of the specified column as a DateTime object.</returns>
+			<exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+		</method>
+		<method name="GetData(System.Int32)">
+			<summary>
+				<b>NOT SUPPORTED.</b>
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns></returns>
+			<exception cref="NotSupportedException">Always.</exception>
+		</method>
+		<method name="IsDBNull(System.Int32)">
+			<summary>
+			Gets a whether the column contains non-existent or missing values.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<returns>true if the specified column value is equivalent to DBNull; otherwise, false.</returns>
+		</method>
+		<method name="IEnumerable.GetEnumerator">
+			<summary>
+			This member supports the .NET Framework infrastructure and is not intended to be 
+			used directly from your code.
+			</summary>
+			<returns>An <b>IEnumerator</b> that can be used to iterate through the collection.</returns>
+		</method>
+		<property name="Depth">
+			<summary>
+			Gets the depth of nesting for the current row.
+			</summary>
+			<value>
+			The depth of nesting for the current row.
+			</value>
+			<remarks>
+			The outermost table has a depth of zero. The Firebird .NET Data Provider 
+			does not support nesting and always returns zero.
+			</remarks>
+		</property>
+		<property name="FieldCount">
+			<summary>
+			Gets the number of columns in the current row.
+			</summary>
+			<value>
+			When not positioned in a valid recordset, 0; otherwise the number of columns in the current row. The default is -1.
+			</value>
+			<remarks>After executing a query that does not return rows, <b>FieldCount</b> returns 0.</remarks>
+		</property>
+		<property name="IsClosed">
+			<summary>
+			Gets a value indicating whether the data reader is closed.
+			</summary>
+			<value>    
+			<b>True</b> if the <see cref="FbDataReader">FbDataReader</see> is closed; otherwise, <b>false</b>.
+			</value>
+			<remarks>
+			<b>IsClosed</b> and <see cref="FbDataReader.RecordsAffected" /> 
+			are the only Properties that you can call after the <see cref="FbDataReader" /> is 
+			closed.
+			</remarks>
+		</property>
+		<property name="RecordsAffected">
+			<summary>
+			Gets the number of rows changed, inserted, or deleted by execution of the 
+			DSQL statement.
+			</summary>
+			<value>
+			The number of rows changed, inserted, or deleted; 0 if no rows were affected 
+			or the statement failed; and -1 for SELECT statements.
+			</value>
+			<remarks>
+				<para>
+				The <b>RecordsAffected</b> property is not set until all rows are read and you
+				close the <see cref="FbDataReader" />.
+				</para>
+				<para>
+				The value of this property is cumulative. For example, if two records 
+				are inserted in batch mode, the value of RecordsAffected will be two.
+				</para>
+				<para>
+				<see cref="IsClosed" /> and <b>RecordsAffected</b> are the only Properties that you can call 
+				after the <see cref="FbDataReader" /> is closed.
+				</para>
+			</remarks>
+		</property>
+		<property name="HasRows">
+			<summary>
+			Gets whether the <see cref="FbDataReader" /> contains one or more rows.
+			</summary>
+			<remarks>This property returns always <b>true</b>.</remarks>
+			<value>
+			<b>True</b> if the <see cref="FbDataReader" /> contains one or more rows; otherwise false.
+			</value>
+		</property>
+		<indexer name="Item(System.Int32)">
+			<summary>
+			Gets the value of the specified column in its native format given the column ordinal.
+			</summary>
+			<param name="i">The zero-based column ordinal. </param>
+			<value>The value of the specified column in its native format.</value>
+			<exception cref="IndexOutOfRangeException">
+			The index passed was outside the range of 0 through <see cref="FbDataReader.FieldCount" />.
+			</exception>
+		</indexer>
+		<indexer name="Item(System.String)">
+			<summary>
+			Gets the value of the specified column in its native format given the column name.
+			</summary>
+			<param name="name">The column name.</param>
+			<value>The value of the specified column in its native format.</value>
+			<exception cref="IndexOutOfRangeException">No column with the specified name was found.</exception>
+		</indexer>
+	</class>
+</doc>
