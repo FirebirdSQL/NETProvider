@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# SharpDevelop 2.1.0.2017
+Project("{CFEE4113-1246-4D54-95CB-156813CB8593}") = "FirebirdClient.Installer", "FirebirdClient.Installer.wixproj", "{7E4B8E73-EB4B-4B0B-9F6E-F5631CAC0848}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7E4B8E73-EB4B-4B0B-9F6E-F5631CAC0848}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E4B8E73-EB4B-4B0B-9F6E-F5631CAC0848}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E4B8E73-EB4B-4B0B-9F6E-F5631CAC0848}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E4B8E73-EB4B-4B0B-9F6E-F5631CAC0848}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+EndGlobal

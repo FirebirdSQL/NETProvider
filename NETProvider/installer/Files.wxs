@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+		<DirectoryRef Id="TARGETDIR">
+			<Directory Id="ProgramFilesFolder" Name="PFiles">
+				<Directory Id="INSTALLDIR" Name="FirebirdClient">
+					<Component Id="FilesComponent" Guid="5FC7B74A-949A-448E-9E5A-1893C3CE9184" DiskId="1">
+			            <File Id="LicenseFile" Name="license.txt" Source="$(var.SolutionDir)/license.txt"/>
+			            <File Id="ReadmeFile" Name="readme.txt" Source="$(var.SolutionDir)/readme.txt"/>
+			            <File Id="HtmlLicenseFile" Name="license.html" Source="$(var.SolutionDir)/license.html"/>
+			            <File Id="FbProfileProviderScript" Name="FbProfileProvider.sql" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FbProfileProvider.sql" />
+			            <File Id="FbRoleProviderScript" Name="FbRoleProvider.sql" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FbRoleProvider.sql" />
+			            <File Id="FbSessionStateStoreScript" Name="FbSessionStateStore.sql" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FbSessionStateStore.sql" />
+			            <File Id="FirebirdMemberShipProviderScript" Name="FirebirdMemberShipProvider.sql" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FirebirdMemberShipProvider.sql" />
+			            <File Id="TFirebirdClientAssembly" Name="FirebirdSql.Data.FirebirdClient.dll" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Data.FirebirdClient.dll" />
+			            <File Id="TWebProvidersAssembly" Name="FirebirdSql.Web.Providers.dll" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Web.Providers.dll" />
+			            <File Id="TUnitTestAssembly" Name="FirebirdSql.Data.FirebirdClient.UnitTests.dll" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Data.FirebirdClient.UnitTests.dll" />
+			            <File Id="UnitTestsConfiguration" Name="FirebirdSql.Data.FirebirdClient.UnitTests.dll.config" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Data.FirebirdClient.UnitTests.dll.config" />
+					</Component>
+				</Directory>
+			</Directory>
+		</DirectoryRef>
+	</Fragment>
+</Wix>

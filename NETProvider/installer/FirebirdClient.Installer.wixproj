@@ -1,0 +1,43 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputName>FirebirdClient.Installer</OutputName>
+    <OutputType>package</OutputType>
+    <WixToolPath Condition=" '$(WixToolPath)' == '' ">$(SharpDevelopBinPath)\Tools\Wix</WixToolPath>
+    <ToolPath Condition=" '$(ToolPath)' == '' ">$(WixToolPath)</ToolPath>
+    <WixMSBuildExtensionsPath>$(SharpDevelopBinPath)\Tools\Wix</WixMSBuildExtensionsPath>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <RootNamespace>FirebirdClient.Installer</RootNamespace>
+    <ProjectGuid>{7E4B8E73-EB4B-4B0B-9F6E-F5631CAC0848}</ProjectGuid>
+    <DefineConstants>SolutionDir=D:\desarrollo\Proyectos\Open Source\FirebirdProject\NETProvider\NETProvider_20\</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <BaseOutputPath>obj\</BaseOutputPath>
+    <IntermediateOutputPath>obj\Debug\</IntermediateOutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <BaseOutputPath>obj\</BaseOutputPath>
+    <IntermediateOutputPath>obj\Release\</IntermediateOutputPath>
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Setup.wxs" />
+    <Compile Include="Assemblies.wxs" />
+    <Compile Include="BrowseDialog.wxs" />
+    <Compile Include="CancelDialog.wxs" />
+    <Compile Include="ErrorDialog.wxs" />
+    <Compile Include="ExitDialog.wxs" />
+    <Compile Include="Files.wxs" />
+    <Compile Include="FilesInUse.wxs" />
+    <Compile Include="OutOfDiskSpaceDialog.wxs" />
+    <Compile Include="OutOfRollbackDiskSpaceDialog.wxs" />
+    <Compile Include="ProgressDialog.wxs" />
+    <Compile Include="SelectFolderDialog.wxs" />
+    <Compile Include="UserExitDialog.wxs" />
+    <Compile Include="UserInterface.wxs" />
+    <Compile Include="VerifyReadyDialog.wxs" />
+    <Compile Include="ViewLicenseAgreementDialog.wxs" />
+    <Compile Include="WelcomeDialog.wxs" />
+  </ItemGroup>
+  <Import Project="$(WixMSBuildExtensionsPath)\wix.targets" />
+</Project>
