@@ -1,0 +1,159 @@
+<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbStatement">
+	<summary>
+	Represents an SQL statement or stored procedure to execute against a data source. 
+	</summary>
+</member>
+<member name="M:#ctor">
+	<summary>
+	Initializes a new instance of the <see cref="FbStatement">FbStatement</see> class.
+	</summary>
+</member>
+<member name="M:#ctor(System.String,FirebirdSql.Data.Firebird.FbConnection,FirebirdSql.Data.Firebird.FbTransaction,FirebirdSql.Data.Firebird.FbParameters,System.Data.CommandType)">
+	<summary>
+	Initializes a new instance of the <see cref="FbStatement">FbStatement</see> class with 
+	the text of the query, an <see cref="FbConnection">FbConnection</see> object, 
+	the <see cref="FbTransaction">Transaction</see>, the <see cref="FbParameterCollection">Parameters</see> collection,
+	and the <b>CommandType</b>.
+	</summary>
+	<param name="cmdText">The text of the query.</param>
+	<param name="connection">An <see cref="FbConnection">FbConnection</see> object that represents the connection to a data source. </param>
+	<param name="transaction">The transaction in which the <see cref="FbCommand">FbCommand</see> executes. </param>
+	<param name="parameters">The list of parameters needed for statement execution. </param>	
+	<param name="commandType">The Command type. </param>		
+</member>
+<member name="P:CommandText">
+	<summary>
+	Gets or sets the SQL statement or stored procedure to execute against the data source.
+	</summary>
+	<value>
+	The SQL statement or stored procedure to execute. The default value is an empty string ("").
+	</value>
+	<remarks>
+	</remarks>
+</member>
+<member name="P:CommandType">
+	<summary>
+	Gets or sets a value indicating how the CommandText property is interpreted.
+	</summary>
+</member>
+<member name="P:CommandTimeout">
+	<summary>
+	Gets or sets the wait time before terminating an attempt to execute a 
+	command and generating an error.
+	</summary>
+	<value>
+	The time (in seconds) to wait for the command to execute. 
+	The default is 30 seconds.
+	</value>
+	<remarks>Not currently supported.</remarks>
+</member>
+<member name="P:Connection">
+	<summary>
+	Gets or sets the FbConnection used by this instance of the FbCommand.
+	</summary>
+	<value>The connection to a data source. The default is a null value.</value>
+</member>
+<member name="P:Parameters">
+	<summary>
+	Gets the FbParameterCollection.
+	</summary>
+	<value>
+	The parameters of the SQL statement or stored procedure. The default is an empty 
+	collection.
+	</value>
+</member>
+<member name="P:Transaction">
+	<summary>
+	Gets or sets the FbTransaction within which the FbCommand executes.
+	</summary>
+	<value>An FbTransaction. The default is a null value.</value>
+</member>
+<member name="P:State">
+	<summary>
+	Get or sets a value that specifies the state of the command
+	</summary>
+</member>
+<member name="M:Close">
+	<summary>
+	Close the Statement handler.
+	</summary>	
+</member>     
+<member name="M:DropStatement">
+	<summary>
+	Close the Statement handler and frees all resources allocated for it.
+	</summary>	
+</member>
+<member name="M:Prepare">
+    <summary>
+    Creates a prepared (or compiled) version of the command at the data source.
+    </summary>
+    <remarks>
+    </remarks>
+</member>
+<member name="M:Execute">
+    <summary>
+    Executes the current query.
+    </summary>
+</member>
+<member name="M:IsSelect">
+	<summary>
+	Test if the Command is a select statement
+	</summary>
+	<returns>true if the command is a select statement or false is not</returns>
+</member>
+<member name="M:SetOutputParameterValues">
+	<summary>
+	Updates the value of output parameters.
+	</summary>
+	<returns>true if the command is a select statement or false is not</returns>
+</member>
+<member name="M:GetRecordsAffected">
+	<summary>
+	Gets the number of INSERTS, UPDATES and DELETES	result of the statement execution
+	</summary>		
+	<returns>A value indicating the number of INSERTS, UPDATES and DELETES</returns>
+</member>
+<member name="M:allocateStatement">
+	<summary>		
+	Allocate the command in memory
+	</summary>
+</member>
+<member name="M:getInSqlda">
+	<summary>
+	Returns a correct Input Sqlda for Statement Execution
+	</summary>
+	<returns>An XSQLDA object</returns>
+</member>
+<member name="M:parseCommandText(System.String)">
+	<summary>
+	Format the Command Text string and subst the parameters names by ?
+	</summary>
+	<returns>An XSQLDA object</returns>
+</member>
+</doc>

@@ -1,0 +1,444 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:GDS">
+	<summary>
+	Implementation of IGDS interface
+	<seealso cref="IGDS"/>
+	</summary>
+</member>
+<member name="M:#ctor">
+	<summary>
+	Initializes a new instance of class GDSImpl
+	</summary>
+</member>
+<member name="M:isc_create_database(System.String,FirebirdSql.Data.INGDS.isc_db_handle,FirebirdSql.Data.INGDS.IClumplet)">
+	<summary>
+	<code>isc_create_database</code> creates a database
+	based on the file name and Clumplet of database properties
+	supplied.  The supplied db handle is attached to the
+	newly created database. 
+	</summary>
+	<param name="file_name">
+	<para>A string the file name, including host and port, for the database.</para>
+	<para>The expected format is host:port:path_to_file.</para>
+	<para>The value for host is localhost if not supplied.</para>
+	<para>The value for port is 3050 if not supplied.</para>
+	</param>
+	<param name="db_handle">
+	An isc_db_handle The db handle to
+	attach to the new database.
+	</param>
+	<param name="c">
+	A Clumplet The parameters for the new database
+	and the attachment to it.  See docs for dpb (database
+	parameter block.)
+	</param>
+	<exception cref="GDSException">GDSException if an error occurs</exception>
+</member>
+<member name="M:isc_attach_database(DbAttachInfo,FirebirdSql.Data.INGDS.isc_db_handle,FirebirdSql.Data.INGDS.IClumplet)">
+	<summary>
+	Attaches to an existing database.
+	</summary>
+	<param name="dbai"></param>
+	<param name="db_handle">
+	An isc_db_handle The db handle to attach to the database.
+	</param>
+	<param name="dpb"></param>
+</member>
+<member name="M:isc_database_info(FirebirdSql.Data.INGDS.isc_db_handle,System.Int32,System.Array,System.Int32,System.Array)">
+	<summary>
+	Reports requested information about a previously attached database.
+	</summary>
+	<remarks>
+	Thanks to Tom Antony for the implemtation of this method
+	</remarks>
+	<param name="db_handle"></param>
+	<param name="item_length"></param>
+	<param name="items"></param>
+	<param name="buffer_length"></param>
+	<param name="buffer"></param>
+</member>
+<member name="M:isc_detach_database(FirebirdSql.Data.INGDS.isc_db_handle)">
+	<summary>
+	Detaches from a database previously connected with isc_attach_database().
+	<seealso cref="isc_attach_database"/>
+	</summary>
+	<param name="db_handle"></param>
+</member>
+<member name="M:isc_drop_database(FirebirdSql.Data.INGDS.isc_db_handle)">
+	<summary>
+	Deletes a currently attached database and all of its supporting files, 
+	such as secondary database files, write-ahead log files, and shadow files.
+	</summary>
+	<param name="db_handle"></param>
+</member>
+<member name="M:isc_expand_dpb(System.Array,System.Int32,System.Int32,System.Array)">
+	<summary>
+	Dynamically builds or expands a database parameter buffer (DPB) to include database	parameters.
+	</summary>
+	<param name="dpb"></param>
+	<param name="dpb_length"></param>
+	<param name="param"></param>
+	<param name="parameters"></param>
+	<returns></returns>
+</member>
+<member name="M:isc_start_transaction(FirebirdSql.Data.INGDS.isc_tr_handle,FirebirdSql.Data.INGDS.isc_db_handle,System.Collections.ArrayList)">
+	<summary>
+	Starts a new transaction against one or more databases.
+	</summary>
+	<param name="tr_handle"></param>
+	<param name="db_handle"></param>
+	<param name="tpb"></param>
+</member>
+<member name="M:isc_commit_transaction(FirebirdSql.Data.INGDS.isc_tr_handle)">
+	<summary>
+	Commits a specified active transaction.
+	</summary>
+	<remarks>
+	isc_commit_transaction() closes record streams, frees system resources, and sets 
+	the transaction handle to zero for the specified transaction.
+	</remarks>
+	<param name="tr_handle"></param>
+</member>
+<member name="M:isc_commit_retaining(FirebirdSql.Data.INGDS.isc_tr_handle)">
+	<summary>
+	Commits an active transaction and retains the transaction context after a commit.
+	</summary>
+	<remarks>
+	isc_commit_retaining() commits an active transaction and immediately clones itself. 
+	</remarks>
+	<param name="tr_handle"></param>
+</member>
+<member name="M:isc_prepare_transaction(FirebirdSql.Data.INGDS.isc_tr_handle)">
+	<summary>
+	Executes the first phase of a two-phase commit against multiple databases.
+	</summary>
+	<param name="tr_handle"></param>
+</member>
+<member name="M:isc_prepare_transaction2(FirebirdSql.Data.INGDS.isc_tr_handle,System.Array)">
+	<summary>
+	Performs the first phase of a two-phase commit for multi-database transactions.
+	</summary>
+	<param name="tr_handle"></param>
+	<param name="bytes"></param>
+</member>
+<member name="M:isc_rollback_transaction(FirebirdSql.Data.INGDS.isc_tr_handle)">
+	<summary>
+	Undoes changes made by a transaction, and restores the database to its state 
+	prior to the start of the specified transaction.		
+	</summary>
+	<remarks>
+	isc_rollback_transaction() rolls back a specified transaction, closes record streams, 
+	frees system resources, and sets the transaction handle to zero. 
+	It is typically used to undo all database changes made by a transaction when an error occurs.
+	</remarks>
+	<param name="tr_handle"></param>
+</member>
+<member name="M:isc_rollback_retaining(FirebirdSql.Data.INGDS.isc_tr_handle)">
+	<summary>
+	Undoes changes made by a transaction and retains the transaction context after the rollback.
+	</summary>
+	<param name="tr_handle"></param>
+</member>
+<member name="M:isc_dsql_allocate_statement(FirebirdSql.Data.INGDS.isc_db_handle,FirebirdSql.Data.INGDS.isc_stmt_handle)">
+	<summary>
+	Allocates a statement handle for subsequent use with other API dynamic SQL (DSQL) calls.
+	</summary>
+	<param name="db_handle"></param>
+	<param name="stmt_handle"></param>
+</member>
+<member name="M:isc_dsql_allocate_statement2(FirebirdSql.Data.INGDS.isc_db_handle,FirebirdSql.Data.INGDS.isc_stmt_handle)">
+	<summary>
+	Allocates a statement handle for subsequent use with other API dynamic SQL (DSQL) calls.
+	</summary>
+	<param name="db_handle"></param>
+	<param name="stmt_handle"></param>
+</member>
+<member name="M:isc_dsql_describe(FirebirdSql.Data.INGDS.isc_stmt_handle,System.Int32)">
+	<summary>
+	Provides information about columns retrieved by the execution of a DSQL SELECT or EXECUTE PROCEDURE statement.
+	</summary>
+	<param name="stmt_handle"></param>
+	<param name="da_version"></param>
+	<returns></returns>
+</member>
+<member name="M:isc_dsql_describe_bind(FirebirdSql.Data.INGDS.isc_stmt_handle,System.Int32)">
+	<summary>
+	Provides information about dynamic input parameters required by a previously prepared DSQL statement.
+	</summary>
+	<param name="stmt_handle"></param>
+	<param name="da_version"></param>
+	<returns></returns>
+</member>
+<member name="M:isc_dsql_execute(FirebirdSql.Data.INGDS.isc_tr_handle,FirebirdSql.Data.INGDS.isc_stmt_handle,System.Int32,FirebirdSql.Data.INGDS.XSQLDA)">
+	<summary>
+	Executes a previously prepared DSQL statement.
+	</summary>
+	<param name="tr_handle"></param>
+	<param name="stmt_handle"></param>
+	<param name="da_version"></param>
+	<param name="xsqlda"></param>
+	<remarks>
+	<para>
+	isc_dsql_execute() executes a DSQL statement previously prepared with <code>isc_dsql_prepare()</code>. 
+	</para>
+	<para>
+	isc_dsql_execute() can be used to execute two types of statements:
+	</para>
+	<para>
+	<list type="bullet">
+		<item>
+		Statements that may return more than one row of data.
+		</item>
+		<item>
+		Statements that need to be executed more than once.
+		</item>
+	</list>
+	</para>
+	</remarks>
+</member>
+<member name="M:isc_dsql_execute2(FirebirdSql.Data.INGDS.isc_tr_handle,FirebirdSql.Data.INGDS.isc_stmt_handle,System.Int32,FirebirdSql.Data.INGDS.XSQLDA,FirebirdSql.Data.INGDS.XSQLDA)">
+	<summary>
+	Executes a previously prepared DSQL statement.
+	</summary>
+	<param name="tr_handle"></param>
+	<param name="stmt_handle"></param>
+	<param name="da_version"></param>
+	<param name="in_xsqlda"></param>
+	<param name="out_xsqlda"></param>
+	<remarks>
+	isc_dsql_execute2() executes a previously prepared DSQL statement 
+	that has input parameters and returns results, such as EXECUTE PROCEDURE and SELECT.
+	</remarks>
+</member>
+<member name="M:isc_dsql_execute_immediate(FirebirdSql.Data.INGDS.isc_db_handle,FirebirdSql.Data.INGDS.isc_tr_handle,System.String,System.Int32,FirebirdSql.Data.INGDS.XSQLDA)">
+	<summary>
+	Prepares and executes just once a DSQL statement that does not return data. 
+	There is a special case of isc_dsql_execute_immediate() for creating databases.
+	</summary>
+	<param name="db_handle"></param>
+	<param name="tr_handle"></param>
+	<param name="statement"></param>
+	<param name="dialect"></param>
+	<param name="xsqlda"></param>
+	<remarks>
+	<para>Note:</para>
+	<para>
+	In the special case where the statement is CREATE DATABASE, there is no 
+	transaction, so db_handle and trans_handle must be pointers to handles whose 
+	value is NULL. When isc_dsql_execute_immediate() returns, db_handle is a valid 
+	handle, just as though you had made a call to isc_attach_database().
+	</para>
+	</remarks>
+</member>
+<member name="M:isc_dsql_exec_immed2(FirebirdSql.Data.INGDS.isc_db_handle,FirebirdSql.Data.INGDS.isc_tr_handle,System.String,System.Int32,FirebirdSql.Data.INGDS.XSQLDA,FirebirdSql.Data.INGDS.XSQLDA)">
+	<summary>
+	Prepares and executes just once, a DSQL statement that returns no more than one row of data.
+	</summary>
+	<param name="db_handle"></param>
+	<param name="tr_handle"></param>
+	<param name="statement"></param>
+	<param name="encoding"></param>
+	<param name="dialect"></param>		
+	<param name="in_xsqlda"></param>
+	<param name="out_xsqlda"></param>
+</member>
+<member name="M:isc_dsql_fetch(FirebirdSql.Data.INGDS.isc_stmt_handle,System.Int32,FirebirdSql.Data.INGDS.XSQLDA)">
+	<summary>
+	Retrieves data returned by a previously prepared and executed DSQL statement.
+	</summary>
+	<param name="stmt_handle"></param>
+	<param name="da_version"></param>
+	<param name="xsqlda"></param>
+	<returns></returns>
+</member>
+<member name="M:isc_dsql_free_statement(FirebirdSql.Data.INGDS.isc_stmt_handle,System.Int32)">
+	<summary>
+	Frees a statement handle and all resources allocated for it, or closes a cursor associated
+	with the statement referenced by a statement handle.
+	</summary>
+	<param name="stmt_handle"></param>
+	<param name="option"></param>
+	<remarks>
+	<para>
+	isc_dsql_free_statement() either frees a statement handle and all resources 
+	allocated for it (option = <b>DSQL_drop</b>), or closes a cursor associated with 
+	the statement (option = <b>DSQL_close</b>).	
+	</para>
+	<para>Note:</para>
+	<para>
+	isc_dsql_free_statement() does nothing if it is called with an option value 
+	other than <b>DSQL_drop</b> or <b>DSQL_close</b>.
+	</para>
+	</remarks>
+</member>
+<member name="M:isc_dsql_prepare(FirebirdSql.Data.INGDS.isc_tr_handle,FirebirdSql.Data.INGDS.isc_stmt_handle,System.String,System.String,System.Int32)">
+	<summary>
+	Prepares a DSQL statement for repeated execution.
+	</summary>
+	<param name="tr_handle"></param>
+	<param name="stmt_handle"></param>
+	<param name="statement"></param>
+	<param name="encoding"></param>
+	<param name="dialect"></param>
+	<returns></returns>
+</member>
+<member name="M:isc_dsql_set_cursor_name(FirebirdSql.Data.INGDS.isc_stmt_handle,System.String,System.Int32)">
+	<summary>
+	Defines a cursor name and associates it with a DSQL statement.
+	</summary>
+	<param name="stmt_handle"></param>
+	<param name="cursor_name"></param>
+	<param name="type"></param>
+</member>
+<member name="M:isc_dsql_sql_info(FirebirdSql.Data.INGDS.isc_stmt_handle,System.Int32,System.Array,System.Int32)">
+	<summary>
+	Returns requested information about a prepared DSQL statement.
+	</summary>
+	<param name="stmt_handle"></param>
+	<param name="item_length"></param>
+	<param name="items"></param>
+	<param name="buffer_length"></param>
+	<returns></returns>
+	<remarks>
+	<para>
+	isc_dsql_sql_info() returns requested information about a statement prepared 
+	with a call to isc_dsql_prepare(). 
+	</para>
+	<para>
+	The main application need for this function is to determine
+	the statement type of an unknown prepared statement, for example, 
+	a statement entered by the user at run time.
+	</para>
+	<para>
+	Requested information can include the:
+	<list type="bullet">
+		<item>
+		Statement type
+		</item>
+		<item>
+		Number of input parameters required by the statement
+		</item>
+		<item>
+		Number of output values returned by the statement		
+		</item>
+		<item>
+		Detailed information regarding each input parameter or 
+		output value, including its datatype, scale, and length
+		</item>
+		<item>
+		The query plan prepared by the optimizer
+		</item>
+	</list>
+	</para>
+	</remarks>
+</member>
+<member name="M:isc_vax_integer(System.Array,system.Int32,system.Int32)">
+	<summary>
+	Reverses the byte order of an integer.
+	</summary>
+	<param name="buffer"></param>
+	<param name="pos"></param>
+	<param name="length"></param>
+	<returns></returns>
+</member>
+<member name="M:isc_create_blob2(FirebirdSql.Data.INGDS.isc_db_handle,FirebirdSql.Data.INGDS.isc_tr_handle,FirebirdSql.Data.INGDS.isc_blob_handle,FirebirdSql.Data.INGDS.IClumplet)">
+	<summary>
+	Creates and opens the Blob for write access, and optionally 
+	specifies the filters to be used to translate the Blob from 
+	one subtype to another.
+	</summary>
+	<param name="db_handle"></param>
+	<param name="tr_handle"></param>
+	<param name="blob_handle"></param>
+	<param name="bpb"></param>
+</member>
+<member name="">
+	<summary>
+	Opens an existing Blob for retrieval and optional filtering.
+	</summary>
+	<param name="db_handle"></param>
+	<param name="tr_handle"></param>
+	<param name="blob_handle"></param>
+	<param name="bpb"></param>
+</member>
+<member name="M:OpenOrCreateBlob(FirebirdSql.Data.INGDS.isc_db_handle,FirebirdSql.Data.INGDS.isc_tr_handle,FirebirdSql.Data.INGDS.isc_blob_handle,FirebirdSql.Data.INGDS.IClumplet,System.Int32)">
+	<summary>
+	<seealso cref="isc_create_blob2"/>
+	<seealso cref="isc_open_blob2"/>
+	</summary>
+	<param name="db_handle"></param>
+	<param name="tr_handle"></param>
+	<param name="blob_handle"></param>
+	<param name="bpb"></param>
+	<param name="op"></param>
+</member>
+<member name="M:isc_get_segment(FirebirdSql.Data.INGDS.isc_blob_handle,System.Int32)">
+	<summary>
+	Reads a segment from an open Blob.
+	</summary>
+	<param name="blob_handle"></param>
+	<param name="requested"></param>
+	<returns></returns>
+</member>
+<member name="M:isc_put_segment(FirebirdSql.Data.INGDS.isc_blob_handle,System.Array)">
+	<summary>
+	Writes a Blob segment.
+	</summary>
+	<param name="blob_handle"></param>
+	<param name="buffer"></param>
+</member>
+<member name="M:isc_close_blob(FirebirdSql.Data.INGDS.isc_blob_handle)">
+	<summary>
+	Closes an open Blob, which involves flushing any remaining segments, 
+	releasing system resources associated with Blob update or retrieval,
+	and setting the Blob handle to zero.
+	</summary>
+	<param name="blob_handle"></param>
+</member>
+<member name="M:isc_sql_code(System.Int32)">
+	<summary>
+	Translates an InterBase error code in the error status vector to an SQL error 
+	code number.
+	</summary>
+	<param name="errcode"></param>
+	<returns></returns>
+</member>
+<member name="M:Connect(M:Connect(FirebirdSql.Data.NGDS.isc_db_handle_impl,FirebirdSql.Data.NGDS.DbAttachInfo)">
+	<summary>
+	Connects to the server
+	</summary>
+	<param name="db"></param>
+	<param name="dbai"></param>
+</member>
+<member name="M:Disconnect(FirebirdSql.Data.NGDS.isc_db_handle_impl)">
+	<summary>
+	Disconnect to the server
+	</summary>
+	<param name="db"></param>
+</member>
+</doc>

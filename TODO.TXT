@@ -1,0 +1,29 @@
+FB.NET - Firebird managed data provider for .NET and Mono
+=========================================================
+
+
+Expected Roadmap:
+
+-Beta 2. 15/02/2003.
+
+-Beta 3. 5/03/2003.
+
+-Release Candidate 1. 25/03/2003.
+
+-Release Candidate 2. 15/04/2003.
+
+-Release Candidate 3. 5/05/2003.
+
+-Release 1.0. 25/05/2003.
+
+
+
+Pending Tasks:
+
+- Bug fixing.
+
+- Improving API reference documentation.
+
+
+
+( See CVS TODO.TXT file in branch "branch-release-1-1". )

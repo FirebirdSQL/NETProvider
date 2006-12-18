@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+
+<project name="FirebirdProvider" default="release" basedir=".">
+    <!-- Project properties -->
+    <property name="project.name" value=".Net Data Provider for Firebird"/>
+    <property name="project.FormalName" value="FirebirdSql.Data.Firebird"/>
+    <property name="project.html-help.dir" value="C:\Archivos de Programa\HTML Help Workshop"/>
+    <property name="project.version" value="1.1"/>
+
+    <!-- Build properties -->
+    <property name="build.debug"  value="true"/>
+    <property name="build.define" value="_DEBUG"/>
+
+    <!-- Paths properties -->
+    <property name="base.dir" value="."/>
+    <property name="src.dir" value="source"/>
+    
+    <property name="build.dir" value="build"/>
+    <property name="examples.dir" value="examples"/>    
+    <property name="help.dir" value="build"/>    
+    <property name="dist.dir" value="dist"/>
+    <property name="help_chm.dir" value="${base.dir}/doc/apiref/msdn style"/>
+            
+    <property name="resources.dir" value="${src.dir}\Resources"/>
+
+    <!-- NUNit properties -->
+    <property name="nunit.tests.dir" value="tests"/>
+    <property name="nunit.framework.dir" value="C:\Archivos de Programa\NUnit V2.0\bin"/>
+
+    <!-- Targets -->
+    <target name="clean" description="cleans build directory">
+        <delete dir="${build.dir}" verbose="true" failonerror="false"/>
+    </target>
+    
+    <target name="debug" depends="clean">
+        <property name="build.debug" value="true"/>
+        
+        <call target="build-apiref"/>
+    </target>
+
+    <target name="release" depends="clean">
+        <property name="build.debug" value="false"/>
+		<property name="build.define" value="_RELEASE"/>
+		
+        <call target="build-apiref"/>
+    </target>
+
+    <target name="build-dll">
+        <mkdir dir="${build.dir}"/>
+
+        <!-- compile FirebirdSql.Data.Firebird -->
+        <csc target="library" output="${build.dir}\${project.FormalName}.dll" debug="${build.debug}" doc="${build.dir}\${project.FormalName}.xml" define="${build.define}">
+            <sources>
+                <includes name="${src.dir}/**/*.cs"/>
+            </sources>
+            
+            <references>
+                <absolute file="System.dll"/>
+                <absolute file="System.Data.dll"/>
+                <absolute file="System.Drawing.dll"/>
+                <absolute file="System.XML.dll"/>
+            </references>
+
+            <arg value="/resource:${resources.dir}\GDS\isc_error_msg.resources,FirebirdSql.Data.Firebird.Resources.GDS.isc_error_msg.resources"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbConnection.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbConnection.bmp"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbCommand.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbCommand.bmp"/>
+            <arg value="/resource:${resources.dir}\ToolboxBitmaps\FbDataAdapter.bmp,FirebirdSql.Data.Firebird.Resources.ToolboxBitmaps.FbDataAdapter.bmp"/>
+        </csc>
+    </target>
+    
+    <target name="build-nunit-tests" depends="build-dll">
+        <copy todir="${build.dir}">
+            <fileset basedir="${nunit.tests.dir}">
+                <includes name="${project.FormalName}.Tests.dll.config"/>
+            </fileset>
+        </copy>
+
+        <!-- compile FirebirdSql.Data.Firebird.Tests -->
+        <csc target="library" output="${build.dir}\${project.FormalName}.Tests.dll">
+            <sources>
+                <includes name="${nunit.tests.dir}/**/*.cs"/>
+            </sources>
+            
+            <references>
+                <absolute file="System.dll"/>
+                <absolute file="System.Data.dll"/>
+                <absolute file="System.XML.dll"/>
+                <includes name="${build.dir}/${project.FormalName}.dll"/>
+                <includes name="${nunit.framework.dir}/nunit.framework.dll"/>                
+            </references>
+        </csc>
+    </target>
+
+    <target name="build-apiref" depends="build-nunit-tests">
+        <ndoc failonerror="false">
+            <assemblies basedir="${build.dir}">
+                <includes name="${project.FormalName}.dll"/>
+            </assemblies>
+            <documenters>
+                <documenter name="MSDN">
+                    <property name="OutputDirectory" value="${help_chm.dir}" />
+                    <property name="HtmlHelpName" value="Firebird .Net Data Provider API Reference Documentation"/>
+                    <property name="HtmlHelpCompilerFilename" value="${project.html-help.dir}\hhc.exe" />
+                    <property name="IncludeFavorites" value="true" />
+                    <property name="Title" value="Firebird .Net Data Provider API Reference Documentation" />
+                    <property name="SplitTOCs" value="False" />
+                    <property name="DefaulTOC" value="" />
+                    <property name="ShowVisualBasic" value="True" />
+                    <property name="ShowMissingSummaries" value="${build.debug}" />
+					<property name="ShowMissingParams" value="${build.debug}" />
+                    <property name="ShowMissingReturns" value="${build.debug}" />
+                    <property name="ShowMissingRemarks" value="${build.debug}" />
+                    <property name="ShowMissingValues" value="${build.debug}" />
+                    <property name="DocumentInternals" value="False" />
+                    <property name="DocumentPrivates" value="False" />
+                    <property name="DocumentProtected" value="True" />
+                    <property name="DocumentEmptyNamespaces" value="False" />
+                    <property name="IncludeAssemblyVersion" value="True" />
+                    <property name="IncludeHierarchy" value="False" />
+                    <property name="ShowVisualBasic" value="True" />
+                    <property name="CopyrightText" value="Copyright (C) 2002 FirebirdSQL." />
+                    <property name="CopyrightHref" value="http://www.firebirdsql.org" />
+                 </documenter>
+            </documenters>            
+        </ndoc>
+    </target>
+
+	<target name="distribution" depends="release">
+		<delete dir="${dist.dir}" verbose="true" failonerror="false"/>
+		
+		<mkdir dir="${dist.dir}"/>		
+		<mkdir dir="${dist.dir}/${examples.dir}"/>
+		<mkdir dir="${dist.dir}/${examples.dir}/ASP.NET"/>
+		<mkdir dir="${dist.dir}/${examples.dir}/csharp"/>
+				        
+        <copy todir="${dist.dir}">
+            <fileset basedir="${build.dir}">
+                <includes name="*.dll"/>
+                <includes name="*.config"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${dist.dir}/${examples.dir}/ASP.NET">
+            <fileset basedir="${examples.dir}/ASP.NET">
+                <includes name="**"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${dist.dir}/${examples.dir}/csharp">
+            <fileset basedir="${examples.dir}/csharp">
+                <includes name="**"/>
+            </fileset>
+        </copy>
+
+        <copy file="${help_chm.dir}/Firebird .Net Data Provider API Reference Documentation.chm" tofile="${dist.dir}/FirebirdNetProviderRef.chm"/>
+
+        <copy todir="${dist.dir}">
+            <fileset basedir=".">
+                <includes name="*.txt"/>
+            </fileset>
+		</copy>
+	</target>
+
+</project>

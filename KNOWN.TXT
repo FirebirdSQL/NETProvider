@@ -1,0 +1,55 @@
+FB.NET - Firebird managed data provider for .NET and Mono
+=========================================================
+
+
+General.
+--------
+
+- Charset doesn't work for FbConnection.CreateDatabase method.
+
+- There are no support for Array datatype ( see TODO.TXT ).
+
+
+
+Known issues with MS .NET Framework.
+------------------------------------
+
+Nothing ( 2003-03-27 )
+
+
+
+Known issues with Mono::
+------------------------
+
+There are no implementations in mono:: for ( 2003-03-27 ):
+
+1. CultureInfo.CurrentCulture.CompareInfo
+
+See:
+
+	http://bugzilla.ximian.com/show_bug.cgi?id=39925
+
+This is used in:
+
+	- FbErrorCollection._cultureAwareCompare.
+
+	- FbParameterCollection._cultureAwareCompare.
+
+	- FbResultSet._cultureAwareCompare.
+
+	- GDSErrorCollection._cultureAwareCompare.
+
+
+2. ToolboxBitmapAttribute.
+
+This is used in:
+
+	- FbCommand class.
+
+	- FbConnection class.
+
+	- FbDataAdapter class.
+
+
+Note: Both problems was fixed using an #if (!_MONO) ... #endif, this will be removed when an 
+implementation of this features was added to mono:: platform.

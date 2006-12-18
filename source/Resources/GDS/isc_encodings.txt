@@ -1,0 +1,81 @@
+#
+# This file contains mapping from the Firebird/InterBase character encodings to
+# character encodings used in .Net. Format of the file:
+#
+# #comment line
+# FB_enc=net_enc
+#
+# where FB_enc is InterBase encoding, and .net_enc is .NET language encoding.
+#
+
+#American Standard Code for Information Interchange	
+ASCII=ascii
+
+#Big5, Traditional Chinese
+BIG_5=big5
+
+#MS-DOS United States, Australia, New Zealand, South Africa	
+DOS437=IBM437
+
+#MS-DOS Latin-1	
+DOS850=ibm850
+
+#MS-DOS Portuguese	
+DOS860=IBM860
+
+#MS-DOS Icelandic	
+DOS861=ibm861
+
+#MS-DOS Canadian French	
+DOS863=IBM863
+
+#MS-DOS Nordic	
+DOS865=IBM865
+
+#JIS X 0201, 0208, 0212, EUC encoding, Japanese	
+EUCJ_0208=euc-jp
+
+#GB2312, EUC encoding, Simplified Chinese	
+GB_2312=gb2312
+
+#ISO 8859-1, Latin alphabet No. 1	
+ISO8859_1=iso-8859-1
+
+#ISO 8859-2, Latin alphabet No. 2
+ISO8859_2=iso-8859-2
+
+#Windows Korean	
+KSC_5601=ks_c_5601-1987
+
+#Windows Japanese	
+ISO2022-JP=iso-2022-jp
+	
+#Shift-JIS, Japanese
+SJIS_0208=shift_jis
+
+#Eight-bit Unicode Transformation Format
+UNICODE_FSS=UTF-8
+
+#Windows Eastern European
+WIN1250=windows-1250
+
+#Windows Cyrillic
+WIN1251=windows-1251
+
+#Windows Latin-1
+WIN1252=windows-1252
+
+#Windows Greek
+WIN1253=windows-1253
+
+#Windows Turkish
+WIN1254=windows-1254
+
+#Windows Hebrew
+WIN1255=windows-1255
+
+#Windows Arabic	
+WIN1256=windows-1256
+
+#Windows Baltic	
+WIN1257=windows-1257

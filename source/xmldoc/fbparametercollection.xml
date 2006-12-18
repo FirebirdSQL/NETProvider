@@ -1,0 +1,214 @@
+<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbParameterCollection">
+    <summary>
+    Collects all parameters relevant to a <see cref="FbCommand">FbCommand</see> as well as their respective mappings to <b>DataSet</b> columns. 
+    This class cannot be inherited.
+    </summary>
+	<remarks>
+	The number of the parameters in the collection must be equal to the
+	number of parameter placeholders within the command text, or Firebird
+	raises an error.
+	</remarks>
+	<example>	
+	The following example creates multiple instances of <see cref="FbParameter">FbParameter</see> 
+	through the <b>FbParameterCollection</b> collection within the <see cref="FbDataAdapter">FbDataAdapter</see>. 
+	These parameters are used to select data within the data source and place the data 
+	in the <b>DataSet</b>. This code assumes that a <b>DataSet</b> and a <b>FbDataAdapter</b> 
+	have already been created with the appropriate schema, commands, and connection.
+	<code>
+public void AddFbParameters() 
+{
+// ...
+// create myDataSet and myDataAdapter
+// ...
+
+  myDataAdapter.SelectCommand.Parameters.Add("@CategoryName", FbType.VarChar, 80).Value = "toasters";
+  myDataAdapter.SelectCommand.Parameters.Add("@SerialNum", FbType.Integer).Value = 239;
+  myDataAdapter.Fill(myDataSet);
+
+}	</code>
+	</example>	
+</member>
+<member name="M:Contains(System.Object)">
+    <summary>
+	Indicates whether a <see cref="FbParameter">FbParameter</see> exists in the collection.
+    </summary>
+    <param name="value">A <see cref="FbParameter">FbParameter</see> object.</param>
+    <returns><b>true</b> if the collection contains the <see cref="FbParameter">FbParameter</see> object; otherwise, <b>false</b>.</returns>
+</member>
+<member name="M:Contains(System.String)">
+    <summary>
+    Indicates whether a <see cref="FbParameter">FbParameter</see> exists in the collection.
+    </summary>
+    <param name="parameterName">The name of the parameter to retrieve.</param>
+    <returns>true if the collection contains the parameter; otherwise, false.</returns>
+</member>
+<member name="M:IndexOf(System.Object)">
+    <summary>
+    Gets the location of the <see cref="FbParameter">FbParameter</see> in the collection with a specific parameter name.
+    </summary>
+    <param name="value">The <see cref="FbParameter">FbParameter</see> object to locate.</param>
+    <returns>
+	The zero-based location of the <see cref="FbParameter">FbParameter</see> in the collection.
+    </returns>
+</member>
+<member name="M:IndexOf(System.String)">
+    <summary>
+    Gets the location of the <see cref="FbParameter">FbParameter</see> in the collection with a specific parameter name.
+    </summary>
+    <param name="parameterName">The name of the parameter to retrieve.</param>
+    <returns>
+	The zero-based location of the <see cref="FbParameter">FbParameter</see> in the collection.
+    </returns>
+</member>
+<member name="M:Insert(System.Int32,System.Object)">
+    <summary>
+    Gets the location of the <see cref="FbParameter">FbParameter</see> in the collection with a specific parameter name.
+    </summary>
+    <param name="index">The zero-based index within the collection to insert the <i>value</i> parameter.</param>
+    <param name="value">The <see cref="FbParameter">FbParameter</see> to add to the collection.</param>
+    <returns>
+	The zero-based location of the <see cref="FbParameter">FbParameter</see> in the collection.
+    </returns>
+</member>
+<member name="M:Remove(System.Object)">
+    <summary>
+    Removes the specified <see cref="FbParameter">FbParameter</see> from the collection.
+    </summary>
+    <param name="value">A <see cref="FbParameter">FbParameter</see> object to remove from the collection.</param>
+    <exception cref="InvalidCastException">The parameter is not a <see cref="FbParameter">FbParameter</see>.</exception>
+    <exception cref="SystemException">The parameter does not exist in the collection.</exception>    
+</member>
+<member name="M:Clear()">
+    <summary>
+    Removes all items from the collection.
+    </summary>
+</member>
+<member name="M:GetEnumerator()">
+    <summary>
+    This member supports the .NET Framework infrastructure and is not intended to be used directly from your code.
+    </summary>
+</member>
+<member name="M:RemoveAt(System.Int32)">
+    <summary>
+    Removes the specified <see cref="FbParameter">FbParameter</see> from the collection using a specific index.
+    </summary>
+    <param name="index">The zero-based index of the parameter.</param>
+    <exception cref="IndexOutOfRangeException">The specified index does not exist.</exception>
+</member>
+<member name="M:RemoveAt(System.String)">
+    <summary>
+    Removes the specified <see cref="FbParameter">FbParameter</see> from the collection.
+    </summary>
+    <param name="parameterName">The name of the parameter to remove.</param>
+</member>
+<member name="M:Add(System.Object)">
+    <summary>
+    Adds the specified <see cref="FbParameter">FbParameter</see> object to the collection.
+    </summary>
+    <param name="value">The <see cref="FbParameter">FbParameter</see> to be added.</param>
+    <returns>A reference to the new <see cref="FbParameter">FbParameter</see> object.</returns>
+    <exception cref="InvalidCastException">The parameter passed was not a <see cref="FbParameter">FbParameter</see>.
+</exception>
+</member>
+<member name="M:Add(FirebirdSql.Data.Firebird.FbParameter)">
+    <summary>
+    Adds the specified <see cref="FbParameter">FbParameter</see> object to the collection.
+    </summary>
+    <param name="param">The <see cref="FbParameter">FbParameter</see> to be added.</param>
+    <returns>A reference to the new <see cref="FbParameter">FbParameter</see> object.</returns>
+</member>
+<member name="M:Add(System.String,FirebirdSql.Data.Firebird.FbType)">
+    <summary>
+    Adds the specified <see cref="FbParameter">FbParameter</see> object to the collection.
+    </summary>
+    <param name="parameterName">Parameter name</param>
+    <param name="type">Parameter type</param>
+    <returns>A reference to the new <see cref="FbParameter">FbParameter</see> object.</returns>
+</member>
+<member name="M:Add(System.String,System.Object)">
+    <summary>
+    Adds a <see cref="FbParameter">FbParameter</see> to the <see cref="FbParameterCollection">FbParameterCollection</see> with the parameter name 
+    and the data type.		
+    </summary>
+    <param name="parameterName">The name of the parameter.</param>
+    <param name="value">The value of the parameter.</param>
+    <returns>A reference to the new <see cref="FbParameter">FbParameter</see> object.</returns>
+</member>
+<member name="M:Add(System.String,FirebirdSql.Data.Firebird.FbType,System.String)">
+    <summary>
+    Adds a <see cref="FbParameter">FbParameter</see> to the <see cref="FbParameterCollection">FbParameterCollection</see> with the parameter name 
+    the data type and the source column.		
+    </summary>
+    <param name="parameterName">The name of the parameter.</param>
+    <param name="fbType">One of the <see cref="FbType">FbType</see> values.</param>
+    <param name="sourceColumn">The name of the source column.</param>
+    <returns>A reference to the new <see cref="FbParameter">FbParameter</see> object.</returns>
+</member>
+<member name="M:Add(System.String,FirebirdSql.Data.Firebird.FbType,System.Int32,System.String)">
+    <summary>
+    Adds a <see cref="FbParameter">FbParameter</see> to the <see cref="FbParameterCollection">FbParameterCollection</see> with the parameter name,
+    the data type, the parameter size (column width), and the source column 
+    name.		
+    </summary>
+    <param name="parameterName">The name of the parameter.</param>
+    <param name="fbType">One of the <see cref="FbType">FbType</see> values.</param>
+    <param name="size">The size of the parameter (width of the column).</param>
+    <param name="sourceColumn">The name of the source column.</param>
+    <returns>A reference to the new <see cref="FbParameter">FbParameter</see> object.</returns>
+</member>
+<member name="M:CopyTo(System.Array,System.Int32)">
+    <summary>
+	Copies <see cref="FbParameterCollection">FbParameterCollection</see> to the specified array.
+    </summary>
+    <param name="array">The <b>Array</b> to copy elements into.</param>
+    <param name="index">The index from which to start copying into the <i>array</i> parameter.</param>
+</member>
+<member name="P:Item(System.String)">
+    <summary>
+    Gets or sets the <see cref="FbParameter">FbParameter</see> with the specified name.
+    </summary>
+    <param name="parameterName">The name of the parameter to retrieve.</param>
+</member>
+<member name="P:Item(System.Int32)">
+    <summary>
+    Gets or sets the <see cref="FbParameter">FbParameter</see> at the specified index.
+    </summary>
+    <param name="parameterIndex">The zero-based index of the parameter to retrieve.</param>
+</member>
+<member name="P:Count">
+    <summary>
+	Gets the number of <see cref="FbParameter">FbParameter</see> objects in the collection.
+    </summary>
+    <value>The number of <see cref="FbParameter">FbParameter</see> objects in the collection.</value>
+</member>
+<member name="P:ICollection.IsSynchronized">
+</member>
+<member name="P:ICollection.SyncRoot">
+</member>
+</doc>

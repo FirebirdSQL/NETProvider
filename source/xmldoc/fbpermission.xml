@@ -1,0 +1,179 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbPermission">
+    <summary>
+    Enables the Firebird .NET Data Provider to ensure that a user has a security 
+    level adequate to access an Firebird data source. 
+    This class cannot be inherited.
+    </summary>
+    <remarks>
+	The <b>IsUnrestricted</b> property takes precedence over the 
+	<b>AllowBlankPassword</b> property. Therefore, if you set 
+	<b>AllowBlankPassword</b> to <b>false</b>, you must also set <b>IsUnrestricted</b> 
+	to <b>false</b> to prevent a user from making a connection using a blank password.
+    </remarks>
+    <example>
+    <code>
+    </code>
+    </example>
+</member>
+<member name="M:#ctor">
+    <summary>
+    Initializes a new instance of the <see cref="FbPermission">FbPermission</see> class.
+    </summary>
+</member>
+<member name="M:#ctor(System.Security.Permissions.PermissionState)">
+    <summary>
+    Initializes a new instance of the <see cref="FbPermission">FbPermission</see> 
+    class with one of the <b>PermissionState</b> values.
+    </summary>
+    <param name="state">One of the <b>System.Security.Permissions.PermissionState</b> values. </param>
+</member>
+<member name="M:#ctor(System.Security.Permissions.PermissionState,System.Boolean)">
+    <summary>
+    Initializes a new instance of the <see cref="FbPermission">FbPermission</see> class.
+    </summary>
+    <param name="state">One of the <b>System.Security.Permissions.PermissionState</b> values. </param>
+    <param name="allowBlankPassword">Indicates whether a blank password is allowed. </param>
+    <remarks>
+    The <b>PermissionState</b> enumeration takes precedence over the <b>AllowBlankPassword</b> 
+	property. Therefore, if you set set <b>AllowBlankPassword</b> to <b>false</b>, 
+	you must also set <b>PermissionState</b> to <b>None</b> to prevent a user from 
+	making a connection using a blank password.
+	</remarks>
+</member>
+<member name="M:Copy">
+    <summary>
+    Creates and returns an identical copy of the current permission object.
+    </summary>
+    <returns>A copy of the current permission object.</returns>
+</member>
+<member name="M:FromXml(System.Security.SecurityElement)">
+    <summary>
+    Reconstructs a security object with a specified state from an XML encoding.
+    </summary>
+    <param name="securityElement">
+    The XML encoding to use to reconstruct the security object.
+    </param>
+    <remarks>
+	Custom code that extends security objects needs to implement the ToXml and 
+	<b>FromXml</b> methods to make the objects security-encodable.
+    </remarks>
+</member>
+<member name="M:Intersect(System.Security.IPermission)">
+    <summary>
+    Returns a new permission object representing the intersection of the 
+    current permission object and the specified permission object.
+    </summary>
+    <param name="target">
+	A permission object to intersect with the current permission object. It must be 
+	of the same type as the current permission object. 
+    </param>
+    <returns>
+	A new permission object that represents the intersection of the current 
+	permission object and the specified permission object. This new permission 
+	object is a null reference if the intersection is empty.
+	</returns>
+	<exception cref="ArgumentException">
+	The <i>target</i> parameter is not a null reference and is not an instance of the same class as 
+	the current permission object.
+	</exception>
+	<remarks>
+	The intersection of two permissions is a permission that describes the set of 
+	operations they both describe in common. Only a demand that passes both original 
+	permissions will pass the intersection.
+	</remarks>
+</member>
+<member name="M:IsSubsetOf(System.Security.IPermission)">
+    <summary>
+    Returns a value indicating whether the current permission object is a subset 
+    of the specified permission object.
+    </summary>
+    <param name="target">
+	A permission object that is to be tested for the subset relationship. This 
+	object must be of the same type as the current permission object. 
+    </param>
+    <returns>
+    <b>True</b> if the current permission object is a subset of the specified 
+	permission object; otherwise <b>false</b>.
+	</returns>
+	<exception cref="ArgumentException">
+	The <i>target</i> parameter is an object that is not of the same type as the 
+	current permission object.
+	</exception>
+	<remarks>
+	The current permission object is a subset of the specified permission object if 
+	the current permission object specifies a set of operations that is wholly 
+	contained by the specified permission object. For example, a permission that 
+	represents access to C:\example.txt is a subset of a permission that represents 
+	access to C:\. If this method returns <b>true</b>, the current permission object 
+	represents no more access to the protected resource than does the specified 
+	permission object.
+	</remarks>
+</member>
+<member name="M:ToString">
+    <summary>
+    Creates and returns a string representation of the current permission object.
+    </summary>
+    <returns>A string representation of the current permission object.</returns>
+    <remarks>This method is useful in debugging when you need to display the permission as a string.</remarks>
+</member>
+<member name="M:ToXml">
+    <summary>
+    Creates an XML encoding of the security object and its current state.
+    </summary>
+    <returns>An XML encoding of the security object, including any state information.</returns>
+    <remarks>
+	Custom code that extends security objects needs to implement the <b>ToXml</b> 
+	and <see cref="FbPermission.FromXml">FromXml</see> 
+	methods to make the objects security-encodable.
+    </remarks>    
+</member>
+<member name="M:Union(System.Security.IPermission)">
+    <summary>
+    Returns a new permission object that is the union of the current and specified 
+    permission objects.
+    </summary>
+    <param name="target">
+    A permission object to combine with the current permission object. It must be of 
+	the same type as the current permission object. 
+	</param>
+    <returns>
+    A new permission object that represents the union of the current permission 
+	object and the specified permission object.
+	</returns>
+	<exception cref="NotSupportedException">
+	The <i>other</i> parameter is not a null reference. This method is only supported 
+	at this level when passed a null reference.
+	</exception>	
+	<remarks>
+	The result of a call to <b>Union</b> is a permission that represents all the 
+	operations represented by both the current permission object and the specified 
+	permission object. Any demand that passes either permission passes their union.
+	</remarks>
+</member>
+</doc>

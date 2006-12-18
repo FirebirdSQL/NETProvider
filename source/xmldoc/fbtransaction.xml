@@ -1,0 +1,260 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbTransaction">
+    <summary>
+    Represents a Firebird transaction to be made in a Firebird database. 
+    This class cannot be inherited.
+    </summary>
+</member>
+<member name="M:#ctor(FirebirdSql.Data.Firebird.FbConnection)">
+    <summary>
+    Initializes a new instance of the <see cref="FbTransaction">FBtransaction</see>
+    </summary>
+    <param name="connection">A <see cref="FbConnection">FbConnection</see> object</param>
+</member>
+<member name="M:#ctor(FirebirdSql.Data.Firebird.FbConnection,System.Data.IsolationLevel)">
+    <summary>
+    Initializes a new instance of the <see cref="FbTransaction">FbTransaction</see>
+    </summary>
+    <param name="connection">A <see cref="FbTransaction">FbConnection</see> object</param>
+    <param name="il">Isolation Level</param>
+</member>
+<member name="M:Dispose">
+    <summary>
+    Releases the unmanaged resources used by the <see cref="FbTransaction">FbTransaction</see> and optionally 
+    releases the managed resources.
+    </summary>
+</member>
+<member name="M:Dispose(bool)">
+    <summary>
+    Releases the unmanaged resources used by the <see cref="FbTransaction">FbTransaction></see> and optionally 
+    releases the managed resources.
+    </summary>
+</member>
+<member name="M:BeginTransaction">
+    <summary>
+    Begins a new Transaction.
+    </summary>
+</member>
+<member name="M:Commit">
+    <summary>
+    Commits the database transaction.
+    </summary>
+    <exception cref="FbException">An error occurred while trying to commit the transaction.</exception>
+    <exception cref="InvalidOperationException">The transaction has already been committed or rolled back.</exception>
+    <exception cref="InvalidOperationException">FbCommand is currently busy Open, Fetching.</exception>    
+</member>
+<member name="M:CommitRetaining">
+    <summary>
+    Commits the database transaction and retains the transaction context after a commit.
+    </summary>
+    <exception cref="FbException">An error occurred while trying to commit the transaction.</exception>
+    <exception cref="InvalidOperationException">The transaction has already been committed or rolled back.</exception>
+    <exception cref="InvalidOperationException">FbCommand is currently busy Open, Fetching.</exception>    
+</member>
+<member name="M:Rollback">
+    <summary>
+    Rolls back a transaction from a pending state.
+    </summary>
+    <exception cref="FbException">An error occurred while trying to commit the transaction.</exception>
+    <exception cref="InvalidOperationException">The transaction has already been committed or rolled back.</exception>
+    <exception cref="InvalidOperationException">FbCommand is currently busy Open, Fetching.</exception>    
+</member>
+<member name="M:Rollback(System.String)">
+    <summary>
+    Rolls back a transaction from a pending state, and specifies the transaction or 
+	savepoint name.
+    </summary>
+    <exception cref="FbException">An error occurred while trying to commit the transaction.</exception>
+    <exception cref="InvalidOperationException">The transaction has already been committed or rolled back.</exception>
+    <exception cref="InvalidOperationException">FbCommand is currently busy Open, Fetching.</exception>    
+    <example>
+		<code>
+FbConnection myConnection = new FbConnection(connectionString);
+myConnection.Open();
+
+FbCommand myCommand = new FbCommand();
+FbTransaction myTrans;
+
+// Start a local transaction
+myTrans = myConnection.BeginTransaction();
+// Assign transaction object for a pending local transaction
+myCommand.Connection = myConnection;
+myCommand.Transaction = myTrans;
+
+try
+{
+	myCommand.CommandText = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBNP', '.Net Provider', 'N/A')";
+	myCommand.ExecuteNonQuery();
+	myTrans.Save("SampleTransaction");
+	myCommand.CommandText = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBN1', '.Net Provider1.', 'N/A')";
+	myCommand.ExecuteNonQuery();
+	myTrans.Commit();
+	Console.WriteLine("Both records are written to database.");
+}
+catch(Exception e)
+{
+	try
+	{
+		myTrans.Rollback("SampleTransaction");
+	}
+	catch (FbException ex)
+	{
+		if (myTrans.Connection != null)
+		{
+			Console.WriteLine("An exception of type " + ex.GetType() +
+				" was encountered while attempting to roll back the transaction.");
+		}
+	}
+
+	Console.WriteLine("An exception of type " + e.GetType() +
+		" was encountered while inserting the data.");
+	Console.WriteLine("Neither record was written to database.");
+}
+finally 
+{
+	myConnection.Close();
+}		
+		</code>
+    </example>
+</member>
+<member name="M:Save(System.String)">
+    <summary>
+    Rolls back a transaction from a pending state, and specifies the transaction or 
+	savepoint name.
+    </summary>
+    <param name="savePointName">The name of the savepoint. </param>
+    <exception cref="FbException">An error occurred while trying to commit the transaction.</exception>
+    <exception cref="InvalidOperationException">The transaction has already been committed or rolled back.</exception>
+    <exception cref="InvalidOperationException">FbCommand is currently busy Open, Fetching.</exception>    
+    <remarks>
+	<para>
+	Savepoints offer a mechanism to roll back portions of transactions. You 
+	create a savepoint using the <b>Save</b> method, and then later call the 
+	<see cref="FbTransaction.Rollback">Rollback</see> method to roll back to 
+	the savepoint instead of rolling back to the start of the transaction.
+	</para>
+	<para>
+	Savepoints are useful in situations where errors are unlikely to occur. The 
+	use of a savepoint to roll back part of a transaction in the case of an 
+	infrequent error can be more efficient than having each transaction test to see 
+	if an update is valid before making the update. Updates and rollbacks are 
+	expensive operations, so savepoints are effective only if the probability of 
+	encountering the error is low and the cost of checking the validity of an update 
+	beforehand is relatively high.
+	</para>
+    </remarks>
+    <example>
+		<code>
+FbConnection myConnection = new FbConnection(connectionString);
+myConnection.Open();
+
+FbCommand myCommand = new FbCommand();
+FbTransaction myTrans;
+
+// Start a local transaction
+myTrans = myConnection.BeginTransaction();
+// Assign transaction object for a pending local transaction
+myCommand.Connection = myConnection;
+myCommand.Transaction = myTrans;
+
+try
+{
+	myCommand.CommandText = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBNP', '.Net Provider', 'N/A')";
+	myCommand.ExecuteNonQuery();
+	myTrans.Save("SampleTransaction");
+	myCommand.CommandText = "INSERT INTO PROJECT(proj_id, proj_name, product) Values('FBN1', '.Net Provider1.', 'N/A')";
+	myCommand.ExecuteNonQuery();
+	myTrans.Commit();
+	Console.WriteLine("Both records are written to database.");
+}
+catch(Exception e)
+{
+	try
+	{
+		myTrans.Rollback("SampleTransaction");
+	}
+	catch (FbException ex)
+	{
+		if (myTrans.Connection != null)
+		{
+			Console.WriteLine("An exception of type " + ex.GetType() +
+				" was encountered while attempting to roll back the transaction.");
+		}
+	}
+
+	Console.WriteLine("An exception of type " + e.GetType() +
+		" was encountered while inserting the data.");
+	Console.WriteLine("Neither record was written to database.");
+}
+finally 
+{
+	myConnection.Close();
+}		
+		</code>
+    </example>
+</member>
+<member name="M:RollbackRetaining">
+    <summary>
+    Rolls back a transaction from a pending state and retains the transaction context after a commit.
+    </summary>
+    <exception cref="ArgumentException">No transaction name was be specified.</exception>
+    <exception cref="InvalidOperationException">The transaction has already been committed or rolled back.</exception>
+    <exception cref="InvalidOperationException">FbCommand is currently busy Open, Fetching.</exception>    
+</member>
+<member name="P:Connection">
+    <summary>
+    Gets the <see cref="FbConnection">FbConnection</see> object associated with the transaction, or a null 
+    reference if the transaction is no longer valid.
+    </summary>
+    <value>
+    The <see cref="FbConnection">FbConnection</see> object associated with the transaction.
+    </value>
+    <remarks>
+	A single application may have multiple database connections, each with zero or 
+	more transactions. This property enables you to determine the connection object 
+	associated with a particular transaction created by 
+	<see cref="FbConnection.BeginTransaction">BeginTransaction</see>.  
+    </remarks>
+</member>
+<member name="P:IsolationLevel">
+    <summary>
+    Specifies the <b>IsolationLevel</b> for this transaction.
+    </summary>
+    <value>The <b>IsolationLevel</b> for this transaction. The default is <b>ReadCommitted</b>.
+    <remarks>
+    Parallel transactions are not supported. Therefore, the <b>IsolationLevel</b> applies to 
+	the entire transaction.
+    </remarks>
+</value>
+</member>
+<member name="P:Transaction">
+    <summary>
+    Internal Transaction handler.
+    </summary>
+</member>
+</doc>

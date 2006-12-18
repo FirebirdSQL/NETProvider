@@ -1,0 +1,44 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:Encodings">
+	<summary>
+	This class allows to get information about encodings of the Firebird Server in C#
+	</summary>
+</member>
+<member name="M:Init">
+	<summary>
+	This method initializes the encodings map.
+	</summary>
+</member>
+<member name="M:GetFromFirebirdEncoding(System.String)">
+	<summary>
+	Returns .Net encoding from a Firebird Encoding
+	</summary>
+	<param name="fbencoding">The name of the Firebird Server encoding</param>
+	<returns>The equivalent encoding in C#.</returns>	
+</member>
+</doc>

@@ -1,0 +1,65 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="">
+	<summary>
+	Implementation of <see cref="isc_tr_handle">isc_tr_handle</see> interface.
+	</summary>
+</member>
+<member name="P:DbHandle">
+	<summary>
+	Gets or Sets a value representing the database handler associated.
+	with the transaction
+	</summary>
+</member>
+<member name="P:State">
+	<summary>
+	Gets a value representing the Transaction state.
+	</summary>
+</member>
+<member name="P:TransactionId">
+	<summary>
+	Gets or Sets a value representing the Transaction ID.
+	</summary>
+</member>
+<member name="M:UnsetDbHandle">
+	<summary>
+	Removes a transaction handler.
+	</summary>
+</member>
+<member name="M:AddBlob(FirebirdSql.Data.NGDS.isc_blob_handle_impl)">
+	<summary>
+	Adds a blob to the transaction.
+	</summary>
+	<param name="blob">An <see cref="isc_blob_handle_impl">isc_blob_handle_impl</see> object.</param>
+</member>
+<member name="M:RemoveBlob(FirebirdSql.Data.NGDS.isc_blob_handle_impl)">
+	<summary>
+	Removes a blob of the transaction
+	</summary>
+	<param name="blob">An <see cref="isc_blob_handle_impl">isc_blob_handle_impl</see> object.</param>
+</member>
+</doc>

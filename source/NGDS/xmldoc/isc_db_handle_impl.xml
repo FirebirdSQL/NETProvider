@@ -1,0 +1,115 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:isc_db_handle_impl">
+	<summary>
+	Implementation of <see cref="isc_db_handle_impl">isc_db_handle</see> interface.
+	</summary>
+</member>
+<member name="M:HasTransactions">
+	<summary>
+	Checks if exist opened transactions.
+	</summary>
+	<returns><b>True</b> if are transactions opened or <b>false</b> if not</returns>
+</member>
+<member name="M:TransactionCount">
+	<summary>
+	Gets a value representing the number of opened transactions.
+	</summary>
+	<returns>The number of opened transactions.</returns>
+</member>
+<member name="M:AddTransaction(FirebirdSql.Data.NGDS.isc_tr_handle_impl)">
+	<summary>
+	Adds a transacion handler.
+	</summary>
+	<param name="tr">Transaction handler.</param>
+</member>
+<member name="M:RemoveTransaction(FirebirdSql.Data.NGDS.isc_tr_handle_impl)">
+	<summary>
+	Removes a tranbsaction handler.
+	</summary>
+	<param name="tr">Transaction handler.</param>
+</member>
+<member name="M:GetWarnings">
+	<summary>
+	Get server Warnings.
+	</summary>
+	<returns>An ArrayList object with the server Warnings.</returns>	
+</member>
+<member name="M:AddWarning(FirebirdSql.Data.INGDS.GDSException)">
+	<summary>
+	Adds a warning to the list.
+	</summary>
+	<param name="warning">An <see cref="FirebirdSql.Data.INGDS.GDSException">GDSException</see> object representing the Warning.</param>
+</member>
+<member name="M:ClearWarnings">
+	<summary>
+	Clear all server warnings.
+	</summary>
+</member>
+<member name="M:CheckValidity">
+	<summary>
+	Checks if Db Handle is invalid or not.
+	</summary>
+	<exception cref="InvalidOperationException">IF Db handle is not valid.</exception>
+</member>
+<member name="M:Invalidate">
+	<summary>
+	Closes all streams and the socket and inavlidate the db handle.
+	</summary>
+</member>
+<member name="P:Rbd_Id">
+	<summary>
+	Gets a value representing the Database handler ID.
+	</summary>
+</member>
+<member name="P:DbSocket">
+	<summary>
+	Gets an object with the <b>Socket</b> used for connect to Firebird Server.
+	</summary>
+</member>
+<member name="P:DbNetworkStream">
+	<summary>
+	Gets an object with the <b>NetworkStream</b> used for send/receive data from a Firebird Server.
+	</summary>
+</member>
+<member name="P:Output">
+	<summary>
+	Gets an object with the <see cref="XdrOutputStream">XdrOutputStream</see> used for send data to a Firebird Server.
+	</summary>
+</member>
+<member name="P:Input">
+	<summary>
+	Gets an object with the <see cref="XdrInputStream">XdrInputStream</see> used for receive data from a Firebird Server.
+	</summary>
+</member>
+<member name="P:IsValid">
+	<summary>
+	Return a value indicating if the database handle is valid or not.
+	</summary>
+	<value><b>true</b> if db handle is valid or <b>false</b> if not.</value>
+</member>
+</doc>

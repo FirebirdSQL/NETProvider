@@ -1,0 +1,179 @@
+WHAT IS NEW - FB.NET - Firebird managed data provider for .NET and Mono
+=======================================================================
+
+
+
+Release Candidate 3 ( 2003-05-05 )
+------- --------- - --------------
+
+- BugFixes.
+
+- Better fit to ADO .NET documentation.
+
+- Updated API reference documentation.
+
+- Better handling of CHAR fields.
+
+
+Release Candidate 2 ( 2003-04-15 )
+------- --------- - --------------
+
+- BugFixes.
+
+- Better fit to ADO .NET documentation.
+
+- Updated API reference documentation.
+
+
+Release Candidate 1 ( 2003-03-25 )
+------- --------- - --------------
+
+- BugFixes.
+
+- Added some little examples for C# and ADO.NET.
+
+
+Beta 3 ( 2003-03-5 )
+------ -------------
+
+- BugFixes.
+
+- Improved API reference documentation.
+
+- Better fit to ADO .NET documentation.
+
+- Improved Connection Pooling Support ( Thanks to Pavol Starek for his feedback ).
+
+- Support for configuration of Packet Size in ConnectionString.
+
+
+Beta 2 ( 2003-02-15 )
+------ --------------
+
+- BugFixes.
+
+- Improved API reference documentation.
+
+- Better fit to ADO .NET documentation.
+
+- Added implementation for FbConnection.ChangeDatabase.
+
+- Initial support for SavePoints in FbTransaction and FbConnection.
+
+- Added implementation for use named parameters in SQL statements:
+
+	"select * from customers where code = @customer_code"
+
+
+
+Beta 1 ( 2003-01-06 )
+------ --------------
+
+- BugFixes.
+
+- Improved API reference documentation.
+
+- Better fit to ADO .NET documentation.
+
+- New instalation system for Windows, using Ghost Installer Free edition ( Thanks to Enrico Speranza for his feedbak )
+
+
+
+Alpha 4 ( 2002-12-09 )
+------- --------------
+
+- BugFixes.
+
+- Improved API reference documentation.
+
+- Better fit to ADO .NET documentation.
+
+- The provider can now be used on Linux using Mono ( www.go-mono.com ), 
+  at this moment this was tested only on Red Hat Linux 8.0
+
+- Improved Connection Pooling implementation.
+
+- Improved exception handling on GDS implementation.
+
+- Improved CommandBuilder implementation.
+
+- Better support for encodings ( Thanks to Jojakim Stahl for his feedbak ).
+
+- Better Support for transaction management ( Thanks to Jojakim Stahl for his feedbak ), 
+  and allowing only one transaction per connection.
+
+- Better disposing of resources allocated for statements.
+
+- Support for large varchars ( Thanks to Pavol Starek for his feedbak ).
+
+- Added event raising in FbConnection class for warnings messages sent from the Firebird Server.
+
+- Added support for null parameters ( Jojakim Stahl ).
+
+
+
+Alpha3 ( 2002-11-11 )
+------ --------------
+
+- BugFixes.
+
+- Updated API Reference documentation.
+
+- Changes for made the Provider to build with Mono.
+
+- NUnit tests (v2.0), for classess:
+	* FbConnection.
+	* FbCommand.
+	* FbCommandBuilder.
+	* FbDataReader.
+	* FbTransaction.
+	* FbParameter.
+	* FbParametersCollection.
+
+- Implementation of DeriveParameters and RefreshSchema methods for CommandBuilder class.
+
+- Implementation of updation RecordsAffected property in FbDataReader class.
+
+- Three new constructors for FbDataAdapter class.
+
+- Initial implementation of Connection pooling.
+
+- Added a .config file for TestApp application.
+
+- Added two new items to connection string:
+	1. Connection lifetime.
+	2. Pooling.
+
+
+
+Alpha 2 ( 2002-10-27 )
+------- --------------
+
+- Bugfixes.
+
+- Changed the assembly name to FirebirdSql.Data.Firebird.
+
+- Changed the namespaces of the source files to FirebirdSql.Data.Firebird, FirebirdSql.Data.INGDS, FirebirdSql.Data.NGDS.
+
+- New API Reference documentation.
+
+- Improved transaction handling.
+
+- Improved data types conversions.
+
+- Added initial support for Batch Querys.
+
+- Added initial support for Blob updating.
+
+- Improved FbDataReader.GetchemaTable method.
+
+- Added the use of port 3050 by default if no port defined in connection string.
+
+- Added new tests to TESTAPP.CS.
+
+
+
+Alpha 1 ( 2002-10-11 )
+----------------------
+
+- Initial revision of the sources.

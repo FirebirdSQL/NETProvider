@@ -1,0 +1,109 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:ClumpletImpl">
+	<summary>
+	Implementation of IClumplet interface.	
+	</summary>
+	<remarks>
+	<para>Format of a clumplet:</para>
+	<para>type	 - 1 byte</para>
+	<para>length - 1 byte</para>
+	<para>contents - length bytes.</para>
+	</remarks>
+</member>
+<member name="P:Length">
+	<summary>
+	Clumplet Length
+	</summary>
+</member>
+<member name="P:Type">
+	<summary>
+	Clumplet Type
+	</summary>
+</member>
+<member name="P:Content">
+	<summary>
+	Clumplet Contents
+	</summary>
+</member>
+<member name="P:Next">
+	<summary>
+	Next Clumplet
+	</summary>
+</member>
+<member name="M:#ctor(System.Array,System.Int32)">
+	<summary>
+	Constructor - Internal, don't allow instances
+	</summary>
+	<param name="type">Type</param>
+	<param name="content">Contents</param>
+</member>
+<member name="M:#ctor(FirebirdSql.Data.NGDS.ClumpletImpl)">
+	<summary>
+	Constructor - Internal, don't allow instances
+	</summary>
+	<param name="c">Clumplet instance</param>
+</member>
+<member name="M:Append(FirebirdSql.Data.NGDS.ClumpletImpl)">
+	<summary>
+	Append a clumplet
+	</summary>
+	<param name="c">Clumplet instance</param>
+	<remarks>
+	Not a very safe implementation, only works for one unchained clumplet.
+	</remarks>
+</member>
+<member name="M:Find(System.Int32)">
+	<summary>
+	Find a clumplet
+	</summary>
+	<param name="type">Clumplet Type</param>
+	<returns>The contents of the Clumplet</returns>
+</member>
+<member name="M:write(FirebirdSql.Data.NGDS.XdrOutputStream)">
+	<summary>
+	Write the contents of the Clumplet on the Stream
+	</summary>
+	<param name="output"></param>
+	<remarks>IXdrable</remarks>
+</member>
+<member name="M:Read(FirebirdSql.Data.NGDS.XdrInputStream,System.Int32)">
+	<summary>		
+	Reads clumplet contents.
+	</summary>
+	<param name="input"></param>
+	<param name="length"></param>
+	<remarks>IXdrable</remarks>
+</member>
+<member name="M:Equals(System.Object)">
+	<summary>
+	Make a comparision with other Clumplet
+	</summary>
+	<param name="o">Clumplet instance</param>
+	<returns><b>True</b> if object are equal or <b>false</b> if not</returns>
+</member>
+</doc>

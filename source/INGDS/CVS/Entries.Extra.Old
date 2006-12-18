@@ -1,0 +1,16 @@
+/GDSCodes.cs////
+/GDSError.cs////
+/GDSErrorCollection.cs////
+/GDSException.cs////
+/GDSExceptionHelper.cs////
+/GDSFactory.cs////
+/IClumplet.cs////
+/IGDS.cs////
+/IXdrable.cs////
+/XSQLDA.cs////
+/XSQLVAR.cs////
+/isc_blob_handle.cs////
+/isc_db_handle.cs////
+/isc_stmt_handle.cs////
+/isc_tr_handle.cs////
+D/xmldoc////

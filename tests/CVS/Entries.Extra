@@ -1,0 +1,16 @@
+/AssemblyInfo.cs////
+/BaseTest.cs////
+/FbClientPermissionAttributeTest.cs////
+/FbClientPermissionTest.cs////
+/FbCommandBuilderTest.cs////
+/FbCommandTest.cs////
+/FbConnectionTest.cs////
+/FbDataAdapterTest.cs////
+/FbDataReaderTest.cs////
+/FbErrorCollectionTest.cs////
+/FbErrorTest.cs////
+/FbExceptionTest.cs////
+/FbParameterCollectionTest.cs////
+/FbParameterTest.cs////
+/FbTransactionTest.cs////
+/FirebirdSql.Data.Firebird.Tests.dll.config////

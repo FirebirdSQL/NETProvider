@@ -1,0 +1,62 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbConnectionRequestInfo">
+    <summary>
+    The class FbConnectionRequestInfo holds a clumplet 
+    that is used to store and transfer connection-specific information 
+    such as user, password, and other dpb information.
+    </summary>
+</member>
+<member name="M:#ctor">
+    <summary>
+    Initializes a new instance of the class <code>FbConnectionRequestInfo</code>
+    </summary>
+</member>
+<member name="M:#ctor(FirebirdSql.Data.Firebird.FbConnectionRequestInfo)">
+    <summary>
+    Initializes a new instance of the class FbConnectionRequestInfo
+    </summary>
+    <param name="src"></param>
+</member>
+<member name="M:Equals(System.Object)">
+    <summary>
+    Checks whether this instance is equal to another. 
+    Since connectionRequestInfo is defined specific to 
+    a resource adapter, the resource adapter is required 
+    to implement this method. The conditions for equality 
+    are specific to the resource adapter.
+    </summary>
+    <param name="other"></param>
+    <returns></returns>
+</member>
+<member name="M:GetHashCode">
+    <summary>
+    Returns the hashCode of the ConnectionRequestInfo.
+    </summary>
+    <returns>hash code os this instance</returns>
+</member>
+</doc>

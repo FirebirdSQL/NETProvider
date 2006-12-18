@@ -1,0 +1,141 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbType">
+    <summary>
+    Specifies the data type of a field, property, or FbParameter.	
+    </summary>
+</member>
+<member name="F:BigInt">
+    <summary>
+    Exact numeric value. 
+    (SQL_INT64). This maps to Int64.
+    </summary>
+</member>
+<member name="F:Binary">
+    <summary>
+    An array of data. This maps to an Array.
+    </summary>
+</member>
+<member name="F:Binary">
+    <summary>
+    A stream of binary data (SQL_BLOB). This maps to an Array of type Byte.
+    </summary>
+</member>
+<member name="F:Char">
+    <summary>
+    A fixed-length character string (SQL_CHAR). This maps to String.
+    </summary>
+</member>
+<member name="F:Date">
+    <summary>
+    Date data in the format yyyymmdd (SQL_TYPE_DATE). This maps to DateTime.
+    </summary>
+</member>
+<member name="F:Decimal">
+    <summary>
+    Signed, exact, numeric value with a precision of at least p and scale s, 		
+    The maximum precision is 18 (SQL_DECIMAL). 
+    This maps to Decimal.
+    </summary>
+</member>
+<member name="F:Double">
+    <summary>
+    Signed, approximate, numeric value with a binary precision 53 (SQL_DOUBLE). 
+    This maps to Double.
+    </summary>
+</member>
+<member name="F:Float">
+    <summary>
+    Signed, approximate, numeric value with a binary precision 24 (SQL_FLOAT). 
+    This maps to Single.
+    </summary>
+</member>
+<member name="F:Integer">
+    <summary>
+    Exact numeric value with precision 10 and scale 0 (SQL_LONG). 
+    This maps to Int32.
+    </summary>
+</member>
+<member name="F:LongVarBinary">
+    <summary>
+    Variable length binary. The maximum is set by the user (SQL_BLOB). 
+    This maps to an Array of type Byte.
+    </summary>
+</member>
+<member name="F:NChar">
+    <summary>
+    Unicode character string of fixed string length (SQL_TEXT).
+    This maps to String.
+    </summary>
+</member>
+<member name="F:NVarChar">
+    <summary>
+    A variable-length stream of Unicode characters (SQL_TEXT).
+    This maps to String.
+    </summary>
+</member>
+<member name="F:NText">
+    <summary>
+    Unicode variable-length character data. (SQL_WLONGVARCHAR). 
+    This maps to String.
+    </summary>
+</member>
+<member name="F:Numeric">
+    <summary>
+    Signed, exact, numeric value with a precision p and scale s
+    This maps to Decimal.
+    </summary>
+</member>
+<member name="F:SmallInt">
+    <summary>
+    Exact numeric value with precision 5 and scale 0 
+    (SQL_SHORT). This maps to Int16.
+    </summary>
+</member>
+<member name="F:Text">
+    <summary>
+    Variable length character data. Maximum length is data source–dependent 
+    (SQL_TEXT). This maps to String.
+    </summary>
+</member>
+<member name="F:Time">
+    <summary>
+    Time data in the format hhmmss (SQL_TYPE_TIME). This maps to DateTime. 
+    </summary>
+</member>
+<member name="F:TimeStamp">
+    <summary>
+    Date data in the format yyyymmddhhmmss (SQL_TIMESTAMP). 
+    This maps to DateTime.
+    </summary>
+</member>
+<member name="F:VarChar">
+    <summary>
+    A variable-length stream character string (SQL_TEXT). This maps to String.
+    </summary>
+</member>
+</doc>

@@ -1,0 +1,53 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbClob">
+    <summary>
+    Provides a means of reading/writing ASCII blob data. 
+    This class cannot be inherited.
+    </summary>
+</member>
+<member name="M:#ctor(FirebirdSql.Data.Firebird.FbConnection,FirebirdSql.Data.Firebird.FbTransaction,System.Int64)">
+    <summary>
+    Initializes a new instance of the FbClob class.
+    </summary>
+    <param name="connection">An FbConnection object</param>
+    <param name="transaction">An FbTransaction object</param>
+    <param name="clobId">A Blob id</param>
+</member>
+<member name="M:Read">
+    <summary>
+    Read data from a ASCII blob
+    </summary>
+    <returns>A string representing blob data</returns>
+</member>
+<member name="M:Write(System.String)">
+    <summary>
+    Write data to a ASCII blob
+    </summary>
+    <returns>A value representing the new Clob ID</returns>
+</member>
+</doc>

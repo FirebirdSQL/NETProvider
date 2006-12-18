@@ -1,0 +1,80 @@
+<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbField">
+    <summary>
+    Auxiliar class for firebird fields management
+    </summary>
+</member>
+<member name="M:GetFbTypeName(System.Int32,System.Int32,System.Int32)">
+    <summary>
+    Get Firebird datatype name
+    </summary>
+    <param name="sqltype">Sql data type</param>
+    <param name="sqlscale">Scale</param>
+    <param name="sqlsubtype">Subtype ( for BLOBS fields )</param>
+    <returns>A string with the data type name</returns>
+</member>
+<member name="M:GetFbType(System.Int32,System.Int32,System.Int32)">
+    <summary>
+    Gets a FbType code from a firebird sql type
+    </summary>
+    <param name="sqltype">Sql data type</param>
+    <param name="sqlscale">Scale</param>
+    <param name="sqlsubtype">Subtype ( for BLOBS fields )</param>
+    <returns>A FbType value</returns>
+</member>
+<member name="M:GetSystemTypeFromFbType(System.Int32,System.Int32,System.Int32)">
+    <summary>
+    Returns a System.Type code from a Firebird Data Type value
+    </summary>
+    <param name="sqltype">Sql data type</param>
+    <param name="sqlscale">Scale</param>
+    <param name="sqlsubtype">Subtype ( for BLOBS fields )</param>
+    <returns>A System.Type value</returns>
+</member>
+<member name="M:GetFbTypeFromDbType(System.Data.DbType)">
+    <summary>
+    Gets a Firebird SQL Data type value from a System.DbType value
+    </summary>
+    <param name="type">A System.DbType value</param>
+    <returns>A value indicating the SQL Firebird data type</returns>
+</member>
+<member name="M:IsNumeric(System.Int32)">
+    <summary>
+    Gets a value indicating whether the column is numeric
+    </summary>
+    <param name="sqltype">A Firebird data type value</param>
+    <returns>True if is numeric false if not</returns>
+</member>
+<member name="M:IsLong(System.Int32)">
+    <summary>
+    Gets a value indicating whether the column contains long values.
+    </summary>
+    <param name="sqltype">A firebird data type value</param>
+    <returns>True if is numeric false if not</returns>
+</member>
+</doc>

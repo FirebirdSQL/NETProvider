@@ -1,0 +1,69 @@
+<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:Blob">
+    <summary>
+	Provides a means of reading/writing binary blob data. 
+	This class cannot be inherited.
+	</summary>
+</member>
+<member name="M:#ctor(FirebirdSql.Data.Firebird.FbConnection,FirebirdSql.Data.Firebird.FbTransaction,System.Int64)">    
+	<summary>
+	Initializes a new instance of the FbBlob class.
+	</summary>
+    <param name="connection">An FbConnection object</param>
+    <param name="transaction">An FbTransaction object</param>
+    <param name="blob_id">A Blob id</param>
+</member>
+<member name="M:Open">
+    <summary>
+    Open a existing blob.
+    </summary>
+    <returns>An isc_blob_handle_impl object</returns>
+</member>
+<member name="M:ReadSegment(FirebirdSql.Data.INGDS.isc_blob_handle)">
+    <summary>
+    Reads a block of data from an opened blob.
+    </summary>
+    <returns>A byte array representing a block of data</returns>
+</member>
+<member name="M:Close(FirebirdSql.Data.INGDS.isc_blob_handle)">
+    <summary>
+    Closes an opened blob.
+    </summary>    
+</member>
+<member name="M:Write(System.String)">
+    <summary>
+    Write data to a Binary blob
+    </summary>
+    <returns>A value representing the new Blob ID</returns>
+</member>
+<member name="P:BlobId">
+    <summary>
+    Gets or sets a value that specifies a blob id
+    </summary>		
+</member>
+</doc>

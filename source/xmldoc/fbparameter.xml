@@ -1,0 +1,150 @@
+<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbParameter">
+    <summary>
+    Represents a parameter to a <see cref="FbCommand">FbCommand</see>, and optionally, its mapping to 
+    DataSet columns. This class cannot be inherited.
+    </summary>
+    <remarks>
+	Parameter names are not case sensitive.
+    </remarks>
+    <example>
+	The following example creates multiple instances of <b>FbParameter</b> through 
+	the <see cref="FbParameterCollection">FbParameterCollection</see> collection within the 
+	<see cref="FbDataAdapter">FbDataAdapter</see>. These parameters are used to select data from 
+	the data source and place the data in the <b>DataSet</b>. 
+	This example assumes that a <b>DataSet</b> and a <b>FbDataAdapter</b> have already 
+	been created with the appropriate schema, commands, and connection.
+    <code>
+public void AddFbParameters() 
+{
+// ...
+// create myDataSet and myDataAdapter
+// ...
+
+  myDataAdapter.SelectCommand.Parameters.Add("@CategoryName", FbType.VarChar, 80).Value = "toasters";
+  myDataAdapter.SelectCommand.Parameters.Add("@SerialNum", FbType.Integer).Value = 239;
+  myDataAdapter.Fill(myDataSet);
+
+}
+    </code>
+    </example>    
+</member>
+<member name="M:#ctor">
+    <summary>
+    Initializes a new instance of the <see cref="FbParameter">FbParameter</see> class.
+    </summary>
+</member>
+<member name="M:#ctor(System.String,FirebirdSql.Data.Firebird.FbType)">
+    <summary>
+    Initializes a new instance of the <see cref="FbType">FbParameter</see> class.
+    </summary>
+    <param name="parameterName">The name of the parameter.</param>
+    <param name="fbType">One of the <see cref="FbType">FbType</see> values.</param>
+</member>
+<member name="M:#ctor(System.String,System.Object)">
+    <summary>
+    Initializes a new instance of the <see cref="FbParameter">FbParameter</see> class.
+    </summary>
+    <param name="parameterName">The name of the parameter.</param>
+    <param name="paramValue">The value of the parameter.</param>
+</member>
+<member name="M:#ctor(System.String,FirebirdSql.Data.Firebird.FbType,System.String)">
+    <summary>
+    Initializes a new instance of the <see cref="FbParameter">FbParameter</see> class.
+    </summary>
+    <param name="parameterName">The name of the parameter.</param>
+    <param name="fbType">One of the FbType values.</param>
+    <param name="sourceColumn">The name of the source column.</param>
+</member>
+<member name="M:#ctor(System.String,FirebirdSql.Data.Firebird.FbType,System.Int32,System.String)">
+    <summary>
+    Initializes a new instance of the <see cref="FbParameter">FbParameter</see> class.
+    </summary>
+    <param name="parameterName">The name of the parameter.</param>
+    <param name="fbType">One of the <see cref="FbType">FbType</see> values.</param>
+    <param name="size">The size of the parameter (width of the column).</param>
+    <param name="sourceColumn">The name of the source column.</param>
+</member>
+<member name="P:Precision">
+    <summary>
+    Gets or sets the maximum number of digits used to represent the Value 
+    property.
+    </summary>
+</member>
+<member name="P:Scale">
+    <summary>
+    Gets or sets the number of decimal places to which Value is resolved.
+    </summary>
+</member>
+<member name="P:Size">
+    <summary>
+    Gets or sets the maximum size, in bytes, of the data within the column.
+    </summary>
+</member>
+<member name="P:DbType">
+    <summary>
+    Gets or sets the <b>DbType</b> of the parameter.
+    </summary>
+</member>
+<member name="P:DbType">
+    <summary>
+    Gets or sets the <see cref="FbType">FbType</see> of the parameter.
+    </summary>
+</member>
+<member name="P:Direction">
+    <summary>
+    Gets or sets the <b>Direction</b> of the parameter.		
+    </summary>
+</member>
+<member name="P:IsNullable">
+    <summary>
+    Gets or sets a value indicating whether the parameter accepts null values.
+    </summary>
+</member>
+<member name="P:ParameterName">
+    <summary>
+    Gets or sets the name of the <see cref="FbParameter">FbParameter</see>.
+    </summary>
+</member>
+<member name="P:SourceColumn">
+    <summary>
+    Gets or sets the name of the source column that is mapped to the DataSet 
+    and used for loading or returning the Value.
+    </summary>
+</member>
+<member name="P:SourceVersion">
+    <summary>
+    Gets or sets the <b>DataRowVersion</b> to use when loading Value.
+    </summary>
+</member>
+<member name="P:Value">
+    <summary>
+    Gets or sets the value of the parameter.
+    </summary>
+</member>
+</doc>

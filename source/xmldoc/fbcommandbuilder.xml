@@ -1,0 +1,340 @@
+<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbCommandBuilder">
+    <summary>    
+    Automatically generates single-table commands used to reconcile changes 
+    made to a DataSet with the associated data source. This class cannot be inherited.    
+    </summary>
+    <remarks>
+    <para>    
+	The <see cref="FbDataAdapter">FbDataAdapter</see> does not automatically generate the SQL statements required to 
+	reconcile changes made to a DataSet associated with the data source. However, you can create an 
+	<b>FbCommandBuilder</b> object that generates SQL statements for single-table 
+	updates by setting the SelectCommand property of the <see cref="FbDataAdapter">FbDataAdapter</see>. 
+	Then, the <b>FbCommandBuilder</b> generates any additional SQL statements that you do not set.
+	</para>
+	<para>
+	To generate INSERT, UPDATE, or DELETE statements, the <b>FbCommandBuilder</b> 
+	uses the <see cref="FbDataAdapter.SelectCommand">SelectCommand</see> property to retrieve a required set of metadata. 
+	If you change the value of <see cref="FbDataAdapter.SelectCommand">SelectCommand</see> after the metadata has been 
+	retrieved (for example, after the first update), you then should call the 
+	<see cref="FbCommandBuilder.RefreshSchema">RefreshSchema</see> method to update the metadata.
+	</para>
+    </remarks>
+	<example>
+	The following example uses <see cref="FbCommand">FbCommand</see>, along with <see cref="FbDataAdapter">FbDataAdapter</see>
+	and <see cref="FbConnection">FbConnection</see>, to select rows from a data source. 
+	The example is passed an initialized DataSet, a connection string, 
+	a query string that is an SQL SELECT statement, and a string that 
+	is the name of the data source table. The example 
+	then creates an <b>FbCommandBuilder</b>.
+	<code>
+public DataSet SelectSqlSrvRows(DataSet myDataSet,string myConnection,string mySelectQuery,string myTableName) 
+{
+    FbConnection  myConn		= new FbConnection(myConnection);    
+    FbDataAdapter myDataAdapter = new FbDataAdapter();
+    FbTransaction myTxn			= myConn.BeginTransaction();
+    
+    myDataAdapter.SelectCommand = new FbCommand(mySelectQuery, myConn, myTxn);
+    FbCommandBuilder custCB		= new FbCommandBuilder(myDataAdapter);
+
+    myConn.Open();
+
+    DataSet custDS = new DataSet();
+    myDataAdapter.Fill(custDS, "Employee");
+
+    //code to modify data in dataset here
+
+    //Without the FbCommandBuilder this line would fail
+    myDataAdapter.Update(custDS, "Employee");
+
+    myConn.Close();
+
+    return custDS;
+ }		
+		</code>
+	</example>    
+</member>
+
+<member name="M:#ctor">
+    <summary>
+    Initializes a new instance of the <see cref="FbCommandBuilder">FbCommandBuilder</see> class.
+    </summary>
+</member>
+
+<member name="M:#ctor(System.Data.FbDataAdapter)">
+    <summary>
+    Initializes a new instance of the <see cref="FbCommandBuilder">FbCommandBuilder</see> class with the 
+    associated <see cref="FbDataAdapter">FbDataAdapter</see> object.
+    </summary>
+    <param name="adapter">An <see cref="FbDataAdapter">FbDataAdapter</see> object to associate with this <see cref="FbCommandBuilder">FbCommandBuilder</see>.</param>
+</member>
+
+<member name="M:DeriveParameters(System.Data.FbCommand)">
+    <summary>
+	Populates the specified <see cref="FbCommand">FbCommand</see> object's 
+	<see cref="FbCommand.Parameters">Parameters</see> collection with parameter 
+	information for a stored procedure specified in the <b>FbCommand</b>.
+    </summary>
+    <param name="command">
+    The <see cref="FbCommand">FbCommand</see> referencing the stored procedure from 
+    which the parameter information is to be derived. The derived 
+    <see cref="FbCommand.Parameters">parameters</see> are added to the Parameters collection this command.
+    </param>
+    <exception cref="InvalidOperationException">The command text is not a valid stored procedure name.</exception>
+    <remarks>
+    <para>
+    <b>DeriveParameters</b> overwrites any existing parameter information for the 
+    <b>FbCommand</b>. 
+    </para>
+    <para>
+    <b>DeriveParameters</b> requires an extra call to the data server to obtain the 
+    information. If the parameter information is known in advance, it is more efficient 
+    to populate the parameters collection by setting the information explicitly.
+    </para>
+    <para>
+	You can only use <b>DeriveParameters</b> with stored procedures. You cannot use 
+	<b>DeriveParameters</b> to populate the <see cref="FbParameterCollection">FbParameterCollection</see>
+	with arbitrary DSQL statements, such as a parameterized SELECT statement.
+    </para>
+    </remarks>
+</member>
+
+<member name="M:GetInsertCommand">
+    <summary>
+    Gets the automatically generated <see cref="FbCommand">FbCommand</see> object required to perform 
+    insertions at the data source.
+    </summary>
+    <returns>
+    The automatically generated <see cref="FbCommand">FbCommand</see> object required to perform insertions.
+    </returns>
+    <remarks>
+    <para>
+    You can use the <b>GetInsertCommand</b> method for informational or troubleshooting 
+    purposes because it returns the <see cref="FbCommand">FbCommand</see> object to be executed.
+    You can also use <b>GetInsertCommand</b> as the basis of a modified command. 
+    </para>
+    <para>
+    For example, you might call <b>GetInsertCommand</b> and modify the 
+    <see cref="FbCommand.CommandTimeout">CommandTimeout</see> value, and then explicitly 
+    set that on the <see cref="FbDataAdapter">FbDataAdapter</see>.
+    </para>
+    <para>
+    After the SQL statement is first generated, you must explicitly call 
+    <see cref="FbCommandBuilder.RefreshSchema">RefreshSchema</see> if it changes the statement in any way. Otherwise, the 
+    <b>GetInsertCommand</b> still will be using information from the previous statement, 
+    which might not be correct. The SQL statements are first generated when the 
+    application calls either Update or <b>GetInsertCommand</b>.
+    </para>
+    </remarks>
+</member>
+
+<member name="M:GetUpdateCommand">
+    <summary>
+    Gets the automatically generated <see cref="FbCommand">FbCommand</see> object required to perform 
+    updates at the data source.
+    </summary>
+    <returns>
+    The automatically generated <see cref="FbCommand">FbCommand</see> object required to perform updates.
+    </returns>
+    <remarks>
+    <para>
+    You can use the <b>GetUpdateCommand</b> method for informational or troubleshooting 
+    purposes because it returns the <see cref="FbCommand">FbCommand</see> object to be executed.
+    You can also use <b>GetUpdateCommand</b> as the basis of a modified command. 
+    </para>
+    <para>
+    For example, you might call <b>GetUpdateCommand</b> and modify the <see cref="FbCommand.CommandTimeout">CommandTimeout</see>
+    value, and then explicitly set that on the <see cref="FbDataAdapter">FbDataAdapter</see>.
+    </para>
+    <para>
+    After the SQL statement is first generated, you must explicitly call 
+    <see cref="FbCommandBuilder.RefreshSchema">RefreshSchema</see> if it 
+    changes the statement in any way. Otherwise, the <b>GetUpdateCommand</b>
+    still will be using information from the previous statement, which might 
+    not be correct. The SQL statements are first generated when the application 
+    calls either Update or <b>GetUpdateCommand</b>.
+    </para>
+    </remarks>
+</member>
+
+<member name="M:GetDeleteCommand">
+    <summary>
+    Gets the automatically generated <see cref="FbCommand">FbCommand</see> object required to perform 
+    deletions at the data source.
+    </summary>
+    <returns>
+    The automatically generated <see cref="FbCommand">FbCommand</see> object required to perform deletions.
+    </returns>
+    <remarks>
+    <para>
+    You can use the <b>GetDeleteCommand</b> method for informational or troubleshooting 
+    purposes because it returns the <see cref="FbCommand">FbCommand</see> object to be executed.
+    </para>
+    <para>
+    You can also use <b>GetDeleteCommand</b> as the basis of a modified command. 
+    For example, you might call <b>GetDeleteCommand</b> and modify the <see cref="FbCommand.CommandTimeout">CommandTimeout</see>
+    value, and then explicitly set that on the <see cref="FbDataAdapter">FbDataAdapter</see>.
+    </para>
+    <para>
+    After the SQL statement is first generated, you must explicitly call 
+    <see cref="FbCommandBuilder.RefreshSchema">RefreshSchema</see> if it 
+    changes the statement in any way. Otherwise, the <b>GetDeleteCommand</b> 
+    still will be using information from the previous statement,
+    which might not be correct. The SQL statements are first generated when 
+    the application calls either Update or <b>GetDeleteCommand</b>.
+    </para>
+    </remarks>
+</member>
+
+<member name="M:RefreshSchema">
+    <summary>
+    Refreshes the database schema information used to generate INSERT, UPDATE, 
+    or DELETE statements.
+    </summary>
+    <remarks>
+    You should call <b>RefreshSchema</b> whenever the <see cref="FbDataAdapter.SelectCommand">SelectCommand</see> value of the 
+    <see cref="FbDataAdapter">FbDataAdapter</see> changes.
+    </remarks>
+</member>
+
+<member name="P:DataAdapter">
+    <summary>
+    Gets or sets an <see cref="FbDataAdapter">FbDataAdapter</see> object for which 
+    this <see cref="FbCommandBuilder">FbCommandBuilder</see> object will generate SQL statements.
+    </summary>
+    <remarks>
+    The <see cref="FbCommandBuilder">FbCommandBuilder</see> registers itself as a listener for 
+    <see cref="FbDataAdapter.RowUpdating">RowUpdating</see> events that are generated by the 
+    <see cref="FbDataAdapter">FbDataAdapter</see> specified in this property.
+	</remarks>
+</member>
+
+<member name="P:QuotePrefix">
+    <summary>
+    Gets or sets the beginning character or characters to use when working 
+    with database objects (for example, tables or columns) whose names 
+    contain characters such as spaces or reserved tokens.
+    </summary>
+    <exception cref="InvalidOperationException">
+    This property cannot be changed after an insert, update, or delete command has 
+	been generated.
+	</exception>
+    <remarks>
+    <para>
+    Some data sources may contain objects whose names include characters 
+    such as spaces, commas, and semicolons. To accommodate this, use the 
+    <b>QuotePrefix</b> and <see cref="FbCommandBuilder.QuoteSuffix">QuoteSuffix</see> 
+    properties to specify delimiters, such as a left and right bracket, that will encapsulate the object name.		
+    </para>
+    <para><b>Note:</b></para>
+    <para>
+	Although you cannot change the <see cref="FbCommandBuilder.QuotePrefix">QuotePrefix</see> or <see cref="FbCommandBuilder.QuoteSuffix">QuoteSuffix</see>
+	properties after an insert, update, or delete command has been generated, you can change their 
+	settings after calling the Update method of an <see cref="FbDataAdapter">FbDataAdapter</see>.
+	</para>
+    </remarks>		
+</member>
+
+<member name="P:QuoteSuffix">
+    <summary>
+    Gets or sets the ending character or characters to use when working with 
+    database objects, (for example, tables or columns), whose names contain 
+    characters such as spaces or reserved tokens.
+    </summary>
+    <exception cref="InvalidOperationException">
+    This property cannot be changed after an insert, update, or delete command has 
+	been generated.
+	</exception>
+    <remarks>
+    <para>
+    Some data sources may contain objects whose names include characters such 
+    as spaces, commas, and semicolons. To accommodate this, use the 
+    <see cref="FbCommandBuilder.QuotePrefix">QuotePrefix</see> and <b>QuoteSuffix</b>
+    properties to specify delimiters, such as a left and right bracket, that will encapsulate the object name.
+    </para>
+    <para>Note:</para>
+    <para>
+	Although you cannot change the <see cref="FbCommandBuilder.QuotePrefix">QuotePrefix</see> or <see cref="FbCommandBuilder.QuoteSuffix">QuoteSuffix</see>
+	properties after an insert, update, or delete command has been generated, you can change their 
+	settings after calling the Update method of an <see cref="FbDataAdapter">FbDataAdapter</see>.
+    </para>
+    </remarks>
+</member>
+
+<member name="P:SelectCommand">
+    <summary>
+    Gets the <see cref="FbDataAdapter.SelectCommand">SelectCommand</see> of the DataAdapter associated with the CommandBuilder.
+    </summary>
+    <value>A <see cref="FbCommand">FbCommand</see> object</value>
+</member>
+
+<member name="M:BuildInsertCommand(System.Data.DataRow,System.Data.Common.DataTableMapping)">
+    <summary>
+    Builds insert command.
+    </summary>
+	<param name="row">The DataRow to update.</param>
+	<param name="tableMapping">The DataTableMapping sent through Update.</param>
+    <returns>An FbCommand object.</returns>
+</member>
+
+<member name="M:BuildUpdateCommand(System.Data.DataRow,System.Data.Common.DataTableMapping)">
+    <summary>
+    Builds update command.
+    </summary>
+	<param name="row">The DataRow to update.</param>
+	<param name="tableMapping">The DataTableMapping sent through Update.</param>
+    <returns>An FbCommand object.</returns>
+</member>
+
+<member name="M:BuildDeleteCommand(System.Data.DataRow,System.Data.Common.DataTableMapping)">
+    <summary>
+    Builds delete command.
+    </summary>
+	<param name="row">The DataRow to update.</param>
+	<param name="tableMapping">The DataTableMapping sent through Update.</param>
+    <returns>An FbCommand object.</returns>
+</member>
+
+<member name="M:IsUpdateble(System.Data.DataRow,System.Data.DataRow)">
+    <summary>
+    Returns a value indicating if the field is updatable or not.
+    </summary>
+	<param name="schemaRow">The DataRow to update.</param>
+	<param name="row">The DataRow to update.</param>
+    <returns><b>true</b> if the field is update; or <b>false</b> if not</returns>
+</member>
+
+<member name="M:IncludedInWhereClause(System.Data.DataRow)">
+    <summary>
+    Returns a value indicating if the field can be included in WHERE clausule.
+    </summary>
+	<param name="schemaRow">The DataRow to update.</param>
+    <returns><b>true</b> if the field can be in WHERE Clausule; or <b>false</b> if not</returns>
+</member>
+
+</doc>

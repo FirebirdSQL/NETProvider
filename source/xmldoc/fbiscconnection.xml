@@ -1,0 +1,93 @@
+<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbIscConnection">
+	<summary>
+		Represents an open connection to a Firebird database. 
+		This class cannot be inherited.	
+	</summary>
+</member>
+<member name="M:Open">
+	<summary>
+	Opens a database connection with the property settings specified by the 
+	ConnectionString.
+	</summary>
+</member>
+<member name="M:ParseConnectionString">
+	<summary>
+	Validates a Connection String
+	</summary>
+	<param name="connStr">Connection String</param>
+	<returns>true if the connection string is valid or false if not</returns>
+</member>
+<member name="M:ClearWarnings">
+	<summary>
+	Clear the list of warning messages sent from Firebird Server.
+	</summary>
+</member>
+<member name="M:Close">
+	<summary>
+	Closes the connection to the database. 
+	</summary>
+</member>
+<member name="M:VerifyAttachedDB">
+	<summary>
+	Verifies that the connection to the database exist.
+	</summary>
+</member>
+<member name="P:Role">
+	<summary>
+	Gets the User Role.
+	</summary>
+	<value>The user role.</value>
+</member>
+<member name="P:Dialect">
+	<summary>
+	Gets the dialect of the database.
+	</summary>	
+	<value>The Database dialect.</value>
+</member>
+<member name="P:Charset">
+	<summary>
+	Gets the Charset encoding of the database.
+	</summary>
+	<value>The database character set.</value>
+	<remarks>
+		<para>
+		For a complete list of Character sets availiables see <see cref="FbConnection.ConnectionString">ConnectionString</see>.
+		</para>
+	</remarks>
+</member>
+<member name="P:DataSource">
+	<summary>
+	Gets the name of the instance of FirebirdSQL to which to connect.
+	</summary>
+	<value>
+	The name of the instance of FirebirdSQL to which to connect. The default value is 
+	an empty string.
+	</value>
+</member>
+</doc>

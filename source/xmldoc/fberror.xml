@@ -1,0 +1,113 @@
+﻿<!--
+//
+// Firebird .Net Data Provider - Firebird managed data provider for .Net and Mono
+//
+// Author : Carlos Guzman Alvarez <carlosga@telefonica.net>
+//
+// Distributable under LGPL license.
+// You may obtain a copy of the License at http://www.gnu.org/copyleft/lesser.html
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// LGPL License for more details.
+//
+// This file was created by members of the firebird development team.
+// All individual contributions remain the Copyright (C) of those
+// individuals.  Contributors to this file are either listed here or
+// can be obtained from a CVS history command.
+//
+// All rights reserved.
+//
+// For more information please see http://www.firebirdsql.org
+//
+-->
+
+<doc>
+<member name="T:FbError">
+    <summary>
+    Collects information relevant to a warning or error returned by Firebird. 
+    This class cannot be inherited.
+    </summary>
+    <remarks>
+	<para>
+	This class is created by the Firebird .NET Data Provider when an error occurs. 
+	An instance of <b>FbError</b> is created and managed by the <see cref="FbException">FbException</see> class.
+	</para>
+    </remarks>
+    <example>
+    <code>
+public void DisplayFbErrors(FbException myException) 
+{
+    for (int i=0; i &lt; myException.Errors.Count; i++)
+    {
+       MessageBox.Show("Index #" + i + "\n" +
+            "Error: " + myException.Errors[i].ToString() + "\n");
+    }
+}
+     </code>
+    </example>    
+</member>
+<member name="M:#ctor">
+    <summary>
+    Initializes a new instance of the <see cref="FbError">FbError</see> class.
+    </summary>
+</member>
+<member name="M:#ctor(System.String,System.Int32)">
+    <summary>
+    Initializes a new instance of the <see cref="FbError">FbError</see> class.
+    </summary>
+    <param name="message">Error message</param>
+    <param name="number">Error Number</param>
+</member>
+<member name="M:#ctor(System.Byte,System.String,System.Int32)">
+    <summary>
+    Initializes a new instance of the <see cref="FbError">FbError</see> class.
+    </summary>
+    <param name="classError">Security level</param>
+    <param name="message">Error message</param>
+    <param name="number">Error number</param>
+</member>
+<member name="M:#ctor(System.Byte,System.Int32,System.String,System.Int32)">
+    <summary>
+    Initializes a new instance of the <see cref="FbError">FbError</see> class.
+    </summary>
+    <param name="classError">Security level</param>
+    <param name="line">Line number</param>
+    <param name="message">Error message</param>
+    <param name="number">Error number</param>
+</member>
+<member name="P:Class">
+    <summary>
+    Gets the severity level of the error returned from Firebird.
+    </summary>
+    <value>
+    A value from 1 to 25 that indicates the severity level of the error. 
+    The default is 0.
+    </value>
+</member>
+<member name="P:LineNumber">
+    <summary>
+    Bets the line number within the DSQL command batch or stored procedure 
+    that contains the error.
+    </summary>
+    <value>
+    The line number within the DSQL command batch or stored 
+    procedure that contains the error.
+    </value>
+    <remarks>
+    Line numbering starts at 1. If the value is 0, the line number is 
+    not applicable.
+    </remarks>
+</member>
+<member name="P:Message">
+    <summary>
+    Gets the text describing the error.
+    </summary>
+</member>
+<member name="P:Number">
+    <summary>
+    Gets a number that identifies the type of error.
+    </summary>
+</member>
+</doc>
