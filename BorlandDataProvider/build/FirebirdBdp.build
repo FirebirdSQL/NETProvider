@@ -15,10 +15,10 @@
   <!-- Platform specific properties. These are the defaults -->
   <property name="current.build.task" value="build" />
   <property name="current.build.help.task" value="build-help" />
-
+  
   <!-- Paths properties -->
   <property name="bdp.assembly.dir" value="../lib" />
-  <property name="provider.base.dir" value="../../NETProvider_17/source" />
+  <property name="provider.base.dir" value="../../../tags/NETProvider_1.7.1/source" />
   <property name="base.dir" value="../source" />
   
   <!-- Check for NUnit -->
@@ -30,7 +30,7 @@
       <sysinfo />
       <property 
         name="nunit.framework.dll"
-        value="${sys.os.folder.programfiles}\NUnit-Net-1.1 2.2.8\bin\nunit.framework.dll"
+        value="${sys.os.folder.programfiles}\NUnit-Net-1.1 2.2.9\bin\nunit.framework.dll"
         readonly="false"
 			/>
     </if>
