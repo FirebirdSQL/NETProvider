@@ -181,7 +181,10 @@ namespace FirebirdSql.VisualStudio.DataTools
             }
             else if (sender.Equals(this.txtPort))
             {
-                this.SetProperty("Port Number", Convert.ToInt32(this.txtPort.Text));
+                if (!String.IsNullOrEmpty(this.txtPort.Text))
+                {
+                    this.SetProperty("Port Number", Convert.ToInt32(this.txtPort.Text));
+                }
             }
             else if (sender.Equals(this.cboCharset))
             {
@@ -189,10 +192,14 @@ namespace FirebirdSql.VisualStudio.DataTools
             }
             else if (sender.Equals(this.cboDialect))
             {
-                this.SetProperty("Dialect", Convert.ToInt32(this.cboDialect.Text));
+                if (!String.IsNullOrEmpty(this.cboDialect.Text))
+                {
+                    this.SetProperty("Dialect", Convert.ToInt32(this.cboDialect.Text));
+                }
             }
             else if (sender.Equals(this.cboServerType))
             {
+                if (!String.IsNullOrEmpty)
                 this.SetProperty("Server Type", Convert.ToInt32(this.cboServerType.SelectedIndex));
             }
         }
