@@ -51,12 +51,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FbProfileProvider1.5.sql" />
-    <None Include="FbRoleProvider1.5.sql" />
-    <None Include="FbSessionStateStore.sql" />
-    <None Include="FirebirdMemberShipProvider1.5.sql" />
     <None Include="FirebirdSql.Web.Providers.snk" />
-    <None Include="WebProviders1.5.sql" />
+    <None Include="sql_scripts\FbMembershipProvider1.5.sql" />
+    <None Include="sql_scripts\FbProfileProvider1.5.sql" />
+    <None Include="sql_scripts\FbRoleProvider1.5.sql" />
+    <None Include="sql_scripts\FbSessionStateStore.sql" />
+    <None Include="sql_scripts\WebProviders1.5.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
