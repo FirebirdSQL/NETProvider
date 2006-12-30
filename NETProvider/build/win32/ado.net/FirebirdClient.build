@@ -225,8 +225,8 @@
       tofile="${build.dir}/FbRoleProvider1.5.sql"
     />
     <copy 
-      file="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/FirebirdMemberShipProvider1.5.sql"
-      tofile="${build.dir}/FirebirdMemberShipProvider1.5.sql"
+      file="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/FbMembershipProvider1.5.sql"
+      tofile="${build.dir}/FbMembershipProvider1.5.sql"
     />
     <copy 
       file="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/FbProfileProvider1.5.sql"
