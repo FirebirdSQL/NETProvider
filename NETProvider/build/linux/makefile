@@ -1,7 +1,7 @@
-PROVIDER = FirebirdSql.Data.FirebirdClient.dll
+<div class="moz-text-flowed" style="font-family: -moz-fixed">PROVIDER = FirebirdSql.Data.FirebirdClient.dll
 PROVIDER_TESTS = FirebirdSql.Data.FirebirdClient.UnitTests.dll
 
-all: preprocess ${PROVIDER} ${PROVIDER_TESTS} install clean 
+all: preprocess ${PROVIDER} ${PROVIDER_TESTS} install clean
 
 # TOOLS
 
@@ -25,9 +25,10 @@ RESOURCES=${BASE_DIR}/Resources
 
 # RESOURCES
 
-COMMON_RESOURCES = -resource:${RESOURCES}/isc_error_msg.resources,FirebirdSql.Data.Common.Resources.isc_error_msg.resources
-
-TOOL_RESOURCES = -resource:${RESOURCES}/FbConnection.bmp,FirebirdSql.Data.Firebird.Resources.FbConnection.bmp -resource:${RESOURCES}/Resources/FbCommand.bmp,FirebirdSql.Data.Firebird.Resources.FbCommand.bmp -resource:${RESOURCES}/Resources/FbDataAdapter.bmp,FirebirdSql.Data.Firebird.Resources.FbDataAdapter.bmp
+COMMON_RESOURCES = 
+-resource:${RESOURCES}/isc_error_msg.resources,FirebirdSql.Resources.isc_error_msg.resources
+SCHEMA_RESOURCES = 
+-resource:${BASE_DIR}/FirebirdSql/Data/Schema/FbMetaData.xml,FirebirdSql.Data.Schema.FbMetaData.xml
 
 # DEFINES
 
@@ -35,17 +36,24 @@ DEFINE = -define:RELEASE -define:MONO -define:LINUX
 
 # REFERENCES
 
-PROVIDER_FLAGS = -reference:System.dll -reference:System.Data.dll -reference:System.Xml.dll -reference:System.Drawing.dll
-
-PROVIDER_TESTS_FLAGS = -reference:System.dll -reference:System.Data.dll -reference:System.Xml.dll  -reference:System.Drawing.dll -reference:nunit.framework.dll -reference:${PROVIDER}
+PROVIDER_FLAGS = -reference:System.dll -reference:System.Data.dll 
+-reference:System.Xml.dll -reference:System.Drawing.dll
+PROVIDER_TESTS_FLAGS = -reference:System.dll -reference:System.Data.dll 
+-reference:System.Xml.dll -reference:System.Drawing.dll 
+-reference:nunit.framework.dll -reference:${PROVIDER}
 
 # TARGETS
 
 FirebirdSql.Data.FirebirdClient.dll:
-	$(CSC) -target:library -out:$(PROVIDER) $(PROVIDER_FLAGS) $(DEFINE) ${COMMON_RESOURCES} $(TOOL_RESOURCES) -recurse:${COMMON_SOURCES}/*.cs -recurse:${CLIENTS_SOURCES}/*.cs -recurse:${SCHEMA_SOURCES}/*.cs -recurse:${SERVICES_SOURCES}/*.cs -recurse:${ISQL_SOURCES}/*.cs -recurse:${PROVIDER_SOURCES}/*.cs
+	$(CSC) -target:library -out:$(PROVIDER) $(PROVIDER_FLAGS) $(DEFINE) 
+${COMMON_RESOURCES} $(SCHEMA_RESOURCES) -recurse:${COMMON_SOURCES}/*.cs 
+-recurse:${CLIENTS_SOURCES}/*.cs -recurse:${SCHEMA_SOURCES}/*.cs 
+-recurse:${SERVICES_SOURCES}/*.cs -recurse:${ISQL_SOURCES}/*.cs 
+-recurse:${PROVIDER_SOURCES}/*.cs
 
 FirebirdSql.Data.FirebirdClient.UnitTests.dll:
-	$(CSC) -target:library -out:$(PROVIDER_TESTS) $(PROVIDER_TESTS_FLAGS) $(DEFINE) -recurse:${PROVIDER_TESTS_SOURCES}/*.cs
+	$(CSC) -target:library -out:$(PROVIDER_TESTS) $(PROVIDER_TESTS_FLAGS) 
+$(DEFINE) -recurse:${PROVIDER_TESTS_SOURCES}/*.cs
 
 preprocess:
 	$(COPY) ${BASE_DIR}/*.snk .
@@ -55,9 +63,12 @@ install:
 	${MKDIR} -p ${BUILD_DIR}
 	$(COPY) $(PROVIDER) ${BUILD_DIR}
 	$(COPY) $(PROVIDER_TESTS) ${BUILD_DIR}
-	$(COPY) ${PROVIDER_TESTS_SOURCES}/App.config ${BUILD_DIR}/$(PROVIDER_TESTS).config
+	$(COPY) ${PROVIDER_TESTS_SOURCES}/App.config 
+${BUILD_DIR}/$(PROVIDER_TESTS).config
 
 clean:
 	${RM} FirebirdSql.Data.FirebirdClient.snk
 	${RM} $(PROVIDER)
 	${RM} $(PROVIDER_TESTS)
+
+</div>
