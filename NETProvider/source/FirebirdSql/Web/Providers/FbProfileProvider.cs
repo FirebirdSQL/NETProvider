@@ -13,6 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2006 Le Roy Arnaud
+ *  Copyright (c) 2007 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -44,9 +45,9 @@ namespace FirebirdSql.Web.Providers
     {
         #region · Fields ·
 
-        private string  appName;
-        private string  connectionString;
-        private int     commandTimeout;
+        private string appName;
+        private string connectionString;
+        private int commandTimeout;
 
         #endregion
 
@@ -57,7 +58,7 @@ namespace FirebirdSql.Web.Providers
             get { return this.appName; }
             set
             {
-                if (value.Length > 256)
+                if (value.Length > 100)
                 {
                     throw new ProviderException("The application name is too long.");
                 }
@@ -87,7 +88,7 @@ namespace FirebirdSql.Web.Providers
             }
 
             base.Initialize(name, config);
-            
+
             string temp = config["connectionStringName"];
 
             if (temp == null || temp.Length < 1)
@@ -101,9 +102,9 @@ namespace FirebirdSql.Web.Providers
             {
                 throw new ProviderException("Connection string cannot be blank.");
             }
-            
+
             this.connectionString = ConnectionStringSettings.ConnectionString;
-            
+
             if (config["applicationName"] == null || config["applicationName"].Trim() == "")
             {
                 this.appName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
@@ -125,17 +126,17 @@ namespace FirebirdSql.Web.Providers
             config.Remove("commandTimeout");
             config.Remove("connectionStringName");
             config.Remove("applicationName");
-            
+
             if (config.Count > 0)
             {
                 string attribUnrecognized = config.GetKey(0);
-                
+
                 if (!String.IsNullOrEmpty(attribUnrecognized))
                 {
                     throw new ProviderException("Attributes not recognized");
                 }
             }
-        } 
+        }
 
         public override SettingsPropertyValueCollection GetPropertyValues(SettingsContext sc, SettingsPropertyCollection properties)
         {
@@ -176,7 +177,7 @@ namespace FirebirdSql.Web.Providers
         public override void SetPropertyValues(SettingsContext sc, SettingsPropertyValueCollection properties)
         {
             string username = (string)sc["UserName"];
-            
+
             bool userIsAuthenticated = (bool)sc["IsAuthenticated"];
 
             if (username == null || username.Length < 1 || properties.Count < 1)
@@ -184,9 +185,9 @@ namespace FirebirdSql.Web.Providers
                 return;
             }
 
-            string  names   = String.Empty;
-            string  values  = String.Empty;
-            byte[]  buf     = null;
+            string names = String.Empty;
+            string values = String.Empty;
+            byte[] buf = null;
 
             PrepareDataForSaving(ref names, ref values, ref buf, true, properties, userIsAuthenticated);
 
@@ -205,7 +206,7 @@ namespace FirebirdSql.Web.Providers
                     conn.Open();
 
                     FbCommand cmd = new FbCommand("PROFILES_SETPROPERTIES", conn);
-                    
+
                     cmd.CommandTimeout = this.commandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
@@ -237,7 +238,7 @@ namespace FirebirdSql.Web.Providers
         {
             if (profiles == null)
             {
-                throw new ArgumentNullException( "profiles" );
+                throw new ArgumentNullException("profiles");
             }
 
             if (profiles.Count < 1)
@@ -258,11 +259,11 @@ namespace FirebirdSql.Web.Providers
 
         public override int DeleteProfiles(string[] usernames)
         {
-            int             numProfilesDeleted  = 0;
-            bool            beginTranCalled     = false;
-            HttpContext     context             = HttpContext.Current;
-            FbTransaction   transac             = null;
-            FbConnection    conn                = new FbConnection(this.connectionString);
+            int numProfilesDeleted = 0;
+            bool beginTranCalled = false;
+            HttpContext context = HttpContext.Current;
+            FbTransaction transac = null;
+            FbConnection conn = new FbConnection(this.connectionString);
 
             try
             {
@@ -272,7 +273,7 @@ namespace FirebirdSql.Web.Providers
                     FbCommand cmd;
 
                     transac = conn.BeginTransaction();
-                 
+
                     int numUsersRemaing = usernames.Length;
                     while (numUsersRemaing > 0)
                     {
@@ -317,20 +318,20 @@ namespace FirebirdSql.Web.Providers
             try
             {
                 FbConnection conn = null;
-             
+
                 try
                 {
                     conn = new FbConnection(this.connectionString);
                     conn.Open();
 
                     FbCommand cmd = new FbCommand("Profiles_DeleteInactProfiles", conn);
-                    
+
                     cmd.CommandTimeout = this.commandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
                     cmd.Parameters.Add(CreateInputParam("@ProfileAuthOptions", FbDbType.Integer, (int)authenticationOption));
                     cmd.Parameters.Add(CreateInputParam("@InactiveSinceDate", FbDbType.Date, userInactiveSinceDate.ToUniversalTime()));
-                
+
                     object o = cmd.ExecuteNonQuery();
 
                     if (o == null || !(o is int))
@@ -360,7 +361,7 @@ namespace FirebirdSql.Web.Providers
             try
             {
                 FbConnection conn = null;
-                
+
                 try
                 {
                     conn = new FbConnection(this.connectionString);
@@ -373,7 +374,7 @@ namespace FirebirdSql.Web.Providers
                     cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
                     cmd.Parameters.Add(CreateInputParam("@ProfileAuthOptions", FbDbType.Integer, (int)authenticationOption));
                     cmd.Parameters.Add(CreateInputParam("@InactiveSinceDate", FbDbType.Date, userInactiveSinceDate.ToUniversalTime()));
-                    
+
                     object o = cmd.ExecuteScalar();
 
                     if (o == null || !(o is int))
@@ -409,7 +410,7 @@ namespace FirebirdSql.Web.Providers
 
         public override ProfileInfoCollection GetAllInactiveProfiles(ProfileAuthenticationOption authenticationOption, DateTime userInactiveSinceDate, int pageIndex, int pageSize, out int totalRecords)
         {
-            FbParameter [] args = new FbParameter[2];
+            FbParameter[] args = new FbParameter[2];
             args[1] = CreateInputParam("@InactiveSinceDate", FbDbType.Date, userInactiveSinceDate.ToUniversalTime());
             args[0] = CreateInputParam("@UserNameToMatch", FbDbType.VarChar, DBNull.Value);
 
@@ -455,10 +456,10 @@ namespace FirebirdSql.Web.Providers
         private void GetPropertyValuesFromDatabase(string userName, SettingsPropertyValueCollection svc)
         {
             HttpContext context = HttpContext.Current;
-            string[]    names   = null;
-            string      values  = null;
-            byte[]      buf     = null;
-            string      sName   = null;
+            string[] names = null;
+            string values = null;
+            byte[] buf = null;
+            string sName = null;
 
             if (context != null)
             {
@@ -474,7 +475,7 @@ namespace FirebirdSql.Web.Providers
                 {
                     conn = new FbConnection(this.connectionString);
                     conn.Open();
-                    
+
                     FbCommand cmd = new FbCommand("PROFILES_GETPROPERTIES", conn);
 
                     cmd.CommandTimeout = this.commandTimeout;
@@ -517,7 +518,7 @@ namespace FirebirdSql.Web.Providers
                 throw;
             }
         }
-        
+
         private static void ParseDataFromDB(string[] names, string values, byte[] buf, SettingsPropertyValueCollection properties)
         {
             if (names == null || values == null || buf == null || properties == null)
@@ -686,7 +687,7 @@ namespace FirebirdSql.Web.Providers
             allValues = values.ToString();
         }
 
-        private ProfileInfoCollection GetProfilesForQuery(FbParameter [] args, ProfileAuthenticationOption authenticationOption, int pageIndex, int pageSize, out int totalRecords)
+        private ProfileInfoCollection GetProfilesForQuery(FbParameter[] args, ProfileAuthenticationOption authenticationOption, int pageIndex, int pageSize, out int totalRecords)
         {
             if (pageIndex < 0)
             {
@@ -698,9 +699,9 @@ namespace FirebirdSql.Web.Providers
             }
 
             totalRecords = 0;
-            
+
             long upperBound = (long)pageIndex * pageSize + pageSize - 1;
-            
+
             if (upperBound > Int32.MaxValue)
             {
                 throw new ArgumentException("The combination of pageIndex and pageSize cannot exceed the maximum value of System.Int32.");
@@ -711,13 +712,13 @@ namespace FirebirdSql.Web.Providers
                 FbConnection conn = null;
                 FbDataReader reader = null;
                 FbParameterCollection param;
-             
+
                 try
                 {
                     conn = new FbConnection(this.connectionString);
                     conn.Open();
-                    
-                    FbCommand cmd = new FbCommand("PROFILES_GETCOUNTPROFILES", conn);                    
+
+                    FbCommand cmd = new FbCommand("PROFILES_GETCOUNTPROFILES", conn);
 
                     cmd.CommandTimeout = this.commandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -728,16 +729,16 @@ namespace FirebirdSql.Web.Providers
                     {
                         cmd.Parameters.Add(arg);
                     }
-                    
+
                     totalRecords = (int)cmd.ExecuteScalar();
-                    
+
                     ProfileInfoCollection profiles = new ProfileInfoCollection();
                     param = cmd.Parameters;
-                    
+
                     cmd = new FbCommand("Profiles_GetProfiles", conn);
                     cmd.CommandTimeout = this.commandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
-                    
+
                     foreach (FbParameter p in param)
                     {
                         cmd.Parameters.Add(p);
@@ -746,7 +747,7 @@ namespace FirebirdSql.Web.Providers
                     cmd.Parameters.Add(CreateInputParam("@PageIndex", FbDbType.Integer, pageIndex));
                     cmd.Parameters.Add(CreateInputParam("@PageSize", FbDbType.Integer, pageSize));
                     reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
-                    
+
                     while (reader.Read())
                     {
                         string username;
