@@ -13,6 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2006 Le Roy Arnaud
+ *  Copyright (c) 2007 Jiri Cincura
  *	All Rights Reserved.
  */
 
@@ -156,9 +157,9 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_ADDUSERTOROLE", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
-            FbParameter roleParm = cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 255);
-            FbParameter userParm = cmd.Parameters.Add("@Username", FbDbType.VarChar, 255);
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+            FbParameter roleParm = cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100);
+            FbParameter userParm = cmd.Parameters.Add("@Username", FbDbType.VarChar, 100);
             FbTransaction tran = null;
 
             try
@@ -220,8 +221,8 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_CREATEROLE", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 255).Value = rolename;
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
             try
             {
                 conn.Open();
@@ -260,8 +261,8 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_DELETEROLE", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 255).Value = rolename;
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
             FbTransaction tran = null;
 
             try
@@ -309,7 +310,7 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_GETALLROLES", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
 
             FbDataReader reader = null;
 
@@ -363,8 +364,8 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_GETUSERROLES", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
-            cmd.Parameters.Add("@Username", FbDbType.VarChar, 255).Value = username;
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+            cmd.Parameters.Add("@Username", FbDbType.VarChar, 100).Value = username;
             FbDataReader reader = null;
 
             try
@@ -416,8 +417,8 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_GETROLEUSERS", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 255).Value = rolename;
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
 
             FbDataReader reader = null;
 
@@ -470,9 +471,9 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_ISUSERINROLE", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 255).Value = rolename;
-            cmd.Parameters.Add("@Username", FbDbType.VarChar, 255).Value = username;            
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
+            cmd.Parameters.Add("@Username", FbDbType.VarChar, 100).Value = username;            
 
             try
             {
@@ -528,9 +529,9 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_DELETEUSERROLE", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
-            FbParameter roleParm = cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 255);
-            FbParameter userParm = cmd.Parameters.Add("@Username", FbDbType.VarChar, 255);
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+            FbParameter roleParm = cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100);
+            FbParameter userParm = cmd.Parameters.Add("@Username", FbDbType.VarChar, 100);
             FbTransaction tran = null;
 
             try
@@ -583,8 +584,8 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_ISEXISTS", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 255).Value = rolename;
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
 
             try
             {
@@ -621,9 +622,9 @@ namespace FirebirdSql.Web.Providers
             FbConnection conn = new FbConnection(connectionString);
             FbCommand cmd = new FbCommand("ROLES_FINDROLEUSERS", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 255).Value = pApplicationName;
-            cmd.Parameters.Add("@RoleName", FbDbType.VarChar, 255).Value = rolename;
-            cmd.Parameters.Add("@UsernameSearch", FbDbType.VarChar, 255).Value = usernameToMatch.ToUpper();
+            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = pApplicationName;
+            cmd.Parameters.Add("@RoleName", FbDbType.VarChar, 100).Value = rolename;
+            cmd.Parameters.Add("@UsernameSearch", FbDbType.VarChar, 100).Value = usernameToMatch.ToUpper();
 
             string tmpUserNames = "";
             FbDataReader reader = null;
