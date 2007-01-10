@@ -1,6 +1,22 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+2007-01-10 Jiri Cincura <jiri@cincura.net>
+
+	* FirebirdSql\Web\Providers\FbMemberShipProvider.cs
+	* FirebirdSql\Web\Providers\FbProfileProvider.cs
+	* FirebirdSql\Web\Providers\FbRoleProvider.cs
+	* FirebirdSql\Web\Providers\FbSessionStateStore.cs
+
+		- Code of providers refactored to be able to use all of FB's potencial (i.e. indices).
+		
+	* FirebirdSql\Web\Providers\sql_scripts\FbMembershipProvider1.5.sql
+	* FirebirdSql\Web\Providers\sql_scripts\FbProfileProvider1.5.sql
+	* FirebirdSql\Web\Providers\sql_scripts\FbRoleProvider1.5.sql
+	* FirebirdSql\Web\Providers\sql_scripts\FbSessionStateStore.sql
+	* FirebirdSql\Web\Providers\sql_scripts\WebProviders1.5.sql
+
+		- Scripts for providers are also improved (not finished yet).
 
 --------------------------------- 2.1.0 Beta 1  --------------------------------- 
 
