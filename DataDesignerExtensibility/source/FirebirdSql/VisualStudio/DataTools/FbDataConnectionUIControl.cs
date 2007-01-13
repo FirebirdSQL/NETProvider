@@ -199,8 +199,10 @@ namespace FirebirdSql.VisualStudio.DataTools
             }
             else if (sender.Equals(this.cboServerType))
             {
-                if (!String.IsNullOrEmpty)
-                this.SetProperty("Server Type", Convert.ToInt32(this.cboServerType.SelectedIndex));
+                if (this.cboServerType.SelectedIndex != -1)
+                {
+                    this.SetProperty("Server Type", Convert.ToInt32(this.cboServerType.SelectedIndex));
+                }
             }
         }
 
