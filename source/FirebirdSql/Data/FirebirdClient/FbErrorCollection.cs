@@ -54,7 +54,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         internal FbErrorCollection()
         {
-            //this.errors = ArrayList.Synchronized(new ArrayList());
             this.errors = new List<FbError>();
         }
 
