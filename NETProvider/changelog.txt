@@ -3,6 +3,12 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 
 2007-01-10 Jiri Cincura <jiri@cincura.net>
 
+	* FirebirdSql\Data\FirebirdClient\FbDataAdapter.cs
+
+		- Update method implemented using generics.
+
+2007-01-10 Jiri Cincura <jiri@cincura.net>
+
 	* FirebirdSql\Web\Providers\FbMemberShipProvider.cs
 	* FirebirdSql\Web\Providers\FbProfileProvider.cs
 	* FirebirdSql\Web\Providers\FbRoleProvider.cs
