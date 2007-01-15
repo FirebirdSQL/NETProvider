@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2006 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -22,6 +25,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -207,12 +211,12 @@ namespace FirebirdSql.Data.FirebirdClient
 		/// </summary>
 		protected override int Update(DataRow[] dataRows, DataTableMapping tableMapping)
 		{
-			int						updated			= 0;
-			IDbCommand				command			= null;
-			StatementType			statementType	= StatementType.Insert;
-			ArrayList				connections		= new ArrayList();
-			RowUpdatingEventArgs	updatingArgs	= null;
-			Exception				updateException = null;
+			int						    updated			= 0;
+			IDbCommand				    command			= null;
+			StatementType			    statementType	= StatementType.Insert;
+            ICollection<IDbConnection>  connections     = new List<IDbConnection>();
+			RowUpdatingEventArgs	    updatingArgs	= null;
+			Exception				    updateException = null;
 
 			foreach (DataRow row in dataRows)
 			{
@@ -525,7 +529,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        private void CloseConnections(ArrayList connections)
+        private void CloseConnections(ICollection<IDbConnection> connections)
         {
             foreach (IDbConnection c in connections)
             {
