@@ -1,6 +1,16 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+2007-01-25 Jiri Cincura <jiri@cincura.net>
+
+	* FirebirdSql\Web\Providers\FbSessionStateStore.cs
+
+		- Changed provider code to fit new naming.
+		
+	* FirebirdSql\Web\Providers\sql_scripts\FbSessionStateStore1.5.sql
+		- Changed columns naming.
+		- Changed definition to fit to FB 1.5.
+
 2007-01-10 Jiri Cincura <jiri@cincura.net>
 
 	* FirebirdSql\Data\FirebirdClient\FbDataAdapter.cs
