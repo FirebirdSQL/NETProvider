@@ -336,6 +336,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 						updated++;
 
+                        // http://forums.microsoft.com/MSDN/ShowPost.aspx?PostID=933212&SiteID=1
+                        if (statementType == StatementType.Insert)
+                        {
+                            row.AcceptChanges();
+                        }
+
 						/* 4. If the command is	set	to FirstReturnedRecord,	then the 
 						 * first returned result is	placed in the DataRow. 
 						 * 
