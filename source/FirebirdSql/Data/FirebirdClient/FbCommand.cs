@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2006 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -682,9 +685,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (this.Parameters.Count > 0 && this.statement != null)
 			{
-				IEnumerator paramEnumerator = this.Parameters.GetEnumerator();
-				int i = 0;
-
 				if (this.statement != null &&
 					this.statement.StatementType == DbStatementType.StoredProcedure)
 				{
@@ -696,10 +696,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					if (values != null && values.Length > 0)
 					{
-						while (paramEnumerator.MoveNext())
+                        int i = 0;
+                        foreach (FbParameter parameter in this.Parameters)
 						{
-							FbParameter parameter = (FbParameter)paramEnumerator.Current;
-
 							if (parameter.Direction == ParameterDirection.Output ||
 								parameter.Direction == ParameterDirection.InputOutput ||
 								parameter.Direction == ParameterDirection.ReturnValue)
