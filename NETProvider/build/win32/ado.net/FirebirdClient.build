@@ -220,26 +220,11 @@
     <call target="${project.config}" />
 
     <!-- Copy SQL Scripts -->
-    <copy 
-      file="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/FbRoleProvider1.5.sql"
-      tofile="${build.dir}/FbRoleProvider1.5.sql"
-    />
-    <copy 
-      file="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/FbMembershipProvider1.5.sql"
-      tofile="${build.dir}/FbMembershipProvider1.5.sql"
-    />
-    <copy 
-      file="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/FbProfileProvider1.5.sql"
-      tofile="${build.dir}/FbProfileProvider1.5.sql"
-    />
-    <copy 
-      file="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/FbSessionStateStore.sql"
-      tofile="${build.dir}/FbSessionStateStore.sql"
-    />
-    <copy 
-      file="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/WebProviders1.5.sql"
-      tofile="${build.dir}/WebProviders1.5.sql"
-    />
+    <copy todir="${build.dir}">
+      <fileset basedir="${source.dir}/FirebirdSql/Web/Providers/sql_scripts/">
+        <include name="*.sql" />
+      </fileset>
+    </copy>
 
     <!--doc="${build.dir}/${project::get-name()}.xml" -->
     <csc target="library" 
