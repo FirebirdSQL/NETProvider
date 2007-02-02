@@ -1,6 +1,12 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+2007-02-02 Jiri Cincura <jiri@cincura.net>
+
+	* FirebirdSql\Data\FirebirdClient\FbCommand.cs
+
+		- SetOutputParameters method refactored (using foreach).
+		
 2007-01-25 Jiri Cincura <jiri@cincura.net>
 
 	* FirebirdSql\Web\Providers\FbSessionStateStore.cs
