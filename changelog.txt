@@ -1,6 +1,17 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+
+2007-02-03 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+
+	* FirebirdSql\Data\FirebirdClient\FbCommand.cs
+	* FirebirdSql\Data\FirebirdClient\FbParameter.cs
+	* FirebirdSql\Data\FirebirdClient\FbParameterCollection.cs
+
+		- Initial changes to allow parameter names to be specified without @.
+		( Testing pending will be done tomorrow )
+
 2007-02-02 Jiri Cincura <jiri@cincura.net>
 
 	* FirebirdSql\Data\FirebirdClient\FbCommand.cs
