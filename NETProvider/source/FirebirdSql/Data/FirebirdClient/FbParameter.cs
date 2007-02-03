@@ -241,6 +241,19 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.parent = value; }
 		}
 
+        internal string InternalParameterName
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(this.parameterName) && !this.parameterName.StartsWith("@"))
+                {
+                    return String.Format("@{0}", this.ParameterName);
+                }
+
+                return this.ParameterName;
+            }
+        }
+
 		#endregion
 
 		#region · Constructors ·
