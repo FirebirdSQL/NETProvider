@@ -1226,7 +1226,7 @@ namespace FirebirdSql.Data.FirebirdClient
 							this.Parameters[i].Direction == ParameterDirection.InputOutput)
 						{
 							// Append parameter	name to parameter list
-							paramsText.Append(this.Parameters[i].ParameterName);
+							paramsText.Append(this.Parameters[i].InternalParameterName);
 							if (i != this.Parameters.Count - 1)
 							{
 								paramsText = paramsText.Append(",");
