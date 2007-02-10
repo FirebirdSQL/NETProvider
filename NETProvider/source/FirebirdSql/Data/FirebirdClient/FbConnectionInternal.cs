@@ -354,6 +354,10 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 throw new ArgumentException("Already enlisted in a transaction");
             }
+            if (transaction == null)
+            {
+                throw new ArgumentException("There is no active TransactionScope");
+            }
 
             this.enlistmentNotification             = new FbEnlistmentNotification(this, transaction);
             this.enlistmentNotification.Completed   += new EventHandler(EnlistmentCompleted);
