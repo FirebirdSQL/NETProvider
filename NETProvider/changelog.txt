@@ -1,6 +1,11 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+2007-02-10 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* FirebirdSql\Data\FirebirdClient\FbConnectionInternal.cs
+
+		- Throw exception when the connection should be enlisted and there are no active transaction ( Sytem.Transactions )
 
 2007-02-03 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
