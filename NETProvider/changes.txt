@@ -2,6 +2,21 @@ WHAT IS NEW - FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ========================================================================
 
 
+· v2.1.0 Beta 2 ( 2007-02-11 ) ·
+
+( Please review the changelog for details )
+
+
+New features:
+
+	- FbParameter class now should allow parameter names to be specified without @
+
+Changes:
+
+	- Updates on Web Providers.
+
+	- More changes on Generics usage.
+
 
 · v2.1.0 Beta 1 ( 2006-10-27 ) ·
 
