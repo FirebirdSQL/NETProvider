@@ -1,6 +1,12 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+2007-02-15 Jiri Cincura <jiri@cincura.net>
+
+	* FirebirdSql\Data\Client\Gds\GdsArray.cs
+
+		- EncodeSliceArray method refactored (using foreach).
+
 2007-02-10 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql\Data\FirebirdClient\FbConnectionInternal.cs
