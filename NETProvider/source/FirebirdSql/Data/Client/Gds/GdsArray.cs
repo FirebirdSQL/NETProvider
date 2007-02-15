@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2006 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -335,7 +338,6 @@ namespace FirebirdSql.Data.Client.Gds
 
 		private byte[] EncodeSliceArray(Array sourceArray)
 		{
-			IEnumerator i		= sourceArray.GetEnumerator();
 			DbDataType	dbType	= DbDataType.Array;
 			Charset		charset = this.db.Charset;
 			XdrStream	xdr		= new XdrStream(this.db.Charset);
@@ -345,54 +347,54 @@ namespace FirebirdSql.Data.Client.Gds
 			type = TypeHelper.GetFbType(this.Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, subType, this.Descriptor.Scale);
 
-			while (i.MoveNext())
+            foreach (object source in sourceArray)
 			{
 				switch (dbType)
 				{
 					case DbDataType.Char:
-						byte[] buffer = charset.GetBytes(i.Current.ToString());
+						byte[] buffer = charset.GetBytes(source.ToString());
 						xdr.WriteOpaque(buffer, this.Descriptor.Length);
 						break;
 
 					case DbDataType.VarChar:
-						xdr.Write((string)i.Current);
+						xdr.Write((string)source);
 						break;
 
 					case DbDataType.SmallInt:
-						xdr.Write((short)i.Current);
+						xdr.Write((short)source);
 						break;
 
 					case DbDataType.Integer:
-						xdr.Write((int)i.Current);
+						xdr.Write((int)source);
 						break;
 
 					case DbDataType.BigInt:
-						xdr.Write((long)i.Current);
+						xdr.Write((long)source);
 						break;
 
 					case DbDataType.Decimal:
 					case DbDataType.Numeric:
-						xdr.Write((decimal)i.Current, type, this.Descriptor.Scale);
+						xdr.Write((decimal)source, type, this.Descriptor.Scale);
 						break;
 
 					case DbDataType.Float:
-						xdr.Write((float)i.Current);
+						xdr.Write((float)source);
 						break;
 
 					case DbDataType.Double:
-						xdr.Write((double)i.Current);
+						xdr.Write((double)source);
 						break;
 
 					case DbDataType.Date:
-						xdr.WriteDate(Convert.ToDateTime(i.Current, CultureInfo.CurrentCulture.DateTimeFormat));
+						xdr.WriteDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
 						break;
 
 					case DbDataType.Time:
-						xdr.WriteTime(Convert.ToDateTime(i.Current, CultureInfo.CurrentCulture.DateTimeFormat));
+						xdr.WriteTime(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
 						break;
 
 					case DbDataType.TimeStamp:
-						xdr.Write(Convert.ToDateTime(i.Current, CultureInfo.CurrentCulture.DateTimeFormat));
+						xdr.Write(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
 						break;
 
 					default:
