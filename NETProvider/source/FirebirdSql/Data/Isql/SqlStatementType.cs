@@ -304,6 +304,21 @@ namespace FirebirdSql.Data.Isql
         Prepare,
 
         /// <summary>
+        /// Represents the SQL statement: <b>RECREATE PROCEDURE</b>
+        /// </summary>
+        RecereateProcedure,
+
+        /// <summary>
+        /// Represents the SQL statement: <b>RECREATE TABLE</b>
+        /// </summary>
+        RecreateTable,
+
+        /// <summary>
+        /// Represents the SQL statement: <b>RECREATE VIEW</b>
+        /// </summary>
+        RecreateView,
+
+        /// <summary>
         /// Represents the SQL statement: <b>REVOKE</b>
         /// </summary>
         Revoke,
