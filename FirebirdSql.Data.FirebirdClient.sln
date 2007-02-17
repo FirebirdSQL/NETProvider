@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual C# Express 2005
+# Visual Studio 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient", "source\FirebirdSql\FirebirdSql.Data.FirebirdClient.csproj", "{326A24F9-6259-45DB-835C-18DB80728460}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Web.Providers", "source\FirebirdSql\Web\Providers\FirebirdSql.Web.Providers.csproj", "{E4CE816A-20E4-4281-B547-B9C02F24F2E7}"
@@ -50,11 +50,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{326A24F9-6259-45DB-835C-18DB80728460} = {A7C83F08-D435-44A0-81BA-2FD8948140FF}
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7} = {38353960-32EB-4BF5-8C03-3384E8B9AC01}
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172} = {30D59198-D370-40C5-867F-10E26DB8CA39}
-		{69159A40-A85B-4E2D-ABF6-42C89AB00FBC} = {FA843A5D-024B-4FF5-BE9F-20347245B252}
 	EndGlobalSection
 EndGlobal
