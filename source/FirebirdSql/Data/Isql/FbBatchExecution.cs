@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
+ *  Copyright (c) 2003-2007 Abel Eduardo Pereira
  *  All Rights Reserved.
  */
 
@@ -335,6 +335,19 @@ namespace FirebirdSql.Data.Isql
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
+                        case SqlStatementType.RecereateProcedure:
+                        case SqlStatementType.RecreateTable:
+                        case SqlStatementType.RecreateView:
+                            // raise the event
+                            this.OnCommandExecuting(this.sqlCommand);
+
+                            rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
+                            this.requiresNewConnection = false;
+
+                            // raise the event
+                            this.OnCommandExecuted(sqlStatement, null, rowsAffected);
+                            break;
+
 						case SqlStatementType.Rollback:
 							// raise the event
 							this.OnCommandExecuting(null);
@@ -420,7 +433,6 @@ namespace FirebirdSql.Data.Isql
 
 			this.sqlConnection.Close();
 		}
-
 		
 		#endregion
 
@@ -963,6 +975,18 @@ namespace FirebirdSql.Data.Isql
                     if (StringParser.StartsWith(sqlStatement, "REVOKE", true))
                     {
                         return SqlStatementType.Revoke;
+                    }
+                    if (StringParser.StartsWith(sqlStatement, "RECREATE PROCEDURE", true))
+                    {
+                        return SqlStatementType.RecereateProcedure;
+                    }
+                    if (StringParser.StartsWith(sqlStatement, "RECREATE TABLE", true))
+                    {
+                        return SqlStatementType.RecreateTable;
+                    }
+                    if (StringParser.StartsWith(sqlStatement, "RECREATE VIEW", true))
+                    {
+                        return SqlStatementType.RecreateView;
                     }
                     if (StringParser.StartsWith(sqlStatement, "ROLLBACK", true))
                     {
