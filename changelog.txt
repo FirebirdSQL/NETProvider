@@ -2,6 +2,18 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-03-08 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* Commited Dean Harding changes to dinamically load client libraries when woriking with the
+	embedded server support.
+
+	Client Library could be specified using the ClientLibrary connection string parameter.
+
+	* FirebirdSql\Data\Common\Charset.cs
+	* FirebirdSql\Data\FirebirdClient\FbCharset.cs
+
+		- Added support for Koi8R and Koi8U character sets.
+
 2007-02-17 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 
