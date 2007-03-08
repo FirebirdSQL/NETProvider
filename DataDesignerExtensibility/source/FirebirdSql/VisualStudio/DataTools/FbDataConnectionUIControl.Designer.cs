@@ -306,7 +306,9 @@ namespace FirebirdSql.VisualStudio.DataTools
             "WIN1252",
             "WIN1253",
             "WIN1254",
-            "WIN1257"});
+            "WIN1257",
+            "KOI8R",
+            "KOI8U"});
             this.cboCharset.Location = new System.Drawing.Point(313, 17);
             this.cboCharset.Name = "cboCharset";
             this.cboCharset.Size = new System.Drawing.Size(144, 21);
