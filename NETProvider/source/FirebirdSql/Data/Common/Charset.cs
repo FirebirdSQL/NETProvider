@@ -125,6 +125,14 @@ namespace FirebirdSql.Data.Common
             Charset.Add(charsets, 59, "WIN1256", 1, "windows-1256");
             // Windows Baltic	
             Charset.Add(charsets, 60, "WIN1257", 1, "windows-1257");
+            // UTF-16
+            // Charset.Add(charsets, 61, "UTF16", 4, "utf-16");
+            // UTF-32
+            // Charset.Add(charsets, 62, "UTF32", 4, "utf-32");
+            // Russian KOI8R
+            Charset.Add(charsets, 63, "KOI8R", 2, "koi8-r");
+            // Ukrainian KOI8U
+            Charset.Add(charsets, 64, "KOI8U", 2, "koi8-u");
 
             return charsets;
         }
