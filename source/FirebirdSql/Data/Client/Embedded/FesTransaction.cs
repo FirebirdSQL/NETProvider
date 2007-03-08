@@ -175,7 +175,7 @@ namespace FirebirdSql.Data.Client.Embedded
 
 					int trHandle = this.handle;
 
-					FbClient.isc_start_multiple(
+					db.FbClient.isc_start_multiple(
 						this.statusVector,
 						ref	trHandle,
 						1,
@@ -227,7 +227,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 
                 int trHandle = this.handle;
 
-				FbClient.isc_commit_transaction(this.statusVector, ref trHandle);
+				db.FbClient.isc_commit_transaction(this.statusVector, ref trHandle);
 
 				this.handle = trHandle;
 
@@ -255,7 +255,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 
                 int trHandle = this.handle;
 
-				FbClient.isc_rollback_transaction(this.statusVector, ref trHandle);
+				db.FbClient.isc_rollback_transaction(this.statusVector, ref trHandle);
 
 				this.handle = trHandle;
 
@@ -283,7 +283,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 
                 int trHandle = this.handle;
 
-				FbClient.isc_commit_retaining(this.statusVector, ref trHandle);
+				db.FbClient.isc_commit_retaining(this.statusVector, ref trHandle);
 
 				this.db.ParseStatusVector(this.statusVector);
 
@@ -302,7 +302,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 
                 int trHandle = this.handle;
 
-				FbClient.isc_rollback_retaining(this.statusVector, ref trHandle);
+				db.FbClient.isc_rollback_retaining(this.statusVector, ref trHandle);
 
 				this.db.ParseStatusVector(this.statusVector);
 

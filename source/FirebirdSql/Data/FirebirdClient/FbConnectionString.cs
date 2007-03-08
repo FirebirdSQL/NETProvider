@@ -85,6 +85,8 @@ namespace FirebirdSql.Data.FirebirdClient
             synonyms.Add("records affected", "records affected");
             synonyms.Add("context connection", "context connection");
             synonyms.Add("enlist", "enlist");
+			synonyms.Add("clientlibrary", "client library");
+            synonyms.Add("client library", "client library");
 
 			return synonyms;
 		}
@@ -199,6 +201,11 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             get { return this.GetBoolean("enlist"); }
         }
+
+		public string ClientLibrary
+		{
+			get { return this.GetString("client library"); }
+		}
 
         #endregion
 
@@ -365,6 +372,7 @@ namespace FirebirdSql.Data.FirebirdClient
             this.options.Add("records affected", true);
             this.options.Add("context connection", false);
             this.options.Add("enlist", false);
+			this.options.Add("client library", "fbembed");
 		}
 
         private void ParseConnectionInfo(string connectInfo)

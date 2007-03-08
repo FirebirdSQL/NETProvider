@@ -130,7 +130,7 @@ namespace FirebirdSql.Data.Services
 			if (this.svc == null)
 			{
 				// New instance	for	Service	handler
-				this.svc = ClientFactory.CreateServiceManager(this.csManager.ServerType);
+				this.svc = ClientFactory.CreateServiceManager(this.csManager);
 			}
 
 			return this.svc.CreateParameterBuffer();
@@ -182,7 +182,7 @@ namespace FirebirdSql.Data.Services
 				if (this.svc == null)
 				{
 					// New instance	for	Service	handler
-					this.svc = ClientFactory.CreateServiceManager(this.csManager.ServerType);
+					this.svc = ClientFactory.CreateServiceManager(this.csManager);
 				}
 
                 // Initialize Services API

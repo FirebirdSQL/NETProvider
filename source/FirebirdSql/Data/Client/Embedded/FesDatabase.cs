@@ -52,6 +52,8 @@ namespace FirebirdSql.Data.Client.Embedded
 		private bool	disposed;
         private int[]   statusVector;
 
+		private IFbClient fbClient;
+
 		#endregion
 
 		#region · Properties ·
@@ -95,16 +97,27 @@ namespace FirebirdSql.Data.Client.Embedded
 			get { return false; }
 		}
 
+		public IFbClient FbClient
+		{
+			get { return fbClient; }
+		}
+
 		#endregion
 
 		#region · Constructors ·
 
 		public FesDatabase()
+			: this(null)
 		{
-			this.charset	    = Charset.DefaultCharset;
-			this.dialect	    = 3;
+		}
+
+		public FesDatabase(string dllName)
+		{
+			this.fbClient       = FbClientFactory.GetFbClient(dllName);
+			this.charset        = Charset.DefaultCharset;
+			this.dialect        = 3;
 			this.packetSize     = 8192;
-            this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
+			this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
 
 			GC.SuppressFinalize(this);
 		}
@@ -177,7 +190,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 // Clear status vector
                 this.ClearStatusVector();
 
-				FbClient.isc_create_database(
+				fbClient.isc_create_database(
 					this.statusVector,
                     (short)databaseBuffer.Length,
 					databaseBuffer,
@@ -203,7 +216,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 // Clear status vector
                 this.ClearStatusVector();
 
-				FbClient.isc_drop_database(this.statusVector, ref dbHandle);
+				fbClient.isc_drop_database(this.statusVector, ref dbHandle);
 
 				this.ParseStatusVector(this.statusVector);
 
@@ -249,7 +262,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 // Clear status vector
                 this.ClearStatusVector();
 
-		        FbClient.isc_attach_database(
+				fbClient.isc_attach_database(
 			        this.statusVector,
 			        (short)databaseBuffer.Length,
 			        databaseBuffer,
@@ -281,7 +294,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 // Clear status vector
                 this.ClearStatusVector();
 
-				FbClient.isc_detach_database(this.statusVector, ref dbHandle);
+				fbClient.isc_detach_database(this.statusVector, ref dbHandle);
 
 				this.handle = dbHandle;
 
@@ -416,7 +429,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 // Clear status vector
                 this.ClearStatusVector();
 
-				FbClient.isc_database_info(
+				fbClient.isc_database_info(
 					this.statusVector,
 					ref	dbHandle,
 					(short)items.Length,

@@ -292,7 +292,7 @@ namespace FirebirdSql.Data.Client.Embedded
 
 				byte[] buffer = this.db.Charset.GetBytes(commandText);
 
-                FbClient.isc_dsql_prepare(
+				db.FbClient.isc_dsql_prepare(
                     this.statusVector,
                     ref	trHandle,
                     ref	stmtHandle,
@@ -367,7 +367,7 @@ namespace FirebirdSql.Data.Client.Embedded
 				int trHandle = this.transaction.Handle;
 				int stmtHandle = this.handle;
 
-				FbClient.isc_dsql_execute2(
+				db.FbClient.isc_dsql_execute2(
 					this.statusVector,
 					ref	trHandle,
 					ref	stmtHandle,
@@ -439,7 +439,7 @@ namespace FirebirdSql.Data.Client.Embedded
 					int stmtHandle = this.handle;
 
 					// Fetch data
-                    int status = FbClient.isc_dsql_fetch(this.statusVector, ref stmtHandle, IscCodes.SQLDA_VERSION1, this.fetchSqlDa);
+					int status = db.FbClient.isc_dsql_fetch(this.statusVector, ref stmtHandle, IscCodes.SQLDA_VERSION1, this.fetchSqlDa);
 
 					// Obtain values
                     Descriptor rowDesc = marshaler.MarshalNativeToManaged(this.db.Charset, this.fetchSqlDa, true);
@@ -508,7 +508,7 @@ namespace FirebirdSql.Data.Client.Embedded
 				IntPtr  sqlda       = marshaler.MarshalManagedToNative(this.db.Charset, this.fields);
 				int     stmtHandle  = this.handle;
 
-				FbClient.isc_dsql_describe(
+				db.FbClient.isc_dsql_describe(
 					this.statusVector,
 					ref	stmtHandle,
 					IscCodes.SQLDA_VERSION1,
@@ -543,7 +543,7 @@ namespace FirebirdSql.Data.Client.Embedded
 				IntPtr  sqlda       = marshaler.MarshalManagedToNative(this.db.Charset, parameters);
 				int     stmtHandle  = this.handle;
 
-				FbClient.isc_dsql_describe_bind(
+				db.FbClient.isc_dsql_describe_bind(
 					this.statusVector,
 					ref	stmtHandle,
 					IscCodes.SQLDA_VERSION1,
@@ -565,7 +565,7 @@ namespace FirebirdSql.Data.Client.Embedded
 					// Marshal new structure
 					sqlda = marshaler.MarshalManagedToNative(this.db.Charset, descriptor);
 
-					FbClient.isc_dsql_describe_bind(
+					db.FbClient.isc_dsql_describe_bind(
 						this.statusVector,
 						ref	stmtHandle,
 						IscCodes.SQLDA_VERSION1,
@@ -608,7 +608,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 byte[]  buffer      = new byte[bufferLength];
 				int		stmtHandle  = this.handle;
 
-				FbClient.isc_dsql_sql_info(
+				db.FbClient.isc_dsql_sql_info(
 					this.statusVector,
 					ref	stmtHandle,
 					(short)items.Length,
@@ -642,7 +642,7 @@ namespace FirebirdSql.Data.Client.Embedded
 
 				int stmtHandle = this.handle;
 
-				FbClient.isc_dsql_free_statement(
+				db.FbClient.isc_dsql_free_statement(
 					this.statusVector,
 					ref	stmtHandle,
 					(short)option);
@@ -705,7 +705,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 int dbHandle    = this.db.Handle;
 				int stmtHandle  = this.handle;
 
-				FbClient.isc_dsql_allocate_statement(
+				db.FbClient.isc_dsql_allocate_statement(
 					this.statusVector,
 					ref	dbHandle,
 					ref	stmtHandle);

@@ -49,6 +49,8 @@
     <Compile Include="Data\Client\Common\ArrayBoundMarshal.cs" />
     <Compile Include="Data\Client\Common\ArrayDescMarshal.cs" />
     <Compile Include="Data\Client\Common\ArrayDescMarshaler.cs" />
+    <Compile Include="Data\Client\Embedded\FbClientFactory.cs" />
+    <Compile Include="Data\Client\Embedded\IFbClient.cs" />
     <Compile Include="Data\Client\ExternalEngine\ParamDsc.cs" />
     <Compile Include="Data\Client\Common\XSQLDA.cs" />
     <Compile Include="Data\Client\Common\XsqldaMarshaler.cs" />

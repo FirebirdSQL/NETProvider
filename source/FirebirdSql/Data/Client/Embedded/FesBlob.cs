@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Client.Embedded
 				int dbHandle = this.db.Handle;
 				int trHandle = this.transaction.Handle;
 
-				FbClient.isc_create_blob2(
+				db.FbClient.isc_create_blob2(
 					this.statusVector,
 					ref	dbHandle,
 					ref	trHandle,
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.Client.Embedded
 				int dbHandle = this.db.Handle;
 				int trHandle = this.transaction.Handle;
 
-				FbClient.isc_open_blob2(
+				db.FbClient.isc_open_blob2(
 					this.statusVector,
 					ref	dbHandle,
 					ref	trHandle,
@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.Client.Embedded
 				MemoryStream    segment = new MemoryStream();
 				byte[]          tmp     = new byte[requested];
 
-				int status = FbClient.isc_get_segment(
+				int status = db.FbClient.isc_get_segment(
 					this.statusVector,
 					ref	this.blobHandle,
 					ref	segmentLength,
@@ -173,7 +173,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 // Clear the status vector
                 this.ClearStatusVector();
 
-				FbClient.isc_put_segment(
+				db.FbClient.isc_put_segment(
 					this.statusVector,
 					ref	this.blobHandle,
 					(short)buffer.Length,
@@ -200,7 +200,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 // Clear the status vector
                 this.ClearStatusVector();
 
-				FbClient.isc_close_blob(this.statusVector, ref this.blobHandle);
+				db.FbClient.isc_close_blob(this.statusVector, ref this.blobHandle);
 
 				FesConnection.ParseStatusVector(this.statusVector);
 			}
@@ -213,7 +213,7 @@ namespace FirebirdSql.Data.Client.Embedded
                 // Clear the status vector
                 this.ClearStatusVector();
 
-				FbClient.isc_cancel_blob(this.statusVector, ref this.blobHandle);
+				db.FbClient.isc_cancel_blob(this.statusVector, ref this.blobHandle);
 
 				FesConnection.ParseStatusVector(this.statusVector);
 			}

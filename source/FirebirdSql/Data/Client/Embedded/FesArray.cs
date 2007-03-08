@@ -119,7 +119,7 @@ namespace FirebirdSql.Data.Client.Embedded
 
 			byte[] buffer = new	byte[sliceLength];
 
-			FbClient.isc_array_get_slice(
+			db.FbClient.isc_array_get_slice(
 				this.statusVector,
 				ref	dbHandle,
 				ref	trHandle,
@@ -162,7 +162,7 @@ namespace FirebirdSql.Data.Client.Embedded
 				buffer = this.EncodeSlice(this.Descriptor, sourceArray,	sliceLength);
 			}
 
-			FbClient.isc_array_put_slice(
+			db.FbClient.isc_array_put_slice(
 				this.statusVector,
 				ref	dbHandle,
 				ref	trHandle,
