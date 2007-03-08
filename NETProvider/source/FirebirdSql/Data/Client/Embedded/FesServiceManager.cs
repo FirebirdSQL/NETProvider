@@ -26,6 +26,7 @@ namespace FirebirdSql.Data.Client.Embedded
 	{
 		#region · Fields ·
 
+		private IFbClient fbClient;
 		private int     handle;
         private int[]   statusVector;
 
@@ -48,7 +49,13 @@ namespace FirebirdSql.Data.Client.Embedded
 		#region · Constructors ·
 
 		public FesServiceManager()
+			: this(null)
 		{
+		}
+
+		public FesServiceManager(string dllName)
+		{
+			fbClient = FbClientFactory.GetFbClient(dllName);
 		}
 
 		#endregion
@@ -62,7 +69,7 @@ namespace FirebirdSql.Data.Client.Embedded
 
             int svcHandle = this.Handle;
 
-			FbClient.isc_service_attach(
+			fbClient.isc_service_attach(
 				this.statusVector,
 				(short)service.Length,
 				service,
@@ -84,7 +91,7 @@ namespace FirebirdSql.Data.Client.Embedded
 
             int svcHandle = this.Handle;
 
-			FbClient.isc_service_detach(this.statusVector, ref svcHandle);
+			fbClient.isc_service_detach(this.statusVector, ref svcHandle);
 
 			// Parse status	vector
 			this.ParseStatusVector(this.statusVector);
@@ -101,7 +108,7 @@ namespace FirebirdSql.Data.Client.Embedded
 			int svcHandle   = this.Handle;
 			int reserved    = 0;
 
-			FbClient.isc_service_start(
+			fbClient.isc_service_start(
 				this.statusVector,
 				ref	svcHandle,
 				ref	reserved,
@@ -125,7 +132,7 @@ namespace FirebirdSql.Data.Client.Embedded
             int svcHandle   = this.Handle;
 			int reserved    = 0;
 
-			FbClient.isc_service_query(
+			fbClient.isc_service_query(
 				this.statusVector,
 				ref	svcHandle,
 				ref	reserved,

@@ -151,6 +151,12 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.SetValue("Enlist", value); }
         }
 
+        public string ClientLibrary
+        {
+            get { return this.GetString("client library"); }
+            set { this.SetValue("Client Library", value); }
+        }
+
         #endregion
 
         #region · Constructors ·

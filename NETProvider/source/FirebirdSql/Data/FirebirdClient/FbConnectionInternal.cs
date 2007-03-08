@@ -191,13 +191,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb)
 		{
-			IDatabase db = ClientFactory.CreateDatabase(this.options.ServerType);
+			IDatabase db = ClientFactory.CreateDatabase(this.options);
 			db.CreateDatabase(dpb, this.options.DataSource, this.options.Port, this.options.Database);
 		}
 
 		public void DropDatabase()
 		{
-			IDatabase db = ClientFactory.CreateDatabase(this.options.ServerType);
+			IDatabase db = ClientFactory.CreateDatabase(this.options);
 			db.Attach(this.BuildDpb(db, this.options), this.options.DataSource, this.options.Port, this.options.Database);
 			db.DropDatabase();
 		}
@@ -208,9 +208,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Connect()
 		{
+            if (Charset.GetCharset(this.options.Charset) == null)
+            {
+                throw new FbException("Invalid character set specified");
+            }
+
 			try
 			{
-				this.db             = ClientFactory.CreateDatabase(this.options.ServerType);
+				this.db             = ClientFactory.CreateDatabase(this.options);
 				this.db.Charset     = Charset.GetCharset(this.options.Charset);
 				this.db.Dialect     = this.options.Dialect;
 				this.db.PacketSize  = this.options.PacketSize;
@@ -354,10 +359,6 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 throw new ArgumentException("Already enlisted in a transaction");
             }
-            if (transaction == null)
-            {
-                throw new ArgumentException("There is no active TransactionScope");
-            }
 
             this.enlistmentNotification             = new FbEnlistmentNotification(this, transaction);
             this.enlistmentNotification.Completed   += new EventHandler(EnlistmentCompleted);
@@ -482,10 +483,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			DatabaseParameterBuffer dpb = db.CreateDatabaseParameterBuffer();
 
 			dpb.Append(IscCodes.isc_dpb_version1);
-			dpb.Append(IscCodes.isc_dpb_dummy_packet_interval,
-				new byte[] { 120, 10, 0, 0 });
-			dpb.Append(IscCodes.isc_dpb_sql_dialect,
-				new byte[] { Convert.ToByte(options.Dialect), 0, 0, 0 });
+			dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
+			dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { Convert.ToByte(options.Dialect), 0, 0, 0 });
 			dpb.Append(IscCodes.isc_dpb_lc_ctype, options.Charset);
 			if (options.Role != null && options.Role.Length > 0)
 			{

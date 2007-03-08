@@ -25,9 +25,9 @@ namespace FirebirdSql.Data.FirebirdClient
     {
         #region · Static Methods ·
 
-        public static IDatabase CreateDatabase(FbServerType serverType)
+        public static IDatabase CreateDatabase(FbConnectionString options)
         {
-            switch (serverType)
+            switch (options.ServerType)
             {
                 case FbServerType.Default:
                     // C# Client
@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 case FbServerType.Embedded:
                     // PInvoke Client
-                    return new FirebirdSql.Data.Client.Embedded.FesDatabase();
+                    return new FirebirdSql.Data.Client.Embedded.FesDatabase(options.ClientLibrary);
 
                 case FbServerType.Context:
                     // External Engine Client
@@ -50,9 +50,9 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        public static IServiceManager CreateServiceManager(FbServerType serverType)
+        public static IServiceManager CreateServiceManager(FbConnectionString options)
         {
-            switch (serverType)
+            switch (options.ServerType)
             {
                 case FbServerType.Default:
                     // C# Client
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 case FbServerType.Embedded:
                     // PInvoke Client
-                    return new FirebirdSql.Data.Client.Embedded.FesServiceManager();
+                    return new FirebirdSql.Data.Client.Embedded.FesServiceManager(options.ClientLibrary);
 
 #endif
 
