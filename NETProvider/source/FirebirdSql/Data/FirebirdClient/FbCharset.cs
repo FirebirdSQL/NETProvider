@@ -81,6 +81,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		/// <include file='Doc/en_EN/FbCharset.xml' path='doc/enum[@name="FbCharset"]/field[@name="Windows1256"]/*'/>
 		Windows1256		= 59,
 		/// <include file='Doc/en_EN/FbCharset.xml' path='doc/enum[@name="FbCharset"]/field[@name="Windows1257"]/*'/>
-		Windows1257		= 60
+		Windows1257		= 60,
+        // UTF-16
+        // Utf16           = 61,
+        // UTF-32
+        // Utf32           = 62,
+        // Russian KOI8R
+        Koi8R           = 63,
+        // Ukrainian KOI8U
+        Koi8U           = 64
 	}
 }
