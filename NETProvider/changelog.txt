@@ -4,7 +4,7 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 
 2007-03-08 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
-	* Commited Dean Harding changes to dinamically load client libraries when woriking with the
+	* Commited Dean Harding changes to dynamically load client libraries when working with the
 	embedded server support.
 
 	Client Library could be specified using the ClientLibrary connection string parameter.
