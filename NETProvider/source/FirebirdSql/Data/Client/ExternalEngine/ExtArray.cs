@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2005 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *   
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -343,7 +346,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		private	byte[] EncodeSlice(ArrayDesc desc, Array sourceArray, int length)
 		{
 			BinaryWriter	writer	= new BinaryWriter(new MemoryStream());
-			IEnumerator		i		= sourceArray.GetEnumerator();
 			Charset			charset = this.db.Charset;
 			DbDataType		dbType	= DbDataType.Array;
 			int				subType = (this.Descriptor.Scale < 0) ? 2 : 0;
@@ -353,13 +355,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			type = TypeHelper.GetFbType(this.Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, subType, this.Descriptor.Scale);
 
-			while (i.MoveNext())
+			foreach (object source in sourceArray)
 			{
 				switch (dbType)
 				{
 					case DbDataType.Char:
 					{
-						string value  = i.Current != null ?	(string)i.Current :	String.Empty;
+                        string value = source != null ? (string)source : String.Empty;
 						byte[] buffer = charset.GetBytes(value);
 
 						writer.Write(buffer);
@@ -376,7 +378,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 					case DbDataType.VarChar:
 					{
-						string value = i.Current !=	null ? (string)i.Current : String.Empty;
+                        string value = source != null ? (string)source : String.Empty;
 
 						value = value.TrimEnd();
 
@@ -395,29 +397,29 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 					break;
 	
 					case DbDataType.SmallInt:
-						writer.Write((short)i.Current);
+                        writer.Write((short)source);
 						break;
 	
 					case DbDataType.Integer:
-						writer.Write((int)i.Current);
+                        writer.Write((int)source);
 						break;
 
 					case DbDataType.BigInt:
-						writer.Write((long)i.Current);
+                        writer.Write((long)source);
 						break;
 					
 					case DbDataType.Float:
-						writer.Write((float)i.Current);
+                        writer.Write((float)source);
 						break;
 										
 					case DbDataType.Double:
-						writer.Write((double)i.Current);
+                        writer.Write((double)source);
 						break;
 					
 					case DbDataType.Numeric:
 					case DbDataType.Decimal:
 					{
-						object numeric = TypeEncoder.EncodeDecimal((decimal)i.Current, desc.Scale, type);
+                        object numeric = TypeEncoder.EncodeDecimal((decimal)source, desc.Scale, type);
 
 						switch (type)
 						{
@@ -438,16 +440,16 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 					break;
 
 					case DbDataType.Date:
-						writer.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(i.Current, CultureInfo.CurrentCulture.DateTimeFormat)));
+                        writer.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
 						break;
 					
 					case DbDataType.Time:
-						writer.Write(TypeEncoder.EncodeTime(Convert.ToDateTime(i.Current, CultureInfo.CurrentCulture.DateTimeFormat)));
+                        writer.Write(TypeEncoder.EncodeTime(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
 						break;
 
 					case DbDataType.TimeStamp:
-						writer.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(i.Current, CultureInfo.CurrentCulture.DateTimeFormat)));
-						writer.Write(TypeEncoder.EncodeTime(Convert.ToDateTime(i.Current, CultureInfo.CurrentCulture.DateTimeFormat)));
+                        writer.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
+                        writer.Write(TypeEncoder.EncodeTime(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
 						break;
 					
 					default:
