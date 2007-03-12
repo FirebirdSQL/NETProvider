@@ -1,10 +1,19 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+2007-03-13 Jiri Cincura <jiri@cincura.net>
+
+	* FirebirdSql\Data\Client\Embedded\FesArray.cs
+
+		- EncodeSlice method refactored (using foreach).
+		
+	* FirebirdSql\Data\Client\ExternalEngine\ExtArray.cs
+
+		- EncodeSlice method refactored (using foreach).		
 
 2007-03-08 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
-	* Commited Dean Harding changes to dynamically load client libraries when working with the
+	* Commited Dean Harding's changes to dynamically load client libraries when working with the
 	embedded server support.
 
 	Client Library could be specified using the ClientLibrary connection string parameter.
@@ -17,7 +26,7 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 2007-02-17 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 
-	* FirebirdSql\Data\Isql\FbBatchExecition.cs:
+	* FirebirdSql\Data\Isql\FbBatchExecution.cs:
 	* FirebirdSql\Data\Isql\SqlStatementType.cs:
 
 		- Added initial support for RECREATE PROCEDURE, RECREATE VIEW AND RECREATE TABLE commands
