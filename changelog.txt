@@ -1,6 +1,12 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+2007-03-14 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* FirebirdSql\Data\Client\Common\XsqldaMarshaler.cs
+
+		- Return back to the original way of releasing Interop Pointers memory
+
 2007-03-13 Jiri Cincura <jiri@cincura.net>
 
 	* FirebirdSql\Data\Client\Embedded\FesArray.cs
