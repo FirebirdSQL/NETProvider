@@ -55,7 +55,6 @@ namespace FirebirdSql.Data.Client.Common
         {
             if (pNativeData != IntPtr.Zero)
             {
-                /*
                 // Obtain XSQLDA information
                 XSQLDA xsqlda = new XSQLDA();
 
@@ -86,7 +85,6 @@ namespace FirebirdSql.Data.Client.Common
                     IntPtr ptr2 = this.GetIntPtr(pNativeData, this.ComputeLength(i));
                     Marshal.DestroyStructure(ptr2, typeof(XSQLVAR));
                 }
-                */
 
                 // Free	pointer	memory
                 Marshal.FreeHGlobal(pNativeData);
