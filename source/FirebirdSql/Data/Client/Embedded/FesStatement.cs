@@ -198,6 +198,7 @@ namespace FirebirdSql.Data.Client.Embedded
                         this.statementType      = DbStatementType.None;
                         this.recordsAffected    = 0;
                         this.handle             = 0;
+                        this.FetchSize          = 0;
                     }
                     
                     base.Dispose(disposing);
@@ -244,20 +245,14 @@ namespace FirebirdSql.Data.Client.Embedded
 
 		public override void Release() 
         {
-			if (fetchSqlDa != IntPtr.Zero) 
-            {
-                XsqldaMarshaler.Instance.CleanUpNativeData(ref this.fetchSqlDa);
-			}
+            XsqldaMarshaler.Instance.CleanUpNativeData(ref this.fetchSqlDa);
 
 			base.Release();
 		}
 
         public override void Close()
         {
-            if (fetchSqlDa != IntPtr.Zero)
-            {
-                XsqldaMarshaler.Instance.CleanUpNativeData(ref this.fetchSqlDa);
-            }
+            XsqldaMarshaler.Instance.CleanUpNativeData(ref this.fetchSqlDa);
 
             base.Close();
         }
