@@ -2,6 +2,34 @@ WHAT IS NEW - FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ========================================================================
 
 
+· v2.1.0 Beta 3 ( 2007-03-18 ) ·
+
+( Please review the changelog for details )
+
+
+New features:
+
+	- New Client Parameter inthe Connection String that will be used to know the
+	client library to be used when working with the embedded server.
+
+	- Support KOI8-R and KOI8-U character sets.
+
+	- Initial support for RECREATE PROCEDURE, RECREATE VIEW AND RECREATE TABLE commands
+	to the FbBatchExecution class
+
+	- Initial support to allow parameter names to be specified without @
+
+Bug Fixes:
+
+	- Return back to the original way of releasing Interop Pointers memory
+
+Changes:
+
+	- More code refactoriing to extend the Generics usage
+
+	- Updated scripts fo rthe Web Providers.
+
+
 · v2.1.0 Beta 2 ( 2007-02-11 ) ·
 
 ( Please review the changelog for details )
