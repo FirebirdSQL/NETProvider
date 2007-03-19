@@ -1,6 +1,17 @@
 FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
 ==========================================================
 
+
+2007-03-19 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* FirebirdSql\Data\Isql\FbScript.cs:
+
+		- Initial fix for bug #DNET-81
+
+
+------------------------------ 2.1.0 Beta 3 ------------------------------ 
+
+
 2007-03-14 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql\Data\Client\Common\XsqldaMarshaler.cs
