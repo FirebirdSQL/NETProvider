@@ -156,10 +156,21 @@ namespace FirebirdSql.Data.Isql
             int             length          = source.Length;
             StringBuilder   result          = new StringBuilder();
             bool            insideComment   = false;
+            bool            insideLiteral   = false;
 
             while (i < length)
             {
-                if (insideComment)
+                if (insideLiteral)
+                {
+                    result.Append(source[i]);
+
+                    if (source[i] == '\'')
+                    {
+                        i++;
+                        insideLiteral = false;
+                    }
+                }
+                else if (insideComment)
                 {
                     if (source[i] == '*')
                     {
@@ -169,6 +180,11 @@ namespace FirebirdSql.Data.Isql
                             insideComment = false;
                         }
                     }
+                }
+                else if ((source[i] == '\'') && (i < length - 1))
+                {
+                    result.Append(source[i]);
+                    insideLiteral = true;
                 }
                 else if ((source[i] == '/') && (i < length - 1) && (source[i + 1] == '*'))
                 {
