@@ -166,7 +166,6 @@ namespace FirebirdSql.Data.Isql
 
                     if (source[i] == '\'')
                     {
-                        i++;
                         insideLiteral = false;
                     }
                 }
