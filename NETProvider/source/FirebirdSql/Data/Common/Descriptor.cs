@@ -142,8 +142,8 @@ namespace FirebirdSql.Data.Common
 
 			for (int i = 0; i < this.fields.Length; i++)
 			{
-				int dtype = this.fields[i].SqlType;
-				int len = this.fields[i].Length;
+				int dtype   = this.fields[i].SqlType;
+				int len     = this.fields[i].Length;
 
 				switch (dtype)
 				{
