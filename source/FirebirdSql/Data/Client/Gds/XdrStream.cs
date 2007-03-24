@@ -629,8 +629,6 @@ namespace FirebirdSql.Data.Client.Gds
 
 		public void Write(DbField param)
 		{
-			Charset innerCharset = (this.charset.Name != "NONE") ? this.charset : param.Charset;
-
 			param.FixNull();
 
 			try
@@ -652,7 +650,7 @@ namespace FirebirdSql.Data.Client.Gds
                                 throw new IscException(335544321);
                             }
 
-                            this.WriteOpaque(innerCharset.GetBytes(svalue), param.Length);
+                            this.WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
 						}
 						break;
 
@@ -665,13 +663,13 @@ namespace FirebirdSql.Data.Client.Gds
 					    {
 							string svalue = param.DbValue.GetString().TrimEnd();
 
-							if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
+                            if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
 								svalue.Length > param.CharCount)
 							{
 								throw new IscException(335544321);
 							}
 
-							byte[] data = innerCharset.GetBytes(svalue);
+                            byte[] data = param.Charset.GetBytes(svalue);
 
 							this.WriteBuffer(data, data.Length);
 						}
