@@ -26,9 +26,9 @@ namespace FirebirdSql.Data.Client.Embedded
 	{
 		#region · Fields ·
 
-		private IFbClient fbClient;
-		private int     handle;
-        private int[]   statusVector;
+		private IFbClient   fbClient;
+		private int         handle;
+        private int[]       statusVector;
 
 		#endregion
 
@@ -55,7 +55,8 @@ namespace FirebirdSql.Data.Client.Embedded
 
 		public FesServiceManager(string dllName)
 		{
-			fbClient = FbClientFactory.GetFbClient(dllName);
+			this.fbClient       = FbClientFactory.GetFbClient(dllName);
+            this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
 		}
 
 		#endregion
