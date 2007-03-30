@@ -2,6 +2,11 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-03-30 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* FirebirdSql\Data\Client\Embedded\FesServiceManager.cs:
+
+		- Fixed bug #DNET-86
 
 2007-03-24 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
