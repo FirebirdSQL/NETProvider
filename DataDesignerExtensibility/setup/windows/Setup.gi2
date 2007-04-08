@@ -30,8 +30,11 @@
           <files>
             <file src="%DDEXPath%\DataTools\Bin\Debug\FirebirdSql.VisualStudio.DataTools.dll" dst="%InstallPath%\FirebirdSql.VisualStudio.DataTools.dll" />
             <file src="%DDEXPath%\DataTools\Bin\Debug\1033\FirebirdSql.VisualStudio.DataToolsUI.dll" dst="%InstallPath%\FirebirdSql.VisualStudio.DataToolsUI.dll" />
-            <file src="%DDEXPath%\DataTools\FirebirdDDEXProvider.reg" dst="%InstallPath%\FirebirdDDEXProvider.reg" />
-            <file src="%DDEXPath%\DataTools\FirebirdDDEXProviderPackageLess.reg" dst="%InstallPath%\FirebirdDDEXProviderPackageLess.reg" />
+            <file src="%DDEXPath%\DataTools\FirebirdDDEXProvider32.reg" dst="%InstallPath%\FirebirdDDEXProvider32.reg" />
+            <file src="%DDEXPath%\DataTools\FirebirdDDEXProvider64.reg" dst="%InstallPath%\FirebirdDDEXProvider64.reg" />
+            <file src="%DDEXPath%\DataTools\FirebirdDDEXProviderVisualWebDeveloper32.reg" dst="%InstallPath%\FirebirdDDEXProviderVisualWebDeveloper32.reg" />
+            <file src="%DDEXPath%\DataTools\FirebirdDDEXProviderPackageLess32.reg" dst="%InstallPath%\FirebirdDDEXProviderPackageLess32.reg" />
+            <file src="%DDEXPath%\DataTools\FirebirdDDEXProviderPackageLess64.reg" dst="%InstallPath%\FirebirdDDEXProviderPackageLess64.reg" />            
           </files>
           <shortcuts>
             <shortcut name="%ProgramsMenu%\%ProgramGroup%\Uninstall %AppName%" cmdline="%InstallPath%\Uninstall.exe" />
