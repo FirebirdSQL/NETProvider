@@ -241,20 +241,23 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Disconnect()
 		{
-            try
+            if (this.db != null)
             {
-                this.db.Dispose();
-            }
-            catch
-            {
-            }
-            finally
-            {
-                this.db                 = null;
-                this.owningConnection   = null;
-                this.options            = null;
-                this.lifetime           = 0;
-                this.pooled             = false;
+                try
+                {
+                    this.db.Dispose();
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    this.db                 = null;
+                    this.owningConnection   = null;
+                    this.options            = null;
+                    this.lifetime           = 0;
+                    this.pooled             = false;
+                }
             }
 		}
 
@@ -441,7 +444,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void CloseEventManager()
 		{
-			if (this.db.HasRemoteEventSupport)
+            if (this.db != null && this.db.HasRemoteEventSupport)
 			{
 				lock (this.db)
 				{

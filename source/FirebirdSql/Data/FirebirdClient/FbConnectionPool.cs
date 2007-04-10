@@ -195,7 +195,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				foreach (FbConnectionInternal connection in list)
 				{
-					connection.Disconnect();
+                    connection.Disconnect();
 				}
 
 				// Clear lists
