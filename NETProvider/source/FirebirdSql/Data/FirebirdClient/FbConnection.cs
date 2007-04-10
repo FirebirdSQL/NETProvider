@@ -586,7 +586,7 @@ namespace FirebirdSql.Data.FirebirdClient
         /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="Close"]/*'/>
         public override void Close()
         {
-            if (!this.IsClosed)
+            if (!this.IsClosed && this.innerConnection != null)
             {
                 lock (this)
                 {
@@ -598,7 +598,10 @@ namespace FirebirdSql.Data.FirebirdClient
                             this.innerConnection.CloseEventManager();
 
                             // Unbind Warning messages event
-                            this.innerConnection.Database.WarningMessage = null;
+                            if (this.innerConnection.Database != null)
+                            {
+                                this.innerConnection.Database.WarningMessage = null;
+                            }
 
                             // Dispose Transaction
                             this.innerConnection.DisposeTransaction();
