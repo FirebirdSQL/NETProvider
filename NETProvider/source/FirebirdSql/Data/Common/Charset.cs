@@ -193,6 +193,10 @@ namespace FirebirdSql.Data.Common
 			this.bytesPerCharacter	= bytesPerCharacter;
 			this.systemName			= systemName;
             this.syncObject         = new object();
+
+#if (!NETCF)
+            this.GetEncoding();
+#endif
 		}
 
 		#endregion
@@ -201,12 +205,20 @@ namespace FirebirdSql.Data.Common
 
 		public byte[] GetBytes(string s)
 		{
+#if (NETCF)
 			return this.GetEncoding().GetBytes(s);
+#else
+            return this.encoding.GetBytes(s);
+#endif
 		}
 
 		public int GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex)
 		{
+#if (NETCF)
 			return this.GetEncoding().GetBytes(s, charIndex, charCount, bytes, byteIndex);
+#else
+            return this.encoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
+#endif
 		}
 
 		public string GetString(byte[] buffer)
@@ -216,7 +228,11 @@ namespace FirebirdSql.Data.Common
 
 		public string GetString(byte[] buffer, int index, int count)
 		{
+#if (NETCF)
 			return this.GetEncoding().GetString(buffer, index, count);
+#else
+            return this.encoding.GetString(buffer, index, count);
+#endif
 		}
 
 		#endregion
