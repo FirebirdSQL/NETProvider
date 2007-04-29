@@ -1,6 +1,14 @@
 Firebird ADO.NET Data provider for .NET and Mono 
 ================================================
 
+
+2007-04-29 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* FirebirdSql.Data.Firebird\FbConnection.cs:
+	* FirebirdSql.Data.Firebird\FbConnectionInternal.cs:
+
+		- Updates on connection disposing.
+
 2006-10-23 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql.Data.Firebird\Design\DataAdapter\FbDataAdapterDataSetGenerator.cs
