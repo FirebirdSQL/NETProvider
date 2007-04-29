@@ -41,19 +41,19 @@ namespace FirebirdSql.Web.Providers
         #region · Fields ·
 
         private string _fbConnectionString;
-        private bool _EnablePasswordRetrieval;
-        private bool _EnablePasswordReset;
-        private bool _RequiresQuestionAndAnswer;
-        private string _AppName;
-        private bool _RequiresUniqueEmail;
-        private int _MaxInvalidPasswordAttempts;
-        private int _CommandTimeout;
-        private int _PasswordAttemptWindow;
-        private int _MinRequiredPasswordLength;
-        private int _MinRequiredNonalphanumericCharacters;
-        private string _PasswordStrengthRegularExpression;
-        private MachineKeySection machineKey;
-        private MembershipPasswordFormat _PasswordFormat;
+        private bool _enablePasswordRetrieval;
+        private bool _enablePasswordReset;
+        private bool _requiresQuestionAndAnswer;
+        private string _appName;
+        private bool _requiresUniqueEmail;
+        private int _maxInvalidPasswordAttempts;
+        private int _commandTimeout;
+        private int _passwordAttemptWindow;
+        private int _minRequiredPasswordLength;
+        private int _minRequiredNonalphanumericCharacters;
+        private string _passwordStrengthRegularExpression;
+        private MachineKeySection _machineKey;
+        private MembershipPasswordFormat _passwordFormat;
         private const int PASSWORD_SIZE = 14;
 
         #endregion
@@ -62,56 +62,56 @@ namespace FirebirdSql.Web.Providers
 
         public override bool EnablePasswordRetrieval
         {
-            get { return _EnablePasswordRetrieval; }
+            get { return _enablePasswordRetrieval; }
         }
 
         public override bool EnablePasswordReset
         {
-            get { return _EnablePasswordReset; }
+            get { return _enablePasswordReset; }
         }
 
         public override bool RequiresQuestionAndAnswer
         {
-            get { return _RequiresQuestionAndAnswer; }
+            get { return _requiresQuestionAndAnswer; }
         }
 
         public override bool RequiresUniqueEmail
         {
-            get { return _RequiresUniqueEmail; }
+            get { return _requiresUniqueEmail; }
         }
 
         public override MembershipPasswordFormat PasswordFormat
         {
-            get { return _PasswordFormat; }
+            get { return _passwordFormat; }
         }
         public override int MaxInvalidPasswordAttempts
         {
-            get { return _MaxInvalidPasswordAttempts; }
+            get { return _maxInvalidPasswordAttempts; }
         }
 
         public override int PasswordAttemptWindow
         {
-            get { return _PasswordAttemptWindow; }
+            get { return _passwordAttemptWindow; }
         }
 
         public override int MinRequiredPasswordLength
         {
-            get { return _MinRequiredPasswordLength; }
+            get { return _minRequiredPasswordLength; }
         }
 
         public override int MinRequiredNonAlphanumericCharacters
         {
-            get { return _MinRequiredNonalphanumericCharacters; }
+            get { return _minRequiredNonalphanumericCharacters; }
         }
 
         public override string PasswordStrengthRegularExpression
         {
-            get { return _PasswordStrengthRegularExpression; }
+            get { return _passwordStrengthRegularExpression; }
         }
 
         public override string ApplicationName
         {
-            get { return _AppName; }
+            get { return _appName; }
             set
             {
                 if (String.IsNullOrEmpty(value))
@@ -122,12 +122,12 @@ namespace FirebirdSql.Web.Providers
                     throw new ProviderException("The application name is too long.");
                 }
 
-                this._AppName = value;
+                this._appName = value;
             }
         }
         private int CommandTimeout
         {
-            get { return _CommandTimeout; }
+            get { return _commandTimeout; }
         }
 
         #endregion
@@ -147,23 +147,23 @@ namespace FirebirdSql.Web.Providers
             }
             base.Initialize(name, config);
 
-            _EnablePasswordRetrieval = Convert.ToBoolean(GetConfigValue(config["enablePasswordRetrieval"], "false"));
-            _EnablePasswordReset = Convert.ToBoolean(GetConfigValue(config["enablePasswordReset"], "true"));
-            _RequiresQuestionAndAnswer = Convert.ToBoolean(GetConfigValue(config["requiresQuestionAndAnswer"], "false"));
-            _RequiresUniqueEmail = Convert.ToBoolean(GetConfigValue(config["requiresUniqueEmail"], "true"));
-            _MaxInvalidPasswordAttempts = Convert.ToInt32(GetConfigValue(config["maxInvalidPasswordAttempts"], "5"));
-            _PasswordAttemptWindow = Convert.ToInt32(GetConfigValue(config["passwordAttemptWindow"], "10"));
-            _MinRequiredPasswordLength = Convert.ToInt32(GetConfigValue(config["minRequiredPasswordLength"], "7"));
-            _MinRequiredNonalphanumericCharacters = Convert.ToInt32(GetConfigValue(config["minRequiredNonalphanumericCharacters"], "0"));
-            _PasswordStrengthRegularExpression = config["passwordStrengthRegularExpression"];
-            if (_PasswordStrengthRegularExpression != null)
+            _enablePasswordRetrieval = Convert.ToBoolean(GetConfigValue(config["enablePasswordRetrieval"], "false"));
+            _enablePasswordReset = Convert.ToBoolean(GetConfigValue(config["enablePasswordReset"], "true"));
+            _requiresQuestionAndAnswer = Convert.ToBoolean(GetConfigValue(config["requiresQuestionAndAnswer"], "false"));
+            _requiresUniqueEmail = Convert.ToBoolean(GetConfigValue(config["requiresUniqueEmail"], "true"));
+            _maxInvalidPasswordAttempts = Convert.ToInt32(GetConfigValue(config["maxInvalidPasswordAttempts"], "5"));
+            _passwordAttemptWindow = Convert.ToInt32(GetConfigValue(config["passwordAttemptWindow"], "10"));
+            _minRequiredPasswordLength = Convert.ToInt32(GetConfigValue(config["minRequiredPasswordLength"], "7"));
+            _minRequiredNonalphanumericCharacters = Convert.ToInt32(GetConfigValue(config["minRequiredNonalphanumericCharacters"], "0"));
+            _passwordStrengthRegularExpression = config["passwordStrengthRegularExpression"];
+            if (_passwordStrengthRegularExpression != null)
             {
-                _PasswordStrengthRegularExpression = _PasswordStrengthRegularExpression.Trim();
-                if (_PasswordStrengthRegularExpression.Length != 0)
+                _passwordStrengthRegularExpression = _passwordStrengthRegularExpression.Trim();
+                if (_passwordStrengthRegularExpression.Length != 0)
                 {
                     try
                     {
-                        Regex regex = new Regex(_PasswordStrengthRegularExpression);
+                        Regex regex = new Regex(_passwordStrengthRegularExpression);
                     }
                     catch (ArgumentException e)
                     {
@@ -173,17 +173,17 @@ namespace FirebirdSql.Web.Providers
             }
             else
             {
-                _PasswordStrengthRegularExpression = string.Empty;
+                _passwordStrengthRegularExpression = string.Empty;
             }
-            if (_MinRequiredNonalphanumericCharacters > _MinRequiredPasswordLength)
+            if (_minRequiredNonalphanumericCharacters > _minRequiredPasswordLength)
                 throw new HttpException("The minRequiredNonalphanumericCharacters can not be greater than minRequiredPasswordLength.");
 
-            _CommandTimeout = Convert.ToInt32(GetConfigValue(config["commandTimeout"], "30"));
-            _AppName = config["applicationName"];
-            if (string.IsNullOrEmpty(_AppName))
-                _AppName = HostingEnvironment.ApplicationVirtualPath;
+            _commandTimeout = Convert.ToInt32(GetConfigValue(config["commandTimeout"], "30"));
+            _appName = config["applicationName"];
+            if (string.IsNullOrEmpty(_appName))
+                _appName = HostingEnvironment.ApplicationVirtualPath;
 
-            if (_AppName.Length > 100)
+            if (_appName.Length > 100)
             {
                 throw new ProviderException("The application name is too long.");
             }
@@ -195,13 +195,13 @@ namespace FirebirdSql.Web.Providers
             switch (strTemp)
             {
                 case "Clear":
-                    _PasswordFormat = MembershipPasswordFormat.Clear;
+                    _passwordFormat = MembershipPasswordFormat.Clear;
                     break;
                 case "Encrypted":
-                    _PasswordFormat = MembershipPasswordFormat.Encrypted;
+                    _passwordFormat = MembershipPasswordFormat.Encrypted;
                     break;
                 case "Hashed":
-                    _PasswordFormat = MembershipPasswordFormat.Hashed;
+                    _passwordFormat = MembershipPasswordFormat.Hashed;
                     break;
                 default:
                     throw new ProviderException("Password format specified is invalid.");
@@ -211,9 +211,9 @@ namespace FirebirdSql.Web.Providers
                 throw new ProviderException("Configured settings are invalid: Hashed passwords cannot be retrieved. Either set the password format to different type, or set supportsPasswordRetrieval to false.");
 
             Configuration cfg = WebConfigurationManager.OpenWebConfiguration(System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath);
-            machineKey = (MachineKeySection)cfg.GetSection("system.web/machineKey");
+            _machineKey = (MachineKeySection)cfg.GetSection("system.web/machineKey");
 
-            if (machineKey.ValidationKey.Contains("AutoGenerate"))
+            if (_machineKey.ValidationKey.Contains("AutoGenerate"))
             {
                 if (this.PasswordFormat == MembershipPasswordFormat.Encrypted)
                 {
@@ -257,13 +257,13 @@ namespace FirebirdSql.Web.Providers
         #region · MembershipProvider Override Methods ·
 
         public override MembershipUser CreateUser(string username,
-                                                   string password,
-                                                   string email,
-                                                   string passwordQuestion,
-                                                   string passwordAnswer,
-                                                   bool isApproved,
-                                                   object providerUserKey,
-                                                   out    MembershipCreateStatus status)
+            string password,
+            string email,
+            string passwordQuestion,
+            string passwordAnswer,
+            bool isApproved,
+            object providerUserKey,
+            out MembershipCreateStatus status)
         {
             if (!ValidateParameter(ref password, true, true, false, 100))
             {
@@ -272,7 +272,7 @@ namespace FirebirdSql.Web.Providers
             }
 
             string salt = GenerateSalt();
-            string pass = EncodePassword(password, (int)_PasswordFormat, salt);
+            string pass = EncodePassword(password, (int)_passwordFormat, salt);
             if (pass.Length > 100)
             {
                 status = MembershipCreateStatus.InvalidPassword;
@@ -292,10 +292,13 @@ namespace FirebirdSql.Web.Providers
                     status = MembershipCreateStatus.InvalidAnswer;
                     return null;
                 }
-                encodedPasswordAnswer = EncodePassword(passwordAnswer.ToLower(CultureInfo.InvariantCulture), (int)_PasswordFormat, salt);
+                encodedPasswordAnswer = EncodePassword(passwordAnswer.ToLower(CultureInfo.InvariantCulture), (int)_passwordFormat, salt);
             }
             else
+            {
                 encodedPasswordAnswer = passwordAnswer;
+            }
+
             if (!ValidateParameter(ref encodedPasswordAnswer, RequiresQuestionAndAnswer, true, false, 100))
             {
                 status = MembershipCreateStatus.InvalidAnswer;
@@ -329,7 +332,9 @@ namespace FirebirdSql.Web.Providers
                 }
             }
             else
+            {
                 providerUserKey = Guid.NewGuid();
+            }
 
             if (password.Length < MinRequiredPasswordLength)
             {
@@ -373,59 +378,57 @@ namespace FirebirdSql.Web.Providers
 
             try
             {
-                FbConnection con = null;
                 DateTime dt = RoundToSeconds(DateTime.UtcNow);
-                try
-                {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_CreateUser", con);
 
-                    cmd.CommandTimeout = CommandTimeout;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-                    cmd.Parameters.Add("@Username", FbDbType.VarChar, 100).Value = username;
-                    cmd.Parameters.Add("@Password", FbDbType.VarChar, 100).Value = pass;
-                    cmd.Parameters.Add("@PasswordSalt", FbDbType.VarChar, 100).Value = salt;
-                    cmd.Parameters.Add("@Email", FbDbType.VarChar, 100).Value = email;
-                    cmd.Parameters.Add("@PasswordQuestion", FbDbType.VarChar, 100).Value = passwordQuestion;
-                    cmd.Parameters.Add("@PasswordAnswer", FbDbType.VarChar, 100).Value = encodedPasswordAnswer;
-                    cmd.Parameters.Add("@IsApproved", FbDbType.SmallInt).Value = isApproved;
-                    cmd.Parameters.Add("@UniqueEmail", FbDbType.SmallInt).Value = RequiresUniqueEmail ? 1 : 0;
-                    cmd.Parameters.Add("@PasswordFormat", FbDbType.Integer).Value = (int)PasswordFormat;
-                    cmd.Parameters.Add("@userid", FbDbType.Guid).Value = providerUserKey;
-                    FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
-                    p.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(p);
-                    cmd.ExecuteNonQuery();
-                    int iStatus = ((p.Value != null) ? ((int)p.Value) : -1);
-                    if (iStatus < 0 || iStatus > (int)MembershipCreateStatus.ProviderError)
-                        iStatus = (int)MembershipCreateStatus.ProviderError;
-                    status = (MembershipCreateStatus)iStatus;
-                    if (iStatus != 0)
-                        return null;
+                using (FbConnection con = new FbConnection(_fbConnectionString))
+                {
+                    con.Open();
+                    using (FbCommand cmd = new FbCommand("Membership_CreateUser", con))
+                    {
+                        cmd.CommandTimeout = CommandTimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                        cmd.Parameters.Add("@Username", FbDbType.VarChar, 100).Value = username;
+                        cmd.Parameters.Add("@Password", FbDbType.VarChar, 100).Value = pass;
+                        cmd.Parameters.Add("@PasswordSalt", FbDbType.VarChar, 100).Value = salt;
+                        cmd.Parameters.Add("@Email", FbDbType.VarChar, 100).Value = email;
+                        cmd.Parameters.Add("@PasswordQuestion", FbDbType.VarChar, 100).Value = passwordQuestion;
+                        cmd.Parameters.Add("@PasswordAnswer", FbDbType.VarChar, 100).Value = encodedPasswordAnswer;
+                        cmd.Parameters.Add("@IsApproved", FbDbType.SmallInt).Value = isApproved;
+                        cmd.Parameters.Add("@UniqueEmail", FbDbType.SmallInt).Value = RequiresUniqueEmail ? 1 : 0;
+                        cmd.Parameters.Add("@PasswordFormat", FbDbType.Integer).Value = (int)PasswordFormat;
+                        cmd.Parameters.Add("@userid", FbDbType.Guid).Value = providerUserKey;
+
+                        FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
+                        p.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(p);
+                        cmd.ExecuteNonQuery();
+
+                        int iStatus = ((p.Value != null) ? ((int)p.Value) : -1);
+                        if (iStatus < 0 || iStatus > (int)MembershipCreateStatus.ProviderError)
+                        {
+                            iStatus = (int)MembershipCreateStatus.ProviderError;
+                        }
+                        status = (MembershipCreateStatus)iStatus;
+                        if (iStatus != 0)
+                        {
+                            return null;
+                        }
+                    }
                     dt = dt.ToLocalTime();
                     return new MembershipUser(this.Name,
-                                               username,
-                                               providerUserKey,
-                                               email,
-                                               passwordQuestion,
-                                               null,
-                                               isApproved,
-                                               false,
-                                               dt,
-                                               dt,
-                                               dt,
-                                               dt,
-                                               new DateTime(1754, 1, 1));
-                }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
-                    }
+                        username,
+                        providerUserKey,
+                        email,
+                        passwordQuestion,
+                        null,
+                        isApproved,
+                        false,
+                        dt,
+                        dt,
+                        dt,
+                        dt,
+                        new DateTime(1754, 1, 1));
                 }
             }
             catch
@@ -434,7 +437,10 @@ namespace FirebirdSql.Web.Providers
             }
         }
 
-        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
+        public override bool ChangePasswordQuestionAndAnswer(string username,
+            string password,
+            string newPasswordQuestion,
+            string newPasswordAnswer)
         {
             CheckParameter(ref username, true, true, true, 100, "username");
             CheckParameter(ref password, true, true, false, 100, "password");
@@ -442,57 +448,53 @@ namespace FirebirdSql.Web.Providers
             string salt;
             int passwordFormat;
             if (!CheckPassword(username, password, false, false, out salt, out passwordFormat))
+            {
                 return false;
+            }
+
+
             CheckParameter(ref newPasswordQuestion, RequiresQuestionAndAnswer, RequiresQuestionAndAnswer, false, 100, "newPasswordQuestion");
-            string encodedPasswordAnswer;
             if (newPasswordAnswer != null)
             {
                 newPasswordAnswer = newPasswordAnswer.Trim();
             }
-
             CheckParameter(ref newPasswordAnswer, RequiresQuestionAndAnswer, RequiresQuestionAndAnswer, false, 100, "newPasswordAnswer");
+            string encodedPasswordAnswer;
             if (!string.IsNullOrEmpty(newPasswordAnswer))
             {
                 encodedPasswordAnswer = EncodePassword(newPasswordAnswer.ToLower(CultureInfo.InvariantCulture), (int)passwordFormat, salt);
             }
             else
+            {
                 encodedPasswordAnswer = newPasswordAnswer;
+            }
             CheckParameter(ref encodedPasswordAnswer, RequiresQuestionAndAnswer, RequiresQuestionAndAnswer, false, 100, "newPasswordAnswer");
 
             try
             {
-                FbConnection con = null;
-
-                try
+                using (FbConnection con = new FbConnection(_fbConnectionString))
                 {
-                    con = new FbConnection(_fbConnectionString);
                     con.Open();
-                    FbCommand cmd = new FbCommand("MEMBERSHIP_PASSQUESTIONANSWER", con);
-
-                    cmd.CommandTimeout = CommandTimeout;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-                    cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
-                    cmd.Parameters.Add("@NewPasswordQuestion", FbDbType.VarChar, 100).Value = newPasswordQuestion;
-                    cmd.Parameters.Add("@NewPasswordAnswer", FbDbType.VarChar, 100).Value = encodedPasswordAnswer;
-                    FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
-                    p.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(p);
-                    cmd.ExecuteNonQuery();
-                    int status = ((p.Value != null) ? ((int)p.Value) : -1);
-                    if (status != 0)
+                    using (FbCommand cmd = new FbCommand("MEMBERSHIP_PASSQUESTIONANSWER", con))
                     {
-                        throw new ProviderException(GetExceptionText(status));
-                    }
+                        cmd.CommandTimeout = CommandTimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                        cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
+                        cmd.Parameters.Add("@NewPasswordQuestion", FbDbType.VarChar, 100).Value = newPasswordQuestion;
+                        cmd.Parameters.Add("@NewPasswordAnswer", FbDbType.VarChar, 100).Value = encodedPasswordAnswer;
+                        FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
+                        p.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(p);
+                        cmd.ExecuteNonQuery();
 
-                    return (status == 0);
-                }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
+                        int status = ((p.Value != null) ? ((int)p.Value) : -1);
+                        if (status != 0)
+                        {
+                            throw new ProviderException(GetExceptionText(status));
+                        }
+
+                        return (status == 0);
                     }
                 }
             }
@@ -508,11 +510,12 @@ namespace FirebirdSql.Web.Providers
             {
                 throw new NotSupportedException("This Membership Provider has not been configured to support password retrieval.");
             }
+
             CheckParameter(ref username, true, true, true, 100, "username");
             string encodedPasswordAnswer = GetEncodedPasswordAnswer(username, passwordAnswer);
             CheckParameter(ref encodedPasswordAnswer, RequiresQuestionAndAnswer, RequiresQuestionAndAnswer, false, 100, "passwordAnswer");
 
-            string errText;
+            string errorText;
             int passwordFormat = 0;
             int status = 0;
 
@@ -520,14 +523,15 @@ namespace FirebirdSql.Web.Providers
 
             if (pass == null)
             {
-                errText = GetExceptionText(status);
+                errorText = GetExceptionText(status);
+
                 if (IsStatusDueToBadPassword(status))
                 {
-                    throw new MembershipPasswordException(errText);
+                    throw new MembershipPasswordException(errorText);
                 }
                 else
                 {
-                    throw new ProviderException(errText);
+                    throw new ProviderException(errorText);
                 }
             }
 
@@ -555,7 +559,6 @@ namespace FirebirdSql.Web.Providers
             }
 
             int count = 0;
-
             for (int i = 0; i < newPassword.Length; i++)
             {
                 if (!char.IsLetterOrDigit(newPassword, i))
@@ -599,48 +602,39 @@ namespace FirebirdSql.Web.Providers
             }
             try
             {
-                FbConnection con = null;
-                try
+                using (FbConnection con = new FbConnection(_fbConnectionString))
                 {
-                    con = new FbConnection(_fbConnectionString);
                     con.Open();
-                    FbCommand cmd = new FbCommand("Membership_SetPassword", con);
-
-                    cmd.CommandTimeout = CommandTimeout;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-                    cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
-                    cmd.Parameters.Add("@NewPassword", FbDbType.VarChar, 100).Value = pass;
-                    cmd.Parameters.Add("@PasswordSalt", FbDbType.VarChar, 100).Value = salt;
-                    cmd.Parameters.Add("@PasswordFormat", FbDbType.Integer).Value = passwordFormat;
-                    FbParameter p = new FbParameter("@ReturnValue", FbDbType.Integer);
-                    p.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(p);
-                    cmd.ExecuteNonQuery();
-                    status = ((p.Value != null) ? ((int)p.Value) : -1);
-                    if (status != 0)
+                    using (FbCommand cmd = new FbCommand("Membership_SetPassword", con))
                     {
-                        string errText = GetExceptionText(status);
+                        cmd.CommandTimeout = CommandTimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                        cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
+                        cmd.Parameters.Add("@NewPassword", FbDbType.VarChar, 100).Value = pass;
+                        cmd.Parameters.Add("@PasswordSalt", FbDbType.VarChar, 100).Value = salt;
+                        cmd.Parameters.Add("@PasswordFormat", FbDbType.Integer).Value = passwordFormat;
+                        FbParameter p = new FbParameter("@ReturnValue", FbDbType.Integer);
+                        p.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(p);
+                        cmd.ExecuteNonQuery();
+                        status = ((p.Value != null) ? ((int)p.Value) : -1);
+                        if (status != 0)
+                        {
+                            string errorText = GetExceptionText(status);
 
-                        if (IsStatusDueToBadPassword(status))
-                        {
-                            throw new MembershipPasswordException(errText);
-                        }
-                        else
-                        {
-                            throw new ProviderException(errText);
+                            if (IsStatusDueToBadPassword(status))
+                            {
+                                throw new MembershipPasswordException(errorText);
+                            }
+                            else
+                            {
+                                throw new ProviderException(errorText);
+                            }
                         }
                     }
 
                     return true;
-                }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
-                    }
                 }
             }
             catch
@@ -665,10 +659,12 @@ namespace FirebirdSql.Web.Providers
             int failedPasswordAttemptCount;
             int failedPasswordAnswerAttemptCount;
             bool isApproved;
-            DateTime lastLoginDate, lastActivityDate;
+            DateTime lastLoginDate;
+            DateTime lastActivityDate;
 
-            GetPasswordWithFormat(username, false, out status, out passwdFromDB, out passwordFormat, out salt, out failedPasswordAttemptCount,
-                                  out failedPasswordAnswerAttemptCount, out isApproved, out lastLoginDate, out lastActivityDate);
+            GetPasswordWithFormat(username, false, out status, out passwdFromDB, out passwordFormat,
+                out salt, out failedPasswordAttemptCount, out failedPasswordAnswerAttemptCount,
+                out isApproved, out lastLoginDate, out lastActivityDate);
             if (status != 0)
             {
                 if (IsStatusDueToBadPassword(status))
@@ -687,9 +683,13 @@ namespace FirebirdSql.Web.Providers
                 passwordAnswer = passwordAnswer.Trim();
             }
             if (!string.IsNullOrEmpty(passwordAnswer))
+            {
                 encodedPasswordAnswer = EncodePassword(passwordAnswer.ToLower(CultureInfo.InvariantCulture), passwordFormat, salt);
+            }
             else
+            {
                 encodedPasswordAnswer = passwordAnswer;
+            }
             CheckParameter(ref encodedPasswordAnswer, RequiresQuestionAndAnswer, RequiresQuestionAndAnswer, false, 100, "passwordAnswer");
             string newPassword = GeneratePassword();
 
@@ -709,53 +709,43 @@ namespace FirebirdSql.Web.Providers
             }
             try
             {
-                FbConnection con = null;
-                try
+                using (FbConnection con = new FbConnection(_fbConnectionString))
                 {
-                    con = new FbConnection(_fbConnectionString);
                     con.Open();
-                    FbCommand cmd = new FbCommand("Membership_ResetPassword", con);
-                    string errText;
-                    cmd.CommandTimeout = CommandTimeout;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-                    cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
-                    cmd.Parameters.Add("@NewPassword", FbDbType.VarChar, 100).Value = EncodePassword(newPassword, (int)passwordFormat, salt);
-                    cmd.Parameters.Add("@MaxInvalidPasswordAttempts", FbDbType.Integer).Value = MaxInvalidPasswordAttempts;
-                    cmd.Parameters.Add("@PasswordAttemptWindow", FbDbType.Integer).Value = PasswordAttemptWindow;
-                    cmd.Parameters.Add("@PasswordSalt", FbDbType.VarChar, 100).Value = salt;
-                    cmd.Parameters.Add("@PasswordFormat", FbDbType.Integer).Value = (int)passwordFormat;
-                    cmd.Parameters.Add("@RequiresQuestionAndAnswer", FbDbType.Integer).Value = RequiresQuestionAndAnswer ? 1 : 0;
-                    cmd.Parameters.Add("@PasswordAnswer", FbDbType.VarChar, 100).Value = encodedPasswordAnswer;
-                    FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
-                    p.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(p);
-                    cmd.ExecuteNonQuery();
-                    status = ((p.Value != null) ? ((int)p.Value) : -1);
-
-                    if (status != 0)
+                    using (FbCommand cmd = new FbCommand("Membership_ResetPassword", con))
                     {
-                        errText = GetExceptionText(status);
+                        cmd.CommandTimeout = CommandTimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                        cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
+                        cmd.Parameters.Add("@NewPassword", FbDbType.VarChar, 100).Value = EncodePassword(newPassword, (int)passwordFormat, salt);
+                        cmd.Parameters.Add("@MaxInvalidPasswordAttempts", FbDbType.Integer).Value = MaxInvalidPasswordAttempts;
+                        cmd.Parameters.Add("@PasswordAttemptWindow", FbDbType.Integer).Value = PasswordAttemptWindow;
+                        cmd.Parameters.Add("@PasswordSalt", FbDbType.VarChar, 100).Value = salt;
+                        cmd.Parameters.Add("@PasswordFormat", FbDbType.Integer).Value = (int)passwordFormat;
+                        cmd.Parameters.Add("@RequiresQuestionAndAnswer", FbDbType.Integer).Value = RequiresQuestionAndAnswer ? 1 : 0;
+                        cmd.Parameters.Add("@PasswordAnswer", FbDbType.VarChar, 100).Value = encodedPasswordAnswer;
+                        FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
+                        p.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(p);
+                        cmd.ExecuteNonQuery();
+                        status = ((p.Value != null) ? ((int)p.Value) : -1);
 
-                        if (IsStatusDueToBadPassword(status))
+                        if (status != 0)
                         {
-                            throw new MembershipPasswordException(errText);
-                        }
-                        else
-                        {
-                            throw new ProviderException(errText);
+                            string errorText = GetExceptionText(status);
+
+                            if (IsStatusDueToBadPassword(status))
+                            {
+                                throw new MembershipPasswordException(errorText);
+                            }
+                            else
+                            {
+                                throw new ProviderException(errorText);
+                            }
                         }
                     }
-
                     return newPassword;
-                }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
-                    }
                 }
             }
             catch
@@ -775,46 +765,38 @@ namespace FirebirdSql.Web.Providers
             CheckParameter(ref temp, true, true, true, 100, "UserName");
             temp = user.Email;
             CheckParameter(ref temp,
-                                       RequiresUniqueEmail,
-                                       RequiresUniqueEmail,
-                                       false,
-                                       100,
-                                       "Email");
+                RequiresUniqueEmail,
+                RequiresUniqueEmail,
+                false,
+                100,
+                "Email");
             user.Email = temp;
             try
             {
-                FbConnection con = null;
-                try
+                using (FbConnection con = new FbConnection(_fbConnectionString))
                 {
-                    con = new FbConnection(_fbConnectionString);
                     con.Open();
-                    FbCommand cmd = new FbCommand("Membership_UpdateUser", con);
-
-                    cmd.CommandTimeout = CommandTimeout;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-                    cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = user.UserName;
-                    cmd.Parameters.Add("@Email", FbDbType.VarChar, 100).Value = user.Email;
-                    cmd.Parameters.Add("@Comment", FbDbType.VarChar, 100).Value = user.Comment;
-                    cmd.Parameters.Add("@IsApproved", FbDbType.Integer).Value = user.IsApproved ? 1 : 0;
-                    cmd.Parameters.Add("@LastLoginDate", FbDbType.TimeStamp).Value = user.LastLoginDate.ToUniversalTime();
-                    cmd.Parameters.Add("@LastActivityDate", FbDbType.TimeStamp).Value = user.LastActivityDate.ToUniversalTime();
-                    cmd.Parameters.Add("@UniqueEmail", FbDbType.Integer).Value = RequiresUniqueEmail ? 1 : 0;
-                    FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
-                    p.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(p);
-                    cmd.ExecuteNonQuery();
-                    int status = ((p.Value != null) ? ((int)p.Value) : -1);
-                    if (status != 0)
-                        throw new ProviderException(GetExceptionText(status));
-                    return;
-                }
-                finally
-                {
-                    if (con != null)
+                    using (FbCommand cmd = new FbCommand("Membership_UpdateUser", con))
                     {
-                        con.Close();
-                        con = null;
+                        cmd.CommandTimeout = CommandTimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                        cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = user.UserName;
+                        cmd.Parameters.Add("@Email", FbDbType.VarChar, 100).Value = user.Email;
+                        cmd.Parameters.Add("@Comment", FbDbType.VarChar, 100).Value = user.Comment;
+                        cmd.Parameters.Add("@IsApproved", FbDbType.Integer).Value = user.IsApproved ? 1 : 0;
+                        cmd.Parameters.Add("@LastLoginDate", FbDbType.TimeStamp).Value = user.LastLoginDate.ToUniversalTime();
+                        cmd.Parameters.Add("@LastActivityDate", FbDbType.TimeStamp).Value = user.LastActivityDate.ToUniversalTime();
+                        cmd.Parameters.Add("@UniqueEmail", FbDbType.Integer).Value = RequiresUniqueEmail ? 1 : 0;
+                        FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
+                        p.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(p);
+                        cmd.ExecuteNonQuery();
+                        int status = ((p.Value != null) ? ((int)p.Value) : -1);
+                        if (status != 0)
+                        {
+                            throw new ProviderException(GetExceptionText(status));
+                        }
                     }
                 }
             }
@@ -829,9 +811,13 @@ namespace FirebirdSql.Web.Providers
             if (ValidateParameter(ref username, true, true, true, 100) &&
                     ValidateParameter(ref password, true, true, false, 100) &&
                     CheckPassword(username, password, true, true))
+            {
                 return true;
+            }
             else
+            {
                 return false;
+            }
         }
 
         public override bool UnlockUser(string username)
@@ -839,37 +825,30 @@ namespace FirebirdSql.Web.Providers
             CheckParameter(ref username, true, true, true, 100, "username");
             try
             {
-                FbConnection con = null;
-                try
+                using (FbConnection con = new FbConnection(_fbConnectionString))
                 {
-                    con = new FbConnection(_fbConnectionString);
                     con.Open();
-                    FbCommand cmd = new FbCommand("Membership_UnlockUser", con);
-
-                    cmd.CommandTimeout = CommandTimeout;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-                    cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
-                    FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
-                    p.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(p);
-
-                    cmd.ExecuteNonQuery();
-
-                    int status = ((p.Value != null) ? ((int)p.Value) : -1);
-                    if (status == 0)
+                    using (FbCommand cmd = new FbCommand("Membership_UnlockUser", con))
                     {
-                        return true;
-                    }
+                        cmd.CommandTimeout = CommandTimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                        cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
+                        FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
+                        p.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(p);
 
-                    return false;
-                }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
+                        cmd.ExecuteNonQuery();
+
+                        int status = ((p.Value != null) ? ((int)p.Value) : -1);
+                        if (status == 0)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
             }
@@ -891,174 +870,111 @@ namespace FirebirdSql.Web.Providers
                 throw new ArgumentException("The provider user key supplied is invalid.  It must be of type System.Guid.", "providerUserKey");
             }
 
-            FbDataReader reader = null;
-
-            try
+            using (FbConnection con = new FbConnection(_fbConnectionString))
             {
-                FbConnection con = null;
-                try
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetUserByUserId", con))
                 {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_GetUserByUserId", con);
-
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@UserId", FbDbType.Guid).Value = providerUserKey;
                     cmd.Parameters.Add("@UpdateLastActivity", FbDbType.Integer).Value = userIsOnline;
-                    reader = cmd.ExecuteReader();
-                    if (reader.Read())
+                    using (FbDataReader reader = cmd.ExecuteReader())
                     {
-                        string email = GetNullableString(reader, 0);
-                        string passwordQuestion = GetNullableString(reader, 1);
-                        string comment = GetNullableString(reader, 2);
-                        bool isApproved = GetNullableBool(reader, 3);
-                        DateTime dtCreate = GetNullableDateTime(reader, 4).ToLocalTime();
-                        DateTime dtLastLogin = GetNullableDateTime(reader, 5).ToLocalTime();
-                        DateTime dtLastActivity = GetNullableDateTime(reader, 6).ToLocalTime();
-                        DateTime dtLastPassChange = GetNullableDateTime(reader, 7).ToLocalTime();
-                        string userName = GetNullableString(reader, 8);
-                        bool isLockedOut = GetNullableBool(reader, 9);
-                        DateTime dtLastLockoutDate = GetNullableDateTime(reader, 10).ToLocalTime();
-                        return new MembershipUser(this.Name,
-                                                   userName,
-                                                   providerUserKey,
-                                                   email,
-                                                   passwordQuestion,
-                                                   comment,
-                                                   isApproved,
-                                                   isLockedOut,
-                                                   dtCreate,
-                                                   dtLastLogin,
-                                                   dtLastActivity,
-                                                   dtLastPassChange,
-                                                   dtLastLockoutDate);
-                    }
-
-                    return null;
-                }
-                finally
-                {
-                    if (reader != null)
-                    {
-                        reader.Close();
-                        reader = null;
-                    }
-
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
+                        if (reader.Read())
+                        {
+                            string email = GetNullableString(reader, 0);
+                            string passwordQuestion = GetNullableString(reader, 1);
+                            string comment = GetNullableString(reader, 2);
+                            bool isApproved = GetNullableBool(reader, 3);
+                            DateTime dtCreate = GetNullableDateTime(reader, 4).ToLocalTime();
+                            DateTime dtLastLogin = GetNullableDateTime(reader, 5).ToLocalTime();
+                            DateTime dtLastActivity = GetNullableDateTime(reader, 6).ToLocalTime();
+                            DateTime dtLastPassChange = GetNullableDateTime(reader, 7).ToLocalTime();
+                            string userName = GetNullableString(reader, 8);
+                            bool isLockedOut = GetNullableBool(reader, 9);
+                            DateTime dtLastLockoutDate = GetNullableDateTime(reader, 10).ToLocalTime();
+                            return new MembershipUser(this.Name,
+                                userName,
+                                providerUserKey,
+                                email,
+                                passwordQuestion,
+                                comment,
+                                isApproved,
+                                isLockedOut,
+                                dtCreate,
+                                dtLastLogin,
+                                dtLastActivity,
+                                dtLastPassChange,
+                                dtLastLockoutDate);
+                        }
                     }
                 }
             }
-            catch
-            {
-                throw;
-            }
+            return null;
         }
 
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
-            CheckParameter(
-                            ref username,
-                            true,
-                            false,
-                            true,
-                            100,
-                            "username");
+            CheckParameter(ref username, true, false, true, 100, "username");
 
-            FbDataReader reader = null;
-
-            try
+            using (FbConnection con = new FbConnection(_fbConnectionString))
             {
-                FbConnection con = null;
-                try
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetUserByName", con))
                 {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_GetUserByName", con);
-
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
                     cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
                     cmd.Parameters.Add("@UpdateLastActivity", FbDbType.Integer).Value = userIsOnline;
-                    reader = cmd.ExecuteReader();
-                    if (reader.Read())
+                    using (FbDataReader reader = cmd.ExecuteReader())
                     {
-                        string email = GetNullableString(reader, 0);
-                        string passwordQuestion = GetNullableString(reader, 1);
-                        string comment = GetNullableString(reader, 2);
-                        bool isApproved = GetNullableBool(reader, 3);
-                        DateTime dtCreate = GetNullableDateTime(reader, 4).ToLocalTime();
-                        DateTime dtLastLogin = GetNullableDateTime(reader, 5).ToLocalTime();
-                        DateTime dtLastActivity = GetNullableDateTime(reader, 6).ToLocalTime();
-                        DateTime dtLastPassChange = GetNullableDateTime(reader, 7).ToLocalTime();
-                        object userId = reader.GetValue(8);
-                        bool isLockedOut = GetNullableBool(reader, 9);
-                        DateTime dtLastLockoutDate = GetNullableDateTime(reader, 10).ToLocalTime(); ;
-                        return new MembershipUser(this.Name,
-                                                   username,
-                                                   userId,
-                                                   email,
-                                                   passwordQuestion,
-                                                   comment,
-                                                   isApproved,
-                                                   isLockedOut,
-                                                   dtCreate,
-                                                   dtLastLogin,
-                                                   dtLastActivity,
-                                                   dtLastPassChange,
-                                                   dtLastLockoutDate);
-                    }
-
-                    return null;
-
-                }
-                finally
-                {
-                    if (reader != null)
-                    {
-                        reader.Close();
-                        reader = null;
-                    }
-
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
+                        if (reader.Read())
+                        {
+                            string email = GetNullableString(reader, 0);
+                            string passwordQuestion = GetNullableString(reader, 1);
+                            string comment = GetNullableString(reader, 2);
+                            bool isApproved = GetNullableBool(reader, 3);
+                            DateTime dtCreate = GetNullableDateTime(reader, 4).ToLocalTime();
+                            DateTime dtLastLogin = GetNullableDateTime(reader, 5).ToLocalTime();
+                            DateTime dtLastActivity = GetNullableDateTime(reader, 6).ToLocalTime();
+                            DateTime dtLastPassChange = GetNullableDateTime(reader, 7).ToLocalTime();
+                            object userId = reader.GetValue(8);
+                            bool isLockedOut = GetNullableBool(reader, 9);
+                            DateTime dtLastLockoutDate = GetNullableDateTime(reader, 10).ToLocalTime(); ;
+                            return new MembershipUser(this.Name,
+                                username,
+                                userId,
+                                email,
+                                passwordQuestion,
+                                comment,
+                                isApproved,
+                                isLockedOut,
+                                dtCreate,
+                                dtLastLogin,
+                                dtLastActivity,
+                                dtLastPassChange,
+                                dtLastLockoutDate);
+                        }
                     }
                 }
             }
-            catch
-            {
-                throw;
-            }
+
+            return null;
         }
 
         public override string GetUserNameByEmail(string email)
         {
-            CheckParameter(
-                            ref email,
-                            false,
-                            false,
-                            false,
-                            100,
-                            "email");
+            CheckParameter(ref email, false, false, false, 100, "email");
 
+            string username = null;
 
-            try
+            using (FbConnection con = new FbConnection(_fbConnectionString))
             {
-                FbConnection con = null;
-                try
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetUserByEmail", con))
                 {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_GetUserByEmail", con);
-                    string username = null;
-                    FbDataReader reader = null;
-
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
@@ -1067,9 +983,8 @@ namespace FirebirdSql.Web.Providers
                     FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
                     p.Direction = ParameterDirection.ReturnValue;
                     cmd.Parameters.Add(p);
-                    try
+                    using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess))
                     {
-                        reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
                         if (reader.Read())
                         {
                             username = GetNullableString(reader, 0);
@@ -1079,25 +994,9 @@ namespace FirebirdSql.Web.Providers
                             }
                         }
                     }
-                    finally
-                    {
-                        if (reader != null)
-                            reader.Close();
-                    }
-                    return username;
                 }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
-                    }
-                }
-            }
-            catch
-            {
-                throw;
+
+                return username;
             }
         }
 
@@ -1105,15 +1004,11 @@ namespace FirebirdSql.Web.Providers
         {
             CheckParameter(ref username, true, true, true, 100, "username");
 
-            try
+            using (FbConnection con = new FbConnection(_fbConnectionString))
             {
-                FbConnection con = null;
-                try
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_DeleteUser", con))
                 {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_DeleteUser", con);
-
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
@@ -1129,18 +1024,6 @@ namespace FirebirdSql.Web.Providers
 
                     return (status > 0);
                 }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
-                    }
-                }
-            }
-            catch
-            {
-                throw;
             }
         }
 
@@ -1157,24 +1040,19 @@ namespace FirebirdSql.Web.Providers
 
             MembershipUserCollection users = new MembershipUserCollection();
             totalRecords = 0;
-            try
-            {
-                FbConnection con = null;
-                try
-                {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_GetAllUsers", con);
-                    FbDataReader reader = null;
 
+            using (FbConnection con = new FbConnection(_fbConnectionString))
+            {
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetAllUsers", con))
+                {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
                     cmd.Parameters.Add("@PageIndex", FbDbType.Integer).Value = pageIndex;
                     cmd.Parameters.Add("@PageSize", FbDbType.Integer).Value = pageSize;
-                    try
+                    using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess))
                     {
-                        reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
                         while (reader.Read())
                         {
 
@@ -1199,39 +1077,22 @@ namespace FirebirdSql.Web.Providers
                             dtLastLockoutDate = GetNullableDateTime(reader, 11).ToLocalTime();
                             totalRecords = reader.GetInt32(12);
                             users.Add(new MembershipUser(this.Name,
-                                                           username,
-                                                           userId,
-                                                           email,
-                                                           passwordQuestion,
-                                                           comment,
-                                                           isApproved,
-                                                           isLockedOut,
-                                                           dtCreate,
-                                                           dtLastLogin,
-                                                           dtLastActivity,
-                                                           dtLastPassChange,
-                                                           dtLastLockoutDate));
+                                username,
+                                userId,
+                                email,
+                                passwordQuestion,
+                                comment,
+                                isApproved,
+                                isLockedOut,
+                                dtCreate,
+                                dtLastLogin,
+                                dtLastActivity,
+                                dtLastPassChange,
+                                dtLastLockoutDate));
                         }
 
                     }
-                    finally
-                    {
-                        if (reader != null)
-                            reader.Close();
-                    }
                 }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
-                    }
-                }
-            }
-            catch
-            {
-                throw;
             }
             return users;
         }
@@ -1239,16 +1100,13 @@ namespace FirebirdSql.Web.Providers
         public override int GetNumberOfUsersOnline()
         {
 
-            try
+            TimeSpan onlineSpan = new TimeSpan(0, System.Web.Security.Membership.UserIsOnlineTimeWindow, 0);
+            DateTime compareTime = DateTime.Now.Subtract(onlineSpan);
+            using (FbConnection con = new FbConnection(_fbConnectionString))
             {
-                FbConnection con = null;
-                try
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetUsersOnline", con))
                 {
-                    TimeSpan onlineSpan = new TimeSpan(0, System.Web.Security.Membership.UserIsOnlineTimeWindow, 0);
-                    DateTime compareTime = DateTime.Now.Subtract(onlineSpan);
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_GetUsersOnline", con);
                     FbParameter p = new FbParameter("@NUMBERUSERS", FbDbType.Integer);
 
                     cmd.CommandTimeout = CommandTimeout;
@@ -1261,18 +1119,6 @@ namespace FirebirdSql.Web.Providers
                     int num = ((p.Value != null) ? ((int)p.Value) : -1);
                     return num;
                 }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
-                    }
-                }
-            }
-            catch
-            {
-                throw;
             }
         }
 
@@ -1289,27 +1135,23 @@ namespace FirebirdSql.Web.Providers
             if (upperBound > Int32.MaxValue)
                 throw new ArgumentException("The combination of pageIndex and pageSize cannot exceed the maximum value of System.Int32.", "pageIndex and pageSize");
 
-            try
-            {
-                FbConnection con = null;
-                totalRecords = 0;
-                try
-                {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_FindUsersByName", con);
-                    MembershipUserCollection users = new MembershipUserCollection();
-                    FbDataReader reader = null;
 
+            MembershipUserCollection users = new MembershipUserCollection();
+            totalRecords = 0;
+
+            using (FbConnection con = new FbConnection(_fbConnectionString))
+            {
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_FindUsersByName", con))
+                {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
                     cmd.Parameters.Add("@UserNameToMatch", FbDbType.VarChar, 100).Value = usernameToMatch;
                     cmd.Parameters.Add("@PageIndex", FbDbType.Integer).Value = pageIndex;
                     cmd.Parameters.Add("@PageSize", FbDbType.Integer).Value = pageSize;
-                    try
+                    using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess))
                     {
-                        reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
                         while (reader.Read())
                         {
                             string username, email, passwordQuestion, comment;
@@ -1333,41 +1175,23 @@ namespace FirebirdSql.Web.Providers
                             dtLastLockoutDate = GetNullableDateTime(reader, 11).ToLocalTime();
                             totalRecords = reader.GetInt32(12);
                             users.Add(new MembershipUser(this.Name,
-                                                           username,
-                                                           userId,
-                                                           email,
-                                                           passwordQuestion,
-                                                           comment,
-                                                           isApproved,
-                                                           isLockedOut,
-                                                           dtCreate,
-                                                           dtLastLogin,
-                                                           dtLastActivity,
-                                                           dtLastPassChange,
-                                                           dtLastLockoutDate));
+                                username,
+                                userId,
+                                email,
+                                passwordQuestion,
+                                comment,
+                                isApproved,
+                                isLockedOut,
+                                dtCreate,
+                                dtLastLogin,
+                                dtLastActivity,
+                                dtLastPassChange,
+                                dtLastLockoutDate));
                         }
-
-                        return users;
-                    }
-                    finally
-                    {
-                        if (reader != null)
-                            reader.Close();
-                    }
-                }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
                     }
                 }
             }
-            catch
-            {
-                throw;
-            }
+            return users;
         }
 
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
@@ -1383,18 +1207,14 @@ namespace FirebirdSql.Web.Providers
             if (upperBound > Int32.MaxValue)
                 throw new ArgumentException("The combination of pageIndex and pageSize cannot exceed the maximum value of System.Int32.", "pageIndex and pageSize");
 
-            try
-            {
-                FbConnection con = null;
-                totalRecords = 0;
-                try
-                {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_FindUsersByEmail", con);
-                    MembershipUserCollection users = new MembershipUserCollection();
-                    FbDataReader reader = null;
+            totalRecords = 0;
+            MembershipUserCollection users = new MembershipUserCollection();
 
+            using (FbConnection con = new FbConnection(_fbConnectionString))
+            {
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_FindUsersByEmail", con))
+                {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
@@ -1402,9 +1222,8 @@ namespace FirebirdSql.Web.Providers
                     cmd.Parameters.Add("@PageIndex", FbDbType.Integer).Value = pageIndex;
                     cmd.Parameters.Add("@PageSize", FbDbType.Integer).Value = pageSize;
 
-                    try
+                    using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess))
                     {
-                        reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
                         while (reader.Read())
                         {
                             string username, email, passwordQuestion, comment;
@@ -1428,43 +1247,24 @@ namespace FirebirdSql.Web.Providers
                             dtLastLockoutDate = GetNullableDateTime(reader, 11).ToLocalTime();
                             totalRecords = reader.GetInt32(12);
                             users.Add(new MembershipUser(this.Name,
-                                                           username,
-                                                           userId,
-                                                           email,
-                                                           passwordQuestion,
-                                                           comment,
-                                                           isApproved,
-                                                           isLockedOut,
-                                                           dtCreate,
-                                                           dtLastLogin,
-                                                           dtLastActivity,
-                                                           dtLastPassChange,
-                                                           dtLastLockoutDate));
+                                username,
+                                userId,
+                                email,
+                                passwordQuestion,
+                                comment,
+                                isApproved,
+                                isLockedOut,
+                                dtCreate,
+                                dtLastLogin,
+                                dtLastActivity,
+                                dtLastPassChange,
+                                dtLastLockoutDate));
                         }
-
-                        return users;
-                    }
-                    finally
-                    {
-                        if (reader != null)
-                            reader.Close();
-                    }
-                }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
                     }
                 }
             }
-            catch
-            {
-                throw;
-            }
+            return users;
         }
-
 
         #endregion
 
@@ -1584,14 +1384,14 @@ namespace FirebirdSql.Web.Providers
 
         private bool CheckPassword(string username, string password, bool updateLastLoginActivityDate, bool failIfNotApproved, out string salt, out int passwordFormat)
         {
-            FbConnection con = null;
             string passwdFromDB;
             int status;
             int failedPasswordAttemptCount;
             int failedPasswordAnswerAttemptCount;
             bool isPasswordCorrect;
             bool isApproved;
-            DateTime lastLoginDate, lastActivityDate;
+            DateTime lastLoginDate;
+            DateTime lastActivityDate;
 
             GetPasswordWithFormat(username, updateLastLoginActivityDate, out status, out passwdFromDB, out passwordFormat, out salt, out failedPasswordAttemptCount,
                                   out failedPasswordAnswerAttemptCount, out isApproved, out lastLoginDate, out lastActivityDate);
@@ -1607,13 +1407,11 @@ namespace FirebirdSql.Web.Providers
             if (isPasswordCorrect && failedPasswordAttemptCount == 0 && failedPasswordAnswerAttemptCount == 0)
                 return true;
 
-            try
+            using (FbConnection con = new FbConnection(_fbConnectionString))
             {
-                try
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_UpdateUserInfo", con))
                 {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_UpdateUserInfo", con);
                     DateTime dtNow = DateTime.UtcNow;
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -1633,18 +1431,6 @@ namespace FirebirdSql.Web.Providers
 
                     status = ((p.Value != null) ? ((int)p.Value) : -1);
                 }
-                finally
-                {
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
-                    }
-                }
-            }
-            catch
-            {
-                throw;
             }
 
             return isPasswordCorrect;
@@ -1662,66 +1448,43 @@ namespace FirebirdSql.Web.Providers
                                            out DateTime lastLoginDate,
                                            out DateTime lastActivityDate)
         {
-            try
+            using (FbConnection con = new FbConnection(_fbConnectionString))
             {
-                FbConnection con = null;
-                FbDataReader reader = null;
-
-                try
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetPasswordandFormat", con))
                 {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_GetPasswordandFormat", con);
-
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
                     cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
                     cmd.Parameters.Add("@UpdateLastLoginActivityDate", FbDbType.Integer).Value = updateLastLoginActivityDate;
-                    reader = cmd.ExecuteReader(CommandBehavior.SingleRow);
-                    status = -1;
-                    if (reader.Read())
+                    using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                     {
-                        password = reader.GetString(0);
-                        passwordFormat = GetNullableInt(reader, 1);
-                        passwordSalt = GetNullableString(reader, 2);
-                        failedPasswordAttemptCount = GetNullableInt(reader, 3);
-                        failedPasswordAnswerAttemptCount = GetNullableInt(reader, 4);
-                        isApproved = GetNullableBool(reader, 5);
-                        lastLoginDate = GetNullableDateTime(reader, 6);
-                        lastActivityDate = GetNullableDateTime(reader, 7);
-                    }
-                    else
-                    {
-                        password = null;
-                        passwordFormat = 0;
-                        passwordSalt = null;
-                        failedPasswordAttemptCount = 0;
-                        failedPasswordAnswerAttemptCount = 0;
-                        isApproved = false;
-                        lastLoginDate = DateTime.UtcNow;
-                        lastActivityDate = DateTime.UtcNow;
-                    }
-                }
-                finally
-                {
-                    if (reader != null)
-                    {
-                        status = GetNullableInt(reader, 8);
-                        reader.Close();
-                        reader = null;
-                    }
-
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
+                        status = -1;
+                        if (reader.Read())
+                        {
+                            password = reader.GetString(0);
+                            passwordFormat = GetNullableInt(reader, 1);
+                            passwordSalt = GetNullableString(reader, 2);
+                            failedPasswordAttemptCount = GetNullableInt(reader, 3);
+                            failedPasswordAnswerAttemptCount = GetNullableInt(reader, 4);
+                            isApproved = GetNullableBool(reader, 5);
+                            lastLoginDate = GetNullableDateTime(reader, 6);
+                            lastActivityDate = GetNullableDateTime(reader, 7);
+                        }
+                        else
+                        {
+                            password = null;
+                            passwordFormat = 0;
+                            passwordSalt = null;
+                            failedPasswordAttemptCount = 0;
+                            failedPasswordAnswerAttemptCount = 0;
+                            isApproved = false;
+                            lastLoginDate = DateTime.UtcNow;
+                            lastActivityDate = DateTime.UtcNow;
+                        }
                     }
                 }
-            }
-            catch
-            {
-                throw;
             }
 
         }
@@ -1732,17 +1495,13 @@ namespace FirebirdSql.Web.Providers
                                           out int passwordFormat,
                                           out int status)
         {
-            try
+            string password;
+
+            using (FbConnection con = new FbConnection(_fbConnectionString))
             {
-                FbConnection con = null;
-                FbDataReader reader = null;
-
-                try
+                con.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetPassword", con))
                 {
-                    con = new FbConnection(_fbConnectionString);
-                    con.Open();
-                    FbCommand cmd = new FbCommand("Membership_GetPassword", con);
-
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
@@ -1751,46 +1510,23 @@ namespace FirebirdSql.Web.Providers
                     cmd.Parameters.Add("@PasswordAttemptWindow", FbDbType.Integer).Value = PasswordAttemptWindow;
                     cmd.Parameters.Add("@requiresQuestionAndAnswer", FbDbType.Integer).Value = requiresQuestionAndAnswer ? 1 : 0;
                     cmd.Parameters.Add("@PasswordAnswer", FbDbType.VarChar, 100).Value = passwordAnswer;
-                    reader = cmd.ExecuteReader(CommandBehavior.SingleRow);
-
-                    string password = null;
-
-                    status = -1;
-
-                    if (reader.Read())
+                    using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                     {
-                        password = reader.GetString(0);
-                        passwordFormat = reader.GetInt32(1);
-                    }
-                    else
-                    {
-                        password = null;
-                        passwordFormat = 0;
-                    }
-
-                    return password;
-                }
-                finally
-                {
-                    if (reader != null)
-                    {
+                        if (reader.Read())
+                        {
+                            password = reader.GetString(0);
+                            passwordFormat = reader.GetInt32(1);
+                        }
+                        else
+                        {
+                            password = null;
+                            passwordFormat = 0;
+                        }
                         status = GetNullableInt(reader, 2);
-                        reader.Close();
-                        reader = null;
-                    }
-
-                    if (con != null)
-                    {
-                        con.Close();
-                        con = null;
                     }
                 }
             }
-            catch
-            {
-                throw;
-            }
-
+            return password;
         }
 
         private string GetEncodedPasswordAnswer(string username, string passwordAnswer)
@@ -1800,17 +1536,28 @@ namespace FirebirdSql.Web.Providers
                 passwordAnswer = passwordAnswer.Trim();
             }
             if (string.IsNullOrEmpty(passwordAnswer))
+            {
                 return passwordAnswer;
-            int status, passwordFormat, failedPasswordAttemptCount, failedPasswordAnswerAttemptCount;
-            string password, passwordSalt;
+            }
+
+            int status;
+            int passwordFormat;
+            int failedPasswordAttemptCount;
+            int failedPasswordAnswerAttemptCount;
+            string password;
+            string passwordSalt;
             bool isApproved;
             DateTime lastLoginDate, lastActivityDate;
             GetPasswordWithFormat(username, false, out status, out password, out passwordFormat, out passwordSalt,
                                   out failedPasswordAttemptCount, out failedPasswordAnswerAttemptCount, out isApproved, out lastLoginDate, out lastActivityDate);
             if (status == 0)
+            {
                 return EncodePassword(passwordAnswer.ToLower(CultureInfo.InvariantCulture), passwordFormat, passwordSalt);
+            }
             else
+            {
                 throw new ProviderException(GetExceptionText(status));
+            }
         }
 
         public virtual string GeneratePassword()
