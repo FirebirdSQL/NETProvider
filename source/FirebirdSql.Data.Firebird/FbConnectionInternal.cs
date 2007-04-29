@@ -159,22 +159,25 @@ namespace FirebirdSql.Data.Firebird
 
 		public void Disconnect()
 		{
-			try
-			{
-				this.db.Dispose();
+            if (this.db != null)
+            {
+                try
+                {
+                    this.db.Dispose();
 
-				this.owningConnection	= null;
-				this.options			= null;
-				this.lifetime			= 0;
-				this.pooled				= false;
-				this.db					= null;
+                    this.owningConnection   = null;
+                    this.options            = null;
+                    this.lifetime           = 0;
+                    this.pooled             = false;
+                    this.db                 = null;
 
-				this.DisposePreparedCommands();
-			}
-			catch (IscException ex)
-			{
-				throw new FbException(ex.Message, ex);
-			}
+                    this.DisposePreparedCommands();
+                }
+                catch (IscException ex)
+                {
+                    throw new FbException(ex.Message, ex);
+                }
+            }
 		}
 
 		#endregion
@@ -320,7 +323,7 @@ namespace FirebirdSql.Data.Firebird
 
 		public void CloseEventManager()
 		{
-			if (this.db.HasRemoteEventSupport)
+            if (this.db != null && this.db.HasRemoteEventSupport)
 			{
 				lock (this.db)
 				{

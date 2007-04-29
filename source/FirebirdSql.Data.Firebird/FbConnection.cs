@@ -754,34 +754,40 @@ namespace FirebirdSql.Data.Firebird
 			{
 				try
 				{
-					lock (this.innerConnection)
-					{
-						// Close the Remote	Event Manager
-						this.innerConnection.CloseEventManager();
+                    if (this.innerConnection != null)
+                    {
+                        lock (this.innerConnection)
+                        {
+                            // Close the Remote	Event Manager
+                            this.innerConnection.CloseEventManager();
 
-						// Unbind Warning messages event
-						this.innerConnection.Database.WarningMessage = null;
+                            // Unbind Warning messages event
+                            if (this.innerConnection.Database != null)
+                            {
+                                this.innerConnection.Database.WarningMessage = null;
+                            }
 
-						// Dispose Transaction
-						this.innerConnection.DisposeTransaction();
+                            // Dispose Transaction
+                            this.innerConnection.DisposeTransaction();
 
-						// Dispose all active statemenets
-						this.innerConnection.DisposePreparedCommands();
+                            // Dispose all active statemenets
+                            this.innerConnection.DisposePreparedCommands();
 
-						// Close connection	or send	it back	to the pool
-						if (this.innerConnection.Pooled)
-						{
-							// Get Connection Pool
-							FbConnectionPool pool = FbPoolManager.Instance.FindPool(this.connectionString);
+                            // Close connection	or send	it back	to the pool
+                            if (this.innerConnection.Pooled)
+                            {
+                                // Get Connection Pool
+                                FbConnectionPool pool = FbPoolManager.Instance.FindPool(this.connectionString);
 
-							// Send	connection to the Pool
-							pool.CheckIn(this.innerConnection);
-						}
-						else
-						{
-							this.innerConnection.Disconnect();
-						}
-					}
+                                // Send	connection to the Pool
+                                pool.CheckIn(this.innerConnection);
+                            }
+                            else
+                            {
+                                this.innerConnection.Disconnect();
+                            }
+                        }
+                    }
 
 					// Update connection state
 					this.OnStateChange(this.state, ConnectionState.Closed);
