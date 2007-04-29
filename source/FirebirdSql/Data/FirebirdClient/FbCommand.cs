@@ -399,28 +399,25 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					try
 					{
-						// If there	are	an active reader close it
-						this.CloseReader();
-
 						// Release any unmanaged resources
 						this.Release();
 
 						// release any managed resources
-						if (disposing)
-						{
-							this.commandTimeout		    = 0;
-                            this.fetchSize              = 0;
-							this.implicitTransaction    = false;
-							this.commandText		    = null;
-							this.connection			    = null;
-							this.transaction		    = null;
-							this.parameters			    = null;
-                            this.statement              = null;
-                            this.activeReader           = null;
+						this.commandTimeout		    = 0;
+                        this.fetchSize              = 0;
+						this.implicitTransaction    = false;
+						this.commandText		    = null;
+						this.connection			    = null;
+						this.transaction		    = null;
+						this.parameters			    = null;
+                        this.statement              = null;
+                        this.activeReader           = null;
 
-							this.namedParameters.Clear();
-							this.namedParameters = null;
-						}
+                        if (this.namedParameters != null)
+                        {
+                            this.namedParameters.Clear();
+                            this.namedParameters = null;
+                        }
 
 						this.disposed = true;
 					}
@@ -798,13 +795,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal void Release()
 		{
+            // Rollback implicit transaction
 			this.RollbackImplicitTransaction();
 
+            // If there	are	an active reader close it
+            this.CloseReader();
+
+            // Remove the command from the Prepared commands list
 			if (this.connection != null && this.connection.State == ConnectionState.Open)
 			{
 				this.connection.InnerConnection.RemovePreparedCommand(this);
 			}
 
+            // Dipose the inner statement
 			if (this.statement != null)
 			{
 				this.statement.Dispose();
@@ -1104,10 +1107,8 @@ namespace FirebirdSql.Data.FirebirdClient
                 }
                 else
                 {
-                    this.implicitTransaction = true;
-                    IsolationLevel il = this.connection.ConnectionOptions.IsolationLevel;
-
-                    this.transaction = new FbTransaction(this.connection, il);
+                    this.implicitTransaction    = true;
+                    this.transaction            = new FbTransaction(this.connection, this.connection.ConnectionOptions.IsolationLevel);
                     this.transaction.BeginTransaction();
 
                     // Update Statement	transaction
