@@ -661,11 +661,13 @@ namespace FirebirdSql.Data.Client.Gds
 				user_id.WriteByte(1);
 				user_id.WriteByte((byte)user.Length);
 				user_id.Write(user, 0, user.Length);
-				/* Host	name */
+				
+                /* Host	name */
 				user_id.WriteByte(4);
 				user_id.WriteByte((byte)host.Length);
 				user_id.Write(host, 0, host.Length);
-				/* Attach/create using this	connection 
+				
+                /* Attach/create using this	connection 
 				 * will	use	user verification
 				 */
 				user_id.WriteByte(6);
