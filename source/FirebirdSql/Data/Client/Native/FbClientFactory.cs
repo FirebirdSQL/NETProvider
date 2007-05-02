@@ -22,7 +22,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	/// <summary>
 	/// This class generates a dynamic class that implements the <see cref="IFbClient"/> interface and

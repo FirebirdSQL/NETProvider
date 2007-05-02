@@ -21,7 +21,7 @@ using System.IO;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesBlob : BlobBase
 	{
@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Client.Embedded
 
 		#region · Properties ·
 
-		public override IDatabase DB
+		public override IDatabase Database
 		{
 			get { return this.db; }
 		}

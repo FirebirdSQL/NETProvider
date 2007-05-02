@@ -23,7 +23,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	/// <summary>
 	/// This is the interface that the dynamically-generated class uses to call the native library.

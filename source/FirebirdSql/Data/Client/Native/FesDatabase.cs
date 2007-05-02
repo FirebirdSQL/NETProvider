@@ -20,12 +20,13 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Data;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesDatabase : IDatabase
 	{
@@ -51,6 +52,7 @@ namespace FirebirdSql.Data.Client.Embedded
 		private short	dialect;
 		private bool	disposed;
         private int[]   statusVector;
+        private object  syncObject;
 
 		private IFbClient fbClient;
 
@@ -101,6 +103,19 @@ namespace FirebirdSql.Data.Client.Embedded
 		{
 			get { return fbClient; }
 		}
+
+        public object SyncObject
+        {
+            get 
+            { 
+                if (this.syncObject == null)
+                {
+                    Interlocked.CompareExchange(ref this.syncObject, new object(), null);
+                }
+
+                return this.syncObject;
+            }
+        }
 
 		#endregion
 
@@ -442,5 +457,5 @@ namespace FirebirdSql.Data.Client.Embedded
 		}
 
 		#endregion
-	}
+    }
 }
