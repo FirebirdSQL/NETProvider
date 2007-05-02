@@ -48,7 +48,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public override IDatabase Database
 		{
 			get { return this.db; }
-			set { this.db = (ExtDatabase)value; }
 		}
 
 		public override ITransaction Transaction
@@ -92,6 +91,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public override int RecordsAffected
 		{
 			get { return this.recordsAffected; }
+            protected set { this.recordsAffected = value; }
 		}
 
 		public override bool IsPrepared
@@ -112,13 +112,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public override DbStatementType StatementType
 		{
 			get { return this.statementType; }
-			set { this.statementType = value; }
+			protected set { this.statementType = value; }
 		}
 
 		public override StatementState State
 		{
 			get { return this.state; }
-			set { this.state = value; }
+			protected set { this.state = value; }
 		}
 
 		public override int FetchSize
