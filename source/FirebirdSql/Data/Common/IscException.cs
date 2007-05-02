@@ -268,6 +268,11 @@ namespace FirebirdSql.Data.Common
 
 #endif
 
+        public override string ToString()
+        {
+            return this.message;
+        }
+
 		#endregion
 	}
 }

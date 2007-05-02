@@ -90,73 +90,73 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Properties ·
+        #region · Abstract Properties ·
 
-		protected bool IsDisposed
-		{
-			get { return this.disposed; }
-		}
+        public abstract IDatabase Database
+        {
+            get;
+        }
 
-		#endregion
+        public abstract ITransaction Transaction
+        {
+            get;
+            set;
+        }
 
-		#region · Abstract Properties ·
+        public abstract Descriptor Parameters
+        {
+            get;
+            set;
+        }
 
-		public abstract IDatabase DB
-		{
-			get;
-			set;
-		}
+        public abstract Descriptor Fields
+        {
+            get;
+        }
 
-		public abstract ITransaction Transaction
-		{
-			get;
-			set;
-		}
+        public abstract int RecordsAffected
+        {
+            get;
+            protected set;
+        }
 
-		public abstract Descriptor Parameters
-		{
-			get;
-			set;
-		}
+        public abstract bool IsPrepared
+        {
+            get;
+        }
 
-		public abstract Descriptor Fields
-		{
-			get;
-		}
+        public abstract DbStatementType StatementType
+        {
+            get;
+            protected set;
+        }
 
-		public abstract int RecordsAffected
-		{
-			get;
-		}
+        public abstract StatementState State
+        {
+            get;
+            protected set;
+        }
 
-		public abstract bool IsPrepared
-		{
-			get;
-		}
-
-		public abstract DbStatementType StatementType
-		{
-			get;
-			set;
-		}
-
-		public abstract StatementState State
-		{
-			get;
-			set;
-		}
-
-		public abstract int FetchSize
-		{
-			get;
-			set;
-		}
+        public abstract int FetchSize
+        {
+            get;
+            set;
+        }
 
         public abstract bool ReturnRecordsAffected
         {
             get;
             set;
         }
+
+        #endregion
+
+		#region · Protected Properties ·
+
+		protected bool IsDisposed
+		{
+			get { return this.disposed; }
+		}
 
 		#endregion
 
@@ -216,7 +216,7 @@ namespace FirebirdSql.Data.Common
 
 			if (len > 0)
 			{
-				plan = this.DB.Charset.GetString(buffer, 4, --len);
+				plan = this.Database.Charset.GetString(buffer, 4, --len);
 			}
 
 			return plan;

@@ -76,6 +76,11 @@ namespace FirebirdSql.Data.Common
 			get;
 		}
 
+        object SyncObject
+        {
+            get;
+        }
+
 		#endregion
 
 		#region · Methods ·
