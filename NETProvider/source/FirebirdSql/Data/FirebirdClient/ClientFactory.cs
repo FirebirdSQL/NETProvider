@@ -18,6 +18,7 @@
 
 using System;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Client.Managed.Version10;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -30,17 +31,17 @@ namespace FirebirdSql.Data.FirebirdClient
             switch (options.ServerType)
             {
                 case FbServerType.Default:
-                    // C# Client
-                    return new FirebirdSql.Data.Client.Gds.GdsDatabase();
+                    // Managed Client
+                    return CreateManagedDatabase(options);
 
 #if (!NETCF)
 
                 case FbServerType.Embedded:
-                    // PInvoke Client
-                    return new FirebirdSql.Data.Client.Embedded.FesDatabase(options.ClientLibrary);
+                    // Native (PInvoke) Client
+                    return new FirebirdSql.Data.Client.Native.FesDatabase(options.ClientLibrary);
 
                 case FbServerType.Context:
-                    // External Engine Client
+                    // External Engine (PInvoke) Client
                     return new FirebirdSql.Data.Client.ExternalEngine.ExtDatabase();
 
 #endif
@@ -55,14 +56,13 @@ namespace FirebirdSql.Data.FirebirdClient
             switch (options.ServerType)
             {
                 case FbServerType.Default:
-                    // C# Client
-                    return new FirebirdSql.Data.Client.Gds.GdsServiceManager();
+                    return CreateManagedServiceManager(options);
 
 #if (!NETCF)
 
                 case FbServerType.Embedded:
                     // PInvoke Client
-                    return new FirebirdSql.Data.Client.Embedded.FesServiceManager(options.ClientLibrary);
+                    return new FirebirdSql.Data.Client.Native.FesServiceManager(options.ClientLibrary);
 
 #endif
 
@@ -71,6 +71,47 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
+        private static IDatabase CreateManagedDatabase(FbConnectionString options)
+        {
+            GdsConnection connection = new GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
+
+            connection.Connect();
+            connection.Identify(options.Database);
+
+            if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION11)
+            {
+                return new FirebirdSql.Data.Client.Managed.Version11.GdsDatabase(connection);
+            }
+            else if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION10)
+            {
+                return new FirebirdSql.Data.Client.Managed.Version10.GdsDatabase(connection);
+            }
+            else
+            {
+                throw new NotSupportedException("Protocol not supported.");
+            }
+        }
+
+        private static GdsServiceManager CreateManagedServiceManager(FbConnectionString options)
+        {
+            GdsConnection connection = new GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
+
+            connection.Connect();
+            connection.Identify(options.Database);
+
+            if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION11)
+            {
+                return new FirebirdSql.Data.Client.Managed.Version10.GdsServiceManager(connection);
+            }
+            else if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION10)
+            {
+                return new FirebirdSql.Data.Client.Managed.Version10.GdsServiceManager(connection);
+            }
+            else
+            {
+                throw new NotSupportedException("Protocol not supported.");
+            }
+        }
         #endregion
 
         #region · Constructors ·

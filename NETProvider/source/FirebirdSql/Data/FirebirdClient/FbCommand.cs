@@ -1062,7 +1062,7 @@ namespace FirebirdSql.Data.FirebirdClient
 									}
 									else
 									{
-										this.statement.Parameters[i].ArrayHandle.DB = this.statement.DB;
+										this.statement.Parameters[i].ArrayHandle.DB = this.statement.Database;
 										this.statement.Parameters[i].ArrayHandle.Transaction = this.statement.Transaction;
 									}
 
