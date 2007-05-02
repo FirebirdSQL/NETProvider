@@ -23,7 +23,7 @@ using System.Text;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Client.Common;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesStatement : StatementBase
 	{
@@ -47,10 +47,9 @@ namespace FirebirdSql.Data.Client.Embedded
 
 		#region · Properties ·
 
-		public override IDatabase DB
+		public override IDatabase Database
 		{
 			get { return this.db; }
-			set { this.db = (FesDatabase)value; }
 		}
 
 		public override ITransaction Transaction
@@ -63,7 +62,7 @@ namespace FirebirdSql.Data.Client.Embedded
 					if (this.TransactionUpdate != null && this.transaction != null)
 					{
 						this.transaction.Update -= this.TransactionUpdate;
-						this.TransactionUpdate = null;
+						this.TransactionUpdate  = null;
 					}
 
 					if (value == null)
@@ -72,8 +71,8 @@ namespace FirebirdSql.Data.Client.Embedded
 					}
 					else
 					{
-						this.transaction = (FesTransaction)value;
-						this.TransactionUpdate = new TransactionUpdateEventHandler(this.TransactionUpdated);
+						this.transaction        = (FesTransaction)value;
+						this.TransactionUpdate  = new TransactionUpdateEventHandler(this.TransactionUpdated);
 						this.transaction.Update += this.TransactionUpdate;
 					}
 				}
@@ -94,6 +93,7 @@ namespace FirebirdSql.Data.Client.Embedded
 		public override int RecordsAffected
 		{
 			get { return this.recordsAffected; }
+            protected set { this.recordsAffected = value; }
 		}
 
 		public override bool IsPrepared
@@ -114,13 +114,13 @@ namespace FirebirdSql.Data.Client.Embedded
 		public override DbStatementType StatementType
 		{
 			get { return this.statementType; }
-			set { this.statementType = value; }
+			protected set { this.statementType = value; }
 		}
 
 		public override StatementState State
 		{
 			get { return this.state; }
-			set { this.state = value; }
+			protected set { this.state = value; }
 		}
 
 		public override int FetchSize

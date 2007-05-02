@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesTransaction : ITransaction, IDisposable
 	{

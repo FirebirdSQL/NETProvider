@@ -20,7 +20,7 @@ using System;
 using System.IO;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesServiceManager : IServiceManager
 	{

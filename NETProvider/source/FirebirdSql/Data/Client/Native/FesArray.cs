@@ -30,7 +30,7 @@ using System.Text;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Client.Common;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed	class FesArray : ArrayBase
 	{

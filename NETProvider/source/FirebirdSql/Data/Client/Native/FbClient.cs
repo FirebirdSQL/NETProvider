@@ -20,7 +20,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace FirebirdSql.Data.Client.Embedded
+namespace FirebirdSql.Data.Client.Native
 {
 	[SuppressUnmanagedCodeSecurity]
 	internal sealed class FbClient
