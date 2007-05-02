@@ -286,6 +286,7 @@
         <include name="System.Configuration.dll" />
         <include name="System.Data.dll" />
         <include name="System.XML.dll" />
+		<include name="System.Transactions.dll" />
         <include name="${nunit.framework.dll}"/>
         <include name="${build.dir}/FirebirdSql.Data.FirebirdClient.dll" />
       </references>
