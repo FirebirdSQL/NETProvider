@@ -96,6 +96,20 @@ namespace FirebirdSql.Data.Common
 		 */
 		public const int PROTOCOL_VERSION10 = 10;
 
+        // Since protocol 11 we must be separated from Borland Interbase.
+        // Therefore always set highmost bit in protocol version to 1.
+        // For unsigned protocol version this does not break version's compare.
+
+        public const int FB_PROTOCOL_FLAG = 0x8000;
+        public const int FB_PROTOCOL_MASK = ~FB_PROTOCOL_FLAG;
+
+        // Protocol 11 has support for user authentication related 
+        // operations (op_update_account_info, op_authenticate_user and 
+        // op_trusted_auth). When specific operation is not supported,
+        // we say "sorry".
+
+        public const int PROTOCOL_VERSION11 = (FB_PROTOCOL_FLAG | 11);
+
 		#endregion
 
 		#region · Server Class ·
@@ -208,6 +222,15 @@ namespace FirebirdSql.Data.Common
 		public const int op_service_info        = 84;
 		public const int op_service_start       = 85;
 		public const int op_rollback_retaining  = 86;
+
+	    // Two following opcode are used in vulcan.
+	    // No plans to implement them completely for a while, but to 
+	    // support protocol 11, where they are used, have them here.
+        public const int op_update_account_info = 87;
+	    public const int op_authenticate_user	= 88;
+
+	    public const int op_partial				= 89;	// packet is not complete - delay processing
+	    public const int op_trusted_auth		= 90;
 
 		#endregion
 

@@ -55,10 +55,10 @@ namespace FirebirdSql.Data.Common
 
         #region · Protected Fields ·
 
-        protected long blobId;
-        protected int blobHandle;
-        protected int position;
-        protected ITransaction transaction;
+        protected long          blobId;
+        protected int           blobHandle;
+        protected int           position;
+        protected ITransaction  transaction;
 
         #endregion
 
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Common
 
 		#region · Abstract Properties ·
 
-		public abstract IDatabase DB
+		public abstract IDatabase Database
 		{
 			get;
 		}
