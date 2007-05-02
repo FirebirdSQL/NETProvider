@@ -68,6 +68,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public int Handle
 		{
 			get { return this.handle; }
+            protected set { this.handle = value; }
 		}
 
         public int TransactionCount
@@ -79,6 +80,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public string ServerVersion
 		{
 			get { return this.serverVersion; }
+            protected set { this.serverVersion = value; }
 		}
 
 		public Charset Charset
