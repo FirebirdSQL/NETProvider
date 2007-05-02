@@ -2,6 +2,23 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-05-01  Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* Started the work on the new GDS implementation for the version 11 of the Firebird protocol
+	( for Firebird Server 2.1 )
+
+		- Major refactoring on existent GDS implementation
+
+		- Internal Namespace names changes.
+
+		- Added a sample of message batching for version 11 of the protocol in the GdsStatement class
+		of the new protocol implementation.
+
+		- !!!! Work in progress !!!!
+
+
+------------------------------ 20070501 - Created Branch for 2.1.0 RC ------------------------------ 
+
 
 2007-04-29 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
