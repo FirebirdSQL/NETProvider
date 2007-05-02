@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#region · Properties ·
 
-		public override IDatabase DB
+		public override IDatabase Database
 		{
 			get { return this.db; }
 			set { this.db = (ExtDatabase)value; }
