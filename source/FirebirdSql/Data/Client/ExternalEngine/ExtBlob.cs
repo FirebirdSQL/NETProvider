@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#region · Properties ·
 
-		public override IDatabase DB
+		public override IDatabase Database
 		{
 			get { return this.db; }
 		}

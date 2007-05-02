@@ -20,8 +20,9 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Data;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
 
 using FirebirdSql.Data.Common;
 
@@ -51,6 +52,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		private short	dialect;
 		private bool	disposed;
         private int[]   statusVector;
+        private object  syncObject;
 
 		#endregion
 
@@ -94,6 +96,19 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		{
 			get { return false; }
 		}
+
+        public object SyncObject
+        {
+            get 
+            { 
+                if (this.syncObject == null)
+                {
+                    Interlocked.CompareExchange(ref this.syncObject, new object(), null);
+                }
+
+                return this.syncObject;
+            }
+        }
 
 		#endregion
 
@@ -356,199 +371,5 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		}
 
 		#endregion
-
-        #region IDatabase Members
-
-        public byte[] ReadBytes(int count)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public byte[] ReadOpaque(int length)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public byte[] ReadBuffer()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public string ReadString()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public string ReadString(int length)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public string ReadString(Charset charset)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public string ReadString(Charset charset, int length)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public short ReadInt16()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public int ReadInt32()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public long ReadInt64()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public Guid ReadGuid(int length)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public float ReadSingle()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public double ReadDouble()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public DateTime ReadDateTime()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public DateTime ReadDate()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public DateTime ReadTime()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public decimal ReadDecimal(int type, int scale)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public object ReadValue(DbField field)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void WriteOpaque(byte[] buffer)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void WriteOpaque(byte[] buffer, int length)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void WriteBuffer(byte[] buffer)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void WriteBuffer(byte[] buffer, int length)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void WriteBlobBuffer(byte[] buffer)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void WriteTyped(int type, byte[] buffer)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(string value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(short value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(int value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(long value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(float value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(double value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(decimal value, int type, int scale)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(bool value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(DateTime value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void WriteDate(DateTime value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void WriteTime(DateTime value)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(Descriptor descriptor)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Write(DbField param)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void Flush()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        #endregion
     }
 }
