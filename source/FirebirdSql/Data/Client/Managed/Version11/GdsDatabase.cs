@@ -40,9 +40,62 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
         #endregion
 
-#warning Override Attach method here
+        #region · Override Attach Method ·
 
-		#region · Override Statement Creation Methods ·
+        public override void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    // Attach to the database
+                    this.Write(IscCodes.op_attach);
+                    this.Write((int)0);				    // Database	object ID
+                    this.Write(database);				// Database	PATH
+                    this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+
+                    // Server version Request 
+                    this.WriteServerVersionRequest();
+
+                    // Send request
+                    this.Flush();
+
+                    // Save the database connection handle
+                    this.Handle = this.ReadGenericResponse().ObjectHandle;
+
+                    // Obtain the server version
+                    GenericResponse response = this.ReadGenericResponse();
+#warning Rewrite this
+                    byte[]  buffer          = new byte[IscCodes.BUFFER_SIZE_128];
+                    int     responseLength  = IscCodes.BUFFER_SIZE_128;
+
+                    if (response.Data.Length < IscCodes.BUFFER_SIZE_128)
+                    {
+                        responseLength = response.Data.Length;
+                    }
+
+                    Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+
+                    this.ServerVersion = IscHelper.ParseDatabaseInfo(buffer)[0].ToString();
+                }
+                catch (IOException)
+                {
+                    try
+                    {
+                        this.Detach();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+
+                    throw new IscException(IscCodes.isc_net_write_err);
+                }
+            }
+        }
+
+        #endregion
+
+        #region · Override Statement Creation Methods ·
 
         public override StatementBase CreateStatement()
 		{
@@ -55,5 +108,36 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		}
 
 		#endregion
+
+        private void WriteServerVersionRequest()
+        {
+			byte[] items = new byte[]
+			{
+				IscCodes.isc_info_isc_version,
+				IscCodes.isc_info_end
+			};
+
+            this.WriteDatabaseInfoRequest(items, IscCodes.BUFFER_SIZE_128);
+        }
+
+        private void WriteDatabaseInfoRequest(byte[] items, int bufferLength)
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    // see src/remote/protocol.h for packet	definition (p_info struct)					
+                    this.Write(IscCodes.op_info_database);	//	operation
+                    this.Write(this.Handle);				//	db_handle
+                    this.Write(0);							//	incarnation
+                    this.WriteBuffer(items, items.Length);	//	items
+                    this.Write(bufferLength);				//	result buffer length
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_network_error);
+                }
+            }
+        }
     }
 }
