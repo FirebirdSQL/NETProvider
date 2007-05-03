@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="7D65E5D3-A191-4208-875A-43F149F9C36F"
+		Name="FirebirdClient"
+		Language="1033"
+		Version="2.0.1.0"
+	    UpgradeCode="8A1FACD4-F003-4720-AD50-4161CA58E84B"
+		Manufacturer="FirebirdSql">
+    <Package
+			Description="ADO.NET 2.0 Data Provider for Firebird"
+			InstallerVersion="200"
+			Compressed="yes"
+		/>
+
+    <Property Id="AcceptLicense">Yes</Property>
+
+    <!--BUTTON TEXT-->
+    <Property Id="Button_Back">&lt; &amp;Back</Property>
+    <Property Id="Button_Next">&amp;Next &gt;</Property>
+    <Property Id="Button_Finish">&amp;Finish</Property>
+
+    <Property Id="Button_OK">OK</Property>
+    <Property Id="Button_Cancel">Cancel</Property>
+
+    <Property Id="Button_Browse">Br&amp;owse...</Property>
+    <Property Id="Button_Exit">&amp;Exit</Property>
+    <Property Id="Button_Ignore">&amp;Ignore</Property>
+    <Property Id="Button_Install">&amp;Install</Property>
+    <Property Id="Button_Remove">&amp;Remove</Property>
+    <Property Id="Button_Repair">&amp;Repair</Property>
+    <Property Id="Button_Reset">&amp;Reset</Property>
+    <Property Id="Button_Resume">&amp;Resume</Property>
+    <Property Id="Button_Retry">&amp;Retry</Property>
+    <Property Id="Button_Return">&amp;Return</Property>
+
+    <Property Id="Button_Yes">&amp;Yes</Property>
+    <Property Id="Button_No">&amp;No</Property>
+    <!--END BUTTON TEXT-->
+
+    <CustomAction Id="SET_INSTALLDIR" Property="INSTALLDIR" Value="[INSTALLDIR]" Execute="firstSequence" />
+
+    <!-- INSTALL DESCRIPTION -->
+    <Media Id="1" Cabinet="contents.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir"/>
+
+    <Feature Id="FirebirdClientFeature" Title="Required Files" Level="1">
+      <ComponentRef Id="FilesComponent" />
+      <ComponentRef Id="AssembliesComponent" />
+    </Feature>
+    <!-- END INSTALL DESCRIPTION -->
+
+    <AdminExecuteSequence>
+    </AdminExecuteSequence>
+
+    <InstallExecuteSequence>
+    </InstallExecuteSequence>
+
+    <UIRef Id="UserInterface"/>
+  </Product>
+</Wix>

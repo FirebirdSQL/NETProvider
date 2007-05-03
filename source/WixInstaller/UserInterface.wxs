@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <UI Id="UserInterface">
+      <!-- FONT DEFINITION -->
+      <Property Id="TitleFont">{&amp;DlgFontBold8}</Property>
+      <Property Id="BigFont">{&amp;VerdanaBold13}</Property>
+      <Property Id="DefaultUIFont">DlgFont8</Property>
+
+      <TextStyle Id="DlgFont8" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="DlgFontBold8" FaceName="Tahoma" Size="8" Bold="yes" />
+      <TextStyle Id="VerdanaBold13" FaceName="Verdana" Size="13" Bold="yes" />
+      <!-- END FONT DEFINITION -->
+
+      <Property Id="ErrorDialog"><![CDATA[ErrorDlg]]></Property>
+
+      <DialogRef Id="FilesInUse"/>
+      
+      <InstallUISequence>
+        <Custom Action="SET_INSTALLDIR" Before="CostInitialize">INSTALLDIR=""</Custom>
+        <Show Dialog="WelcomeDialog" After="MigrateFeatureStates" />
+        <Show Dialog="ProgressDialog" After="WelcomeDialog" />
+        <Show Dialog="UserExit" OnExit="cancel" />
+        <Show Dialog="ExitDialog" OnExit="success" />
+        <Show Dialog="ErrorDlg" OnExit="error" />
+      </InstallUISequence>
+
+      <AdminUISequence>
+        <Custom Action="SET_INSTALLDIR" Before="CostInitialize">INSTALLDIR=""</Custom>
+        <Show Dialog="WelcomeDialog" After="CostFinalize" />
+        <Show Dialog="ProgressDialog" After="WelcomeDialog" />
+        <Show Dialog="UserExit"   OnExit="cancel" />
+        <Show Dialog="ExitDialog" OnExit="success" />
+        <Show Dialog="ErrorDlg" OnExit="error" />
+      </AdminUISequence>
+
+      <Binary Id="dialog.bmp" SourceFile="images/default-dialog.bmp" />
+      <Binary Id="banner.bmp" SourceFile="images/default-banner.bmp" />
+      <Binary Id="info.bmp"   SourceFile="images/info.bmp" />
+      <Binary Id="up.bmp"     SourceFile="images/up.bmp" />
+      <Binary Id="new.bmp"    SourceFile="images/new.bmp" />
+    </UI>
+  </Fragment>
+</Wix>
