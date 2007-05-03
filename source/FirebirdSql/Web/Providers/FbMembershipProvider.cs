@@ -735,7 +735,7 @@ namespace FirebirdSql.Web.Providers
             }
 
             string temp = user.UserName;
-            CheckParameter(ref temp, true, true, true, 100, "UserName");
+            CheckParameter(ref temp, true, true, true, 100, "username");
             temp = user.Email;
             CheckParameter(ref temp,
                 RequiresUniqueEmail,

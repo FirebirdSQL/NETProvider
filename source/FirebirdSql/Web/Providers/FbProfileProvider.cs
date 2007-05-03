@@ -84,7 +84,7 @@ namespace FirebirdSql.Web.Providers
             if (string.IsNullOrEmpty(config["description"]))
             {
                 config.Remove("description");
-                config.Add("description", "Fb Profile provider");
+                config.Add("description", "Fb Profile Provider");
             }
 
             base.Initialize(name, config);
@@ -114,11 +114,7 @@ namespace FirebirdSql.Web.Providers
                 this.appName = config["applicationName"];
             }
 
-            try
-            {
-                this.commandTimeout = Convert.ToInt32(config["commandTimeout"]);
-            }
-            catch
+            if (!(int.TryParse(config["commandTimeout"], out this.commandTimeout)))
             {
                 this.commandTimeout = 30;
             }
@@ -195,18 +191,12 @@ namespace FirebirdSql.Web.Providers
             {
                 return;
             }
-
-            try
+            using (FbConnection conn = new FbConnection(this.connectionString))
             {
-                FbConnection conn = null;
+                conn.Open();
 
-                try
+                using (FbCommand cmd = new FbCommand("Profiles_SetProperties", conn))
                 {
-                    conn = new FbConnection(this.connectionString);
-                    conn.Open();
-
-                    FbCommand cmd = new FbCommand("PROFILES_SETPROPERTIES", conn);
-
                     cmd.CommandTimeout = this.commandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
@@ -219,18 +209,6 @@ namespace FirebirdSql.Web.Providers
 
                     cmd.ExecuteNonQuery();
                 }
-                finally
-                {
-                    if (conn != null)
-                    {
-                        conn.Close();
-                        conn = null;
-                    }
-                }
-            }
-            catch
-            {
-                throw;
             }
         }
 
@@ -262,27 +240,26 @@ namespace FirebirdSql.Web.Providers
             int numProfilesDeleted = 0;
             bool beginTranCalled = false;
             HttpContext context = HttpContext.Current;
-            FbTransaction transac = null;
-            FbConnection conn = new FbConnection(this.connectionString);
 
-            try
+            using (FbConnection conn = new FbConnection(this.connectionString))
             {
+
+                conn.Open();
+                FbTransaction trans = conn.BeginTransaction();
                 try
                 {
-                    conn.Open();
-                    FbCommand cmd;
-
-                    transac = conn.BeginTransaction();
-
                     int numUsersRemaing = usernames.Length;
                     while (numUsersRemaing > 0)
                     {
-                        cmd = new FbCommand("PROFILES_DELETEPROFILE", conn, transac);
-                        cmd.CommandTimeout = this.commandTimeout;
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
-                        cmd.Parameters.Add(CreateInputParam("@UserNames", FbDbType.VarChar, usernames[numUsersRemaing - 1]));
-                        cmd.ExecuteNonQuery();
+                        using (FbCommand cmd = new FbCommand("Profiles_DeleteProfile", conn, trans))
+                        {
+                            cmd.CommandTimeout = this.commandTimeout;
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
+                            cmd.Parameters.Add(CreateInputParam("@UserNames", FbDbType.VarChar, usernames[numUsersRemaing - 1]));
+                            cmd.ExecuteNonQuery();
+                        }
+
                         numUsersRemaing--;
                         numProfilesDeleted++;
                     }
@@ -294,19 +271,11 @@ namespace FirebirdSql.Web.Providers
 
                 if (beginTranCalled)
                 {
-                    transac.Rollback();
+                    trans.Rollback();
                 }
                 else
                 {
-                    transac.Commit();
-                }
-            }
-            finally
-            {
-                if (conn != null)
-                {
-                    conn.Close();
-                    conn = null;
+                    trans.Commit();
                 }
             }
 
@@ -315,87 +284,58 @@ namespace FirebirdSql.Web.Providers
 
         public override int DeleteInactiveProfiles(ProfileAuthenticationOption authenticationOption, DateTime userInactiveSinceDate)
         {
-            try
+
+            using (FbConnection conn = new FbConnection(this.connectionString))
             {
-                FbConnection conn = null;
+                conn.Open();
 
-                try
+                using (FbCommand cmd = new FbCommand("Profiles_DeleteInactProfiles", conn))
                 {
-                    conn = new FbConnection(this.connectionString);
-                    conn.Open();
-
-                    FbCommand cmd = new FbCommand("Profiles_DeleteInactProfiles", conn);
-
                     cmd.CommandTimeout = this.commandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
                     cmd.Parameters.Add(CreateInputParam("@ProfileAuthOptions", FbDbType.Integer, (int)authenticationOption));
                     cmd.Parameters.Add(CreateInputParam("@InactiveSinceDate", FbDbType.Date, userInactiveSinceDate.ToUniversalTime()));
 
-                    object o = cmd.ExecuteNonQuery();
+                    object result = cmd.ExecuteNonQuery();
 
-                    if (o == null || !(o is int))
+                    if (result == null || !(result is int))
                     {
                         return 0;
                     }
-
-                    return (int)o;
-                }
-                finally
-                {
-                    if (conn != null)
+                    else
                     {
-                        conn.Close();
-                        conn = null;
+                        return (int)result;
                     }
                 }
-            }
-            catch
-            {
-                throw;
             }
         }
 
         public override int GetNumberOfInactiveProfiles(ProfileAuthenticationOption authenticationOption, DateTime userInactiveSinceDate)
         {
-            try
+            using (FbConnection conn = new FbConnection(this.connectionString))
             {
-                FbConnection conn = null;
+                conn.Open();
 
-                try
+                using (FbCommand cmd = new FbCommand("Profiles_GetNbOfInactProfiles", conn))
                 {
-                    conn = new FbConnection(this.connectionString);
-                    conn.Open();
-
-                    FbCommand cmd = new FbCommand("Profiles_GetNbOfInactProfiles", conn);
-
                     cmd.CommandTimeout = this.commandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
                     cmd.Parameters.Add(CreateInputParam("@ProfileAuthOptions", FbDbType.Integer, (int)authenticationOption));
                     cmd.Parameters.Add(CreateInputParam("@InactiveSinceDate", FbDbType.Date, userInactiveSinceDate.ToUniversalTime()));
 
-                    object o = cmd.ExecuteScalar();
+                    object result = cmd.ExecuteScalar();
 
-                    if (o == null || !(o is int))
+                    if (result == null || !(result is int))
                     {
                         return 0;
                     }
-
-                    return (int)o;
-                }
-                finally
-                {
-                    if (conn != null)
+                    else
                     {
-                        conn.Close();
-                        conn = null;
+                        return (int)result;
                     }
                 }
-            }
-            catch
-            {
-                throw;
             }
         }
 
@@ -466,56 +406,34 @@ namespace FirebirdSql.Web.Providers
                 sName = (context.Request.IsAuthenticated ? context.User.Identity.Name : context.Request.AnonymousID);
             }
 
-            try
+            using (FbConnection conn = new FbConnection(this.connectionString))
             {
-                FbConnection conn = null;
-                FbDataReader reader = null;
+                conn.Open();
 
-                try
+                using (FbCommand cmd = new FbCommand("Profiles_GetProperties", conn))
                 {
-                    conn = new FbConnection(this.connectionString);
-                    conn.Open();
-
-                    FbCommand cmd = new FbCommand("PROFILES_GETPROPERTIES", conn);
-
                     cmd.CommandTimeout = this.commandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
                     cmd.Parameters.Add(CreateInputParam("@UserName", FbDbType.VarChar, userName));
                     cmd.Parameters.Add(CreateInputParam("@CurrentTimeUtc", FbDbType.Date, DateTime.UtcNow));
 
-                    reader = cmd.ExecuteReader(CommandBehavior.SingleRow);
-
-                    if (reader.Read())
+                    using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                     {
-                        names = reader.GetString(0).Split(':');
-                        values = reader.GetString(1);
+                        if (reader.Read())
+                        {
+                            names = reader.GetString(0).Split(':');
+                            values = reader.GetString(1);
 
-                        int size = (int)reader.GetBytes(2, 0, null, 0, 0);
+                            int size = (int)reader.GetBytes(2, 0, null, 0, 0);
 
-                        buf = new byte[size];
-                        reader.GetBytes(2, 0, buf, 0, size);
-                    }
-                }
-                finally
-                {
-                    if (conn != null)
-                    {
-                        conn.Close();
-                        conn = null;
-                    }
-
-                    if (reader != null)
-                    {
-                        reader.Close();
+                            buf = new byte[size];
+                            reader.GetBytes(2, 0, buf, 0, size);
+                        }
                     }
                 }
 
                 ParseDataFromDB(names, values, buf, svc);
-            }
-            catch
-            {
-                throw;
             }
         }
 
@@ -526,43 +444,37 @@ namespace FirebirdSql.Web.Providers
                 return;
             }
 
-            try
+            for (int iter = 0; iter < names.Length / 4; iter++)
             {
-                for (int iter = 0; iter < names.Length / 4; iter++)
+                string name = names[iter * 4];
+                SettingsPropertyValue pp = properties[name];
+
+                if (pp == null)
                 {
-                    string name = names[iter * 4];
-                    SettingsPropertyValue pp = properties[name];
-
-                    if (pp == null)
-                    {
-                        continue;
-                    }
-
-                    int startPos = Int32.Parse(names[iter * 4 + 2], CultureInfo.InvariantCulture);
-                    int length = Int32.Parse(names[iter * 4 + 3], CultureInfo.InvariantCulture);
-
-                    if (length == -1 && !pp.Property.PropertyType.IsValueType)
-                    {
-                        pp.PropertyValue = null;
-                        pp.IsDirty = false;
-                        pp.Deserialized = true;
-                    }
-                    if (names[iter * 4 + 1] == "S" && startPos >= 0 && length > 0 && values.Length >= startPos + length)
-                    {
-                        pp.SerializedValue = values.Substring(startPos, length);
-                    }
-
-                    if (names[iter * 4 + 1] == "B" && startPos >= 0 && length > 0 && buf.Length >= startPos + length)
-                    {
-                        byte[] buf2 = new byte[length];
-
-                        Buffer.BlockCopy(buf, startPos, buf2, 0, length);
-                        pp.SerializedValue = buf2;
-                    }
+                    continue;
                 }
-            }
-            catch
-            {
+
+                int startPos = Int32.Parse(names[iter * 4 + 2], CultureInfo.InvariantCulture);
+                int length = Int32.Parse(names[iter * 4 + 3], CultureInfo.InvariantCulture);
+
+                if (length == -1 && !pp.Property.PropertyType.IsValueType)
+                {
+                    pp.PropertyValue = null;
+                    pp.IsDirty = false;
+                    pp.Deserialized = true;
+                }
+                if (names[iter * 4 + 1] == "S" && startPos >= 0 && length > 0 && values.Length >= startPos + length)
+                {
+                    pp.SerializedValue = values.Substring(startPos, length);
+                }
+
+                if (names[iter * 4 + 1] == "B" && startPos >= 0 && length > 0 && buf.Length >= startPos + length)
+                {
+                    byte[] buf2 = new byte[length];
+
+                    Buffer.BlockCopy(buf, startPos, buf2, 0, length);
+                    pp.SerializedValue = buf2;
+                }
             }
         }
 
@@ -571,116 +483,103 @@ namespace FirebirdSql.Web.Providers
             StringBuilder names = new StringBuilder();
             StringBuilder values = new StringBuilder();
 
-            MemoryStream ms = (binarySupported ? new System.IO.MemoryStream() : null);
-
-            try
+            using (MemoryStream ms = (binarySupported ? new System.IO.MemoryStream() : null))
             {
-                try
+                bool anyItemsToSave = false;
+
+                foreach (SettingsPropertyValue pp in properties)
                 {
-                    bool anyItemsToSave = false;
-
-                    foreach (SettingsPropertyValue pp in properties)
-                    {
-                        if (pp.IsDirty)
-                        {
-                            if (!userIsAuthenticated)
-                            {
-                                bool allowAnonymous = (bool)pp.Property.Attributes["AllowAnonymous"];
-
-                                if (!allowAnonymous)
-                                {
-                                    continue;
-                                }
-                            }
-
-                            anyItemsToSave = true;
-                            break;
-                        }
-                    }
-
-                    if (!anyItemsToSave)
-                    {
-                        return;
-                    }
-
-                    foreach (SettingsPropertyValue pp in properties)
+                    if (pp.IsDirty)
                     {
                         if (!userIsAuthenticated)
                         {
                             bool allowAnonymous = (bool)pp.Property.Attributes["AllowAnonymous"];
+
                             if (!allowAnonymous)
+                            {
                                 continue;
+                            }
                         }
 
-                        if (!pp.IsDirty && pp.UsingDefaultValue)
+                        anyItemsToSave = true;
+                        break;
+                    }
+                }
+
+                if (!anyItemsToSave)
+                {
+                    return;
+                }
+
+                foreach (SettingsPropertyValue pp in properties)
+                {
+                    if (!userIsAuthenticated)
+                    {
+                        bool allowAnonymous = (bool)pp.Property.Attributes["AllowAnonymous"];
+                        if (!allowAnonymous)
                         {
                             continue;
                         }
+                    }
 
-                        int len = 0, startPos = 0;
-                        string propValue = null;
+                    if (!pp.IsDirty && pp.UsingDefaultValue)
+                    {
+                        continue;
+                    }
 
-                        if (pp.Deserialized && pp.PropertyValue == null)
+                    int len = 0;
+                    int startPos = 0;
+                    string propValue = null;
+
+                    if (pp.Deserialized && pp.PropertyValue == null)
+                    {
+                        len = -1;
+                    }
+                    else
+                    {
+                        object serializedValue = pp.SerializedValue;
+
+                        if (serializedValue == null)
                         {
                             len = -1;
                         }
                         else
                         {
-                            object sVal = pp.SerializedValue;
-
-                            if (sVal == null)
+                            if (!(serializedValue is string) && !binarySupported)
                             {
-                                len = -1;
+                                serializedValue = Convert.ToBase64String((byte[])serializedValue);
+                            }
+
+                            if (serializedValue is string)
+                            {
+                                propValue = (string)serializedValue;
+                                len = propValue.Length;
+                                startPos = values.Length;
                             }
                             else
                             {
-                                if (!(sVal is string) && !binarySupported)
-                                {
-                                    sVal = Convert.ToBase64String((byte[])sVal);
-                                }
-
-                                if (sVal is string)
-                                {
-                                    propValue = (string)sVal;
-                                    len = propValue.Length;
-                                    startPos = values.Length;
-                                }
-                                else
-                                {
-                                    byte[] b2 = (byte[])sVal;
-                                    startPos = (int)ms.Position;
-                                    ms.Write(b2, 0, b2.Length);
-                                    ms.Position = startPos + b2.Length;
-                                    len = b2.Length;
-                                }
+                                byte[] b2 = (byte[])serializedValue;
+                                startPos = (int)ms.Position;
+                                ms.Write(b2, 0, b2.Length);
+                                ms.Position = startPos + b2.Length;
+                                len = b2.Length;
                             }
                         }
-
-                        names.Append(pp.Name + ":" + ((propValue != null) ? "S" : "B") +
-                                     ":" + startPos.ToString(CultureInfo.InvariantCulture) + ":" + len.ToString(CultureInfo.InvariantCulture) + ":");
-
-                        if (propValue != null)
-                        {
-                            values.Append(propValue);
-                        }
                     }
 
-                    if (binarySupported)
+                    names.Append(pp.Name + ":" + ((propValue != null) ? "S" : "B") +
+                                 ":" + startPos.ToString(CultureInfo.InvariantCulture) + ":" + len.ToString(CultureInfo.InvariantCulture) + ":");
+
+                    if (propValue != null)
                     {
-                        buf = ms.ToArray();
+                        values.Append(propValue);
                     }
                 }
-                finally
+
+                if (binarySupported)
                 {
-                    if (ms != null)
-                    {
-                        ms.Close();
-                    }
+                    buf = ms.ToArray();
                 }
-            }
-            catch
-            {
-                throw;
             }
 
             allNames = names.ToString();
@@ -707,78 +606,56 @@ namespace FirebirdSql.Web.Providers
                 throw new ArgumentException("The combination of pageIndex and pageSize cannot exceed the maximum value of System.Int32.");
             }
 
-            try
+            ProfileInfoCollection profiles = new ProfileInfoCollection();
+
+            using (FbConnection conn = new FbConnection(this.connectionString))
             {
-                FbConnection conn = null;
-                FbDataReader reader = null;
-                FbParameterCollection param;
+                conn.Open();
 
-                try
+                using (FbCommand
+                    cmd1 = new FbCommand("Profiles_GetCountProfiles", conn),
+                    cmd2 = new FbCommand("Profiles_GetProfiles", conn))
                 {
-                    conn = new FbConnection(this.connectionString);
-                    conn.Open();
-
-                    FbCommand cmd = new FbCommand("PROFILES_GETCOUNTPROFILES", conn);
-
-                    cmd.CommandTimeout = this.commandTimeout;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
-                    cmd.Parameters.Add(CreateInputParam("@ProfileAuthOptions", FbDbType.Integer, (int)authenticationOption));
+                    cmd1.CommandTimeout = this.commandTimeout;
+                    cmd1.CommandType = CommandType.StoredProcedure;
+                    cmd1.Parameters.Add(CreateInputParam("@ApplicationName", FbDbType.VarChar, ApplicationName));
+                    cmd1.Parameters.Add(CreateInputParam("@ProfileAuthOptions", FbDbType.Integer, (int)authenticationOption));
 
                     foreach (FbParameter arg in args)
                     {
-                        cmd.Parameters.Add(arg);
+                        cmd1.Parameters.Add(arg);
                     }
 
-                    totalRecords = (int)cmd.ExecuteScalar();
+                    totalRecords = (int)cmd1.ExecuteScalar();
 
-                    ProfileInfoCollection profiles = new ProfileInfoCollection();
-                    param = cmd.Parameters;
+                    cmd2.CommandTimeout = this.commandTimeout;
+                    cmd2.CommandType = CommandType.StoredProcedure;
 
-                    cmd = new FbCommand("Profiles_GetProfiles", conn);
-                    cmd.CommandTimeout = this.commandTimeout;
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    foreach (FbParameter p in param)
+                    foreach (FbParameter p in cmd1.Parameters)
                     {
-                        cmd.Parameters.Add(p);
+                        cmd2.Parameters.Add(p);
                     }
 
-                    cmd.Parameters.Add(CreateInputParam("@PageIndex", FbDbType.Integer, pageIndex));
-                    cmd.Parameters.Add(CreateInputParam("@PageSize", FbDbType.Integer, pageSize));
-                    reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
-
-                    while (reader.Read())
+                    cmd2.Parameters.Add(CreateInputParam("@PageIndex", FbDbType.Integer, pageIndex));
+                    cmd2.Parameters.Add(CreateInputParam("@PageSize", FbDbType.Integer, pageSize));
+                    using (FbDataReader reader = cmd2.ExecuteReader(CommandBehavior.SequentialAccess))
                     {
-                        string username;
-                        DateTime dtLastActivity, dtLastUpdated;
-                        bool isAnon;
-                        username = reader.GetString(0);
-                        isAnon = reader.GetBoolean(1);
-                        dtLastActivity = DateTime.SpecifyKind(reader.GetDateTime(2), DateTimeKind.Utc);
-                        dtLastUpdated = DateTime.SpecifyKind(reader.GetDateTime(3), DateTimeKind.Utc);
-                        profiles.Add(new ProfileInfo(username, isAnon, dtLastActivity, dtLastUpdated, -1));
-                    }
-
-                    return profiles;
-                }
-                finally
-                {
-                    if (reader != null)
-                    {
-                        reader.Close();
-                    }
-                    if (conn != null)
-                    {
-                        conn.Close();
-                        conn = null;
+                        while (reader.Read())
+                        {
+                            string username;
+                            DateTime dtLastActivity, dtLastUpdated;
+                            bool isAnon;
+                            username = reader.GetString(0);
+                            isAnon = reader.GetBoolean(1);
+                            dtLastActivity = DateTime.SpecifyKind(reader.GetDateTime(2), DateTimeKind.Utc);
+                            dtLastUpdated = DateTime.SpecifyKind(reader.GetDateTime(3), DateTimeKind.Utc);
+                            profiles.Add(new ProfileInfo(username, isAnon, dtLastActivity, dtLastUpdated, -1));
+                        }
                     }
                 }
             }
-            catch
-            {
-                throw;
-            }
+
+            return profiles;
         }
 
         #endregion
