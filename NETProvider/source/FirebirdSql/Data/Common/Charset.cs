@@ -101,8 +101,10 @@ namespace FirebirdSql.Data.Common
             Charset.Add(charsets, 21, "ISO8859_1", 1, "iso-8859-1");
             // ISO 8859-2, Latin alphabet No. 2
             Charset.Add(charsets, 22, "ISO8859_2", 1, "iso-8859-2");
+#if (NET)
             // Windows Korean	
             Charset.Add(charsets, 44, "KSC_5601", 2, "ks_c_5601-1987");
+#endif
             // MS-DOS Icelandic	
             Charset.Add(charsets, 47, "DOS861", 1, "ibm861");
             // Windows Eastern European
