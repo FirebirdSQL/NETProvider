@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+		<!--Product Id="915191fe-f30e-4477-8c52-7a8e7bdc1011" Name="PUT-PRODUCT-NAME-HERE" Language="1033" Version="1.0.0.0" Manufacturer="PUT-COMPANY-NAME-HERE" UpgradeCode="e55e4338-de36-408e-bca4-af6c42f7ae08">
+		<Package InstallerVersion="200" Compressed="yes" />
+
+		<Media Id="1" Cabinet="WixInstaller.cab" EmbedCab="yes" />
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLLOCATION" Name="PUT-APPLICATION-DIRECTORY-HERE">
+
+					<Component Id="ProductComponent" Guid="fdcd8dba-703e-4d0f-9ce0-8a8a7ec88496">
+					</Component>
+
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<Feature Id="ProductFeature" Title="PUT-FEATURE-TITLE-HERE" Level="1">
+			<ComponentRef Id="ProductComponent" />
+		</Feature>
+	</Product-->
+</Wix>
