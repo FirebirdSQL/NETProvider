@@ -143,7 +143,7 @@ namespace FirebirdSql.Web.Providers
             if (string.IsNullOrEmpty(config["description"]))
             {
                 config.Remove("description");
-                config.Add("description", "Firebird New Membership provider");
+                config.Add("description", "Firebird Membership provider");
             }
             base.Initialize(name, config);
 
@@ -204,7 +204,7 @@ namespace FirebirdSql.Web.Providers
                     passwordFormat = MembershipPasswordFormat.Hashed;
                     break;
                 default:
-                    throw new ProviderException("Password format specified is invalid.");
+                    throw new ProviderException("Specified password format is invalid.");
             }
 
             if (PasswordFormat == MembershipPasswordFormat.Hashed && EnablePasswordRetrieval)
@@ -466,7 +466,7 @@ namespace FirebirdSql.Web.Providers
             using (FbConnection con = new FbConnection(fbConnectionString))
             {
                 con.Open();
-                using (FbCommand cmd = new FbCommand("MEMBERSHIP_PASSQUESTIONANSWER", con))
+                using (FbCommand cmd = new FbCommand("Membership_PassQuestionAnswer", con))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -494,7 +494,7 @@ namespace FirebirdSql.Web.Providers
         {
             if (!EnablePasswordRetrieval)
             {
-                throw new NotSupportedException("This Membership Provider has not been configured to support password retrieval.");
+                throw new NotSupportedException("This membership provider has not been configured to support password retrieval.");
             }
 
             CheckParameter(ref username, true, true, true, 100, "username");
@@ -960,7 +960,7 @@ namespace FirebirdSql.Web.Providers
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
                     cmd.Parameters.Add("@UserName", FbDbType.VarChar, 100).Value = username;
-                    cmd.Parameters.Add("@deleteAllRelatedData", FbDbType.Integer).Value = deleteAllRelatedData ? 1 : 0;
+                    cmd.Parameters.Add("@DeleteAllRelatedData", FbDbType.Integer).Value = deleteAllRelatedData ? 1 : 0;
 
                     FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
                     p.Direction = ParameterDirection.Output;
@@ -1060,12 +1060,12 @@ namespace FirebirdSql.Web.Providers
                 con.Open();
                 using (FbCommand cmd = new FbCommand("Membership_GetUsersOnline", con))
                 {
-                    FbParameter p = new FbParameter("@NUMBERUSERS", FbDbType.Integer);
-
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
                     cmd.Parameters.Add("@SinceLastInActive", FbDbType.TimeStamp).Value = compareTime;
+                    
+                    FbParameter p = new FbParameter("@NUMBERUSERS", FbDbType.Integer);
                     p.Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(p);
                     cmd.ExecuteNonQuery();
@@ -1321,7 +1321,7 @@ namespace FirebirdSql.Web.Providers
                 param = param.Trim();
                 if (checkIfEmpty && param.Length < 1)
                 {
-                    throw new ArgumentException("A parameter  must not be empty.", paramName);
+                    throw new ArgumentException("A parameter must be not empty.", paramName);
                 }
 
                 if (maxSize > 0 && param.Length > maxSize)
@@ -1393,6 +1393,7 @@ namespace FirebirdSql.Web.Providers
                     cmd.Parameters.Add("@PasswordAttemptWindow", FbDbType.Integer).Value = PasswordAttemptWindow;
                     cmd.Parameters.Add("@LastLoginDate", FbDbType.TimeStamp).Value = isPasswordCorrect ? dtNow : lastLoginDate;
                     cmd.Parameters.Add("@LastActivityDate", FbDbType.TimeStamp).Value = isPasswordCorrect ? dtNow : lastActivityDate;
+                    
                     FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
                     p.Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(p);
