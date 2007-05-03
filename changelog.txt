@@ -2,6 +2,15 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-05-03  Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* FirebirdSql\Data\Common\Charset.cs:
+
+		- Added conditional code for charsets not supported in mono.
+
+	* Moved the Wix Installer sources to the source directory
+	The installer is now working, while it has only basic funcionality
+
 2007-05-01  Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* Started the work on the new GDS implementation for the version 11 of the Firebird protocol
