@@ -25,10 +25,10 @@ namespace FirebirdSql.Data.Client.Managed
 	{
 		#region · Fields ·
 
-		private int			objectHandle;
-		private long		blobId;
-		private byte[]		data;
-		private IscException warning;
+		private int			    objectHandle;
+		private long		    blobId;
+		private byte[]		    data;
+		private IscException    exception;
 
 		#endregion
 
@@ -49,22 +49,21 @@ namespace FirebirdSql.Data.Client.Managed
 			get { return data; }
 		}
 
-		public IscException Warning
+		public IscException Exception
 		{
-			get { return this.warning; }
-			set { this.warning = value; }
+			get { return this.exception; }
 		}
 
 		#endregion
 
 		#region · Constructors ·
 
-		public GenericResponse(int objectHandle, long blobId, byte[] data, IscException warning)
+		public GenericResponse(int objectHandle, long blobId, byte[] data, IscException exception)
 		{
 			this.objectHandle	= objectHandle;
 			this.blobId			= blobId;
 			this.data			= data;
-            this.warning        = warning;
+            this.exception      = exception;
 		}
 
 		#endregion
