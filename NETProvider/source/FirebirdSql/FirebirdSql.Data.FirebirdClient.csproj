@@ -49,6 +49,10 @@
     <Compile Include="Data\Client\Common\ArrayBoundMarshal.cs" />
     <Compile Include="Data\Client\Common\ArrayDescMarshal.cs" />
     <Compile Include="Data\Client\Common\ArrayDescMarshaler.cs" />
+    <Compile Include="Data\Client\Managed\FetchResponse.cs" />
+    <Compile Include="Data\Client\Managed\GenericResponse.cs" />
+    <Compile Include="Data\Client\Managed\IResponse.cs" />
+    <Compile Include="Data\Client\Managed\SqlResponse.cs" />
     <Compile Include="Data\Client\Managed\Version10\GdsArray.cs" />
     <Compile Include="Data\Client\Managed\Version10\GdsBlob.cs" />
     <Compile Include="Data\Client\Managed\Version10\GdsConnection.cs" />
@@ -85,10 +89,6 @@
     <Compile Include="Data\Client\ExternalEngine\ExtTriggerContext.cs" />
     <Compile Include="Data\Client\ExternalEngine\ParamDscMarshaler.cs" />
     <Compile Include="Data\Client\ExternalEngine\SafeNativeMethods.cs" />
-    <Compile Include="Data\Common\FetchResponse.cs" />
-    <Compile Include="Data\Common\GenericResponse.cs" />
-    <Compile Include="Data\Common\SqlResponse.cs" />
-    <Compile Include="Data\Common\IResponse.cs" />
     <Compile Include="Data\Common\ArrayBase.cs" />
     <Compile Include="Data\Common\ArrayBound.cs" />
     <Compile Include="Data\Common\ArrayDesc.cs" />
