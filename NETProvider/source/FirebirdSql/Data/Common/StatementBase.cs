@@ -19,6 +19,7 @@
 using System;
 using System.Text;
 using System.Data;
+using FirebirdSql.Data.Client.Managed;
 
 namespace FirebirdSql.Data.Common
 {
