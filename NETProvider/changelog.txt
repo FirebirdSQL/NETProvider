@@ -2,6 +2,11 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+
+2007-05-04  Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	- Changes for the server response handling when batching messages.
+
 2007-05-03  Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql\Data\Common\Charset.cs:
