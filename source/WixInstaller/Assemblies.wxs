@@ -3,16 +3,24 @@
   <Fragment>
     <DirectoryRef Id="TARGETDIR">
       <Directory Id="Assembly" Name="Assembly">
-        <Component Id="AssembliesComponent" Guid="CC3639B8-6E2B-4b82-AB7A-EE0AACC35F35" DiskId="1">
-          <File 
-              Id="FirebirdClientAssembly" 
-              Assembly=".net" 
-              KeyPath="yes" 
-              Name="FirebirdSql.Data.FirebirdClient.dll" 
+        <Component Id="FirebirdClientAssemblyComponent" Guid="CC3639B8-6E2B-4b82-AB7A-EE0AACC35F35" DiskId="1">
+          <File
+              Id="FirebirdClientAssembly"
+              Assembly=".net"
+              KeyPath="yes"
+              Name="FirebirdSql.Data.FirebirdClient.dll"
               Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Data.FirebirdClient.dll"
-            />
-          <!--File Id="WebProvidersAssembly" Assembly=".net" Name="FirebirdSql.Web.Providers.dll" Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Web.Providers.dll" / -->
+          />
         </Component>
+        <Component Id="WebProvidersAssemblyComponent" Guid="CA9D195D-C0BD-41bc-88B2-6C148A152038" DiskId="1">
+          <File
+              Id="WebProvidersAssembly"
+              Assembly=".net"
+              KeyPath="yes"
+              Name="FirebirdSql.Web.Providers.dll"
+              Source="$(var.SolutionDir)/build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Web.Providers.dll"
+          />
+        </Component>        
       </Directory>
     </DirectoryRef>
   </Fragment>

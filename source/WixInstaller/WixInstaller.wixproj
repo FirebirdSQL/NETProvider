@@ -18,7 +18,7 @@
     <IntermediateOutputPath>obj\Release\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assemblies.wxs" />
+    <Compile Include="AssembliesComponent.wxs" />
     <Compile Include="BrowseDialog.wxs" />
     <Compile Include="CancelDialog.wxs" />
     <Compile Include="ErrorDialog.wxs" />
@@ -35,7 +35,6 @@
     <Compile Include="VerifyReadyDialog.wxs" />
     <Compile Include="ViewLicenseAgreementDialog.wxs" />
     <Compile Include="WelcomeDialog.wxs" />
-    <Compile Include="WixInstaller.wxs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="images" />
