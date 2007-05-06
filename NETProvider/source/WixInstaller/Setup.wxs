@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Id="7D65E5D3-A191-4208-875A-43F149F9C36F"
-		Name="FirebirdClient"
+		Name="FirebirdClient 2.5.0 - ADO.NET 2.0 Data Provider for Firebird"
 		Language="1033"
-		Version="2.0.1.0"
-	    UpgradeCode="8A1FACD4-F003-4720-AD50-4161CA58E84B"
+		Version="2.5.0.0"
+	  UpgradeCode="8A1FACD4-F003-4720-AD50-4161CA58E84B"
 		Manufacturer="FirebirdSql">
     <Package
 			Description="ADO.NET 2.0 Data Provider for Firebird"
@@ -46,7 +46,8 @@
 
     <Feature Id="FirebirdClientFeature" Title="Required Files" Level="1">
       <ComponentRef Id="FilesComponent" />
-      <ComponentRef Id="AssembliesComponent" />
+      <ComponentRef Id="FirebirdClientAssemblyComponent" />
+      <ComponentRef Id="WebProvidersAssemblyComponent" />
     </Feature>
     <!-- END INSTALL DESCRIPTION -->
 

@@ -3,7 +3,7 @@
   <Fragment>
     <DirectoryRef Id="TARGETDIR">
       <Directory Id="ProgramFilesFolder" Name="PFiles">
-        <Directory Id="INSTALLDIR" Name="FirebirdClient">
+        <Directory Id="INSTALLDIR" Name="FirebirdClient 2.0">
           <Component Id="FilesComponent" Guid="5FC7B74A-949A-448E-9E5A-1893C3CE9184" DiskId="1">
             <File Id="LicenseFile" Name="license.txt" Source="$(var.SolutionDir)license.txt"/>
             <File Id="ReadmeFile" Name="readme.txt" Source="$(var.SolutionDir)readme.txt"/>
