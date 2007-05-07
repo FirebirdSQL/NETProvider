@@ -2,8 +2,14 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-05-07 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
-2007-05-04  Carlos Guzmán Álvarez <carlosga05@gmail.com>
+	* FirebirdSql\Data\FirebirdClient\ClientFactory.cs:
+	* FirebirdSql\Data\Client\Managed\Version10\GdsServiceManager.cs
+
+		- Fixed Services connections ( all services nunit test cases are running fine now )
+		
+2007-05-04 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	- Changes for the server response handling when batching messages.
 
