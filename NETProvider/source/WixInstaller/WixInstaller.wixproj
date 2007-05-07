@@ -18,7 +18,7 @@
     <IntermediateOutputPath>obj\Release\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AssembliesComponent.wxs" />
+    <Compile Include="Assemblies.wxs" />
     <Compile Include="BrowseDialog.wxs" />
     <Compile Include="CancelDialog.wxs" />
     <Compile Include="ErrorDialog.wxs" />
