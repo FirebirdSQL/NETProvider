@@ -26,8 +26,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region · Fields ·
 
-		private int         handle;
-		private GdsDatabase database;
+		private int             handle;
+		private GdsDatabase     database;
+        private GdsConnection   connection;
 
 		#endregion
 
@@ -49,7 +50,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public GdsServiceManager(GdsConnection connection)
 		{
-            this.database = new GdsDatabase(connection);
+            this.connection = connection;
+            this.database   = new GdsDatabase(this.connection);
 		}
 
 		#endregion
@@ -103,14 +105,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				finally
 				{
-					try
-					{
-						this.database.Detach();
-					}
-					catch (IOException)
-					{
-						throw new IscException(IscCodes.isc_network_error);
-					}
+                    try
+                    {
+                        this.connection.Disconnect();
+                    }
+                    catch (IOException)
+                    {
+                        throw new IscException(IscCodes.isc_network_error);
+                    }
+                    finally
+                    {
+                        this.database   = null;
+                        this.connection = null;
+                    }
 				}
 			}
 		}
