@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.FirebirdClient
             GdsConnection connection = new GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
 
             connection.Connect();
-            connection.Identify(options.Database);
+            connection.Identify(!String.IsNullOrEmpty(options.Database) ? options.Database : "");
 
             if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION11)
             {
