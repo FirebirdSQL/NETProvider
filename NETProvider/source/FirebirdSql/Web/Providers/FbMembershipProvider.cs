@@ -32,6 +32,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
+
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Web.Providers
@@ -40,11 +41,11 @@ namespace FirebirdSql.Web.Providers
     {
         #region · Fields ·
 
-        private string fbConnectionString;
+        private string connectionString;
         private bool enablePasswordRetrieval;
         private bool enablePasswordReset;
         private bool requiresQuestionAndAnswer;
-        private string appName;
+        private string applicationName;
         private bool requiresUniqueEmail;
         private int maxInvalidPasswordAttempts;
         private int commandTimeout;
@@ -111,7 +112,7 @@ namespace FirebirdSql.Web.Providers
 
         public override string ApplicationName
         {
-            get { return appName; }
+            get { return applicationName; }
             set
             {
                 if (String.IsNullOrEmpty(value))
@@ -122,7 +123,7 @@ namespace FirebirdSql.Web.Providers
                     throw new ProviderException("The application name is too long.");
                 }
 
-                this.appName = value;
+                this.applicationName = value;
             }
         }
         private int CommandTimeout
@@ -143,7 +144,7 @@ namespace FirebirdSql.Web.Providers
             if (string.IsNullOrEmpty(config["description"]))
             {
                 config.Remove("description");
-                config.Add("description", "Firebird Membership provider");
+                config.Add("description", "FB Membership Provider");
             }
             base.Initialize(name, config);
 
@@ -165,9 +166,9 @@ namespace FirebirdSql.Web.Providers
                     {
                         Regex regex = new Regex(passwordStrengthRegularExpression);
                     }
-                    catch (ArgumentException e)
+                    catch (ArgumentException ex)
                     {
-                        throw new ProviderException(e.Message, e);
+                        throw new ProviderException(ex.Message, ex);
                     }
                 }
             }
@@ -179,11 +180,11 @@ namespace FirebirdSql.Web.Providers
                 throw new HttpException("The minRequiredNonalphanumericCharacters can not be greater than minRequiredPasswordLength.");
 
             commandTimeout = Convert.ToInt32(GetConfigValue(config["commandTimeout"], "30"));
-            appName = config["applicationName"];
-            if (string.IsNullOrEmpty(appName))
-                appName = HostingEnvironment.ApplicationVirtualPath;
+            applicationName = config["applicationName"];
+            if (string.IsNullOrEmpty(applicationName))
+                applicationName = HostingEnvironment.ApplicationVirtualPath;
 
-            if (appName.Length > 100)
+            if (applicationName.Length > 100)
             {
                 throw new ProviderException("The application name is too long.");
             }
@@ -228,7 +229,7 @@ namespace FirebirdSql.Web.Providers
                 throw new ProviderException("Connection string cannot be blank.");
             }
 
-            fbConnectionString = ConnectionStringSettings.ConnectionString;
+            connectionString = ConnectionStringSettings.ConnectionString;
 
             config.Remove("connectionStringName");
             config.Remove("enablePasswordRetrieval");
@@ -378,10 +379,10 @@ namespace FirebirdSql.Web.Providers
 
             DateTime dt = RoundToSeconds(DateTime.UtcNow);
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_CreateUser", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_CreateUser", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -463,10 +464,10 @@ namespace FirebirdSql.Web.Providers
             }
             CheckParameter(ref encodedPasswordAnswer, RequiresQuestionAndAnswer, RequiresQuestionAndAnswer, false, 100, "newPasswordAnswer");
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_PassQuestionAnswer", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_PassQuestionAnswer", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -586,10 +587,10 @@ namespace FirebirdSql.Web.Providers
                     throw new ArgumentException("The custom password validation failed.", "newPassword");
                 }
             }
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_SetPassword", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_SetPassword", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -686,10 +687,10 @@ namespace FirebirdSql.Web.Providers
                     throw new ProviderException("The custom password validation failed.");
                 }
             }
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_ResetPassword", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_ResetPassword", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -744,10 +745,10 @@ namespace FirebirdSql.Web.Providers
                 100,
                 "Email");
             user.Email = temp;
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_UpdateUser", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_UpdateUser", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -782,10 +783,10 @@ namespace FirebirdSql.Web.Providers
         public override bool UnlockUser(string username)
         {
             CheckParameter(ref username, true, true, true, 100, "username");
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_UnlockUser", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_UnlockUser", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -815,10 +816,10 @@ namespace FirebirdSql.Web.Providers
                 throw new ArgumentException("The provider user key supplied is invalid.  It must be of type System.Guid.", "providerUserKey");
             }
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_GetUserByUserId", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetUserByUserId", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -863,10 +864,10 @@ namespace FirebirdSql.Web.Providers
         {
             CheckParameter(ref username, true, false, true, 100, "username");
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_GetUserByName", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetUserByName", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -917,10 +918,10 @@ namespace FirebirdSql.Web.Providers
 
             string username = null;
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_GetUserByEmail", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetUserByEmail", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -951,10 +952,10 @@ namespace FirebirdSql.Web.Providers
         {
             CheckParameter(ref username, true, true, true, 100, "username");
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_DeleteUser", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_DeleteUser", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -994,10 +995,10 @@ namespace FirebirdSql.Web.Providers
             MembershipUserCollection users = new MembershipUserCollection();
             totalRecords = 0;
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_GetAllUsers", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetAllUsers", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -1055,10 +1056,10 @@ namespace FirebirdSql.Web.Providers
 
             TimeSpan onlineSpan = new TimeSpan(0, System.Web.Security.Membership.UserIsOnlineTimeWindow, 0);
             DateTime compareTime = DateTime.Now.Subtract(onlineSpan);
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_GetUsersOnline", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetUsersOnline", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -1098,10 +1099,10 @@ namespace FirebirdSql.Web.Providers
             MembershipUserCollection users = new MembershipUserCollection();
             totalRecords = 0;
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_FindUsersByName", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_FindUsersByName", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -1175,10 +1176,10 @@ namespace FirebirdSql.Web.Providers
             totalRecords = 0;
             MembershipUserCollection users = new MembershipUserCollection();
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_FindUsersByEmail", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_FindUsersByEmail", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -1377,10 +1378,10 @@ namespace FirebirdSql.Web.Providers
                 return true;
             }
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_UpdateUserInfo", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_UpdateUserInfo", conn))
                 {
                     DateTime dtNow = DateTime.UtcNow;
                     cmd.CommandTimeout = CommandTimeout;
@@ -1419,10 +1420,10 @@ namespace FirebirdSql.Web.Providers
                                            out DateTime lastLoginDate,
                                            out DateTime lastActivityDate)
         {
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_GetPasswordandFormat", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetPasswordandFormat", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -1468,10 +1469,10 @@ namespace FirebirdSql.Web.Providers
         {
             string password;
 
-            using (FbConnection con = new FbConnection(fbConnectionString))
+            using (FbConnection conn = new FbConnection(connectionString))
             {
-                con.Open();
-                using (FbCommand cmd = new FbCommand("Membership_GetPassword", con))
+                conn.Open();
+                using (FbCommand cmd = new FbCommand("Membership_GetPassword", conn))
                 {
                     cmd.CommandTimeout = CommandTimeout;
                     cmd.CommandType = CommandType.StoredProcedure;
