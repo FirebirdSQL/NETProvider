@@ -74,11 +74,11 @@
 
     <!-- Copy snk file -->
     <copy 
-      file="${source.dir}/FirebirdSql/FirebirdSql.Data.FirebirdClient.snk" 
+      file="${source.dir}/FirebirdSql/Properties/FirebirdSql.Data.FirebirdClient.snk" 
       todir="." 
     />
     <copy 
-      file="${source.dir}/FirebirdSql/FirebirdSql.Web.Providers.snk" 
+      file="${source.dir}/FirebirdSql/Web/Providers/Properties/FirebirdSql.Web.Providers.snk" 
       todir="." 
     />
   </target>
@@ -194,7 +194,7 @@
           define="${current.build.defines}">
 
       <sources basedir="${source.dir}">
-        <include name="FirebirdSql/**/*.cs"/>
+        <include name="FirebirdSql/Data/**/*.cs"/>
         <exclude name="FirebirdSql/Web/**/*.cs"/>
         <exclude name="FirebirdSql/Data/UnitTests/**/*.cs"/>
       </sources>
@@ -207,7 +207,7 @@
         <include name="System.Windows.Forms.dll"/>
       </references>
 
-      <arg value="/resource:${source.dir}/FirebirdSql/Resources/isc_error_msg.resources,FirebirdSql.Resources.isc_error_msg.resources"/>
+      <arg value="/resource:${source.dir}/FirebirdSql/Data/Resources/isc_error_msg.resources,FirebirdSql.Resources.isc_error_msg.resources"/>
       <arg value="/resource:${source.dir}/FirebirdSql/Data/Schema/FbMetaData.xml,FirebirdSql.Data.Schema.FbMetaData.xml"/>
       <arg value="/optimize+" />
       <arg value="/keyfile:FirebirdSql.Data.FirebirdClient.snk" />
