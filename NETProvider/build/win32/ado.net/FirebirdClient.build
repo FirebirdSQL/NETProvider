@@ -74,7 +74,7 @@
 
     <!-- Copy snk file -->
     <copy 
-      file="${source.dir}/FirebirdSql/Properties/FirebirdSql.Data.FirebirdClient.snk" 
+      file="${source.dir}/FirebirdSql/Data/Properties/FirebirdSql.Data.FirebirdClient.snk" 
       todir="." 
     />
     <copy 
