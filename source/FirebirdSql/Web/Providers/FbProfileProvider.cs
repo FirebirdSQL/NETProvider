@@ -128,7 +128,7 @@ namespace FirebirdSql.Web.Providers
             {
                 string attribUnrecognized = config.GetKey(0);
 
-                if (!String.IsNullOrEmpty(attribUnrecognized))
+                if (!string.IsNullOrEmpty(attribUnrecognized))
                 {
                     throw new ProviderException("Attributes not recognized");
                 }
@@ -163,7 +163,7 @@ namespace FirebirdSql.Web.Providers
                 svc.Add(new SettingsPropertyValue(prop));
             }
 
-            if (!String.IsNullOrEmpty(username))
+            if (!string.IsNullOrEmpty(username))
             {
                 GetPropertyValuesFromDatabase(username, svc);
             }
@@ -182,8 +182,8 @@ namespace FirebirdSql.Web.Providers
                 return;
             }
 
-            string names = String.Empty;
-            string values = String.Empty;
+            string names = string.Empty;
+            string values = string.Empty;
             byte[] buf = null;
 
             PrepareDataForSaving(ref names, ref values, ref buf, true, properties, userIsAuthenticated);
@@ -386,7 +386,7 @@ namespace FirebirdSql.Web.Providers
 
             if (objValue == null)
             {
-                objValue = String.Empty;
+                objValue = string.Empty;
             }
 
             param.Value = objValue;

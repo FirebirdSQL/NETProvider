@@ -115,7 +115,7 @@ namespace FirebirdSql.Web.Providers
             get { return applicationName; }
             set
             {
-                if (String.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value))
                     throw new ArgumentNullException("application name");
 
                 if (value.Length > 100)
@@ -139,7 +139,7 @@ namespace FirebirdSql.Web.Providers
         {
             if (config == null)
                 throw new ArgumentNullException("config");
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 name = "FbMembershipProvider";
             if (string.IsNullOrEmpty(config["description"]))
             {
@@ -248,7 +248,7 @@ namespace FirebirdSql.Web.Providers
             if (config.Count > 0)
             {
                 string attribUnrecognized = config.GetKey(0);
-                if (!String.IsNullOrEmpty(attribUnrecognized))
+                if (!string.IsNullOrEmpty(attribUnrecognized))
                     throw new ProviderException("Attribute not recognized.");
             }
         }
@@ -1564,7 +1564,7 @@ namespace FirebirdSql.Web.Providers
             switch (status)
             {
                 case 0:
-                    return String.Empty;
+                    return string.Empty;
                 case 1:
                     return "The user was not found.";
                 case 2:

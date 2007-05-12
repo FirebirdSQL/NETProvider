@@ -89,7 +89,7 @@ namespace FirebirdSql.Web.Providers
                 name = "FbRoleProvider";
             }
 
-            if (String.IsNullOrEmpty(config["description"]))
+            if (string.IsNullOrEmpty(config["description"]))
             {
                 config.Remove("description");
                 config.Add("description", "FB Role Provider");
