@@ -21,7 +21,8 @@ SCHEMA_SOURCES=${BASE_DIR}/Data/Schema
 SERVICES_SOURCES=${BASE_DIR}/Data/Services
 PROVIDER_SOURCES=${BASE_DIR}/Data/FirebirdClient
 PROVIDER_TESTS_SOURCES=${BASE_DIR}/Data/UnitTest
-RESOURCES=${BASE_DIR}/Resources
+RESOURCES=${BASE_DIR}/Data/Resources
+PROVIDER_SOURCES_PROPERTIES=${BASE_DIR}/Data/Properties
 
 # RESOURCES
 
@@ -49,22 +50,21 @@ FirebirdSql.Data.FirebirdClient.dll:
 ${COMMON_RESOURCES} $(SCHEMA_RESOURCES) -recurse:${COMMON_SOURCES}/*.cs 
 -recurse:${CLIENTS_SOURCES}/*.cs -recurse:${SCHEMA_SOURCES}/*.cs 
 -recurse:${SERVICES_SOURCES}/*.cs -recurse:${ISQL_SOURCES}/*.cs 
--recurse:${PROVIDER_SOURCES}/*.cs
+-recurse:${PROVIDER_SOURCES}/*.cs -recurse:${PROVIDER_SOURCES_PROPERTIES}/*.cs
 
 FirebirdSql.Data.FirebirdClient.UnitTests.dll:
 	$(CSC) -target:library -out:$(PROVIDER_TESTS) $(PROVIDER_TESTS_FLAGS) 
 $(DEFINE) -recurse:${PROVIDER_TESTS_SOURCES}/*.cs
 
 preprocess:
-	$(COPY) ${BASE_DIR}/*.snk .
+	$(COPY) ${PROVIDER_SOURCES_PROPERTIES}/*.snk .
 
 install:
 	${RM} -rf ${BUILD_DIR}
 	${MKDIR} -p ${BUILD_DIR}
 	$(COPY) $(PROVIDER) ${BUILD_DIR}
 	$(COPY) $(PROVIDER_TESTS) ${BUILD_DIR}
-	$(COPY) ${PROVIDER_TESTS_SOURCES}/App.config 
-${BUILD_DIR}/$(PROVIDER_TESTS).config
+	$(COPY) ${PROVIDER_TESTS_SOURCES}/App.config ${BUILD_DIR}/$(PROVIDER_TESTS).config
 
 clean:
 	${RM} FirebirdSql.Data.FirebirdClient.snk
