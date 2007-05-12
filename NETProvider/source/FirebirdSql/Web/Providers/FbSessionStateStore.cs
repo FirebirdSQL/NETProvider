@@ -36,9 +36,9 @@ namespace FirebirdSql.Web.Providers
 	{
 		#region · Fields ·
 
-		private SessionStateSection _config;
-		private string _connectionString;
-		private string _applicationName;
+		private SessionStateSection config;
+		private string connectionString;
+		private string applicationName;
 
 		#endregion
 
@@ -46,7 +46,7 @@ namespace FirebirdSql.Web.Providers
 
 		public string ApplicationName
 		{
-			get { return this._applicationName; }
+			get { return this.applicationName; }
 		}
 
 		#endregion
@@ -68,34 +68,40 @@ namespace FirebirdSql.Web.Providers
 				throw new ArgumentNullException("config");
 			}
 
-			if (String.IsNullOrEmpty(name))
+			if (string.IsNullOrEmpty(name))
 			{
 				name = "FbSessionStateStore";
 			}
+
+            if (string.IsNullOrEmpty(config["description"]))
+            {
+                config.Remove("description");
+                config.Add("description", "FB Session State Store");
+            }
 
 			base.Initialize(name, config);
 
 			if (config["applicationName"] == null || config["applicationName"].Trim() == "")
             {
-                this._applicationName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
+                this.applicationName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
             }
             else
             {
-                this._applicationName = config["applicationName"];
+                this.applicationName = config["applicationName"];
             }
 
 
 			Configuration cfg = WebConfigurationManager.OpenWebConfiguration(ApplicationName);
-			this._config = (SessionStateSection)cfg.GetSection("system.web/sessionState");
+			this.config = (SessionStateSection)cfg.GetSection("system.web/sessionState");
 
 			ConnectionStringSettings connectionStringSettings = ConfigurationManager.ConnectionStrings[config["connectionStringName"]];
 
-			if (connectionStringSettings == null || String.IsNullOrEmpty(connectionStringSettings.ConnectionString))
+			if (connectionStringSettings == null || string.IsNullOrEmpty(connectionStringSettings.ConnectionString))
 			{
 				throw new ProviderException("Connection string cannot be blank.");
 			}
 
-			this._connectionString = connectionStringSettings.ConnectionString;
+			this.connectionString = connectionStringSettings.ConnectionString;
 		}
 
 		public override bool SetItemExpireCallback(SessionStateItemExpireCallback expireCallback)
@@ -105,9 +111,9 @@ namespace FirebirdSql.Web.Providers
 
 		public override void SetAndReleaseItemExclusive(HttpContext context, string id, SessionStateStoreData item, object lockId, bool newItem)
 		{
-			string sessItems = Serialize((SessionStateItemCollection)item.Items);
+			string sessionItems = Serialize((SessionStateItemCollection)item.Items);
 
-			using (FbConnection conn = new FbConnection(this._connectionString))
+			using (FbConnection conn = new FbConnection(this.connectionString))
 			{
 				conn.Open();
 
@@ -136,7 +142,7 @@ namespace FirebirdSql.Web.Providers
 						cmd.Parameters.Add("@LOCKID", FbDbType.Integer).Value = 0;
 						cmd.Parameters.Add("@TIMEOUT", FbDbType.Integer).Value = item.Timeout;
 						cmd.Parameters.Add("@LOCKED", FbDbType.SmallInt).Value = false;
-						cmd.Parameters.Add("@SESSIONITEMS", FbDbType.Text, sessItems.Length).Value = sessItems;
+						cmd.Parameters.Add("@SESSIONITEMS", FbDbType.Text, sessionItems.Length).Value = sessionItems;
 						cmd.Parameters.Add("@FLAGS", FbDbType.Integer).Value = 0;
 						cmd.ExecuteNonQuery();
 					}
@@ -149,7 +155,7 @@ namespace FirebirdSql.Web.Providers
 							"LOCKED = @LOCKED WHERE SESSIONID = @SESSIONID AND APPLICATIONNAME = @APPLICATIONNAME AND " +
 							"LOCKID = @LOCKID";
 						cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now.AddMinutes((Double)item.Timeout);
-						cmd.Parameters.Add("@SESSIONITEMS", FbDbType.Text, sessItems.Length).Value = sessItems;
+						cmd.Parameters.Add("@SESSIONITEMS", FbDbType.Text, sessionItems.Length).Value = sessionItems;
 						cmd.Parameters.Add("@LOCKED", FbDbType.SmallInt).Value = false;
 						cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
                         cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
@@ -174,7 +180,7 @@ namespace FirebirdSql.Web.Providers
 
 		public override void ReleaseItemExclusive(HttpContext context, string id, object lockId)
 		{
-			using (FbConnection conn = new FbConnection(this._connectionString))
+			using (FbConnection conn = new FbConnection(this.connectionString))
 			{
 				conn.Open();
 
@@ -182,7 +188,7 @@ namespace FirebirdSql.Web.Providers
 				{
 					cmd.CommandText = "UPDATE SESSIONS SET LOCKED = 0, EXPIRES = @EXPIRES " +
 						"WHERE SESSIONID = @SESSIONID AND APPLICATIONNAME = @APPLICATIONNAME AND LOCKID = @LOCKID";
-					cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now.AddMinutes(this._config.Timeout.Minutes);
+					cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now.AddMinutes(this.config.Timeout.Minutes);
 					cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
                     cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 					cmd.Parameters.Add("@LOCKID", FbDbType.Integer).Value = lockId;
@@ -193,7 +199,7 @@ namespace FirebirdSql.Web.Providers
 
 		public override void RemoveItem(HttpContext context, string id, object lockId, SessionStateStoreData item)
 		{
-			using (FbConnection conn = new FbConnection(this._connectionString))
+			using (FbConnection conn = new FbConnection(this.connectionString))
 			{
 				conn.Open();
 
@@ -212,7 +218,7 @@ namespace FirebirdSql.Web.Providers
 
 		public override void CreateUninitializedItem(HttpContext context, string id, int timeout)
 		{
-			using (FbConnection conn = new FbConnection(this._connectionString))
+			using (FbConnection conn = new FbConnection(this.connectionString))
 			{
 				conn.Open();
 
@@ -245,7 +251,7 @@ namespace FirebirdSql.Web.Providers
 
 		public override void ResetItemTimeout(HttpContext context, string id)
 		{
-			using (FbConnection conn = new FbConnection(this._connectionString))
+			using (FbConnection conn = new FbConnection(this.connectionString))
 			{
 				conn.Open();
 
@@ -253,7 +259,7 @@ namespace FirebirdSql.Web.Providers
 				{
 					cmd.CommandText = "UPDATE SESSIONS SET EXPIRES = @EXPIRES WHERE SESSIONID = @SESSIONID AND " + 
 						"APPLICATIONNAME = @APPLICATIONNAME";
-					cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now.AddMinutes(this._config.Timeout.Minutes);
+					cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now.AddMinutes(this.config.Timeout.Minutes);
 					cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
                     cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 
@@ -284,7 +290,7 @@ namespace FirebirdSql.Web.Providers
 
 			SessionStateStoreData item = null;
 
-			using (FbConnection conn = new FbConnection(this._connectionString))
+			using (FbConnection conn = new FbConnection(this.connectionString))
 			{
 				DateTime expires;
 				string serializedItems = "";
@@ -385,7 +391,7 @@ namespace FirebirdSql.Web.Providers
 
 					if (actionFlags == SessionStateActions.InitializeItem)
 					{
-						item = CreateNewStoreData(context, this._config.Timeout.Minutes);
+						item = CreateNewStoreData(context, this.config.Timeout.Minutes);
 					}
 					else
 					{
@@ -414,14 +420,15 @@ namespace FirebirdSql.Web.Providers
 
 		private SessionStateStoreData Deserialize(HttpContext context, string serializedItems, int timeout)
 		{
-			MemoryStream ms = new MemoryStream(Convert.FromBase64String(serializedItems));
+            SessionStateItemCollection sessionItems;
 
-			SessionStateItemCollection sessionItems;
-
-			using (BinaryReader reader = new BinaryReader(ms))
-			{
-				sessionItems = SessionStateItemCollection.Deserialize(reader);
-			}
+            using (MemoryStream memory = new MemoryStream(Convert.FromBase64String(serializedItems)))
+            {
+                using (BinaryReader reader = new BinaryReader(memory))
+                {
+                    sessionItems = SessionStateItemCollection.Deserialize(reader);
+                }
+            }
 
 			return new SessionStateStoreData(sessionItems, SessionStateUtility.GetSessionStaticObjects(context), timeout);
 		}
