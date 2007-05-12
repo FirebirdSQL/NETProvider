@@ -10,7 +10,7 @@
     <RootNamespace>FirebirdSql.Web.Providers</RootNamespace>
     <AssemblyName>FirebirdSql.Web.Providers</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>FirebirdSql.Web.Providers.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Properties\FirebirdSql.Web.Providers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,13 +45,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\FirebirdSql.Data.FirebirdClient.csproj">
+    <ProjectReference Include="..\..\Data\FirebirdSql.Data.FirebirdClient.csproj">
       <Project>{326A24F9-6259-45DB-835C-18DB80728460}</Project>
       <Name>FirebirdSql.Data.FirebirdClient</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FirebirdSql.Web.Providers.snk" />
+    <None Include="Properties\FirebirdSql.Web.Providers.snk" />
     <None Include="sql_scripts\FbMembershipProvider1.5.sql" />
     <None Include="sql_scripts\FbProfileProvider1.5.sql" />
     <None Include="sql_scripts\FbRoleProvider1.5.sql" />
