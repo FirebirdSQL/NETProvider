@@ -266,11 +266,6 @@
       tofile="${build.dir}/${project::get-name()}.UnitTests.dll.config" 
     />
 
-    <copy 
-      file="${nunit.framework.dll}" 
-      todir="${build.dir}"
-    />
-
     <!-- compile FirebirdSql.Data.Firebird.UnitTest -->
     <csc target="library" 
          output="${build.dir}/${project::get-name()}.UnitTests.dll" 
