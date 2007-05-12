@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
-[assembly: AssemblyTitle("Firebird Web Providers")]
+[assembly: AssemblyTitle("")]
 [assembly: AssemblyDescription("Firebird Web Providers for ASP.NET 2.0")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FirebirdSQL")]
