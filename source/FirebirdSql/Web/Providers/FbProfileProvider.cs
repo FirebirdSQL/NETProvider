@@ -37,6 +37,7 @@ using System.Web.Hosting;
 using System.Web.Profile;
 using System.Web.Util;
 using System.Xml.Serialization;
+
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Web.Providers
@@ -45,7 +46,7 @@ namespace FirebirdSql.Web.Providers
     {
         #region · Fields ·
 
-        private string appName;
+        private string applicationName;
         private string connectionString;
         private int commandTimeout;
 
@@ -55,7 +56,7 @@ namespace FirebirdSql.Web.Providers
 
         public override string ApplicationName
         {
-            get { return this.appName; }
+            get { return this.applicationName; }
             set
             {
                 if (value.Length > 100)
@@ -63,7 +64,7 @@ namespace FirebirdSql.Web.Providers
                     throw new ProviderException("The application name is too long.");
                 }
 
-                this.appName = value;
+                this.applicationName = value;
             }
         }
 
@@ -84,7 +85,7 @@ namespace FirebirdSql.Web.Providers
             if (string.IsNullOrEmpty(config["description"]))
             {
                 config.Remove("description");
-                config.Add("description", "Fb Profile Provider");
+                config.Add("description", "FB Profile Provider");
             }
 
             base.Initialize(name, config);
@@ -107,11 +108,11 @@ namespace FirebirdSql.Web.Providers
 
             if (config["applicationName"] == null || config["applicationName"].Trim() == "")
             {
-                this.appName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
+                this.applicationName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
             }
             else
             {
-                this.appName = config["applicationName"];
+                this.applicationName = config["applicationName"];
             }
 
             if (!(int.TryParse(config["commandTimeout"], out this.commandTimeout)))

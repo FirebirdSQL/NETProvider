@@ -26,6 +26,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Web;
 using System.Web.Security;
+using System.Text;
+
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Web.Providers
@@ -43,29 +45,28 @@ namespace FirebirdSql.Web.Providers
         //
         private string eventSource = "FbRoleProvider";
         private string eventLog = "Application";
-        private string exceptionMessage = "An exception occurred. Please check the Event Log.";
-        private ConnectionStringSettings pConnectionStringSettings;
+        private ConnectionStringSettings connectionStringSettings;
         private string connectionString;
         //
         // If false, exceptions are thrown to the caller. If true,
         // exceptions are written to the event log.
         //
-        private bool pWriteExceptionsToEventLog = false;
-        private string pApplicationName;
+        private bool writeExceptionsToEventLog = false;
+        private string applicationName;
         #endregion
 
         #region · Properties ·
-        
+
         public bool WriteExceptionsToEventLog
         {
-            get { return pWriteExceptionsToEventLog; }
-            set { pWriteExceptionsToEventLog = value; }
+            get { return writeExceptionsToEventLog; }
+            set { writeExceptionsToEventLog = value; }
         }
 
         public override string ApplicationName
         {
-            get { return pApplicationName; }
-            set { pApplicationName = value; }
+            get { return applicationName; }
+            set { applicationName = value; }
         }
 
         #endregion
@@ -91,7 +92,7 @@ namespace FirebirdSql.Web.Providers
             if (String.IsNullOrEmpty(config["description"]))
             {
                 config.Remove("description");
-                config.Add("description", "Fb Role provider");
+                config.Add("description", "FB Role Provider");
             }
 
             // Initialize the abstract base class.
@@ -99,18 +100,18 @@ namespace FirebirdSql.Web.Providers
 
             if (config["applicationName"] == null || config["applicationName"].Trim() == "")
             {
-                pApplicationName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
+                applicationName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
             }
             else
             {
-                pApplicationName = config["applicationName"];
+                applicationName = config["applicationName"];
             }
 
             if (config["writeExceptionsToEventLog"] != null)
             {
                 if (config["writeExceptionsToEventLog"].ToUpper() == "TRUE")
                 {
-                    pWriteExceptionsToEventLog = true;
+                    writeExceptionsToEventLog = true;
                 }
             }
 
@@ -118,14 +119,14 @@ namespace FirebirdSql.Web.Providers
             // Initialize FbConnection.
             //
 
-            pConnectionStringSettings = ConfigurationManager.ConnectionStrings[config["connectionStringName"]];
+            connectionStringSettings = ConfigurationManager.ConnectionStrings[config["connectionStringName"]];
 
-            if (pConnectionStringSettings == null || pConnectionStringSettings.ConnectionString.Trim() == "")
+            if (connectionStringSettings == null || connectionStringSettings.ConnectionString.Trim() == "")
             {
                 throw new ProviderException("Connection string cannot be blank.");
             }
 
-            connectionString = pConnectionStringSettings.ConnectionString;
+            connectionString = connectionStringSettings.ConnectionString;
         }
 
         public override void AddUsersToRoles(string[] usernames, string[] rolenames)
@@ -154,55 +155,46 @@ namespace FirebirdSql.Web.Providers
                 }
             }
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_ADDUSERTOROLE", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-            FbParameter roleParm = cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100);
-            FbParameter userParm = cmd.Parameters.Add("@Username", FbDbType.VarChar, 100);
-            FbTransaction tran = null;
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
-                tran = conn.BeginTransaction();
-                cmd.Transaction = tran;
-
-                foreach (string username in usernames)
+                using (FbCommand cmd = new FbCommand("ROLES_ADDUSERTOROLE", conn))
                 {
-                    foreach (string rolename in rolenames)
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                    FbParameter roleParameter = cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100);
+                    FbParameter userParameter = cmd.Parameters.Add("@Username", FbDbType.VarChar, 100);
+                    FbTransaction trans = conn.BeginTransaction();
+                    cmd.Transaction = trans;
+
+                    try
                     {
-                        userParm.Value = username;
-                        roleParm.Value = rolename;
-                        cmd.ExecuteNonQuery();
+                        foreach (string username in usernames)
+                        {
+                            foreach (string rolename in rolenames)
+                            {
+                                userParameter.Value = username;
+                                roleParameter.Value = rolename;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        trans.Commit();
+                    }
+                    catch (FbException ex)
+                    {
+                        trans.Rollback();
+
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "AddUsersToRoles");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
                     }
                 }
-
-                tran.Commit();
-            }
-            catch (FbException e)
-            {
-                try
-                {
-                    tran.Rollback();
-                }
-                catch 
-                { 
-                }
-
-
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "AddUsersToRoles");
-                }
-                else
-                {
-                    throw e;
-                }
-            }
-            finally
-            {
-                conn.Close();
             }
         }
 
@@ -218,31 +210,30 @@ namespace FirebirdSql.Web.Providers
                 throw new ProviderException("Role name already exists.");
             }
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_CREATEROLE", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
-
-                cmd.ExecuteNonQuery();
-            }
-            catch (FbException e)
-            {
-                if (WriteExceptionsToEventLog)
+                using (FbCommand cmd = new FbCommand("ROLES_CREATEROLE", conn))
                 {
-                    WriteToEventLog(e, "CreateRole");
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                    cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (FbException ex)
+                    {
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "CreateRole");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
                 }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                conn.Close();
             }
         }
 
@@ -258,209 +249,181 @@ namespace FirebirdSql.Web.Providers
                 throw new ProviderException("Cannot delete a populated role.");
             }
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_DELETEROLE", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
-            FbTransaction tran = null;
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
-                tran = conn.BeginTransaction();
-                cmd.Transaction = tran;
-                cmd.ExecuteNonQuery();
-                tran.Commit();
+                using (FbCommand cmd = new FbCommand("ROLES_DELETEROLE", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                    cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
+                    FbTransaction tran = conn.BeginTransaction();
+                    cmd.Transaction = tran;
+
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        tran.Commit();
+                    }
+                    catch (FbException ex)
+                    {
+                        tran.Rollback();
+
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "DeleteRole");
+
+                            return false;
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
+                }
             }
-            catch (FbException e)
-            {
-                try
-                {
-                    tran.Rollback();
-                }
-                catch 
-                {
-                }
-
-
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "DeleteRole");
-
-                    return false;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                conn.Close();
-            }
-
             return true;
         }
 
         public override string[] GetAllRoles()
         {
-            string tmpRoleNames = "";
+            StringBuilder roleNames = new StringBuilder();
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_GETALLROLES", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-
-            FbDataReader reader = null;
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
-
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (FbCommand cmd = new FbCommand("ROLES_GETALLROLES", conn))
                 {
-                    tmpRoleNames += reader.GetString(0) + ",";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+
+                    try
+                    {
+                        using (FbDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                roleNames.Append(reader.GetString(0));
+                                roleNames.Append(",");
+                            }
+                        }
+                    }
+                    catch (FbException ex)
+                    {
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "GetAllRoles");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
                 }
             }
-            catch (FbException e)
-            {
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "GetAllRoles");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                if (reader != null) 
-                { 
-                    reader.Close(); 
-                }
 
-                conn.Close();
-            }
-
-            if (tmpRoleNames.Length > 0)
+            if (roleNames.Length > 0)
             {
                 // Remove trailing comma.
-                tmpRoleNames = tmpRoleNames.Substring(0, tmpRoleNames.Length - 1);
+                roleNames.Remove(roleNames.Length - 1, 1);
 
-                return tmpRoleNames.Split(',');
+                return roleNames.ToString().Split(',');
             }
-
             return new string[0];
         }
 
         public override string[] GetRolesForUser(string username)
         {
-            string tmpRoleNames = "";
+            StringBuilder roleNames = new StringBuilder();
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_GETUSERROLES", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-            cmd.Parameters.Add("@Username", FbDbType.VarChar, 100).Value = username;
-            FbDataReader reader = null;
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
-
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (FbCommand cmd = new FbCommand("ROLES_GETUSERROLES", conn))
                 {
-                    tmpRoleNames += reader.GetString(0) + ",";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                    cmd.Parameters.Add("@Username", FbDbType.VarChar, 100).Value = username;
+                    try
+                    {
+                        using (FbDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                roleNames.Append(reader.GetString(0));
+                                roleNames.Append(",");
+                            }
+                        }
+                    }
+                    catch (FbException ex)
+                    {
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "GetRolesForUser");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
                 }
             }
-            catch (FbException e)
-            {
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "GetRolesForUser");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                if (reader != null) 
-                { 
-                    reader.Close(); 
-                }
-                conn.Close();
-            }
 
-            if (tmpRoleNames.Length > 0)
+            if (roleNames.Length > 0)
             {
                 // Remove trailing comma.
-                tmpRoleNames = tmpRoleNames.Substring(0, tmpRoleNames.Length - 1);
+                roleNames.Remove(roleNames.Length - 1, 1);
 
-                return tmpRoleNames.Split(',');
+                return roleNames.ToString().Split(',');
             }
-
             return new string[0];
         }
 
         public override string[] GetUsersInRole(string rolename)
         {
-            string tmpUserNames = "";
+            StringBuilder userNames = new StringBuilder();
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_GETROLEUSERS", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
-
-            FbDataReader reader = null;
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
-
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (FbCommand cmd = new FbCommand("ROLES_GETROLEUSERS", conn))
                 {
-                    tmpUserNames += reader.GetString(0) + ",";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                    cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
+
+                    try
+                    {
+                        using (FbDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                userNames.Append(reader.GetString(0));
+                                userNames.Append(",");
+                            }
+                        }
+                    }
+                    catch (FbException ex)
+                    {
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "GetUsersInRole");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
                 }
             }
-            catch (FbException e)
-            {
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "GetUsersInRole");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                if (reader != null) 
-                { 
-                    reader.Close(); 
-                }
 
-                conn.Close();
-            }
-
-            if (tmpUserNames.Length > 0)
+            if (userNames.Length > 0)
             {
                 // Remove trailing comma.
-                tmpUserNames = tmpUserNames.Substring(0, tmpUserNames.Length - 1);
-                return tmpUserNames.Split(',');
-            }
+                userNames.Remove(userNames.Length - 1, 1);
 
+                return userNames.ToString().Split(',');
+            }
             return new string[0];
         }
 
@@ -468,38 +431,34 @@ namespace FirebirdSql.Web.Providers
         {
             bool userIsInRole = false;
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_ISUSERINROLE", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
-            cmd.Parameters.Add("@Username", FbDbType.VarChar, 100).Value = username;            
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
+                using (FbCommand cmd = new FbCommand("ROLES_ISUSERINROLE", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                    cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
+                    cmd.Parameters.Add("@Username", FbDbType.VarChar, 100).Value = username;
 
-                int numRecs = (int)cmd.ExecuteScalar();
+                    try
+                    {
+                        int numRecs = (int)cmd.ExecuteScalar();
 
-                if (numRecs > 0)
-                {
-                    userIsInRole = true;
+                        userIsInRole = numRecs > 0;
+                    }
+                    catch (FbException ex)
+                    {
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "IsUserInRole");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
                 }
-            }
-            catch (FbException e)
-            {
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "IsUserInRole");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                conn.Close();
             }
 
             return userIsInRole;
@@ -526,54 +485,46 @@ namespace FirebirdSql.Web.Providers
                 }
             }
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_DELETEUSERROLE", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-            FbParameter roleParm = cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100);
-            FbParameter userParm = cmd.Parameters.Add("@Username", FbDbType.VarChar, 100);
-            FbTransaction tran = null;
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
-                tran = conn.BeginTransaction();
-                cmd.Transaction = tran;
-
-                foreach (string username in usernames)
+                using (FbCommand cmd = new FbCommand("ROLES_DELETEUSERROLE", conn))
                 {
-                    foreach (string rolename in rolenames)
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                    FbParameter roleParameter = cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100);
+                    FbParameter userParameter = cmd.Parameters.Add("@Username", FbDbType.VarChar, 100);
+                    FbTransaction trans = conn.BeginTransaction();
+                    cmd.Transaction = trans;
+
+                    try
                     {
-                        userParm.Value = username;
-                        roleParm.Value = rolename;
-                        cmd.ExecuteNonQuery();
+                        foreach (string username in usernames)
+                        {
+                            foreach (string rolename in rolenames)
+                            {
+                                userParameter.Value = username;
+                                roleParameter.Value = rolename;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        trans.Commit();
+                    }
+                    catch (FbException ex)
+                    {
+                        trans.Rollback();
+
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "RemoveUsersFromRoles");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
                     }
                 }
-
-                tran.Commit();
-            }
-            catch (FbException e)
-            {
-                try
-                {
-                    tran.Rollback();
-                }
-                catch 
-                { 
-                }
-
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "RemoveUsersFromRoles");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                conn.Close();
             }
         }
 
@@ -581,37 +532,33 @@ namespace FirebirdSql.Web.Providers
         {
             bool exists = false;
 
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_ISEXISTS", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
-            cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
+                using (FbCommand cmd = new FbCommand("ROLES_ISEXISTS", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
+                    cmd.Parameters.Add("@Rolename", FbDbType.VarChar, 100).Value = rolename;
 
-                int numRecs = (int)cmd.ExecuteScalar();
+                    try
+                    {
+                        int numRecs = (int)cmd.ExecuteScalar();
 
-                if (numRecs > 0)
-                {
-                    exists = true;
+                        exists = numRecs > 0;
+                    }
+                    catch (FbException ex)
+                    {
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "RoleExists");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
                 }
-            }
-            catch (FbException e)
-            {
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "RoleExists");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                conn.Close();
             }
 
             return exists;
@@ -619,52 +566,51 @@ namespace FirebirdSql.Web.Providers
 
         public override string[] FindUsersInRole(string rolename, string usernameToMatch)
         {
-            FbConnection conn = new FbConnection(connectionString);
-            FbCommand cmd = new FbCommand("ROLES_FINDROLEUSERS", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = pApplicationName;
-            cmd.Parameters.Add("@RoleName", FbDbType.VarChar, 100).Value = rolename;
-            cmd.Parameters.Add("@UsernameSearch", FbDbType.VarChar, 100).Value = usernameToMatch.ToUpper();
+            StringBuilder userNames = new StringBuilder();
 
-            string tmpUserNames = "";
-            FbDataReader reader = null;
-
-            try
+            using (FbConnection conn = new FbConnection(connectionString))
             {
                 conn.Open();
-
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (FbCommand cmd = new FbCommand("ROLES_FINDROLEUSERS", conn))
                 {
-                    tmpUserNames += reader.GetString(0) + ",";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = applicationName;
+                    cmd.Parameters.Add("@RoleName", FbDbType.VarChar, 100).Value = rolename;
+                    cmd.Parameters.Add("@UsernameSearch", FbDbType.VarChar, 100).Value = usernameToMatch.ToUpper();
+
+
+                    try
+                    {
+                        using (FbDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                userNames.Append(reader.GetString(0));
+                                userNames.Append(",");
+                            }
+                        }
+                    }
+                    catch (FbException ex)
+                    {
+                        if (WriteExceptionsToEventLog)
+                        {
+                            WriteToEventLog(ex, "FindUsersInRole");
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
                 }
             }
-            catch (FbException e)
-            {
-                if (WriteExceptionsToEventLog)
-                {
-                    WriteToEventLog(e, "FindUsersInRole");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                if (reader != null) { reader.Close(); }
 
-                conn.Close();
-            }
-
-            if (tmpUserNames.Length > 0)
+            if (userNames.Length > 0)
             {
                 // Remove trailing comma.
-                tmpUserNames = tmpUserNames.Substring(0, tmpUserNames.Length - 1);
-                return tmpUserNames.Split(',');
-            }
+                userNames.Remove(userNames.Length - 1, 1);
 
+                return userNames.ToString().Split(',');
+            }
             return new string[0];
         }
 
@@ -678,7 +624,8 @@ namespace FirebirdSql.Web.Providers
             log.Source = eventSource;
             log.Log = eventLog;
 
-            string message = exceptionMessage + "\n\n";
+            string message = string.Empty;
+            message += "An exception occurred. Please check the Event Log." + "\n\n";
             message += "Action: " + action + "\n\n";
             message += "Exception: " + e.ToString();
 
