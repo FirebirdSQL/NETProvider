@@ -36,7 +36,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="FbArrayTest.cs" />
     <Compile Include="FbBlobTest.cs" />
@@ -58,16 +58,13 @@
     <Compile Include="TransactionScopeTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\FirebirdSql.Data.FirebirdClient.csproj">
+    <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient.csproj">
       <Project>{326A24F9-6259-45DB-835C-18DB80728460}</Project>
       <Name>FirebirdSql.Data.FirebirdClient</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
