@@ -26,7 +26,7 @@ using System.Security.Cryptography;
 using Borland.Data.Provider;
 using Borland.Data.Common;
 
-namespace FirebirdSql.Data.Bdp.Tests
+namespace FirebirdSql.Data.Bdp.UnitTests
 {
 	public class BaseTest
 	{

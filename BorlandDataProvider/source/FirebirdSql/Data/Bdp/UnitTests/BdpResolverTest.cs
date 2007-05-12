@@ -21,7 +21,7 @@
 /// This unit contains tests to exercise the FbResolver unit.
 /// </summary>
 
-namespace FirebirdSql.Data.Bdp.Tests
+namespace FirebirdSql.Data.Bdp.UnitTests
 {
 	using System;
 	using System.Collections;

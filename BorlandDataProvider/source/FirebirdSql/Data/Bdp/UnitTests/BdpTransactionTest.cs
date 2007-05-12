@@ -22,7 +22,7 @@ using System.Text;
 using NUnit.Framework;
 using Borland.Data.Provider;
 
-namespace FirebirdSql.Data.Bdp.Tests
+namespace FirebirdSql.Data.Bdp.UnitTests
 {
 	[TestFixture]
 	public class BdpTransactionTest : BaseTest 

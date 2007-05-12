@@ -23,7 +23,7 @@ using NUnit.Framework;
 using Borland.Data.Common;
 using Borland.Data.Provider;
 
-namespace FirebirdSql.Data.Bdp.Tests
+namespace FirebirdSql.Data.Bdp.UnitTests
 {
 	[TestFixture]
 	public class BdpCommandBuilderTest : BaseTest
