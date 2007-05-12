@@ -17,7 +17,7 @@ set DEFINES=-define:DEBUG -define:NETCF
 
 rem ********** RESOURCES **********
 
-set RESOURCES=-resource:%SOURCE_DIR%\FirebirdSql\Resources\isc_error_msg.resources,FirebirdSql.Resources.isc_error_msg.resources
+set RESOURCES=-resource:%SOURCE_DIR%\FirebirdSql\Data\Resources\isc_error_msg.resources,FirebirdSql.Resources.isc_error_msg.resources
 
 rem ********** References **********
 
@@ -25,6 +25,6 @@ set REFERENCES=/r:%NETCFLIBS%\mscorlib.dll /r:%NETCFLIBS%\system.dll /r:%NETCFLI
 
 rem ********** Build **********
 
-copy %SOURCE_DIR%\FirebirdSql\*.snk .
+copy %SOURCE_DIR%\FirebirdSql\Properties\*.snk .
 
 csc.exe /noconfig /nostdlib /target:library /out:%BUILD_DIR%\FirebirdSql.Data.FirebirdClient.dll %REFERENCES% %DEFINES% %COMMON_RESOURCES% /recurse:%COMMON_SOURCES%\*.cs /recurse:%GDS_SOURCES%\*.cs /recurse:%PROVIDER_SOURCES%\*.cs /recurse:%SCHEMA_SOURCES%\*.cs /recurse:%SERVICES_SOURCES%\*.cs
