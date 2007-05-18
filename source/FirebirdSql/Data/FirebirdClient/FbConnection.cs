@@ -564,6 +564,9 @@ namespace FirebirdSql.Data.FirebirdClient
                         this.innerConnection.Connect();
                     }
 
+                    // Enlist the connection
+                    this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
+
                     // Bind	Warning	messages event
                     this.innerConnection.Database.WarningMessage = new WarningMessageCallback(this.OnWarningMessage);
 
