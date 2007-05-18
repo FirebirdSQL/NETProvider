@@ -223,15 +223,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				DatabaseParameterBuffer dpb = this.BuildDpb(this.db, options);
 
 				this.db.Attach(dpb, this.options.DataSource, this.options.Port, this.options.Database);
-
-#if (NET)
-
-                if (this.options.Enlist)
-                {
-                    this.EnlistTransaction(System.Transactions.Transaction.Current);
-                }
-
-#endif
 			}
 			catch (IscException ex)
 			{
@@ -350,21 +341,24 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Transaction Enlistement ·
 
-#if (NET )
+#if (NET)
 
         public void EnlistTransaction(System.Transactions.Transaction transaction)
         {
-            if (this.HasActiveTransaction)
+            if (this.owningConnection != null && this.options.Enlist)
             {
-                throw new ArgumentException("Unable to enlist in transaction, a local transaction already exists");
-            }
-            if (this.enlistmentNotification != null)
-            {
-                throw new ArgumentException("Already enlisted in a transaction");
-            }
+                if (this.HasActiveTransaction)
+                {
+                    throw new ArgumentException("Unable to enlist in transaction, a local transaction already exists");
+                }
+                if (this.enlistmentNotification != null)
+                {
+                    throw new ArgumentException("Already enlisted in a transaction");
+                }
 
-            this.enlistmentNotification             = new FbEnlistmentNotification(this, transaction);
-            this.enlistmentNotification.Completed   += new EventHandler(EnlistmentCompleted);
+                this.enlistmentNotification = new FbEnlistmentNotification(this, transaction);
+                this.enlistmentNotification.Completed += new EventHandler(EnlistmentCompleted);
+            }
         }
 
         private void EnlistmentCompleted(object sender, EventArgs e)
