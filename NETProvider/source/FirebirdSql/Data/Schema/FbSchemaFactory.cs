@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Schema
     {
         #region · Static Members ·
 
-        private static readonly string ResName = "FirebirdSql.Data.Schema.FbMetaData.xml";
+        private static readonly string ResName = "FirebirdSql.Schema.FbMetaData.xml";
 
         #endregion
 
