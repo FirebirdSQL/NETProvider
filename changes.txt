@@ -2,6 +2,28 @@ WHAT IS NEW - FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ========================================================================
 
 
+· v2.1.0 Release Candidate 1 ( 2007-05-19 ) ·
+
+( Please review the changelog for details )
+
+
+Bug Fixes:
+
+	- #DNET-81
+
+	- #DNET-85
+
+	- #DNET-86
+
+	- Fixed bug with TransactionScope and Connection Pooling.
+
+	- Bug fixes on Dispose implementation.
+
+Changes:
+
+	- Added conditional code for charsets not supported in mono.
+	
+
 · v2.1.0 Beta 3 ( 2007-03-18 ) ·
 
 ( Please review the changelog for details )

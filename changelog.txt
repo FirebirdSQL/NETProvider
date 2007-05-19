@@ -23,7 +23,6 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 
 		- Added more checks to prevent exceptions on gc calls
 
-
 2007-03-30 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql\Data\Client\Embedded\FesServiceManager.cs:
