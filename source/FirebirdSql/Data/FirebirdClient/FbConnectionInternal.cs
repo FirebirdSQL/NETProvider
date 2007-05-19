@@ -341,7 +341,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Transaction Enlistement ·
 
-#if (NET )
+#if (NET)
 
         public void EnlistTransaction(System.Transactions.Transaction transaction)
         {
