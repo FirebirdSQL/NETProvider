@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient", "FirebirdSql\Data\FirebirdSql.Data.FirebirdClient.csproj", "{326A24F9-6259-45DB-835C-18DB80728460}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Web.Providers", "FirebirdSql\Web\Providers\FirebirdSql.Web.Providers.csproj", "{E4CE816A-20E4-4281-B547-B9C02F24F2E7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests", "FirebirdSql\Data\UnitTests\FirebirdSql.Data.UnitTests.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
 EndProject
 Global
@@ -26,16 +24,6 @@ Global
 		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Win32.ActiveCfg = Release|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{E4CE816A-20E4-4281-B547-B9C02F24F2E7}.Release|Win32.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
