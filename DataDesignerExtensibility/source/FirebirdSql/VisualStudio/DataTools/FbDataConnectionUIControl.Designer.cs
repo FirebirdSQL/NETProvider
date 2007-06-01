@@ -306,6 +306,7 @@ namespace FirebirdSql.VisualStudio.DataTools
             "WIN1252",
             "WIN1253",
             "WIN1254",
+            "WIN1255",
             "WIN1257",
             "KOI8R",
             "KOI8U"});
