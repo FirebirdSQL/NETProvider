@@ -545,6 +545,10 @@ namespace FirebirdSql.Data.FirebirdClient
                 {
                     throw new InvalidOperationException("Connection already Open.");
                 }
+                if (this.options.Enlist && System.Transactions.Transaction.Current == null)
+                {
+                    throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
+                }
 
                 this.DemandPermission();
 
