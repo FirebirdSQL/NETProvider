@@ -1065,12 +1065,12 @@ namespace FirebirdSql.Web.Providers
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@ApplicationName", FbDbType.VarChar, 100).Value = ApplicationName;
                     cmd.Parameters.Add("@SinceLastInActive", FbDbType.TimeStamp).Value = compareTime;
-                    
+
                     FbParameter p = new FbParameter("@NUMBERUSERS", FbDbType.Integer);
                     p.Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(p);
                     cmd.ExecuteNonQuery();
-                    
+
                     return (p.Value != null) ? ((int)p.Value) : -1;
                 }
             }
@@ -1394,7 +1394,7 @@ namespace FirebirdSql.Web.Providers
                     cmd.Parameters.Add("@PasswordAttemptWindow", FbDbType.Integer).Value = PasswordAttemptWindow;
                     cmd.Parameters.Add("@LastLoginDate", FbDbType.TimeStamp).Value = isPasswordCorrect ? dtNow : lastLoginDate;
                     cmd.Parameters.Add("@LastActivityDate", FbDbType.TimeStamp).Value = isPasswordCorrect ? dtNow : lastActivityDate;
-                    
+
                     FbParameter p = new FbParameter("@RETURNCODE", FbDbType.Integer);
                     p.Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(p);
@@ -1432,7 +1432,6 @@ namespace FirebirdSql.Web.Providers
                     cmd.Parameters.Add("@UpdateLastLoginActivityDate", FbDbType.Integer).Value = updateLastLoginActivityDate;
                     using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                     {
-                        status = -1;
                         if (reader.Read())
                         {
                             password = reader.GetString(0);
@@ -1443,6 +1442,7 @@ namespace FirebirdSql.Web.Providers
                             isApproved = GetNullableBool(reader, 5);
                             lastLoginDate = GetNullableDateTime(reader, 6);
                             lastActivityDate = GetNullableDateTime(reader, 7);
+                            status = GetNullableInt(reader, 8);
                         }
                         else
                         {
@@ -1454,6 +1454,7 @@ namespace FirebirdSql.Web.Providers
                             isApproved = false;
                             lastLoginDate = DateTime.UtcNow;
                             lastActivityDate = DateTime.UtcNow;
+                            status = -1;
                         }
                     }
                 }
@@ -1488,13 +1489,14 @@ namespace FirebirdSql.Web.Providers
                         {
                             password = reader.GetString(0);
                             passwordFormat = reader.GetInt32(1);
+                            status = GetNullableInt(reader, 2);
                         }
                         else
                         {
                             password = null;
                             passwordFormat = 0;
+                            status = -1;
                         }
-                        status = GetNullableInt(reader, 2);
                     }
                 }
             }
