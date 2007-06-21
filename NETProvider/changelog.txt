@@ -2,6 +2,12 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-05-21 Jiri Cincura <jiri@cincura.net>
+
+	* FirebirdSql\Data\FirebirdClient\FbConnection.cs:
+
+		- Fixed page size, when creating new DB (DNET-96)
+
 2007-05-18 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql\Data\FirebirdClient\FbConnection.cs:
