@@ -152,8 +152,9 @@ namespace FirebirdSql.Data.Schema
                     row["COLUMN_SIZE"] = Int32.MaxValue;
                 }
 
-				if (row["NUMERIC_PRECISION"] == System.DBNull.Value)
-				{
+                if ((dbType == FbDbType.Decimal || dbType == FbDbType.Numeric) &&
+                    (row["NUMERIC_PRECISION"] == System.DBNull.Value || Convert.ToInt32(row["NUMERIC_PRECISION"]) == 0))
+                {
 					row["NUMERIC_PRECISION"] = 0;
 				}
 
