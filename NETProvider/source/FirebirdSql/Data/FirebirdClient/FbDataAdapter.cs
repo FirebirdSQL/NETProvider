@@ -74,6 +74,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #endregion
 
+        #region · Fields ·
+
+        private bool disposed;
+        private bool shouldDisposeSelectCommand;
+
+        #endregion
+
         #region · Properties ·
 
         /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/property[@name="SelectCommand"]/*'/>
@@ -135,17 +142,55 @@ namespace FirebirdSql.Data.FirebirdClient
             this.SelectCommand = selectCommand;
         }
 
+        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/constructor[@name="ctor(System.String,System.String)"]/*'/>
+        public FbDataAdapter(string selectCommandText, string selectConnectionString)
+            : this(selectCommandText, new FbConnection(selectConnectionString))
+        {
+        }
+
         /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/constructor[@name="ctor(System.String,FbConnection)"]/*'/>		
         public FbDataAdapter(string selectCommandText, FbConnection selectConnection) : base()
         {
-            this.SelectCommand = new FbCommand(selectCommandText, selectConnection);
+            this.SelectCommand              = new FbCommand(selectCommandText, selectConnection);
+            this.shouldDisposeSelectCommand = true;
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/constructor[@name="ctor(System.String,System.String)"]/*'/>
-        public FbDataAdapter(string selectCommandText, string selectConnectionString) : base()
+        #endregion
+
+        #region IDisposable	Methods
+
+        /// <include file='Doc/en_EN/FbDataAdapter.xml'	path='doc/class[@name="FbDataAdapter"]/method[@name="Dispose(System.Boolean)"]/*'/>
+        protected override void Dispose(bool disposing)
         {
-			FbConnection connection = new FbConnection(selectConnectionString);
-            this.SelectCommand = new FbCommand(selectCommandText, connection);
+            lock (this)
+            {
+                if (!this.disposed)
+                {
+                    try
+                    {
+                        // Release any managed resources
+                        if (disposing)
+                        {
+                            if (this.shouldDisposeSelectCommand)
+                            {
+                                if (this.SelectCommand != null)
+                                {
+                                    this.SelectCommand.Dispose();
+                                    this.SelectCommand = null;
+                                }
+                            }
+                        }
+
+                        // release any unmanaged resources
+
+                        this.disposed = true;
+                    }
+                    finally
+                    {
+                        base.Dispose(disposing);
+                    }
+                }
+            }
         }
 
         #endregion
