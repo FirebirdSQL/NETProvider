@@ -11,6 +11,8 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 		- Fixed possible memory leak, when using the ctor's tahat
 		takes the sql command as a string.
 
+		( Thanks to Alex Tchumel for the bug report )
+
 
 2007-06-21 Jiri Cincura <jiri@cincura.net>
 
