@@ -2,23 +2,16 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
-2007-06-01 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+2007-06-23 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* Fixed bug #DNET-90
 
 	* FirebirdSql\Data\FirebirdClient\FbDataAdapter.cs:
 
-		- Fixed possible memory leak, when using the ctor's tahat
-		takes the sql command as a string.
+		- Fixed possible memory leak when using the constructors that are taking
+		the sql command as a string.
 
 		( Thanks to Alex Tchumel for the bug report )
-
-
-2007-06-21 Jiri Cincura <jiri@cincura.net>
-
-	* FirebirdSql\Data\FirebirdClient\FbConnection.cs:
-
-		- Fixed page size, when creating new DB (DNET-96)
 
 2007-06-01 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
@@ -26,7 +19,6 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 	
 			- Throw exception when there are no TransactionScope active and
 			the connection string has Enlist = true
-
 
 2007-05-18 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
