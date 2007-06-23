@@ -157,7 +157,8 @@ namespace FirebirdSql.Data.Schema
 					row["NUMERIC_PRECISION"] = 0;
 				}
 
-                if (dbType == FbDbType.Decimal || dbType == FbDbType.Numeric)
+                if ((dbType == FbDbType.Decimal || dbType == FbDbType.Numeric) &&
+                    (row["NUMERIC_PRECISION"] == System.DBNull.Value || Convert.ToInt32(row["NUMERIC_PRECISION"]) == 0))
                 {
                     row["NUMERIC_PRECISION"] = row["COLUMN_SIZE"];
                 }
