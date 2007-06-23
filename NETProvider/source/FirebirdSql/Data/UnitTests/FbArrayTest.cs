@@ -1027,7 +1027,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			if (original)
 			{
-				Console.WriteLine("Original	field values:");
+				Console.WriteLine("Original field values:");
 			}
 			else
 			{
