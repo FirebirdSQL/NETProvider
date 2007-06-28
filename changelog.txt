@@ -2,6 +2,11 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-06-28 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* Fixed bug #DNET-101
+
+
 2007-06-23 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* Fixed bug #DNET-90
