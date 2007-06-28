@@ -5,6 +5,7 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 2007-06-28  Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql\Data\FirebirdClient\FbDataAdapter.cs:
+	* FirebirdSql\Data\FirebirdClient\FbConnection.cs:
 
 		- Backported bugfix from devel trunk.
 
