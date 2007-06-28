@@ -179,11 +179,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Fields ·
 
-        private FbConnectionInternal innerConnection;
-        private ConnectionState state;
-        private FbConnectionString options;
-        private bool disposed;
-        private string connectionString;
+        private FbConnectionInternal    innerConnection;
+        private ConnectionState         state;
+        private FbConnectionString      options;
+        private bool                    disposed;
+        private string                  connectionString;
 
         #endregion
 
@@ -568,8 +568,28 @@ namespace FirebirdSql.Data.FirebirdClient
                         this.innerConnection.Connect();
                     }
 
-                    // Enlist the transaction
-                    this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
+                    try
+                    {
+                        this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
+                    }
+                    catch
+                    {
+                        // if enlistment fails clean up innerConnection
+                        this.innerConnection.DisposeTransaction();
+
+                        if (this.innerConnection.Pooled)
+                        {
+                            // Send connection return back to the Pool
+                            FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
+                        }
+                        else
+                        {
+                            this.innerConnection.Dispose();
+                            this.innerConnection = null;
+                        }
+
+                        throw;
+                    } 
 
                     // Bind	Warning	messages event
                     this.innerConnection.Database.WarningMessage = new WarningMessageCallback(this.OnWarningMessage);
