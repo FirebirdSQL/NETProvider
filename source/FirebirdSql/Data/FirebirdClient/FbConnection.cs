@@ -566,8 +566,28 @@ namespace FirebirdSql.Data.FirebirdClient
 
 #if (NET)
 
-                    // Enlist the connection
-                    this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
+                    try
+                    {
+                        this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
+                    }
+                    catch
+                    {
+                        // if enlistment fails clean up innerConnection
+                        this.innerConnection.DisposeTransaction();
+
+                        if (this.innerConnection.Pooled)
+                        {
+                            // Send connection return back to the Pool
+                            FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
+                        }
+                        else
+                        {
+                            this.innerConnection.Dispose();
+                            this.innerConnection = null;
+                        }
+
+                        throw;
+                    } 
 
 #endif
 
