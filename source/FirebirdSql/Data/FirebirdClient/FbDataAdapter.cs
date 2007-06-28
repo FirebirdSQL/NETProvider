@@ -74,6 +74,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #endregion
 
+        #region · Fields ·
+
+        private bool disposed;
+        private bool shouldDisposeSelectCommand;
+
+        #endregion
+
         #region · Properties ·
 
         /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/property[@name="SelectCommand"]/*'/>
@@ -146,6 +153,44 @@ namespace FirebirdSql.Data.FirebirdClient
         {
 			FbConnection connection = new FbConnection(selectConnectionString);
             this.SelectCommand = new FbCommand(selectCommandText, connection);
+        }
+
+        #endregion
+
+        #region IDisposable	Methods
+
+        /// <include file='Doc/en_EN/FbDataAdapter.xml'	path='doc/class[@name="FbDataAdapter"]/method[@name="Dispose(System.Boolean)"]/*'/>
+        protected override void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (!this.disposed)
+                {
+                    try
+                    {
+                        // Release any managed resources
+                        if (disposing)
+                        {
+                            if (this.shouldDisposeSelectCommand)
+                            {
+                                if (this.SelectCommand != null)
+                                {
+                                    this.SelectCommand.Dispose();
+                                    this.SelectCommand = null;
+                                }
+                            }
+                        }
+
+                        // release any unmanaged resources
+
+                        this.disposed = true;
+                    }
+                    finally
+                    {
+                        base.Dispose(disposing);
+                    }
+                }
+            }
         }
 
         #endregion
