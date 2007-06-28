@@ -297,10 +297,10 @@ namespace FirebirdSql.Data.Common
 			return (this.Name != this.Alias) ? true : false;
 		}
 
-		public bool IsExpression()
-		{
-			return this.Name.Length == 0 ? true : false;
-		}
+        //public bool IsExpression()
+        //{
+        //    return this.Name.Length == 0 ? true : false;
+        //}
 
 		public int GetSize()
 		{
