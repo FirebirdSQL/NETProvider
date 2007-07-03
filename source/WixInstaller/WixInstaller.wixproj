@@ -6,7 +6,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>WixInstaller</OutputName>
     <OutputType>Package</OutputType>
-    <WixToolPath>C:\Archivos de programa\Windows Installer XML v3\bin\</WixToolPath>
+    <WixToolPath>C:\Program Files (x86)\Windows Installer XML v3\bin\</WixToolPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>bin\Debug\</OutputPath>
