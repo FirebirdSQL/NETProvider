@@ -29,6 +29,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FirebirdSQL")]
 [assembly: AssemblyProduct("FirebirdClient")]
-[assembly: AssemblyCopyright("(c) 2002-2007. Carlos Guzman Alvarez")]
+[assembly: AssemblyCopyright("(c) 2002-2007.")]
 [assembly: AssemblyVersion("2.5.0.0")]
 [assembly: AssemblyDelaySign(false)]
