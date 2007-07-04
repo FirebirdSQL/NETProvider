@@ -21,48 +21,17 @@
   <!-- Paths properties -->
   <property name="source.dir" value="../../../source" />
 
-  <!-- Check for Html Help Compiler -->
-  <target name="check-htmlhelp-compiler" description="Checks existance of the HTML help compiler">
-    <if test="${property::exists('htmlhelp.compiler')}">
-      <readregistry 
-        property="htmlhelp.workshop.installroot" 
-        key="SOFTWARE\Microsoft\HTML Help Workshop\InstallDir"
-        hive="CurrentUser" 
-        failonerror="false" 
-      />
-
-      <if test="${property::exists('htmlhelp.workshop.installroot')}">
-        <property 
-            name="htmlhelp.compiler" 
-            value="${htmlhelp.workshop.installroot}\hhc.exe" 
-            readonly="false" 
-        />
-      </if>
-    </if>
-
-    <if test="${not property::exists('htmlhelp.compiler')}">
-      <sysinfo />
-      <property 
-        name="htmlhelp.compiler" 
-        value="${sys.os.folder.programfiles}\HTML Help Workshop\hhc.exe"
-        readonly="false" 
-      />
-    </if>
-  </target>
-
   <!-- Check for NUnit -->
   <target 
-        name="check-nunit-framework" 
-        depends="check-htmlhelp-compiler" 
+        name="check-nunit-framework"         
         description="Checks existance of NUnit2">
 
     <if test="${not property::exists('nunit.framework.dll')}">
-      <sysinfo />
       <property 
         name="nunit.framework.dll"
-        value="${sys.os.folder.programfiles}\NUnit-Net-2.0 2.2.9\bin\nunit.framework.dll"
+        value="${source.dir}\..\lib\nunit.framework.dll"
         readonly="false"
-			/>
+	  />
     </if>
   </target>
 
@@ -75,10 +44,6 @@
     <!-- Copy snk file -->
     <copy 
       file="${source.dir}/FirebirdSql/Data/Properties/FirebirdSql.Data.FirebirdClient.snk" 
-      todir="." 
-    />
-    <copy 
-      file="${source.dir}/FirebirdSql/Web/Providers/Properties/FirebirdSql.Web.Providers.snk" 
       todir="." 
     />
   </target>
