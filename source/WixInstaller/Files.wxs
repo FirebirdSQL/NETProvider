@@ -8,13 +8,7 @@
             <File Id="LicenseFile" Name="license.txt" Source="$(var.SolutionDir)../license.txt"/>
             <File Id="ReadmeFile" Name="readme.txt" Source="$(var.SolutionDir)../readme.txt"/>
             <File Id="HtmlLicenseFile" Name="license.html" Source="$(var.SolutionDir)../license.html"/>
-            <File Id="FbProfileProvider1.5" Name="FbProfileProvider1.5.sql" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FbProfileProvider1.5.sql" />
-            <File Id="FbRoleProvider1.5" Name="FbRoleProvider1.5.sql" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FbRoleProvider1.5.sql" />
-            <File Id="FbSessionStateStore1.5" Name="FbSessionStateStore1.5.sql" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FbSessionStateStore1.5.sql" />
-            <File Id="FbSessionStateStore2.0" Name="FbSessionStateStore2.0.sql" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FbSessionStateStore2.0.sql" />
-            <File Id="FbMembershipProvider1.5" Name="FbMembershipProvider1.5.sql" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FbMembershipProvider1.5.sql" />
             <File Id="TFirebirdClientAssembly" Name="FirebirdSql.Data.FirebirdClient.dll" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Data.FirebirdClient.dll" />
-            <File Id="TWebProvidersAssembly" Name="FirebirdSql.Web.Providers.dll" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Web.Providers.dll" />
             <File Id="TUnitTestAssembly" Name="FirebirdSql.Data.FirebirdClient.UnitTests.dll" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Data.FirebirdClient.UnitTests.dll" />
             <File Id="UnitTestsConfiguration" Name="FirebirdSql.Data.FirebirdClient.UnitTests.dll.config" Source="$(var.SolutionDir)../build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Data.FirebirdClient.UnitTests.dll.config" />
           </Component>
