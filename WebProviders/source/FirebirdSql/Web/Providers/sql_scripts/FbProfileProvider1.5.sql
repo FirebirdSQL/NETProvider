@@ -10,7 +10,7 @@ NOT NULL
 CHECK (value=1 or value=0 or value is null);
 
 CREATE TABLE PROFILES (
-    PKID                  CHAR(36) CHARACTER SET OCTETS NOT NULL,
+    PKID                  CHAR(16) CHARACTER SET OCTETS NOT NULL,
     PROPERTYNAMES         BLOB SUB_TYPE TEXT SEGMENT SIZE 80 CHARACTER SET UNICODE_FSS,
     PROPERTYVALUESSTRING  BLOB SUB_TYPE TEXT SEGMENT SIZE 80 CHARACTER SET UNICODE_FSS,
     PROPERTYVALUESBINARY  BLOB SUB_TYPE BINARY SEGMENT SIZE 80,
@@ -42,7 +42,7 @@ CREATE PROCEDURE PROFILES_DELETEPROFILE (
     APPLICATIONNAME VARCHAR(100) CHARACTER SET NONE,
     USERNAME VARCHAR(100) CHARACTER SET NONE)
 AS
-declare variable userid char(36) character set octets;
+declare variable userid char(16) character set octets;
 begin
   userid = null;
   select pkid from users where applicationname = :applicationname and username = :username into :userid;
@@ -83,8 +83,7 @@ RETURNS (
     LASTACTIVITYDATE TIMESTAMP,
     LASTUPDATEDDATE TIMESTAMP)
 AS
-declare variable pkid char(36) character set octets;
-declare variable spkid char(16) character set octets;
+declare variable pkid char(16) character set octets;
 declare variable upperusername varchar(100) character set NONE;
 declare variable pagelowerbound integer;
 declare variable pageupperbound integer;
@@ -105,8 +104,7 @@ BEGIN
     username = pkid;
    ELSE
    BEGIN
-    spkid = CAST(:pkid AS CHAR(16) character set octets);
-    SELECT username, upperusername FROM users WHERE pkid = :spkid INTO :username,:upperusername;
+    SELECT username, upperusername FROM users WHERE pkid = :pkid INTO :username,:upperusername;
    END
    IF (usernametomatch IS NOT NULL) THEN
    BEGIN
@@ -126,8 +124,7 @@ CREATE PROCEDURE PROFILES_GETCOUNTPROFILES (
 RETURNS (
     TOTALRECORDS INTEGER)
 AS
-declare variable pkid char(36) character set octets;
-declare variable spkid char(16) character set octets;
+declare variable pkid char(16) character set octets;
 declare variable upperusername varchar(100) character set NONE;
 declare variable isanonymous smallint;
 declare variable username varchar(100) character set NONE;
@@ -148,8 +145,7 @@ BEGIN
         username = pkid;
      ELSE
      BEGIN
-      spkid = CAST(:pkid AS CHAR(16) character set octets);
-      SELECT userName, upperusername FROM users WHERE pkid = :spkid INTO :username, :upperusername;
+      SELECT userName, upperusername FROM users WHERE pkid = :pkid INTO :username, :upperusername;
      END
      IF (upperusername LIKE :usernametomatch) THEN
       totalrecords = totalrecords + 1;
@@ -173,7 +169,7 @@ RETURNS (
     PROPERTYVALUESSTRING BLOB SUB_TYPE 1 SEGMENT SIZE 80,
     PROPERTYVALUESBINARY BLOB SUB_TYPE 0 SEGMENT SIZE 80)
 AS
-declare variable userid char(36) character set octets;
+declare variable userid char(16) character set octets;
 begin
   userid = null;
   PropertyNames = null;
@@ -206,7 +202,7 @@ CREATE PROCEDURE PROFILES_SETPROPERTIES (
 RETURNS (
     ERRORCODE INTEGER)
 AS
-declare variable userid char(36) character set octets;
+declare variable userid char(16) character set octets;
 begin
   userid = null;
   errorcode = 0;
