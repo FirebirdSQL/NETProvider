@@ -1,0 +1,10 @@
+ASP.NET 2.0 Web Providers
+=========================
+
+
+2007-07-08 Jiri Cincura <jiri@cincura.net>
+
+	* sql_scripts\FbProfileProvider1.5.sql:
+
+		 - Updated definition of GUID columns.
+		 
