@@ -1,1 +1,1 @@
-d:\desarrollo\herramientas\nant\bin\nant > log.txt
+d:\desarrollo\herramientas\nant\bin\nant -verbose > log.txt
