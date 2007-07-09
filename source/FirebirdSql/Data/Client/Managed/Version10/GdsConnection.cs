@@ -33,7 +33,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private Socket			socket;
 		private NetworkStream	networkStream;
-        private bool            isConnected;
         private string          dataSource;
         private int             portNumber;
         private int             packetSize;
