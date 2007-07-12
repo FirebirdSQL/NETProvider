@@ -545,10 +545,12 @@ namespace FirebirdSql.Data.FirebirdClient
                 {
                     throw new InvalidOperationException("Connection already Open.");
                 }
+#if (NET)
                 if (this.options.Enlist && System.Transactions.Transaction.Current == null)
                 {
                     throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
                 }
+#endif
 
                 this.DemandPermission();
 
@@ -568,6 +570,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         this.innerConnection.Connect();
                     }
 
+#if (NET)
                     try
                     {
                         this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
@@ -590,6 +593,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                         throw;
                     } 
+#endif
 
                     // Bind	Warning	messages event
                     this.innerConnection.Database.WarningMessage = new WarningMessageCallback(this.OnWarningMessage);
