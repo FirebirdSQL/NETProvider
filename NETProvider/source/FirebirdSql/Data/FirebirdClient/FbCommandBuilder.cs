@@ -182,6 +182,11 @@ namespace FirebirdSql.Data.FirebirdClient
             return base.GetInsertCommand() as FbCommand;
         }
 
+        public new FbCommand GetInsertCommand(bool useColumnsForParameterNames)
+        {
+            return base.GetInsertCommand(useColumnsForParameterNames) as FbCommand;
+        }
+
         public new FbCommand GetUpdateCommand()
         {
             return base.GetUpdateCommand() as FbCommand;
