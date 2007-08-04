@@ -20,12 +20,13 @@
 
 using System;
 using System.Data.Common;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
     public class FirebirdClientFactory : DbProviderFactory
+#if (NET_35)
+        , IServiceProvider
+#endif
     {
         #region · Static Properties ·
 
@@ -85,6 +86,28 @@ namespace FirebirdSql.Data.FirebirdClient
         public override DbCommandBuilder CreateCommandBuilder()
         {
             return new FbCommandBuilder();
+        }
+
+        #endregion
+
+        #region · IServiceProvider Members ·
+
+        object IServiceProvider.GetService(Type serviceType)
+        {
+#if (NET_35)
+            #if (ENTITY_FRAMEWORK)
+            if (serviceType == typeof(DbProviderServices))
+            {
+                return new FbProviderServices();
+            }
+            else
+            {
+                return null;
+            }
+            #else
+                return null;
+            #endif
+#endif
         }
 
         #endregion

@@ -308,6 +308,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #endregion
 
+        #region · Protected Properties ·
+
+#if (NET_35)
+
+        protected override DbProviderFactory DbProviderFactory
+        {
+            get { return FirebirdClientFactory.Instance; }
+        }
+
+#endif
+
+        #endregion
+
         #region · Constructors ·
 
         /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/constructor[@name="ctor"]/*'/>
