@@ -1,8 +1,8 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.20706</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{326A24F9-6259-45DB-835C-18DB80728460}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -10,14 +10,20 @@
     <RootNamespace>FirebirdSql</RootNamespace>
     <AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>FirebirdSql.Data.FirebirdClient.pfx</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET;NET_20;VISUAL_STUDIO;EXTERNAL_ENGINE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET;NET_20;NET_35;VISUAL_STUDIO;EXTERNAL_ENGINE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -36,15 +42,29 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="VSLangProj80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FirebirdClient\FbProviderServices.cs" />
+    <Compile Include="Entity\DmlSqlGenerator.cs" />
+    <Compile Include="Entity\ISqlFragment.cs" />
+    <Compile Include="Entity\JoinSymbol.cs" />
+    <Compile Include="Entity\MetadataHelpers.cs" />
+    <Compile Include="Entity\SqlBuilder.cs" />
+    <Compile Include="Entity\SqlGenerator.cs" />
+    <Compile Include="Entity\SqlSelectStatement.cs" />
+    <Compile Include="Entity\SqlWriter.cs" />
+    <Compile Include="Entity\Symbol.cs" />
+    <Compile Include="Entity\SymbolPair.cs" />
+    <Compile Include="Entity\SymbolTable.cs" />
+    <Compile Include="Entity\TopClause.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Client\Common\ArrayBoundMarshal.cs" />
     <Compile Include="Client\Common\ArrayDescMarshal.cs" />
@@ -241,13 +261,18 @@
     <EmbeddedResource Include="Resources\isc_error_msg.resources" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FirebirdSql.Data.FirebirdClient.pfx" />
     <None Include="Properties\FirebirdSql.Data.FirebirdClient.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entity\Common.ConceptualSchemaDefinition.xml" />
+    <EmbeddedResource Include="Entity\Firebird.ProviderManifest.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>rem copy "$(TargetDir)\$(ProjectName).dll" "C:\Archivos de programa\fyracle-0.8.9\bin\assembly"
-rem copy "$(TargetDir)\$(ProjectName).pdb" "C:\Archivos de programa\fyracle-0.8.9\bin\assembly"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
