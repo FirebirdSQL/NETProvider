@@ -3,6 +3,23 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 
 
 
+2007-08-04  Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* Added new Entity directory/namespace with tow XML files
+	Describing Entity Framework features support, based on the Beta 1 ORcas
+	provider sample.
+
+	* Added new FbProviderServices.cs source file.
+
+	* FirebirdSql\Data\FirebirdClient\FbConnection.cs:
+	* FirebirdSql\Data\FirebirdClient\FbClientFactory.cs:
+
+		- Added some changes for .NET 2.5 compatibility
+
+
+	* Visual Studio Solution and project files converted to Visual Studio 2008 Beta 2
+
+
 ------------------------------ 2.5.0 Alpha 1 ------------------------------ 
 
 
