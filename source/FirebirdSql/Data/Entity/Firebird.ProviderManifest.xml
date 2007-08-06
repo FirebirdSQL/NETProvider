@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 This is the provider manifest for the FirebirdClient ADO.NET Data Provider
   
@@ -13,146 +13,146 @@ PROCESS
   <Types>
     <Type Name="smallint" PrimitiveTypeKind="Int16" PreferredMapping="true">
       <Conversions>
-        <Implicit DestinationType="varchar" />
-        <Promotable DestinationType="int" />
-        <Promotable DestinationType="bigint" />
-        <Promotable DestinationType="decimal" />
-        <Promotable DestinationType="numeric" />
-        <Promotable DestinationType="float" />
-        <Promotable DestinationType="double" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="varchar"/>
+        <Promotable DestinationType="integer"/>
+        <Promotable DestinationType="bigint"/>
+        <Promotable DestinationType="decimal"/>
+        <Promotable DestinationType="numeric"/>
+        <Promotable DestinationType="float"/>
+        <Promotable DestinationType="double"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="integer" PrimitiveTypeKind="Int32" PreferredMapping="true">
       <Conversions>
-        <Implicit DestinationType="varchar" />
-        <Promotable DestinationType="bigint" />
-        <Promotable DestinationType="decimal" />
-        <Promotable DestinationType="numeric" />
-        <Promotable DestinationType="real" />
-        <Promotable DestinationType="float" />
-        <Promotable DestinationType="double" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="varchar"/>
+        <Promotable DestinationType="bigint"/>
+        <Promotable DestinationType="decimal"/>
+        <Promotable DestinationType="numeric"/>
+        <Promotable DestinationType="real"/>
+        <Promotable DestinationType="float"/>
+        <Promotable DestinationType="double"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="bigint" PrimitiveTypeKind="Int64" PreferredMapping="true">
       <Conversions>
-        <Implicit DestinationType="varchar" />
-        <Promotable DestinationType="decimal" />
-        <Promotable DestinationType="numeric" />
-        <Promotable DestinationType="float" />
-        <Promotable DestinationType="double" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="varchar"/>
+        <Promotable DestinationType="decimal"/>
+        <Promotable DestinationType="numeric"/>
+        <Promotable DestinationType="float"/>
+        <Promotable DestinationType="double"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="float" PrimitiveTypeKind="Single" PreferredMapping="true">
       <Conversions>
-        <Implicit DestinationType="decimal" />
-        <Implicit DestinationType="numeric" />
-        <Implicit DestinationType="varchar" />
-        <Implicit DestinationType="double" />
-        <Promotable DestinationType="float" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="decimal"/>
+        <Implicit DestinationType="numeric"/>
+        <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="double"/>
+        <Promotable DestinationType="float"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="decimal" PrimitiveTypeKind="Decimal" PreferredMapping="true">
       <FacetDescriptions>
-        <Precision Minimum="1" Maximum="18" Default="18" Constant="false" />
-        <Scale Minimum="0" Maximum="18" Default="0" Constant="false" />
+        <Precision Minimum="1" Maximum="18" Default="18" Constant="false"/>
+        <Scale Minimum="0" Maximum="18" Default="0" Constant="false"/>
       </FacetDescriptions>
       <Conversions>
-        <Implicit DestinationType="decimal" />
-        <Implicit DestinationType="numeric" />
-        <Implicit DestinationType="float" />
-        <Implicit DestinationType="double" />
-        <Implicit DestinationType="varchar" />
-        <Promotable DestinationType="numeric" />
-        <Promotable DestinationType="float" />
-        <Promotable DestinationType="double" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="decimal"/>
+        <Implicit DestinationType="numeric"/>
+        <Implicit DestinationType="float"/>
+        <Implicit DestinationType="double"/>
+        <Implicit DestinationType="varchar"/>
+        <Promotable DestinationType="numeric"/>
+        <Promotable DestinationType="float"/>
+        <Promotable DestinationType="double"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="numeric" PrimitiveTypeKind="Decimal" PreferredMapping="true">
       <FacetDescriptions>
-        <Precision Minimum="1" Maximum="18" Default="18" Constant="false" />
-        <Scale Minimum="0" Maximum="18" Default="0" Constant="false" />
+        <Precision Minimum="1" Maximum="18" Default="18" Constant="false"/>
+        <Scale Minimum="0" Maximum="18" Default="0" Constant="false"/>
       </FacetDescriptions>
       <Conversions>
-        <Implicit DestinationType="decimal" />
-        <Implicit DestinationType="numeric" />
-        <Implicit DestinationType="float" />
-        <Implicit DestinationType="double" />
-        <Implicit DestinationType="varchar" />
-        <Promotable DestinationType="numeric" />
-        <Promotable DestinationType="float" />
-        <Promotable DestinationType="double" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="decimal"/>
+        <Implicit DestinationType="numeric"/>
+        <Implicit DestinationType="float"/>
+        <Implicit DestinationType="double"/>
+        <Implicit DestinationType="varchar"/>
+        <Promotable DestinationType="numeric"/>
+        <Promotable DestinationType="float"/>
+        <Promotable DestinationType="double"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <!--Type Name="binary" PrimitiveTypeKind="Binary">
@@ -181,119 +181,119 @@ PROCESS
     </Type-->
     <Type Name="date" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
-        <PreserveSeconds Default="false" Constant="true" />
-        <DateTimeKind Default="Unspecified" Constant="true" />
+        <PreserveSeconds Default="false" Constant="true"/>
+        <DateTimeKind Default="Unspecified" Constant="true"/>
       </FacetDescriptions>
       <Conversions>
-        <Implicit DestinationType="date" />
-        <Implicit DestinationType="time" />
-        <Implicit DestinationType="varchar" />
-        <Promotable DestinationType="timestamp" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="date"/>
+        <Implicit DestinationType="time"/>
+        <Implicit DestinationType="varchar"/>
+        <Promotable DestinationType="timestamp"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="time" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
-        <PreserveSeconds Default="true" Constant="true" />
-        <DateTimeKind Default="Unspecified" Constant="true" />
+        <PreserveSeconds Default="true" Constant="true"/>
+        <DateTimeKind Default="Unspecified" Constant="true"/>
       </FacetDescriptions>
       <Conversions>
-        <Implicit DestinationType="date" />
-        <Implicit DestinationType="time" />
-        <Implicit DestinationType="varchar" />
-        <Promotable DestinationType="timestamp" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="date"/>
+        <Implicit DestinationType="time"/>
+        <Implicit DestinationType="varchar"/>
+        <Promotable DestinationType="timestamp"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="timestamp" PrimitiveTypeKind="DateTime" PreferredMapping="true">
       <FacetDescriptions>
-        <PreserveSeconds Default="true" Constant="true" />
-        <DateTimeKind Default="Unspecified" Constant="true" />
+        <PreserveSeconds Default="true" Constant="true"/>
+        <DateTimeKind Default="Unspecified" Constant="true"/>
       </FacetDescriptions>
       <Conversions>
-        <Implicit DestinationType="date" />
-        <Implicit DestinationType="time" />
-        <Implicit DestinationType="timestamp" />
-        <Implicit DestinationType="varchar" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Implicit DestinationType="date" />
-        <Implicit DestinationType="time" />
-        <Implicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="real" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Implicit DestinationType="date"/>
+        <Implicit DestinationType="time"/>
+        <Implicit DestinationType="timestamp"/>
+        <Implicit DestinationType="varchar"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Implicit DestinationType="date"/>
+        <Implicit DestinationType="time"/>
+        <Implicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="real"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="varchar" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength Minimum="1" Maximum="32000" Default="1" Constant="false" />
-        <Unicode Default="false" Constant="true" />
-        <FixedLength Default="false" Constant="true" />
+        <MaxLength Minimum="1" Maximum="32000" Default="1" Constant="false"/>
+        <Unicode Default="false" Constant="true"/>
+        <FixedLength Default="false" Constant="true"/>
       </FacetDescriptions>
       <Conversions>
-        <Promotable DestinationType="char" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Promotable DestinationType="char"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <Type Name="char" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength Minimum="1" Maximum="32000" Default="1" Constant="false" />
-        <Unicode Default="false" Constant="true" />
-        <FixedLength Default="true" Constant="true" />
+        <MaxLength Minimum="1" Maximum="32000" Default="1" Constant="false"/>
+        <Unicode Default="false" Constant="true"/>
+        <FixedLength Default="true" Constant="true"/>
       </FacetDescriptions>
       <Conversions>
-        <Promotable DestinationType="varchar" />
-        <Implicit DestinationType="varchar" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="date" />
-        <Explicit DestinationType="time" />
-        <Explicit DestinationType="timestamp" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="float" />
-        <Explicit DestinationType="double" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Promotable DestinationType="varchar"/>
+        <Implicit DestinationType="varchar"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
     <!--Type Name="uniqueidentifier" PrimitiveTypeKind="Guid" PreferredMapping="true">
@@ -301,14 +301,9 @@ PROCESS
         <Implicit DestinationType="varchar" />
         <Implicit DestinationType="nvarchar" />
         <Explicit DestinationType="binary" />
-        <Explicit DestinationType="varbinary" />
-        <Explicit DestinationType="varbinary(max)" />
         <Explicit DestinationType="char" />
         <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="varchar(max)" />
         <Explicit DestinationType="nchar" />
-        <Explicit DestinationType="nvarchar" />
-        <Explicit DestinationType="nvarchar(max)" />
       </Conversions>
     </Type-->
   </Types>
@@ -316,8 +311,11 @@ PROCESS
 
     <!-- BEGIN AGGREGATES ############################################# -->
     <!-- AVG -->
-    <Function Name="AVG" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(int)" Mode="in"/>
+    <Function Name="AVG" ReturnType="smallint" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(smallint)" Mode="in"/>
+    </Function>
+    <Function Name="AVG" ReturnType="integer" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(integer)" Mode="in"/>
     </Function>
     <Function Name="AVG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(bigint)" Mode="in"/>
@@ -325,84 +323,38 @@ PROCESS
     <Function Name="AVG" ReturnType="decimal" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(decimal)" Mode="in"/>
     </Function>
+    <Function Name="AVG" ReturnType="numeric" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(numeric)" Mode="in"/>
+    </Function>
     <Function Name="AVG" ReturnType="float" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
     </Function>
-
-    <!-- CHECKSUM_AGG -->
-    <Function Name="CHECKSUM_AGG" ReturnType="int" Aggregate="true" BuiltIn="true" ParameterTypeSemantics="ExactMatchOnly">
-      <Parameter Name="arg" Type="Collection(int)" Mode="in"/>
+    <Function Name="AVG" ReturnType="double" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(double)" Mode="in"/>
     </Function>
 
     <!-- COUNT -->
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(bit)" Mode="in"/>
+    <Function Name="COUNT" ReturnType="integer" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(smallint)" Mode="in"/>
     </Function>
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
+    <Function Name="COUNT" ReturnType="integer" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(integer)" Mode="in"/>
+    </Function>
+    <Function Name="COUNT" ReturnType="integer" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(bigint)" Mode="in"/>
+    </Function>
+    <Function Name="COUNT" ReturnType="integer" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(datetime)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(uniqueidentifier)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(nvarchar)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(nvarchar(max))" Mode="in"/>
-    </Function>
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varbinary(max))" Mode="in"/>
-    </Function>
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varchar)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varchar(max))" Mode="in"/>
-    </Function>
-
-    <!-- COUNT_BIG -->
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(bit)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(datetime)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(uniqueidentifier)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(nvarchar)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(nvarchar(max))" Mode="in"/>
-    </Function>
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varbinary(max))" Mode="in"/>
-    </Function>
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varchar)" Mode="in"/>
-    </Function>
-    <Function Name="COUNT_BIG" ReturnType="bigint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varchar(max))" Mode="in"/>
     </Function>
 
     <!-- GROUPING !NOT SUPPORTED! -->
 
     <!-- MAX -->
-    <Function Name="MAX" ReturnType="tinyint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(tinyint)" Mode="in"/>
-    </Function>
     <Function Name="MAX" ReturnType="smallint" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(smallint)" Mode="in"/>
     </Function>
-    <Function Name="MAX" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(int)" Mode="in"/>
+    <Function Name="MAX" ReturnType="integer" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(integer)" Mode="in"/>
     </Function>
     <Function Name="MAX" ReturnType="bigint" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(bigint)" Mode="in"/>
@@ -410,55 +362,37 @@ PROCESS
     <Function Name="MAX" ReturnType="decimal" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(decimal)" Mode="in"/>
     </Function>
+    <Function Name="MAX" ReturnType="numeric" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(numeric)" Mode="in"/>
+    </Function>
     <Function Name="MAX" ReturnType="float" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
     </Function>
-    <Function Name="MAX" ReturnType="real" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(real)" Mode="in"/>
+    <Function Name="MAX" ReturnType="double" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(double)" Mode="in"/>
     </Function>
-    <Function Name="MAX" ReturnType="smalldatetime" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(smalldatetime)" Mode="in"/>
+    <Function Name="MAX" ReturnType="date" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(date)" Mode="in"/>
     </Function>
-    <Function Name="MAX" ReturnType="datetime" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(datetime)" Mode="in"/>
+    <Function Name="MAX" ReturnType="time" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(time)" Mode="in"/>
+    </Function>
+    <Function Name="MAX" ReturnType="timestamp" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(timestamp)" Mode="in"/>
     </Function>
     <Function Name="MAX" ReturnType="char" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(char)" Mode="in"/>
     </Function>
-    <Function Name="MAX" ReturnType="varchar" Aggregate="true" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
+    <Function Name="MAX" ReturnType="varchar" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(varchar)" Mode="in"/>
-    </Function>
-    <Function Name="MAX" ReturnType="nchar" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(nchar)" Mode="in"/>
-    </Function>
-    <Function Name="MAX" ReturnType="nvarchar" Aggregate="true" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="Collection(nvarchar)" Mode="in"/>
-    </Function>
-    <Function Name="MAX" ReturnType="varchar(max)" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varchar(max))" Mode="in"/>
-    </Function>
-    <Function Name="MAX" ReturnType="nvarchar(max)" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(nvarchar(max))" Mode="in"/>
-    </Function>
-    <Function Name="MAX" ReturnType="binary" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(binary)" Mode="in"/>
-    </Function>
-    <Function Name="MAX" ReturnType="varbinary" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varbinary)" Mode="in"/>
-    </Function>
-    <Function Name="MAX" ReturnType="varbinary(max)" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varbinary(max))" Mode="in"/>
     </Function>
 
     <!-- MIN -->
-    <Function Name="MIN" ReturnType="tinyint" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(tinyint)" Mode="in"/>
-    </Function>
     <Function Name="MIN" ReturnType="smallint" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(smallint)" Mode="in"/>
     </Function>
-    <Function Name="MIN" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(int)" Mode="in"/>
+    <Function Name="MIN" ReturnType="integer" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(integer)" Mode="in"/>
     </Function>
     <Function Name="MIN" ReturnType="bigint" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(bigint)" Mode="in"/>
@@ -466,49 +400,37 @@ PROCESS
     <Function Name="MIN" ReturnType="decimal" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(decimal)" Mode="in"/>
     </Function>
+    <Function Name="MIN" ReturnType="numeric" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(numeric)" Mode="in"/>
+    </Function>
     <Function Name="MIN" ReturnType="float" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
     </Function>
-    <Function Name="MIN" ReturnType="real" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(real)" Mode="in"/>
+    <Function Name="MIN" ReturnType="double" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(double)" Mode="in"/>
     </Function>
-    <Function Name="MIN" ReturnType="smalldatetime" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(smalldatetime)" Mode="in"/>
+    <Function Name="MIN" ReturnType="date" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(date)" Mode="in"/>
     </Function>
-    <Function Name="MIN" ReturnType="datetime" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(datetime)" Mode="in"/>
+    <Function Name="MIN" ReturnType="time" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(time)" Mode="in"/>
+    </Function>
+    <Function Name="MIN" ReturnType="timestamp" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(timestamp)" Mode="in"/>
     </Function>
     <Function Name="MIN" ReturnType="char" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(char)" Mode="in"/>
     </Function>
-    <Function Name="MIN" ReturnType="varchar" Aggregate="true" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
+    <Function Name="MIN" ReturnType="varchar" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(varchar)" Mode="in"/>
-    </Function>
-    <Function Name="MIN" ReturnType="nchar" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(nchar)" Mode="in"/>
-    </Function>
-    <Function Name="MIN" ReturnType="nvarchar" Aggregate="true" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="Collection(nvarchar)" Mode="in"/>
-    </Function>
-    <Function Name="MIN" ReturnType="varchar(max)" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varchar(max))" Mode="in"/>
-    </Function>
-    <Function Name="MIN" ReturnType="nvarchar(max)" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(nvarchar(max))" Mode="in"/>
-    </Function>
-    <Function Name="MIN" ReturnType="binary" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(binary)" Mode="in"/>
-    </Function>
-    <Function Name="MIN" ReturnType="varbinary" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varbinary)" Mode="in"/>
-    </Function>
-    <Function Name="MIN" ReturnType="varbinary(max)" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(varbinary(max))" Mode="in"/>
     </Function>
 
     <!-- SUM -->
-    <Function Name="SUM" ReturnType="int" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(int)" Mode="in"/>
+    <Function Name="SUM" ReturnType="integer" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(smallint)" Mode="in"/>
+    </Function>
+    <Function Name="SUM" ReturnType="integer" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(integer)" Mode="in"/>
     </Function>
     <Function Name="SUM" ReturnType="bigint" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(bigint)" Mode="in"/>
@@ -516,18 +438,14 @@ PROCESS
     <Function Name="SUM" ReturnType="decimal" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(decimal)" Mode="in"/>
     </Function>
+    <Function Name="SUM" ReturnType="numeric" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(numeric)" Mode="in"/>
+    </Function>
     <Function Name="SUM" ReturnType="float" Aggregate="true" BuiltIn="true">
       <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
     </Function>
-
-    <!-- STDEV -->
-    <Function Name="STDEV" ReturnType="float" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
-    </Function>
-
-    <!-- STDEVP -->
-    <Function Name="STDEVP" ReturnType="float" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
+    <Function Name="SUM" ReturnType="double" Aggregate="true" BuiltIn="true">
+      <Parameter Name="arg" Type="Collection(double)" Mode="in"/>
     </Function>
 
     <!-- VAR -->
@@ -535,99 +453,23 @@ PROCESS
       <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
     </Function>
 
-    <!-- VARP -->
-    <Function Name="VARP" ReturnType="float" Aggregate="true" BuiltIn="true">
-      <Parameter Name="arg" Type="Collection(float)" Mode="in"/>
-    </Function>
-
     <!-- END AGGREGATES ############################################# -->
 
     <!-- BEGIN STRING FUNCTIONS ##################################### -->
-    <!-- ASCII( arg ) 
+    <!-- ASCII_VAL( arg ) 
                 arg1: char, varchar (nvarchar is allowed by SQL server)
                 returns: int   
     -->
-    <Function Name="ASCII" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg" Type="nvarchar" Mode="in"/>
+    <Function Name="ASCII_VAL" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="arg" Type="varchar" Mode="in"/>
     </Function>
 
-    <!-- CHAR( arg )
+    <!-- ASCII_CHAR( arg )
                 arg: tinyint, *smallint, *int, *bigint
                 returns: char(1)
     -->
-    <Function Name="CHAR" ReturnType="char" BuiltIn="true">
-      <Parameter Name="arg" Type="int" Mode="in"/>
-    </Function>
-
-    <!-- CHARINDEX( strSearch, strTarget [, startLocation ] )
-                strSearch: character expression
-                strTarget: character expression
-                startLocation: tinyint, smallint, int, bigint
-                returns: int, bigint   
-    -->
-    <Function Name="CHARINDEX" ReturnType="int" BuiltIn="true">
-      <Parameter Name="strSearch" Type="nvarchar" Mode="in"/>
-      <Parameter Name="strTarget" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="int" BuiltIn="true">
-      <Parameter Name="strSearch" Type="varbinary" Mode="in"/>
-      <Parameter Name="strTarget" Type="varbinary" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="int" BuiltIn="true">
-      <Parameter Name="strSearch" Type="varchar" Mode="in"/>
-      <Parameter Name="strTarget" Type="varchar" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="strSearch" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="strTarget" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="strSearch" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="strTarget" Type="varbinary(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="strSearch" Type="varchar(max)" Mode="in"/>
-      <Parameter Name="strTarget" Type="varchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="int" BuiltIn="true">
-      <Parameter Name="strSearch" Type="nvarchar" Mode="in"/>
-      <Parameter Name="strTarget" Type="nvarchar" Mode="in"/>
-      <Parameter Name="startLocation" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="int" BuiltIn="true">
-      <Parameter Name="strSearch" Type="varbinary" Mode="in"/>
-      <Parameter Name="strTarget" Type="varbinary" Mode="in"/>
-      <Parameter Name="startLocation" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="int" BuiltIn="true">
-      <Parameter Name="strSearch" Type="varchar" Mode="in"/>
-      <Parameter Name="strTarget" Type="varchar" Mode="in"/>
-      <Parameter Name="startLocation" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="strSearch" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="strTarget" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="startLocation" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="strSearch" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="strTarget" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="startLocation" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="CHARINDEX" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="strSearch" Type="varchar(max)" Mode="in"/>
-      <Parameter Name="strTarget" Type="varchar(max)" Mode="in"/>
-      <Parameter Name="startLocation" Type="bigint" Mode="in"/>
-    </Function>
-
-    <!-- DIFFERENCE( str1, str2 ) 
-            str1: varchar
-            str2: varchar
-            returns: int   
-    -->
-    <Function Name="DIFFERENCE" ReturnType="int" BuiltIn="true">
-      <Parameter Name="str1" Type="varchar" Mode="in"/>
-      <Parameter Name="str2" Type="varchar" Mode="in"/>
+    <Function Name="ASCII_CHAR" ReturnType="char" BuiltIn="true">
+      <Parameter Name="arg" Type="integer" Mode="in"/>
     </Function>
 
     <!-- LEFT( str, count ) 
@@ -639,42 +481,13 @@ PROCESS
       <Parameter Name="str" Type="varchar" Mode="in"/>
       <Parameter Name="count" Type="bigint" Mode="in"/>
     </Function>
-    <Function Name="LEFT" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varchar(max)" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="LEFT" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="LEFT" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="LEFT" ReturnType="varbinary" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="LEFT" ReturnType="varbinary(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
 
-    <!-- LEN( string_expression )
+    <!-- CHAR_LENGTH( string_expression )
                 string_expression: char, nchar, varchar, nvarchar, varchar(max), nvarchar(max)
                 returns: int, bigint   
     -->
-    <Function Name="LEN" ReturnType="int" BuiltIn="true">
-      <Parameter Name="string_expression" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="LEN" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="string_expression" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="LEN" ReturnType="int" BuiltIn="true">
-      <Parameter Name="string_expression" Type="varbinary" Mode="in"/>
-    </Function>
-    <Function Name="LEN" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="string_expression" Type="varbinary(max)" Mode="in"/>
+    <Function Name="LEN" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="string_expression" Type="varchar" Mode="in"/>
     </Function>
 
     <!-- LOWER( str ) 
@@ -684,15 +497,6 @@ PROCESS
     <Function Name="LOWER" ReturnType="varchar" BuiltIn="true">
       <Parameter Name="str" Type="varchar" Mode="in"/>
     </Function>
-    <Function Name="LOWER" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="LOWER" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="LOWER" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar(max)" Mode="in"/>
-    </Function>
 
     <!-- LTRIM( str ) 
             str: char, nchar, varchar, nvarchar, varchar(max), nvarchar(max)
@@ -700,21 +504,6 @@ PROCESS
     -->
     <Function Name="LTRIM" ReturnType="varchar" BuiltIn="true">
       <Parameter Name="str" Type="varchar" Mode="in"/>
-    </Function>
-    <Function Name="LTRIM" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="LTRIM" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary" Mode="in"/>
-    </Function>
-    <Function Name="LTRIM" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="LTRIM" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="LTRIM" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary(max)" Mode="in"/>
     </Function>
 
     <!-- REPLACE( strTarget, strSearch, strReplacement )
@@ -728,46 +517,6 @@ PROCESS
       <Parameter Name="strSearch" Type="varchar" Mode="in"/>
       <Parameter Name="strReplacement" Type="varchar" Mode="in"/>
     </Function>
-    <Function Name="REPLACE" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="strTarget" Type="nvarchar" Mode="in"/>
-      <Parameter Name="strSearch" Type="nvarchar" Mode="in"/>
-      <Parameter Name="strReplacement" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="REPLACE" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="strTarget" Type="varbinary" Mode="in"/>
-      <Parameter Name="strSearch" Type="varbinary" Mode="in"/>
-      <Parameter Name="strReplacement" Type="varbinary" Mode="in"/>
-    </Function>
-
-    <!-- REPLICATE( strSource, count )
-            strSource: varchar, nvarchar
-            count: tinyint, smallint, int
-            returns: varchar, nvarchar   
-    -->
-    <Function Name="REPLICATE" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="strTarget" Type="varchar" Mode="in"/>
-      <Parameter Name="count" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="REPLICATE" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="strTarget" Type="varchar(max)" Mode="in"/>
-      <Parameter Name="count" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="REPLICATE" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="strTarget" Type="nvarchar" Mode="in"/>
-      <Parameter Name="count" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="REPLICATE" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="strTarget" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="count" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="REPLICATE" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="strTarget" Type="varbinary" Mode="in"/>
-      <Parameter Name="count" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="REPLICATE" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="strTarget" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="count" Type="int" Mode="in"/>
-    </Function>
 
     <!-- REVERSE( arg ) 
             arg: char, nchar, varchar, nvarchar, varchar(max), nvarchar(max)
@@ -775,21 +524,6 @@ PROCESS
     -->
     <Function Name="REVERSE" ReturnType="varchar" BuiltIn="true">
       <Parameter Name="arg" Type="varchar" Mode="in"/>
-    </Function>
-    <Function Name="REVERSE" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="arg" Type="varchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="REVERSE" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="arg" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="REVERSE" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="arg" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="REVERSE" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="arg" Type="varbinary" Mode="in"/>
-    </Function>
-    <Function Name="REVERSE" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="arg" Type="varbinary(max)" Mode="in"/>
     </Function>
 
     <!-- RIGHT( atr, count ) 
@@ -800,137 +534,6 @@ PROCESS
     <Function Name="RIGHT" ReturnType="varchar" BuiltIn="true">
       <Parameter Name="str" Type="varchar" Mode="in"/>
       <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="RIGHT" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varchar(max)" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="RIGHT" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="RIGHT" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="RIGHT" ReturnType="varbinary" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="RIGHT" ReturnType="varbinary(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="count" Type="bigint" Mode="in"/>
-    </Function>
-
-    <!-- RTRIM( arg1 ) 
-            str: char, nchar, varchar, nvarchar, varchar(max), nvarchar(max)
-            returns: varchar, nvarchar
-    -->
-    <Function Name="RTRIM" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="str" Type="varchar" Mode="in"/>
-    </Function>
-    <Function Name="RTRIM" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="RTRIM" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary" Mode="in"/>
-    </Function>
-    <Function Name="RTRIM" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="RTRIM" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="RTRIM" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary(max)" Mode="in"/>
-    </Function>
-
-    <!-- SOUNDEX( arg ) 
-            arg: char, nchar, varchar, nvarchar, varchar(max), nvarchar(max)
-            returns: varchar   
-    -->
-    <Function Name="SOUNDEX" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="arg" Type="varchar" Mode="in"/>
-    </Function>
-    <Function Name="SOUNDEX" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="arg" Type="varchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="SOUNDEX" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="arg" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="SOUNDEX" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="arg" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-
-    <!-- SPACE( arg ) 
-            arg: tinyint, smallint, int
-            returns: char   
-    -->
-    <Function Name="SPACE" ReturnType="char" BuiltIn="true">
-      <Parameter Name="arg1" Type="int" Mode="in"/>
-    </Function>
-
-    <!-- STR( number [,length [,decimal]] ) 
-                number: float
-                length: int
-                decimal: int
-                returns: char   
-    -->
-    <Function Name="STR" ReturnType="char" BuiltIn="true">
-      <Parameter Name="number" Type="float" Mode="in"/>
-    </Function>
-    <Function Name="STR" ReturnType="char" BuiltIn="true">
-      <Parameter Name="number" Type="float" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="STR" ReturnType="char" BuiltIn="true">
-      <Parameter Name="number" Type="float" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="decimal" Type="int" Mode="in"/>
-    </Function>
-
-    <!-- STUFF( strInput, start, length, strReplacement )
-                strInput: varchar, nvarchar
-                start: int
-                legth: int
-                strReplacement: varchar, nvarchar
-                returns: int, bigint   
-    -->
-    <Function Name="STUFF" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="strInput" Type="varchar" Mode="in"/>
-      <Parameter Name="start" Type="int" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="strReplacement" Type="varchar" Mode="in"/>
-    </Function>
-    <Function Name="STUFF" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="strInput" Type="varchar(max)" Mode="in"/>
-      <Parameter Name="start" Type="int" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="strReplacement" Type="varchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="STUFF" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="strInput" Type="nvarchar" Mode="in"/>
-      <Parameter Name="start" Type="int" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="strReplacement" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="STUFF" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="strInput" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="start" Type="int" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="strReplacement" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="STUFF" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="strInput" Type="varbinary" Mode="in"/>
-      <Parameter Name="start" Type="int" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="strReplacement" Type="varbinary" Mode="in"/>
-    </Function>
-    <Function Name="STUFF" ReturnType="varchar" BuiltIn="true">
-      <Parameter Name="strInput" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="start" Type="int" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="strReplacement" Type="varbinary(max)" Mode="in"/>
     </Function>
 
     <!-- SUBSTRING( str, start, length )
@@ -944,31 +547,6 @@ PROCESS
       <Parameter Name="start" Type="bigint" Mode="in"/>
       <Parameter Name="length" Type="bigint" Mode="in"/>
     </Function>
-    <Function Name="SUBSTRING" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar" Mode="in"/>
-      <Parameter Name="start" Type="bigint" Mode="in"/>
-      <Parameter Name="length" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="SUBSTRING" ReturnType="varbinary" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary" Mode="in"/>
-      <Parameter Name="start" Type="bigint" Mode="in"/>
-      <Parameter Name="length" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="SUBSTRING" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varchar(max)" Mode="in"/>
-      <Parameter Name="start" Type="bigint" Mode="in"/>
-      <Parameter Name="length" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="SUBSTRING" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="start" Type="bigint" Mode="in"/>
-      <Parameter Name="length" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="SUBSTRING" ReturnType="varbinary(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="start" Type="bigint" Mode="in"/>
-      <Parameter Name="length" Type="bigint" Mode="in"/>
-    </Function>
 
     <!-- UPPER( arg ) 
                 str: char, nchar, varchar, nvarchar, varchar(max), nvarchar(max)
@@ -977,24 +555,18 @@ PROCESS
     <Function Name="UPPER" ReturnType="varchar" BuiltIn="true">
       <Parameter Name="str" Type="varchar" Mode="in"/>
     </Function>
-    <Function Name="UPPER" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="UPPER" ReturnType="varchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="varchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="UPPER" ReturnType="nvarchar(max)" BuiltIn="true">
-      <Parameter Name="str" Type="nvarchar(max)" Mode="in"/>
-    </Function>
     <!-- END STRING FUNCTIONS ####################################### -->
 
     <!-- BEGIN MATH FUNCTIONS ####################################### -->
     <!-- ABS( arg )
-                arg: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-                returns: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
+                arg: number
+                returns: number
     -->
-    <Function Name="ABS" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg" Type="int" Mode="in"/>
+    <Function Name="ABS" ReturnType="smallint" BuiltIn="true">
+      <Parameter Name="arg" Type="smallint" Mode="in"/>
+    </Function>
+    <Function Name="ABS" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="arg" Type="integer" Mode="in"/>
     </Function>
     <Function Name="ABS" ReturnType="bigint" BuiltIn="true">
       <Parameter Name="arg" Type="bigint" Mode="in"/>
@@ -1002,50 +574,97 @@ PROCESS
     <Function Name="ABS" ReturnType="decimal" BuiltIn="true">
       <Parameter Name="arg" Type="decimal" Mode="in"/>
     </Function>
+    <Function Name="ABS" ReturnType="numeric" BuiltIn="true">
+      <Parameter Name="arg" Type="numeric" Mode="in"/>
+    </Function>
     <Function Name="ABS" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="ABS" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- ACOS( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="ACOS" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg1" Type="float" Mode="in"/>
     </Function>
+    <Function Name="ACOS" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg1" Type="double" Mode="in"/>
+    </Function>
 
     <!-- ASIN( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="ASIN" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="ASIN" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- ATAN( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="ATAN" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="ATAN" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
-    <!-- ATN2( arg1, arg2 )
-                arg1: float
-                arg2: float
-                returns: float   
+    <!-- ATAN2( arg1, arg2 )
+                arg: number
+                returns: number
     -->
-    <Function Name="ATN2" ReturnType="float" BuiltIn="true">
+    <Function Name="ATAN2" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg1" Type="float" Mode="in"/>
       <Parameter Name="arg2" Type="float" Mode="in"/>
     </Function>
+    <Function Name="ATAN2" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg1" Type="double" Mode="in"/>
+      <Parameter Name="arg2" Type="double" Mode="in"/>
+    </Function>
+
+    <!-- CEIL( arg )
+                arg: number
+                returns: number
+    -->
+    <Function Name="CEIL" ReturnType="smallint" BuiltIn="true">
+      <Parameter Name="arg" Type="smallint" Mode="in"/>
+    </Function>
+    <Function Name="CEIL" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="arg" Type="integer" Mode="in"/>
+    </Function>
+    <Function Name="CEIL" ReturnType="bigint" BuiltIn="true">
+      <Parameter Name="arg" Type="bigint" Mode="in"/>
+    </Function>
+    <Function Name="CEIL" ReturnType="decimal" BuiltIn="true">
+      <Parameter Name="arg" Type="decimal" Mode="in"/>
+    </Function>
+    <Function Name="CEIL" ReturnType="numeric" BuiltIn="true">
+      <Parameter Name="arg" Type="numeric" Mode="in"/>
+    </Function>
+    <Function Name="CEIL" ReturnType="float" BuiltIn="true">
+      <Parameter Name="arg" Type="float" Mode="in"/>
+    </Function>
+    <Function Name="CEIL" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- CEILING( arg )
-                arg: smalldatetime, datetime
-                returns: int   
+                arg: number
+                returns: number
     -->
-    <Function Name="CEILING" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg" Type="int" Mode="in"/>
+    <Function Name="CEILING" ReturnType="smallint" BuiltIn="true">
+      <Parameter Name="arg" Type="smallint" Mode="in"/>
+    </Function>
+    <Function Name="CEILING" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="arg" Type="integer" Mode="in"/>
     </Function>
     <Function Name="CEILING" ReturnType="bigint" BuiltIn="true">
       <Parameter Name="arg" Type="bigint" Mode="in"/>
@@ -1053,57 +672,69 @@ PROCESS
     <Function Name="CEILING" ReturnType="decimal" BuiltIn="true">
       <Parameter Name="arg" Type="decimal" Mode="in"/>
     </Function>
+    <Function Name="CEILING" ReturnType="numeric" BuiltIn="true">
+      <Parameter Name="arg" Type="numeric" Mode="in"/>
+    </Function>
     <Function Name="CEILING" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="CEILING" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- COS( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="COS" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="COS" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
+
+    <!-- COSH( arg )
+                arg: number
+                returns: number
+    -->
+    <Function Name="COSH" ReturnType="float" BuiltIn="true">
+      <Parameter Name="arg" Type="float" Mode="in"/>
+    </Function>
+    <Function Name="COSH" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- COT( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="COT" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
-
-    <!-- DEGREES( arg )
-                arg: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-                returns: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-    -->
-    <Function Name="DEGREES" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="DEGREES" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="arg1" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="DEGREES" ReturnType="decimal" BuiltIn="true">
-      <Parameter Name="arg1" Type="decimal" Mode="in"/>
-    </Function>
-    <Function Name="DEGREES" ReturnType="float" BuiltIn="true">
-      <Parameter Name="arg1" Type="float" Mode="in"/>
+    <Function Name="COT" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
     </Function>
 
     <!-- EXP( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="EXP" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="EXP" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- FLOOR( arg )
-                arg: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-                returns: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
+                arg: number
+                returns: number
     -->
-    <Function Name="FLOOR" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg" Type="int" Mode="in"/>
+    <Function Name="FLOOR" ReturnType="smallint" BuiltIn="true">
+      <Parameter Name="arg" Type="smallint" Mode="in"/>
+    </Function>
+    <Function Name="FLOOR" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="arg" Type="integer" Mode="in"/>
     </Function>
     <Function Name="FLOOR" ReturnType="bigint" BuiltIn="true">
       <Parameter Name="arg" Type="bigint" Mode="in"/>
@@ -1111,129 +742,145 @@ PROCESS
     <Function Name="FLOOR" ReturnType="decimal" BuiltIn="true">
       <Parameter Name="arg" Type="decimal" Mode="in"/>
     </Function>
+    <Function Name="FLOOR" ReturnType="numeric" BuiltIn="true">
+      <Parameter Name="arg" Type="numeric" Mode="in"/>
+    </Function>
     <Function Name="FLOOR" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="FLOOR" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
+
+    <!-- LN( arg )
+                arg: number
+                returns: number
+    -->
+    <Function Name="LN" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- LOG( arg )
-            arg: float
-            returns: float   
+                arg: number
+                returns: number
     -->
-    <Function Name="LOG" ReturnType="float" BuiltIn="true">
-      <Parameter Name="arg" Type="float" Mode="in"/>
+    <Function Name="LOG" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
     </Function>
 
     <!-- LOG10( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="LOG10" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="LOG10" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
+
+    <!-- MOD( arg1, arg2 )
+                arg1: number
+                arg2: number
+                returns: number
+    -->
+    <Function Name="MOD" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="arg" Type="float" Mode="in"/>
+      <Parameter Name="arg" Type="float" Mode="in"/>
+    </Function>
+    <Function Name="MOD" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- PI( )
-                returns: float   
+                returns: number
     -->
-    <Function Name="PI" ReturnType="float" BuiltIn="true"/>
+    <Function Name="PI" ReturnType="double" BuiltIn="true"/>
 
     <!-- POWER( x, y )
-                x: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-                y: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-                returns: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
+                x: number
+                y: number
+                returns: number
     -->
-    <Function Name="POWER" ReturnType="int" BuiltIn="true">
-      <Parameter Name="x" Type="int" Mode="in"/>
-      <Parameter Name="y" Type="float" Mode="in"/>
+    <Function Name="POWER" ReturnType="smallint" BuiltIn="true">
+      <Parameter Name="x" Type="integer" Mode="in"/>
+      <Parameter Name="y" Type="double" Mode="in"/>
+    </Function>
+    <Function Name="POWER" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="x" Type="integer" Mode="in"/>
+      <Parameter Name="y" Type="double" Mode="in"/>
     </Function>
     <Function Name="POWER" ReturnType="bigint" BuiltIn="true">
       <Parameter Name="x" Type="bigint" Mode="in"/>
-      <Parameter Name="y" Type="float" Mode="in"/>
+      <Parameter Name="y" Type="double" Mode="in"/>
     </Function>
     <Function Name="POWER" ReturnType="decimal" BuiltIn="true">
       <Parameter Name="x" Type="decimal" Mode="in"/>
-      <Parameter Name="y" Type="float" Mode="in"/>
+      <Parameter Name="y" Type="double" Mode="in"/>
+    </Function>
+    <Function Name="POWER" ReturnType="numeric" BuiltIn="true">
+      <Parameter Name="x" Type="numeric" Mode="in"/>
+      <Parameter Name="y" Type="double" Mode="in"/>
     </Function>
     <Function Name="POWER" ReturnType="float" BuiltIn="true">
       <Parameter Name="x" Type="float" Mode="in"/>
-      <Parameter Name="y" Type="float" Mode="in"/>
+      <Parameter Name="y" Type="double" Mode="in"/>
+    </Function>
+    <Function Name="POWER" ReturnType="double" BuiltIn="true">
+      <Parameter Name="x" Type="double" Mode="in"/>
+      <Parameter Name="y" Type="double" Mode="in"/>
     </Function>
 
-    <!-- RADIANS( arg )
-                arg: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-                returns: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
+    <!-- RAND()
+                returns: number
     -->
-    <Function Name="RADIANS" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="RADIANS" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="arg" Type="bigint" Mode="in"/>
-    </Function>
-    <Function Name="RADIANS" ReturnType="decimal" BuiltIn="true">
-      <Parameter Name="arg" Type="decimal" Mode="in"/>
-    </Function>
-    <Function Name="RADIANS" ReturnType="float" BuiltIn="true">
-      <Parameter Name="arg" Type="float" Mode="in"/>
-    </Function>
-
-    <!-- RAND( [seed] )
-                seed: tinyint, smallint, int
-                returns: float
-    -->
-    <Function Name="RAND" ReturnType="float" BuiltIn="true">
-    </Function>
-    <Function Name="RAND" ReturnType="float" BuiltIn="true">
-      <Parameter Name="seed" Type="int" Mode="in"/>
+    <Function Name="RAND" ReturnType="double" BuiltIn="true">
     </Function>
 
     <!-- ROUND( numeric_expression, length [ ,function ] )
-                numeric_expression: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-                length: tinyint, smallint, int
-                function: tinyint, smallint, int
-                returns: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
+                numeric_expression: number
+                length: number
+                returns: number
     -->
-    <Function Name="ROUND" ReturnType="int" BuiltIn="true">
-      <Parameter Name="numeric_expression" Type="int" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
+    <Function Name="ROUND" ReturnType="smallint" BuiltIn="true">
+      <Parameter Name="numeric_expression" Type="smallint" Mode="in"/>
+      <Parameter Name="length" Type="integer" Mode="in"/>
+    </Function>
+    <Function Name="ROUND" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="numeric_expression" Type="integer" Mode="in"/>
+      <Parameter Name="length" Type="integer" Mode="in"/>
     </Function>
     <Function Name="ROUND" ReturnType="bigint" BuiltIn="true">
       <Parameter Name="numeric_expression" Type="bigint" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
+      <Parameter Name="length" Type="integer" Mode="in"/>
     </Function>
     <Function Name="ROUND" ReturnType="decimal" BuiltIn="true">
       <Parameter Name="numeric_expression" Type="decimal" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
+      <Parameter Name="length" Type="integer" Mode="in"/>
+    </Function>
+    <Function Name="ROUND" ReturnType="numeric" BuiltIn="true">
+      <Parameter Name="numeric_expression" Type="numeric" Mode="in"/>
+      <Parameter Name="length" Type="integer" Mode="in"/>
     </Function>
     <Function Name="ROUND" ReturnType="float" BuiltIn="true">
       <Parameter Name="numeric_expression" Type="float" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
+      <Parameter Name="length" Type="integer" Mode="in"/>
     </Function>
-    <Function Name="ROUND" ReturnType="int" BuiltIn="true">
-      <Parameter Name="numeric_expression" Type="int" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="function" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="ROUND" ReturnType="bigint" BuiltIn="true">
-      <Parameter Name="numeric_expression" Type="bigint" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="function" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="ROUND" ReturnType="decimal" BuiltIn="true">
-      <Parameter Name="numeric_expression" Type="decimal" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="function" Type="int" Mode="in"/>
-    </Function>
-    <Function Name="ROUND" ReturnType="float" BuiltIn="true">
-      <Parameter Name="numeric_expression" Type="float" Mode="in"/>
-      <Parameter Name="length" Type="int" Mode="in"/>
-      <Parameter Name="function" Type="int" Mode="in"/>
+    <Function Name="ROUND" ReturnType="double" BuiltIn="true">
+      <Parameter Name="numeric_expression" Type="double" Mode="in"/>
+      <Parameter Name="length" Type="integer" Mode="in"/>
     </Function>
 
     <!-- SIGN( arg )
-            arg: tinyint, smallint, int, bigint, numeric, decimal, smallmoney, money, real, float
-            returns: bigint, numeric, decimal, money, float
+            arg: number
+            returns: number
     -->
-    <Function Name="SIGN" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg" Type="int" Mode="in"/>
+    <Function Name="SIGN" ReturnType="smallint" BuiltIn="true">
+      <Parameter Name="arg" Type="smallint" Mode="in"/>
+    </Function>
+    <Function Name="SIGN" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="arg" Type="integer" Mode="in"/>
     </Function>
     <Function Name="SIGN" ReturnType="bigint" BuiltIn="true">
       <Parameter Name="arg" Type="bigint" Mode="in"/>
@@ -1241,40 +888,47 @@ PROCESS
     <Function Name="SIGN" ReturnType="decimal" BuiltIn="true">
       <Parameter Name="arg" Type="decimal" Mode="in"/>
     </Function>
+    <Function Name="SIGN" ReturnType="numeric" BuiltIn="true">
+      <Parameter Name="arg" Type="numeric" Mode="in"/>
+    </Function>
     <Function Name="SIGN" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
+    <Function Name="SIGN" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
+    </Function>
 
     <!-- SIN( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
-    <Function Name="SIN" ReturnType="float" BuiltIn="true">
+    <Function Name="SIN" ReturnType="double" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
+    </Function>
+    <Function Name="SIN" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
     </Function>
 
     <!-- SQRT( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="SQRT" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
     </Function>
-
-    <!-- SQUARE( arg )
-                arg: smalldatetime, datetime
-                returns: int   
-    -->
-    <Function Name="SQUARE" ReturnType="float" BuiltIn="true">
-      <Parameter Name="arg1" Type="float" Mode="in"/>
+    <Function Name="SQRT" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
     </Function>
 
     <!-- TAN( arg )
-                arg: float
-                returns: float   
+                arg: number
+                returns: number
     -->
     <Function Name="TAN" ReturnType="float" BuiltIn="true">
       <Parameter Name="arg" Type="float" Mode="in"/>
+    </Function>
+    <Function Name="TAN" ReturnType="double" BuiltIn="true">
+      <Parameter Name="arg" Type="double" Mode="in"/>
     </Function>
     <!-- END MATH FUNCTIONS ######################################### -->
 
@@ -1286,20 +940,20 @@ PROCESS
                 date: smalldatetime, datetime, varchar, nvarchar, char, nchar
                 returns: SMALLTIME, datetime   
     -->
-    <Function Name="DATEADD" ReturnType="smalldatetime" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
+    <Function Name="DATEADD" ReturnType="date" BuiltIn="true">
+      <Parameter Name="datepart" Type="varchar" Mode="in"/>
       <Parameter Name="number" Type="float" Mode="in"/>
-      <Parameter Name="date" Type="smalldatetime" Mode="in"/>
+      <Parameter Name="date" Type="date" Mode="in"/>
     </Function>
-    <Function Name="DATEADD" ReturnType="datetime" BuiltIn="true">
+    <Function Name="DATEADD" ReturnType="time" BuiltIn="true">
       <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
       <Parameter Name="number" Type="float" Mode="in"/>
-      <Parameter Name="date" Type="datetime" Mode="in"/>
+      <Parameter Name="time" Type="time" Mode="in"/>
     </Function>
-    <Function Name="DATEADD" ReturnType="datetime" BuiltIn="true">
+    <Function Name="DATEADD" ReturnType="timestamp" BuiltIn="true">
       <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
       <Parameter Name="number" Type="float" Mode="in"/>
-      <Parameter Name="date" Type="nvarchar" Mode="in"/>
+      <Parameter Name="timestamp" Type="timestamp" Mode="in"/>
     </Function>
 
     <!-- DATEDIFF( datepart, startdate, enddate )
@@ -1308,248 +962,82 @@ PROCESS
                 enddate: smalldatetime, datetime, char, nchar, varchar, nvarchar
                 returns: int   
     -->
-    <Function Name="DATEDIFF" ReturnType="int" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
-      <Parameter Name="startdate" Type="datetime" Mode="in"/>
-      <Parameter Name="enddate" Type="datetime" Mode="in"/>
+    <Function Name="DATEDIFF" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="datepart" Type="varchar" Mode="in"/>
+      <Parameter Name="startdate" Type="date" Mode="in"/>
+      <Parameter Name="enddate" Type="date" Mode="in"/>
     </Function>
-    <Function Name="DATEDIFF" ReturnType="int" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
-      <Parameter Name="startdate" Type="nvarchar" Mode="in"/>
-      <Parameter Name="enddate" Type="datetime" Mode="in"/>
+    <Function Name="DATEDIFF" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="datepart" Type="varchar" Mode="in"/>
+      <Parameter Name="startdate" Type="time" Mode="in"/>
+      <Parameter Name="enddate" Type="time" Mode="in"/>
     </Function>
-    <Function Name="DATEDIFF" ReturnType="int" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
-      <Parameter Name="startdate" Type="datetime" Mode="in"/>
-      <Parameter Name="enddate" Type="nvarchar" Mode="in"/>
+    <Function Name="DATEDIFF" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="datepart" Type="varchar" Mode="in"/>
+      <Parameter Name="startdate" Type="timestamp" Mode="in"/>
+      <Parameter Name="enddate" Type="timestamp" Mode="in"/>
     </Function>
-    <Function Name="DATEDIFF" ReturnType="int" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
-      <Parameter Name="startdate" Type="nvarchar" Mode="in"/>
-      <Parameter Name="enddate" Type="nvarchar" Mode="in"/>
-    </Function>
-
-    <!-- DATENAME( datepart, date )
-            datepart: nvarchar
-            date: smalldatetime, datetime, char, nchar, varchar, nvarchar
-            returns: nvarchar   
-    -->
-    <Function Name="DATENAME" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
-      <Parameter Name="date" Type="datetime" Mode="in"/>
-    </Function>
-    <Function Name="DATENAME" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
-      <Parameter Name="date" Type="nvarchar" Mode="in"/>
-    </Function>
-
-    <!-- DATEPART( datepart, date )
-                datepart: nvarchar
-                date: smalldatetime, datetime, char, nchar, varchar, nvarchar
-                returns: int   
-    -->
-    <Function Name="DATEPART" ReturnType="int" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
-      <Parameter Name="date" Type="datetime" Mode="in"/>
-    </Function>
-    <Function Name="DATEPART" ReturnType="int" BuiltIn="true">
-      <Parameter Name="datepart" Type="nvarchar" Mode="in"/>
-      <Parameter Name="date" Type="nvarchar" Mode="in"/>
+    <Function Name="DATEDIFF" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="datepart" Type="varchar" Mode="in"/>
+      <Parameter Name="startdate" Type="varchar" Mode="in"/>
+      <Parameter Name="enddate" Type="varchar" Mode="in"/>
     </Function>
 
     <!-- DAY( date )
             date: smalldatetime, datetime
             returns: int   
     -->
-    <Function Name="DAY" ReturnType="int" BuiltIn="true">
-      <Parameter Name="date" Type="datetime" Mode="in"/>
+    <Function Name="DAY" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="date" Mode="in"/>
     </Function>
-    <Function Name="DAY" ReturnType="int" BuiltIn="true">
-      <Parameter Name="date" Type="nvarchar" Mode="in"/>
+    <Function Name="DAY" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="timestamp" Mode="in"/>
     </Function>
-
-    <!-- GETDATE()
-            returns: datetime   
-    -->
-    <Function Name="GETDATE" ReturnType="datetime" BuiltIn="true"/>
-
-
-    <!-- GETUTCDATE()
-            returns: datetime   
-    -->
-    <Function Name="GETUTCDATE" ReturnType="datetime" BuiltIn="true"/>
+    <Function Name="DAY" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="varchar" Mode="in"/>
+    </Function>
 
     <!-- MONTH( date )
                 date: smalldatetime, datetime
                 returns: int   
     -->
-    <Function Name="MONTH" ReturnType="int" BuiltIn="true">
-      <Parameter Name="date" Type="datetime" Mode="in"/>
+    <Function Name="MONTH" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="date" Mode="in"/>
     </Function>
-    <Function Name="MONTH" ReturnType="int" BuiltIn="true">
-      <Parameter Name="date" Type="nvarchar" Mode="in"/>
+    <Function Name="MONTH" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="timestamp" Mode="in"/>
+    </Function>
+    <Function Name="MONTH" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="varchar" Mode="in"/>
     </Function>
 
     <!-- YEAR( date )
             date: smalldatetime, datetime
             returns: int   
     -->
-    <Function Name="YEAR" ReturnType="int" BuiltIn="true">
-      <Parameter Name="date" Type="datetime" Mode="in"/>
+    <Function Name="YEAR" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="date" Mode="in"/>
     </Function>
-    <Function Name="YEAR" ReturnType="int" BuiltIn="true">
-      <Parameter Name="date" Type="nvarchar" Mode="in"/>
+    <Function Name="YEAR" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="timestamp" Mode="in"/>
+    </Function>
+    <Function Name="YEAR" ReturnType="integer" BuiltIn="true">
+      <Parameter Name="date" Type="varchar" Mode="in"/>
     </Function>
     <!-- END DATE FUNCTIONS ######################################### -->
 
     <!-- BEGIN SYSTEM FUNCTIONS ##################################### -->
-    <!-- DATALENGTH( arg ) 
-                arg: any
-                returns: int, bigint  
-    -->
-    <Function Name="DATALENGTH" ReturnType="int" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="bit" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="int" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="float" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="int" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="datetime" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="int" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="uniqueidentifier" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="int" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="nvarchar" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="int" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="varbinary" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="int" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="varchar" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="bigint" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="bigint" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="varbinary(max)" Mode="in"/>
-    </Function>
-    <Function Name="DATALENGTH" ReturnType="bigint" BuiltIn="true" ParameterTypeSemantics="AllowImplicitPromotion">
-      <Parameter Name="arg" Type="varchar(max)" Mode="in"/>
-    </Function>
+    <!-- CURRENT_DATE -->
+    <Function Name="CURRENT_DATE" ReturnType="date" BuiltIn="true" NiladicFunction="true"/>
 
-    <!-- CHECKSUM -->
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="bit" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="float" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="datetime" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="varbinary(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="uniqueidentifier" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="timestamp" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="bit" Mode="in"/>
-      <Parameter Name="arg2" Type="bit" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="float" Mode="in"/>
-      <Parameter Name="arg2" Type="float" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="arg2" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="datetime" Mode="in"/>
-      <Parameter Name="arg2" Type="datetime" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="arg2" Type="varbinary(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="uniqueidentifier" Mode="in"/>
-      <Parameter Name="arg2" Type="uniqueidentifier" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="timestamp" Mode="in"/>
-      <Parameter Name="arg2" Type="timestamp" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="bit" Mode="in"/>
-      <Parameter Name="arg2" Type="bit" Mode="in"/>
-      <Parameter Name="arg3" Type="bit" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="float" Mode="in"/>
-      <Parameter Name="arg2" Type="float" Mode="in"/>
-      <Parameter Name="arg3" Type="float" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="arg2" Type="nvarchar(max)" Mode="in"/>
-      <Parameter Name="arg3" Type="nvarchar(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="datetime" Mode="in"/>
-      <Parameter Name="arg2" Type="datetime" Mode="in"/>
-      <Parameter Name="arg3" Type="datetime" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="arg2" Type="varbinary(max)" Mode="in"/>
-      <Parameter Name="arg3" Type="varbinary(max)" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="uniqueidentifier" Mode="in"/>
-      <Parameter Name="arg2" Type="uniqueidentifier" Mode="in"/>
-      <Parameter Name="arg3" Type="uniqueidentifier" Mode="in"/>
-    </Function>
-    <Function Name="CHECKSUM" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg1" Type="timestamp" Mode="in"/>
-      <Parameter Name="arg2" Type="timestamp" Mode="in"/>
-      <Parameter Name="arg3" Type="timestamp" Mode="in"/>
-    </Function>
-
-    <!-- NEWID() -->
-    <Function Name="NEWID" ReturnType="uniqueidentifier" BuiltIn="true"/>
+    <!-- CURRENT_TIME -->
+    <Function Name="CURRENT_TIME" ReturnType="time" BuiltIn="true" NiladicFunction="true"/>
 
     <!-- CURRENT_TIMESTAMP -->
     <Function Name="CURRENT_TIMESTAMP" ReturnType="timestamp" BuiltIn="true" NiladicFunction="true"/>
 
     <!-- CURRENT_USER -->
     <Function Name="CURRENT_USER" ReturnType="nvarchar" BuiltIn="true" NiladicFunction="true"/>
-
-    <!-- HOST_NAME() -->
-    <Function Name="HOST_NAME" ReturnType="nvarchar" BuiltIn="true"/>
-
-    <!-- USER_NAME() -->
-    <Function Name="USER_NAME" ReturnType="nvarchar" BuiltIn="true">
-      <Parameter Name="arg" Type="int" Mode="in"/>
-    </Function>
-
-    <!-- ISNUMERIC( arg ) //implicit conversion -->
-    <Function Name="ISNUMERIC" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg" Type="nvarchar" Mode="in"/>
-    </Function>
-
-    <!-- ISDATE( arg ) //implicit conversion -->
-    <Function Name="ISDATE" ReturnType="int" BuiltIn="true">
-      <Parameter Name="arg" Type="nvarchar" Mode="in"/>
-    </Function>
     <!-- END SYSTEM FUNCTIONS ####################################### -->
   </Functions>
 </ProviderManifest>
