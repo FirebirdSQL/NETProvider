@@ -25,7 +25,7 @@
         </Control>
         <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="425" Height="0" />
         <Control Id="List" Type="ListBox" X="20" Y="87" Width="330" Height="130" Property="FileInUseProcess" Sunken="yes" TabSkip="yes" />
-      </Dialog>      
+      </Dialog>
     </UI>
 	</Fragment>
 </Wix>
