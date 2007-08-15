@@ -2,6 +2,10 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-08-15  Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* Moved the installer to Wix
+
 2007-06-28  Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql\Data\FirebirdClient\FbDataAdapter.cs:
