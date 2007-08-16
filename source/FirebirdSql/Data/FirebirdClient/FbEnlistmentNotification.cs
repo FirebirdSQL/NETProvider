@@ -54,10 +54,11 @@ namespace FirebirdSql.Data.FirebirdClient
         #region · Constructors ·
 
         public FbEnlistmentNotification(FbConnectionInternal connection, Transaction systemTransaction)
-        {
+        {            
             this.connection         = connection;
-            this.transaction        = this.connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
+            this.transaction        = connection.BeginTransaction(systemTransaction.IsolationLevel);
             this.systemTransaction  = systemTransaction;
+
             this.systemTransaction.EnlistVolatile(this, System.Transactions.EnlistmentOptions.None);
         }
 

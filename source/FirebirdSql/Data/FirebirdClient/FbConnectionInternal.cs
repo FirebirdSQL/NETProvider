@@ -366,6 +366,34 @@ namespace FirebirdSql.Data.FirebirdClient
             this.enlistmentNotification = null;
         }
 
+        public FbTransaction BeginTransaction(System.Transactions.IsolationLevel isolationLevel)
+        {
+            switch (isolationLevel)
+            {
+                case System.Transactions.IsolationLevel.Chaos:
+                    return this.BeginTransaction(System.Data.IsolationLevel.Chaos, null);
+
+                case System.Transactions.IsolationLevel.ReadUncommitted:
+                    return this.BeginTransaction(System.Data.IsolationLevel.ReadUncommitted, null);
+
+                case System.Transactions.IsolationLevel.RepeatableRead:
+                    return this.BeginTransaction(System.Data.IsolationLevel.RepeatableRead, null);
+
+                case System.Transactions.IsolationLevel.Serializable:
+                    return this.BeginTransaction(System.Data.IsolationLevel.Serializable, null);
+
+                case System.Transactions.IsolationLevel.Snapshot:
+                    return this.BeginTransaction(System.Data.IsolationLevel.Snapshot, null);
+
+                case System.Transactions.IsolationLevel.Unspecified:
+                    return this.BeginTransaction(System.Data.IsolationLevel.Unspecified, null);
+
+                case System.Transactions.IsolationLevel.ReadCommitted:
+                default:
+                    return this.BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
+            }
+        }
+
 #endif
 
         #endregion
