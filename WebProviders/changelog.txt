@@ -1,10 +1,12 @@
 ASP.NET 2.0 Web Providers
 =========================
 
+2007-08-16 Jiri Cincura <jiri@cincura.net>
+
+  * sql_scripts\*:
+    - Change charsets of web-scripts (http://tracker.firebirdsql.org/browse/DNET-111).
 
 2007-07-08 Jiri Cincura <jiri@cincura.net>
 
-	* sql_scripts\FbProfileProvider1.5.sql:
-
-		 - Updated definition of GUID columns.
-		 
+  * sql_scripts\FbProfileProvider1.5.sql:
+    - Updated definition of GUID columns.
