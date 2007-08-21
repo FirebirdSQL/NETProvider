@@ -250,36 +250,25 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         private IPAddress GetIPAddress(string dataSource, AddressFamily addressFamily)
         {
-            try
+            IPAddress ipaddress = null;
+
+            if (!IPAddress.TryParse(dataSource, out ipaddress))
             {
-                IPAddress[] addresses = Dns.GetHostEntry(dataSource).AddressList;
-
-                // Try to avoid problems with IPV6 addresses
-                foreach (IPAddress address in addresses)
-                {
-                    if (address.AddressFamily == addressFamily)
-                    {
-                        return address;
-                    }
-                }
-
-                return addresses[0];
+                return ipaddress;
             }
-            catch (Exception ex)
+
+            IPAddress[] addresses = Dns.GetHostEntry(dataSource).AddressList;
+
+            // Try to avoid problems with IPV6 addresses
+            foreach (IPAddress address in addresses)
             {
-                // If it's not possible to get the list of IP adress associated to 
-                // the Data Source we try to check if Data Source is already an IP Address
-                // and return it
-                try
+                if (address.AddressFamily == addressFamily)
                 {
-                    return IPAddress.Parse(dataSource);
-                }
-                catch
-                {
-                    // In this case we want to rethrow the first exception
-                    throw ex;
+                    return address;
                 }
             }
+
+            return addresses[0];
         }
 
         #endregion
