@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         {
             IPAddress ipaddress = null;
 
-            if (!IPAddress.TryParse(dataSource, out ipaddress))
+            if (IPAddress.TryParse(dataSource, out ipaddress))
             {
                 return ipaddress;
             }
