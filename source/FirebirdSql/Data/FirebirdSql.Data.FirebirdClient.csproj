@@ -10,7 +10,7 @@
     <RootNamespace>FirebirdSql</RootNamespace>
     <AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>FirebirdSql.Data.FirebirdClient.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -249,12 +249,15 @@
     <EmbeddedResource Include="Resources\isc_error_msg.resources" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FirebirdSql.Data.FirebirdClient.pfx" />
+    <None Include="FirebirdSql.Data.FirebirdClient.snk" />
     <None Include="Properties\FirebirdSql.Data.FirebirdClient.snk" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Entity\Common.ConceptualSchemaDefinition.xml" />
     <EmbeddedResource Include="Entity\Firebird.ProviderManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
