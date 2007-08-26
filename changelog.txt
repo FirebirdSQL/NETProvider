@@ -2,6 +2,12 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-08-26  Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* FirebirdSql\Data\FirebirdClient\FbParameter.cs:
+
+		- Minr fix for character set handling.
+
 2007-08-15  Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* Moved the installer to Wix
