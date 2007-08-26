@@ -327,6 +327,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.sourceColumn	= sourceColumn;
 			this.sourceVersion	= sourceVersion;
 			this.value			= value;
+            this.charset        = FbCharset.Default;
 		}
 
 		#endregion
