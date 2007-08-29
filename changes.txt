@@ -2,6 +2,17 @@ WHAT IS NEW - FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ========================================================================
 
 
+
+· v2.1.0 Release Candidate 2 ( 2007-08-30 ) ·
+
+( Please review the changelog for details )
+
+
+Bug Fixes:
+
+	- Minor fixes for character set handling in FbParameter class.
+
+
 · v2.1.0 Release Candidate 1 ( 2007-05-19 ) ·
 
 ( Please review the changelog for details )
