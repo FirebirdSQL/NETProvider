@@ -1,16 +1,18 @@
-#if (NET_35 && ENTITY_FRAMEWORK)
+#if (NET_35)
 
 using System;
-using System.Xml;
 using System.Data.Common;
-using FirebirdSql.Data.FirebirdClient;
-using System.Reflection;
+using System.Data.Common.CommandTrees;
 using System.IO;
+using System.Reflection;
+using System.Xml;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
     public class FbProviderServices : DbProviderServices
     {
+        #region · Methods ·
+
         protected override XmlReader GetDbInformation(string informationType, DbConnection connection)
         {
             if (informationType == DbProviderServices.ProviderManifest)
@@ -22,19 +24,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 if (connection.GetType() != typeof(FbConnection))
                 {
-                    throw new ArgumentException(string.Format("Wrong connection type.  Expecting SampleConnection, received {0}",
+                    throw new ArgumentException(string.Format("Wrong connection type. Expecting FnConnection, received {0}",
                                                               connection));
                 }
 
-                return this.GetXmlResource("OrcasSampleProvider.Resources.SampleProviderServices.ProviderManifest.xml");
+                return this.GetXmlResource("FirebirdSql.Entity.ProviderManifest.xml");
             }
             else if (informationType == DbProviderServices.StoreSchemaDefinition)
             {
-                return this.GetXmlResource("OrcasSampleProvider.Resources.SampleProviderServices.StoreSchemaDefinition.ssdl");
+                return this.GetXmlResource("FirebirdSql.Entity.StoreSchemaDefinition.ssdl");
             }
             else if (informationType == DbProviderServices.StoreSchemaMapping)
             {
-                return this.GetXmlResource("OrcasSampleProvider.Resources.SampleProviderServices.StoreSchemaMapping.msl");
+                return this.GetXmlResource("FirebirdSql.Entity.StoreSchemaMapping.msl");
             }
 
             throw new NotSupportedException(string.Format("SampleProviderServices does not support informationType of {0}",
@@ -46,19 +48,28 @@ namespace FirebirdSql.Data.FirebirdClient
             return base.CreateCommandDefinition(prototype);
         }
 
-        public override DbCommandDefinition CreateCommandDefinition(DbConnection connection, DbCommandTree commandTree)
-        {
-            DbCommand           prototype   = this.CreateCommand(connection, commandTree);
-            DbCommandDefinition result      = this.CreateCommandDefinition(prototype);
+        #endregion
 
-            return result;
+        #region · Protected Methods ·
+
+        protected override DbCommandDefinition CreateDbCommandDefinition(DbConnection connection, DbCommandTree commandTree)
+        {
+            return this.CreateCommandDefinition(this.CreateCommand(connection, commandTree));
         }
+
+        #endregion
+
+        #region · Internal Methods ·
 
         internal DbCommand CreateCommand(DbConnection connection, DbCommandTree commandTree)
         {
             //SQL Generation logic goes here!
-            throw new NotImpelementedException("SQL Generation logic not yet supplied!");
+            throw new NotImplementedException("SQL Generation logic not yet supplied!");
         }
+
+        #endregion
+
+        #region · Private Methods ·
 
         private XmlReader GetXmlResource(string resourceName)
         {
@@ -67,6 +78,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
             return XmlReader.Create(stream);
         }
+
+        #endregion
     }
 }
 
