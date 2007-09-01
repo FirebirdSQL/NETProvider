@@ -96,6 +96,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
 #if (NET_35)
             #if (ENTITY_FRAMEWORK)
+
             if (serviceType == typeof(DbProviderServices))
             {
                 return new FbProviderServices();
@@ -104,6 +105,7 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 return null;
             }
+            
             #else
                 return null;
             #endif
