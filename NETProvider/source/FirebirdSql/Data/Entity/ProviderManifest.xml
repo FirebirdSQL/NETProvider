@@ -11,9 +11,30 @@ PROCESS
 -->
 <ProviderManifest Namespace="Firebird" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/providermanifest">
   <Types>
+    <Type Name="boolean" PrimitiveTypeKind="Boolean" PreferredMapping="true">
+      <Conversions>
+        <Implicit DestinationType="varchar" />
+        <Explicit DestinationType="blob" />
+        <Explicit DestinationType="char" />
+        <Explicit DestinationType="varchar" />
+        <Explicit DestinationType="varchar(max)" />
+        <Explicit DestinationType="date" />
+        <Explicit DestinationType="time" />
+        <Explicit DestinationType="timestamp" />
+        <Explicit DestinationType="decimal" />
+        <Explicit DestinationType="numeric" />
+        <Explicit DestinationType="float" />
+        <Explicit DestinationType="double" />
+        <Explicit DestinationType="bigint" />
+        <Explicit DestinationType="integer" />
+        <Explicit DestinationType="smallint" />
+        <Explicit DestinationType="boolean" />
+      </Conversions>
+    </Type>
     <Type Name="smallint" PrimitiveTypeKind="Int16" PreferredMapping="true">
       <Conversions>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Promotable DestinationType="integer"/>
         <Promotable DestinationType="bigint"/>
         <Promotable DestinationType="decimal"/>
@@ -22,6 +43,7 @@ PROCESS
         <Promotable DestinationType="double"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -37,6 +59,7 @@ PROCESS
     <Type Name="integer" PrimitiveTypeKind="Int32" PreferredMapping="true">
       <Conversions>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Promotable DestinationType="bigint"/>
         <Promotable DestinationType="decimal"/>
         <Promotable DestinationType="numeric"/>
@@ -44,6 +67,7 @@ PROCESS
         <Promotable DestinationType="double"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -59,12 +83,14 @@ PROCESS
     <Type Name="bigint" PrimitiveTypeKind="Int64" PreferredMapping="true">
       <Conversions>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Promotable DestinationType="decimal"/>
         <Promotable DestinationType="numeric"/>
         <Promotable DestinationType="float"/>
         <Promotable DestinationType="double"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -82,10 +108,12 @@ PROCESS
         <Implicit DestinationType="decimal"/>
         <Implicit DestinationType="numeric"/>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Implicit DestinationType="double"/>
         <Promotable DestinationType="double"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -103,9 +131,11 @@ PROCESS
         <Implicit DestinationType="decimal"/>
         <Implicit DestinationType="numeric"/>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Implicit DestinationType="float"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -120,8 +150,8 @@ PROCESS
     </Type>
     <Type Name="decimal" PrimitiveTypeKind="Decimal" PreferredMapping="true">
       <FacetDescriptions>
-        <Precision Minimum="1" Maximum="18" Default="18" Constant="false"/>
-        <Scale Minimum="0" Maximum="18" Default="0" Constant="false"/>
+        <Precision Minimum="1" Maximum="19" Default="18" Constant="false"/>
+        <Scale Minimum="0" Maximum="19" Default="0" Constant="false"/>
       </FacetDescriptions>
       <Conversions>
         <Implicit DestinationType="decimal"/>
@@ -129,11 +159,13 @@ PROCESS
         <Implicit DestinationType="float"/>
         <Implicit DestinationType="double"/>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Promotable DestinationType="numeric"/>
         <Promotable DestinationType="float"/>
         <Promotable DestinationType="double"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -157,11 +189,13 @@ PROCESS
         <Implicit DestinationType="float"/>
         <Implicit DestinationType="double"/>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Promotable DestinationType="decimal"/>
         <Promotable DestinationType="float"/>
         <Promotable DestinationType="double"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -174,30 +208,23 @@ PROCESS
         <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
-    <!--Type Name="binary" PrimitiveTypeKind="Binary">
+    <Type Name="blob" PrimitiveTypeKind="Binary" PreferredMapping="true">
       <FacetDescriptions>
-        <MaxLength Minimum="1" Maximum="8000" Default="8000" Constant="false" />
-        <FixedLength Default="true" Constant="true" />
+        <MaxLength Minimum="1" Maximum="2147483647" Default="2147483647" Constant="false" />
+        <FixedLength Default="false" Constant="false" />
+      </FacetDescriptions>
+    </Type>
+    <Type Name="text" PrimitiveTypeKind="String">
+      <FacetDescriptions>
+        <MaxLength Minimum="1" Maximum="2147483647" Default="2147483647" Constant="false" />
+        <FixedLength Default="false" Constant="false" />
+        <Unicode Default="true" Constant="true"/>
       </FacetDescriptions>
       <Conversions>
-        <Promotable DestinationType="varbinary" />
-        <Promotable DestinationType="varbinary(max)" />
-        <Implicit DestinationType="varbinary" />
-        <Explicit DestinationType="binary" />
-        <Explicit DestinationType="varbinary" />
-        <Explicit DestinationType="varbinary(max)" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="nchar" />
-        <Explicit DestinationType="datetime" />
-        <Explicit DestinationType="smalldatetime" />
-        <Explicit DestinationType="decimal" />
-        <Explicit DestinationType="numeric" />
-        <Explicit DestinationType="bigint" />
-        <Explicit DestinationType="integer" />
-        <Explicit DestinationType="smallint" />
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
       </Conversions>
-    </Type-->
+    </Type>
     <Type Name="date" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
         <PreserveSeconds Default="false" Constant="true"/>
@@ -207,9 +234,11 @@ PROCESS
         <Implicit DestinationType="date"/>
         <Implicit DestinationType="time"/>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Promotable DestinationType="timestamp"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -231,9 +260,11 @@ PROCESS
         <Implicit DestinationType="date"/>
         <Implicit DestinationType="time"/>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Promotable DestinationType="timestamp"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -256,8 +287,10 @@ PROCESS
         <Implicit DestinationType="time"/>
         <Implicit DestinationType="timestamp"/>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Implicit DestinationType="date"/>
         <Implicit DestinationType="time"/>
         <Implicit DestinationType="timestamp"/>
@@ -273,13 +306,17 @@ PROCESS
     <Type Name="varchar" PrimitiveTypeKind="String" PreferredMapping="true">
       <FacetDescriptions>
         <MaxLength Minimum="1" Maximum="32000" Default="1" Constant="false"/>
-        <Unicode Default="false" Constant="true"/>
+        <Unicode Default="true" Constant="true"/>
         <FixedLength Default="false" Constant="true"/>
       </FacetDescriptions>
       <Conversions>
         <Promotable DestinationType="char"/>
+        <Promotable DestinationType="varchar(max)"/>
+        <Promotable DestinationType="text"/>
         <Explicit DestinationType="char"/>
+        <Explicit DestinationType="text"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -290,19 +327,50 @@ PROCESS
         <Explicit DestinationType="bigint"/>
         <Explicit DestinationType="integer"/>
         <Explicit DestinationType="smallint"/>
+      </Conversions>
+    </Type>
+    <Type Name="varchar(max)" PrimitiveTypeKind="String">
+      <FacetDescriptions>
+        <MaxLength Default="32000" Constant="true" />
+        <Unicode Default="true" Constant="true" />
+        <FixedLength Default="false" Constant="true" />
+      </FacetDescriptions>
+      <Conversions>
+        <Promotable DestinationType="char"/>
+        <Promotable DestinationType="varchar"/>
+        <Promotable DestinationType="text"/>
+        <Explicit DestinationType="char"/>
+        <Explicit DestinationType="text"/>
+        <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
+        <Explicit DestinationType="date"/>
+        <Explicit DestinationType="time"/>
+        <Explicit DestinationType="timestamp"/>
+        <Explicit DestinationType="decimal"/>
+        <Explicit DestinationType="numeric"/>
+        <Explicit DestinationType="float"/>
+        <Explicit DestinationType="double"/>
+        <Explicit DestinationType="bigint"/>
+        <Explicit DestinationType="integer"/>
+        <Explicit DestinationType="smallint"/>        
       </Conversions>
     </Type>
     <Type Name="char" PrimitiveTypeKind="String" PreferredMapping="false">
       <FacetDescriptions>
         <MaxLength Minimum="1" Maximum="32000" Default="1" Constant="false"/>
-        <Unicode Default="false" Constant="true"/>
+        <Unicode Default="true" Constant="true"/>
         <FixedLength Default="true" Constant="true"/>
       </FacetDescriptions>
       <Conversions>
         <Promotable DestinationType="varchar"/>
+        <Promotable DestinationType="varchar(max)"/>
+        <Promotable DestinationType="text"/>
         <Implicit DestinationType="varchar"/>
+        <Implicit DestinationType="varchar(max)"/>
+        <Explicit DestinationType="text"/>
         <Explicit DestinationType="char"/>
         <Explicit DestinationType="varchar"/>
+        <Explicit DestinationType="varchar(max)"/>
         <Explicit DestinationType="date"/>
         <Explicit DestinationType="time"/>
         <Explicit DestinationType="timestamp"/>
@@ -315,16 +383,6 @@ PROCESS
         <Explicit DestinationType="smallint"/>
       </Conversions>
     </Type>
-    <!--Type Name="uniqueidentifier" PrimitiveTypeKind="Guid" PreferredMapping="true">
-      <Conversions>
-        <Implicit DestinationType="varchar" />
-        <Implicit DestinationType="nvarchar" />
-        <Explicit DestinationType="binary" />
-        <Explicit DestinationType="char" />
-        <Explicit DestinationType="varchar" />
-        <Explicit DestinationType="nchar" />
-      </Conversions>
-    </Type-->
   </Types>
   <Functions>
 
