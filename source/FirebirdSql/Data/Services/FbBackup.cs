@@ -23,6 +23,7 @@ using System;
 using System.Collections;
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
@@ -84,40 +85,40 @@ namespace FirebirdSql.Data.Services
 		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackup"]/method[@name="Execute"]/*'/>
 		public void Execute()
 		{
-			try
-			{
-				// Configure Spb
-				this.StartSpb = this.CreateParameterBuffer();
+            try
+            {
+                // Configure Spb
+                this.StartSpb = this.CreateParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_backup);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+                this.StartSpb.Append(IscCodes.isc_action_svc_backup);
+                this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-				foreach (FbBackupFile file in backupFiles)
-				{
-					this.StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
-					this.StartSpb.Append(IscCodes.isc_spb_bkp_length, file.BackupLength);
-				}
+                foreach (FbBackupFile file in backupFiles)
+                {
+                    this.StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
+                    this.StartSpb.Append(IscCodes.isc_spb_bkp_length, file.BackupLength);
+                }
 
-				if (verbose)
-				{
-					this.StartSpb.Append(IscCodes.isc_spb_verbose);
-				}
+                if (verbose)
+                {
+                    this.StartSpb.Append(IscCodes.isc_spb_verbose);
+                }
 
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+                this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
-				// Start execution
-				this.StartTask();
+                // Start execution
+                this.StartTask();
 
-				if (this.verbose)
-				{
-					this.ProcessServiceOutput();
-				}
-			}
-			catch
-			{
-				throw;
-			}
-			finally
+                if (this.verbose)
+                {
+                    this.ProcessServiceOutput();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new FbException(ex.Message, ex);
+            }
+            finally
 			{
 				// Close
 				this.Close();

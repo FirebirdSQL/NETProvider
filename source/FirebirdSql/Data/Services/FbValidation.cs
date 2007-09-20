@@ -71,11 +71,11 @@ namespace FirebirdSql.Data.Services
 				// Process service output
 				this.ProcessServiceOutput();
 			}
-			catch
-			{
-				throw;
-			}
-			finally
+            catch (Exception ex)
+            {
+                throw new FbException(ex.Message, ex);
+            }
+            finally
 			{
 				this.Close();
 			}
