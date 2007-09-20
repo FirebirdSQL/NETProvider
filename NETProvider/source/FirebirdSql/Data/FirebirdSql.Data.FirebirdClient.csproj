@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET;NET_20;NET_35;VISUAL_STUDIO;EXTERNAL_ENGINE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET;NET_20;NET_35;VISUAL_STUDIO;EXTERNAL_ENGINE;ENTITY_FRAMEWORK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -41,17 +41,39 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.Data.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
     <Reference Include="VSLangProj80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entity\DmlSqlGenerator.cs" />
+    <Compile Include="Entity\ExpressionTranslator.cs" />
+    <Compile Include="Entity\FirstClause.cs" />
+    <Compile Include="Entity\ISqlFragment.cs" />
+    <Compile Include="Entity\JoinSymbol.cs" />
+    <Compile Include="Entity\MetadataHelpers.cs" />
+    <Compile Include="Entity\SkipClause.cs" />
+    <Compile Include="Entity\SqlBuilder.cs" />
+    <Compile Include="Entity\SqlGenerator.cs" />
+    <Compile Include="Entity\SqlSelectStatement.cs" />
+    <Compile Include="Entity\SqlWriter.cs" />
+    <Compile Include="Entity\Symbol.cs" />
+    <Compile Include="Entity\SymbolPair.cs" />
+    <Compile Include="Entity\SymbolTable.cs" />
     <Compile Include="FirebirdClient\FbProviderServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Client\Common\ArrayBoundMarshal.cs" />
@@ -249,21 +271,23 @@
     <EmbeddedResource Include="Resources\isc_error_msg.resources" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Entity\ProviderManifest.xsd" />
+    <EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
+    <EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
     <None Include="FirebirdSql.Data.FirebirdClient.snk" />
     <None Include="Properties\FirebirdSql.Data.FirebirdClient.snk" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Entity\Common.ConceptualSchemaDefinition.xml" />
-    <EmbeddedResource Include="Entity\Firebird.ProviderManifest.xml" />
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+    <EmbeddedResource Include="Entity\ConceptualSchemaDefinition.xml" />
+    <EmbeddedResource Include="Entity\ProviderManifest.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>"%25windir%25\Microsoft.NET\Framework\v3.5\EdmxDeploy.exe" "$(ProjectDir) " "$(TargetDir) "</PostBuildEvent>
   </PropertyGroup>
 </Project>

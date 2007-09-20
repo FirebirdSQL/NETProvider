@@ -1,15 +1,12 @@
-rem set NETCFLIBS="C:\Archivos de programa\Microsoft Visual Studio 8\SDK\v2.0\CompactFramework\WindowsCE"
 set CSC="csc.exe"
-set NETCFLIBS="C:\Archivos de programa\Microsoft Visual Studio 8\SmartDevices\SDK\CompactFramework\2.0\v2.0\WindowsCE"
-rem set CSC="C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\csc.exe"
-rem set NETCFLIBS="C:\Program Files\Microsoft Visual Studio 8\SmartDevices\SDK\CompactFramework\2.0\v2.0\WindowsCE"
+set NETCFLIBS="C:\Program Files (x86)\Microsoft.NET\SDK\CompactFramework\v2.0\WindowsCE"
 
 rem ********** PATHS **********
 
 set BUILD_DIR=.
 set SOURCE_DIR=..\..\source
 set COMMON_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Common
-set GDS_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Client\Gds
+set GDS_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Client\Managed
 set PROVIDER_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\FirebirdClient
 set SCHEMA_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Schema
 set SERVICES_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Services
