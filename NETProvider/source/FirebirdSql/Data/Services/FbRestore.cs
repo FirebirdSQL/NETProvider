@@ -134,11 +134,11 @@ namespace FirebirdSql.Data.Services
 					this.ProcessServiceOutput();
 				}
 			}
-			catch
-			{
-				throw;
-			}
-			finally
+            catch (Exception ex)
+            {
+                throw new FbException(ex.Message, ex);
+            }
+            finally
 			{
 				this.Close();
 			}

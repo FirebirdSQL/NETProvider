@@ -190,11 +190,11 @@ namespace FirebirdSql.Data.Services
 
 				this.state = FbServiceState.Open;
 			}
-			catch (IscException ex)
-			{
-				throw new FbException(ex.Message, ex);
-			}
-		}
+            catch (Exception ex)
+            {
+                throw new FbException(ex.Message, ex);
+            }
+        }
 
 		/// <include file='Doc/en_EN/FbService.xml'	path='doc/class[@name="FbService"]/method[@name="Close"]/*'/>
 		protected void Close()
@@ -211,11 +211,11 @@ namespace FirebirdSql.Data.Services
 
 				this.state = FbServiceState.Closed;
 			}
-			catch (IscException ex)
-			{
-				throw new FbException(ex.Message, ex);
-			}
-		}
+            catch (Exception ex)
+            {
+                throw new FbException(ex.Message, ex);
+            }
+        }
 
 		/// <include file='Doc/en_EN/FbService.xml'	path='doc/class[@name="FbService"]/method[@name="startTask"]/*'/>
 		protected void StartTask()
@@ -231,11 +231,11 @@ namespace FirebirdSql.Data.Services
 				// Start service operation
 				this.svc.Start(this.StartSpb);
 			}
-			catch (IscException ex)
-			{
-				throw new FbException(ex.Message, ex);
-			}
-		}
+            catch (Exception ex)
+            {
+                throw new FbException(ex.Message, ex);
+            }
+        }
 
 		/// <include file='Doc/en_EN/FbService.xml'	path='doc/class[@name="FbService"]/method[@name="queryService"]/*'/>
 		protected byte[] QueryService(byte[] items)
