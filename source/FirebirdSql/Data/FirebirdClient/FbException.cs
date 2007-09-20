@@ -60,6 +60,19 @@ namespace FirebirdSql.Data.FirebirdClient
             }
 		}
 
+        public override int ErrorCode
+        {
+            get
+            {
+                if ((this.InnerException != null) && (this.InnerException is IscException))
+                {
+                    return ((IscException)this.InnerException).ErrorCode;
+                }
+
+                return base.ErrorCode;
+            }
+        }
+
 		#endregion
 
 		#region · Constructors ·
