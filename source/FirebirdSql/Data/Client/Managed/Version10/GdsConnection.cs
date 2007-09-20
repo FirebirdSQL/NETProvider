@@ -216,7 +216,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         public XdrStream CreateXdrStream()
         {
 #if	(NETCF)
-            return new XdrStream(this.networkStream, this.charset);
+            return new XdrStream(this.networkStream, this.characterSet);
 #else
             return new XdrStream(new BufferedStream(this.networkStream), this.characterSet);
 #endif
@@ -250,6 +250,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         private IPAddress GetIPAddress(string dataSource, AddressFamily addressFamily)
         {
+#if (!NETCF)
+
             IPAddress ipaddress = null;
 
             if (IPAddress.TryParse(dataSource, out ipaddress))
@@ -269,6 +271,40 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             }
 
             return addresses[0];
+#else
+
+            try
+            {
+                IPAddress[] addresses = Dns.GetHostEntry(dataSource).AddressList;
+
+                // Try to avoid problems with IPV6 addresses
+                foreach (IPAddress address in addresses)
+                {
+                    if (address.AddressFamily == addressFamily)
+                    {
+                        return address;
+                    }
+                }
+
+                return addresses[0];
+            }
+            catch (Exception ex)
+            {
+                // If it's not possible to get the list of IP adress associated to 
+                // the Data Source we try to check if Data Source is already an IP Address
+                // and return it
+                try
+                {
+                    return IPAddress.Parse(dataSource);
+                }
+                catch
+                {
+                    // In this case we want to rethrow the first exception
+                    throw ex;
+                }
+            }
+
+#endif
         }
 
         #endregion

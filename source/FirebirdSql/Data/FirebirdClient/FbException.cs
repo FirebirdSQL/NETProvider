@@ -60,6 +60,8 @@ namespace FirebirdSql.Data.FirebirdClient
             }
 		}
 
+#if (!NETCF)
+
         public override int ErrorCode
         {
             get
@@ -72,6 +74,8 @@ namespace FirebirdSql.Data.FirebirdClient
                 return base.ErrorCode;
             }
         }
+
+#endif
 
 		#endregion
 

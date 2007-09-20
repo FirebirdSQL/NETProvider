@@ -2,6 +2,13 @@ FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono
 ==========================================================
 
 
+2007-09-20  Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* Fixed issue #DNET-118
+
+	* Fixed issue #DNET-117
+
+
 2007-08-26  Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql\Data\FirebirdClient\FbParameter.cs:

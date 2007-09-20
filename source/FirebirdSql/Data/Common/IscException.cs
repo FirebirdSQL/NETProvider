@@ -155,8 +155,8 @@ namespace FirebirdSql.Data.Common
 		{
 			string resources = "FirebirdSql.Resources.isc_error_msg";
 
-			StringBuilder builder = new StringBuilder();
-			ResourceManager rm = new ResourceManager(resources, Assembly.GetExecutingAssembly());
+			StringBuilder   builder = new StringBuilder();
+			ResourceManager rm      = new ResourceManager(resources, Assembly.GetExecutingAssembly());
 
 			this.errorCode = (this.Errors.Count != 0) ? this.Errors[0].ErrorCode : 0;
 
@@ -165,11 +165,11 @@ namespace FirebirdSql.Data.Common
 				if (this.Errors[i].Type == IscCodes.isc_arg_gds ||
 					this.Errors[i].Type == IscCodes.isc_arg_warning)
 				{
-					int code = this.Errors[i].ErrorCode;
-					string message = null;
+					int     code    = this.Errors[i].ErrorCode;
+					string  message = null;
 
 					try
-					{
+					{                        
 						message = rm.GetString(code.ToString());
 					}
 					catch

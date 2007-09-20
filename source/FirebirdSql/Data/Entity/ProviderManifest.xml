@@ -150,8 +150,8 @@ PROCESS
     </Type>
     <Type Name="decimal" PrimitiveTypeKind="Decimal" PreferredMapping="true">
       <FacetDescriptions>
-        <Precision Minimum="1" Maximum="19" Default="18" Constant="false"/>
-        <Scale Minimum="0" Maximum="19" Default="0" Constant="false"/>
+        <Precision Minimum="1" Maximum="18" Default="18" Constant="false"/>
+        <Scale Minimum="0" Maximum="18" Default="0" Constant="false"/>
       </FacetDescriptions>
       <Conversions>
         <Implicit DestinationType="decimal"/>
