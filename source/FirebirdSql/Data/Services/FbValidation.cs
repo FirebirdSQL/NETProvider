@@ -19,6 +19,7 @@
 using System;
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
@@ -56,6 +57,11 @@ namespace FirebirdSql.Data.Services
 		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/class[@name="FbValidation"]/method[@name="Execute"]/*'/>
 		public void Execute()
 		{
+            if (String.IsNullOrEmpty(this.Database))
+            {
+                throw new FbException("Validation should be used against a specific database");
+            }
+
 			try
 			{
 				this.StartSpb = this.CreateParameterBuffer();
@@ -71,10 +77,10 @@ namespace FirebirdSql.Data.Services
 				// Process service output
 				this.ProcessServiceOutput();
 			}
-			catch
-			{
-				throw;
-			}
+            catch (Exception ex)
+            {
+                throw new FbException(ex.Message, ex);
+            }
 			finally
 			{
 				this.Close();
