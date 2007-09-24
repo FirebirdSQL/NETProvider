@@ -514,6 +514,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (this.options.Contains(key))
 			{
 				string il = this.options[key].ToString().ToLower(CultureInfo.CurrentCulture);
+
 				switch (il)
 				{
 					case "readcommitted":
@@ -531,6 +532,9 @@ namespace FirebirdSql.Data.FirebirdClient
 					case "chaos":
 						return IsolationLevel.Chaos;
 
+                    case "snapshot":
+                        return IsolationLevel.Snapshot;
+
 					case "unspecified":
 						return IsolationLevel.Unspecified;
 				}
@@ -542,6 +546,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private void CheckIsolationLevel()
 		{
 			string il = this.options["isolation level"].ToString().ToLower(CultureInfo.CurrentCulture);
+
 			switch (il)
 			{
 				case "readcommitted":
@@ -550,6 +555,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				case "serializable":
 				case "chaos":
 				case "unspecified":
+                case "snapshot":
 					break;
 
 				default:
