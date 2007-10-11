@@ -11,6 +11,7 @@ set GDS_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Client\Managed
 set PROVIDER_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\FirebirdClient
 set SCHEMA_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Schema
 set SERVICES_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Services
+set PROPERTIES_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Properties
 
 rem ********** DEFINES **********
 
@@ -28,4 +29,4 @@ rem ********** Build **********
 
 copy %SOURCE_DIR%\FirebirdSql\Data\Properties\*.snk .
 
-%CSC% /noconfig /nostdlib /target:library /keyfile:FirebirdSql.Data.FirebirdClient.snk /out:%BUILD_DIR%\FirebirdSql.Data.FirebirdClient.dll %REFERENCES% %DEFINES% %COMMON_RESOURCES% /recurse:%COMMON_SOURCES%\*.cs /recurse:%GDS_SOURCES%\*.cs /recurse:%PROVIDER_SOURCES%\*.cs /recurse:%SCHEMA_SOURCES%\*.cs /recurse:%SERVICES_SOURCES%\*.cs
+%CSC% /noconfig /nostdlib /target:library /keyfile:FirebirdSql.Data.FirebirdClient.snk /out:%BUILD_DIR%\FirebirdSql.Data.FirebirdClient.dll %REFERENCES% %DEFINES% %RESOURCES% /recurse:%COMMON_SOURCES%\*.cs /recurse:%GDS_SOURCES%\*.cs /recurse:%PROVIDER_SOURCES%\*.cs /recurse:%SCHEMA_SOURCES%\*.cs /recurse:%SERVICES_SOURCES%\*.cs /recurse:%PROPERTIES_SOURCES%\*.cs
