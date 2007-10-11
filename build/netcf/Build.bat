@@ -1,5 +1,6 @@
 set CSC="csc.exe"
 set NETCFLIBS="C:\Program Files (x86)\Microsoft.NET\SDK\CompactFramework\v2.0\WindowsCE"
+rem set NETCFLIBS="C:\Program Files\Microsoft Visual Studio 8\SmartDevices\SDK\CompactFramework\2.0\v2.0\WindowsCE"
 
 rem ********** PATHS **********
 
@@ -27,4 +28,4 @@ rem ********** Build **********
 
 copy %SOURCE_DIR%\FirebirdSql\Data\Properties\*.snk .
 
-%CSC% /noconfig /nostdlib /target:library /out:%BUILD_DIR%\FirebirdSql.Data.FirebirdClient.dll %REFERENCES% %DEFINES% %COMMON_RESOURCES% /recurse:%COMMON_SOURCES%\*.cs /recurse:%GDS_SOURCES%\*.cs /recurse:%PROVIDER_SOURCES%\*.cs /recurse:%SCHEMA_SOURCES%\*.cs /recurse:%SERVICES_SOURCES%\*.cs
+%CSC% /noconfig /nostdlib /target:library /keyfile:FirebirdSql.Data.FirebirdClient.snk /out:%BUILD_DIR%\FirebirdSql.Data.FirebirdClient.dll %REFERENCES% %DEFINES% %COMMON_RESOURCES% /recurse:%COMMON_SOURCES%\*.cs /recurse:%GDS_SOURCES%\*.cs /recurse:%PROVIDER_SOURCES%\*.cs /recurse:%SCHEMA_SOURCES%\*.cs /recurse:%SERVICES_SOURCES%\*.cs
