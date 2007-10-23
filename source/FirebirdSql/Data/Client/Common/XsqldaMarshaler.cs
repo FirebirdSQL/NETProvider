@@ -223,12 +223,15 @@ namespace FirebirdSql.Data.Client.Common
 
         private IntPtr GetIntPtr(IntPtr ptr, int offset)
         {
-            return (IntPtr)(ptr.ToInt32() + offset);
+            return new IntPtr(ptr.ToInt64() + offset);
         }
 
         private int ComputeLength(int n)
         {
-            return (Marshal.SizeOf(typeof(XSQLDA)) + n * Marshal.SizeOf(typeof(XSQLVAR)));
+            int length = (Marshal.SizeOf(typeof(XSQLDA)) + n * Marshal.SizeOf(typeof(XSQLVAR)));
+            if (IntPtr.Size == 8)
+                length += 4;
+            return length;
         }
 
         private byte[] GetBytes(XSQLVAR xsqlvar)

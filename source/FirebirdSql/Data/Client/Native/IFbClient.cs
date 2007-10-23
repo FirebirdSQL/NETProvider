@@ -32,8 +32,8 @@ namespace FirebirdSql.Data.Client.Native
 	{
 		#region · Array Functions ·
 
-		int isc_array_get_slice(
-			[In, Out] int[] statusVector,
+		IntPtr isc_array_get_slice(
+			[In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			ref	int trHandle,
 			ref	long arrayId,
@@ -41,8 +41,8 @@ namespace FirebirdSql.Data.Client.Native
 			byte[] destArray,
 			ref	int sliceLength);
 
-		int isc_array_put_slice(
-			[In, Out] int[] statusVector,
+        IntPtr isc_array_put_slice(
+            [In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			ref	int trHandle,
 			ref	long arrayId,
@@ -54,8 +54,8 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region · Blob Functions ·
 
-		int isc_create_blob2(
-			[In, Out] int[] statusVector,
+        IntPtr isc_create_blob2(
+            [In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			ref	int trHandle,
 			ref	int blobHandle,
@@ -63,8 +63,8 @@ namespace FirebirdSql.Data.Client.Native
 			short bpbLength,
 			byte[] bpbAddress);
 
-		int isc_open_blob2(
-			[In, Out] int[] statusVector,
+        IntPtr isc_open_blob2(
+            [In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			ref	int trHandle,
 			ref	int blobHandle,
@@ -72,53 +72,53 @@ namespace FirebirdSql.Data.Client.Native
 			short bpbLength,
 			byte[] bpbAddress);
 
-		int isc_get_segment(
-			[In, Out] int[] statusVector,
+        IntPtr isc_get_segment(
+            [In, Out] IntPtr[] statusVector,
 			ref	int blobHandle,
 			ref	short actualSegLength,
 			short segBufferLength,
 			byte[] segBuffer);
 
-		int isc_put_segment(
-			[In, Out] int[] statusVector,
+        IntPtr isc_put_segment(
+            [In, Out] IntPtr[] statusVector,
 			ref	int blobHandle,
 			short segBufferLength,
 			byte[] segBuffer);
 
-		int isc_cancel_blob(
-			[In, Out] int[] statusVector,
+        IntPtr isc_cancel_blob(
+            [In, Out] IntPtr[] statusVector,
 			ref	int blobHandle);
 
-		int isc_close_blob(
-			[In, Out] int[] statusVector,
+        IntPtr isc_close_blob(
+            [In, Out] IntPtr[] statusVector,
 			ref	int blobHandle);
 
 		#endregion
 
 		#region · Database Functions ·
 
-		int isc_attach_database(
-			[In, Out] int[] statusVector,
+        IntPtr isc_attach_database(
+            [In, Out] IntPtr[] statusVector,
 			short dbNameLength,
 			byte[] dbName,
 			ref	int dbHandle,
 			short parmBufferLength,
 			byte[] parmBuffer);
 
-		int isc_detach_database(
-			[In, Out] int[] statusVector,
+        IntPtr isc_detach_database(
+            [In, Out] IntPtr[] statusVector,
 			ref	int dbHandle);
 
-		int isc_database_info(
-			[In, Out] int[] statusVector,
+        IntPtr isc_database_info(
+            [In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			short itemListBufferLength,
 			byte[] itemListBuffer,
 			short resultBufferLength,
 			byte[] resultBuffer);
 
-		int isc_create_database(
-			[In, Out] int[] statusVector,
+        IntPtr isc_create_database(
+			[In, Out] IntPtr[] statusVector,
 			short dbNameLength,
 			byte[] dbName,
 			ref	int dbHandle,
@@ -126,59 +126,59 @@ namespace FirebirdSql.Data.Client.Native
 			byte[] parmBuffer,
 			short dbType);
 
-		int isc_drop_database(
-			[In, Out] int[] statusVector,
+		IntPtr isc_drop_database(
+			[In, Out] IntPtr[] statusVector,
 			ref	int dbHandle);
 
 		#endregion
 
 		#region · Transaction Functions ·
 
-		int isc_start_multiple(
-			[In, Out]	int[] statusVector,
+		IntPtr isc_start_multiple(
+			[In, Out]	IntPtr[] statusVector,
 			ref	int trHandle,
 			short dbHandleCount,
 			IntPtr tebVectorAddress);
 
-		int isc_commit_transaction(
-			[In, Out] int[] statusVector,
+		IntPtr isc_commit_transaction(
+			[In, Out] IntPtr[] statusVector,
 			ref	int trHandle);
 
-		int isc_commit_retaining(
-			[In, Out] int[] statusVector,
+		IntPtr isc_commit_retaining(
+			[In, Out] IntPtr[] statusVector,
 			ref	int trHandle);
 
-		int isc_rollback_transaction(
-			[In, Out] int[] statusVector,
+		IntPtr isc_rollback_transaction(
+			[In, Out] IntPtr[] statusVector,
 			ref	int trHandle);
 
-		int isc_rollback_retaining(
-			[In, Out] int[] statusVector,
+		IntPtr isc_rollback_retaining(
+			[In, Out] IntPtr[] statusVector,
 			ref	int trHandle);
 
 		#endregion
 
 		#region · DSQL Functions ·
 
-		int isc_dsql_allocate_statement(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_allocate_statement(
+			[In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			ref	int stmtHandle);
 
-		int isc_dsql_describe(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_describe(
+			[In, Out] IntPtr[] statusVector,
 			ref	int stmtHandle,
 			short daVersion,
 			IntPtr xsqlda);
 
-		int isc_dsql_describe_bind(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_describe_bind(
+			[In, Out] IntPtr[] statusVector,
 			ref	int stmtHandle,
 			short daVersion,
 			IntPtr xsqlda);
 
-		int isc_dsql_prepare(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_prepare(
+			[In, Out] IntPtr[] statusVector,
 			ref	int trHandle,
 			ref	int stmtHandle,
 			short length,
@@ -186,41 +186,41 @@ namespace FirebirdSql.Data.Client.Native
 			short dialect,
 			IntPtr xsqlda);
 
-		int isc_dsql_execute(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_execute(
+			[In, Out] IntPtr[] statusVector,
 			ref	int trHandle,
 			ref	int stmtHandle,
 			short daVersion,
 			IntPtr xsqlda);
 
-		int isc_dsql_execute2(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_execute2(
+			[In, Out] IntPtr[] statusVector,
 			ref	int trHandle,
 			ref	int stmtHandle,
 			short da_version,
 			IntPtr inXsqlda,
 			IntPtr outXsqlda);
 
-		int isc_dsql_fetch(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_fetch(
+			[In, Out] IntPtr[] statusVector,
 			ref	int stmtHandle,
 			short daVersion,
 			IntPtr xsqlda);
 
-		int isc_dsql_free_statement(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_free_statement(
+			[In, Out] IntPtr[] statusVector,
 			ref	int stmtHandle,
 			short option);
 
-		int isc_dsql_sql_info(
-			[In, Out] int[] statusVector,
+		IntPtr isc_dsql_sql_info(
+			[In, Out] IntPtr[] statusVector,
 			ref	int stmtHandle,
 			short itemsLength,
 			byte[] items,
 			short bufferLength,
 			byte[] buffer);
 
-		int isc_vax_integer(
+		IntPtr isc_vax_integer(
 			byte[] buffer,
 			short length);
 
@@ -228,27 +228,27 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region · Services Functions ·
 
-		int isc_service_attach(
-			[In, Out] int[] statusVector,
+		IntPtr isc_service_attach(
+			[In, Out] IntPtr[] statusVector,
 			short serviceLength,
 			string service,
 			ref	int svcHandle,
 			short spbLength,
 			byte[] spb);
 
-		int isc_service_start(
-			[In, Out] int[] statusVector,
+		IntPtr isc_service_start(
+			[In, Out] IntPtr[] statusVector,
 			ref	int svcHandle,
 			ref	int reserved,
 			short spbLength,
 			byte[] spb);
 
-		int isc_service_detach(
-			[In, Out] int[] statusVector,
+		IntPtr isc_service_detach(
+			[In, Out] IntPtr[] statusVector,
 			ref	int svcHandle);
 
-		int isc_service_query(
-			[In, Out] int[] statusVector,
+		IntPtr isc_service_query(
+			[In, Out] IntPtr[] statusVector,
 			ref	int svcHandle,
 			ref	int reserved,
 			short sendSpbLength,
