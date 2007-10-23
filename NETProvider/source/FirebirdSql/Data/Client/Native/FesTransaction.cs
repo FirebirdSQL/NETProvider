@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Client.Native
 		private FesDatabase			db;
 		private TransactionState	state;
 		private bool				disposed;
-        private int[]               statusVector;
+        private IntPtr[] statusVector;
 
 		#endregion
 
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			this.db		        = (FesDatabase)db;
 			this.state	        = TransactionState.NoTransaction;
-            this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
+            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
 			GC.SuppressFinalize(this);
 		}

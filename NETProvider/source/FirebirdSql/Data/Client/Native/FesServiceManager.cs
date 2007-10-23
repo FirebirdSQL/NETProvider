@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		private IFbClient   fbClient;
 		private int         handle;
-        private int[]       statusVector;
+        private IntPtr[] statusVector;
 
 		#endregion
 
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Client.Native
 		public FesServiceManager(string dllName)
 		{
 			this.fbClient       = FbClientFactory.GetFbClient(dllName);
-            this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
+            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
 		#endregion
@@ -166,9 +166,9 @@ namespace FirebirdSql.Data.Client.Native
             Array.Clear(this.statusVector, 0, this.statusVector.Length);
         }
 
-		private void ParseStatusVector(int[] tatusVector)
+        private void ParseStatusVector(IntPtr[] tatusVector)
 		{
-			IscException ex = FesConnection.ParseStatusVector(this.statusVector);
+			IscException ex = FesConnection.ParseStatusVector(tatusVector);
 
 			if (ex != null && !ex.IsWarning)
 			{

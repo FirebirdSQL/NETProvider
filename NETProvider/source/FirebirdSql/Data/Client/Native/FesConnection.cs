@@ -27,26 +27,26 @@ namespace FirebirdSql.Data.Client.Native
 	{
         #region · Static Methods ·
 
-        public static IscException ParseStatusVector(int[] statusVector)
+        public static IscException ParseStatusVector(IntPtr[] statusVector)
         {
             IscException    exception   = null;
             bool            eof         = false;
 
             for (int i = 0; i < statusVector.Length; )
             {
-                int arg = statusVector[i++];
+                IntPtr arg = statusVector[i++];
 
-                switch (arg)
+                switch (arg.ToInt32())
                 {
                     case IscCodes.isc_arg_gds:
-                        int er = statusVector[i++];
-                        if (er != 0)
+                        IntPtr er = statusVector[i++];
+                        if (er != IntPtr.Zero)
                         {
                             if (exception == null)
                             {
                                 exception = new IscException();
                             }
-                            exception.Errors.Add(new IscError(arg, er));
+                            exception.Errors.Add(new IscError(arg.ToInt32(), er.ToInt32()));
                         }
                         break;
 
@@ -61,10 +61,10 @@ namespace FirebirdSql.Data.Client.Native
                     case IscCodes.isc_arg_interpreted:
                     case IscCodes.isc_arg_string:
                         {
-                            IntPtr ptr          = new IntPtr(statusVector[i++]);
-                            string arg_value    = Marshal.PtrToStringAnsi(ptr);
+                            IntPtr ptr = statusVector[i++];
+                            string arg_value = Marshal.PtrToStringAnsi(ptr);
 
-                            exception.Errors.Add(new IscError(arg, arg_value));
+                            exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
                         }
                         break;
 
@@ -72,28 +72,28 @@ namespace FirebirdSql.Data.Client.Native
                         {
                             i++;
 
-                            IntPtr ptr          = new IntPtr(statusVector[i++]);
-                            string arg_value    = Marshal.PtrToStringAnsi(ptr);
+                            IntPtr ptr = statusVector[i++];
+                            string arg_value = Marshal.PtrToStringAnsi(ptr);
 
-                            exception.Errors.Add(new IscError(arg, arg_value));
+                            exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
                         }
                         break;
 
                     case IscCodes.isc_arg_win32:
                     case IscCodes.isc_arg_number:
-                        exception.Errors.Add(new IscError(arg, statusVector[i++]));
+                        exception.Errors.Add(new IscError(arg.ToInt32(), statusVector[i++].ToInt32()));
                         break;
 
                     default:
                         {
-                            int e = statusVector[i++];
-                            if (e != 0)
+                            IntPtr e = statusVector[i++];
+                            if (e != IntPtr.Zero)
                             {
                                 if (exception == null)
                                 {
                                     exception = new IscException();
                                 }
-                                exception.Errors.Add(new IscError(arg, e));
+                                exception.Errors.Add(new IscError(arg.ToInt32(), e.ToInt32()));
                             }
                         }
                         break;

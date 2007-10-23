@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Client.Native
 		#region · Fields ·
 
 		private FesDatabase db;
-        private int[]       statusVector;
+        private IntPtr[] statusVector;
 
 		#endregion
 
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Client.Native
 			this.position		= 0;
 			this.blobHandle		= 0;
 			this.blobId			= blobId;
-            this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
+            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
 		#endregion
@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.Client.Native
 				MemoryStream    segment = new MemoryStream();
 				byte[]          tmp     = new byte[requested];
 
-				int status = db.FbClient.isc_get_segment(
+                IntPtr status = db.FbClient.isc_get_segment(
 					this.statusVector,
 					ref	this.blobHandle,
 					ref	segmentLength,
@@ -145,14 +145,14 @@ namespace FirebirdSql.Data.Client.Native
 
 				this.RblRemoveValue(IscCodes.RBL_segment);
 				
-                if (this.statusVector[1] == IscCodes.isc_segstr_eof)
+                if (this.statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
 				{
 					segment.SetLength(0);
 					this.RblAddValue(IscCodes.RBL_eof_pending);
 				}
 				else
 				{
-					if (status == 0 || this.statusVector[1] == IscCodes.isc_segment)
+					if (status == IntPtr.Zero || this.statusVector[1] == new IntPtr(IscCodes.isc_segment))
 					{
 						this.RblAddValue(IscCodes.RBL_segment);
 					}

@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Native
 		private	long			handle;
 		private	FesDatabase		db;
 		private	FesTransaction	transaction;
-        private int[]           statusVector;
+        private IntPtr[] statusVector;
 
 		#endregion
 
@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.Client.Native
 		public FesArray(ArrayDesc descriptor) 
             :	base(descriptor)
 		{
-            this.statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
+            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
 		public FesArray(
@@ -99,7 +99,7 @@ namespace FirebirdSql.Data.Client.Native
 			this.db			    = (FesDatabase)db;
 			this.transaction    = (FesTransaction)transaction;
 			this.handle		    = handle;
-            this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
+            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
 			this.LookupBounds();
 		}

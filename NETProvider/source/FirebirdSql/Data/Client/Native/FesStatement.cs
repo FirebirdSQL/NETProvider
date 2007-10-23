@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Native
 		private Queue			outputParams;
 		private int				recordsAffected;
         private bool            returnRecordsAffected;
-        private int[]           statusVector;
+        private IntPtr[] statusVector;
         private IntPtr          fetchSqlDa;
 
 		#endregion
@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.Client.Native
 			this.recordsAffected    = -1;
 			this.db                 = (FesDatabase)db;
 			this.outputParams       = new Queue();
-            this.statusVector       = new int[IscCodes.ISC_STATUS_LENGTH];
+            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
             this.fetchSqlDa         = IntPtr.Zero;
 
 			if (transaction != null)
@@ -434,7 +434,7 @@ namespace FirebirdSql.Data.Client.Native
 					int stmtHandle = this.handle;
 
 					// Fetch data
-					int status = db.FbClient.isc_dsql_fetch(this.statusVector, ref stmtHandle, IscCodes.SQLDA_VERSION1, this.fetchSqlDa);
+                    IntPtr status = db.FbClient.isc_dsql_fetch(this.statusVector, ref stmtHandle, IscCodes.SQLDA_VERSION1, this.fetchSqlDa);
 
 					// Obtain values
                     Descriptor rowDesc = marshaler.MarshalNativeToManaged(this.db.Charset, this.fetchSqlDa, true);
@@ -456,7 +456,7 @@ namespace FirebirdSql.Data.Client.Native
 					// Parse status	vector
 					this.db.ParseStatusVector(this.statusVector);
 
-					if (status == 100)
+					if (status == new IntPtr(100))
 					{
 						this.allRowsFetched = true;
 

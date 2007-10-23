@@ -18,10 +18,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Specialized;
-using System.Data;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 
 using FirebirdSql.Data.Common;
@@ -51,7 +47,7 @@ namespace FirebirdSql.Data.Client.Native
 		private short	packetSize;
 		private short	dialect;
 		private bool	disposed;
-        private int[]   statusVector;
+        private IntPtr[]   statusVector;
         private object  syncObject;
 
 		private IFbClient fbClient;
@@ -132,7 +128,7 @@ namespace FirebirdSql.Data.Client.Native
 			this.charset        = Charset.DefaultCharset;
 			this.dialect        = 3;
 			this.packetSize     = 8192;
-			this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
+            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
 			GC.SuppressFinalize(this);
 		}
@@ -409,7 +405,7 @@ namespace FirebirdSql.Data.Client.Native
 
         #region · Internal Methods ·
 
-        internal void ParseStatusVector(int[] statusVector)
+        internal void ParseStatusVector(IntPtr[] statusVector)
 		{
 			IscException ex = FesConnection.ParseStatusVector(statusVector);
 
