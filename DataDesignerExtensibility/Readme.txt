@@ -33,9 +33,9 @@ Modify it like this (for 64bit systems you have to edit "32bit version" of this 
 </configuration>
 
 And substitute (these informations you can find using gacutil):
-  - %Version% With the version of the provider assembly that you have in the GAC.
-  - %Culture% With the culture of the provider assembly that you have in the GAC.
-  - %PublicKeyToken% With the PublicKeyToken of the provider assembly that you have in the GAC.
+  - %Version% with the version of the provider assembly that you have in the GAC.
+  - %Culture% with the culture of the provider assembly that you have in the GAC.
+  - %PublicKeyToken% with the PublicKeyToken of the provider assembly that you have in the GAC.
 
 Note:
   Notice, that in configSections there isn't signature of FirebirdClient but the signature of assembly from framework.
