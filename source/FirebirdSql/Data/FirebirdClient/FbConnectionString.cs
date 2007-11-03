@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		// for use with	the	DbConnectionOptions	or DbConnectionString classes.
 		private static Hashtable GetSynonyms()
 		{
-			Hashtable synonyms = new Hashtable(StringComparer.CurrentCultureIgnoreCase);
+			Hashtable synonyms = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 
 			synonyms.Add("data source", "data source");
 			synonyms.Add("datasource", "data source");
