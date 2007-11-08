@@ -470,7 +470,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						}
 
 						// 7. Call AcceptChanges
-                        if (this.AcceptChangesDuringUpdate)
+                        if (this.AcceptChangesDuringUpdate && !row.HasErrors)
                         {
                             row.AcceptChanges();
                         }
