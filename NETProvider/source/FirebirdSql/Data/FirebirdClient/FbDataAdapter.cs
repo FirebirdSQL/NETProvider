@@ -376,7 +376,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						int rowsAffected = command.ExecuteNonQuery();
 						if (rowsAffected == 0)
 						{
-							throw new DBConcurrencyException("An attempt to execute an INSERT, UPDATE, or DELETE statement resulted in zero records affected.");
+                            throw new DBConcurrencyException("An attempt to execute an INSERT, UPDATE, or DELETE statement resulted in zero records affected.", null, new DataRow[] { row });
 						}
 
 						updated++;
