@@ -10,7 +10,7 @@ Windows Registry Editor Version 5.00
 "DisplayName"="Provider_DisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources"
 "ShortDisplayName"="Provider_ShortDisplayName,FirebirdSql.VisualStudio.DataTools.Properties.Resources"
 "Description"="Provider_Description, FirebirdSql.VisualStudio.DataTools.Properties.Resources"
-"CodeBase"="%Path\\%FirebirdSql.VisualStudio.DataTools.dll"
+"CodeBase"="%Path%\\FirebirdSql.VisualStudio.DataTools.dll"
 "InvariantName"="FirebirdSql.Data.FirebirdClient"
 "Technology"="{77AB9A9D-78B9-4ba7-91AC-873F5338F1D2}"
 
