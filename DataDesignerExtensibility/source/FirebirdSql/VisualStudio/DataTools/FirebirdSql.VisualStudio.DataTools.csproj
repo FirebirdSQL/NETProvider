@@ -9,7 +9,7 @@
     <RootNamespace>FirebirdSql.VisualStudio.DataTools</RootNamespace>
     <AssemblyName>FirebirdSql.VisualStudio.DataTools</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>FirebirdSql.VisualStudio.DataTools.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Properties\FirebirdSql.VisualStudio.DataTools.snk</AssemblyOriginatorKeyFile>
     <ProjectGuid>{22230F86-1455-4DB6-A0EF-7649E745B8CD}</ProjectGuid>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -53,7 +53,6 @@
     <Compile Include="FbDataConnectionProperties.cs" />
     <Compile Include="FbDataConnectionSupport.cs" />
     <Compile Include="FbDataConnectionUIControl.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="FbDataConnectionUIControl.Designer.cs">
       <DependentUpon>FbDataConnectionUIControl.cs</DependentUpon>
@@ -84,7 +83,7 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FirebirdSql.VisualStudio.DataTools.snk" />
+    <None Include="Properties\FirebirdSql.VisualStudio.DataTools.snk" />
   </ItemGroup>
   <PropertyGroup>
     <TargetRegistryRoot>Software\Microsoft\VisualStudio\8.0Exp</TargetRegistryRoot>
