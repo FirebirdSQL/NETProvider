@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -113,7 +116,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public void AddRange(FbParameter[] values)
         {
-            this.AddRange(values);
+            this.AddRange((Array)values);
         }
 
 		public override void AddRange(Array values)
