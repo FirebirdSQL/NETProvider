@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
  *  All Rights Reserved.
+ * 
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -33,8 +36,8 @@ namespace FirebirdSql.Data.Isql
     {
         #region · Fields ·
 
-        private StringParser        parser;
-        private StringCollection    results;
+        private StringParser parser;
+        private StringCollection results;
 
         #endregion
 
@@ -59,29 +62,17 @@ namespace FirebirdSql.Data.Isql
         /// <param name="sqlFilename">The filename for the SQL file.</param>
         public FbScript(string sqlFilename)
         {
-            string          script = "";
-            StreamReader    reader = null;
+            string script = "";
+            StreamReader reader = null;
 
-            try
+            using (StreamReader reader = File.OpenText(sqlFilename))
             {
-                reader = File.OpenText(sqlFilename);
                 script = reader.ReadToEnd();
             }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Close();
-                }
-            }
 
-            this.results        = new StringCollection();
-            this.parser         = new StringParser(RemoveComments(script), false);
-            this.parser.Token   = ";";
+            this.results = new StringCollection();
+            this.parser = new StringParser(RemoveComments(script), false);
+            this.parser.Token = ";";
         }
 
         /// <summary>
@@ -91,9 +82,9 @@ namespace FirebirdSql.Data.Isql
         /// <remarks>The all data in <see cref="TextReader"/> is read.</remarks>
         public FbScript(TextReader sqlCode)
         {
-            this.results        = new StringCollection();
-            this.parser         = new StringParser(RemoveComments(sqlCode.ReadToEnd()), false);
-            this.parser.Token   = ";";
+            this.results = new StringCollection();
+            this.parser = new StringParser(RemoveComments(sqlCode.ReadToEnd()), false);
+            this.parser.Token = ";";
         }
 
         #endregion
@@ -106,16 +97,16 @@ namespace FirebirdSql.Data.Isql
         /// <returns>The number of statements found.</returns>
         public int Parse()
         {
-            int     index = 0;
-            string  atomicResult;
-            string  newParserToken;
+            int index = 0;
+            string atomicResult;
+            string newParserToken;
 
             this.results.Clear();
 
             while (index < this.parser.Length)
             {
-                index           = this.parser.ParseNext();
-                atomicResult    = this.parser.Result.Trim();
+                index = this.parser.ParseNext();
+                atomicResult = this.parser.Result.Trim();
 
                 if (this.isSetTermStatement(atomicResult, out newParserToken))
                 {
@@ -152,11 +143,11 @@ namespace FirebirdSql.Data.Isql
         /// <returns>A string containing the SQL code without comments.</returns>
         protected static string RemoveComments(string source)
         {
-            int             i               = 0;
-            int             length          = source.Length;
-            StringBuilder   result          = new StringBuilder();
-            bool            insideComment   = false;
-            bool            insideLiteral   = false;
+            int i = 0;
+            int length = source.Length;
+            StringBuilder result = new StringBuilder();
+            bool insideComment = false;
+            bool insideLiteral = false;
 
             while (i < length)
             {
