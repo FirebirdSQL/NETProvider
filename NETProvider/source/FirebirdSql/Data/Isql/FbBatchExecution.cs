@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2003-2007 Abel Eduardo Pereira
  *  All Rights Reserved.
+ * 
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net
  */
 
 using System;
@@ -420,7 +423,7 @@ namespace FirebirdSql.Data.Isql
 						this.sqlTransaction = null;
 					}
 
-					throw new FbException(String.Format(CultureInfo.CurrentUICulture, "An exception was thrown when executing command: {0}\nBatch execution aborted\nThe returned message was: {1}", sqlStatement, ex.Message));
+					throw new FbException(string.Format(CultureInfo.CurrentUICulture, "An exception was thrown when executing command: {0}\nBatch execution aborted\nThe returned message was: {1}", sqlStatement, ex.Message));
 				}
 			}
 

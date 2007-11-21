@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
  *  All Rights Reserved.
+ * 
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -206,9 +209,9 @@ namespace FirebirdSql.Data.Isql
 			int i = start;
 			while (i < this.sourceLength) 
 			{
-				if (String.Compare(this.source[i].ToString(), this.token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0) 
+				if (string.Compare(this.source[i].ToString(), this.token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0) 
 				{
-					if (String.Compare(this.source.Substring(i, this.tokenLength), this.token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0) 
+                    if (string.Compare(this.source.Substring(i, this.tokenLength), this.token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0) 
 					{
 						i += this.tokenLength; 
 						break;
@@ -260,9 +263,9 @@ namespace FirebirdSql.Data.Isql
 
 				if (!inLiteral)
 				{
-					if (String.Compare(this.source[i].ToString(), this.token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0) 
+                    if (string.Compare(this.source[i].ToString(), this.token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0) 
 					{
-						if (String.Compare(this.source.Substring(i, this.tokenLength), this.token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0) 
+                        if (string.Compare(this.source.Substring(i, this.tokenLength), this.token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0) 
 						{
 							i += this.tokenLength; 
 							break;
@@ -325,7 +328,7 @@ namespace FirebirdSql.Data.Isql
 			int i = startIndex;
 			while (i < this.sourceLength) 
 			{
-                if (String.Compare(this.source[i].ToString(), substring[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
+                if (string.Compare(this.source[i].ToString(), substring[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
 				{
                     if (substring != null && substring.Length == 1)
                     {
@@ -335,7 +338,7 @@ namespace FirebirdSql.Data.Isql
 					int j = i + 1;
 					while ((j < this.sourceLength) && ((j - i) < substring.Length))
 					{
-                        if (String.Compare(this.source[j].ToString(), substring[j - i].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
+                        if (string.Compare(this.source[j].ToString(), substring[j - i].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
                         {
 							j++;
                         }
@@ -384,7 +387,7 @@ namespace FirebirdSql.Data.Isql
 				return false;
 			}
 
-            return String.Compare(token, source.Substring(0, token.Length), ignoreCase, CultureInfo.CurrentUICulture) == 0;
+            return string.Compare(token, source.Substring(0, token.Length), ignoreCase, CultureInfo.CurrentUICulture) == 0;
 		}
 
 		#endregion
