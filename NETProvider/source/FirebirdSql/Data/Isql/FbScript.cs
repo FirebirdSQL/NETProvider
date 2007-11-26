@@ -22,7 +22,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Collections.Specialized;
 
 namespace FirebirdSql.Data.Isql
 {
@@ -37,7 +36,7 @@ namespace FirebirdSql.Data.Isql
         #region · Fields ·
 
         private StringParser parser;
-        private StringCollection results;
+        private FbStatementCollection results;
 
         #endregion
 
@@ -47,7 +46,7 @@ namespace FirebirdSql.Data.Isql
         /// Returns a StringCollection containing all the SQL statements (without comments) present on the file.
         /// This property is loaded after the method call <see cref="Parse"/>.
         /// </summary>
-        public StringCollection Results
+        public FbStatementCollection Results
         {
             get { return this.results; }
         }
@@ -70,7 +69,7 @@ namespace FirebirdSql.Data.Isql
                 script = reader.ReadToEnd();
             }
 
-            this.results = new StringCollection();
+            this.results = new FbStatementCollection();
             this.parser = new StringParser(RemoveComments(script), false);
             this.parser.Token = ";";
         }
@@ -82,7 +81,7 @@ namespace FirebirdSql.Data.Isql
         /// <remarks>The all data in <see cref="TextReader"/> is read.</remarks>
         public FbScript(TextReader sqlCode)
         {
-            this.results = new StringCollection();
+            this.results = new FbStatementCollection();
             this.parser = new StringParser(RemoveComments(sqlCode.ReadToEnd()), false);
             this.parser.Token = ";";
         }
