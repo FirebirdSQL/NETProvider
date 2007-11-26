@@ -28,34 +28,11 @@ using Microsoft.VisualStudio.Shell;
 
 namespace FirebirdSql.VisualStudio.DataTools
 {
-    /// <summary>
-    /// This is the class that implements the package exposed by this assembly.
-    ///
-    /// The minimum requirement for a class to be considered a valid package for Visual Studio
-    /// is to implement the IVsPackage interface and register itself with the shell.
-    /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-    /// to do it: it derives from the Package class that provides the implementation of the 
-    /// IVsPackage interface and uses the registration attributes defined in the framework to 
-    /// register itself and its components with the shell.
-    /// </summary>
-    // This attribute tells the registration utility (regpkg.exe) that this class needs
-    // to be registered as package.
-    [PackageRegistration(UseManagedResourcesOnly = true)]
-    // A Visual Studio component can be registered under different regitry roots; for instance
-    // when you debug your package you want to register it in the experimental hive. This
-    // attribute specifies the registry root to use if no one is provided to regpkg.exe with
-    // the /root switch.
-    [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\8.0")]
-    // This attribute is used to register the informations needed to show the this package
-    // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration(true, "#100", "#102", "1.0", IconResourceID = 400)]
-    // In order be loaded inside Visual Studio in a machine that has not the VS SDK installed, 
-    // package needs to have a valid load key (it can be requested at 
-    // http://msdn.microsoft.com/vstudio/extend/). This attributes tells the shell that this 
-    // package has a load key embedded in its resources.
-    [ProvideLoadKey("Standard", "1.0", "DDEX Provider for FirebirdClient", "..", 106)]
     [Guid(GuidList.GuidDataToolsPkgString)]
-    [ProvideService(typeof(FbDataProviderObjectFactory), ServiceName = "Firebird Provider Object Factory")]
+    [DefaultRegistryRoot(@"Microsoft\VisualStudio\9.0")]
+    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [ProvideService(typeof(FbDataProviderObjectFactory))]
+    [ProvideMenuResource(1000, 1)]
     public sealed class DataPackage : Package
     {
         #region · Constructors ·
@@ -83,26 +60,13 @@ namespace FirebirdSql.VisualStudio.DataTools
         protected override void Initialize()
         {
             Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
-            
-            ((IServiceContainer)this).AddService(typeof(FbDataProviderObjectFactory), new ServiceCreatorCallback(this.CreateService), true);
 
-            base.Initialize();
-        }
+            IServiceContainer serviceContainer = this as IServiceContainer;
 
-        #endregion
-
-        #region · Private Methods ·
-
-        private object CreateService(IServiceContainer container, Type serviceType)
-        {
-            System.Diagnostics.Trace.WriteLine(String.Format("DataPackage::CreateService({0})", serviceType.FullName));
-
-            if (serviceType == typeof(FbDataProviderObjectFactory))
+            if (serviceContainer != null)
             {
-                return new FbDataProviderObjectFactory();
+                serviceContainer.AddService(typeof(FbDataProviderObjectFactory), delegate { return new FbDataProviderObjectFactory(); }, true);
             }
-
-            return null;
         }
 
         #endregion

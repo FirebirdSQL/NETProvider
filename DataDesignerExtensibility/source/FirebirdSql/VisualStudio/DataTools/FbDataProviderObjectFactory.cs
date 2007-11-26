@@ -18,13 +18,13 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Data;
-using Microsoft.VisualStudio.Data.AdoDotNet;
+using Microsoft.VisualStudio.Data.Framework;
+using Microsoft.VisualStudio.Data.Services.SupportEntities;
 
 namespace FirebirdSql.VisualStudio.DataTools
 {
     [Guid(GuidList.GuidObjectFactoryServiceString)]
-    internal class FbDataProviderObjectFactory : AdoDotNetProviderObjectFactory
+    internal class FbDataProviderObjectFactory : DataProviderObjectFactory
     {
         #region · Constructors ·
 
@@ -41,20 +41,25 @@ namespace FirebirdSql.VisualStudio.DataTools
         {
             System.Diagnostics.Trace.WriteLine(String.Format("FbDataProviderObjectFactory::CreateObject({0})", objectType.FullName));
 
-            if (objectType == typeof(DataConnectionSupport))
-            {
-                return new FbDataConnectionSupport();
-            }
-            else if (objectType == typeof(DataConnectionUIControl))
-            {
-                return new FbDataConnectionUIControl();
-            }
-            else if (objectType == typeof(DataConnectionProperties))
+            if (objectType == typeof(IVsDataConnectionProperties) ||
+                objectType == typeof(IVsDataConnectionUIProperties))
             {
                 return new FbDataConnectionProperties();
             }
+            if (objectType == typeof(IVsDataConnectionSupport))
+            {
+                return new FbDataConnectionSupport();
+            }
+            if (objectType == typeof(IVsDataConnectionUIControl))
+            {
+                return new FbDataConnectionUIControl();
+            }
+            if (objectType == typeof(IVsDataViewSupport))
+            {
+                return new DataViewSupport(GetType().Namespace + ".FbDataViewSupport", GetType().Assembly);
+            }
 
-            return base.CreateObject(objectType);
+            return null;
         }
 
         #endregion

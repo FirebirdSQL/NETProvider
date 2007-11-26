@@ -17,8 +17,12 @@
  */
 
 using System;
-using Microsoft.VisualStudio.Data;
-using Microsoft.VisualStudio.Data.AdoDotNet;
+using System.Data;
+using System.Diagnostics;
+using System.ComponentModel.Design;
+using Microsoft.VisualStudio.Data.Framework;
+using Microsoft.VisualStudio.Data.Framework.AdoDotNet;
+using Microsoft.VisualStudio.Data.Services.SupportEntities;
 
 namespace FirebirdSql.VisualStudio.DataTools
 {
@@ -27,7 +31,6 @@ namespace FirebirdSql.VisualStudio.DataTools
         #region · Constructors ·
 
         public FbDataConnectionSupport() 
-            : base("FirebirdSql.Data.FirebirdClient")
         {
             System.Diagnostics.Trace.WriteLine("FbDataConnectionSupport()");
         }
@@ -36,36 +39,38 @@ namespace FirebirdSql.VisualStudio.DataTools
 
         #region · Protected Methods ·
 
-        protected override DataSourceInformation CreateDataSourceInformation()
+        protected override object CreateService(IServiceContainer container, Type serviceType)
         {
-            System.Diagnostics.Trace.WriteLine("FbDataConnectionSupport::CreateDataSourceInformation()");
-
-            return new FbDataSourceInformation(base.Site as DataConnection);
-        }
-
-        protected override DataObjectIdentifierConverter CreateObjectIdentifierConverter()
-        {
-            return new FbDataObjectIdentifierConverter(base.Site as DataConnection);
-        }
-
-        protected override object GetServiceImpl(Type serviceType)
-        {
-            System.Diagnostics.Trace.WriteLine(String.Format("FbDataConnectionSupport::GetServiceImpl({0})", serviceType.FullName));
-
-            if (serviceType == typeof(DataViewSupport))
+            if (serviceType == typeof(IDSRefBuilder))
             {
-                return new FbDataViewSupport();
+                return new DSRefBuilder(Site);
             }
-            else if (serviceType == typeof(DataObjectSupport))
+            if (serviceType == typeof(IVsDataObjectIdentifierConverter))
             {
-                return new FbDataObjectSupport();
+                return new FbDataObjectIdentifierConverter(Site);
             }
-            else if (serviceType == typeof(DataObjectIdentifierResolver))
+            if (serviceType == typeof(IVsDataObjectIdentifierResolver))
             {
-                return new FbDataObjectIdentifierResolver(base.Site as DataConnection);
+                return new FbDataObjectIdentifierResolver(Site);
+            }
+            //if (serviceType == typeof(IVsDataObjectMemberComparer))
+            //{
+            //    return new FbDataObjectMemberComparer(Site);
+            //}
+            //if (serviceType == typeof(IVsDataObjectSelector))
+            //{
+            //    return new FbDataObjectSelector(Site);
+            //}
+            if (serviceType == typeof(IVsDataObjectSupport))
+            {
+                return new DataObjectSupport(GetType().Namespace + ".FbDataObjectSupport", GetType().Assembly);
+            }
+            if (serviceType == typeof(IVsDataSourceInformation))
+            {
+                return new FbDataSourceInformation(Site);
             }
 
-            return base.GetServiceImpl(serviceType);
+            return base.CreateService(container, serviceType);
         }
 
         #endregion
