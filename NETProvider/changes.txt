@@ -1,5 +1,5 @@
-WHAT IS NEW - FirebirdClient ADO.NET 2.0 Data provider for .NET and Mono 
-========================================================================
+WHAT IS NEW - FirebirdClient ADO.NET 2.0 Data provider for Firebird
+===================================================================
 
 
 · v2.5.0 Alpha 1 ( 2007-07-99 ) ·
