@@ -532,6 +532,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                     /* Set up the new Database	*/
                     csb.Database = db;
+                    this.ConnectionString = csb.ToString();
 
                     /* Open	new	connection	*/
                     this.Open();
