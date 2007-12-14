@@ -333,11 +333,11 @@ namespace FirebirdSql.Data.FirebirdClient
         public FbConnection(string connectionString)
             : base()
         {
-            this.options = new FbConnectionString();
-            this.state = ConnectionState.Closed;
-            this.connectionString = "";
+            this.options            = new FbConnectionString();
+            this.state              = ConnectionState.Closed;
+            this.connectionString   = "";
 
-            if (connectionString != null)
+            if (!String.IsNullOrEmpty(connectionString))
             {
                 this.ConnectionString = connectionString;
             }
