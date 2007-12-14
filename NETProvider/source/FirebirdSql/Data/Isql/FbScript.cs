@@ -62,7 +62,6 @@ namespace FirebirdSql.Data.Isql
         public FbScript(string sqlFilename)
         {
             string script = "";
-            StreamReader reader = null;
 
             using (StreamReader reader = File.OpenText(sqlFilename))
             {
