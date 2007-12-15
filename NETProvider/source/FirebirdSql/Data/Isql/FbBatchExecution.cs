@@ -423,7 +423,7 @@ namespace FirebirdSql.Data.Isql
 						this.sqlTransaction = null;
 					}
 
-					throw new FbException(string.Format(CultureInfo.CurrentUICulture, "An exception was thrown when executing command: {0}\nBatch execution aborted\nThe returned message was: {1}", sqlStatement, ex.Message));
+					throw new FbException(string.Format(CultureInfo.CurrentUICulture, "An exception was thrown when executing command: {0}{2}Batch execution aborted{2}The returned message was: {1}", sqlStatement, ex.Message, Environment.NewLine));
 				}
 			}
 
