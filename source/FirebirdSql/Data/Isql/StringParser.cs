@@ -38,7 +38,8 @@ namespace FirebirdSql.Data.Isql
 	///		while (currentIndex &lt; s.Length) {
 	///			Console.WriteLine("Returned Index: {0}", currentIndex = parser.ParseNext());
 	///			Console.WriteLine("Chars scanned: {0}", parser.CharsParsed);
-	///			Console.WriteLine("Parsing result: {0}\n", parser.Result);
+	///			Console.WriteLine("Parsing result: {0}", parser.Result);
+	///			Console.WriteLine();     
 	///		}
 	/// }
 	/// </code>
