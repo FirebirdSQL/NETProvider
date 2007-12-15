@@ -776,34 +776,30 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private string GetSchemaCommandText()
         {
-            System.Text.StringBuilder sql = new System.Text.StringBuilder();
-            sql.Append(
-                "SELECT \n" +
-                    "fld.rdb$computed_blr	   as computed_blr,\n" +
-                    "fld.rdb$computed_source   as computed_source,\n" +
-                    "(select count(*)\n" +
-                    "from rdb$relation_constraints rel, rdb$indices idx, rdb$index_segments seg\n" +
-                    "where rel.rdb$constraint_type = 'PRIMARY KEY'\n" +
-                    "and rel.rdb$index_name = idx.rdb$index_name\n" +
-                    "and idx.rdb$index_name = seg.rdb$index_name\n" +
-                    "and rel.rdb$relation_name = rfr.rdb$relation_name\n" +
-                    "and seg.rdb$field_name = rfr.rdb$field_name) as primary_key,\n" +
-                    "(select count(*)\n" +
-                    "from rdb$relation_constraints rel, rdb$indices idx, rdb$index_segments seg\n" +
-                    "where rel.rdb$constraint_type = 'UNIQUE'\n" +
-                    "and rel.rdb$index_name = idx.rdb$index_name\n" +
-                    "and idx.rdb$index_name = seg.rdb$index_name\n" +
-                    "and rel.rdb$relation_name = rfr.rdb$relation_name\n" +
-                    "and seg.rdb$field_name = rfr.rdb$field_name) as unique_key,\n" +
-                    "fld.rdb$field_precision as numeric_precision\n" +
-                "from rdb$relation_fields rfr, rdb$fields fld\n" +
-                    "where rfr.rdb$field_source = fld.rdb$field_name");
+            const string sql =
+                @"SELECT
+                    fld.rdb$computed_blr AS computed_blr,
+                    fld.rdb$computed_source AS computed_source,
+                    (SELECT COUNT(*) FROM rdb$relation_constraints rel 
+                      INNER JOIN rdb$indices idx ON rel.rdb$index_name = idx.rdb$index_name
+                      INNER JOIN rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name
+                    WHERE rel.rdb$constraint_type = 'PRIMARY KEY'
+                      AND rel.rdb$relation_name = rfr.rdb$relation_name
+                      AND seg.rdb$field_name = rfr.rdb$field_name) AS primary_key,
+                    (SELECT COUNT(*) FROM rdb$relation_constraints rel
+                      INNER JOIN rdb$indices idx ON rel.rdb$index_name = idx.rdb$index_name
+                      INNER JOIN rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name
+                    WHERE rel.rdb$constraint_type = 'UNIQUE'
+                      AND rel.rdb$relation_name = rfr.rdb$relation_name
+                      AND seg.rdb$field_name = rfr.rdb$field_name) AS unique_key,
+                    fld.rdb$field_precision AS numeric_precision
+                  FROM rdb$relation_fields rfr
+                    INNER JOIN rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name
+                  WHERE fr.rdb$relation_name = ?
+                    AND rfr.rdb$field_name = ?
+                  ORDER BY rfr.rdb$relation_name, rfr.rdb$field_position";
 
-            sql.Append("\n and rfr.rdb$relation_name = ?");
-            sql.Append("\n and rfr.rdb$field_name = ?");
-            sql.Append("\n order by rfr.rdb$relation_name, rfr.rdb$field_position");
-
-            return sql.ToString();
+            return sql;
         }
 
         private void UpdateRecordsAffected()
