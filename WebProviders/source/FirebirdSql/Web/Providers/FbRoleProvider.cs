@@ -624,12 +624,14 @@ namespace FirebirdSql.Web.Providers
             log.Source = eventSource;
             log.Log = eventLog;
 
-            string message = string.Empty;
-            message += "An exception occurred. Please check the Event Log." + "\n\n";
-            message += "Action: " + action + "\n\n";
-            message += "Exception: " + e.ToString();
+            StringBuilder sb = new StringBuilder(50);
+            sb.AppendFormat("An exception occurred. Please check the Event Log.{0}", Environment.NewLine);
+            sb.AppendLine();
+            sb.AppendFormat("Action: {0}{1}", action, Environment.NewLine);
+            sb.AppendLine();
+            sb.AppendFormat("Exception: {0}{1}", e.ToString(), Environment.NewLine);
 
-            log.WriteEntry(message);
+            log.WriteEntry(sb.ToString());
         }
 
         #endregion
