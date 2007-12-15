@@ -1256,8 +1256,9 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             StringBuilder   builder         = new StringBuilder();
             StringBuilder   paramBuilder    = new StringBuilder();
-            bool            inCommas        = false;
-            bool            inParam         = false;
+            bool inSingleQuotes             = false;
+            bool inDoubleQuotes             = false;
+            bool inParam                    = false;
 
             this.namedParameters.Clear();
 
@@ -1287,11 +1288,15 @@ namespace FirebirdSql.Data.FirebirdClient
                 }
                 else
                 {
-                    if (sym == '\'' || sym == '\"')
+                    if (sym == '\'')
                     {
-                        inCommas = !inCommas;
+                        inSingleQuotes = !inSingleQuotes;
                     }
-                    else if (!inCommas && sym == '@')
+                    else if (sym == '\"')
+                    {
+                        inDoubleQuotes = !inDoubleQuotes;
+                    }
+                    else if (!(inSingleQuotes || inDoubleQuotes) && sym == '@')
                     {
                         inParam = true;
                         paramBuilder.Append(sym);
