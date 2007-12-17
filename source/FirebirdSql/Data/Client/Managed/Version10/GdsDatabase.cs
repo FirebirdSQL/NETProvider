@@ -383,6 +383,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					this.ReadOperation();
 
+                    /*
 					auxHandle = this.ReadInt32();
 
 					// socketaddr_in (non XDR encoded)
@@ -402,7 +403,39 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					// sin_zero	+ garbage
 					this.ReadBytes(12);
+                    */
 
+                    auxHandle = this.ReadInt32(); 
+
+                    this.ReadBytes(8);
+                                         
+                    // sin_port
+                    int respLen = this.ReadInt32();
+                    respLen += respLen % 4;
+                    
+                    // socketaddr_in (non XDR encoded)
+                     
+                    // sin_Family
+                    this.ReadBytes(2);
+                    respLen -= 2;
+                    
+                    // sin_port
+                    byte[] buffer   = this.ReadBytes(2);
+                    portNumber      = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+                    respLen         -= 2;
+                     
+                    // sin_addr
+                    buffer      = this.ReadBytes(4);
+                    respLen     -= 4;
+
+                    ipAddress   = String.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}.{1}.{2}.{3}",
+                        buffer[0], buffer[1], buffer[2], buffer[3]);
+                     
+                    // garbage
+                    this.ReadBytes(respLen);
+                     
 					// Read	Status Vector
 					this.ReadStatusVector();
 				}
@@ -455,12 +488,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					EventParameterBuffer epb = events.ToEpb();
 
-					this.Write(IscCodes.op_que_events);// Op codes
+					this.Write(IscCodes.op_que_events); // Op codes
 					this.Write(this.handle);			// Database	object id
 					this.WriteBuffer(epb.ToArray());	// Event description block
 					this.Write(0);						// Address of ast routine
 					this.Write(0);						// Argument	to ast routine						
-					this.Write(events.LocalId);		// Client side id of remote	event
+					this.Write(events.LocalId);		    // Client side id of remote	event
 
 					this.Flush();
 
@@ -487,7 +520,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					this.Write(IscCodes.op_cancel_events);	// Op code
 					this.Write(this.handle);				// Database	object id
-					this.Write(events.LocalId);			// Event ID
+					this.Write(events.LocalId);			    // Event ID
 
 					this.Flush();
 
