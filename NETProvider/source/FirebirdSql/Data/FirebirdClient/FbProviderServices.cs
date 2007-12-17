@@ -18,7 +18,7 @@
  *  Based on the Microsoft Entity Framework Provider Sample Beta 1
  */
 
-#if (NET_35)
+#if (NET_35 && ENTITY_FRAMEWORK)
 
 using System;
 using System.Collections.Generic;
