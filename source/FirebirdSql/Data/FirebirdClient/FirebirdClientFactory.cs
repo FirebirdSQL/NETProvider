@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *     The contents of this file are subject to the Initial 
@@ -92,9 +92,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · IServiceProvider Members ·
 
+#if (NET_35)
         object IServiceProvider.GetService(Type serviceType)
         {
-#if (NET_35)
             #if (ENTITY_FRAMEWORK)
 
             if (serviceType == typeof(DbProviderServices))
@@ -109,8 +109,8 @@ namespace FirebirdSql.Data.FirebirdClient
             #else
                 return null;
             #endif
+        } 
 #endif
-        }
 
         #endregion
     }
