@@ -94,7 +94,7 @@
     />
     <property
       name="current.build.defines"
-      value="${build.defines}NET,NET_2_0"
+      value="${build.defines}NET,NET_20"
       dynamic="true"
     />
   </target>
