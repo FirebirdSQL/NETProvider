@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{326A24F9-6259-45DB-835C-18DB80728460}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -10,7 +10,7 @@
     <RootNamespace>FirebirdSql</RootNamespace>
     <AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -37,8 +37,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
@@ -57,7 +55,6 @@
     <Reference Include="System.Security" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
-    <Reference Include="VSLangProj80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entity\DmlSqlGenerator.cs" />
@@ -275,7 +272,6 @@
     <EmbeddedResource Include="Entity\ProviderManifest.xsd" />
     <EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
     <EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
-    <None Include="FirebirdSql.Data.FirebirdClient.snk" />
     <None Include="Properties\FirebirdSql.Data.FirebirdClient.snk" />
   </ItemGroup>
   <ItemGroup>
