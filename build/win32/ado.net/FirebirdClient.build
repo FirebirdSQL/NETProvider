@@ -44,6 +44,7 @@
     <copy
       file="${source.dir}/FirebirdSql/Data/Properties/FirebirdSql.Data.FirebirdClient.snk"
       todir="."
+      overwrite="true"
     />
   </target>
 
