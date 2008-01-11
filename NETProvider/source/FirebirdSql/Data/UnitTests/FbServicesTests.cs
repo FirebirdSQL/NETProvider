@@ -34,10 +34,6 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbServicesTest : BaseTest
 	{
-        //file for Backup & Restore test
-        //Restore will automatically remove it after test
-        const string BackupRestoreFile = @"C:\testdb.gbk";
-
         #region · Constructors ·
 
 		public FbServicesTest()
@@ -70,7 +66,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbBackup backupSvc = new FbBackup();
 
 			backupSvc.ConnectionString = this.BuildServicesConnectionString();
-			backupSvc.BackupFiles.Add(new FbBackupFile(BackupRestoreFile, 2048));
+			backupSvc.BackupFiles.Add(new FbBackupFile(ConfigurationManager.AppSettings["BackupRestoreFile"], 2048));
 			backupSvc.Verbose = true;
 
 			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
@@ -86,7 +82,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbRestore restoreSvc = new FbRestore();
 
 			restoreSvc.ConnectionString = this.BuildServicesConnectionString();
-			restoreSvc.BackupFiles.Add(new FbBackupFile(BackupRestoreFile, 2048));
+			restoreSvc.BackupFiles.Add(new FbBackupFile(ConfigurationManager.AppSettings["BackupRestoreFile"], 2048));
 			restoreSvc.Verbose = true;
 			restoreSvc.PageSize = 4096;
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
@@ -95,9 +91,9 @@ namespace FirebirdSql.Data.UnitTests
 
 			restoreSvc.Execute();
 
-            if (File.Exists(BackupRestoreFile))
+            if (File.Exists(ConfigurationManager.AppSettings["BackupRestoreFile"]))
             {
-                File.Delete(BackupRestoreFile);
+                File.Delete(ConfigurationManager.AppSettings["BackupRestoreFile"]);
             }
 		}
 
