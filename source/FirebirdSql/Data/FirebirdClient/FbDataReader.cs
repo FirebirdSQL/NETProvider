@@ -795,7 +795,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     fld.rdb$field_precision AS numeric_precision
                   FROM rdb$relation_fields rfr
                     INNER JOIN rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name
-                  WHERE fr.rdb$relation_name = ?
+                  WHERE rfr.rdb$relation_name = ?
                     AND rfr.rdb$field_name = ?
                   ORDER BY rfr.rdb$relation_name, rfr.rdb$field_position";
 
