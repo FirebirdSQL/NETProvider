@@ -16,7 +16,7 @@
  *  All Rights Reserved.
  * 
  * Contributors:
- *   Jiri Cincura (jiri@cincura.net
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
