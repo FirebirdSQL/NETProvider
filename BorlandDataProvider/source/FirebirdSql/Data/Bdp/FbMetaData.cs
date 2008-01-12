@@ -16,6 +16,7 @@
  * 
  *  Contributors:
  *      Copyright (c) 2006 Rick Hoover
+ *      Jiri Cincura (jiri@cincura.net) 
  *
  *  All Rights Reserved.
  */
@@ -306,7 +307,7 @@ namespace FirebirdSql.Data.Bdp
 				"fld.rdb$field_length AS ColumnSize, " +
 				"fld.rdb$field_precision AS ColumnPrecision, " +
 				"fld.rdb$field_scale AS ColumnScale, " +
-				"rfr.rdb$null_flag AS ColumnNullable " +
+				"coalesce(fld.rdb$null_flag, rfr.rdb$null_flag) AS ColumnNullable " +
 				"FROM " +
 				"rdb$relation_fields rfr " +
 				"left join rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name ");
