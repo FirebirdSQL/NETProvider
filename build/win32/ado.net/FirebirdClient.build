@@ -95,7 +95,7 @@
     />
     <property
       name="current.build.defines"
-      value="${build.defines}NET,NET_20"
+      value="${build.defines}TRACE;DEBUG;NET;NET_20;VISUAL_STUDIO;EXTERNAL_ENGINE"
       dynamic="true"
     />
   </target>
@@ -139,7 +139,9 @@
     <csc  target="library"
           output="${build.dir}/${project::get-name()}.dll"
           debug="${build.debug}"
-          define="${current.build.defines}">
+          define="${current.build.defines}"
+          optimize="true"
+          keyfile="FirebirdSql.Data.FirebirdClient.snk">
 
       <sources basedir="${source.dir}">
         <include name="FirebirdSql/Data/**/*.cs"/>
@@ -154,10 +156,16 @@
         <include name="System.XML.dll"/>
         <include name="System.Windows.Forms.dll"/>
       </references>
-
-      <arg value="/resource:${source.dir}/FirebirdSql/Data/Resources/isc_error_msg.resources,FirebirdSql.Resources.isc_error_msg.resources"/>
-      <arg value="/resource:${source.dir}/FirebirdSql/Data/Schema/FbMetaData.xml,FirebirdSql.Data.Schema.FbMetaData.xml"/>
-      <arg value="/keyfile:FirebirdSql.Data.FirebirdClient.snk" />
+      
+      <resources dynamicprefix="true" prefix="FirebirdSql" basedir="${source.dir}/FirebirdSql/Data">
+        <include name="Resources/isc_error_msg.resources" />
+        <include name="Schema/FbMetaData.xml" />
+        <include name="Entity/ConceptualSchemaDefinition.xml" />
+        <include name="Entity/ProviderManifest.xml" />
+        <include name="Entity/ProviderManifest.xsd" />
+        <include name="Entity/StoreSchemaDefinition.ssdl" />
+        <include name="Entity/StoreSchemaMapping.msl" />
+      </resources>
     </csc>
   </target>
 
