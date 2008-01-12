@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   <copyright file="SampleProviderServices.StoreSchemaMapping.msl" company="Microsoft">
+        Copyright (c) Microsoft Corporation.  All rights reserved.
+   </copyright>
+
+   <Provider_Writer_Tech_Preview_notes>
+        This MSL file maps the conceptual catalog schema for information such as tables, views, columns, etc.
+        to the store-specific schema specified in the corresponding SSDL file
+   </Provider_Writer_Tech_Preview_notes>
+-->
+<Mapping xmlns:cs="urn:schemas-microsoft-com:windows:storage:mapping:CS" cs:Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+  <cs:EntityContainerMapping cs:StorageEntityContainer="Schema" cs:CdmEntityContainer="SchemaInformation">
+    <cs:EntitySetMapping cs:Name="Tables" cs:TableName="STables" cs:TypeName="Provider.Table">
+      <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id" />
+      <cs:ScalarProperty cs:Name="Catalog" cs:ColumnName="Catalog" />
+      <cs:ScalarProperty cs:Name="Schema" cs:ColumnName="Schema" />
+      <cs:ScalarProperty cs:Name="Name" cs:ColumnName="Name" />
+    </cs:EntitySetMapping>
+
+    <cs:EntitySetMapping cs:Name="Columns" cs:TableName="SColumns" cs:TypeName="Provider.Column">
+      <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id" />
+      <cs:ScalarProperty cs:Name="Name" cs:ColumnName="Name" />
+      <cs:ScalarProperty cs:Name="Ordinal" cs:ColumnName="Ordinal" />
+      <cs:ScalarProperty cs:Name="Nullable" cs:ColumnName="Nullable" />
+      <cs:ScalarProperty cs:Name="Type" cs:ColumnName="Type" />
+      <cs:ScalarProperty cs:Name="MaxLength" cs:ColumnName="MaxLength" />
+      <cs:ScalarProperty cs:Name="Precision" cs:ColumnName="Precision" />
+      <cs:ScalarProperty cs:Name="Scale" cs:ColumnName="Scale" />
+      <cs:ScalarProperty cs:Name="StoreGenerated" cs:ColumnName="StoreGenerated" />
+    </cs:EntitySetMapping>
+    
+    <cs:EntitySetMapping cs:Name="PrimaryKeys" cs:TableName="SPrimaryKeys" cs:TypeName="Provider.PrimaryKey">
+      <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id" />
+      <cs:ScalarProperty cs:Name="Name" cs:ColumnName="Name" />
+      <cs:ScalarProperty cs:Name="Ordinal" cs:ColumnName="Ordinal" />
+    </cs:EntitySetMapping>
+
+    <cs:EntitySetMapping cs:Name="Relationships" cs:TableName="SRelationships" cs:TypeName="Provider.Relationship">
+      <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id" />
+      <cs:ScalarProperty cs:Name="Name" cs:ColumnName="Name" />
+    </cs:EntitySetMapping>
+    
+    <cs:EntitySetMapping cs:Name="RelationshipColumnMaps" cs:TableName="SRelationshipColumnMaps" cs:TypeName="Provider.RelationshipColumnMap">
+      <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id" />
+      <cs:ScalarProperty cs:Name="Ordinal" cs:ColumnName="MapOrdinal" />
+    </cs:EntitySetMapping>
+
+    <cs:AssociationSetMapping cs:Name="ColumnPrimaryKeys" cs:TableName="SPrimaryKeys" cs:TypeName="Provider.ColumnPrimaryKey">
+      <cs:EndProperty cs:Name="Column">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="ColumnId"/>
+      </cs:EndProperty>
+      <cs:EndProperty cs:Name="PrimaryKey">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id"/>
+      </cs:EndProperty>
+    </cs:AssociationSetMapping>
+
+    <cs:AssociationSetMapping cs:Name="RelationshipRelationshipColumnMaps" cs:TableName="SRelationshipColumnMaps" cs:TypeName="Provider.RelationshipRelationshipColumnMap">
+      <cs:EndProperty cs:Name="Relationship">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="RelationshipId"/>
+      </cs:EndProperty>
+      <cs:EndProperty cs:Name="RelationshipColumnMap">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id"/>
+      </cs:EndProperty>
+    </cs:AssociationSetMapping>
+
+    <cs:AssociationSetMapping cs:Name="FromColumnRelationshipColumnMaps" cs:TableName="SRelationshipColumnMaps" cs:TypeName="Provider.FromColumnRelationshipColumnMap">
+      <cs:EndProperty cs:Name="Column">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="FromColumnId"/>
+      </cs:EndProperty>
+      <cs:EndProperty cs:Name="RelationshipColumnMap">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id"/>
+      </cs:EndProperty>
+    </cs:AssociationSetMapping>
+
+    <cs:AssociationSetMapping cs:Name="ToColumnRelationshipColumnMaps" cs:TableName="SRelationshipColumnMaps" cs:TypeName="Provider.ToColumnRelationshipColumnMap">
+      <cs:EndProperty cs:Name="Column">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="ToColumnId"/>
+      </cs:EndProperty>
+      <cs:EndProperty cs:Name="RelationshipColumnMap">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id"/>
+      </cs:EndProperty>
+    </cs:AssociationSetMapping>
+
+    <cs:AssociationSetMapping cs:Name="TableColumns" cs:TableName="SColumns" cs:TypeName="Provider.TableColumn">
+      <cs:EndProperty cs:Name="Table">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="TableId"/>
+      </cs:EndProperty>
+      <cs:EndProperty cs:Name="Column">
+        <cs:ScalarProperty cs:Name="Id" cs:ColumnName="Id"/>
+      </cs:EndProperty>
+    </cs:AssociationSetMapping>
+  </cs:EntityContainerMapping>
+</Mapping>
