@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -56,7 +59,7 @@ namespace FirebirdSql.Data.Schema
                     "rfr.rdb$default_source AS COLUMN_DEFAULT, " +
 				    "fld.rdb$computed_source AS COMPUTED_SOURCE, " +
                     "fld.rdb$dimensions AS COLUMN_ARRAY, " +
-                    "rfr.rdb$null_flag AS COLUMN_NULLABLE, " +
+                    "coalesce(fld.rdb$null_flag, rfr.rdb$null_flag) AS COLUMN_NULLABLE, " +
 				    "0 AS IS_READONLY, " +
                     "fld.rdb$field_type AS FIELD_TYPE, " +
                     "null AS CHARACTER_SET_CATALOG, " +
