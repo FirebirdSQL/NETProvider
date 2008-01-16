@@ -95,7 +95,7 @@
     />
     <property
       name="current.build.defines"
-      value="${build.defines}TRACE;DEBUG;NET;NET_20;VISUAL_STUDIO;EXTERNAL_ENGINE"
+      value="${build.defines}TRACE;NET;NET_20;VISUAL_STUDIO;EXTERNAL_ENGINE"
       dynamic="true"
     />
   </target>
