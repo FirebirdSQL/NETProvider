@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -22,7 +25,7 @@ using FirebirdSql.Data.Client.Managed.Version10;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	internal sealed class ClientFactory
+    internal sealed class ClientFactory
     {
         #region · Static Methods ·
 
@@ -78,17 +81,14 @@ namespace FirebirdSql.Data.FirebirdClient
             connection.Connect();
             connection.Identify(options.Database);
 
-            if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION11)
+            switch (connection.ProtocolVersion)
             {
-                return new FirebirdSql.Data.Client.Managed.Version11.GdsDatabase(connection);
-            }
-            else if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION10)
-            {
-                return new FirebirdSql.Data.Client.Managed.Version10.GdsDatabase(connection);
-            }
-            else
-            {
-                throw new NotSupportedException("Protocol not supported.");
+                case IscCodes.PROTOCOL_VERSION11:
+                    return new FirebirdSql.Data.Client.Managed.Version11.GdsDatabase(connection);
+                case IscCodes.PROTOCOL_VERSION10:
+                    return new FirebirdSql.Data.Client.Managed.Version10.GdsDatabase(connection);
+                default:
+                    throw new NotSupportedException("Protocol not supported.");
             }
         }
 
@@ -99,17 +99,14 @@ namespace FirebirdSql.Data.FirebirdClient
             connection.Connect();
             connection.Identify(!String.IsNullOrEmpty(options.Database) ? options.Database : "");
 
-            if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION11)
+            switch (connection.ProtocolVersion)
             {
-                return new FirebirdSql.Data.Client.Managed.Version10.GdsServiceManager(connection);
-            }
-            else if (connection.ProtocolVersion == IscCodes.PROTOCOL_VERSION10)
-            {
-                return new FirebirdSql.Data.Client.Managed.Version10.GdsServiceManager(connection);
-            }
-            else
-            {
-                throw new NotSupportedException("Protocol not supported.");
+                case IscCodes.PROTOCOL_VERSION11:
+                    return new FirebirdSql.Data.Client.Managed.Version10.GdsServiceManager(connection);
+                case IscCodes.PROTOCOL_VERSION10:
+                    return new FirebirdSql.Data.Client.Managed.Version10.GdsServiceManager(connection);
+                default:
+                    throw new NotSupportedException("Protocol not supported.");
             }
         }
         #endregion
@@ -117,8 +114,7 @@ namespace FirebirdSql.Data.FirebirdClient
         #region · Constructors ·
 
         private ClientFactory()
-        {
-        }
+        { }
 
         #endregion
     }
