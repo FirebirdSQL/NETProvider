@@ -21,44 +21,41 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbInfoMessageEventArgs.xml' path='doc/class[@name="FbInfoMessageEventArgs"]/overview/*'/>
-	public sealed class FbInfoMessageEventArgs : EventArgs
-	{
-		#region · Fields ·
+    public sealed class FbInfoMessageEventArgs : EventArgs
+    {
+        #region · Fields ·
 
-		private FbErrorCollection errors = new FbErrorCollection();
-		private string			  message = String.Empty;
+        private FbErrorCollection errors = new FbErrorCollection();
+        private string message = String.Empty;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbInfoMessageEventArgs.xml' path='doc/class[@name="FbInfoMessageEventArgs"]/property[@name="Errors"]/*'/>
-		public FbErrorCollection Errors
-		{
-			get { return this.errors; }
-		}
+        public FbErrorCollection Errors
+        {
+            get { return this.errors; }
+        }
 
-		/// <include file='Doc/en_EN/FbInfoMessageEventArgs.xml' path='doc/class[@name="FbInfoMessageEventArgs"]/property[@name="Message"]/*'/>
-		public string Message
-		{
-			get { return this.message; }
-		}
+        public string Message
+        {
+            get { return this.message; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		internal FbInfoMessageEventArgs(IscException ex)
-		{
-			this.message = ex.Message;
-			
-			foreach (IscError error in ex.Errors)
-			{
-				this.errors.Add(error.Message, error.ErrorCode);
-			}
-		}
+        internal FbInfoMessageEventArgs(IscException ex)
+        {
+            this.message = ex.Message;
 
-		#endregion
-	}
+            foreach (IscError error in ex.Errors)
+            {
+                this.errors.Add(error.Message, error.ErrorCode);
+            }
+        }
+
+        #endregion
+    }
 }

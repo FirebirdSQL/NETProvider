@@ -20,6 +20,5 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbInfoMessageEventArgs.xml' path='doc/delegate[@name="FbInfoMessageEventHandler"]/overview/*'/>
-	public delegate void FbInfoMessageEventHandler(object sender, FbInfoMessageEventArgs e);
+    public delegate void FbInfoMessageEventHandler(object sender, FbInfoMessageEventArgs e);
 }

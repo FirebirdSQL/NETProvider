@@ -20,14 +20,10 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbConfiguration.xml' path='doc/enum[@name="FbShutdownMode"]/overview/*'/>
-	public enum FbShutdownMode
-	{
-		/// <include file='Doc/en_EN/FbConfiguration.xml' path='doc/enum[@name="FbShutdownMode"]/field[@name="Forced"]/*'/>
-		Forced,
-		/// <include file='Doc/en_EN/FbConfiguration.xml' path='doc/enum[@name="FbShutdownMode"]/field[@name="DenyTransaction"]/*'/>
-		DenyTransaction,
-		/// <include file='Doc/en_EN/FbConfiguration.xml' path='doc/enum[@name="FbShutdownMode"]/field[@name="DenyConnection"]/*'/>
-		DenyConnection
-	}
+    public enum FbShutdownMode
+    {
+        Forced,
+        DenyTransaction,
+        DenyConnection
+    }
 }

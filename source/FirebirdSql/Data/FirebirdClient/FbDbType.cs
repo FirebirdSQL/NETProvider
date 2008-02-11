@@ -20,45 +20,27 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/overview/*'/>
 #if (!NETCF)
-	[Serializable]
+    [Serializable]
 #endif
-	public enum FbDbType
-	{
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Array"]/*'/>
-		Array			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="BigInt"]/*'/>
-		BigInt			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Binary"]/*'/>
-		Binary			,
-        /// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Boolean"]/*'/>
+    public enum FbDbType
+    {
+        Array,
+        BigInt,
+        Binary,
         Boolean,
-        /// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Char"]/*'/>
-		Char			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Date"]/*'/>
-		Date			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Decimal"]/*'/>
-		Decimal			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Double"]/*'/>
-		Double			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Float"]/*'/>
-		Float			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Guid"]/*'/>
-		Guid,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Integer"]/*'/>
-		Integer			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Numeric"]/*'/>
-		Numeric			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="SmallInt"]/*'/>
-		SmallInt		,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Text"]/*'/>
-		Text			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="Time"]/*'/>
-		Time			,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="TimeStamp"]/*'/>
-		TimeStamp		,
-		/// <include file='Doc/en_EN/FbDbType.xml' path='doc/enum[@name="FbDbType"]/field[@name="VarChar"]/*'/>
-		VarChar
-	}
+        Char,
+        Date,
+        Decimal,
+        Double,
+        Float,
+        Guid,
+        Integer,
+        Numeric,
+        SmallInt,
+        Text,
+        Time,
+        TimeStamp,
+        VarChar
+    }
 }

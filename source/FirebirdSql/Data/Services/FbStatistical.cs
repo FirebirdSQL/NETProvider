@@ -23,65 +23,61 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/class[@name="FbStatistical"]/overview/*'/>
-	public sealed class FbStatistical : FbService
-	{
-		#region · Fields ·
+    public sealed class FbStatistical : FbService
+    {
+        #region · Fields ·
 
-		private FbStatisticalFlags options;
+        private FbStatisticalFlags options;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/class[@name="FbStatistical"]/property[@name="Options"]/*'/>
-		public FbStatisticalFlags Options
-		{
-			get { return this.options; }
-			set { this.options = value; }
-		}
+        public FbStatisticalFlags Options
+        {
+            get { return this.options; }
+            set { this.options = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/class[@name="FbStatistical"]/constructor[@name="FbStatistical"]/*'/>
-		public FbStatistical() : base()
-		{
-		}
+        public FbStatistical()
+            : base()
+        { }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/class[@name="FbStatistical"]/constructor[@name="Execute"]/*'/>
-		public void Execute()
-		{
-			try
-			{
-				this.StartSpb = this.CreateParameterBuffer();
+        public void Execute()
+        {
+            try
+            {
+                this.StartSpb = this.CreateParameterBuffer();
 
-				// Configure Spb
-				this.StartSpb.Append(IscCodes.isc_action_svc_db_stats);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+                // Configure Spb
+                this.StartSpb.Append(IscCodes.isc_action_svc_db_stats);
+                this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+                this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
-				// Start execution
-				this.StartTask();
+                // Start execution
+                this.StartTask();
 
-				// Process service output
-				this.ProcessServiceOutput();
-			}
+                // Process service output
+                this.ProcessServiceOutput();
+            }
             catch (Exception ex)
             {
                 throw new FbException(ex.Message, ex);
             }
             finally
-			{
-				this.Close();
-			}
-		}
+            {
+                this.Close();
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

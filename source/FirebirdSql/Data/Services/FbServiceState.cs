@@ -23,12 +23,9 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbService.xml'	path='doc/enum[@name="FbServiceState"]/overview/*'/>
-	public enum FbServiceState
-	{
-		/// <include file='Doc/en_EN/FbService.xml'	path='doc/enum[@name="FbServiceState"]/field[@name="Closed"]/*'/>
-		Closed = 0,
-		/// <include file='Doc/en_EN/FbService.xml'	path='doc/enum[@name="FbServiceState"]/field[@name="Open"]/*'/>
-		Open = 1
-	}
+    public enum FbServiceState
+    {
+        Closed = 0,
+        Open = 1
+    }
 }

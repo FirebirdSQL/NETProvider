@@ -22,19 +22,13 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/enum[@name="FbStatisticalFlags"]/overview/*'/>
-	[Flags]
-	public enum FbStatisticalFlags
-	{
-		/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/enum[@name="FbStatisticalFlags"]/field[@name="DataPages"]/*'/>
-		DataPages		= 0x01,
-		/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/enum[@name="FbStatisticalFlags"]/field[@name="DatabaseLog"]/*'/>
-		DatabaseLog		= 0x02,
-		/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/enum[@name="FbStatisticalFlags"]/field[@name="HeaderPages"]/*'/>
-		HeaderPages		= 0x04,
-		/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/enum[@name="FbStatisticalFlags"]/field[@name="IndexPages"]/*'/>
-		IndexPages		= 0x08,
-		/// <include file='Doc/en_EN/FbStatistical.xml'	path='doc/enum[@name="FbStatisticalFlags"]/field[@name="SystemTablesRelations"]/*'/>
-		SystemTablesRelations = 0x10,
-	}
+    [Flags]
+    public enum FbStatisticalFlags
+    {
+        DataPages = 0x01,
+        DatabaseLog = 0x02,
+        HeaderPages = 0x04,
+        IndexPages = 0x08,
+        SystemTablesRelations = 0x10,
+    }
 }

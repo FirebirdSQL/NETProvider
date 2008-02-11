@@ -21,234 +21,227 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbSecurity.xml' path='doc/class[@name="FbSecurity"]/overview/*'/>
-	public sealed class FbSecurity : FbService
-	{
-		#region · Properties ·
+    public sealed class FbSecurity : FbService
+    {
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbSecurity.xml' path='doc/class[@name="FbSecurity"]/property[@name="UsersDbPath"]/*'/>
-		public string UsersDbPath
-		{
-			get
-			{
-				byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_user_dbpath });
+        public string UsersDbPath
+        {
+            get
+            {
+                byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_user_dbpath });
 
-				System.Collections.ArrayList info = this.ParseQueryInfo(buffer);
+                System.Collections.ArrayList info = this.ParseQueryInfo(buffer);
 
-				return info.Count != 0 ? (string)info[0] : null;
-			}
-		}
+                return info.Count != 0 ? (string)info[0] : null;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbSecurity.xml' path='doc/class[@name="FbSecurity"]/constructor[@name="FbSecurity"]/*'/>
-		public FbSecurity() : base()
-		{
-		}
+        public FbSecurity()
+            : base()
+        {
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		/// <include file='Doc/en_EN/FbSecurity.xml' path='doc/class[@name="FbSecurity"]/method[@name="AddUser(FbUserData)"]/*'/>
-		public void AddUser(FbUserData user)
-		{
-			if (user.UserName != null && user.UserName.Length == 0)
-			{
-				throw new InvalidOperationException("Invalid user name.");
-			}
-			if (user.UserPassword != null && user.UserPassword.Length == 0)
-			{
-				throw new InvalidOperationException("Invalid user password.");
-			}
+        public void AddUser(FbUserData user)
+        {
+            if (user.UserName != null && user.UserName.Length == 0)
+            {
+                throw new InvalidOperationException("Invalid user name.");
+            }
+            if (user.UserPassword != null && user.UserPassword.Length == 0)
+            {
+                throw new InvalidOperationException("Invalid user password.");
+            }
 
-			// Configure Spb
-			this.StartSpb = this.CreateParameterBuffer();
+            // Configure Spb
+            this.StartSpb = this.CreateParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_add_user);
+            this.StartSpb.Append(IscCodes.isc_action_svc_add_user);
 
-			this.StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
-			this.StartSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
+            this.StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
+            this.StartSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
 
-			if (user.FirstName != null && user.FirstName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
-			}
+            if (user.FirstName != null && user.FirstName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
+            }
 
-			if (user.MiddleName != null && user.MiddleName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
-			}
+            if (user.MiddleName != null && user.MiddleName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
+            }
 
-			if (user.LastName != null && user.LastName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
-			}
+            if (user.LastName != null && user.LastName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
+            }
 
-			if (user.UserID != 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
-			}
+            if (user.UserID != 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
+            }
 
-			if (user.GroupID != 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
-			}
+            if (user.GroupID != 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
+            }
 
-			if (user.GroupName != null && user.GroupName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
-			}
+            if (user.GroupName != null && user.GroupName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
+            }
 
-			if (user.RoleName != null && user.RoleName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			}
+            if (user.RoleName != null && user.RoleName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
+            }
 
-			// Start execution
-			this.StartTask();
+            // Start execution
+            this.StartTask();
 
-			this.Close();
-		}
+            this.Close();
+        }
 
-		/// <include file='Doc/en_EN/FbSecurity.xml' path='doc/class[@name="FbSecurity"]/method[@name="DeleteUser(FbUserData)"]/*'/>
-		public void DeleteUser(FbUserData user)
-		{
-			if (user.UserName != null && user.UserName.Length == 0)
-			{
-				throw new InvalidOperationException("Invalid user name.");
-			}
+        public void DeleteUser(FbUserData user)
+        {
+            if (user.UserName != null && user.UserName.Length == 0)
+            {
+                throw new InvalidOperationException("Invalid user name.");
+            }
 
-			// Configure Spb
-			this.StartSpb = this.CreateParameterBuffer();
+            // Configure Spb
+            this.StartSpb = this.CreateParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_delete_user);
+            this.StartSpb.Append(IscCodes.isc_action_svc_delete_user);
 
-			this.StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
+            this.StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
 
-			if (user.RoleName != null && user.RoleName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			}
+            if (user.RoleName != null && user.RoleName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
+            }
 
-			// Start execution
-			this.StartTask();
+            // Start execution
+            this.StartTask();
 
-			this.Close();
-		}
+            this.Close();
+        }
 
-		/// <include file='Doc/en_EN/FbSecurity.xml' path='doc/class[@name="FbSecurity"]/method[@name="ModifyUser(FbUserData)"]/*'/>
-		public void ModifyUser(FbUserData user)
-		{
-			if (user.UserName != null && user.UserName.Length == 0)
-			{
-				throw new InvalidOperationException("Invalid user name.");
-			}
-			if (user.UserPassword != null && user.UserPassword.Length == 0)
-			{
-				throw new InvalidOperationException("Invalid user password.");
-			}
+        public void ModifyUser(FbUserData user)
+        {
+            if (user.UserName != null && user.UserName.Length == 0)
+            {
+                throw new InvalidOperationException("Invalid user name.");
+            }
+            if (user.UserPassword != null && user.UserPassword.Length == 0)
+            {
+                throw new InvalidOperationException("Invalid user password.");
+            }
 
-			// Configure Spb
-			this.StartSpb = this.CreateParameterBuffer();
+            // Configure Spb
+            this.StartSpb = this.CreateParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_modify_user);
-			this.StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
+            this.StartSpb.Append(IscCodes.isc_action_svc_modify_user);
+            this.StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
 
-			if (user.UserPassword != null && user.UserPassword.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
-			}
+            if (user.UserPassword != null && user.UserPassword.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
+            }
 
-			if (user.FirstName != null && user.FirstName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
-			}
+            if (user.FirstName != null && user.FirstName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
+            }
 
-			if (user.MiddleName != null && user.MiddleName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
-			}
+            if (user.MiddleName != null && user.MiddleName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
+            }
 
-			if (user.LastName != null && user.LastName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
-			}
+            if (user.LastName != null && user.LastName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
+            }
 
-			this.StartSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
-			this.StartSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
+            this.StartSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
+            this.StartSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
 
-			if (user.GroupName != null && user.GroupName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
-			}
+            if (user.GroupName != null && user.GroupName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
+            }
 
-			if (user.RoleName != null && user.RoleName.Length > 0)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			}
+            if (user.RoleName != null && user.RoleName.Length > 0)
+            {
+                this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
+            }
 
-			// Start execution
-			this.StartTask();
+            // Start execution
+            this.StartTask();
 
-			this.Close();
-		}
+            this.Close();
+        }
 
-		/// <include file='Doc/en_EN/FbSecurity.xml' path='doc/class[@name="FbSecurity"]/method[@name="DisplayUser(System.String)"]/*'/>
-		public FbUserData DisplayUser(string userName)
-		{
-			// Configure Spb
-			this.StartSpb = this.CreateParameterBuffer();
+        public FbUserData DisplayUser(string userName)
+        {
+            // Configure Spb
+            this.StartSpb = this.CreateParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_display_user);
-			this.StartSpb.Append(IscCodes.isc_spb_sec_username, userName);
+            this.StartSpb.Append(IscCodes.isc_action_svc_display_user);
+            this.StartSpb.Append(IscCodes.isc_spb_sec_username, userName);
 
-			// Start execution
-			this.StartTask();
+            // Start execution
+            this.StartTask();
 
-			byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_get_users });
+            byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_get_users });
 
-			System.Collections.ArrayList info = base.ParseQueryInfo(buffer);
+            System.Collections.ArrayList info = base.ParseQueryInfo(buffer);
 
-			this.Close();
+            this.Close();
 
-			if (info.Count == 0)
-			{
-				return null;
-			}
+            if (info.Count == 0)
+            {
+                return null;
+            }
 
-			FbUserData[] users = (FbUserData[])info[0];
+            FbUserData[] users = (FbUserData[])info[0];
 
-			return (users != null && users.Length > 0) ? users[0] : null;
-		}
+            return (users != null && users.Length > 0) ? users[0] : null;
+        }
 
-		/// <include file='Doc/en_EN/FbSecurity.xml' path='doc/class[@name="FbSecurity"]/method[@name="DisplayUsers"]/*'/>
-		public FbUserData[] DisplayUsers()
-		{
-			// Configure Spb
-			this.StartSpb = this.CreateParameterBuffer();
+        public FbUserData[] DisplayUsers()
+        {
+            // Configure Spb
+            this.StartSpb = this.CreateParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_display_user);
+            this.StartSpb.Append(IscCodes.isc_action_svc_display_user);
 
-			// Start execution
-			this.StartTask();
+            // Start execution
+            this.StartTask();
 
-			byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_get_users });
+            byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_get_users });
 
-			System.Collections.ArrayList info = base.ParseQueryInfo(buffer);
+            System.Collections.ArrayList info = base.ParseQueryInfo(buffer);
 
-			this.Close();
+            this.Close();
 
-			if (info.Count == 0)
-			{
-				return null;
-			}
+            if (info.Count == 0)
+            {
+                return null;
+            }
 
-			return (FbUserData[])info[0];
-		}
+            return (FbUserData[])info[0];
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

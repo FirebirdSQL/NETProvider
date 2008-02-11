@@ -20,6 +20,5 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbRowUpdatedEventArgs.xml' path='doc/delegate[@name="FbRowUpdatedEventHandler"]/*'/>
 	public delegate void FbRowUpdatedEventHandler(object sender, FbRowUpdatedEventArgs e);
 }

@@ -20,25 +20,16 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/overview/*'/>
-	[Flags]
-	public enum FbBackupFlags
-	{
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/field[@name="IgnoreChecksums"]/*'/>
-		IgnoreChecksums		= 0x01,
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/field[@name="IgnoreLimbo"]/*'/>
-		IgnoreLimbo			= 0x02,
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/field[@name="MetaDataOnly"]/*'/>
-		MetaDataOnly		= 0x04,
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/field[@name="NoGarbageCollect"]/*'/>
-		NoGarbageCollect	= 0x08,
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/field[@name="OldDescriptions"]/*'/>
-		OldDescriptions		= 0x10,
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/field[@name="NonTransportable"]/*'/>
-		NonTransportable	= 0x20,
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/field[@name="Convert"]/*'/>
-		Convert				= 0x40,
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/enum[@name="FbBackupFlags"]/field[@name="Expand"]/*'/>
-		Expand				= 0x80
-	}
+    [Flags]
+    public enum FbBackupFlags
+    {
+        IgnoreChecksums = 0x01,
+        IgnoreLimbo = 0x02,
+        MetaDataOnly = 0x04,
+        NoGarbageCollect = 0x08,
+        OldDescriptions = 0x10,
+        NonTransportable = 0x20,
+        Convert = 0x40,
+        Expand = 0x80
+    }
 }

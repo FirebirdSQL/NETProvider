@@ -23,46 +23,44 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbLog.xml'	path='doc/class[@name="FbLog"]/overview/*'/>
-	public sealed class FbLog : FbService
-	{
-		#region · Constructors ·
+    public sealed class FbLog : FbService
+    {
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbLog.xml'	path='doc/class[@name="FbLog"]/constructor[@name="ctor"]/*'/>
-		public FbLog() : base()
-		{
-		}
+        public FbLog()
+            : base()
+        {
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		/// <include file='Doc/en_EN/FbLog.xml'	path='doc/class[@name="FbLog"]/method[@name="Execute"]/*'/>
-		public void Execute()
-		{
-			try
-			{
-				// Configure Spb
-				this.StartSpb = this.CreateParameterBuffer();
+        public void Execute()
+        {
+            try
+            {
+                // Configure Spb
+                this.StartSpb = this.CreateParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
+                this.StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
 
-				// Start execution
-				this.StartTask();
+                // Start execution
+                this.StartTask();
 
-				// Process service output
-				this.ProcessServiceOutput();
-			}
+                // Process service output
+                this.ProcessServiceOutput();
+            }
             catch (Exception ex)
             {
                 throw new FbException(ex.Message, ex);
             }
             finally
-			{
-				this.Close();
-			}
-		}
+            {
+                this.Close();
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

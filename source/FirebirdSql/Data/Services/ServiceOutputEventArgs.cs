@@ -20,33 +20,30 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbService.xml'	path='doc/class[@name="ServiceOutputEventArgs"]/overview/*'/>
-	public sealed class ServiceOutputEventArgs : EventArgs
-	{
-		#region · Fields ·
+    public sealed class ServiceOutputEventArgs : EventArgs
+    {
+        #region · Fields ·
 
-		private string message;
+        private string message;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbService.xml'	path='doc/class[@name="ServiceOutputEventArgs"]/property[@name="Message"]/*'/>
-		public string Message
-		{
-			get { return this.message; }
-		}
+        public string Message
+        {
+            get { return this.message; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbService.xml'	path='doc/class[@name="ServiceOutputEventArgs"]/constructor[@name="ctor(System.String)"]/*'/>
-		public ServiceOutputEventArgs(string message)
-		{
-			this.message = message;
-		}
+        public ServiceOutputEventArgs(string message)
+        {
+            this.message = message;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

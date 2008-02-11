@@ -20,6 +20,5 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbRemoteEventEventArgs.xml' path='doc/delegate[@name="FbRemoteEventEventHandler"]/overview/*'/>
 	public delegate void FbRemoteEventEventHandler(object sender, FbRemoteEventEventArgs e);
 }

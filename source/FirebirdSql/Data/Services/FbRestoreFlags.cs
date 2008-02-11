@@ -23,23 +23,15 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/enum[@name="FbRestoreFlags"]/overview/*'/>
 	[Flags]
 	public enum FbRestoreFlags
 	{
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/enum[@name="FbRestoreFlags"]/field[@name="DeactivateIndexes"]/*'/>
 		DeactivateIndexes	= 0x0100,
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/enum[@name="FbRestoreFlags"]/field[@name="NoShadow"]/*'/>
 		NoShadow			= 0x0200,
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/enum[@name="FbRestoreFlags"]/field[@name="NoValidity"]/*'/>
 		NoValidity			= 0x0400,
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/enum[@name="FbRestoreFlags"]/field[@name="IndividualCommit"]/*'/>
 		IndividualCommit	= 0x0800,
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/enum[@name="FbRestoreFlags"]/field[@name="Replace"]/*'/>
 		Replace				= 0x1000,
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/enum[@name="FbRestoreFlags"]/field[@name="Create"]/*'/>
 		Create				= 0x2000,
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/enum[@name="FbRestoreFlags"]/field[@name="UseAllSpace"]/*'/>
 		UseAllSpace			= 0x4000
 	}
 }

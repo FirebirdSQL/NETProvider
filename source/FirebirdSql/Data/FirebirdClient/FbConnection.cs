@@ -31,7 +31,6 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/overview/*'/>
 #if	(!NETCF)
     [DefaultEvent("InfoMessage")]
 #endif
@@ -39,7 +38,6 @@ namespace FirebirdSql.Data.FirebirdClient
     {
         #region · Static Properties ·
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/property[@name="ConnectionPoolsCount"]/*'/>
         public static int ConnectionPoolsCount
         {
             get { return FbPoolManager.Instance.PoolsCount; }
@@ -49,19 +47,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Static Pool Handling Methods ·
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="GetPooledConnectionCount(FbConnection)"]/*'/>
         public static int GetPooledConnectionCount(FbConnection connection)
         {
             return FbPoolManager.Instance.GetPooledConnectionCount(connection.ConnectionString);
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="ClearAllPools"]/*'/>
         public static void ClearAllPools()
         {
             FbPoolManager.Instance.ClearAllPools();
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="ClearPool(FbConnection)"]/*'/>
         public static void ClearPool(FbConnection connection)
         {
             FbPoolManager.Instance.ClearPool(connection.ConnectionString);
@@ -71,19 +66,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Static Database Creation/Drop methods ·
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="CreateDatabase(System.String)"]/*'/>
         public static void CreateDatabase(string connectionString)
         {
             FbConnection.CreateDatabase(connectionString, 4096, true, false);
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="CreateDatabase(System.String, System.Boolean)"]/*'/>
         public static void CreateDatabase(string connectionString, bool overwrite)
         {
             FbConnection.CreateDatabase(connectionString, 4096, true, overwrite);
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="CreateDatabase(System.String,System.Int32,System.Boolean,System.Boolean)"]/*'/>
         public static void CreateDatabase(string connectionString, int pageSize, bool forcedWrites, bool overwrite)
         {
             FbConnectionString options = new FbConnectionString(connectionString);
@@ -146,7 +138,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="DropDatabase(System.String)"]/*'/>
         public static void DropDatabase(string connectionString)
         {
             // Configure Attachment
@@ -169,27 +160,24 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Events ·
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/event[@name="StateChange"]/*'/>
         public override event StateChangeEventHandler StateChange;
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/event[@name="InfoMessage"]/*'/>
         public event FbInfoMessageEventHandler InfoMessage;
 
         #endregion
 
         #region · Fields ·
 
-        private FbConnectionInternal    innerConnection;
-        private ConnectionState         state;
-        private FbConnectionString      options;
-        private bool                    disposed;
-        private string                  connectionString;
+        private FbConnectionInternal innerConnection;
+        private ConnectionState state;
+        private FbConnectionString options;
+        private bool disposed;
+        private string connectionString;
 
         #endregion
 
         #region · Properties ·
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/property[@name="ConnectionString"]/*'/>
 #if	(NET)
         [Category("Data")]
         [SettingsBindable(true)]
@@ -218,7 +206,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/property[@name="ConnectionTimeout"]/*'/>
 #if	(!NETCF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -227,7 +214,6 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.options.ConnectionTimeout; }
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/property[@name="Database"]/*'/>
 #if	(!NETCF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -236,7 +222,6 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.options.Database; }
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/property[@name="DataSource"]/*'/>
 #if	(!NETCF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -245,7 +230,6 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.options.DataSource; }
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/property[@name="ServerVersion"]/*'/>
 #if	(!NETCF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -268,7 +252,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/property[@name="State"]/*'/>
 #if	(!NETCF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -278,7 +261,6 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.state; }
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/property[@name="PacketSize"]/*'/>
 #if	(!NETCF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -323,19 +305,17 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Constructors ·
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/constructor[@name="ctor"]/*'/>
         public FbConnection()
             : this(null)
         {
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/constructor[@name="ctor(System.String)"]/*'/>	
         public FbConnection(string connectionString)
             : base()
         {
-            this.options            = new FbConnectionString();
-            this.state              = ConnectionState.Closed;
-            this.connectionString   = "";
+            this.options = new FbConnectionString();
+            this.state = ConnectionState.Closed;
+            this.connectionString = "";
 
             if (!String.IsNullOrEmpty(connectionString))
             {
@@ -347,7 +327,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · IDisposable methods ·
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="Dispose(System.Boolean)"]/*'/>
         protected override void Dispose(bool disposing)
         {
             lock (this)
@@ -403,13 +382,11 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.BeginTransaction(level, null);
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="BeginTransaction(System.String)"]/*'/>
         public FbTransaction BeginTransaction(string transactionName)
         {
             return this.BeginTransaction(IsolationLevel.ReadCommitted, transactionName);
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="BeginTransaction(System.Data.IsolationLevel,System.String)"]/*'/>
         public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
         {
             if (this.IsClosed)
@@ -420,13 +397,11 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.innerConnection.BeginTransaction(level, transactionName);
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="BeginTransaction(FbTransactionOptions)"]/*'/>
         public FbTransaction BeginTransaction(FbTransactionOptions options)
         {
             return this.BeginTransaction(options, null);
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="BeginTransaction(FbTransactionOptions, System.String)"]/*'/>
         public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
         {
             if (this.IsClosed)
@@ -473,19 +448,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Database Schema Methods ·
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="GetSchema"]/*'/>
         public override DataTable GetSchema()
         {
             return this.GetSchema("MetaDataCollections");
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="GetSchema(System.String)"]/*'/>
         public override DataTable GetSchema(string collectionName)
         {
             return this.GetSchema(collectionName, null);
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="GetSchema(System.String, System.String[])"]/*'/>
         public override DataTable GetSchema(string collectionName, string[] restrictions)
         {
             if (this.IsClosed)
@@ -505,7 +477,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return (FbCommand)this.CreateDbCommand();
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="ChangeDatabase(System.String)"]/*'/>
         public override void ChangeDatabase(string db)
         {
 #if (!NETCF)
@@ -546,7 +517,6 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="Open"]/*'/>
         public override void Open()
         {
             lock (this)
@@ -606,7 +576,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         }
 
                         throw;
-                    } 
+                    }
 #endif
 
                     // Bind	Warning	messages event
@@ -628,7 +598,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="Close"]/*'/>
         public override void Close()
         {
             if (!this.IsClosed && this.innerConnection != null)

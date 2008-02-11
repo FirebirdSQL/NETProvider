@@ -20,27 +20,24 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbRemoteEventEventArgs.xml' path='doc/class[@name="FbRemoteEventEventArgs"]/overview/*'/>
-	public sealed class FbRemoteEventEventArgs : System.ComponentModel.CancelEventArgs
-	{
+    public sealed class FbRemoteEventEventArgs : System.ComponentModel.CancelEventArgs
+    {
         #region · Fields ·
 
-        private string  name;
-        private int     counts;
+        private string name;
+        private int counts;
 
         #endregion
 
         #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbRemoteEventEventArgs.xml' path='doc/class[@name="FbRemoteEventEventArgs"]/property[@name="Name"]/*'/>
-		public string Name
-		{
+        public string Name
+        {
             get { return this.name; }
         }
 
-		/// <include file='Doc/en_EN/FbRemoteEventEventArgs.xml' path='doc/class[@name="FbRemoteEventEventArgs"]/property[@name="Counts"]/*'/>
-		public int Counts
-		{
+        public int Counts
+        {
             get { return this.counts; }
         }
 
@@ -48,15 +45,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbRemoteEventEventArgs.xml' path='doc/class[@name="FbRemoteEventEventArgs"]/constructor[@name="ctor(System.String,System.Int32)"]/*'/>
-		public FbRemoteEventEventArgs(string name, int counts) : this(name, counts, false)
-        {
-        }
+        public FbRemoteEventEventArgs(string name, int counts)
+            : this(name, counts, false)
+        { }
 
-		/// <include file='Doc/en_EN/FbRemoteEventEventArgs.xml' path='doc/class[@name="FbRemoteEventEventArgs"]/constructor[@name="ctor(System.String,System.Int32,System.Boolean)"]/*'/>
-		public FbRemoteEventEventArgs(string name, int counts, bool cancel) : base(cancel)
-		{
-            this.name   = name;
+        public FbRemoteEventEventArgs(string name, int counts, bool cancel)
+            : base(cancel)
+        {
+            this.name = name;
             this.counts = counts;
         }
 
