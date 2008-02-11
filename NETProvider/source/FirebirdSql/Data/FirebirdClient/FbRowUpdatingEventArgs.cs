@@ -22,12 +22,10 @@ using System.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbRowUpdatingEventArgs.xml' path='doc/class[@name="FbRowUpdatingEventArgs"]/overview/*'/>
 	public sealed class FbRowUpdatingEventArgs : RowUpdatingEventArgs
 	{
 		#region · Properties ·
 
-		/// <include file='Doc/en_EN/FbRowUpdatingEventArgs.xml' path='doc/class[@name="FbRowUpdatingEventArgs"]/property[@name="Command"]/*'/>
 		public new FbCommand Command
 		{
 			get  { return (FbCommand)base.Command; }
@@ -38,7 +36,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbRowUpdatingEventArgs.xml' path='doc/class[@name="FbRowUpdatingEventArgs"]/constructor[@name="ctor(DataRow,IDbCommand,StatementType,DataTableMapping)"]/*'/>
 		public FbRowUpdatingEventArgs(
 			DataRow				row, 
 			IDbCommand			command, 

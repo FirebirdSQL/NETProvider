@@ -20,6 +20,5 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbService.xml'	path='doc/delegate[@name="ServiceOutputEventHandler(System.Object,ServiceOutputEventArgs)"]/*'/>
-	public delegate void ServiceOutputEventHandler(object sender, ServiceOutputEventArgs e);
+    public delegate void ServiceOutputEventHandler(object sender, ServiceOutputEventArgs e);
 }

@@ -30,7 +30,6 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/overview/*'/>
     public sealed class FbDataReader : DbDataReader
     {
         #region · Constants ·
@@ -56,13 +55,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · DbDataReader Indexers ·
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/indexer[@name="Item(System.Int32)"]/*'/>
         public override object this[int i]
         {
             get { return this.GetValue(i); }
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/indexer[@name="Item(System.String)"]/*'/>
         public override object this[String name]
         {
             get { return this.GetValue(this.GetOrdinal(name)); }
@@ -95,7 +92,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Finalizer ·
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/destructor[@name="Finalize"]/*'/>
         ~FbDataReader()
         {
             this.Dispose(false);
@@ -131,7 +127,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · DbDataReader overriden Properties ·
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/property[@name="Depth"]/*'/>
         public override int Depth
         {
             get
@@ -142,19 +137,16 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/property[@name="HasRows"]/*'/>
         public override bool HasRows
         {
             get { return this.command.IsSelectCommand; }
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/property[@name="IsClosed"]/*'/>
         public override bool IsClosed
         {
             get { return this.isClosed; }
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/property[@name="FieldCount"]/*'/>
         public override int FieldCount
         {
             get
@@ -165,7 +157,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/property[@name="RecordsAffected"]/*'/>
         public override int RecordsAffected
         {
             get { return this.recordsAffected; }
@@ -185,7 +176,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · DbDataReader overriden methods ·
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="Close"]/*'/>
         public override void Close()
         {
             if (!this.IsClosed)
@@ -231,7 +221,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="Read"]/*'/>
         public override bool Read()
         {
             this.CheckState();
@@ -266,7 +255,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return retValue;
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetSchemaTable"]/*'/>
         public override DataTable GetSchemaTable()
         {
             this.CheckState();
@@ -378,7 +366,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return schemaTable;
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetOrdinal(System.String)"]/*'/>
         public override int GetOrdinal(string name)
         {
             this.CheckState();
@@ -394,7 +381,6 @@ namespace FirebirdSql.Data.FirebirdClient
             throw new IndexOutOfRangeException("Could not find specified column in results.");
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetName(System.Int32)"]/*'/>
         public override string GetName(int i)
         {
             this.CheckState();
@@ -410,7 +396,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetDataTypeName(System.Int32)"]/*'/>
         public override string GetDataTypeName(int i)
         {
             this.CheckState();
@@ -419,7 +404,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return TypeHelper.GetDataTypeName(this.fields[i].DbDataType);
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetFieldType(System.Int32)"]/*'/>
         public override Type GetFieldType(int i)
         {
             this.CheckState();
@@ -443,7 +427,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.GetValues(values);
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetValue(System.Int32)"]/*'/>
         public override object GetValue(int i)
         {
             this.CheckState();
@@ -453,7 +436,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].Value;
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetValues(System.Array)"]/*'/>
         public override int GetValues(object[] values)
         {
             this.CheckState();
@@ -467,7 +449,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return values.Length;
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetBoolean(System.Int32)"]/*'/>
         public override bool GetBoolean(int i)
         {
             this.CheckPosition();
@@ -475,7 +456,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetBoolean();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetByte(System.Int32)"]/*'/>
         public override byte GetByte(int i)
         {
             this.CheckPosition();
@@ -484,7 +464,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetByte();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetBytes(System.Int32,System.Int64,System.Byte[],System.Int32,System.Int32)"]/*'/>
         public override long GetBytes(
             int i,
             long dataIndex,
@@ -531,7 +510,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return bytesRead;
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetChar(System.Int32)"]/*'/>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override char GetChar(int i)
         {
@@ -541,7 +519,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetChar();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetChars(System.Int32,System.Int64,System.Char[],System.Int32,System.Int32)"]/*'/>
         public override long GetChars(
             int i,
             long dataIndex,
@@ -591,7 +568,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return charsRead;
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetGuid(System.Int32)"]/*'/>
         public override Guid GetGuid(int i)
         {
             this.CheckPosition();
@@ -601,7 +577,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetGuid();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetInt16(System.Int32)"]/*'/>
         public override Int16 GetInt16(int i)
         {
             this.CheckPosition();
@@ -610,7 +585,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetInt16();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetInt32(System.Int32)"]/*'/>
         public override Int32 GetInt32(int i)
         {
             this.CheckPosition();
@@ -619,7 +593,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetInt32();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetInt64(System.Int32)"]/*'/>		
         public override Int64 GetInt64(int i)
         {
             this.CheckPosition();
@@ -628,7 +601,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetInt64();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetFloat(System.Int32)"]/*'/>
         public override float GetFloat(int i)
         {
             this.CheckPosition();
@@ -637,7 +609,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetFloat();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetDouble(System.Int32)"]/*'/>
         public override double GetDouble(int i)
         {
             this.CheckPosition();
@@ -646,7 +617,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetDouble();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetString(System.Int32)"]/*'/>
         public override string GetString(int i)
         {
             this.CheckPosition();
@@ -655,7 +625,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetString();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetDecimal(System.Int32)"]/*'/>
         public override Decimal GetDecimal(int i)
         {
             this.CheckPosition();
@@ -664,7 +633,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetDecimal();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="GetDateTime(System.Int32)"]/*'/>
         public override DateTime GetDateTime(int i)
         {
             this.CheckPosition();
@@ -674,7 +642,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].GetDateTime();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="IsDBNull(System.Int32)"]/*'/>
         public override bool IsDBNull(int i)
         {
             this.CheckPosition();
@@ -683,7 +650,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.row[i].IsDBNull();
         }
 
-        /// <include file='Doc/en_EN/FbDataReader.xml' path='doc/class[@name="FbDataReader"]/method[@name="IEnumerable.GetEnumerator"]/*'/>
         public override IEnumerator GetEnumerator()
         {
             return new DbEnumerator(this, this.IsCommandBehavior(CommandBehavior.CloseConnection));

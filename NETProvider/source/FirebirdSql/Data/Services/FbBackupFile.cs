@@ -20,43 +20,39 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackupFile"]/overview/*'/
-	public class FbBackupFile
-	{
-		#region · Fields ·
+    public class FbBackupFile
+    {
+        #region · Fields ·
 
-		private string	backupFile;
-		private int		backupLength;
+        private string backupFile;
+        private int backupLength;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackupFile"]/property[@name="BackupFile"]/*'/>
-		public string BackupFile
-		{
-			get { return this.backupFile; }
-			set { this.backupFile = value; }
-		}
+        public string BackupFile
+        {
+            get { return this.backupFile; }
+            set { this.backupFile = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackupFile"]/property[@name="BackupLength"]/*'/>
-		public int BackupLength
-		{
-			get { return this.backupLength; }
-			set { this.backupLength = value; }
-		}
+        public int BackupLength
+        {
+            get { return this.backupLength; }
+            set { this.backupLength = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackupFile"]/constructor[@name="ctor(system.String,System.Int32)"]/*'/>
-		public FbBackupFile(string fileName, int fileLength)
-		{
-			this.backupFile		= fileName;
-			this.backupLength	= fileLength;
-		}
+        public FbBackupFile(string fileName, int fileLength)
+        {
+            this.backupFile = fileName;
+            this.backupLength = fileLength;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

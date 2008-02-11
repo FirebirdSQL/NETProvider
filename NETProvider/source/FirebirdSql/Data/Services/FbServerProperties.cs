@@ -23,108 +23,98 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/overview/*'/>
-	public sealed class FbServerProperties : FbService
-	{
-		#region · Properties ·
+    public sealed class FbServerProperties : FbService
+    {
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/property[@name="Version"]/*'/>
-		public int Version
-		{
-			get { return this.GetInt32(IscCodes.isc_info_svc_version); }
-		}
+        public int Version
+        {
+            get { return this.GetInt32(IscCodes.isc_info_svc_version); }
+        }
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/property[@name="ServerVersion"]/*'/>
-		public string ServerVersion
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_server_version); }
-		}
+        public string ServerVersion
+        {
+            get { return this.GetString(IscCodes.isc_info_svc_server_version); }
+        }
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/property[@name="Implementation"]/*'/>
-		public string Implementation
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_implementation); }
-		}
+        public string Implementation
+        {
+            get { return this.GetString(IscCodes.isc_info_svc_implementation); }
+        }
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/property[@name="RootDirectory"]/*'/>
-		public string RootDirectory
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_get_env); }
-		}
+        public string RootDirectory
+        {
+            get { return this.GetString(IscCodes.isc_info_svc_get_env); }
+        }
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/property[@name="LockManager"]/*'/>
-		public string LockManager
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_get_env_lock); }
-		}
+        public string LockManager
+        {
+            get { return this.GetString(IscCodes.isc_info_svc_get_env_lock); }
+        }
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/property[@name="MessageFile"]/*'/>
-		public string MessageFile
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_get_env_msg); }
-		}
+        public string MessageFile
+        {
+            get { return this.GetString(IscCodes.isc_info_svc_get_env_msg); }
+        }
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/property[@name="DatabasesInfo"]/*'/>
-		public FbDatabasesInfo DatabasesInfo
-		{
-			get
-			{
-				ArrayList info = this.GetInfo(IscCodes.isc_info_svc_svr_db_info);
+        public FbDatabasesInfo DatabasesInfo
+        {
+            get
+            {
+                ArrayList info = this.GetInfo(IscCodes.isc_info_svc_svr_db_info);
 
-				return info.Count != 0 ? (FbDatabasesInfo)info[0] : new FbDatabasesInfo();
-			}
-		}
+                return info.Count != 0 ? (FbDatabasesInfo)info[0] : new FbDatabasesInfo();
+            }
+        }
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/property[@name="ServerConfig"]/*'/>
-		public FbServerConfig ServerConfig
-		{
-			get
-			{
-				ArrayList info = this.GetInfo(IscCodes.isc_info_svc_get_config);
+        public FbServerConfig ServerConfig
+        {
+            get
+            {
+                ArrayList info = this.GetInfo(IscCodes.isc_info_svc_get_config);
 
-				return info.Count != 0 ? (FbServerConfig)info[0] : new FbServerConfig();
-			}
-		}
+                return info.Count != 0 ? (FbServerConfig)info[0] : new FbServerConfig();
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbServerProperties.xml' path='doc/class[@name="FbServerProperties"]/constructor[@name="FbServerProperties"]/*'/>
-		public FbServerProperties() : base()
-		{
-		}
+        public FbServerProperties()
+            : base()
+        { }
 
-		#endregion
+        #endregion
 
-		#region · Private Methods ·
+        #region · Private Methods ·
 
-		private string GetString(int item)
-		{
-			ArrayList info = this.GetInfo(item);
+        private string GetString(int item)
+        {
+            ArrayList info = this.GetInfo(item);
 
-			return info.Count != 0 ? (string)info[0] : null;
-		}
+            return info.Count != 0 ? (string)info[0] : null;
+        }
 
-		private int GetInt32(int item)
-		{
-			ArrayList info = this.GetInfo(item);
+        private int GetInt32(int item)
+        {
+            ArrayList info = this.GetInfo(item);
 
-			return info.Count != 0 ? (int)info[0] : 0;
-		}
+            return info.Count != 0 ? (int)info[0] : 0;
+        }
 
-		private ArrayList GetInfo(int item)
-		{
-			return this.GetInfo(new byte[] { (byte)item });
-		}
+        private ArrayList GetInfo(int item)
+        {
+            return this.GetInfo(new byte[] { (byte)item });
+        }
 
-		private ArrayList GetInfo(byte[] items)
-		{
-			byte[] buffer = this.QueryService(items);
+        private ArrayList GetInfo(byte[] items)
+        {
+            byte[] buffer = this.QueryService(items);
 
-			return this.ParseQueryInfo(buffer);
-		}
+            return this.ParseQueryInfo(buffer);
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

@@ -23,70 +23,67 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbValidation.xml' path='doc/class[@name="FbValidation"]/overview/*'/>
-	public sealed class FbValidation : FbService
-	{
-		#region · Fields ·
+    public sealed class FbValidation : FbService
+    {
+        #region · Fields ·
 
-		private FbValidationFlags options;
+        private FbValidationFlags options;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/class[@name="FbValidation"]/property[@name="Options"]/*'/>
-		public FbValidationFlags Options
-		{
-			get { return this.options; }
-			set { this.options = value; }
-		}
+        public FbValidationFlags Options
+        {
+            get { return this.options; }
+            set { this.options = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/class[@name="FbValidation"]/constructor[@name="ctor"]/*'/>
-		public FbValidation() : base()
-		{
-		}
+        public FbValidation()
+            : base()
+        {
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/class[@name="FbValidation"]/method[@name="Execute"]/*'/>
-		public void Execute()
-		{
+        public void Execute()
+        {
             if (String.IsNullOrEmpty(this.Database))
             {
                 throw new FbException("Validation should be used against a specific database");
             }
 
-			try
-			{
-				this.StartSpb = this.CreateParameterBuffer();
+            try
+            {
+                this.StartSpb = this.CreateParameterBuffer();
 
-				// Configure Spb
-				this.StartSpb.Append(IscCodes.isc_action_svc_repair);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+                // Configure Spb
+                this.StartSpb.Append(IscCodes.isc_action_svc_repair);
+                this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+                this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
-				// Start execution
-				this.StartTask();
+                // Start execution
+                this.StartTask();
 
-				// Process service output
-				this.ProcessServiceOutput();
-			}
+                // Process service output
+                this.ProcessServiceOutput();
+            }
             catch (Exception ex)
             {
                 throw new FbException(ex.Message, ex);
             }
             finally
-			{
-				this.Close();
-			}
-		}
+            {
+                this.Close();
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

@@ -31,7 +31,6 @@ namespace FirebirdSql.Data.FirebirdClient
     {
         #region · Static Methods ·
 
-        /// <include file='Doc/en_EN/FbCommandBuilder.xml' path='doc/class[@name="FbCommandBuilder"]/method[@name="DeriveParameters(FbCommand)"]/*'/>
         public static void DeriveParameters(FbCommand command)
         {
             if (command.CommandType != CommandType.StoredProcedure)
@@ -100,7 +99,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Fields ·
 
-		private FbRowUpdatingEventHandler rowUpdatingHandler;
+        private FbRowUpdatingEventHandler rowUpdatingHandler;
 
         #endregion
 
@@ -114,14 +113,14 @@ namespace FirebirdSql.Data.FirebirdClient
         public override string QuotePrefix
         {
             get { return base.QuotePrefix; }
-            set             
+            set
             {
                 if (String.IsNullOrEmpty(value))
                 {
                     base.QuotePrefix = value;
                 }
                 else
-                {                    
+                {
                     base.QuotePrefix = "\"";
                 }
             }
@@ -135,7 +134,7 @@ namespace FirebirdSql.Data.FirebirdClient
         public override string QuoteSuffix
         {
             get { return base.QuoteSuffix; }
-            set 
+            set
             {
                 if (String.IsNullOrEmpty(value))
                 {
@@ -161,15 +160,17 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Constructors ·
 
-        public FbCommandBuilder() : this(null)
+        public FbCommandBuilder()
+            : this(null)
         {
         }
 
-        public FbCommandBuilder(FbDataAdapter adapter) : base()
+        public FbCommandBuilder(FbDataAdapter adapter)
+            : base()
         {
-            this.DataAdapter    = adapter;
-            this.QuotePrefix    = "\"";
-            this.QuoteSuffix    = "\"";
+            this.DataAdapter = adapter;
+            this.QuotePrefix = "\"";
+            this.QuoteSuffix = "\"";
             this.ConflictOption = ConflictOption.OverwriteChanges;
         }
 
@@ -280,19 +281,19 @@ namespace FirebirdSql.Data.FirebirdClient
                 throw new InvalidOperationException("adapter needs to be a FbDataAdapter");
             }
 
-			this.rowUpdatingHandler = new FbRowUpdatingEventHandler(this.RowUpdatingHandler);
+            this.rowUpdatingHandler = new FbRowUpdatingEventHandler(this.RowUpdatingHandler);
             ((FbDataAdapter)adapter).RowUpdating += this.rowUpdatingHandler;
         }
 
         #endregion
 
-		#region · Event Handlers ·
+        #region · Event Handlers ·
 
-		private void RowUpdatingHandler(object sender, FbRowUpdatingEventArgs e)
-		{
+        private void RowUpdatingHandler(object sender, FbRowUpdatingEventArgs e)
+        {
             base.RowUpdatingHandler(e);
-		}
+        }
 
-		#endregion
+        #endregion
     }
 }

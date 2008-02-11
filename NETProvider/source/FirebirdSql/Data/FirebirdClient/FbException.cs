@@ -20,45 +20,43 @@ using System;
 using System.ComponentModel;
 using System.Data.Common;
 #if (!NETCF)
-	using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 #endif
 using System.Security.Permissions;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbException.xml' path='doc/class[@name="FbException"]/overview/*'/>
 #if (!NETCF)
-	[Serializable] 
-	public sealed class FbException : DbException
+    [Serializable]
+    public sealed class FbException : DbException
 #else
 	public sealed class FbException : SystemException
 #endif
-	{
-		#region · Fields ·
-		
-		private FbErrorCollection errors;
-		
-		#endregion
+    {
+        #region · Fields ·
 
-		#region · Properties ·
+        private FbErrorCollection errors;
 
-		/// <include file='Doc/en_EN/FbException.xml' path='doc/class[@name="FbException"]/property[@name="Errors"]/*'/>
+        #endregion
+
+        #region · Properties ·
+
 #if (!NETCF)
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 #endif
-		public FbErrorCollection Errors
-		{
-			get 
+        public FbErrorCollection Errors
+        {
+            get
             {
                 if (this.errors == null)
                 {
                     this.errors = new FbErrorCollection();
                 }
 
-                return this.errors; 
+                return this.errors;
             }
-		}
+        }
 
 #if (!NETCF)
 
@@ -77,68 +75,67 @@ namespace FirebirdSql.Data.FirebirdClient
 
 #endif
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		internal FbException() 
-			: base()
-		{
-		}
+        internal FbException()
+            : base()
+        {
+        }
 
-		internal FbException(string message) 
-			: base(message)
-		{
-		}
+        internal FbException(string message)
+            : base(message)
+        {
+        }
 
-		internal FbException(string message, Exception innerException) 
-			: base(message, innerException)
-		{
+        internal FbException(string message, Exception innerException)
+            : base(message, innerException)
+        {
             if (innerException is IscException)
             {
                 this.GetIscExceptionErrors((IscException)innerException);
             }
-		}
+        }
 
 #if (!NETCF)
 
-		internal FbException(SerializationInfo info, StreamingContext context)
-			: base(info, context)
-		{
-			this.errors	 = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
-		}
+        internal FbException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
+        }
 
 #endif
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
 #if (!NETCF)
 
-		/// <include file='Doc/en_EN/FbException.xml' path='doc/class[@name="FbException"]/method[@name="GetObjectData(SerializationInfo, StreamingContext)"]/*'/>
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter=true)]
-		public override void GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			info.AddValue("errors", this.errors);
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("errors", this.errors);
 
-			base.GetObjectData(info, context);
-		}
+            base.GetObjectData(info, context);
+        }
 
 #endif
 
-		#endregion
+        #endregion
 
-		#region · Internal Methods ·
+        #region · Internal Methods ·
 
-		internal void GetIscExceptionErrors(IscException innerException)
-		{
+        internal void GetIscExceptionErrors(IscException innerException)
+        {
             foreach (IscError error in innerException.Errors)
-			{
-				this.Errors.Add(error.Message, error.ErrorCode);
-			}
-		}
+            {
+                this.Errors.Add(error.Message, error.ErrorCode);
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

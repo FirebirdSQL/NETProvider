@@ -28,7 +28,6 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    /// <include file='Doc/en_EN/FbErrorCollection.xml' path='doc/class[@name="FbErrorCollection"]/overview/*'/>
 #if (!NETCF)
     [Serializable, ListBindable(false)]
 #endif
@@ -42,7 +41,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Indexers ·
 
-        /// <include file='Doc/en_EN/FbErrorCollection.xml' path='doc/class[@name="FbErrorCollection"]/indexer[@name="Item(System.Int32)"]/*'/>
         public FbError this[int index]
         {
             get { return this.errors[index]; }
@@ -61,7 +59,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · ICollection Properties ·
 
-        /// <include file='Doc/en_EN/FbErrorCollection.xml' path='doc/class[@name="FbErrorCollection"]/property[@name="Count"]/*'/>
         public int Count
         {
             get { return this.errors.Count; }
@@ -83,7 +80,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · ICollection Methods ·
 
-        /// <include file='Doc/en_EN/FbErrorCollection.xml' path='doc/class[@name="FbErrorCollection"]/method[@name="CopyTo(System.Array,System.Int32)"]/*'/>	
         public void CopyTo(Array array, int index)
         {
             ((ICollection)this.errors).CopyTo(array, index);
@@ -102,7 +98,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Internal Methods ·
 
-        /// <include file='Doc/en_EN/FbErrorCollection.xml' path='doc/class[@name="FbErrorCollection"]/method[@name="IndexOf(System.String)"]/*'/>		
         internal int IndexOf(string errorMessage)
         {
             int index = 0;
@@ -118,7 +113,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return -1;
         }
 
-        /// <include file='Doc/en_EN/FbErrorCollection.xml' path='doc/class[@name="FbErrorCollection"]/method[@name="Add(FbError)"]/*'/>
         internal FbError Add(FbError error)
         {
             this.errors.Add(error);
@@ -126,7 +120,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return error;
         }
 
-        /// <include file='Doc/en_EN/FbErrorCollection.xml' path='doc/class[@name="FbErrorCollection"]/method[@name="Add(System.String,System.Int32)"]/*'/>
         internal FbError Add(string errorMessage, int number)
         {
             return this.Add(new FbError(errorMessage, number));

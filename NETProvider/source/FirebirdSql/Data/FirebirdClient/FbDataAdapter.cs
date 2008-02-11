@@ -29,10 +29,9 @@ using System.Collections.Generic;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/overview/*'/>
 #if (NET)
-	[DefaultEvent("RowUpdated")]
-#endif	
+    [DefaultEvent("RowUpdated")]
+#endif
     public sealed class FbDataAdapter : DbDataAdapter, ICloneable
     {
         #region · Static Fields ·
@@ -44,7 +43,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Events ·
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/event[@name="RowUpdated"]/*'/>
         public event FbRowUpdatedEventHandler RowUpdated
         {
             add
@@ -58,7 +56,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/event[@name="RowUpdating"]/*'/>
         public event FbRowUpdatingEventHandler RowUpdating
         {
             add
@@ -83,10 +80,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Properties ·
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/property[@name="SelectCommand"]/*'/>
 #if (!NETCF)
-		[Category("Fill")]
-		[DefaultValue(null)]
+        [Category("Fill")]
+        [DefaultValue(null)]
 #endif
         public new FbCommand SelectCommand
         {
@@ -94,10 +90,9 @@ namespace FirebirdSql.Data.FirebirdClient
             set { base.SelectCommand = value; }
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/property[@name="InsertCommand"]/*'/>
-#if (!NETCF)        
-		[Category("Update")]
-		[DefaultValue(null)]
+#if (!NETCF)
+        [Category("Update")]
+        [DefaultValue(null)]
 #endif
         public new FbCommand InsertCommand
         {
@@ -105,10 +100,9 @@ namespace FirebirdSql.Data.FirebirdClient
             set { base.InsertCommand = value; }
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/property[@name="UpdateCommand"]/*'/>		
 #if (!NETCF)
-		[Category("Update")]
-		[DefaultValue(null)]
+        [Category("Update")]
+        [DefaultValue(null)]
 #endif
         public new FbCommand UpdateCommand
         {
@@ -116,10 +110,9 @@ namespace FirebirdSql.Data.FirebirdClient
             set { base.UpdateCommand = value; }
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/property[@name="DeleteCommand"]/*'/>
 #if (!NETCF)
-		[Category("Update")]
-		[DefaultValue(null)]
+        [Category("Update")]
+        [DefaultValue(null)]
 #endif
         public new FbCommand DeleteCommand
         {
@@ -131,27 +124,26 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Constructors ·
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/constructor[@name="ctor"]/*'/>
-        public FbDataAdapter() : base()
+        public FbDataAdapter()
+            : base()
         {
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/constructor[@name="ctor(FbCommand)"]/*'/>
-        public FbDataAdapter(FbCommand selectCommand) : base()
+        public FbDataAdapter(FbCommand selectCommand)
+            : base()
         {
             this.SelectCommand = selectCommand;
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/constructor[@name="ctor(System.String,System.String)"]/*'/>
         public FbDataAdapter(string selectCommandText, string selectConnectionString)
             : this(selectCommandText, new FbConnection(selectConnectionString))
         {
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/constructor[@name="ctor(System.String,FbConnection)"]/*'/>		
-        public FbDataAdapter(string selectCommandText, FbConnection selectConnection) : base()
+        public FbDataAdapter(string selectCommandText, FbConnection selectConnection)
+            : base()
         {
-            this.SelectCommand              = new FbCommand(selectCommandText, selectConnection);
+            this.SelectCommand = new FbCommand(selectCommandText, selectConnection);
             this.shouldDisposeSelectCommand = true;
         }
 
@@ -159,7 +151,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region IDisposable	Methods
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml'	path='doc/class[@name="FbDataAdapter"]/method[@name="Dispose(System.Boolean)"]/*'/>
         protected override void Dispose(bool disposing)
         {
             lock (this)
@@ -197,27 +188,24 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Protected Methods ·
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/method[@name="CreateRowUpdatingEvent(System.Data.DataRow,System.Data.IDbCommand,System.Data.StatementType,System.Data.Common.DataTableMapping)"]/*'/>
         protected override RowUpdatingEventArgs CreateRowUpdatingEvent(
-            DataRow				dataRow,
-            IDbCommand			command,
-            StatementType		statementType,
-            DataTableMapping	tableMapping)
+            DataRow dataRow,
+            IDbCommand command,
+            StatementType statementType,
+            DataTableMapping tableMapping)
         {
             return new FbRowUpdatingEventArgs(dataRow, command, statementType, tableMapping);
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/method[@name="CreateRowUpdatedEvent(System.Data.DataRow,System.Data.IDbCommand,System.Data.StatementType,System.Data.Common.DataTableMapping)"]/*'/>
         protected override RowUpdatedEventArgs CreateRowUpdatedEvent(
-            DataRow				dataRow,
-            IDbCommand			command,
-            StatementType		statementType,
-            DataTableMapping	tableMapping)
+            DataRow dataRow,
+            IDbCommand command,
+            StatementType statementType,
+            DataTableMapping tableMapping)
         {
             return new FbRowUpdatedEventArgs(dataRow, command, statementType, tableMapping);
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/method[@name="OnRowUpdating(System.Data.Common.RowUpdatingEventArgs)"]/*'/>
         protected override void OnRowUpdating(RowUpdatingEventArgs value)
         {
             FbRowUpdatingEventHandler handler = null;
@@ -232,7 +220,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        /// <include file='Doc/en_EN/FbDataAdapter.xml' path='doc/class[@name="FbDataAdapter"]/method[@name="OnRowUpdated(System.Data.Common.RowUpdatedEventArgs)"]/*'/>
         protected override void OnRowUpdated(RowUpdatedEventArgs value)
         {
             FbRowUpdatedEventHandler handler = null;
@@ -249,74 +236,74 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #endregion
 
-		#region · Update DataRow Collection ·
+        #region · Update DataRow Collection ·
 
-		/// <summary>
-		/// Review .NET	Framework documentation.
-		/// </summary>
-		protected override int Update(DataRow[] dataRows, DataTableMapping tableMapping)
-		{
-			int						    updated			= 0;
-			IDbCommand				    command			= null;
-			StatementType			    statementType	= StatementType.Insert;
-            ICollection<IDbConnection>  connections     = new List<IDbConnection>();
-			RowUpdatingEventArgs	    updatingArgs	= null;
-			Exception				    updateException = null;
+        /// <summary>
+        /// Review .NET	Framework documentation.
+        /// </summary>
+        protected override int Update(DataRow[] dataRows, DataTableMapping tableMapping)
+        {
+            int updated = 0;
+            IDbCommand command = null;
+            StatementType statementType = StatementType.Insert;
+            ICollection<IDbConnection> connections = new List<IDbConnection>();
+            RowUpdatingEventArgs updatingArgs = null;
+            Exception updateException = null;
 
-			foreach (DataRow row in dataRows)
-			{
+            foreach (DataRow row in dataRows)
+            {
                 updateException = null;
 
-				if (row.RowState == DataRowState.Detached ||
-					row.RowState == DataRowState.Unchanged)
-				{
-					continue;
-				}
+                if (row.RowState == DataRowState.Detached ||
+                    row.RowState == DataRowState.Unchanged)
+                {
+                    continue;
+                }
 
-				switch (row.RowState)
-				{
+                switch (row.RowState)
+                {
                     case DataRowState.Unchanged:
                     case DataRowState.Detached:
                         continue;
 
-					case DataRowState.Added:
-						command         = this.InsertCommand;
-						statementType   = StatementType.Insert;
-						break;
+                    case DataRowState.Added:
+                        command = this.InsertCommand;
+                        statementType = StatementType.Insert;
+                        break;
 
-					case DataRowState.Modified:
-						command         = this.UpdateCommand;
-						statementType   = StatementType.Update;
-						break;
+                    case DataRowState.Modified:
+                        command = this.UpdateCommand;
+                        statementType = StatementType.Update;
+                        break;
 
-					case DataRowState.Deleted:
-						command         = this.DeleteCommand;
-						statementType   = StatementType.Delete;
-						break;
-				}
+                    case DataRowState.Deleted:
+                        command = this.DeleteCommand;
+                        statementType = StatementType.Delete;
+                        break;
+                }
 
-				/* The order of	execution can be reviewed in the .NET 1.1 documentation
-				 *
-				 * 1. The values in	the	DataRow	are	moved to the parameter values. 
-				 * 2. The OnRowUpdating	event is raised. 
-				 * 3. The command executes.	
-				 * 4. If the command is	set	to FirstReturnedRecord,	then the first returned	result is placed in	the	DataRow. 
-				 * 5. If there are output parameters, they are placed in the DataRow. 
-				 * 6. The OnRowUpdated event is	raised.	
-				 * 7 AcceptChanges is called. 
-				 */
+                /* The order of	execution can be reviewed in the .NET 1.1 documentation
+                 *
+                 * 1. The values in	the	DataRow	are	moved to the parameter values. 
+                 * 2. The OnRowUpdating	event is raised. 
+                 * 3. The command executes.	
+                 * 4. If the command is	set	to FirstReturnedRecord,	then the first returned	result is placed in	the	DataRow. 
+                 * 5. If there are output parameters, they are placed in the DataRow. 
+                 * 6. The OnRowUpdated event is	raised.	
+                 * 7 AcceptChanges is called. 
+                 */
 
-				try
-				{
+                try
+                {
                     updatingArgs = this.CreateRowUpdatingEvent(row, command, statementType, tableMapping);
 
-					/* 1. Update Parameter values (It's	very similar to	what we	
-					 * are doing in	the	FbCommandBuilder class).
-					 *
-					 * Only	input parameters should	be updated.
-					 */
-					if (command != null && command.Parameters.Count > 0)
-					{
+                    /* 1. Update Parameter values (It's	very similar to	what we	
+                     * are doing in	the	FbCommandBuilder class).
+                     *
+                     * Only	input parameters should	be updated.
+                     */
+                    if (command != null && command.Parameters.Count > 0)
+                    {
                         try
                         {
                             this.UpdateParameterValues(command, statementType, row, tableMapping);
@@ -326,60 +313,60 @@ namespace FirebirdSql.Data.FirebirdClient
                             updatingArgs.Errors = ex;
                             updatingArgs.Status = UpdateStatus.ErrorsOccurred;
                         }
-					}
+                    }
 
-					// 2. Raise	RowUpdating	event
-					this.OnRowUpdating(updatingArgs);
+                    // 2. Raise	RowUpdating	event
+                    this.OnRowUpdating(updatingArgs);
 
-					if (updatingArgs.Status == UpdateStatus.SkipAllRemainingRows)
-					{
-						break;
-					}
-					else if (updatingArgs.Status == UpdateStatus.ErrorsOccurred)
-					{
-						if (updatingArgs.Errors == null)
-						{
-							throw new InvalidOperationException("RowUpdatingEvent: Errors occurred; no additional is information available.");
-						}
-						throw updatingArgs.Errors;
-					}
-					else if (updatingArgs.Status == UpdateStatus.SkipCurrentRow)
-					{
+                    if (updatingArgs.Status == UpdateStatus.SkipAllRemainingRows)
+                    {
+                        break;
+                    }
+                    else if (updatingArgs.Status == UpdateStatus.ErrorsOccurred)
+                    {
+                        if (updatingArgs.Errors == null)
+                        {
+                            throw new InvalidOperationException("RowUpdatingEvent: Errors occurred; no additional is information available.");
+                        }
+                        throw updatingArgs.Errors;
+                    }
+                    else if (updatingArgs.Status == UpdateStatus.SkipCurrentRow)
+                    {
                         updated++;
                         continue;
-					}
-					else if (updatingArgs.Status == UpdateStatus.Continue)
-					{
-						if (command != updatingArgs.Command)
-						{
-							command = updatingArgs.Command;
-						}
-						if (command == null)
-						{
-							/* Samples of exceptions thrown	by DbDataAdapter class
-							 *
-							 *	Update requires	a valid	InsertCommand when passed DataRow collection with new rows
-							 *	Update requires	a valid	UpdateCommand when passed DataRow collection with modified rows.
-							 *	Update requires	a valid	DeleteCommand when passed DataRow collection with deleted rows.
-							 */
-							throw new InvalidOperationException(this.CreateExceptionMessage(statementType));
-						}
+                    }
+                    else if (updatingArgs.Status == UpdateStatus.Continue)
+                    {
+                        if (command != updatingArgs.Command)
+                        {
+                            command = updatingArgs.Command;
+                        }
+                        if (command == null)
+                        {
+                            /* Samples of exceptions thrown	by DbDataAdapter class
+                             *
+                             *	Update requires	a valid	InsertCommand when passed DataRow collection with new rows
+                             *	Update requires	a valid	UpdateCommand when passed DataRow collection with modified rows.
+                             *	Update requires	a valid	DeleteCommand when passed DataRow collection with deleted rows.
+                             */
+                            throw new InvalidOperationException(this.CreateExceptionMessage(statementType));
+                        }
 
-						// 3. Execute the command
-						if (command.Connection.State == ConnectionState.Closed)
-						{
-							command.Connection.Open();
-							// Track command connection
-							connections.Add(command.Connection);
-						}
+                        // 3. Execute the command
+                        if (command.Connection.State == ConnectionState.Closed)
+                        {
+                            command.Connection.Open();
+                            // Track command connection
+                            connections.Add(command.Connection);
+                        }
 
-						int rowsAffected = command.ExecuteNonQuery();
-						if (rowsAffected == 0)
-						{
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (rowsAffected == 0)
+                        {
                             throw new DBConcurrencyException("An attempt to execute an INSERT, UPDATE, or DELETE statement resulted in zero records affected.", null, new DataRow[] { row });
-						}
+                        }
 
-						updated++;
+                        updated++;
 
                         // http://forums.microsoft.com/MSDN/ShowPost.aspx?PostID=933212&SiteID=1
                         if (statementType == StatementType.Insert)
@@ -387,112 +374,112 @@ namespace FirebirdSql.Data.FirebirdClient
                             row.AcceptChanges();
                         }
 
-						/* 4. If the command is	set	to FirstReturnedRecord,	then the 
-						 * first returned result is	placed in the DataRow. 
-						 * 
-						 * We have nothing to do in	this case as there are no 
-						 * support for batch commands.
-						 */
+                        /* 4. If the command is	set	to FirstReturnedRecord,	then the 
+                         * first returned result is	placed in the DataRow. 
+                         * 
+                         * We have nothing to do in	this case as there are no 
+                         * support for batch commands.
+                         */
 
-						/* 5. Check	if we have output parameters and they should 
-						 * be updated.
-						 *
-						 * Only	output parameters should be	updated
-						 */
-						if (command.UpdatedRowSource == UpdateRowSource.OutputParameters ||
-							command.UpdatedRowSource == UpdateRowSource.Both)
-						{
-							// Process output parameters
-							foreach (IDataParameter parameter in command.Parameters)
-							{
-								if ((parameter.Direction == ParameterDirection.Output ||
-									parameter.Direction == ParameterDirection.ReturnValue ||
-									parameter.Direction == ParameterDirection.InputOutput) &&
-									!String.IsNullOrEmpty(parameter.SourceColumn))
-								{
-									DataColumn column = null;
+                        /* 5. Check	if we have output parameters and they should 
+                         * be updated.
+                         *
+                         * Only	output parameters should be	updated
+                         */
+                        if (command.UpdatedRowSource == UpdateRowSource.OutputParameters ||
+                            command.UpdatedRowSource == UpdateRowSource.Both)
+                        {
+                            // Process output parameters
+                            foreach (IDataParameter parameter in command.Parameters)
+                            {
+                                if ((parameter.Direction == ParameterDirection.Output ||
+                                    parameter.Direction == ParameterDirection.ReturnValue ||
+                                    parameter.Direction == ParameterDirection.InputOutput) &&
+                                    !String.IsNullOrEmpty(parameter.SourceColumn))
+                                {
+                                    DataColumn column = null;
 
-									DataColumnMapping columnMapping = tableMapping.GetColumnMappingBySchemaAction(
-										parameter.SourceColumn,
-										this.MissingMappingAction);
+                                    DataColumnMapping columnMapping = tableMapping.GetColumnMappingBySchemaAction(
+                                        parameter.SourceColumn,
+                                        this.MissingMappingAction);
 
-									if (columnMapping != null)
-									{
-										column = columnMapping.GetDataColumnBySchemaAction(
-											row.Table,
-											null,
-											this.MissingSchemaAction);
+                                    if (columnMapping != null)
+                                    {
+                                        column = columnMapping.GetDataColumnBySchemaAction(
+                                            row.Table,
+                                            null,
+                                            this.MissingSchemaAction);
 
-										if (column != null)
-										{
-											row[column] = parameter.Value;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					row.RowError	= ex.Message;
-					updateException = ex;
-				}
+                                        if (column != null)
+                                        {
+                                            row[column] = parameter.Value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    row.RowError = ex.Message;
+                    updateException = ex;
+                }
 
                 if (updatingArgs != null && updatingArgs.Status == UpdateStatus.Continue)
-				{
-					// 6. Raise	RowUpdated event
-					RowUpdatedEventArgs	updatedArgs = this.CreateRowUpdatedEvent(row, command, statementType, tableMapping);
-					this.OnRowUpdated(updatedArgs);
+                {
+                    // 6. Raise	RowUpdated event
+                    RowUpdatedEventArgs updatedArgs = this.CreateRowUpdatedEvent(row, command, statementType, tableMapping);
+                    this.OnRowUpdated(updatedArgs);
 
-					if (updatedArgs.Status == UpdateStatus.SkipAllRemainingRows)
-					{
-						break;
-					}
-					else if (updatedArgs.Status == UpdateStatus.ErrorsOccurred)
-					{
-						if (updatingArgs.Errors == null)
-						{
-							throw new InvalidOperationException("RowUpdatedEvent: Errors occurred; no additional information available.");
-						}
-						throw updatedArgs.Errors;
-					}
-					else if (updatedArgs.Status == UpdateStatus.SkipCurrentRow)
-					{
-					}
-					else if (updatingArgs.Status == UpdateStatus.Continue)
-					{
-						// If the update result is an exception throw it
-						if (!this.ContinueUpdateOnError && updateException != null)
-						{
-							this.CloseConnections(connections);
-							throw updateException;
-						}
+                    if (updatedArgs.Status == UpdateStatus.SkipAllRemainingRows)
+                    {
+                        break;
+                    }
+                    else if (updatedArgs.Status == UpdateStatus.ErrorsOccurred)
+                    {
+                        if (updatingArgs.Errors == null)
+                        {
+                            throw new InvalidOperationException("RowUpdatedEvent: Errors occurred; no additional information available.");
+                        }
+                        throw updatedArgs.Errors;
+                    }
+                    else if (updatedArgs.Status == UpdateStatus.SkipCurrentRow)
+                    {
+                    }
+                    else if (updatingArgs.Status == UpdateStatus.Continue)
+                    {
+                        // If the update result is an exception throw it
+                        if (!this.ContinueUpdateOnError && updateException != null)
+                        {
+                            this.CloseConnections(connections);
+                            throw updateException;
+                        }
 
-						// 7. Call AcceptChanges
+                        // 7. Call AcceptChanges
                         if (this.AcceptChangesDuringUpdate && !row.HasErrors)
                         {
                             row.AcceptChanges();
                         }
-					}
-				}
-				else
-				{
-					// If the update result is an exception throw it
-					if (!this.ContinueUpdateOnError && updateException != null)
-					{
-						this.CloseConnections(connections);
-						throw updateException;
-					}
-				}
-			}
+                    }
+                }
+                else
+                {
+                    // If the update result is an exception throw it
+                    if (!this.ContinueUpdateOnError && updateException != null)
+                    {
+                        this.CloseConnections(connections);
+                        throw updateException;
+                    }
+                }
+            }
 
-			this.CloseConnections(connections);
+            this.CloseConnections(connections);
 
-			return updated;
-		}
+            return updated;
+        }
 
-		#endregion
+        #endregion
 
         #region · Private Methods ·
 
@@ -525,10 +512,10 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         private void UpdateParameterValues(
-            IDbCommand          command,
-            StatementType       statementType,
-            DataRow             row, 
-            DataTableMapping    tableMapping)
+            IDbCommand command,
+            StatementType statementType,
+            DataRow row,
+            DataTableMapping tableMapping)
         {
             foreach (DbParameter parameter in command.Parameters)
             {
@@ -542,7 +529,7 @@ namespace FirebirdSql.Data.FirebirdClient
                      * column name
                      */
                     DataColumnMapping columnMapping = tableMapping.GetColumnMappingBySchemaAction(
-                        parameter.SourceColumn, 
+                        parameter.SourceColumn,
                         this.MissingMappingAction);
 
                     if (columnMapping != null)

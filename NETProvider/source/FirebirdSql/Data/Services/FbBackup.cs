@@ -27,64 +27,58 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackup"]/overview/*'/>
-	public sealed class FbBackup : FbService
-	{
-		#region · Fields ·
+    public sealed class FbBackup : FbService
+    {
+        #region · Fields ·
 
-		private bool			        verbose;
-		private int				        factor;
-        private FbBackupFileCollection  backupFiles;
-		private FbBackupFlags	        options;
+        private bool verbose;
+        private int factor;
+        private FbBackupFileCollection backupFiles;
+        private FbBackupFlags options;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackup"]/property[@name="BackupFiles"]/*'/>
-		public FbBackupFileCollection BackupFiles
-		{
-			get { return this.backupFiles; }
-		}
+        public FbBackupFileCollection BackupFiles
+        {
+            get { return this.backupFiles; }
+        }
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackup"]/property[@name="Verbose"]/*'/>
-		public bool Verbose
-		{
-			get { return this.verbose; }
+        public bool Verbose
+        {
+            get { return this.verbose; }
             set { this.verbose = value; }
-		}
+        }
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackup"]/property[@name="Factor"]/*'/>
-		public int Factor
-		{
-			get { return this.factor; }
-			set { this.factor = value; }
-		}
+        public int Factor
+        {
+            get { return this.factor; }
+            set { this.factor = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackup"]/property[@name="Options"]/*'/>
-		public FbBackupFlags Options
-		{
-			get { return this.options; }
-			set { this.options = value; }
-		}
+        public FbBackupFlags Options
+        {
+            get { return this.options; }
+            set { this.options = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackup"]/constructor[@name="ctor"]/*'/>
-		public FbBackup() : base()
-		{
-			this.backupFiles = new FbBackupFileCollection();
-		}
+        public FbBackup()
+            : base()
+        {
+            this.backupFiles = new FbBackupFileCollection();
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		/// <include file='Doc/en_EN/FbBackup.xml' path='doc/class[@name="FbBackup"]/method[@name="Execute"]/*'/>
-		public void Execute()
-		{
+        public void Execute()
+        {
             try
             {
                 // Configure Spb
@@ -119,12 +113,12 @@ namespace FirebirdSql.Data.Services
                 throw new FbException(ex.Message, ex);
             }
             finally
-			{
-				// Close
-				this.Close();
-			}
-		}
+            {
+                // Close
+                this.Close();
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

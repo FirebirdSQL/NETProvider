@@ -27,124 +27,117 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/class[@name="FbRestore"]/overview/*'/>
-	public sealed class FbRestore : FbService
-	{
-		#region · Fields ·
+    public sealed class FbRestore : FbService
+    {
+        #region · Fields ·
 
-		private FbBackupFileCollection  backupFiles;
-		private FbRestoreFlags	        options;
-		private bool			        verbose;
-		private int				        pageBuffers;
-		private int				        pageSize;
+        private FbBackupFileCollection backupFiles;
+        private FbRestoreFlags options;
+        private bool verbose;
+        private int pageBuffers;
+        private int pageSize;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/class[@name="FbRestore"]/property[@name="BackupFiles"]/*'/>
-		public FbBackupFileCollection BackupFiles
-		{
-			get { return this.backupFiles; }
-		}
+        public FbBackupFileCollection BackupFiles
+        {
+            get { return this.backupFiles; }
+        }
 
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/class[@name="FbRestore"]/property[@name="Verbose"]/*'/>
-		public bool Verbose
-		{
-			get { return this.verbose; }
-			set { this.verbose = value; }
-		}
+        public bool Verbose
+        {
+            get { return this.verbose; }
+            set { this.verbose = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/class[@name="FbRestore"]/property[@name="PageBuffers"]/*'/>
-		public int PageBuffers
-		{
-			get { return this.pageBuffers; }
-			set { this.pageBuffers = value; }
-		}
+        public int PageBuffers
+        {
+            get { return this.pageBuffers; }
+            set { this.pageBuffers = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/class[@name="FbRestore"]/property[@name="PageSize"]/*'/>
-		public int PageSize
-		{
-			get { return this.pageSize; }
-			set
-			{
-				if (this.pageSize != 1024 && this.pageSize != 2048 &&
-					this.pageSize != 4096 && this.pageSize != 8192 &&
-					this.pageSize != 16384)
-				{
-					throw new InvalidOperationException("Invalid page size.");
-				}
-				this.pageSize = value;
-			}
-		}
+        public int PageSize
+        {
+            get { return this.pageSize; }
+            set
+            {
+                if (this.pageSize != 1024 && this.pageSize != 2048 &&
+                    this.pageSize != 4096 && this.pageSize != 8192 &&
+                    this.pageSize != 16384)
+                {
+                    throw new InvalidOperationException("Invalid page size.");
+                }
+                this.pageSize = value;
+            }
+        }
 
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/class[@name="FbRestore"]/property[@name="Options"]/*'/>
-		public FbRestoreFlags Options
-		{
-			get { return this.options; }
-			set { this.options = value; }
-		}
+        public FbRestoreFlags Options
+        {
+            get { return this.options; }
+            set { this.options = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/class[@name="FbRestore"]/constructor[@name="ctor"]/*'/>
-		public FbRestore() : base()
-		{
-			this.backupFiles	= new FbBackupFileCollection();
-			this.pageSize		= 4096;
-			this.pageBuffers	= 2048;
-		}
+        public FbRestore()
+            : base()
+        {
+            this.backupFiles = new FbBackupFileCollection();
+            this.pageSize = 4096;
+            this.pageBuffers = 2048;
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		/// <include file='Doc/en_EN/FbRestore.xml'	path='doc/class[@name="FbRestore"]/method[@name="Execute"]/*'/>
-		public void Execute()
-		{
-			try
-			{
-				// Configure Spb
-				this.StartSpb = this.CreateParameterBuffer();
+        public void Execute()
+        {
+            try
+            {
+                // Configure Spb
+                this.StartSpb = this.CreateParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_restore);
+                this.StartSpb.Append(IscCodes.isc_action_svc_restore);
 
-				foreach (FbBackupFile bkpFile in backupFiles)
-				{
-					this.StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
-				}
+                foreach (FbBackupFile bkpFile in backupFiles)
+                {
+                    this.StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
+                }
 
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+                this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-				if (this.verbose)
-				{
-					this.StartSpb.Append(IscCodes.isc_spb_verbose);
-				}
+                if (this.verbose)
+                {
+                    this.StartSpb.Append(IscCodes.isc_spb_verbose);
+                }
 
-				this.StartSpb.Append(IscCodes.isc_spb_res_buffers, this.pageBuffers);
-				this.StartSpb.Append(IscCodes.isc_spb_res_page_size, this.pageSize);
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+                this.StartSpb.Append(IscCodes.isc_spb_res_buffers, this.pageBuffers);
+                this.StartSpb.Append(IscCodes.isc_spb_res_page_size, this.pageSize);
+                this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
-				// Start execution
-				this.StartTask();
+                // Start execution
+                this.StartTask();
 
-				if (this.verbose)
-				{
-					this.ProcessServiceOutput();
-				}
-			}
+                if (this.verbose)
+                {
+                    this.ProcessServiceOutput();
+                }
+            }
             catch (Exception ex)
             {
                 throw new FbException(ex.Message, ex);
             }
             finally
-			{
-				this.Close();
-			}
-		}
+            {
+                this.Close();
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

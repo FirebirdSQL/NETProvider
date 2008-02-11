@@ -24,38 +24,35 @@ using System.Collections.Generic;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbService.xml'	path='doc/struct[@name="FbDatabasesInfo"]/overview/*'/>
-	public struct FbDatabasesInfo
-	{
-		#region · Fields ·
+    public struct FbDatabasesInfo
+    {
+        #region · Fields ·
 
-		private int connectionCount;
-		private List<string> databases;
+        private int connectionCount;
+        private List<string> databases;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbService.xml'	path='doc/struct[@name="FbDatabasesInfo"]/field[@name="ConnectionCount"]/*'/>
-		public int ConnectionCount
-		{
-			get { return this.connectionCount; }
-			set { this.connectionCount = value; }
-		}
+        public int ConnectionCount
+        {
+            get { return this.connectionCount; }
+            set { this.connectionCount = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbService.xml'	path='doc/struct[@name="FbDatabasesInfo"]/field[@name="Databases"]/*'/>
         public List<string> Databases
-		{
-			get
-			{
-				if (this.databases == null)
-				{
-					this.databases = new List<string>();
-				}
-				return this.databases;
-			}
-		}
+        {
+            get
+            {
+                if (this.databases == null)
+                {
+                    this.databases = new List<string>();
+                }
+                return this.databases;
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

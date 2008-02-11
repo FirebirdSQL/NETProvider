@@ -20,23 +20,15 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-	/// <include file='Doc/en_EN/FbValidation.xml' path='doc/struct[@name="FbValidationFlags"]/overview/*'/>
-	[Flags]
-	public enum FbValidationFlags
-	{
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/struct[@name="FbValidationFlags"]/field[@name="ValidateDatabase"]/*'/>
-		ValidateDatabase	= 0x01,
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/struct[@name="FbValidationFlags"]/field[@name="SweepDatabase"]/*'/>
-		SweepDatabase		= 0x02,
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/struct[@name="FbValidationFlags"]/field[@name="MendDatabase"]/*'/>
-		MendDatabase		= 0x04,
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/struct[@name="FbValidationFlags"]/field[@name="CheckDatabase"]/*'/>
-		CheckDatabase		= 0x10,
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/struct[@name="FbValidationFlags"]/field[@name="IgnoreChecksum"]/*'/>
-		IgnoreChecksum		= 0x20,
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/struct[@name="FbValidationFlags"]/field[@name="KillShadows"]/*'/>
-		KillShadows			= 0x40,
-		/// <include file='Doc/en_EN/FbValidation.xml' path='doc/struct[@name="FbValidationFlags"]/field[@name="Full"]/*'/>
-		Full				= 0x80
-	}
+    [Flags]
+    public enum FbValidationFlags
+    {
+        ValidateDatabase = 0x01,
+        SweepDatabase = 0x02,
+        MendDatabase = 0x04,
+        CheckDatabase = 0x10,
+        IgnoreChecksum = 0x20,
+        KillShadows = 0x40,
+        Full = 0x80
+    }
 }

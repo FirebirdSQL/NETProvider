@@ -25,53 +25,50 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/overview/*'/>
 #if	(NET)
-	[ParenthesizePropertyName(true)]
+    [ParenthesizePropertyName(true)]
 #endif
-	public sealed class FbParameter : DbParameter, ICloneable
-	{
-		#region · Fields ·
+    public sealed class FbParameter : DbParameter, ICloneable
+    {
+        #region · Fields ·
 
-		private FbParameterCollection parent;
-		private FbDbType			fbDbType;
-		private ParameterDirection	direction;
-		private DataRowVersion		sourceVersion;
-		private FbCharset			charset;
-		private bool				isNullable;
-		private bool				sourceColumnNullMapping;
-		private byte				precision;
-		private byte				scale;
-		private int					size;
-		private object				value;
-		private string				parameterName;
-		private string				sourceColumn;
-        private bool                isTypeSet;
+        private FbParameterCollection parent;
+        private FbDbType fbDbType;
+        private ParameterDirection direction;
+        private DataRowVersion sourceVersion;
+        private FbCharset charset;
+        private bool isNullable;
+        private bool sourceColumnNullMapping;
+        private byte precision;
+        private byte scale;
+        private int size;
+        private object value;
+        private string parameterName;
+        private string sourceColumn;
+        private bool isTypeSet;
 
-		#endregion
+        #endregion
 
-		#region · DbParameter properties ·
+        #region · DbParameter properties ·
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="ParameterName"]/*'/>
 #if	(!NETCF)
-		[DefaultValue("")]
+        [DefaultValue("")]
 #endif
-		public override string ParameterName
-		{
-			get { return this.parameterName; }
-			set { this.parameterName = value; }
-		}
+        public override string ParameterName
+        {
+            get { return this.parameterName; }
+            set { this.parameterName = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="Size"]/*'/>
 #if	(!NETCF)
-		[Category("Data")]
-		[DefaultValue(0)]
+        [Category("Data")]
+        [DefaultValue(0)]
 #endif
-		public override int Size
-		{
-			get { return this.size; }
-			set 
-            { 
+        public override int Size
+        {
+            get { return this.size; }
+            set
+            {
                 this.size = value;
 
                 // Hack for Clob parameters
@@ -81,55 +78,50 @@ namespace FirebirdSql.Data.FirebirdClient
                     this.FbDbType = FbDbType.Text;
                 }
             }
-		}
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="Direction"]/*'/>
 #if	(!NETCF)
-		[Category("Data")]
-		[DefaultValue(ParameterDirection.Input)]
+        [Category("Data")]
+        [DefaultValue(ParameterDirection.Input)]
 #endif
-		public override ParameterDirection Direction
-		{
-			get { return this.direction; }
-			set { this.direction = value; }
-		}
+        public override ParameterDirection Direction
+        {
+            get { return this.direction; }
+            set { this.direction = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="IsNullable"]/*'/>
 #if	(!NETCF)
-		[Browsable(false)]
-		[DesignOnly(true)]
-		[DefaultValue(false)]
-		[EditorBrowsable(EditorBrowsableState.Advanced)]
+        [Browsable(false)]
+        [DesignOnly(true)]
+        [DefaultValue(false)]
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
 #endif
-		public override bool IsNullable
-		{
-			get { return this.isNullable; }
-			set { this.isNullable = value; }
-		}
+        public override bool IsNullable
+        {
+            get { return this.isNullable; }
+            set { this.isNullable = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="SourceColumn"]/*'/>
 #if	(!NETCF)
-		[Category("Data")]
-		[DefaultValue("")]
+        [Category("Data")]
+        [DefaultValue("")]
 #endif
-		public override string SourceColumn
-		{
-			get { return this.sourceColumn; }
-			set { this.sourceColumn = value; }
-		}
+        public override string SourceColumn
+        {
+            get { return this.sourceColumn; }
+            set { this.sourceColumn = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="SourceVersion"]/*'/>
 #if	(!NETCF)
-		[Category("Data")]
-		[DefaultValue(DataRowVersion.Current)]
+        [Category("Data")]
+        [DefaultValue(DataRowVersion.Current)]
 #endif
-		public override DataRowVersion SourceVersion
-		{
-			get { return this.sourceVersion; }
-			set { this.sourceVersion = value; }
-		}
+        public override DataRowVersion SourceVersion
+        {
+            get { return this.sourceVersion; }
+            set { this.sourceVersion = value; }
+        }
 
-        /// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="DbType"]/*'/>
 #if	(!NETCF)
         [Browsable(false)]
         [Category("Data")]
@@ -142,7 +134,6 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.FbDbType = (FbDbType)TypeHelper.GetDbDataType(value); }
         }
 
-        /// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="FbDbType"]/*'/>
 #if	(!NETCF)
         [RefreshProperties(RefreshProperties.All)]
         [Category("Data")]
@@ -151,95 +142,91 @@ namespace FirebirdSql.Data.FirebirdClient
         public FbDbType FbDbType
         {
             get { return this.fbDbType; }
-            set 
-            { 
-                this.fbDbType     = value;
-                this.isTypeSet  = true;
+            set
+            {
+                this.fbDbType = value;
+                this.isTypeSet = true;
             }
         }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="Value"]/*'/>
 #if	(!NETCF)
-		[Category("Data")]
-		[TypeConverter(typeof(StringConverter)), DefaultValue(null)]
+        [Category("Data")]
+        [TypeConverter(typeof(StringConverter)), DefaultValue(null)]
 #endif
-		public override object Value
-		{
-			get { return this.value; }
-			set
-			{
-				if (value == null)
-				{
-					value = System.DBNull.Value;
-				}
+        public override object Value
+        {
+            get { return this.value; }
+            set
+            {
+                if (value == null)
+                {
+                    value = System.DBNull.Value;
+                }
 
-				if (this.FbDbType == FbDbType.Guid && value != null && 
+                if (this.FbDbType == FbDbType.Guid && value != null &&
                     value != DBNull.Value && !(value is Guid) && !(value is byte[]))
-				{
-					throw new InvalidOperationException("Incorrect Guid value.");
-				}
+                {
+                    throw new InvalidOperationException("Incorrect Guid value.");
+                }
 
-				this.value = value;
+                this.value = value;
 
-				if (!this.isTypeSet)
-				{
-					this.SetFbDbType(value);
-				}
-			}
-		}
+                if (!this.isTypeSet)
+                {
+                    this.SetFbDbType(value);
+                }
+            }
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="Charset"]/*'/>
 #if	(!NETCF)
-		[Category("Data")]
-		[DefaultValue(FbCharset.Default)]
+        [Category("Data")]
+        [DefaultValue(FbCharset.Default)]
 #endif
-		public FbCharset Charset
-		{
-			get { return this.charset; }
-			set { this.charset = value; }
-		}
+        public FbCharset Charset
+        {
+            get { return this.charset; }
+            set { this.charset = value; }
+        }
 
-		public override bool SourceColumnNullMapping
-		{
-			get { return this.sourceColumnNullMapping; }
-			set { this.sourceColumnNullMapping = value; }
-		}
+        public override bool SourceColumnNullMapping
+        {
+            get { return this.sourceColumnNullMapping; }
+            set { this.sourceColumnNullMapping = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="Precision"]/*'/>
 #if	(!NETCF)
-		[Category("Data")]
-		[DefaultValue((byte)0)]
+        [Category("Data")]
+        [DefaultValue((byte)0)]
 #endif
-		public byte Precision
-		{
-			get { return this.precision; }
-			set { this.precision = value; }
-		}
+        public byte Precision
+        {
+            get { return this.precision; }
+            set { this.precision = value; }
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/property[@name="Scale"]/*'/>
 #if	(!NETCF)
-		[Category("Data")]
-		[DefaultValue((byte)0)]
+        [Category("Data")]
+        [DefaultValue((byte)0)]
 #endif
-		public byte Scale
-		{
-			get { return this.scale; }
-			set { this.scale = value; }
-		}
+        public byte Scale
+        {
+            get { return this.scale; }
+            set { this.scale = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Internal Properties ·
+        #region · Internal Properties ·
 
-		internal FbParameterCollection Parent
-		{
-			get { return this.parent; }
-			set { this.parent = value; }
-		}
+        internal FbParameterCollection Parent
+        {
+            get { return this.parent; }
+            set { this.parent = value; }
+        }
 
         internal string InternalParameterName
         {
@@ -254,200 +241,196 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/constrctor[@name="ctor"]/*'/>
-		public FbParameter()
-		{
-			this.fbDbType		= FbDbType.VarChar;
-			this.direction		= ParameterDirection.Input;
-			this.sourceVersion	= DataRowVersion.Current;
-			this.sourceColumn	= String.Empty;
-			this.parameterName	= String.Empty;
-			this.charset		= FbCharset.Default;
-		}
+        public FbParameter()
+        {
+            this.fbDbType = FbDbType.VarChar;
+            this.direction = ParameterDirection.Input;
+            this.sourceVersion = DataRowVersion.Current;
+            this.sourceColumn = String.Empty;
+            this.parameterName = String.Empty;
+            this.charset = FbCharset.Default;
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/constrctor[@name="ctor(System.String,System.Object)"]/*'/>
-		public FbParameter(string parameterName, object value) : this()
-		{
-			this.parameterName	= parameterName;
-			this.Value			= value;
-		}
+        public FbParameter(string parameterName, object value)
+            : this()
+        {
+            this.parameterName = parameterName;
+            this.Value = value;
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/constrctor[@name="ctor(System.String,FbDbType)"]/*'/>
-		public FbParameter(string parameterName, FbDbType fbType) : this()
-		{
-			this.parameterName	= parameterName;
-			this.FbDbType		= fbType;
-		}
+        public FbParameter(string parameterName, FbDbType fbType)
+            : this()
+        {
+            this.parameterName = parameterName;
+            this.FbDbType = fbType;
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/constrctor[@name="ctor(System.String,FbDbType,System.Int32)"]/*'/>
-		public FbParameter(string parameterName, FbDbType fbType, int size) : this()
-		{
-			this.parameterName	= parameterName;
-			this.FbDbType		= fbType;
-			this.size			= size;
-		}
+        public FbParameter(string parameterName, FbDbType fbType, int size)
+            : this()
+        {
+            this.parameterName = parameterName;
+            this.FbDbType = fbType;
+            this.size = size;
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/constrctor[@name="ctor(System.String,FbDbType,System.Int32,System.String)"]/*'/>
-		public FbParameter(string parameterName, FbDbType fbType, int size, string sourceColumn)
-			: this()
-		{
-			this.parameterName	= parameterName;
-			this.FbDbType		= fbType;
-			this.size			= size;
-			this.sourceColumn	= sourceColumn;
-		}
+        public FbParameter(string parameterName, FbDbType fbType, int size, string sourceColumn)
+            : this()
+        {
+            this.parameterName = parameterName;
+            this.FbDbType = fbType;
+            this.size = size;
+            this.sourceColumn = sourceColumn;
+        }
 
-		/// <include file='Doc/en_EN/FbParameter.xml' path='doc/class[@name="FbParameter"]/constrctor[@name="ctor(System.String,FbDbType,System.Int32,System.Data.ParameterDirection,System.Boolean,System.Byte,System.Byte,System.String,System.Data.DataRowVersion,System.Object)"]/*'/>
 #if	(!NETCF)
-		[EditorBrowsable(EditorBrowsableState.Advanced)]
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
 #endif
-		public FbParameter(
-			string				parameterName, 
-			FbDbType			dbType, 
-			int					size,
-			ParameterDirection	direction,
-			bool				isNullable,
-			byte				precision,
-			byte				scale,
-			string				sourceColumn,
-			DataRowVersion		sourceVersion,
-			object				value)
-		{
-			this.parameterName	= parameterName;
-			this.FbDbType		= dbType;
-			this.size			= size;
-			this.direction		= direction;
-			this.isNullable		= isNullable;
-			this.precision		= precision;
-			this.scale			= scale;
-			this.sourceColumn	= sourceColumn;
-			this.sourceVersion	= sourceVersion;
-			this.value			= value;
-            this.charset        = FbCharset.Default;
-		}
+        public FbParameter(
+            string parameterName,
+            FbDbType dbType,
+            int size,
+            ParameterDirection direction,
+            bool isNullable,
+            byte precision,
+            byte scale,
+            string sourceColumn,
+            DataRowVersion sourceVersion,
+            object value)
+        {
+            this.parameterName = parameterName;
+            this.FbDbType = dbType;
+            this.size = size;
+            this.direction = direction;
+            this.isNullable = isNullable;
+            this.precision = precision;
+            this.scale = scale;
+            this.sourceColumn = sourceColumn;
+            this.sourceVersion = sourceVersion;
+            this.value = value;
+            this.charset = FbCharset.Default;
+        }
 
-		#endregion
+        #endregion
 
-		#region · ICloneable Methods ·
+        #region · ICloneable Methods ·
 
-		object ICloneable.Clone()
-		{
-			FbParameter p = new FbParameter(
-				this.parameterName,
-				this.fbDbType,
-				this.size,
-				this.direction,
-				this.isNullable,
-				this.precision,
-				this.scale,
-				this.sourceColumn,
-				this.sourceVersion,
-				this.value);
+        object ICloneable.Clone()
+        {
+            FbParameter p = new FbParameter(
+                this.parameterName,
+                this.fbDbType,
+                this.size,
+                this.direction,
+                this.isNullable,
+                this.precision,
+                this.scale,
+                this.sourceColumn,
+                this.sourceVersion,
+                this.value);
 
-			// Set extra properties
-			p.Charset = this.charset;
+            // Set extra properties
+            p.Charset = this.charset;
 
-			return p;
-		}
+            return p;
+        }
 
-		#endregion
+        #endregion
 
-		#region · DbParameter methods ·
+        #region · DbParameter methods ·
 
-		/// <include file='Doc/en_EN/FbCommand.xml'	path='doc/class[@name="FbParameter"]/method[@name="ToString"]/*'/>
-		public override string ToString()
-		{
-			return this.parameterName;
-		}
+        public override string ToString()
+        {
+            return this.parameterName;
+        }
 
-		public override void ResetDbType()
-		{
-			throw new Exception("The method or operation is not implemented.");
-		}
+        public override void ResetDbType()
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
 
-		#endregion
+        #endregion
 
-		#region · Private Methods ·
+        #region · Private Methods ·
 
-		private void SetFbDbType(object value)
-		{
-			if (value == null)
-			{
-				value = System.DBNull.Value;
-			}
+        private void SetFbDbType(object value)
+        {
+            if (value == null)
+            {
+                value = System.DBNull.Value;
+            }
 
-			TypeCode code = Type.GetTypeCode(value.GetType());
+            TypeCode code = Type.GetTypeCode(value.GetType());
 
-			switch (code)
-			{
-				case TypeCode.Char:
-					this.fbDbType = FbDbType.Char;
-					break;
+            switch (code)
+            {
+                case TypeCode.Char:
+                    this.fbDbType = FbDbType.Char;
+                    break;
 
-				case TypeCode.DBNull:
-				case TypeCode.String:
-					this.fbDbType = FbDbType.VarChar;
-					break;
+                case TypeCode.DBNull:
+                case TypeCode.String:
+                    this.fbDbType = FbDbType.VarChar;
+                    break;
 
-				case TypeCode.Boolean:
+                case TypeCode.Boolean:
                     this.fbDbType = FbDbType.Boolean;
                     break;
 
-				case TypeCode.Byte:
-				case TypeCode.SByte:
-				case TypeCode.Int16:
-				case TypeCode.UInt16:
-					this.fbDbType = FbDbType.SmallInt;
-					break;
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.Int16:
+                case TypeCode.UInt16:
+                    this.fbDbType = FbDbType.SmallInt;
+                    break;
 
-				case TypeCode.Int32:
-				case TypeCode.UInt32:
-					this.fbDbType = FbDbType.Integer;
-					break;
+                case TypeCode.Int32:
+                case TypeCode.UInt32:
+                    this.fbDbType = FbDbType.Integer;
+                    break;
 
-				case TypeCode.Int64:
-				case TypeCode.UInt64:
-					this.fbDbType = FbDbType.BigInt;
-					break;
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                    this.fbDbType = FbDbType.BigInt;
+                    break;
 
-				case TypeCode.Single:
-					this.fbDbType = FbDbType.Float;
-					break;
+                case TypeCode.Single:
+                    this.fbDbType = FbDbType.Float;
+                    break;
 
-				case TypeCode.Double:
-					this.fbDbType = FbDbType.Double;
-					break;
+                case TypeCode.Double:
+                    this.fbDbType = FbDbType.Double;
+                    break;
 
-				case TypeCode.Decimal:
-					this.fbDbType = FbDbType.Decimal;
-					break;
+                case TypeCode.Decimal:
+                    this.fbDbType = FbDbType.Decimal;
+                    break;
 
-				case TypeCode.DateTime:
-					this.fbDbType = FbDbType.TimeStamp;
-					break;
+                case TypeCode.DateTime:
+                    this.fbDbType = FbDbType.TimeStamp;
+                    break;
 
-				case TypeCode.Empty:
-				default:
-					if (value is Guid)
-					{
-						this.fbDbType = FbDbType.Guid;
-					}
+                case TypeCode.Empty:
+                default:
+                    if (value is Guid)
+                    {
+                        this.fbDbType = FbDbType.Guid;
+                    }
                     else if (code == TypeCode.Object)
                     {
                         this.fbDbType = FbDbType.Binary;
                     }
                     else
-					{
-						throw new SystemException("Value is of unknown data type");
-					}
-					break;
-			}
-		}
+                    {
+                        throw new SystemException("Value is of unknown data type");
+                    }
+                    break;
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
