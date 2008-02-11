@@ -1,4 +1,4 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -156,14 +156,22 @@
     <Compile Include="FirebirdClient\ClientFactory.cs" />
     <Compile Include="FirebirdClient\EmptyPoolEventHandler.cs" />
     <Compile Include="FirebirdClient\FbCharset.cs" />
-    <Compile Include="FirebirdClient\FbCommand.cs" />
-    <Compile Include="FirebirdClient\FbCommandBuilder.cs" />
-    <Compile Include="FirebirdClient\FbConnection.cs" />
+    <Compile Include="FirebirdClient\FbCommand.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FirebirdClient\FbCommandBuilder.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FirebirdClient\FbConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FirebirdClient\FbConnectionInternal.cs" />
     <Compile Include="FirebirdClient\FbConnectionPool.cs" />
     <Compile Include="FirebirdClient\FbConnectionString.cs" />
     <Compile Include="FirebirdClient\FbConnectionStringBuilder.cs" />
-    <Compile Include="FirebirdClient\FbDataAdapter.cs" />
+    <Compile Include="FirebirdClient\FbDataAdapter.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FirebirdClient\FbDatabaseInfo.cs" />
     <Compile Include="FirebirdClient\FbDataReader.cs" />
     <Compile Include="FirebirdClient\FbDbType.cs" />
