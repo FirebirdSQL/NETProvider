@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *  
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -35,7 +38,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             if (command.CommandType != CommandType.StoredProcedure)
             {
-                throw new InvalidOperationException("The command text is not a valid stored procedure name.");
+                throw new InvalidOperationException("DeriveParameters only supports CommandType.StoredProcedure.");
             }
 
             string spName = command.CommandText.Trim();
@@ -60,7 +63,14 @@ namespace FirebirdSql.Data.FirebirdClient
             DataTable spSchema = command.Connection.GetSchema(
                 "ProcedureParameters", new string[] { null, null, spName });
 
-            int count = 1;
+            // SP has zero params. or not exist
+            // so check whether exists, else thow exception
+            if (spSchema.Rows.Count == 0)
+            {
+                if (command.Connection.GetSchema("Procedures", new string[] { null, null, spName }).Rows.Count == 0)
+                    throw new InvalidOperationException("Stored procedure doesn't exist.");
+            }
+
             foreach (DataRow row in spSchema.Rows)
             {
                 dataTypes.RowFilter = String.Format(
@@ -90,8 +100,6 @@ namespace FirebirdSql.Data.FirebirdClient
                         parameter.Scale = Convert.ToByte(row["NUMERIC_SCALE"], CultureInfo.InvariantCulture);
                     }
                 }
-
-                count++;
             }
         }
 
