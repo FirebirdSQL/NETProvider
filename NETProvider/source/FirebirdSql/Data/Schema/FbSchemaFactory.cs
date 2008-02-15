@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *	
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -94,7 +97,7 @@ namespace FirebirdSql.Data.Schema
         {
             FbSchema returnSchema = null;
 
-            switch (collectionName.ToLower(CultureInfo.CurrentCulture))
+            switch (collectionName.ToLower(CultureInfo.InvariantCulture))
             {
                 case "charactersets":
                     returnSchema = new FbCharacterSets();
