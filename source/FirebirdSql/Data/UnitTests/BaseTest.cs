@@ -102,6 +102,9 @@ namespace FirebirdSql.Data.UnitTests
 				}
 			}
 			connection.Close();
+
+            string cs = this.BuildConnectionString();
+            DropDatabase(cs);
 		}
 
 		#endregion
@@ -116,6 +119,11 @@ namespace FirebirdSql.Data.UnitTests
 				Boolean.Parse(ConfigurationManager.AppSettings["ForcedWrite"]),
 				true);
 		}
+
+        private static void DropDatabase(string connectionString)
+        {
+            FbConnection.DropDatabase(connectionString);
+        }
 
 		private static void CreateTables(string connectionString)
 		{
