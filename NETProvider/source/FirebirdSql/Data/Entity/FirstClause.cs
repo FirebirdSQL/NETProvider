@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.Entity
         public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
         {
             writer.Write("FIRST (");
-            this.TopCount.WriteSql(writer, sqlGenerator);
+            this.FirstCount.WriteSql(writer, sqlGenerator);
             writer.Write(")");
 
             writer.Write(" ");

@@ -247,12 +247,6 @@ namespace FirebirdSql.Data.Entity
                     return DbType.SByte;
                 case PrimitiveTypeKind.String:
                     return DbType.String;
-                case PrimitiveTypeKind.UInt16:
-                    return DbType.UInt16;
-                case PrimitiveTypeKind.UInt32:
-                    return DbType.UInt32;
-                case PrimitiveTypeKind.UInt64:
-                    return DbType.UInt64;
                 default:
                     Debug.Fail("unknown PrimitiveTypeKind" + primitiveType.ToString());
                     throw new InvalidOperationException(string.Format("Unknown PrimitiveTypeKind {0}", primitiveType));
