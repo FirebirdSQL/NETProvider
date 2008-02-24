@@ -13,9 +13,10 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
@@ -28,11 +29,12 @@ using System.IO;
 using System.Text;
 using System.Data;
 using System.Data.Common;
-using FirebirdSql.Data.FirebirdClient;
+using System.Data.SqlClient;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 using System.Data.Common.Utils;
 using System.Data.Mapping.Update.Internal;
+
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Entity
@@ -41,7 +43,7 @@ namespace FirebirdSql.Data.Entity
     /// Lightweight expression translator for DML expression trees, which have constrained
     /// scope and support.
     /// </summary>
-    internal class ExpressionTranslator : DbExpressionVisitor
+    class ExpressionTranslator : DbExpressionVisitor
     {
         #region · Fields ·
 
@@ -240,12 +242,12 @@ namespace FirebirdSql.Data.Entity
 
         public override void Visit(DbAndExpression expression)
         {
-            this.VisitBinary(expression, " and ");
+            VisitBinary(expression, " and ");
         }
 
         public override void Visit(DbOrExpression expression)
         {
-            this.VisitBinary(expression, " or ");
+            VisitBinary(expression, " or ");
         }
 
         public override void Visit(DbComparisonExpression expression)
@@ -253,8 +255,9 @@ namespace FirebirdSql.Data.Entity
             Debug.Assert(expression.ExpressionKind == DbExpressionKind.Equals,
                 "only equals comparison expressions are produced in DML command trees in V1");
 
-            this.VisitBinary(expression, " = ");
-            this.RegisterMemberValue(expression.Left, expression.Right);
+            VisitBinary(expression, " = ");
+
+            RegisterMemberValue(expression.Left, expression.Right);
         }
 
         public override void Visit(DbIsNullExpression expression)
@@ -272,7 +275,7 @@ namespace FirebirdSql.Data.Entity
 
         public override void Visit(DbConstantExpression expression)
         {
-            FbParameter parameter = this.CreateParameter(expression.Value, expression.ResultType);
+            FbParameter parameter = CreateParameter(expression.Value, expression.ResultType);
             commandText.Append(parameter.ParameterName);
         }
 
@@ -307,7 +310,6 @@ namespace FirebirdSql.Data.Entity
                 {
                     commandText.Append(", ");
                 }
-
                 argument.Accept(this);
             }
         }
@@ -406,5 +408,4 @@ namespace FirebirdSql.Data.Entity
         #endregion
     }
 }
-
 #endif

@@ -13,9 +13,10 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
@@ -25,9 +26,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using FirebirdSql.Data.FirebirdClient;
+using System.Data.SqlClient;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
+
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Entity
 {
@@ -42,7 +45,7 @@ namespace FirebirdSql.Data.Entity
     /// top level, we need this information to ensure that extent aliases are renamed
     /// correctly in <see cref="SqlSelectStatement.WriteSql"/></item>
     /// <item>NameToExtent has all the extents in ExtentList as a dictionary.
-    /// This is used by <see cref="SqlGenerator.Visit(PropertyExpression)"/> to flatten
+    /// This is used by <see cref="SqlGenerator.Visit(DbPropertyExpression)"/> to flatten
     /// record accesses.</item>
     /// <item>IsNestedJoin - is used to determine whether a JoinSymbol is an 
     /// ordinary join symbol, or one that has a corresponding SqlSelectStatement.</item>
@@ -54,11 +57,11 @@ namespace FirebirdSql.Data.Entity
     {
         #region · Fields ·
 
-        private List<Symbol>                columnList;
-        private List<Symbol>                extentList;
-        private List<Symbol>                flattenedExtentList;
-        private Dictionary<string, Symbol>  nameToExtent;
-        private bool                        isNestedJoin;
+        private List<Symbol> columnList;
+        private List<Symbol> extentList;
+        private List<Symbol> flattenedExtentList;
+        private Dictionary<string, Symbol> nameToExtent;
+        private bool isNestedJoin;
 
         #endregion
 
@@ -70,40 +73,40 @@ namespace FirebirdSql.Data.Entity
             {
                 if (null == columnList)
                 {
-                    this.columnList = new List<Symbol>();
+                    columnList = new List<Symbol>();
                 }
-                return this.columnList;
+                return columnList;
             }
-            set { this.columnList = value; }
+            set { columnList = value; }
         }
-        
+
         internal List<Symbol> ExtentList
         {
-            get { return this.extentList; }
+            get { return extentList; }
         }
-        
+
         internal List<Symbol> FlattenedExtentList
         {
             get
             {
                 if (null == flattenedExtentList)
                 {
-                    this.flattenedExtentList = new List<Symbol>();
+                    flattenedExtentList = new List<Symbol>();
                 }
-                return this.flattenedExtentList;
+                return flattenedExtentList;
             }
-            set { this.flattenedExtentList = value; }
+            set { flattenedExtentList = value; }
         }
-        
+
         internal Dictionary<string, Symbol> NameToExtent
         {
-            get { return this.nameToExtent; }
+            get { return nameToExtent; }
         }
-        
+
         internal bool IsNestedJoin
         {
-            get { return this.isNestedJoin; }
-            set { this.isNestedJoin = value; }
+            get { return isNestedJoin; }
+            set { isNestedJoin = value; }
         }
 
         #endregion
@@ -113,8 +116,8 @@ namespace FirebirdSql.Data.Entity
         public JoinSymbol(string name, TypeUsage type, List<Symbol> extents)
             : base(name, type)
         {
-            this.extentList     = new List<Symbol>(extents.Count);
-            this.nameToExtent   = new Dictionary<string, Symbol>(extents.Count, StringComparer.OrdinalIgnoreCase);
+            extentList = new List<Symbol>(extents.Count);
+            nameToExtent = new Dictionary<string, Symbol>(extents.Count, StringComparer.OrdinalIgnoreCase);
 
             foreach (Symbol symbol in extents)
             {
@@ -126,5 +129,4 @@ namespace FirebirdSql.Data.Entity
         #endregion
     }
 }
-
 #endif

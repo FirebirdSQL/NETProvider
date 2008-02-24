@@ -13,9 +13,10 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
@@ -27,7 +28,7 @@ namespace FirebirdSql.Data.Entity
 {
     /// <summary>
     /// SkipClause represents the SKIP expression in a SqlSelectStatement. 
-    /// It has a count property, which indicates how rows should be skipped.
+    /// It has a count property, which indicates how many rows should be skipped.
     /// </summary>
     internal class SkipClause : ISqlFragment
     {
@@ -40,7 +41,7 @@ namespace FirebirdSql.Data.Entity
         #region · Internal Properties ·
 
         /// <summary>
-        /// How many top rows should be selected.
+        /// How many rows should be skipped.
         /// </summary>
         internal ISqlFragment SkipCount
         {
@@ -52,7 +53,7 @@ namespace FirebirdSql.Data.Entity
         #region · Constructors ·
 
         /// <summary>
-        /// Creates a TopClause with the given topCount and withTies.
+        /// Creates a SkipClause with the given skipCount.
         /// </summary>
         /// <param name="topCount"></param>
         internal SkipClause(ISqlFragment skipCount)
@@ -61,7 +62,7 @@ namespace FirebirdSql.Data.Entity
         }
 
         /// <summary>
-        /// Creates a TopClause with the given topCount and withTies.
+        /// Creates a SkipClause with the given skipCount.
         /// </summary>
         /// <param name="topCount"></param>
         internal SkipClause(int skipCount)

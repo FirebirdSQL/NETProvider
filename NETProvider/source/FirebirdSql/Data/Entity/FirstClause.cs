@@ -13,9 +13,10 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
@@ -41,9 +42,9 @@ namespace FirebirdSql.Data.Entity
         #region · Internal Properties ·
 
         /// <summary>
-        /// How many top rows should be selected.
+        /// How many first rows should be selected.
         /// </summary>
-        internal ISqlFragment TopCount
+        internal ISqlFragment FirstCount
         {
             get { return this.firstCount; }
         }
@@ -53,22 +54,22 @@ namespace FirebirdSql.Data.Entity
         #region · Constructors ·
 
         /// <summary>
-        /// Creates a TopClause with the given topCount and withTies.
+        /// Creates a FirstClause with the given topCount and withTies.
         /// </summary>
         /// <param name="topCount"></param>
-        internal FirstClause(ISqlFragment topCount)
+        internal FirstClause(ISqlFragment firstCount)
         {
-            this.firstCount = topCount;
+            this.firstCount = firstCount;
         }
 
         /// <summary>
         /// Creates a TopClause with the given topCount and withTies.
         /// </summary>
         /// <param name="topCount"></param>
-        internal FirstClause(int topCount)
+        internal FirstClause(int firstCount)
         {
             SqlBuilder sqlBuilder = new SqlBuilder();
-            sqlBuilder.Append(topCount.ToString(CultureInfo.InvariantCulture));
+            sqlBuilder.Append(firstCount.ToString(CultureInfo.InvariantCulture));
             this.firstCount = sqlBuilder;
         }
 
@@ -84,7 +85,7 @@ namespace FirebirdSql.Data.Entity
         /// <param name="sqlGenerator"></param>
         public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
         {
-            writer.Write("TOP (");
+            writer.Write("FIRST (");
             this.TopCount.WriteSql(writer, sqlGenerator);
             writer.Write(")");
 

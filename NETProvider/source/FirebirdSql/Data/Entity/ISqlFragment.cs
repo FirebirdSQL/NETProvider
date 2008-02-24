@@ -13,9 +13,10 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
@@ -25,9 +26,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using FirebirdSql.Data.FirebirdClient;
+using System.Data.SqlClient;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
+
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Entity
 {
@@ -57,5 +60,4 @@ namespace FirebirdSql.Data.Entity
         void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator);
     }
 }
-
 #endif

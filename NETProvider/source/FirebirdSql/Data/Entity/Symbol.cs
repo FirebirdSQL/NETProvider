@@ -13,9 +13,10 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
@@ -25,7 +26,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using FirebirdSql.Data.FirebirdClient;
+using System.Data.SqlClient;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 
@@ -54,13 +55,12 @@ namespace FirebirdSql.Data.Entity
         #region · Fields ·
 
         private Dictionary<string, Symbol> columns = new Dictionary<string, Symbol>(StringComparer.CurrentCultureIgnoreCase);
+        private bool needsRenaming = false;
+        private bool isUnnest = false;
+        private string name;
+        private string newName;
+        private TypeUsage type;
 
-        private bool        needsRenaming   = false;
-        private bool        isUnnest        = false;
-        private string      name;
-        private string      newName;
-        private TypeUsage   type;
-        
         #endregion
 
         #region · Public Properties ·
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Entity
         {
             get { return this.name; }
         }
-        
+
         public string NewName
         {
             get { return this.newName; }
@@ -109,9 +109,9 @@ namespace FirebirdSql.Data.Entity
 
         public Symbol(string name, TypeUsage type)
         {
-            this.name       = name;
-            this.newName    = name;
-            this.Type       = type;
+            this.name = name;
+            this.newName = name;
+            this.Type = type;
         }
 
         #endregion
@@ -130,20 +130,18 @@ namespace FirebirdSql.Data.Entity
         {
             if (this.NeedsRenaming)
             {
-                string  newName = null;
-                int     i       = sqlGenerator.AllColumnNames[this.NewName];
-
+                string newName;
+                int i = sqlGenerator.AllColumnNames[this.NewName];
                 do
                 {
                     ++i;
                     newName = this.Name + i.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 } while (sqlGenerator.AllColumnNames.ContainsKey(newName));
-
                 sqlGenerator.AllColumnNames[this.NewName] = i;
 
                 // Prevent it from being renamed repeatedly.
-                this.NeedsRenaming  = false;
-                this.NewName        = newName;
+                this.NeedsRenaming = false;
+                this.NewName = newName;
 
                 // Add this column name to list of known names so that there are no subsequent
                 // collisions
@@ -156,5 +154,4 @@ namespace FirebirdSql.Data.Entity
         #endregion
     }
 }
-
 #endif
