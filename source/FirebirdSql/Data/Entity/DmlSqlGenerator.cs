@@ -13,9 +13,10 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
@@ -28,11 +29,12 @@ using System.IO;
 using System.Text;
 using System.Data;
 using System.Data.Common;
-using FirebirdSql.Data.FirebirdClient;
+using System.Data.SqlClient;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 using System.Data.Common.Utils;
 using System.Data.Mapping.Update.Internal;
+
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Entity
@@ -95,7 +97,6 @@ namespace FirebirdSql.Data.Entity
                 commandText.Append(parameter.ParameterName);
                 commandText.Append(" = 0");
             }
-
             commandText.AppendLine();
 
             // where c1 = ..., c2 = ...
@@ -106,8 +107,7 @@ namespace FirebirdSql.Data.Entity
             // generate returning sql
             GenerateReturningSql(commandText, tree, translator, tree.Returning); 
 
-            parameters = translator.Parameters;
-            
+            parameters = translator.Parameters;          
             return commandText.ToString();
         }
 
@@ -126,7 +126,6 @@ namespace FirebirdSql.Data.Entity
             tree.Predicate.Accept(translator);
 
             parameters = translator.Parameters;
-
             return commandText.ToString();
         }
 
@@ -155,13 +154,11 @@ namespace FirebirdSql.Data.Entity
                 }
                 setClause.Property.Accept(translator);
             }
-
             commandText.AppendLine(")");
 
             // values c1, c2, ...
             first = true;
             commandText.Append("values (");
-
             foreach (DbSetClause setClause in tree.SetClauses)
             {
                 if (first) 
@@ -171,20 +168,17 @@ namespace FirebirdSql.Data.Entity
                 else 
                 { 
                     commandText.Append(", "); 
-                }
-                
+                }               
                 setClause.Value.Accept(translator);
 
                 translator.RegisterMemberValue(setClause.Property, setClause.Value);
             }
-
             commandText.AppendLine(")");
 
             // generate returning sql
             GenerateReturningSql(commandText, tree, translator, tree.Returning);
 
-            parameters = translator.Parameters;
-            
+            parameters = translator.Parameters;            
             return commandText.ToString();
         }
 
@@ -259,8 +253,7 @@ namespace FirebirdSql.Data.Entity
                 // retrieve member value sql. the translator remembers member values
                 // as it constructs the DML statement (which precedes the "returning"
                 // SQL)
-                DbParameter value;
-            
+                DbParameter value;           
                 if (translator.MemberValues.TryGetValue(keyMember, out value))
                 {
                     commandText.Append(value.ParameterName);
@@ -284,5 +277,4 @@ namespace FirebirdSql.Data.Entity
         #endregion
     }
 }
-
 #endif

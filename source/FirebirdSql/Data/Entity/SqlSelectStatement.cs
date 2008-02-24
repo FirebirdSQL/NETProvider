@@ -13,9 +13,10 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
@@ -23,6 +24,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Data.SqlClient;
+using System.Data.Metadata.Edm;
+using System.Data.Common.CommandTrees;
 
 namespace FirebirdSql.Data.Entity
 {
@@ -166,7 +172,6 @@ namespace FirebirdSql.Data.Entity
                 {
                     this.orderBy = new SqlBuilder();
                 }
-
                 return this.orderBy;
             }
         }
@@ -208,11 +213,11 @@ namespace FirebirdSql.Data.Entity
         {
             get
             {
-                if (null == this.outerExtents)
+                if (null == outerExtents)
                 {
                     this.outerExtents = new Dictionary<Symbol, bool>();
                 }
-                return this.outerExtents;
+                return outerExtents;
             }
         }
 
@@ -254,7 +259,6 @@ namespace FirebirdSql.Data.Entity
                 {
                     this.where = new SqlBuilder();
                 }
-
                 return this.where;
             }
         }
@@ -309,7 +313,6 @@ namespace FirebirdSql.Data.Entity
                 foreach (Symbol outerExtent in outerExtents.Keys)
                 {
                     JoinSymbol joinSymbol = outerExtent as JoinSymbol;
-
                     if (joinSymbol != null)
                     {
                         foreach (Symbol symbol in joinSymbol.FlattenedExtentList)
@@ -336,7 +339,6 @@ namespace FirebirdSql.Data.Entity
             // If AllJoinExtents is non-null - it has precedence.
             // The new name is derived from the old name - we append an increasing int.
             List<Symbol> extentList = this.AllJoinExtents ?? this.fromExtents;
-
             if (null != extentList)
             {
                 foreach (Symbol fromAlias in extentList)
@@ -377,7 +379,6 @@ namespace FirebirdSql.Data.Entity
             writer.Indent += 1; // ++ can be confusing in this context
 
             writer.Write("SELECT ");
-
             if (this.IsDistinct)
             {
                 writer.Write("DISTINCT ");
@@ -434,5 +435,4 @@ namespace FirebirdSql.Data.Entity
         #endregion
     }
 }
-
 #endif

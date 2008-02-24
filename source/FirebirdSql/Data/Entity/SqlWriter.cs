@@ -13,16 +13,22 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 1
+ *  Based on the Microsoft Entity Framework Provider Sample Beta 3
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Data.SqlClient;
+using System.Data.Metadata.Edm;
+using System.Data.Common.CommandTrees;
 
 namespace FirebirdSql.Data.Entity
 {
@@ -56,9 +62,9 @@ namespace FirebirdSql.Data.Entity
         #region · Constructors ·
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqlWriter"/> class.
+        /// 
         /// </summary>
-        /// <param name="b">The b.</param>
+        /// <param name="b"></param>
         public SqlWriter(StringBuilder b) 
             : base(b, System.Globalization.CultureInfo.InvariantCulture)
         {
@@ -92,7 +98,6 @@ namespace FirebirdSql.Data.Entity
                     }
                     this.atBeginningOfLine = false;
                 }
-
                 base.Write(value);
             }
         }
@@ -111,5 +116,4 @@ namespace FirebirdSql.Data.Entity
         #endregion
     }
 }
-
 #endif
