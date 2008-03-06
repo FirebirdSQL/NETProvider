@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdCl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests", "FirebirdSql\Data\UnitTests\FirebirdSql.Data.UnitTests.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WixInstaller", "WixInstaller\WixInstaller.wixproj", "{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,12 +14,9 @@ Global
 		EntityFW|Any CPU = EntityFW|Any CPU
 		EntityFW|Mixed Platforms = EntityFW|Mixed Platforms
 		EntityFW|Win32 = EntityFW|Win32
-		Release20|Any CPU = Release20|Any CPU
-		Release20|Mixed Platforms = Release20|Mixed Platforms
-		Release20|Win32 = Release20|Win32
-		Release35|Any CPU = Release35|Any CPU
-		Release35|Mixed Platforms = Release35|Mixed Platforms
-		Release35|Win32 = Release35|Win32
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{326A24F9-6259-45DB-835C-18DB80728460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -30,16 +29,11 @@ Global
 		{326A24F9-6259-45DB-835C-18DB80728460}.EntityFW|Mixed Platforms.ActiveCfg = EntityFW|Any CPU
 		{326A24F9-6259-45DB-835C-18DB80728460}.EntityFW|Mixed Platforms.Build.0 = EntityFW|Any CPU
 		{326A24F9-6259-45DB-835C-18DB80728460}.EntityFW|Win32.ActiveCfg = EntityFW|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release20|Any CPU.ActiveCfg = Release20|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release20|Any CPU.Build.0 = Release20|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release20|Mixed Platforms.ActiveCfg = Release20|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release20|Mixed Platforms.Build.0 = Release20|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release20|Win32.ActiveCfg = Release20|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release35|Any CPU.ActiveCfg = Release35|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release35|Any CPU.Build.0 = Release35|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release35|Mixed Platforms.ActiveCfg = Release35|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release35|Mixed Platforms.Build.0 = Release35|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release35|Win32.ActiveCfg = Release35|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Any CPU.Build.0 = Release|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Win32.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -50,16 +44,26 @@ Global
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.EntityFW|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.EntityFW|Mixed Platforms.Build.0 = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.EntityFW|Win32.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release20|Any CPU.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release20|Any CPU.Build.0 = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release20|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release20|Mixed Platforms.Build.0 = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release20|Win32.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release35|Any CPU.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release35|Any CPU.Build.0 = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release35|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release35|Mixed Platforms.Build.0 = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release35|Win32.ActiveCfg = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Win32.ActiveCfg = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.EntityFW|Any CPU.ActiveCfg = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.EntityFW|Any CPU.Build.0 = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.EntityFW|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.EntityFW|Mixed Platforms.Build.0 = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.EntityFW|Win32.ActiveCfg = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
