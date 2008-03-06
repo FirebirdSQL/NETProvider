@@ -9,7 +9,7 @@
               Assembly=".net"
               KeyPath="yes"
               Name="FirebirdSql.Data.FirebirdClient.dll"
-              Source="$(var.SolutionDir)/../build/win32/ado.net/net-2.0/bin/release/FirebirdSql.Data.FirebirdClient.dll"
+              Source="$(var.SolutionDir)FirebirdSql\Data\bin\Release\FirebirdSql.Data.FirebirdClient.dll"
           />
         </Component>
       </Directory>
