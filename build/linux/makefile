@@ -1,4 +1,4 @@
-<div class="moz-text-flowed" style="font-family: -moz-fixed">PROVIDER = FirebirdSql.Data.FirebirdClient.dll
+PROVIDER = FirebirdSql.Data.FirebirdClient.dll
 PROVIDER_TESTS = FirebirdSql.Data.FirebirdClient.UnitTests.dll
 
 all: preprocess ${PROVIDER} ${PROVIDER_TESTS} install clean
@@ -70,5 +70,3 @@ clean:
 	${RM} FirebirdSql.Data.FirebirdClient.snk
 	${RM} $(PROVIDER)
 	${RM} $(PROVIDER_TESTS)
-
-</div>
