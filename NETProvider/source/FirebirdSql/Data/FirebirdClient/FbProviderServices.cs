@@ -106,8 +106,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 throw new ArgumentException(string.Format("The connection given is not of type '{0}'.", typeof(FbConnection)));
             }
 
-            #warning Implement ProviderManifest for FB
-            return new SampleProviderManifest(connection);
+            return new FbProviderManifest(connection);
         }
 
         protected override DbProviderManifest GetDbProviderManifest(string versionHint)
@@ -117,8 +116,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 throw new ArgumentException("Could not determine store version; a valid store connection or a version hint is required.");
             }
 
-            #warning Implement ProviderManifest for FB
-            return new SampleProviderManifest(versionHint);
+            return new FbProviderManifest(versionHint);
         }
 
         internal static XmlReader GetXmlResource(string resourceName)
@@ -236,5 +234,4 @@ namespace FirebirdSql.Data.FirebirdClient
         #endregion OLD CODE
     }
 }
-
 #endif

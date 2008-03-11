@@ -83,6 +83,7 @@
     <Compile Include="Entity\Symbol.cs" />
     <Compile Include="Entity\SymbolPair.cs" />
     <Compile Include="Entity\SymbolTable.cs" />
+    <Compile Include="FirebirdClient\FbProviderManifest.cs" />
     <Compile Include="FirebirdClient\FbProviderServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Client\Common\ArrayBoundMarshal.cs" />
