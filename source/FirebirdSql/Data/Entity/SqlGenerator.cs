@@ -31,6 +31,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
+using System.Data;
 
 using FirebirdSql.Data.FirebirdClient;
 
