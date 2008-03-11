@@ -32,7 +32,7 @@
   <ItemGroup>
     <Reference Include="FirebirdSql.Data.FirebirdClient, Version=2.5.0.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\NETProvider\build\win32\ado.net\net-2.0\bin\release\FirebirdSql.Data.FirebirdClient.dll</HintPath>
+      <HintPath>..\..\..\..\..\NETProvider\source\FirebirdSql\Data\bin\Release\FirebirdSql.Data.FirebirdClient.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
