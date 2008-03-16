@@ -190,8 +190,7 @@
 335544510=lock time-out on wait transaction
 335544511=procedure {0} is not defined
 335544512=Input parameter mismatch for procedure {0}
-335544513=Database {0}: WAL subsystem bug for pid {1}\
-{2}
+335544513=Database {0}: WAL subsystem bug for pid {1}\n{2}
 335544514=Could not expand the WAL segment for database {0}
 335544515=status code {0} unknown
 335544516=exception {0} not defined
