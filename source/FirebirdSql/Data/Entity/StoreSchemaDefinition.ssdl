@@ -4,14 +4,14 @@
     <EntitySet Name="STables" EntityType="Self.Table">
       <DefiningQuery>
         SELECT
-        '[' + TABLE_SCHEMA + ']' + '[' + TABLE_NAME + ']' [Id]
-        ,   TABLE_CATALOG [Catalog]
-        ,   TABLE_SCHEMA [Schema]
-        ,   TABLE_NAME    [Name]
+        rdb$relation_id [Id]
+        ,   NULL [Catalog]
+        ,   NULL [Schema]
+        ,   rdb$relation_name [Name]
         FROM
-        INFORMATION_SCHEMA.TABLES
+        rdb$relations
         WHERE
-        TABLE_TYPE = 'BASE TABLE'
+        rdb$view_source IS NULL and rdb$system_flag = 0
       </DefiningQuery>
     </EntitySet>
     <EntitySet Name="STableColumns" EntityType="Self.TableColumn">

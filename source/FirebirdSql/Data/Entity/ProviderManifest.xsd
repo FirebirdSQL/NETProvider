@@ -1,167 +1,149 @@
-﻿<!--
-   <copyright file="ProviderManifest.xsd" company="Microsoft">
-        Copyright (c) Microsoft Corporation.  All rights reserved.
-   </copyright>
-
-  <Provider_Writer_Tech_Preview_notes>
-        This is the schema for provider manifests
-        which describes type mappings and functions for the data store
-  </Provider_Writer_Tech_Preview_notes>
--->
-
-<?xml version="1.0" encoding="utf-8"?>
-<xs:schema elementFormDefault="qualified" 
-		   xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-		   targetNamespace="http://schemas.microsoft.com/ado/2006/04/edm/providermanifest" 
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		   targetNamespace="http://schemas.microsoft.com/ado/2006/04/edm/providermanifest"
 		   xmlns:pm="http://schemas.microsoft.com/ado/2006/04/edm/providermanifest">
 
-    <xs:element name="ProviderManifest">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="Types" type="pm:TTypes" minOccurs="1" maxOccurs="1" />
-                <xs:element name="Functions" type="pm:TFunctions" minOccurs="1" maxOccurs="1"/>
-            </xs:sequence>
-            <xs:attribute name="Namespace" type="xs:string" use="required"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="TVersion">
-        <xs:attribute name="Major" type="xs:int" use="required" />
-        <xs:attribute name="Minor" type="xs:int" use="required" />
-        <xs:attribute name="Build" type="xs:int" use="required" />
-        <xs:attribute name="Revision" type="xs:int" use="required" />
+  <xs:element name="ProviderManifest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Types" type="pm:TTypes" minOccurs="1" maxOccurs="1" />
+        <xs:element name="Functions" type="pm:TFunctions" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Namespace" type="xs:string" use="required"/>
     </xs:complexType>
+  </xs:element>
+  <xs:complexType name="TVersion">
+    <xs:attribute name="Major" type="xs:int" use="required" />
+    <xs:attribute name="Minor" type="xs:int" use="required" />
+    <xs:attribute name="Build" type="xs:int" use="required" />
+    <xs:attribute name="Revision" type="xs:int" use="required" />
+  </xs:complexType>
 
-    <xs:complexType name="TIntegerFacetDescription">
-        <xs:attribute name="Minimum" type="xs:int" use="optional" />
-        <xs:attribute name="Maximum" type="xs:int" use="optional" />
-        <xs:attribute name="Default" type="xs:int" use="optional" />
-        <xs:attribute name="Constant" type="xs:boolean" default="false" />
-    </xs:complexType>
+  <xs:complexType name="TIntegerFacetDescription">
+    <xs:attribute name="Minimum" type="xs:int" use="optional" />
+    <xs:attribute name="Maximum" type="xs:int" use="optional" />
+    <xs:attribute name="Default" type="xs:int" use="optional" />
+    <xs:attribute name="Constant" type="xs:boolean" default="false" />
+  </xs:complexType>
 
-    <xs:complexType name="TBooleanFacetDescription">
-        <xs:attribute name="Default" type="xs:boolean" use="optional" />
-        <xs:attribute name="Constant" type="xs:boolean" default="true" />
-    </xs:complexType>
+  <xs:complexType name="TBooleanFacetDescription">
+    <xs:attribute name="Default" type="xs:boolean" use="optional" />
+    <xs:attribute name="Constant" type="xs:boolean" default="true" />
+  </xs:complexType>
 
-    <xs:complexType name="TDateTimeFacetDescription">
-        <xs:attribute name="Default" type="pm:DateTimeKind" use="optional" />
-        <xs:attribute name="Constant" type="xs:boolean" default="false" />
-    </xs:complexType>
+  <xs:complexType name="TDateTimeFacetDescription">
+    <xs:attribute name="Default" type="pm:DateTimeKind" use="optional" />
+    <xs:attribute name="Constant" type="xs:boolean" default="false" />
+  </xs:complexType>
 
-    <xs:complexType name="TFacetDescriptions">
-        <xs:choice maxOccurs="unbounded">
-            <xs:element name="Precision" minOccurs="0" maxOccurs="1" type="pm:TIntegerFacetDescription"/>
-            <xs:element name="Scale" minOccurs="0" maxOccurs="1" type="pm:TIntegerFacetDescription"/>
-            <xs:element name="MaxLength" minOccurs="0" maxOccurs="1" type="pm:TIntegerFacetDescription"/>
-            <xs:element name="Unicode" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
-            <xs:element name="FixedLength" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
-            <xs:element name="PreserveSeconds" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
-            <xs:element name="DateTimeKind" minOccurs="0" maxOccurs="1" type="pm:TDateTimeFacetDescription"/>
-        </xs:choice>
-    </xs:complexType>
+  <xs:complexType name="TFacetDescriptions">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="Precision" minOccurs="0" maxOccurs="1" type="pm:TIntegerFacetDescription"/>
+      <xs:element name="Scale" minOccurs="0" maxOccurs="1" type="pm:TIntegerFacetDescription"/>
+      <xs:element name="MaxLength" minOccurs="0" maxOccurs="1" type="pm:TIntegerFacetDescription"/>
+      <xs:element name="Unicode" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
+      <xs:element name="FixedLength" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
+      <xs:element name="PreserveSeconds" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
+      <xs:element name="DateTimeKind" minOccurs="0" maxOccurs="1" type="pm:TDateTimeFacetDescription"/>
+    </xs:choice>
+  </xs:complexType>
 
-    <xs:complexType name="TConversions">
-        <xs:choice maxOccurs="unbounded">
-            <xs:element name="Promotable" type="pm:TConversion"/>
-            <xs:element name="Implicit" type="pm:TConversion"/>
-            <xs:element name="Explicit" type="pm:TConversion"/>
-        </xs:choice>
-    </xs:complexType>
+  <xs:complexType name="TType">
+    <xs:sequence>
+      <xs:element name="FacetDescriptions" type="pm:TFacetDescriptions" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="PrimitiveTypeKind" type="pm:TPrimitiveTypeKind" use="required" />
+  </xs:complexType>
 
-    <xs:complexType name="TConversion">
-        <xs:attribute name="DestinationType" type="xs:string" use="required" />
-    </xs:complexType>
+  <xs:complexType name="TTypes">
+    <xs:sequence>
+      <xs:element name="Type" type="pm:TType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="TType">
-        <xs:sequence>
-            <xs:element name="FacetDescriptions" type="pm:TFacetDescriptions" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="Conversions" type="pm:TConversions" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attribute name="Name" type="xs:string" use="required"/>
-        <xs:attribute name="PrimitiveTypeKind" type="pm:TPrimitiveTypeKind" use="required" />
-        <xs:attribute name="PreferredMapping" type="xs:boolean" default="false" />
-        <xs:attribute name="EqualComparabable" type="xs:boolean" use="optional" />
-        <xs:attribute name="OrderComparable" type="xs:boolean" use="optional" />
-        <xs:attribute name="Searchable" type="xs:boolean" use="optional" />
-    </xs:complexType>
+  <xs:attributeGroup name="TFacetAttribute">
+    <xs:attribute name="Precision" type="xs:int" use="optional"/>
+    <xs:attribute name="Scale" type="xs:int" use="optional"/>
+    <xs:attribute name="MaxLength" type="xs:int" use="optional"/>
+    <xs:attribute name="Unicode" type="xs:boolean" use="optional"/>
+    <xs:attribute name="FixedLength" type="xs:boolean" use="optional"/>
+    <xs:attribute name="PreserveSeconds" type="xs:boolean" use="optional"/>
+    <xs:attribute name="DateTimeKind" type="xs:boolean" use="optional"/>
+  </xs:attributeGroup>
 
-    <xs:complexType name="TTypes">
-        <xs:sequence>
-            <xs:element name="Type" type="pm:TType" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="TFunctionParameter">
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="Type" type="xs:string" use="required" />
+    <xs:attributeGroup ref="pm:TFacetAttribute" />
+    <xs:attribute name="Mode" type="pm:TParameterDirection" use="required" />
+  </xs:complexType>
 
-    <xs:complexType name="TFunctionParameter">
-        <xs:attribute name="Name" type="xs:string" use="required" />
-        <xs:attribute name="Type" type="xs:string" use="required" />
-        <xs:attribute name="Mode" type="pm:TParameterDirection" use="required" />
-    </xs:complexType>
+  <xs:complexType name="TReturnType">
+    <xs:attribute name="Type" type="xs:string" use="required" />
+    <xs:attributeGroup ref="pm:TFacetAttribute" />
+  </xs:complexType>
 
-    <xs:complexType name="TFunction">
-        <xs:sequence>
-            <xs:element name="Parameter" type="pm:TFunctionParameter" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attribute name="Name" type="xs:string" use="required" />
-        <xs:attribute name="ReturnType" type="xs:string" use="optional" />
-        <xs:attribute name="Aggregate" type="xs:boolean" use="optional" />
-        <xs:attribute name="BuiltIn" type="xs:boolean" use="optional" />
-        <xs:attribute name="StoreFunctionName" type="xs:string" use="optional" />
-        <xs:attribute name="NiladicFunction" type="xs:boolean" use="optional" />
-        <xs:attribute name="ParameterTypeSemantics" type="pm:TParameterTypeSemantics" use="optional" default="AllowImplicitConversion" />
-    </xs:complexType>
+  <xs:complexType name="TFunction">
+    <xs:choice minOccurs="0" maxOccurs ="unbounded">
+      <xs:element name ="ReturnType" type="pm:TReturnType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="Parameter" type="pm:TFunctionParameter" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:choice>
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="Aggregate" type="xs:boolean" use="optional" />
+    <xs:attribute name="BuiltIn" type="xs:boolean" use="optional" />
+    <xs:attribute name="StoreFunctionName" type="xs:string" use="optional" />
+    <xs:attribute name="NiladicFunction" type="xs:boolean" use="optional" />
+    <xs:attribute name="ParameterTypeSemantics" type="pm:TParameterTypeSemantics" use="optional" default="AllowImplicitConversion" />
+  </xs:complexType>
 
-    <xs:complexType name="TFunctions">
-        <xs:sequence>
-            <xs:element name="Function" type="pm:TFunction" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="TFunctions">
+    <xs:sequence>
+      <xs:element name="Function" type="pm:TFunction" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:simpleType name="TPrimitiveTypeKind">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="Binary"/>
-            <xs:enumeration value="Boolean"/>
-            <xs:enumeration value="Byte"/>
-            <xs:enumeration value="DateTime"/>
-            <xs:enumeration value="Decimal"/>
-            <xs:enumeration value="Double"/>
-            <xs:enumeration value="Guid"/>
-            <xs:enumeration value="Single"/>
-            <xs:enumeration value="SByte"/>
-            <xs:enumeration value="Int16"/>
-            <xs:enumeration value="Int32"/>
-            <xs:enumeration value="Int64"/>
-            <xs:enumeration value="Money"/>
-            <xs:enumeration value="String"/>
-            <xs:enumeration value="UInt16"/>
-            <xs:enumeration value="UInt32"/>
-            <xs:enumeration value="UInt64"/>
-            <xs:enumeration value="Xml"/>
-        </xs:restriction>
-    </xs:simpleType>
+  <xs:simpleType name="TPrimitiveTypeKind">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Binary"/>
+      <xs:enumeration value="Boolean"/>
+      <xs:enumeration value="Byte"/>
+      <xs:enumeration value="DateTime"/>
+      <xs:enumeration value="Decimal"/>
+      <xs:enumeration value="Double"/>
+      <xs:enumeration value="Guid"/>
+      <xs:enumeration value="Single"/>
+      <xs:enumeration value="SByte"/>
+      <xs:enumeration value="Int16"/>
+      <xs:enumeration value="Int32"/>
+      <xs:enumeration value="Int64"/>
+      <xs:enumeration value="String"/>
+    </xs:restriction>
+  </xs:simpleType>
 
 
-    <xs:simpleType name="TParameterDirection">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="in"/>
-            <xs:enumeration value="out"/>
-            <xs:enumeration value="both"/>
-            <xs:enumeration value="return"/>
-        </xs:restriction>
-    </xs:simpleType>
+  <xs:simpleType name="TParameterDirection">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="In"/>
+      <xs:enumeration value="Out"/>
+      <xs:enumeration value="InOut"/>
+    </xs:restriction>
+  </xs:simpleType>
 
-    <xs:simpleType name="DateTimeKind">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="Local"/>
-            <xs:enumeration value="Unspecified"/>
-            <xs:enumeration value="Utc"/>
-        </xs:restriction>
-    </xs:simpleType>
+  <xs:simpleType name="DateTimeKind">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Local"/>
+      <xs:enumeration value="Unspecified"/>
+      <xs:enumeration value="Utc"/>
+    </xs:restriction>
+  </xs:simpleType>
 
-    <xs:simpleType name="TParameterTypeSemantics">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="ExactMatchOnly" />
-            <xs:enumeration value="AllowImplicitPromotion" />
-            <xs:enumeration value="AllowImplicitConversion" />
-        </xs:restriction>
-    </xs:simpleType>
+  <xs:simpleType name="TParameterTypeSemantics">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ExactMatchOnly" />
+      <xs:enumeration value="AllowImplicitPromotion" />
+      <xs:enumeration value="AllowImplicitConversion" />
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>
