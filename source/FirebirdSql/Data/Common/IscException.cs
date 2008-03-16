@@ -174,14 +174,7 @@ namespace FirebirdSql.Data.Common
                     }
                     catch
                     {
-                        message = null;
-                    }
-                    finally
-                    {
-                        if (message == null)
-                        {
-                            message = String.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
-                        }
+                        message = string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
                     }
 
                     ArrayList param = new ArrayList();
@@ -237,7 +230,7 @@ namespace FirebirdSql.Data.Common
                     }
                     catch
                     {
-                        message = String.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
+                        message = string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
 
                         builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
                     }
