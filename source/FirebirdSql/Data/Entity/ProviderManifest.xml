@@ -11,23 +11,23 @@ PROCESS
   <Types>
     <!--<Type Name="tinyint" PrimitiveTypeKind="Byte">
     </Type>-->
-    <Type Name="smallint" PrimitiveTypeKind="Int16" PreferredMapping="true">
+    <Type Name="smallint" PrimitiveTypeKind="Int16">
     </Type>
-    <Type Name="int" PrimitiveTypeKind="Int32" PreferredMapping="true">
+    <Type Name="int" PrimitiveTypeKind="Int32">
     </Type>
-    <Type Name="bigint" PrimitiveTypeKind="Int64" PreferredMapping="true">
+    <Type Name="bigint" PrimitiveTypeKind="Int64">
     </Type>
-    <Type Name="float" PrimitiveTypeKind="Double" PreferredMapping="true">
+    <Type Name="float" PrimitiveTypeKind="Double">
     </Type>
     <!--<Type Name="real" PrimitiveTypeKind="Single">
     </Type>-->
-    <Type Name="decimal" PrimitiveTypeKind="Decimal" PreferredMapping="true">
+    <Type Name="decimal" PrimitiveTypeKind="Decimal">
       <FacetDescriptions>
         <Precision Minimum="1" Maximum="38" Default="18" Constant="false" />
         <Scale Minimum="0" Maximum="38" Default="0" Constant="false" />
       </FacetDescriptions>
     </Type>
-    <Type Name="numeric" PrimitiveTypeKind="Decimal" PreferredMapping="true">
+    <Type Name="numeric" PrimitiveTypeKind="Decimal">
       <FacetDescriptions>
         <Precision Minimum="1" Maximum="38" Default="18" Constant="false" />
         <Scale Minimum="0" Maximum="38" Default="0" Constant="false" />
@@ -69,7 +69,7 @@ PROCESS
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
     </Type>-->
-    <Type Name="timestamp" PrimitiveTypeKind="DateTime" PreferredMapping="true">
+    <Type Name="timestamp" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
         <PreserveSeconds Default="true" Constant="true" />
         <DateTimeKind Default="Unspecified" Constant="true" />
@@ -89,7 +89,7 @@ PROCESS
         <DateTimeKind Default="Unspecified" Constant="true" />
       </FacetDescriptions>
     </Type>-->
-    <Type Name="datetime" PrimitiveTypeKind="DateTime" PreferredMapping="true">
+    <Type Name="datetime" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
         <PreserveSeconds Default="true" Constant="true" />
         <DateTimeKind Default="Unspecified" Constant="true" />
@@ -102,14 +102,14 @@ PROCESS
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
     </Type>-->
-    <Type Name="varchar" PrimitiveTypeKind="String" PreferredMapping="true">
+    <Type Name="varchar" PrimitiveTypeKind="String">
       <FacetDescriptions>
         <MaxLength Minimum="1" Maximum="8000" Default="8000" Constant="false" />
         <Unicode Default="false" Constant="true" />
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
     </Type>
-    <Type Name="char" PrimitiveTypeKind="String" PreferredMapping="true">
+    <Type Name="char" PrimitiveTypeKind="String">
       <FacetDescriptions>
         <MaxLength Minimum="1" Maximum="8000" Default="8000" Constant="false" />
         <Unicode Default="false" Constant="true" />
