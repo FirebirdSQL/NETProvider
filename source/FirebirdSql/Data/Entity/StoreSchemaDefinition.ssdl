@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Schema Namespace="FirebirdClient" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
   <EntityContainer Name="Schema">
     <EntitySet Name="STables" EntityType="Self.Table">
@@ -97,7 +97,7 @@
         SELECT
         rdb$constraint_name as "Id"
         ,   rdb$constraint_name as "Name"
-        ,   CASE rdb$delete_rule when 'DELETE' THEN '1' ELSE '0' END as "IsCascadeDelete"
+        ,   CASE rdb$delete_rule when 'CASCADE' THEN '1' ELSE '0' END as "IsCascadeDelete"
         FROM
         rdb$ref_constraints
       </DefiningQuery>
@@ -105,21 +105,13 @@
     <EntitySet Name="SRelationshipColumnMaps" EntityType="Self.RelationshipColumnMap">
       <DefiningQuery>
         SELECT
-        null as "Id"
-        ,   null as "FromColumnId"
-        ,   null as "ToColumnId"
-        ,   null as "RelationshipId"
-        ,   null as "MapOrdinal"
-        FROM
-        nothing
-        SELECT
         refc.rdb$constraint_name || is2.rdb$field_position as "Id"
-        , is1.rdb$field_name as "FromColumnId"
-        , is2.rdb$field_name as "ToColumnId"
+        , relc1.rdb$relation_name || is1.rdb$field_name as "FromColumnId"
+        , relc2.rdb$relation_name || is2.rdb$field_name as "ToColumnId"
         , refc.rdb$constraint_name as "RelationshipId"
         , is2.rdb$field_position as "MapOrdinal"
         FROM rdb$ref_constraints refc
-        LEFT LEFT rdb$relation_constraints relc1 ON (refc.rdb$constraint_name = relc1.rdb$constraint_name)
+        LEFT JOIN rdb$relation_constraints relc1 ON (refc.rdb$constraint_name = relc1.rdb$constraint_name)
           INNER JOIN rdb$index_segments is1 ON (relc1.rdb$index_name = is1.rdb$index_name)
         LEFT JOIN rdb$relation_constraints relc2 ON (refc.rdb$const_name_uq = relc2.rdb$constraint_name)
           INNER JOIN rdb$index_segments is2 ON (relc2.rdb$index_name = is2.rdb$index_name)
