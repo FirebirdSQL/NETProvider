@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema xmlns="http://schemas.microsoft.com/ado/2006/04/edm" xmlns:edm="http://schemas.microsoft.com/ado/2006/04/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" Namespace="Provider" Alias="Self">
+
+  <EntityContainer Name="SchemaInformation">
+    <EntitySet EntityType="Self.Table" Name="Tables" />
+    <EntitySet EntityType="Self.View" Name="Views" />
+    <EntitySet EntityType="Self.Function" Name="Functions" />
+    <EntitySet EntityType="Self.FunctionParameter" Name="FunctionParameters" />
+    <EntitySet EntityType="Self.TableColumn" Name="TableColumns" />
+    <EntitySet EntityType="Self.ViewColumn" Name="ViewColumns" />
+    <EntitySet EntityType="Self.PrimaryKey" Name="PrimaryKeys" />
+    <EntitySet EntityType="Self.Relationship" Name="Relationships" />
+    <EntitySet EntityType="Self.RelationshipColumnMap" Name="RelationshipColumnMaps" />
+    <AssociationSet Association="Self.ColumnPrimaryKey" Name="ColumnPrimaryKeys" />
+    <AssociationSet Association="Self.RelationshipRelationshipColumnMap" Name="RelationshipRelationshipColumnMaps" />
+    <AssociationSet Association="Self.FromColumnRelationshipColumnMap" Name="FromColumnRelationshipColumnMaps" />
+    <AssociationSet Association="Self.ToColumnRelationshipColumnMap" Name="ToColumnRelationshipColumnMaps" />
+    <AssociationSet Association="Self.TableTableColumn" Name="TableTableColumns" />
+    <AssociationSet Association="Self.ViewViewColumn" Name="ViewViewColumns" />
+    <AssociationSet Association="Self.FunctionFunctionParameter" Name="FunctionFunctionParameters" />
+  </EntityContainer>
+
+  <EntityType Name="Table">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Catalog" Type="String" MaxLength="256" />
+    <Property Name="Schema" Nullable="false" Type="String" MaxLength="256" />
+    <Property Name="Name" Nullable="false" Type="String" MaxLength="256" />
+    <NavigationProperty Relationship="Self.TableTableColumn" Name="Columns" FromRole="Table" ToRole="Column" />
+  </EntityType>
+
+  <EntityType Name="View">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Catalog" Type="String" MaxLength="256" />
+    <Property Name="Schema" Nullable="false" Type="String" MaxLength="256" />
+    <Property Name="Name" Nullable="false" Type="String" MaxLength="256" />
+    <Property Name="IsUpdatable" Nullable="false" Type="Boolean" />
+    <Property Name="ViewDefinition" Nullable="false" Type="String" MaxLength="Max" />
+    <NavigationProperty Relationship="Self.ViewViewColumn" Name="Columns" FromRole="View" ToRole="ViewColumn" />
+  </EntityType>
+
+  <EntityType Name="Function">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Catalog" Type="String" MaxLength="256" />
+    <Property Name="Schema" Nullable="false" Type="String" MaxLength="256" />
+    <Property Name="Name" Nullable="false" Type="String" MaxLength="256" />
+    <Property Name="ReturnTypeName" Type="String" MaxLength="256" />
+    <Property Name="ReturnMaxLength" Type="Int32" />
+    <Property Name="ReturnPrecision" Type="Int32" />
+    <Property Name="ReturnScale" Type="Int32" />
+    <Property Name="IsAggregate" Type="Boolean" />
+    <Property Name="IsComposable" Type="Boolean" />
+    <Property Name="IsBuiltIn" Type="Boolean" />
+    <Property Name="IsNiladic" Type="Boolean" />
+    <NavigationProperty Relationship="Self.FunctionFunctionParameter" Name="Parameters" FromRole="Function" ToRole="Parameter" />
+  </EntityType>
+
+  <EntityType Name="TableColumn">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Name" Nullable="false" MaxLength="256" Type="String" />
+    <Property Name="Ordinal" Nullable="false" Type="Int32" />
+    <Property Name="IsNullable" Nullable="false" Type="Boolean" />
+    <Property Name="TypeName" Nullable="false" Type="String" MaxLength="256" />
+    <Property Name="MaxLength" Type="Int32" />
+    <Property Name="Precision" Type="Int32" />
+    <Property Name="Scale" Type="Int32" />
+    <Property Name="IsIdentity" Nullable="false" Type="Boolean" />
+    <Property Name="IsStoreGenerated" Nullable="false" Type="Boolean" />
+    <NavigationProperty Relationship="Self.TableTableColumn" Name="Table" FromRole="Column" ToRole="Table" />
+    <NavigationProperty Relationship="Self.ColumnPrimaryKey" Name="PrimaryKey" FromRole="Column" ToRole="PrimaryKey" />
+    <NavigationProperty Relationship="Self.FromColumnRelationshipColumnMap" Name="OutgoingRelationships" FromRole="Column" ToRole="RelationshipColumnMap" />
+    <NavigationProperty Relationship="Self.ToColumnRelationshipColumnMap" Name="IncomingRelationships" FromRole="Column" ToRole="RelationshipColumnMap" />
+  </EntityType>
+
+  <EntityType Name="ViewColumn">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Name" Nullable="false" MaxLength="256" Type="String" />
+    <Property Name="Ordinal" Nullable="false" Type="Int32" />
+    <Property Name="IsNullable" Nullable="false" Type="Boolean" />
+    <Property Name="TypeName" Nullable="false" Type="String" MaxLength="256" />
+    <Property Name="MaxLength" Type="Int32" />
+    <Property Name="Precision" Type="Int32" />
+    <Property Name="Scale" Type="Int32" />
+    <Property Name="IsIdentity" Nullable="false" Type="Boolean" />
+    <Property Name="IsStoreGenerated" Nullable="false" Type="Boolean" />
+    <NavigationProperty Relationship="Self.ViewViewColumn" Name="View" FromRole="ViewColumn" ToRole="View" />
+  </EntityType>
+
+  <EntityType Name="FunctionParameter">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Name" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Ordinal" Nullable="false" Type="Int32" />
+    <Property Name="TypeName" Nullable="false" Type="String" MaxLength="256" />
+    <Property Name="MaxLength" Nullable="true" Type="Int32" />
+    <Property Name="Precision" Nullable="true" Type="Int32" />
+    <Property Name="Scale" Nullable="true" Type="Int32" />
+    <Property Name="Mode" Type="String" MaxLength="16" />
+    <NavigationProperty Relationship="Self.FunctionFunctionParameter" Name="Function" FromRole="Parameter" ToRole="Function" />
+  </EntityType>
+
+  <EntityType Name="PrimaryKey">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Name" Nullable="false" MaxLength="256" Type="String" />
+    <Property Name="Ordinal" Nullable="false" Type="Int32" />
+    <NavigationProperty Relationship="Self.ColumnPrimaryKey" Name="Column" FromRole="PrimaryKey" ToRole="Column" />
+  </EntityType>
+
+  <EntityType Name="Relationship">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Name" Nullable="false" MaxLength="256" Type="String" />
+    <Property Name="IsCascadeDelete" Nullable="false" Type="Boolean" />
+    <NavigationProperty Relationship="Self.RelationshipRelationshipColumnMap" Name="ColumnMaps" FromRole="Relationship" ToRole="RelationshipColumnMap" />
+  </EntityType>
+
+  <EntityType Name="RelationshipColumnMap">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Nullable="false" Type="String" MaxLength="Max" />
+    <Property Name="Ordinal" Nullable="false" Type="Int32" />
+    <NavigationProperty Relationship="Self.FromColumnRelationshipColumnMap" Name="FromColumn" ToRole="Column" FromRole="RelationshipColumnMap" />
+    <NavigationProperty Relationship="Self.ToColumnRelationshipColumnMap" Name="ToColumn" ToRole="Column" FromRole="RelationshipColumnMap" />
+    <NavigationProperty Relationship="Self.RelationshipRelationshipColumnMap" Name="Relationship" FromRole="RelationshipColumnMap" ToRole="Relationship" />
+  </EntityType>
+
+  <Association Name="ColumnPrimaryKey">
+    <End Type="Self.TableColumn" Role="Column" Multiplicity="1" />
+    <End Type="Self.PrimaryKey" Role="PrimaryKey" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Column">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="PrimaryKey">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+
+  <Association Name="RelationshipRelationshipColumnMap">
+    <End Type="Self.Relationship" Role="Relationship" Multiplicity="1" />
+    <End Type="Self.RelationshipColumnMap" Role="RelationshipColumnMap" Multiplicity="*" />
+  </Association>
+
+  <Association Name="FromColumnRelationshipColumnMap">
+    <End Type="Self.TableColumn" Role="Column" Multiplicity="1" />
+    <End Type="Self.RelationshipColumnMap" Role="RelationshipColumnMap" Multiplicity="*" />
+  </Association>
+
+  <Association Name="ToColumnRelationshipColumnMap">
+    <End Type="Self.TableColumn" Role="Column" Multiplicity="1" />
+    <End Type="Self.RelationshipColumnMap" Role="RelationshipColumnMap" Multiplicity="*" />
+  </Association>
+
+  <Association Name="TableTableColumn">
+    <End Type="Self.Table" Role="Table" Multiplicity="1" />
+    <End Type="Self.TableColumn" Role="Column" Multiplicity="*" />
+  </Association>
+
+  <Association Name="ViewViewColumn">
+    <End Type="Self.View" Role="View" Multiplicity="1" />
+    <End Type="Self.ViewColumn" Role="ViewColumn" Multiplicity="*" />
+  </Association>
+
+  <Association Name="FunctionFunctionParameter">
+    <End Type="Self.Function" Role="Function" Multiplicity="1" />
+    <End Type="Self.FunctionParameter" Role="Parameter" Multiplicity="*" />
+  </Association>
+
+</Schema>
