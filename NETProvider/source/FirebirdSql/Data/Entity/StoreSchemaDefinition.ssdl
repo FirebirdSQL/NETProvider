@@ -6,8 +6,8 @@
       <DefiningQuery>
         SELECT
         rdb$relation_name as "Id"
-        ,   NULL as "Catalog"
-        ,   NULL as "Schema"
+        ,   '' as "Catalog"
+        ,   '' as "Schema"
         ,   rdb$relation_name as "Name"
         FROM
         rdb$relations
@@ -124,8 +124,8 @@
       <DefiningQuery>
         SELECT
         rdb$relation_name as "Id"
-        ,   NULL as "Catalog"
-        ,   NULL as "Schema"
+        ,   '' as "Catalog"
+        ,   '' as "Schema"
         ,   rdb$relation_name as "Name"
         ,   rdb$view_source as "ViewDefinition"
         ,   1 as "IsUpdatable"
@@ -140,8 +140,8 @@
       <DefiningQuery>
         SELECT
         rdb$procedure_name as "Id"
-        , null as "Catalog"
-        , null as "Schema"
+        , '' as "Catalog"
+        , '' as "Schema"
         , rdb$procedure_name as "Name"
         , null as "ReturnTypeName"
         , null as "ReturnMaxLength"
