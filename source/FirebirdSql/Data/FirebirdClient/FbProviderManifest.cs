@@ -99,7 +99,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public override string Token
         {
-            get { return _serverVersion; }
+            get
+            {
+#warning Finish this for real
+                return "FB";
+                return _serverVersion;
+            }
         }
 
         internal static XmlReader GetProviderManifest(DbConnection connection)
@@ -211,7 +216,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 //case "tinyint":
                 case "smallint":
                 case "bigint":
-                //case "bit":
+                case "smallint_bool":
                 //case "uniqueidentifier":
                 case "int":
                     return TypeUsage.CreateDefaultTypeUsage(edmPrimitiveType);
@@ -219,7 +224,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 case "varchar":
                     newPrimitiveTypeKind = PrimitiveTypeKind.String;
                     isUnbounded = !TypeHelpers.TryGetMaxLength(storeType, out maxLength);
-                    isUnicode = false;
+                    isUnicode = true; //TODO: hardcoded
                     isFixedLen = false;
                     break;
 
@@ -303,12 +308,6 @@ namespace FirebirdSql.Data.FirebirdClient
                         }
                     }
 
-                //case "money":
-                //    return TypeUsage.CreateDecimalTypeUsage(edmPrimitiveType, 19, 4);
-
-                //case "smallmoney":
-                //    return TypeUsage.CreateDecimalTypeUsage(edmPrimitiveType, 10, 4);
-
                 case "datetime":
                     return TypeUsage.CreateDateTimeTypeUsage(edmPrimitiveType, true, DateTimeKind.Unspecified);
 
@@ -370,8 +369,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
             switch (primitiveType.PrimitiveTypeKind)
             {
-                //case PrimitiveTypeKind.Boolean:
-                //    return TypeUsage.CreateDefaultTypeUsage(StoreTypeNameToStorePrimitiveType["bit"]);
+                case PrimitiveTypeKind.Boolean:
+                    return TypeUsage.CreateDefaultTypeUsage(StoreTypeNameToStorePrimitiveType["smallint_bool"]);
 
                 //case PrimitiveTypeKind.Byte:
                 //    return TypeUsage.CreateDefaultTypeUsage(StoreTypeNameToStorePrimitiveType["tinyint"]);
@@ -456,17 +455,17 @@ namespace FirebirdSql.Data.FirebirdClient
                         {
                             if (isFixedLength)
                             {
-                                tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["nchar"], true, true, maxLength);
+                                tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["char"], true, true, maxLength);
                             }
                             else
                             {
                                 if (isMaxLength)
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["nvarchar(max)"], true, false);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], true, false);
                                 }
                                 else
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["nvarchar"], true, false, maxLength);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], true, false, maxLength);
                                 }
                             }
                         }
@@ -480,7 +479,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             {
                                 if (isMaxLength)
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar(max)"], false, false);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], false, false);
                                 }
                                 else
                                 {

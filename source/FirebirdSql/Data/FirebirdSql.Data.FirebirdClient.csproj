@@ -281,7 +281,7 @@
     <EmbeddedResource Include="Entity\ProviderManifest.xsd" />
     <EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
     <EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
-    <EmbeddedResource Include="Entity\ConceptualSchemaDefinition.csdl" />
+    <None Include="Entity\ConceptualSchemaDefinition.csdl" />
     <None Include="Properties\FirebirdSql.Data.FirebirdClient.snk" />
   </ItemGroup>
   <ItemGroup>

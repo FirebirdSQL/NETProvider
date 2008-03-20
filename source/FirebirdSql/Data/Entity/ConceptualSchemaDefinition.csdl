@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Schema xmlns="http://schemas.microsoft.com/ado/2006/04/edm" xmlns:edm="http://schemas.microsoft.com/ado/2006/04/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" Namespace="Provider" Alias="Self">
-
+  
   <EntityContainer Name="SchemaInformation">
-    <EntitySet EntityType="Self.Table" Name="Tables" />
-    <EntitySet EntityType="Self.View" Name="Views" />
-    <EntitySet EntityType="Self.Function" Name="Functions" />
-    <EntitySet EntityType="Self.FunctionParameter" Name="FunctionParameters" />
+    <EntitySet EntityType="Self.Table" Name="Tables" /> 
+    <EntitySet EntityType="Self.View" Name="Views" /> 
+    <EntitySet EntityType="Self.Function" Name="Functions" /> 
+    <EntitySet EntityType="Self.FunctionParameter" Name="FunctionParameters" /> 
     <EntitySet EntityType="Self.TableColumn" Name="TableColumns" />
     <EntitySet EntityType="Self.ViewColumn" Name="ViewColumns" />
     <EntitySet EntityType="Self.PrimaryKey" Name="PrimaryKeys" />
@@ -17,7 +17,7 @@
     <AssociationSet Association="Self.ToColumnRelationshipColumnMap" Name="ToColumnRelationshipColumnMaps" />
     <AssociationSet Association="Self.TableTableColumn" Name="TableTableColumns" />
     <AssociationSet Association="Self.ViewViewColumn" Name="ViewViewColumns" />
-    <AssociationSet Association="Self.FunctionFunctionParameter" Name="FunctionFunctionParameters" />
+    <AssociationSet Association="Self.FunctionFunctionParameter" Name="FunctionFunctionParameters" />    
   </EntityContainer>
 
   <EntityType Name="Table">
@@ -30,8 +30,8 @@
     <Property Name="Name" Nullable="false" Type="String" MaxLength="256" />
     <NavigationProperty Relationship="Self.TableTableColumn" Name="Columns" FromRole="Table" ToRole="Column" />
   </EntityType>
-
-  <EntityType Name="View">
+  
+   <EntityType Name="View">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
@@ -62,7 +62,7 @@
     <Property Name="IsNiladic" Type="Boolean" />
     <NavigationProperty Relationship="Self.FunctionFunctionParameter" Name="Parameters" FromRole="Function" ToRole="Parameter" />
   </EntityType>
-
+  
   <EntityType Name="TableColumn">
     <Key>
       <PropertyRef Name="Id" />
@@ -174,19 +174,19 @@
     <End Type="Self.RelationshipColumnMap" Role="RelationshipColumnMap" Multiplicity="*" />
   </Association>
 
-  <Association Name="TableTableColumn">
+  <Association Name="TableTableColumn"> 
     <End Type="Self.Table" Role="Table" Multiplicity="1" />
     <End Type="Self.TableColumn" Role="Column" Multiplicity="*" />
   </Association>
 
-  <Association Name="ViewViewColumn">
+  <Association Name="ViewViewColumn"> 
     <End Type="Self.View" Role="View" Multiplicity="1" />
     <End Type="Self.ViewColumn" Role="ViewColumn" Multiplicity="*" />
   </Association>
-
+  
   <Association Name="FunctionFunctionParameter">
     <End Type="Self.Function" Role="Function" Multiplicity="1" />
     <End Type="Self.FunctionParameter" Role="Parameter" Multiplicity="*" />
   </Association>
-
+  
 </Schema>
