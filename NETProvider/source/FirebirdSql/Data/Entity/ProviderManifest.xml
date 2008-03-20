@@ -33,56 +33,14 @@ PROCESS
         <Scale Minimum="0" Maximum="38" Default="0" Constant="false" />
       </FacetDescriptions>
     </Type>
-    <!--<Type Name="smallmoney" PrimitiveTypeKind="Decimal">
-      <FacetDescriptions>
-        <Precision Default="10" Constant="true" />
-        <Scale Default="4" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
-    <!--<Type Name="money" PrimitiveTypeKind="Decimal">
-      <FacetDescriptions>
-        <Precision Default="19" Constant="true" />
-        <Scale Default="4" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
-    <!--<Type Name="binary" PrimitiveTypeKind="Binary">
-      <FacetDescriptions>
-        <MaxLength Minimum="1" Maximum="8000" Default="8000" Constant="false" />
-        <FixedLength Default="true" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
-    <!--<Type Name="varbinary" PrimitiveTypeKind="Binary">
-      <FacetDescriptions>
-        <MaxLength Minimum="1" Maximum="8000" Default="8000" Constant="false" />
-        <FixedLength Default="false" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
-    <!--<Type Name="varbinary(max)" PrimitiveTypeKind="Binary">
-      <FacetDescriptions>
-        <MaxLength Default="2147483647" Constant="true" />
-        <FixedLength Default="false" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
-    <!--<Type Name="image" PrimitiveTypeKind="Binary" >
-      <FacetDescriptions>
-        <MaxLength Default="2147483647" Constant="true" />
-        <FixedLength Default="false" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
     <Type Name="timestamp" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
         <PreserveSeconds Default="true" Constant="true" />
         <DateTimeKind Default="Unspecified" Constant="true" />
       </FacetDescriptions>
     </Type>
-    <!--<Type Name="rowversion" PrimitiveTypeKind="Binary">
-      <FacetDescriptions>
-        <MaxLength Default="8" Constant="true" />
-        <FixedLength Default="true" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
-    <!--<Type Name="bit" PrimitiveTypeKind="Boolean">
-    </Type>-->
+    <Type Name="smallint_bool" PrimitiveTypeKind="Boolean">
+    </Type>
     <!--<Type Name="smalldatetime" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
         <PreserveSeconds Default="false" Constant="true" />
@@ -102,17 +60,17 @@ PROCESS
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
     </Type>-->
-    <Type Name="varchar" PrimitiveTypeKind="String">
+    <!--<Type Name="varchar" PrimitiveTypeKind="String">
       <FacetDescriptions>
         <MaxLength Minimum="1" Maximum="8000" Default="8000" Constant="false" />
         <Unicode Default="false" Constant="true" />
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
-    </Type>
+    </Type>-->
     <Type Name="char" PrimitiveTypeKind="String">
       <FacetDescriptions>
         <MaxLength Minimum="1" Maximum="8000" Default="8000" Constant="false" />
-        <Unicode Default="false" Constant="true" />
+        <Unicode Default="false" Constant="false" />
         <FixedLength Default="true" Constant="true" />
       </FacetDescriptions>
     </Type>
@@ -130,13 +88,13 @@ PROCESS
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
     </Type>-->
-    <!--<Type Name="nvarchar(max)" PrimitiveTypeKind="String">
+    <Type Name="varchar" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength Default="1073741823" Constant="true" />
-        <Unicode Default="true" Constant="true" />
+        <MaxLength Default="8000" Minimum="1" Maximum="8000" Constant="false" />
+        <Unicode Default="true" Constant="false" />
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
-    </Type>-->
+    </Type>
     <!--<Type Name="ntext" PrimitiveTypeKind="String" >
       <FacetDescriptions>
         <MaxLength Default="1073741823" Constant="true" />
@@ -148,15 +106,6 @@ PROCESS
       <FacetDescriptions>
         <MaxLength Default="2147483647" Constant="true" />
         <Unicode Default="false" Constant="true" />
-        <FixedLength Default="false" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
-    <!--<Type Name="uniqueidentifier" PrimitiveTypeKind="Guid">
-    </Type>-->
-    <!--<Type Name="xml" PrimitiveTypeKind="String" >
-      <FacetDescriptions>
-        <MaxLength Default="1073741823" Constant="true" />
-        <Unicode Default="true" Constant="true" />
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
     </Type>-->

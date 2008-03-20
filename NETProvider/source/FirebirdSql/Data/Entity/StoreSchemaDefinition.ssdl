@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Schema Namespace="FirebirdClient" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
+<Schema Namespace="FirebirdClient_EF" Alias="Self"
+        xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
   <EntityContainer Name="Schema">
     <EntitySet Name="STables" EntityType="Self.Table">
       <DefiningQuery>
@@ -20,27 +21,27 @@
         ,   rf.rdb$relation_name as "TableId"
         ,   rf.rdb$field_name as "Name"
         ,   rf.rdb$field_position as "Ordinal"
-        ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN '1' ELSE '0' END as "IsNullable"   
+        ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN '1' ELSE '0' END as "IsNullable"
         ,   CASE f.rdb$field_type
-              WHEN 7 THEN 'smallint'
-              WHEN 8 THEN 'int'
-              WHEN 16 THEN 'bigint'
-              WHEN 10 THEN 'float'
-              WHEN 27 THEN 'double'
-              WHEN 12 THEN 'date'
-              WHEN 13 THEN 'time'
-              WHEN 35 THEN 'timestamp'
-              WHEN 261 THEN 'blob'
-              WHEN 37 THEN 'varchar'
-              WHEN 14 THEN 'char'
-              WHEN 40 THEN 'cstring'
-            END as "TypeName"
+        WHEN 7 THEN 'smallint'
+        WHEN 8 THEN 'int'
+        WHEN 16 THEN 'bigint'
+        WHEN 10 THEN 'float'
+        WHEN 27 THEN 'double'
+        WHEN 12 THEN 'date'
+        WHEN 13 THEN 'time'
+        WHEN 35 THEN 'timestamp'
+        WHEN 261 THEN 'blob'
+        WHEN 37 THEN 'varchar'
+        WHEN 14 THEN 'char'
+        WHEN 40 THEN 'cstring'
+        END as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
-        ,   f.rdb$field_precision as "Precision"    
+        ,   f.rdb$field_precision as "Precision"
         ,   f.rdb$field_scale as "Scale"
         ,   '0' as "IsIdentity"
         ,   CASE WHEN f.rdb$computed_blr IS NULL THEN '0' ELSE '1' END as "IsComputed"
-        ,   '0' as "IsStoreGenerated"  
+        ,   '0' as "IsStoreGenerated"
         FROM
         rdb$relation_fields rf LEFT JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
       </DefiningQuery>
@@ -112,9 +113,9 @@
         , is2.rdb$field_position as "MapOrdinal"
         FROM rdb$ref_constraints refc
         LEFT JOIN rdb$relation_constraints relc1 ON (refc.rdb$constraint_name = relc1.rdb$constraint_name)
-          INNER JOIN rdb$index_segments is1 ON (relc1.rdb$index_name = is1.rdb$index_name)
+        INNER JOIN rdb$index_segments is1 ON (relc1.rdb$index_name = is1.rdb$index_name)
         LEFT JOIN rdb$relation_constraints relc2 ON (refc.rdb$const_name_uq = relc2.rdb$constraint_name)
-          INNER JOIN rdb$index_segments is2 ON (relc2.rdb$index_name = is2.rdb$index_name)
+        INNER JOIN rdb$index_segments is2 ON (relc2.rdb$index_name = is2.rdb$index_name)
         WHERE is1.rdb$field_position = is2.rdb$field_position
       </DefiningQuery>
     </EntitySet>
@@ -201,72 +202,72 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)" />
-    <Property Name="Catalog" Type="nvarchar" MaxLength="256" />
-    <Property Name="Schema" Nullable="false" Type="nvarchar" MaxLength="256" />
-    <Property Name="Name" Nullable="false" Type="nvarchar" MaxLength="256" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Catalog" Type="varchar" MaxLength="256" />
+    <Property Name="Schema" Nullable="false" Type="varchar" MaxLength="256" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256" />
   </EntityType>
 
   <EntityType Name="View">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)" />
-    <Property Name="Catalog" Type="nvarchar" MaxLength="256" />
-    <Property Name="Schema" Nullable="false" Type="nvarchar" MaxLength="256" />
-    <Property Name="Name" Nullable="false" Type="nvarchar" MaxLength="256" />
-    <Property Name="ViewDefinition" Nullable="false" Type="nvarchar(max)" />
-    <Property Name="IsUpdatable" Nullable="false" Type="bit" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Catalog" Type="varchar" MaxLength="256" />
+    <Property Name="Schema" Nullable="false" Type="varchar" MaxLength="256" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256" />
+    <Property Name="ViewDefinition" Nullable="false" Type="varchar" />
+    <Property Name="IsUpdatable" Nullable="false" Type="smallint_bool" />
   </EntityType>
 
   <EntityType Name="Function">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)"/>
-    <Property Name="Catalog" Type="nvarchar" MaxLength="256"/>
-    <Property Name="Schema" Nullable="false" Type="nvarchar" MaxLength="256"/>
-    <Property Name="Name" Nullable="false" Type="nvarchar" MaxLength="256"/>
-    <Property Name="ReturnTypeName" Type="nvarchar" MaxLength="256" />
+    <Property Name="Id" Nullable="false" Type="varchar"/>
+    <Property Name="Catalog" Type="varchar" MaxLength="256"/>
+    <Property Name="Schema" Nullable="false" Type="varchar" MaxLength="256"/>
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
+    <Property Name="ReturnTypeName" Type="varchar" MaxLength="256" />
     <Property Name="ReturnMaxLength" Type="int" />
     <Property Name="ReturnPrecision" Type="int" />
     <Property Name="ReturnScale" Type="int" />
-    <Property Name="IsAggregate" Type="bit" />
-    <Property Name="IsComposable" Type="bit" />
-    <Property Name="IsBuiltIn" Type="bit" />
-    <Property Name="IsNiladic" Type="bit" />
+    <Property Name="IsAggregate" Type="smallint_bool" />
+    <Property Name="IsComposable" Type="smallint_bool" />
+    <Property Name="IsBuiltIn" Type="smallint_bool" />
+    <Property Name="IsNiladic" Type="smallint_bool" />
   </EntityType>
 
   <EntityType Name="FunctionParameter">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)"/>
-    <Property Name="FunctionId" Nullable="false" Type="nvarchar(max)"/>
-    <Property Name="Name" Nullable="false" Type="nvarchar(max)" />
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="256" />
+    <Property Name="FunctionId" Nullable="false" Type="varchar"/>
+    <Property Name="Name" Nullable="false" Type="varchar" />
     <Property Name="Ordinal" Nullable="false" Type="int"/>
-    <Property Name="TypeName" Nullable="false" Type="nvarchar" MaxLength="256" />
+    <Property Name="TypeName" Nullable="false" Type="varchar" MaxLength="256" />
     <Property Name="MaxLength" Nullable="true" Type="int" />
     <Property Name="Precision" Nullable="true" Type="int" />
     <Property Name="Scale" Nullable="true" Type="int" />
-    <Property Name="Mode" Type="nvarchar" MaxLength="16" />
+    <Property Name="Mode" Type="varchar" MaxLength="16" />
   </EntityType>
 
   <EntityType Name="TableColumn">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)"/>
-    <Property Name="TableId" Nullable="false" Type="nvarchar(max)"/>
-    <Property Name="Name" Nullable="false" Type="nvarchar" MaxLength="256"/>
+    <Property Name="Id" Nullable="false" Type="varchar"/>
+    <Property Name="TableId" Nullable="false" Type="varchar"/>
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
     <Property Name="Ordinal" Nullable="false" Type="int" />
-    <Property Name="IsNullable" Nullable="false" Type="bit" />
-    <Property Name="TypeName" Nullable="false" Type="nvarchar" MaxLength="256" />
+    <Property Name="IsNullable" Nullable="false" Type="smallint_bool" />
+    <Property Name="TypeName" Nullable="false" Type="varchar" MaxLength="256" />
     <Property Name="MaxLength" Type="int" />
     <Property Name="Precision" Type="int" />
     <Property Name="Scale" Type="int" />
-    <Property Name="IsIdentity" Nullable="false" Type="bit" />
-    <Property Name="IsStoreGenerated" Nullable="false" Type="bit" />
+    <Property Name="IsIdentity" Nullable="false" Type="smallint_bool" />
+    <Property Name="IsStoreGenerated" Nullable="false" Type="smallint_bool" />
   </EntityType>
 
 
@@ -274,17 +275,17 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)"/>
-    <Property Name="ViewId" Nullable="false" Type="nvarchar(max)"/>
-    <Property Name="Name" Nullable="false" Type="nvarchar" MaxLength="256"/>
+    <Property Name="Id" Nullable="false" Type="varchar"/>
+    <Property Name="ViewId" Nullable="false" Type="varchar"/>
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
     <Property Name="Ordinal" Nullable="false" Type="int" />
-    <Property Name="IsNullable" Nullable="false" Type="bit" />
-    <Property Name="TypeName" Nullable="false" Type="nvarchar" MaxLength="256" />
+    <Property Name="IsNullable" Nullable="false" Type="smallint_bool" />
+    <Property Name="TypeName" Nullable="false" Type="varchar" MaxLength="256" />
     <Property Name="MaxLength" Type="int" />
     <Property Name="Precision" Type="int" />
     <Property Name="Scale" Type="int" />
-    <Property Name="IsIdentity" Nullable="false" Type="bit" />
-    <Property Name="IsStoreGenerated" Nullable="false" Type="bit" />
+    <Property Name="IsIdentity" Nullable="false" Type="smallint_bool" />
+    <Property Name="IsStoreGenerated" Nullable="false" Type="smallint_bool" />
   </EntityType>
 
 
@@ -292,8 +293,8 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)" />
-    <Property Name="Name" Nullable="false" MaxLength="256" Type="nvarchar" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Name" Nullable="false" MaxLength="256" Type="varchar" />
     <Property Name="Ordinal" Nullable="false" Type="int" />
     <NavigationProperty Relationship="Self.ColumnPrimaryKey" Name="Column" FromRole="PrimaryKey" ToRole="Column" />
   </EntityType>
@@ -302,20 +303,20 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)" />
-    <Property Name="Name" Nullable="false" MaxLength="256" Type="nvarchar" />
-    <Property Name="IsCascadeDelete" Nullable="false" Type="bit" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Name" Nullable="false" MaxLength="256" Type="varchar" />
+    <Property Name="IsCascadeDelete" Nullable="false" Type="smallint_bool" />
   </EntityType>
 
   <EntityType Name="RelationshipColumnMap">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="nvarchar(max)" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
     <Property Name="MapOrdinal" Nullable="false" Type="int" />
-    <Property Name="RelationshipId" Nullable="false" Type="nvarchar(max)" />
-    <Property Name="FromColumnId" Nullable="false" Type="nvarchar(max)" />
-    <Property Name="ToColumnId" Nullable="false" Type="nvarchar(max)" />
+    <Property Name="RelationshipId" Nullable="false" Type="varchar" />
+    <Property Name="FromColumnId" Nullable="false" Type="varchar" />
+    <Property Name="ToColumnId" Nullable="false" Type="varchar" />
   </EntityType>
 
   <Association Name="ColumnPrimaryKey">
