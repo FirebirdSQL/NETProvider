@@ -95,6 +95,13 @@ PROCESS
         <FixedLength Default="false" Constant="true" />
       </FacetDescriptions>
     </Type>
+    <Type Name="varchar_max" PrimitiveTypeKind="String">
+      <FacetDescriptions>
+        <MaxLength Default="8000" Constant="true" />
+        <Unicode Default="true" Constant="false" />
+        <FixedLength Default="false" Constant="true" />
+      </FacetDescriptions>
+    </Type>
     <!--<Type Name="ntext" PrimitiveTypeKind="String" >
       <FacetDescriptions>
         <MaxLength Default="1073741823" Constant="true" />
