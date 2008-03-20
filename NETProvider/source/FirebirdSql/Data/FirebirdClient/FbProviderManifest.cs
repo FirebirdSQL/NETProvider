@@ -228,6 +228,13 @@ namespace FirebirdSql.Data.FirebirdClient
                     isFixedLen = false;
                     break;
 
+                case "varchar_max":
+                    newPrimitiveTypeKind = PrimitiveTypeKind.String;
+                    isUnbounded = true;
+                    isUnicode = true; //TODO: hardcoded
+                    isFixedLen = false;
+                    break;
+
                 case "char":
                     newPrimitiveTypeKind = PrimitiveTypeKind.String;
                     isUnbounded = !TypeHelpers.TryGetMaxLength(storeType, out maxLength);
@@ -461,7 +468,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             {
                                 if (isMaxLength)
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], true, false);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar_max"], true, false);
                                 }
                                 else
                                 {
@@ -479,7 +486,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             {
                                 if (isMaxLength)
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], false, false);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar_max"], false, false);
                                 }
                                 else
                                 {

@@ -202,7 +202,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar_max" />
     <Property Name="Catalog" Type="varchar" MaxLength="256" />
     <Property Name="Schema" Nullable="false" Type="varchar" MaxLength="256" />
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256" />
@@ -212,11 +212,11 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar_max" />
     <Property Name="Catalog" Type="varchar" MaxLength="256" />
     <Property Name="Schema" Nullable="false" Type="varchar" MaxLength="256" />
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256" />
-    <Property Name="ViewDefinition" Nullable="false" Type="varchar" />
+    <Property Name="ViewDefinition" Nullable="false" Type="varchar_max" />
     <Property Name="IsUpdatable" Nullable="false" Type="smallint_bool" />
   </EntityType>
 
@@ -224,7 +224,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar"/>
+    <Property Name="Id" Nullable="false" Type="varchar_max"/>
     <Property Name="Catalog" Type="varchar" MaxLength="256"/>
     <Property Name="Schema" Nullable="false" Type="varchar" MaxLength="256"/>
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
@@ -242,9 +242,9 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="256" />
-    <Property Name="FunctionId" Nullable="false" Type="varchar"/>
-    <Property Name="Name" Nullable="false" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar_max" />
+    <Property Name="FunctionId" Nullable="false" Type="varchar_max"/>
+    <Property Name="Name" Nullable="false" Type="varchar_max" />
     <Property Name="Ordinal" Nullable="false" Type="int"/>
     <Property Name="TypeName" Nullable="false" Type="varchar" MaxLength="256" />
     <Property Name="MaxLength" Nullable="true" Type="int" />
@@ -257,8 +257,8 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar"/>
-    <Property Name="TableId" Nullable="false" Type="varchar"/>
+    <Property Name="Id" Nullable="false" Type="varchar_max"/>
+    <Property Name="TableId" Nullable="false" Type="varchar_max"/>
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
     <Property Name="Ordinal" Nullable="false" Type="int" />
     <Property Name="IsNullable" Nullable="false" Type="smallint_bool" />
@@ -275,8 +275,8 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar"/>
-    <Property Name="ViewId" Nullable="false" Type="varchar"/>
+    <Property Name="Id" Nullable="false" Type="varchar_max"/>
+    <Property Name="ViewId" Nullable="false" Type="varchar_max"/>
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
     <Property Name="Ordinal" Nullable="false" Type="int" />
     <Property Name="IsNullable" Nullable="false" Type="smallint_bool" />
@@ -293,7 +293,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar_max" />
     <Property Name="Name" Nullable="false" MaxLength="256" Type="varchar" />
     <Property Name="Ordinal" Nullable="false" Type="int" />
     <NavigationProperty Relationship="Self.ColumnPrimaryKey" Name="Column" FromRole="PrimaryKey" ToRole="Column" />
@@ -303,7 +303,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar_max" />
     <Property Name="Name" Nullable="false" MaxLength="256" Type="varchar" />
     <Property Name="IsCascadeDelete" Nullable="false" Type="smallint_bool" />
   </EntityType>
@@ -312,11 +312,11 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar_max" />
     <Property Name="MapOrdinal" Nullable="false" Type="int" />
-    <Property Name="RelationshipId" Nullable="false" Type="varchar" />
-    <Property Name="FromColumnId" Nullable="false" Type="varchar" />
-    <Property Name="ToColumnId" Nullable="false" Type="varchar" />
+    <Property Name="RelationshipId" Nullable="false" Type="varchar_max" />
+    <Property Name="FromColumnId" Nullable="false" Type="varchar_max" />
+    <Property Name="ToColumnId" Nullable="false" Type="varchar_max" />
   </EntityType>
 
   <Association Name="ColumnPrimaryKey">
