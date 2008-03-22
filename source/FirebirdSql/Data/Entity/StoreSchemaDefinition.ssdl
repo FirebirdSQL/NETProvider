@@ -5,10 +5,10 @@
     <EntitySet Name="STables" EntityType="Self.Table">
       <DefiningQuery>
         SELECT
-        rdb$relation_name as "Id"
-        ,   '' as "Catalog"
-        ,   '' as "Schema"
-        ,   rdb$relation_name as "Name"
+        TRIM(rdb$relation_name) as "Id"
+        ,   'bar' as "Catalog"
+        ,   'foo' as "Schema" --keep it with space
+        ,   TRIM(rdb$relation_name) as "Name"
         FROM
         rdb$relations
         WHERE
@@ -17,12 +17,12 @@
     </EntitySet>
     <EntitySet Name="STableColumns" EntityType="Self.TableColumn">
       <DefiningQuery>
-        SELECT rf.rdb$relation_name || rf.rdb$field_name as "Id"
-        ,   rf.rdb$relation_name as "TableId"
-        ,   rf.rdb$field_name as "Name"
-        ,   rf.rdb$field_position as "Ordinal"
+        SELECT TRIM(rf.rdb$relation_name) || 'x' || TRIM(rf.rdb$field_name) as "Id"
+        ,   TRIM(rf.rdb$relation_name) as "TableId"
+        ,   TRIM(rf.rdb$field_name) as "Name"
+        ,   rf.rdb$field_position+1 as "Ordinal"
         ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN 1 ELSE 0 END as "IsNullable"
-        ,   CASE f.rdb$field_type
+        ,   TRIM(CASE f.rdb$field_type
         WHEN 7 THEN 'smallint'
         WHEN 8 THEN 'int'
         WHEN 16 THEN 'bigint'
@@ -35,7 +35,7 @@
         WHEN 37 THEN 'varchar'
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
-        END as "TypeName"
+        END) as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
         ,   f.rdb$field_precision as "Precision"
         ,   f.rdb$field_scale as "Scale"
@@ -52,12 +52,12 @@
 
     <EntitySet Name="SViewColumns" EntityType="Self.ViewColumn">
       <DefiningQuery>
-        SELECT rf.rdb$relation_name || rf.rdb$field_name as "Id"
-        ,   rf.rdb$relation_name as "ViewId"
-        ,   rf.rdb$field_name as "Name"
-        ,   rf.rdb$field_position as "Ordinal"
+        SELECT TRIM(rf.rdb$relation_name) || 'x' || TRIM(rf.rdb$field_name) as "Id"
+        ,   TRIM(rf.rdb$relation_name) as "ViewId"
+        ,   TRIM(rf.rdb$field_name) as "Name"
+        ,   rf.rdb$field_position+1 as "Ordinal"
         ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN 1 ELSE 0 END as "IsNullable"
-        ,   CASE f.rdb$field_type
+        ,   TRIM(CASE f.rdb$field_type
         WHEN 7 THEN 'smallint'
         WHEN 8 THEN 'int'
         WHEN 16 THEN 'bigint'
@@ -70,7 +70,7 @@
         WHEN 37 THEN 'varchar'
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
-        END as "TypeName"
+        END) as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
         ,   f.rdb$field_precision as "Precision"
         ,   f.rdb$field_scale as "Scale"
@@ -88,9 +88,9 @@
     <EntitySet Name="SPrimaryKeys" EntityType="Self.PrimaryKey">
       <DefiningQuery>
         SELECT
-        rc.rdb$relation_name || ise.rdb$field_name as "Id"
-        ,   rc.rdb$constraint_name as "Name"
-        ,   0 as "Ordinal"
+        TRIM(rc.rdb$relation_name) || 'x' || TRIM(ise.rdb$field_name) as "Id"
+        ,   TRIM(rc.rdb$constraint_name) as "Name"
+        ,   1 as "Ordinal"
         FROM
         rdb$relation_constraints rc LEFT JOIN rdb$index_segments ise ON (rc.rdb$index_name = ise.rdb$index_name)
         WHERE
@@ -100,8 +100,8 @@
     <EntitySet Name="SRelationships" EntityType="Self.Relationship">
       <DefiningQuery>
         SELECT
-        rdb$constraint_name as "Id"
-        ,   rdb$constraint_name as "Name"
+        TRIM(rdb$constraint_name) as "Id"
+        ,   TRIM(rdb$constraint_name) as "Name"
         ,   CASE rdb$delete_rule when 'CASCADE' THEN 1 ELSE 0 END as "IsCascadeDelete"
         FROM
         rdb$ref_constraints
@@ -110,11 +110,11 @@
     <EntitySet Name="SRelationshipColumnMaps" EntityType="Self.RelationshipColumnMap">
       <DefiningQuery>
         SELECT
-        refc.rdb$constraint_name || is2.rdb$field_position as "Id"
-        , relc1.rdb$relation_name || is1.rdb$field_name as "FromColumnId"
-        , relc2.rdb$relation_name || is2.rdb$field_name as "ToColumnId"
-        , refc.rdb$constraint_name as "RelationshipId"
-        , is2.rdb$field_position as "MapOrdinal"
+        TRIM(refc.rdb$constraint_name) || 'x' || TRIM(is2.rdb$field_position) as "Id"
+        , TRIM(relc1.rdb$relation_name) || 'x' || TRIM(is1.rdb$field_name) as "FromColumnId"
+        , TRIM(relc2.rdb$relation_name) || 'x' || TRIM(is2.rdb$field_name) as "ToColumnId"
+        , TRIM(refc.rdb$constraint_name) as "RelationshipId"
+        , is2.rdb$field_position+1 as "MapOrdinal"
         FROM rdb$ref_constraints refc
         LEFT JOIN rdb$relation_constraints relc1 ON (refc.rdb$constraint_name = relc1.rdb$constraint_name)
         INNER JOIN rdb$index_segments is1 ON (relc1.rdb$index_name = is1.rdb$index_name)
@@ -127,10 +127,10 @@
     <EntitySet Name="SViews" EntityType="Self.View">
       <DefiningQuery>
         SELECT
-        rdb$relation_name as "Id"
-        ,   '' as "Catalog"
-        ,   '' as "Schema"
-        ,   rdb$relation_name as "Name"
+        TRIM(rdb$relation_name) as "Id"
+        ,   'bar' as "Catalog"
+        ,   'foo' as "Schema" --keep it with space
+        ,   TRIM(rdb$relation_name) as "Name"
         ,   rdb$view_source as "ViewDefinition"
         ,   1 as "IsUpdatable"
         FROM
@@ -143,10 +143,10 @@
     <EntitySet Name="SFunctions" EntityType="Self.Function">
       <DefiningQuery>
         SELECT
-        rdb$procedure_name as "Id"
-        , '' as "Catalog"
-        , '' as "Schema"
-        , rdb$procedure_name as "Name"
+        TRIM(rdb$procedure_name) as "Id"
+        , 'bar' as "Catalog"
+        , 'foo' as "Schema" --keep it with space
+        , TRIM(rdb$procedure_name) as "Name"
         , null as "ReturnTypeName"
         , null as "ReturnMaxLength"
         , null as "ReturnPrecision"
@@ -163,10 +163,10 @@
     <EntitySet Name="SFunctionParameters" EntityType="Self.FunctionParameter">
       <DefiningQuery>
         SELECT
-        pp.rdb$parameter_name as "Id"
-        ,  pp.rdb$procedure_name as "FunctionId"
-        ,  pp.rdb$procedure_name as "Name"
-        ,  pp.rdb$parameter_number as "Ordinal"
+        TRIM(pp.rdb$parameter_name) as "Id"
+        ,  TRIM(pp.rdb$procedure_name) as "FunctionId"
+        ,  TRIM(pp.rdb$procedure_name) as "Name"
+        ,  pp.rdb$parameter_number+1 as "Ordinal"
         , CASE f.rdb$field_type
         WHEN 7 THEN 'smallint'
         WHEN 8 THEN 'int'
