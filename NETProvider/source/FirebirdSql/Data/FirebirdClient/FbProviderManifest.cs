@@ -276,12 +276,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 case "timestamp":
                     //case "rowversion":
-                    return TypeUsage.CreateBinaryTypeUsage(edmPrimitiveType, true, 8);
+                    return TypeUsage.CreateDateTimeTypeUsage(edmPrimitiveType, true, DateTimeKind.Unspecified);
 
                 case "float":
                     //case "real":
                     return TypeUsage.CreateDefaultTypeUsage(edmPrimitiveType);
 
+#warning Revork DefiningQuery
                 case "decimal":
                 case "numeric":
                     {

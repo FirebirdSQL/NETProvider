@@ -47,12 +47,12 @@ PROCESS
         <DateTimeKind Default="Unspecified" Constant="true" />
       </FacetDescriptions>
     </Type>-->
-    <Type Name="datetime" PrimitiveTypeKind="DateTime">
+    <!--<Type Name="datetime" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
         <PreserveSeconds Default="true" Constant="true" />
         <DateTimeKind Default="Unspecified" Constant="true" />
       </FacetDescriptions>
-    </Type>
+    </Type>-->
     <!--<Type Name="nvarchar" PrimitiveTypeKind="String">
       <FacetDescriptions>
         <MaxLength Minimum="1" Maximum="4000" Default="4000" Constant="false" />
