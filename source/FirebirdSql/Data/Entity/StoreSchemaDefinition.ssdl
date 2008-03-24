@@ -90,7 +90,7 @@
         SELECT
         TRIM(rc.rdb$relation_name) || 'x' || TRIM(ise.rdb$field_name) as "Id"
         ,   TRIM(rc.rdb$constraint_name) as "Name"
-        ,   1 as "Ordinal"
+        ,   ise.rdb$field_position+1 as "Ordinal"
         FROM
         rdb$relation_constraints rc LEFT JOIN rdb$index_segments ise ON (rc.rdb$index_name = ise.rdb$index_name)
         WHERE
