@@ -7,7 +7,7 @@
         SELECT
         TRIM(rdb$relation_name) as "Id"
         ,   'bar' as "Catalog"
-        ,   'foo' as "Schema" --keep it with space
+        ,   'foo' as "Schema" 
         ,   TRIM(rdb$relation_name) as "Name"
         FROM
         rdb$relations
@@ -129,7 +129,7 @@
         SELECT
         TRIM(rdb$relation_name) as "Id"
         ,   'bar' as "Catalog"
-        ,   'foo' as "Schema" --keep it with space
+        ,   'foo' as "Schema" 
         ,   TRIM(rdb$relation_name) as "Name"
         ,   rdb$view_source as "ViewDefinition"
         ,   1 as "IsUpdatable"
@@ -145,7 +145,7 @@
         SELECT
         TRIM(rdb$procedure_name) as "Id"
         , 'bar' as "Catalog"
-        , 'foo' as "Schema" --keep it with space
+        , 'foo' as "Schema" 
         , TRIM(rdb$procedure_name) as "Name"
         , null as "ReturnTypeName"
         , null as "ReturnMaxLength"
