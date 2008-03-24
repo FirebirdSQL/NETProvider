@@ -117,7 +117,7 @@ namespace FirebirdSql.Data.Entity
             ExpressionTranslator    translator  = new ExpressionTranslator(commandText, tree, false);
 
             // delete [schemaName].[tableName]
-            commandText.Append("delete ");
+            commandText.Append("delete from ");
             tree.Target.Expression.Accept(translator);
             commandText.AppendLine();
             
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.Entity
             bool                    first       = true;
 
             // insert [schemaName].[tableName]
-            commandText.Append("insert ");
+            commandText.Append("insert into ");
             tree.Target.Expression.Accept(translator);
 
             // (c1, c2, c3, ...)
