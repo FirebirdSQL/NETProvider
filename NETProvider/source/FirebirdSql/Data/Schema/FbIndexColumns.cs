@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -33,19 +36,18 @@ namespace FirebirdSql.Data.Schema
             StringBuilder where = new StringBuilder();
 
             sql.Append(
-                @"SELECT " +
-                    "null AS CONSTRAINT_CATALOG, " +
-                    "null AS CONSTRAINT_SCHEMA, " +
-                    "idx.rdb$index_name AS CONSTRAINT_NAME, " +
-                    "null AS TABLE_CATALOG, " +
-                    "null AS TABLE_SCHEMA, " +
-                    "idx.rdb$relation_name AS TABLE_NAME, " +
-                    "seg.rdb$field_name AS COLUMN_NAME, " +
-                    "seg.rdb$field_position AS ORDINAL_POSITION, " +
-                    "idx.rdb$index_name AS INDEX_NAME " +
-                "FROM " +
-                    "rdb$indices idx " +
-                    "left join rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name");
+                @"SELECT
+                    null AS CONSTRAINT_CATALOG,
+                    null AS CONSTRAINT_SCHEMA,
+                    idx.rdb$index_name AS CONSTRAINT_NAME,
+                    null AS TABLE_CATALOG,
+                    null AS TABLE_SCHEMA,
+                    idx.rdb$relation_name AS TABLE_NAME,
+                    seg.rdb$field_name AS COLUMN_NAME,
+                    seg.rdb$field_position AS ORDINAL_POSITION,
+                    idx.rdb$index_name AS INDEX_NAME
+                FROM rdb$indices idx
+                    LEFT JOIN rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name");
 
             if (restrictions != null)
             {
@@ -88,7 +90,7 @@ namespace FirebirdSql.Data.Schema
 
                     where.AppendFormat(CultureInfo.CurrentCulture, "seg.rdb$field_name = @p{0}", index++);
                 }
-			}
+            }
 
             if (where.Length > 0)
             {

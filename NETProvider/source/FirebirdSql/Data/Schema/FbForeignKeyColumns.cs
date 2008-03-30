@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -33,35 +36,27 @@ namespace FirebirdSql.Data.Schema
             StringBuilder where = new StringBuilder();
 
             sql.Append(
-                @"SELECT " +
-                    "null AS CONSTRAINT_CATALOG, " +
-                    "null AS CONSTRAINT_SCHEMA, " +
-                    "co.rdb$constraint_name AS CONSTRAINT_NAME, " +
-                    "null AS TABLE_CATALOG, " +
-                    "null AS TABLE_SCHEMA, " +
-                    "co.rdb$relation_name AS TABLE_NAME, " +
-                    "coidxseg.rdb$field_name AS COLUMN_NAME, " +
-                    "null as REFERENCED_TABLE_CATALOG, " +
-                    "null as REFERENCED_TABLE_SCHEMA, " +
-                    "refidx.rdb$relation_name as REFERENCED_TABLE_NAME, " +
-                    "refidxseg.rdb$field_name AS REFERENCED_COLUMN_NAME, " +
-                    "coidxseg.rdb$field_position as ORDINAL_POSITION " +
-                "FROM " +
-                    "rdb$relation_constraints co, " +
-                    "rdb$ref_constraints ref, " +
-                    "rdb$indices tempidx, " +
-                    "rdb$indices refidx," +
-                    "rdb$index_segments coidxseg, " +
-                    "rdb$index_segments refidxseg ");
-                
-            where.Append(
-                    "co.rdb$constraint_name = ref.rdb$constraint_name and " +
-                    "co.rdb$constraint_type = 'FOREIGN KEY' and " +
-                    "co.rdb$index_name = tempidx.rdb$index_name and " +
-                    "co.rdb$index_name = coidxseg.rdb$index_name and " +
-                    "refidx.rdb$index_name = tempidx.rdb$foreign_key and " +
-                    "refidxseg.rdb$index_name = refidx.rdb$index_name and " +
-                    "coidxseg.rdb$field_position = refidxseg.rdb$field_position ");
+                @"SELECT
+                    null AS CONSTRAINT_CATALOG,
+                    null AS CONSTRAINT_SCHEMA,
+                    co.rdb$constraint_name AS CONSTRAINT_NAME,
+                    null AS TABLE_CATALOG,
+                    null AS TABLE_SCHEMA,
+                    co.rdb$relation_name AS TABLE_NAME,
+                    coidxseg.rdb$field_name AS COLUMN_NAME,
+                    null as REFERENCED_TABLE_CATALOG,
+                    null as REFERENCED_TABLE_SCHEMA,
+                    refidx.rdb$relation_name as REFERENCED_TABLE_NAME,
+                    refidxseg.rdb$field_name AS REFERENCED_COLUMN_NAME,
+                    coidxseg.rdb$field_position as ORDINAL_POSITION
+                FROM rdb$relation_constraints co
+                    INNER JOIN rdb$ref_constraints ref ON co.rdb$constraint_name = ref.rdb$constraint_name
+                    INNER JOIN rdb$indices tempidx ON co.rdb$index_name = tempidx.rdb$index_name
+                    INNER JOIN rdb$index_segments coidxseg ON co.rdb$index_name = coidxseg.rdb$index_name
+                    INNER JOIN rdb$index_segments refidxseg ON coidxseg.rdb$field_position = refidxseg.rdb$field_position
+                    INNER JOIN rdb$indices refidx ON refidxseg.rdb$index_name = refidx.rdb$index_name");
+
+            where.Append("co.rdb$constraint_type = 'FOREIGN KEY'");
 
             if (restrictions != null)
             {
@@ -80,19 +75,19 @@ namespace FirebirdSql.Data.Schema
                 /* TABLE_NAME */
                 if (restrictions.Length >= 3 && restrictions[2] != null)
                 {
-                    where.AppendFormat(CultureInfo.CurrentCulture, " and co.rdb$relation_name = @p{0}", index++);
+                    where.AppendFormat(CultureInfo.CurrentCulture, " AND co.rdb$relation_name = @p{0}", index++);
                 }
 
                 /* CONSTRAINT_NAME */
                 if (restrictions.Length >= 4 && restrictions[3] != null)
                 {
-                    where.AppendFormat(CultureInfo.CurrentCulture, " and co.rdb$constraint_name = @p{0}", index++);
+                    where.AppendFormat(CultureInfo.CurrentCulture, " AND co.rdb$constraint_name = @p{0}", index++);
                 }
 
                 /* COLUMN_NAME */
                 if (restrictions.Length >= 5 && restrictions[4] != null)
                 {
-                    where.AppendFormat(CultureInfo.CurrentCulture, " and coidxseg.rdb$field_name = @p{0}", index++);
+                    where.AppendFormat(CultureInfo.CurrentCulture, " AND coidxseg.rdb$field_name = @p{0}", index++);
                 }
             }
 

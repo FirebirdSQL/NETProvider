@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,31 +26,30 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbTableConstraints : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbTableConstraints : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql	= new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-                    "null AS CONSTRAINT_CATALOG, " +
-                    "null AS CONSTRAINT_SCHEMA, " +
-                    "rc.rdb$constraint_name AS CONSTRAINT_NAME, " +
-                    "null AS TABLE_CATALOG, " +
-                    "null AS TABLE_SCHEMA, " +
-                    "rc.rdb$relation_name AS TABLE_NAME, " +
-                    "rc.rdb$constraint_type AS CONSTRAINT_TYPE, " +
-				    "rc.rdb$deferrable AS IS_DEFERRABLE, " +
-				    "rc.rdb$initially_deferred AS INITIALLY_DEFERRED " +
-				"FROM " +
-				    "rdb$relation_constraints rc");
+            sql.Append(
+                @"SELECT
+                    null AS CONSTRAINT_CATALOG,
+                    null AS CONSTRAINT_SCHEMA,
+                    rc.rdb$constraint_name AS CONSTRAINT_NAME,
+                    null AS TABLE_CATALOG,
+                    null AS TABLE_SCHEMA,
+                    rc.rdb$relation_name AS TABLE_NAME,
+                    rc.rdb$constraint_type AS CONSTRAINT_TYPE,
+				    rc.rdb$deferrable AS IS_DEFERRABLE,
+				    rc.rdb$initially_deferred AS INITIALLY_DEFERRED
+				FROM rdb$relation_constraints rc");
 
-			if (restrictions != null)
-			{
+            if (restrictions != null)
+            {
                 int index = 0;
 
                 /* CONSTRAINT_CATALOG */
@@ -62,11 +64,11 @@ namespace FirebirdSql.Data.Schema
 
                 /* CONSTRAINT_NAME */
                 if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					if (where.Length > 0)
-					{
-						where.Append(" AND ");
-					}
+                {
+                    if (where.Length > 0)
+                    {
+                        where.Append(" AND ");
+                    }
 
                     where.AppendFormat(CultureInfo.CurrentUICulture, "rc.rdb$constraint_name = @p{0}", index++);
                 }
@@ -94,58 +96,58 @@ namespace FirebirdSql.Data.Schema
 
                 /* CONSTRAINT_TYPE */
                 if (restrictions.Length >= 7 && restrictions[6] != null)
-				{
-					if (where.Length > 0)
-					{
-						where.Append(" AND ");
-					}
+                {
+                    if (where.Length > 0)
+                    {
+                        where.Append(" AND ");
+                    }
 
                     where.AppendFormat(CultureInfo.CurrentUICulture, "rc.rdb$constraint_type = @p{0}", index++);
                 }
-			}
+            }
 
-			if (where.Length > 0)
-			{
+            if (where.Length > 0)
+            {
                 sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
             }
 
-			sql.Append(" ORDER BY rc.rdb$relation_name, rc.rdb$constraint_name");
+            sql.Append(" ORDER BY rc.rdb$relation_name, rc.rdb$constraint_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
-		protected override string[] ParseRestrictions(string[] restrictions)
-		{
-			string[] parsed = restrictions;
+        protected override string[] ParseRestrictions(string[] restrictions)
+        {
+            string[] parsed = restrictions;
 
-			if (parsed != null)
-			{
-				if (parsed.Length == 7 && parsed[6] != null)
-				{
-					switch (parsed[6].ToString().ToUpper(CultureInfo.CurrentCulture))
-					{
-						case "UNIQUE":
-							parsed[3] = "u";
-							break;
+            if (parsed != null)
+            {
+                if (parsed.Length == 7 && parsed[6] != null)
+                {
+                    switch (parsed[6].ToString().ToUpper(CultureInfo.CurrentCulture))
+                    {
+                        case "UNIQUE":
+                            parsed[3] = "u";
+                            break;
 
-						case "PRIMARY KEY":
-							parsed[3] = "p";
-							break;
+                        case "PRIMARY KEY":
+                            parsed[3] = "p";
+                            break;
 
-						case "FOREIGN KEY":
-							parsed[3] = "f";
-							break;
+                        case "FOREIGN KEY":
+                            parsed[3] = "f";
+                            break;
 
-						case "CHECK":
-							parsed[3] = "c";
-							break;
-					}
-				}
-			}
+                        case "CHECK":
+                            parsed[3] = "c";
+                            break;
+                    }
+                }
+            }
 
-			return parsed;
-		}
-		
-		#endregion
-	}
+            return parsed;
+        }
+
+        #endregion
+    }
 }

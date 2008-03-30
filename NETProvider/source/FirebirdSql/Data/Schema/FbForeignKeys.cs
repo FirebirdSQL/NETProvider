@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,81 +26,76 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbForeignKeys : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbForeignKeys : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql = new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-                @"SELECT " +
-                    "null AS CONSTRAINT_CATALOG, " +
-                    "null AS CONSTRAINT_SCHEMA, " +
-                    "co.rdb$constraint_name AS CONSTRAINT_NAME, " +
-                    "null AS TABLE_CATALOG, " +
-	                "null AS TABLE_SCHEMA, " +
-                    "co.rdb$relation_name AS TABLE_NAME, " +
-					"null as REFERENCED_TABLE_CATALOG, " +
-					"null as REFERENCED_TABLE_SCHEMA, " +
-					"refidx.rdb$relation_name as REFERENCED_TABLE_NAME, " +
-                    "co.rdb$deferrable AS IS_DEFERRABLE, " +
-                    "co.rdb$initially_deferred AS INITIALLY_DEFERRED, " +
-                    "ref.rdb$match_option AS MATCH_OPTION, " +
-                    "ref.rdb$update_rule AS UPDATE_RULE, " +
-                    "ref.rdb$delete_rule AS DELETE_RULE, " +
-                    "co.rdb$index_name as INDEX_NAME " +
-                "FROM " +
-	                "rdb$relation_constraints co, " +
-	                "rdb$ref_constraints ref, " +
-                    "rdb$indices tempidx, " +
-					"rdb$indices refidx ");
+            sql.Append(
+                @"SELECT
+                    null AS CONSTRAINT_CATALOG,
+                    null AS CONSTRAINT_SCHEMA,
+                    co.rdb$constraint_name AS CONSTRAINT_NAME,
+                    null AS TABLE_CATALOG,
+	                null AS TABLE_SCHEMA,
+                    co.rdb$relation_name AS TABLE_NAME,
+					null as REFERENCED_TABLE_CATALOG,
+					null as REFERENCED_TABLE_SCHEMA,
+					refidx.rdb$relation_name as REFERENCED_TABLE_NAME,
+                    co.rdb$deferrable AS IS_DEFERRABLE,
+                    co.rdb$initially_deferred AS INITIALLY_DEFERRED,
+                    ref.rdb$match_option AS MATCH_OPTION,
+                    ref.rdb$update_rule AS UPDATE_RULE,
+                    ref.rdb$delete_rule AS DELETE_RULE,
+                    co.rdb$index_name as INDEX_NAME
+                FROM rdb$relation_constraints co
+	                INNER JOIN rdb$ref_constraints ref ON co.rdb$constraint_name = ref.rdb$constraint_name
+                    INNER JOIN rdb$indices tempidx ON co.rdb$index_name = tempidx.rdb$index_name
+					INNER JOIN rdb$indices refidx ON refidx.rdb$index_name = tempidx.rdb$foreign_key");
 
-                where.Append(
-	                "co.rdb$constraint_name = ref.rdb$constraint_name and " +
-					"co.rdb$constraint_type = 'FOREIGN KEY' and " +
-                    "co.rdb$index_name = tempidx.rdb$index_name and " +
-                    "refidx.rdb$index_name = tempidx.rdb$foreign_key");
+            where.Append("co.rdb$constraint_type = 'FOREIGN KEY'");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
                 /* CONSTRAINT_CATALOG	*/
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
+                if (restrictions.Length >= 1 && restrictions[0] != null)
+                {
+                }
 
-				/* CONSTRAINT_SCHEMA */
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
+                /* CONSTRAINT_SCHEMA */
+                if (restrictions.Length >= 2 && restrictions[1] != null)
+                {
+                }
 
-				/* TABLE_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat(CultureInfo.CurrentCulture, " and co.rdb$relation_name = @p{0}", index++);
-				}
+                /* TABLE_NAME */
+                if (restrictions.Length >= 3 && restrictions[2] != null)
+                {
+                    where.AppendFormat(CultureInfo.CurrentCulture, " AND co.rdb$relation_name = @p{0}", index++);
+                }
 
                 /* CONSTRAINT_NAME */
                 if (restrictions.Length >= 4 && restrictions[3] != null)
                 {
-                    where.AppendFormat(CultureInfo.CurrentCulture, " and rel.rdb$constraint_name = @p{0}", index++);
+                    where.AppendFormat(CultureInfo.CurrentCulture, " AND rel.rdb$constraint_name = @p{0}", index++);
                 }
             }
 
-			if (where.Length > 0)
-			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
-			}
+            if (where.Length > 0)
+            {
+                sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
+            }
 
-			sql.Append(" ORDER BY co.rdb$relation_name, co.rdb$constraint_name");
+            sql.Append(" ORDER BY co.rdb$relation_name, co.rdb$constraint_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

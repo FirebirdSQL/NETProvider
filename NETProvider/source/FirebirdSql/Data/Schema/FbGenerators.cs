@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,90 +26,89 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbGenerators : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbGenerators : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql = new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-					"null AS GENERATOR_CATALOG, " +
-					"null AS GENERATOR_SCHEMA, " +
-					"rdb$generator_name AS GENERATOR_NAME, " +
-					"rdb$system_flag AS IS_SYSTEM_GENERATOR, " +
-					"rdb$generator_id AS GENERATOR_ID " +
-				"FROM " +
-					"rdb$generators");
+            sql.Append(
+                @"SELECT
+					null AS GENERATOR_CATALOG,
+					null AS GENERATOR_SCHEMA,
+					rdb$generator_name AS GENERATOR_NAME,
+					rdb$system_flag AS IS_SYSTEM_GENERATOR,
+					rdb$generator_id AS GENERATOR_ID
+				FROM rdb$generators");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
-				/* GENERATOR_CATALOG */
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
+                /* GENERATOR_CATALOG */
+                if (restrictions.Length >= 1 && restrictions[0] != null)
+                {
+                }
 
-				/* GENERATOR_SCHEMA	*/
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
+                /* GENERATOR_SCHEMA	*/
+                if (restrictions.Length >= 2 && restrictions[1] != null)
+                {
+                }
 
-				/* GENERATOR_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat(CultureInfo.CurrentCulture, "rdb$generator_name = @p{0}", index++);
-				}
+                /* GENERATOR_NAME */
+                if (restrictions.Length >= 3 && restrictions[2] != null)
+                {
+                    where.AppendFormat(CultureInfo.CurrentCulture, "rdb$generator_name = @p{0}", index++);
+                }
 
                 /* IS_SYSTEM_GENERATOR	*/
-				if (restrictions.Length >= 4 && restrictions[3] != null)
-				{
-					if (where.Length > 0)
-					{
-						where.Append(" AND ");
-					}
+                if (restrictions.Length >= 4 && restrictions[3] != null)
+                {
+                    if (where.Length > 0)
+                    {
+                        where.Append(" AND ");
+                    }
 
-					where.AppendFormat(CultureInfo.CurrentCulture, "rdb$system_flag = @p{0}", index++);
-				}
-			}
+                    where.AppendFormat(CultureInfo.CurrentCulture, "rdb$system_flag = @p{0}", index++);
+                }
+            }
 
-			if (where.Length > 0)
-			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
-			}
+            if (where.Length > 0)
+            {
+                sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
+            }
 
-			sql.Append(" ORDER BY rdb$generator_name");
+            sql.Append(" ORDER BY rdb$generator_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
-		protected override DataTable ProcessResult(DataTable schema)
-		{
-			schema.BeginLoadData();
+        protected override DataTable ProcessResult(DataTable schema)
+        {
+            schema.BeginLoadData();
 
-			foreach (DataRow row in schema.Rows)
-			{
-				if (row["IS_SYSTEM_GENERATOR"] == DBNull.Value ||
-					Convert.ToInt32(row["IS_SYSTEM_GENERATOR"], CultureInfo.InvariantCulture) == 0)
-				{
-					row["IS_SYSTEM_GENERATOR"] = false;
-				}
-				else
-				{
-					row["IS_SYSTEM_GENERATOR"] = true;
-				}
-			}
+            foreach (DataRow row in schema.Rows)
+            {
+                if (row["IS_SYSTEM_GENERATOR"] == DBNull.Value ||
+                    Convert.ToInt32(row["IS_SYSTEM_GENERATOR"], CultureInfo.InvariantCulture) == 0)
+                {
+                    row["IS_SYSTEM_GENERATOR"] = false;
+                }
+                else
+                {
+                    row["IS_SYSTEM_GENERATOR"] = true;
+                }
+            }
 
-			schema.EndLoadData();
-			schema.AcceptChanges();
+            schema.EndLoadData();
+            schema.AcceptChanges();
 
-			return schema;
-		}
+            return schema;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

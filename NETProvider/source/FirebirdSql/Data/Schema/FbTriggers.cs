@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,33 +26,32 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbTriggers : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbTriggers : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql	= new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-                    "null AS TABLE_CATALOG, " +
-                    "null AS TABLE_SCHEMA, " +
-                    "rdb$relation_name AS TABLE_NAME, " +
-                    "rdb$trigger_name AS TRIGGER_NAME, " + 
-					"rdb$system_flag AS IS_SYSTEM_TRIGGER, " +
-					"rdb$trigger_type AS TRIGGER_TYPE, " +
-					"rdb$trigger_inactive AS IS_INACTIVE, " +
-					"rdb$trigger_sequence AS SEQUENCE, " +
-					"rdb$trigger_source AS SOURCE, " +
-					"rdb$description AS DESCRIPTION " +
-				"FROM " +
-					"rdb$triggers");
+            sql.Append(
+                @"SELECT
+                    null AS TABLE_CATALOG,
+                    null AS TABLE_SCHEMA,
+                    rdb$relation_name AS TABLE_NAME,
+                    rdb$trigger_name AS TRIGGER_NAME, 
+					rdb$system_flag AS IS_SYSTEM_TRIGGER,
+					rdb$trigger_type AS TRIGGER_TYPE,
+					rdb$trigger_inactive AS IS_INACTIVE,
+					rdb$trigger_sequence AS SEQUENCE,
+					rdb$trigger_source AS SOURCE,
+					rdb$description AS DESCRIPTION
+				FROM rdb$triggers");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
                 /* TABLE_CATALOG */
                 if (restrictions.Length >= 1 && restrictions[0] != null)
@@ -62,8 +64,8 @@ namespace FirebirdSql.Data.Schema
                 }
 
                 /* TABLE_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
+                if (restrictions.Length >= 3 && restrictions[2] != null)
+                {
                     where.AppendFormat(CultureInfo.CurrentUICulture, "rdb$relation_name = @p{0}", index++);
                 }
 
@@ -77,17 +79,17 @@ namespace FirebirdSql.Data.Schema
 
                     where.AppendFormat(CultureInfo.CurrentUICulture, "rdb$trigger_name = @p{0}", index++);
                 }
-			}
+            }
 
-			if (where.Length > 0)
-			{
+            if (where.Length > 0)
+            {
                 sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
             }
 
-			sql.Append(" ORDER BY rdb$relation_name, rdb$trigger_name");
+            sql.Append(" ORDER BY rdb$relation_name, rdb$trigger_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
         protected override DataTable ProcessResult(DataTable schema)
         {
@@ -112,6 +114,6 @@ namespace FirebirdSql.Data.Schema
             return schema;
         }
 
-		#endregion
-	}
+        #endregion
+    }
 }

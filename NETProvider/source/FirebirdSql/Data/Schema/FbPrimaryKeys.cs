@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,61 +26,60 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbPrimaryKeys : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbPrimaryKeys : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql = new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-					"null AS TABLE_CATALOG, " +
-					"null AS TABLE_SCHEMA, " +
-					"rel.rdb$relation_name AS TABLE_NAME, " +
-					"seg.rdb$field_name AS COLUMN_NAME, " +
-					"seg.rdb$field_position AS ORDINAL_POSITION, " +
-					"rel.rdb$constraint_name AS PK_NAME " +
-				"FROM " +
-					"rdb$relation_constraints rel " +
-					"left join rdb$indices idx ON rel.rdb$index_name = idx.rdb$index_name " +
-					"left join rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name");
+            sql.Append(
+                @"SELECT
+					null AS TABLE_CATALOG,
+					null AS TABLE_SCHEMA,
+					rel.rdb$relation_name AS TABLE_NAME,
+					seg.rdb$field_name AS COLUMN_NAME,
+					seg.rdb$field_position AS ORDINAL_POSITION,
+					rel.rdb$constraint_name AS PK_NAME
+				FROM rdb$relation_constraints rel
+					LEFT JOIN rdb$indices idx ON rel.rdb$index_name = idx.rdb$index_name
+					LEFT JOIN rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name");
 
-			where.Append("rel.rdb$constraint_type = 'PRIMARY KEY'");
+            where.Append("rel.rdb$constraint_type = 'PRIMARY KEY'");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
-				/* TABLE_CATALOG */
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
+                /* TABLE_CATALOG */
+                if (restrictions.Length >= 1 && restrictions[0] != null)
+                {
+                }
 
-				/* TABLE_SCHEMA	*/
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
+                /* TABLE_SCHEMA	*/
+                if (restrictions.Length >= 2 && restrictions[1] != null)
+                {
+                }
 
-				/* TABLE_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat(CultureInfo.CurrentCulture, " AND rel.rdb$relation_name = @p{0}", index++);
-				}
-			}
+                /* TABLE_NAME */
+                if (restrictions.Length >= 3 && restrictions[2] != null)
+                {
+                    where.AppendFormat(CultureInfo.CurrentCulture, " AND rel.rdb$relation_name = @p{0}", index++);
+                }
+            }
 
-			if (where.Length > 0)
-			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
-			}
+            if (where.Length > 0)
+            {
+                sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
+            }
 
-			sql.Append(" ORDER BY rel.rdb$relation_name, rel.rdb$constraint_name, seg.rdb$field_position");
+            sql.Append(" ORDER BY rel.rdb$relation_name, rel.rdb$constraint_name, seg.rdb$field_position");
 
-			return sql;
-		}
+            return sql;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
