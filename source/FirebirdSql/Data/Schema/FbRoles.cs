@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,41 +26,41 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbRoles : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbRoles : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql	= new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-					"rdb$role_name AS ROLE_NAME, " +
-					"rdb$owner_name AS OWNER_NAME " +
-				"FROM rdb$roles");
+            sql.Append(
+                @"SELECT
+					rdb$role_name AS ROLE_NAME,
+					rdb$owner_name AS OWNER_NAME
+				FROM rdb$roles");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
+                if (restrictions.Length >= 1 && restrictions[0] != null)
+                {
                     where.AppendFormat(CultureInfo.CurrentUICulture, "rdb$role_name = @p{0}", index++);
                 }
-			}
+            }
 
-			if (where.Length > 0)
-			{
+            if (where.Length > 0)
+            {
                 sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
             }
 
-			sql.Append(" ORDER BY rdb$role_name");
+            sql.Append(" ORDER BY rdb$role_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

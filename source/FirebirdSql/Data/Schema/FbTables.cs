@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,61 +26,60 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbTables : FbSchema
-	{
-    	#region · Protected Methods ·
+    internal class FbTables : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql	= new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-                    "null AS TABLE_CATALOG, " +
-                    "null AS TABLE_SCHEMA, " +
-                    "rdb$relation_name AS TABLE_NAME, " +
-					"null AS TABLE_TYPE, " +
-					"rdb$system_flag AS IS_SYSTEM_TABLE, " +
-					"rdb$owner_name AS OWNER_NAME, " +
-					"rdb$description AS DESCRIPTION, " +
-                    "rdb$view_source AS VIEW_SOURCE " +
-                "FROM " +
-					"rdb$relations");
+            sql.Append(
+                @"SELECT
+                    null AS TABLE_CATALOG,
+                    null AS TABLE_SCHEMA,
+                    rdb$relation_name AS TABLE_NAME,
+					null AS TABLE_TYPE,
+					rdb$system_flag AS IS_SYSTEM_TABLE,
+					rdb$owner_name AS OWNER_NAME,
+					rdb$description AS DESCRIPTION,
+                    rdb$view_source AS VIEW_SOURCE
+                FROM rdb$relations");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
                 /* TABLE_CATALOG */
                 if (restrictions.Length >= 1 && restrictions[0] != null)
                 {
                 }
-                
+
                 /* TABLE_SCHEMA */
                 if (restrictions.Length >= 2 && restrictions[1] != null)
                 {
                 }
-                
+
                 /* TABLE_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
+                if (restrictions.Length >= 3 && restrictions[2] != null)
+                {
                     where.AppendFormat(CultureInfo.CurrentUICulture, "rdb$relation_name = @p{0}", index++);
                 }
 
                 /* TABLE_TYPE */
                 if (restrictions.Length >= 4 && restrictions[3] != null)
-				{
-					if (where.Length > 0)
-					{
-						where.Append(" AND ");
-					}
+                {
+                    if (where.Length > 0)
+                    {
+                        where.Append(" AND ");
+                    }
 
-					switch (restrictions[3].ToString())
-					{
-						case "VIEW":
-							where.Append("rdb$view_source IS NOT NULL");
-							break;
+                    switch (restrictions[3].ToString())
+                    {
+                        case "VIEW":
+                            where.Append("rdb$view_source IS NOT NULL");
+                            break;
 
                         case "SYSTEM TABLE":
                             where.Append("rdb$view_source IS NULL and rdb$system_flag = 1");
@@ -88,18 +90,18 @@ namespace FirebirdSql.Data.Schema
                             where.Append("rdb$view_source IS NULL and rdb$system_flag = 0");
                             break;
                     }
-				}
-			}
+                }
+            }
 
-			if (where.Length > 0)
-			{
+            if (where.Length > 0)
+            {
                 sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
             }
 
-			sql.Append(" ORDER BY rdb$system_flag, rdb$owner_name, rdb$relation_name");
+            sql.Append(" ORDER BY rdb$system_flag, rdb$owner_name, rdb$relation_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
         protected override DataTable ProcessResult(DataTable schema)
         {
@@ -117,8 +119,8 @@ namespace FirebirdSql.Data.Schema
                 {
                     row["IS_SYSTEM_TABLE"] = true;
                     row["TABLE_TYPE"] = "SYSTEM_TABLE";
-                }                
-                if (row["VIEW_SOURCE"] != null && 
+                }
+                if (row["VIEW_SOURCE"] != null &&
                     row["VIEW_SOURCE"].ToString().Length > 0)
                 {
                     row["TABLE_TYPE"] = "VIEW";
@@ -133,6 +135,6 @@ namespace FirebirdSql.Data.Schema
             return schema;
         }
 
-		#endregion
-	}
+        #endregion
+    }
 }

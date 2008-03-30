@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -26,133 +29,132 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbDomains : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbDomains : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql = new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-					"null AS DOMAIN_CATALOG, " +
-					"null AS DOMAIN_SCHEMA, " +
-					"fld.rdb$field_name AS DOMAIN_NAME, " +
-					"null AS DOMAIN_DATA_TYPE, " +
-					"rdb$field_sub_type AS DOMAIN_SUB_TYPE, " +
-					"cast(fld.rdb$field_length AS integer) AS DOMAIN_SIZE, " +
-					"cast(fld.rdb$field_precision AS integer) AS NUMERIC_PRECISION, " +
-					"cast(fld.rdb$field_scale  AS integer) AS NUMERIC_SCALE, " +
-                    "cast(fld.rdb$character_length AS integer) AS CHARACTER_MAX_LENGTH, " +
-					"cast(fld.rdb$field_length AS integer) AS CHARACTER_OCTET_LENGTH, " +
-					"fld.rdb$null_flag AS COLUMN_NULLABLE, " +
-					"fld.rdb$dimensions AS COLUMN_ARRAY, " +
-					"fld.rdb$description AS DESCRIPTION, " +
-					"fld.rdb$field_type AS FIELD_TYPE, " +
-                    "null AS CHARACTER_SET_CATALOG, " +
-					"null AS CHARACTER_SET_SCHEMA, " +
-					"cs.rdb$character_set_name AS CHARACTER_SET_NAME, " +
-					"null AS COLLATION_CATALOG, " +
-					"null AS COLLATION_SCHEMA, " +
-					"coll.rdb$collation_name AS COLLATION_NAME " +
-				"FROM " +
-					"rdb$fields fld " +
-					"left join rdb$character_sets cs ON cs.rdb$character_set_id = fld.rdb$character_set_id " +
-					"left join rdb$collations coll ON (coll.rdb$collation_id = fld.rdb$collation_id AND coll.rdb$character_set_id = fld.rdb$character_set_id)");
+            sql.Append(
+                @"SELECT
+					null AS DOMAIN_CATALOG,
+					null AS DOMAIN_SCHEMA,
+					fld.rdb$field_name AS DOMAIN_NAME,
+					null AS DOMAIN_DATA_TYPE,
+					rdb$field_sub_type AS DOMAIN_SUB_TYPE,
+					CAST(fld.rdb$field_length AS integer) AS DOMAIN_SIZE,
+					CAST(fld.rdb$field_precision AS integer) AS NUMERIC_PRECISION,
+					CAST(fld.rdb$field_scale  AS integer) AS NUMERIC_SCALE,
+                    CAST(fld.rdb$character_length AS integer) AS CHARACTER_MAX_LENGTH,
+					CAST(fld.rdb$field_length AS integer) AS CHARACTER_OCTET_LENGTH,
+					fld.rdb$null_flag AS COLUMN_NULLABLE,
+					fld.rdb$dimensions AS COLUMN_ARRAY,
+					fld.rdb$description AS DESCRIPTION,
+					fld.rdb$field_type AS FIELD_TYPE,
+                    null AS CHARACTER_SET_CATALOG,
+					null AS CHARACTER_SET_SCHEMA,
+					cs.rdb$character_set_name AS CHARACTER_SET_NAME,
+					null AS COLLATION_CATALOG,
+					null AS COLLATION_SCHEMA,
+					coll.rdb$collation_name AS COLLATION_NAME
+				FROM rdb$fields fld
+					LEFT JOIN rdb$character_sets cs ON cs.rdb$character_set_id = fld.rdb$character_set_id
+					LEFT JOIN rdb$collations coll ON (coll.rdb$collation_id = fld.rdb$collation_id AND coll.rdb$character_set_id = fld.rdb$character_set_id)");
 
-			where.Append("not rdb$field_name starting with 'RDB$'");
+            where.Append("rdb$field_name NOT STARTING WITH 'RDB$'");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
-				/* DOMAIN_CATALOG */
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
+                /* DOMAIN_CATALOG */
+                if (restrictions.Length >= 1 && restrictions[0] != null)
+                {
+                }
 
-				/* DOMAIN_SCHEMA */
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
+                /* DOMAIN_SCHEMA */
+                if (restrictions.Length >= 2 && restrictions[1] != null)
+                {
+                }
 
-				/* DOMAIN_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat(CultureInfo.CurrentCulture, " AND rdb$field_name = @p{0}", index++);
-				}
-			}
+                /* DOMAIN_NAME */
+                if (restrictions.Length >= 3 && restrictions[2] != null)
+                {
+                    where.AppendFormat(CultureInfo.CurrentCulture, " AND rdb$field_name = @p{0}", index++);
+                }
+            }
 
-			if (where.Length > 0)
-			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
-			}
+            if (where.Length > 0)
+            {
+                sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
+            }
 
-			sql.Append(" ORDER BY rdb$field_name");
+            sql.Append(" ORDER BY rdb$field_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
-		protected override DataTable ProcessResult(DataTable schema)
-		{
-			schema.BeginLoadData();
+        protected override DataTable ProcessResult(DataTable schema)
+        {
+            schema.BeginLoadData();
             schema.Columns.Add("IS_NULLABLE", typeof(bool));
             schema.Columns.Add("IS_ARRAY", typeof(bool));
 
-			foreach (DataRow row in schema.Rows)
-			{
-				int blrType = Convert.ToInt32(row["FIELD_TYPE"], CultureInfo.InvariantCulture);
+            foreach (DataRow row in schema.Rows)
+            {
+                int blrType = Convert.ToInt32(row["FIELD_TYPE"], CultureInfo.InvariantCulture);
 
-				int subType = 0;
-				if (row["DOMAIN_SUB_TYPE"] != System.DBNull.Value)
-				{
-					subType = Convert.ToInt32(row["DOMAIN_SUB_TYPE"], CultureInfo.InvariantCulture);
-				}
+                int subType = 0;
+                if (row["DOMAIN_SUB_TYPE"] != System.DBNull.Value)
+                {
+                    subType = Convert.ToInt32(row["DOMAIN_SUB_TYPE"], CultureInfo.InvariantCulture);
+                }
 
-				int scale = 0;
-				if (row["NUMERIC_SCALE"] != System.DBNull.Value)
-				{
-					scale = Convert.ToInt32(row["NUMERIC_SCALE"], CultureInfo.InvariantCulture);
-				}
+                int scale = 0;
+                if (row["NUMERIC_SCALE"] != System.DBNull.Value)
+                {
+                    scale = Convert.ToInt32(row["NUMERIC_SCALE"], CultureInfo.InvariantCulture);
+                }
 
-                row["IS_NULLABLE"]  = (row["COLUMN_NULLABLE"] == DBNull.Value);
-                row["IS_ARRAY"]     = (row["COLUMN_ARRAY"] == DBNull.Value);
+                row["IS_NULLABLE"] = (row["COLUMN_NULLABLE"] == DBNull.Value);
+                row["IS_ARRAY"] = (row["COLUMN_ARRAY"] == DBNull.Value);
 
-				FbDbType dbType = (FbDbType)TypeHelper.GetDbDataType(blrType, subType, scale);
-				row["DOMAIN_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLower(CultureInfo.CurrentCulture);
+                FbDbType dbType = (FbDbType)TypeHelper.GetDbDataType(blrType, subType, scale);
+                row["DOMAIN_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLower(CultureInfo.CurrentCulture);
 
-				if (dbType == FbDbType.Char || dbType == FbDbType.VarChar)
-				{
+                if (dbType == FbDbType.Char || dbType == FbDbType.VarChar)
+                {
                     row["DOMAIN_SIZE"] = row["CHARACTER_MAX_LENGTH"];
-				}
-				else
-				{
-					row["CHARACTER_OCTET_LENGTH"] = 0;
-				}
+                }
+                else
+                {
+                    row["CHARACTER_OCTET_LENGTH"] = 0;
+                }
 
-				if (dbType == FbDbType.Binary || dbType == FbDbType.Text)
-				{
-					row["DOMAIN_SIZE"] = Int32.MaxValue;
-				}
+                if (dbType == FbDbType.Binary || dbType == FbDbType.Text)
+                {
+                    row["DOMAIN_SIZE"] = Int32.MaxValue;
+                }
 
-				if (row["NUMERIC_PRECISION"] == System.DBNull.Value)
-				{
-					row["NUMERIC_PRECISION"] = 0;
-				}
+                if (row["NUMERIC_PRECISION"] == System.DBNull.Value)
+                {
+                    row["NUMERIC_PRECISION"] = 0;
+                }
 
-				if ((dbType == FbDbType.Decimal || dbType == FbDbType.Numeric) &&
+                if ((dbType == FbDbType.Decimal || dbType == FbDbType.Numeric) &&
                     (row["NUMERIC_PRECISION"] == System.DBNull.Value || Convert.ToInt32(row["NUMERIC_PRECISION"]) == 0))
-				{
-					row["NUMERIC_PRECISION"] = row["DOMAIN_SIZE"];
-				}
+                {
+                    row["NUMERIC_PRECISION"] = row["DOMAIN_SIZE"];
+                }
 
-				row["NUMERIC_SCALE"] = (-1) * scale;
-			}
+                row["NUMERIC_SCALE"] = (-1) * scale;
+            }
 
-			schema.EndLoadData();
-			schema.AcceptChanges();
+            schema.EndLoadData();
+            schema.AcceptChanges();
 
             // Remove not more needed columns
             schema.Columns.Remove("COLUMN_NULLABLE");
@@ -160,9 +162,9 @@ namespace FirebirdSql.Data.Schema
             schema.Columns.Remove("FIELD_TYPE");
             schema.Columns.Remove("CHARACTER_MAX_LENGTH");
 
-			return schema;
-		}
+            return schema;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

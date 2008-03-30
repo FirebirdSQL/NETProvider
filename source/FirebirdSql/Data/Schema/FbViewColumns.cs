@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -36,37 +39,36 @@ namespace FirebirdSql.Data.Schema
             StringBuilder where = new StringBuilder();
 
             sql.Append(
-                @"SELECT " +
-                    "null AS VIEW_CATALOG, " +
-                    "null AS VIEW_SCHEMA, " +
-                    "rel.rdb$relation_name AS VIEW_NAME, " +
-                    "rfr.rdb$field_name AS COLUMN_NAME, " +
-                    "null AS COLUMN_DATA_TYPE, " +
-                    "fld.rdb$field_sub_type AS COLUMN_SUB_TYPE, " +
-                    "cast(fld.rdb$field_length AS integer) AS COLUMN_SIZE, " +
-                    "cast(fld.rdb$field_precision AS integer) AS NUMERIC_PRECISION, " +
-                    "cast(fld.rdb$field_scale AS integer) AS NUMERIC_SCALE, " +
-                    "cast(fld.rdb$character_length AS integer) AS CHARACTER_MAX_LENGTH, " +
-                    "cast(fld.rdb$field_length AS integer) AS CHARACTER_OCTET_LENGTH, " +
-                    "rfr.rdb$field_position AS ORDINAL_POSITION, " +
-                    "fld.rdb$default_source AS COLUMN_DEFAULT, " +
-                    "fld.rdb$null_flag AS COLUMN_NULLABLE, " +
-                    "fld.rdb$dimensions AS COLUMN_ARRAY, " +
-                    "0 AS IS_READONLY, " +
-                    "fld.rdb$field_type AS FIELD_TYPE, " +
-                    "null AS CHARACTER_SET_CATALOG, " +
-                    "null AS CHARACTER_SET_SCHEMA, " +
-                    "cs.rdb$character_set_name AS CHARACTER_SET_NAME, " +
-                    "null AS COLLATION_CATALOG, " +
-                    "null AS COLLATION_SCHEMA, " +
-                    "coll.rdb$collation_name AS COLLATION_NAME, " +
-                    "rfr.rdb$description AS DESCRIPTION " +
-                "FROM " +
-                    "rdb$relations rel " +
-                    "left join rdb$relation_fields rfr ON rel.rdb$relation_name = rfr.rdb$relation_name " +
-                    "left join rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name " +
-                    "left join rdb$character_sets cs ON cs.rdb$character_set_id = fld.rdb$character_set_id " +
-				    "left join rdb$collations coll ON (coll.rdb$collation_id = fld.rdb$collation_id AND coll.rdb$character_set_id = fld.rdb$character_set_id)");
+                @"SELECT
+                    null AS VIEW_CATALOG,
+                    null AS VIEW_SCHEMA,
+                    rel.rdb$relation_name AS VIEW_NAME,
+                    rfr.rdb$field_name AS COLUMN_NAME,
+                    null AS COLUMN_DATA_TYPE,
+                    fld.rdb$field_sub_type AS COLUMN_SUB_TYPE,
+                    CAST(fld.rdb$field_length AS integer) AS COLUMN_SIZE,
+                    CAST(fld.rdb$field_precision AS integer) AS NUMERIC_PRECISION,
+                    CAST(fld.rdb$field_scale AS integer) AS NUMERIC_SCALE,
+                    CAST(fld.rdb$character_length AS integer) AS CHARACTER_MAX_LENGTH,
+                    CAST(fld.rdb$field_length AS integer) AS CHARACTER_OCTET_LENGTH,
+                    rfr.rdb$field_position AS ORDINAL_POSITION,
+                    fld.rdb$default_source AS COLUMN_DEFAULT,
+                    fld.rdb$null_flag AS COLUMN_NULLABLE,
+                    fld.rdb$dimensions AS COLUMN_ARRAY,
+                    0 AS IS_READONLY,
+                    fld.rdb$field_type AS FIELD_TYPE,
+                    null AS CHARACTER_SET_CATALOG,
+                    null AS CHARACTER_SET_SCHEMA,
+                    cs.rdb$character_set_name AS CHARACTER_SET_NAME,
+                    null AS COLLATION_CATALOG,
+                    null AS COLLATION_SCHEMA,
+                    coll.rdb$collation_name AS COLLATION_NAME,
+                    rfr.rdb$description AS DESCRIPTION
+                FROM rdb$relations rel
+                    LEFT JOIN rdb$relation_fields rfr ON rel.rdb$relation_name = rfr.rdb$relation_name
+                    LEFT JOIN rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name
+                    LEFT JOIN rdb$character_sets cs ON cs.rdb$character_set_id = fld.rdb$character_set_id
+				    LEFT JOIN rdb$collations coll ON (coll.rdb$collation_id = fld.rdb$collation_id AND coll.rdb$character_set_id = fld.rdb$character_set_id)");
 
             where.Append("rel.rdb$view_source IS NOT NULL");
 
@@ -129,8 +131,8 @@ namespace FirebirdSql.Data.Schema
                     scale = Convert.ToInt32(row["NUMERIC_SCALE"], CultureInfo.InvariantCulture);
                 }
 
-                row["IS_NULLABLE"]  = (row["COLUMN_NULLABLE"] == DBNull.Value);
-                row["IS_ARRAY"]     = (row["COLUMN_ARRAY"] == DBNull.Value);
+                row["IS_NULLABLE"] = (row["COLUMN_NULLABLE"] == DBNull.Value);
+                row["IS_ARRAY"] = (row["COLUMN_ARRAY"] == DBNull.Value);
 
                 FbDbType dbType = (FbDbType)TypeHelper.GetDbDataType(blrType, subType, scale);
                 row["COLUMN_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLower(CultureInfo.CurrentUICulture);
@@ -152,10 +154,10 @@ namespace FirebirdSql.Data.Schema
                     row["COLUMN_SIZE"] = Int32.MaxValue;
                 }
 
-				if (row["NUMERIC_PRECISION"] == System.DBNull.Value)
-				{
-					row["NUMERIC_PRECISION"] = 0;
-				}
+                if (row["NUMERIC_PRECISION"] == System.DBNull.Value)
+                {
+                    row["NUMERIC_PRECISION"] = 0;
+                }
 
                 if ((dbType == FbDbType.Decimal || dbType == FbDbType.Numeric) &&
                     (row["NUMERIC_PRECISION"] == System.DBNull.Value || Convert.ToInt32(row["NUMERIC_PRECISION"]) == 0))

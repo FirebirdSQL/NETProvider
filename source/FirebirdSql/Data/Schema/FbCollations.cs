@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,29 +26,28 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbCollations : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbCollations : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql	= new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-                    "null AS COLLATION_CATALOG, " +
-                    "null AS COLLATION_SCHEMA, " +
-                    "coll.rdb$collation_name AS COLLATION_NAME, " +
-                    "cs.rdb$character_set_name AS CHARACTER_SET_NAME, " +
-                    "coll.rdb$description AS DESCRIPTION " +
-				"FROM rdb$collations coll " +
-					"left join rdb$character_sets cs ON coll.rdb$character_set_id = cs.rdb$character_set_id"
-				);
+            sql.Append(
+                @"SELECT
+                    null AS COLLATION_CATALOG,
+                    null AS COLLATION_SCHEMA,
+                    coll.rdb$collation_name AS COLLATION_NAME,
+                    cs.rdb$character_set_name AS CHARACTER_SET_NAME,
+                    coll.rdb$description AS DESCRIPTION
+				FROM rdb$collations coll
+					LEFT JOIN rdb$character_sets cs ON coll.rdb$character_set_id = cs.rdb$character_set_id");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
                 /* COLLATION_CATALOG */
                 if (restrictions.Length >= 1 && restrictions[0] != null)
@@ -58,22 +60,22 @@ namespace FirebirdSql.Data.Schema
                 }
 
                 /* COLLATION_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
+                if (restrictions.Length >= 3 && restrictions[2] != null)
+                {
                     where.AppendFormat(CultureInfo.CurrentUICulture, "coll.rdb$collation_name = @p{0}", index++);
                 }
-			}
+            }
 
-			if (where.Length > 0)
-			{
+            if (where.Length > 0)
+            {
                 sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
             }
 
-			sql.Append(" ORDER BY cs.rdb$character_set_name, coll.rdb$collation_name");
+            sql.Append(" ORDER BY cs.rdb$character_set_name, coll.rdb$collation_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

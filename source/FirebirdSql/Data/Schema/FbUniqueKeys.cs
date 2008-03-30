@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,8 +26,8 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbUniqueKeys : FbSchema
-	{
+    internal class FbUniqueKeys : FbSchema
+    {
         #region · Protected Methods ·
 
         protected override StringBuilder GetCommandText(string[] restrictions)
@@ -33,17 +36,16 @@ namespace FirebirdSql.Data.Schema
             StringBuilder where = new StringBuilder();
 
             sql.Append(
-                @"SELECT " +
-                    "null AS TABLE_CATALOG, " +
-                    "null AS TABLE_SCHEMA, " +
-                    "rel.rdb$relation_name AS TABLE_NAME, " +
-                    "seg.rdb$field_name AS COLUMN_NAME, " +
-                    "seg.rdb$field_position AS ORDINAL_POSITION, " +
-                    "rel.rdb$constraint_name AS UK_NAME " +
-                "FROM " +
-                    "rdb$relation_constraints rel " +
-                    "left join rdb$indices idx ON rel.rdb$index_name = idx.rdb$index_name " +
-                    "left join rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name");
+                @"SELECT
+                    null AS TABLE_CATALOG,
+                    null AS TABLE_SCHEMA,
+                    rel.rdb$relation_name AS TABLE_NAME,
+                    seg.rdb$field_name AS COLUMN_NAME,
+                    seg.rdb$field_position AS ORDINAL_POSITION,
+                    rel.rdb$constraint_name AS UK_NAME
+                FROM rdb$relation_constraints rel
+                    LEFT JOIN rdb$indices idx ON rel.rdb$index_name = idx.rdb$index_name
+                    LEFT JOIN rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name");
 
             where.Append("rel.rdb$constraint_type = 'UNIQUE'");
 

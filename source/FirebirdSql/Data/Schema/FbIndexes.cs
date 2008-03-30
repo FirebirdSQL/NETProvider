@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Constributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,88 +26,81 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbIndexes : FbSchema
-	{
-		#region · Protected Methods ·
+    internal class FbIndexes : FbSchema
+    {
+        #region · Protected Methods ·
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			StringBuilder sql = new StringBuilder();
-			StringBuilder where = new StringBuilder();
+        protected override StringBuilder GetCommandText(string[] restrictions)
+        {
+            StringBuilder sql = new StringBuilder();
+            StringBuilder where = new StringBuilder();
 
-			sql.Append(
-				@"SELECT " +
-                    "null AS TABLE_CATALOG, " +
-					"null AS TABLE_SCHEMA, " +
-					"idx.rdb$relation_name AS TABLE_NAME, " +
-                    "idx.rdb$index_name AS INDEX_NAME, " +
-                    "idx.rdb$index_inactive AS IS_INACTIVE, " +
-                    "idx.rdb$unique_flag AS IS_UNIQUE," + 
-				    "(select count(*)\n"							+
-				    "from rdb$relation_constraints rel "	+
-				    "where rel.rdb$constraint_type = 'PRIMARY KEY' "	+
-				    "and rel.rdb$index_name = idx.rdb$index_name "	+
-				    "and rel.rdb$relation_name = idx.rdb$relation_name) as PRIMARY_KEY, " +
-                    "(select count(*) " +
-                    "from rdb$relation_constraints rel " +
-                    "where rel.rdb$constraint_type = 'UNIQUE' " +
-                    "and rel.rdb$index_name = idx.rdb$index_name " +
-                    "and rel.rdb$relation_name = idx.rdb$relation_name) as UNIQUE_KEY, " +
-                    "idx.rdb$system_flag AS IS_SYSTEM_INDEX, " +
-                    "idx.rdb$index_type AS INDEX_TYPE, " +
-                    "idx.rdb$description AS DESCRIPTION " +
-				"FROM " +
-					"rdb$indices idx ");
+            sql.Append(
+                @"SELECT
+                    null AS TABLE_CATALOG,
+					null AS TABLE_SCHEMA,
+					idx.rdb$relation_name AS TABLE_NAME,
+                    idx.rdb$index_name AS INDEX_NAME,
+                    idx.rdb$index_inactive AS IS_INACTIVE,
+                    idx.rdb$unique_flag AS IS_UNIQUE,
+				    (SELECT COUNT(*) FROM rdb$relation_constraints rel
+				    WHERE rel.rdb$constraint_type = 'PRIMARY KEY' AND rel.rdb$index_name = idx.rdb$index_name AND rel.rdb$relation_name = idx.rdb$relation_name) as PRIMARY_KEY,
+                    (SELECT COUNT(*) FROM rdb$relation_constraints rel
+                    WHERE rel.rdb$constraint_type = 'UNIQUE' AND rel.rdb$index_name = idx.rdb$index_name AND rel.rdb$relation_name = idx.rdb$relation_name) as UNIQUE_KEY,
+                    idx.rdb$system_flag AS IS_SYSTEM_INDEX,
+                    idx.rdb$index_type AS INDEX_TYPE,
+                    idx.rdb$description AS DESCRIPTION
+				FROM rdb$indices idx");
 
-			if (restrictions != null)
-			{
-				int index = 0;
+            if (restrictions != null)
+            {
+                int index = 0;
 
-				/* TABLE_CATALOG */
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
+                /* TABLE_CATALOG */
+                if (restrictions.Length >= 1 && restrictions[0] != null)
+                {
+                }
 
-				/* TABLE_SCHEMA	*/
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
+                /* TABLE_SCHEMA	*/
+                if (restrictions.Length >= 2 && restrictions[1] != null)
+                {
+                }
 
-				/* TABLE_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat(CultureInfo.CurrentCulture, "idx.rdb$relation_name = @p{0}", index++);
-				}
+                /* TABLE_NAME */
+                if (restrictions.Length >= 3 && restrictions[2] != null)
+                {
+                    where.AppendFormat(CultureInfo.CurrentCulture, "idx.rdb$relation_name = @p{0}", index++);
+                }
 
-				/* INDEX_NAME */
-				if (restrictions.Length >= 4 && restrictions[3] != null)
-				{
-					if (where.Length > 0)
-					{
-						where.Append(" AND ");
-					}
+                /* INDEX_NAME */
+                if (restrictions.Length >= 4 && restrictions[3] != null)
+                {
+                    if (where.Length > 0)
+                    {
+                        where.Append(" AND ");
+                    }
 
-					where.AppendFormat(CultureInfo.CurrentCulture, "idx.rdb$index_name = @p{0}", index++);
-				}
-			}
+                    where.AppendFormat(CultureInfo.CurrentCulture, "idx.rdb$index_name = @p{0}", index++);
+                }
+            }
 
-			if (where.Length > 0)
-			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
-			}
+            if (where.Length > 0)
+            {
+                sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
+            }
 
-			sql.Append(" ORDER BY idx.rdb$relation_name, idx.rdb$index_name");
+            sql.Append(" ORDER BY idx.rdb$relation_name, idx.rdb$index_name");
 
-			return sql;
-		}
+            return sql;
+        }
 
-		protected override DataTable ProcessResult(DataTable schema)
-		{
-			schema.BeginLoadData();
+        protected override DataTable ProcessResult(DataTable schema)
+        {
+            schema.BeginLoadData();
             schema.Columns.Add("IS_PRIMARY", typeof(bool));
-            
-			foreach (DataRow row in schema.Rows)
-			{
+
+            foreach (DataRow row in schema.Rows)
+            {
                 if (row["IS_UNIQUE"] == DBNull.Value ||
                      Convert.ToInt32(row["IS_UNIQUE"], CultureInfo.InvariantCulture) == 0)
                 {
@@ -133,37 +129,37 @@ namespace FirebirdSql.Data.Schema
                 else
                 {
                     row["IS_UNIQUE"] = false;
-                }                
+                }
 
                 if (row["IS_INACTIVE"] == DBNull.Value ||
                     Convert.ToInt32(row["IS_INACTIVE"], CultureInfo.InvariantCulture) == 0)
-				{
-					row["IS_INACTIVE"] = false;
-				}
-				else
-				{
-					row["IS_INACTIVE"] = true;
-				}
+                {
+                    row["IS_INACTIVE"] = false;
+                }
+                else
+                {
+                    row["IS_INACTIVE"] = true;
+                }
 
-				if (row["IS_SYSTEM_INDEX"] == DBNull.Value ||
-					Convert.ToInt32(row["IS_SYSTEM_INDEX"], CultureInfo.InvariantCulture) == 0)
-				{
-					row["IS_SYSTEM_INDEX"] = false;
-				}
-				else
-				{
-					row["IS_SYSTEM_INDEX"] = true;
-				}
-			}
+                if (row["IS_SYSTEM_INDEX"] == DBNull.Value ||
+                    Convert.ToInt32(row["IS_SYSTEM_INDEX"], CultureInfo.InvariantCulture) == 0)
+                {
+                    row["IS_SYSTEM_INDEX"] = false;
+                }
+                else
+                {
+                    row["IS_SYSTEM_INDEX"] = true;
+                }
+            }
 
-			schema.EndLoadData();
-			schema.AcceptChanges();
+            schema.EndLoadData();
+            schema.AcceptChanges();
 
             schema.Columns.Remove("PRIMARY_KEY");
-		
-			return schema;
-		}
 
-		#endregion
-	}
+            return schema;
+        }
+
+        #endregion
+    }
 }
