@@ -250,7 +250,6 @@ namespace FirebirdSql.Data.Isql
 			if (this.currentIndex >= this.sourceLength) 
 			{
                 return -1;
-                //throw new Exception("Cannot start parsing after the end of the string.");
 			}
 			
 			int i = this.currentIndex;
