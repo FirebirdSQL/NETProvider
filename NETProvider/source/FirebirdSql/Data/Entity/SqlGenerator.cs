@@ -25,10 +25,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 
