@@ -38,7 +38,7 @@
         END) as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
         ,   f.rdb$field_precision as "Precision"
-        ,   f.rdb$field_scale as "Scale"
+        ,   f.rdb$field_scale * (-1) as "Scale"
         ,   0 as "IsIdentity"
         ,   CASE WHEN f.rdb$computed_blr IS NULL THEN 0 ELSE 1 END as "IsComputed"
         ,   0 as "IsStoreGenerated"
@@ -73,7 +73,7 @@
         END) as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
         ,   f.rdb$field_precision as "Precision"
-        ,   f.rdb$field_scale as "Scale"
+        ,   f.rdb$field_scale * (-1) as "Scale"
         ,   0 as "IsIdentity"
         ,   CASE WHEN f.rdb$computed_blr IS NULL THEN 0 ELSE 1 END as "IsComputed"
         ,   0 as "IsStoreGenerated"
@@ -154,7 +154,7 @@
         , 0 as "IsComposable" --???
         , 0 as "IsAggregate"
         , 0 as "IsBuiltIn"
-        , 0 as "IsNiladic" --nullable???
+        , 0 as "IsNiladic" --without params
         FROM
         rdb$procedures
       </DefiningQuery>
@@ -183,7 +183,7 @@
         END as "TypeName"
         , f.rdb$character_length as "MaxLength"
         , f.rdb$field_precision as "Precision"
-        , f.rdb$field_scale as "Scale"
+        , f.rdb$field_scale * (-1) as "Scale"
         , 'IN' as "Mode"
         FROM
         rdb$procedure_parameters pp LEFT JOIN rdb$fields f ON (pp.rdb$field_source = f.rdb$field_name)
