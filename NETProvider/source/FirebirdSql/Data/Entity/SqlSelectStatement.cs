@@ -149,7 +149,7 @@ namespace FirebirdSql.Data.Entity
         private List<Symbol>                allJoinExtents;
         private List<Symbol>                fromExtents;
         private Dictionary<Symbol, bool>    outerExtents;
-        private FirstClause                 top;
+        private FirstClause                 first;
         private SkipClause                  skip;
         private SqlBuilder                  select = new SqlBuilder();
         private SqlBuilder                  from = new SqlBuilder();
@@ -221,13 +221,13 @@ namespace FirebirdSql.Data.Entity
             }
         }
 
-        internal FirstClause Top
+        internal FirstClause First
         {
-            get { return this.top; }
+            get { return this.first; }
             set
             {
-                Debug.Assert(top == null, "SqlSelectStatement.Top has already been set");
-                this.top = value;
+                Debug.Assert(first == null, "SqlSelectStatement.Top has already been set");
+                this.first = value;
             }
         }
 
@@ -384,9 +384,9 @@ namespace FirebirdSql.Data.Entity
                 writer.Write("DISTINCT ");
             }
 
-            if (this.Top != null)
+            if (this.First != null)
             {
-                this.Top.WriteSql(writer, sqlGenerator);
+                this.First.WriteSql(writer, sqlGenerator);
             }
 
             if (this.Skip != null)
@@ -422,7 +422,7 @@ namespace FirebirdSql.Data.Entity
                 this.GroupBy.WriteSql(writer, sqlGenerator);
             }
 
-            if ((this.orderBy != null) && !this.OrderBy.IsEmpty && (this.IsTopMost || this.Top != null))
+            if ((this.orderBy != null) && !this.OrderBy.IsEmpty && (this.IsTopMost || this.First != null))
             {
                 writer.WriteLine();
                 writer.Write("ORDER BY ");
