@@ -1358,7 +1358,6 @@ namespace FirebirdSql.Data.Entity
         /// <returns>A <see cref="SqlBuilder"/></returns>
         public override ISqlFragment Visit(DbLimitExpression e)
         {
-#warning Review this (implement FIRST, SKIP)
             Debug.Assert(e.Limit is DbConstantExpression || e.Limit is DbParameterReferenceExpression, "DbLimitExpression.Limit is of invalid expression type");
 
             SqlSelectStatement result = VisitExpressionEnsureSqlStatement(e.Argument, false);
@@ -1372,10 +1371,9 @@ namespace FirebirdSql.Data.Entity
                 AddFromSymbol(result, "top", fromSymbol, false);
             }
 
-            ISqlFragment topCount = HandaleCountExpression(e.Limit);
+            ISqlFragment topCount = HandleCountExpression(e.Limit);
 
-            //result.Top = new TopClause(topCount, e.WithTies);
-            result.Top = new FirstClause(topCount);
+            result.First = new FirstClause(topCount);
             return result;
         }
 
@@ -1701,94 +1699,22 @@ namespace FirebirdSql.Data.Entity
         /// <returns>A <see cref="SqlBuilder"/></returns>
         public override ISqlFragment Visit(DbSkipExpression e)
         {
-#warning Look at TOP (limit)
             Debug.Assert(e.Count is DbConstantExpression || e.Count is DbParameterReferenceExpression, "DbSkipExpression.Count is of invalid expression type");
 
-            //Visit the input
+            SqlSelectStatement result = VisitExpressionEnsureSqlStatement(e.Input.Expression, false);
             Symbol fromSymbol;
-            SqlSelectStatement input = VisitInputExpression(e.Input.Expression, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
 
-            // Skip is not compatible with anything that OrderBy is not compatible with, as well as with distinct
-            if (!IsCompatible(input, e.ExpressionKind))
+            if (!IsCompatible(result, e.ExpressionKind))
             {
-                input = CreateNewSelectStatement(input, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+                TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(e.Input.VariableType);
+
+                result = CreateNewSelectStatement(result, "skip", inputType, out fromSymbol);
+                AddFromSymbol(result, "skip", fromSymbol, false);
             }
 
-            selectStatementStack.Push(input);
-            symbolTable.EnterScope();
+            ISqlFragment skipCount = HandleCountExpression(e.Count);
 
-            AddFromSymbol(input, e.Input.VariableName, fromSymbol);
-
-            //Add the default columns
-            Debug.Assert(input.Select.IsEmpty);
-            List<Symbol> inputColumns = AddDefaultColumns(input);
-
-            input.Select.Append(", row_number() OVER (ORDER BY ");
-            AddSortKeys(input.Select, e.SortOrder);
-            input.Select.Append(") AS ");
-
-            Symbol row_numberSymbol = new Symbol("row_number", null);
-
-            input.Select.Append(row_numberSymbol);
-
-            //The inner statement is complete, its scopes need not be valid any longer
-            symbolTable.ExitScope();
-            selectStatementStack.Pop();
-
-            //Create the resulting statement 
-            //See CreateNewSelectStatement, it is very similar
-
-            SqlSelectStatement result = new SqlSelectStatement();
-            result.From.Append("( ");
-            result.From.Append(input);
-            result.From.AppendLine();
-            result.From.Append(") ");
-
-            //Create a symbol for the input
-            Symbol resultFromSymbol = null;
-
-            if (input.FromExtents.Count == 1)
-            {
-                JoinSymbol oldJoinSymbol = input.FromExtents[0] as JoinSymbol;
-                if (oldJoinSymbol != null)
-                {
-                    // Note: input.FromExtents will not do, since it might
-                    // just be an alias of joinSymbol, and we want an actual JoinSymbol.
-                    JoinSymbol newJoinSymbol = new JoinSymbol(e.Input.VariableName, e.Input.VariableType, oldJoinSymbol.ExtentList);
-                    // This indicates that the oldStatement is a blocking scope
-                    // i.e. it hides/renames extent columns
-                    newJoinSymbol.IsNestedJoin = true;
-                    newJoinSymbol.ColumnList = inputColumns;
-                    newJoinSymbol.FlattenedExtentList = oldJoinSymbol.FlattenedExtentList;
-
-                    resultFromSymbol = newJoinSymbol;
-                }
-            }
-
-            if (resultFromSymbol == null)
-            {
-                // This is just a simple extent/SqlSelectStatement,
-                // and we can get the column list from the type.
-                resultFromSymbol = new Symbol(e.Input.VariableName, e.Input.VariableType);
-            }
-            //Add the ORDER BY part
-            selectStatementStack.Push(result);
-            symbolTable.EnterScope();
-
-            AddFromSymbol(result, e.Input.VariableName, resultFromSymbol);
-
-            //Add the predicate 
-            result.Where.Append(resultFromSymbol);
-            result.Where.Append(".");
-            result.Where.Append(row_numberSymbol);
-            result.Where.Append(" > ");
-            result.Where.Append(HandaleCountExpression(e.Count));
-
-            AddSortKeys(result.OrderBy, e.SortOrder);
-
-            symbolTable.ExitScope();
-            selectStatementStack.Pop();
-
+            result.Skip = new SkipClause(skipCount);
             return result;
         }
 
@@ -2052,8 +1978,8 @@ namespace FirebirdSql.Data.Entity
                     result = CreateNewSelectStatement(result, "element", inputType, out fromSymbol);
                     AddFromSymbol(result, "element", fromSymbol, false);
                 }
-                //result.Top = new TopClause(1, false);
-                result.Top = new FirstClause(1);
+
+                result.First = new FirstClause(1);
                 return result;
             }
 
@@ -3369,7 +3295,7 @@ namespace FirebirdSql.Data.Entity
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        private ISqlFragment HandaleCountExpression(DbExpression e)
+        private ISqlFragment HandleCountExpression(DbExpression e)
         {
             ISqlFragment result;
 
@@ -3450,7 +3376,7 @@ namespace FirebirdSql.Data.Entity
             switch (expressionKind)
             {
                 case DbExpressionKind.Distinct:
-                    return result.Top == null
+                    return result.First == null
                         // The projection after distinct may not project all 
                         // columns used in the Order By
                         && result.OrderBy.IsEmpty;
@@ -3459,17 +3385,17 @@ namespace FirebirdSql.Data.Entity
                     return result.Select.IsEmpty
                             && result.Where.IsEmpty
                             && result.GroupBy.IsEmpty
-                            && result.Top == null;
+                            && result.First == null;
 
                 case DbExpressionKind.GroupBy:
                     return result.Select.IsEmpty
                             && result.GroupBy.IsEmpty
                             && result.OrderBy.IsEmpty
-                            && result.Top == null;
+                            && result.First == null;
 
                 case DbExpressionKind.Limit:
                 case DbExpressionKind.Element:
-                    return result.Top == null;
+                    return result.First == null;
 
                 case DbExpressionKind.Project:
                     return result.Select.IsEmpty
