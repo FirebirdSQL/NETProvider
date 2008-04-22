@@ -111,8 +111,8 @@
       <DefiningQuery>
         SELECT
         TRIM(refc.rdb$constraint_name) || 'x' || TRIM(is2.rdb$field_position) as "Id"
-        , TRIM(relc1.rdb$relation_name) || 'x' || TRIM(is1.rdb$field_name) as "FromColumnId"
-        , TRIM(relc2.rdb$relation_name) || 'x' || TRIM(is2.rdb$field_name) as "ToColumnId"
+        , TRIM(relc2.rdb$relation_name) || 'x' || TRIM(is2.rdb$field_name) as "FromColumnId"
+        , TRIM(relc1.rdb$relation_name) || 'x' || TRIM(is1.rdb$field_name) as "ToColumnId"
         , TRIM(refc.rdb$constraint_name) as "RelationshipId"
         , is2.rdb$field_position+1 as "MapOrdinal"
         FROM rdb$ref_constraints refc
