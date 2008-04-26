@@ -23,9 +23,21 @@
         ,   rf.rdb$field_position+1 as "Ordinal"
         ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN 1 ELSE 0 END as "IsNullable"
         ,   TRIM(CASE f.rdb$field_type
-        WHEN 7 THEN 'smallint'
-        WHEN 8 THEN 'int'
-        WHEN 16 THEN 'bigint'
+        WHEN 7 THEN CASE f.rdb$field_sub_type
+          WHEN 0 THEN 'smallint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+          END
+        WHEN 8 THEN CASE f.rdb$field_sub_type
+          WHEN 0 THEN 'int'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+          END
+        WHEN 16 THEN CASE f.rdb$field_sub_type
+          WHEN 0 THEN 'bigint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+          END
         WHEN 10 THEN 'float'
         WHEN 27 THEN 'double'
         WHEN 12 THEN 'date'
@@ -58,9 +70,21 @@
         ,   rf.rdb$field_position+1 as "Ordinal"
         ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN 1 ELSE 0 END as "IsNullable"
         ,   TRIM(CASE f.rdb$field_type
-        WHEN 7 THEN 'smallint'
-        WHEN 8 THEN 'int'
-        WHEN 16 THEN 'bigint'
+        WHEN 7 THEN CASE f.rdb$field_sub_type
+          WHEN 0 THEN 'smallint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+          END
+        WHEN 8 THEN CASE f.rdb$field_sub_type
+          WHEN 0 THEN 'int'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+          END
+        WHEN 16 THEN CASE f.rdb$field_sub_type
+          WHEN 0 THEN 'bigint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+          END
         WHEN 10 THEN 'float'
         WHEN 27 THEN 'double'
         WHEN 12 THEN 'date'
