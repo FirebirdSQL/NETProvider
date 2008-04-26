@@ -293,7 +293,7 @@ namespace FirebirdSql.Data.Entity
         private static Dictionary<string, FunctionHandler> InitializeBuiltInFunctionHandlers()
         {
             Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(5, StringComparer.Ordinal);
-            functionHandlers.Add("concat", HandleConcatFunction);
+            //functionHandlers.Add("concat", HandleConcatFunction);
             //functionHandlers.Add("dateadd", HandleDatepartDateFunction);
             //functionHandlers.Add("datediff", HandleDatepartDateFunction);
             //functionHandlers.Add("datename", HandleDatepartDateFunction);
@@ -309,7 +309,7 @@ namespace FirebirdSql.Data.Entity
         {
             Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(16, StringComparer.Ordinal);
             //functionHandlers.Add("IndexOf", HandleCanonicalFunctionIndexOf);
-            //functionHandlers.Add("Length", HandleCanonicalFunctionLength);
+            functionHandlers.Add("Length", HandleCanonicalFunctionLength);
             //functionHandlers.Add("NewGuid", HandleCanonicalFunctionNewGuid);
             functionHandlers.Add("Round", HandleCanonicalFunctionRound);
             functionHandlers.Add("ToLower", HandleCanonicalFunctionToLower);
@@ -329,6 +329,7 @@ namespace FirebirdSql.Data.Entity
             //Functions that translate to operators
             functionHandlers.Add("Concat", HandleConcatFunction);
             functionHandlers.Add("BitwiseAnd", HandleCanonicalFunctionBitwise);
+#warning Not supported by FB now
             //functionHandlers.Add("BitwiseNot", HandleCanonicalFunctionBitwise);
             functionHandlers.Add("BitwiseOr", HandleCanonicalFunctionBitwise);
             functionHandlers.Add("BitwiseXor", HandleCanonicalFunctionBitwise);
@@ -2546,7 +2547,6 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private static ISqlFragment HandleDatepartDateFunction(SqlGenerator sqlgen, DbFunctionExpression e)
         {
-#warning Do we need this?
             Debug.Assert(e.Arguments.Count > 0, "e.Arguments.Count > 0");
 
             DbConstantExpression constExpr = e.Arguments[0] as DbConstantExpression;
@@ -2653,7 +2653,6 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private static ISqlFragment HandleCanonicalFunctionDatepart(SqlGenerator sqlgen, DbFunctionExpression e)
         {
-#warning Not needed?
             SqlBuilder result = new SqlBuilder();
             result.Append("EXTRACT(");
             result.Append(e.Function.Name.ToUpperInvariant());
@@ -2692,23 +2691,21 @@ namespace FirebirdSql.Data.Entity
         }
 
         /// <summary>
-        ///  Length(arg) -> LEN(arg + '.') - LEN('.')
+        ///  Length(arg) -> CHAR_LENGTH(arg)
         /// </summary>
         /// <param name="sqlgen"></param>
         /// <param name="e"></param>
         /// <returns></returns>
         private static ISqlFragment HandleCanonicalFunctionLength(SqlGenerator sqlgen, DbFunctionExpression e)
         {
-#warning Not needed?
             SqlBuilder result = new SqlBuilder();
 
-            result.Append("LEN(");
+            result.Append("CHAR_LENGTH(");
 
             Debug.Assert(e.Arguments.Count == 1, "Len should have one argument");
             result.Append(e.Arguments[0].Accept(sqlgen));
 
             result.Append(")");
-            //result.Append(" + '.') - LEN('.')");
 
             return result;
         }
