@@ -294,8 +294,8 @@ namespace FirebirdSql.Data.Entity
         {
             Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(5, StringComparer.Ordinal);
             functionHandlers.Add("concat", HandleConcatFunction);
-            functionHandlers.Add("dateadd", HandleDatepartDateFunction);
-            functionHandlers.Add("datediff", HandleDatepartDateFunction);
+            //functionHandlers.Add("dateadd", HandleDatepartDateFunction);
+            //functionHandlers.Add("datediff", HandleDatepartDateFunction);
             //functionHandlers.Add("datename", HandleDatepartDateFunction);
             //functionHandlers.Add("datepart", HandleDatepartDateFunction);
             return functionHandlers;
@@ -317,12 +317,12 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("Trim", HandleCanonicalFunctionTrim);
 
             //DatePartFunctions
-            //functionHandlers.Add("Year", HandleCanonicalFunctionDatepart);
-            //functionHandlers.Add("Month", HandleCanonicalFunctionDatepart);
-            //functionHandlers.Add("Day", HandleCanonicalFunctionDatepart);
-            //functionHandlers.Add("Hour", HandleCanonicalFunctionDatepart);
-            //functionHandlers.Add("Minute", HandleCanonicalFunctionDatepart);
-            //functionHandlers.Add("Second", HandleCanonicalFunctionDatepart);
+            functionHandlers.Add("Year", HandleCanonicalFunctionDatepart);
+            functionHandlers.Add("Month", HandleCanonicalFunctionDatepart);
+            functionHandlers.Add("Day", HandleCanonicalFunctionDatepart);
+            functionHandlers.Add("Hour", HandleCanonicalFunctionDatepart);
+            functionHandlers.Add("Minute", HandleCanonicalFunctionDatepart);
+            functionHandlers.Add("Second", HandleCanonicalFunctionDatepart);
             //functionHandlers.Add("DateAdd", HandleCanonicalFunctionDateAdd);
             //functionHandlers.Add("DateDiff", HandleCanonicalFunctionDateSubtract);
 
@@ -723,13 +723,13 @@ namespace FirebirdSql.Data.Entity
                 switch (typeKind)
                 {
                     case PrimitiveTypeKind.Boolean:
-                        result.Append((bool)e.Value ? "cast(1 as smallint)" : "cast(0 as smallint)");
+                        result.Append((bool)e.Value ? "CAST(1 AS SMALLINT)" : "CAST(0 AS SMALLINT)");
                         break;
 
                     case PrimitiveTypeKind.Int16:
-                        result.Append("cast(");
+                        result.Append("CAST(");
                         result.Append(e.Value.ToString());
-                        result.Append(" as smallint)");
+                        result.Append(" AS SMALLINT)");
                         break;
 
                     case PrimitiveTypeKind.Int32:
@@ -738,21 +738,21 @@ namespace FirebirdSql.Data.Entity
                         break;
 
                     case PrimitiveTypeKind.Int64:
-                        result.Append("cast(");
+                        result.Append("CAST(");
                         result.Append(e.Value.ToString());
-                        result.Append(" as bigint)");
+                        result.Append(" AS BIGINT)");
                         break;
 
                     case PrimitiveTypeKind.Double:
-                        result.Append("cast(");
+                        result.Append("CAST(");
                         result.Append(((Double)e.Value).ToString(CultureInfo.InvariantCulture));
-                        result.Append(" as double)");
+                        result.Append(" AS DOUBLE)");
                         break;
 
                     case PrimitiveTypeKind.Single:
-                        result.Append("cast(");
+                        result.Append("CAST(");
                         result.Append(((Single)e.Value).ToString(CultureInfo.InvariantCulture));
-                        result.Append(" as float)");
+                        result.Append(" AS FLOAT)");
                         break;
 
                     case PrimitiveTypeKind.Decimal:
@@ -773,9 +773,9 @@ namespace FirebirdSql.Data.Entity
                                 }
                             }
                             Debug.Assert(precision > 0, "Precision must be greater than zero");
-                            result.Append("cast(");
+                            result.Append("CAST(");
                             result.Append(strDecimal);
-                            result.Append(" as decimal(");
+                            result.Append(" AS DECIMAL(");
                             result.Append(precision.ToString(CultureInfo.InvariantCulture));
                             result.Append("))");
                         }
@@ -2646,7 +2646,7 @@ namespace FirebirdSql.Data.Entity
         /// <summary>
         /// Handler for canonical funcitons for extracting date parts. 
         /// For example:
-        ///     Year(date) -> DATEPART( year, date)
+        ///     Year(date) -> EXTRACT(YEAR from date)
         /// </summary>
         /// <param name="sqlgen"></param>
         /// <param name="e"></param>
@@ -2655,9 +2655,9 @@ namespace FirebirdSql.Data.Entity
         {
 #warning Not needed?
             SqlBuilder result = new SqlBuilder();
-            result.Append("DATEPART (");
-            result.Append(e.Function.Name.ToLowerInvariant());
-            result.Append(", ");
+            result.Append("EXTRACT(");
+            result.Append(e.Function.Name.ToUpperInvariant());
+            result.Append(" FROM ");
 
             Debug.Assert(e.Arguments.Count == 1, "Canonical datepart functions should have exactly one argument");
             result.Append(e.Arguments[0].Accept(sqlgen));

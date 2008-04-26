@@ -314,7 +314,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         byte precision;
                         if (!TypeHelpers.TryGetPrecision(edmType, out precision))
                         {
-                            precision = 18;
+                            precision = 9;
                         }
 
                         byte scale;

@@ -21,14 +21,14 @@ PROCESS
     </Type>
     <Type Name="decimal" PrimitiveTypeKind="Decimal">
       <FacetDescriptions>
-        <Precision Minimum="1" Maximum="38" Default="18" Constant="false" />
-        <Scale Minimum="0" Maximum="38" Default="0" Constant="false" />
+        <Precision Minimum="1" Maximum="18" Default="9" Constant="false" />
+        <Scale Minimum="0" Maximum="18" Default="0" Constant="false" />
       </FacetDescriptions>
     </Type>
     <Type Name="numeric" PrimitiveTypeKind="Decimal">
       <FacetDescriptions>
-        <Precision Minimum="1" Maximum="38" Default="18" Constant="false" />
-        <Scale Minimum="0" Maximum="38" Default="0" Constant="false" />
+        <Precision Minimum="1" Maximum="18" Default="9" Constant="false" />
+        <Scale Minimum="0" Maximum="18" Default="0" Constant="false" />
       </FacetDescriptions>
     </Type>
     <Type Name="timestamp" PrimitiveTypeKind="DateTime">
