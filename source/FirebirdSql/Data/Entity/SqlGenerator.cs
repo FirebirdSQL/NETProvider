@@ -308,7 +308,7 @@ namespace FirebirdSql.Data.Entity
         private static Dictionary<string, FunctionHandler> InitializeCanonicalFunctionHandlers()
         {
             Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(16, StringComparer.Ordinal);
-            //functionHandlers.Add("IndexOf", HandleCanonicalFunctionIndexOf);
+            functionHandlers.Add("IndexOf", HandleCanonicalFunctionIndexOf);
             functionHandlers.Add("Length", HandleCanonicalFunctionLength);
             //functionHandlers.Add("NewGuid", HandleCanonicalFunctionNewGuid);
             functionHandlers.Add("Round", HandleCanonicalFunctionRound);
@@ -764,21 +764,22 @@ namespace FirebirdSql.Data.Entity
                         if (-1 == strDecimal.IndexOf('.') && (strDecimal.TrimStart(new char[] { '-' }).Length < 20))
                         {
                             byte precision = (Byte)strDecimal.Length;
-                            FacetDescription precisionFacetDescription;
-                            Debug.Assert(MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, "precision", out precisionFacetDescription), "Decimal primitive type must have Precision facet");
-                            if (MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, "precision", out precisionFacetDescription))
-                            {
-                                if (precisionFacetDescription.DefaultValue != null)
-                                {
-                                    precision = Math.Max(precision, (byte)precisionFacetDescription.DefaultValue);
-                                }
-                            }
+                            //FacetDescription precisionFacetDescription;
+                            //Debug.Assert(MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, "precision", out precisionFacetDescription), "Decimal primitive type must have Precision facet");
+                            //if (MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, "precision", out precisionFacetDescription))
+                            //{
+                            //    if (precisionFacetDescription.DefaultValue != null)
+                            //    {
+                            //        precision = Math.Max(precision, (byte)precisionFacetDescription.DefaultValue);
+                            //    }
+                            //}
                             Debug.Assert(precision > 0, "Precision must be greater than zero");
                             result.Append("CAST(");
                             result.Append(strDecimal);
-                            result.Append(" AS DECIMAL(");
-                            result.Append(precision.ToString(CultureInfo.InvariantCulture));
-                            result.Append("))");
+                            result.Append(" AS DECIMAL)");
+                            //result.Append(" AS DECIMAL(");
+                            //result.Append(precision.ToString(CultureInfo.InvariantCulture));
+                            //result.Append("))");
                         }
                         else
                         {
@@ -2674,8 +2675,7 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private static ISqlFragment HandleCanonicalFunctionIndexOf(SqlGenerator sqlgen, DbFunctionExpression e)
         {
-#warning Not needed?
-            return sqlgen.HandleFunctionDefaultGivenName(e, "CHARINDEX");
+            return sqlgen.HandleFunctionDefaultGivenName(e, "POSITION");
         }
 
         /// <summary>
