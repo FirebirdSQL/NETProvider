@@ -323,7 +323,7 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("Hour", HandleCanonicalFunctionDatepart);
             functionHandlers.Add("Minute", HandleCanonicalFunctionDatepart);
             functionHandlers.Add("Second", HandleCanonicalFunctionDatepart);
-            //functionHandlers.Add("DateAdd", HandleCanonicalFunctionDateAdd);
+            functionHandlers.Add("DateAdd", HandleCanonicalFunctionDateAdd);
             //functionHandlers.Add("DateDiff", HandleCanonicalFunctionDateSubtract);
 
             //Functions that translate to operators
@@ -2595,16 +2595,15 @@ namespace FirebirdSql.Data.Entity
         }
 
         /// <summary>
-        /// DateAdd(datetime, secondsToAdd) -> DATEADD ( seconds , number,  date)
+        /// DateAdd(datetime, secondsToAdd) -> DATEADD(<timestamp_part>, <number>, <date_time>)
         /// </summary>
         /// <param name="sqlgen"></param>
         /// <param name="e"></param>
         /// <returns></returns>
         private static ISqlFragment HandleCanonicalFunctionDateAdd(SqlGenerator sqlgen, DbFunctionExpression e)
         {
-#warning Check
             SqlBuilder result = new SqlBuilder();
-            result.Append("DATEADD (second");
+            result.Append("DATEADD(SECOND");
 
             Debug.Assert(e.Arguments.Count == 2, "Canonical datepart functions should have exactly two arguments");
 
