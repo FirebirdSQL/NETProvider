@@ -3051,7 +3051,6 @@ namespace FirebirdSql.Data.Entity
                 orderByClause.Append(separator);
                 orderByClause.Append(sortClause.Expression.Accept(this));
                 Debug.Assert(sortClause.Collation != null);
-#warning This?
                 if (!String.IsNullOrEmpty(sortClause.Collation))
                 {
                     orderByClause.Append(" COLLATE ");
