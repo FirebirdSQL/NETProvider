@@ -325,6 +325,7 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("Second", HandleCanonicalFunctionDatepart);
             functionHandlers.Add("DateAdd", HandleCanonicalFunctionDateAdd);
             functionHandlers.Add("DateDiff", HandleCanonicalFunctionDateDiff);
+            functionHandlers.Add("GetDate", HandleCanonicalFunctionGetDate);
 
             //Functions that translate to operators
             functionHandlers.Add("Concat", HandleConcatFunction);
@@ -2615,6 +2616,13 @@ namespace FirebirdSql.Data.Entity
 
             result.Append(")");
 
+            return result;
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionGetDate(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            SqlBuilder result = new SqlBuilder();
+            result.Append("CURRENT_TIMESTAMP");
             return result;
         }
 
