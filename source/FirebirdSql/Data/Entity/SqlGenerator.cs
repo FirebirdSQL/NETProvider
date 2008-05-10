@@ -308,15 +308,30 @@ namespace FirebirdSql.Data.Entity
         private static Dictionary<string, FunctionHandler> InitializeCanonicalFunctionHandlers()
         {
             Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(16, StringComparer.Ordinal);
+            functionHandlers.Add("NewGuid", HandleCanonicalFunctionNewGuid);
+
+            //Math Canonical Functions
+            functionHandlers.Add("Round", HandleCanonicalFunctionRound);
+            functionHandlers.Add("Abs", HandleCanonicalFunctionAbs);
+            functionHandlers.Add("Ceiling", HandleCanonicalFunctionCeiling);
+            functionHandlers.Add("Floor", HandleCanonicalFunctionFloor);
+
+            //String Canonical Functions
+            functionHandlers.Add("Concat", HandleConcatFunction);
             functionHandlers.Add("IndexOf", HandleCanonicalFunctionIndexOf);
             functionHandlers.Add("Length", HandleCanonicalFunctionLength);
-            //functionHandlers.Add("NewGuid", HandleCanonicalFunctionNewGuid);
-            functionHandlers.Add("Round", HandleCanonicalFunctionRound);
             functionHandlers.Add("ToLower", HandleCanonicalFunctionToLower);
             functionHandlers.Add("ToUpper", HandleCanonicalFunctionToUpper);
             functionHandlers.Add("Trim", HandleCanonicalFunctionTrim);
+            functionHandlers.Add("LTrim", HandleCanonicalFunctionLTrim);
+            functionHandlers.Add("RTrim", HandleCanonicalFunctionRTrim);
+            functionHandlers.Add("Left", HandleCanonicalFunctionLeft);
+            functionHandlers.Add("Right", HandleCanonicalFunctionRight);
+            functionHandlers.Add("Reverse", HandleCanonicalFunctionReverse);
+            functionHandlers.Add("Replace", HandleCanonicalFunctionReplace);
+            functionHandlers.Add("Substring", HandleCanonicalFunctionSubstring);
 
-            //DatePartFunctions
+            //Date and Time Canonical Functions
             functionHandlers.Add("Year", HandleCanonicalFunctionDatepart);
             functionHandlers.Add("Month", HandleCanonicalFunctionDatepart);
             functionHandlers.Add("Day", HandleCanonicalFunctionDatepart);
@@ -326,9 +341,9 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("DateAdd", HandleCanonicalFunctionDateAdd);
             functionHandlers.Add("DateDiff", HandleCanonicalFunctionDateDiff);
             functionHandlers.Add("GetDate", HandleCanonicalFunctionGetDate);
+            functionHandlers.Add("GetUtcDate", HandleCanonicalFunctionGetUtcDate); // not implemented
 
             //Functions that translate to operators
-            functionHandlers.Add("Concat", HandleConcatFunction);
             functionHandlers.Add("BitwiseAnd", HandleCanonicalFunctionBitwise);
 #warning Not supported by FB now
             //functionHandlers.Add("BitwiseNot", HandleCanonicalFunctionBitwise);
@@ -930,7 +945,7 @@ namespace FirebirdSql.Data.Entity
             }
             else
             {
-#warning No schema generating in FB
+                // No schema in FB
                 //string schemaName = MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "Schema");
                 //if (!string.IsNullOrEmpty(schemaName))
                 //{
@@ -2516,7 +2531,7 @@ namespace FirebirdSql.Data.Entity
             return result;
         }
 
-
+        #region String Canonical Functions
         /// <summary>
         /// <see cref="HandleSpecialFunctionToOperator"></see>
         /// </summary>
@@ -2527,6 +2542,151 @@ namespace FirebirdSql.Data.Entity
         {
             return sqlgen.HandleSpecialFunctionToOperator(e, false);
         }
+
+        /// <summary>
+        ///  Function rename IndexOf -> CHARINDEX
+        /// </summary>
+        /// <param name="sqlgen"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private static ISqlFragment HandleCanonicalFunctionIndexOf(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            return sqlgen.HandleFunctionDefaultGivenName(e, "POSITION");
+        }
+
+        /// <summary>
+        ///  Length(arg) -> CHAR_LENGTH(arg)
+        /// </summary>
+        /// <param name="sqlgen"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private static ISqlFragment HandleCanonicalFunctionLength(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            SqlBuilder result = new SqlBuilder();
+
+            result.Append("CHAR_LENGTH(");
+
+            Debug.Assert(e.Arguments.Count == 1, "Len should have one argument");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+
+            result.Append(")");
+
+            return result;
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionTrim(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            return TrimHelper(sqlgen, e, "BOTH");
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionLTrim(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            return TrimHelper(sqlgen, e, "LEADING");
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionRTrim(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            return TrimHelper(sqlgen, e, "TRAILING");
+        }
+
+        private static ISqlFragment TrimHelper(SqlGenerator sqlgen, DbFunctionExpression e, string what)
+        {
+            SqlBuilder result = new SqlBuilder();
+
+            result.Append("TRIM(");
+            result.Append(what);
+            result.Append(" FROM ");
+
+            Debug.Assert(e.Arguments.Count == 1, "Trim should have one argument");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+
+            result.Append(")");
+
+            return result;
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionLeft(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            SqlBuilder result = new SqlBuilder();
+
+            result.Append("LEFT(");
+
+            Debug.Assert(e.Arguments.Count == 2, "Left should have two arguments");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+            result.Append(", ");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+
+            result.Append(")");
+
+            return result;
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionRight(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            SqlBuilder result = new SqlBuilder();
+
+            result.Append("RIGHT(");
+
+            Debug.Assert(e.Arguments.Count == 2, "Left should have two arguments");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+            result.Append(", ");
+            result.Append(e.Arguments[1].Accept(sqlgen));
+
+            result.Append(")");
+
+            return result;
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionReverse(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            return sqlgen.HandleFunctionDefaultGivenName(e, "REVERSE");
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionReplace(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            return sqlgen.HandleFunctionDefaultGivenName(e, "REPLACE");
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionSubstring(SqlGenerator sqlgen, DbFunctionExpression e)
+        { 
+            SqlBuilder result = new SqlBuilder();
+
+            result.Append("SUBSTRING(");
+
+            Debug.Assert(e.Arguments.Count == 3, "Substring should have three arguments");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+            result.Append(" FROM ");
+            result.Append(e.Arguments[1].Accept(sqlgen));
+            result.Append(" FOR ");
+            result.Append(e.Arguments[2].Accept(sqlgen));
+
+            result.Append(")");
+
+            return result;
+        }
+
+        /// <summary>
+        ///  Function rename ToLower -> LOWER
+        /// </summary>
+        /// <param name="sqlgen"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private static ISqlFragment HandleCanonicalFunctionToLower(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            return sqlgen.HandleFunctionDefaultGivenName(e, "LOWER");
+        }
+
+        /// <summary>
+        ///  Function rename ToUpper -> UPPER
+        /// </summary>
+        /// <param name="sqlgen"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private static ISqlFragment HandleCanonicalFunctionToUpper(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            return sqlgen.HandleFunctionDefaultGivenName(e, "UPPER");
+        }
+        #endregion
 
         /// <summary>
         /// <see cref="HandleSpecialFunctionToOperator"></see>
@@ -2595,34 +2755,39 @@ namespace FirebirdSql.Data.Entity
             return result;
         }
 
-        /// <summary>
-        /// DateAdd(datetime, secondsToAdd) -> DATEADD(<timestamp_part>, <number>, <date_time>)
-        /// </summary>
-        /// <param name="sqlgen"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionDateAdd(SqlGenerator sqlgen, DbFunctionExpression e)
+        #region Date and Time Canonical Functions
+        private static ISqlFragment HandleCanonicalFunctionGetUtcDate(SqlGenerator sqlgen, DbFunctionExpression e)
         {
-            SqlBuilder result = new SqlBuilder();
-            result.Append("DATEADD(SECOND");
-
-            Debug.Assert(e.Arguments.Count == 2, "Canonical datepart functions should have exactly two arguments");
-
-            for (int i = 1; i >= 0; i--)
-            {
-                result.Append(", ");
-                result.Append(e.Arguments[i].Accept(sqlgen));
-            }
-
-            result.Append(")");
-
-            return result;
+            throw new NotSupportedException();
         }
 
         private static ISqlFragment HandleCanonicalFunctionGetDate(SqlGenerator sqlgen, DbFunctionExpression e)
         {
             SqlBuilder result = new SqlBuilder();
             result.Append("CURRENT_TIMESTAMP");
+            return result;
+        }
+
+        /// <summary>
+        /// Handler for canonical funcitons for extracting date parts. 
+        /// For example:
+        ///     Year(date) -> EXTRACT(YEAR from date)
+        /// </summary>
+        /// <param name="sqlgen"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private static ISqlFragment HandleCanonicalFunctionDatepart(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            SqlBuilder result = new SqlBuilder();
+            result.Append("EXTRACT(");
+            result.Append(e.Function.Name.ToUpperInvariant());
+            result.Append(" FROM ");
+
+            Debug.Assert(e.Arguments.Count == 1, "Canonical datepart functions should have exactly one argument");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+
+            result.Append(")");
+
             return result;
         }
 
@@ -2651,38 +2816,29 @@ namespace FirebirdSql.Data.Entity
         }
 
         /// <summary>
-        /// Handler for canonical funcitons for extracting date parts. 
-        /// For example:
-        ///     Year(date) -> EXTRACT(YEAR from date)
+        /// DateAdd(datetime, secondsToAdd) -> DATEADD(<timestamp_part>, <number>, <date_time>)
         /// </summary>
         /// <param name="sqlgen"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionDatepart(SqlGenerator sqlgen, DbFunctionExpression e)
+        private static ISqlFragment HandleCanonicalFunctionDateAdd(SqlGenerator sqlgen, DbFunctionExpression e)
         {
             SqlBuilder result = new SqlBuilder();
-            result.Append("EXTRACT(");
-            result.Append(e.Function.Name.ToUpperInvariant());
-            result.Append(" FROM ");
+            result.Append("DATEADD(SECOND");
 
-            Debug.Assert(e.Arguments.Count == 1, "Canonical datepart functions should have exactly one argument");
-            result.Append(e.Arguments[0].Accept(sqlgen));
+            Debug.Assert(e.Arguments.Count == 2, "Canonical datepart functions should have exactly two arguments");
+
+            for (int i = 1; i >= 0; i--)
+            {
+                result.Append(", ");
+                result.Append(e.Arguments[i].Accept(sqlgen));
+            }
 
             result.Append(")");
 
             return result;
         }
-
-        /// <summary>
-        ///  Function rename IndexOf -> CHARINDEX
-        /// </summary>
-        /// <param name="sqlgen"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionIndexOf(SqlGenerator sqlgen, DbFunctionExpression e)
-        {
-            return sqlgen.HandleFunctionDefaultGivenName(e, "POSITION");
-        }
+        #endregion
 
         /// <summary>
         ///  Function rename NewGuid -> NEWID
@@ -2692,23 +2848,45 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private static ISqlFragment HandleCanonicalFunctionNewGuid(SqlGenerator sqlgen, DbFunctionExpression e)
         {
-#warning Not needed?
-            return sqlgen.HandleFunctionDefaultGivenName(e, "NEWID");
+            return sqlgen.HandleFunctionDefaultGivenName(e, "GEN_UUID");
         }
 
-        /// <summary>
-        ///  Length(arg) -> CHAR_LENGTH(arg)
-        /// </summary>
-        /// <param name="sqlgen"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionLength(SqlGenerator sqlgen, DbFunctionExpression e)
+        #region Math Canonical Functions
+        private static ISqlFragment HandleCanonicalFunctionCeiling(SqlGenerator sqlgen, DbFunctionExpression e)
         {
             SqlBuilder result = new SqlBuilder();
 
-            result.Append("CHAR_LENGTH(");
+            result.Append("CEIL(");
 
-            Debug.Assert(e.Arguments.Count == 1, "Len should have one argument");
+            Debug.Assert(e.Arguments.Count == 1, "Ceiling should have one argument");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+
+            result.Append(")");
+
+            return result;
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionFloor(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            SqlBuilder result = new SqlBuilder();
+
+            result.Append("FLOOR(");
+
+            Debug.Assert(e.Arguments.Count == 1, "Floor should have one argument");
+            result.Append(e.Arguments[0].Accept(sqlgen));
+
+            result.Append(")");
+
+            return result;
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionAbs(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            SqlBuilder result = new SqlBuilder();
+
+            result.Append("ABS(");
+
+            Debug.Assert(e.Arguments.Count == 1, "Abs should have one argument");
             result.Append(e.Arguments[0].Accept(sqlgen));
 
             result.Append(")");
@@ -2735,48 +2913,7 @@ namespace FirebirdSql.Data.Entity
 
             return result;
         }
-
-        /// <summary>
-        /// TRIM(string) -> LTRIM(RTRIM(string))
-        /// </summary>
-        /// <param name="sqlgen"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionTrim(SqlGenerator sqlgen, DbFunctionExpression e)
-        {
-            SqlBuilder result = new SqlBuilder();
-
-            result.Append("TRIM(");
-
-            Debug.Assert(e.Arguments.Count == 1, "Trim should have one argument");
-            result.Append(e.Arguments[0].Accept(sqlgen));
-
-            result.Append("))");
-
-            return result;
-        }
-
-        /// <summary>
-        ///  Function rename ToLower -> LOWER
-        /// </summary>
-        /// <param name="sqlgen"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionToLower(SqlGenerator sqlgen, DbFunctionExpression e)
-        {
-            return sqlgen.HandleFunctionDefaultGivenName(e, "LOWER");
-        }
-
-        /// <summary>
-        ///  Function rename ToUpper -> UPPER
-        /// </summary>
-        /// <param name="sqlgen"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionToUpper(SqlGenerator sqlgen, DbFunctionExpression e)
-        {
-            return sqlgen.HandleFunctionDefaultGivenName(e, "UPPER");
-        }
+        #endregion
 
         #endregion
 
