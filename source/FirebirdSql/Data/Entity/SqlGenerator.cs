@@ -3248,22 +3248,7 @@ namespace FirebirdSql.Data.Entity
 
             switch (primitiveType.PrimitiveTypeKind)
             {
-                //case PrimitiveTypeKind.Binary:
-                //    maxLength = MetadataHelpers.GetFacetValueOrDefault<int>(type, MetadataHelpers.MaxLengthFacetName, MetadataHelpers.BinaryMaxMaxLength);
-                //    if (maxLength == MetadataHelpers.BinaryMaxMaxLength)
-                //    {
-                //        length = "max";
-                //    }
-                //    else
-                //    {
-                //        length = maxLength.ToString(CultureInfo.InvariantCulture);
-                //    }
-                //    isFixedLength = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.FixedLengthFacetName, false);
-                //    typeName = (isFixedLength ? "binary(" : "varbinary(") + length + ")";
-                //    break;
-
                 case PrimitiveTypeKind.String:
-                    // Question: How do we handle ntext?
                     isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.UnicodeFacetName, true);
                     isFixedLength = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.FixedLengthFacetName, false);
                     maxLength = MetadataHelpers.GetFacetValueOrDefault<int>(type, MetadataHelpers.MaxLengthFacetName, Int32.MinValue);
@@ -3293,7 +3278,7 @@ namespace FirebirdSql.Data.Entity
 
                 case PrimitiveTypeKind.DateTime:
                     preserveSeconds = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.PreserveSecondsFacetName, false);
-                    typeName = preserveSeconds ? "datetime" : "smalldatetime";
+                    typeName = preserveSeconds ? "TIMESTAMP" : "DATE";
                     break;
 
                 case PrimitiveTypeKind.Decimal:
@@ -3301,41 +3286,33 @@ namespace FirebirdSql.Data.Entity
                     Debug.Assert(decimalPrecision > 0, "decimal precision must be greater than zero");
                     decimalScale = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.ScaleFacetName, 0);
                     Debug.Assert(decimalPrecision >= decimalScale, "decimalPrecision must be greater or equal to decimalScale");
-                    Debug.Assert(decimalPrecision <= 38, "decimalPrecision must be less than or equal to 38");
-                    typeName = typeName + "(" + decimalPrecision + "," + decimalScale + ")";
+                    Debug.Assert(decimalPrecision <= 18, "decimalPrecision must be less than or equal to 18");
+                    typeName = "DECIMAL(" + decimalPrecision + "," + decimalScale + ")";
                     break;
 
                 case PrimitiveTypeKind.Int32:
-                    typeName = "int";
+                    typeName = "INT";
                     break;
 
                 case PrimitiveTypeKind.Int64:
-                    typeName = "bigint";
+                    typeName = "BIGINT";
                     break;
 
                 case PrimitiveTypeKind.Int16:
-                    typeName = "smallint";
-                    break;
-
-                case PrimitiveTypeKind.Byte:
-                    typeName = "tinyint";
+                    typeName = "SMALLINT";
                     break;
 
                 case PrimitiveTypeKind.Boolean:
-                    typeName = "smallint";
+                    typeName = "SMALLINT";
                     break;
 
-                //case PrimitiveTypeKind.Single:
-                //    typeName = "real";
-                //    break;
+                case PrimitiveTypeKind.Single:
+                    typeName = "FLOAT";
+                    break;
 
                 case PrimitiveTypeKind.Double:
-                    typeName = "float";
+                    typeName = "DOUBLE";
                     break;
-
-                //case PrimitiveTypeKind.Guid:
-                //    typeName = "uniqueidentifier";
-                //    break;
 
                 default:
                     throw new NotSupportedException("Unsupported EdmType: " + primitiveType.PrimitiveTypeKind);
