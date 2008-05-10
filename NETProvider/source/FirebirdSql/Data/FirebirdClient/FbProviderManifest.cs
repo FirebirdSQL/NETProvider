@@ -84,11 +84,9 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             Debug.Assert(!string.IsNullOrEmpty(versionHint), "versionHint should not be null/empty");
 
-#warning Token - Finish this for real
-            //if (versionHint.StartsWith("", StringComparison.Ordinal))
             if (true)
             {
-                _serverVersion = "";
+                _serverVersion = versionHint;
             }
             else
             {
@@ -101,8 +99,6 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             get
             {
-#warning Token - Finish this for real
-                return "FB";
                 return _serverVersion;
             }
         }
@@ -391,7 +387,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         preserveSeconds = true;
                     }
 #warning What about TIME?
-                    return TypeUsage.CreateDefaultTypeUsage(preserveSeconds ? StoreTypeNameToStorePrimitiveType["datetime"] : StoreTypeNameToStorePrimitiveType["date"]);
+                    return TypeUsage.CreateDefaultTypeUsage(preserveSeconds ? StoreTypeNameToStorePrimitiveType["timestamp"] : StoreTypeNameToStorePrimitiveType["date"]);
 
                 default:
                     throw new NotSupportedException(String.Format("There is no store type corresponding to the EDM type '{0}' of primitive type '{1}'.", edmType, primitiveType.PrimitiveTypeKind));
