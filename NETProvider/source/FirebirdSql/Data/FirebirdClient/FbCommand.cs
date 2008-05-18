@@ -1268,11 +1268,11 @@ namespace FirebirdSql.Data.FirebirdClient
                 }
                 else
                 {
-                    if (sym == '\'')
+                    if (sym == '\'' && !inDoubleQuotes)
                     {
                         inSingleQuotes = !inSingleQuotes;
                     }
-                    else if (sym == '\"')
+                    else if (sym == '\"' && !inSingleQuotes)
                     {
                         inDoubleQuotes = !inDoubleQuotes;
                     }
