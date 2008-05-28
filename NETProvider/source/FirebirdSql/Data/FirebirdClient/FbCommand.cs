@@ -1306,7 +1306,7 @@ namespace FirebirdSql.Data.FirebirdClient
             if (this.connection == null ||
                 this.connection.State != ConnectionState.Open)
             {
-                throw new InvalidOperationException("Connection must valid and open");
+                throw new InvalidOperationException("Connection must be valid and open");
             }
 
             if (this.activeReader != null)
