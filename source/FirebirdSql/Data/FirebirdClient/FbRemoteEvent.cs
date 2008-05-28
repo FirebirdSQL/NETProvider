@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             if (connection == null || connection.State != System.Data.ConnectionState.Open)
             {
-                throw new InvalidOperationException("Connection must valid and open");
+                throw new InvalidOperationException("Connection must be valid and open");
             }
 
             this.connection = connection;
