@@ -342,7 +342,7 @@ namespace FirebirdSql.Data.Firebird
 			if (this.connection == null ||
 				this.connection.State == ConnectionState.Closed)
 			{
-				throw new InvalidOperationException("Connection must valid and open");
+				throw new InvalidOperationException("Connection must be valid and open");
 			}
 		}
 
