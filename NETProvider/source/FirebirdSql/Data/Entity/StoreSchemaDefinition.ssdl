@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Schema Namespace="FirebirdClient_EF" Provider="FirebirdSql.Data.FirebirdClient" ProviderManifestToken="WI-V6.3.0.17798 Firebird 2.1" Alias="Self"
+<Schema Namespace="FirebirdClient_EF" Provider="FirebirdSql.Data.FirebirdClient" ProviderManifestToken="Firebird" Alias="Self"
         xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
   <EntityContainer Name="Schema">
     <EntitySet Name="STables" EntityType="Self.Table">
