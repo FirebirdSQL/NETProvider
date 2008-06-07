@@ -3316,6 +3316,11 @@ namespace FirebirdSql.Data.Entity
                         length = "max";
                     if (!isUnicode && !isFixedLength && maxLength > 8000)
                         length = "max";
+
+#warning Quick Fix!!!
+                    if (length == "max")
+                        length = "1000";
+
                     if (isFixedLength)
                     {
                         //typeName = (isUnicode ? "nchar(" : "char(") + length + ")";
