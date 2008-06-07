@@ -12,11 +12,10 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2007 Carlos Guzman Alvarez
  *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 3
+ *  Based on the Microsoft Entity Framework Provider Sample SP1 Beta 1
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
