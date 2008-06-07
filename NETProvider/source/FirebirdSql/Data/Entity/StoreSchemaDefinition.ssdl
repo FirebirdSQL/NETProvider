@@ -146,33 +146,93 @@
     <EntitySet Name="SFunctions" EntityType="Self.Function">
       <DefiningQuery>
         SELECT
-        TRIM(rdb$procedure_name) as "Id"
-        , 'bar' as "CatalogName"
-        , 'foo' as "SchemaName"
-        , TRIM(rdb$procedure_name) as "Name"
+        null as "Id"
+        , null as "CatalogName"
+        , null as "SchemaName"
+        , null as "Name"
         , null as "ReturnTypeName"
         , null as "ReturnMaxLength"
         , null as "ReturnPrecision"
+        , null as "ReturnDateTimePrecision"
         , null as "ReturnScale"
-        , 0 as "IsComposable" --???
-        , 0 as "IsAggregate"
-        , 0 as "IsBuiltIn"
-        , 0 as "IsNiladic" --without params
+        , null as "ReturnCollationCatalog"
+        , null as "ReturnCollationSchema"
+        , null as "ReturnCollationName"
+        , null as "ReturnCharacterSetCatalog"
+        , null as "ReturnCharacterSetSchema"
+        , null as "ReturnCharacterSetName"
+        , null as "ReturnIsMultiSet"
+        , null as "IsAggregate"
+        , null as "IsBuiltIn"
+        , null as "IsNiladic"
         FROM
-        rdb$procedures
+        rdb$database
+        WHERE
+        0=1
       </DefiningQuery>
     </EntitySet>
     <EntitySet Name="SFunctionParameters" EntityType="Self.Parameter">
       <DefiningQuery>
         SELECT
-        TRIM(pp.rdb$parameter_name) as "Id"
-        ,  TRIM(pp.rdb$procedure_name) as "FunctionId"
-        ,  TRIM(pp.rdb$procedure_name) as "Name"
-        ,  pp.rdb$parameter_number+1 as "Ordinal"
-        , CASE f.rdb$field_type
-        WHEN 7 THEN 'smallint'
-        WHEN 8 THEN 'int'
-        WHEN 16 THEN 'bigint'
+        null as "Id"
+        , null as "ParentId"
+        , null as "Name"
+        , null as "Ordinal"
+        , null as "TypeName"
+        , null as "MaxLength"
+        , null as "Precision"
+        , null as "DateTimePrecision"
+        , null as "Scale"
+        , null as "CollationCatalog"
+        , null as "CollationSchema"
+        , null as "CollationName"
+        , null as "CharacterSetCatalog"
+        , null as "CharacterSetSchema"
+        , null as "CharacterSetName"
+        , null as "IsMultiSet"
+        , null as "Mode"
+        , null as "Default"
+        FROM
+        rdb$database
+        WHERE
+        0=1
+      </DefiningQuery>
+    </EntitySet>
+
+    <EntitySet Name="SProcedures" EntityType="Self.Procedure">
+      <DefiningQuery>
+        SELECT
+        TRIM(rdb$procedure_name) as "Id"
+        , 'bar' as "CatalogName"
+        , 'foo' as "SchemaName"
+        , TRIM(rdb$procedure_name) as "Name"
+        FROM
+        rdb$procedures
+      </DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="SProcedureParameters" EntityType="Self.Parameter">
+      <DefiningQuery>
+        SELECT
+        TRIM(pp.rdb$procedure_name) || 'x' || TRIM(pp.rdb$parameter_name) as "Id"
+        , TRIM(pp.rdb$procedure_name) as "ParentId"
+        , TRIM(pp.rdb$parameter_name) as "Name"
+        , pp.rdb$parameter_number+1 as "Ordinal"
+        , TRIM(CASE f.rdb$field_type
+        WHEN 7 THEN CASE f.rdb$field_sub_type
+        WHEN 0 THEN 'smallint'
+        WHEN 1 THEN 'numeric'
+        WHEN 2 THEN 'decimal'
+        END
+        WHEN 8 THEN CASE f.rdb$field_sub_type
+        WHEN 0 THEN 'int'
+        WHEN 1 THEN 'numeric'
+        WHEN 2 THEN 'decimal'
+        END
+        WHEN 16 THEN CASE f.rdb$field_sub_type
+        WHEN 0 THEN 'bigint'
+        WHEN 1 THEN 'numeric'
+        WHEN 2 THEN 'decimal'
+        END
         WHEN 10 THEN 'float'
         WHEN 27 THEN 'double'
         WHEN 12 THEN 'date'
@@ -182,74 +242,22 @@
         WHEN 37 THEN 'varchar'
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
-        END as "TypeName"
+        END) as "TypeName"
         , f.rdb$character_length as "MaxLength"
         , f.rdb$field_precision as "Precision"
+        , '0' as "DateTimePrecision"
         , f.rdb$field_scale * (-1) as "Scale"
-        , 'IN' as "Mode"
+        , null as "CollationCatalog"
+        , null as "CollationSchema"
+        , null "CollationName"
+        , null as "CharacterSetCatalog"
+        , null as "CharacterSetSchema"
+        , null as "CharacterSetName"
+        , CAST(0 as smallint) as "IsMultiSet"
+        , IIF(pp.rdb$parameter_type = 1, 'OUT', 'IN') as "Mode"
+        , NULL as "Default"
         FROM
         rdb$procedure_parameters pp LEFT JOIN rdb$fields f ON (pp.rdb$field_source = f.rdb$field_name)
-        WHERE
-        pp.rdb$parameter_type = 0
-      </DefiningQuery>
-    </EntitySet>
-
-    <!--Not Done-->
-    <EntitySet Name="SProcedures" EntityType="Self.Procedure">
-      <DefiningQuery>
-        SELECT
-        '[' + SPECIFIC_SCHEMA + ']' + '[' + SPECIFIC_NAME + ']' [Id]
-        , SPECIFIC_CATALOG         [CatalogName]
-        , SPECIFIC_SCHEMA          [SchemaName]
-        , SPECIFIC_NAME            [Name]
-        FROM
-        INFORMATION_SCHEMA.ROUTINES
-        WHERE
-        NOT (ROUTINE_SCHEMA = 'dbo'
-        AND ROUTINE_NAME LIKE 'dt[_]%'
-        AND SUBSTRING(CAST(SERVERPROPERTY('productversion') as varchar(20)),1,1) = 8)
-        AND (DATA_TYPE != 'TABLE' OR DATA_TYPE is null)
-        AND ROUTINE_TYPE = 'PROCEDURE'
-      </DefiningQuery>
-    </EntitySet>
-    <EntitySet Name="SProcedureParameters" EntityType="Self.Parameter">
-      <DefiningQuery>
-        SELECT
-        '[' + p.SPECIFIC_SCHEMA + ']' + '[' + p.SPECIFIC_NAME + ']' + '[' + p.PARAMETER_NAME + ']' [Id]
-        , '[' + p.SPECIFIC_SCHEMA + ']' + '[' + p.SPECIFIC_NAME + ']'                              [ParentId]
-        , CASE -- trim off the @ symbol
-        WHEN p.PARAMETER_NAME is null THEN NULL
-        ELSE SUBSTRING(p.PARAMETER_NAME, 2, LEN(p.PARAMETER_NAME) )
-        END   [Name]
-        , p.ORDINAL_POSITION [Ordinal]
-        , CASE
-        WHEN p.DATA_TYPE in ('varchar', 'nvarchar', 'varbinary') and
-        p.CHARACTER_MAXIMUM_LENGTH = -1 THEN
-        p.DATA_TYPE + '(max)'
-        ELSE
-        p.DATA_TYPE
-        END [TypeName]
-        , p.CHARACTER_MAXIMUM_LENGTH [MaxLength]
-        , p.NUMERIC_PRECISION [Precision]
-        , CAST(p.DATETIME_PRECISION as integer) as [DateTimePrecision]
-        , p.NUMERIC_SCALE    [Scale]
-        , p.COLLATION_CATALOG [CollationCatalog]
-        , p.COLLATION_SCHEMA [CollationSchema]
-        , p.COLLATION_NAME [CollationName]
-        , p.CHARACTER_SET_CATALOG [CharacterSetCatalog]
-        , p.CHARACTER_SET_SCHEMA [CharacterSetSchema]
-        , p.CHARACTER_SET_NAME [CharacterSetName]
-        , CAST(0 as bit) as [IsMultiSet]
-        , p.PARAMETER_MODE   [Mode]
-        , NULL [Default]
-        FROM
-        INFORMATION_SCHEMA.PARAMETERS p
-        INNER JOIN INFORMATION_SCHEMA.ROUTINES r ON
-        p.SPECIFIC_SCHEMA = r.SPECIFIC_SCHEMA AND
-        p.SPECIFIC_NAME = r.SPECIFIC_NAME AND
-        r.ROUTINE_TYPE = 'PROCEDURE'
-        WHERE
-        p.IS_RESULT = 'NO'
       </DefiningQuery>
     </EntitySet>
 
@@ -327,34 +335,37 @@
     <EntitySet Name="SViewConstraints" EntityType="Self.ViewConstraint">
       <DefiningQuery>
         SELECT
-        CAST(NULL as nvarchar(1))   [Id]
-        , CAST(NULL as nvarchar(256)) [ParentId]
-        , CAST(NULL as nvarchar(256)) [Name]
-        , CAST(NULL as nvarchar(256)) [ConstraintType]
-        , CAST(0 as bit) [IsDeferrable]
-        , CAST(0 as bit) [IsInitiallyDeferred]
-        , CAST(NULL as nvarchar(max)) [Expression]
-        , CAST(NULL as nvarchar(11))  [UpdateRule]
-        , CAST(NULL as nvarchar(11))  [DeleteRule]
+        CAST(NULL as varchar(1)) as "Id"
+        , CAST(NULL as varchar(256)) as "ParentId"
+        , CAST(NULL as varchar(256)) as "Name"
+        , CAST(NULL as varchar(256)) as "ConstraintType"
+        , CAST(0 as smallint) as "IsDeferrable"
+        , CAST(0 as smallint) as "IsInitiallyDeferred"
+        , CAST(NULL as varchar(1000)) as "Expression"
+        , CAST(NULL as varchar(11)) as "UpdateRule"
+        , CAST(NULL as varchar(11)) as "DeleteRule"
+        FROM rdb$database
         WHERE 1=2
       </DefiningQuery>
     </EntitySet>
     <EntitySet Name="SViewConstraintColumns" EntityType="Self.ConstraintColumn">
       <DefiningQuery>
         SELECT
-        CAST(NULL as nvarchar(1))     [ConstraintId]
-        , CAST(NULL as nvarchar(max)) [ColumnId]
+        CAST(NULL as varchar(1)) as "ConstraintId"
+        , CAST(NULL as varchar(1000)) as "ColumnId"
+        FROM rdb$database
         WHERE 1=2
       </DefiningQuery>
     </EntitySet>
     <EntitySet Name="SViewForeignKeys" EntityType="Self.ForeignKey">
       <DefiningQuery>
         SELECT
-        CAST(NULL as nvarchar(1))    [Id]
-        ,  CAST(NULL as nvarchar(max)) [ToColumnId]
-        ,  CAST(NULL as nvarchar(max)) [FromColumnId]
-        ,  CAST(NULL as nvarchar(1))   [ConstraintId]
-        ,  0 [Ordinal]
+        CAST(NULL as varchar(1)) as "Id"
+        ,  CAST(NULL as varchar(100)) as "ToColumnId"
+        ,  CAST(NULL as varchar(100)) as "FromColumnId"
+        ,  CAST(NULL as varchar(1)) as "ConstraintId"
+        ,  0 as "Ordinal"
+        FROM rdb$database
         WHERE 1=2
       </DefiningQuery>
     </EntitySet>
