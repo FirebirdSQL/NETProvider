@@ -28,6 +28,7 @@ using System.Text;
 using System.Data.Common;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
+using System.Data;
 
 
 namespace FirebirdSql.Data.Entity
@@ -431,8 +432,10 @@ namespace FirebirdSql.Data.Entity
         /// <param name="parameters">Parameters to add to the command tree corresponding
         /// to constants in the command tree. Used only in ModificationCommandTrees.</param>
         /// <returns>The string representing the SQL to be executed.</returns>
-        internal static string GenerateSql(DbCommandTree tree, out List<DbParameter> parameters)
+        internal static string GenerateSql(DbCommandTree tree, out List<DbParameter> parameters, out CommandType commandType)
         {
+            commandType = CommandType.Text;
+
             //Handle Query
             DbQueryCommandTree queryCommandTree = tree as DbQueryCommandTree;
             if (queryCommandTree != null)
@@ -440,6 +443,18 @@ namespace FirebirdSql.Data.Entity
                 SqlGenerator sqlGen = new SqlGenerator();
                 parameters = null;
                 return sqlGen.GenerateSql((DbQueryCommandTree)tree);
+            }
+
+            //Handle Function
+            DbFunctionCommandTree DbFunctionCommandTree = tree as DbFunctionCommandTree;
+            if (DbFunctionCommandTree != null)
+            {
+                SqlGenerator sqlGen = new SqlGenerator();
+                parameters = null;
+
+                string sql = sqlGen.GenerateFunctionSql(DbFunctionCommandTree, out commandType);
+
+                return sql;
             }
 
             //Handle Insert
@@ -520,6 +535,53 @@ namespace FirebirdSql.Data.Entity
             Debug.Assert(isParentAJoinStack.Count == 0);
 
             return WriteSql(result);
+        }
+
+        /// <summary>
+        /// Translate a function command tree to a SQL string.
+        /// </summary>
+        private string GenerateFunctionSql(DbFunctionCommandTree tree, out CommandType commandType)
+        {
+            tree.Validate();
+
+            EdmFunction function = tree.Function;
+
+            // We expect function to always have these properties
+            string userCommandText = (string)function.MetadataProperties["CommandTextAttribute"].Value;
+            string userSchemaName = (string)function.MetadataProperties["Schema"].Value;
+            string userFuncName = (string)function.MetadataProperties["StoreFunctionNameAttribute"].Value;
+
+            if (String.IsNullOrEmpty(userCommandText))
+            {
+                // build a quoted description of the function
+                commandType = CommandType.StoredProcedure;
+
+                // if the schema name is not explicitly given, it is assumed to be the metadata namespace
+                string schemaName = String.IsNullOrEmpty(userSchemaName) ?
+                    function.NamespaceName : userSchemaName;
+
+                // if the function store name is not explicitly given, it is assumed to be the metadata name
+                string functionName = String.IsNullOrEmpty(userFuncName) ?
+                    function.Name : userFuncName;
+
+                // quote elements of function text
+                string quotedSchemaName = QuoteIdentifier(schemaName);
+                string quotedFunctionName = QuoteIdentifier(functionName);
+
+                // separator
+                const string schemaSeparator = ".";
+#warning look at generating schemas here (not in FB)
+                // concatenate elements of function text
+                string quotedFunctionText = quotedSchemaName + schemaSeparator + quotedFunctionName;
+
+                return quotedFunctionText;
+            }
+            else
+            {
+                // if the user has specified the command text, pass it through verbatim and choose CommandType.Text
+                commandType = CommandType.Text;
+                return userCommandText;
+            }
         }
 
         /// <summary>
@@ -801,7 +863,7 @@ namespace FirebirdSql.Data.Entity
                         break;
 
                     case PrimitiveTypeKind.String:
-                        bool isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(e.ResultType, MetadataHelpers.UnicodeFacetName);
+                        bool isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(e.ResultType, MetadataHelpers.UnicodeFacetName, true);
                         result.Append(EscapeSingleQuote(e.Value as string, isUnicode));
                         break;
 
@@ -966,17 +1028,6 @@ namespace FirebirdSql.Data.Entity
                 }
             }
             return builder.ToString();
-        }
-
-
-        /// <summary>
-        /// <see cref="DbViewExpression"/> is illegal at this stage
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        public override ISqlFragment Visit(DbViewExpression e)
-        {
-            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -2011,7 +2062,7 @@ namespace FirebirdSql.Data.Entity
             if (e.Arguments.Count == 0)
             {
                 Debug.Assert(isScalarElement);
-                resultSql.Append(" SELECT CAST(null as ");
+                resultSql.Append(" SELECT CAST(NULL AS ");
                 resultSql.Append(GetSqlPrimitiveType(collectionType.TypeUsage));
                 resultSql.Append(") AS X FROM (SELECT 1 FROM RDB$DATABASE) AS Y WHERE 1=0");
             }
@@ -3115,6 +3166,7 @@ namespace FirebirdSql.Data.Entity
                 Debug.Assert(sortClause.Collation != null);
                 if (!String.IsNullOrEmpty(sortClause.Collation))
                 {
+#warning What about this?
                     orderByClause.Append(" COLLATE ");
                     orderByClause.Append(sortClause.Collation);
                 }

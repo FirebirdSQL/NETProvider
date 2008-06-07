@@ -21,49 +21,52 @@ PROCESS
     </Type>
     <Type Name="decimal" PrimitiveTypeKind="Decimal">
       <FacetDescriptions>
-        <Precision Minimum="1" Maximum="18" Default="9" Constant="false" />
-        <Scale Minimum="0" Maximum="18" Default="0" Constant="false" />
+        <Precision Minimum="1" Maximum="18" DefaultValue="9" Constant="false" />
+        <Scale Minimum="0" Maximum="18" DefaultValue="0" Constant="false" />
       </FacetDescriptions>
     </Type>
     <Type Name="numeric" PrimitiveTypeKind="Decimal">
       <FacetDescriptions>
-        <Precision Minimum="1" Maximum="18" Default="9" Constant="false" />
-        <Scale Minimum="0" Maximum="18" Default="0" Constant="false" />
+        <Precision Minimum="1" Maximum="18" DefaultValue="9" Constant="false" />
+        <Scale Minimum="0" Maximum="18" DefaultValue="0" Constant="false" />
       </FacetDescriptions>
-    </Type>
+    </Type>    
     <Type Name="timestamp" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
-        <PreserveSeconds Default="true" Constant="true" />
-        <DateTimeKind Default="Unspecified" Constant="true" />
+        <Precision DefaultValue="4" Constant="true" />
       </FacetDescriptions>
     </Type>
     <Type Name="date" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
-        <PreserveSeconds Default="false" Constant="true" />
-        <DateTimeKind Default="Unspecified" Constant="true" />
+        <Precision DefaultValue="0" Constant="true" />
       </FacetDescriptions>
     </Type>
+    <Type Name="time" PrimitiveTypeKind="Time">
+      <FacetDescriptions>
+        <Precision Minimum="0" Maximum="7" DefaultValue="7" Constant="false" />
+      </FacetDescriptions>
+    </Type>   
     <Type Name="smallint_bool" PrimitiveTypeKind="Boolean">
     </Type>
     <Type Name="char" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength Minimum="1" Maximum="8000" Default="8000" Constant="false" />
-        <Unicode Default="false" Constant="false" />
-        <FixedLength Default="true" Constant="true" />
+        <MaxLength Minimum="1" Maximum="8000" DefaultValue="8000" Constant="false" />
+        <Unicode DefaultValue="false" Constant="false" />
+        <FixedLength DefaultValue="true" Constant="true" />
       </FacetDescriptions>
     </Type>
     <Type Name="varchar" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength Default="8000" Minimum="1" Maximum="8000" Constant="false" />
-        <Unicode Default="true" Constant="false" />
-        <FixedLength Default="false" Constant="true" />
+        <MaxLength DefaultValue="8000" Minimum="1" Maximum="8000" Constant="false" />
+        <Unicode DefaultValue="true" Constant="false" />
+        <FixedLength DefaultValue="false" Constant="true" />
       </FacetDescriptions>
     </Type>
     <Type Name="varchar_max" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength Default="8000" Constant="true" />
-        <Unicode Default="true" Constant="false" />
-        <FixedLength Default="false" Constant="true" />
+        <MaxLength DefaultValue="8000" Constant="true" />
+        <Unicode DefaultValue="true" Constant="false" />
+        <FixedLength DefaultValue="false" Constant="true" />
       </FacetDescriptions>
     </Type>
   </Types>
@@ -297,11 +300,11 @@ PROCESS
     <!-- BEGIN SYSTEM FUNCTIONS ##################################### -->
     <!-- CURRENT_TIMESTAMP -->
     <Function Name="CURRENT_TIMESTAMP" BuiltIn="true" NiladicFunction="true">
-      <ReturnType Type="DateTime" PreserveSeconds="true" />
+      <ReturnType Type="DateTime" />
     </Function>
     <!-- CURRENT_DATE -->
     <Function Name="CURRENT_DATE" BuiltIn="true" NiladicFunction="true">
-      <ReturnType Type="DateTime" PreserveSeconds="false" />
+      <ReturnType Type="DateTime" />
     </Function>
 
     <!-- CURRENT_USER -->

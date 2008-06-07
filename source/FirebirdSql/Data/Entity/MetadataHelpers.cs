@@ -33,9 +33,9 @@ namespace FirebirdSql.Data.Entity
     /// <summary>
     /// A set of static helpers for type metadata
     /// </summary>
-    internal static class MetadataHelpers
+    static class MetadataHelpers
     {
-        #region · Type Helpers ·
+        #region Type Helpers
 
         /// <summary>
         /// Cast the EdmType of the given type usage to the given TEdmType
@@ -176,13 +176,11 @@ namespace FirebirdSql.Data.Entity
         internal static PrimitiveTypeKind GetPrimitiveTypeKind(TypeUsage type)
         {
             PrimitiveTypeKind returnValue;
-
             if (!MetadataHelpers.TryGetPrimitiveTypeKind(type, out returnValue))
             {
                 Debug.Assert(false, "Cannot create parameter of non-primitive type");
                 throw new NotSupportedException("Cannot create parameter of non-primitive type");
             }
-
             return returnValue;
         }
 
@@ -196,7 +194,6 @@ namespace FirebirdSql.Data.Entity
         internal static T TryGetValueForMetadataProperty<T>(MetadataItem item, string propertyName)
         {
             MetadataProperty property;
-
             if (!item.MetadataProperties.TryGetValue(propertyName, true, out property))
             {
                 return default(T);
@@ -208,12 +205,10 @@ namespace FirebirdSql.Data.Entity
         internal static bool IsPrimitiveType(TypeUsage type, PrimitiveTypeKind primitiveType)
         {
             PrimitiveTypeKind typeKind;
-
             if (TryGetPrimitiveTypeKind(type, out typeKind))
             {
                 return (typeKind == primitiveType);
             }
-
             return false;
         }
 
@@ -221,32 +216,24 @@ namespace FirebirdSql.Data.Entity
         {
             switch (primitiveType)
             {
-                case PrimitiveTypeKind.Binary:
-                    return DbType.Binary;
-                case PrimitiveTypeKind.Boolean:
-                    return DbType.Boolean;
-                case PrimitiveTypeKind.Byte:
-                    return DbType.Byte;
-                case PrimitiveTypeKind.DateTime:
-                    return DbType.DateTime;
-                case PrimitiveTypeKind.Decimal:
-                    return DbType.Decimal;
-                case PrimitiveTypeKind.Double:
-                    return DbType.Double;
-                case PrimitiveTypeKind.Single:
-                    return DbType.Single;
-                case PrimitiveTypeKind.Guid:
-                    return DbType.Guid;
-                case PrimitiveTypeKind.Int16:
-                    return DbType.Int16;
-                case PrimitiveTypeKind.Int32:
-                    return DbType.Int32;
-                case PrimitiveTypeKind.Int64:
-                    return DbType.Int64;
-                case PrimitiveTypeKind.SByte:
-                    return DbType.SByte;
-                case PrimitiveTypeKind.String:
-                    return DbType.String;
+                case PrimitiveTypeKind.Binary: return DbType.Binary;
+                case PrimitiveTypeKind.Boolean: return DbType.Boolean;
+                case PrimitiveTypeKind.Byte: return DbType.Byte;
+                case PrimitiveTypeKind.DateTime: return DbType.DateTime;
+                case PrimitiveTypeKind.Decimal: return DbType.Decimal;
+                case PrimitiveTypeKind.Double: return DbType.Double;
+                case PrimitiveTypeKind.Single: return DbType.Single;
+                case PrimitiveTypeKind.Guid: return DbType.Guid;
+                case PrimitiveTypeKind.Int16: return DbType.Int16;
+                case PrimitiveTypeKind.Int32: return DbType.Int32;
+                case PrimitiveTypeKind.Int64: return DbType.Int64;
+                //case PrimitiveTypeKind.Money: return DbType.Decimal;
+                case PrimitiveTypeKind.SByte: return DbType.SByte;
+                case PrimitiveTypeKind.String: return DbType.String;
+                //case PrimitiveTypeKind.UInt16: return DbType.UInt16;
+                //case PrimitiveTypeKind.UInt32: return DbType.UInt32;
+                //case PrimitiveTypeKind.UInt64: return DbType.UInt64;
+                //case PrimitiveTypeKind.Xml: return DbType.Xml;
                 default:
                     Debug.Fail("unknown PrimitiveTypeKind" + primitiveType.ToString());
                     throw new InvalidOperationException(string.Format("Unknown PrimitiveTypeKind {0}", primitiveType));
@@ -255,14 +242,12 @@ namespace FirebirdSql.Data.Entity
 
         #endregion
 
-        #region · Facet Support ·
-
+        #region Facet Support
         internal static readonly int UnicodeStringMaxMaxLength = Int32.MaxValue / 2;
         internal static readonly int AsciiStringMaxMaxLength = Int32.MaxValue;
         internal static readonly int BinaryMaxMaxLength = Int32.MaxValue;
 
-        #region · Facet Names ·
-
+        #region Facet Names
         /// <summary>
         /// Name of the MaxLength Facet
         /// </summary>
@@ -298,9 +283,13 @@ namespace FirebirdSql.Data.Entity
         /// </summary>
         public static readonly string DefaultValueFacetName = "DefaultValue";
 
+        /// <summary>
+        /// Name of the Nullable Facet
+        /// </summary>
+        internal const string NullableFacetName = "Nullable";
         #endregion
 
-        #region · Facet Retreival Helpers ·
+        #region Facet Retreival Helpers
 
         /// <summary>
         /// Get the value specified on the given type usage for the given facet name.
@@ -324,7 +313,7 @@ namespace FirebirdSql.Data.Entity
         {
             //Get the value for the facet, if any
             Facet facet;
-            if (type.Facets.TryGetValue(facetName, false, out facet) && facet.Value != null)
+            if (type.Facets.TryGetValue(facetName, false, out facet) && facet.Value != null && !facet.IsUnbounded)
             {
                 return (T)facet.Value;
             }
@@ -332,22 +321,6 @@ namespace FirebirdSql.Data.Entity
             {
                 return defaultValue;
             }
-        }
-
-        internal static T GetFacetValueOrDefault<T>(TypeUsage type, string facetName)
-        {
-            //Get the value for the facet, if any
-            Facet facet;
-
-            if (type.Facets.TryGetValue(facetName, false, out facet) && facet.Value != null)
-            {
-                return (T)facet.Value;
-            }
-
-            //If no value was specified, get the default value for the facet.
-            FacetDescription facetDescription;
-            MetadataHelpers.TryGetTypeFacetDescriptionByName(type.EdmType, facetName, out facetDescription);
-            return (T)facetDescription.DefaultValue;
         }
 
         internal static bool IsFacetValueConstant(TypeUsage type, string facetName)
@@ -378,7 +351,6 @@ namespace FirebirdSql.Data.Entity
         internal static bool TryGetTypeFacetDescriptionByName(EdmType edmType, string facetName, out FacetDescription facetDescription)
         {
             facetDescription = null;
-
             if (MetadataHelpers.IsPrimitiveType(edmType))
             {
                 PrimitiveType primitiveType = (PrimitiveType)edmType;
@@ -391,8 +363,81 @@ namespace FirebirdSql.Data.Entity
                     }
                 }
             }
+            return false;
+        }
+
+        internal static bool IsNullable(TypeUsage type)
+        {
+            Facet nullableFacet;
+            if (type.Facets.TryGetValue(NullableFacetName, false, out nullableFacet))
+            {
+                return (bool)nullableFacet.Value;
+            }
+            return false;
+        }
+
+        internal static bool TryGetMaxLength(TypeUsage type, out int maxLength)
+        {
+            if (!IsPrimitiveType(type, PrimitiveTypeKind.String) &&
+                !IsPrimitiveType(type, PrimitiveTypeKind.Binary))
+            {
+                maxLength = 0;
+                return false;
+            }
+
+            // Binary and String FixedLength facets share the same name
+            return TryGetIntFacetValue(type, MaxLengthFacetName, out maxLength);
+        }
+
+        internal static bool TryGetIntFacetValue(TypeUsage type, string facetName, out int intValue)
+        {
+            intValue = 0;
+            Facet intFacet;
+
+            if (type.Facets.TryGetValue(facetName, false, out intFacet) && intFacet.Value != null && !intFacet.IsUnbounded)
+            {
+                intValue = (int)intFacet.Value;
+                return true;
+            }
 
             return false;
+        }
+
+        internal static bool TryGetIsFixedLength(TypeUsage type, out bool isFixedLength)
+        {
+            if (!IsPrimitiveType(type, PrimitiveTypeKind.String) &&
+                !IsPrimitiveType(type, PrimitiveTypeKind.Binary))
+            {
+                isFixedLength = false;
+                return false;
+            }
+
+            // Binary and String MaxLength facets share the same name
+            return TryGetBooleanFacetValue(type, FixedLengthFacetName, out isFixedLength);
+        }
+
+        internal static bool TryGetBooleanFacetValue(TypeUsage type, string facetName, out bool boolValue)
+        {
+            boolValue = false;
+            Facet boolFacet;
+            if (type.Facets.TryGetValue(facetName, false, out boolFacet) && boolFacet.Value != null)
+            {
+                boolValue = (bool)boolFacet.Value;
+                return true;
+            }
+
+            return false;
+        }
+
+        internal static bool TryGetIsUnicode(TypeUsage type, out bool isUnicode)
+        {
+            if (!IsPrimitiveType(type, PrimitiveTypeKind.String))
+            {
+                isUnicode = false;
+                return false;
+            }
+
+            return TryGetBooleanFacetValue(type, UnicodeFacetName, out isUnicode);
         }
 
         #endregion
@@ -403,9 +448,33 @@ namespace FirebirdSql.Data.Entity
         {
             return (function.NamespaceName == "Edm");
         }
+
         internal static bool IsStoreFunction(EdmFunction function)
         {
             return !IsCanonicalFunction(function);
+        }
+
+        // Returns ParameterDirection corresponding to given ParameterMode
+        internal static ParameterDirection ParameterModeToParameterDirection(ParameterMode mode)
+        {
+            switch (mode)
+            {
+                case ParameterMode.In:
+                    return ParameterDirection.Input;
+
+                case ParameterMode.InOut:
+                    return ParameterDirection.InputOutput;
+
+                case ParameterMode.Out:
+                    return ParameterDirection.Output;
+
+                case ParameterMode.ReturnValue:
+                    return ParameterDirection.ReturnValue;
+
+                default:
+                    Debug.Fail("unrecognized mode " + mode.ToString());
+                    return default(ParameterDirection);
+            }
         }
     }
 }

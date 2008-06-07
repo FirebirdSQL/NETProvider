@@ -23,17 +23,16 @@
   <xs:complexType name="TIntegerFacetDescription">
     <xs:attribute name="Minimum" type="xs:int" use="optional" />
     <xs:attribute name="Maximum" type="xs:int" use="optional" />
-    <xs:attribute name="Default" type="xs:int" use="optional" />
+    <xs:attribute name="DefaultValue" type="xs:int" use="optional" />
     <xs:attribute name="Constant" type="xs:boolean" default="false" />
   </xs:complexType>
 
   <xs:complexType name="TBooleanFacetDescription">
-    <xs:attribute name="Default" type="xs:boolean" use="optional" />
+    <xs:attribute name="DefaultValue" type="xs:boolean" use="optional" />
     <xs:attribute name="Constant" type="xs:boolean" default="true" />
   </xs:complexType>
 
   <xs:complexType name="TDateTimeFacetDescription">
-    <xs:attribute name="Default" type="pm:DateTimeKind" use="optional" />
     <xs:attribute name="Constant" type="xs:boolean" default="false" />
   </xs:complexType>
 
@@ -44,8 +43,6 @@
       <xs:element name="MaxLength" minOccurs="0" maxOccurs="1" type="pm:TIntegerFacetDescription"/>
       <xs:element name="Unicode" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
       <xs:element name="FixedLength" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
-      <xs:element name="PreserveSeconds" minOccurs="0" maxOccurs="1" type="pm:TBooleanFacetDescription"/>
-      <xs:element name="DateTimeKind" minOccurs="0" maxOccurs="1" type="pm:TDateTimeFacetDescription"/>
     </xs:choice>
   </xs:complexType>
 
@@ -69,8 +66,6 @@
     <xs:attribute name="MaxLength" type="xs:int" use="optional"/>
     <xs:attribute name="Unicode" type="xs:boolean" use="optional"/>
     <xs:attribute name="FixedLength" type="xs:boolean" use="optional"/>
-    <xs:attribute name="PreserveSeconds" type="xs:boolean" use="optional"/>
-    <xs:attribute name="DateTimeKind" type="xs:boolean" use="optional"/>
   </xs:attributeGroup>
 
   <xs:complexType name="TFunctionParameter">
@@ -109,8 +104,10 @@
       <xs:enumeration value="Binary"/>
       <xs:enumeration value="Boolean"/>
       <xs:enumeration value="Byte"/>
-      <xs:enumeration value="DateTime"/>
       <xs:enumeration value="Decimal"/>
+      <xs:enumeration value="DateTime"/>
+      <xs:enumeration value="Time"/>
+      <xs:enumeration value="DateTimeOffset"/>
       <xs:enumeration value="Double"/>
       <xs:enumeration value="Guid"/>
       <xs:enumeration value="Single"/>
@@ -128,14 +125,6 @@
       <xs:enumeration value="In"/>
       <xs:enumeration value="Out"/>
       <xs:enumeration value="InOut"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="DateTimeKind">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Local"/>
-      <xs:enumeration value="Unspecified"/>
-      <xs:enumeration value="Utc"/>
     </xs:restriction>
   </xs:simpleType>
 

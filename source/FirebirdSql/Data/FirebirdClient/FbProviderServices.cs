@@ -41,31 +41,56 @@ namespace FirebirdSql.Data.FirebirdClient
     {
         internal static readonly FbProviderServices Instance = new FbProviderServices();
 
-        protected override DbCommandDefinition CreateDbCommandDefinition(DbConnection connection, DbCommandTree commandTree)
+        protected override DbCommandDefinition CreateDbCommandDefinition(DbProviderManifest manifest, DbCommandTree commandTree)
         {
-            DbCommand prototype = CreateCommand(connection, commandTree);
+            DbCommand prototype = CreateCommand(manifest, commandTree);
             DbCommandDefinition result = this.CreateCommandDefinition(prototype);
             return result;
         }
 
-        internal DbCommand CreateCommand(DbConnection connection, DbCommandTree commandTree)
+        /// <summary>
+        /// Create a SampleCommand object, given the provider manifest and command tree
+        /// </summary>
+        private DbCommand CreateCommand(DbProviderManifest manifest, DbCommandTree commandTree)
         {
-            if (connection == null)
-                throw new ArgumentNullException("connection");
+            if (manifest == null)
+                throw new ArgumentNullException("manifest");
+
             if (commandTree == null)
                 throw new ArgumentNullException("commandTree");
 
-            FbConnection fbConnection = (FbConnection)connection;
             FbCommand command = new FbCommand();
 
             List<DbParameter> parameters;
-            command.CommandText = SqlGenerator.GenerateSql(commandTree, out parameters);
-            command.CommandType = CommandType.Text;
+            CommandType commandType;
+
+            command.CommandText = SqlGenerator.GenerateSql(commandTree, out parameters, out commandType);
+            command.CommandType = commandType;
+
+            // Get the function (if any) implemented by the command tree since this influences our interpretation of parameters
+            EdmFunction function = null;
+            if (commandTree is DbFunctionCommandTree)
+            {
+                function = ((DbFunctionCommandTree)commandTree).Function;
+            }
 
             // Now make sure we populate the command's parameters from the CQT's parameters:
             foreach (KeyValuePair<string, TypeUsage> queryParameter in commandTree.Parameters)
             {
-                DbParameter parameter = CreateParameterFromQueryParameter(queryParameter);
+                FbParameter parameter;
+
+                // Use the corresponding function parameter TypeUsage where available (currently, the SSDL facets and 
+                // type trump user-defined facets and type in the EntityCommand).
+                FunctionParameter functionParameter;
+                if (null != function && function.Parameters.TryGetValue(queryParameter.Key, false, out functionParameter))
+                {
+                    parameter = CreateSqlParameter(functionParameter.Name, functionParameter.TypeUsage, functionParameter.Mode, DBNull.Value);
+                }
+                else
+                {
+                    parameter = CreateSqlParameter(queryParameter.Key, queryParameter.Value, ParameterMode.In, DBNull.Value);
+                }
+
                 command.Parameters.Add(parameter);
             }
 
@@ -73,6 +98,13 @@ namespace FirebirdSql.Data.FirebirdClient
             // does not support user parameters, where there is no risk of name collision)
             if (null != parameters && 0 < parameters.Count)
             {
+                if (!(commandTree is DbInsertCommandTree) &&
+                    !(commandTree is DbUpdateCommandTree) &&
+                    !(commandTree is DbDeleteCommandTree))
+                {
+                    throw new InvalidOperationException("SqlGenParametersNotPermitted");
+                }
+
                 foreach (DbParameter parameter in parameters)
                 {
                     command.Parameters.Add(parameter);
@@ -82,31 +114,47 @@ namespace FirebirdSql.Data.FirebirdClient
             return command;
         }
 
-        private DbParameter CreateParameterFromQueryParameter(KeyValuePair<string, TypeUsage> queryParameter)
-        {
-            // We really can't have a parameter here that isn't a scalar type...
-            Debug.Assert(MetadataHelpers.IsPrimitiveType(queryParameter.Value), "Non-PrimitiveType used as query parameter type");
-
-            DbParameter result = FirebirdClientFactory.Instance.CreateParameter();
-            result.ParameterName = queryParameter.Key;
-            result.Direction = ParameterDirection.Input;
-
-            return result;
-        }
-
-        protected override DbProviderManifest GetDbProviderManifest(DbConnection connection)
+        protected override string GetDbProviderManifestToken(DbConnection connection)
         {
             if (connection == null)
+                throw new ArgumentException("connection");
+
+            FbConnection fbConnection = connection as FbConnection;
+            if (fbConnection == null)
             {
-                throw new ArgumentNullException("connection");
+                throw new ArgumentException("The connection is not of type 'FbConnection'.");
             }
 
-            if (connection.GetType() != typeof(FbConnection))
+            if (string.IsNullOrEmpty(fbConnection.ConnectionString))
             {
-                throw new ArgumentException(string.Format("The connection given is not of type '{0}'.", typeof(FbConnection)));
+                throw new ArgumentException("Could not determine storage version; a valid storage connection or a version hint is required.");
             }
 
-            return new FbProviderManifest(connection);
+            bool closeConnection = false;
+            try
+            {
+                if (fbConnection.State != ConnectionState.Open)
+                {
+                    fbConnection.Open();
+                    closeConnection = true;
+                }
+
+#warning What about this?
+                //StoreVersion version = StoreVersionUtils.GetStoreVersion(fbConnection);
+                //if (version == StoreVersion.Sql9)
+                //    return SampleProviderManifest.TokenSql9;
+                //else
+
+                //    return StoreVersionUtils.GetVersionHint(version);
+                return fbConnection.ServerVersion;
+            }
+            finally
+            {
+                if (closeConnection)
+                {
+                    fbConnection.Close();
+                }
+            }
         }
 
         protected override DbProviderManifest GetDbProviderManifest(string versionHint)
@@ -119,12 +167,296 @@ namespace FirebirdSql.Data.FirebirdClient
             return new FbProviderManifest(versionHint);
         }
 
-        internal static XmlReader GetXmlResource(string resourceName)
+        /// <summary>
+        /// Creates a SqlParameter given a name, type, and direction
+        /// </summary>
+        internal static FbParameter CreateSqlParameter(string name, TypeUsage type, ParameterMode mode, object value)
         {
-            Assembly executingAssembly = Assembly.GetExecutingAssembly();
-            Stream stream = executingAssembly.GetManifestResourceStream(resourceName);
-            return XmlReader.Create(stream);
+            int? size;
+
+            FbParameter result = new FbParameter(name, value);
+
+            // .Direction
+            ParameterDirection direction = MetadataHelpers.ParameterModeToParameterDirection(mode);
+            if (result.Direction != direction)
+            {
+                result.Direction = direction;
+            }
+
+            // .Size and .SqlDbType
+            // output parameters are handled differently (we need to ensure there is space for return
+            // values where the user has not given a specific Size/MaxLength)
+            bool isOutParam = mode != ParameterMode.In;
+            FbDbType sqlDbType = GetSqlDbType(type, isOutParam, out size);
+
+            if (result.FbDbType != sqlDbType)
+            {
+                result.FbDbType = sqlDbType;
+            }
+
+            // Note that we overwrite 'facet' parameters where either the value is different or
+            // there is an output parameter.
+            if (size.HasValue && (isOutParam || result.Size != size.Value))
+            {
+                result.Size = size.Value;
+            }
+
+            // .IsNullable
+            bool isNullable = MetadataHelpers.IsNullable(type);
+            if (isOutParam || isNullable != result.IsNullable)
+            {
+                result.IsNullable = isNullable;
+            }
+
+            return result;
         }
+
+
+        /// <summary>
+        /// Determines SqlDbType for the given primitive type. Extracts facet
+        /// information as well.
+        /// </summary>
+        private static FbDbType GetSqlDbType(TypeUsage type, bool isOutParam, out int? size)
+        {
+            // only supported for primitive type
+            PrimitiveTypeKind primitiveTypeKind = MetadataHelpers.GetPrimitiveTypeKind(type);
+
+            size = default(int?);
+
+
+            // TODO add logic for Xml here
+            switch (primitiveTypeKind)
+            {
+                case PrimitiveTypeKind.Binary:
+                    // for output parameters, ensure there is space...
+                    size = GetParameterSize(type, isOutParam);
+                    return GetBinaryDbType(type);
+
+                case PrimitiveTypeKind.Boolean:
+                    return FbDbType.SmallInt;
+
+#warning What about this
+                //case PrimitiveTypeKind.Byte:
+                //    return SqlDbType.TinyInt;
+
+                case PrimitiveTypeKind.Time:
+                    return FbDbType.Time;
+
+#warning What about this
+                //case PrimitiveTypeKind.DateTimeOffset:
+                //    return SqlDbType.DateTimeOffset;
+
+                case PrimitiveTypeKind.DateTime:
+                    return FbDbType.TimeStamp;
+
+                case PrimitiveTypeKind.Decimal:
+                    return FbDbType.Decimal;
+
+                case PrimitiveTypeKind.Double:
+                    return FbDbType.Double;
+
+#warning What about this
+                //case PrimitiveTypeKind.Guid:
+                //    return SqlDbType.UniqueIdentifier;
+
+                case PrimitiveTypeKind.Int16:
+                    return FbDbType.SmallInt;
+
+                case PrimitiveTypeKind.Int32:
+                    return FbDbType.Integer;
+
+                case PrimitiveTypeKind.Int64:
+                    return FbDbType.BigInt;
+
+#warning What about this
+                //case PrimitiveTypeKind.SByte:
+                //    return SqlDbType.SmallInt;
+
+                case PrimitiveTypeKind.Single:
+                    return FbDbType.Float;
+
+                case PrimitiveTypeKind.String:
+                    size = GetParameterSize(type, isOutParam);
+                    return GetStringDbType(type);
+
+                default:
+                    Debug.Fail("unknown PrimitiveTypeKind " + primitiveTypeKind);
+                    //return SqlDbType.Variant;
+                    throw new InvalidOperationException("unknown PrimitiveTypeKind " + primitiveTypeKind);
+            }
+        }
+
+        /// <summary>
+        /// Determines preferred value for SqlParameter.Size. Returns null
+        /// where there is no preference.
+        /// </summary>
+        private static int? GetParameterSize(TypeUsage type, bool isOutParam)
+        {
+            int maxLength;
+            if (MetadataHelpers.TryGetMaxLength(type, out maxLength))
+            {
+                // if the MaxLength facet has a specific value use it
+                return maxLength;
+            }
+            else if (isOutParam)
+            {
+                // if the parameter is a return/out/inout parameter, ensure there 
+                // is space for any value
+                return int.MaxValue;
+            }
+            else
+            {
+                // no value
+                return default(int?);
+            }
+        }
+
+        /// <summary>
+        /// Chooses the appropriate SqlDbType for the given string type.
+        /// </summary>
+        private static FbDbType GetStringDbType(TypeUsage type)
+        {
+            Debug.Assert(type.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType &&
+                PrimitiveTypeKind.String == ((PrimitiveType)type.EdmType).PrimitiveTypeKind, "only valid for string type");
+
+            FbDbType dbType;
+#warning What about this
+            //if (type.EdmType.Name.ToLowerInvariant() == "xml")
+            //{
+            //    dbType = SqlDbType.Xml;
+            //}
+            //else
+            {
+                // Specific type depends on whether the string is a unicode string and whether it is a fixed length string.
+                // By default, assume widest type (unicode) and most common type (variable length)
+                bool unicode;
+                bool fixedLength;
+                if (!MetadataHelpers.TryGetIsFixedLength(type, out fixedLength))
+                {
+                    fixedLength = false;
+                }
+
+                if (!MetadataHelpers.TryGetIsUnicode(type, out unicode))
+                {
+                    unicode = true;
+                }
+
+#warning How to handle unicode
+                if (fixedLength)
+                {
+                    dbType = (unicode ? FbDbType.Char : FbDbType.Char);
+                }
+                else
+                {
+                    dbType = (unicode ? FbDbType.VarChar : FbDbType.VarChar);
+                }
+            }
+            return dbType;
+        }
+
+        /// <summary>
+        /// Chooses the appropriate SqlDbType for the given binary type.
+        /// </summary>
+        private static FbDbType GetBinaryDbType(TypeUsage type)
+        {
+            Debug.Assert(type.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType &&
+                PrimitiveTypeKind.Binary == ((PrimitiveType)type.EdmType).PrimitiveTypeKind, "only valid for binary type");
+
+            // Specific type depends on whether the binary value is fixed length. By default, assume variable length.
+            bool fixedLength;
+            if (!MetadataHelpers.TryGetIsFixedLength(type, out fixedLength))
+            {
+                fixedLength = false;
+            }
+
+            //return fixedLength ? SqlDbType.Binary : SqlDbType.VarBinary;
+            return FbDbType.Binary;
+        }
+
+        #region OLD
+//        internal DbCommand CreateCommand(DbConnection connection, DbCommandTree commandTree)
+//        {
+//            if (connection == null)
+//                throw new ArgumentNullException("connection");
+//            if (commandTree == null)
+//                throw new ArgumentNullException("commandTree");
+
+//            FbConnection fbConnection = (FbConnection)connection;
+//            FbCommand command = new FbCommand();
+
+//            List<DbParameter> parameters;
+//            command.CommandText = SqlGenerator.GenerateSql(commandTree, out parameters);
+//            command.CommandType = CommandType.Text;
+
+//            // Now make sure we populate the command's parameters from the CQT's parameters:
+//            foreach (KeyValuePair<string, TypeUsage> queryParameter in commandTree.Parameters)
+//            {
+//                DbParameter parameter = CreateParameterFromQueryParameter(queryParameter);
+//                command.Parameters.Add(parameter);
+//            }
+
+//            // Now add parameters added as part of SQL gen (note: this feature is only safe for DML SQL gen which
+//            // does not support user parameters, where there is no risk of name collision)
+//            if (null != parameters && 0 < parameters.Count)
+//            {
+//                foreach (DbParameter parameter in parameters)
+//                {
+//                    command.Parameters.Add(parameter);
+//                }
+//            }
+
+//            return command;
+//        }
+
+//        private DbParameter CreateParameterFromQueryParameter(KeyValuePair<string, TypeUsage> queryParameter)
+//        {
+//            // We really can't have a parameter here that isn't a scalar type...
+//            Debug.Assert(MetadataHelpers.IsPrimitiveType(queryParameter.Value), "Non-PrimitiveType used as query parameter type");
+
+//            DbParameter result = FirebirdClientFactory.Instance.CreateParameter();
+//            result.ParameterName = queryParameter.Key;
+//            result.Direction = ParameterDirection.Input;
+
+//            return result;
+//        }
+
+//        protected override DbProviderManifest GetDbProviderManifest(string versionHint)
+//        {
+//            if (string.IsNullOrEmpty(versionHint))
+//            {
+//                throw new ArgumentException("Could not determine store version; a valid store connection or a version hint is required.");
+//            }
+
+//            return new FbProviderManifest(versionHint);
+//        }
+
+//        internal static XmlReader GetXmlResource(string resourceName)
+//        {
+//            Assembly executingAssembly = Assembly.GetExecutingAssembly();
+//            Stream stream = executingAssembly.GetManifestResourceStream(resourceName);
+//            return XmlReader.Create(stream);
+//        }
+
+//#warning SP1 Beta new
+//        public override DbCommandDefinition CreateCommandDefinition(DbCommand prototype)
+//        {
+//            return base.CreateCommandDefinition(prototype);
+//        }
+
+//#warning SP1 Beta new
+//        protected override string GetDbProviderManifestToken(DbConnection connection)
+//        {
+//            throw new NotImplementedException();
+//        }
+
+//#warning SP1 Beta new
+//        protected override DbCommandDefinition CreateDbCommandDefinition(DbProviderManifest providerManifest, DbCommandTree commandTree)
+//        {
+//            DbCommand prototype = CreateCommand(providerManifest, commandTree);
+//            DbCommandDefinition result = this.CreateCommandDefinition(prototype);
+//            return result;
+//        }
+        #endregion
 
         #region OLD CODE
 

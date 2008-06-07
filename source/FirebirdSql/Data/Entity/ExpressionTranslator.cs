@@ -231,10 +231,11 @@ namespace FirebirdSql.Data.Entity
             throw new NotSupportedException("Visit(\"VariableReferenceExpression\") is not supported.");
         }
 
-        public override void Visit(DbViewExpression expression)
-        {
-            throw new NotSupportedException("Visit(\"ViewExpression\") is not supported.");
-        }
+#warning SP1 Beta comment
+        //public override void Visit(DbViewExpression expression)
+        //{
+        //    throw new NotSupportedException("Visit(\"ViewExpression\") is not supported.");
+        //}
 
         #endregion
 
