@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Schema Namespace="FirebirdClient_EF" Provider="FirebirdSql.Data.FirebirdClient" ProviderManifestToken="" Alias="Self"
+<Schema Namespace="FirebirdClient_EF" Provider="FirebirdSql.Data.FirebirdClient" ProviderManifestToken="WI-V6.3.0.17798 Firebird 2.1" Alias="Self"
         xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
   <EntityContainer Name="Schema">
     <EntitySet Name="STables" EntityType="Self.Table">
@@ -162,7 +162,7 @@
         rdb$procedures
       </DefiningQuery>
     </EntitySet>
-    <EntitySet Name="SFunctionParameters" EntityType="Self.FunctionParameter">
+    <EntitySet Name="SFunctionParameters" EntityType="Self.Parameter">
       <DefiningQuery>
         SELECT
         TRIM(pp.rdb$parameter_name) as "Id"
@@ -513,7 +513,7 @@
     <Property Name="ReturnCharacterSetCatalog" Type="varchar" MaxLength="128" />
     <Property Name="ReturnCharacterSetSchema" Type="varchar" MaxLength="128" />
     <Property Name="ReturnCharacterSetName" Type="varchar" MaxLength="128" />
-    <Property Name="ReturnIsMultiSet" Nullable="false" Type="bit" />
+    <Property Name="ReturnIsMultiSet" Nullable="false" Type="smallint_bool" />
     <Property Name="IsAggregate" Type="smallint_bool" />
     <Property Name="IsBuiltIn" Type="smallint_bool" />
     <Property Name="IsNiladic" Type="smallint_bool" />
@@ -548,7 +548,7 @@
     <Property Name="CharacterSetCatalog" Type="varchar" MaxLength="128" />
     <Property Name="CharacterSetSchema" Type="varchar" MaxLength="128" />
     <Property Name="CharacterSetName" Type="varchar" MaxLength="128" />
-    <Property Name="IsMultiSet" Nullable="false" Type="bit" />
+    <Property Name="IsMultiSet" Nullable="false" Type="smallint_bool" />
     <Property Name="Mode" Type="varchar" MaxLength="16" />
     <Property Name="Default" Type="varchar_max" />
   </EntityType>
@@ -569,7 +569,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max_" />
+    <Property Name="Id" Nullable="false" Type="varchar_max" />
     <Property Name="Expression" Nullable="true" MaxLength="4000" Type="varchar" />
   </EntityType>
 
