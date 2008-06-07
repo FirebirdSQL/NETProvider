@@ -15,7 +15,7 @@
  *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
- *  Based on the Microsoft Entity Framework Provider Sample Beta 3
+ *  Based on the Microsoft Entity Framework Provider Sample SP1 Beta 1
  */
 
 #if (NET_35 && ENTITY_FRAMEWORK)
