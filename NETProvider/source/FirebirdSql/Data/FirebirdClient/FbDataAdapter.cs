@@ -326,7 +326,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     {
                         if (updatingArgs.Errors == null)
                         {
-                            throw new InvalidOperationException("RowUpdatingEvent: Errors occurred; no additional is information available.");
+                            throw new InvalidOperationException("RowUpdatingEvent: Errors occurred; no additional information is available.");
                         }
                         throw updatingArgs.Errors;
                     }
