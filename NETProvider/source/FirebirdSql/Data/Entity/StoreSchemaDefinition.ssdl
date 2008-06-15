@@ -4,6 +4,7 @@
   <EntityContainer Name="Schema">
     <EntitySet Name="STables" EntityType="Self.Table">
       <DefiningQuery>
+        -- STables
         SELECT
         TRIM(rdb$relation_name) as "Id"
         ,   'bar' as "CatalogName"
@@ -18,6 +19,7 @@
     
     <EntitySet Name="STableColumns" EntityType="Self.TableColumn">
       <DefiningQuery>
+        -- STableColumns
         SELECT TRIM(rf.rdb$relation_name) || 'x' || TRIM(rf.rdb$field_name) as "Id"
         ,   TRIM(rf.rdb$relation_name) as "ParentId"
         ,   TRIM(rf.rdb$field_name) as "Name"
@@ -65,7 +67,7 @@
         ,   0 as "IsStoreGenerated"
         ,   null as "Default"
         FROM
-        rdb$relation_fields rf LEFT JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
+        rdb$relation_fields rf INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
         WHERE
         rf.rdb$system_flag = 0
       </DefiningQuery>
@@ -73,10 +75,11 @@
 
     <EntitySet Name="SViews" EntityType="Self.View">
       <DefiningQuery>
+        -- SViews
         SELECT
         TRIM(rdb$relation_name) as "Id"
         ,   'bar' as "CatalogName"
-        ,   'foo' as "SchemaName" 
+        ,   'foo' as "SchemaName"
         ,   TRIM(rdb$relation_name) as "Name"
         ,   rdb$view_source as "ViewDefinition"
         ,   1 as "IsUpdatable"
@@ -89,6 +92,7 @@
     
     <EntitySet Name="SViewColumns" EntityType="Self.ViewColumn">
       <DefiningQuery>
+        -- SViewColumns
         SELECT TRIM(rf.rdb$relation_name) || 'x' || TRIM(rf.rdb$field_name) as "Id"
         ,   TRIM(rf.rdb$relation_name) as "ParentId"
         ,   TRIM(rf.rdb$field_name) as "Name"
@@ -96,20 +100,20 @@
         ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN 1 ELSE 0 END as "IsNullable"
         ,   TRIM(CASE f.rdb$field_type
         WHEN 7 THEN CASE f.rdb$field_sub_type
-          WHEN 0 THEN 'smallint'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-          END
+        WHEN 0 THEN 'smallint'
+        WHEN 1 THEN 'numeric'
+        WHEN 2 THEN 'decimal'
+        END
         WHEN 8 THEN CASE f.rdb$field_sub_type
-          WHEN 0 THEN 'int'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-          END
+        WHEN 0 THEN 'int'
+        WHEN 1 THEN 'numeric'
+        WHEN 2 THEN 'decimal'
+        END
         WHEN 16 THEN CASE f.rdb$field_sub_type
-          WHEN 0 THEN 'bigint'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-          END
+        WHEN 0 THEN 'bigint'
+        WHEN 1 THEN 'numeric'
+        WHEN 2 THEN 'decimal'
+        END
         WHEN 10 THEN 'float'
         WHEN 27 THEN 'double'
         WHEN 12 THEN 'date'
@@ -136,7 +140,7 @@
         ,   0 as "IsStoreGenerated"
         ,   null as "Default"
         FROM
-        rdb$relation_fields rf LEFT JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
+        rdb$relation_fields rf INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
         WHERE
         rf.rdb$system_flag = 0
       </DefiningQuery>
@@ -263,6 +267,7 @@
 
     <EntitySet Name="SConstraints" EntityType="Self.Constraint">
       <DefiningQuery>
+        -- SConstraints
         SELECT
         TRIM(rc.rdb$constraint_name) as "Id"
         ,   TRIM(rc.rdb$relation_name) as "ParentId"
@@ -271,19 +276,20 @@
         ,   0 as "IsDeferrable"
         ,   0 "IsInitiallyDeferred"
         FROM
-        rdb$relation_constraints rc LEFT JOIN rdb$index_segments ise ON (rc.rdb$index_name = ise.rdb$index_name)
+        rdb$relation_constraints rc
         WHERE
-        rc.rdb$constraint_type IN ('PRIMARY KEY', 'FOREING KEY', 'UNIQUE')
+        rc.rdb$constraint_type IN ('PRIMARY KEY', 'FOREIGN KEY', 'UNIQUE')
       </DefiningQuery>
     </EntitySet>
 
     <EntitySet Name="SCheckConstraints" EntityType="Self.CheckConstraint">
       <DefiningQuery>
+        -- SCheckConstraints
         SELECT
         TRIM(rc.rdb$constraint_name) as "Id"
         ,   TRIM(SUBSTRING(trg.rdb$trigger_source from 6)) as "Expression"
         FROM
-        rdb$relation_constraints rc 
+        rdb$relation_constraints rc
         INNER JOIN rdb$check_constraints cc on (rc.rdb$constraint_name = cc.rdb$constraint_name)
         LEFT JOIN rdb$triggers trg on (cc.rdb$trigger_name = trg.rdb$trigger_name)
         WHERE
@@ -293,13 +299,14 @@
 
     <EntitySet Name="SConstraintColumns" EntityType="Self.ConstraintColumn">
       <DefiningQuery>
+        -- SConstraintColumns
         SELECT
         TRIM(rc.rdb$constraint_name) as "ConstraintId"
-        ,   'foo' || 'x' || TRIM(rc.rdb$relation_name) || 'x' || TRIM(ise.rdb$field_name) as "ColumnId"
+        ,   TRIM(rc.rdb$relation_name) || 'x' || TRIM(ise.rdb$field_name) as "ColumnId"
         FROM
-        rdb$relation_constraints rc LEFT JOIN rdb$index_segments ise ON (rc.rdb$index_name = ise.rdb$index_name)
+        rdb$relation_constraints rc INNER JOIN rdb$index_segments ise ON (rc.rdb$index_name = ise.rdb$index_name)
         WHERE
-        rc.rdb$constraint_type IN ('PRIMARY KEY', 'FOREING KEY', 'UNIQUE')
+        rc.rdb$constraint_type IN ('PRIMARY KEY', 'FOREIGN KEY', 'UNIQUE')
       </DefiningQuery>
     </EntitySet>
 
@@ -334,6 +341,7 @@
     <!--Not Done-->
     <EntitySet Name="SViewConstraints" EntityType="Self.ViewConstraint">
       <DefiningQuery>
+        -- SViewConstraints
         SELECT
         CAST(NULL as varchar(1)) as "Id"
         , CAST(NULL as varchar(256)) as "ParentId"
@@ -350,6 +358,7 @@
     </EntitySet>
     <EntitySet Name="SViewConstraintColumns" EntityType="Self.ConstraintColumn">
       <DefiningQuery>
+        -- SViewConstraintColumns
         SELECT
         CAST(NULL as varchar(1)) as "ConstraintId"
         , CAST(NULL as varchar(1000)) as "ColumnId"
@@ -359,6 +368,7 @@
     </EntitySet>
     <EntitySet Name="SViewForeignKeys" EntityType="Self.ForeignKey">
       <DefiningQuery>
+        -- SViewForeignKeys
         SELECT
         CAST(NULL as varchar(1)) as "Id"
         ,  CAST(NULL as varchar(100)) as "ToColumnId"
