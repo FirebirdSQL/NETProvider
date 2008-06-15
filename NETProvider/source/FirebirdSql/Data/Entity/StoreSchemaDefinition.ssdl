@@ -67,9 +67,11 @@
         ,   0 as "IsStoreGenerated"
         ,   null as "Default"
         FROM
-        rdb$relation_fields rf INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
+        rdb$relation_fields rf 
+        INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
+        INNER JOIN rdb$relations r ON (rf.rdb$relation_name = r.rdb$relation_name)
         WHERE
-        rf.rdb$system_flag = 0
+        rf.rdb$system_flag = 0 AND r.rdb$view_source IS NULL
       </DefiningQuery>
     </EntitySet>
 
@@ -140,9 +142,11 @@
         ,   0 as "IsStoreGenerated"
         ,   null as "Default"
         FROM
-        rdb$relation_fields rf INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
+        rdb$relation_fields rf
+        INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
+        INNER JOIN rdb$relations r ON (rf.rdb$relation_name = r.rdb$relation_name)
         WHERE
-        rf.rdb$system_flag = 0
+        rf.rdb$system_flag = 0 AND r.rdb$view_source IS NOT NULL
       </DefiningQuery>
     </EntitySet>
 
