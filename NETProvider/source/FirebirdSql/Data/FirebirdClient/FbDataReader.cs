@@ -13,10 +13,9 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *   
- *  Contributors:
- *   Jiri Cincura (jiri@cincura.net) 
+ *  
  */
 
 using System;
@@ -432,6 +431,16 @@ namespace FirebirdSql.Data.FirebirdClient
             this.CheckState();
             this.CheckPosition();
             this.CheckIndex(i);
+
+#if (NET_35 && ENTITY_FRAMEWORK)
+            // type coercions for EF
+            // I think only bool datatype needs to be done explicitly
+            if (this.command.ExpectedColumnTypes != default(System.Data.Metadata.Edm.PrimitiveType[]))
+                if (this.command.ExpectedColumnTypes[i].ClrEquivalentType == typeof(bool))
+                {
+                    return this.row[i].GetBoolean();
+                }
+#endif
 
             return this.row[i].Value;
         }

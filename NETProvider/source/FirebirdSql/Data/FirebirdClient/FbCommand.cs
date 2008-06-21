@@ -53,6 +53,11 @@ namespace FirebirdSql.Data.FirebirdClient
         private int commandTimeout;
         private int fetchSize;
 
+#if (NET_35 && ENTITY_FRAMEWORK)
+        // type coercions
+        internal System.Data.Metadata.Edm.PrimitiveType[] ExpectedColumnTypes { get; set; }
+#endif
+
         #endregion
 
         #region · Properties ·
@@ -432,6 +437,11 @@ namespace FirebirdSql.Data.FirebirdClient
             command.CommandTimeout = this.CommandTimeout;
             command.FetchSize = this.FetchSize;
             command.UpdatedRowSource = this.UpdatedRowSource;
+
+#if (NET_35 && ENTITY_FRAMEWORK)
+            if (this.ExpectedColumnTypes != default(System.Data.Metadata.Edm.PrimitiveType[]))
+                command.ExpectedColumnTypes = (System.Data.Metadata.Edm.PrimitiveType[])this.ExpectedColumnTypes.Clone();
+#endif
 
             for (int i = 0; i < this.Parameters.Count; i++)
             {
@@ -1076,6 +1086,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private void Prepare(bool returnsSet)
         {
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(@"I:\command.log", true))
+            {
+                sw.WriteLine(this.commandText);
+                sw.WriteLine("===");
+            }
+
             FbConnectionInternal innerConn = this.connection.InnerConnection;
 
             // Check if	we have	a valid	transaction
