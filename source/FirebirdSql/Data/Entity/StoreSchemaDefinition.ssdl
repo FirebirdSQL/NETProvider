@@ -227,19 +227,19 @@
         , pp.rdb$parameter_number+1 as "Ordinal"
         , TRIM(CASE f.rdb$field_type
         WHEN 7 THEN CASE f.rdb$field_sub_type
-        WHEN 0 THEN 'smallint'
-        WHEN 1 THEN 'numeric'
-        WHEN 2 THEN 'decimal'
+          WHEN 0 THEN 'smallint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
         END
         WHEN 8 THEN CASE f.rdb$field_sub_type
-        WHEN 0 THEN 'int'
-        WHEN 1 THEN 'numeric'
-        WHEN 2 THEN 'decimal'
+          WHEN 0 THEN 'int'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
         END
         WHEN 16 THEN CASE f.rdb$field_sub_type
-        WHEN 0 THEN 'bigint'
-        WHEN 1 THEN 'numeric'
-        WHEN 2 THEN 'decimal'
+          WHEN 0 THEN 'bigint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
         END
         WHEN 10 THEN 'float'
         WHEN 27 THEN 'double'
@@ -262,7 +262,7 @@
         , null as "CharacterSetSchema"
         , null as "CharacterSetName"
         , CAST(0 as smallint) as "IsMultiSet"
-        , IIF(pp.rdb$parameter_type = 1, 'OUT', 'IN') as "Mode"
+        , TRIM(IIF(pp.rdb$parameter_type = 1, 'OUT', 'IN')) as "Mode"
         , NULL as "Default"
         FROM
         rdb$procedure_parameters pp INNER JOIN rdb$fields f ON (pp.rdb$field_source = f.rdb$field_name)
