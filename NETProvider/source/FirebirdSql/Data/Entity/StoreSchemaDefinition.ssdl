@@ -7,16 +7,15 @@
         -- STables
         SELECT
         TRIM(rdb$relation_name) as "Id"
-        ,   'bar' as "CatalogName"
-        ,   'foo' as "SchemaName" 
+        ,   null as "CatalogName"
+        ,   null as "SchemaName" 
         ,   TRIM(rdb$relation_name) as "Name"
         FROM
         rdb$relations
         WHERE
         rdb$view_source IS NULL AND rdb$system_flag = 0
       </DefiningQuery>
-    </EntitySet>
-    
+    </EntitySet>    
     <EntitySet Name="STableColumns" EntityType="Self.TableColumn">
       <DefiningQuery>
         -- STableColumns
@@ -30,17 +29,17 @@
           WHEN 0 THEN 'smallint'
           WHEN 1 THEN 'numeric'
           WHEN 2 THEN 'decimal'
-          END
+        END
         WHEN 8 THEN CASE f.rdb$field_sub_type
           WHEN 0 THEN 'int'
           WHEN 1 THEN 'numeric'
           WHEN 2 THEN 'decimal'
-          END
+        END
         WHEN 16 THEN CASE f.rdb$field_sub_type
           WHEN 0 THEN 'bigint'
           WHEN 1 THEN 'numeric'
           WHEN 2 THEN 'decimal'
-          END
+        END
         WHEN 10 THEN 'float'
         WHEN 27 THEN 'double'
         WHEN 12 THEN 'date'
@@ -61,17 +60,16 @@
         ,   null as "CharacterSetCatalog"
         ,   null as "CharacterSetSchema"
         ,   null as "CharacterSetName"
-        ,   CAST(0 as smallint) as "IsMultiSet"
+        ,   0 as "IsMultiSet"
         ,   0 as "IsIdentity"
-        --,   CASE WHEN f.rdb$computed_blr IS NULL THEN 0 ELSE 1 END as "IsComputed"
-        ,   0 as "IsStoreGenerated"
-        ,   null as "Default"
+        ,   CASE WHEN f.rdb$computed_blr IS NULL THEN 0 ELSE 1 END as "IsStoreGenerated"
+        ,   COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
         FROM
-        rdb$relation_fields rf 
+        rdb$relation_fields rf
         INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
         INNER JOIN rdb$relations r ON (rf.rdb$relation_name = r.rdb$relation_name)
         WHERE
-        rf.rdb$system_flag = 0 AND r.rdb$view_source IS NULL
+        rf.rdb$system_flag = 0 AND r.rdb$view_blr IS NULL
       </DefiningQuery>
     </EntitySet>
 
@@ -80,8 +78,8 @@
         -- SViews
         SELECT
         TRIM(rdb$relation_name) as "Id"
-        ,   'bar' as "CatalogName"
-        ,   'foo' as "SchemaName"
+        ,   null as "CatalogName"
+        ,   null as "SchemaName"
         ,   TRIM(rdb$relation_name) as "Name"
         ,   rdb$view_source as "ViewDefinition"
         ,   1 as "IsUpdatable"
@@ -90,8 +88,7 @@
         WHERE
         rdb$view_blr IS NOT NULL AND rdb$system_flag = 0
       </DefiningQuery>
-    </EntitySet>
-    
+    </EntitySet>   
     <EntitySet Name="SViewColumns" EntityType="Self.ViewColumn">
       <DefiningQuery>
         -- SViewColumns
@@ -102,19 +99,19 @@
         ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN 1 ELSE 0 END as "IsNullable"
         ,   TRIM(CASE f.rdb$field_type
         WHEN 7 THEN CASE f.rdb$field_sub_type
-        WHEN 0 THEN 'smallint'
-        WHEN 1 THEN 'numeric'
-        WHEN 2 THEN 'decimal'
+          WHEN 0 THEN 'smallint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
         END
         WHEN 8 THEN CASE f.rdb$field_sub_type
-        WHEN 0 THEN 'int'
-        WHEN 1 THEN 'numeric'
-        WHEN 2 THEN 'decimal'
+          WHEN 0 THEN 'int'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
         END
         WHEN 16 THEN CASE f.rdb$field_sub_type
-        WHEN 0 THEN 'bigint'
-        WHEN 1 THEN 'numeric'
-        WHEN 2 THEN 'decimal'
+          WHEN 0 THEN 'bigint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
         END
         WHEN 10 THEN 'float'
         WHEN 27 THEN 'double'
@@ -136,17 +133,16 @@
         ,   null as "CharacterSetCatalog"
         ,   null as "CharacterSetSchema"
         ,   null as "CharacterSetName"
-        ,   CAST(0 as smallint) as "IsMultiSet"
+        ,   0 as "IsMultiSet"
         ,   0 as "IsIdentity"
-        --,   CASE WHEN f.rdb$computed_blr IS NULL THEN 0 ELSE 1 END as "IsComputed"
-        ,   0 as "IsStoreGenerated"
-        ,   null as "Default"
+        ,   CASE WHEN f.rdb$computed_blr IS NULL THEN 0 ELSE 1 END as "IsStoreGenerated"
+        ,   COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
         FROM
         rdb$relation_fields rf
         INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
         INNER JOIN rdb$relations r ON (rf.rdb$relation_name = r.rdb$relation_name)
         WHERE
-        rf.rdb$system_flag = 0 AND r.rdb$view_source IS NOT NULL
+        rf.rdb$system_flag = 0 AND r.rdb$view_blr IS NOT NULL
       </DefiningQuery>
     </EntitySet>
 
@@ -211,8 +207,8 @@
       <DefiningQuery>
         SELECT
         TRIM(rdb$procedure_name) as "Id"
-        , 'bar' as "CatalogName"
-        , 'foo' as "SchemaName"
+        , null as "CatalogName"
+        , '' as "SchemaName" -- bug or not??? need to be not null
         , TRIM(rdb$procedure_name) as "Name"
         FROM
         rdb$procedures
@@ -285,7 +281,6 @@
         rc.rdb$constraint_type IN ('PRIMARY KEY', 'FOREIGN KEY', 'UNIQUE')
       </DefiningQuery>
     </EntitySet>
-
     <EntitySet Name="SCheckConstraints" EntityType="Self.CheckConstraint">
       <DefiningQuery>
         -- SCheckConstraints
@@ -300,7 +295,6 @@
         rc.rdb$constraint_type IN ('CHECK')
       </DefiningQuery>
     </EntitySet>
-
     <EntitySet Name="SConstraintColumns" EntityType="Self.ConstraintColumn">
       <DefiningQuery>
         -- SConstraintColumns
@@ -313,7 +307,7 @@
         rc.rdb$constraint_type IN ('PRIMARY KEY', 'FOREIGN KEY', 'UNIQUE')
       </DefiningQuery>
     </EntitySet>
-
+    
     <EntitySet Name="SForeignKeyConstraints" EntityType="Self.ForeignKeyConstraint">
       <DefiningQuery>
         SELECT
@@ -324,13 +318,12 @@
         rdb$ref_constraints rc
       </DefiningQuery>
     </EntitySet>
-
     <EntitySet Name="SForeignKeys" EntityType="Self.ForeignKey">
       <DefiningQuery>
         SELECT
         TRIM(refc.rdb$constraint_name) || 'x' || TRIM(is2.rdb$field_position+1) as "Id"
-        , TRIM(relc1.rdb$relation_name) || 'x' || TRIM(is1.rdb$field_name) as "ToColumnId"
-        , TRIM(relc2.rdb$relation_name) || 'x' || TRIM(is2.rdb$field_name) as "FromColumnId"
+        , TRIM(relc1.rdb$relation_name) || 'x' || TRIM(is1.rdb$field_name) as "FromColumnId"
+        , TRIM(relc2.rdb$relation_name) || 'x' || TRIM(is2.rdb$field_name) as "ToColumnId"
         , TRIM(refc.rdb$constraint_name) as "ConstraintId"
         , is2.rdb$field_position+1 as "Ordinal"
         FROM rdb$ref_constraints refc
