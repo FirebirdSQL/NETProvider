@@ -1086,12 +1086,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private void Prepare(bool returnsSet)
         {
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(@"I:\command.log", true))
-            {
-                sw.WriteLine(this.commandText);
-                sw.WriteLine("===");
-            }
-
             FbConnectionInternal innerConn = this.connection.InnerConnection;
 
             // Check if	we have	a valid	transaction
