@@ -1201,8 +1201,8 @@ namespace FirebirdSql.Data.FirebirdClient
             string sql = spName == null ? "" : spName.Trim();
 
             if (sql.Length > 0 &&
-                !sql.ToLower(CultureInfo.CurrentCulture).StartsWith("execute procedure ") &&
-                !sql.ToLower(CultureInfo.CurrentCulture).StartsWith("select "))
+                !sql.ToLower(CultureInfo.InvariantCulture).StartsWith("execute procedure ") &&
+                !sql.ToLower(CultureInfo.InvariantCulture).StartsWith("select "))
             {
                 StringBuilder paramsText = new StringBuilder();
 
