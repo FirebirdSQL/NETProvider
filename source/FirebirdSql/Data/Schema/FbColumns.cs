@@ -142,7 +142,7 @@ namespace FirebirdSql.Data.Schema
                 row["IS_ARRAY"] = (row["COLUMN_ARRAY"] == DBNull.Value);
 
                 FbDbType dbType = (FbDbType)TypeHelper.GetDbDataType(blrType, subType, scale);
-                row["COLUMN_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLower(CultureInfo.CurrentCulture);
+                row["COLUMN_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLower(CultureInfo.InvariantCulture);
 
                 if (dbType == FbDbType.Binary || dbType == FbDbType.Text)
                 {

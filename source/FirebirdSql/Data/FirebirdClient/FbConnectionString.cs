@@ -254,7 +254,7 @@ namespace FirebirdSql.Data.FirebirdClient
 							values[0] != null && values[0].Length > 0 &&
 							values[1] != null && values[1].Length > 0)
 						{
-							values[0] = values[0].ToLower(CultureInfo.CurrentCulture);
+							values[0] = values[0].ToLower(CultureInfo.InvariantCulture);
 
 							if (synonyms.Contains(values[0]))
 							{
@@ -513,7 +513,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (this.options.Contains(key))
 			{
-				string il = this.options[key].ToString().ToLower(CultureInfo.CurrentCulture);
+				string il = this.options[key].ToString().ToLower(CultureInfo.InvariantCulture);
 
 				switch (il)
 				{
@@ -545,7 +545,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckIsolationLevel()
 		{
-			string il = this.options["isolation level"].ToString().ToLower(CultureInfo.CurrentCulture);
+			string il = this.options["isolation level"].ToString().ToLower(CultureInfo.InvariantCulture);
 
 			switch (il)
 			{
