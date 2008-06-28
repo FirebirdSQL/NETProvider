@@ -25,19 +25,19 @@
       </Concepts>
 
       <Identifier>
-        <Part name="Catalog" itemName="domain_catalog">
+        <Part name="Catalog" itemName="DOMAIN_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
 
-        <Part name="Schema" itemName="domain_schema">
+        <Part name="Schema" itemName="DOMAIN_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
 
-        <Part name="Name" itemName="domain_name">
+        <Part name="Name" itemName="DOMAIN_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
@@ -45,8 +45,8 @@
       </Identifier>
 
       <Properties>
-        <Property name="Name" type="System.String" itemName="domain_name"/>
-        <Property name="SystemType" type="System.String" itemName="domain_data_type">
+        <Property name="Name" type="System.String" itemName="DOMAIN_NAME"/>
+        <Property name="SystemType" type="System.String" itemName="DOMAIN_DATA_TYPE">
           <Concepts>
             <!--
 							We can produce reasonable values for all data type concepts given just
@@ -67,13 +67,13 @@
           </Concepts>
         </Property>
 
-        <Property name="Length" type="System.Int32" itemName='domain_size'>
+        <Property name="Length" type="System.Int32" itemName="DOMAIN_SIZE">
           <Concepts>
             <Concept name="Length"/>
           </Concepts>
         </Property>
 
-        <Property name="Precision" type="System.Byte" itemName="numeric_precision">
+        <Property name="Precision" type="System.Byte" itemName="NUMERIC_PRECISION">
           <Concepts>
             <Concept name="Precision">
               <Conversion>
@@ -83,13 +83,13 @@
           </Concepts>
         </Property>
 
-        <Property name="Scale" type="System.Int32" itemName="numeric_scale">
+        <Property name="Scale" type="System.Int32" itemName="NUMERIC_SCALE">
           <Concepts>
             <Concept name="Scale"/>
           </Concepts>
         </Property>
 
-        <Property name="Nullable" type="System.String" itemName="is_nullable">
+        <Property name="Nullable" type="System.String" itemName="IS_NULLABLE">
           <Concepts>
             <!--
 							The nullable concept is defined as a boolean value but the enumeration
@@ -104,19 +104,19 @@
           </Concepts>
         </Property>
 
-        <Property name="CharacterSet" type="System.String" itemName="character_set_name">
+        <Property name="CharacterSet" type="System.String" itemName="CHARACTER_SET_NAME">
           <Concepts>
             <Concept name="CharacterSet"/>
           </Concepts>
         </Property>
 
-        <Property name="Collation" type="System.String" itemName="collation_name">
+        <Property name="Collation" type="System.String" itemName="COLLATION_NAME">
           <Concepts>
             <Concept name="CharacterSet"/>
           </Concepts>
         </Property>
 
-        <Property name="Description" type="System.String" itemName="description">
+        <Property name="Description" type="System.String" itemName="DESCRIPTION">
           <Concepts>
             <Concept name="Description"/>
           </Concepts>
@@ -143,17 +143,17 @@
 					of the table (catalog, schema and name).  In this case the generic and
 					specific identifier are identical.
 				-->
-        <Part name="Catalog" itemName="table_catalog">
+        <Part name="Catalog" itemName="TABLE_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
-        <Part name="Schema" itemName="table_schema">
+        <Part name="Schema" itemName="TABLE_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
-        <Part name="Name" itemName="table_name">
+        <Part name="Name" itemName="TABLE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
@@ -171,10 +171,10 @@
         <Restriction name="Type"/>
       </Restrictions>
       <Properties>
-        <Property name="Name" type="System.String" itemName="table_name"/>
-        <Property name="Schema" type="System.String" itemName="table_schema"/>
-        <Property name="Type" type="System.String" itemName="table_type"/>
-        <Property name="IsSystemObject" type="System.Boolean" itemName="is_system_table"/>
+        <Property name="Name" type="System.String" itemName="TABLE_NAME"/>
+        <Property name="Schema" type="System.String" itemName="TABLE_SCHEMA"/>
+        <Property name="Type" type="System.String" itemName="TABLE_TYPE"/>
+        <Property name="IsSystemObject" type="System.Boolean" itemName="IS_SYSTEM_TABLE"/>
       </Properties>
       <Actions>
         <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator">
@@ -213,25 +213,25 @@
       </Concepts>
 
       <Identifier>
-        <Part name="Catalog" itemName="table_catalog">
+        <Part name="Catalog" itemName="TABLE_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
 
-        <Part name="Schema" itemName="table_schema">
+        <Part name="Schema" itemName="TABLE_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
 
-        <Part name="Table" itemName="table_name">
+        <Part name="Table" itemName="TABLE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
 
-        <Part name="Name" itemName="column_name">
+        <Part name="Name" itemName="COLUMN_NAME">
           <Concepts>
             <Concept name="Identifier3"/>
           </Concepts>
@@ -239,8 +239,8 @@
       </Identifier>
 
       <Properties>
-        <Property name="Name" type="System.String" itemName="column_name"/>
-        <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+        <Property name="Name" type="System.String" itemName="COLUMN_NAME"/>
+        <Property name="Ordinal" type="System.Int16" itemName="ORDINAL_POSITION">
           <Concepts>
             <Concept name="Ordinal">
               <!--
@@ -254,7 +254,7 @@
           </Concepts>
         </Property>
 
-        <Property name="SystemType" type="System.String" itemName="column_data_type">
+        <Property name="SystemType" type="System.String" itemName="COLUMN_DATA_TYPE">
           <Concepts>
             <Concept name="ProviderDataType">
               <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
@@ -268,13 +268,13 @@
           </Concepts>
         </Property>
 
-        <Property name="Length" type="System.Int32" itemName='column_size'>
+        <Property name="Length" type="System.Int32" itemName="COLUMN_SIZE">
           <Concepts>
             <Concept name="Length"/>
           </Concepts>
         </Property>
 
-        <Property name="Precision" type="System.Byte" itemName="numeric_precision">
+        <Property name="Precision" type="System.Byte" itemName="NUMERIC_PRECISION">
           <Concepts>
             <Concept name="Precision">
               <Conversion>
@@ -284,37 +284,37 @@
           </Concepts>
         </Property>
 
-        <Property name="Scale" type="System.Int32" itemName="numeric_scale">
+        <Property name="Scale" type="System.Int32" itemName="NUMERIC_SCALE">
           <Concepts>
             <Concept name="Scale"/>
           </Concepts>
         </Property>
 
-        <Property name="Nullable" type="System.Boolean" itemName="is_nullable">
+        <Property name="Nullable" type="System.Boolean" itemName="IS_NULLABLE">
           <Concepts>
             <Concept name="Nullable" />
           </Concepts>
         </Property>
 
-        <Property name="Default" type="System.String" itemName="column_default">
+        <Property name="Default" type="System.String" itemName="COLUMN_DEFAULT">
           <Concepts>
             <Concept name="Default"/>
           </Concepts>
         </Property>
 
-        <Property name="CharacterSet" type="System.String" itemName="character_set_name">
+        <Property name="CharacterSet" type="System.String" itemName="CHARACTER_SET_NAME">
           <Concepts>
             <Concept name="CharacterSet"/>
           </Concepts>
         </Property>
 
-        <Property name="Collation" type="System.String" itemName="collation_name">
+        <Property name="Collation" type="System.String" itemName="COLLATION_NAME">
           <Concepts>
             <Concept name="CharacterSet"/>
           </Concepts>
         </Property>
 
-        <Property name="Description" type="System.String" itemName="description">
+        <Property name="Description" type="System.String" itemName="DESCRIPTION">
           <Concepts>
             <Concept name="Description"/>
           </Concepts>
@@ -367,32 +367,32 @@
       </Concepts>
 
       <Identifier>
-        <Part name="Catalog" itemName="procedure_catalog">
+        <Part name="Catalog" itemName="PROCEDURE_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
 
-        <Part name="Schema" itemName="procedure_schema">
+        <Part name="Schema" itemName="PROCEDURE_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
 
-        <Part name="Name" itemName="procedure_name">
+        <Part name="Name" itemName="PROCEDURE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
       </Identifier>
       <Properties>
-        <Property name="Name" type="System.String" itemName="procedure_name"/>
-        <Property name="Schema" type="System.String" itemName="procedure_schema">
+        <Property name="Name" type="System.String" itemName="PROCEDURE_NAME"/>
+        <Property name="Schema" type="System.String" itemName="PROCEDURE_SCHEMA">
           <Concepts>
             <Concept name="Schema"/>
           </Concepts>
         </Property>
-        <Property name="IsSystemObject" type="System.Boolean" itemName="is_system_procedure"/>
+        <Property name="IsSystemObject" type="System.Boolean" itemName="IS_SYSTEM_PROCEDURE"/>
       </Properties>
       <Actions>
         <Action name="Enumerate" guid="61CC0372-384D-42e5-9707-6D7C8DC5287A" handler="FirebirdSql.VisualStudio.DataTools.FbDataObjectEnumerator" >
@@ -424,30 +424,30 @@
         <Concept name="StoredProcedureParameter" restrictions="{Catalog},{Schema},{StoredProcedure},{Name}" filter="Direction=1"/>
       </Concepts>
       <Identifier>
-        <Part name="Catalog" itemName="procedure_catalog">
+        <Part name="Catalog" itemName="PROCEDURE_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
-        <Part name="Schema" itemName="procedure_schema">
+        <Part name="Schema" itemName="PROCEDURE_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
-        <Part name="StoredProcedure" itemName="procedure_name">
+        <Part name="StoredProcedure" itemName="PROCEDURE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
-        <Part name="Name" itemName="parameter_name">
+        <Part name="Name" itemName="PARAMETER_NAME">
           <Concepts>
             <Concept name="Identifier3"/>
           </Concepts>
         </Part>
       </Identifier>
       <Properties>
-        <Property name="Name" type="System.String" itemName="parameter_name"/>
-        <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+        <Property name="Name" type="System.String" itemName="PARAMETER_NAME"/>
+        <Property name="Ordinal" type="System.Int16" itemName="ORDINAL_POSITION">
           <Concepts>
             <Concept name="Ordinal">
               <Conversion>
@@ -456,7 +456,7 @@
             </Concept>
           </Concepts>
         </Property>
-        <Property name="SystemType" type="System.String" itemName="parameter_data_type">
+        <Property name="SystemType" type="System.String" itemName="PARAMETER_DATA_TYPE">
           <Concepts>
             <Concept name="ProviderDataType">
               <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
@@ -469,12 +469,12 @@
             </Concept>
           </Concepts>
         </Property>
-        <Property name="Length" type="System.Int32" itemName="parameter_size">
+        <Property name="Length" type="System.Int32" itemName="PARAMETER_SIZE">
           <Concepts>
             <Concept name="Length"/>
           </Concepts>
         </Property>
-        <Property name="Precision" type="System.Byte" itemName="numeric_precision">
+        <Property name="Precision" type="System.Byte" itemName="NUMERIC_PRECISION">
           <Concepts>
             <Concept name="Precision">
               <Conversion>
@@ -483,17 +483,17 @@
             </Concept>
           </Concepts>
         </Property>
-        <Property name="Scale" type="System.Int32" itemName="numeric_scale">
+        <Property name="Scale" type="System.Int32" itemName="NUMERIC_SCALE">
           <Concepts>
             <Concept name="Scale"/>
           </Concepts>
         </Property>
-        <Property name="Direction" type="System.Int32" itemName="parameter_direction">
+        <Property name="Direction" type="System.Int32" itemName="PARAMETER_DIRECTION">
           <Concepts>
             <Concept name="Direction" />
           </Concepts>
         </Property>
-        <Property name="Nullable" type="System.String" itemName="is_nullable">
+        <Property name="Nullable" type="System.String" itemName="IS_NULLABLE">
           <Concepts>
             <!--
 							The nullable concept is defined as a boolean value but the enumeration
@@ -523,30 +523,30 @@
         <Concept name="StoredProcedureColumn" restrictions="{Catalog},{Schema},{StoredProcedure},{Name}" filter="Direction=2"/>
       </Concepts>
       <Identifier>
-        <Part name="Catalog" itemName="procedure_catalog">
+        <Part name="Catalog" itemName="PROCEDURE_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
-        <Part name="Schema" itemName="procedure_schema">
+        <Part name="Schema" itemName="PROCEDURE_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
-        <Part name="StoredProcedure" itemName="procedure_name">
+        <Part name="StoredProcedure" itemName="PROCEDURE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
-        <Part name="Name" itemName="parameter_name">
+        <Part name="Name" itemName="PARAMETER_NAME">
           <Concepts>
             <Concept name="Identifier3"/>
           </Concepts>
         </Part>
       </Identifier>
       <Properties>
-        <Property name="Name" type="System.String" itemName="parameter_name"/>
-        <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+        <Property name="Name" type="System.String" itemName="PARAMETER_NAME"/>
+        <Property name="Ordinal" type="System.Int16" itemName="ORDINAL_POSITION">
           <Concepts>
             <Concept name="Ordinal">
               <Conversion>
@@ -555,7 +555,7 @@
             </Concept>
           </Concepts>
         </Property>
-        <Property name="SystemType" type="System.String" itemName="parameter_data_type">
+        <Property name="SystemType" type="System.String" itemName="PARAMETER_DATA_TYPE">
           <Concepts>
             <Concept name="ProviderDataType">
               <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
@@ -568,12 +568,12 @@
             </Concept>
           </Concepts>
         </Property>
-        <Property name="Length" type="System.Int32" itemName="parameter_size">
+        <Property name="Length" type="System.Int32" itemName="PARAMETER_SIZE">
           <Concepts>
             <Concept name="Length"/>
           </Concepts>
         </Property>
-        <Property name="Precision" type="System.Byte" itemName="numeric_precision">
+        <Property name="Precision" type="System.Byte" itemName="NUMERIC_PRECISION">
           <Concepts>
             <Concept name="Precision">
               <Conversion>
@@ -582,17 +582,17 @@
             </Concept>
           </Concepts>
         </Property>
-        <Property name="Scale" type="System.Int32" itemName="numeric_scale">
+        <Property name="Scale" type="System.Int32" itemName="NUMERIC_SCALE">
           <Concepts>
             <Concept name="Scale"/>
           </Concepts>
         </Property>
-        <Property name="Direction" type="System.Int32" itemName="parameter_direction">
+        <Property name="Direction" type="System.Int32" itemName="PARAMETER_DIRECTION">
           <Concepts>
             <Concept name="Direction" />
           </Concepts>
         </Property>
-        <Property name="Nullable" type="System.String" itemName="is_nullable">
+        <Property name="Nullable" type="System.String" itemName="IS_NULLABLE">
           <Concepts>
             <Concept name="Nullable">
               <Conversion>
@@ -618,19 +618,19 @@
       </Concepts>
 
       <Identifier>
-        <Part name="Catalog" itemName="view_catalog">
+        <Part name="Catalog" itemName="VIEW_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
 
-        <Part name="Schema" itemName="view_schema">
+        <Part name="Schema" itemName="VIEW_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
 
-        <Part name="Name" itemName="view_name">
+        <Part name="Name" itemName="VIEW_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
@@ -638,13 +638,13 @@
       </Identifier>
 
       <Properties>
-        <Property name="Name" type="System.String" itemName="view_name"/>
-        <Property name="Schema" type="System.String" itemName="view_schema">
+        <Property name="Name" type="System.String" itemName="VIEW_NAME"/>
+        <Property name="Schema" type="System.String" itemName="VIEW_SCHEMA">
           <Concepts>
             <Concept name="Schema"/>
           </Concepts>
         </Property>
-        <Property name="IsSystemObject" type="System.Boolean" itemName="is_system_view"/>
+        <Property name="IsSystemObject" type="System.Boolean" itemName="IS_SYSTEM_VIEW"/>
       </Properties>      
 
       <Actions>
@@ -679,22 +679,22 @@
       </Concepts>
 
       <Identifier>
-        <Part name="Catalog" itemName="view_catalog">
+        <Part name="Catalog" itemName="VIEW_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
-        <Part name="Schema" itemName="view_schema">
+        <Part name="Schema" itemName="VIEW_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
-        <Part name="View" itemName="view_name">
+        <Part name="View" itemName="VIEW_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
-        <Part name="Name" itemName="column_name">
+        <Part name="Name" itemName="COLUMN_NAME">
           <Concepts>
             <Concept name="Identifier3"/>
           </Concepts>
@@ -702,8 +702,8 @@
       </Identifier>
 
       <Properties>
-        <Property name="Name" type="System.String" itemName="column_name"/>
-        <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+        <Property name="Name" type="System.String" itemName="COLUMN_NAME"/>
+        <Property name="Ordinal" type="System.Int16" itemName="ORDINAL_POSITION">
           <Concepts>
             <Concept name="Ordinal">
               <Conversion>
@@ -713,7 +713,7 @@
           </Concepts>
         </Property>
 
-        <Property name="SystemType" type="System.String" itemName="column_data_type">
+        <Property name="SystemType" type="System.String" itemName="COLUMN_DATA_TYPE">
           <Concepts>
             <Concept name="ProviderDataType">
               <Conversion mapper="Microsoft.VisualStudio.Data.AdoDotNet.AdoDotNetObjectConceptMapper"/>
@@ -727,13 +727,13 @@
           </Concepts>
         </Property>
 
-        <Property name="Length" type="System.Int32" itemName='column_size'>
+        <Property name="Length" type="System.Int32" itemName="COLUMN_SIZE">
           <Concepts>
             <Concept name="Length"/>
           </Concepts>
         </Property>
 
-        <Property name="Precision" type="System.Byte" itemName="numeric_precision">
+        <Property name="Precision" type="System.Byte" itemName="NUMERIC_PRECISION">
           <Concepts>
             <Concept name="Precision">
               <Conversion>
@@ -743,19 +743,19 @@
           </Concepts>
         </Property>
 
-        <Property name="Scale" type="System.Int32" itemName="numeric_scale">
+        <Property name="Scale" type="System.Int32" itemName="NUMERIC_SCALE">
           <Concepts>
             <Concept name="Scale"/>
           </Concepts>
         </Property>
 
-        <Property name="Nullable" type="System.Boolean" itemName="is_nullable">
+        <Property name="Nullable" type="System.Boolean" itemName="IS_NULLABLE">
           <Concepts>
             <Concept name="Nullable" />
           </Concepts>
         </Property>
 
-        <Property name="Default" type="System.String" itemName="column_default">
+        <Property name="Default" type="System.String" itemName="COLUMN_DEFAULT">
           <Concepts>
             <Concept name="Default"/>
           </Concepts>
@@ -809,31 +809,31 @@
         <Concept name="TableUniqueKey" restrictions="{Catalog},{Schema},{Table},{Name}" filter="IsUnique = true"/>
       </Concepts>
       <Identifier>
-        <Part name="Catalog" itemName="table_catalog">
+        <Part name="Catalog" itemName="TABLE_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
-        <Part name="Schema" itemName="table_schema">
+        <Part name="Schema" itemName="TABLE_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
-        <Part name="Table" itemName="table_name">
+        <Part name="Table" itemName="TABLE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
-        <Part name="Name" itemName="index_name">
+        <Part name="Name" itemName="INDEX_NAME">
           <Concepts>
             <Concept name="Identifier3"/>
           </Concepts>
         </Part>
       </Identifier>
       <Properties>
-        <Property name="Name" type="System.String" itemName="index_name"/>
-        <Property name="IsUnique" type="System.Boolean" itemName="is_unique"/>
-        <Property name="IsPrimary" type="System.Boolean" itemName="is_primary">
+        <Property name="Name" type="System.String" itemName="INDEX_NAME"/>
+        <Property name="IsUnique" type="System.Boolean" itemName="IS_UNIQUE"/>
+        <Property name="IsPrimary" type="System.Boolean" itemName="IS_PRIMARY">
           <Concepts>
             <Concept name="IsPrimary"/>
           </Concepts>
@@ -877,35 +877,35 @@
         <Concept name="TableUniqueKeyColumn" restrictions="{Catalog},{Schema},{Table},{TableUniqueKey},{Name}"/>
       </Concepts>
       <Identifier>
-        <Part name="Catalog" itemName="table_catalog">
+        <Part name="Catalog" itemName="TABLE_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
-        <Part name="Schema" itemName="table_schema">
+        <Part name="Schema" itemName="TABLE_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
-        <Part name="Table" itemName="table_name">
+        <Part name="Table" itemName="TABLE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
-        <Part name="Index" itemName="index_name">
+        <Part name="Index" itemName="INDEX_NAME">
           <Concepts>
             <Concept name="Identifier3"/>
           </Concepts>
         </Part>
-        <Part name="Name" itemName="column_name">
+        <Part name="Name" itemName="COLUMN_NAME">
           <Concepts>
             <Concept name="Identifier4"/>
           </Concepts>
         </Part>
       </Identifier>
       <Properties>
-        <Property name="Name" type="System.String" itemName="column_name"/>
-        <Property name="Ordinal" type="System.Int16" itemName="ordinal_position">
+        <Property name="Name" type="System.String" itemName="COLUMN_NAME"/>
+        <Property name="Ordinal" type="System.Int16" itemName="ORDINAL_POSITION">
           <Concepts>
             <Concept name="Ordinal">
               <!--
@@ -969,30 +969,30 @@
         <Concept name="TableForeignKey" restrictions="{Catalog},{Schema},{Table},{Name}"/>
       </Concepts>
       <Identifier>
-        <Part name="Catalog" itemName="constraint_catalog">
+        <Part name="Catalog" itemName="CONSTRAINT_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
-        <Part name="Schema" itemName="constraint_schema">
+        <Part name="Schema" itemName="CONSTRAINT_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
-        <Part name="Table" itemName="table_name">
+        <Part name="Table" itemName="TABLE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
-        <Part name="Name" itemName="constraint_name">
+        <Part name="Name" itemName="CONSTRAINT_NAME">
           <Concepts>
             <Concept name="Identifier3"/>
           </Concepts>
         </Part>
       </Identifier>
       <Properties>
-        <Property name="Name" type="System.String" itemName="constraint_name"/>
-        <Property name="ReferencedTableCatalog" type="System.String" itemName="referenced_table_catalog">
+        <Property name="Name" type="System.String" itemName="CONSTRAINT_NAME"/>
+        <Property name="ReferencedTableCatalog" type="System.String" itemName="REFERENCED_TABLE_CATALOG">
           <Concepts>
             <!--The ForeignKey type concept specifies that there should be property
 							concepts that fully identify the referenced table.  These concepts
@@ -1002,12 +1002,12 @@
             <Concept name="ReferencedTableId0"/>
           </Concepts>
         </Property>
-        <Property name="ReferencedTableSchema" type="System.String" itemName="referenced_table_schema">
+        <Property name="ReferencedTableSchema" type="System.String" itemName="REFERENCED_TABLE_SCHEMA">
           <Concepts>
             <Concept name="ReferencedTableId1"/>
           </Concepts>
         </Property>
-        <Property name="ReferencedTableName" type="System.String" itemName="referenced_table_name">
+        <Property name="ReferencedTableName" type="System.String" itemName="REFERENCED_TABLE_NAME">
           <Concepts>
             <Concept name="ReferencedTableId2"/>
           </Concepts>
@@ -1028,40 +1028,40 @@
         <Concept name="TableForeignKeyColumn" restrictions="{Catalog},{Schema},{Table},{TableForeignKey},{Name}"/>
       </Concepts>
       <Identifier>
-        <Part name="Catalog" itemName="constraint_catalog">
+        <Part name="Catalog" itemName="CONSTRAINT_CATALOG">
           <Concepts>
             <Concept name="Identifier0"/>
           </Concepts>
         </Part>
-        <Part name="Schema" itemName="constraint_schema">
+        <Part name="Schema" itemName="CONSTRAINT_SCHEMA">
           <Concepts>
             <Concept name="Identifier1"/>
           </Concepts>
         </Part>
-        <Part name="Table" itemName="table_name">
+        <Part name="Table" itemName="TABLE_NAME">
           <Concepts>
             <Concept name="Identifier2"/>
           </Concepts>
         </Part>
-        <Part name="ForeignKey" itemName="constraint_name">
+        <Part name="ForeignKey" itemName="CONSTRAINT_NAME">
           <Concepts>
             <Concept name="Identifier3"/>
           </Concepts>
         </Part>
-        <Part name="Name" itemName="column_name">
+        <Part name="Name" itemName="COLUMN_NAME">
           <Concepts>
             <Concept name="Identifier4"/>
           </Concepts>
         </Part>
       </Identifier>
       <Properties>
-        <Property name="Name" type="System.String" itemName="column_name"/>
-        <Property name="Ordinal" type="System.Int32" itemName="ordinal_position">
+        <Property name="Name" type="System.String" itemName="COLUMN_NAME"/>
+        <Property name="Ordinal" type="System.Int32" itemName="ORDINAL_POSITION">
           <Concepts>
             <Concept name="Ordinal"/>
           </Concepts>
         </Property>
-        <Property name="ReferencedColumnName" type="System.String" itemName="referenced_column_name">
+        <Property name="ReferencedColumnName" type="System.String" itemName="REFERENCED_COLUMN_NAME">
           <Concepts>
             <!--The ForeignKeyColumn type concept specifies that there should be
 							a property concept that gives the name of the referenced column
