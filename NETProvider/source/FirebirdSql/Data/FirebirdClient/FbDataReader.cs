@@ -371,7 +371,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
             for (int i = 0; i < this.fields.Count; i++)
             {
-                if (GlobalizationHelper.CultureAwareCompare(name, this.fields[i].Alias))
+                if (name.ToLower(CultureInfo.InvariantCulture) == this.fields[i].Alias.ToLower(CultureInfo.InvariantCulture))
                 {
                     return i;
                 }
