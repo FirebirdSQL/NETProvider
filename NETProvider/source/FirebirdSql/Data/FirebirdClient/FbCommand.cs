@@ -996,13 +996,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 if (this.namedParameters.Count > 0)
                 {
-                    if (this.Parameters.IndexOf(this.namedParameters[i]) == -1)
+                    index = this.Parameters.IndexOf(this.namedParameters[i]);
+                    if (index == -1)
                     {
                         throw new FbException(String.Format("Must declare the variable '{0}'", this.namedParameters[i]));
-                    }
-                    else
-                    {
-                        index = this.Parameters.IndexOf(this.namedParameters[i]);
                     }
                 }
 
