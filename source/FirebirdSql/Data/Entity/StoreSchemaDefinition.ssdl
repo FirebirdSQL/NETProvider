@@ -52,7 +52,7 @@
         END) as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
         ,   f.rdb$field_precision as "Precision"
-        ,   '0' as "DateTimePrecision"
+        ,   0 as "DateTimePrecision"
         ,   f.rdb$field_scale * (-1) as "Scale"
         ,   null as "CollationCatalog"
         ,   null as "CollationSchema"
@@ -125,7 +125,7 @@
         END) as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
         ,   f.rdb$field_precision as "Precision"
-        ,   '0' as "DateTimePrecision"
+        ,   0 as "DateTimePrecision"
         ,   f.rdb$field_scale * (-1) as "Scale"
         ,   null as "CollationCatalog"
         ,   null as "CollationSchema"
@@ -150,29 +150,53 @@
     <EntitySet Name="SFunctions" EntityType="Self.Function">
       <DefiningQuery>
         SELECT
-        null as "Id"
+        TRIM(f.rdb$function_name) as "Id"
         , null as "CatalogName"
         , null as "SchemaName"
-        , null as "Name"
-        , null as "ReturnTypeName"
-        , null as "ReturnMaxLength"
-        , null as "ReturnPrecision"
-        , null as "ReturnDateTimePrecision"
-        , null as "ReturnScale"
+        , TRIM(f.rdb$function_name) as "Name"
+        , TRIM(CASE fa.rdb$field_type
+        WHEN 7 THEN CASE fa.rdb$field_sub_type
+          WHEN 0 THEN 'smallint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+        END
+        WHEN 8 THEN CASE fa.rdb$field_sub_type
+          WHEN 0 THEN 'int'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+        END
+        WHEN 16 THEN CASE fa.rdb$field_sub_type
+          WHEN 0 THEN 'bigint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+        END
+        WHEN 10 THEN 'float'
+        WHEN 27 THEN 'double'
+        WHEN 12 THEN 'date'
+        WHEN 13 THEN 'time'
+        WHEN 35 THEN 'timestamp'
+        WHEN 261 THEN 'blob'
+        WHEN 37 THEN 'varchar'
+        WHEN 14 THEN 'char'
+        WHEN 40 THEN 'cstring'
+        END) as "ReturnTypeName"
+        , fa.rdb$character_length as "ReturnMaxLength"
+        , fa.rdb$field_precision as "ReturnPrecision"
+        , 0 as "ReturnDateTimePrecision"
+        , fa.rdb$field_scale * (-1) as "ReturnScale"
         , null as "ReturnCollationCatalog"
         , null as "ReturnCollationSchema"
         , null as "ReturnCollationName"
         , null as "ReturnCharacterSetCatalog"
         , null as "ReturnCharacterSetSchema"
         , null as "ReturnCharacterSetName"
-        , null as "ReturnIsMultiSet"
-        , null as "IsAggregate"
-        , null as "IsBuiltIn"
-        , null as "IsNiladic"
+        , CAST(0 as smallint) as "ReturnIsMultiSet"
+        , CAST(0 as smallint) as "IsAggregate"
+        , CAST(0 as smallint) as "IsBuiltIn"
+        , CAST((select CASE COUNT(*) WHEN 1 THEN 1 ELSE 0 END FROM rdb$function_arguments fa WHERE fa.rdb$function_name = f.rdb$function_name) as smallint) as "IsNiladic"
         FROM
-        rdb$database
-        WHERE
-        0=1
+        rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument = fa.rdb$argument_position)
+        WHERE rdb$system_flag = 0
       </DefiningQuery>
     </EntitySet>
     <EntitySet Name="SFunctionParameters" EntityType="Self.Parameter">
@@ -249,7 +273,7 @@
         END) as "TypeName"
         , f.rdb$character_length as "MaxLength"
         , f.rdb$field_precision as "Precision"
-        , '0' as "DateTimePrecision"
+        , 0 as "DateTimePrecision"
         , f.rdb$field_scale * (-1) as "Scale"
         , null as "CollationCatalog"
         , null as "CollationSchema"
@@ -335,7 +359,7 @@
       </DefiningQuery>
     </EntitySet>
 
-    <!--Not Done-->
+    <!--In sample (MSSQL/ORA) it's not implemented. And for FB not related.-->
     <EntitySet Name="SViewConstraints" EntityType="Self.ViewConstraint">
       <DefiningQuery>
         -- SViewConstraints
