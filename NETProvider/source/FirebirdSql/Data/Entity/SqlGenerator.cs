@@ -548,7 +548,8 @@ namespace FirebirdSql.Data.Entity
 
             // We expect function to always have these properties
             string userCommandText = (string)function.MetadataProperties["CommandTextAttribute"].Value;
-            string userSchemaName = (string)function.MetadataProperties["Schema"].Value;
+            /// No schema in FB
+            //string userSchemaName = (string)function.MetadataProperties["Schema"].Value;
             string userFuncName = (string)function.MetadataProperties["StoreFunctionNameAttribute"].Value;
 
             if (String.IsNullOrEmpty(userCommandText))
@@ -557,22 +558,26 @@ namespace FirebirdSql.Data.Entity
                 commandType = CommandType.StoredProcedure;
 
                 // if the schema name is not explicitly given, it is assumed to be the metadata namespace
-                string schemaName = String.IsNullOrEmpty(userSchemaName) ?
-                    function.NamespaceName : userSchemaName;
+                /// No schema in FB
+                //string schemaName = String.IsNullOrEmpty(userSchemaName) ?
+                //    function.NamespaceName : userSchemaName;
 
                 // if the function store name is not explicitly given, it is assumed to be the metadata name
                 string functionName = String.IsNullOrEmpty(userFuncName) ?
                     function.Name : userFuncName;
 
                 // quote elements of function text
-                string quotedSchemaName = QuoteIdentifier(schemaName);
+                /// No schema in FB
+                //string quotedSchemaName = QuoteIdentifier(schemaName);
                 string quotedFunctionName = QuoteIdentifier(functionName);
 
                 // separator
-                const string schemaSeparator = ".";
-#warning look at generating schemas here (not in FB)
+                /// No schema in FB
+                //const string schemaSeparator = ".";
                 // concatenate elements of function text
-                string quotedFunctionText = quotedSchemaName + schemaSeparator + quotedFunctionName;
+
+                /// No schema in FB
+                string quotedFunctionText = /*quotedSchemaName + schemaSeparator + */quotedFunctionName;
 
                 return quotedFunctionText;
             }
@@ -1004,7 +1009,7 @@ namespace FirebirdSql.Data.Entity
             }
             else
             {
-                // No schema in FB
+                /// No schema in FB
                 //string schemaName = MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "Schema");
                 //if (!string.IsNullOrEmpty(schemaName))
                 //{
