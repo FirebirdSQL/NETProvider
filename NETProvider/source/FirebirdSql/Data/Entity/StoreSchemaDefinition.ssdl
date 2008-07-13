@@ -146,9 +146,9 @@
       </DefiningQuery>
     </EntitySet>
 
-    <!--Not Done-->
     <EntitySet Name="SFunctions" EntityType="Self.Function">
       <DefiningQuery>
+        -- SFunctions
         SELECT
         TRIM(f.rdb$function_name) as "Id"
         , null as "CatalogName"
@@ -196,39 +196,65 @@
         , CAST((select CASE COUNT(*) WHEN 1 THEN 1 ELSE 0 END FROM rdb$function_arguments fa WHERE fa.rdb$function_name = f.rdb$function_name) as smallint) as "IsNiladic"
         FROM
         rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument = fa.rdb$argument_position)
-        WHERE rdb$system_flag = 0
+        WHERE f.rdb$system_flag = 0
       </DefiningQuery>
     </EntitySet>
     <EntitySet Name="SFunctionParameters" EntityType="Self.Parameter">
       <DefiningQuery>
+        -- SFunctionParameters
         SELECT
-        null as "Id"
-        , null as "ParentId"
-        , null as "Name"
-        , null as "Ordinal"
-        , null as "TypeName"
-        , null as "MaxLength"
-        , null as "Precision"
-        , null as "DateTimePrecision"
-        , null as "Scale"
+        TRIM(fa.rdb$function_name) || 'x' || 'param' || TRIM(fa.rdb$argument_position) as "Id"
+        , TRIM(fa.rdb$function_name) as "ParentId"
+        , 'param' || TRIM(fa.rdb$argument_position) as "Name"
+        , fa.rdb$argument_position as "Ordinal"
+        , TRIM(CASE fa.rdb$field_type
+        WHEN 7 THEN CASE fa.rdb$field_sub_type
+          WHEN 0 THEN 'smallint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+        END
+        WHEN 8 THEN CASE fa.rdb$field_sub_type
+          WHEN 0 THEN 'int'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+        END
+        WHEN 16 THEN CASE fa.rdb$field_sub_type
+          WHEN 0 THEN 'bigint'
+          WHEN 1 THEN 'numeric'
+          WHEN 2 THEN 'decimal'
+        END
+        WHEN 10 THEN 'float'
+        WHEN 27 THEN 'double'
+        WHEN 12 THEN 'date'
+        WHEN 13 THEN 'time'
+        WHEN 35 THEN 'timestamp'
+        WHEN 261 THEN 'blob'
+        WHEN 37 THEN 'varchar'
+        WHEN 14 THEN 'char'
+        WHEN 40 THEN 'cstring'
+        END) as "TypeName"
+        , fa.rdb$character_length as "MaxLength"
+        , fa.rdb$field_precision as "Precision"
+        , 0 as "DateTimePrecision"
+        , fa.rdb$field_scale * (-1) as "Scale"
         , null as "CollationCatalog"
         , null as "CollationSchema"
         , null as "CollationName"
         , null as "CharacterSetCatalog"
         , null as "CharacterSetSchema"
         , null as "CharacterSetName"
-        , null as "IsMultiSet"
-        , null as "Mode"
+        , cast(0 as smallint) as "IsMultiSet"
+        , 'IN' as "Mode"
         , null as "Default"
         FROM
-        rdb$database
-        WHERE
-        0=1
+        rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument != fa.rdb$argument_position)
+        WHERE f.rdb$system_flag = 0
       </DefiningQuery>
     </EntitySet>
 
     <EntitySet Name="SProcedures" EntityType="Self.Procedure">
       <DefiningQuery>
+        -- SProcedures
         SELECT
         TRIM(rdb$procedure_name) as "Id"
         , null as "CatalogName"
@@ -240,6 +266,7 @@
     </EntitySet>
     <EntitySet Name="SProcedureParameters" EntityType="Self.Parameter">
       <DefiningQuery>
+        -- SProcedureParameters
         SELECT
         TRIM(pp.rdb$procedure_name) || 'x' || TRIM(pp.rdb$parameter_name) as "Id"
         , TRIM(pp.rdb$procedure_name) as "ParentId"
