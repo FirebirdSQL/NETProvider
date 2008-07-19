@@ -199,13 +199,6 @@ namespace FirebirdSql.Data.FirebirdClient
                     closeConnection = true;
                 }
 
-#warning What about this?
-                //StoreVersion version = StoreVersionUtils.GetStoreVersion(fbConnection);
-                //if (version == StoreVersion.Sql9)
-                //    return SampleProviderManifest.TokenSql9;
-                //else
-
-                //    return StoreVersionUtils.GetVersionHint(version);
                 return fbConnection.ServerVersion;
             }
             finally
@@ -283,42 +276,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
             size = default(int?);
 
-
-            // TODO add logic for Xml here
-#warning Review this
             switch (primitiveTypeKind)
             {
-                case PrimitiveTypeKind.Binary:
-                    // for output parameters, ensure there is space...
-                    size = GetParameterSize(type, isOutParam);
-                    return GetBinaryDbType(type);
-
                 case PrimitiveTypeKind.Boolean:
                     return FbDbType.SmallInt;
-
-#warning What about this
-                //case PrimitiveTypeKind.Byte:
-                //    return SqlDbType.TinyInt;
-
-                case PrimitiveTypeKind.Time:
-                    return FbDbType.Time;
-
-#warning What about this
-                //case PrimitiveTypeKind.DateTimeOffset:
-                //    return SqlDbType.DateTimeOffset;
-
-                case PrimitiveTypeKind.DateTime:
-                    return FbDbType.TimeStamp;
-
-                case PrimitiveTypeKind.Decimal:
-                    return FbDbType.Decimal;
-
-                case PrimitiveTypeKind.Double:
-                    return FbDbType.Double;
-
-#warning What about this
-                //case PrimitiveTypeKind.Guid:
-                //    return SqlDbType.UniqueIdentifier;
 
                 case PrimitiveTypeKind.Int16:
                     return FbDbType.SmallInt;
@@ -329,20 +290,32 @@ namespace FirebirdSql.Data.FirebirdClient
                 case PrimitiveTypeKind.Int64:
                     return FbDbType.BigInt;
 
-#warning What about this
-                //case PrimitiveTypeKind.SByte:
-                //    return SqlDbType.SmallInt;
+                case PrimitiveTypeKind.Double:
+                    return FbDbType.Double;
 
                 case PrimitiveTypeKind.Single:
                     return FbDbType.Float;
+
+                case PrimitiveTypeKind.Decimal:
+                    return FbDbType.Decimal;
+
+                case PrimitiveTypeKind.Binary:
+                    // for output parameters, ensure there is space...
+                    size = GetParameterSize(type, isOutParam);
+                    return GetBinaryDbType(type);
 
                 case PrimitiveTypeKind.String:
                     size = GetParameterSize(type, isOutParam);
                     return GetStringDbType(type);
 
+                case PrimitiveTypeKind.DateTime:
+                    return FbDbType.TimeStamp;
+
+                case PrimitiveTypeKind.Time:
+                    return FbDbType.Time;
+
                 default:
                     Debug.Fail("unknown PrimitiveTypeKind " + primitiveTypeKind);
-                    //return SqlDbType.Variant;
                     throw new InvalidOperationException("unknown PrimitiveTypeKind " + primitiveTypeKind);
             }
         }
@@ -381,37 +354,29 @@ namespace FirebirdSql.Data.FirebirdClient
                 PrimitiveTypeKind.String == ((PrimitiveType)type.EdmType).PrimitiveTypeKind, "only valid for string type");
 
             FbDbType dbType;
-#warning What about this
-            //if (type.EdmType.Name.ToLowerInvariant() == "xml")
-            //{
-            //    dbType = SqlDbType.Xml;
-            //}
-            //else
+            // Specific type depends on whether the string is a unicode string and whether it is a fixed length string.
+            // By default, assume widest type (unicode) and most common type (variable length)
+            bool unicode;
+            bool fixedLength;
+            if (!MetadataHelpers.TryGetIsFixedLength(type, out fixedLength))
             {
-                // Specific type depends on whether the string is a unicode string and whether it is a fixed length string.
-                // By default, assume widest type (unicode) and most common type (variable length)
-                bool unicode;
-                bool fixedLength;
-                if (!MetadataHelpers.TryGetIsFixedLength(type, out fixedLength))
-                {
-                    fixedLength = false;
-                }
-
-                if (!MetadataHelpers.TryGetIsUnicode(type, out unicode))
-                {
-                    unicode = true;
-                }
-
-#warning How to handle unicode
-                if (fixedLength)
-                {
-                    dbType = (unicode ? FbDbType.Char : FbDbType.Char);
-                }
-                else
-                {
-                    dbType = (unicode ? FbDbType.VarChar : FbDbType.VarChar);
-                }
+                fixedLength = false;
             }
+
+            if (!MetadataHelpers.TryGetIsUnicode(type, out unicode))
+            {
+                unicode = true;
+            }
+
+            if (fixedLength)
+            {
+                dbType = (unicode ? FbDbType.Char : FbDbType.Char);
+            }
+            else
+            {
+                dbType = (unicode ? FbDbType.VarChar : FbDbType.VarChar);
+            }
+
             return dbType;
         }
 
@@ -430,7 +395,6 @@ namespace FirebirdSql.Data.FirebirdClient
                 fixedLength = false;
             }
 
-            //return fixedLength ? SqlDbType.Binary : SqlDbType.VarBinary;
             return FbDbType.Binary;
         }
     }

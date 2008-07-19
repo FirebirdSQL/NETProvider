@@ -32,19 +32,17 @@ using System.Data.Metadata.Edm;
 using System.Reflection;
 using System.IO;
 
+using FirebirdSql.Data.Entity;
+
 namespace FirebirdSql.Data.FirebirdClient
 {
     public class FbProviderManifest : DbXmlEnabledProviderManifest
     {
         #region Private Fields
 
-        /// <summary>
-        /// maximum size of sql server unicode 
-        /// </summary>
-        private const int varcharMaxSize = 8000;
-        private const int nvarcharMaxSize = 4000;
-        private const int binaryMaxSize = 8000;
-        //private const int varcharMaxSize = 32765;
+        private const int binaryMaxSize = Int32.MaxValue;
+        private const int varcharMaxSize = 32765;
+        private const int nvarcharMaxSize = varcharMaxSize;
 
         private System.Collections.ObjectModel.ReadOnlyCollection<PrimitiveType> _primitiveTypes = null;
         private System.Collections.ObjectModel.ReadOnlyCollection<EdmFunction> _functions = null;
@@ -324,42 +322,39 @@ namespace FirebirdSql.Data.FirebirdClient
                         return TypeUsage.CreateDecimalTypeUsage(StoreTypeNameToStorePrimitiveType["decimal"], precision, scale);
                     }
 
-#warning Finish!!!
-                //case PrimitiveTypeKind.Binary: // blob
-                //    {
-                //        bool isFixedLength = null != facets["FixedLength"].Value && (bool)facets["FixedLength"].Value;
-                //        Facet f = facets["MaxLength"];
-
-                //        bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > binaryMaxSize;
-                //        int maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
-
-                //        TypeUsage tu;
-                //        if (isFixedLength)
-                //        {
-                //            tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["binary"], true, maxLength);
-                //        }
-                //        else
-                //        {
-                //            if (isMaxLength)
-                //            {
-                //                tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["varbinary(max)"], false);
-                //                System.Diagnostics.Debug.Assert(tu.Facets["MaxLength"].Description.IsConstant, "varbinary(max) is not constant!");
-                //            }
-                //            else
-                //            {
-                //                tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["varbinary"], false, maxLength);
-                //            }
-                //        }
-                //        return tu;
-                //    }
-
-#warning Finish!!!
-                case PrimitiveTypeKind.String:
-                    // char, varchar
+                case PrimitiveTypeKind.Binary: // blob
                     {
-                        bool isUnicode = null == facets["Unicode"].Value || (bool)facets["Unicode"].Value;
-                        bool isFixedLength = null != facets["FixedLength"].Value && (bool)facets["FixedLength"].Value;
-                        Facet f = facets["MaxLength"];
+                        bool isFixedLength = null != facets[MetadataHelpers.FixedLengthFacetName].Value && (bool)facets[MetadataHelpers.FixedLengthFacetName].Value;
+                        Facet f = facets[MetadataHelpers.MaxLengthFacetName];
+
+                        bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > binaryMaxSize;
+                        int maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
+
+                        TypeUsage tu;
+                        if (isFixedLength)
+                        {
+                            tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["binary"], true, maxLength);
+                        }
+                        else
+                        {
+                            if (isMaxLength)
+                            {
+                                tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["blob"], false);
+                                System.Diagnostics.Debug.Assert(tu.Facets["MaxLength"].Description.IsConstant, "blob is not constant!");
+                            }
+                            else
+                            {
+                                tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["blob"], false, maxLength);
+                            }
+                        }
+                        return tu;
+                    }
+
+                case PrimitiveTypeKind.String: // char, varchar
+                    {
+                        bool isUnicode = null == facets[MetadataHelpers.UnicodeFacetName].Value || (bool)facets[MetadataHelpers.UnicodeFacetName].Value;
+                        bool isFixedLength = null != facets[MetadataHelpers.FixedLengthFacetName].Value && (bool)facets[MetadataHelpers.FixedLengthFacetName].Value;
+                        Facet f = facets[MetadataHelpers.MaxLengthFacetName];
                         // maxlen is true if facet value is unbounded, the value is bigger than the limited string sizes *or* the facet
                         // value is null. this is needed since functions still have maxlength facet value as null
                         bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > (isUnicode ? nvarcharMaxSize : varcharMaxSize);
