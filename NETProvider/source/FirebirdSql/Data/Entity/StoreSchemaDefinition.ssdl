@@ -190,10 +190,10 @@
         , null as "ReturnCharacterSetCatalog"
         , null as "ReturnCharacterSetSchema"
         , null as "ReturnCharacterSetName"
-        , CAST(0 as smallint) as "ReturnIsMultiSet"
-        , CAST(0 as smallint) as "IsAggregate"
-        , CAST(0 as smallint) as "IsBuiltIn"
-        , cast(0 as smallint) as "IsNiladic" --CAST((select CASE COUNT(*) WHEN 1 THEN 1 ELSE 0 END FROM rdb$function_arguments fa WHERE fa.rdb$function_name = f.rdb$function_name) as smallint) as "IsNiladic"
+        , 0 as "ReturnIsMultiSet"
+        , 0 as "IsAggregate"
+        , 0 as "IsBuiltIn"
+        , 0 as "IsNiladic" --CAST((select CASE COUNT(*) WHEN 1 THEN 1 ELSE 0 END FROM rdb$function_arguments fa WHERE fa.rdb$function_name = f.rdb$function_name) as smallint) as "IsNiladic"
         FROM
         rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument = fa.rdb$argument_position)
         WHERE f.rdb$system_flag = 0
@@ -243,7 +243,7 @@
         , null as "CharacterSetCatalog"
         , null as "CharacterSetSchema"
         , null as "CharacterSetName"
-        , cast(0 as smallint) as "IsMultiSet"
+        , 0 as "IsMultiSet"
         , 'IN' as "Mode"
         , null as "Default"
         FROM
@@ -361,6 +361,7 @@
     
     <EntitySet Name="SForeignKeyConstraints" EntityType="Self.ForeignKeyConstraint">
       <DefiningQuery>
+        -- SForeignKeyConstraints
         SELECT
         TRIM(rc.rdb$constraint_name) as "Id"
         , rc.rdb$update_rule "UpdateRule"
@@ -371,6 +372,7 @@
     </EntitySet>
     <EntitySet Name="SForeignKeys" EntityType="Self.ForeignKey">
       <DefiningQuery>
+        -- SForeignKeys
         SELECT
         TRIM(refc.rdb$constraint_name) || 'x' || TRIM(is2.rdb$field_position+1) as "Id"
         , TRIM(relc1.rdb$relation_name) || 'x' || TRIM(is1.rdb$field_name) as "FromColumnId"
