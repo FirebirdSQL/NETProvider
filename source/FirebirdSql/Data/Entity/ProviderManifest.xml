@@ -30,7 +30,7 @@ PROCESS
         <Precision Minimum="1" Maximum="18" DefaultValue="9" Constant="false" />
         <Scale Minimum="0" Maximum="18" DefaultValue="0" Constant="false" />
       </FacetDescriptions>
-    </Type>    
+    </Type>
     <Type Name="timestamp" PrimitiveTypeKind="DateTime">
       <FacetDescriptions>
         <Precision DefaultValue="4" Constant="true" />
@@ -43,32 +43,39 @@ PROCESS
     </Type>
     <Type Name="time" PrimitiveTypeKind="Time">
       <FacetDescriptions>
-        <Precision Minimum="0" Maximum="7" DefaultValue="7" Constant="false" />
+        <Precision DefaultValue="4" Constant="true" />
       </FacetDescriptions>
-    </Type>   
+    </Type>
     <Type Name="smallint_bool" PrimitiveTypeKind="Boolean">
     </Type>
     <Type Name="char" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength Minimum="1" Maximum="8000" DefaultValue="8000" Constant="false" />
+        <MaxLength Minimum="1" Maximum="32765" DefaultValue="32765" Constant="false" />
         <Unicode DefaultValue="false" Constant="false" />
         <FixedLength DefaultValue="true" Constant="true" />
       </FacetDescriptions>
     </Type>
     <Type Name="varchar" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength DefaultValue="8000" Minimum="1" Maximum="8000" Constant="false" />
+        <MaxLength Minimum="1" Maximum="32765" DefaultValue="32765" Constant="false" />
         <Unicode DefaultValue="true" Constant="false" />
         <FixedLength DefaultValue="false" Constant="true" />
       </FacetDescriptions>
     </Type>
-    <Type Name="varchar_max" PrimitiveTypeKind="String">
+    <!--<Type Name="varchar_max" PrimitiveTypeKind="String">
       <FacetDescriptions>
-        <MaxLength DefaultValue="8000" Constant="true" />
+        <MaxLength DefaultValue="32765" Constant="true" />
         <Unicode DefaultValue="true" Constant="false" />
         <FixedLength DefaultValue="false" Constant="true" />
       </FacetDescriptions>
+    </Type>-->
+    <Type Name="blob" PrimitiveTypeKind="Binary">
+      <FacetDescriptions>
+        <MaxLength DefaultValue="2147483647" Constant="true" />
+        <FixedLength DefaultValue="false" Constant="true" />
+      </FacetDescriptions>
     </Type>
+
   </Types>
   <Functions>
 

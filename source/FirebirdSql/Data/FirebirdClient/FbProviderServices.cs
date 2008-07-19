@@ -285,6 +285,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 
             // TODO add logic for Xml here
+#warning Review this
             switch (primitiveTypeKind)
             {
                 case PrimitiveTypeKind.Binary:

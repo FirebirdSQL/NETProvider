@@ -7,8 +7,8 @@
         -- STables
         SELECT
         TRIM(rdb$relation_name) as "Id"
-        ,   null as "CatalogName"
-        ,   null as "SchemaName" 
+        ,   'CFirebird' as "CatalogName"
+        ,   'SFirebird' as "SchemaName" 
         ,   TRIM(rdb$relation_name) as "Name"
         FROM
         rdb$relations
@@ -52,7 +52,7 @@
         END) as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
         ,   f.rdb$field_precision as "Precision"
-        ,   0 as "DateTimePrecision"
+        ,   4 as "DateTimePrecision"
         ,   f.rdb$field_scale * (-1) as "Scale"
         ,   null as "CollationCatalog"
         ,   null as "CollationSchema"
@@ -125,7 +125,7 @@
         END) as "TypeName"
         ,   f.rdb$character_length as "MaxLength"
         ,   f.rdb$field_precision as "Precision"
-        ,   0 as "DateTimePrecision"
+        ,   4 as "DateTimePrecision"
         ,   f.rdb$field_scale * (-1) as "Scale"
         ,   null as "CollationCatalog"
         ,   null as "CollationSchema"
@@ -182,7 +182,7 @@
         END) as "ReturnTypeName"
         , fa.rdb$character_length as "ReturnMaxLength"
         , fa.rdb$field_precision as "ReturnPrecision"
-        , 0 as "ReturnDateTimePrecision"
+        , 4 as "ReturnDateTimePrecision"
         , fa.rdb$field_scale * (-1) as "ReturnScale"
         , null as "ReturnCollationCatalog"
         , null as "ReturnCollationSchema"
@@ -193,7 +193,7 @@
         , CAST(0 as smallint) as "ReturnIsMultiSet"
         , CAST(0 as smallint) as "IsAggregate"
         , CAST(0 as smallint) as "IsBuiltIn"
-        , CAST((select CASE COUNT(*) WHEN 1 THEN 1 ELSE 0 END FROM rdb$function_arguments fa WHERE fa.rdb$function_name = f.rdb$function_name) as smallint) as "IsNiladic"
+        , cast(0 as smallint) as "IsNiladic" --CAST((select CASE COUNT(*) WHEN 1 THEN 1 ELSE 0 END FROM rdb$function_arguments fa WHERE fa.rdb$function_name = f.rdb$function_name) as smallint) as "IsNiladic"
         FROM
         rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument = fa.rdb$argument_position)
         WHERE f.rdb$system_flag = 0
@@ -235,7 +235,7 @@
         END) as "TypeName"
         , fa.rdb$character_length as "MaxLength"
         , fa.rdb$field_precision as "Precision"
-        , 0 as "DateTimePrecision"
+        , 4 as "DateTimePrecision"
         , fa.rdb$field_scale * (-1) as "Scale"
         , null as "CollationCatalog"
         , null as "CollationSchema"
@@ -300,7 +300,7 @@
         END) as "TypeName"
         , f.rdb$character_length as "MaxLength"
         , f.rdb$field_precision as "Precision"
-        , 0 as "DateTimePrecision"
+        , 4 as "DateTimePrecision"
         , f.rdb$field_scale * (-1) as "Scale"
         , null as "CollationCatalog"
         , null as "CollationSchema"
@@ -493,7 +493,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
     <Property Name="CatalogName" Type="varchar" MaxLength="256" />
     <Property Name="SchemaName" Type="varchar" MaxLength="256" />
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256" />
@@ -503,8 +503,8 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max"/>
-    <Property Name="ParentId" Nullable="false" Type="varchar_max"/>
+    <Property Name="Id" Nullable="false" Type="varchar"/>
+    <Property Name="ParentId" Nullable="false" Type="varchar"/>
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
     <Property Name="Ordinal" Nullable="false" Type="int" />
     <Property Name="IsNullable" Nullable="false" Type="smallint_bool" />
@@ -522,18 +522,18 @@
     <Property Name="IsMultiSet" Nullable="false" Type="smallint_bool" />
     <Property Name="IsIdentity" Nullable="false" Type="smallint_bool" />
     <Property Name="IsStoreGenerated" Nullable="false" Type="smallint_bool" />
-    <Property Name="Default" Nullable="true" Type="varchar_max"/>
+    <Property Name="Default" Nullable="true" Type="varchar"/>
   </EntityType>
 
   <EntityType Name="View">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
     <Property Name="CatalogName" Type="varchar" MaxLength="256" />
     <Property Name="SchemaName" Type="varchar" MaxLength="256" />
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256" />
-    <Property Name="ViewDefinition" Nullable="true" Type="varchar_max" />
+    <Property Name="ViewDefinition" Nullable="true" Type="varchar" />
     <Property Name="IsUpdatable" Nullable="false" Type="smallint_bool" />
   </EntityType>
 
@@ -541,8 +541,8 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max"/>
-    <Property Name="ParentId" Nullable="false" Type="varchar_max"/>
+    <Property Name="Id" Nullable="false" Type="varchar"/>
+    <Property Name="ParentId" Nullable="false" Type="varchar"/>
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
     <Property Name="Ordinal" Nullable="false" Type="int" />
     <Property Name="IsNullable" Nullable="false" Type="smallint_bool" />
@@ -560,14 +560,14 @@
     <Property Name="IsMultiSet" Nullable="false" Type="smallint_bool" />
     <Property Name="IsIdentity" Nullable="false" Type="smallint_bool" />
     <Property Name="IsStoreGenerated" Nullable="false" Type="smallint_bool" />
-    <Property Name="Default" Nullable="true" Type="varchar_max"/>
+    <Property Name="Default" Nullable="true" Type="varchar"/>
   </EntityType>
 
   <EntityType Name="Function">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max"/>
+    <Property Name="Id" Nullable="false" Type="varchar"/>
     <Property Name="CatalogName" Type="varchar" MaxLength="256"/>
     <Property Name="SchemaName" Type="varchar" MaxLength="256"/>
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
@@ -592,7 +592,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max"/>
+    <Property Name="Id" Nullable="false" Type="varchar"/>
     <Property Name="CatalogName" Type="varchar" MaxLength="256"/>
     <Property Name="SchemaName" Type="varchar" MaxLength="256"/>
     <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
@@ -602,9 +602,9 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max"/>
-    <Property Name="ParentId" Nullable="false" Type="varchar_max"/>
-    <Property Name="Name" Nullable="false" Type="varchar_max" />
+    <Property Name="Id" Nullable="false" Type="varchar"/>
+    <Property Name="ParentId" Nullable="false" Type="varchar"/>
+    <Property Name="Name" Nullable="false" Type="varchar" />
     <Property Name="Ordinal" Nullable="false" Type="int"/>
     <Property Name="TypeName" Nullable="false" Type="varchar" MaxLength="256" />
     <Property Name="MaxLength" Nullable="true" Type="int" />
@@ -619,15 +619,15 @@
     <Property Name="CharacterSetName" Type="varchar" MaxLength="128" />
     <Property Name="IsMultiSet" Nullable="false" Type="smallint_bool" />
     <Property Name="Mode" Type="varchar" MaxLength="16" />
-    <Property Name="Default" Type="varchar_max" />
+    <Property Name="Default" Type="varchar" />
   </EntityType>
 
   <EntityType Name="Constraint">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max" />
-    <Property Name="ParentId" Nullable="false" Type="varchar_max" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="ParentId" Nullable="false" Type="varchar" />
     <Property Name="Name" Nullable="false" MaxLength="256" Type="varchar" />
     <Property Name="IsDeferrable" Nullable="false" Type="smallint_bool" />
     <Property Name="IsInitiallyDeferred" Nullable="false" Type="smallint_bool" />
@@ -638,7 +638,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
     <Property Name="Expression" Nullable="true" MaxLength="4000" Type="varchar" />
   </EntityType>
 
@@ -647,15 +647,15 @@
       <PropertyRef Name="ConstraintId" />
       <PropertyRef Name="ColumnId" />
     </Key>
-    <Property Name="ConstraintId" Nullable="false" Type="varchar_max" />
-    <Property Name="ColumnId" Nullable="false" Type="varchar_max" />
+    <Property Name="ConstraintId" Nullable="false" Type="varchar" />
+    <Property Name="ColumnId" Nullable="false" Type="varchar" />
   </EntityType>
 
   <EntityType Name="ForeignKeyConstraint">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
     <Property Name="UpdateRule" Nullable="false" MaxLength="11" Type="varchar" />
     <Property Name="DeleteRule" Nullable="false" MaxLength="11" Type="varchar" />
   </EntityType>
@@ -664,19 +664,19 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
     <Property Name="Ordinal" Nullable="false" Type="int" />
-    <Property Name="ConstraintId" Nullable="false" Type="varchar_max" />
-    <Property Name="FromColumnId" Nullable="false" Type="varchar_max" />
-    <Property Name="ToColumnId" Nullable="false" Type="varchar_max" />
+    <Property Name="ConstraintId" Nullable="false" Type="varchar" />
+    <Property Name="FromColumnId" Nullable="false" Type="varchar" />
+    <Property Name="ToColumnId" Nullable="false" Type="varchar" />
   </EntityType>
 
   <EntityType Name="ViewConstraint">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar_max" />
-    <Property Name="ParentId" Nullable="false" Type="varchar_max" />
+    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="ParentId" Nullable="false" Type="varchar" />
     <Property Name="Name" Nullable="false" MaxLength="256" Type="varchar" />
     <Property Name="IsDeferrable" Nullable="false" Type="smallint_bool" />
     <Property Name="IsInitiallyDeferred" Nullable="false" Type="smallint_bool" />
