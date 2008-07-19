@@ -44,6 +44,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private const int varcharMaxSize = 8000;
         private const int nvarcharMaxSize = 4000;
         private const int binaryMaxSize = 8000;
+        //private const int varcharMaxSize = 32765;
 
         private System.Collections.ObjectModel.ReadOnlyCollection<PrimitiveType> _primitiveTypes = null;
         private System.Collections.ObjectModel.ReadOnlyCollection<EdmFunction> _functions = null;
@@ -178,10 +179,27 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 // for some types we just go with simple type usage with no facets
                 case "smallint":
+                case "int":
                 case "bigint":
                 case "smallint_bool":
-                case "int":
                     return TypeUsage.CreateDefaultTypeUsage(edmPrimitiveType);
+
+                case "float":
+                case "double":
+                    return TypeUsage.CreateDefaultTypeUsage(edmPrimitiveType);
+
+                case "decimal":
+                case "numeric":
+                    byte precision;
+                    byte scale;
+                    if (TypeHelpers.TryGetPrecision(storeType, out precision) && TypeHelpers.TryGetScale(storeType, out scale))
+                    {
+                        return TypeUsage.CreateDecimalTypeUsage(edmPrimitiveType, precision, scale);
+                    }
+                    else
+                    {
+                        return TypeUsage.CreateDecimalTypeUsage(edmPrimitiveType);
+                    }
 
                 case "varchar":
                     newPrimitiveTypeKind = PrimitiveTypeKind.String;
@@ -189,12 +207,12 @@ namespace FirebirdSql.Data.FirebirdClient
                     isUnicode = true; //TODO: hardcoded
                     isFixedLen = false;
                     break;
-                case "varchar_max":
-                    newPrimitiveTypeKind = PrimitiveTypeKind.String;
-                    isUnbounded = true;
-                    isUnicode = true; //TODO: hardcoded
-                    isFixedLen = false;
-                    break;
+                //case "varchar_max":
+                //    newPrimitiveTypeKind = PrimitiveTypeKind.String;
+                //    isUnbounded = true;
+                //    isUnicode = true; //TODO: hardcoded
+                //    isFixedLen = false;
+                //    break;
 
                 case "char":
                     newPrimitiveTypeKind = PrimitiveTypeKind.String;
@@ -203,46 +221,18 @@ namespace FirebirdSql.Data.FirebirdClient
                     isFixedLen = true;
                     break;
 
-                //case "text":
-                //    newPrimitiveTypeKind = PrimitiveTypeKind.String;
-                //    isUnbounded = true;
-                //    isUnicode = false;
-                //    isFixedLen = false;
-                //    break;
-
-                //case "binary":
-                //    newPrimitiveTypeKind = PrimitiveTypeKind.Binary;
-                //    isUnbounded = !TypeHelpers.TryGetMaxLength(storeType, out maxLength);
-                //    isFixedLen = true;
-                //    break;
-
-                //case "varbinary":
-                //    newPrimitiveTypeKind = PrimitiveTypeKind.Binary;
-                //    isUnbounded = !TypeHelpers.TryGetMaxLength(storeType, out maxLength);
-                //    isFixedLen = false;
-                //    break;
-
-                case "float":
-                case "double":
-                    return TypeUsage.CreateDefaultTypeUsage(edmPrimitiveType);
-
-                case "decimal":
-                case "numeric":
-                    {
-                        byte precision;
-                        byte scale;
-                        if (TypeHelpers.TryGetPrecision(storeType, out precision) && TypeHelpers.TryGetScale(storeType, out scale))
-                        {
-                            return TypeUsage.CreateDecimalTypeUsage(edmPrimitiveType, precision, scale);
-                        }
-                        else
-                        {
-                            return TypeUsage.CreateDecimalTypeUsage(edmPrimitiveType);
-                        }
-                    }
-
                 case "timestamp":
                     return TypeUsage.CreateDateTimeTypeUsage(edmPrimitiveType, null);
+                case "date":
+                    return TypeUsage.CreateDateTimeTypeUsage(edmPrimitiveType, null);
+                case "time":
+                    return TypeUsage.CreateTimeTypeUsage(edmPrimitiveType, null);
+
+                case "binary":
+                    newPrimitiveTypeKind = PrimitiveTypeKind.Binary;
+                    isUnbounded = true;
+                    isFixedLen = false;
+                    break;
 
                 default:
                     throw new NotSupportedException(String.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
@@ -334,7 +324,8 @@ namespace FirebirdSql.Data.FirebirdClient
                         return TypeUsage.CreateDecimalTypeUsage(StoreTypeNameToStorePrimitiveType["decimal"], precision, scale);
                     }
 
-                //case PrimitiveTypeKind.Binary: // binary, varbinary, varbinary(max), image, timestamp, rowversion
+#warning Finish!!!
+                //case PrimitiveTypeKind.Binary: // blob
                 //    {
                 //        bool isFixedLength = null != facets["FixedLength"].Value && (bool)facets["FixedLength"].Value;
                 //        Facet f = facets["MaxLength"];
@@ -362,8 +353,9 @@ namespace FirebirdSql.Data.FirebirdClient
                 //        return tu;
                 //    }
 
+#warning Finish!!!
                 case PrimitiveTypeKind.String:
-                    // char, nchar, varchar, nvarchar, varchar(max), nvarchar(max), ntext, text, xml
+                    // char, varchar
                     {
                         bool isUnicode = null == facets["Unicode"].Value || (bool)facets["Unicode"].Value;
                         bool isFixedLength = null != facets["FixedLength"].Value && (bool)facets["FixedLength"].Value;
@@ -385,7 +377,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             {
                                 if (isMaxLength)
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar_max"], true, false);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], true, false);
                                 }
                                 else
                                 {
@@ -403,7 +395,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             {
                                 if (isMaxLength)
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar_max"], false, false);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], false, false);
                                 }
                                 else
                                 {
@@ -414,22 +406,30 @@ namespace FirebirdSql.Data.FirebirdClient
                         return tu;
                     }
 
-                case PrimitiveTypeKind.DateTime: // datetime, smalldatetime
-                    Facet preserveSecondsFacet;
-                    bool preserveSeconds;
-                    if (edmType.Facets.TryGetValue("PreserveSeconds", true, out preserveSecondsFacet) && null != preserveSecondsFacet.Value)
+                case PrimitiveTypeKind.DateTime: // datetime, date
                     {
-                        preserveSeconds = (bool)preserveSecondsFacet.Value;
-                    }
-                    else
-                    {
-                        preserveSeconds = true;
+                        byte precision;
+                        bool useTimestamp;
+                        if (TypeHelpers.TryGetPrecision(edmType, out precision))
+                        {
+                            if (precision == 0)
+                                useTimestamp = false;
+                            else
+                                useTimestamp = true;
+                        }
+                        else
+                        {
+                            useTimestamp = true;
+                        }
+
+                        return TypeUsage.CreateDefaultTypeUsage(useTimestamp ? StoreTypeNameToStorePrimitiveType["timestamp"] : StoreTypeNameToStorePrimitiveType["date"]);
                     }
 
-                    return TypeUsage.CreateDefaultTypeUsage(preserveSeconds ? StoreTypeNameToStorePrimitiveType["timestamp"] : StoreTypeNameToStorePrimitiveType["date"]);
+                case PrimitiveTypeKind.Time:
+                    return TypeUsage.CreateDefaultTypeUsage(StoreTypeNameToStorePrimitiveType["time"]);
 
                 default:
-                    throw new NotSupportedException(String.Format("There is no store type corresponding to the EDM type '{0}' of primitive type '{1}'.", edmType, primitiveType.PrimitiveTypeKind));
+                    throw new NotSupportedException(string.Format("There is no store type corresponding to the EDM type '{0}' of primitive type '{1}'.", edmType, primitiveType.PrimitiveTypeKind));
             }
         }
 
