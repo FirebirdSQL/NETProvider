@@ -30,6 +30,7 @@ using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 using System.Data;
 
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Entity
 {
@@ -3284,65 +3285,25 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private string GetSqlPrimitiveType(TypeUsage type)
         {
-#warning Revork according to ProviderManifest
             PrimitiveType primitiveType = MetadataHelpers.GetEdmType<PrimitiveType>(type);
 
             string typeName = primitiveType.Name;
             bool isUnicode = true;
             bool isFixedLength = false;
             int maxLength = 0;
-            string length = "max";
+            string length = string.Empty;
             bool preserveSeconds = true;
             byte decimalPrecision = 0;
             byte decimalScale = 0;
 
             switch (primitiveType.PrimitiveTypeKind)
             {
-                case PrimitiveTypeKind.String:
-                    isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.UnicodeFacetName, true);
-                    isFixedLength = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.FixedLengthFacetName, false);
-                    maxLength = MetadataHelpers.GetFacetValueOrDefault<int>(type, MetadataHelpers.MaxLengthFacetName, Int32.MinValue);
-                    if (maxLength == Int32.MinValue)
-                    {
-                        length = "max";
-                    }
-                    else
-                    {
-                        length = maxLength.ToString(CultureInfo.InvariantCulture);
-                    }
-                    if (isUnicode && !isFixedLength && maxLength > 4000)
-                        length = "max";
-                    if (!isUnicode && !isFixedLength && maxLength > 8000)
-                        length = "max";
-
-#warning Quick Fix!!!
-                    if (length == "max")
-                        length = "1000";
-
-                    if (isFixedLength)
-                    {
-                        //typeName = (isUnicode ? "nchar(" : "char(") + length + ")";
-                        typeName = (isUnicode ? "char(" : "char(") + length + ")";
-                    }
-                    else
-                    {
-                        //typeName = (isUnicode ? "nvarchar(" : "varchar(") + length + ")";
-                        typeName = (isUnicode ? "varchar(" : "varchar(") + length + ")";
-                    }
+                case PrimitiveTypeKind.Boolean:
+                    typeName = "SMALLINT";
                     break;
 
-                case PrimitiveTypeKind.DateTime:
-                    preserveSeconds = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.PreserveSecondsFacetName, false);
-                    typeName = preserveSeconds ? "TIMESTAMP" : "DATE";
-                    break;
-
-                case PrimitiveTypeKind.Decimal:
-                    decimalPrecision = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.PrecisionFacetName, 18);
-                    Debug.Assert(decimalPrecision > 0, "decimal precision must be greater than zero");
-                    decimalScale = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.ScaleFacetName, 0);
-                    Debug.Assert(decimalPrecision >= decimalScale, "decimalPrecision must be greater or equal to decimalScale");
-                    Debug.Assert(decimalPrecision <= 18, "decimalPrecision must be less than or equal to 18");
-                    typeName = "DECIMAL(" + decimalPrecision + "," + decimalScale + ")";
+                case PrimitiveTypeKind.Int16:
+                    typeName = "SMALLINT";
                     break;
 
                 case PrimitiveTypeKind.Int32:
@@ -3353,20 +3314,61 @@ namespace FirebirdSql.Data.Entity
                     typeName = "BIGINT";
                     break;
 
-                case PrimitiveTypeKind.Int16:
-                    typeName = "SMALLINT";
-                    break;
-
-                case PrimitiveTypeKind.Boolean:
-                    typeName = "SMALLINT";
+                case PrimitiveTypeKind.Double:
+                    typeName = "DOUBLE";
                     break;
 
                 case PrimitiveTypeKind.Single:
                     typeName = "FLOAT";
                     break;
 
-                case PrimitiveTypeKind.Double:
-                    typeName = "DOUBLE";
+                case PrimitiveTypeKind.Decimal:
+                    decimalPrecision = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.PrecisionFacetName, 9);
+                    Debug.Assert(decimalPrecision > 0, "decimal precision must be greater than zero");
+                    decimalScale = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.ScaleFacetName, 0);
+                    Debug.Assert(decimalPrecision >= decimalScale, "decimalPrecision must be greater or equal to decimalScale");
+                    Debug.Assert(decimalPrecision <= 18, "decimalPrecision must be less than or equal to 18");
+                    typeName = string.Format("DECIMAL({0},{1})", decimalPrecision, decimalScale);
+                    break;
+
+                case PrimitiveTypeKind.Binary:
+                    throw new NotSupportedException("PrimitiveTypeKind.Binary");
+
+                case PrimitiveTypeKind.String:
+                    isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.UnicodeFacetName, true);
+                    isFixedLength = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.FixedLengthFacetName, false);
+                    maxLength = MetadataHelpers.GetFacetValueOrDefault<int>(type, MetadataHelpers.MaxLengthFacetName, Int32.MinValue);
+                    if (maxLength == Int32.MinValue)
+                    {
+                        // try to get maximum length, if not enough, server will return error
+                        if (isUnicode)
+                            length = FbProviderManifest.nvarcharMaxSize.ToString(CultureInfo.InvariantCulture);
+                        else
+                            length = FbProviderManifest.varcharMaxSize.ToString(CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        // if the length will be too much, server will return error
+                        length = maxLength.ToString(CultureInfo.InvariantCulture);
+                    }
+
+                    if (isFixedLength)
+                    {
+                        typeName = (isUnicode ? "CHAR(" : "CHAR(") + length + ")";
+                    }
+                    else
+                    {
+                        typeName = (isUnicode ? "VARCHAR(" : "VARCHAR(") + length + ")";
+                    }
+                    break;
+
+                case PrimitiveTypeKind.DateTime:
+                    preserveSeconds = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.PreserveSecondsFacetName, false);
+                    typeName = preserveSeconds ? "TIMESTAMP" : "DATE";
+                    break;
+                    
+                case PrimitiveTypeKind.Time:
+                    typeName = "TIME";
                     break;
 
                 default:

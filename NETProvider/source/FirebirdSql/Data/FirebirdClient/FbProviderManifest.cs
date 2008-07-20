@@ -40,9 +40,9 @@ namespace FirebirdSql.Data.FirebirdClient
     {
         #region Private Fields
 
-        private const int binaryMaxSize = Int32.MaxValue;
-        private const int varcharMaxSize = 32765;
-        private const int nvarcharMaxSize = varcharMaxSize;
+        internal const int binaryMaxSize = Int32.MaxValue;
+        internal const int varcharMaxSize = 32765;
+        internal const int nvarcharMaxSize = varcharMaxSize;
 
         private System.Collections.ObjectModel.ReadOnlyCollection<PrimitiveType> _primitiveTypes = null;
         private System.Collections.ObjectModel.ReadOnlyCollection<EdmFunction> _functions = null;
