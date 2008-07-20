@@ -798,7 +798,7 @@ namespace FirebirdSql.Data.Entity
 
             PrimitiveTypeKind typeKind;
             // Model Types can be (at the time of this implementation):
-            //      Binary, Boolean, Byte, DateTime, Decimal, Double, Guid, Int16, Int32, Int64,Single, String
+            //      Binary, Boolean, Byte, DateTime, Decimal, Double, Guid, Int16, Int32, Int64, Single, String
             if (MetadataHelpers.TryGetPrimitiveTypeKind(e.ResultType, out typeKind))
             {
                 switch (typeKind)
@@ -838,34 +838,28 @@ namespace FirebirdSql.Data.Entity
 
                     case PrimitiveTypeKind.Decimal:
                         string strDecimal = ((Decimal)e.Value).ToString(CultureInfo.InvariantCulture);
-                        // if the decimal value has no decimal part, cast as decimal to preserve type
-                        // if the number has precision > int64 max precision, it will be handled as decimal by sql server
-                        // and does not need cast. if precision is lest then 20, then cast using Max(literal precision, sql default precision)
-                        if (-1 == strDecimal.IndexOf('.') && (strDecimal.TrimStart(new char[] { '-' }).Length < 20))
-                        {
-                            byte precision = (Byte)strDecimal.Length;
-                            //FacetDescription precisionFacetDescription;
-                            //Debug.Assert(MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, "precision", out precisionFacetDescription), "Decimal primitive type must have Precision facet");
-                            //if (MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, "precision", out precisionFacetDescription))
-                            //{
-                            //    if (precisionFacetDescription.DefaultValue != null)
-                            //    {
-                            //        precision = Math.Max(precision, (byte)precisionFacetDescription.DefaultValue);
-                            //    }
-                            //}
-                            Debug.Assert(precision > 0, "Precision must be greater than zero");
-                            result.Append("CAST(");
-                            result.Append(strDecimal);
-                            result.Append(" AS DECIMAL)");
-                            //result.Append(" AS DECIMAL(");
-                            //result.Append(precision.ToString(CultureInfo.InvariantCulture));
-                            //result.Append("))");
-                        }
-                        else
-                        {
-                            result.Append(strDecimal);
-                        }
+                        
+                        int pointPosition = strDecimal.IndexOf('.');
+
+                        FacetDescription precisionFacetDescription;
+                        // there's always the max value in manifest
+                        MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, MetadataHelpers.PrecisionFacetName, out precisionFacetDescription);
+                        int precision = precisionFacetDescription.MaxValue.Value;
+
+                        int maxScale = (pointPosition != -1 ? precision - pointPosition + 1 : 0);
+
+                        result.Append("CAST(");
+                        result.Append(strDecimal);
+                        result.Append(" AS DECIMAL(");
+                        result.Append(precision);
+                        result.Append(",");
+                        result.Append(maxScale);
+                        result.Append("))");
                         break;
+
+                    case PrimitiveTypeKind.Binary:
+                        // Binary cannot be in sql text
+                        throw new NotSupportedException("PrimitiveTypeKind.Binary");
 
                     case PrimitiveTypeKind.String:
                         bool isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(e.ResultType, MetadataHelpers.UnicodeFacetName, true);
@@ -873,11 +867,10 @@ namespace FirebirdSql.Data.Entity
                         break;
 
                     case PrimitiveTypeKind.DateTime:
-                        //result.Append("convert(");
-                        //result.Append(e.ResultType.EdmType.Name);
-                        //result.Append(", ");
-                        result.Append(EscapeSingleQuote(((System.DateTime)e.Value).ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture), false /* IsUnicode */));
-                        //result.Append(", 121)");
+                        result.Append(EscapeSingleQuote(((System.DateTime)e.Value).ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture), false /* isUnicode */));
+                        break;
+                    case PrimitiveTypeKind.Time:
+                        result.Append(EscapeSingleQuote(((System.DateTime)e.Value).ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture), false /* isUnicode */));
                         break;
 
                     default:
