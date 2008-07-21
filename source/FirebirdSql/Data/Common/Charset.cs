@@ -22,7 +22,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Linq;
 
 namespace FirebirdSql.Data.Common
 {
@@ -47,12 +46,22 @@ namespace FirebirdSql.Data.Common
 
         public static Charset GetCharset(int charsetId)
         {
-            return supportedCharsets.FirstOrDefault(charset => charset.Identifier == charsetId);
+            foreach (Charset charset in supportedCharsets)
+            {
+                if (charset.Identifier == charsetId)
+                    return charset;
+            }
+            return null;
         }
 
         public static Charset GetCharset(string charsetName)
         {
-            return supportedCharsets.FirstOrDefault(charset => GlobalizationHelper.CultureAwareCompare(charset.Name, charsetName));
+            foreach (Charset charset in supportedCharsets)
+            {
+                if (GlobalizationHelper.CultureAwareCompare(charset.Name, charsetName))
+                    return charset;
+            }
+            return null;
         }
 
         private static List<Charset> InitializeSupportedCharsets()
