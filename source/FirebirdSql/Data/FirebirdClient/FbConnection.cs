@@ -317,7 +317,7 @@ namespace FirebirdSql.Data.FirebirdClient
             this.state = ConnectionState.Closed;
             this.connectionString = "";
 
-            if (!String.IsNullOrEmpty(connectionString))
+            if (!string.IsNullOrEmpty(connectionString))
             {
                 this.ConnectionString = connectionString;
             }
