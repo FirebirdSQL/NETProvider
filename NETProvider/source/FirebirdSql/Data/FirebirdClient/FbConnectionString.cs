@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2004-2005 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *	
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -21,171 +24,172 @@ using System.Collections;
 using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.IO;
 
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	internal sealed class FbConnectionString
-	{
-		#region · Static Fields ·
+    internal sealed class FbConnectionString
+    {
+        #region · Static Fields ·
 
-		public static readonly Hashtable Synonyms = GetSynonyms();
+        public static readonly Hashtable Synonyms = GetSynonyms();
 
-		#endregion
+        #endregion
 
-		#region · Static Methods ·
+        #region · Static Methods ·
 
-		// This	is somethig	that should	be needed in .NET 2.0
-		// for use with	the	DbConnectionOptions	or DbConnectionString classes.
-		private static Hashtable GetSynonyms()
-		{
-			Hashtable synonyms = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
+        // This	is somethig	that should	be needed in .NET 2.0
+        // for use with	the	DbConnectionOptions	or DbConnectionString classes.
+        private static Hashtable GetSynonyms()
+        {
+            Hashtable synonyms = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 
-			synonyms.Add("data source", "data source");
-			synonyms.Add("datasource", "data source");
-			synonyms.Add("server", "data source");
-			synonyms.Add("host", "data source");
-			synonyms.Add("port", "port number");
-			synonyms.Add("port number", "port number");
+            synonyms.Add("data source", "data source");
+            synonyms.Add("datasource", "data source");
+            synonyms.Add("server", "data source");
+            synonyms.Add("host", "data source");
+            synonyms.Add("port", "port number");
+            synonyms.Add("port number", "port number");
             synonyms.Add("database", "initial catalog");
             synonyms.Add("initial catalog", "initial catalog");
-			synonyms.Add("user id", "user id");
+            synonyms.Add("user id", "user id");
             synonyms.Add("userid", "user id");
-			synonyms.Add("uid", "user id");
-			synonyms.Add("user", "user id");
-			synonyms.Add("user name", "user id");
+            synonyms.Add("uid", "user id");
+            synonyms.Add("user", "user id");
+            synonyms.Add("user name", "user id");
             synonyms.Add("username", "user id");
             synonyms.Add("password", "password");
-			synonyms.Add("user password", "password");
+            synonyms.Add("user password", "password");
             synonyms.Add("userpassword", "password");
             synonyms.Add("dialect", "dialect");
-			synonyms.Add("pooling", "pooling");
-			synonyms.Add("max pool size", "max pool size");
+            synonyms.Add("pooling", "pooling");
+            synonyms.Add("max pool size", "max pool size");
             synonyms.Add("maxpoolsize", "max pool size");
-			synonyms.Add("min pool size", "min pool size");
+            synonyms.Add("min pool size", "min pool size");
             synonyms.Add("minpoolsize", "min pool size");
             synonyms.Add("character set", "character set");
             synonyms.Add("charset", "character set");
-			synonyms.Add("connection lifetime", "connection lifetime");
+            synonyms.Add("connection lifetime", "connection lifetime");
             synonyms.Add("connectionlifetime", "connection lifetime");
             synonyms.Add("timeout", "connection timeout");
-			synonyms.Add("connection timeout", "connection timeout");
+            synonyms.Add("connection timeout", "connection timeout");
             synonyms.Add("connectiontimeout", "connection timeout");
-			synonyms.Add("packet size", "packet size");
+            synonyms.Add("packet size", "packet size");
             synonyms.Add("packetsize", "packet size");
-			synonyms.Add("role", "role name");
-			synonyms.Add("role name", "role name");
-			synonyms.Add("fetch size", "fetch size");
-			synonyms.Add("fetchsize", "fetch size");
-			synonyms.Add("server type", "server type");
-			synonyms.Add("servertype", "server type");
-			synonyms.Add("isolation level", "isolation level");
-            synonyms.Add("isolationlevel", "isolation level"); 
+            synonyms.Add("role", "role name");
+            synonyms.Add("role name", "role name");
+            synonyms.Add("fetch size", "fetch size");
+            synonyms.Add("fetchsize", "fetch size");
+            synonyms.Add("server type", "server type");
+            synonyms.Add("servertype", "server type");
+            synonyms.Add("isolation level", "isolation level");
+            synonyms.Add("isolationlevel", "isolation level");
             synonyms.Add("records affected", "records affected");
             synonyms.Add("context connection", "context connection");
             synonyms.Add("enlist", "enlist");
-			synonyms.Add("clientlibrary", "client library");
+            synonyms.Add("clientlibrary", "client library");
             synonyms.Add("client library", "client library");
 
-			return synonyms;
-		}
+            return synonyms;
+        }
 
-		#endregion
+        #endregion
 
-		#region · Fields ·
+        #region · Fields ·
 
-		private Hashtable   options;
-		private bool        isServiceConnectionString;
+        private Hashtable options;
+        private bool isServiceConnectionString;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		public string UserID
-		{
-			get { return this.GetString("user id"); }
-		}
+        public string UserID
+        {
+            get { return this.GetString("user id"); }
+        }
 
-		public string Password
-		{
-			get { return this.GetString("password"); }
-		}
+        public string Password
+        {
+            get { return this.GetString("password"); }
+        }
 
-		public string DataSource
-		{
-			get { return this.GetString("data source"); }
-		}
+        public string DataSource
+        {
+            get { return this.GetString("data source"); }
+        }
 
-		public int Port
-		{
-			get { return this.GetInt32("port number"); }
-		}
+        public int Port
+        {
+            get { return this.GetInt32("port number"); }
+        }
 
-		public string Database
-		{
-            get { return this.GetString("initial catalog"); }
-		}
+        public string Database
+        {
+            get { return ExpandDataDirectory(this.GetString("initial catalog")); }
+        }
 
-		public short PacketSize
-		{
-			get { return this.GetInt16("packet size"); }
-		}
+        public short PacketSize
+        {
+            get { return this.GetInt16("packet size"); }
+        }
 
-		public string Role
-		{
-			get { return this.GetString("role name"); }
-		}
+        public string Role
+        {
+            get { return this.GetString("role name"); }
+        }
 
-		public byte Dialect
-		{
-			get { return this.GetByte("dialect"); }
-		}
+        public byte Dialect
+        {
+            get { return this.GetByte("dialect"); }
+        }
 
-		public string Charset
-		{
-			get { return this.GetString("character set"); }
-		}
+        public string Charset
+        {
+            get { return this.GetString("character set"); }
+        }
 
-		public int ConnectionTimeout
-		{
-			get { return this.GetInt32("connection timeout"); }
-		}
+        public int ConnectionTimeout
+        {
+            get { return this.GetInt32("connection timeout"); }
+        }
 
-		public bool Pooling
-		{
-			get { return this.GetBoolean("pooling"); }
-		}
+        public bool Pooling
+        {
+            get { return this.GetBoolean("pooling"); }
+        }
 
-		public long ConnectionLifeTime
-		{
-			get { return this.GetInt64("connection lifetime"); }
-		}
+        public long ConnectionLifeTime
+        {
+            get { return this.GetInt64("connection lifetime"); }
+        }
 
-		public int MinPoolSize
-		{
-			get { return this.GetInt32("min pool size"); }
-		}
+        public int MinPoolSize
+        {
+            get { return this.GetInt32("min pool size"); }
+        }
 
-		public int MaxPoolSize
-		{
-			get { return this.GetInt32("max pool size"); }
-		}
+        public int MaxPoolSize
+        {
+            get { return this.GetInt32("max pool size"); }
+        }
 
-		public int FetchSize
-		{
-			get { return this.GetInt32("fetch size"); }
-		}
+        public int FetchSize
+        {
+            get { return this.GetInt32("fetch size"); }
+        }
 
-		public FbServerType ServerType
-		{
-			get { return (FbServerType)this.GetInt32("server type"); }
-		}
+        public FbServerType ServerType
+        {
+            get { return (FbServerType)this.GetInt32("server type"); }
+        }
 
-		public IsolationLevel IsolationLevel
-		{
-			get { return this.GetIsolationLevel("isolation level"); }
-		}
+        public IsolationLevel IsolationLevel
+        {
+            get { return this.GetIsolationLevel("isolation level"); }
+        }
 
         public bool ReturnRecordsAffected
         {
@@ -202,63 +206,63 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.GetBoolean("enlist"); }
         }
 
-		public string ClientLibrary
-		{
-			get { return this.GetString("client library"); }
-		}
+        public string ClientLibrary
+        {
+            get { return this.GetString("client library"); }
+        }
 
         #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		public FbConnectionString()
-		{
-			this.SetDefaultOptions();
-		}
+        public FbConnectionString()
+        {
+            this.SetDefaultOptions();
+        }
 
-		public FbConnectionString(string connectionString)
-		{
-			this.Load(connectionString);
-		}
+        public FbConnectionString(string connectionString)
+        {
+            this.Load(connectionString);
+        }
 
-		internal FbConnectionString(bool isServiceConnectionString)
-		{
-			this.isServiceConnectionString = isServiceConnectionString;
-			this.SetDefaultOptions();
-		}
+        internal FbConnectionString(bool isServiceConnectionString)
+        {
+            this.isServiceConnectionString = isServiceConnectionString;
+            this.SetDefaultOptions();
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		public void Load(string connectionString)
-		{
-			this.SetDefaultOptions();
+        public void Load(string connectionString)
+        {
+            this.SetDefaultOptions();
 
-			if (connectionString != null && connectionString.Length > 0)
-			{
-				Hashtable synonyms = GetSynonyms();
-				MatchCollection keyPairs = Regex.Matches(connectionString, @"([\w\s\d]*)\s*=\s*([^;]*)");
+            if (connectionString != null && connectionString.Length > 0)
+            {
+                Hashtable synonyms = GetSynonyms();
+                MatchCollection keyPairs = Regex.Matches(connectionString, @"([\w\s\d]*)\s*=\s*([^;]*)");
 
-				foreach (Match keyPair in keyPairs)
-				{
-					if (keyPair.Groups.Count == 3)
-					{
-						string[] values = new string[] 
+                foreach (Match keyPair in keyPairs)
+                {
+                    if (keyPair.Groups.Count == 3)
+                    {
+                        string[] values = new string[] 
 						{
 							keyPair.Groups[1].Value.Trim(),
 							keyPair.Groups[2].Value.Trim()
 						};
 
-						if (values.Length == 2 &&
-							values[0] != null && values[0].Length > 0 &&
-							values[1] != null && values[1].Length > 0)
-						{
-							values[0] = values[0].ToLower(CultureInfo.InvariantCulture);
+                        if (values.Length == 2 &&
+                            values[0] != null && values[0].Length > 0 &&
+                            values[1] != null && values[1].Length > 0)
+                        {
+                            values[0] = values[0].ToLower(CultureInfo.InvariantCulture);
 
-							if (synonyms.Contains(values[0]))
-							{
-								string key = (string)synonyms[values[0]];
+                            if (synonyms.Contains(values[0]))
+                            {
+                                string key = (string)synonyms[values[0]];
                                 if (key == "server type")
                                 {
                                     switch (this.UnquoteString(values[1].Trim()))
@@ -282,98 +286,98 @@ namespace FirebirdSql.Data.FirebirdClient
                                 }
                                 else
                                 {
-								    this.options[key] = this.UnquoteString(values[1].Trim());
+                                    this.options[key] = this.UnquoteString(values[1].Trim());
                                 }
-							}
-						}
-					}
-				}
+                            }
+                        }
+                    }
+                }
 
-				if (this.ContextConnection || this.ServerType == FbServerType.Context)
-				{
+                if (this.ContextConnection || this.ServerType == FbServerType.Context)
+                {
                     // When Context connection is true we should get the currently active connection
                     // on the Firebird Server
-                    this.options["server type"]         = FbServerType.Context;
-					this.options["pooling"]             = false;
-                    this.options["context connection"]  = true;
-				}
-				else
-				{
-					if (this.Database != null && this.Database.Length > 0)
-					{
-						this.ParseConnectionInfo(this.Database);
-					}
-				}
-			}
-		}
+                    this.options["server type"] = FbServerType.Context;
+                    this.options["pooling"] = false;
+                    this.options["context connection"] = true;
+                }
+                else
+                {
+                    if (this.Database != null && this.Database.Length > 0)
+                    {
+                        this.ParseConnectionInfo(this.Database);
+                    }
+                }
+            }
+        }
 
-		public void Validate()
-		{
-			if (!this.ContextConnection)
-			{
-				if ((this.UserID == null || this.UserID.Length == 0) ||
-					(this.Password == null || this.Password.Length == 0) ||
-					((this.Database == null || this.Database.Length == 0) && !this.isServiceConnectionString) ||
-					((this.DataSource == null || this.DataSource.Length == 0) && this.ServerType != FbServerType.Embedded) ||
-					(this.Charset == null || this.Charset.Length == 0) ||
-					this.Port == 0 ||
-					(!Enum.IsDefined(typeof(FbServerType), this.ServerType)) ||
-					(this.MinPoolSize > this.MaxPoolSize))
-				{
-					throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
-				}
-				else
-				{
-					if (this.Dialect < 1 || this.Dialect > 3)
-					{
-						throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
-					}
-					if (this.PacketSize < 512 || this.PacketSize > 32767)
-					{
-						throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
-					}
+        public void Validate()
+        {
+            if (!this.ContextConnection)
+            {
+                if ((this.UserID == null || this.UserID.Length == 0) ||
+                    (this.Password == null || this.Password.Length == 0) ||
+                    ((this.Database == null || this.Database.Length == 0) && !this.isServiceConnectionString) ||
+                    ((this.DataSource == null || this.DataSource.Length == 0) && this.ServerType != FbServerType.Embedded) ||
+                    (this.Charset == null || this.Charset.Length == 0) ||
+                    this.Port == 0 ||
+                    (!Enum.IsDefined(typeof(FbServerType), this.ServerType)) ||
+                    (this.MinPoolSize > this.MaxPoolSize))
+                {
+                    throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
+                }
+                else
+                {
+                    if (this.Dialect < 1 || this.Dialect > 3)
+                    {
+                        throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
+                    }
+                    if (this.PacketSize < 512 || this.PacketSize > 32767)
+                    {
+                        throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
+                    }
 
-					this.CheckIsolationLevel();
-				}
-			}
-		}
+                    this.CheckIsolationLevel();
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Private Methods ·
+        #region · Private Methods ·
 
-		private void SetDefaultOptions()
-		{
-			if (this.options == null)
-			{
-				this.options = new Hashtable();
-			}
+        private void SetDefaultOptions()
+        {
+            if (this.options == null)
+            {
+                this.options = new Hashtable();
+            }
 
-			this.options.Clear();
+            this.options.Clear();
 
-			// Add default key pairs values
-			this.options.Add("data source", "");
-			this.options.Add("port number", 3050);
-			this.options.Add("user id", "SYSDBA");
-			this.options.Add("password", "masterkey");
-			this.options.Add("role name", String.Empty);
-			this.options.Add("catalog", String.Empty);
-			this.options.Add("character set", "None");
-			this.options.Add("dialect", 3);
-			this.options.Add("packet size", 8192);
-			this.options.Add("pooling", true);
-			this.options.Add("connection lifetime", 0);
-			this.options.Add("min pool size", 0);
-			this.options.Add("max pool size", 100);
-			this.options.Add("connection timeout", 15);
-			this.options.Add("fetch size", 200);
-			this.options.Add("server type", FbServerType.Default);
-			this.options.Add("isolation level", IsolationLevel.ReadCommitted.ToString());
+            // Add default key pairs values
+            this.options.Add("data source", "");
+            this.options.Add("port number", 3050);
+            this.options.Add("user id", "SYSDBA");
+            this.options.Add("password", "masterkey");
+            this.options.Add("role name", String.Empty);
+            this.options.Add("catalog", String.Empty);
+            this.options.Add("character set", "None");
+            this.options.Add("dialect", 3);
+            this.options.Add("packet size", 8192);
+            this.options.Add("pooling", true);
+            this.options.Add("connection lifetime", 0);
+            this.options.Add("min pool size", 0);
+            this.options.Add("max pool size", 100);
+            this.options.Add("connection timeout", 15);
+            this.options.Add("fetch size", 200);
+            this.options.Add("server type", FbServerType.Default);
+            this.options.Add("isolation level", IsolationLevel.ReadCommitted.ToString());
             this.options.Add("records affected", true);
             this.options.Add("context connection", false);
             this.options.Add("enlist", false);
-			this.options.Add("client library", "fbembed");
-		}
+            this.options.Add("client library", "fbembed");
+        }
 
         private void ParseConnectionInfo(string connectInfo)
         {
@@ -449,119 +453,126 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-		private string GetString(string key)
-		{
-			if (this.options.Contains(key))
-			{
-				return (string)this.options[key];
-			}
+        private string ExpandDataDirectory(string s)
+        {
+            const string dataDirectoryKeyword = "|DataDirectory|";
+            string dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
+            return Regex.Replace(s, Regex.Escape(dataDirectoryKeyword), dataDirectoryLocation, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        }
 
-			return null;
-		}
+        private string GetString(string key)
+        {
+            if (this.options.Contains(key))
+            {
+                return (string)this.options[key];
+            }
 
-		private bool GetBoolean(string key)
-		{
-			if (this.options.Contains(key))
-			{
-				return Boolean.Parse(this.options[key].ToString());
-			}
+            return null;
+        }
 
-			return false;
-		}
+        private bool GetBoolean(string key)
+        {
+            if (this.options.Contains(key))
+            {
+                return Boolean.Parse(this.options[key].ToString());
+            }
 
-		private byte GetByte(string key)
-		{
-			if (this.options.Contains(key))
-			{
-				return Convert.ToByte(this.options[key], CultureInfo.CurrentCulture);
-			}
+            return false;
+        }
 
-			return 0;
-		}
+        private byte GetByte(string key)
+        {
+            if (this.options.Contains(key))
+            {
+                return Convert.ToByte(this.options[key], CultureInfo.CurrentCulture);
+            }
 
-		private short GetInt16(string key)
-		{
-			if (this.options.Contains(key))
-			{
-				return Convert.ToInt16(this.options[key], CultureInfo.InvariantCulture);
-			}
+            return 0;
+        }
 
-			return 0;
-		}
+        private short GetInt16(string key)
+        {
+            if (this.options.Contains(key))
+            {
+                return Convert.ToInt16(this.options[key], CultureInfo.InvariantCulture);
+            }
 
-		private int GetInt32(string key)
-		{
-			if (this.options.Contains(key))
-			{
-				return Convert.ToInt32(this.options[key], CultureInfo.InvariantCulture);
-			}
+            return 0;
+        }
 
-			return 0;
-		}
+        private int GetInt32(string key)
+        {
+            if (this.options.Contains(key))
+            {
+                return Convert.ToInt32(this.options[key], CultureInfo.InvariantCulture);
+            }
 
-		private long GetInt64(string key)
-		{
-			if (this.options.Contains(key))
-			{
-				return Convert.ToInt64(this.options[key], CultureInfo.InvariantCulture);
-			}
+            return 0;
+        }
 
-			return 0;
-		}
+        private long GetInt64(string key)
+        {
+            if (this.options.Contains(key))
+            {
+                return Convert.ToInt64(this.options[key], CultureInfo.InvariantCulture);
+            }
 
-		private IsolationLevel GetIsolationLevel(string key)
-		{
-			if (this.options.Contains(key))
-			{
-				string il = this.options[key].ToString().ToLower(CultureInfo.InvariantCulture);
+            return 0;
+        }
 
-				switch (il)
-				{
-					case "readcommitted":
-						return IsolationLevel.ReadCommitted;
+        private IsolationLevel GetIsolationLevel(string key)
+        {
+            if (this.options.Contains(key))
+            {
+                string il = this.options[key].ToString().ToLower(CultureInfo.InvariantCulture);
 
-					case "readuncommitted":
-						return IsolationLevel.ReadUncommitted;
+                switch (il)
+                {
+                    case "readcommitted":
+                        return IsolationLevel.ReadCommitted;
 
-					case "repeatableread":
-						return IsolationLevel.RepeatableRead;
+                    case "readuncommitted":
+                        return IsolationLevel.ReadUncommitted;
 
-					case "serializable":
-						return IsolationLevel.Serializable;
+                    case "repeatableread":
+                        return IsolationLevel.RepeatableRead;
 
-					case "chaos":
-						return IsolationLevel.Chaos;
+                    case "serializable":
+                        return IsolationLevel.Serializable;
+
+                    case "chaos":
+                        return IsolationLevel.Chaos;
 
                     case "snapshot":
                         return IsolationLevel.Snapshot;
 
-					case "unspecified":
-						return IsolationLevel.Unspecified;
-				}
-			}
+                    case "unspecified":
+                        return IsolationLevel.Unspecified;
+                }
+            }
 
-			return IsolationLevel.ReadCommitted;
-		}
+            return IsolationLevel.ReadCommitted;
+        }
 
-		private void CheckIsolationLevel()
-		{
-			string il = this.options["isolation level"].ToString().ToLower(CultureInfo.InvariantCulture);
+        private void CheckIsolationLevel()
+        {
+            string il = this.options["isolation level"].ToString().ToLower(CultureInfo.InvariantCulture);
 
-			switch (il)
-			{
-				case "readcommitted":
-				case "readuncommitted":
-				case "repeatableread":
-				case "serializable":
-				case "chaos":
-				case "unspecified":
+            switch (il)
+            {
+                case "readcommitted":
+                case "readuncommitted":
+                case "repeatableread":
+                case "serializable":
+                case "chaos":
+                case "unspecified":
                 case "snapshot":
-					break;
+                    break;
 
-				default:
-					throw new ArgumentException("Specified Isolation Level is not valid.");
-			}
-		}
+                default:
+                    throw new ArgumentException("Specified Isolation Level is not valid.");
+            }
+        }
 
         private string UnquoteString(string value)
         {
@@ -579,6 +590,6 @@ namespace FirebirdSql.Data.FirebirdClient
             return unquoted;
         }
 
-		#endregion
-	}
+        #endregion
+    }
 }
