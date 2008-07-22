@@ -457,7 +457,8 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             const string dataDirectoryKeyword = "|DataDirectory|";
             string dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
-            return Regex.Replace(s, Regex.Escape(dataDirectoryKeyword), dataDirectoryLocation, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            string pattern = string.Format("{0}{1}?", Regex.Escape(dataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
+            return Regex.Replace(s, pattern, dataDirectoryLocation + Path.DirectorySeparatorChar, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         }
 
         private string GetString(string key)
