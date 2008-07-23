@@ -449,7 +449,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
             if (portNumber != -1)
             {
-                this.options["port"] = portNumber;
+                this.options["port number"] = portNumber;
             }
         }
 
