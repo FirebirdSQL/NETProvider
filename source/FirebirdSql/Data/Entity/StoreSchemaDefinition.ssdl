@@ -8,7 +8,7 @@
         SELECT
         TRIM(rdb$relation_name) as "Id"
         ,   null as "CatalogName"
-        ,   'Sirebird' as "SchemaName" 
+        ,   'Firebird' as "SchemaName" 
         ,   TRIM(rdb$relation_name) as "Name"
         FROM
         rdb$relations
@@ -45,7 +45,10 @@
         WHEN 12 THEN 'date'
         WHEN 13 THEN 'time'
         WHEN 35 THEN 'timestamp'
-        WHEN 261 THEN 'blob'
+        WHEN 261 THEN CASE f.rdb$field_sub_type
+          WHEN 1 THEN 'clob'
+          ELSE 'blob'
+        END
         WHEN 37 THEN 'varchar'
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
@@ -118,7 +121,10 @@
         WHEN 12 THEN 'date'
         WHEN 13 THEN 'time'
         WHEN 35 THEN 'timestamp'
-        WHEN 261 THEN 'blob'
+        WHEN 261 THEN CASE f.rdb$field_sub_type
+          WHEN 1 THEN 'clob'
+          ELSE 'blob'
+        END
         WHEN 37 THEN 'varchar'
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
@@ -175,7 +181,10 @@
         WHEN 12 THEN 'date'
         WHEN 13 THEN 'time'
         WHEN 35 THEN 'timestamp'
-        WHEN 261 THEN 'blob'
+        WHEN 261 THEN CASE fa.rdb$field_sub_type
+          WHEN 1 THEN 'clob'
+          ELSE 'blob'
+        END
         WHEN 37 THEN 'varchar'
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
@@ -228,7 +237,10 @@
         WHEN 12 THEN 'date'
         WHEN 13 THEN 'time'
         WHEN 35 THEN 'timestamp'
-        WHEN 261 THEN 'blob'
+        WHEN 261 THEN CASE fa.rdb$field_sub_type
+          WHEN 1 THEN 'clob'
+          ELSE 'blob'
+        END
         WHEN 37 THEN 'varchar'
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
@@ -293,7 +305,10 @@
         WHEN 12 THEN 'date'
         WHEN 13 THEN 'time'
         WHEN 35 THEN 'timestamp'
-        WHEN 261 THEN 'blob'
+        WHEN 261 THEN CASE f.rdb$field_sub_type
+          WHEN 1 THEN 'clob'
+          ELSE 'blob'
+        END
         WHEN 37 THEN 'varchar'
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'

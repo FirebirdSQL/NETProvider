@@ -62,16 +62,16 @@ PROCESS
         <FixedLength DefaultValue="false" Constant="true" />
       </FacetDescriptions>
     </Type>
-    <!--<Type Name="varchar_max" PrimitiveTypeKind="String">
-      <FacetDescriptions>
-        <MaxLength DefaultValue="32765" Constant="true" />
-        <Unicode DefaultValue="true" Constant="false" />
-        <FixedLength DefaultValue="false" Constant="true" />
-      </FacetDescriptions>
-    </Type>-->
     <Type Name="blob" PrimitiveTypeKind="Binary">
       <FacetDescriptions>
         <MaxLength DefaultValue="2147483647" Constant="true" />
+        <FixedLength DefaultValue="false" Constant="true" />
+      </FacetDescriptions>
+    </Type>
+    <Type Name="clob" PrimitiveTypeKind="String">
+      <FacetDescriptions>
+        <MaxLength DefaultValue="2147483647" Constant="true" />
+        <Unicode DefaultValue="true" Constant="false" />
         <FixedLength DefaultValue="false" Constant="true" />
       </FacetDescriptions>
     </Type>

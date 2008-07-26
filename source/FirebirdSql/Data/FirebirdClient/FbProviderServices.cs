@@ -305,6 +305,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     return GetBinaryDbType(type);
 
                 case PrimitiveTypeKind.String:
+#warning clob
                     size = GetParameterSize(type, isOutParam);
                     return GetStringDbType(type);
 
@@ -346,10 +347,11 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         /// <summary>
-        /// Chooses the appropriate SqlDbType for the given string type.
+        /// Chooses the appropriate FbDbType for the given string type.
         /// </summary>
         private static FbDbType GetStringDbType(TypeUsage type)
         {
+#warning clob
             Debug.Assert(type.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType &&
                 PrimitiveTypeKind.String == ((PrimitiveType)type.EdmType).PrimitiveTypeKind, "only valid for string type");
 
@@ -381,7 +383,7 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         /// <summary>
-        /// Chooses the appropriate SqlDbType for the given binary type.
+        /// Chooses the appropriate FbDbType for the given binary type.
         /// </summary>
         private static FbDbType GetBinaryDbType(TypeUsage type)
         {
@@ -389,11 +391,11 @@ namespace FirebirdSql.Data.FirebirdClient
                 PrimitiveTypeKind.Binary == ((PrimitiveType)type.EdmType).PrimitiveTypeKind, "only valid for binary type");
 
             // Specific type depends on whether the binary value is fixed length. By default, assume variable length.
-            bool fixedLength;
-            if (!MetadataHelpers.TryGetIsFixedLength(type, out fixedLength))
-            {
-                fixedLength = false;
-            }
+            //bool fixedLength;
+            //if (!MetadataHelpers.TryGetIsFixedLength(type, out fixedLength))
+            //{
+            //    fixedLength = false;
+            //}
 
             return FbDbType.Binary;
         }
