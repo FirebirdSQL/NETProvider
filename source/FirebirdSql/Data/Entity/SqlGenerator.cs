@@ -1525,13 +1525,8 @@ namespace FirebirdSql.Data.Entity
         /// <returns><see cref="SqlBuilder"/></returns>
         public override ISqlFragment Visit(DbNullExpression e)
         {
-#warning Review this
             SqlBuilder result = new SqlBuilder();
-            // always cast nulls - sqlserver doesn't like case expressions where the "then" clause is null
-            result.Append("CAST(NULL AS ");
-            TypeUsage type = e.ResultType;
-            result.Append(GetSqlPrimitiveType(type));
-            result.Append(")");
+            result.Append("NULL");
             return result;
         }
 
