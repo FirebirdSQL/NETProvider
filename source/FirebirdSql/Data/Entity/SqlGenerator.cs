@@ -3731,10 +3731,8 @@ namespace FirebirdSql.Data.Entity
             }
             else
             {
-                // Should we actually support this?
-#warning DBO not in FB
-                result.Append(QuoteIdentifier((string)function.MetadataProperties["Schema"].Value ?? "dbo"));
-                result.Append(".");
+                //result.Append(QuoteIdentifier((string)function.MetadataProperties["Schema"].Value ?? "dbo"));
+                //result.Append(".");
                 result.Append(QuoteIdentifier(storeFunctionName));
             }
         }
