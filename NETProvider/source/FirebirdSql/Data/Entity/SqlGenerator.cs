@@ -740,11 +740,18 @@ namespace FirebirdSql.Data.Entity
         public override ISqlFragment Visit(DbCastExpression e)
         {
             SqlBuilder result = new SqlBuilder();
-            result.Append(" CAST( ");
-            result.Append(e.Argument.Accept(this));
-            result.Append(" AS ");
-            result.Append(GetSqlPrimitiveType(e.ResultType));
-            result.Append(")");
+            string sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType); 
+            
+            switch (sqlPrimitiveType.ToLowerInvariant())
+            {
+                 default:
+                    result.Append(" CAST( ");
+                    result.Append(e.Argument.Accept(this));
+                    result.Append(" AS ");
+                    result.Append(sqlPrimitiveType);
+                    result.Append(")");
+                    break;
+            }
 
             return result;
         }
@@ -3335,6 +3342,7 @@ namespace FirebirdSql.Data.Entity
                     throw new NotSupportedException("PrimitiveTypeKind.Binary");
 
                 case PrimitiveTypeKind.String:
+#warning clob
                     isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.UnicodeFacetName, true);
                     isFixedLength = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.FixedLengthFacetName, false);
                     maxLength = MetadataHelpers.GetFacetValueOrDefault<int>(type, MetadataHelpers.MaxLengthFacetName, Int32.MinValue);

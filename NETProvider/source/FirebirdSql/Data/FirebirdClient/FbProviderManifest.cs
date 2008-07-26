@@ -205,12 +205,6 @@ namespace FirebirdSql.Data.FirebirdClient
                     isUnicode = true; //TODO: hardcoded
                     isFixedLen = false;
                     break;
-                //case "varchar_max":
-                //    newPrimitiveTypeKind = PrimitiveTypeKind.String;
-                //    isUnbounded = true;
-                //    isUnicode = true; //TODO: hardcoded
-                //    isFixedLen = false;
-                //    break;
 
                 case "char":
                     newPrimitiveTypeKind = PrimitiveTypeKind.String;
@@ -226,9 +220,16 @@ namespace FirebirdSql.Data.FirebirdClient
                 case "time":
                     return TypeUsage.CreateTimeTypeUsage(edmPrimitiveType, null);
 
-                case "binary":
+                case "blob":
                     newPrimitiveTypeKind = PrimitiveTypeKind.Binary;
                     isUnbounded = true;
+                    isFixedLen = false;
+                    break;     
+          
+                case "clob":
+                    newPrimitiveTypeKind = PrimitiveTypeKind.String;
+                    isUnbounded = true;
+                    isUnicode = true; //TODO: hardcoded
                     isFixedLen = false;
                     break;
 
@@ -350,7 +351,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         return tu;
                     }
 
-                case PrimitiveTypeKind.String: // char, varchar
+                case PrimitiveTypeKind.String: // char, varchar, text blob
                     {
                         bool isUnicode = null == facets[MetadataHelpers.UnicodeFacetName].Value || (bool)facets[MetadataHelpers.UnicodeFacetName].Value;
                         bool isFixedLength = null != facets[MetadataHelpers.FixedLengthFacetName].Value && (bool)facets[MetadataHelpers.FixedLengthFacetName].Value;
@@ -372,7 +373,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             {
                                 if (isMaxLength)
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], true, false);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["clob"], true, false);
                                 }
                                 else
                                 {
@@ -390,7 +391,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             {
                                 if (isMaxLength)
                                 {
-                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["varchar"], false, false);
+                                    tu = TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["clob"], false, false);
                                 }
                                 else
                                 {
