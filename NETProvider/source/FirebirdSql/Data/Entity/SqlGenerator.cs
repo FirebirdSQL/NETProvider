@@ -283,7 +283,6 @@ namespace FirebirdSql.Data.Entity
         static private readonly Dictionary<string, FunctionHandler> _builtInFunctionHandlers = InitializeBuiltInFunctionHandlers();
         static private readonly Dictionary<string, FunctionHandler> _canonicalFunctionHandlers = InitializeCanonicalFunctionHandlers();
         static private readonly Dictionary<string, string> _functionNameToOperatorDictionary = InitializeFunctionNameToOperatorDictionary();
-        static private readonly Dictionary<string, object> _datepartKeywords = InitializeDatepartKeywords();
         static private readonly char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
         private delegate ISqlFragment FunctionHandler(SqlGenerator sqlgen, DbFunctionExpression functionExpr);
@@ -294,12 +293,7 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private static Dictionary<string, FunctionHandler> InitializeBuiltInFunctionHandlers()
         {
-            Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(5, StringComparer.Ordinal);
-            //functionHandlers.Add("concat", HandleConcatFunction);
-            //functionHandlers.Add("dateadd", HandleDatepartDateFunction);
-            //functionHandlers.Add("datediff", HandleDatepartDateFunction);
-            //functionHandlers.Add("datename", HandleDatepartDateFunction);
-            //functionHandlers.Add("datepart", HandleDatepartDateFunction);
+            Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(0, StringComparer.Ordinal);
             return functionHandlers;
         }
 
@@ -354,51 +348,6 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("BitwiseXor", HandleCanonicalFunctionBitwiseXor);
 
             return functionHandlers;
-        }
-
-        /// <summary>
-        /// Valid datepart values
-        /// </summary>
-        /// <returns></returns>
-        private static Dictionary<string, object> InitializeDatepartKeywords()
-        {
-            #region Datepart Keywords
-            //
-            // valid datepart values
-            //
-            Dictionary<string, object> datepartKeywords = new Dictionary<string, object>(30, StringComparer.Ordinal);
-            //datepartKeywords.Add("d", null);
-            //datepartKeywords.Add("day", null);
-            //datepartKeywords.Add("dayofyear", null);
-            //datepartKeywords.Add("dd", null);
-            //datepartKeywords.Add("dw", null);
-            //datepartKeywords.Add("dy", null);
-            //datepartKeywords.Add("hh", null);
-            //datepartKeywords.Add("hour", null);
-            //datepartKeywords.Add("m", null);
-            //datepartKeywords.Add("mi", null);
-            //datepartKeywords.Add("millisecond", null);
-            //datepartKeywords.Add("minute", null);
-            //datepartKeywords.Add("mm", null);
-            //datepartKeywords.Add("month", null);
-            //datepartKeywords.Add("ms", null);
-            //datepartKeywords.Add("n", null);
-            //datepartKeywords.Add("q", null);
-            //datepartKeywords.Add("qq", null);
-            //datepartKeywords.Add("quarter", null);
-            //datepartKeywords.Add("s", null);
-            //datepartKeywords.Add("second", null);
-            //datepartKeywords.Add("ss", null);
-            //datepartKeywords.Add("week", null);
-            //datepartKeywords.Add("weekday", null);
-            //datepartKeywords.Add("wk", null);
-            //datepartKeywords.Add("ww", null);
-            //datepartKeywords.Add("y", null);
-            //datepartKeywords.Add("year", null);
-            //datepartKeywords.Add("yy", null);
-            //datepartKeywords.Add("yyyy", null);
-            return datepartKeywords;
-            #endregion
         }
 
         /// <summary>
@@ -2415,7 +2364,7 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private bool IsSpecialBuiltInFunction(DbFunctionExpression e)
         {
-            return IsBuiltinFunction(e.Function) && _builtInFunctionHandlers.ContainsKey(e.Function.Name);
+            return IsBuiltInFunction(e.Function) && _builtInFunctionHandlers.ContainsKey(e.Function.Name);
         }
 
         /// <summary>
@@ -2566,62 +2515,6 @@ namespace FirebirdSql.Data.Entity
             }
             return result;
         }
-
-        ///// <summary>
-        ///// Handles special case in which datapart 'type' parameter is present. all the functions
-        ///// handles here have *only* the 1st parameter as datepart. datepart value is passed along
-        ///// the QP as string and has to be expanded as TSQL keyword.
-        ///// </summary>
-        ///// <param name="sqlgen"></param>
-        ///// <param name="e"></param>
-        ///// <returns></returns>
-        //private static ISqlFragment HandleDatepartDateFunction(SqlGenerator sqlgen, DbFunctionExpression e)
-        //{
-        //    Debug.Assert(e.Arguments.Count > 0, "e.Arguments.Count > 0");
-
-        //    DbConstantExpression constExpr = e.Arguments[0] as DbConstantExpression;
-        //    if (null == constExpr)
-        //    {
-        //        throw new InvalidOperationException(String.Format("DATEPART argument to function '{0}.{1}' must be a literal string", e.Function.NamespaceName, e.Function.Name));
-        //    }
-
-        //    string datepart = constExpr.Value as string;
-        //    if (null == datepart)
-        //    {
-        //        throw new InvalidOperationException(String.Format("DATEPART argument to function '{0}.{1}' must be a literal string", e.Function.NamespaceName, e.Function.Name));
-        //    }
-
-        //    SqlBuilder result = new SqlBuilder();
-
-        //    //
-        //    // check if datepart value is valid
-        //    //
-        //    if (!_datepartKeywords.ContainsKey(datepart))
-        //    {
-        //        throw new InvalidOperationException(String.Format("{0}' is not a valid value for DATEPART argument in '{1}.{2}' function", datepart, e.Function.NamespaceName, e.Function.Name));
-        //    }
-
-        //    //
-        //    // finaly, expand the function name
-        //    //
-        //    sqlgen.WriteFunctionName(result, e.Function);
-        //    result.Append("(");
-
-        //    // expand the datepart literal as tsql kword
-        //    result.Append(datepart);
-        //    string separator = ", ";
-
-        //    // expand remaining arguments
-        //    for (int i = 1; i < e.Arguments.Count; i++)
-        //    {
-        //        result.Append(separator);
-        //        result.Append(e.Arguments[i].Accept(sqlgen));
-        //    }
-
-        //    result.Append(")");
-
-        //    return result;
-        //}
 
         #region String Canonical Functions
         /// <summary>
@@ -3676,7 +3569,7 @@ namespace FirebirdSql.Data.Entity
         /// </summary>
         /// <param name="function"></param>
         /// <returns></returns>
-        private static bool IsBuiltinFunction(EdmFunction function)
+        private static bool IsBuiltInFunction(EdmFunction function)
         {
             return MetadataHelpers.TryGetValueForMetadataProperty<bool>(function, "BuiltInAttribute");
         }
@@ -3698,7 +3591,7 @@ namespace FirebirdSql.Data.Entity
             // If the function is a builtin (ie) the BuiltIn attribute has been
             // specified, then, the function name should not be quoted; additionally,
             // no namespace should be used.
-            if (IsBuiltinFunction(function))
+            if (IsBuiltInFunction(function))
             {
                 if (function.NamespaceName == "Edm")
                 {
