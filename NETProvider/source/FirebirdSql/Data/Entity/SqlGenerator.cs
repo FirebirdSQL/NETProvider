@@ -1158,11 +1158,9 @@ namespace FirebirdSql.Data.Entity
         /// </summary>
         /// <param name="e"></param>
         /// <returns>A <see cref="SqlSelectStatement"/></returns>
-#warning Review this
         public override ISqlFragment Visit(DbGroupByExpression e)
         {
             Symbol fromSymbol;
-            //SqlSelectStatement result = VisitInputExpression(e.Input.Expression,
             SqlSelectStatement innerQuery = VisitInputExpression(e.Input.Expression,
                 e.Input.VariableName, e.Input.VariableType, out fromSymbol);
 
@@ -1185,7 +1183,7 @@ namespace FirebirdSql.Data.Entity
             // so, we do not close it in between.
             RowType groupByType = MetadataHelpers.GetEdmType<RowType>(MetadataHelpers.GetEdmType<CollectionType>(e.ResultType).TypeUsage);
 
-            //Whenever there exists at least one aggregate with an argument that is not simply a PropertyExpression 
+            // Whenever there exists at least one aggregate with an argument that is not simply a PropertyExpression 
             // over a VarRefExpression, we need a nested query in which we alias the arguments to the aggregates.
             bool needsInnerQuery = NeedsInnerQuery(e.Aggregates);
 
@@ -1886,18 +1884,7 @@ namespace FirebirdSql.Data.Entity
                 throw new NotSupportedException();
             }
 
-            //The only aggregate function with different name is Big_Count
-            //Note: If another such function is to be added, a dictionary should be created
-#warning What about this?
-            if (MetadataHelpers.IsCanonicalFunction(functionAggregate.Function)
-                && String.Equals(functionAggregate.Function.Name, "BigCount", StringComparison.Ordinal))
-            {
-                aggregateResult.Append("COUNT_BIG");
-            }
-            else
-            {
-                WriteFunctionName(aggregateResult, functionAggregate.Function);
-            }
+            WriteFunctionName(aggregateResult, functionAggregate.Function);
 
             aggregateResult.Append("(");
 
