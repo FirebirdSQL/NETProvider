@@ -3051,15 +3051,14 @@ namespace FirebirdSql.Data.Entity
         /// <param name="sortKeys"></param>
         void AddSortKeys(SqlBuilder orderByClause, IList<DbSortClause> sortKeys)
         {
-            string separator = "";
+            string separator = string.Empty;
             foreach (DbSortClause sortClause in sortKeys)
             {
                 orderByClause.Append(separator);
                 orderByClause.Append(sortClause.Expression.Accept(this));
                 Debug.Assert(sortClause.Collation != null);
-                if (!String.IsNullOrEmpty(sortClause.Collation))
+                if (!string.IsNullOrEmpty(sortClause.Collation))
                 {
-#warning What about this?
                     orderByClause.Append(" COLLATE ");
                     orderByClause.Append(sortClause.Collation);
                 }
