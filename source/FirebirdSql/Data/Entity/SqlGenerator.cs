@@ -689,11 +689,11 @@ namespace FirebirdSql.Data.Entity
         public override ISqlFragment Visit(DbCastExpression e)
         {
             SqlBuilder result = new SqlBuilder();
-            string sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType); 
-            
+            string sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType);
+
             switch (sqlPrimitiveType.ToLowerInvariant())
             {
-                 default:
+                default:
                     result.Append(" CAST( ");
                     result.Append(e.Argument.Accept(this));
                     result.Append(" AS ");
@@ -795,7 +795,7 @@ namespace FirebirdSql.Data.Entity
 
                     case PrimitiveTypeKind.Decimal:
                         string strDecimal = ((Decimal)e.Value).ToString(CultureInfo.InvariantCulture);
-                        
+
                         int pointPosition = strDecimal.IndexOf('.');
 
                         FacetDescription precisionFacetDescription;
@@ -1833,12 +1833,24 @@ namespace FirebirdSql.Data.Entity
                 throw new NotSupportedException();
             }
 
-            WriteFunctionName(aggregateResult, functionAggregate.Function);
+            if (MetadataHelpers.IsCanonicalFunction(functionAggregate.Function) && string.Equals(functionAggregate.Function.Name, "StDev", StringComparison.Ordinal))
+            {
+                throw new NotSupportedException();
+            }
+
+            // what about some rewrite of property and continuing normal to WriteFunctionName?
+            if (MetadataHelpers.IsCanonicalFunction(functionAggregate.Function) && string.Equals(functionAggregate.Function.Name, "BigCount", StringComparison.Ordinal))
+            {
+                aggregateResult.Append("COUNT");
+            }
+            else
+            {
+                WriteFunctionName(aggregateResult, functionAggregate.Function);
+            }
 
             aggregateResult.Append("(");
 
-            DbFunctionAggregate fnAggr = functionAggregate;
-            if ((null != fnAggr) && (fnAggr.Distinct))
+            if (functionAggregate.Distinct)
             {
                 aggregateResult.Append("DISTINCT ");
             }
@@ -3249,7 +3261,7 @@ namespace FirebirdSql.Data.Entity
                     preserveSeconds = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.PreserveSecondsFacetName, false);
                     typeName = preserveSeconds ? "TIMESTAMP" : "DATE";
                     break;
-                    
+
                 case PrimitiveTypeKind.Time:
                     typeName = "TIME";
                     break;
