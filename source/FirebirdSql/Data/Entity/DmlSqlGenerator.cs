@@ -259,8 +259,7 @@ namespace FirebirdSql.Data.Entity
             foreach (KeyValuePair<EdmMember, DbParameter> item in translator.MemberValues)
             {
                 startBlock.Append(separator);
-                //startBlock.Append(GenerateMemberSql(item.Key));
-                startBlock.Append(item.Value.ParameterName.Replace("@", "")); //quick fix
+                startBlock.Append(item.Value.ParameterName.Replace("@", ""));
                 startBlock.Append(" ");
                 startBlock.Append(SqlGenerator.GetSqlPrimitiveType(item.Key.TypeUsage));
                 startBlock.Append(" = ");
@@ -284,7 +283,9 @@ namespace FirebirdSql.Data.Entity
             startBlock.AppendLine(")");
             startBlock.AppendLine("as begin");
 
-            commandText.Replace("@", ":"); //hack
+            string newCommand = ChangeParamsToPSQLParams(commandText);
+            commandText.Remove(0, commandText.Length);
+            commandText.Insert(0, newCommand);
             commandText.Insert(0, startBlock.ToString());
 
             commandText.Append("returning ");
@@ -303,6 +304,12 @@ namespace FirebirdSql.Data.Entity
             commandText.AppendLine("end");
 
             Debug.WriteLine(commandText.ToString());
+        }
+
+        private static string ChangeParamsToPSQLParams( StringBuilder commandText)
+        {
+#warning Look for some faster way and some more reliable way
+            return new System.Text.RegularExpressions.Regex(@"@(p\d+)").Replace(commandText.ToString(), ":$1");
         }
 
         #endregion
