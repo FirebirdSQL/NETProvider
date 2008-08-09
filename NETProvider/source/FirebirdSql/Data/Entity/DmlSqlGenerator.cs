@@ -75,9 +75,12 @@ namespace FirebirdSql.Data.Entity
                 {
                     commandText.Append(", ");
                 }
+
                 setClause.Property.Accept(translator);
                 commandText.Append(" = ");
                 setClause.Value.Accept(translator);
+
+                translator.RegisterMemberValue(setClause.Property, setClause.Value);
             }
 
             if (first)
@@ -172,14 +175,6 @@ namespace FirebirdSql.Data.Entity
                 setClause.Value.Accept(translator);
 
                 translator.RegisterMemberValue(setClause.Property, setClause.Value);
-
-                //fix the param
-                if (tree.Returning != null)
-                {
-                    string parameterName = translator.Parameters[translator.Parameters.Count - 1].ParameterName;
-                    string fieldName = parameterName.Replace("@", ":");
-                    commandText.Replace(parameterName, fieldName, commandText.Length - parameterName.Length, parameterName.Length);
-                }
             }
             commandText.AppendLine(")");
 
@@ -289,6 +284,7 @@ namespace FirebirdSql.Data.Entity
             startBlock.AppendLine(")");
             startBlock.AppendLine("as begin");
 
+            commandText.Replace("@", ":"); //hack
             commandText.Insert(0, startBlock.ToString());
 
             commandText.Append("returning ");
