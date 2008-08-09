@@ -176,8 +176,9 @@ namespace FirebirdSql.Data.Entity
                 //fix the param
                 if (tree.Returning != null)
                 {
-                    System.Text.RegularExpressions.Regex re = new System.Text.RegularExpressions.Regex("(.+)(@)(.+?)$");
-                    commandText = new StringBuilder(re.Replace(commandText.ToString(), "$1:$3"));
+                    string parameterName = translator.Parameters[translator.Parameters.Count - 1].ParameterName;
+                    string fieldName = parameterName.Replace("@", ":");
+                    commandText.Replace(parameterName, fieldName, commandText.Length - parameterName.Length, parameterName.Length);
                 }
             }
             commandText.AppendLine(")");
