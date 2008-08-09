@@ -305,7 +305,6 @@ namespace FirebirdSql.Data.FirebirdClient
                     return GetBinaryDbType(type);
 
                 case PrimitiveTypeKind.String:
-#warning clob
                     size = GetParameterSize(type, isOutParam);
                     return GetStringDbType(type);
 
@@ -351,7 +350,6 @@ namespace FirebirdSql.Data.FirebirdClient
         /// </summary>
         private static FbDbType GetStringDbType(TypeUsage type)
         {
-#warning clob
             Debug.Assert(type.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType &&
                 PrimitiveTypeKind.String == ((PrimitiveType)type.EdmType).PrimitiveTypeKind, "only valid for string type");
 
@@ -376,7 +374,19 @@ namespace FirebirdSql.Data.FirebirdClient
             }
             else
             {
-                dbType = (unicode ? FbDbType.VarChar : FbDbType.VarChar);
+                int maxLength;
+                if (!MetadataHelpers.TryGetMaxLength(type, out maxLength))
+                {
+                    maxLength = (unicode ? FbProviderManifest.nvarcharMaxSize : FbProviderManifest.varcharMaxSize);
+                }
+                if (maxLength > (unicode ? FbProviderManifest.nvarcharMaxSize : FbProviderManifest.varcharMaxSize))
+                {
+                    dbType = FbDbType.Text;
+                }
+                else
+                {
+                    dbType = (unicode ? FbDbType.VarChar : FbDbType.VarChar);
+                }
             }
 
             return dbType;

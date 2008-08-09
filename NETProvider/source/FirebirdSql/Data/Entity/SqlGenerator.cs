@@ -3176,7 +3176,7 @@ namespace FirebirdSql.Data.Entity
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private string GetSqlPrimitiveType(TypeUsage type)
+        internal static string GetSqlPrimitiveType(TypeUsage type)
         {
             PrimitiveType primitiveType = MetadataHelpers.GetEdmType<PrimitiveType>(type);
 
@@ -3228,7 +3228,6 @@ namespace FirebirdSql.Data.Entity
                     throw new NotSupportedException("PrimitiveTypeKind.Binary");
 
                 case PrimitiveTypeKind.String:
-#warning clob
                     isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.UnicodeFacetName, true);
                     isFixedLength = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.FixedLengthFacetName, false);
                     maxLength = MetadataHelpers.GetFacetValueOrDefault<int>(type, MetadataHelpers.MaxLengthFacetName, Int32.MinValue);
@@ -3252,7 +3251,14 @@ namespace FirebirdSql.Data.Entity
                     }
                     else
                     {
-                        typeName = (isUnicode ? "VARCHAR(" : "VARCHAR(") + length + ")";
+                        if (int.Parse(length) > (isUnicode ? FbProviderManifest.nvarcharMaxSize : FbProviderManifest.varcharMaxSize))
+                        {
+                            typeName = "BLOB SUB_TYPE TEXT";
+                        }
+                        else
+                        {
+                            typeName = (isUnicode ? "VARCHAR(" : "VARCHAR(") + length + ")";
+                        }
                     }
                     break;
 
