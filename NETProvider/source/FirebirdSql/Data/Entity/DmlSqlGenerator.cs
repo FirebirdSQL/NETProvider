@@ -53,9 +53,9 @@ namespace FirebirdSql.Data.Entity
 
         internal static string GenerateUpdateSql(DbUpdateCommandTree tree, out List<DbParameter> parameters)
         {
-            StringBuilder           commandText = new StringBuilder(commandTextBuilderInitialCapacity);
-            ExpressionTranslator    translator  = new ExpressionTranslator(commandText, tree, null != tree.Returning);
-            bool                    first       = true;
+            StringBuilder commandText = new StringBuilder(commandTextBuilderInitialCapacity);
+            ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
+            bool first = true;
 
             // update [schemaName].[tableName]
             commandText.Append("update ");
@@ -71,9 +71,9 @@ namespace FirebirdSql.Data.Entity
                 {
                     first = false;
                 }
-                else 
-                { 
-                    commandText.Append(", "); 
+                else
+                {
+                    commandText.Append(", ");
                 }
                 setClause.Property.Accept(translator);
                 commandText.Append(" = ");
@@ -104,22 +104,22 @@ namespace FirebirdSql.Data.Entity
             commandText.AppendLine();
 
             // generate returning sql
-            GenerateReturningSql(commandText, tree, translator, tree.Returning); 
+            GenerateReturningSql(commandText, tree, translator, tree.Returning);
 
-            parameters = translator.Parameters;          
+            parameters = translator.Parameters;
             return commandText.ToString();
         }
 
         internal static string GenerateDeleteSql(DbDeleteCommandTree tree, out List<DbParameter> parameters)
         {
-            StringBuilder           commandText = new StringBuilder(commandTextBuilderInitialCapacity);
-            ExpressionTranslator    translator  = new ExpressionTranslator(commandText, tree, false);
+            StringBuilder commandText = new StringBuilder(commandTextBuilderInitialCapacity);
+            ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, false);
 
             // delete [schemaName].[tableName]
             commandText.Append("delete from ");
             tree.Target.Expression.Accept(translator);
             commandText.AppendLine();
-            
+
             // where c1 = ... AND c2 = ...
             commandText.Append("where ");
             tree.Predicate.Accept(translator);
@@ -130,9 +130,9 @@ namespace FirebirdSql.Data.Entity
 
         internal static string GenerateInsertSql(DbInsertCommandTree tree, out List<DbParameter> parameters)
         {
-            StringBuilder           commandText = new StringBuilder(commandTextBuilderInitialCapacity);
-            ExpressionTranslator    translator  = new ExpressionTranslator(commandText, tree, null != tree.Returning);
-            bool                    first       = true;
+            StringBuilder commandText = new StringBuilder(commandTextBuilderInitialCapacity);
+            ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
+            bool first = true;
 
             // insert [schemaName].[tableName]
             commandText.Append("insert into ");
@@ -160,24 +160,32 @@ namespace FirebirdSql.Data.Entity
             commandText.Append("values (");
             foreach (DbSetClause setClause in tree.SetClauses)
             {
-                if (first) 
-                { 
-                    first = false; 
+                if (first)
+                {
+                    first = false;
                 }
-                else 
-                { 
-                    commandText.Append(", "); 
-                }               
+                else
+                {
+                    commandText.Append(", ");
+                }
+
                 setClause.Value.Accept(translator);
 
                 translator.RegisterMemberValue(setClause.Property, setClause.Value);
+
+                //fix the param
+                if (tree.Returning != null)
+                {
+                    System.Text.RegularExpressions.Regex re = new System.Text.RegularExpressions.Regex("(.+)(@)(.+?)$");
+                    commandText = new StringBuilder(re.Replace(commandText.ToString(), "$1:$3"));
+                }
             }
             commandText.AppendLine(")");
 
             // generate returning sql
             GenerateReturningSql(commandText, tree, translator, tree.Returning);
 
-            parameters = translator.Parameters;            
+            parameters = translator.Parameters;
             return commandText.ToString();
         }
 
@@ -216,61 +224,88 @@ namespace FirebirdSql.Data.Entity
         /// <param name="returning">Returning expression. If null, the method returns
         /// immediately without producing a SELECT statement.</param>
         private static void GenerateReturningSql(
-            StringBuilder               commandText, 
-            DbModificationCommandTree   tree,
-            ExpressionTranslator        translator, 
-            DbExpression                returning)
+            StringBuilder commandText,
+            DbModificationCommandTree tree,
+            ExpressionTranslator translator,
+            DbExpression returning)
         {
             // Nothing to do if there is no Returning expression
-            if (returning == null) 
-            { 
-                return; 
-            }
-            
-            bool identity = false;
-
-            // select
-            commandText.Append("select ");
-            returning.Accept(translator);
-            commandText.AppendLine();
-
-            // from
-            commandText.Append("from ");
-            tree.Target.Expression.Accept(translator);
-            commandText.AppendLine();
-
-            // where
-            commandText.Append("where @@ROWCOUNT > 0");
-            EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
-            
-            foreach (EdmMember keyMember in table.ElementType.KeyMembers)
+            if (returning == null)
             {
-                commandText.Append(" and ");
-                commandText.Append(GenerateMemberSql(keyMember));
-                commandText.Append(" = ");
-
-                // retrieve member value sql. the translator remembers member values
-                // as it constructs the DML statement (which precedes the "returning"
-                // SQL)
-                DbParameter value;           
-                if (translator.MemberValues.TryGetValue(keyMember, out value))
-                {
-                    commandText.Append(value.ParameterName);
-                }
-                else
-                {
-                    // if no value is registered for the key member, it means it is an identity
-                    // which can be retrieved using the scope_identity() function
-                    if (identity)
-                    {
-                        // there can be only one server generated key
-                        throw new NotSupportedException(string.Format("Server generated keys are only supported for identity columns. More than one key column is marked as server generated in table '{0}'.", table.Name));
-                    }
-
-                    commandText.Append("scope_identity()");
-                    identity = true;
-                }
+                return;
             }
+
+            /// for the V1 only one row is changed per command
+
+            EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
+            List<EdmMember> columnsToFetch = new List<EdmMember>();
+
+            foreach (EdmMember tableColumn in table.ElementType.Members)
+            {
+                const string StoreGeneratedPatternFacetName = "StoreGeneratedPattern";
+
+                Facet item = null;
+                if (tableColumn.TypeUsage.Facets.TryGetValue(StoreGeneratedPatternFacetName, false, out item) && ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed)
+                {
+                    columnsToFetch.Add(tableColumn);
+                }
+                //else if (table.ElementType.KeyMembers.Contains(tableColumn))
+                //{
+                //    columnsToFetch.Add(tableColumn);
+                //}
+            }
+
+            StringBuilder startBlock = new StringBuilder();
+            string separator = string.Empty;
+
+            startBlock.AppendLine("execute block (");
+            separator = string.Empty;
+            foreach (KeyValuePair<EdmMember, DbParameter> item in translator.MemberValues)
+            {
+                startBlock.Append(separator);
+                //startBlock.Append(GenerateMemberSql(item.Key));
+                startBlock.Append(item.Value.ParameterName.Replace("@", "")); //quick fix
+                startBlock.Append(" ");
+                startBlock.Append(SqlGenerator.GetSqlPrimitiveType(item.Key.TypeUsage));
+                startBlock.Append(" = ");
+                startBlock.Append(item.Value.ParameterName);
+
+                separator = ", ";
+            }
+            startBlock.AppendLine(") ");
+
+            startBlock.AppendLine("returns (");
+            separator = string.Empty;
+            foreach (EdmMember m in columnsToFetch)
+            {
+                startBlock.Append(separator);
+                startBlock.Append(GenerateMemberSql(m));
+                startBlock.Append(" ");
+                startBlock.Append(SqlGenerator.GetSqlPrimitiveType(m.TypeUsage));
+
+                separator = ", ";
+            }
+            startBlock.AppendLine(")");
+            startBlock.AppendLine("as begin");
+
+            commandText.Insert(0, startBlock.ToString());
+
+            commandText.Append("returning ");
+            separator = string.Empty;
+            foreach (EdmMember m in columnsToFetch)
+            {
+                commandText.Append(separator);
+                commandText.Append(GenerateMemberSql(m));
+                commandText.Append(" into ");
+                commandText.Append(":" + GenerateMemberSql(m));
+
+                separator = ", ";
+            }
+            commandText.AppendLine(";");
+            commandText.AppendLine("suspend;");
+            commandText.AppendLine("end");
+
+            Debug.WriteLine(commandText.ToString());
         }
 
         #endregion
