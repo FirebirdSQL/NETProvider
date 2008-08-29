@@ -446,8 +446,6 @@ namespace FirebirdSql.Data.Entity
         /// <returns>The string representing the SQL to be executed.</returns>
         private string GenerateSql(DbQueryCommandTree tree)
         {
-            tree.Validate();
-
             selectStatementStack = new Stack<SqlSelectStatement>();
             isParentAJoinStack = new Stack<bool>();
 
@@ -492,9 +490,7 @@ namespace FirebirdSql.Data.Entity
         /// </summary>
         private string GenerateFunctionSql(DbFunctionCommandTree tree, out CommandType commandType)
         {
-            tree.Validate();
-
-            EdmFunction function = tree.Function;
+            EdmFunction function = tree.EdmFunction;
 
             // We expect function to always have these properties
             string userCommandText = (string)function.MetadataProperties["CommandTextAttribute"].Value;
@@ -1024,11 +1020,6 @@ namespace FirebirdSql.Data.Entity
         /// <returns>A <see cref="SqlBuilder"/></returns>
         public override ISqlFragment Visit(DbFunctionExpression e)
         {
-            if (e.IsLambda)
-            {
-                throw new NotSupportedException();
-            }
-
             //
             // check if function requires special case processing, if so, delegates to it
             //

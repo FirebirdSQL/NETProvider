@@ -63,25 +63,6 @@ namespace FirebirdSql.Data.FirebirdClient
         #endregion
 
         #region Properties
-
-        /// <summary>
-        /// Provider Invariant Name - this property will be removed in Entity Framework v1
-        /// Entity Framework SP1Beta does not use it, but it must be defined.
-        /// </summary>
-        public override string Provider
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        /// <summary>
-        /// Provider Manifest Token - this property will be removed in Entity Framework v1
-        /// Entity Framework SP1Beta does not use it, but it must be defined.
-        /// </summary>
-        public override string Token
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         #endregion
 
         internal static XmlReader GetProviderManifest()
