@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.FirebirdClient
             EdmFunction function = null;
             if (commandTree is DbFunctionCommandTree)
             {
-                function = ((DbFunctionCommandTree)commandTree).Function;
+                function = ((DbFunctionCommandTree)commandTree).EdmFunction;
             }
 
             // Now make sure we populate the command's parameters from the CQT's parameters:
