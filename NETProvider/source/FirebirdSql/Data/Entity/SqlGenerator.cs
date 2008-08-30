@@ -309,10 +309,10 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("NewGuid", HandleCanonicalFunctionNewGuid);
 
             //Math Canonical Functions
-            functionHandlers.Add("Round", HandleCanonicalFunctionRound);
             functionHandlers.Add("Abs", HandleCanonicalFunctionAbs);
             functionHandlers.Add("Ceiling", HandleCanonicalFunctionCeiling);
             functionHandlers.Add("Floor", HandleCanonicalFunctionFloor);
+            functionHandlers.Add("Round", HandleCanonicalFunctionRound);
 
             //String Canonical Functions
             functionHandlers.Add("Concat", HandleConcatFunction);
@@ -330,16 +330,19 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("Substring", HandleCanonicalFunctionSubstring);
 
             //Date and Time Canonical Functions
-            functionHandlers.Add("Year", HandleCanonicalFunctionDatepart);
-            functionHandlers.Add("Month", HandleCanonicalFunctionDatepart);
-            functionHandlers.Add("Day", HandleCanonicalFunctionDatepart);
-            functionHandlers.Add("Hour", HandleCanonicalFunctionDatepart);
-            functionHandlers.Add("Minute", HandleCanonicalFunctionDatepart);
-            functionHandlers.Add("Second", HandleCanonicalFunctionDatepart);
+            functionHandlers.Add("Year", HandleCanonicalFunctionExtract);
+            functionHandlers.Add("Month", HandleCanonicalFunctionExtract);
+            functionHandlers.Add("Day", HandleCanonicalFunctionExtract);
+            functionHandlers.Add("Hour", HandleCanonicalFunctionExtract);
+            functionHandlers.Add("Minute", HandleCanonicalFunctionExtract);
+            functionHandlers.Add("Second", HandleCanonicalFunctionExtract);
+            functionHandlers.Add("Millisecond", HandleCanonicalFunctionExtract);
             functionHandlers.Add("DateAdd", HandleCanonicalFunctionDateAdd);
             functionHandlers.Add("DateDiff", HandleCanonicalFunctionDateDiff);
-            functionHandlers.Add("GetDate", HandleCanonicalFunctionGetDate);
-            functionHandlers.Add("GetUtcDate", HandleCanonicalFunctionGetUtcDate); // not supported
+            functionHandlers.Add("CurrentDateTime", HandleCanonicalFunctionCurrentDateTime);
+            functionHandlers.Add("CurrentUtcDateTime", HandleCanonicalFunctionCurrentUtcDateTime); // not supported
+            functionHandlers.Add("CurrentDateTimeOffset", HandleCanonicalFunctionCurrentDateTimeOffset); // not supported
+            functionHandlers.Add("GetTotalOffsetMinutes", HandleCanonicalFunctionGetTotalOffsetMinutes); // not supported
 
             //Bitwise Canonical Functions
             functionHandlers.Add("BitwiseAnd", HandleCanonicalFunctionBitwiseAnd);
@@ -2645,12 +2648,22 @@ namespace FirebirdSql.Data.Entity
         #endregion
 
         #region Date and Time Canonical Functions
-        private static ISqlFragment HandleCanonicalFunctionGetUtcDate(SqlGenerator sqlgen, DbFunctionExpression e)
+        private static ISqlFragment HandleCanonicalFunctionCurrentUtcDateTime(SqlGenerator sqlgen, DbFunctionExpression e)
         {
             throw new NotSupportedException();
         }
 
-        private static ISqlFragment HandleCanonicalFunctionGetDate(SqlGenerator sqlgen, DbFunctionExpression e)
+        private static ISqlFragment HandleCanonicalFunctionCurrentDateTimeOffset(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            throw new NotSupportedException();
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionGetTotalOffsetMinutes(SqlGenerator sqlgen, DbFunctionExpression e)
+        {
+            throw new NotSupportedException();
+        }
+
+        private static ISqlFragment HandleCanonicalFunctionCurrentDateTime(SqlGenerator sqlgen, DbFunctionExpression e)
         {
             SqlBuilder result = new SqlBuilder();
             result.Append("CURRENT_TIMESTAMP");
@@ -2662,7 +2675,7 @@ namespace FirebirdSql.Data.Entity
         /// For example:
         ///     Year(date) -> EXTRACT(YEAR from date)
         /// </summary>
-        private static ISqlFragment HandleCanonicalFunctionDatepart(SqlGenerator sqlgen, DbFunctionExpression e)
+        private static ISqlFragment HandleCanonicalFunctionExtract(SqlGenerator sqlgen, DbFunctionExpression e)
         {
             SqlBuilder result = new SqlBuilder();
             result.Append("EXTRACT(");
