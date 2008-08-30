@@ -8,6 +8,10 @@ This project is supported by:
 
 The DDEX Provider for Firebird provides integration of FirebirdClient into Visual Studio. In order to use Firebird Client in Visual Studio, you have to perform these steps.
 
+0. Preinstallation steps.
+-------------------------
+Copy files from this archive to some place (must be accessible for VS). 
+
 1. Install FirebirdClient into the GAC.
 ---------------------------------------
 You can use gacutil utility to do this or to check whether it's correctly installed. The gacutil show you also the signature for assembly, that will be used later.
@@ -42,7 +46,7 @@ Note:
 
 3. Import registry file.
 ------------------------
-There's a couple of *.reg files in installation. There are files files for 32bit and for 64bit system, so select appropriate version for your system. There are also files with "Less" suffix and without it. The file with "Less" suffix is for systems without Visual Studio SDK (it's *not* the .NET FW SDK!) and it's probably the best choice for a lot of developers. The file without suffix can be used for Visual Studio with VS SDK installed. The registry file need be modified to set the correct paths. To do this, substitute %Path% in the file with path for the DDEX files (remember to backslash the backslash character).
+There's a couple of *.reg files in installation. There are files for 32bit and for 64bit system, so select appropriate version for your system. There are also files in "withSDK" directory. These can be used for Visual Studio with VS SDK installed. The files not in this directory are for systems without Visual Studio SDK (it's *not* the .NET FW SDK!) and it's probably the best choice for a lot of developers. The selected registry file needs be modified to set the correct paths. To do this, substitute %Path% in the file with path for the DDEX files where you copyied them in step 0 (remember to backslash the backslash character).
 
 IMPORTANT: The DDEX provider didn't work with Express editions of Visual Studio.
 
