@@ -1,12 +1,12 @@
-Visual Studio 2005 DDEX Provider for Firebird
-=============================================
+Visual Studio 2005/2008 DDEX Provider for Firebird
+==================================================
 
 This project is supported by:
 =============================
 
   Sean Leyne (Broadview Software)
 
-The DDEX Provider for Firebird provides integration of FirebirdClient into Visual Studio 2005. In order to use Firebird Client in Visual Studio, you have to perform these steps.
+The DDEX Provider for Firebird provides integration of FirebirdClient into Visual Studio. In order to use Firebird Client in Visual Studio, you have to perform these steps.
 
 1. Install FirebirdClient into the GAC.
 ---------------------------------------
@@ -44,6 +44,6 @@ Note:
 ------------------------
 There's a couple of *.reg files in installation. There are files files for 32bit and for 64bit system, so select appropriate version for your system. There are also files with "Less" suffix and without it. The file with "Less" suffix is for systems without Visual Studio SDK (it's *not* the .NET FW SDK!) and it's probably the best choice for a lot of developers. The file without suffix can be used for Visual Studio with VS SDK installed. The registry file need be modified to set the correct paths. To do this, substitute %Path% in the file with path for the DDEX files (remember to backslash the backslash character).
 
-IMPORTANT: The DDEX provider didn't work with Express editions of Visual Studio 2005.
+IMPORTANT: The DDEX provider didn't work with Express editions of Visual Studio.
 
 (If you want to build the sources you will need to have C# and C++ installed and VS SDK.)
