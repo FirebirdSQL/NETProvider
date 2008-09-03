@@ -460,9 +460,16 @@ namespace FirebirdSql.Data.FirebirdClient
         private string ExpandDataDirectory(string s)
         {
             const string dataDirectoryKeyword = "|DataDirectory|";
+#if (!NETCF)
             string dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
             string pattern = string.Format("{0}{1}?", Regex.Escape(dataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
             return Regex.Replace(s, pattern, dataDirectoryLocation + Path.DirectorySeparatorChar, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+#else
+            if (s.ToUpper(CultureInfo.InvariantCulture).IndexOf(dataDirectoryKeyword.ToUpper(CultureInfo.InvariantCulture)) != -1 )
+                throw new NotImplementedException();
+
+            return s;
+#endif
         }
 
         private string GetString(string key)
