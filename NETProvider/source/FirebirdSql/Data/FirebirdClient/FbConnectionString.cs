@@ -334,7 +334,11 @@ namespace FirebirdSql.Data.FirebirdClient
                     }
                     if (this.PacketSize < 512 || this.PacketSize > 32767)
                     {
+#if (!NETCF)
                         throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
+#else
+                        throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, "\r\n"));
+#endif
                     }
 
                     this.CheckIsolationLevel();
