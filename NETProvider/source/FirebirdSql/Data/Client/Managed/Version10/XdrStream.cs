@@ -678,7 +678,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                             if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
                                 svalue.Length > param.CharCount)
                             {
-                                throw new IscException(335544321);
+                                //throw new IscException(335544321);
+                                svalue = svalue.Substring(0, param.CharCount);
                             }
 
                             this.WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
@@ -695,10 +696,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							string svalue = param.DbValue.GetString().TrimEnd();
 
                             if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
-								svalue.Length > param.CharCount)
-							{
-								throw new IscException(335544321);
-							}
+                                svalue.Length > param.CharCount)
+                            {
+                                //throw new IscException(335544321);
+                                svalue = svalue.Substring(0, param.CharCount);
+                            }
 
                             byte[] data = param.Charset.GetBytes(svalue);
 
