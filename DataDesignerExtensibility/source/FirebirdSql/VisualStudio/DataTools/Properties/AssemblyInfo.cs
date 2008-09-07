@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("DDEX Provider for FirebirdClient")]
 [assembly: AssemblyDescription("DDEX Provider for FirebirdClient")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("FirebirdSQL")]
 [assembly: AssemblyProduct("DDEX Provider for FirebirdClient")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
@@ -26,6 +26,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("2.0.3.0")]
-[assembly: AssemblyFileVersion("2.0.3.0")]
+[assembly: AssemblyVersion("2.0.4.0")]
+[assembly: AssemblyFileVersion("2.0.4.0")]
 [assembly: GuidAttribute("8d9358ba-ccc9-4169-9fd6-a52b8aee2d50")]
