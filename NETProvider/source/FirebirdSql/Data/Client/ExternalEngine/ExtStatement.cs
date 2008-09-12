@@ -447,7 +447,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			return row;
 		}
 
-		public override DbValue[] GetOuputParameters()
+		public override DbValue[] GetOutputParameters()
 		{
 			if (this.outputParams != null && this.outputParams.Count > 0)
 			{
