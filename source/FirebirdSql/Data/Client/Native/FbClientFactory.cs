@@ -221,7 +221,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			Type t = tb.CreateType();
 
-#if DEBUG
+#if (DEBUG)
 			// In debug mode, we'll save the assembly out to disk, so we can look at it in Reflector.
 			AssemblyBuilder ab = (AssemblyBuilder) tb.Assembly;
 			ab.Save("DynamicAssembly.dll");
