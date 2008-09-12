@@ -1083,6 +1083,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private void Prepare(bool returnsSet)
         {
+#if (DEBUG)
+            System.Diagnostics.Debug.WriteLine(string.Format("Command:\n{0}", commandText));
+            if (this.parameters!=null)
+                foreach (FbParameter item in this.parameters)
+                {
+                    System.Diagnostics.Debug.WriteLine(string.Format("Name:{0} \t Type:{1} \t Value:{2}", item.InternalParameterName, item.FbDbType, item.Value));
+                }
+#endif
+
             FbConnectionInternal innerConn = this.connection.InnerConnection;
 
             // Check if	we have	a valid	transaction
