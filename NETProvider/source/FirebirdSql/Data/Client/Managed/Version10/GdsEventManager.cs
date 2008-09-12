@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 				}
 
-#if	(!NETCF)
+#if	(!NET_CF)
 				if (this.thread == null ||
 					(this.thread.ThreadState != ThreadState.Running && 
 					this.thread.ThreadState != ThreadState.Background))

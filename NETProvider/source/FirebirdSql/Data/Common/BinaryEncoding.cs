@@ -130,7 +130,7 @@ namespace FirebirdSql.Data.Common
             return count;
         }
 
-#if (!NETCF)
+#if (!NET_CF)
 
         public override string GetString(byte[] bytes)
         {

@@ -430,7 +430,7 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.BuildTpb(options);
         }
 
-#if (!NETCF)
+#if (!NET_CF)
 
         private TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
         {

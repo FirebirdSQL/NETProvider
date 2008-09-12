@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Indexers ·
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this[this.IndexOf(parameterName)] = value; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · DbParameterCollection overriden properties ·
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif

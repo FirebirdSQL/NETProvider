@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · DbParameter properties ·
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [DefaultValue("")]
 #endif
         public override string ParameterName
@@ -60,7 +60,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.parameterName = value; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue(0)]
 #endif
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue(ParameterDirection.Input)]
 #endif
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.direction = value; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [DesignOnly(true)]
         [DefaultValue(false)]
@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.isNullable = value; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue("")]
 #endif
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.sourceColumn = value; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue(DataRowVersion.Current)]
 #endif
@@ -122,7 +122,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.sourceVersion = value; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [Category("Data")]
         [RefreshProperties(RefreshProperties.All)]
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.FbDbType = (FbDbType)TypeHelper.GetDbDataType(value); }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [RefreshProperties(RefreshProperties.All)]
         [Category("Data")]
         [DefaultValue(FbDbType.VarChar)]
@@ -149,7 +149,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [TypeConverter(typeof(StringConverter)), DefaultValue(null)]
 #endif
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue(FbCharset.Default)]
 #endif
@@ -198,7 +198,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Properties ·
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue((byte)0)]
 #endif
@@ -208,7 +208,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.precision = value; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue((byte)0)]
 #endif
@@ -286,7 +286,7 @@ namespace FirebirdSql.Data.FirebirdClient
             this.sourceColumn = sourceColumn;
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [EditorBrowsable(EditorBrowsableState.Advanced)]
 #endif
         public FbParameter(

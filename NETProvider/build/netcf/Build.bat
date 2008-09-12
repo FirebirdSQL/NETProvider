@@ -15,7 +15,7 @@ set PROPERTIES_SOURCES=%SOURCE_DIR%\FirebirdSql\Data\Properties
 
 rem ********** DEFINES **********
 
-set DEFINES=-define:DEBUG -define:NETCF
+set DEFINES=-define:DEBUG -define:NET_CF
 
 rem ********** RESOURCES **********
 

@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-#if	(!NETCF)
+#if	(!NET_CF)
 				// Set Receive Buffer size.
 				this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, packetSize);
 
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				// Here	we identify	the	user to	the	engine.	 
 				// This	may	or may not be used as login	info to	a database.				
-#if	(!NETCF)
+#if	(!NET_CF)
 				byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
 				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
 #else
@@ -215,7 +215,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         public XdrStream CreateXdrStream()
         {
-#if	(NETCF)
+#if	(NET_CF)
             return new XdrStream(this.networkStream, this.characterSet);
 #else
             return new XdrStream(new BufferedStream(this.networkStream), this.characterSet);
@@ -250,7 +250,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         private IPAddress GetIPAddress(string dataSource, AddressFamily addressFamily)
         {
-#if (!NETCF)
+#if (!NET_CF)
 
             IPAddress ipaddress = null;
 

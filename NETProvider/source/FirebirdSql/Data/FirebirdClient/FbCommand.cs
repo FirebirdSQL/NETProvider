@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue(CommandType.Text), RefreshProperties(RefreshProperties.All)]
 #endif
@@ -108,7 +108,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
 #endif
         public string CommandPlan
@@ -123,7 +123,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Behavior")]
         [DefaultValue(null)]
 #endif
@@ -156,7 +156,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Data")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 #endif
@@ -172,7 +172,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -207,7 +207,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Behavior")]
         [DefaultValue(UpdateRowSource.Both)]
 #endif
@@ -217,7 +217,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { this.updatedRowSource = value; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Category("Behavior")]
         [DefaultValue(200)]
 #endif
@@ -259,7 +259,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Design-Time properties ·
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [DesignOnly(true)]
         [DefaultValue(true)]
@@ -270,7 +270,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set
             {
                 this.designTimeVisible = value;
-#if	(!NETCF)
+#if	(!NET_CF)
                 TypeDescriptor.Refresh(this);
 #endif
             }

@@ -242,7 +242,7 @@ namespace FirebirdSql.Data.Isql
                             break;
 
                         case SqlStatementType.CreateDatabase:
-#if (!NETCF)
+#if (!NET_CF)
                             throw new NotImplementedException();
 #else
 							throw new NotSupportedException();
@@ -284,7 +284,7 @@ namespace FirebirdSql.Data.Isql
                             break;
 
                         case SqlStatementType.DropDatabase:
-#if (!NETCF)
+#if (!NET_CF)
                             throw new NotImplementedException();
 #else
 							throw new NotSupportedException();
@@ -396,7 +396,7 @@ namespace FirebirdSql.Data.Isql
                         case SqlStatementType.SetStatistics:
                         case SqlStatementType.SetTransaction:
                         case SqlStatementType.ShowSQLDialect:
-#if (!NETCF)
+#if (!NET_CF)
                             throw new NotImplementedException();
 #else
 							throw new NotSupportedException();
@@ -502,7 +502,7 @@ namespace FirebirdSql.Data.Isql
             // [LENGTH [=] int [PAGE[S]]]
             // [DEFAULT CHARACTER SET charset]
             // [<secondary_file>];	
-#if (!NETCF)
+#if (!NET_CF)
             throw new NotImplementedException();
 #else
 			throw new NotSupportedException();
@@ -515,7 +515,7 @@ namespace FirebirdSql.Data.Isql
         /// <returns></returns>
         protected internal FbConnection SetDatabase(string setDbStatement)
         {
-#if (!NETCF)
+#if (!NET_CF)
             throw new NotImplementedException();
 #else
 			throw new NotSupportedException();

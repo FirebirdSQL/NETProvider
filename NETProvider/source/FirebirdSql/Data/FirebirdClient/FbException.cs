@@ -19,7 +19,7 @@
 using System;
 using System.ComponentModel;
 using System.Data.Common;
-#if (!NETCF)
+#if (!NET_CF)
 using System.Runtime.Serialization;
 #endif
 using System.Security.Permissions;
@@ -27,7 +27,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (!NETCF)
+#if (!NET_CF)
     [Serializable]
     public sealed class FbException : DbException
 #else
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Properties ·
 
-#if (!NETCF)
+#if (!NET_CF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 #endif
         public FbErrorCollection Errors
@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if (!NETCF)
+#if (!NET_CF)
 
         public override int ErrorCode
         {
@@ -98,7 +98,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if (!NETCF)
+#if (!NET_CF)
 
         internal FbException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Methods ·
 
-#if (!NETCF)
+#if (!NET_CF)
 
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

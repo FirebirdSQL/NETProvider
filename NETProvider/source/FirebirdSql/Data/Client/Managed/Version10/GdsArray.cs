@@ -181,7 +181,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
 			// Create arrays
-#if	(NETCF)
+#if	(NET_CF)
 			sliceData = Array.CreateInstance(systemType, lengths);
 #else
 			sliceData = Array.CreateInstance(systemType, lengths, lowerBounds);

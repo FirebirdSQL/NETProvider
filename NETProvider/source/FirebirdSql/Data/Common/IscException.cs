@@ -23,14 +23,14 @@ using System.Globalization;
 using System.Text;
 using System.Reflection;
 using System.Resources;
-#if (!NETCF)
+#if (!NET_CF)
 using System.Runtime.Serialization;
 #endif
 using System.Security.Permissions;
 
 namespace FirebirdSql.Data.Common
 {
-#if (!NETCF)
+#if (!NET_CF)
     [Serializable]
 #endif
     internal sealed class IscException : Exception
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.Common
             this.BuildExceptionMessage();
         }
 
-#if (!NETCF)
+#if (!NET_CF)
 
         internal IscException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -206,7 +206,7 @@ namespace FirebirdSql.Data.Common
                             // The next error contains the PSQL Stack Trace
                             if (builder.Length > 0)
                             {
-#if (NETCF)
+#if (NET_CF)
 								builder.Append("\r\n");
 #else
                                 builder.Append(Environment.NewLine);
@@ -218,7 +218,7 @@ namespace FirebirdSql.Data.Common
                         {
                             if (builder.Length > 0)
                             {
-#if (NETCF)
+#if (NET_CF)
 								builder.Append("\r\n");
 #else
                                 builder.Append(Environment.NewLine);
@@ -247,7 +247,7 @@ namespace FirebirdSql.Data.Common
             this.message = builder.ToString();
         }
 
-#if (!NETCF)
+#if (!NET_CF)
 
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

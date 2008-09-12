@@ -183,7 +183,7 @@ namespace FirebirdSql.Data.Common
 			this.systemName			= systemName;
             this.syncObject         = new object();
 
-#if (!NETCF)
+#if (!NET_CF)
             this.GetEncoding();
 #endif
 		}
@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.Common
 
 		public byte[] GetBytes(string s)
 		{
-#if (NETCF)
+#if (NET_CF)
 			return this.GetEncoding().GetBytes(s);
 #else
             return this.encoding.GetBytes(s);
@@ -203,7 +203,7 @@ namespace FirebirdSql.Data.Common
 
 		public int GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex)
 		{
-#if (NETCF)
+#if (NET_CF)
 			return this.GetEncoding().GetBytes(s, charIndex, charCount, bytes, byteIndex);
 #else
             return this.encoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
@@ -217,7 +217,7 @@ namespace FirebirdSql.Data.Common
 
 		public string GetString(byte[] buffer, int index, int count)
 		{
-#if (NETCF)
+#if (NET_CF)
 			return this.GetEncoding().GetString(buffer, index, count);
 #else
             return this.encoding.GetString(buffer, index, count);
