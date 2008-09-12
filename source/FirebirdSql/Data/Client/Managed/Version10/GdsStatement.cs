@@ -483,7 +483,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override DbValue[] GetOuputParameters()
+		public override DbValue[] GetOutputParameters()
 		{
 			if (this.outputParams.Count > 0)
 			{

@@ -575,7 +575,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     // the output parameters values if command is an Stored Procedure
                     if (this.statement.StatementType == DbStatementType.StoredProcedure)
                     {
-                        values = this.statement.GetOuputParameters();
+                        values = this.statement.GetOutputParameters();
                         this.SetOutputParameters(values);
                     }
                     else
@@ -678,7 +678,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     DbValue[] values = outputParameterValues;
                     if (outputParameterValues == null)
                     {
-                        values = (DbValue[])this.statement.GetOuputParameters();
+                        values = (DbValue[])this.statement.GetOutputParameters();
                     }
 
                     if (values != null && values.Length > 0)

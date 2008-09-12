@@ -274,7 +274,7 @@ namespace FirebirdSql.Data.Common
 		public abstract void Prepare(string commandText);
 		public abstract void Execute();
 		public abstract DbValue[] Fetch();
-		public abstract DbValue[] GetOuputParameters();
+		public abstract DbValue[] GetOutputParameters();
 		public abstract byte[] GetSqlInfo(byte[] items, int bufferLength);
 
 		public abstract BlobBase CreateBlob();

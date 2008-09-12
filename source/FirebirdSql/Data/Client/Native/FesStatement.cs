@@ -477,7 +477,7 @@ namespace FirebirdSql.Data.Client.Native
 			return row;
 		}
 
-		public override DbValue[] GetOuputParameters()
+		public override DbValue[] GetOutputParameters()
 		{
 			if (this.outputParams != null && this.outputParams.Count > 0)
 			{
