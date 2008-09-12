@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     // Managed Client
                     return CreateManagedDatabase(options);
 
-#if (!NETCF)
+#if (!NET_CF)
 
                 case FbServerType.Embedded:
                     // Native (PInvoke) Client
@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 case FbServerType.Default:
                     return CreateManagedServiceManager(options);
 
-#if (!NETCF)
+#if (!NET_CF)
 
                 case FbServerType.Embedded:
                     // PInvoke Client

@@ -16,7 +16,7 @@
  *	All Rights Reserved.
  */
 
-#if	(NETCF)
+#if	(NET_CF)
 
 using System;
 using System.Collections;

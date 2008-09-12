@@ -31,7 +31,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if	(!NETCF)
+#if	(!NET_CF)
     [DefaultEvent("InfoMessage")]
 #endif
     public sealed class FbConnection : DbConnection, ICloneable
@@ -206,7 +206,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
         public override int ConnectionTimeout
@@ -214,7 +214,7 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.options.ConnectionTimeout; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
         public override string Database
@@ -222,7 +222,7 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.options.Database; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
         public override string DataSource
@@ -230,7 +230,7 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.options.DataSource; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
@@ -261,7 +261,7 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.state; }
         }
 
-#if	(!NETCF)
+#if	(!NET_CF)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
         public int PacketSize
@@ -479,7 +479,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public override void ChangeDatabase(string db)
         {
-#if (!NETCF)
+#if (!NET_CF)
             lock (this)
             {
                 if (this.IsClosed)
@@ -657,7 +657,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         internal void DemandPermission()
         {
-#if (!NETCF)
+#if (!NET_CF)
             FirebirdClientPermission permission = new FirebirdClientPermission(this.connectionString);
             permission.Demand();
 #endif

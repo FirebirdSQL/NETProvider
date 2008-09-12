@@ -20,7 +20,7 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (!NETCF)
+#if (!NET_CF)
     [Serializable]
 #endif
     public sealed class FbError

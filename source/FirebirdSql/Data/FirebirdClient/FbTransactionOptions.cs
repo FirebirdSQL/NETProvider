@@ -22,7 +22,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (!NETCF)
+#if (!NET_CF)
     [Flags]
     [Serializable]
 #endif

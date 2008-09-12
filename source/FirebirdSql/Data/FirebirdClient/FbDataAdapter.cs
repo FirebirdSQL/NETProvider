@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Properties ·
 
-#if (!NETCF)
+#if (!NET_CF)
         [Category("Fill")]
         [DefaultValue(null)]
 #endif
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { base.SelectCommand = value; }
         }
 
-#if (!NETCF)
+#if (!NET_CF)
         [Category("Update")]
         [DefaultValue(null)]
 #endif
@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { base.InsertCommand = value; }
         }
 
-#if (!NETCF)
+#if (!NET_CF)
         [Category("Update")]
         [DefaultValue(null)]
 #endif
@@ -110,7 +110,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set { base.UpdateCommand = value; }
         }
 
-#if (!NETCF)
+#if (!NET_CF)
         [Category("Update")]
         [DefaultValue(null)]
 #endif

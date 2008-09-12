@@ -28,7 +28,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (!NETCF)
+#if (!NET_CF)
     [Serializable, ListBindable(false)]
 #endif
     public sealed class FbErrorCollection : IEnumerable, ICollection

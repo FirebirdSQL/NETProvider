@@ -21,7 +21,7 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
-#if (!NETCF)
+#if (!NET_CF)
     [Serializable]
 #endif
 	internal sealed class IscError

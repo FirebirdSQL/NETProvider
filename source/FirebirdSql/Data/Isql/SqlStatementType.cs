@@ -23,7 +23,7 @@ namespace FirebirdSql.Data.Isql
     /// <summary>
     /// DSQL and ISQL statement types.
     /// </summary>
-#if (!NETCF)
+#if (!NET_CF)
 	[Serializable]
 #endif
     public enum SqlStatementType

@@ -334,7 +334,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     }
                     if (this.PacketSize < 512 || this.PacketSize > 32767)
                     {
-#if (!NETCF)
+#if (!NET_CF)
                         throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
 #else
                         throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, "\r\n"));
@@ -460,7 +460,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private string ExpandDataDirectory(string s)
         {
             const string dataDirectoryKeyword = "|DataDirectory|";
-#if (!NETCF)
+#if (!NET_CF)
             string dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
             string pattern = string.Format("{0}{1}?", Regex.Escape(dataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
             return Regex.Replace(s, pattern, dataDirectoryLocation + Path.DirectorySeparatorChar, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
