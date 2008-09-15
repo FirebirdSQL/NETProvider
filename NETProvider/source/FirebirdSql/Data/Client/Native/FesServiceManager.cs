@@ -166,9 +166,9 @@ namespace FirebirdSql.Data.Client.Native
             Array.Clear(this.statusVector, 0, this.statusVector.Length);
         }
 
-        private void ParseStatusVector(IntPtr[] tatusVector)
+        private void ParseStatusVector(IntPtr[] statusVector)
 		{
-			IscException ex = FesConnection.ParseStatusVector(tatusVector);
+			IscException ex = FesConnection.ParseStatusVector(statusVector);
 
 			if (ex != null && !ex.IsWarning)
 			{
