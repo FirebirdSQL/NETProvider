@@ -15,9 +15,10 @@
  *  Copyright (c) 2008 Vladimir Bodecek, Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
+ *  Adapted from pinvoke.net.
  */
 
-#if (TRUSTED_AUTH)
+#if (!LINUX)  //SSPI is available only on Windows
 
 using System;
 using System.Text;
@@ -27,7 +28,6 @@ using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
-
 	internal sealed class SSPIHelper : IDisposable
 	{
 
@@ -431,7 +431,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		#endregion
 	}
-
 }
 
 #endif
