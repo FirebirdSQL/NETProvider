@@ -13,6 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2008 Vladimir Bodecek, Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -30,12 +31,12 @@ using FirebirdSql.Data.Common;
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
     internal class GdsDatabase : FirebirdSql.Data.Client.Managed.Version10.GdsDatabase
-	{
+    {
         #region · Constructors ·
 
         public GdsDatabase(FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection)
             : base(connection)
-		{
+        {
         }
 
         #endregion
@@ -43,15 +44,107 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         #region · Override Statement Creation Methods ·
 
         public override StatementBase CreateStatement()
-		{
-			return new GdsStatement(this);
-		}
+        {
+            return new GdsStatement(this);
+        }
 
         public override StatementBase CreateStatement(ITransaction transaction)
-		{
-			return new GdsStatement(this, transaction);
-		}
+        {
+            return new GdsStatement(this, transaction);
+        }
 
-		#endregion
+        #endregion
+
+        #region Trusted Auth
+        public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    using (SSPIHelper sspiHelper = new SSPIHelper())
+                    {
+                        byte[] authData = sspiHelper.InitializeClientSecurity();
+                        dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
+
+                        // Attach to the database
+                        this.Write(IscCodes.op_attach);
+                        this.Write((int)0);				    // Database	object ID
+                        this.Write(database);				// Database	PATH
+                        this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+                        this.Flush();
+
+                        IResponse response = this.ReadResponse();
+                        while (response is AuthResponse)
+                        {
+                            authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
+                            this.Write(IscCodes.op_trusted_auth);
+                            this.WriteBuffer(authData);
+                            this.Flush();
+                            response = this.ReadResponse();
+                        }
+                        // Save the database connection handle
+                        this.handle = ((GenericResponse)response).ObjectHandle;
+                    }
+                }
+                catch (IOException)
+                {
+                    try
+                    {
+                        this.Detach();
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    throw new IscException(IscCodes.isc_net_write_err);
+                }
+
+                // Get server version
+                this.serverVersion = this.GetServerVersion();
+            }
+        }
+
+        protected override IResponse ReadSingleResponse()
+        {
+            IResponse response = null;
+            int operation = this.ReadOperation();
+
+            switch (operation)
+            {
+                case IscCodes.op_response:
+                    response = new GenericResponse(
+                        this.ReadInt32(),
+                        this.ReadInt64(),
+                        this.ReadBuffer(),
+                        this.ReadStatusVector());
+                    break;
+
+                case IscCodes.op_fetch_response:
+                    response = new FetchResponse(this.ReadInt32(), this.ReadInt32());
+                    break;
+
+                case IscCodes.op_sql_response:
+                    response = new SqlResponse(this.ReadInt32());
+                    break;
+
+                case IscCodes.op_trusted_auth:
+                    return new AuthResponse(this.ReadBuffer());
+            }
+
+            // Process response warnings
+            if (response is GenericResponse)
+            {
+                if (((GenericResponse)response).Exception != null &&
+                    ((GenericResponse)response).Exception.IsWarning &&
+                    this.warningMessage != null)
+                {
+                    this.warningMessage(((GenericResponse)response).Exception);
+                }
+            }
+
+            return response;
+        }
+        #endregion
     }
 }
