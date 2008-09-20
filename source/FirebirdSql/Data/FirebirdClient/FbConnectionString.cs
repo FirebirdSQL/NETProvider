@@ -216,8 +216,8 @@ namespace FirebirdSql.Data.FirebirdClient
         #region · Internal Properties ·
         internal bool FallIntoTrustedAuth
         {
-            // on non-Win the UserID is checked in Validate method
-            get { return string.IsNullOrEmpty(this.UserID); }
+            // on non-Win the UserID/Password is checked in Validate method
+            get { return string.IsNullOrEmpty(this.UserID) && string.IsNullOrEmpty(this.Password); }
         }
         #endregion
 
