@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *	
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -289,6 +292,11 @@ namespace FirebirdSql.Data.Client.Native
 		        // Get server version
 		        this.serverVersion = this.GetServerVersion();
 	        }
+        }
+
+        public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+        {
+            throw new NotImplementedException("Trusted Auth wasn't implemented for Embedded Firebird, yet.");
         }
 
 		public void Detach()

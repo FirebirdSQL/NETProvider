@@ -17,8 +17,6 @@
  *  
  */
 
-#if (TRUSTED_AUTH)
-
 using System;
 using FirebirdSql.Data.Client.Managed;
 
@@ -26,18 +24,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 {
     internal class AuthResponse : IResponse
     {
-        #region · Fields ·
-
-        private byte[] data;
-
-        #endregion
-
         #region · Properties ·
-
-        public byte[] Data
-        {
-            get { return this.data; }
-        }
+        
+        public byte[] Data { get; private set; }
 
         #endregion
 
@@ -45,11 +34,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
         public AuthResponse(byte[] data)
         {
-            this.data = data;
+            this.Data = data;
         }
 
         #endregion
     }
 }
-
-#endif

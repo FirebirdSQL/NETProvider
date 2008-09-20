@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *	
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -44,14 +47,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region · Fields ·
 
-		private WarningMessageCallback warningMessage;
+		protected WarningMessageCallback warningMessage;
 
 		private GdsConnection	connection;
 		private GdsEventManager eventManager;
 		private Charset			charset;
-		private int				handle;
+		protected int			handle;
 		private int				transactionCount;
-		private string			serverVersion;
+		protected string		serverVersion;
 		private short			packetSize;
 		private short			dialect;
 		private int				eventsId;
@@ -228,6 +231,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				this.serverVersion = this.GetServerVersion();
 			}
 		}
+
+        public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+        {
+            throw new NotSupportedException("Trusted Auth isn't supported on protocol version 10.");
+        }
 
         public virtual void Detach()
 		{

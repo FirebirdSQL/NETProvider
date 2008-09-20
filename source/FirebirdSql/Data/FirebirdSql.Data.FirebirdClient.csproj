@@ -79,6 +79,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client\Managed\Version11\AuthResponse.cs" />
+    <Compile Include="Client\Managed\Version11\SSPIHelper.cs" />
     <Compile Include="Entity\DmlSqlGenerator.cs" />
     <Compile Include="Entity\ExpressionTranslator.cs" />
     <Compile Include="Entity\FirstClause.cs" />

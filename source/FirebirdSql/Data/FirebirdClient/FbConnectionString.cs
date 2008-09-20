@@ -213,6 +213,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #endregion
 
+        #region · Internal Properties ·
+        internal bool FallIntoTrustedAuth
+        {
+            // on non-Win the UserID is checked in Validate method
+            get { return string.IsNullOrEmpty(this.UserID); }
+        }
+        #endregion
+
         #region · Constructors ·
 
         public FbConnectionString()
@@ -316,7 +324,7 @@ namespace FirebirdSql.Data.FirebirdClient
             if (!this.ContextConnection)
             {
                 if (
-#if (!LINUX)  // on Linux trusted auth isn't available
+#if (LINUX)  // on Linux Trusted Auth isn't available
                     (this.UserID == null || this.UserID.Length == 0) ||
                     (this.Password == null || this.Password.Length == 0) ||
 #endif

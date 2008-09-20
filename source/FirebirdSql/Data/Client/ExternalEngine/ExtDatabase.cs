@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2005 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *	
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -227,6 +230,11 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
                 this.handle = dbHandle;
             }
+		}
+
+		public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
+            throw new NotSupportedException("Trusted Auth isn't supported on External Engine.");
 		}
 
 		public void Detach()
