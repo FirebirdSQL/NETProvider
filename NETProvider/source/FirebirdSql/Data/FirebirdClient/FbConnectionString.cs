@@ -315,14 +315,18 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             if (!this.ContextConnection)
             {
-                if ((this.UserID == null || this.UserID.Length == 0) ||
+                if (
+#if (!LINUX)  // on Linux trusted auth isn't available
+                    (this.UserID == null || this.UserID.Length == 0) ||
                     (this.Password == null || this.Password.Length == 0) ||
+#endif
                     ((this.Database == null || this.Database.Length == 0) && !this.isServiceConnectionString) ||
                     ((this.DataSource == null || this.DataSource.Length == 0) && this.ServerType != FbServerType.Embedded) ||
                     (this.Charset == null || this.Charset.Length == 0) ||
-                    this.Port == 0 ||
+                    (this.Port == 0) ||
                     (!Enum.IsDefined(typeof(FbServerType), this.ServerType)) ||
-                    (this.MinPoolSize > this.MaxPoolSize))
+                    (this.MinPoolSize > this.MaxPoolSize)
+                   )
                 {
                     throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
                 }
@@ -335,9 +339,9 @@ namespace FirebirdSql.Data.FirebirdClient
                     if (this.PacketSize < 512 || this.PacketSize > 32767)
                     {
 #if (!NET_CF)
-                        throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
+                        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
 #else
-                        throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, "\r\n"));
+                        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, "\r\n"));
 #endif
                     }
 
@@ -360,12 +364,12 @@ namespace FirebirdSql.Data.FirebirdClient
             this.options.Clear();
 
             // Add default key pairs values
-            this.options.Add("data source", "");
+            this.options.Add("data source", string.Empty);
             this.options.Add("port number", 3050);
-            this.options.Add("user id", "SYSDBA");
-            this.options.Add("password", "masterkey");
-            this.options.Add("role name", String.Empty);
-            this.options.Add("catalog", String.Empty);
+            this.options.Add("user id", string.Empty);
+            this.options.Add("password", string.Empty);
+            this.options.Add("role name", string.Empty);
+            this.options.Add("catalog", string.Empty);
             this.options.Add("character set", "None");
             this.options.Add("dialect", 3);
             this.options.Add("packet size", 8192);
