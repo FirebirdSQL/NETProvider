@@ -525,7 +525,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
             dpb.Append(IscCodes.isc_dpb_connect_timeout, options.ConnectionTimeout);
 
-            if (options.FallIntoTrustedAuth)
+            if (!options.FallIntoTrustedAuth)
             {
                 dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
                 dpb.Append(IscCodes.isc_dpb_password, options.Password);
