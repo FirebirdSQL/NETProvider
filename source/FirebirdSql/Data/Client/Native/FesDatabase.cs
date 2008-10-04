@@ -121,14 +121,14 @@ namespace FirebirdSql.Data.Client.Native
 		#region · Constructors ·
 
 		public FesDatabase()
-			: this(null)
+			: this(null, null)
 		{
 		}
 
-		public FesDatabase(string dllName)
+		public FesDatabase(string dllName, Charset charset)
 		{
 			this.fbClient       = FbClientFactory.GetFbClient(dllName);
-			this.charset        = Charset.DefaultCharset;
+			this.charset        = (charset != null ? charset : Charset.DefaultCharset);
 			this.dialect        = 3;
 			this.packetSize     = 8192;
             this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
@@ -317,7 +317,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				this.handle = dbHandle;
 
-				FesConnection.ParseStatusVector(this.statusVector);
+				FesConnection.ParseStatusVector(this.statusVector, this.charset);
 			}
 		}
 
@@ -415,7 +415,7 @@ namespace FirebirdSql.Data.Client.Native
 
         internal void ParseStatusVector(IntPtr[] statusVector)
 		{
-			IscException ex = FesConnection.ParseStatusVector(statusVector);
+			IscException ex = FesConnection.ParseStatusVector(statusVector, this.charset);
 
 			if (ex != null)
 			{
