@@ -14,6 +14,10 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *	
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
+ *      
  */
 
 using System;
@@ -23,14 +27,14 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-	internal sealed class FesConnection
-	{
+    internal sealed class FesConnection
+    {
         #region · Static Methods ·
 
-        public static IscException ParseStatusVector(IntPtr[] statusVector)
+        public static IscException ParseStatusVector(IntPtr[] statusVector, Charset charset)
         {
-            IscException    exception   = null;
-            bool            eof         = false;
+            IscException exception = null;
+            bool eof = false;
 
             for (int i = 0; i < statusVector.Length; )
             {
@@ -62,7 +66,9 @@ namespace FirebirdSql.Data.Client.Native
                     case IscCodes.isc_arg_string:
                         {
                             IntPtr ptr = statusVector[i++];
-                            string arg_value = Marshal.PtrToStringAnsi(ptr);
+                            string s = Marshal.PtrToStringAnsi(ptr);
+                            string arg_value = charset.GetString(
+                                System.Text.Encoding.Default.GetBytes(s));
 
                             exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
                         }
@@ -73,7 +79,9 @@ namespace FirebirdSql.Data.Client.Native
                             i++;
 
                             IntPtr ptr = statusVector[i++];
-                            string arg_value = Marshal.PtrToStringAnsi(ptr);
+                            string s = Marshal.PtrToStringAnsi(ptr);
+                            string arg_value = charset.GetString(
+                                System.Text.Encoding.Default.GetBytes(s));
 
                             exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
                         }
@@ -109,13 +117,12 @@ namespace FirebirdSql.Data.Client.Native
         }
 
         #endregion
-        
+
         #region · Constructors ·
 
-		private FesConnection()
-		{
-		}
+        private FesConnection()
+        { }
 
-		#endregion
-	}
+        #endregion
+    }
 }
