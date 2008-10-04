@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *   
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -22,144 +25,152 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-	internal sealed class FesServiceManager : IServiceManager
-	{
-		#region · Fields ·
+    internal sealed class FesServiceManager : IServiceManager
+    {
+        #region · Fields ·
 
-		private IFbClient   fbClient;
-		private int         handle;
+        private IFbClient fbClient;
+        private int handle;
         private IntPtr[] statusVector;
+        private Charset charset;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		public int Handle
-		{
-			get { return this.handle; }
-		}
+        public int Handle
+        {
+            get { return this.handle; }
+        }
 
-		public bool IsLittleEndian
-		{
-			get { return BitConverter.IsLittleEndian; }
-		}
+        public bool IsLittleEndian
+        {
+            get { return BitConverter.IsLittleEndian; }
+        }
 
-		#endregion
+        public Charset Charset
+        {
+            get { return this.charset; }
+            set { this.charset = value; }
+        }
 
-		#region · Constructors ·
+        #endregion
 
-		public FesServiceManager()
-			: this(null)
-		{
-		}
+        #region · Constructors ·
 
-		public FesServiceManager(string dllName)
-		{
-			this.fbClient       = FbClientFactory.GetFbClient(dllName);
+        public FesServiceManager()
+            : this(null, null)
+        {
+        }
+
+        public FesServiceManager(string dllName, Charset charset)
+        {
+            this.fbClient = FbClientFactory.GetFbClient(dllName);
+            this.charset = (charset != null ? charset : Charset.DefaultCharset);
             this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-		}
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
-		{
+        public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
+        {
             // Clear the status vector
             this.ClearStatusVector();
 
             int svcHandle = this.Handle;
 
-			fbClient.isc_service_attach(
-				this.statusVector,
-				(short)service.Length,
-				service,
-				ref	svcHandle,
-				(short)spb.Length,
-				spb.ToArray());
+            fbClient.isc_service_attach(
+                this.statusVector,
+                (short)service.Length,
+                service,
+                ref	svcHandle,
+                (short)spb.Length,
+                spb.ToArray());
 
-			// Parse status	vector
-			this.ParseStatusVector(this.statusVector);
+            // Parse status	vector
+            this.ParseStatusVector(this.statusVector);
 
-			// Update status vector
-			this.handle = svcHandle;
-		}
+            // Update status vector
+            this.handle = svcHandle;
+        }
 
-		public void Detach()
-		{
+        public void Detach()
+        {
             // Clear the status vector
             this.ClearStatusVector();
 
             int svcHandle = this.Handle;
 
-			fbClient.isc_service_detach(this.statusVector, ref svcHandle);
+            fbClient.isc_service_detach(this.statusVector, ref svcHandle);
 
-			// Parse status	vector
-			this.ParseStatusVector(this.statusVector);
+            // Parse status	vector
+            this.ParseStatusVector(this.statusVector);
 
-			// Update status vector
-			this.handle = svcHandle;
-		}
+            // Update status vector
+            this.handle = svcHandle;
+        }
 
-		public void Start(ServiceParameterBuffer spb)
-		{
+        public void Start(ServiceParameterBuffer spb)
+        {
             // Clear the status vector
             this.ClearStatusVector();
 
-			int svcHandle   = this.Handle;
-			int reserved    = 0;
+            int svcHandle = this.Handle;
+            int reserved = 0;
 
-			fbClient.isc_service_start(
-				this.statusVector,
-				ref	svcHandle,
-				ref	reserved,
-				(short)spb.Length,
-				spb.ToArray());
+            fbClient.isc_service_start(
+                this.statusVector,
+                ref	svcHandle,
+                ref	reserved,
+                (short)spb.Length,
+                spb.ToArray());
 
-			// Parse status	vector
-			this.ParseStatusVector(this.statusVector);
-		}
+            // Parse status	vector
+            this.ParseStatusVector(this.statusVector);
+        }
 
-		public void Query(
-			ServiceParameterBuffer  spb,
-			int                     requestLength,
-			byte[]                  requestBuffer,
-		    int                     bufferLength,
-			byte[]                  buffer)
-		{
+        public void Query(
+            ServiceParameterBuffer spb,
+            int requestLength,
+            byte[] requestBuffer,
+            int bufferLength,
+            byte[] buffer)
+        {
             // Clear the status vector
             this.ClearStatusVector();
 
-            int svcHandle   = this.Handle;
-			int reserved    = 0;
+            int svcHandle = this.Handle;
+            int reserved = 0;
 
-			fbClient.isc_service_query(
-				this.statusVector,
-				ref	svcHandle,
-				ref	reserved,
-				(short)spb.Length,
-				spb.ToArray(),
-				(short)requestLength,
-				requestBuffer,
-				(short)buffer.Length,
-				buffer);
+            fbClient.isc_service_query(
+                this.statusVector,
+                ref	svcHandle,
+                ref	reserved,
+                (short)spb.Length,
+                spb.ToArray(),
+                (short)requestLength,
+                requestBuffer,
+                (short)buffer.Length,
+                buffer);
 
-			// Parse status	vector
-			this.ParseStatusVector(this.statusVector);
-		}
+            // Parse status	vector
+            this.ParseStatusVector(this.statusVector);
+        }
 
-		#endregion
+        #endregion
 
-		#region · Buffer Creation Methods ·
+        #region · Buffer Creation Methods ·
 
-		public ServiceParameterBuffer CreateParameterBuffer()
-		{
-			return new ServiceParameterBuffer();
-		}
+        public ServiceParameterBuffer CreateParameterBuffer()
+        {
+            return new ServiceParameterBuffer();
+        }
 
-		#endregion
+        #endregion
 
-		#region · Private Methods ·
+        #region · Private Methods ·
 
         private void ClearStatusVector()
         {
@@ -167,15 +178,15 @@ namespace FirebirdSql.Data.Client.Native
         }
 
         private void ParseStatusVector(IntPtr[] statusVector)
-		{
-			IscException ex = FesConnection.ParseStatusVector(statusVector);
+        {
+            IscException ex = FesConnection.ParseStatusVector(statusVector, this.charset);
 
-			if (ex != null && !ex.IsWarning)
-			{
-				throw ex;
-			}
-		}
+            if (ex != null && !ex.IsWarning)
+            {
+                throw ex;
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
