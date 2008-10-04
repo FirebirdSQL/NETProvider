@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 case FbServerType.Embedded:
                     // Native (PInvoke) Client
-                    return new FirebirdSql.Data.Client.Native.FesDatabase(options.ClientLibrary);
+                    return new FirebirdSql.Data.Client.Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
 
                 case FbServerType.Context:
                     // External Engine (PInvoke) Client
@@ -65,7 +65,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 case FbServerType.Embedded:
                     // PInvoke Client
-                    return new FirebirdSql.Data.Client.Native.FesServiceManager(options.ClientLibrary);
+                    return new FirebirdSql.Data.Client.Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset));
 
 #endif
 
