@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *   
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -89,7 +92,7 @@ namespace FirebirdSql.Data.Client.Native
 					0,
 					new byte[0]);
 
-				FesConnection.ParseStatusVector(this.statusVector);
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 
 				this.RblAddValue(IscCodes.RBL_create);
 			}
@@ -114,7 +117,7 @@ namespace FirebirdSql.Data.Client.Native
 					0,
 					new byte[0]);
 
-				FesConnection.ParseStatusVector(this.statusVector);
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 			}
 		}
 
@@ -179,7 +182,7 @@ namespace FirebirdSql.Data.Client.Native
 					(short)buffer.Length,
 					buffer);
 
-				FesConnection.ParseStatusVector(this.statusVector);
+                FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 			}
 		}
 
@@ -202,7 +205,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				db.FbClient.isc_close_blob(this.statusVector, ref this.blobHandle);
 
-				FesConnection.ParseStatusVector(this.statusVector);
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 			}
 		}
 
@@ -215,7 +218,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				db.FbClient.isc_cancel_blob(this.statusVector, ref this.blobHandle);
 
-				FesConnection.ParseStatusVector(this.statusVector);
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 			}
 		}
 

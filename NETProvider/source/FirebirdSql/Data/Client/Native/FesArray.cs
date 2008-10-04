@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.Client.Native
 			// Free	memory
 			marshaler.CleanUpNativeData(ref	arrayDesc);
 
-			FesConnection.ParseStatusVector(this.statusVector);
+			FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 
 			return buffer;
 		}
@@ -177,7 +177,7 @@ namespace FirebirdSql.Data.Client.Native
 			// Free	memory
 			marshaler.CleanUpNativeData(ref	arrayDesc);
 
-			FesConnection.ParseStatusVector(this.statusVector);
+			FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 		}
 
 		#endregion
