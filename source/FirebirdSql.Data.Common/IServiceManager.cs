@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Common
 
 		#region Methods
 
-		void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service);
+		void Attach(ServiceParameterBuffer spb, string service);
 
 		void Detach();
 

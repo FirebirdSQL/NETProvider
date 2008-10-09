@@ -303,7 +303,7 @@ namespace FirebirdSql.Data.Firebird
 			try
 			{
 				// DPB configuration
-				DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
+				DatabaseParameterBuffer dpb = new DatabaseParameterBuffer(BitConverter.IsLittleEndian);
 
 				// Dpb version
 				dpb.Append(IscCodes.isc_dpb_version1);
@@ -320,55 +320,31 @@ namespace FirebirdSql.Data.Firebird
 				// Database	dialect
 				dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { options.Dialect, 0, 0, 0 });
 
-				// Database overwrite
-				dpb.Append(IscCodes.isc_dpb_overwrite, (short)(overwrite ? 1 : 0));
-
 				// Character set
 				if (options.Charset.Length > 0)
 				{
-					int index = Charset.SupportedCharsets.IndexOf(options.Charset);
+					Charset charset = Charset.GetCharset(options.Charset);
 
-					if (index == -1)
+					if (charset == null)
 					{
 						throw new ArgumentException("Character set is not valid.");
 					}
 					else
 					{
-						dpb.Append(
-							IscCodes.isc_dpb_set_db_charset,
-							Charset.SupportedCharsets[index].Name);
+						dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
 					}
-				}
-
-				// Page	Size
-				if (pageSize > 0)
-				{
-					dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
 				}
 
 				// Forced writes
 				dpb.Append(IscCodes.isc_dpb_force_write, (short)(forcedWrites ? 1 : 0));
 
-				if (!overwrite)
+				// Database overwrite
+				dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
+
+				// Page	Size
+				if (pageSize > 0)
 				{
-					// Check if	the	database exists
-					FbConnectionInternal c = new FbConnectionInternal(options);
-
-					try
-					{
-						c.Connect();
-						c.Disconnect();
-
-						IscException ex = new IscException(IscCodes.isc_db_or_file_exists);
-						throw new FbException(ex.Message, ex);
-					}
-					catch (FbException ex)
-					{
-						if (ex.ErrorCode != 335544344)
-						{
-							throw;
-						}
-					}
+					dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
 				}
 
 				// Create the new database
@@ -404,10 +380,11 @@ namespace FirebirdSql.Data.Firebird
 		[Obsolete("Use CreateDatabase(string connectionString) instead")]
 		public static void CreateDatabase(Hashtable values)
 		{
-			bool overwrite = false;
-			int index = 0;
-			byte dialect = 3;
-			int serverType = 0;
+			bool	overwrite		= false;
+			byte	dialect			= 3;
+			int		serverType		= 0;
+			int		pageSize		= 0;
+			bool	forcedWrites	= false;
 
 			if (!values.ContainsKey("User") ||
 				!values.ContainsKey("Password") ||
@@ -446,99 +423,29 @@ namespace FirebirdSql.Data.Firebird
 				overwrite = (bool)values["Overwrite"];
 			}
 
-			try
+			if (values.ContainsKey("PageSize"))
 			{
-				// Configure Attachment
-				FbConnectionStringBuilder csb = new FbConnectionStringBuilder();
-
-				csb.DataSource	= values["DataSource"].ToString();
-				csb.UserID		= values["User"].ToString();
-				csb.Password	= values["Password"].ToString();
-				csb.Database	= values["Database"].ToString();
-				csb.Port		= Convert.ToInt32(values["Port"], CultureInfo.InvariantCulture);
-				csb.ServerType	= serverType;
-
-				FbConnectionString options = new FbConnectionString(csb);
-
-				// DPB configuration
-				DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
-
-				// Dpb version
-				dpb.Append(IscCodes.isc_dpb_version1);
-
-				// Dummy packet	interval
-				dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-
-				// User	name
-				dpb.Append(IscCodes.isc_dpb_user_name, values["User"].ToString());
-
-				// User	password
-				dpb.Append(IscCodes.isc_dpb_password, values["Password"].ToString());
-
-				// Database	dialect
-				dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { dialect, 0, 0, 0 });
-
-				// Database overwrite
-				dpb.Append(IscCodes.isc_dpb_overwrite, (short)(overwrite ? 1 : 0));
-
-				// Character set
-				if (values.ContainsKey("Charset"))
-				{
-					index = Charset.SupportedCharsets.IndexOf(values["Charset"].ToString());
-
-					if (index == -1)
-					{
-						throw new ArgumentException("Character set is not valid.");
-					}
-					else
-					{
-						dpb.Append(
-							IscCodes.isc_dpb_set_db_charset,
-							Charset.SupportedCharsets[index].Name);
-					}
-				}
-
-				// Page	Size
-				if (values.ContainsKey("PageSize"))
-				{
-					dpb.Append(IscCodes.isc_dpb_page_size, Convert.ToInt32(values["PageSize"], CultureInfo.InvariantCulture));
-				}
-
-				// Forced writes
-				if (values.ContainsKey("ForcedWrite"))
-				{
-					dpb.Append(IscCodes.isc_dpb_force_write,
-						(short)((bool)values["ForcedWrite"] ? 1 : 0));
-				}
-
-				if (!overwrite)
-				{
-					try
-					{
-						// Check if	the	database exists
-						FbConnectionInternal check = new FbConnectionInternal(options);
-
-						check.Connect();
-						check.Disconnect();
-
-						IscException ex = new IscException(IscCodes.isc_db_or_file_exists);
-
-						throw new FbException(ex.Message, ex);
-					}
-					catch (Exception)
-					{
-						throw;
-					}
-				}
-
-				// Create the new database
-				FbConnectionInternal c = new FbConnectionInternal(options);
-				c.CreateDatabase(dpb);
+				pageSize = Convert.ToInt32(values["PageSize"]);
 			}
-			catch (IscException ex)
+
+			if (values.ContainsKey("ForcedWrites"))
 			{
-				throw new FbException(ex.Message, ex);
+				forcedWrites = (bool)values["ForcedWrites"];
 			}
+
+			// Configure Attachment
+			FbConnectionStringBuilder csb = new FbConnectionStringBuilder();
+
+			csb.DataSource	= values["DataSource"].ToString();
+			csb.UserID		= values["User"].ToString();
+			csb.Password	= values["Password"].ToString();
+			csb.Database	= values["Database"].ToString();
+			csb.Port		= Convert.ToInt32(values["Port"], CultureInfo.InvariantCulture);
+			csb.ServerType	= serverType;
+
+			FbConnectionString options = new FbConnectionString(csb);
+
+			CreateDatabase(csb.ToString(), pageSize, forcedWrites, overwrite);
 		}
 
 		/// <include file='Doc/en_EN/FbConnection.xml' path='doc/class[@name="FbConnection"]/method[@name="DropDatabase(System.Collections.Hashtable)"]/*'/>

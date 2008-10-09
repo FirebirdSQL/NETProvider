@@ -20,24 +20,60 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Gds
 {
 	internal sealed class GdsConnection
-	{
-		#region Fields
+    {
+        #region · Fields ·
 
-		private Socket			socket;
+        private Socket			socket;
 		private NetworkStream	networkStream;
 		private XdrStream		send;
 		private XdrStream		receive;
-		private int				operation;
+        private string          dataSource;
+        private int             portNumber;
+        private int             packetSize;
+        private Charset         characterSet;
+        private int             protocolVersion;
+        private int             protocolArchitecture;
+        private int             protocolMinimunType;
 
-		#endregion
+        #endregion
 
-		#region Internal Properties
+        #region · Properties ·
+
+        public bool IsConnected
+        {
+            get { return (this.socket != null && this.socket.Connected); }
+        }
+
+        public int ProtocolVersion
+        {
+            get { return this.protocolVersion; }
+        }
+
+        public int ProtocolArchitecture
+        {
+            get { return this.protocolArchitecture; }
+        }
+
+        public int ProtocolMinimunType
+        {
+            get { return this.protocolMinimunType; }
+        }
+
+        public Boolean DataAvailable
+        {
+            get { return this.networkStream.DataAvailable; }
+        }
+
+        #endregion
+
+		#region · Internal Properties ·
 
 		internal XdrStream Receive
 		{
@@ -51,30 +87,33 @@ namespace FirebirdSql.Data.Gds
 
 		#endregion
 
-		#region Constructors
+		#region · Constructors ·
 
-		public GdsConnection()
-		{
-			this.operation = -1;
+        public GdsConnection(string dataSource, int port)
+            : this(dataSource, port, 8192, Charset.DefaultCharset)
+        {
+        }
 
-			GC.SuppressFinalize(this);
-		}
+        public GdsConnection(string dataSource, int portNumber, int packetSize, Charset characterSet)
+        {
+            this.dataSource     = dataSource;
+            this.portNumber     = portNumber;
+            this.packetSize     = packetSize;
+            this.characterSet   = characterSet;
+
+            GC.SuppressFinalize(this);
+        }
 
 		#endregion
 
-		#region Methods
+		#region · Methods ·
 
-		public void Connect(string dataSource, int port)
-		{
-			this.Connect(dataSource, port, 8192, Charset.DefaultCharset);
-		}
-
-		public void Connect(string dataSource, int port, int packetSize, Charset charset)
+		public void Connect()
 		{
 			try
 			{
 				IPAddress hostadd = Dns.Resolve(dataSource).AddressList[0];
-				IPEndPoint EPhost = new IPEndPoint(hostadd, port);
+				IPEndPoint EPhost = new IPEndPoint(hostadd, this.portNumber);
 
 				this.socket = new Socket(
 					AddressFamily.InterNetwork,
@@ -107,11 +146,11 @@ namespace FirebirdSql.Data.Gds
 				this.networkStream = new NetworkStream(this.socket, true);
 
 #if	(NETCF)
-				this.send	 = new XdrStream(this.networkStream, charset);
-				this.receive = new XdrStream(this.networkStream, charset);
+				this.send	 = new XdrStream(this.networkStream, this.characterSet);
+				this.receive = new XdrStream(this.networkStream, this.characterSet);
 #else
-				this.send = new XdrStream(new BufferedStream(this.networkStream), charset);
-				this.receive = new XdrStream(new BufferedStream(this.networkStream), charset);
+                this.send       = new XdrStream(new BufferedStream(this.networkStream), this.characterSet);
+                this.receive    = new XdrStream(new BufferedStream(this.networkStream), this.characterSet);
 #endif
 
 				GC.SuppressFinalize(this.socket);
@@ -157,39 +196,104 @@ namespace FirebirdSql.Data.Gds
 			}
 		}
 
+        public void Identify(string database)
+        {
+            try
+            {
+                // Here	we identify	the	user to	the	engine.	 
+                // This	may	or may not be used as login	info to	a database.				
+                byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
+                byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
+
+                MemoryStream user_id = new MemoryStream();
+
+                // User	Name
+                user_id.WriteByte(1);
+                user_id.WriteByte((byte)user.Length);
+                user_id.Write(user, 0, user.Length);
+
+                // Host	name
+                user_id.WriteByte(4);
+                user_id.WriteByte((byte)host.Length);
+                user_id.Write(host, 0, host.Length);
+
+                // Attach/create using this connection will use user verification
+                user_id.WriteByte(6);
+                user_id.WriteByte(0);
+
+                this.send.Write(IscCodes.op_connect);
+                this.send.Write(IscCodes.op_attach);
+                this.send.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
+                this.send.Write(1);							// Architecture	of client -	Generic
+
+                this.send.Write(database);					// Database	path
+                this.send.Write(2);							// Protocol	versions understood
+                this.send.WriteBuffer(user_id.ToArray());	// User	identification Stuff
+
+                this.send.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
+                this.send.Write(1);							// Architecture	of client -	Generic
+                this.send.Write(2);							// Minumum type
+                this.send.Write(3);							// Maximum type
+                this.send.Write(2);							// Preference weight
+
+                this.send.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
+                this.send.Write(1);							// Architecture	of client -	Generic
+                this.send.Write(2);							// Minumum type
+                this.send.Write(3);							// Maximum type
+                this.send.Write(2);							// Preference weight
+
+                this.send.Flush();
+
+                if (this.receive.ReadOperation() == IscCodes.op_accept)
+                {
+                    this.protocolVersion        = this.receive.ReadInt32();	// Protocol	version
+                    this.protocolArchitecture   = this.receive.ReadInt32();	// Architecture	for	protocol
+                    this.protocolMinimunType    = this.receive.ReadInt32();	// Minimum type
+
+                    if (this.protocolVersion < 0)
+                    {
+                        this.protocolVersion = (this.protocolVersion & IscCodes.FB_PROTOCOL_FLAG) | 11;
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        this.Disconnect();
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    finally
+                    {
+                        throw new IscException(IscCodes.isc_connect_reject);
+                    }
+                }
+            }
+            catch (IOException)
+            {
+                throw new IscException(IscCodes.isc_network_error);
+            }
+        }
+
+        public XdrStream CreateXdrStream()
+        {
+#if	(NET_CF)
+            return new XdrStream(this.networkStream, this.characterSet);
+#else
+            return new XdrStream(new BufferedStream(this.networkStream), this.characterSet);
+#endif
+        }
+
 		#endregion
 
 		#region Internal Methods
-
-		internal int ReadOperation()
-		{
-			int op = (this.operation >= 0) ? this.operation : this.NextOperation();
-			this.operation = -1;
-
-			return op;
-		}
-
-		internal int NextOperation()
-		{
-			do
-			{
-				/* loop	as long	as we are receiving	dummy packets, just
-				 * throwing	them away--note	that if	we are a server	we won't
-				 * be receiving	them, but it is	better to check	for	them at
-				 * this	level rather than try to catch them	in all places where
-				 * this	routine	is called 
-				 */
-				this.operation = this.receive.ReadInt32();
-			} while (this.operation == IscCodes.op_dummy);
-
-			return this.operation;
-		}
 
 		internal GdsResponse ReadGenericResponse()
 		{
 			try
 			{
-				if (this.ReadOperation() == IscCodes.op_response)
+				if (this.Receive.ReadOperation() == IscCodes.op_response)
 				{
 					GdsResponse r = new GdsResponse(
 						this.receive.ReadInt32(),
@@ -280,11 +384,6 @@ namespace FirebirdSql.Data.Gds
 			}
 
 			return exception;
-		}
-
-		internal void SetOperation(int operation)
-		{
-			this.operation = operation;
 		}
 
 		#endregion

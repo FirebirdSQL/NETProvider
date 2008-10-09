@@ -56,8 +56,8 @@ namespace FirebirdSql.Data.Gds
 			// Initialize the connection
 			if (this.connection == null)
 			{
-				this.connection = new GdsConnection();
-				this.connection.Connect(ipAddress, portNumber);
+				this.connection = new GdsConnection(ipAddress, portNumber);
+				this.connection.Connect();
 			}
 		}
 
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.Gds
 			{
 				try
 				{
-					operation = this.connection.NextOperation();
+                    operation = this.connection.Receive.ReadNextOperation();
 
 					switch (operation)
 					{

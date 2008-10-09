@@ -882,14 +882,13 @@ namespace FirebirdSql.Data.Firebird
 			// Check the parameter character set
 			if (parameter.Charset != FbCharset.Default)
 			{
-				int idx = Charset.SupportedCharsets.IndexOf((int)parameter.Charset);
-				charset = Charset.SupportedCharsets[idx];
+                charset = Charset.GetCharset((int)parameter.Charset);
 			}
 			else
 			{
 				if (type == FbDbType.Guid)
 				{
-					charset = Charset.SupportedCharsets["OCTETS"];
+					charset = Charset.GetCharset("OCTETS");
 				}
 			}
 
@@ -909,12 +908,12 @@ namespace FirebirdSql.Data.Firebird
 					break;
 
 				case FbDbType.Guid:
-					descriptor[index].SubType = (short)charset.ID;
+					descriptor[index].SubType = (short)charset.Identifier;
 					break;
 
 				case FbDbType.Char:
 				case FbDbType.VarChar:
-					descriptor[index].SubType = (short)charset.ID;
+                    descriptor[index].SubType = (short)charset.Identifier;
 					if (parameter.Size > 0)
 					{
 						short len = (short)(parameter.Size * charset.BytesPerCharacter);

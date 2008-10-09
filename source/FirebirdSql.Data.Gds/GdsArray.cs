@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.Gds
 			dbType	= TypeHelper.GetDbDataType(this.Descriptor.DataType, 0, this.Descriptor.Scale);
 
 			// Decode slice	data
-			XdrStream xdr = new XdrStream(slice, this.db.Charset);
+			XdrStream xdr = new XdrStream(slice, this.DB.Charset);
 
 			while (xdr.Position < xdr.Length)
 			{
@@ -322,7 +322,6 @@ namespace FirebirdSql.Data.Gds
 				}
 				else
 				{
-					this.db.SetOperation(operation);
 					this.db.ReadGenericResponse();
 
 					return null;

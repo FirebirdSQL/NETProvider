@@ -117,9 +117,9 @@ namespace FirebirdSql.Data.Gds
 
 		#region Constructors
 
-		public GdsDatabase()
+		public GdsDatabase(GdsConnection connection)
 		{
-			this.connection		= new GdsConnection();
+			this.connection		= connection;
 			this.charset		= Charset.DefaultCharset;
 			this.dialect		= 3;
 			this.packetSize		= 8192;
@@ -185,13 +185,13 @@ namespace FirebirdSql.Data.Gds
 
 		#region Database Methods
 
-		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public void CreateDatabase(DatabaseParameterBuffer dpb, string database)
 		{
 			lock (this)
 			{
 				try
 				{
-					this.connection.Connect(dataSource, port, this.packetSize, this.charset);
+					this.connection.Connect();
 					this.Send.Write(IscCodes.op_create);
 					this.Send.Write((int)0);
 					this.Send.Write(database);
@@ -394,16 +394,12 @@ namespace FirebirdSql.Data.Gds
 
 		#region Methods
 
-		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public void Attach(DatabaseParameterBuffer dpb, string database)
 		{
 			lock (this)
 			{
 				try
 				{
-					this.connection.Connect(dataSource, port, this.packetSize, this.charset);
-
-					this.Identify(database);
-
 					this.Send.Write(IscCodes.op_attach);
 					this.Send.Write((int)0);				// Database	object ID
 					this.Send.Write(database);				// Database	PATH
@@ -423,6 +419,7 @@ namespace FirebirdSql.Data.Gds
 						catch
 						{
 						}
+
 						throw;
 					}
 				}
@@ -540,30 +537,30 @@ namespace FirebirdSql.Data.Gds
 
 		#region Database Information methods
 
-		public string GetServerVersion()
-		{
-			byte[] items = new byte[]
+        public string GetServerVersion()
+        {
+            byte[] items = new byte[]
 			{
 				IscCodes.isc_info_isc_version,
 				IscCodes.isc_info_end
 			};
 
-			return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256)[0].ToString();
-		}
+            return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_128)[0].ToString();
+        }
 
-		public ArrayList GetDatabaseInfo(byte[] items)
-		{
-			return this.GetDatabaseInfo(items, IscCodes.MAX_BUFFER_SIZE);
-		}
+        public ArrayList GetDatabaseInfo(byte[] items)
+        {
+            return this.GetDatabaseInfo(items, IscCodes.MAX_BUFFER_SIZE);
+        }
 
-		public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
-		{
-			byte[] buffer = new byte[bufferLength];
+        public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
+        {
+            byte[] buffer = new byte[bufferLength];
 
-			this.DatabaseInfo(items, buffer, buffer.Length);
+            this.DatabaseInfo(items, buffer, buffer.Length);
 
-			return IscHelper.ParseDatabaseInfo(buffer);
-		}
+            return IscHelper.ParseDatabaseInfo(buffer);
+        }
 
 		#endregion
 
@@ -605,17 +602,12 @@ namespace FirebirdSql.Data.Gds
 
 		internal int ReadOperation()
 		{
-			return this.connection.ReadOperation();
+			return this.connection.Receive.ReadOperation();
 		}
 
 		internal int NextOperation()
 		{
-			return this.connection.NextOperation();
-		}
-
-		internal void SetOperation(int operation)
-		{
-			this.connection.SetOperation(operation);
+            return this.connection.Receive.ReadNextOperation();
 		}
 
 		internal bool IsAssigned()
@@ -630,108 +622,38 @@ namespace FirebirdSql.Data.Gds
 
 		#region Private	Methods
 
-		private void Identify(string database)
-		{
-			try
-			{
-				// Here	we identify	the	user to	the	engine.	 
-				// This	may	or may not be used as login	info to	a database.				
-#if	(!NETCF)
-				byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
-				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
-#else
-				byte[] user = Encoding.Default.GetBytes("fbnetcf");
-				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
-#endif
-
-				MemoryStream user_id = new MemoryStream();
-
-				/* User	Name */
-				user_id.WriteByte(1);
-				user_id.WriteByte((byte)user.Length);
-				user_id.Write(user, 0, user.Length);
-				/* Host	name */
-				user_id.WriteByte(4);
-				user_id.WriteByte((byte)host.Length);
-				user_id.Write(host, 0, host.Length);
-				/* Attach/create using this	connection 
-				 * will	use	user verification
-				 */
-				user_id.WriteByte(6);
-				user_id.WriteByte(0);
-
-				this.Send.Write(IscCodes.op_connect);
-				this.Send.Write(IscCodes.op_attach);
-				this.Send.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
-				this.Send.Write(1);							// Architecture	of client -	Generic
-
-				this.Send.Write(database);					// Database	path
-				this.Send.Write(1);							// Protocol	versions understood
-				this.Send.WriteBuffer(user_id.ToArray());	// User	identification Stuff
-
-				this.Send.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
-				this.Send.Write(1);							// Architecture	of client -	Generic
-				this.Send.Write(2);							// Minumum type
-				this.Send.Write(3);							// Maximum type
-				this.Send.Write(2);							// Preference weight
-
-				this.Send.Flush();
-
-				if (this.ReadOperation() == IscCodes.op_accept)
-				{
-					this.Receive.ReadInt32();	// Protocol	version
-					this.Receive.ReadInt32();	// Architecture	for	protocol
-					this.Receive.ReadInt32();	// Minimum type
-				}
-				else
-				{
-					try
-					{
-						this.Detach();
-					}
-					catch (Exception)
-					{
-					}
-					finally
-					{
-						throw new IscException(IscCodes.isc_connect_reject);
-					}
-				}
-			}
-			catch (IOException)
-			{
-				// throw new IscException(IscCodes.isc_arg_gds,	IscCodes.isc_network_error,	Parameters.DataSource);
-				throw new IscException(IscCodes.isc_network_error);
-			}
-		}
-
 		/// <summary>
 		/// isc_database_info
 		/// </summary>
 		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
 		{
-			lock (this)
-			{
-				try
-				{
-					// see src/remote/protocol.h for packet	definition (p_info struct)					
-					this.Send.Write(IscCodes.op_info_database);	//	operation
-					this.Send.Write(this.handle);				//	db_handle
-					this.Send.Write(0);							//	incarnation
-					this.Send.WriteBuffer(items, items.Length);	//	items
-					this.Send.Write(bufferLength);				//	result buffer length
+            lock (this)
+            {
+                try
+                {
+                    // see src/remote/protocol.h for packet	definition (p_info struct)					
+                    this.Send.Write(IscCodes.op_info_database);	//	operation
+                    this.Send.Write(this.handle);				//	db_handle
+                    this.Send.Write(0);							//	incarnation
+                    this.Send.WriteBuffer(items, items.Length);	//	items
+                    this.Send.Write(bufferLength);				//	result buffer length
+                    this.Send.Flush();
 
-					this.Send.Flush();
+                    GdsResponse response        = this.ReadGenericResponse();
+                    int         responseLength  = bufferLength;
 
-					GdsResponse r = this.ReadGenericResponse();
+                    if (response.Data.Length < bufferLength)
+                    {
+                        responseLength = response.Data.Length;
+                    }
 
-					Buffer.BlockCopy(r.Data, 0, buffer, 0, bufferLength);
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_network_error);
-				}
-			}
+                    Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_network_error);
+                }
+            }
 		}
 
 		#endregion

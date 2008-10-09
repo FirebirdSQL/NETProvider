@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("(c) 2002-2005. Carlos Guzman Alvarez")]
 [assembly: AssemblyVersion("1.7.1.0")]
 [assembly: AssemblyDelaySign(false)]
-[assembly: AssemblyKeyFile("FirebirdSql.Data.Firebird.snk")]
+// [assembly: AssemblyKeyFile("FirebirdSql.Data.Firebird.snk")]
 [assembly: AssemblyKeyName("")]

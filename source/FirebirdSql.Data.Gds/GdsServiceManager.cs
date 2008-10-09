@@ -47,27 +47,21 @@ namespace FirebirdSql.Data.Gds
 
 		#region Constructors
 
-		public GdsServiceManager()
+		public GdsServiceManager(GdsConnection connection)
 		{
+            this.connection = connection;
 		}
 
 		#endregion
 
 		#region Methods
 
-		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
+		public void Attach(ServiceParameterBuffer spb, string service)
 		{
 			lock (this)
 			{
 				try
 				{
-					if (this.connection == null)
-					{
-						this.connection = new GdsConnection();
-					}
-
-					this.connection.Connect(dataSource, port, 8192, Charset.DefaultCharset);
-
 					this.connection.Send.Write(IscCodes.op_service_attach);
 					this.connection.Send.Write(0);
 					this.connection.Send.Write(service);
@@ -184,7 +178,14 @@ namespace FirebirdSql.Data.Gds
 
 					GdsResponse r = this.connection.ReadGenericResponse();
 
-					Buffer.BlockCopy(r.Data, 0, buffer, 0, bufferLength);
+					int responseLength = bufferLength;
+
+					if (r.Data.Length < bufferLength)
+					{
+						responseLength = r.Data.Length;
+					}
+
+					Buffer.BlockCopy(r.Data, 0, buffer, 0, responseLength);
 				}
 				catch (IOException)
 				{

@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2002, 2005 Carlos Guzman Alvarez
+ *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
  */
 
@@ -23,7 +23,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal sealed class TypeHelper
 	{
-		#region Constructors
+		#region · Constructors ·
 
 		private TypeHelper()
 		{
@@ -31,7 +31,12 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region Static Methods
+		#region · Static Methods ·
+
+		public static bool IsDBNull(object value)
+		{
+			return (value == null || value == System.DBNull.Value);
+		}
 
 		public static short GetSize(DbDataType dataType)
 		{
@@ -205,28 +210,36 @@ namespace FirebirdSql.Data.Common
 					return DbDataType.Text;
 
 				case IscCodes.blr_short:
-                    if (subType == 2)
-                    {
-                        return DbDataType.Decimal;
-                    }
-                    else if (subType == 1)
-                    {
-                        return DbDataType.Numeric;
-                    }
+					if (subType == 2)
+					{
+						return DbDataType.Decimal;
+					}
+					else if (subType == 1)
+					{
+						return DbDataType.Numeric;
+					}
+					else if (scale < 0)
+					{
+						return DbDataType.Decimal;
+					}
 					else
 					{
 						return DbDataType.SmallInt;
 					}
 
 				case IscCodes.blr_long:
-                    if (subType == 2)
-                    {
-                        return DbDataType.Decimal;
-                    }
-                    else if (subType == 1)
-                    {
-                        return DbDataType.Numeric;
-                    }
+					if (subType == 2)
+					{
+						return DbDataType.Decimal;
+					}
+					else if (subType == 1)
+					{
+						return DbDataType.Numeric;
+					}
+					else if (scale < 0)
+					{
+						return DbDataType.Decimal;
+					}
 					else
 					{
 						return DbDataType.Integer;
@@ -235,14 +248,18 @@ namespace FirebirdSql.Data.Common
 				case IscCodes.blr_quad:
 				case IscCodes.blr_int64:
 				case IscCodes.blr_blob_id:
-                    if (subType == 2)
-                    {
-                        return DbDataType.Decimal;
-                    }
-                    else if (subType == 1)
-                    {
-                        return DbDataType.Numeric;
-                    }
+					if (subType == 2)
+					{
+						return DbDataType.Decimal;
+					}
+					else if (subType == 1)
+					{
+						return DbDataType.Numeric;
+					}
+					else if (scale < 0)
+					{
+						return DbDataType.Decimal;
+					}
 					else
 					{
 						return DbDataType.BigInt;
@@ -328,6 +345,53 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.TimeStamp:
 					return "TIMESTAMP";
+
+				default:
+					return null;
+			}
+		}
+
+		public static string GetSystemDataTypeName(DbDataType dataType)
+		{
+			switch (dataType)
+			{
+				case DbDataType.Array:
+					return "System.Array";
+
+				case DbDataType.Binary:
+					return "System.Array";
+
+				case DbDataType.Text:
+				case DbDataType.Char:
+				case DbDataType.VarChar:
+					return "System.String";
+
+				case DbDataType.Guid:
+					return "System.Guid";                    
+
+				case DbDataType.SmallInt:
+					return "System.Int16";
+
+				case DbDataType.Integer:
+					return "System.Int32";
+
+				case DbDataType.BigInt:
+					return "System.Int64";
+
+				case DbDataType.Float:
+					return "System.Single";
+
+				case DbDataType.Double:
+					return "System.Double";
+
+				case DbDataType.Numeric:
+				case DbDataType.Decimal:
+					return "System.Decimal";
+
+				case DbDataType.Date:
+				case DbDataType.Time:
+				case DbDataType.TimeStamp:
+					return "System.DateTime";
 
 				default:
 					return null;
@@ -434,6 +498,97 @@ namespace FirebirdSql.Data.Common
 
 				case DbType.Guid:
 					return DbDataType.Guid;
+
+				default:
+					throw new ArgumentException("Invalid data type");
+			}
+		}
+
+		public static DbDataType GetTypeFromDsc(int dsc_type, int dsc_scale, int dsc_subType)
+		{
+			switch (dsc_type)
+			{
+				case IscCodes.dtype_cstring:	// char
+					return DbDataType.Char;
+
+				case IscCodes.dtype_varying:	// varchar
+					return DbDataType.VarChar;
+
+				case IscCodes.dtype_short:	    // Int16
+					if (dsc_subType == 2)
+					{
+						return DbDataType.Decimal;
+					}
+					else if (dsc_subType == 1)
+					{
+						return DbDataType.Numeric;
+					}
+					else if (dsc_scale < 0)
+					{
+						return DbDataType.Decimal;
+					}
+					else
+					{
+						return DbDataType.SmallInt;
+					}
+
+				case IscCodes.dtype_long:	    // Int32
+					if (dsc_subType == 2)
+					{
+						return DbDataType.Decimal;
+					}
+					else if (dsc_subType == 1)
+					{
+						return DbDataType.Numeric;
+					}
+					else if (dsc_scale < 0)
+					{
+						return DbDataType.Decimal;
+					}
+					else
+					{
+						return DbDataType.Integer;
+					}
+
+				case IscCodes.dtype_int64:	    // Int64
+					if (dsc_subType == 2)
+					{
+						return DbDataType.Decimal;
+					}
+					else if (dsc_subType == 1)
+					{
+						return DbDataType.Numeric;
+					}
+					else if (dsc_scale < 0)
+					{
+						return DbDataType.Decimal;
+					}
+					else
+					{
+						return DbDataType.BigInt;
+					}
+
+				case IscCodes.dtype_d_float:	// Double
+				case IscCodes.dtype_double:	    
+					return DbDataType.Double;
+
+				case IscCodes.dtype_real:	    // Float
+					return DbDataType.Float;
+
+				case IscCodes.dtype_sql_date:   // Date
+					return DbDataType.Date;
+
+				case IscCodes.dtype_sql_time:   // Time
+					return DbDataType.Time;
+
+				case IscCodes.dtype_timestamp:	// Timestamp
+					return DbDataType.TimeStamp;
+
+				case IscCodes.dtype_blob:       // Blob
+					return DbDataType.Binary;
+
+				case IscCodes.dtype_text:       // Clob
+					return DbDataType.Text;
 
 				default:
 					throw new ArgumentException("Invalid data type");

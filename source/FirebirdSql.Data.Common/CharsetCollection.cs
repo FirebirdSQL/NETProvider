@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Common
 
 			foreach (Charset item in this)
 			{
-				if (item.ID == id)
+				if (item.Identifier == id)
 				{
 					return index;
 				}

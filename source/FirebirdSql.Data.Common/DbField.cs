@@ -78,14 +78,11 @@ namespace FirebirdSql.Data.Common
 					// Bits 8-17 hold collation_id for this value.
 					byte[] cs = BitConverter.GetBytes(value);
 
-					int index = Charset.SupportedCharsets.IndexOf(cs[0]);
-					if (index != -1)
+					this.charset = Charset.GetCharset(cs[0]);
+
+					if (this.charset == null)
 					{
-						this.charset = Charset.SupportedCharsets[index];
-					}
-					else
-					{
-						this.charset = Charset.SupportedCharsets[0];
+						this.charset = Charset.DefaultCharset;
 					}
 				}
 			}

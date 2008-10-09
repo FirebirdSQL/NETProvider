@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Embedded
 
 		#region Methods
 
-		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
+		public void Attach(ServiceParameterBuffer spb, string service)
 		{
 			int[] statusVector = FesConnection.GetNewStatusVector();
 			int svcHandle = this.Handle;

@@ -86,10 +86,10 @@ namespace FirebirdSql.Data.Common
 
 		#region Methods
 
-		void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database);
+		void Attach(DatabaseParameterBuffer dpb, string database);
 		void Detach();
 
-		void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database);
+		void CreateDatabase(DatabaseParameterBuffer dpb, string database);
 		void DropDatabase();
 
 		ITransaction BeginTransaction(TransactionParameterBuffer tpb);
