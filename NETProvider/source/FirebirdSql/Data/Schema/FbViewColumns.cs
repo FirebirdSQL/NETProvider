@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.Schema
                 }
 
                 row["IS_NULLABLE"] = (row["COLUMN_NULLABLE"] == DBNull.Value);
-                row["IS_ARRAY"] = (row["COLUMN_ARRAY"] == DBNull.Value);
+                row["IS_ARRAY"] = (row["COLUMN_ARRAY"] != DBNull.Value);
 
                 FbDbType dbType = (FbDbType)TypeHelper.GetDbDataType(blrType, subType, scale);
                 row["COLUMN_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLower(CultureInfo.CurrentUICulture);
