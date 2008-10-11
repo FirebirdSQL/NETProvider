@@ -131,41 +131,43 @@ namespace FirebirdSql.Data.Client.Native
                 // Clear the status vector
                 this.ClearStatusVector();
 
-				MemoryStream    segment = new MemoryStream();
-				byte[]          tmp     = new byte[requested];
+                using (MemoryStream segment = new MemoryStream())
+                {
+                    byte[] tmp = new byte[requested];
 
-                IntPtr status = db.FbClient.isc_get_segment(
-					this.statusVector,
-					ref	this.blobHandle,
-					ref	segmentLength,
-					requested,
-					tmp);
+                    IntPtr status = db.FbClient.isc_get_segment(
+                        this.statusVector,
+                        ref	this.blobHandle,
+                        ref	segmentLength,
+                        requested,
+                        tmp);
 
-				if (segmentLength > 0)
-				{
-					segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
-				}
+                    if (segmentLength > 0)
+                    {
+                        segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
+                    }
 
-				this.RblRemoveValue(IscCodes.RBL_segment);
-				
-                if (this.statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
-				{
-					segment.SetLength(0);
-					this.RblAddValue(IscCodes.RBL_eof_pending);
-				}
-				else
-				{
-					if (status == IntPtr.Zero || this.statusVector[1] == new IntPtr(IscCodes.isc_segment))
-					{
-						this.RblAddValue(IscCodes.RBL_segment);
-					}
-					else
-					{
-						this.db.ParseStatusVector(this.statusVector);
-					}
-				}
+                    this.RblRemoveValue(IscCodes.RBL_segment);
 
-				return segment.ToArray();
+                    if (this.statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
+                    {
+                        segment.SetLength(0);
+                        this.RblAddValue(IscCodes.RBL_eof_pending);
+                    }
+                    else
+                    {
+                        if (status == IntPtr.Zero || this.statusVector[1] == new IntPtr(IscCodes.isc_segment))
+                        {
+                            this.RblAddValue(IscCodes.RBL_segment);
+                        }
+                        else
+                        {
+                            this.db.ParseStatusVector(this.statusVector);
+                        }
+                    }
+
+                    return segment.ToArray();
+                }
 			}
 		}
 
