@@ -67,12 +67,14 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                     if (this.Parameters != null)
                     {
-                        XdrStream xdr = new XdrStream(database.Charset);
-                        xdr.Write(this.Parameters);
+                        using (XdrStream xdr = new XdrStream(database.Charset))
+                        {
+                            xdr.Write(this.Parameters);
 
-                        descriptor = xdr.ToArray();
+                            descriptor = xdr.ToArray();
 
-                        xdr.Close();
+                            xdr.Close();
+                        }
                     }
 
                     // Prepare the statement
@@ -150,12 +152,14 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                     if (this.Parameters != null)
                     {
-                        XdrStream xdr = new XdrStream(database.Charset);
-                        xdr.Write(this.Parameters);
+                        using (XdrStream xdr = new XdrStream(database.Charset))
+                        {
+                            xdr.Write(this.Parameters);
 
-                        descriptor = xdr.ToArray();
+                            descriptor = xdr.ToArray();
 
-                        xdr.Close();
+                            xdr.Close();
+                        }
                     }
 
                     // Write the message
