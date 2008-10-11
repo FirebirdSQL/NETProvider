@@ -21,7 +21,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    public sealed class FbRemoteEvent
+    public sealed class FbRemoteEvent : IDisposable
     {
         #region · Events ·
 
@@ -33,6 +33,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private FbConnection connection;
         private RemoteEvent revent;
+        private bool _disposed = false;
 
         #endregion
 
@@ -192,6 +193,33 @@ namespace FirebirdSql.Data.FirebirdClient
                     this.QueueEvents();
                 }
             }
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    this.CancelEvents();
+                    this.connection.Dispose();
+                    this.connection = null;
+                    this.revent = null;
+                }
+
+                // There are no unmanaged resources to release, but
+                // if we add them, they need to be released here.
+            }
+            this._disposed = true;
         }
 
         #endregion

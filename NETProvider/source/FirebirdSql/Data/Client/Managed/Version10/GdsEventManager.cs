@@ -25,170 +25,177 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-	internal class GdsEventManager
-	{
-		#region · Fields ·
+    internal class GdsEventManager
+    {
+        #region · Fields ·
 
-		private GdsDatabase	database;
-		private Thread		thread;
-		private Hashtable	events;
-		private int			handle;
+        private GdsDatabase database;
+        private Thread thread;
+        private Hashtable events;
+        private int handle;
+        private SynchronizationContext syncContext;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		public Hashtable EventList
-		{
-			get { return this.events; }
-		}
+        //public Hashtable EventList
+        //{
+        //    get { return this.events; }
+        //}
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		public GdsEventManager(int handle, string ipAddress, int portNumber)
-		{
-			this.events = new Hashtable();
-			this.events = Hashtable.Synchronized(this.events);
-			this.handle = handle;
+        public GdsEventManager(int handle, string ipAddress, int portNumber)
+        {
+            this.events = new Hashtable();
+            this.events = Hashtable.Synchronized(this.events);
+            this.handle = handle;
+            this.syncContext = (SynchronizationContext.Current != null ? SynchronizationContext.Current : new SynchronizationContext());
+                    
 
-			// Initialize the connection
-			if (this.database == null)
-			{
+            // Initialize the connection
+            if (this.database == null)
+            {
                 GdsConnection connection = new GdsConnection(ipAddress, portNumber);
 
                 connection.Connect();
 
-				this.database = new GdsDatabase(connection);
-			}
-		}
+                this.database = new GdsDatabase(connection);
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		public void QueueEvents(RemoteEvent remoteEvent)
-		{
-			lock (this)
-			{
-				lock (this.events.SyncRoot)
-				{
-					if (!this.events.ContainsKey(remoteEvent.LocalId))
-					{
-						this.events.Add(remoteEvent.LocalId, remoteEvent);
-					}
-				}
+        public void QueueEvents(RemoteEvent remoteEvent)
+        {
+            lock (this)
+            {
+                if (!this.events.ContainsKey(remoteEvent.LocalId))
+                {
+                    lock (this.events.SyncRoot)
+                    {
+                        this.events.Add(remoteEvent.LocalId, remoteEvent);
+                    }
+                }
 
 #if	(!NET_CF)
-				if (this.thread == null ||
-					(this.thread.ThreadState != ThreadState.Running && 
-					this.thread.ThreadState != ThreadState.Background))
+                if (this.thread == null ||
+                    (this.thread.ThreadState != ThreadState.Running &&
+                    this.thread.ThreadState != ThreadState.Background))
 #else
 				if (this.thread == null)
 #endif
-				{
-					this.thread = new Thread(new ThreadStart(ThreadHandler));
-					this.thread.Start();
-					this.thread.IsBackground = true;
-				}
-			}
-		}
+                {
+                    this.thread = new Thread(new ParameterizedThreadStart(ThreadHandler));
+                    this.thread.Name = "FirebirdClient - Events Thread";
+                    this.thread.Start(this.syncContext);
+                    this.thread.IsBackground = true;
+                }
+            }
+        }
 
-		public void CancelEvents(RemoteEvent remoteEvent)
-		{
-			lock (this.events.SyncRoot)
-			{
-				this.events.Remove(remoteEvent.LocalId);
-			}
-		}
+        public void CancelEvents(RemoteEvent remoteEvent)
+        {
+            lock (this.events.SyncRoot)
+            {
+                this.events.Remove(remoteEvent.LocalId);
+            }
+        }
 
-		public void Close()
-		{
-			lock (this.database.SyncObject)
-			{
-				if (this.database != null)
-				{
-					this.database.Detach();
-				}
+        public void Close()
+        {
+            lock (this.database.SyncObject)
+            {
+                if (this.database != null)
+                {
+                    this.database.Detach();
+                }
 
-				if (this.thread != null)
-				{
-					this.thread.Abort();
-					this.thread.Join();
+                if (this.thread != null)
+                {
+                    this.thread.Abort();
+                    this.thread.Join();
 
-					this.thread = null;
-				}
-			}
-		}
+                    this.thread = null;
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Private Methods ·
+        #region · Private Methods ·
 
-		private void ThreadHandler()
-		{
-			int		operation   = -1;
-			int		dbHandle    = 0;
-			int		eventId     = 0;
-			byte[]	buffer	    = null;
-			byte[]	ast		    = null;
+        private void ThreadHandler(object o)
+        {
+            int operation = -1;
+            int dbHandle = 0;
+            int eventId = 0;
+            byte[] buffer = null;
+            byte[] ast = null;
 
-			while (this.events.Count > 0)
-			{
-				try
-				{
-					operation = this.database.NextOperation();
+            while (this.events.Count > 0)
+            {
+                try
+                {
+                    operation = this.database.NextOperation();
 
-					switch (operation)
-					{
-						case IscCodes.op_response:
-							this.database.ReadResponse();
-							break;
+                    switch (operation)
+                    {
+                        case IscCodes.op_response:
+                            this.database.ReadResponse();
+                            break;
 
-						case IscCodes.op_exit:
-						case IscCodes.op_disconnect:
-							this.database.Detach();
-							return;
+                        case IscCodes.op_exit:
+                        case IscCodes.op_disconnect:
+                            this.database.Detach();
+                            return;
 
-						case IscCodes.op_event:
-							dbHandle	= this.database.ReadInt32();
-							buffer		= this.database.ReadBuffer();
-							ast			= this.database.ReadBytes(8);
-							eventId		= this.database.ReadInt32();
+                        case IscCodes.op_event:
+                            dbHandle = this.database.ReadInt32();
+                            buffer = this.database.ReadBuffer();
+                            ast = this.database.ReadBytes(8);
+                            eventId = this.database.ReadInt32();
 
-							if (this.events.ContainsKey(eventId))
-							{
-								RemoteEvent currentEvent = (RemoteEvent)this.events[eventId];
+                            if (this.events.ContainsKey(eventId))
+                            {
+                                RemoteEvent currentEvent = (RemoteEvent)this.events[eventId];
 
-								lock (this.events.SyncRoot)
-								{
-									// Remove event	from the list
-									this.events.Remove(eventId);
+                                lock (this.events.SyncRoot)
+                                {
+                                    // Remove event	from the list
+                                    this.events.Remove(eventId);
+                                }
 
-									// Notify new event	counts
-									currentEvent.EventCounts(buffer);
+                                // Notify new event	counts
+                                ((SynchronizationContext)o).Send(delegate
+                                {
+                                    currentEvent.EventCounts(buffer);
+                                }, null);
 
-									if (this.events.Count == 0)
-									{
-										return;
-									}
-								}
-							}
-							break;
-					}
-				}
-				catch (ThreadAbortException)
-				{
-					return;
-				}
-				catch (Exception)
-				{
-					return;
-				}
-			}
-		}
+                                if (this.events.Count == 0)
+                                {
+                                    return;
+                                }
+                            }
+                            break;
+                    }
+                }
+                catch (ThreadAbortException)
+                {
+                    return;
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
