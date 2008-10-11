@@ -123,40 +123,42 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			{
 				int[] statusVector = ExtConnection.GetNewStatusVector();
 
-				MemoryStream segment = new MemoryStream();
-				byte[] tmp = new byte[requested];
+                using (MemoryStream segment = new MemoryStream())
+                {
+                    byte[] tmp = new byte[requested];
 
-				int status = SafeNativeMethods.isc_get_segment(
-					statusVector,
-					ref	this.blobHandle,
-					ref	segmentLength,
-					requested,
-					tmp);
+                    int status = SafeNativeMethods.isc_get_segment(
+                        statusVector,
+                        ref	this.blobHandle,
+                        ref	segmentLength,
+                        requested,
+                        tmp);
 
-				if (segmentLength > 0)
-				{
-					segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
-				}
+                    if (segmentLength > 0)
+                    {
+                        segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
+                    }
 
-				this.RblRemoveValue(IscCodes.RBL_segment);
-				if (statusVector[1] == IscCodes.isc_segstr_eof)
-				{
-					segment.SetLength(0);
-					this.RblAddValue(IscCodes.RBL_eof_pending);
-				}
-				else
-				{
-					if (status == 0 || statusVector[1] == IscCodes.isc_segment)
-					{
-						this.RblAddValue(IscCodes.RBL_segment);
-					}
-					else
-					{
-						this.db.ParseStatusVector(statusVector);
-					}
-				}
+                    this.RblRemoveValue(IscCodes.RBL_segment);
+                    if (statusVector[1] == IscCodes.isc_segstr_eof)
+                    {
+                        segment.SetLength(0);
+                        this.RblAddValue(IscCodes.RBL_eof_pending);
+                    }
+                    else
+                    {
+                        if (status == 0 || statusVector[1] == IscCodes.isc_segment)
+                        {
+                            this.RblAddValue(IscCodes.RBL_segment);
+                        }
+                        else
+                        {
+                            this.db.ParseStatusVector(statusVector);
+                        }
+                    }
 
-				return segment.ToArray();
+                    return segment.ToArray();
+                }
 			}
 		}
 
