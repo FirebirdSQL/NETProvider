@@ -142,43 +142,43 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
 #endif
 
-				MemoryStream user_id = new MemoryStream();
+                using (MemoryStream user_id = new MemoryStream())
+                {
+                    // User	Name
+                    user_id.WriteByte(1);
+                    user_id.WriteByte((byte)user.Length);
+                    user_id.Write(user, 0, user.Length);
 
-				// User	Name
-				user_id.WriteByte(1);
-				user_id.WriteByte((byte)user.Length);
-				user_id.Write(user, 0, user.Length);
-				
-                // Host	name
-				user_id.WriteByte(4);
-				user_id.WriteByte((byte)host.Length);
-				user_id.Write(host, 0, host.Length);
-				
-                // Attach/create using this connection will use user verification
-				user_id.WriteByte(6);
-				user_id.WriteByte(0);
+                    // Host	name
+                    user_id.WriteByte(4);
+                    user_id.WriteByte((byte)host.Length);
+                    user_id.Write(host, 0, host.Length);
 
-				outputStream.Write(IscCodes.op_connect);
-				outputStream.Write(IscCodes.op_attach);
-				outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
-				outputStream.Write(1);							// Architecture	of client -	Generic
+                    // Attach/create using this connection will use user verification
+                    user_id.WriteByte(6);
+                    user_id.WriteByte(0);
 
-				outputStream.Write(database);					// Database	path
-				outputStream.Write(2);							// Protocol	versions understood
-				outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
+                    outputStream.Write(IscCodes.op_connect);
+                    outputStream.Write(IscCodes.op_attach);
+                    outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
+                    outputStream.Write(1);							// Architecture	of client -	Generic
 
-				outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
-				outputStream.Write(1);							// Architecture	of client -	Generic
-				outputStream.Write(2);							// Minumum type
-				outputStream.Write(3);							// Maximum type
-				outputStream.Write(2);							// Preference weight
+                    outputStream.Write(database);					// Database	path
+                    outputStream.Write(2);							// Protocol	versions understood
+                    outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
 
-                outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
-                outputStream.Write(1);							// Architecture	of client -	Generic
-                outputStream.Write(2);							// Minumum type
-                outputStream.Write(3);							// Maximum type
-                outputStream.Write(2);							// Preference weight
+                    outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
+                    outputStream.Write(1);							// Architecture	of client -	Generic
+                    outputStream.Write(2);							// Minumum type
+                    outputStream.Write(3);							// Maximum type
+                    outputStream.Write(2);							// Preference weight
 
+                    outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
+                    outputStream.Write(1);							// Architecture	of client -	Generic
+                    outputStream.Write(2);							// Minumum type
+                    outputStream.Write(3);							// Maximum type
+                    outputStream.Write(2);							// Preference weight
+                }
 				outputStream.Flush();
 
 				if (inputStream.ReadOperation() == IscCodes.op_accept)
