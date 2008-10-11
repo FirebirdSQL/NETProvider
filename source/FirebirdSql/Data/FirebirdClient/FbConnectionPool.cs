@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				this.isRunning = true;
 
 				this.cleanUpThread = new Thread(new ThreadStart(this.RunCleanup));
-				this.cleanUpThread.Name = "Cleanup Thread";
+				this.cleanUpThread.Name = "FirebirdClient - Connection Pooling Cleanup Thread";
 				this.cleanUpThread.Start();
 				this.cleanUpThread.IsBackground = true;
 			}
