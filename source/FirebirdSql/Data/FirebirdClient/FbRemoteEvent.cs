@@ -215,9 +215,6 @@ namespace FirebirdSql.Data.FirebirdClient
                     this.connection = null;
                     this.revent = null;
                 }
-
-                // There are no unmanaged resources to release, but
-                // if we add them, they need to be released here.
             }
             this._disposed = true;
         }

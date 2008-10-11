@@ -23,12 +23,13 @@ using System.Net;
 
 namespace FirebirdSql.Data.Common
 {
-	internal abstract class ParameterBuffer
+	internal abstract class ParameterBuffer : IDisposable
 	{
 		#region · Fields ·
 
 		private MemoryStream stream;
-		private bool isLittleEndian;
+        private bool isLittleEndian;
+        private bool _disposed = false;
 
 		#endregion
 
@@ -125,5 +126,27 @@ namespace FirebirdSql.Data.Common
 		}
 
 		#endregion
-	}
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    this.stream.Dispose();
+                    this.stream = null;
+                }
+            }
+            this._disposed = true;
+        }
+
+        #endregion
+    }
 }
