@@ -130,98 +130,100 @@ namespace FirebirdSql.Data.Common
 
 		public byte[] ToBlrArray()
 		{
-			MemoryStream blr = new MemoryStream();
-			int par_count = this.Count * 2;
+            using (MemoryStream blr = new MemoryStream())
+            {
+                int par_count = this.Count * 2;
 
-			blr.WriteByte(IscCodes.blr_version5);
-			blr.WriteByte(IscCodes.blr_begin);
-			blr.WriteByte(IscCodes.blr_message);
-			blr.WriteByte(0);
-			blr.WriteByte((byte)(par_count & 255));
-			blr.WriteByte((byte)(par_count >> 8));
+                blr.WriteByte(IscCodes.blr_version5);
+                blr.WriteByte(IscCodes.blr_begin);
+                blr.WriteByte(IscCodes.blr_message);
+                blr.WriteByte(0);
+                blr.WriteByte((byte)(par_count & 255));
+                blr.WriteByte((byte)(par_count >> 8));
 
-			for (int i = 0; i < this.fields.Length; i++)
-			{
-				int dtype   = this.fields[i].SqlType;
-				int len     = this.fields[i].Length;
+                for (int i = 0; i < this.fields.Length; i++)
+                {
+                    int dtype = this.fields[i].SqlType;
+                    int len = this.fields[i].Length;
 
-				switch (dtype)
-				{
-					case IscCodes.SQL_VARYING:
-						blr.WriteByte(IscCodes.blr_varying);
-						blr.WriteByte((byte)(len & 255));
-						blr.WriteByte((byte)(len >> 8));
-						break;
+                    switch (dtype)
+                    {
+                        case IscCodes.SQL_VARYING:
+                            blr.WriteByte(IscCodes.blr_varying);
+                            blr.WriteByte((byte)(len & 255));
+                            blr.WriteByte((byte)(len >> 8));
+                            break;
 
-					case IscCodes.SQL_TEXT:
-						blr.WriteByte(IscCodes.blr_text);
-						blr.WriteByte((byte)(len & 255));
-						blr.WriteByte((byte)(len >> 8));
-						break;
+                        case IscCodes.SQL_TEXT:
+                            blr.WriteByte(IscCodes.blr_text);
+                            blr.WriteByte((byte)(len & 255));
+                            blr.WriteByte((byte)(len >> 8));
+                            break;
 
-					case IscCodes.SQL_DOUBLE:
-						blr.WriteByte(IscCodes.blr_double);
-						break;
+                        case IscCodes.SQL_DOUBLE:
+                            blr.WriteByte(IscCodes.blr_double);
+                            break;
 
-					case IscCodes.SQL_FLOAT:
-						blr.WriteByte(IscCodes.blr_float);
-						break;
+                        case IscCodes.SQL_FLOAT:
+                            blr.WriteByte(IscCodes.blr_float);
+                            break;
 
-					case IscCodes.SQL_D_FLOAT:
-						blr.WriteByte(IscCodes.blr_d_float);
-						break;
+                        case IscCodes.SQL_D_FLOAT:
+                            blr.WriteByte(IscCodes.blr_d_float);
+                            break;
 
-					case IscCodes.SQL_TYPE_DATE:
-						blr.WriteByte(IscCodes.blr_sql_date);
-						break;
+                        case IscCodes.SQL_TYPE_DATE:
+                            blr.WriteByte(IscCodes.blr_sql_date);
+                            break;
 
-					case IscCodes.SQL_TYPE_TIME:
-						blr.WriteByte(IscCodes.blr_sql_time);
-						break;
+                        case IscCodes.SQL_TYPE_TIME:
+                            blr.WriteByte(IscCodes.blr_sql_time);
+                            break;
 
-					case IscCodes.SQL_TIMESTAMP:
-						blr.WriteByte(IscCodes.blr_timestamp);
-						break;
+                        case IscCodes.SQL_TIMESTAMP:
+                            blr.WriteByte(IscCodes.blr_timestamp);
+                            break;
 
-					case IscCodes.SQL_BLOB:
-						blr.WriteByte(IscCodes.blr_quad);
-						blr.WriteByte(0);
-						break;
+                        case IscCodes.SQL_BLOB:
+                            blr.WriteByte(IscCodes.blr_quad);
+                            blr.WriteByte(0);
+                            break;
 
-					case IscCodes.SQL_ARRAY:
-						blr.WriteByte(IscCodes.blr_quad);
-						blr.WriteByte(0);
-						break;
+                        case IscCodes.SQL_ARRAY:
+                            blr.WriteByte(IscCodes.blr_quad);
+                            blr.WriteByte(0);
+                            break;
 
-					case IscCodes.SQL_LONG:
-						blr.WriteByte(IscCodes.blr_long);
-						blr.WriteByte((byte)this.fields[i].NumericScale);
-						break;
+                        case IscCodes.SQL_LONG:
+                            blr.WriteByte(IscCodes.blr_long);
+                            blr.WriteByte((byte)this.fields[i].NumericScale);
+                            break;
 
-					case IscCodes.SQL_SHORT:
-						blr.WriteByte(IscCodes.blr_short);
-						blr.WriteByte((byte)this.fields[i].NumericScale);
-						break;
+                        case IscCodes.SQL_SHORT:
+                            blr.WriteByte(IscCodes.blr_short);
+                            blr.WriteByte((byte)this.fields[i].NumericScale);
+                            break;
 
-					case IscCodes.SQL_INT64:
-						blr.WriteByte(IscCodes.blr_int64);
-						blr.WriteByte((byte)this.fields[i].NumericScale);
-						break;
+                        case IscCodes.SQL_INT64:
+                            blr.WriteByte(IscCodes.blr_int64);
+                            blr.WriteByte((byte)this.fields[i].NumericScale);
+                            break;
 
-					case IscCodes.SQL_QUAD:
-						blr.WriteByte(IscCodes.blr_quad);
-						blr.WriteByte((byte)this.fields[i].NumericScale);
-						break;
-				}
+                        case IscCodes.SQL_QUAD:
+                            blr.WriteByte(IscCodes.blr_quad);
+                            blr.WriteByte((byte)this.fields[i].NumericScale);
+                            break;
+                    }
 
-				blr.WriteByte(IscCodes.blr_short);
-				blr.WriteByte(0);
-			}
+                    blr.WriteByte(IscCodes.blr_short);
+                    blr.WriteByte(0);
+                }
 
-			blr.WriteByte(IscCodes.blr_end);
-			blr.WriteByte(IscCodes.blr_eoc);
+                blr.WriteByte(IscCodes.blr_end);
+                blr.WriteByte(IscCodes.blr_eoc);
 
-			return blr.ToArray();
+                return blr.ToArray();
+            }
 		}
 
 		#endregion
