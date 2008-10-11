@@ -127,90 +127,91 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         public virtual void Identify(string database)
 		{
-            XdrStream inputStream   = this.CreateXdrStream();
-            XdrStream outputStream  = this.CreateXdrStream();
-
-            try
-			{
-				// Here	we identify	the	user to	the	engine.	 
-				// This	may	or may not be used as login	info to	a database.				
+            using (XdrStream inputStream = this.CreateXdrStream(),
+                outputStream = this.CreateXdrStream())
+            {
+                try
+                {
+                    // Here	we identify	the	user to	the	engine.	 
+                    // This	may	or may not be used as login	info to	a database.				
 #if	(!NET_CF)
-				byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
-				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
+                    byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
+                    byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
 #else
 				byte[] user = Encoding.Default.GetBytes("fbnetcf");
 				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
 #endif
 
-                using (MemoryStream user_id = new MemoryStream())
-                {
-                    // User	Name
-                    user_id.WriteByte(1);
-                    user_id.WriteByte((byte)user.Length);
-                    user_id.Write(user, 0, user.Length);
-
-                    // Host	name
-                    user_id.WriteByte(4);
-                    user_id.WriteByte((byte)host.Length);
-                    user_id.Write(host, 0, host.Length);
-
-                    // Attach/create using this connection will use user verification
-                    user_id.WriteByte(6);
-                    user_id.WriteByte(0);
-
-                    outputStream.Write(IscCodes.op_connect);
-                    outputStream.Write(IscCodes.op_attach);
-                    outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
-                    outputStream.Write(1);							// Architecture	of client -	Generic
-
-                    outputStream.Write(database);					// Database	path
-                    outputStream.Write(2);							// Protocol	versions understood
-                    outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
-
-                    outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
-                    outputStream.Write(1);							// Architecture	of client -	Generic
-                    outputStream.Write(2);							// Minumum type
-                    outputStream.Write(3);							// Maximum type
-                    outputStream.Write(2);							// Preference weight
-
-                    outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
-                    outputStream.Write(1);							// Architecture	of client -	Generic
-                    outputStream.Write(2);							// Minumum type
-                    outputStream.Write(3);							// Maximum type
-                    outputStream.Write(2);							// Preference weight
-                }
-				outputStream.Flush();
-
-				if (inputStream.ReadOperation() == IscCodes.op_accept)
-				{
-                    this.protocolVersion        = inputStream.ReadInt32();	// Protocol	version
-					this.protocolArchitecture   = inputStream.ReadInt32();	// Architecture	for	protocol
-					this.protocolMinimunType    = inputStream.ReadInt32();	// Minimum type
-
-                    if (this.protocolVersion < 0)
+                    using (MemoryStream user_id = new MemoryStream())
                     {
-                        this.protocolVersion = (this.protocolVersion & IscCodes.FB_PROTOCOL_FLAG) | 11;
+                        // User	Name
+                        user_id.WriteByte(1);
+                        user_id.WriteByte((byte)user.Length);
+                        user_id.Write(user, 0, user.Length);
+
+                        // Host	name
+                        user_id.WriteByte(4);
+                        user_id.WriteByte((byte)host.Length);
+                        user_id.Write(host, 0, host.Length);
+
+                        // Attach/create using this connection will use user verification
+                        user_id.WriteByte(6);
+                        user_id.WriteByte(0);
+
+                        outputStream.Write(IscCodes.op_connect);
+                        outputStream.Write(IscCodes.op_attach);
+                        outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
+                        outputStream.Write(1);							// Architecture	of client -	Generic
+
+                        outputStream.Write(database);					// Database	path
+                        outputStream.Write(2);							// Protocol	versions understood
+                        outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
+
+                        outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
+                        outputStream.Write(1);							// Architecture	of client -	Generic
+                        outputStream.Write(2);							// Minumum type
+                        outputStream.Write(3);							// Maximum type
+                        outputStream.Write(2);							// Preference weight
+
+                        outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
+                        outputStream.Write(1);							// Architecture	of client -	Generic
+                        outputStream.Write(2);							// Minumum type
+                        outputStream.Write(3);							// Maximum type
+                        outputStream.Write(2);							// Preference weight
                     }
-				}
-				else
-				{
-					try
-					{
-						this.Disconnect();
-					}
-					catch (Exception)
-					{
-					}
-					finally
-					{
-						throw new IscException(IscCodes.isc_connect_reject);
-					}
-				}
-			}
-			catch (IOException)
-			{
-				throw new IscException(IscCodes.isc_network_error);
-			}
+                    outputStream.Flush();
+
+                    if (inputStream.ReadOperation() == IscCodes.op_accept)
+                    {
+                        this.protocolVersion = inputStream.ReadInt32();	// Protocol	version
+                        this.protocolArchitecture = inputStream.ReadInt32();	// Architecture	for	protocol
+                        this.protocolMinimunType = inputStream.ReadInt32();	// Minimum type
+
+                        if (this.protocolVersion < 0)
+                        {
+                            this.protocolVersion = (this.protocolVersion & IscCodes.FB_PROTOCOL_FLAG) | 11;
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            this.Disconnect();
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        finally
+                        {
+                            throw new IscException(IscCodes.isc_connect_reject);
+                        }
+                    }
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_network_error);
+                }
+            }
 		}
 
         public XdrStream CreateXdrStream()
