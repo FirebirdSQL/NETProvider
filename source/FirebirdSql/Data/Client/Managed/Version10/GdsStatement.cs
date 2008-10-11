@@ -332,12 +332,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                     if (this.parameters != null)
                     {
-                        XdrStream xdr = new XdrStream(database.Charset);
-                        xdr.Write(this.parameters);
+                        using (XdrStream xdr = new XdrStream(database.Charset))
+                        {
+                            xdr.Write(this.parameters);
 
-                        descriptor = xdr.ToArray();
+                            descriptor = xdr.ToArray();
 
-                        xdr.Close();
+                            xdr.Close();
+                        }
                     }
 
                     // Write the message
