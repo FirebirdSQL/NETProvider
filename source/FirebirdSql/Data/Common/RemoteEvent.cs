@@ -48,10 +48,10 @@ namespace FirebirdSql.Data.Common
 
 		#region · Properties ·
 
-		public IDatabase Database
-		{
-			get { return this.db; }
-		}
+        //public IDatabase Database
+        //{
+        //    get { return this.db; }
+        //}
 
 		public int LocalId
 		{
@@ -151,6 +151,8 @@ namespace FirebirdSql.Data.Common
 			{
 				this.db.CancelEvents(this);
 				this.ResetCounts();
+#warning // is this good place for it?
+                this.db.CloseEventManager();
 			}
 		}
 
