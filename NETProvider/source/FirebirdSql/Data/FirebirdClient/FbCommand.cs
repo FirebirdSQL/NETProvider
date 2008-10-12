@@ -52,6 +52,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private bool implicitTransaction;
         private int commandTimeout;
         private int fetchSize;
+        private bool _released = false;
 
 #if (NET_35 && ENTITY_FRAMEWORK)
         // type coercions
@@ -359,7 +360,6 @@ namespace FirebirdSql.Data.FirebirdClient
             this.namedParameters = new StringCollection();
             this.updatedRowSource = UpdateRowSource.Both;
             this.commandType = CommandType.Text;
-            this.designTimeVisible = true;
             this.designTimeVisible = true;
             this.commandTimeout = 30;
             this.fetchSize = 200;
@@ -791,10 +791,14 @@ namespace FirebirdSql.Data.FirebirdClient
             // If there	are	an active reader close it
             this.CloseReader();
 
-            // Remove the command from the Prepared commands list
-            if (this.connection != null && this.connection.State == ConnectionState.Open)
+            if (!this._released)
             {
-                this.connection.InnerConnection.RemovePreparedCommand(this);
+                // Remove the command from the Prepared commands list
+                if (this.connection != null && this.connection.State == ConnectionState.Open)
+                {
+                    this.connection.InnerConnection.RemovePreparedCommand(this);
+                }
+                this._released = true;
             }
 
             // Dipose the inner statement
@@ -1181,7 +1185,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 // Set if it's needed the Records Affected information
                 this.statement.ReturnRecordsAffected = this.connection.ConnectionOptions.ReturnRecordsAffected;
 
-                // Valida input parameter count
+                // Validate input parameter count
                 if (this.namedParameters.Count > 0 && this.Parameters.Count == 0)
                 {
                     throw new FbException("Must declare command parameters.");
