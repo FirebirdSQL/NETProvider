@@ -30,19 +30,19 @@ using System.Text;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-	internal class GdsConnection
-	{
-		#region · Fields ·
+    internal class GdsConnection
+    {
+        #region · Fields ·
 
-		private Socket			socket;
-		private NetworkStream	networkStream;
-        private string          dataSource;
-        private int             portNumber;
-        private int             packetSize;
-        private Charset         characterSet;          
-        private int             protocolVersion;
-        private int             protocolArchitecture;
-        private int             protocolMinimunType;
+        private Socket socket;
+        private NetworkStream networkStream;
+        private string dataSource;
+        private int portNumber;
+        private int packetSize;
+        private Charset characterSet;
+        private int protocolVersion;
+        private int protocolArchitecture;
+        private int protocolMinimunType;
 
         #endregion
 
@@ -77,145 +77,145 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         #region · Constructors ·
 
-        public GdsConnection(string dataSource, int port) 
+        public GdsConnection(string dataSource, int port)
             : this(dataSource, port, 8192, Charset.DefaultCharset)
-		{
-		}
+        {
+        }
 
         public GdsConnection(string dataSource, int portNumber, int packetSize, Charset characterSet)
-		{
-            this.dataSource     = dataSource;
-            this.portNumber     = portNumber;
-            this.packetSize     = packetSize;
-            this.characterSet   = characterSet;
+        {
+            this.dataSource = dataSource;
+            this.portNumber = portNumber;
+            this.packetSize = packetSize;
+            this.characterSet = characterSet;
 
-			GC.SuppressFinalize(this);
-		}
+            GC.SuppressFinalize(this);
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
-       
-		public virtual void Connect()
-		{
-			try
-			{
-				IPAddress   hostadd     = this.GetIPAddress(this.dataSource, AddressFamily.InterNetwork);
-                IPEndPoint  endPoint    = new IPEndPoint(hostadd, this.portNumber);
+        #region · Methods ·
 
-				this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        public virtual void Connect()
+        {
+            try
+            {
+                IPAddress hostadd = this.GetIPAddress(this.dataSource, AddressFamily.InterNetwork);
+                IPEndPoint endPoint = new IPEndPoint(hostadd, this.portNumber);
+
+                this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
 #if	(!NET_CF)
-				// Set Receive Buffer size.
-				this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, packetSize);
+                // Set Receive Buffer size.
+                this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, packetSize);
 
-				// Set Send	Buffer size.
-				this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, packetSize);
+                // Set Send	Buffer size.
+                this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, packetSize);
 #endif
                 // Disables	the	Nagle algorithm	for	send coalescing.
-				this.socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
+                this.socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
 
-				// Make	the	socket to connect to the Server
-				this.socket.Connect(endPoint);
-				this.networkStream = new NetworkStream(this.socket, true);
+                // Make	the	socket to connect to the Server
+                this.socket.Connect(endPoint);
+                this.networkStream = new NetworkStream(this.socket, true);
 
-				GC.SuppressFinalize(this.socket);
-				GC.SuppressFinalize(this.networkStream);
-			}
-			catch (SocketException)
-			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_network_error, dataSource);
-			}
-		}
+                GC.SuppressFinalize(this.socket);
+                GC.SuppressFinalize(this.networkStream);
+            }
+            catch (SocketException)
+            {
+                throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_network_error, dataSource);
+            }
+        }
 
         public virtual void Identify(string database)
-		{
-            using (XdrStream inputStream = this.CreateXdrStream(),
-                outputStream = this.CreateXdrStream())
+        {
+            // handles this.networkStream
+            XdrStream inputStream = this.CreateXdrStream();
+            XdrStream outputStream = this.CreateXdrStream();
+
+            try
             {
-                try
-                {
-                    // Here	we identify	the	user to	the	engine.	 
-                    // This	may	or may not be used as login	info to	a database.				
+                // Here	we identify	the	user to	the	engine.	 
+                // This	may	or may not be used as login	info to	a database.				
 #if	(!NET_CF)
-                    byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
-                    byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
+                byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
+                byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
 #else
 				byte[] user = Encoding.Default.GetBytes("fbnetcf");
 				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
 #endif
 
-                    using (MemoryStream user_id = new MemoryStream())
+                using (MemoryStream user_id = new MemoryStream())
+                {
+                    // User	Name
+                    user_id.WriteByte(1);
+                    user_id.WriteByte((byte)user.Length);
+                    user_id.Write(user, 0, user.Length);
+
+                    // Host	name
+                    user_id.WriteByte(4);
+                    user_id.WriteByte((byte)host.Length);
+                    user_id.Write(host, 0, host.Length);
+
+                    // Attach/create using this connection will use user verification
+                    user_id.WriteByte(6);
+                    user_id.WriteByte(0);
+
+                    outputStream.Write(IscCodes.op_connect);
+                    outputStream.Write(IscCodes.op_attach);
+                    outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
+                    outputStream.Write(1);							// Architecture	of client -	Generic
+
+                    outputStream.Write(database);					// Database	path
+                    outputStream.Write(2);							// Protocol	versions understood
+                    outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
+
+                    outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
+                    outputStream.Write(1);							// Architecture	of client -	Generic
+                    outputStream.Write(2);							// Minumum type
+                    outputStream.Write(3);							// Maximum type
+                    outputStream.Write(2);							// Preference weight
+
+                    outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
+                    outputStream.Write(1);							// Architecture	of client -	Generic
+                    outputStream.Write(2);							// Minumum type
+                    outputStream.Write(3);							// Maximum type
+                    outputStream.Write(2);							// Preference weight
+                }
+                outputStream.Flush();
+
+                if (inputStream.ReadOperation() == IscCodes.op_accept)
+                {
+                    this.protocolVersion = inputStream.ReadInt32();	// Protocol	version
+                    this.protocolArchitecture = inputStream.ReadInt32();	// Architecture	for	protocol
+                    this.protocolMinimunType = inputStream.ReadInt32();	// Minimum type
+
+                    if (this.protocolVersion < 0)
                     {
-                        // User	Name
-                        user_id.WriteByte(1);
-                        user_id.WriteByte((byte)user.Length);
-                        user_id.Write(user, 0, user.Length);
-
-                        // Host	name
-                        user_id.WriteByte(4);
-                        user_id.WriteByte((byte)host.Length);
-                        user_id.Write(host, 0, host.Length);
-
-                        // Attach/create using this connection will use user verification
-                        user_id.WriteByte(6);
-                        user_id.WriteByte(0);
-
-                        outputStream.Write(IscCodes.op_connect);
-                        outputStream.Write(IscCodes.op_attach);
-                        outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
-                        outputStream.Write(1);							// Architecture	of client -	Generic
-
-                        outputStream.Write(database);					// Database	path
-                        outputStream.Write(2);							// Protocol	versions understood
-                        outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
-
-                        outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
-                        outputStream.Write(1);							// Architecture	of client -	Generic
-                        outputStream.Write(2);							// Minumum type
-                        outputStream.Write(3);							// Maximum type
-                        outputStream.Write(2);							// Preference weight
-
-                        outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
-                        outputStream.Write(1);							// Architecture	of client -	Generic
-                        outputStream.Write(2);							// Minumum type
-                        outputStream.Write(3);							// Maximum type
-                        outputStream.Write(2);							// Preference weight
-                    }
-                    outputStream.Flush();
-
-                    if (inputStream.ReadOperation() == IscCodes.op_accept)
-                    {
-                        this.protocolVersion = inputStream.ReadInt32();	// Protocol	version
-                        this.protocolArchitecture = inputStream.ReadInt32();	// Architecture	for	protocol
-                        this.protocolMinimunType = inputStream.ReadInt32();	// Minimum type
-
-                        if (this.protocolVersion < 0)
-                        {
-                            this.protocolVersion = (this.protocolVersion & IscCodes.FB_PROTOCOL_FLAG) | 11;
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            this.Disconnect();
-                        }
-                        catch (Exception)
-                        {
-                        }
-                        finally
-                        {
-                            throw new IscException(IscCodes.isc_connect_reject);
-                        }
+                        this.protocolVersion = (this.protocolVersion & IscCodes.FB_PROTOCOL_FLAG) | 11;
                     }
                 }
-                catch (IOException)
+                else
                 {
-                    throw new IscException(IscCodes.isc_network_error);
+                    try
+                    {
+                        this.Disconnect();
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    finally
+                    {
+                        throw new IscException(IscCodes.isc_connect_reject);
+                    }
                 }
             }
-		}
+            catch (IOException)
+            {
+                throw new IscException(IscCodes.isc_network_error);
+            }
+        }
 
         public XdrStream CreateXdrStream()
         {
@@ -227,28 +227,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         }
 
         public virtual void Disconnect()
-		{
-			try
-			{
-				if (this.networkStream != null)
-				{
-					this.networkStream.Close();
-				}
-				if (this.socket != null)
-				{
-					this.socket.Close();
-				}
+        {
+            try
+            {
+                if (this.networkStream != null)
+                {
+                    this.networkStream.Close();
+                }
+                if (this.socket != null)
+                {
+                    this.socket.Close();
+                }
 
-				this.socket			= null;
-				this.networkStream	= null;
-			}
-			catch (IOException)
-			{
-				throw;
-			}
-		}
+                this.socket = null;
+                this.networkStream = null;
+            }
+            catch (IOException)
+            {
+                throw;
+            }
+        }
 
-		#endregion
+        #endregion
 
         #region · Private Methods ·
 
