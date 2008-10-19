@@ -118,20 +118,20 @@ namespace FirebirdSql.Data.Services
 
         #region · Internal Methods ·
 
-        internal ServiceParameterBuffer CreateParameterBuffer()
-        {
-            if (this.svc == null)
-            {
-                // New instance	for	Service	handler
-                this.svc = ClientFactory.CreateServiceManager(this.csManager);
-            }
+        //internal ServiceParameterBuffer CreateParameterBuffer()
+        //{
+        //    if (this.svc == null)
+        //    {
+        //        // New instance	for	Service	handler
+        //        this.svc = ClientFactory.CreateServiceManager(this.csManager);
+        //    }
 
-            return this.svc.CreateParameterBuffer();
-        }
+        //    return this.svc.CreateParameterBuffer();
+        //}
 
         internal ServiceParameterBuffer BuildSpb()
         {
-            ServiceParameterBuffer spb = this.CreateParameterBuffer();
+            ServiceParameterBuffer spb = new ServiceParameterBuffer();
 
             // SPB configuration				
             spb.Append(IscCodes.isc_spb_version);

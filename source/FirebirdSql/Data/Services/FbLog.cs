@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Services
             try
             {
                 // Configure Spb
-                this.StartSpb = this.CreateParameterBuffer();
+                this.StartSpb = new ServiceParameterBuffer();
 
                 this.StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
 

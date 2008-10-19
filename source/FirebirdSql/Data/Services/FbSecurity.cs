@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Services
             }
 
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_add_user);
 
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.Services
             }
 
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_delete_user);
 
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.Services
             }
 
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_modify_user);
             this.StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.Services
         public FbUserData DisplayUser(string userName)
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_display_user);
             this.StartSpb.Append(IscCodes.isc_spb_sec_username, userName);
@@ -221,7 +221,7 @@ namespace FirebirdSql.Data.Services
         public FbUserData[] DisplayUsers()
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_display_user);
 

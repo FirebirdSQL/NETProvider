@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Services
         {
             try
             {
-                this.StartSpb = this.CreateParameterBuffer();
+                this.StartSpb = new ServiceParameterBuffer();
 
                 // Configure Spb
                 this.StartSpb.Append(IscCodes.isc_action_svc_db_stats);
