@@ -269,30 +269,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Parameter Buffer Creation Methods ·
-
-		public BlobParameterBuffer CreateBlobParameterBuffer()
-		{
-			return new BlobParameterBuffer(BitConverter.IsLittleEndian);
-		}
-
-		public DatabaseParameterBuffer CreateDatabaseParameterBuffer()
-		{
-			return new DatabaseParameterBuffer(BitConverter.IsLittleEndian);
-		}
-
-		public EventParameterBuffer CreateEventParameterBuffer()
-		{
-			return new EventParameterBuffer();
-		}
-
-		public TransactionParameterBuffer CreateTransactionParameterBuffer()
-		{
-			return new TransactionParameterBuffer(BitConverter.IsLittleEndian);
-		}
-
-		#endregion
-
 		#region · Database Information Methods ·
 
 		public string GetServerVersion()

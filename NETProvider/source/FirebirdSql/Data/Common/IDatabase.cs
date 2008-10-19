@@ -100,11 +100,6 @@ namespace FirebirdSql.Data.Common
 		StatementBase CreateStatement();
 		StatementBase CreateStatement(ITransaction transaction);
 
-		BlobParameterBuffer CreateBlobParameterBuffer();
-		DatabaseParameterBuffer CreateDatabaseParameterBuffer();
-		EventParameterBuffer CreateEventParameterBuffer();
-		TransactionParameterBuffer CreateTransactionParameterBuffer();
-
 		ArrayList GetDatabaseInfo(byte[] items);
 		ArrayList GetDatabaseInfo(byte[] items, int bufferLength);
 
