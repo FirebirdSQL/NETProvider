@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *  
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -23,57 +26,51 @@ using System.Net;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class DatabaseParameterBuffer : ParameterBuffer
-	{
-		#region · Constructors ·
+    internal sealed class DatabaseParameterBuffer : ParameterBuffer
+    {
+        #region · Constructors ·
 
-		public DatabaseParameterBuffer() 
-			: base()
-		{
-		}
+        public DatabaseParameterBuffer()
+            : base(BitConverter.IsLittleEndian)
+        { }
 
-		public DatabaseParameterBuffer(bool isLittleEndian) 
-			: base(isLittleEndian)
-		{
-		}
+        #endregion
 
-		#endregion
+        #region · Methods ·
 
-		#region · Methods ·
+        public void Append(int type, byte value)
+        {
+            this.WriteByte(type);
+            this.WriteByte(1);
+            this.Write(value);
+        }
 
-		public void Append(int type, byte value)
-		{
-			this.WriteByte(type);
-			this.WriteByte(1);
-			this.Write(value);
-		}
+        public void Append(int type, short value)
+        {
+            this.WriteByte(type);
+            this.WriteByte(2);
+            this.Write(value);
+        }
 
-		public void Append(int type, short value)
-		{
-			this.WriteByte(type);
-			this.WriteByte(2);
-			this.Write(value);
-		}
+        public void Append(int type, int value)
+        {
+            this.WriteByte(type);
+            this.WriteByte((byte)4);
+            this.Write(value);
+        }
 
-		public void Append(int type, int value)
-		{
-			this.WriteByte(type);
-			this.WriteByte((byte)4);
-			this.Write(value);
-		}
+        public void Append(int type, string content)
+        {
+            this.Append(type, Encoding.Default.GetBytes(content));
+        }
 
-		public void Append(int type, string content)
-		{
-			this.Append(type, Encoding.Default.GetBytes(content));
-		}
+        public void Append(int type, byte[] buffer)
+        {
+            this.WriteByte(type);
+            this.WriteByte(buffer.Length);
+            this.Write(buffer);
+        }
 
-		public void Append(int type, byte[] buffer)
-		{
-			this.WriteByte(type);
-			this.WriteByte(buffer.Length);
-			this.Write(buffer);
-		}
-
-		#endregion
-	}
+        #endregion
+    }
 }
