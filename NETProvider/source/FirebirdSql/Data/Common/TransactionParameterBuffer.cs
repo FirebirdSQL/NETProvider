@@ -14,24 +14,34 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *  
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class TransactionParameterBuffer : ParameterBuffer
-	{
-		#region · Constructors ·
+    internal sealed class TransactionParameterBuffer : ParameterBuffer
+    {
+        #region · Constructors ·
 
-		public TransactionParameterBuffer() : base()
-		{
-		}
+        public TransactionParameterBuffer()
+            : base(BitConverter.IsLittleEndian)
+        { }
 
-		public TransactionParameterBuffer(bool isLittleEndian) : base(isLittleEndian)
-		{
-		}
+        #endregion
 
-		#endregion
-	}
+        #region · Methods ·
+
+        public void Append(int type, short value)
+        {
+            this.WriteByte(type);
+            this.WriteByte(2);
+            this.Write(value);
+        }
+
+        #endregion
+    }
 }

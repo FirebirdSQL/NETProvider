@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *  
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -22,30 +25,30 @@ using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class EventParameterBuffer : ParameterBuffer
-	{
-		#region · Constructors ·
+    internal sealed class EventParameterBuffer : ParameterBuffer
+    {
+        #region · Constructors ·
 
-		public EventParameterBuffer() : base(true)
-		{
-		}
+        public EventParameterBuffer()
+            : base(BitConverter.IsLittleEndian)
+        { }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		public void Append(string content, int actualCount)
-		{
-			this.Append(Encoding.Default.GetBytes(content), actualCount);
-		}
+        public void Append(string content, int actualCount)
+        {
+            this.Append(Encoding.Default.GetBytes(content), actualCount);
+        }
 
-		public void Append(byte[] content, int actualCount)
-		{
-			this.WriteByte(content.Length);
-			this.Write(content);
-			this.Write(actualCount);
-		}
+        public void Append(byte[] content, int actualCount)
+        {
+            this.WriteByte(content.Length);
+            this.Write(content);
+            this.Write(actualCount);
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
