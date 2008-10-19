@@ -513,7 +513,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private DatabaseParameterBuffer BuildDpb(IDatabase db, FbConnectionString options)
         {
-            DatabaseParameterBuffer dpb = db.CreateDatabaseParameterBuffer();
+            DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
 
             dpb.Append(IscCodes.isc_dpb_version1);
             dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });

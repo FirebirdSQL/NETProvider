@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.FirebirdClient
             try
             {
                 // DPB configuration
-                DatabaseParameterBuffer dpb = new DatabaseParameterBuffer(BitConverter.IsLittleEndian);
+                DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
 
                 // Dpb version
                 dpb.Append(IscCodes.isc_dpb_version1);
