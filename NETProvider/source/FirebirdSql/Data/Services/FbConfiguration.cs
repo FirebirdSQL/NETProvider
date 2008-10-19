@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Services
         public void SetSqlDialect(int sqlDialect)
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Services
         public void SetSweepInterval(int sweepInterval)
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Services
         public void SetPageBuffers(int pageBuffers)
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.Services
         public void DatabaseShutdown(FbShutdownMode mode, int seconds)
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.Services
         public void DatabaseOnline()
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.Services
         public void ActivateShadows()
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
@@ -142,7 +142,7 @@ namespace FirebirdSql.Data.Services
         public void SetForcedWrites(bool forcedWrites)
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
@@ -165,7 +165,7 @@ namespace FirebirdSql.Data.Services
 
         public void SetReserveSpace(bool reserveSpace)
         {
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
@@ -189,7 +189,7 @@ namespace FirebirdSql.Data.Services
         public void SetAccessMode(bool readOnly)
         {
             // Configure Spb
-            this.StartSpb = this.CreateParameterBuffer();
+            this.StartSpb = new ServiceParameterBuffer();
 
             this.StartSpb.Append(IscCodes.isc_action_svc_properties);
             this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
