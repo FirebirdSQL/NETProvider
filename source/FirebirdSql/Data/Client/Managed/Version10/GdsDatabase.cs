@@ -572,30 +572,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Parameter Buffer Creation Methods ·
-
-        public virtual BlobParameterBuffer CreateBlobParameterBuffer()
-		{
-			return new BlobParameterBuffer(false);
-		}
-
-        public virtual DatabaseParameterBuffer CreateDatabaseParameterBuffer()
-		{
-			return new DatabaseParameterBuffer(false);
-		}
-
-        public virtual EventParameterBuffer CreateEventParameterBuffer()
-		{
-			return new EventParameterBuffer();
-		}
-
-        public virtual TransactionParameterBuffer CreateTransactionParameterBuffer()
-		{
-			return new TransactionParameterBuffer(false);
-		}
-
-		#endregion
-
 		#region · Database Information Methods ·
 
         public virtual string GetServerVersion()
