@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *  
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -29,11 +32,6 @@ namespace FirebirdSql.Data.Common
 			get;
 		}
 
-		bool IsLittleEndian
-		{
-			get;
-		}
-
 		#endregion
 
 		#region · Methods ·
@@ -43,8 +41,6 @@ namespace FirebirdSql.Data.Common
 		void Detach();
 
 		void Start(ServiceParameterBuffer spb);
-
-		ServiceParameterBuffer CreateParameterBuffer();
 
 		void Query(ServiceParameterBuffer spb, int requestLength, 
 			byte[] requestBuffer, int bufferLength, byte[] buffer);
