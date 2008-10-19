@@ -118,6 +118,7 @@ namespace FirebirdSql.Data.Services
 
         #region · Internal Methods ·
 
+#warning Can be removed
         //internal ServiceParameterBuffer CreateParameterBuffer()
         //{
         //    if (this.svc == null)
