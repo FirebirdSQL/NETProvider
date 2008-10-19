@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2005 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *  
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -35,11 +38,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public int Handle
 		{
 			get { return this.handle; }
-		}
-
-		public bool IsLittleEndian
-		{
-			get { return BitConverter.IsLittleEndian; }
 		}
 
 		#endregion
@@ -129,15 +127,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 			// Parse status	vector
 			this.ParseStatusVector(statusVector);
-		}
-
-		#endregion
-
-		#region · Buffer Creation Methods ·
-
-		public ServiceParameterBuffer CreateParameterBuffer()
-		{
-			return new ServiceParameterBuffer();
 		}
 
 		#endregion

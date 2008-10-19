@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *  
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -37,11 +40,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public int Handle
 		{
 			get { return this.handle; }
-		}
-
-		public bool IsLittleEndian
-		{
-			get { return false; }
 		}
 
 		#endregion
@@ -188,15 +186,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					throw new IscException(IscCodes.isc_network_error);
 				}
 			}
-		}
-
-		#endregion
-
-		#region · Buffer creation methods ·
-
-		public ServiceParameterBuffer CreateParameterBuffer()
-		{
-			return new ServiceParameterBuffer();
 		}
 
 		#endregion

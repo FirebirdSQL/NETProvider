@@ -43,11 +43,6 @@ namespace FirebirdSql.Data.Client.Native
             get { return this.handle; }
         }
 
-        public bool IsLittleEndian
-        {
-            get { return BitConverter.IsLittleEndian; }
-        }
-
         public Charset Charset
         {
             get { return this.charset; }
@@ -157,15 +152,6 @@ namespace FirebirdSql.Data.Client.Native
 
             // Parse status	vector
             this.ParseStatusVector(this.statusVector);
-        }
-
-        #endregion
-
-        #region · Buffer Creation Methods ·
-
-        public ServiceParameterBuffer CreateParameterBuffer()
-        {
-            return new ServiceParameterBuffer();
         }
 
         #endregion
