@@ -397,19 +397,19 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.innerConnection.BeginTransaction(level, transactionName);
         }
 
-        public FbTransaction BeginTransaction(FbTransactionOptions options, FbTransactionOptionsValues values)
+        public FbTransaction BeginTransaction(FbTransactionOptions options)
         {
-            return this.BeginTransaction(options, values, null);
+            return this.BeginTransaction(options, null);
         }
 
-        public FbTransaction BeginTransaction(FbTransactionOptions options, FbTransactionOptionsValues values, string transactionName)
+        public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
         {
             if (this.IsClosed)
             {
                 throw new InvalidOperationException("BeginTransaction requires an open and available Connection.");
             }
 
-            return this.innerConnection.BeginTransaction(options, values, transactionName);
+            return this.innerConnection.BeginTransaction(options, transactionName);
         }
 
         #endregion

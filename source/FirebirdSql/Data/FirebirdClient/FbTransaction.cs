@@ -369,14 +369,14 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        internal void BeginTransaction(FbTransactionOptions options, FbTransactionOptionsValues values)
+        internal void BeginTransaction(FbTransactionOptions options)
         {
             lock (this)
             {
                 try
                 {
                     IDatabase database = this.connection.InnerConnection.Database;
-                    this.transaction = database.BeginTransaction(this.BuildTpb(options, values));
+                    this.transaction = database.BeginTransaction(this.BuildTpb(options));
                 }
                 catch (IscException ex)
                 {
@@ -403,112 +403,114 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private TransactionParameterBuffer BuildTpb()
         {
-            FbTransactionOptions options = FbTransactionOptions.Write;
+            FbTransactionOptions options = new FbTransactionOptions();
+            options.WaitTimeout = null;
+            options.TransactionBehavior = FbTransactionBehavior.Write;
 
-            options |= FbTransactionOptions.Wait;
+            options.TransactionBehavior |= FbTransactionBehavior.Wait;
 
             /* Isolation level */
             switch (this.isolationLevel)
             {
                 case IsolationLevel.Serializable:
-                    options |= FbTransactionOptions.Consistency;
+                    options.TransactionBehavior |= FbTransactionBehavior.Consistency;
                     break;
 
                 case IsolationLevel.RepeatableRead:
-                    options |= FbTransactionOptions.Concurrency;
+                    options.TransactionBehavior |= FbTransactionBehavior.Concurrency;
                     break;
 
                 case IsolationLevel.ReadUncommitted:
-                    options |= FbTransactionOptions.ReadCommitted;
-                    options |= FbTransactionOptions.RecVersion;
+                    options.TransactionBehavior |= FbTransactionBehavior.ReadCommitted;
+                    options.TransactionBehavior |= FbTransactionBehavior.RecVersion;
                     break;
 
                 case IsolationLevel.ReadCommitted:
                 default:
-                    options |= FbTransactionOptions.ReadCommitted;
-                    options |= FbTransactionOptions.NoRecVersion;
+                    options.TransactionBehavior |= FbTransactionBehavior.ReadCommitted;
+                    options.TransactionBehavior |= FbTransactionBehavior.NoRecVersion;
                     break;
             }
 
             // just empty FbTransactionOptionsValues struct
-            return this.BuildTpb(options, default(FbTransactionOptionsValues));
+            return this.BuildTpb(options);
         }
 
-        private TransactionParameterBuffer BuildTpb(FbTransactionOptions options, FbTransactionOptionsValues values)
+        private TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
 		{
 			TransactionParameterBuffer tpb = new TransactionParameterBuffer();
 
 			tpb.Append(IscCodes.isc_tpb_version3);
 
-            if ((options & FbTransactionOptions.Consistency) == FbTransactionOptions.Consistency)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Consistency) == FbTransactionBehavior.Consistency)
             {
                 tpb.Append(IscCodes.isc_tpb_consistency);
             }
-            if ((options & FbTransactionOptions.Concurrency) == FbTransactionOptions.Concurrency)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Concurrency) == FbTransactionBehavior.Concurrency)
             {
                 tpb.Append(IscCodes.isc_tpb_concurrency);
             }
-            if ((options & FbTransactionOptions.Shared) == FbTransactionOptions.Shared)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Shared) == FbTransactionBehavior.Shared)
             {
                 tpb.Append(IscCodes.isc_tpb_shared);
             }
-            if ((options & FbTransactionOptions.Protected) == FbTransactionOptions.Protected)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Protected) == FbTransactionBehavior.Protected)
             {
                 tpb.Append(IscCodes.isc_tpb_protected);
             }
-            if ((options & FbTransactionOptions.Exclusive) == FbTransactionOptions.Exclusive)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Exclusive) == FbTransactionBehavior.Exclusive)
             {
                 tpb.Append(IscCodes.isc_tpb_exclusive);
             }
-            if ((options & FbTransactionOptions.Wait) == FbTransactionOptions.Wait)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Wait) == FbTransactionBehavior.Wait)
             {
                 tpb.Append(IscCodes.isc_tpb_wait);
-                if (values.WaitTimeout.HasValue)
+                if (options.WaitTimeout.HasValue)
                 {
-                    tpb.Append(IscCodes.isc_tpb_lock_timeout, (short)values.WaitTimeout);
+                    tpb.Append(IscCodes.isc_tpb_lock_timeout, (short)options.WaitTimeout);
                 }
             }
-            if ((options & FbTransactionOptions.NoWait) == FbTransactionOptions.NoWait)
+            if ((options.TransactionBehavior & FbTransactionBehavior.NoWait) == FbTransactionBehavior.NoWait)
             {
                 tpb.Append(IscCodes.isc_tpb_nowait);
             }
-            if ((options & FbTransactionOptions.Read) == FbTransactionOptions.Read)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Read) == FbTransactionBehavior.Read)
             {
                 tpb.Append(IscCodes.isc_tpb_read);
             }
-            if ((options & FbTransactionOptions.Write) == FbTransactionOptions.Write)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Write) == FbTransactionBehavior.Write)
             {
                 tpb.Append(IscCodes.isc_tpb_write);
             }
-            if ((options & FbTransactionOptions.LockRead) == FbTransactionOptions.LockRead)
+            if ((options.TransactionBehavior & FbTransactionBehavior.LockRead) == FbTransactionBehavior.LockRead)
             {
                 tpb.Append(IscCodes.isc_tpb_lock_read);
             }
-            if ((options & FbTransactionOptions.LockWrite) == FbTransactionOptions.LockWrite)
+            if ((options.TransactionBehavior & FbTransactionBehavior.LockWrite) == FbTransactionBehavior.LockWrite)
             {
                 tpb.Append(IscCodes.isc_tpb_lock_write);
             }
-            if ((options & FbTransactionOptions.ReadCommitted) == FbTransactionOptions.ReadCommitted)
+            if ((options.TransactionBehavior & FbTransactionBehavior.ReadCommitted) == FbTransactionBehavior.ReadCommitted)
             {
                 tpb.Append(IscCodes.isc_tpb_read_committed);
             }
-            if ((options & FbTransactionOptions.Autocommit) == FbTransactionOptions.Autocommit)
+            if ((options.TransactionBehavior & FbTransactionBehavior.Autocommit) == FbTransactionBehavior.Autocommit)
             {
                 tpb.Append(IscCodes.isc_tpb_autocommit);
             }
-            if ((options & FbTransactionOptions.RecVersion) == FbTransactionOptions.RecVersion)
+            if ((options.TransactionBehavior & FbTransactionBehavior.RecVersion) == FbTransactionBehavior.RecVersion)
             {
                 tpb.Append(IscCodes.isc_tpb_rec_version);
             }
-            if ((options & FbTransactionOptions.NoRecVersion) == FbTransactionOptions.NoRecVersion)
+            if ((options.TransactionBehavior & FbTransactionBehavior.NoRecVersion) == FbTransactionBehavior.NoRecVersion)
             {
                 tpb.Append(IscCodes.isc_tpb_no_rec_version);
             }
-            if ((options & FbTransactionOptions.RestartRequests) == FbTransactionOptions.RestartRequests)
+            if ((options.TransactionBehavior & FbTransactionBehavior.RestartRequests) == FbTransactionBehavior.RestartRequests)
             {
                 tpb.Append(IscCodes.isc_tpb_restart_requests);
             }
-            if ((options & FbTransactionOptions.NoAutoUndo) == FbTransactionOptions.NoAutoUndo)
+            if ((options.TransactionBehavior & FbTransactionBehavior.NoAutoUndo) == FbTransactionBehavior.NoAutoUndo)
             {
                 tpb.Append(IscCodes.isc_tpb_no_auto_undo);
             }

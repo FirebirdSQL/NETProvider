@@ -97,7 +97,7 @@
     <Compile Include="Entity\SymbolTable.cs" />
     <Compile Include="FirebirdClient\FbProviderManifest.cs" />
     <Compile Include="FirebirdClient\FbProviderServices.cs" />
-    <Compile Include="FirebirdClient\FbTransactionOptionsValues.cs" />
+    <Compile Include="FirebirdClient\FbTransactionOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Client\Common\ArrayBoundMarshal.cs" />
     <Compile Include="Client\Common\ArrayDescMarshal.cs" />
@@ -222,7 +222,7 @@
     <Compile Include="FirebirdClient\FbRowUpdatingEventArgs.cs" />
     <Compile Include="FirebirdClient\FbRowUpdatingEventHandler.cs" />
     <Compile Include="FirebirdClient\FbTransaction.cs" />
-    <Compile Include="FirebirdClient\FbTransactionOptions.cs" />
+    <Compile Include="FirebirdClient\FbTransactionBehavior.cs" />
     <Compile Include="FirebirdClient\FirebirdClientFactory.cs" />
     <Compile Include="Isql\CommandExecutedEventArgs.cs" />
     <Compile Include="Isql\CommandExecutedEventHandler.cs" />
