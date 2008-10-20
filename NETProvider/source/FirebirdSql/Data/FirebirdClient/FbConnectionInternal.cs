@@ -292,7 +292,7 @@ namespace FirebirdSql.Data.FirebirdClient
             return this.activeTransaction;
         }
 
-        public FbTransaction BeginTransaction(FbTransactionOptions options, FbTransactionOptionsValues values, string transactionName)
+        public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
         {
             lock (this)
             {
@@ -306,7 +306,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     this.activeTransaction = new FbTransaction(
                         this.owningConnection, IsolationLevel.Unspecified);
 
-                    this.activeTransaction.BeginTransaction(options, values);
+                    this.activeTransaction.BeginTransaction(options);
 
                     if (transactionName != null)
                     {
