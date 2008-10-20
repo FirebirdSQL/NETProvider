@@ -578,7 +578,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			byte[] items = new byte[]
 			{
-				IscCodes.isc_info_isc_version,
+				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
 

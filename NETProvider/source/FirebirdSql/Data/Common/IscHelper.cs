@@ -126,6 +126,7 @@ namespace FirebirdSql.Data.Common
                         break;
 
                     case IscCodes.isc_info_isc_version:
+                    case IscCodes.isc_info_firebird_version:
                         /* Version identification string of	the	database implementation:
                          *		• 1	byte containing	the	number 1
                          *		• 1	byte specifying	the	length,	n, of the following	string
@@ -244,10 +245,6 @@ namespace FirebirdSql.Data.Common
                     //
                     // Misc
                     //
-
-                    case IscCodes.isc_info_firebird_version:
-                        info.Add(Encoding.Default.GetString(buffer, pos + 2, buffer[pos + 1]));
-                        break;
 
                     case IscCodes.isc_info_db_class:
                         int serverClass = VaxInteger(buffer, pos, length);
