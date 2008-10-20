@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *  
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -366,14 +369,14 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        internal void BeginTransaction(FbTransactionOptions options)
+        internal void BeginTransaction(FbTransactionOptions options, FbTransactionOptionsValues values)
         {
             lock (this)
             {
                 try
                 {
                     IDatabase database = this.connection.InnerConnection.Database;
-                    this.transaction = database.BeginTransaction(this.BuildTpb(options));
+                    this.transaction = database.BeginTransaction(this.BuildTpb(options, values));
                 }
                 catch (IscException ex)
                 {
@@ -427,102 +430,11 @@ namespace FirebirdSql.Data.FirebirdClient
                     break;
             }
 
-            return this.BuildTpb(options);
+            // just empty FbTransactionOptionsValues struct
+            return this.BuildTpb(options, default(FbTransactionOptionsValues));
         }
 
-#if (!NET_CF)
-
-        private TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
-        {
-            TransactionParameterBuffer tpb = new TransactionParameterBuffer();
-
-            tpb.Append(IscCodes.isc_tpb_version3);
-
-            FbTransactionOptions[] o = (FbTransactionOptions[])Enum.GetValues(options.GetType());
-            for (int i = 0; i < o.Length; i++)
-            {
-                FbTransactionOptions option = ((FbTransactionOptions)(o[i]));
-                if ((options & option) == option)
-                {
-                    switch (option)
-                    {
-                        case FbTransactionOptions.Consistency:
-                            tpb.Append(IscCodes.isc_tpb_consistency);
-                            break;
-
-                        case FbTransactionOptions.Concurrency:
-                            tpb.Append(IscCodes.isc_tpb_concurrency);
-                            break;
-
-                        case FbTransactionOptions.Shared:
-                            tpb.Append(IscCodes.isc_tpb_shared);
-                            break;
-
-                        case FbTransactionOptions.Protected:
-                            tpb.Append(IscCodes.isc_tpb_protected);
-                            break;
-
-                        case FbTransactionOptions.Exclusive:
-                            tpb.Append(IscCodes.isc_tpb_exclusive);
-                            break;
-
-                        case FbTransactionOptions.Wait:
-                            tpb.Append(IscCodes.isc_tpb_wait);
-                            break;
-
-                        case FbTransactionOptions.NoWait:
-                            tpb.Append(IscCodes.isc_tpb_nowait);
-                            break;
-
-                        case FbTransactionOptions.Read:
-                            tpb.Append(IscCodes.isc_tpb_read);
-                            break;
-
-                        case FbTransactionOptions.Write:
-                            tpb.Append(IscCodes.isc_tpb_write);
-                            break;
-
-                        case FbTransactionOptions.LockRead:
-                            tpb.Append(IscCodes.isc_tpb_lock_read);
-                            break;
-
-                        case FbTransactionOptions.LockWrite:
-                            tpb.Append(IscCodes.isc_tpb_lock_write);
-                            break;
-
-                        case FbTransactionOptions.ReadCommitted:
-                            tpb.Append(IscCodes.isc_tpb_read_committed);
-                            break;
-
-                        case FbTransactionOptions.Autocommit:
-                            tpb.Append(IscCodes.isc_tpb_autocommit);
-                            break;
-
-                        case FbTransactionOptions.RecVersion:
-                            tpb.Append(IscCodes.isc_tpb_rec_version);
-                            break;
-
-                        case FbTransactionOptions.NoRecVersion:
-                            tpb.Append(IscCodes.isc_tpb_no_rec_version);
-                            break;
-
-                        case FbTransactionOptions.RestartRequests:
-                            tpb.Append(IscCodes.isc_tpb_restart_requests);
-                            break;
-
-                        case FbTransactionOptions.NoAutoUndo:
-                            tpb.Append(IscCodes.isc_tpb_no_auto_undo);
-                            break;
-                    }
-                }
-            }
-
-            return tpb;
-        }
-
-#else
-
-		private TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
+        private TransactionParameterBuffer BuildTpb(FbTransactionOptions options, FbTransactionOptionsValues values)
 		{
 			TransactionParameterBuffer tpb = new TransactionParameterBuffer();
 
@@ -551,6 +463,10 @@ namespace FirebirdSql.Data.FirebirdClient
             if ((options & FbTransactionOptions.Wait) == FbTransactionOptions.Wait)
             {
                 tpb.Append(IscCodes.isc_tpb_wait);
+                if (values.WaitTimeout.HasValue)
+                {
+                    tpb.Append(IscCodes.isc_tpb_lock_timeout, (short)values.WaitTimeout);
+                }
             }
             if ((options & FbTransactionOptions.NoWait) == FbTransactionOptions.NoWait)
             {
@@ -599,8 +515,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			
 			return tpb;
 		}
-
-#endif
 
         #endregion
     }
