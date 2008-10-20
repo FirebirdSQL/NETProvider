@@ -25,6 +25,17 @@ namespace FirebirdSql.Data.FirebirdClient
 {
     public struct FbTransactionOptionsValues
     {
-        public short? WaitTimeout { get; set; }
+        private short? _waitTimeout;
+        public short? WaitTimeout
+        {
+            get { return _waitTimeout; }
+            set
+            {
+                if (value < 1)
+                    throw new ArgumentException("The property value assigned is less than 1.");
+                
+                _waitTimeout = value;
+            }
+        }
     }
 }
