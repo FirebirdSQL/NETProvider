@@ -97,6 +97,7 @@
     <Compile Include="Entity\SymbolTable.cs" />
     <Compile Include="FirebirdClient\FbProviderManifest.cs" />
     <Compile Include="FirebirdClient\FbProviderServices.cs" />
+    <Compile Include="FirebirdClient\FbTransactionOptionsValues.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Client\Common\ArrayBoundMarshal.cs" />
     <Compile Include="Client\Common\ArrayDescMarshal.cs" />
