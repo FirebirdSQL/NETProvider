@@ -791,7 +791,7 @@ namespace FirebirdSql.Data.FirebirdClient
             // If there	are	an active reader close it
             this.CloseReader();
 
-            if (!this.addedToPrepared)
+            if (this.addedToPrepared)
             {
                 // Remove the command from the Prepared commands list
                 if (this.connection != null && this.connection.State == ConnectionState.Open)
