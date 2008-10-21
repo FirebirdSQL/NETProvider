@@ -499,7 +499,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			using (IDbCommand command = this.Connection.CreateCommand())
 			{
-				using (IDbTransaction transaction = this.Connection.BeginTransaction(FbTransactionOptions.Read))
+                using (IDbTransaction transaction = this.Connection.BeginTransaction(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Read, WaitTimeout = null }))
 				{
 					try
 					{
