@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private bool implicitTransaction;
         private int commandTimeout;
         private int fetchSize;
-        private bool _released = false;
+        private bool addedToPrepared;
 
 #if (NET_35 && ENTITY_FRAMEWORK)
         // type coercions
@@ -791,14 +791,14 @@ namespace FirebirdSql.Data.FirebirdClient
             // If there	are	an active reader close it
             this.CloseReader();
 
-            if (!this._released)
+            if (!this.addedToPrepared)
             {
                 // Remove the command from the Prepared commands list
                 if (this.connection != null && this.connection.State == ConnectionState.Open)
                 {
                     this.connection.InnerConnection.RemovePreparedCommand(this);
                 }
-                this._released = true;
+                this.addedToPrepared = false;
             }
 
             // Dipose the inner statement
@@ -1155,6 +1155,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 // Add this	command	to the active command list
                 innerConn.AddPreparedCommand(this);
+                this.addedToPrepared = true;
             }
             else
             {
