@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -64,6 +64,7 @@
     <Compile Include="FbStoredProcCallsTest.cs" />
     <Compile Include="FbTransactionTest.cs" />
     <Compile Include="GuidTest.cs" />
+    <Compile Include="TrackerIssuesTest.cs" />
     <Compile Include="TransactionScopeTest.cs" />
   </ItemGroup>
   <ItemGroup>

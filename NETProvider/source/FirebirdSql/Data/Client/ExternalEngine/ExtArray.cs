@@ -380,8 +380,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 					{
                         string value = source != null ? (string)source : String.Empty;
 
-						value = value.TrimEnd();
-
 						byte[] buffer = charset.GetBytes(value);
 						writer.Write(buffer);
 

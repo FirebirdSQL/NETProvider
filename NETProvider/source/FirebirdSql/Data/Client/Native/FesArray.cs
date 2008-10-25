@@ -391,8 +391,6 @@ namespace FirebirdSql.Data.Client.Native
 					{
                         string value = source != null ? (string)source : String.Empty;
 
-						value = value.TrimEnd();
-
 						byte[] buffer = charset.GetBytes(value);
 						writer.Write(buffer);
 
