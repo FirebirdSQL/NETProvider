@@ -429,7 +429,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     }
                     else
                     {
-                        fieldValue = this.ReadString(innerCharset).TrimEnd();
+                        fieldValue = this.ReadString(innerCharset);
                     }
 					break;
 
@@ -693,7 +693,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                         }
                         else
 					    {
-							string svalue = param.DbValue.GetString().TrimEnd();
+                            string svalue = param.DbValue.GetString();
 
                             if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
                                 svalue.Length > param.CharCount)

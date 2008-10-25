@@ -56,6 +56,25 @@ namespace FirebirdSql.Data.UnitTests
             }
 		}
 
+        [Test]
+        public void DNET183()
+        {
+            const string value = "foo  ";
+
+            using (FbCommand cmd = Connection.CreateCommand())
+            {
+                cmd.CommandText = "select cast(@foo as varchar(5)) from rdb$database";
+                cmd.Parameters.Add(new FbParameter() { ParameterName = "@foo", FbDbType = FbDbType.VarChar, Size = 5, Value = value });
+                using (FbDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Assert.AreEqual(value, (string)reader[0]);
+                    }
+                }
+            }
+        }
+
         #endregion
     }
 }
