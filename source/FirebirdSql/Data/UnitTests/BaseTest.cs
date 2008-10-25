@@ -257,8 +257,9 @@ namespace FirebirdSql.Data.UnitTests
 			commandText.Append("RETURNS	(\r\n");
 			commandText.Append("content	VARCHAR(128))\r\n");
 			commandText.Append("AS\r\n");
-			commandText.Append("begin\r\n");
-			commandText.Append("content	= 'test';\r\n");
+            commandText.Append("begin\r\n");
+            commandText.Append("content	= 'test';\r\n");
+            commandText.Append("suspend;\r\n");
 			commandText.Append("end\r\n");
 
 			command = new FbCommand(commandText.ToString(), connection);
