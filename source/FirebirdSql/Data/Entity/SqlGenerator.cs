@@ -797,19 +797,23 @@ namespace FirebirdSql.Data.Entity
 
                         int pointPosition = strDecimal.IndexOf('.');
 
+                        int precision = 9;
                         FacetDescription precisionFacetDescription;
                         // there's always the max value in manifest
-                        MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, MetadataHelpers.PrecisionFacetName, out precisionFacetDescription);
-                        int precision = precisionFacetDescription.MaxValue.Value;
+                        if (MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, MetadataHelpers.PrecisionFacetName, out precisionFacetDescription))
+                        {
+                            if (precisionFacetDescription.DefaultValue != null)
+                                precision = (int)precisionFacetDescription.DefaultValue;
+                        }
 
                         int maxScale = (pointPosition != -1 ? precision - pointPosition + 1 : 0);
 
                         result.Append("CAST(");
                         result.Append(strDecimal);
                         result.Append(" AS DECIMAL(");
-                        result.Append(precision);
+                        result.Append(precision.ToString(CultureInfo.InvariantCulture));
                         result.Append(",");
-                        result.Append(maxScale);
+                        result.Append(maxScale.ToString(CultureInfo.InvariantCulture));
                         result.Append("))");
                         break;
 
