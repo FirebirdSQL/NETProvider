@@ -110,7 +110,7 @@ namespace FirebirdSql.Data.Entity
             {
                 foreach (object o in sqlFragments)
                 {
-                    string str = (o as String);
+                    string str = (o as string);
                     if (null != str)
                     {
                         writer.Write(str);
