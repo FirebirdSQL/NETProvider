@@ -26,6 +26,7 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using FirebirdSql.Data.Common;
 
@@ -248,7 +249,22 @@ namespace FirebirdSql.Data.FirebirdClient
                     return this.innerConnection.Database.ServerVersion;
                 }
 
-                return String.Empty;
+                return string.Empty;
+            }
+        }
+
+#if	(!NET_CF)
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+#endif
+        public Version ServerVersionNumber
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.ServerVersion))
+                    throw new InvalidOperationException("ServerVersion is not valid.");
+                
+                return new Version(Regex.Replace(this.ServerVersion, @"\w{2,2}-\w(\d+.\d+.\d+.\d+) .+", "$1"));
             }
         }
 
