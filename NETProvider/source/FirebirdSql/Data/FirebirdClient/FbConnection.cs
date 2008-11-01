@@ -264,7 +264,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 if (string.IsNullOrEmpty(this.ServerVersion))
                     throw new InvalidOperationException("ServerVersion is not valid.");
                 
-                return new Version(Regex.Replace(this.ServerVersion, @"\w{2,2}-\w(\d+.\d+.\d+.\d+) .+", "$1"));
+                return new Version(Regex.Replace(this.ServerVersion, @"\w{2}-\w(\d+\.\d+\.\d+\.\d+) .*", "$1"));
             }
         }
 
