@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     closeConnection = true;
                 }
 
-                return fbConnection.ServerVersion;
+                return fbConnection.ServerVersionNumber.ToString(4);
             }
             finally
             {
