@@ -693,7 +693,7 @@ namespace FirebirdSql.Data.Entity
             switch (sqlPrimitiveType.ToLowerInvariant())
             {
                 default:
-                    result.Append(" CAST( ");
+                    result.Append("CAST(");
                     result.Append(e.Argument.Accept(this));
                     result.Append(" AS ");
                     result.Append(sqlPrimitiveType);
