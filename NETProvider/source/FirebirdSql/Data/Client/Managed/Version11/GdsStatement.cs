@@ -35,14 +35,12 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         #region · Constructors ·
 
         public GdsStatement(IDatabase db)
-			: base(db)
-		{
-		}
+            : base(db)
+        { }
 
-		public GdsStatement(IDatabase db, ITransaction transaction) : 
-            base(db, transaction)
-		{
-		}
+        public GdsStatement(IDatabase db, ITransaction transaction)
+            : base(db, transaction)
+        { }
 
         #endregion
 
@@ -53,10 +51,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             // Clear data
             this.ClearAll();
 
-            lock (this.Database.SyncObject)
+            lock (this.database.SyncObject)
             {
-                GdsDatabase database = (GdsDatabase)this.Database;
-
                 if (this.State == StatementState.Deallocated)
                 {
                     // Allocate statement
@@ -73,52 +69,37 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         using (XdrStream xdr = new XdrStream(database.Charset))
                         {
                             xdr.Write(this.Parameters);
-
                             descriptor = xdr.ToArray();
-
                             xdr.Close();
                         }
                     }
 
                     // Prepare the statement
-                    database.Write(IscCodes.op_prepare_statement);
-                    database.Write(this.Transaction.Handle);
-                    database.Write(this.Handle);
-                    database.Write((int)this.Database.Dialect);
-                    database.Write(commandText);
-                    database.WriteBuffer(DescribeInfoItems, DescribeInfoItems.Length);
-                    database.Write(IscCodes.MAX_BUFFER_SIZE);
+                    this.database.Write(IscCodes.op_prepare_statement);
+                    this.database.Write(this.Transaction.Handle);
+                    this.database.Write(this.handle);
+                    this.database.Write((int)this.database.Dialect);
+                    this.database.Write(commandText);
+                    this.database.WriteBuffer(DescribeInfoItems, DescribeInfoItems.Length);
+                    this.database.Write(IscCodes.MAX_BUFFER_SIZE);
 
                     // Grab statement type
                     this.WriteSqlInfoRequest(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 
                     // Flush data
-                    database.Flush();
+                    this.database.Flush();
 
                     // Read Responses
-                    List<IResponse> responses = database.ReadResponses(2);
+                    List<IResponse> responses = this.database.ReadResponses(2);
 
-                    GenericResponse prepareResponse         = (GenericResponse)responses[0];
-                    GenericResponse statementTypeResponse   = (GenericResponse)responses[1];
+                    GenericResponse prepareResponse = (GenericResponse)responses[0];
+                    GenericResponse statementTypeResponse = (GenericResponse)responses[1];
 
-                    if (prepareResponse.Exception != null && !prepareResponse.Exception.IsWarning)
-                    {
-                        throw prepareResponse.Exception;
-                    }
-                    else
-                    {
-                        this.ProcessPrepareResponse(prepareResponse);
-                    }
-
-                    // Statement type information processing
-                    if (statementTypeResponse.Exception != null && !statementTypeResponse.Exception.IsWarning)
-                    {
-                        throw statementTypeResponse.Exception;
-                    }
-                    else
-                    {
-                        this.StatementType = this.ParseStatementTypeInfo(statementTypeResponse.Data);
-                    }
+                    database.ProcessResponse(prepareResponse);
+                    database.ProcessResponse(statementTypeResponse);
+                    
+                    this.ProcessPrepareResponse(prepareResponse);
+                    this.StatementType = this.ParseStatementTypeInfo(statementTypeResponse.Data);
 
                     this.State = StatementState.Prepared;
                 }
@@ -134,17 +115,16 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         {
             if (this.State == StatementState.Deallocated)
             {
-                throw new InvalidOperationException("Statment is not correctly created.");
+                throw new InvalidOperationException("Statement is not correctly created.");
             }
 
             // Clear data
             this.Clear();
 
-            lock (this.Database.SyncObject)
+            lock (this.database.SyncObject)
             {
-                GdsDatabase database                = (GdsDatabase)this.Database;
-                bool        rowsAffectedResponse    = false;
-                int         responseCount           = 1;
+                bool rowsAffectedResponse = false;
+                int responseCount = 1;
 
                 try
                 {
@@ -158,9 +138,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         using (XdrStream xdr = new XdrStream(database.Charset))
                         {
                             xdr.Write(this.Parameters);
-
                             descriptor = xdr.ToArray();
-
                             xdr.Close();
                         }
                     }
@@ -168,34 +146,34 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     // Write the message
                     if (this.StatementType == DbStatementType.StoredProcedure)
                     {
-                        database.Write(IscCodes.op_execute2);
+                        this.database.Write(IscCodes.op_execute2);
                     }
                     else
                     {
-                        database.Write(IscCodes.op_execute);
+                        this.database.Write(IscCodes.op_execute);
                     }
 
-                    database.Write(this.Handle);
-                    database.Write(this.Transaction.Handle);
+                    this.database.Write(this.handle);
+                    this.database.Write(this.Transaction.Handle);
 
                     if (this.Parameters != null)
                     {
-                        database.WriteBuffer(this.Parameters.ToBlrArray());
-                        database.Write(0);    // Message number
-                        database.Write(1);    // Number of messages
-                        database.Write(descriptor, 0, descriptor.Length);
+                        this.database.WriteBuffer(this.Parameters.ToBlrArray());
+                        this.database.Write(0);    // Message number
+                        this.database.Write(1);    // Number of messages
+                        this.database.Write(descriptor, 0, descriptor.Length);
                     }
                     else
                     {
-                        database.WriteBuffer(null);
-                        database.Write(0);
-                        database.Write(0);
+                        this.database.WriteBuffer(null);
+                        this.database.Write(0);
+                        this.database.Write(0);
                     }
 
                     if (this.StatementType == DbStatementType.StoredProcedure)
                     {
-                        database.WriteBuffer((this.Fields == null) ? null : this.Fields.ToBlrArray());
-                        database.Write(0);    // Output message number
+                        this.database.WriteBuffer((this.Fields == null) ? null : this.Fields.ToBlrArray());
+                        this.database.Write(0);    // Output message number
                     }
 
                     // Obtain records affected by query execution
@@ -213,25 +191,25 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         rowsAffectedResponse = true;
                     }
 
-                    database.Flush();
+                    this.database.Flush();
 
-                    SqlResponse     sqlResponse     = null;
+                    SqlResponse sqlResponse = null;
                     GenericResponse executeResponse = null;
-                    GenericResponse raResponse      = null;
+                    GenericResponse raResponse = null;
 
                     if (this.StatementType == DbStatementType.StoredProcedure)
                     {
-                        sqlResponse = database.ReadSqlResponse();
+                        sqlResponse = this.database.ReadSqlResponse();
 
                         this.ProcessStoredProcedureResponse(sqlResponse);
                     }
 
                     executeResponse = database.ReadGenericResponse();
-                    
+
                     // Process Rows Affected Response
                     if (rowsAffectedResponse)
                     {
-                        raResponse = database.ReadGenericResponse();
+                        raResponse = this.database.ReadGenericResponse();
 
                         if (raResponse.Data != null && raResponse.Data.Length > 0)
                         {
@@ -240,9 +218,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     }
 
                     // Process responses
-                    database.ProcessResponse(sqlResponse);
-                    database.ProcessResponse(executeResponse);
-                    database.ProcessResponse(raResponse);
+                    this.database.ProcessResponse(sqlResponse);
+                    this.database.ProcessResponse(executeResponse);
+                    this.database.ProcessResponse(raResponse);
 
                     this.State = StatementState.Executed;
                 }
@@ -262,13 +240,11 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         {
             lock (this.Database.SyncObject)
             {
-                GdsDatabase database = (GdsDatabase)this.Database;
-             
-                database.Write(IscCodes.op_info_sql);
-                database.Write(this.Handle);
-                database.Write(0);
-                database.WriteBuffer(buffer, buffer.Length);
-                database.Write(bufferSize);
+                this.database.Write(IscCodes.op_info_sql);
+                this.database.Write(this.handle);
+                this.database.Write(0);
+                this.database.WriteBuffer(buffer, buffer.Length);
+                this.database.Write(bufferSize);
             }
         }
 
