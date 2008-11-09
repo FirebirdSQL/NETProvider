@@ -32,28 +32,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region · Fields ·
 
-		private int				handle;
-		private GdsDatabase		database;
-		private GdsTransaction	transaction;
-		private Descriptor		parameters;
-		private Descriptor		fields;
-		private StatementState	state;
-		private DbStatementType statementType;
-		private bool			allRowsFetched;
-		private Queue			rows;
-		private Queue			outputParams;
-		private int				recordsAffected;
-		private int				fetchSize;
-        private bool            returnRecordsAffected;
+		protected int			    handle;
+        protected GdsDatabase       database;
+		private GdsTransaction      transaction;
+		private Descriptor		    parameters;
+		private Descriptor		    fields;
+		private StatementState	    state;
+		private DbStatementType     statementType;
+		private bool			    allRowsFetched;
+		private Queue			    rows;
+		private Queue			    outputParams;
+		private int				    recordsAffected;
+		private int				    fetchSize;
+        private bool                returnRecordsAffected;
 
 		#endregion
 
 		#region · Properties ·
 
-		public override IDatabase Database
-		{
-			get { return this.database; }
-		}
+        public override IDatabase Database
+        {
+            get { return this.database; }
+        }
 
 		public override ITransaction Transaction
 		{
@@ -82,11 +82,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override Descriptor Parameters
-		{
-			get { return this.parameters; }
-			set { this.parameters = value; }
-		}
+        public override Descriptor Parameters
+        {
+            get { return this.parameters; }
+            set { this.parameters = value; }
+        }
 
 		public override Descriptor Fields
 		{
@@ -338,9 +338,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                         using (XdrStream xdr = new XdrStream(database.Charset))
                         {
                             xdr.Write(this.parameters);
-
                             descriptor = xdr.ToArray();
-
                             xdr.Close();
                         }
                     }
