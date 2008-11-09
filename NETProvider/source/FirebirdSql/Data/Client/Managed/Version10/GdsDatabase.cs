@@ -623,6 +623,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             }
         }
 
+        public virtual void ProcessResponseWarnings(IResponse response)
+        {
+            if (response is GenericResponse)
+            {
+                if (((GenericResponse)response).Exception != null &&
+                    ((GenericResponse)response).Exception.IsWarning &&
+                    this.warningMessage != null)
+                {
+                    this.warningMessage(((GenericResponse)response).Exception);
+                }
+            }
+        }
+
         public virtual int ReadOperation()
         {
             return this.inputStream.ReadOperation();
@@ -786,16 +799,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     break;
             }
 
-            // Process response warnings
-            if (response is GenericResponse)
-            {
-                if (((GenericResponse)response).Exception != null &&
-                    ((GenericResponse)response).Exception.IsWarning &&
-                    this.warningMessage != null)
-                {
-                    this.warningMessage(((GenericResponse)response).Exception);
-                }
-            }
+            ProcessResponseWarnings(response);
 
             return response;
         }
