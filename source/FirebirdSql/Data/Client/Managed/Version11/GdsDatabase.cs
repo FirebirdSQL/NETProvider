@@ -110,6 +110,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             IResponse response = null;
             int operation = this.ReadOperation();
 
+#warning Refactor to one place
             switch (operation)
             {
                 case IscCodes.op_response:
@@ -132,16 +133,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     return new AuthResponse(this.ReadBuffer());
             }
 
-            // Process response warnings
-            if (response is GenericResponse)
-            {
-                if (((GenericResponse)response).Exception != null &&
-                    ((GenericResponse)response).Exception.IsWarning &&
-                    this.warningMessage != null)
-                {
-                    this.warningMessage(((GenericResponse)response).Exception);
-                }
-            }
+            ProcessResponseWarnings(response);
 
             return response;
         }
