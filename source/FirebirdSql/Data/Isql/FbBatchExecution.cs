@@ -22,7 +22,7 @@
 using System;
 using System.Data;
 using System.Collections;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.Globalization;
 
 using FirebirdSql.Data.FirebirdClient;
@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Isql
 
         #region · Fields ·
 
-        private StringCollection sqlStatements;
+        private FbStatementCollection sqlStatements;
         private FbConnection sqlConnection;
         private FbTransaction sqlTransaction;
         private FbConnectionStringBuilder connectionString;
@@ -67,13 +67,13 @@ namespace FirebirdSql.Data.Isql
         /// <summary>
         /// Represents the list of SQL statements for batch execution.
         /// </summary>
-        public StringCollection SqlStatements
+        public FbStatementCollection SqlStatements
         {
             get
             {
                 if (this.sqlStatements == null)
                 {
-                    this.sqlStatements = new StringCollection();
+                    this.sqlStatements = new FbStatementCollection();
                 }
                 return this.sqlStatements;
             }
@@ -164,7 +164,7 @@ namespace FirebirdSql.Data.Isql
 
             foreach (string sqlStatement in this.SqlStatements)
             {
-                if (sqlStatement == null || sqlStatement.Length == 0)
+                if (string.IsNullOrEmpty(sqlStatement))
                 {
                     continue;
                 }
@@ -174,27 +174,34 @@ namespace FirebirdSql.Data.Isql
                 FbDataReader dataReader = null;
                 SqlStatementType statementType = FbBatchExecution.GetStatementType(sqlStatement);
 
-                // Update command configuration
-                this.ProvideCommand().CommandText = sqlStatement;
+                if (!(statementType == SqlStatementType.Connect ||
+                    statementType == SqlStatementType.CreateDatabase ||
+                    statementType == SqlStatementType.Disconnect ||
+                    statementType == SqlStatementType.DropDatabase))
+                {
+                    // Update command configuration
+                    this.ProvideCommand();
+                    this.sqlCommand.CommandText = sqlStatement;
 
-                // Check how transactions are going to be handled
-                if (statementType == SqlStatementType.Insert ||
-                    statementType == SqlStatementType.Update ||
-                    statementType == SqlStatementType.Delete)
-                {
-                    // DML commands should be inside a transaction
-                    if (this.sqlTransaction == null)
+                    // Check how transactions are going to be handled
+                    if (statementType == SqlStatementType.Insert ||
+                        statementType == SqlStatementType.Update ||
+                        statementType == SqlStatementType.Delete)
                     {
-                        this.sqlTransaction = this.sqlConnection.BeginTransaction();
+                        // DML commands should be inside a transaction
+                        if (this.sqlTransaction == null)
+                        {
+                            this.sqlTransaction = this.sqlConnection.BeginTransaction();
+                        }
+                        this.sqlCommand.Transaction = this.sqlTransaction;
                     }
-                    this.sqlCommand.Transaction = this.sqlTransaction;
-                }
-                else if (this.sqlTransaction != null && (statementType != SqlStatementType.Commit && statementType != SqlStatementType.Rollback))
-                {
-                    // Non DML Statements should be executed using
-                    // implicit transaction support
-                    this.sqlTransaction.Commit();
-                    this.sqlTransaction = null;
+                    else if (this.sqlTransaction != null && !(statementType == SqlStatementType.Commit || statementType == SqlStatementType.Rollback))
+                    {
+                        // Non DML Statements should be executed using
+                        // implicit transaction support
+                        this.sqlTransaction.Commit();
+                        this.sqlTransaction = null;
+                    }
                 }
 
                 try
@@ -235,18 +242,23 @@ namespace FirebirdSql.Data.Isql
 
                             this.ConnectToDatabase(sqlStatement);
 
-                            requiresNewConnection = false;
+                            this.requiresNewConnection = false;
 
                             // raise the event
                             this.OnCommandExecuted(sqlStatement, null, -1);
                             break;
 
                         case SqlStatementType.CreateDatabase:
-#if (!NET_CF)
-                            throw new NotImplementedException();
-#else
-							throw new NotSupportedException();
-#endif
+                            // raise the event
+                            this.OnCommandExecuting(null);
+
+                            this.CreateDatabase(sqlStatement);
+
+                            this.requiresNewConnection = false;
+
+                            // raise the event
+                            this.OnCommandExecuted(sqlStatement, null, -1);
+                            break;
 
                         case SqlStatementType.CreateDomain:
                         case SqlStatementType.CreateException:
@@ -269,7 +281,7 @@ namespace FirebirdSql.Data.Isql
                             this.OnCommandExecuting(this.sqlCommand);
 
                             rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
-                            requiresNewConnection = false;
+                            this.requiresNewConnection = false;
 
                             // raise the event
                             this.OnCommandExecuted(sqlStatement, null, rowsAffected);
@@ -279,16 +291,28 @@ namespace FirebirdSql.Data.Isql
                             break;
 
                         case SqlStatementType.Disconnect:
+                            // raise the event
+                            this.OnCommandExecuting(null);
+
                             this.sqlConnection.Close();
+                            FbConnection.ClearPool(this.sqlConnection);
                             this.requiresNewConnection = false;
+
+                            // raise the event
+                            this.OnCommandExecuted(sqlStatement, null, -1);
                             break;
 
                         case SqlStatementType.DropDatabase:
-#if (!NET_CF)
-                            throw new NotImplementedException();
-#else
-							throw new NotSupportedException();
-#endif
+                            // raise the event
+                            this.OnCommandExecuting(null);
+
+                            FbConnection.DropDatabase(this.connectionString.ToString());
+                            //this.sqlConnection = null;
+                            this.requiresNewConnection = true;
+
+                            // raise the event
+                            this.OnCommandExecuted(null, null, -1);
+                            break;
 
                         case SqlStatementType.DropDomain:
                         case SqlStatementType.DropException:
@@ -502,11 +526,55 @@ namespace FirebirdSql.Data.Isql
             // [LENGTH [=] int [PAGE[S]]]
             // [DEFAULT CHARACTER SET charset]
             // [<secondary_file>];	
-#if (!NET_CF)
-            throw new NotImplementedException();
-#else
-			throw new NotSupportedException();
-#endif
+            int pageSize = 0;
+            StringParser parser = new StringParser(createDbStatement, false);
+            parser.Token = " ";
+            parser.ParseNext();
+            if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
+            {
+                throw new Exception("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
+            }
+            parser.ParseNext(); // {DATABASE | SCHEMA}
+            parser.ParseNext();
+            this.connectionString.Database = parser.Result.Replace("'", "");
+            while (parser.ParseNext() != -1)
+            {
+                switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
+                {
+                    case "USER":
+                        parser.ParseNext();
+                        this.connectionString.UserID = parser.Result.Replace("'", "");
+                        break;
+
+                    case "PASSWORD":
+                        parser.ParseNext();
+                        this.connectionString.Password = parser.Result.Replace("'", "");
+                        break;
+
+                    case "PAGE_SIZE":
+                        parser.ParseNext();
+                        if (parser.Result.Trim() == "=")
+                            parser.ParseNext();
+                        int.TryParse(parser.Result, out pageSize);
+                        break;
+
+                    case "DEFAULT":
+                        parser.ParseNext();
+                        if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CHARACTER")
+                            throw new Exception("Expected the keyword CHARACTER but something else was found.");
+
+                        parser.ParseNext();
+                        if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+                            throw new Exception("Expected the keyword SET but something else was found.");
+
+                        parser.ParseNext();
+                        this.connectionString.Charset = parser.Result;
+                        break;
+                }
+            }
+            FbConnection.CreateDatabase(this.connectionString.ToString(), pageSize, true, false);
+            this.requiresNewConnection = true;
+            this.ProvideConnection();
         }
 
         /// <summary>
@@ -546,9 +614,9 @@ namespace FirebirdSql.Data.Isql
         {
             if (requiresNewConnection)
             {
-                if ((this.sqlConnection != null) ||
-                    (this.sqlConnection.State != ConnectionState.Closed) ||
-                    (this.sqlConnection.State != ConnectionState.Broken))
+                if ((this.sqlConnection != null) &&
+                    ((this.sqlConnection.State != ConnectionState.Closed) ||
+                    (this.sqlConnection.State != ConnectionState.Broken)))
                 {
                     this.sqlConnection.Close();
                 }
