@@ -1089,7 +1089,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
 #if (DEBUG)
             System.Diagnostics.Debug.WriteLine(string.Format("Command:\n{0}", commandText));
-            if (this.parameters!=null)
+            if (this.parameters != null)
                 foreach (FbParameter item in this.parameters)
                 {
                     System.Diagnostics.Debug.WriteLine(string.Format("Name:{0} \t Type:{1} \t Value:{2}", item.InternalParameterName, item.FbDbType, item.Value));
