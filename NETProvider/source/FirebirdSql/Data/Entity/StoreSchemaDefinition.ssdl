@@ -7,7 +7,7 @@
         -- STables
         SELECT
         TRIM(rdb$relation_name) as "Id"
-        ,   null as "CatalogName"
+        ,   'Firebird' as "CatalogName"
         ,   'Firebird' as "SchemaName" 
         ,   TRIM(rdb$relation_name) as "Name"
         FROM
@@ -81,7 +81,7 @@
         -- SViews
         SELECT
         TRIM(rdb$relation_name) as "Id"
-        ,   null as "CatalogName"
+        ,   'Firebird' as "CatalogName"
         ,   'Firebird' as "SchemaName"
         ,   TRIM(rdb$relation_name) as "Name"
         ,   rdb$view_source as "ViewDefinition"
@@ -157,7 +157,7 @@
         -- SFunctions
         SELECT
         TRIM(f.rdb$function_name) as "Id"
-        , null as "CatalogName"
+        , 'Firebird' as "CatalogName"
         , 'Firebird' as "SchemaName"
         , TRIM(f.rdb$function_name) as "Name"
         , TRIM(CASE fa.rdb$field_type
@@ -269,7 +269,7 @@
         -- SProcedures
         SELECT
         TRIM(rdb$procedure_name) as "Id"
-        , null as "CatalogName"
+        , 'Firebird' as "CatalogName"
         , 'Firebird' as "SchemaName"
         , TRIM(rdb$procedure_name) as "Name"
         FROM
