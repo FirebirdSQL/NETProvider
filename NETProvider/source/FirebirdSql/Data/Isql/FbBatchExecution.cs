@@ -177,7 +177,10 @@ namespace FirebirdSql.Data.Isql
                 if (!(statementType == SqlStatementType.Connect ||
                     statementType == SqlStatementType.CreateDatabase ||
                     statementType == SqlStatementType.Disconnect ||
-                    statementType == SqlStatementType.DropDatabase))
+                    statementType == SqlStatementType.DropDatabase ||
+                    statementType == SqlStatementType.SetDatabase ||
+                    statementType == SqlStatementType.SetNames ||
+                    statementType == SqlStatementType.SetSQLDialect))
                 {
                     // Update command configuration
                     this.ProvideCommand();
