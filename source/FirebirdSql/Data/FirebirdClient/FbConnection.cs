@@ -537,7 +537,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             lock (this)
             {
-                if (this.connectionString == null || this.connectionString.Length == 0)
+                if (string.IsNullOrEmpty(this.connectionString))
                 {
                     throw new InvalidOperationException("Connection String is not initialized.");
                 }
