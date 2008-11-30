@@ -303,6 +303,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_dpb_gstat_attach = 67;
 		public const int isc_dpb_set_db_charset = 68;
 		public const int isc_dpb_trusted_auth = 73;
+        public const int isc_dpb_process_name = 74;
 
 		#endregion
 
