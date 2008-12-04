@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Diagnostics;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Schema;
@@ -223,7 +224,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 DatabaseParameterBuffer dpb = this.BuildDpb(this.db, options);
 
-                if (options.FallIntoTrustedAuth)    
+                if (options.FallIntoTrustedAuth)
                 {
                     this.db.AttachWithTrustedAuth(dpb, this.options.DataSource, this.options.Port, this.options.Database);
                 }
@@ -530,6 +531,12 @@ namespace FirebirdSql.Data.FirebirdClient
                 dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
                 dpb.Append(IscCodes.isc_dpb_password, options.Password);
             }
+
+#if (NET_CF) 
+            // for CF we can implement GetModuleFileName from coredll
+#else
+            dpb.Append(IscCodes.isc_dpb_process_name, Process.GetCurrentProcess().MainModule.FileName);
+#endif
 
             return dpb;
         }
