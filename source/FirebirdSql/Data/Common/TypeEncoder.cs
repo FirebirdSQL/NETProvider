@@ -56,13 +56,13 @@ namespace FirebirdSql.Data.Common
 		{
 			GregorianCalendar calendar = new GregorianCalendar();
 
-			return EncodeTime(new TimeSpan(calendar.GetHour(d), calendar.GetMinute(d), calendar.GetSecond(d)));
+			return EncodeTime(new TimeSpan(0, calendar.GetHour(d), calendar.GetMinute(d), calendar.GetSecond(d), (int)calendar.GetMilliseconds(d)));
 		}
 
         public static int EncodeTime(TimeSpan t)
         {
             return
-                (int)(t.Hours * 3600000 +
+                (t.Hours * 3600000 +
                 t.Minutes * 60000 +
                 t.Seconds * 1000 +
                 t.Milliseconds) * 10;
