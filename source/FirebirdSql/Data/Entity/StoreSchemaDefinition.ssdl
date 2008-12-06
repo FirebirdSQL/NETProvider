@@ -23,7 +23,7 @@
         ,   TRIM(rf.rdb$relation_name) as "ParentId"
         ,   TRIM(rf.rdb$field_name) as "Name"
         ,   rf.rdb$field_position+1 as "Ordinal"
-        ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN 1 ELSE 0 END as "IsNullable"
+        ,   IIF(COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL, 1, 0) as "IsNullable"
         ,   TRIM(CASE f.rdb$field_type
         WHEN 7 THEN CASE f.rdb$field_sub_type
           WHEN 0 THEN 'smallint'
@@ -53,7 +53,7 @@
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
         END) as "TypeName"
-        ,   f.rdb$character_length as "MaxLength"
+        ,   IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
         ,   f.rdb$field_precision as "Precision"
         ,   4 as "DateTimePrecision"
         ,   f.rdb$field_scale * (-1) as "Scale"
@@ -65,7 +65,7 @@
         ,   null as "CharacterSetName"
         ,   0 as "IsMultiSet"
         ,   0 as "IsIdentity"
-        ,   CASE WHEN f.rdb$computed_blr IS NULL THEN 0 ELSE 1 END as "IsStoreGenerated"
+        ,   IIF(f.rdb$computed_blr IS NULL, 0, 1) as "IsStoreGenerated"
         ,   COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
         FROM
         rdb$relation_fields rf
@@ -99,7 +99,7 @@
         ,   TRIM(rf.rdb$relation_name) as "ParentId"
         ,   TRIM(rf.rdb$field_name) as "Name"
         ,   rf.rdb$field_position+1 as "Ordinal"
-        ,   CASE WHEN COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL THEN 1 ELSE 0 END as "IsNullable"
+        ,   IIF(COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL, 1, 0) as "IsNullable"
         ,   TRIM(CASE f.rdb$field_type
         WHEN 7 THEN CASE f.rdb$field_sub_type
           WHEN 0 THEN 'smallint'
@@ -129,7 +129,7 @@
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
         END) as "TypeName"
-        ,   f.rdb$character_length as "MaxLength"
+        ,   IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
         ,   f.rdb$field_precision as "Precision"
         ,   4 as "DateTimePrecision"
         ,   f.rdb$field_scale * (-1) as "Scale"
@@ -141,7 +141,7 @@
         ,   null as "CharacterSetName"
         ,   0 as "IsMultiSet"
         ,   0 as "IsIdentity"
-        ,   CASE WHEN f.rdb$computed_blr IS NULL THEN 0 ELSE 1 END as "IsStoreGenerated"
+        ,   IIF(f.rdb$computed_blr IS NULL, 0, 1) as "IsStoreGenerated"
         ,   COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
         FROM
         rdb$relation_fields rf
@@ -313,7 +313,7 @@
         WHEN 14 THEN 'char'
         WHEN 40 THEN 'cstring'
         END) as "TypeName"
-        , f.rdb$character_length as "MaxLength"
+        , IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
         , f.rdb$field_precision as "Precision"
         , 4 as "DateTimePrecision"
         , f.rdb$field_scale * (-1) as "Scale"
