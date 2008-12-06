@@ -182,7 +182,14 @@ namespace FirebirdSql.Data.Common
 
         public int GetTime()
         {
-            return TypeEncoder.EncodeTime(this.GetDateTime());
+            if (this.value is TimeSpan)
+            {
+                return TypeEncoder.EncodeTime((TimeSpan)this.value);
+            }
+            else
+            {
+                return TypeEncoder.EncodeTime(this.GetDateTime());
+            }
         }
 
         public byte[] GetBytes()
