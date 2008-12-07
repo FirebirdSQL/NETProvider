@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -21,88 +24,86 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class TypeDecoder
-	{
-		#region · Static Methods ·
+    internal sealed class TypeDecoder
+    {
+        #region · Static Methods ·
 
-		public static decimal DecodeDecimal(object value, int scale, int sqltype)
-		{
-			long divisor = 1;
-			decimal returnValue = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+        public static decimal DecodeDecimal(object value, int scale, int sqltype)
+        {
+            long divisor = 1;
+            decimal returnValue = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
 
-			if (scale < 0)
-			{
-				divisor = (long)System.Math.Pow(10, scale * (-1));
-			}
+            if (scale < 0)
+            {
+                divisor = (long)System.Math.Pow(10, scale * (-1));
+            }
 
-			switch (sqltype & ~1)
-			{
-				case IscCodes.SQL_SHORT:
-				case IscCodes.SQL_LONG:
-				case IscCodes.SQL_QUAD:
-				case IscCodes.SQL_INT64:
-					returnValue = returnValue / divisor;
-					break;
-			}
+            switch (sqltype & ~1)
+            {
+                case IscCodes.SQL_SHORT:
+                case IscCodes.SQL_LONG:
+                case IscCodes.SQL_QUAD:
+                case IscCodes.SQL_INT64:
+                    returnValue = returnValue / divisor;
+                    break;
+            }
 
-			return returnValue;
-		}
+            return returnValue;
+        }
 
-		public static DateTime DecodeTime(int sql_time)
-		{
-			GregorianCalendar calendar = new GregorianCalendar();
+        public static TimeSpan DecodeTime(int sql_time)
+        {
+            int millisInDay = sql_time / 10;
+            int hour = millisInDay / 3600000;
+            int minute = (millisInDay - hour * 3600000) / 60000;
+            int second = (millisInDay - hour * 3600000 - minute * 60000) / 1000;
+            int millisecond = millisInDay - hour * 3600000 - minute * 60000 - second * 1000;
 
-			int millisInDay = sql_time / 10;
-			int hour = millisInDay / 3600000;
-			int minute = (millisInDay - hour * 3600000) / 60000;
-			int second = (millisInDay - hour * 3600000 - minute * 60000) / 1000;
-			int millisecond = millisInDay - hour * 3600000 - minute * 60000 - second * 1000;
+            return new TimeSpan(0, hour, minute, second, millisecond);
+        }
 
-			return new DateTime(1970, 1, 1, hour, minute, second, millisecond, calendar);
-		}
+        public static DateTime DecodeDate(int sql_date)
+        {
+            int year, month, day, century;
 
-		public static DateTime DecodeDate(int sql_date)
-		{
-			int year, month, day, century;
+            sql_date -= 1721119 - 2400001;
+            century = (4 * sql_date - 1) / 146097;
+            sql_date = 4 * sql_date - 1 - 146097 * century;
+            day = sql_date / 4;
 
-			sql_date -= 1721119 - 2400001;
-			century = (4 * sql_date - 1) / 146097;
-			sql_date = 4 * sql_date - 1 - 146097 * century;
-			day = sql_date / 4;
+            sql_date = (4 * day + 3) / 1461;
+            day = 4 * day + 3 - 1461 * sql_date;
+            day = (day + 4) / 4;
 
-			sql_date = (4 * day + 3) / 1461;
-			day = 4 * day + 3 - 1461 * sql_date;
-			day = (day + 4) / 4;
+            month = (5 * day - 3) / 153;
+            day = 5 * day - 3 - 153 * month;
+            day = (day + 5) / 5;
 
-			month = (5 * day - 3) / 153;
-			day = 5 * day - 3 - 153 * month;
-			day = (day + 5) / 5;
+            year = 100 * century + sql_date;
 
-			year = 100 * century + sql_date;
+            if (month < 10)
+            {
+                month += 3;
+            }
+            else
+            {
+                month -= 9;
+                year += 1;
+            }
 
-			if (month < 10)
-			{
-				month += 3;
-			}
-			else
-			{
-				month -= 9;
-				year += 1;
-			}
+            DateTime date = new System.DateTime(year, month, day);
 
-			DateTime date = new System.DateTime(year, month, day);
+            return date.Date;
+        }
 
-			return date.Date;
-		}
+        #endregion
 
-		#endregion
+        #region · Constructors ·
 
-		#region · Constructors ·
+        private TypeDecoder()
+        {
+        }
 
-		private TypeDecoder()
-		{
-		}
-
-		#endregion
-	}
+        #endregion
+    }
 }

@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -183,13 +186,9 @@ namespace FirebirdSql.Data.Common
         public int GetTime()
         {
             if (this.value is TimeSpan)
-            {
                 return TypeEncoder.EncodeTime((TimeSpan)this.value);
-            }
             else
-            {
-                return TypeEncoder.EncodeTime(this.GetDateTime());
-            }
+                return TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(this.GetDateTime()));
         }
 
         public byte[] GetBytes()
@@ -288,16 +287,14 @@ namespace FirebirdSql.Data.Common
                     return BitConverter.GetBytes(this.GetDouble());
 
                 case DbDataType.Date:
-                    return BitConverter.GetBytes(
-                        TypeEncoder.EncodeDate(this.GetDateTime()));
+                    return BitConverter.GetBytes(TypeEncoder.EncodeDate(this.GetDateTime()));
 
                 case DbDataType.Time:
-                    return BitConverter.GetBytes(TypeEncoder.EncodeTime(this.GetDateTime()));
+                    return BitConverter.GetBytes(this.GetTime());
 
                 case DbDataType.TimeStamp:
                     byte[] date = BitConverter.GetBytes(TypeEncoder.EncodeDate(this.GetDateTime()));
-
-                    byte[] time = BitConverter.GetBytes(TypeEncoder.EncodeTime(this.GetDateTime()));
+                    byte[] time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(this.GetDateTime())));
 
                     byte[] result = new byte[8];
 

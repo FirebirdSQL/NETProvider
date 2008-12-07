@@ -15,8 +15,8 @@
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
  *   
- * Contributors:
- *   Jiri Cincura (jiri@cincura.net)
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -32,443 +32,445 @@ using FirebirdSql.Data.Client.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-	internal sealed	class FesArray : ArrayBase
-	{
-		#region · Fields ·
+    internal sealed class FesArray : ArrayBase
+    {
+        #region · Fields ·
 
-		private	long			handle;
-		private	FesDatabase		db;
-		private	FesTransaction	transaction;
+        private long handle;
+        private FesDatabase db;
+        private FesTransaction transaction;
         private IntPtr[] statusVector;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		public override	long Handle
-		{
-			get	{ return this.handle; }
-			set	{ this.handle = value; }
-		}
+        public override long Handle
+        {
+            get { return this.handle; }
+            set { this.handle = value; }
+        }
 
-		public override	IDatabase DB
-		{
-			get	{ return this.db; }
-			set	{ this.db = (FesDatabase)value;	}
-		}
+        public override IDatabase DB
+        {
+            get { return this.db; }
+            set { this.db = (FesDatabase)value; }
+        }
 
-		public override	ITransaction Transaction
-		{
-			get	{ return this.transaction; }
-			set	{ this.transaction = (FesTransaction)value;	}
-		}
+        public override ITransaction Transaction
+        {
+            get { return this.transaction; }
+            set { this.transaction = (FesTransaction)value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		public FesArray(ArrayDesc descriptor) 
-            :	base(descriptor)
-		{
+        public FesArray(ArrayDesc descriptor)
+            : base(descriptor)
+        {
             this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-		}
+        }
 
-		public FesArray(
-			IDatabase		db,
-			ITransaction	transaction,
-			string			tableName, 
-			string			fieldName) : this(db, transaction, -1, tableName, fieldName)
-		{
-		}
+        public FesArray(
+            IDatabase db,
+            ITransaction transaction,
+            string tableName,
+            string fieldName)
+            : this(db, transaction, -1, tableName, fieldName)
+        {
+        }
 
-		public FesArray(
-			IDatabase		db,
-			ITransaction	transaction,
-			long			handle,	
-			string			tableName, 
-			string			fieldName)	: base(tableName, fieldName)
-		{
-			if (!(db is	FesDatabase))
-			{
-				throw new ArgumentException("Specified argument is not of GdsDatabase type.");
-			}
-			if (!(transaction is FesTransaction))
-			{
-				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
-			}
-			this.db			    = (FesDatabase)db;
-			this.transaction    = (FesTransaction)transaction;
-			this.handle		    = handle;
+        public FesArray(
+            IDatabase db,
+            ITransaction transaction,
+            long handle,
+            string tableName,
+            string fieldName)
+            : base(tableName, fieldName)
+        {
+            if (!(db is FesDatabase))
+            {
+                throw new ArgumentException("Specified argument is not of GdsDatabase type.");
+            }
+            if (!(transaction is FesTransaction))
+            {
+                throw new ArgumentException("Specified argument is not of GdsTransaction type.");
+            }
+            this.db = (FesDatabase)db;
+            this.transaction = (FesTransaction)transaction;
+            this.handle = handle;
             this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
-			this.LookupBounds();
-		}
+            this.LookupBounds();
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
-		public override	byte[] GetSlice(int	sliceLength)
-		{
+        public override byte[] GetSlice(int sliceLength)
+        {
             // Clear the status vector
             this.ClearStatusVector();
 
-			int	dbHandle = this.db.Handle;
-			int	trHandle = this.transaction.Handle;
+            int dbHandle = this.db.Handle;
+            int trHandle = this.transaction.Handle;
 
-			ArrayDescMarshaler marshaler = ArrayDescMarshaler.Instance;
+            ArrayDescMarshaler marshaler = ArrayDescMarshaler.Instance;
 
-			IntPtr arrayDesc = marshaler.MarshalManagedToNative(this.Descriptor);
+            IntPtr arrayDesc = marshaler.MarshalManagedToNative(this.Descriptor);
 
-			byte[] buffer = new	byte[sliceLength];
+            byte[] buffer = new byte[sliceLength];
 
-			db.FbClient.isc_array_get_slice(
-				this.statusVector,
-				ref	dbHandle,
-				ref	trHandle,
-				ref	this.handle,
-				arrayDesc,
-				buffer,
-				ref	sliceLength);
-			
-			// Free	memory
-			marshaler.CleanUpNativeData(ref	arrayDesc);
+            db.FbClient.isc_array_get_slice(
+                this.statusVector,
+                ref	dbHandle,
+                ref	trHandle,
+                ref	this.handle,
+                arrayDesc,
+                buffer,
+                ref	sliceLength);
 
-			FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+            // Free	memory
+            marshaler.CleanUpNativeData(ref	arrayDesc);
 
-			return buffer;
-		}
+            FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 
-		public override	void PutSlice(System.Array sourceArray,	int	sliceLength)
-		{
+            return buffer;
+        }
+
+        public override void PutSlice(System.Array sourceArray, int sliceLength)
+        {
             // Clear the status vector
             this.ClearStatusVector();
 
-			int	dbHandle = this.db.Handle;
-			int	trHandle = this.transaction.Handle;
+            int dbHandle = this.db.Handle;
+            int trHandle = this.transaction.Handle;
 
-			ArrayDescMarshaler marshaler = ArrayDescMarshaler.Instance;
+            ArrayDescMarshaler marshaler = ArrayDescMarshaler.Instance;
 
-			IntPtr arrayDesc = marshaler.MarshalManagedToNative(this.Descriptor);
+            IntPtr arrayDesc = marshaler.MarshalManagedToNative(this.Descriptor);
 
-			// Obtain the System of	type of	Array elements and
-			// Fill	buffer
-			Type systemType = this.GetSystemType();
+            // Obtain the System of	type of	Array elements and
+            // Fill	buffer
+            Type systemType = this.GetSystemType();
 
-			byte[] buffer = new	byte[sliceLength];
-			if (systemType.IsPrimitive)
-			{
-				Buffer.BlockCopy(sourceArray, 0, buffer, 0,	buffer.Length);
-			}
-			else
-			{
-				buffer = this.EncodeSlice(this.Descriptor, sourceArray,	sliceLength);
-			}
+            byte[] buffer = new byte[sliceLength];
+            if (systemType.IsPrimitive)
+            {
+                Buffer.BlockCopy(sourceArray, 0, buffer, 0, buffer.Length);
+            }
+            else
+            {
+                buffer = this.EncodeSlice(this.Descriptor, sourceArray, sliceLength);
+            }
 
-			db.FbClient.isc_array_put_slice(
-				this.statusVector,
-				ref	dbHandle,
-				ref	trHandle,
-				ref	this.handle,
-				arrayDesc,
-				buffer,
-				ref	sliceLength);
-			
-			// Free	memory
-			marshaler.CleanUpNativeData(ref	arrayDesc);
+            db.FbClient.isc_array_put_slice(
+                this.statusVector,
+                ref	dbHandle,
+                ref	trHandle,
+                ref	this.handle,
+                arrayDesc,
+                buffer,
+                ref	sliceLength);
 
-			FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
-		}
+            // Free	memory
+            marshaler.CleanUpNativeData(ref	arrayDesc);
 
-		#endregion
+            FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+        }
 
-		#region · Protected Methods ·
+        #endregion
 
-		protected override System.Array	DecodeSlice(byte[] slice)
-		{
-			Array		sliceData	 = null;
-			int			slicePosition = 0;
-			int			type		 = 0;
-			DbDataType	dbType		 = DbDataType.Array;
-			Type		systemType	 = this.GetSystemType();
-			Charset		charset		 = this.db.Charset;
-			int[]		lengths		 = new int[this.Descriptor.Dimensions];
-			int[]		lowerBounds	 = new int[this.Descriptor.Dimensions];			
+        #region · Protected Methods ·
 
-			// Get upper and lower bounds of each dimension
-			for	(int i = 0;	i <	this.Descriptor.Dimensions;	i++)
-			{
-				lowerBounds[i]	= this.Descriptor.Bounds[i].LowerBound;
-				lengths[i]		= this.Descriptor.Bounds[i].UpperBound;
+        protected override System.Array DecodeSlice(byte[] slice)
+        {
+            Array sliceData = null;
+            int slicePosition = 0;
+            int type = 0;
+            DbDataType dbType = DbDataType.Array;
+            Type systemType = this.GetSystemType();
+            Charset charset = this.db.Charset;
+            int[] lengths = new int[this.Descriptor.Dimensions];
+            int[] lowerBounds = new int[this.Descriptor.Dimensions];
 
-				if (lowerBounds[i] == 0)
-				{
-					lengths[i]++;
-				}
-			}
-			
-			// Create slice	arrays
-			sliceData = Array.CreateInstance(systemType, lengths, lowerBounds);
+            // Get upper and lower bounds of each dimension
+            for (int i = 0; i < this.Descriptor.Dimensions; i++)
+            {
+                lowerBounds[i] = this.Descriptor.Bounds[i].LowerBound;
+                lengths[i] = this.Descriptor.Bounds[i].UpperBound;
 
-			Array tempData = Array.CreateInstance(systemType, sliceData.Length);
+                if (lowerBounds[i] == 0)
+                {
+                    lengths[i]++;
+                }
+            }
 
-			// Infer data types
-			type = TypeHelper.GetFbType(this.Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, 0,	this.Descriptor.Scale);
+            // Create slice	arrays
+            sliceData = Array.CreateInstance(systemType, lengths, lowerBounds);
 
-			int	itemLength = this.Descriptor.Length;
+            Array tempData = Array.CreateInstance(systemType, sliceData.Length);
 
-			for	(int i = 0;	i <	tempData.Length; i++)
-			{
-				if (slicePosition >= slice.Length)
-				{
-					break;
-				}
-								
-				switch(dbType)
-				{							
-					case DbDataType.Char:
-						tempData.SetValue(charset.GetString(slice, slicePosition, itemLength), i);
-						break;
+            // Infer data types
+            type = TypeHelper.GetFbType(this.Descriptor.DataType);
+            dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, 0, this.Descriptor.Scale);
 
-					case DbDataType.VarChar:
-					{
-						int	index = slicePosition;
-						int	count = 0;
-						while (slice[index++] != 0)
-						{
-							count ++;
-						}
-						tempData.SetValue(charset.GetString(slice, slicePosition, count), i);
+            int itemLength = this.Descriptor.Length;
 
-						slicePosition += 2;
-					}
-					break;
-					
-					case DbDataType.SmallInt:
-						tempData.SetValue(BitConverter.ToInt16(slice, slicePosition), i);
-						break;
-	
-					case DbDataType.Integer:
-						tempData.SetValue(BitConverter.ToInt32(slice, slicePosition), i);
-						break;
-	
-					case DbDataType.BigInt:
-						tempData.SetValue(BitConverter.ToInt64(slice, slicePosition), i);
-						break;
-					
-					case DbDataType.Decimal:
-					case DbDataType.Numeric:
-					{
-						object evalue = null;
+            for (int i = 0; i < tempData.Length; i++)
+            {
+                if (slicePosition >= slice.Length)
+                {
+                    break;
+                }
 
-						switch (type)
-						{
-							case IscCodes.SQL_SHORT:
-								evalue = BitConverter.ToInt16(slice, slicePosition);
-								break;
+                switch (dbType)
+                {
+                    case DbDataType.Char:
+                        tempData.SetValue(charset.GetString(slice, slicePosition, itemLength), i);
+                        break;
 
-							case IscCodes.SQL_LONG:
-								evalue = BitConverter.ToInt32(slice, slicePosition);
-								break;
+                    case DbDataType.VarChar:
+                        {
+                            int index = slicePosition;
+                            int count = 0;
+                            while (slice[index++] != 0)
+                            {
+                                count++;
+                            }
+                            tempData.SetValue(charset.GetString(slice, slicePosition, count), i);
 
-							case IscCodes.SQL_QUAD:
-							case IscCodes.SQL_INT64:
-								evalue = BitConverter.ToInt64(slice, slicePosition);
-								break;
-						}
+                            slicePosition += 2;
+                        }
+                        break;
 
-						decimal	dvalue = TypeDecoder.DecodeDecimal(evalue, this.Descriptor.Scale, type);
+                    case DbDataType.SmallInt:
+                        tempData.SetValue(BitConverter.ToInt16(slice, slicePosition), i);
+                        break;
 
-						tempData.SetValue(dvalue, i);
-					}
-					break;
+                    case DbDataType.Integer:
+                        tempData.SetValue(BitConverter.ToInt32(slice, slicePosition), i);
+                        break;
 
-					case DbDataType.Double:	
-						tempData.SetValue(BitConverter.ToDouble(slice, slicePosition), i);
-						break;
-	
-					case DbDataType.Float:
-						tempData.SetValue(BitConverter.ToSingle(slice, slicePosition), i);
-						break;
+                    case DbDataType.BigInt:
+                        tempData.SetValue(BitConverter.ToInt64(slice, slicePosition), i);
+                        break;
 
-					case DbDataType.Date:
-					{
-						int	idate = BitConverter.ToInt32(slice,	slicePosition);
+                    case DbDataType.Decimal:
+                    case DbDataType.Numeric:
+                        {
+                            object evalue = null;
 
-						DateTime date = TypeDecoder.DecodeDate(idate);
-						
-						tempData.SetValue(date,	i);
-					}
-					break;
-					
-					case DbDataType.Time:
-					{
-						int	itime = BitConverter.ToInt32(slice,	slicePosition);
-					
-						DateTime time = TypeDecoder.DecodeTime(itime);					
-						
-						tempData.SetValue(time,	i);
-					}
-					break;
-										
-					case DbDataType.TimeStamp:
-					{
-						int	idate = BitConverter.ToInt32(slice,	slicePosition);
-						int	itime = BitConverter.ToInt32(slice,	slicePosition +	4);
-					
-						DateTime date = TypeDecoder.DecodeDate(idate);
-						DateTime time = TypeDecoder.DecodeTime(itime);
+                            switch (type)
+                            {
+                                case IscCodes.SQL_SHORT:
+                                    evalue = BitConverter.ToInt16(slice, slicePosition);
+                                    break;
 
-						DateTime timestamp = new System.DateTime(
-							date.Year, date.Month, date.Day,
-							time.Hour,time.Minute, time.Second,	time.Millisecond);
-											
-						tempData.SetValue(timestamp, i);
-					}
-					break;
-				}
-				
-				slicePosition += itemLength;
-			}
-			
-			if (systemType.IsPrimitive)
-			{
-				// For primitive types we can use System.Buffer	to copy	generated data to destination array
-				Buffer.BlockCopy(tempData, 0, sliceData, 0,	Buffer.ByteLength(tempData));
-			}
-			else
-			{
-				sliceData = tempData;	
-			}
-			
-			return sliceData;
-		}
+                                case IscCodes.SQL_LONG:
+                                    evalue = BitConverter.ToInt32(slice, slicePosition);
+                                    break;
 
-		#endregion
+                                case IscCodes.SQL_QUAD:
+                                case IscCodes.SQL_INT64:
+                                    evalue = BitConverter.ToInt64(slice, slicePosition);
+                                    break;
+                            }
 
-		#region · Private Metods ·
+                            decimal dvalue = TypeDecoder.DecodeDecimal(evalue, this.Descriptor.Scale, type);
+
+                            tempData.SetValue(dvalue, i);
+                        }
+                        break;
+
+                    case DbDataType.Double:
+                        tempData.SetValue(BitConverter.ToDouble(slice, slicePosition), i);
+                        break;
+
+                    case DbDataType.Float:
+                        tempData.SetValue(BitConverter.ToSingle(slice, slicePosition), i);
+                        break;
+
+                    case DbDataType.Date:
+                        {
+                            int idate = BitConverter.ToInt32(slice, slicePosition);
+
+                            DateTime date = TypeDecoder.DecodeDate(idate);
+
+                            tempData.SetValue(date, i);
+                        }
+                        break;
+
+                    case DbDataType.Time:
+                        {
+                            int itime = BitConverter.ToInt32(slice, slicePosition);
+
+                            TimeSpan time = TypeDecoder.DecodeTime(itime);
+
+                            tempData.SetValue(time, i);
+                        }
+                        break;
+
+                    case DbDataType.TimeStamp:
+                        {
+                            int idate = BitConverter.ToInt32(slice, slicePosition);
+                            int itime = BitConverter.ToInt32(slice, slicePosition + 4);
+
+                            DateTime date = TypeDecoder.DecodeDate(idate);
+                            TimeSpan time = TypeDecoder.DecodeTime(itime);
+
+                            DateTime timestamp = new System.DateTime(
+                                date.Year, date.Month, date.Day,
+                                time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+
+                            tempData.SetValue(timestamp, i);
+                        }
+                        break;
+                }
+
+                slicePosition += itemLength;
+            }
+
+            if (systemType.IsPrimitive)
+            {
+                // For primitive types we can use System.Buffer	to copy	generated data to destination array
+                Buffer.BlockCopy(tempData, 0, sliceData, 0, Buffer.ByteLength(tempData));
+            }
+            else
+            {
+                sliceData = tempData;
+            }
+
+            return sliceData;
+        }
+
+        #endregion
+
+        #region · Private Metods ·
 
         private void ClearStatusVector()
         {
             Array.Clear(this.statusVector, 0, this.statusVector.Length);
         }
 
-		private	byte[] EncodeSlice(ArrayDesc desc, Array sourceArray, int length)
-		{
-			BinaryWriter	writer	= new BinaryWriter(new MemoryStream());
-			Charset			charset = this.db.Charset;
-			DbDataType		dbType	= DbDataType.Array;
-			int				subType = (this.Descriptor.Scale < 0) ? 2 : 0;
-			int				type	= 0;
+        private byte[] EncodeSlice(ArrayDesc desc, Array sourceArray, int length)
+        {
+            BinaryWriter writer = new BinaryWriter(new MemoryStream());
+            Charset charset = this.db.Charset;
+            DbDataType dbType = DbDataType.Array;
+            int subType = (this.Descriptor.Scale < 0) ? 2 : 0;
+            int type = 0;
 
-			// Infer data types
-			type = TypeHelper.GetFbType(this.Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, subType, this.Descriptor.Scale);
+            // Infer data types
+            type = TypeHelper.GetFbType(this.Descriptor.DataType);
+            dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, subType, this.Descriptor.Scale);
 
-			foreach (object source in sourceArray)
-			{
-				switch (dbType)
-				{
-					case DbDataType.Char:
-					{
-                        string value = source != null ? (string)source : String.Empty;
-						byte[] buffer = charset.GetBytes(value);
+            foreach (object source in sourceArray)
+            {
+                switch (dbType)
+                {
+                    case DbDataType.Char:
+                        {
+                            string value = source != null ? (string)source : String.Empty;
+                            byte[] buffer = charset.GetBytes(value);
 
-						writer.Write(buffer);
+                            writer.Write(buffer);
 
-						if (desc.Length	> buffer.Length)
-						{
-							for	(int j = buffer.Length;	j <	desc.Length; j++)
-							{
-								writer.Write((byte)32);
-							}
-						}
-					}
-					break;
+                            if (desc.Length > buffer.Length)
+                            {
+                                for (int j = buffer.Length; j < desc.Length; j++)
+                                {
+                                    writer.Write((byte)32);
+                                }
+                            }
+                        }
+                        break;
 
-					case DbDataType.VarChar:
-					{
-                        string value = source != null ? (string)source : String.Empty;
+                    case DbDataType.VarChar:
+                        {
+                            string value = source != null ? (string)source : String.Empty;
 
-						byte[] buffer = charset.GetBytes(value);
-						writer.Write(buffer);
+                            byte[] buffer = charset.GetBytes(value);
+                            writer.Write(buffer);
 
-						if (desc.Length	> buffer.Length)
-						{
-							for	(int j = buffer.Length;	j <	desc.Length; j++)
-							{
-								writer.Write((byte)0);
-							}
-						}
-						writer.Write((short)0);
-					}
-					break;
-	
-					case DbDataType.SmallInt:
+                            if (desc.Length > buffer.Length)
+                            {
+                                for (int j = buffer.Length; j < desc.Length; j++)
+                                {
+                                    writer.Write((byte)0);
+                                }
+                            }
+                            writer.Write((short)0);
+                        }
+                        break;
+
+                    case DbDataType.SmallInt:
                         writer.Write((short)source);
-						break;
-	
-					case DbDataType.Integer:
+                        break;
+
+                    case DbDataType.Integer:
                         writer.Write((int)source);
-						break;
+                        break;
 
-					case DbDataType.BigInt:
+                    case DbDataType.BigInt:
                         writer.Write((long)source);
-						break;
-					
-					case DbDataType.Float:
+                        break;
+
+                    case DbDataType.Float:
                         writer.Write((float)source);
-						break;
-										
-					case DbDataType.Double:
+                        break;
+
+                    case DbDataType.Double:
                         writer.Write((double)source);
-						break;
-					
-					case DbDataType.Numeric:
-					case DbDataType.Decimal:
-					{
-                        object numeric = TypeEncoder.EncodeDecimal((decimal)source, desc.Scale, type);
+                        break;
 
-						switch (type)
-						{
-							case IscCodes.SQL_SHORT:
-								writer.Write((short)numeric);
-								break;
+                    case DbDataType.Numeric:
+                    case DbDataType.Decimal:
+                        {
+                            object numeric = TypeEncoder.EncodeDecimal((decimal)source, desc.Scale, type);
 
-							case IscCodes.SQL_LONG:
-								writer.Write((int)numeric);
-								break;
+                            switch (type)
+                            {
+                                case IscCodes.SQL_SHORT:
+                                    writer.Write((short)numeric);
+                                    break;
 
-							case IscCodes.SQL_QUAD:
-							case IscCodes.SQL_INT64:
-								writer.Write((long)numeric);
-								break;
-						}
-					}
-					break;
+                                case IscCodes.SQL_LONG:
+                                    writer.Write((int)numeric);
+                                    break;
 
-					case DbDataType.Date:
+                                case IscCodes.SQL_QUAD:
+                                case IscCodes.SQL_INT64:
+                                    writer.Write((long)numeric);
+                                    break;
+                            }
+                        }
+                        break;
+
+                    case DbDataType.Date:
                         writer.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
-						break;
-					
-					case DbDataType.Time:
-                        writer.Write(TypeEncoder.EncodeTime(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
-						break;
+                        break;
 
-					case DbDataType.TimeStamp:
+                    case DbDataType.Time:
+                        writer.Write(TypeEncoder.EncodeTime((TimeSpan)source));
+                        break;
+
+                    case DbDataType.TimeStamp:
                         writer.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
-                        writer.Write(TypeEncoder.EncodeTime(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
-						break;
-					
-					default:
-						throw new NotSupportedException("Unknown data type");
-				}
-			}
+                        writer.Write(TypeEncoder.EncodeTime((TimeSpan)source));
+                        break;
 
-			return ((MemoryStream)writer.BaseStream).ToArray();
-		}
+                    default:
+                        throw new NotSupportedException("Unknown data type");
+                }
+            }
 
-		#endregion
-	}
+            return ((MemoryStream)writer.BaseStream).ToArray();
+        }
+
+        #endregion
+    }
 }
