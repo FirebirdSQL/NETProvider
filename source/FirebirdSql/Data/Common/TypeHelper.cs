@@ -14,10 +14,14 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
 using System.Data;
+using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
@@ -391,9 +395,11 @@ namespace FirebirdSql.Data.Common
                     return "System.Decimal";
 
                 case DbDataType.Date:
-                case DbDataType.Time:
                 case DbDataType.TimeStamp:
                     return "System.DateTime";
+                
+                case DbDataType.Time:
+                    return "System.TimeSpan";
 
                 default:
                     return null;
@@ -595,6 +601,12 @@ namespace FirebirdSql.Data.Common
                 default:
                     throw new ArgumentException("Invalid data type");
             }
+        }
+
+        public static TimeSpan DateTimeToTimeSpan(DateTime d)
+        {
+            GregorianCalendar calendar = new GregorianCalendar();
+            return new TimeSpan(0, calendar.GetHour(d), calendar.GetMinute(d), calendar.GetSecond(d), (int)calendar.GetMilliseconds(d));
         }
 
 		#endregion

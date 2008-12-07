@@ -156,7 +156,7 @@ namespace FirebirdSql.Data.UnitTests
 			newRow["NUMERIC_FIELD"] = 100.01;
 			newRow["DECIMAL_FIELD"] = 100.01;
 			newRow["DATE_FIELD"] = new DateTime(100, 10, 10);
-			newRow["TIME_FIELD"] = new DateTime(100, 10, 10, 10, 10, 10, 10);
+			newRow["TIME_FIELD"] = new TimeSpan(10, 10, 10);
 			newRow["TIMESTAMP_FIELD"] = new DateTime(100, 10, 10, 10, 10, 10, 10);
 			newRow["CLOB_FIELD"] = "ONE THOUSAND";
 
@@ -561,7 +561,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			DateTime dtValue = DateTime.Now;
+            TimeSpan dtValue = new TimeSpan(5, 6, 7);
 
 			ds.Tables["TEST"].Rows[0]["TIME_FIELD"] = dtValue;
 
@@ -579,13 +579,13 @@ namespace FirebirdSql.Data.UnitTests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			DateTime val = (DateTime)command.ExecuteScalar();
+            TimeSpan val = (TimeSpan)command.ExecuteScalar();
 
 			transaction.Commit();
 
-			Assert.AreEqual(dtValue.Hour, val.Hour, "time_field has not correct hour");
-			Assert.AreEqual(dtValue.Minute, val.Minute, "time_field has not correct minute");
-			Assert.AreEqual(dtValue.Second, val.Second, "time_field has not correct second");
+			Assert.AreEqual(dtValue.Hours, val.Hours, "time_field has not correct hour");
+			Assert.AreEqual(dtValue.Minutes, val.Minutes, "time_field has not correct minute");
+			Assert.AreEqual(dtValue.Seconds, val.Seconds, "time_field has not correct second");
 		}
 
 		[Test]

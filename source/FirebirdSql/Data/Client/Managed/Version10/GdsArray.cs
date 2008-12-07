@@ -14,9 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
- * 
+ *   
  *  Contributors:
- *   Jiri Cincura (jiri@cincura.net)
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -390,7 +390,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						break;
 
 					case DbDataType.Time:
-						xdr.WriteTime(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
+						xdr.WriteTime((TimeSpan)source);
 						break;
 
 					case DbDataType.TimeStamp:

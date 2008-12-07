@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -55,7 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         DateTime ReadDate();
 
-        DateTime ReadTime();
+        TimeSpan ReadTime();
 
         decimal ReadDecimal(int type, int scale);
 

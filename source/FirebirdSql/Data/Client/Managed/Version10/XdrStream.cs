@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -350,10 +353,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public DateTime ReadDateTime()
 		{
 			DateTime date = this.ReadDate();
-			DateTime time = this.ReadTime();
+			TimeSpan time = this.ReadTime();
 
-			return new DateTime(
-				date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, time.Millisecond);
+			return new DateTime(date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
 		}
 
 		public DateTime ReadDate()
@@ -361,7 +363,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return TypeDecoder.DecodeDate(this.ReadInt32());
 		}
 
-		public DateTime ReadTime()
+		public TimeSpan ReadTime()
 		{
 			return TypeDecoder.DecodeTime(this.ReadInt32());
 		}
@@ -634,21 +636,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             this.Write((short)(value ? 1 : 0));
         }
 
-		public void Write(DateTime value)
-		{
-			this.WriteDate(value);
-			this.WriteTime(value);
-		}
+        public void Write(DateTime value)
+        {
+            this.WriteDate(value);
+            this.WriteTime(TypeHelper.DateTimeToTimeSpan(value));
+        }
 
 		public void WriteDate(DateTime value)
 		{
 			this.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(value)));
 		}
 
-		public void WriteTime(DateTime value)
-		{
-			this.Write(TypeEncoder.EncodeTime(Convert.ToDateTime(value)));
-		}
+        public void WriteTime(TimeSpan value)
+        {
+            this.Write(TypeEncoder.EncodeTime(value));
+        }
 
 		public void Write(Descriptor descriptor)
 		{

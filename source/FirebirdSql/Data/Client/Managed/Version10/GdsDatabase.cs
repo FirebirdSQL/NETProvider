@@ -14,9 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
- *	
+ *   
  *  Contributors:
- *      Jiri Cincura (jiri@cincura.net)
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -33,46 +33,46 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-	internal class GdsDatabase : IDatabase, IDatabaseStream
-	{
-		#region · Callbacks ·
+    internal class GdsDatabase : IDatabase, IDatabaseStream
+    {
+        #region · Callbacks ·
 
-		public WarningMessageCallback WarningMessage
-		{
-			get { return this.warningMessage; }
-			set { this.warningMessage = value; }
-		}
+        public WarningMessageCallback WarningMessage
+        {
+            get { return this.warningMessage; }
+            set { this.warningMessage = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Fields ·
+        #region · Fields ·
 
-		protected WarningMessageCallback warningMessage;
+        protected WarningMessageCallback warningMessage;
 
-		private GdsConnection	connection;
-		private GdsEventManager eventManager;
-		private Charset			charset;
-		protected int			handle;
-		private int				transactionCount;
-		protected string		serverVersion;
-		private short			packetSize;
-		private short			dialect;
-		private int				eventsId;
-        private int             operation;
-		private bool			disposed;
-		private XdrStream		outputStream;
-		private XdrStream		inputStream;
-        private object          syncObject;
+        private GdsConnection connection;
+        private GdsEventManager eventManager;
+        private Charset charset;
+        protected int handle;
+        private int transactionCount;
+        protected string serverVersion;
+        private short packetSize;
+        private short dialect;
+        private int eventsId;
+        private int operation;
+        private bool disposed;
+        private XdrStream outputStream;
+        private XdrStream inputStream;
+        private object syncObject;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		public int Handle
-		{
-			get { return this.handle; }
+        public int Handle
+        {
+            get { return this.handle; }
             protected set { this.handle = value; }
-		}
+        }
 
         public int TransactionCount
         {
@@ -80,39 +80,39 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             set { this.transactionCount = value; }
         }
 
-		public string ServerVersion
-		{
-			get { return this.serverVersion; }
+        public string ServerVersion
+        {
+            get { return this.serverVersion; }
             protected set { this.serverVersion = value; }
-		}
+        }
 
-		public Charset Charset
-		{
-			get { return this.charset; }
-			set { this.charset = value; }
-		}
+        public Charset Charset
+        {
+            get { return this.charset; }
+            set { this.charset = value; }
+        }
 
-		public short PacketSize
-		{
-			get { return this.packetSize; }
-			set { this.packetSize = value; }
-		}
+        public short PacketSize
+        {
+            get { return this.packetSize; }
+            set { this.packetSize = value; }
+        }
 
-		public short Dialect
-		{
-			get { return this.dialect; }
-			set { this.dialect = value; }
-		}
+        public short Dialect
+        {
+            get { return this.dialect; }
+            set { this.dialect = value; }
+        }
 
-		public bool HasRemoteEventSupport
-		{
-			get { return true; }
-		}
+        public bool HasRemoteEventSupport
+        {
+            get { return true; }
+        }
 
         public object SyncObject
         {
-            get 
-            { 
+            get
+            {
                 if (this.syncObject == null)
                 {
                     Interlocked.CompareExchange(ref this.syncObject, new object(), null);
@@ -122,47 +122,47 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             }
         }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		public GdsDatabase(GdsConnection connection)
-		{
-			this.connection		= connection;
-			this.charset		= Charset.DefaultCharset;
-			this.dialect		= 3;
-			this.packetSize		= 8192;
-            this.inputStream    = this.connection.CreateXdrStream();
-            this.outputStream   = this.connection.CreateXdrStream();
+        public GdsDatabase(GdsConnection connection)
+        {
+            this.connection = connection;
+            this.charset = Charset.DefaultCharset;
+            this.dialect = 3;
+            this.packetSize = 8192;
+            this.inputStream = this.connection.CreateXdrStream();
+            this.outputStream = this.connection.CreateXdrStream();
 
-			GC.SuppressFinalize(this);
-		}
+            GC.SuppressFinalize(this);
+        }
 
-		#endregion
+        #endregion
 
-		#region · Finalizer ·
+        #region · Finalizer ·
 
-		~GdsDatabase()
-		{
-			this.Dispose(false);
-		}
+        ~GdsDatabase()
+        {
+            this.Dispose(false);
+        }
 
-		#endregion
+        #endregion
 
-		#region · IDisposable methods ·
+        #region · IDisposable methods ·
 
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		private void Dispose(bool disposing)
-		{
-			lock (this.SyncObject)
-			{
-				if (!this.disposed)
-				{
+        private void Dispose(bool disposing)
+        {
+            lock (this.SyncObject)
+            {
+                if (!this.disposed)
+                {
                     try
                     {
                         // release any unmanaged resources
@@ -171,51 +171,51 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     catch
                     {
                     }
-					finally
-					{
+                    finally
+                    {
                         // release any managed resources
                         if (disposing)
                         {
-                            this.connection         = null;
-                            this.charset            = null;
-                            this.eventManager       = null;
-                            this.serverVersion      = null;
-                            this.dialect            = 0;
-                            this.eventsId           = 0;
-                            this.handle             = 0;
-                            this.packetSize         = 0;
-                            this.warningMessage     = null;
-                            this.transactionCount   = 0;
+                            this.connection = null;
+                            this.charset = null;
+                            this.eventManager = null;
+                            this.serverVersion = null;
+                            this.dialect = 0;
+                            this.eventsId = 0;
+                            this.handle = 0;
+                            this.packetSize = 0;
+                            this.warningMessage = null;
+                            this.transactionCount = 0;
                         }
 
                         this.disposed = true;
-					}					
-				}
-			}
-		}
+                    }
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
         #region · Attach/Detach Methods ·
 
         public virtual void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-		{
-			lock (this.SyncObject)
-			{
-				try
-				{
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
                     // Attach to the database
-					this.Write(IscCodes.op_attach);
-					this.Write((int)0);				    // Database	object ID
-					this.Write(database);				// Database	PATH
-					this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
-					this.Flush();
+                    this.Write(IscCodes.op_attach);
+                    this.Write((int)0);				    // Database	object ID
+                    this.Write(database);				// Database	PATH
+                    this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+                    this.Flush();
 
                     // Save the database connection handle
-					this.handle = this.ReadGenericResponse().ObjectHandle;
-				}
-				catch (IOException)
-				{
+                    this.handle = this.ReadGenericResponse().ObjectHandle;
+                }
+                catch (IOException)
+                {
                     try
                     {
                         this.Detach();
@@ -224,13 +224,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     {
                     }
 
-					throw new IscException(IscCodes.isc_net_write_err);
-				}
+                    throw new IscException(IscCodes.isc_net_write_err);
+                }
 
-				// Get server version
-				this.serverVersion = this.GetServerVersion();
-			}
-		}
+                // Get server version
+                this.serverVersion = this.GetServerVersion();
+            }
+        }
 
         public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
         {
@@ -238,24 +238,24 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         }
 
         public virtual void Detach()
-		{
-			lock (this.SyncObject)
-			{
-				if (this.TransactionCount > 0)
-				{
-					throw new IscException(IscCodes.isc_open_trans, this.TransactionCount);
-				}
+        {
+            lock (this.SyncObject)
+            {
+                if (this.TransactionCount > 0)
+                {
+                    throw new IscException(IscCodes.isc_open_trans, this.TransactionCount);
+                }
 
-				try
-				{
-					this.Write(IscCodes.op_detach);
-					this.Write(this.handle);
-					this.Flush();
+                try
+                {
+                    this.Write(IscCodes.op_detach);
+                    this.Write(this.handle);
+                    this.Flush();
 
-					this.ReadResponse();
+                    this.ReadResponse();
 
-					// Close the Event Manager
-					this.CloseEventManager();
+                    // Close the Event Manager
+                    this.CloseEventManager();
 
                     // Disconnection
                     this.connection.Disconnect();
@@ -271,125 +271,125 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     }
 
                     // Clear members
-					this.transactionCount	= 0;
-					this.handle				= 0;
-					this.dialect			= 0;
-					this.packetSize			= 0;
-                    this.operation          = 0;
-                    this.outputStream       = null;
-                    this.inputStream        = null;
-					this.charset			= null;
-					this.connection			= null;
-					this.serverVersion		= null;
-				}
-				catch (IOException)
-				{
-					try
-					{
-						this.connection.Disconnect();
-					}
-					catch (IOException)
-					{
-						throw new IscException(IscCodes.isc_network_error);
-					}
+                    this.transactionCount = 0;
+                    this.handle = 0;
+                    this.dialect = 0;
+                    this.packetSize = 0;
+                    this.operation = 0;
+                    this.outputStream = null;
+                    this.inputStream = null;
+                    this.charset = null;
+                    this.connection = null;
+                    this.serverVersion = null;
+                }
+                catch (IOException)
+                {
+                    try
+                    {
+                        this.connection.Disconnect();
+                    }
+                    catch (IOException)
+                    {
+                        throw new IscException(IscCodes.isc_network_error);
+                    }
 
-					throw new IscException(IscCodes.isc_network_error);
-				}
-			}
-		}
+                    throw new IscException(IscCodes.isc_network_error);
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Database Methods ·
+        #region · Database Methods ·
 
         public virtual void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-		{
-			lock (this.SyncObject)
-			{
-				try
-				{
-					this.Write(IscCodes.op_create);
-					this.Write((int)0);
-					this.Write(database);
-					this.WriteBuffer(dpb.ToArray());
-					this.Flush();
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    this.Write(IscCodes.op_create);
+                    this.Write((int)0);
+                    this.Write(database);
+                    this.WriteBuffer(dpb.ToArray());
+                    this.Flush();
 
-					try
-					{
+                    try
+                    {
                         GenericResponse response = (GenericResponse)this.ReadResponse();
 
                         this.handle = response.ObjectHandle;
-						this.Detach();
-					}
-					catch (IscException)
-					{
-						try
-						{
-							this.connection.Disconnect();
-						}
-						catch (Exception)
-						{
-						}
+                        this.Detach();
+                    }
+                    catch (IscException)
+                    {
+                        try
+                        {
+                            this.connection.Disconnect();
+                        }
+                        catch (Exception)
+                        {
+                        }
 
-						throw;
-					}
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_net_write_err);
-				}
-			}
-		}
+                        throw;
+                    }
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_net_write_err);
+                }
+            }
+        }
 
         public virtual void DropDatabase()
-		{
-			lock (this.SyncObject)
-			{
-				try
-				{
-					this.Write(IscCodes.op_drop_database);
-					this.Write(this.handle);
-					this.Flush();
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    this.Write(IscCodes.op_drop_database);
+                    this.Write(this.handle);
+                    this.Flush();
 
-					this.ReadResponse();
+                    this.ReadResponse();
 
-					this.handle = 0;
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_network_error);
-				}
-				finally
-				{
-					try
-					{
-						this.Detach();
-					}
-					catch
-					{
-					}
-				}
-			}
-		}
+                    this.handle = 0;
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_network_error);
+                }
+                finally
+                {
+                    try
+                    {
+                        this.Detach();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Auxiliary Connection Methods ·
+        #region · Auxiliary Connection Methods ·
 
         public virtual void ConnectionRequest(out int auxHandle, out string ipAddress, out int portNumber)
-		{
-			lock (this.SyncObject)
-			{
-				try
-				{
-					this.Write(IscCodes.op_connect_request);
-					this.Write(IscCodes.P_REQ_async);	// Connection type
-					this.Write(this.handle);			// Related object
-					this.Write(0);						// Partner identification
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    this.Write(IscCodes.op_connect_request);
+                    this.Write(IscCodes.P_REQ_async);	// Connection type
+                    this.Write(this.handle);			// Related object
+                    this.Write(0);						// Partner identification
 
-					this.Flush();
+                    this.Flush();
 
-					this.ReadOperation();
+                    this.ReadOperation();
 
                     /*
 					auxHandle = this.ReadInt32();
@@ -413,193 +413,193 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.ReadBytes(12);
                     */
 
-                    auxHandle = this.ReadInt32(); 
+                    auxHandle = this.ReadInt32();
 
                     this.ReadBytes(8);
-                                         
+
                     // sin_port
                     int respLen = this.ReadInt32();
                     respLen += respLen % 4;
-                    
+
                     // socketaddr_in (non XDR encoded)
-                     
+
                     // sin_Family
                     this.ReadBytes(2);
                     respLen -= 2;
-                    
-                    // sin_port
-                    byte[] buffer   = this.ReadBytes(2);
-                    portNumber      = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
-                    respLen         -= 2;
-                     
-                    // sin_addr
-                    buffer      = this.ReadBytes(4);
-                    respLen     -= 4;
 
-                    ipAddress   = String.Format(
+                    // sin_port
+                    byte[] buffer = this.ReadBytes(2);
+                    portNumber = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+                    respLen -= 2;
+
+                    // sin_addr
+                    buffer = this.ReadBytes(4);
+                    respLen -= 4;
+
+                    ipAddress = String.Format(
                         CultureInfo.InvariantCulture,
                         "{0}.{1}.{2}.{3}",
                         buffer[0], buffer[1], buffer[2], buffer[3]);
-                     
+
                     // garbage
                     this.ReadBytes(respLen);
-                     
-					// Read	Status Vector
-					this.ReadStatusVector();
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_net_read_err);
-				}
-			}
-		}
 
-		#endregion
+                    // Read	Status Vector
+                    this.ReadStatusVector();
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_net_read_err);
+                }
+            }
+        }
 
-		#region · Remote Events Methods ·
+        #endregion
 
-		public void CloseEventManager()
-		{
-			lock (this.SyncObject)
-			{
-				if (this.eventManager != null)
-				{
-					this.eventManager.Close();
-					this.eventManager = null;
-				}
-			}
-		}
+        #region · Remote Events Methods ·
 
-		public RemoteEvent CreateEvent()
-		{
-			return new RemoteEvent(this);
-		}
+        public void CloseEventManager()
+        {
+            lock (this.SyncObject)
+            {
+                if (this.eventManager != null)
+                {
+                    this.eventManager.Close();
+                    this.eventManager = null;
+                }
+            }
+        }
 
-		public void QueueEvents(RemoteEvent events)
-		{
-			if (this.eventManager == null)
-			{
-				string	ipAddress	= string.Empty;
-				int		portNumber	= 0;
-				int		auxHandle	= 0;
+        public RemoteEvent CreateEvent()
+        {
+            return new RemoteEvent(this);
+        }
 
-				this.ConnectionRequest(out auxHandle, out ipAddress, out portNumber);
+        public void QueueEvents(RemoteEvent events)
+        {
+            if (this.eventManager == null)
+            {
+                string ipAddress = string.Empty;
+                int portNumber = 0;
+                int auxHandle = 0;
 
-				this.eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
-			}
+                this.ConnectionRequest(out auxHandle, out ipAddress, out portNumber);
 
-			lock (this.SyncObject)
-			{
-				try
-				{
-					events.LocalId = ++this.eventsId;
+                this.eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
+            }
 
-					EventParameterBuffer epb = events.ToEpb();
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    events.LocalId = ++this.eventsId;
 
-					this.Write(IscCodes.op_que_events); // Op codes
-					this.Write(this.handle);			// Database	object id
-					this.WriteBuffer(epb.ToArray());	// Event description block
-					this.Write(0);						// Address of ast routine
-					this.Write(0);						// Argument	to ast routine						
-					this.Write(events.LocalId);		    // Client side id of remote	event
+                    EventParameterBuffer epb = events.ToEpb();
 
-					this.Flush();
+                    this.Write(IscCodes.op_que_events); // Op codes
+                    this.Write(this.handle);			// Database	object id
+                    this.WriteBuffer(epb.ToArray());	// Event description block
+                    this.Write(0);						// Address of ast routine
+                    this.Write(0);						// Argument	to ast routine						
+                    this.Write(events.LocalId);		    // Client side id of remote	event
+
+                    this.Flush();
 
                     GenericResponse response = (GenericResponse)this.ReadResponse();
 
-					// Update event	Remote event ID
+                    // Update event	Remote event ID
                     events.RemoteId = response.ObjectHandle;
 
-					// Enqueue events in the event manager
-					this.eventManager.QueueEvents(events);
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_net_read_err);
-				}
-			}
-		}
+                    // Enqueue events in the event manager
+                    this.eventManager.QueueEvents(events);
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_net_read_err);
+                }
+            }
+        }
 
-		public void CancelEvents(RemoteEvent events)
-		{
-			lock (this.SyncObject)
-			{
-				try
-				{
-					this.Write(IscCodes.op_cancel_events);	// Op code
-					this.Write(this.handle);				// Database	object id
-					this.Write(events.LocalId);			    // Event ID
+        public void CancelEvents(RemoteEvent events)
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    this.Write(IscCodes.op_cancel_events);	// Op code
+                    this.Write(this.handle);				// Database	object id
+                    this.Write(events.LocalId);			    // Event ID
 
-					this.Flush();
+                    this.Flush();
 
-					this.ReadResponse();
+                    this.ReadResponse();
 
-					this.eventManager.CancelEvents(events);
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_net_read_err);
-				}
-			}
-		}
+                    this.eventManager.CancelEvents(events);
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_net_read_err);
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Transaction Methods ·
+        #region · Transaction Methods ·
 
         public virtual ITransaction BeginTransaction(TransactionParameterBuffer tpb)
-		{
-			GdsTransaction transaction = new GdsTransaction(this);
+        {
+            GdsTransaction transaction = new GdsTransaction(this);
 
-			transaction.BeginTransaction(tpb);
+            transaction.BeginTransaction(tpb);
 
-			return transaction;
-		}
+            return transaction;
+        }
 
-		#endregion
+        #endregion
 
-		#region · Statement Creation Methods ·
+        #region · Statement Creation Methods ·
 
         public virtual StatementBase CreateStatement()
-		{
-			return new GdsStatement(this);
-		}
+        {
+            return new GdsStatement(this);
+        }
 
         public virtual StatementBase CreateStatement(ITransaction transaction)
-		{
-			return new GdsStatement(this, transaction);
-		}
+        {
+            return new GdsStatement(this, transaction);
+        }
 
-		#endregion
+        #endregion
 
-		#region · Database Information Methods ·
+        #region · Database Information Methods ·
 
         public virtual string GetServerVersion()
-		{
-			byte[] items = new byte[]
+        {
+            byte[] items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
 
-			return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_128)[0].ToString();
-		}
+            return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_128)[0].ToString();
+        }
 
         public virtual ArrayList GetDatabaseInfo(byte[] items)
-		{
-			return this.GetDatabaseInfo(items, IscCodes.MAX_BUFFER_SIZE);
-		}
+        {
+            return this.GetDatabaseInfo(items, IscCodes.MAX_BUFFER_SIZE);
+        }
 
         public virtual ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
-		{
-			byte[] buffer = new byte[bufferLength];
+        {
+            byte[] buffer = new byte[bufferLength];
 
-			this.DatabaseInfo(items, buffer, buffer.Length);
+            this.DatabaseInfo(items, buffer, buffer.Length);
 
-			return IscHelper.ParseDatabaseInfo(buffer);
-		}
+            return IscHelper.ParseDatabaseInfo(buffer);
+        }
 
-		#endregion
+        #endregion
 
         #region · Trigger Context Methods ·
 
@@ -690,8 +690,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         public virtual IscException ReadStatusVector()
         {
-            IscException    exception   = null;
-            bool            eof         = false;
+            IscException exception = null;
+            bool eof = false;
 
             while (!eof)
             {
@@ -753,32 +753,32 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         }
 
         public virtual void ReleaseObject(int op, int id)
-		{
-			lock (this.SyncObject)
-			{
-				try
-				{
-					this.Write(op);
-					this.Write(id);
-					this.Flush();
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    this.Write(op);
+                    this.Write(id);
+                    this.Flush();
 
-					this.ReadResponse();
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_net_read_err);
-				}
-			}
-		}
+                    this.ReadResponse();
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_net_read_err);
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Protected Methods ·
+        #region · Protected Methods ·
 
         protected virtual IResponse ReadSingleResponse()
         {
-            IResponse   response    = null;
-            int         operation   = this.ReadOperation();
+            IResponse response = null;
+            int operation = this.ReadOperation();
 
             switch (operation)
             {
@@ -804,23 +804,23 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             return response;
         }
 
-		/// <summary>
-		/// isc_database_info
-		/// </summary>
-		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
-		{
-			lock (this.SyncObject)
-			{
-				try
-				{
-					// see src/remote/protocol.h for packet	definition (p_info struct)					
-					this.Write(IscCodes.op_info_database);	//	operation
-					this.Write(this.handle);				//	db_handle
-					this.Write(0);							//	incarnation
-					this.WriteBuffer(items, items.Length);	//	items
-					this.Write(bufferLength);				//	result buffer length
+        /// <summary>
+        /// isc_database_info
+        /// </summary>
+        private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    // see src/remote/protocol.h for packet	definition (p_info struct)					
+                    this.Write(IscCodes.op_info_database);	//	operation
+                    this.Write(this.handle);				//	db_handle
+                    this.Write(0);							//	incarnation
+                    this.WriteBuffer(items, items.Length);	//	items
+                    this.Write(bufferLength);				//	result buffer length
 
-					this.Flush();
+                    this.Flush();
 
                     GenericResponse response = (GenericResponse)this.ReadResponse();
 
@@ -832,15 +832,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     }
 
                     Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_network_error);
-				}
-			}
-		}
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_network_error);
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
         #region · Read Members ·
 
@@ -919,7 +919,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             return this.inputStream.ReadDate();
         }
 
-        public DateTime ReadTime()
+        public TimeSpan ReadTime()
         {
             return this.inputStream.ReadTime();
         }

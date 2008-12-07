@@ -422,12 +422,12 @@ namespace FirebirdSql.Data.UnitTests
 			string insertText = "INSERT	INTO TEST (int_field, tarray_field)	values(@int_field, @array_field)";
 
 			// Insert new Record
-			DateTime[] insert_values = new DateTime[4];
+			TimeSpan[] insert_values = new TimeSpan[4];
 
-			insert_values[0] = DateTime.Now.AddHours(10);
-			insert_values[1] = DateTime.Now.AddHours(20);
-			insert_values[2] = DateTime.Now.AddHours(30);
-			insert_values[3] = DateTime.Now.AddHours(40);
+            insert_values[0] = new TimeSpan(3, 9, 10);
+			insert_values[1] = new TimeSpan(4, 11, 12);
+            insert_values[2] = new TimeSpan(6, 13, 14);
+            insert_values[3] = new TimeSpan(8, 15, 16); 
 
 			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
@@ -447,12 +447,12 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				if (!reader.IsDBNull(0))
 				{
-					DateTime[] select_values = new DateTime[insert_values.Length];
+                    TimeSpan[] select_values = new TimeSpan[insert_values.Length];
 					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
 
 					for (int i = 0; i < insert_values.Length; i++)
 					{
-						if (insert_values[i].ToString("HH:mm:ss") != select_values[i].ToString("HH:mm:ss"))
+						if (insert_values[i].ToString() != select_values[i].ToString())
 						{
 							throw new Exception("differences at	index " + i.ToString());
 						}
@@ -809,10 +809,10 @@ namespace FirebirdSql.Data.UnitTests
 			string updateText = "update	TEST set tarray_field =	@array_field " +
 								"WHERE int_field = 1";
 
-			DateTime[] new_values = new DateTime[2];
+            TimeSpan[] new_values = new TimeSpan[2];
 
-			new_values[0] = DateTime.Now.AddHours(100);
-			new_values[1] = DateTime.Now.AddHours(200);
+            new_values[0] = new TimeSpan(11, 13,14);
+            new_values[1] = new TimeSpan(12, 15, 16);
 
 			FbCommand update = new FbCommand(updateText, Connection, Transaction);
 
