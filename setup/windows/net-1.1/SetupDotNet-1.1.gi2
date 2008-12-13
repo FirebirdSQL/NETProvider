@@ -122,7 +122,7 @@
     </launchconditions>
 	<variables>
 		<var name="AppID" value="FirebirdNETProvider1.7" />
-		<var name="AppName" value="Firebird .NET Data Provider 1.7.1 RC 4 (.NET 1.1)" />
+		<var name="AppName" value="Firebird .NET Data Provider 1.7.2 (.NET 1.1)" />
 		<var name="Password" type="normal"/>
 		<var name="CompressionLevel" value="7" type="normal" />
         <var name="Languages" value="Bgr,Chs,Csy,Dan,Deu,Enu,Epo,Esn,Fin,Fra,Frc,Hrv,Hun,Ita,Jpn,Kor,Lth,Nld,Nor,Plk,Ptb,Ptg,Rom,Rus,Sky,Slv,Srl,Sve,Ukr" type="normal"/>

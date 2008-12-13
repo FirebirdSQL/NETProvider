@@ -3,7 +3,7 @@
     <!-- Project properties -->
     <property 
         name="project.name" 
-        value="FbClient"
+        value="FirebirdClient"
     />
     <property 
         name="project.version" 
@@ -11,7 +11,7 @@
     />
     <property 
         name="project.release.type" 
-        value="rc4" 
+        value="release" 
         overwrite="false" 
     /> <!-- nightly / dev / alpha / beta# / rc# / release -->
 
@@ -19,7 +19,7 @@
     
     <property 
         name="project.config" 
-        value="debug"
+        value="release"
     />
     <property 
         name="build.debug"  
