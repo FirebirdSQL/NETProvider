@@ -2,6 +2,34 @@ Firebird ADO.NET Data provider for .NET and Mono
 ================================================
 
 
+2008-10-09 Carlos Guzmán Álvarez <carlosga05@gmail.com>
+
+	* FirebirdSql.Data.Common/Charset.cs:
+	* FirebirdSql.Data.Common/CharsetCollection.cs:
+	* FirebirdSql.Data.Common/DbField.cs:
+	* FirebirdSql.Data.Common/DbValue.cs:
+	* FirebirdSql.Data.Common/IDatabase.cs:
+	* FirebirdSql.Data.Common/IServiceManager.cs:
+	* FirebirdSql.Data.Common/IscCodes.cs:
+	* FirebirdSql.Data.Common/TypeHelper.cs:
+	* FirebirdSql.Data.Embedded/FesDatabase.cs:
+	* FirebirdSql.Data.Embedded/FesServiceManager.cs:
+	* FirebirdSql.Data.Firebird/AssemblyInfo.cs:
+	* FirebirdSql.Data.Firebird/ClientFactory.cs:
+	* FirebirdSql.Data.Firebird/FbCommand.cs:
+	* FirebirdSql.Data.Firebird/FbConnection.cs:
+	* FirebirdSql.Data.Firebird/FbConnectionInternal.cs:
+	* FirebirdSql.Data.Firebird/Services/FbService.cs:
+	* FirebirdSql.Data.Firebird.UnitTest/App.config:
+	* FirebirdSql.Data.Gds/GdsArray.cs:
+	* FirebirdSql.Data.Gds/GdsConnection.cs:
+	* FirebirdSql.Data.Gds/GdsDatabase.cs:
+	* FirebirdSql.Data.Gds/GdsEventManager.cs:
+	* FirebirdSql.Data.Gds/GdsServiceManager.cs:
+	* FirebirdSql.Data.Gds/XdrStream.cs:
+
+		- Changes to allow v1.7 sources under .net 1.1 to connect to Firebird 2.1 ( backported from trunk sources ).
+
 2007-04-29 Carlos Guzmán Álvarez <carlosga05@gmail.com>
 
 	* FirebirdSql.Data.Firebird\FbConnection.cs:

@@ -2,6 +2,16 @@ WHAT IS NEW - Firebird ADO.NET Data provider for .NET and Mono
 ==============================================================
 
 
+· 1.7.2 ( 2008-12-13 ) ·
+
+(Please read the Changelog for details)
+
+
+Changes:
+
+	- Changes to allow to connect to Firebird 2.1.
+
+
 · 1.7.1 ( 2006-03-29 ) ·
 
 (Please read the Changelog for details)
