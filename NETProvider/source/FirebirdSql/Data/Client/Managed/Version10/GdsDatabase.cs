@@ -391,55 +391,30 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                     this.ReadOperation();
 
-                    /*
-					auxHandle = this.ReadInt32();
-
-					// socketaddr_in (non XDR encoded)
-
-					// sin_port
-					portNumber = IscHelper.VaxInteger(this.ReadBytes(2), 0, 2);
-
-					// sin_Family
-					this.ReadBytes(2);
-
-					// sin_addr
-					byte[] buffer = this.ReadBytes(4);
-					ipAddress = String.Format(
-						CultureInfo.InvariantCulture,
-						"{0}.{1}.{2}.{3}",
-						buffer[3], buffer[2], buffer[1], buffer[0]);
-
-					// sin_zero	+ garbage
-					this.ReadBytes(12);
-                    */
-
                     auxHandle = this.ReadInt32();
 
+                    // garbage
                     this.ReadBytes(8);
 
-                    // sin_port
                     int respLen = this.ReadInt32();
                     respLen += respLen % 4;
 
-                    // socketaddr_in (non XDR encoded)
-
-                    // sin_Family
+                    // sin_family
                     this.ReadBytes(2);
                     respLen -= 2;
 
                     // sin_port
                     byte[] buffer = this.ReadBytes(2);
-                    portNumber = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+                    portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
                     respLen -= 2;
 
                     // sin_addr
                     buffer = this.ReadBytes(4);
-                    respLen -= 4;
-
-                    ipAddress = String.Format(
+                    ipAddress = string.Format(
                         CultureInfo.InvariantCulture,
                         "{0}.{1}.{2}.{3}",
                         buffer[0], buffer[1], buffer[2], buffer[3]);
+                    respLen -= 4;
 
                     // garbage
                     this.ReadBytes(respLen);
