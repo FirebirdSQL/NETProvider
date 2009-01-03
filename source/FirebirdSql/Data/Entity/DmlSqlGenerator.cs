@@ -241,7 +241,8 @@ namespace FirebirdSql.Data.Entity
                 const string StoreGeneratedPatternFacetName = "StoreGeneratedPattern";
 
                 Facet item = null;
-                if (tableColumn.TypeUsage.Facets.TryGetValue(StoreGeneratedPatternFacetName, false, out item) && ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed)
+                if (tableColumn.TypeUsage.Facets.TryGetValue(StoreGeneratedPatternFacetName, false, out item) && 
+                    (((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed || ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Identity))
                 {
                     columnsToFetch.Add(tableColumn);
                 }
