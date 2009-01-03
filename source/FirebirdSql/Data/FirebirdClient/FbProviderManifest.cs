@@ -315,7 +315,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         TypeUsage tu;
                         if (isFixedLength)
                         {
-                            tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["binary"], true, maxLength);
+                            tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["blob"], true, maxLength);
                         }
                         else
                         {
