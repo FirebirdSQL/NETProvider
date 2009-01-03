@@ -211,33 +211,33 @@ namespace FirebirdSql.Data.Entity
             return false;
         }
 
-        internal static DbType GetDbType(PrimitiveTypeKind primitiveType)
-        {
-            switch (primitiveType)
-            {
-                case PrimitiveTypeKind.Binary: return DbType.Binary;
-                case PrimitiveTypeKind.Boolean: return DbType.Boolean;
-                case PrimitiveTypeKind.Byte: return DbType.Byte;
-                case PrimitiveTypeKind.DateTime: return DbType.DateTime;
-                case PrimitiveTypeKind.Decimal: return DbType.Decimal;
-                case PrimitiveTypeKind.Double: return DbType.Double;
-                case PrimitiveTypeKind.Single: return DbType.Single;
-                case PrimitiveTypeKind.Guid: return DbType.Guid;
-                case PrimitiveTypeKind.Int16: return DbType.Int16;
-                case PrimitiveTypeKind.Int32: return DbType.Int32;
-                case PrimitiveTypeKind.Int64: return DbType.Int64;
-                //case PrimitiveTypeKind.Money: return DbType.Decimal;
-                case PrimitiveTypeKind.SByte: return DbType.SByte;
-                case PrimitiveTypeKind.String: return DbType.String;
-                //case PrimitiveTypeKind.UInt16: return DbType.UInt16;
-                //case PrimitiveTypeKind.UInt32: return DbType.UInt32;
-                //case PrimitiveTypeKind.UInt64: return DbType.UInt64;
-                //case PrimitiveTypeKind.Xml: return DbType.Xml;
-                default:
-                    Debug.Fail("unknown PrimitiveTypeKind" + primitiveType.ToString());
-                    throw new InvalidOperationException(string.Format("Unknown PrimitiveTypeKind {0}", primitiveType));
-            }
-        }
+        //internal static DbType GetDbType(PrimitiveTypeKind primitiveType)
+        //{
+        //    switch (primitiveType)
+        //    {
+        //        case PrimitiveTypeKind.Binary: return DbType.Binary;
+        //        case PrimitiveTypeKind.Boolean: return DbType.Boolean;
+        //        case PrimitiveTypeKind.Byte: return DbType.Byte;
+        //        case PrimitiveTypeKind.DateTime: return DbType.DateTime;
+        //        case PrimitiveTypeKind.Decimal: return DbType.Decimal;
+        //        case PrimitiveTypeKind.Double: return DbType.Double;
+        //        case PrimitiveTypeKind.Single: return DbType.Single;
+        //        case PrimitiveTypeKind.Guid: return DbType.Guid;
+        //        case PrimitiveTypeKind.Int16: return DbType.Int16;
+        //        case PrimitiveTypeKind.Int32: return DbType.Int32;
+        //        case PrimitiveTypeKind.Int64: return DbType.Int64;
+        //        //case PrimitiveTypeKind.Money: return DbType.Decimal;
+        //        case PrimitiveTypeKind.SByte: return DbType.SByte;
+        //        case PrimitiveTypeKind.String: return DbType.String;
+        //        //case PrimitiveTypeKind.UInt16: return DbType.UInt16;
+        //        //case PrimitiveTypeKind.UInt32: return DbType.UInt32;
+        //        //case PrimitiveTypeKind.UInt64: return DbType.UInt64;
+        //        //case PrimitiveTypeKind.Xml: return DbType.Xml;
+        //        default:
+        //            Debug.Fail("unknown PrimitiveTypeKind" + primitiveType.ToString());
+        //            throw new InvalidOperationException(string.Format("Unknown PrimitiveTypeKind {0}", primitiveType));
+        //    }
+        //}
 
         #endregion
 

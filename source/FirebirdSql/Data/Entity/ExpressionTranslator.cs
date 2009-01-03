@@ -337,21 +337,11 @@ namespace FirebirdSql.Data.Entity
         // generate parameter (name based on parameter ordinal)
         internal FbParameter CreateParameter(object value, TypeUsage type)
         {
-            PrimitiveTypeKind   primitiveType   = MetadataHelpers.GetPrimitiveTypeKind(type);
-            DbType              dbType          = MetadataHelpers.GetDbType(primitiveType);
-
-            return this.CreateParameter(value, dbType);
-        }
-
-        // Creates a new parameter for a value in this expression translator
-        internal FbParameter CreateParameter(object value, DbType dbType)
-        {
             string parameterName = string.Concat("@p", parameterNameCount.ToString(CultureInfo.InvariantCulture));
             parameterNameCount++;
 
-            FbParameter parameter = new FbParameter(parameterName, value);
-            
-            parameter.DbType = dbType;
+            FbParameter parameter = FbProviderServices.CreateSqlParameter(parameterName, type, ParameterMode.In, value);
+
             parameters.Add(parameter);
 
             return parameter;

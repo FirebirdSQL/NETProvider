@@ -96,9 +96,10 @@ namespace FirebirdSql.Data.Entity
                 //  update Foo
                 //  set @i = 0
                 //  where ...
-                DbParameter parameter = translator.CreateParameter(default(Int32), DbType.Int32);
-                commandText.Append(parameter.ParameterName);
-                commandText.Append(" = 0");
+#warning How to do on FB
+                //DbParameter parameter = translator.CreateParameter(default(Int32), DbType.Int32);
+                //commandText.Append(parameter.ParameterName);
+                //commandText.Append(" = 0");
             }
             commandText.AppendLine();
 
