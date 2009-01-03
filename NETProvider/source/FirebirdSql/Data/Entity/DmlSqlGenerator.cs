@@ -33,6 +33,7 @@ using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 using System.Data.Common.Utils;
 using System.Data.Mapping.Update.Internal;
+using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 
@@ -241,7 +242,7 @@ namespace FirebirdSql.Data.Entity
                 const string StoreGeneratedPatternFacetName = "StoreGeneratedPattern";
 
                 Facet item = null;
-                if (tableColumn.TypeUsage.Facets.TryGetValue(StoreGeneratedPatternFacetName, false, out item) && 
+                if (tableColumn.TypeUsage.Facets.TryGetValue(StoreGeneratedPatternFacetName, false, out item) &&
                     (((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed || ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Identity))
                 {
                     columnsToFetch.Add(tableColumn);
@@ -284,7 +285,7 @@ namespace FirebirdSql.Data.Entity
             startBlock.AppendLine(")");
             startBlock.AppendLine("as begin");
 
-            string newCommand = ChangeParamsToPSQLParams(commandText);
+            string newCommand = ChangeParamsToPSQLParams(commandText.ToString(), translator.Parameters.Select(p => p.ParameterName).ToArray());
             commandText.Remove(0, commandText.Length);
             commandText.Insert(0, newCommand);
             commandText.Insert(0, startBlock.ToString());
@@ -307,10 +308,16 @@ namespace FirebirdSql.Data.Entity
             Debug.WriteLine(commandText.ToString());
         }
 
-        private static string ChangeParamsToPSQLParams( StringBuilder commandText)
+        private static string ChangeParamsToPSQLParams(string commandText, string[] parametersUsed)
         {
-#warning Look for some faster way and some more reliable way
-            return new System.Text.RegularExpressions.Regex(@"@(p\d+)").Replace(commandText.ToString(), ":$1");
+            const string valuesPattern = "values (";
+            int limitPosition = commandText.LastIndexOf(valuesPattern) + valuesPattern.Length;
+            StringBuilder command = new StringBuilder(commandText);
+            foreach (string param in parametersUsed)
+            {
+                command.Replace(param, ":" + param.Substring(1), limitPosition, command.Length - limitPosition);
+            }
+            return command.ToString();
         }
 
         #endregion
