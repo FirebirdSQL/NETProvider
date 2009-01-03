@@ -326,7 +326,7 @@ namespace FirebirdSql.Data.FirebirdClient
         /// </summary>
         private static int? GetParameterSize(TypeUsage type, bool isOutParam)
         {
-            int maxLength;
+            int? maxLength;
             if (MetadataHelpers.TryGetMaxLength(type, out maxLength))
             {
                 // if the MaxLength facet has a specific value use it
@@ -374,12 +374,12 @@ namespace FirebirdSql.Data.FirebirdClient
             }
             else
             {
-                int maxLength;
+                int? maxLength;
                 if (!MetadataHelpers.TryGetMaxLength(type, out maxLength))
                 {
                     maxLength = (unicode ? FbProviderManifest.nvarcharMaxSize : FbProviderManifest.varcharMaxSize);
                 }
-                if (maxLength > (unicode ? FbProviderManifest.nvarcharMaxSize : FbProviderManifest.varcharMaxSize))
+                if (maxLength == default(int?) || maxLength > (unicode ? FbProviderManifest.nvarcharMaxSize : FbProviderManifest.varcharMaxSize))
                 {
                     dbType = FbDbType.Text;
                 }

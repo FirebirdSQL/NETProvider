@@ -347,7 +347,7 @@ namespace FirebirdSql.Data.Entity
             return false;
         }
 
-        internal static bool TryGetMaxLength(TypeUsage type, out int maxLength)
+        internal static bool TryGetMaxLength(TypeUsage type, out int? maxLength)
         {
             if (!IsPrimitiveType(type, PrimitiveTypeKind.String) &&
                 !IsPrimitiveType(type, PrimitiveTypeKind.Binary))
@@ -360,14 +360,17 @@ namespace FirebirdSql.Data.Entity
             return TryGetIntFacetValue(type, MaxLengthFacetName, out maxLength);
         }
 
-        internal static bool TryGetIntFacetValue(TypeUsage type, string facetName, out int intValue)
+        internal static bool TryGetIntFacetValue(TypeUsage type, string facetName, out int? intValue)
         {
             intValue = 0;
             Facet intFacet;
 
-            if (type.Facets.TryGetValue(facetName, false, out intFacet) && intFacet.Value != null && !intFacet.IsUnbounded)
+            if (type.Facets.TryGetValue(facetName, false, out intFacet) && intFacet.Value != null)
             {
-                intValue = (int)intFacet.Value;
+                if (!intFacet.IsUnbounded)
+                    intValue = (int)intFacet.Value;
+                else
+                    intValue = default(int?);
                 return true;
             }
 
