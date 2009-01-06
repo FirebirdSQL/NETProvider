@@ -175,13 +175,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     outputStream.Write(1);							// Architecture	of client -	Generic
                     outputStream.Write(2);							// Minimum type (ptype_rpc)
                     outputStream.Write(3);							// Maximum type (ptype_batch_send)
-                    outputStream.Write(2);							// Preference weight
+#if (DEBUG)
+                    outputStream.Write(0);							// Preference weight
+#else
+                    // on release prefer old one, new one isn't done yet
+                    outputStream.Write(2);
+#endif
 
                     outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
                     outputStream.Write(1);							// Architecture	of client -	Generic
                     outputStream.Write(2);							// Minumum type (ptype_rpc)
                     outputStream.Write(3);							// Maximum type (ptype_batch_send)
-                    outputStream.Write(2);							// Preference weight
+                    outputStream.Write(1);							// Preference weight
                 }
                 outputStream.Flush();
 
