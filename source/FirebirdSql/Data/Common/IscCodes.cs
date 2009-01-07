@@ -45,7 +45,8 @@ namespace FirebirdSql.Data.Common
 		public const int DSQL_close                 = 1;
 		public const int DSQL_drop                  = 2;
 		public const int ARRAY_DESC_COLUMN_MAJOR    = 1;	/* Set for FORTRAN */
-		public const int ISC_STATUS_LENGTH = 20;
+		public const int ISC_STATUS_LENGTH          = 20;
+        public const ushort INVALID_OBJECT          = 0xFFFF;
 
 		#endregion
 
