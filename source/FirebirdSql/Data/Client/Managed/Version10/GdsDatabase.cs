@@ -587,7 +587,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         #region · Response Methods ·
 
-        public virtual void ProcessResponse(IResponse response)
+        protected void ProcessResponse(IResponse response)
         {
             if (response != null && response is GenericResponse)
             {
@@ -598,7 +598,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             }
         }
 
-        public virtual void ProcessResponseWarnings(IResponse response)
+        protected void ProcessResponseWarnings(IResponse response)
         {
             if (response is GenericResponse)
             {
@@ -641,26 +641,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         public virtual SqlResponse ReadSqlResponse()
         {
             return (SqlResponse)this.ReadResponse();
-        }
-
-        public virtual List<IResponse> ReadResponses(int responseCount)
-        {
-            List<IResponse> responses = new List<IResponse>();
-
-            try
-            {
-                for (int i = 0; i < responseCount; i++)
-                {
-                    // Add response to the Response list
-                    responses.Add(this.ReadSingleResponse());
-                }
-            }
-            catch (IOException)
-            {
-                throw new IscException(IscCodes.isc_net_read_err);
-            }
-
-            return responses;
         }
 
         public virtual IscException ReadStatusVector()
