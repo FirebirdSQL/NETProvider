@@ -53,22 +53,23 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
             lock (this.database.SyncObject)
             {
-                if (this.State == StatementState.Deallocated)
-                {
-                    // Allocate statement
-                    this.Allocate();
-                }
-
                 try
                 {
+                    if (this.state == StatementState.Deallocated)
+                    {
+                        // Allocate statement
+                        this.SendAllocateToBuffer();
+                    }
+
+#warning Why are params here???
                     // Parameter descriptor
                     byte[] descriptor = null;
 
-                    if (this.Parameters != null)
+                    if (this.parameters != null)
                     {
                         using (XdrStream xdr = new XdrStream(database.Charset))
                         {
-                            xdr.Write(this.Parameters);
+                            xdr.Write(this.parameters);
                             descriptor = xdr.ToArray();
                             xdr.Close();
                         }
@@ -77,7 +78,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     // Prepare the statement
                     this.database.Write(IscCodes.op_prepare_statement);
                     this.database.Write(this.Transaction.Handle);
-                    this.database.Write(this.handle);
+                    this.database.Write((int)IscCodes.INVALID_OBJECT);
                     this.database.Write((int)this.database.Dialect);
                     this.database.Write(commandText);
                     this.database.WriteBuffer(DescribeInfoItems, DescribeInfoItems.Length);
@@ -86,26 +87,24 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     // Grab statement type
                     this.WriteSqlInfoRequest(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 
-                    // Flush data
                     this.database.Flush();
 
-                    // Read Responses
-                    List<IResponse> responses = this.database.ReadResponses(2);
+                    // allocate response
+                    this.ProcessAllocateResponce(this.database.ReadGenericResponse());
 
-                    GenericResponse prepareResponse = (GenericResponse)responses[0];
-                    GenericResponse statementTypeResponse = (GenericResponse)responses[1];
+                    // prepare response
+                    this.ProcessPrepareResponse(this.database.ReadGenericResponse());
 
-                    database.ProcessResponse(prepareResponse);
-                    database.ProcessResponse(statementTypeResponse);
-                    
-                    this.ProcessPrepareResponse(prepareResponse);
-                    this.StatementType = this.ParseStatementTypeInfo(statementTypeResponse.Data);
+                    // statement type response
+                    this.StatementType = this.ParseStatementTypeInfo(this.database.ReadGenericResponse().Data);
 
-                    this.State = StatementState.Prepared;
+                    this.state = StatementState.Prepared;
                 }
                 catch (IOException)
                 {
-                    this.State = StatementState.Error;
+                    // if the statement has been already allocated, it's now in error
+                    if (this.state == StatementState.Allocated)
+                        this.state = StatementState.Error;
                     throw new IscException(IscCodes.isc_net_read_err);
                 }
             }
@@ -113,7 +112,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
         public override void Execute()
         {
-            if (this.State == StatementState.Deallocated)
+            if (this.state == StatementState.Deallocated)
             {
                 throw new InvalidOperationException("Statement is not correctly created.");
             }
@@ -133,11 +132,11 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     // Build Parameter description
                     byte[] descriptor = null;
 
-                    if (this.Parameters != null)
+                    if (this.parameters != null)
                     {
                         using (XdrStream xdr = new XdrStream(database.Charset))
                         {
-                            xdr.Write(this.Parameters);
+                            xdr.Write(this.parameters);
                             descriptor = xdr.ToArray();
                             xdr.Close();
                         }
@@ -156,9 +155,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     this.database.Write(this.handle);
                     this.database.Write(this.Transaction.Handle);
 
-                    if (this.Parameters != null)
+                    if (this.parameters != null)
                     {
-                        this.database.WriteBuffer(this.Parameters.ToBlrArray());
+                        this.database.WriteBuffer(this.parameters.ToBlrArray());
                         this.database.Write(0);    // Message number
                         this.database.Write(1);    // Number of messages
                         this.database.Write(descriptor, 0, descriptor.Length);
@@ -217,16 +216,11 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         }
                     }
 
-                    // Process responses
-                    this.database.ProcessResponse(sqlResponse);
-                    this.database.ProcessResponse(executeResponse);
-                    this.database.ProcessResponse(raResponse);
-
-                    this.State = StatementState.Executed;
+                    this.state = StatementState.Executed;
                 }
                 catch (IOException)
                 {
-                    this.State = StatementState.Error;
+                    this.state = StatementState.Error;
                     throw new IscException(IscCodes.isc_net_read_err);
                 }
             }
@@ -241,7 +235,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             lock (this.Database.SyncObject)
             {
                 this.database.Write(IscCodes.op_info_sql);
-                this.database.Write(this.handle);
+                this.database.Write((int)IscCodes.INVALID_OBJECT);
                 this.database.Write(0);
                 this.database.WriteBuffer(buffer, buffer.Length);
                 this.database.Write(bufferSize);

@@ -35,11 +35,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected int			    handle;
         protected GdsDatabase       database;
 		private GdsTransaction      transaction;
-		private Descriptor		    parameters;
+		protected Descriptor	    parameters;
 		private Descriptor		    fields;
-		private StatementState	    state;
-		private DbStatementType     statementType;
-		private bool			    allRowsFetched;
+		protected StatementState	state;
+		protected DbStatementType   statementType;
+		protected bool			    allRowsFetched;
 		private Queue			    rows;
 		private Queue			    outputParams;
 		private int				    recordsAffected;
@@ -281,36 +281,41 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			lock (this.database.SyncObject)
 			{
-				if (this.state == StatementState.Deallocated)
-				{
-					// Allocate	statement
-					this.Allocate();
-				}
+                try
+                {
+                    if (this.state == StatementState.Deallocated)
+                    {
+                        // Allocate	statement
+                        this.SendAllocateToBuffer();
+                        this.database.Flush();
+                        this.ProcessAllocateResponce(this.database.ReadGenericResponse());
+                    }
 
-				try
-				{
-					this.database.Write(IscCodes.op_prepare_statement);
-					this.database.Write(this.transaction.Handle);
-					this.database.Write(this.handle);
-					this.database.Write((int)this.database.Dialect);
-					this.database.Write(commandText);
-					this.database.WriteBuffer(DescribeInfoItems, DescribeInfoItems.Length);
-					this.database.Write(IscCodes.MAX_BUFFER_SIZE);
-					this.database.Flush();
+                    this.database.Write(IscCodes.op_prepare_statement);
+                    this.database.Write(this.transaction.Handle);
+                    this.database.Write(this.handle);
+                    this.database.Write((int)this.database.Dialect);
+                    this.database.Write(commandText);
+                    this.database.WriteBuffer(DescribeInfoItems, DescribeInfoItems.Length);
+                    this.database.Write(IscCodes.MAX_BUFFER_SIZE);
+
+                    this.database.Flush();
 
                     // Read Fields Information
                     this.ProcessPrepareResponse(this.database.ReadGenericResponse());
 
-					// Determine the statement type
-					this.statementType = this.GetStatementType();
+                    // Determine the statement type
+                    this.statementType = this.GetStatementType();
 
-					this.state = StatementState.Prepared;
-				}
-				catch (IOException)
-				{
-					this.state = StatementState.Error;
-					throw new IscException(IscCodes.isc_net_read_err);
-				}
+                    this.state = StatementState.Prepared;
+                }
+                catch (IOException)
+                {
+                    // if the statement has been already allocated, it's now in error
+                    if (this.state == StatementState.Allocated)
+                        this.state = StatementState.Error;
+                    throw new IscException(IscCodes.isc_net_read_err);
+                }
 			}
 		}
 
@@ -601,7 +606,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.Transaction.Update -= this.TransactionUpdate;
 				}
 
-				this.State              = StatementState.Closed;
+				this.state              = StatementState.Closed;
 				this.TransactionUpdate  = null;
 				this.allRowsFetched     = false;
 			}
@@ -654,30 +659,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return row;
 		}
 
-        protected void Allocate()
-		{
-			lock (this.database.SyncObject)
-			{
-				try
-				{
-					this.database.Write(IscCodes.op_allocate_statement);
-					this.database.Write(this.database.Handle);
-					this.database.Flush();
+        protected void SendAllocateToBuffer()
+        {
+            this.database.Write(IscCodes.op_allocate_statement);
+            this.database.Write(this.database.Handle);
+        }
 
-                    GenericResponse response = this.database.ReadGenericResponse();
-                    
-					this.handle         = response.ObjectHandle;
-					this.allRowsFetched = false;
-					this.state          = StatementState.Allocated;
-					this.statementType  = DbStatementType.None;
-				}
-				catch (IOException)
-				{
-					this.state = StatementState.Deallocated;
-					throw new IscException(IscCodes.isc_net_read_err);
-				}
-			}
-		}
+        protected void ProcessAllocateResponce(GenericResponse response)
+        {
+            this.handle = response.ObjectHandle;
+            this.allRowsFetched = false;
+            this.state = StatementState.Allocated;
+            this.statementType = DbStatementType.None;
+        }
 
         protected Descriptor ParseSqlInfo(byte[] info, byte[] items)
 		{
