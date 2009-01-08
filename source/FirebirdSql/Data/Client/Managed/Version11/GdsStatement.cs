@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                     if (this.parameters != null)
                     {
-                        using (XdrStream xdr = new XdrStream(database.Charset))
+                        using (XdrStream xdr = new XdrStream(this.database.Charset))
                         {
                             xdr.Write(this.parameters);
                             descriptor = xdr.ToArray();
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                     if (this.parameters != null)
                     {
-                        using (XdrStream xdr = new XdrStream(database.Charset))
+                        using (XdrStream xdr = new XdrStream(this.database.Charset))
                         {
                             xdr.Write(this.parameters);
                             descriptor = xdr.ToArray();
@@ -203,7 +203,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         this.ProcessStoredProcedureResponse(sqlResponse);
                     }
 
-                    executeResponse = database.ReadGenericResponse();
+                    executeResponse = this.database.ReadGenericResponse();
 
                     // Process Rows Affected Response
                     if (rowsAffectedResponse)
@@ -232,7 +232,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
         private void WriteSqlInfoRequest(byte[] buffer, int bufferSize)
         {
-            lock (this.Database.SyncObject)
+            lock (this.database.SyncObject)
             {
                 this.database.Write(IscCodes.op_info_sql);
                 this.database.Write((int)IscCodes.INVALID_OBJECT);
@@ -242,6 +242,25 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             }
         }
 
+        #endregion
+
+        #region Protected methods
+        protected override void Free(int option)
+        {
+            // Does	not	seem to	be possible	or necessary to	close
+            // an execute procedure	statement.
+            if (this.StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
+            {
+                return;
+            }
+
+            lock (this.database.SyncObject)
+            {
+                ProcessFreeSending(option);
+#warning Redesign access to fields in derived classes
+                (this.database as GdsDatabase).DefferedPacketsProcessing.Add(ProcessFreeResponse);
+            }
+        }
         #endregion
     }
 }

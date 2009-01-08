@@ -340,7 +340,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                     if (this.parameters != null)
                     {
-                        using (XdrStream xdr = new XdrStream(database.Charset))
+                        using (XdrStream xdr = new XdrStream(this.database.Charset))
                         {
                             xdr.Write(this.parameters);
                             descriptor = xdr.ToArray();
@@ -366,7 +366,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						this.database.WriteBuffer(this.parameters.ToBlrArray());
 						this.database.Write(0);	// Message number
 						this.database.Write(1);	// Number of messages
-                        database.Write(descriptor, 0, descriptor.Length);
+                        this.database.Write(descriptor, 0, descriptor.Length);
 					}
 					else
 					{
@@ -571,31 +571,40 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			lock (this.database.SyncObject)
 			{
-				try
-				{
-					this.database.Write(IscCodes.op_free_statement);
-					this.database.Write(this.handle);
-					this.database.Write(option);
-					this.database.Flush();
-
-					// Reset statement information
-					if (option == IscCodes.DSQL_drop)
-					{
-						this.parameters = null;
-						this.fields     = null;
-					}
-
-					this.Clear();
-
-					this.database.ReadResponse();
-				}
-				catch (IOException)
-				{
-					this.state = StatementState.Error;
-					throw new IscException(IscCodes.isc_net_read_err);
-				}
+				ProcessFreeSending(option);
+                this.database.Flush();
+                ProcessFreeResponse(this.database.ReadResponse());
 			}
 		}
+
+        protected void ProcessFreeSending(int option)
+        {
+            try
+            {
+                this.database.Write(IscCodes.op_free_statement);
+                this.database.Write(this.handle);
+                this.database.Write(option);
+
+                // Reset statement information
+                if (option == IscCodes.DSQL_drop)
+                {
+                    this.parameters = null;
+                    this.fields = null;
+                }
+
+                this.Clear();
+            }
+            catch (IOException)
+            {
+                this.state = StatementState.Error;
+                throw new IscException(IscCodes.isc_net_read_err);
+            }
+        }
+
+        protected void ProcessFreeResponse(IResponse response)
+        { 
+
+        }
 
 		protected override void TransactionUpdated(object sender, EventArgs e)
 		{
