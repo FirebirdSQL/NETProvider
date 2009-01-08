@@ -19,12 +19,12 @@
 
 using System;
 using System.Collections;
-using System.Collections.Specialized;
 using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Net;
+using System.Collections.Generic;
 
 using FirebirdSql.Data.Common;
 
@@ -37,8 +37,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         public GdsDatabase(FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection)
             : base(connection)
         {
+            this.DefferedPacketsProcessing = new List<Action<IResponse>>();
         }
 
+        #endregion
+
+        #region Properties
+        public List<Action<IResponse>> DefferedPacketsProcessing { get; private set; }
         #endregion
 
         #region · Override Statement Creation Methods ·
@@ -104,8 +109,22 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 this.serverVersion = this.GetServerVersion();
             }
         }
+        #endregion
 
+        #region Protected methods
         protected override IResponse ReadSingleResponse()
+        {
+            while (DefferedPacketsProcessing.Count > 0)
+            {
+                DefferedPacketsProcessing[0](DoReadSingleResponse());
+                DefferedPacketsProcessing.RemoveAt(0);
+            }
+            return DoReadSingleResponse();
+        }
+        #endregion
+
+        #region Private methods
+        private IResponse DoReadSingleResponse()
         {
             IResponse response = null;
             int operation = this.ReadOperation();
