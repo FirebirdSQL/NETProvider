@@ -257,8 +257,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             lock (this.database.SyncObject)
             {
                 ProcessFreeSending(option);
-#warning Redesign access to fields in derived classes
-                (this.database as GdsDatabase).DefferedPacketsProcessing.Add(ProcessFreeResponse);
+                (this.Database as GdsDatabase).DefferedPacketsProcessing.Add(ProcessFreeResponse);
             }
         }
         #endregion
