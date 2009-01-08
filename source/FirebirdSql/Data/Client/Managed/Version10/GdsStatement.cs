@@ -140,25 +140,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-        #region · Protected Properties ·
-
-        protected int Handle
-        {
-            get { return this.handle; }
-        }
-
-        protected IDatabaseStream DatabaseStream
-        {
-            get { return this.database; }
-        }
-
-        protected Queue OutputParams
-        {
-            get { return this.outputParams; }
-        }
-
-        #endregion
-
         #region · Constructors ·
 
         public GdsStatement(IDatabase db)
@@ -633,7 +614,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					if (((SqlResponse)response).Count > 0)
 					{
-						this.OutputParams.Enqueue(this.ReadDataRow());
+						this.outputParams.Enqueue(this.ReadDataRow());
 					}
 				}
 			}
