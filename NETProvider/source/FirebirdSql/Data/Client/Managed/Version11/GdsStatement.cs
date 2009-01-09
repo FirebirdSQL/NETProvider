@@ -89,14 +89,26 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                     this.database.Flush();
 
-                    // allocate response
-                    this.ProcessAllocateResponce(this.database.ReadGenericResponse());
+                    // allocate, prepare, statement type
+                    int numberOfResponses = 3;
+                    try
+                    {
+                        numberOfResponses--;
+                        GenericResponse allocateResponse = this.database.ReadGenericResponse();
+                        this.ProcessAllocateResponce(allocateResponse);
 
-                    // prepare response
-                    this.ProcessPrepareResponse(this.database.ReadGenericResponse());
+                        numberOfResponses--;
+                        GenericResponse prepareResponse = this.database.ReadGenericResponse();
+                        this.ProcessPrepareResponse(prepareResponse);
 
-                    // statement type response
-                    this.StatementType = this.ParseStatementTypeInfo(this.database.ReadGenericResponse().Data);
+                        numberOfResponses--;
+                        GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
+                        this.statementType = this.ParseStatementTypeInfo(statementTypeResponse.Data);
+                    }
+                    finally
+                    {
+                        FinishFetching(ref numberOfResponses);
+                    }
 
                     this.state = StatementState.Prepared;
                 }
@@ -122,9 +134,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
             lock (this.database.SyncObject)
             {
-                bool rowsAffectedResponse = false;
-                int responseCount = 1;
-
                 try
                 {
                     this.RecordsAffected = -1;
@@ -175,6 +184,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         this.database.Write(0);    // Output message number
                     }
 
+                    bool readRowsAffectedResponse = false;
                     // Obtain records affected by query execution
                     if (this.ReturnRecordsAffected &&
                         (this.StatementType == DbStatementType.Insert ||
@@ -186,34 +196,46 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         // Grab statement type
                         this.WriteSqlInfoRequest(RecordsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
-                        responseCount++;
-                        rowsAffectedResponse = true;
+                        readRowsAffectedResponse = true;
                     }
 
                     this.database.Flush();
 
-                    SqlResponse sqlResponse = null;
-                    GenericResponse executeResponse = null;
-                    GenericResponse raResponse = null;
-
-                    if (this.StatementType == DbStatementType.StoredProcedure)
+                    // sql?, execute, rows affected?
+                    int numberOfResponses = 3;
+                    try
                     {
-                        sqlResponse = this.database.ReadSqlResponse();
-
-                        this.ProcessStoredProcedureResponse(sqlResponse);
-                    }
-
-                    executeResponse = this.database.ReadGenericResponse();
-
-                    // Process Rows Affected Response
-                    if (rowsAffectedResponse)
-                    {
-                        raResponse = this.database.ReadGenericResponse();
-
-                        if (raResponse.Data != null && raResponse.Data.Length > 0)
+                        if (this.StatementType == DbStatementType.StoredProcedure)
                         {
-                            this.RecordsAffected = this.ProcessRecordsAffectedBuffer(raResponse.Data);
+                            numberOfResponses--;
+                            SqlResponse sqlResponse = this.database.ReadSqlResponse();
+                            this.ProcessStoredProcedureResponse(sqlResponse);
                         }
+                        else
+                        {
+                            numberOfResponses--;
+                        }
+
+                        numberOfResponses--;
+                        GenericResponse executeResponse = this.database.ReadGenericResponse();
+
+                        if (readRowsAffectedResponse)
+                        {
+                            numberOfResponses--;
+                            GenericResponse rowsAffectedResponse = this.database.ReadGenericResponse();
+                            if (rowsAffectedResponse.Data != null && rowsAffectedResponse.Data.Length > 0)
+                            {
+                                this.RecordsAffected = this.ProcessRecordsAffectedBuffer(rowsAffectedResponse.Data);
+                            }
+                        }
+                        else
+                        {
+                            numberOfResponses--;
+                        }
+                    }
+                    finally
+                    {
+                        FinishFetching(ref numberOfResponses);
                     }
 
                     this.state = StatementState.Executed;
@@ -242,6 +264,16 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             }
         }
 
+        private void FinishFetching(ref int numberOfResponses)
+        {
+            while (numberOfResponses > 0)
+            {
+#warning Or ReadSingle to not get exception again?
+                this.database.ReadResponse();
+                numberOfResponses--;
+            }
+        }
+
         #endregion
 
         #region Protected methods
@@ -256,7 +288,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
             lock (this.database.SyncObject)
             {
-                ProcessFreeSending(option);
+                DoFreePacket(option);
                 (this.Database as GdsDatabase).DefferedPacketsProcessing.Add(ProcessFreeResponse);
             }
         }
