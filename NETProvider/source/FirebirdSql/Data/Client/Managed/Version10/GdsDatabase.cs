@@ -12,11 +12,9 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2007 - 2008 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *   
- *  Contributors:
- *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -713,11 +711,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             {
                 try
                 {
-                    this.Write(op);
-                    this.Write(id);
+                    DoReleaseObjectPacket(op, id);
                     this.Flush();
-
-                    this.ReadResponse();
+                    ProcessReleaseObjectResponse(this.ReadResponse());
                 }
                 catch (IOException)
                 {
@@ -793,6 +789,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     throw new IscException(IscCodes.isc_network_error);
                 }
             }
+        }
+
+        protected void DoReleaseObjectPacket(int op, int id)
+        {
+            this.Write(op);
+            this.Write(id);
+        }
+
+        protected void ProcessReleaseObjectResponse(IResponse response)
+        {
+
         }
 
         #endregion

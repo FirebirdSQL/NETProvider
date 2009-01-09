@@ -12,8 +12,12 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
- *	Copyright (c) 2008 Vladimir Bodecek, Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2007 - 2008 Jiri Cincura (jiri@cincura.net) 
+ *	 
+ *  Contributors:
+ *      Vladimir Bodecek
+ *      
  *	All Rights Reserved.
  */
 
@@ -107,6 +111,25 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                 // Get server version
                 this.serverVersion = this.GetServerVersion();
+            }
+        }
+        #endregion
+
+        #region Public methods
+        public override void ReleaseObject(int op, int id)
+        {
+            lock (this.SyncObject)
+            {
+                try
+                {
+                    DoReleaseObjectPacket(op, id);
+#warning This isn't in lock anymore later
+                    this.DefferedPacketsProcessing.Add(ProcessReleaseObjectResponse);
+                }
+                catch (IOException)
+                {
+                    throw new IscException(IscCodes.isc_net_read_err);
+                }
             }
         }
         #endregion
