@@ -800,7 +800,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             this.allRowsFetched = false;
 		}
 
-#warning Finish implementation
         protected void ClearAll()
         {
             this.Clear();
