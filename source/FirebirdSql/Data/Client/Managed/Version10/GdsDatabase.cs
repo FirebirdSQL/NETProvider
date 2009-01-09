@@ -728,31 +728,35 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         protected virtual IResponse ReadSingleResponse()
         {
-            IResponse response = null;
             int operation = this.ReadOperation();
 
-            switch (operation)
-            {
-                case IscCodes.op_response:
-                    response = new GenericResponse(
-                        this.ReadInt32(),
-                        this.ReadInt64(),
-                        this.ReadBuffer(),
-                        this.ReadStatusVector());
-                    break;
-
-                case IscCodes.op_fetch_response:
-                    response = new FetchResponse(this.ReadInt32(), this.ReadInt32());
-                    break;
-
-                case IscCodes.op_sql_response:
-                    response = new SqlResponse(this.ReadInt32());
-                    break;
-            }
+            IResponse response = ProcessOperation(operation);
 
             ProcessResponseWarnings(response);
 
             return response;
+        }
+
+        protected virtual IResponse ProcessOperation(int operation)
+        {
+            switch (operation)
+            {
+                case IscCodes.op_response:
+                    return new GenericResponse(
+                        this.ReadInt32(),
+                        this.ReadInt64(),
+                        this.ReadBuffer(),
+                        this.ReadStatusVector());
+
+                case IscCodes.op_fetch_response:
+                    return new FetchResponse(this.ReadInt32(), this.ReadInt32());
+
+                case IscCodes.op_sql_response:
+                    return new SqlResponse(this.ReadInt32());
+
+                default:
+                    return null;
+            }
         }
 
         /// <summary>
