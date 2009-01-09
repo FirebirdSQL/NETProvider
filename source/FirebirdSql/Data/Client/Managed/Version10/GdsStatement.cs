@@ -552,13 +552,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			lock (this.database.SyncObject)
 			{
-				ProcessFreeSending(option);
+				DoFreePacket(option);
                 this.database.Flush();
                 ProcessFreeResponse(this.database.ReadResponse());
 			}
 		}
 
-        protected void ProcessFreeSending(int option)
+        protected void DoFreePacket(int option)
         {
             try
             {
