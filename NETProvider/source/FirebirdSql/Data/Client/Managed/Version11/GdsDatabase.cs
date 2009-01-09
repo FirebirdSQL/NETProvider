@@ -149,7 +149,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     break;
 
                 case IscCodes.op_trusted_auth:
-                    return new AuthResponse(this.ReadBuffer());
+                    response = new AuthResponse(this.ReadBuffer());
+                    break;
             }
 
             ProcessResponseWarnings(response);
