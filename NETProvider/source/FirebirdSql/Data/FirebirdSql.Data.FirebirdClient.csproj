@@ -35,7 +35,7 @@
     <OutputPath>bin\EntityFW\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NET;NET_20;NET_35;ENTITY_FRAMEWORK;VISUAL_STUDIO;EXTERNAL_ENGINE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
