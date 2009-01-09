@@ -139,46 +139,22 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         {
             while (DefferedPacketsProcessing.Count > 0)
             {
-                DefferedPacketsProcessing[0](DoReadSingleResponse());
+                DefferedPacketsProcessing[0](base.ReadSingleResponse());
                 DefferedPacketsProcessing.RemoveAt(0);
             }
-            return DoReadSingleResponse();
+            return base.ReadSingleResponse();
         }
-        #endregion
 
-        #region Private methods
-        private IResponse DoReadSingleResponse()
+        protected override IResponse ProcessOperation(int operation)
         {
-            IResponse response = null;
-            int operation = this.ReadOperation();
-
-#warning Refactor to one place
             switch (operation)
             {
-                case IscCodes.op_response:
-                    response = new GenericResponse(
-                        this.ReadInt32(),
-                        this.ReadInt64(),
-                        this.ReadBuffer(),
-                        this.ReadStatusVector());
-                    break;
-
-                case IscCodes.op_fetch_response:
-                    response = new FetchResponse(this.ReadInt32(), this.ReadInt32());
-                    break;
-
-                case IscCodes.op_sql_response:
-                    response = new SqlResponse(this.ReadInt32());
-                    break;
-
                 case IscCodes.op_trusted_auth:
-                    response = new AuthResponse(this.ReadBuffer());
-                    break;
+                    return new AuthResponse(this.ReadBuffer());
+
+                default:
+                    return base.ProcessOperation(operation);
             }
-
-            ProcessResponseWarnings(response);
-
-            return response;
         }
         #endregion
     }
