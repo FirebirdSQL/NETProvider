@@ -12,11 +12,9 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2007 - 2008 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *	
- *  Contributors:
- *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;

@@ -12,11 +12,9 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2007 - 2008 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *	
- *  Contributors
- *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -85,7 +83,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     this.database.Write(IscCodes.MAX_BUFFER_SIZE);
 
                     // Grab statement type
-                    this.WriteSqlInfoRequest(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+                    this.WriteSqlInfoRequest(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, IscCodes.INVALID_OBJECT);
 
                     this.database.Flush();
 
@@ -194,7 +192,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         this.StatementType == DbStatementType.Select))
                     {
                         // Grab statement type
-                        this.WriteSqlInfoRequest(RecordsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+                        this.WriteSqlInfoRequest(RecordsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, this.handle);
 
                         readRowsAffectedResponse = true;
                     }
@@ -252,12 +250,12 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
         #region · Private Methods ·
 
-        private void WriteSqlInfoRequest(byte[] buffer, int bufferSize)
+        private void WriteSqlInfoRequest(byte[] buffer, int bufferSize, int handle)
         {
             lock (this.database.SyncObject)
             {
                 this.database.Write(IscCodes.op_info_sql);
-                this.database.Write((int)IscCodes.INVALID_OBJECT);
+                this.database.Write(handle);
                 this.database.Write(0);
                 this.database.WriteBuffer(buffer, buffer.Length);
                 this.database.Write(bufferSize);
@@ -289,6 +287,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             lock (this.database.SyncObject)
             {
                 DoFreePacket(option);
+#warning This isn't in lock anymore later
                 (this.Database as GdsDatabase).DefferedPacketsProcessing.Add(ProcessFreeResponse);
             }
         }
