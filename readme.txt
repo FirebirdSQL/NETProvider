@@ -5,6 +5,8 @@ This project is supported by:
 ---- ------- -- --------- ---
 
 	Sean Leyne ( Broadview Software )
+	
+  * Work to add support v2.1 server connectivity to the v1.7 branch was sponsored by Public Broadcasting Service (PBS).
 
 
 Developement list
