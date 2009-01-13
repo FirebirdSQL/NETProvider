@@ -708,83 +708,84 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
             byte item;
-            while ((item = info[currentPosition++]) != IscCodes.isc_info_sql_describe_end)
+            while (info[currentPosition] != IscCodes.isc_info_end &&
+                info[currentPosition] != IscCodes.isc_info_sql_select && info[currentPosition] != IscCodes.isc_info_sql_bind)
             {
-                switch (item)
+                while ((item = info[currentPosition++]) != IscCodes.isc_info_sql_describe_end)
                 {
-                    case IscCodes.isc_info_sql_sqlda_seq:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        lastIndex = IscHelper.VaxInteger(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                    switch (item)
+                    {
+                        case IscCodes.isc_info_sql_sqlda_seq:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            lastIndex = IscHelper.VaxInteger(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_sql_type:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        rowDesc[lastIndex - 1].DataType = (short)IscHelper.VaxInteger(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                        case IscCodes.isc_info_sql_type:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            rowDesc[lastIndex - 1].DataType = (short)IscHelper.VaxInteger(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_sql_sub_type:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        rowDesc[lastIndex - 1].SubType = (short)IscHelper.VaxInteger(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                        case IscCodes.isc_info_sql_sub_type:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            rowDesc[lastIndex - 1].SubType = (short)IscHelper.VaxInteger(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_sql_scale:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        rowDesc[lastIndex - 1].NumericScale = (short)IscHelper.VaxInteger(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                        case IscCodes.isc_info_sql_scale:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            rowDesc[lastIndex - 1].NumericScale = (short)IscHelper.VaxInteger(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_sql_length:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        rowDesc[lastIndex - 1].Length = (short)IscHelper.VaxInteger(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                        case IscCodes.isc_info_sql_length:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            rowDesc[lastIndex - 1].Length = (short)IscHelper.VaxInteger(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_sql_field:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        rowDesc[lastIndex - 1].Name = this.database.Charset.GetString(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                        case IscCodes.isc_info_sql_field:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            rowDesc[lastIndex - 1].Name = this.database.Charset.GetString(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_sql_relation:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        rowDesc[lastIndex - 1].Relation = this.database.Charset.GetString(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                        case IscCodes.isc_info_sql_relation:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            rowDesc[lastIndex - 1].Relation = this.database.Charset.GetString(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_sql_owner:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        rowDesc[lastIndex - 1].Owner = this.database.Charset.GetString(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                        case IscCodes.isc_info_sql_owner:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            rowDesc[lastIndex - 1].Owner = this.database.Charset.GetString(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_sql_alias:
-                        len = IscHelper.VaxInteger(info, currentPosition, 2);
-                        currentPosition += 2;
-                        rowDesc[lastIndex - 1].Alias = this.database.Charset.GetString(info, currentPosition, len);
-                        currentPosition += len;
-                        break;
+                        case IscCodes.isc_info_sql_alias:
+                            len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            rowDesc[lastIndex - 1].Alias = this.database.Charset.GetString(info, currentPosition, len);
+                            currentPosition += len;
+                            break;
 
-                    case IscCodes.isc_info_truncated:
-                        return false;
+                        case IscCodes.isc_info_truncated:
+                            return false;
 
-                    default:
-                        throw new IscException(IscCodes.isc_dsql_sqlda_err);
+                        default:
+                            throw new IscException(IscCodes.isc_dsql_sqlda_err);
+                    }
                 }
             }
-
-            if (info[currentPosition] == IscCodes.isc_info_end)
-                currentPosition++;
 
             return true;
 		}
