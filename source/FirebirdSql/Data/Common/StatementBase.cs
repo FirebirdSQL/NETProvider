@@ -28,19 +28,19 @@ namespace FirebirdSql.Data.Common
 		#region · Protected Static Fields ·
 
 		// Plan	information	items
-		protected static byte[] DescribePlanInfoItems = new byte[] 
+		protected static readonly byte[] DescribePlanInfoItems = new byte[] 
 		{ 
 			IscCodes.isc_info_sql_get_plan
 		};
 
 		// Records affected	items
-		protected static byte[] RecordsAffectedInfoItems = new byte[]
+        protected static readonly byte[] RecordsAffectedInfoItems = new byte[]
 		{
 			IscCodes.isc_info_sql_records
 		};
 
 		// Describe	information	items
-		protected static byte[] DescribeInfoItems = new byte[] 
+        protected static readonly byte[] DescribeInfoItems = new byte[] 
 		{ 
 			IscCodes.isc_info_sql_select,
 			IscCodes.isc_info_sql_describe_vars,
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Common
 			IscCodes.isc_info_sql_describe_end
 		};
 
-		protected static byte[] DescribeBindInfoItems = new byte[] 
+        protected static readonly byte[] DescribeBindInfoItems = new byte[] 
 		{ 
 			IscCodes.isc_info_sql_bind,
 			IscCodes.isc_info_sql_describe_vars,
@@ -72,7 +72,7 @@ namespace FirebirdSql.Data.Common
 			IscCodes.isc_info_sql_describe_end 
 		};
 
-		protected static byte[] StatementTypeInfoItems = new byte[]
+        protected static readonly byte[] StatementTypeInfoItems = new byte[]
 		{
 			IscCodes.isc_info_sql_stmt_type
 		};
