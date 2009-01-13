@@ -59,27 +59,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         this.SendAllocateToBuffer();
                     }
 
-#warning Why are params here???
-                    // Parameter descriptor
-                    byte[] descriptor = null;
-
-                    if (this.parameters != null)
-                    {
-                        using (XdrStream xdr = new XdrStream(this.database.Charset))
-                        {
-                            xdr.Write(this.parameters);
-                            descriptor = xdr.ToArray();
-                            xdr.Close();
-                        }
-                    }
-
                     // Prepare the statement
                     this.database.Write(IscCodes.op_prepare_statement);
                     this.database.Write(this.Transaction.Handle);
                     this.database.Write((int)IscCodes.INVALID_OBJECT);
                     this.database.Write((int)this.database.Dialect);
                     this.database.Write(commandText);
-                    this.database.WriteBuffer(DescribeInfoItems, DescribeInfoItems.Length);
+                    this.database.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
                     this.database.Write(IscCodes.MAX_BUFFER_SIZE);
 
                     // Grab statement type
@@ -98,7 +84,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         numberOfResponses--;
                         GenericResponse prepareResponse = this.database.ReadGenericResponse();
                         this.ProcessPrepareResponse(prepareResponse);
-
+                        
                         numberOfResponses--;
                         GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
                         this.statementType = this.ParseStatementTypeInfo(statementTypeResponse.Data);
