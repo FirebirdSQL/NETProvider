@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Common
 		};
 
 		// Describe	information	items
-        protected static readonly byte[] DescribeInfoItems = new byte[] 
+        protected static readonly byte[] DescribeInfoAndBindInfoItems = new byte[] 
 		{ 
 			IscCodes.isc_info_sql_select,
 			IscCodes.isc_info_sql_describe_vars,
@@ -53,11 +53,8 @@ namespace FirebirdSql.Data.Common
 			IscCodes.isc_info_sql_relation,
 			// IscCodes.isc_info_sql_owner,
 			IscCodes.isc_info_sql_alias,
-			IscCodes.isc_info_sql_describe_end
-		};
-
-        protected static readonly byte[] DescribeBindInfoItems = new byte[] 
-		{ 
+			IscCodes.isc_info_sql_describe_end,
+            
 			IscCodes.isc_info_sql_bind,
 			IscCodes.isc_info_sql_describe_vars,
 			IscCodes.isc_info_sql_sqlda_seq,
