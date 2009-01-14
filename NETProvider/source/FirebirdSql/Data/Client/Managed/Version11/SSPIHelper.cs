@@ -380,7 +380,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		~SSPIHelper()
 		{
-			Dispose(false);
+			this.Dispose(false);
 		}
 
 		#endregion
@@ -389,7 +389,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		public void Dispose()
 		{
-			Dispose(true);
+			this.Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
