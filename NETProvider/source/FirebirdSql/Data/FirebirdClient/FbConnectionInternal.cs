@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private long created;
         private long lifetime;
         private bool pooled;
-        private bool isDisposed;
+        private bool disposed;
 
 #if (NET)
         private FbEnlistmentNotification enlistmentNotification;
@@ -170,21 +170,24 @@ namespace FirebirdSql.Data.FirebirdClient
 
         protected void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            lock (this)
             {
-                if (disposing)
+                if (!this.disposed)
                 {
-                    // Release managed resources here
-                    this.Disconnect();
+                    if (disposing)
+                    {
+                        // Release managed resources here
+                        this.Disconnect();
+                    }
+
+                    // Call the appropriate methods to clean up 
+                    // unmanaged resources here.
+                    // If disposing is false, 
+                    // only the following code is executed.
+
+                    this.disposed = true;
                 }
-
-                // Call the appropriate methods to clean up 
-                // unmanaged resources here.
-                // If disposing is false, 
-                // only the following code is executed.
             }
-
-            this.isDisposed = true;
         }
 
         #endregion
