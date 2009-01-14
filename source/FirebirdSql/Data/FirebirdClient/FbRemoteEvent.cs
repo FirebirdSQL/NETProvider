@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private FbConnection connection;
         private RemoteEvent revent;
-        private bool _disposed = false;
+        private bool disposed = false;
 
         #endregion
 
@@ -210,18 +210,22 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private void Dispose(bool disposing)
         {
-            if (!this._disposed)
+            lock (this)
             {
-                if (disposing)
+                if (!this.disposed)
                 {
-                    this.CancelEvents();
-                    if (this.connection != null)
-                        this.connection.Dispose();
-                    this.connection = null;
-                    this.revent = null;
+                    if (disposing)
+                    {
+                        this.CancelEvents();
+                        if (this.connection != null)
+                            this.connection.Dispose();
+                        this.connection = null;
+                        this.revent = null;
+                    }
+
+                    this.disposed = true;
                 }
             }
-            this._disposed = true;
         }
 
         #endregion
