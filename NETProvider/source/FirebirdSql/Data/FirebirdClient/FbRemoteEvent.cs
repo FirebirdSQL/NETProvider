@@ -205,6 +205,7 @@ namespace FirebirdSql.Data.FirebirdClient
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)
