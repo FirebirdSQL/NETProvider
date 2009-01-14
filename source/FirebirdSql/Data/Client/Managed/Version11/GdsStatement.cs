@@ -177,8 +177,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         this.StatementType == DbStatementType.StoredProcedure ||
                         this.StatementType == DbStatementType.Select))
                     {
-                        // Grab statement type
-                        this.WriteSqlInfoRequest(RecordsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, this.handle);
+                        // Grab rows affected
+                        this.WriteSqlInfoRequest(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, this.handle);
 
                         readRowsAffectedResponse = true;
                     }
@@ -186,7 +186,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     this.database.Flush();
 
                     // sql?, execute, rows affected?
-                    int numberOfResponses = 3;
+                    int numberOfResponses = 
+                        (this.StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
                     try
                     {
                         if (this.StatementType == DbStatementType.StoredProcedure)
@@ -194,10 +195,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                             numberOfResponses--;
                             SqlResponse sqlResponse = this.database.ReadSqlResponse();
                             this.ProcessStoredProcedureResponse(sqlResponse);
-                        }
-                        else
-                        {
-                            numberOfResponses--;
                         }
 
                         numberOfResponses--;
@@ -211,10 +208,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                             {
                                 this.RecordsAffected = this.ProcessRecordsAffectedBuffer(rowsAffectedResponse.Data);
                             }
-                        }
-                        else
-                        {
-                            numberOfResponses--;
                         }
                     }
                     finally
