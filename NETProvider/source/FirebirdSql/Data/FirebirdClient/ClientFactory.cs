@@ -21,7 +21,6 @@
 
 using System;
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Client.Managed.Version10;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -76,7 +75,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private static IDatabase CreateManagedDatabase(FbConnectionString options)
         {
-            GdsConnection connection = new GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
+            FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
 
             connection.Connect();
             connection.Identify(options.Database);
@@ -92,9 +91,9 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        private static GdsServiceManager CreateManagedServiceManager(FbConnectionString options)
+        private static IServiceManager CreateManagedServiceManager(FbConnectionString options)
         {
-            GdsConnection connection = new GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
+            FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
 
             connection.Connect();
             connection.Identify(!String.IsNullOrEmpty(options.Database) ? options.Database : "");

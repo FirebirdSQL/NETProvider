@@ -28,7 +28,7 @@ using FirebirdSql.Data.Client.Managed.Version10;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
-    internal class GdsStatement : FirebirdSql.Data.Client.Managed.Version10.GdsStatement
+    internal class GdsStatement : Version10.GdsStatement
     {
         #region · Constructors ·
 

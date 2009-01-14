@@ -34,11 +34,11 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
-    internal class GdsDatabase : FirebirdSql.Data.Client.Managed.Version10.GdsDatabase
+    internal class GdsDatabase : Version10.GdsDatabase
     {
         #region · Constructors ·
 
-        public GdsDatabase(FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection)
+        public GdsDatabase(Version10.GdsConnection connection)
             : base(connection)
         {
             this.DefferedPackets = new Queue<Action<IResponse>>();
