@@ -483,32 +483,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public override void Describe()
 		{
             System.Diagnostics.Debug.Assert(true);
-            //try
-            //{
-            //    byte[] buffer = this.GetSqlInfo(DescribeInfoItems);
-            //    int dummy = 0;
-            //    this.fields = this.ParseSqlInfo(buffer, DescribeInfoItems, ref dummy);
-            //}
-            //catch (IscException)
-            //{
-            //    throw;
-            //}
 		}
-
-#warning Not needed
+        // these are not needed for Gds, because it's pre-fetched in Prepare
+        // maybe we can fetch these also for Fes and Ext etc.
         public override void DescribeParameters()
         {
-            System.Diagnostics.Debug.Assert(true, "The code shouldn't be here.");
-            //try
-            //{
-            //    byte[] buffer = this.GetSqlInfo(DescribeBindInfoItems);
-            //    int dummy = 0;
-            //    this.parameters = this.ParseSqlInfo(buffer, DescribeBindInfoItems, ref dummy);
-            //}
-            //catch (IscException)
-            //{
-            //    throw;
-            //}
+            System.Diagnostics.Debug.Assert(true);
         }
 
 		public override byte[] GetSqlInfo(byte[] items, int bufferLength)
