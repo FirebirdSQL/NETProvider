@@ -274,7 +274,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             {
                 DoFreePacket(option);
 #warning This isn't in lock anymore later
-                (this.Database as GdsDatabase).DefferedPacketsProcessing.Add(ProcessFreeResponse);
+                (this.Database as GdsDatabase).DefferedPackets.Enqueue(ProcessFreeResponse);
             }
         }
         #endregion

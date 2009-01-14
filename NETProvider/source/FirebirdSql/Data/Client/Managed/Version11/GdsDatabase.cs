@@ -41,13 +41,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         public GdsDatabase(FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection)
             : base(connection)
         {
-            this.DefferedPacketsProcessing = new List<Action<IResponse>>();
+            this.DefferedPackets = new Queue<Action<IResponse>>();
         }
 
         #endregion
 
         #region Properties
-        public List<Action<IResponse>> DefferedPacketsProcessing { get; private set; }
+        public Queue<Action<IResponse>> DefferedPackets { get; private set; }
         #endregion
 
         #region · Override Statement Creation Methods ·
@@ -124,7 +124,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 {
                     DoReleaseObjectPacket(op, id);
 #warning This isn't in lock anymore later
-                    this.DefferedPacketsProcessing.Add(ProcessReleaseObjectResponse);
+                    this.DefferedPackets.Enqueue(ProcessReleaseObjectResponse);
                 }
                 catch (IOException)
                 {
@@ -132,19 +132,21 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 }
             }
         }
+
+        public override int ReadOperation()
+        {
+            ProcessDefferedPackets();
+            return base.ReadOperation();
+        }
+
+        public override int NextOperation()
+        {
+            ProcessDefferedPackets();
+            return base.NextOperation();
+        }
         #endregion
 
         #region Protected methods
-        protected override IResponse ReadSingleResponse()
-        {
-            while (DefferedPacketsProcessing.Count > 0)
-            {
-                DefferedPacketsProcessing[0](base.ReadSingleResponse());
-                DefferedPacketsProcessing.RemoveAt(0);
-            }
-            return base.ReadSingleResponse();
-        }
-
         protected override IResponse ProcessOperation(int operation)
         {
             switch (operation)
@@ -154,6 +156,22 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                 default:
                     return base.ProcessOperation(operation);
+            }
+        }
+        #endregion
+
+        #region Private methods
+        private void ProcessDefferedPackets()
+        {
+            if (DefferedPackets.Count > 0)
+            {
+                // copy it to local collection and clear to not get new processing when the method is hit again from ReadSingleResponse
+                Action<IResponse>[] methods = DefferedPackets.ToArray();
+                DefferedPackets.Clear();
+                foreach (var method in methods)
+                {
+                    method(ReadSingleResponse());
+                }
             }
         }
         #endregion
