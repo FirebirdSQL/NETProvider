@@ -165,7 +165,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         {
             if (DefferedPackets.Count > 0)
             {
-                // copy it to local collection and clear to not get new processing when the method is hit again from ReadSingleResponse
+                // copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
                 Action<IResponse>[] methods = DefferedPackets.ToArray();
                 DefferedPackets.Clear();
                 foreach (var method in methods)
