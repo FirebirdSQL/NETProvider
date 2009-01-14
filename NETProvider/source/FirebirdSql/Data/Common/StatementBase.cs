@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Common
 		};
 
 		// Records affected	items
-        protected static readonly byte[] RecordsAffectedInfoItems = new byte[]
+        protected static readonly byte[] RowsAffectedInfoItems = new byte[]
 		{
 			IscCodes.isc_info_sql_records
 		};
@@ -299,7 +299,7 @@ namespace FirebirdSql.Data.Common
 
 		protected int GetRecordsAffected()
 		{
-			byte[] buffer = this.GetSqlInfo(RecordsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+			byte[] buffer = this.GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
 			return this.ProcessRecordsAffectedBuffer(buffer);
 		}
