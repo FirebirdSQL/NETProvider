@@ -27,7 +27,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	internal sealed class FbConnectionPool : MarshalByRefObject
+	internal sealed class FbConnectionPool : MarshalByRefObject, IDisposable
 	{
         #region · Inner Types ·
         
@@ -55,6 +55,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private bool				isRunning;
 		private long				lifeTime;
 		private object				syncObject;
+        private bool disposed = false;
 
 		#endregion
 
@@ -441,5 +442,40 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
 		#endregion
+    
+        #region · Finalizer ·
+
+        ~FbConnectionPool()
+        {
+            this.Dispose(false);
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (!this.disposed)
+                {
+                    if (disposing)
+                    {
+                    }
+                    this.Clear();
+
+                    this.disposed = true;
+                }
+            }
+        }
+
+        #endregion
 	}
 }
