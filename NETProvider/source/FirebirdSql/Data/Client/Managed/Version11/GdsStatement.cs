@@ -91,7 +91,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     }
                     finally
                     {
-                        FinishFetching(ref numberOfResponses);
+                        SafeFinishFetching(ref numberOfResponses);
                     }
 
                     this.state = StatementState.Prepared;
@@ -212,7 +212,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     }
                     finally
                     {
-                        FinishFetching(ref numberOfResponses);
+                        SafeFinishFetching(ref numberOfResponses);
                     }
 
                     this.state = StatementState.Executed;
@@ -241,13 +241,17 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             }
         }
 
-        private void FinishFetching(ref int numberOfResponses)
+        private void SafeFinishFetching(ref int numberOfResponses)
         {
             while (numberOfResponses > 0)
             {
-#warning Or ReadSingle to not get exception again?
-                this.database.ReadResponse();
                 numberOfResponses--;
+                try
+                {
+                    this.database.ReadResponse();
+                }
+                catch (IscException)
+                { }
             }
         }
 
