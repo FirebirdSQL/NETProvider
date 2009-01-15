@@ -123,8 +123,15 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 try
                 {
                     DoReleaseObjectPacket(op, id);
-#warning This isn't in lock anymore later
                     this.DefferedPackets.Enqueue(ProcessReleaseObjectResponse);
+                    this.DefferedPackets.Enqueue(
+                        (IResponse response) =>
+                        {
+                            lock (this.SyncObject)
+                            {
+                                ProcessReleaseObjectResponse(response);
+                            }
+                        });
                 }
                 catch (IOException)
                 {
@@ -170,6 +177,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 DefferedPackets.Clear();
                 foreach (var method in methods)
                 {
+#warning What about exceptions here?
                     method(ReadSingleResponse());
                 }
             }

@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         numberOfResponses--;
                         GenericResponse prepareResponse = this.database.ReadGenericResponse();
                         this.ProcessPrepareResponse(prepareResponse);
-                        
+
                         numberOfResponses--;
                         GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
                         this.statementType = this.ParseStatementTypeInfo(statementTypeResponse.Data);
@@ -186,7 +186,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     this.database.Flush();
 
                     // sql?, execute, rows affected?
-                    int numberOfResponses = 
+                    int numberOfResponses =
                         (this.StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
                     try
                     {
@@ -250,7 +250,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 {
                     this.database.ReadResponse();
                 }
-                catch (IscException)
+                catch (IscException) 
                 { }
             }
         }
@@ -270,8 +270,14 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             lock (this.database.SyncObject)
             {
                 DoFreePacket(option);
-#warning This isn't in lock anymore later
-                (this.Database as GdsDatabase).DefferedPackets.Enqueue(ProcessFreeResponse);
+                (this.Database as GdsDatabase).DefferedPackets.Enqueue(
+                    (IResponse response) =>
+                    {
+                        lock (this.database.SyncObject)
+                        {
+                            ProcessFreeResponse(response);
+                        }
+                    });
             }
         }
         #endregion
