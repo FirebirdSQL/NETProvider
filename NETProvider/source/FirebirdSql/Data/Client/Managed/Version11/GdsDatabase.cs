@@ -41,13 +41,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         public GdsDatabase(Version10.GdsConnection connection)
             : base(connection)
         {
-            this.DefferedPackets = new Queue<Action<IResponse>>();
+            this.DeferredPackets = new Queue<Action<IResponse>>();
         }
 
         #endregion
 
         #region Properties
-        public Queue<Action<IResponse>> DefferedPackets { get; private set; }
+        public Queue<Action<IResponse>> DeferredPackets { get; private set; }
         #endregion
 
         #region · Override Statement Creation Methods ·
@@ -123,8 +123,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 try
                 {
                     DoReleaseObjectPacket(op, id);
-                    this.DefferedPackets.Enqueue(ProcessReleaseObjectResponse);
-                    this.DefferedPackets.Enqueue(
+                    this.DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
+                    this.DeferredPackets.Enqueue(
                         (IResponse response) =>
                         {
                             lock (this.SyncObject)
@@ -142,13 +142,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
         public override int ReadOperation()
         {
-            ProcessDefferedPackets();
+            ProcessDeferredPackets();
             return base.ReadOperation();
         }
 
         public override int NextOperation()
         {
-            ProcessDefferedPackets();
+            ProcessDeferredPackets();
             return base.NextOperation();
         }
         #endregion
@@ -168,13 +168,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         #endregion
 
         #region Private methods
-        private void ProcessDefferedPackets()
+        private void ProcessDeferredPackets()
         {
-            if (DefferedPackets.Count > 0)
+            if (DeferredPackets.Count > 0)
             {
                 // copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
-                Action<IResponse>[] methods = DefferedPackets.ToArray();
-                DefferedPackets.Clear();
+                Action<IResponse>[] methods = DeferredPackets.ToArray();
+                DeferredPackets.Clear();
                 foreach (var method in methods)
                 {
 #warning What about exceptions here?
