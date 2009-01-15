@@ -123,7 +123,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 try
                 {
                     DoReleaseObjectPacket(op, id);
-                    this.DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
                     this.DeferredPackets.Enqueue(
                         (IResponse response) =>
                         {
