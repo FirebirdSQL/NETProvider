@@ -83,6 +83,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                         numberOfResponses--;
                         GenericResponse prepareResponse = this.database.ReadGenericResponse();
+                        bool deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
                         this.ProcessPrepareResponse(prepareResponse);
 
                         numberOfResponses--;
@@ -270,7 +271,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             lock (this.database.SyncObject)
             {
                 DoFreePacket(option);
-                (this.Database as GdsDatabase).DefferedPackets.Enqueue(
+                (this.Database as GdsDatabase).DeferredPackets.Enqueue(
                     (IResponse response) =>
                     {
                         lock (this.database.SyncObject)

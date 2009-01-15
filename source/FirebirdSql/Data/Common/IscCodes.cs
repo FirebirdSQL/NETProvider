@@ -114,6 +114,12 @@ namespace FirebirdSql.Data.Common
 
         public const int PROTOCOL_VERSION11 = (FB_PROTOCOL_FLAG | 11);
 
+        #endregion
+
+        #region · Statement Flags ·
+
+        public const int STMT_DEFER_EXECUTE = 4;
+
 		#endregion
 
 		#region · Server Class ·
