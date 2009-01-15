@@ -297,11 +297,19 @@ namespace FirebirdSql.Data.Entity
             {
                 commandText.Append(separator);
                 commandText.Append(GenerateMemberSql(m));
-                commandText.Append(" into ");
+
+                separator = ", ";
+            }
+            commandText.Append(" into ");
+            separator = string.Empty;
+            foreach (EdmMember m in columnsToFetch)
+            {
+                commandText.Append(separator);
                 commandText.Append(":" + GenerateMemberSql(m));
 
                 separator = ", ";
             }
+
             commandText.AppendLine(";");
             commandText.AppendLine("suspend;");
             commandText.AppendLine("end");
