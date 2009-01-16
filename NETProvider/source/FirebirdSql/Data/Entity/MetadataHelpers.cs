@@ -222,37 +222,42 @@ namespace FirebirdSql.Data.Entity
         /// <summary>
         /// Name of the MaxLength Facet
         /// </summary>
-        public static readonly string MaxLengthFacetName = "MaxLength";
+        internal const string MaxLengthFacetName = "MaxLength";
 
         /// <summary>
         /// Name of the Unicode Facet
         /// </summary>
-        public static readonly string UnicodeFacetName = "Unicode";
+        internal const string UnicodeFacetName = "Unicode";
 
         /// <summary>
         /// Name of the FixedLength Facet
         /// </summary>
-        public static readonly string FixedLengthFacetName = "FixedLength";
+        internal const string FixedLengthFacetName = "FixedLength";
 
         /// <summary>
         /// Name of the Precision Facet
         /// </summary>
-        public static readonly string PrecisionFacetName = "Precision";
+        internal const string PrecisionFacetName = "Precision";
 
         /// <summary>
         /// Name of the Scale Facet
         /// </summary>
-        public static readonly string ScaleFacetName = "Scale";
+        internal const string ScaleFacetName = "Scale";
 
         /// <summary>
         /// Name of the DefaultValue Facet
         /// </summary>
-        public static readonly string DefaultValueFacetName = "DefaultValue";
+        internal const string DefaultValueFacetName = "DefaultValue";
 
         /// <summary>
         /// Name of the Nullable Facet
         /// </summary>
         internal const string NullableFacetName = "Nullable";
+
+        /// <summary>
+        /// Name of StoreGeneratedPattern Facet
+        /// </summary>
+        internal const string StoreGeneratedPatternFacetName = "StoreGeneratedPattern";
         #endregion
 
         #region Facet Retreival Helpers

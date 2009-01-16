@@ -90,16 +90,11 @@ namespace FirebirdSql.Data.Entity
                 // clauses. Introduce a fake set clause so that:
                 // - we acquire the appropriate locks
                 // - server-gen columns (e.g. timestamp) get recomputed
-                //
-                // We use the following pattern:
-                //
-                //  update Foo
-                //  set @i = 0
-                //  where ...
-#warning How to do on FB
-                //DbParameter parameter = translator.CreateParameter(default(Int32), DbType.Int32);
-                //commandText.Append(parameter.ParameterName);
-                //commandText.Append(" = 0");
+                
+                EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
+                // hope this column isn't indexed to not waste power
+                EdmMember someColumn = table.ElementType.Members.Last(x => !IsStoreGenerated(x));
+                commandText.AppendFormat("{0} = {0}", GenerateMemberSql(someColumn));
             }
             commandText.AppendLine();
 
@@ -195,6 +190,20 @@ namespace FirebirdSql.Data.Entity
             return SqlGenerator.QuoteIdentifier(member.Name);
         }
 
+        private static bool IsStoreGenerated(EdmMember member)
+        {
+            Facet item = null;
+            if (member.TypeUsage.Facets.TryGetValue(MetadataHelpers.StoreGeneratedPatternFacetName, false, out item) &&
+                (((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed || ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Identity))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Generates SQL fragment returning server-generated values.
         /// Requires: translator knows about member values so that we can figure out
@@ -233,25 +242,15 @@ namespace FirebirdSql.Data.Entity
                 return;
             }
 
-            /// for the V1 only one row is changed per command
-
             EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
             List<EdmMember> columnsToFetch = new List<EdmMember>();
 
             foreach (EdmMember tableColumn in table.ElementType.Members)
             {
-                const string StoreGeneratedPatternFacetName = "StoreGeneratedPattern";
-
-                Facet item = null;
-                if (tableColumn.TypeUsage.Facets.TryGetValue(StoreGeneratedPatternFacetName, false, out item) &&
-                    (((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed || ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Identity))
+                if (IsStoreGenerated(tableColumn))
                 {
                     columnsToFetch.Add(tableColumn);
                 }
-                //else if (table.ElementType.KeyMembers.Contains(tableColumn))
-                //{
-                //    columnsToFetch.Add(tableColumn);
-                //}
             }
 
             StringBuilder startBlock = new StringBuilder();
