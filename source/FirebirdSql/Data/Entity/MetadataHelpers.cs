@@ -235,11 +235,6 @@ namespace FirebirdSql.Data.Entity
         public static readonly string FixedLengthFacetName = "FixedLength";
 
         /// <summary>
-        /// Name of the PreserveSeconds Facet
-        /// </summary>
-        public static readonly string PreserveSecondsFacetName = "PreserveSeconds";
-
-        /// <summary>
         /// Name of the Precision Facet
         /// </summary>
         public static readonly string PrecisionFacetName = "Precision";

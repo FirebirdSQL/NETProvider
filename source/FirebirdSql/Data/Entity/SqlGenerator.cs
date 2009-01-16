@@ -3193,9 +3193,8 @@ namespace FirebirdSql.Data.Entity
             bool isFixedLength = false;
             int maxLength = 0;
             string length = string.Empty;
-            bool preserveSeconds = true;
-            byte decimalPrecision = 0;
-            byte decimalScale = 0;
+            byte precision = 0;
+            byte scale = 0;
 
             switch (primitiveType.PrimitiveTypeKind)
             {
@@ -3224,12 +3223,12 @@ namespace FirebirdSql.Data.Entity
                     break;
 
                 case PrimitiveTypeKind.Decimal:
-                    decimalPrecision = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.PrecisionFacetName, 9);
-                    Debug.Assert(decimalPrecision > 0, "decimal precision must be greater than zero");
-                    decimalScale = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.ScaleFacetName, 0);
-                    Debug.Assert(decimalPrecision >= decimalScale, "decimalPrecision must be greater or equal to decimalScale");
-                    Debug.Assert(decimalPrecision <= 18, "decimalPrecision must be less than or equal to 18");
-                    typeName = string.Format("DECIMAL({0},{1})", decimalPrecision, decimalScale);
+                    precision = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.PrecisionFacetName, 9);
+                    Debug.Assert(precision > 0, "decimal precision must be greater than zero");
+                    scale = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.ScaleFacetName, 0);
+                    Debug.Assert(precision >= scale, "decimalPrecision must be greater or equal to decimalScale");
+                    Debug.Assert(precision <= 18, "decimalPrecision must be less than or equal to 18");
+                    typeName = string.Format("DECIMAL({0},{1})", precision, scale);
                     break;
 
                 case PrimitiveTypeKind.Binary:
@@ -3271,8 +3270,8 @@ namespace FirebirdSql.Data.Entity
                     break;
 
                 case PrimitiveTypeKind.DateTime:
-                    preserveSeconds = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.PreserveSecondsFacetName, false);
-                    typeName = preserveSeconds ? "TIMESTAMP" : "DATE";
+                    precision = MetadataHelpers.GetFacetValueOrDefault<byte>(type, MetadataHelpers.PrecisionFacetName, 4);
+                    typeName = (precision > 0 ? "TIMESTAMP" : "DATE");
                     break;
 
                 case PrimitiveTypeKind.Time:
