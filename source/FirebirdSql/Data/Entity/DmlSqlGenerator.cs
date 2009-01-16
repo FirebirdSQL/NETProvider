@@ -319,12 +319,10 @@ namespace FirebirdSql.Data.Entity
 
         private static string ChangeParamsToPSQLParams(string commandText, string[] parametersUsed)
         {
-            const string valuesPattern = "values (";
-            int limitPosition = commandText.LastIndexOf(valuesPattern) + valuesPattern.Length;
             StringBuilder command = new StringBuilder(commandText);
             foreach (string param in parametersUsed)
             {
-                command.Replace(param, ":" + param.Substring(1), limitPosition, command.Length - limitPosition);
+                command.Replace(param, ":" + param.Remove(0, 1));
             }
             return command.ToString();
         }
