@@ -148,7 +148,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-        #region · Methods
+        #region · Methods ·
 
         public FbTransaction BeginTransaction(IsolationLevel level)
         {
