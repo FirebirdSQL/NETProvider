@@ -177,48 +177,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Clear()
 		{
-			lock (this.SyncObject)
-			{
-				// Stop	cleanup	thread
-				if (this.cleanUpThread != null)
-				{
-					this.cleanUpThread.Abort();
-					this.cleanUpThread.Join();
-				}
-
-				// Close all unlocked connections
-				FbConnectionInternal[] list = (FbConnectionInternal[])this.unlocked.ToArray(typeof(FbConnectionInternal));
-
-				foreach (FbConnectionInternal connection in list)
-				{
-					connection.Disconnect();
-				}
-
-				// Close all locked	connections
-				list = (FbConnectionInternal[])this.locked.ToArray(typeof(FbConnectionInternal));
-
-				foreach (FbConnectionInternal connection in list)
-				{
-                    connection.Disconnect();
-				}
-
-				// Clear lists
-				this.unlocked.Clear();
-				this.locked.Clear();
-
-				// Raise EmptyPool event
-				if (this.EmptyPool != null)
-				{
-					this.EmptyPool(this.connectionString.GetHashCode(), null);
-				}
-
-				// Reset fields
-				this.unlocked			= null;
-				this.locked				= null;
-				this.connectionString	= null;
-				this.cleanUpThread		= null;
-				this.EmptyPool			= null;
-			}
+            Dispose();
 		}
 
 		#endregion
@@ -462,14 +421,55 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private void Dispose(bool disposing)
         {
-            lock (this)
+            lock (this.SyncObject)
             {
                 if (!this.disposed)
                 {
                     if (disposing)
                     {
+                        // Stop	cleanup	thread
+                        if (this.cleanUpThread != null)
+                        {
+                            this.cleanUpThread.Abort();
+                            this.cleanUpThread.Join();
+                        }
                     }
-                    this.Clear();
+
+                    // Close all unlocked connections
+                    FbConnectionInternal[] list = (FbConnectionInternal[])this.unlocked.ToArray(typeof(FbConnectionInternal));
+
+                    foreach (FbConnectionInternal connection in list)
+                    {
+                        connection.Disconnect();
+                    }
+
+                    // Close all locked	connections
+                    list = (FbConnectionInternal[])this.locked.ToArray(typeof(FbConnectionInternal));
+
+                    foreach (FbConnectionInternal connection in list)
+                    {
+                        connection.Disconnect();
+                    }
+
+                    if (disposing)
+                    {
+                        // Raise EmptyPool event
+                        if (this.EmptyPool != null)
+                        {
+                            this.EmptyPool(this.connectionString.GetHashCode(), null);
+                        }
+
+                        // Clear lists
+                        this.unlocked.Clear();
+                        this.locked.Clear();
+
+                        // Reset fields
+                        this.unlocked = null;
+                        this.locked = null;
+                        this.connectionString = null;
+                        this.cleanUpThread = null;
+                        this.EmptyPool = null;
+                    }
 
                     this.disposed = true;
                 }
