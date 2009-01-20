@@ -156,7 +156,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
 			}
 
-			this.recordsAffected = -1;
+            this.handle = IscCodes.INVALID_OBJECT;
+            this.recordsAffected = -1;
 			this.fetchSize		= 200;
 			this.rows			= new Queue();
 			this.outputParams	= new Queue();
@@ -270,21 +271,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                         this.ProcessAllocateResponce(this.database.ReadGenericResponse());
                     }
 
-                    this.database.Write(IscCodes.op_prepare_statement);
-                    this.database.Write(this.transaction.Handle);
-                    this.database.Write(this.handle);
-                    this.database.Write((int)this.database.Dialect);
-                    this.database.Write(commandText);
-                    this.database.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
-                    this.database.Write(IscCodes.MAX_BUFFER_SIZE);
-
+                    this.SendPrepareToBuffer(commandText);
                     this.database.Flush();
-
-                    // Read Fields Information
                     this.ProcessPrepareResponse(this.database.ReadGenericResponse());
 
-                    // Determine the statement type
-                    this.statementType = this.GetStatementType();
+                    // Grab statement type
+                    this.SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+                    this.database.Flush(); 
+                    this.statementType = this.ProcessStatementTypeInfoBuffer(this.ProcessInfoSqlResponse(this.database.ReadGenericResponse()));
+
 
                     this.state = StatementState.Prepared;
                 }
@@ -314,57 +309,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
                     this.recordsAffected = -1;
 
-                    // Build Parameter description
-                    byte[] descriptor = null;
-
-                    if (this.parameters != null)
-                    {
-                        using (XdrStream xdr = new XdrStream(this.database.Charset))
-                        {
-                            xdr.Write(this.parameters);
-                            descriptor = xdr.ToArray();
-                            xdr.Close();
-                        }
-                    }
-
-                    // Write the message
-					if (this.statementType == DbStatementType.StoredProcedure)
-					{
-						this.database.Write(IscCodes.op_execute2);
-					}
-					else
-					{
-						this.database.Write(IscCodes.op_execute);
-					}
-
-					this.database.Write(this.handle);
-					this.database.Write(this.transaction.Handle);
-
-					if (this.parameters != null)
-					{
-						this.database.WriteBuffer(this.parameters.ToBlrArray());
-						this.database.Write(0);	// Message number
-						this.database.Write(1);	// Number of messages
-                        this.database.Write(descriptor, 0, descriptor.Length);
-					}
-					else
-					{
-						this.database.WriteBuffer(null);
-						this.database.Write(0);
-						this.database.Write(0);
-					}
-
-					if (this.statementType == DbStatementType.StoredProcedure)
-					{
-						this.database.WriteBuffer((this.fields == null) ? null : this.fields.ToBlrArray());
-						this.database.Write(0);	// Output message number
-					}
+                    this.SendExecuteToBuffer();
 
 					this.database.Flush();
 
                     if (this.statementType == DbStatementType.StoredProcedure)
 					{
-						this.ProcessStoredProcedureResponse(this.database.ReadResponse());
+						this.ProcessStoredProcedureExecuteResponse(this.database.ReadSqlResponse());
 					}
 
                     GenericResponse executeResponse = this.database.ReadGenericResponse();
@@ -376,7 +327,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						this.StatementType == DbStatementType.Update ||
                         this.StatementType == DbStatementType.StoredProcedure))
 					{
-						this.recordsAffected = this.GetRecordsAffected();
+                        this.SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+                        this.database.Flush();
+                        this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(this.database.ReadGenericResponse()));
 					}
 
 					this.state = StatementState.Executed;
@@ -491,49 +444,74 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             System.Diagnostics.Debug.Assert(true);
         }
 
-		public override byte[] GetSqlInfo(byte[] items, int bufferLength)
-		{
-			lock (this.database.SyncObject)
-			{
-				try
-				{
-					this.database.Write(IscCodes.op_info_sql);
-					this.database.Write(this.handle);
-					this.database.Write(0);
-					this.database.WriteBuffer(items, items.Length);
-					this.database.Write(bufferLength);
-					this.database.Flush();
-
-                    GenericResponse response = this.database.ReadGenericResponse();
-
-					return response.Data;
-				}
-				catch (IOException)
-				{
-					throw new IscException(IscCodes.isc_net_read_err);
-				}
-			}
-		}
-
 		#endregion
 
 		#region · Protected Methods ·
 
-        protected virtual void ProcessPrepareResponse(GenericResponse response)
+        #region op_prepare methods
+        protected void SendPrepareToBuffer(string commandText)
+        {
+            this.database.Write(IscCodes.op_prepare_statement);
+            this.database.Write(this.transaction.Handle);
+            this.database.Write(this.handle);
+            this.database.Write((int)this.database.Dialect);
+            this.database.Write(commandText);
+            this.database.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
+            this.database.Write(IscCodes.MAX_BUFFER_SIZE);
+        }
+
+        protected void ProcessPrepareResponse(GenericResponse response)
         {
             int lastPosition = 0;
             this.fields = this.ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref lastPosition);
             this.parameters = this.ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref lastPosition);
         }
+        #endregion
 
-		protected override void Free(int option)
+        #region op_info_sql methods
+        protected override byte[] GetSqlInfo(byte[] items, int bufferLength)
+        {
+            lock (this.database.SyncObject)
+            {
+                DoInfoSqlPacket(items, bufferLength);
+                this.database.Flush();
+                return ProcessInfoSqlResponse(this.database.ReadGenericResponse());
+            }
+        }
+
+        protected void DoInfoSqlPacket(byte[] items, int bufferLength)
+        {
+            try
+            {
+                SendInfoSqlToBuffer(items, bufferLength);
+            }
+            catch (IOException)
+            {
+                throw new IscException(IscCodes.isc_net_read_err);
+            }
+        }
+
+        protected void SendInfoSqlToBuffer(byte[] items, int bufferLength)
+        {
+            this.database.Write(IscCodes.op_info_sql);
+            this.database.Write(this.handle);
+            this.database.Write(0);
+            this.database.WriteBuffer(items, items.Length);
+            this.database.Write(bufferLength);
+        }
+
+        protected byte[] ProcessInfoSqlResponse(GenericResponse respose)
+        {
+            System.Diagnostics.Debug.Assert(respose.Data != null && respose.Data.Length > 0);
+            return respose.Data;
+        }
+        #endregion
+
+        #region op_free_statement methods
+        protected override void Free(int option)
 		{
-			// Does	not	seem to	be possible	or necessary to	close
-			// an execute procedure	statement.
-			if (this.StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
-			{
-				return;
-			}
+            if (FreeNotNeeded(option))
+                return;
 
 			lock (this.database.SyncObject)
 			{
@@ -543,13 +521,25 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
+        protected bool FreeNotNeeded(int option)
+        {
+            // Does	not	seem to	be possible	or necessary to	close
+            // an execute procedure	statement.
+            if (this.StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         protected void DoFreePacket(int option)
         {
             try
             {
-                this.database.Write(IscCodes.op_free_statement);
-                this.database.Write(this.handle);
-                this.database.Write(option);
+                SendFreeToBuffer(option);
 
                 // Reset statement information
                 if (option == IscCodes.DSQL_drop)
@@ -567,12 +557,91 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             }
         }
 
-        protected void ProcessFreeResponse(IResponse response)
-        { 
-
+        protected void SendFreeToBuffer(int option)
+        {
+            this.database.Write(IscCodes.op_free_statement);
+            this.database.Write(this.handle);
+            this.database.Write(option);
         }
 
-		protected override void TransactionUpdated(object sender, EventArgs e)
+        protected void ProcessFreeResponse(IResponse response)
+        {
+
+        }
+        #endregion
+
+        #region op_allocate_statement methods
+        protected void SendAllocateToBuffer()
+        {
+            this.database.Write(IscCodes.op_allocate_statement);
+            this.database.Write(this.database.Handle);
+        }
+
+        protected void ProcessAllocateResponce(GenericResponse response)
+        {
+            this.handle = response.ObjectHandle;
+            this.allRowsFetched = false;
+            this.state = StatementState.Allocated;
+            this.statementType = DbStatementType.None;
+        }
+        #endregion
+
+        #region op_execute/op_execute2 methods
+        protected void SendExecuteToBuffer()
+        {
+            // Write the message
+            if (this.statementType == DbStatementType.StoredProcedure)
+            {
+                this.database.Write(IscCodes.op_execute2);
+            }
+            else
+            {
+                this.database.Write(IscCodes.op_execute);
+            }
+
+            this.database.Write(this.handle);
+            this.database.Write(this.transaction.Handle);
+
+            if (this.parameters != null)
+            {
+                byte[] descriptor = this.BuildParameterDescriptor();
+
+                this.database.WriteBuffer(this.parameters.ToBlrArray());
+                this.database.Write(0);	// Message number
+                this.database.Write(1);	// Number of messages
+                this.database.Write(descriptor, 0, descriptor.Length);
+            }
+            else
+            {
+                this.database.WriteBuffer(null);
+                this.database.Write(0);
+                this.database.Write(0);
+            }
+
+            if (this.statementType == DbStatementType.StoredProcedure)
+            {
+                this.database.WriteBuffer((this.fields == null) ? null : this.fields.ToBlrArray());
+                this.database.Write(0);	// Output message number
+            }
+        }
+
+        protected void ProcessStoredProcedureExecuteResponse(SqlResponse response)
+        {
+            try
+            {
+                if (response.Count > 0)
+                {
+                    this.outputParams.Enqueue(this.ReadDataRow());
+                }
+            }
+            catch (IOException)
+            {
+                throw new IscException(IscCodes.isc_net_read_err);
+            }
+        }
+        #endregion
+
+        protected override void TransactionUpdated(object sender, EventArgs e)
 		{
 			lock (this)
 			{
@@ -584,28 +653,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				this.state              = StatementState.Closed;
 				this.TransactionUpdate  = null;
 				this.allRowsFetched     = false;
-			}
-		}
-
-		#endregion
-
-		#region · Protected Methods ·
-
-        protected void ProcessStoredProcedureResponse(IResponse response)
-		{
-			try
-			{
-				if (response is SqlResponse)
-				{
-					if (((SqlResponse)response).Count > 0)
-					{
-						this.outputParams.Enqueue(this.ReadDataRow());
-					}
-				}
-			}
-			catch (IOException)
-			{
-				throw new IscException(IscCodes.isc_net_read_err);
 			}
 		}
 
@@ -632,20 +679,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
 			return row;
-		}
-
-        protected void SendAllocateToBuffer()
-        {
-            this.database.Write(IscCodes.op_allocate_statement);
-            this.database.Write(this.database.Handle);
-        }
-
-        protected void ProcessAllocateResponce(GenericResponse response)
-        {
-            this.handle = response.ObjectHandle;
-            this.allRowsFetched = false;
-            this.state = StatementState.Allocated;
-            this.statementType = DbStatementType.None;
         }
 
         protected Descriptor ParseSqlInfo(byte[] info, byte[] items, ref int lastPosition)
@@ -770,6 +803,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             return true;
 		}
 
+        protected byte[] BuildParameterDescriptor()
+        {
+            if (this.parameters == null)
+            {
+                throw new InvalidOperationException("Cannot build descriptor from null parameters.");
+            }
+
+            using (XdrStream xdr = new XdrStream(this.database.Charset))
+            {
+                xdr.Write(this.parameters);
+                return xdr.ToArray();
+            }
+        }
+
         protected void Clear()
 		{
 			if (this.rows != null && this.rows.Count > 0)
@@ -789,7 +836,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             this.Clear();
 
             this.parameters = null;
-            this.fields     = null;
+            this.fields = null;
         }
 
 		#endregion

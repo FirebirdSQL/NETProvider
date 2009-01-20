@@ -60,16 +60,10 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     }
 
                     // Prepare the statement
-                    this.database.Write(IscCodes.op_prepare_statement);
-                    this.database.Write(this.Transaction.Handle);
-                    this.database.Write((int)IscCodes.INVALID_OBJECT);
-                    this.database.Write((int)this.database.Dialect);
-                    this.database.Write(commandText);
-                    this.database.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
-                    this.database.Write(IscCodes.MAX_BUFFER_SIZE);
+                    this.SendPrepareToBuffer(commandText);
 
                     // Grab statement type
-                    this.WriteSqlInfoRequest(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, IscCodes.INVALID_OBJECT);
+                    this.SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 
                     this.database.Flush();
 
@@ -88,7 +82,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
                         numberOfResponses--;
                         GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
-                        this.statementType = this.ParseStatementTypeInfo(statementTypeResponse.Data);
+                        this.statementType = this.ProcessStatementTypeInfoBuffer(this.ProcessInfoSqlResponse(statementTypeResponse));
                     }
                     finally
                     {
@@ -123,51 +117,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 {
                     this.RecordsAffected = -1;
 
-                    // Build Parameter description
-                    byte[] descriptor = null;
-
-                    if (this.parameters != null)
-                    {
-                        using (XdrStream xdr = new XdrStream(this.database.Charset))
-                        {
-                            xdr.Write(this.parameters);
-                            descriptor = xdr.ToArray();
-                            xdr.Close();
-                        }
-                    }
-
-                    // Write the message
-                    if (this.StatementType == DbStatementType.StoredProcedure)
-                    {
-                        this.database.Write(IscCodes.op_execute2);
-                    }
-                    else
-                    {
-                        this.database.Write(IscCodes.op_execute);
-                    }
-
-                    this.database.Write(this.handle);
-                    this.database.Write(this.Transaction.Handle);
-
-                    if (this.parameters != null)
-                    {
-                        this.database.WriteBuffer(this.parameters.ToBlrArray());
-                        this.database.Write(0);    // Message number
-                        this.database.Write(1);    // Number of messages
-                        this.database.Write(descriptor, 0, descriptor.Length);
-                    }
-                    else
-                    {
-                        this.database.WriteBuffer(null);
-                        this.database.Write(0);
-                        this.database.Write(0);
-                    }
-
-                    if (this.StatementType == DbStatementType.StoredProcedure)
-                    {
-                        this.database.WriteBuffer((this.Fields == null) ? null : this.Fields.ToBlrArray());
-                        this.database.Write(0);    // Output message number
-                    }
+                    this.SendExecuteToBuffer();
 
                     bool readRowsAffectedResponse = false;
                     // Obtain records affected by query execution
@@ -179,7 +129,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         this.StatementType == DbStatementType.Select))
                     {
                         // Grab rows affected
-                        this.WriteSqlInfoRequest(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, this.handle);
+                        this.SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
                         readRowsAffectedResponse = true;
                     }
@@ -195,7 +145,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         {
                             numberOfResponses--;
                             SqlResponse sqlResponse = this.database.ReadSqlResponse();
-                            this.ProcessStoredProcedureResponse(sqlResponse);
+                            this.ProcessStoredProcedureExecuteResponse(sqlResponse);
                         }
 
                         numberOfResponses--;
@@ -205,10 +155,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         {
                             numberOfResponses--;
                             GenericResponse rowsAffectedResponse = this.database.ReadGenericResponse();
-                            if (rowsAffectedResponse.Data != null && rowsAffectedResponse.Data.Length > 0)
-                            {
-                                this.RecordsAffected = this.ProcessRecordsAffectedBuffer(rowsAffectedResponse.Data);
-                            }
+                            this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
                         }
                     }
                     finally
@@ -230,18 +177,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
         #region · Private Methods ·
 
-        private void WriteSqlInfoRequest(byte[] buffer, int bufferSize, int handle)
-        {
-            lock (this.database.SyncObject)
-            {
-                this.database.Write(IscCodes.op_info_sql);
-                this.database.Write(handle);
-                this.database.Write(0);
-                this.database.WriteBuffer(buffer, buffer.Length);
-                this.database.Write(bufferSize);
-            }
-        }
-
         private void SafeFinishFetching(ref int numberOfResponses)
         {
             while (numberOfResponses > 0)
@@ -261,12 +196,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         #region Protected methods
         protected override void Free(int option)
         {
-            // Does	not	seem to	be possible	or necessary to	close
-            // an execute procedure	statement.
-            if (this.StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
-            {
+            if (FreeNotNeeded(option))
                 return;
-            }
 
             lock (this.database.SyncObject)
             {
