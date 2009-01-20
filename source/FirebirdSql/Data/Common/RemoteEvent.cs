@@ -72,11 +72,6 @@ namespace FirebirdSql.Data.Common
 		{
 			get
 			{
-				if (this.events == null)
-				{
-					this.events = new StringCollection();
-				}
-
 				return this.events;
 			}
 		}
@@ -124,7 +119,7 @@ namespace FirebirdSql.Data.Common
 
 		#region · Constructors ·
 
-		public RemoteEvent(IDatabase db) : this(db, 0, 0, null)
+		public RemoteEvent(IDatabase db) : this(db, 0, 0, new StringCollection())
 		{
 		}
 
@@ -144,7 +139,7 @@ namespace FirebirdSql.Data.Common
 		{
 			lock (this.db)
 			{
-				this.db.QueueEvents(this);
+                this.db.QueueEvents(this);
 			}
 		}
 
