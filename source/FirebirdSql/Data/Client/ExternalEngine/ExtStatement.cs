@@ -236,9 +236,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public override void Prepare(string commandText)
 		{
 			// Clear data
-			this.Clear();
-			this.parameters = null;
-			this.fields		= null;
+			this.ClearAll();
 
 			lock (this.db)
 			{
@@ -561,28 +559,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			}
 		}
 
-		public override byte[] GetSqlInfo(byte[] items, int bufferLength)
-		{
-			lock (this.db)
-			{
-				byte[]	buffer			= new byte[bufferLength];
-				int[]	statusVector	= ExtConnection.GetNewStatusVector();
-				int		stmtHandle		= this.handle;
-
-				SafeNativeMethods.isc_dsql_sql_info(
-					statusVector,
-					ref	stmtHandle,
-					(short)items.Length,
-					items,
-					(short)bufferLength,
-					buffer);
-
-				this.db.ParseStatusVector(statusVector);
-
-				return buffer;
-			}
-		}
-
 		#endregion
 
 		#region · Protected Methods ·
@@ -635,7 +611,29 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				this.TransactionUpdate = null;
 				this.allRowsFetched = false;
 			}
-		}
+        }
+
+        protected override byte[] GetSqlInfo(byte[] items, int bufferLength)
+        {
+            lock (this.db)
+            {
+                byte[] buffer = new byte[bufferLength];
+                int[] statusVector = ExtConnection.GetNewStatusVector();
+                int stmtHandle = this.handle;
+
+                SafeNativeMethods.isc_dsql_sql_info(
+                    statusVector,
+                    ref	stmtHandle,
+                    (short)items.Length,
+                    items,
+                    (short)bufferLength,
+                    buffer);
+
+                this.db.ParseStatusVector(statusVector);
+
+                return buffer;
+            }
+        }
 
 		#endregion
 
@@ -647,7 +645,15 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			{
 				this.outputParams.Clear();
 			}
-		}
+        }
+
+        private void ClearAll()
+        {
+            this.Clear();
+
+            this.parameters = null;
+            this.fields = null;
+        }
 
 		private void Allocate()
 		{
