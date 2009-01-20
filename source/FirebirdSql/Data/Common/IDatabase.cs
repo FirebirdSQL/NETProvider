@@ -22,7 +22,6 @@
 using System;
 using System.Data;
 using System.Collections;
-using System.Collections.Specialized;
 
 namespace FirebirdSql.Data.Common
 {

@@ -21,7 +21,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
@@ -29,6 +28,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 using FirebirdSql.Data.Common;
 
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private FbParameterCollection parameters;
         private StatementBase statement;
         private FbDataReader activeReader;
-        private StringCollection namedParameters;
+        private List<string> namedParameters;
         private string commandText;
         private bool disposed;
         private bool designTimeVisible;
@@ -357,7 +357,7 @@ namespace FirebirdSql.Data.FirebirdClient
         public FbCommand(string cmdText, FbConnection connection, FbTransaction transaction)
             : base()
         {
-            this.namedParameters = new StringCollection();
+            this.namedParameters = new List<string>();
             this.updatedRowSource = UpdateRowSource.Both;
             this.commandType = CommandType.Text;
             this.designTimeVisible = true;
