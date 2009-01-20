@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         #region · Fields ·
 
         private GdsDatabase database;
-        private Thread thread;
+        private Thread eventsThread;
         private Hashtable events;
         private int handle;
         private SynchronizationContext syncContext;
@@ -84,17 +84,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                 }
 
 #if	(!NET_CF)
-                if (this.thread == null ||
-                    (this.thread.ThreadState != ThreadState.Running &&
-                    this.thread.ThreadState != ThreadState.Background))
+                if (this.eventsThread == null ||
+                    (this.eventsThread.ThreadState != ThreadState.Running &&
+                    this.eventsThread.ThreadState != ThreadState.Background))
 #else
 				if (this.thread == null)
 #endif
                 {
-                    this.thread = new Thread(new ParameterizedThreadStart(ThreadHandler));
-                    this.thread.Name = "FirebirdClient - Events Thread";
-                    this.thread.Start(this.syncContext);
-                    this.thread.IsBackground = true;
+                    this.eventsThread = new Thread(new ParameterizedThreadStart(ThreadHandler));
+                    this.eventsThread.IsBackground = true;
+                    this.eventsThread.Name = "FirebirdClient - Events Thread";
+                    this.eventsThread.Start(this.syncContext);
                 }
             }
         }
@@ -116,12 +116,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     this.database.Detach();
                 }
 
-                if (this.thread != null)
+                if (this.eventsThread != null)
                 {
-                    this.thread.Abort();
-                    this.thread.Join();
+                    this.eventsThread.Abort();
+                    this.eventsThread.Join();
 
-                    this.thread = null;
+                    this.eventsThread = null;
                 }
             }
         }
