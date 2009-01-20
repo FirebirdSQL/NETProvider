@@ -275,7 +275,6 @@ namespace FirebirdSql.Data.Common
 		public abstract void Execute();
 		public abstract DbValue[] Fetch();
 		public abstract DbValue[] GetOutputParameters();
-		public abstract byte[] GetSqlInfo(byte[] items, int bufferLength);
 
 		public abstract BlobBase CreateBlob();
 		public abstract BlobBase CreateBlob(long handle);
@@ -288,7 +287,8 @@ namespace FirebirdSql.Data.Common
 
 		#region · Protected Abstract Methods ·
 
-		protected abstract void TransactionUpdated(object sender, EventArgs e);
+        protected abstract void TransactionUpdated(object sender, EventArgs e);
+        protected abstract byte[] GetSqlInfo(byte[] items, int bufferLength);
 		protected abstract void Free(int option);
 
 		#endregion
@@ -300,12 +300,12 @@ namespace FirebirdSql.Data.Common
 			return this.GetSqlInfo(items, IscCodes.MAX_BUFFER_SIZE);
 		}
 
-		protected int GetRecordsAffected()
-		{
-			byte[] buffer = this.GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+        protected int GetRecordsAffected()
+        {
+            byte[] buffer = this.GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
-			return this.ProcessRecordsAffectedBuffer(buffer);
-		}
+            return this.ProcessRecordsAffectedBuffer(buffer);
+        }
 
 		protected int ProcessRecordsAffectedBuffer(byte[] buffer)
 		{
@@ -365,14 +365,14 @@ namespace FirebirdSql.Data.Common
 			return insertCount + updateCount + deleteCount;
 		}
 
-		protected DbStatementType GetStatementType()
-		{
-			byte[] buffer = this.GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+        protected DbStatementType GetStatementType()
+        {
+            byte[] buffer = this.GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 
-			return this.ParseStatementTypeInfo(buffer);
-		}
+            return this.ProcessStatementTypeInfoBuffer(buffer);
+        }
 
-		protected DbStatementType ParseStatementTypeInfo(byte[] buffer)
+		protected DbStatementType ProcessStatementTypeInfoBuffer(byte[] buffer)
 		{
 			DbStatementType stmtType = DbStatementType.None;
 			int pos = 0;
