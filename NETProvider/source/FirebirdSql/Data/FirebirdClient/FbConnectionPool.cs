@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private FbConnectionString	options;
 		private ArrayList			locked;
 		private ArrayList			unlocked;
-		private Thread				cleanUpThread;
+		private Thread				cleanupThread;
 		private string				connectionString;
 		private bool				isRunning;
 		private long				lifeTime;
@@ -119,10 +119,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				this.isRunning = true;
 
-				this.cleanUpThread = new Thread(new ThreadStart(this.RunCleanup));
-				this.cleanUpThread.Name = "FirebirdClient - Connection Pooling Cleanup Thread";
-				this.cleanUpThread.Start();
-				this.cleanUpThread.IsBackground = true;
+                this.cleanupThread = new Thread(new ThreadStart(this.RunCleanup));
+                this.cleanupThread.IsBackground = true;
+				this.cleanupThread.Name = "FirebirdClient - Connection Pooling Cleanup Thread";
+				this.cleanupThread.Start();
 			}
 		}
 
@@ -428,10 +428,10 @@ namespace FirebirdSql.Data.FirebirdClient
                     if (disposing)
                     {
                         // Stop	cleanup	thread
-                        if (this.cleanUpThread != null)
+                        if (this.cleanupThread != null)
                         {
-                            this.cleanUpThread.Abort();
-                            this.cleanUpThread.Join();
+                            this.cleanupThread.Abort();
+                            this.cleanupThread.Join();
                         }
                     }
 
@@ -467,7 +467,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         this.unlocked = null;
                         this.locked = null;
                         this.connectionString = null;
-                        this.cleanUpThread = null;
+                        this.cleanupThread = null;
                         this.EmptyPool = null;
                     }
 
