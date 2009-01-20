@@ -171,7 +171,6 @@
     <Compile Include="Common\ServiceParameterBuffer.cs" />
     <Compile Include="Common\StatementBase.cs" />
     <Compile Include="Common\StatementState.cs" />
-    <Compile Include="Common\StringCollection.cs" />
     <Compile Include="Common\TransactionParameterBuffer.cs" />
     <Compile Include="Common\TransactionState.cs" />
     <Compile Include="Common\TransactionUpdateEventHandler.cs" />

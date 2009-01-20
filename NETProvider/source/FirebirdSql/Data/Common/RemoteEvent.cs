@@ -20,7 +20,7 @@
  */
 
 using System;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 
 namespace FirebirdSql.Data.Common
 {
@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Common
 		#region · Fields ·
 
 		private RemoteEventCountsCallback eventCountsCallback;
-		private StringCollection	events;
+		private List<string>	events;
 		private IDatabase	db;
 		private int			localId;
 		private int			remoteId;
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Common
 			set { this.remoteId = value; }
 		}
 
-		public StringCollection Events
+		public List<string> Events
 		{
 			get
 			{
@@ -119,11 +119,11 @@ namespace FirebirdSql.Data.Common
 
 		#region · Constructors ·
 
-		public RemoteEvent(IDatabase db) : this(db, 0, 0, new StringCollection())
+		public RemoteEvent(IDatabase db) : this(db, 0, 0, new List<string>())
 		{
 		}
 
-		public RemoteEvent(IDatabase db, int localId, int remoteId, StringCollection events)
+		public RemoteEvent(IDatabase db, int localId, int remoteId, List<string> events)
 		{
 			this.db = db;
 			this.localId = localId;

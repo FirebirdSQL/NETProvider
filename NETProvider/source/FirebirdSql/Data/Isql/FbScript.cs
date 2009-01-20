@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Isql
         #region · Properties ·
 
         /// <summary>
-        /// Returns a StringCollection containing all the SQL statements (without comments) present on the file.
+        /// Returns a FbStatementCollection containing all the SQL statements (without comments) present on the file.
         /// This property is loaded after the method call <see cref="Parse"/>.
         /// </summary>
         public FbStatementCollection Results
