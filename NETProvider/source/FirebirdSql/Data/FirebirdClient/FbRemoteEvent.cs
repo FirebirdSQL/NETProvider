@@ -200,6 +200,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #endregion
 
+        #region Finalizer
+        ~FbRemoteEvent()
+        {
+            this.Dispose(false);
+        }
+        #endregion
+
         #region IDisposable
 
         public void Dispose()
