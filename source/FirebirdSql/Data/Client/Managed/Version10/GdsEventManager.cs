@@ -132,14 +132,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         private void ThreadHandler(object o)
         {
+            int operation = -1;
+            int dbHandle = 0;
+            int eventId = 0;
+            byte[] buffer = null;
+            byte[] ast = null;
+
             try
             {
-                int operation = -1;
-                int dbHandle = 0;
-                int eventId = 0;
-                byte[] buffer = null;
-                byte[] ast = null;
-
                 while (this.events.Count > 0)
                 {
                     operation = this.database.NextOperation();
