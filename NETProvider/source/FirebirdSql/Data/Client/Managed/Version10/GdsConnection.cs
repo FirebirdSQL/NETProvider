@@ -66,7 +66,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             get { return this.protocolMinimunType; }
         }
 
-        public Boolean DataAvailable
+        public bool DataAvailable
         {
             get { return this.networkStream.DataAvailable; }
         }
