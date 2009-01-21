@@ -624,9 +624,6 @@ namespace FirebirdSql.Data.FirebirdClient
                     {
                         lock (this.innerConnection)
                         {
-                            // Close the Remote	Event Manager
-                            this.innerConnection.CloseEventManager();
-
                             // Unbind Warning messages event
                             if (this.innerConnection.Database != null)
                             {

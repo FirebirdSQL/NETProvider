@@ -221,11 +221,10 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 if (!this.disposed)
                 {
+                    this.connection.Dispose();
+
                     if (disposing)
                     {
-                        this.CancelEvents();
-                        if (this.connection != null)
-                            this.connection.Dispose();
                         this.connection = null;
                         this.revent = null;
                     }
