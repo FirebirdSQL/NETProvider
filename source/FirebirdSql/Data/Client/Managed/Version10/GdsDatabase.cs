@@ -255,8 +255,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     // Close the Event Manager
                     this.CloseEventManager();
 
-                    // Disconnection
-                    this.connection.Disconnect();
+                    // Disconnect
+                    this.CloseConnection();
 
                     // Close Input and Output streams
                     if (this.inputStream != null)
@@ -427,6 +427,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             }
         }
 
+        #endregion
+
+        #region · Connection Methods ·
+        public void CloseConnection()
+        {
+            this.connection.Disconnect();
+        }
         #endregion
 
         #region · Remote Events Methods ·

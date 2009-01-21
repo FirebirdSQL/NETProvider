@@ -231,24 +231,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         public virtual void Disconnect()
         {
-            try
+            if (this.networkStream != null)
             {
-                if (this.networkStream != null)
-                {
-                    this.networkStream.Close();
-                }
-                if (this.socket != null)
-                {
-                    this.socket.Close();
-                }
+                this.networkStream.Close();
+            }
+            if (this.socket != null)
+            {
+                this.socket.Close();
+            }
 
-                this.socket = null;
-                this.networkStream = null;
-            }
-            catch (IOException)
-            {
-                throw;
-            }
+            this.socket = null;
+            this.networkStream = null;
         }
 
         #endregion
