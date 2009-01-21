@@ -474,21 +474,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #endregion
 
-        #region · Firebird Events Methods ·
-
-        public void CloseEventManager()
-        {
-            if (this.db != null && this.db.HasRemoteEventSupport)
-            {
-                lock (this.db)
-                {
-                    this.db.CloseEventManager();
-                }
-            }
-        }
-
-        #endregion
-
         #region · Connection Verification ·
 
         public bool Verify()
