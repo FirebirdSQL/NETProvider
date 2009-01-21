@@ -24,7 +24,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    public sealed class FbRemoteEvent : IDisposable
+    public sealed class FbRemoteEvent
     {
         #region · Events ·
 
@@ -194,42 +194,6 @@ namespace FirebirdSql.Data.FirebirdClient
                 {
                     // Requeque
                     this.QueueEvents();
-                }
-            }
-        }
-
-        #endregion
-
-        #region Finalizer
-        ~FbRemoteEvent()
-        {
-            this.Dispose(false);
-        }
-        #endregion
-
-        #region IDisposable
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (!this.disposed)
-                {
-                    this.connection.Dispose();
-
-                    if (disposing)
-                    {
-                        this.connection = null;
-                        this.revent = null;
-                    }
-
-                    this.disposed = true;
                 }
             }
         }
