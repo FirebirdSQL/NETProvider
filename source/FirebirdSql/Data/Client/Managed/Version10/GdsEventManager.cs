@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             {
                 if (this.database != null)
                 {
-                    this.database.Detach();
+                    this.database.CloseConnection();
                 }
 
                 if (this.eventsThread != null)
@@ -132,15 +132,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         private void ThreadHandler(object o)
         {
-            int operation = -1;
-            int dbHandle = 0;
-            int eventId = 0;
-            byte[] buffer = null;
-            byte[] ast = null;
-
-            while (this.events.Count > 0)
+            try
             {
-                try
+                int operation = -1;
+                int dbHandle = 0;
+                int eventId = 0;
+                byte[] buffer = null;
+                byte[] ast = null;
+
+                while (this.events.Count > 0)
                 {
                     operation = this.database.NextOperation();
 
@@ -152,7 +152,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                         case IscCodes.op_exit:
                         case IscCodes.op_disconnect:
-                            this.database.Detach();
+                            this.Close();
                             return;
 
                         case IscCodes.op_event:
@@ -185,14 +185,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                             break;
                     }
                 }
-                catch (ThreadAbortException)
-                {
-                    return;
-                }
-                catch (Exception)
-                {
-                    return;
-                }
+            }
+            catch (ThreadAbortException)
+            {
+                return;
+            }
+            catch (Exception)
+            {
+                return;
             }
         }
 
