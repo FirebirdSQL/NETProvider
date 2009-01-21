@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
         }
 
-        public FbRemoteEvent(FbConnection connection, string[] events)
+        public FbRemoteEvent(FbConnection connection, params string[] events)
         {
             if (connection == null || connection.State != System.Data.ConnectionState.Open)
             {
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Methods ·
 
-        public void AddEvents(string[] events)
+        public void AddEvents(params string[] events)
         {
             if (events == null)
             {
