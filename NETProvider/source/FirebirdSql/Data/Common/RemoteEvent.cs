@@ -149,8 +149,6 @@ namespace FirebirdSql.Data.Common
 			{
 				this.db.CancelEvents(this);
 				this.ResetCounts();
-#warning // is this good place for it?
-                this.db.CloseEventManager();
 			}
 		}
 
