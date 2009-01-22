@@ -589,6 +589,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         #region op_execute/op_execute2 methods
         protected void SendExecuteToBuffer()
         {
+            // this may throw error, so it needs to be before any writing
+            byte[] descriptor = null;
+            if (this.parameters != null)
+            {
+                using (XdrStream xdr = new XdrStream(this.database.Charset))
+                {
+                    xdr.Write(this.parameters);
+                    descriptor = xdr.ToArray();
+                }
+            }
+
             // Write the message
             if (this.statementType == DbStatementType.StoredProcedure)
             {
@@ -604,8 +615,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
             if (this.parameters != null)
             {
-                byte[] descriptor = this.BuildParameterDescriptor();
-
                 this.database.WriteBuffer(this.parameters.ToBlrArray());
                 this.database.Write(0);	// Message number
                 this.database.Write(1);	// Number of messages
@@ -802,20 +811,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
             return true;
 		}
-
-        protected byte[] BuildParameterDescriptor()
-        {
-            if (this.parameters == null)
-            {
-                throw new InvalidOperationException("Cannot build descriptor from null parameters.");
-            }
-
-            using (XdrStream xdr = new XdrStream(this.database.Charset))
-            {
-                xdr.Write(this.parameters);
-                return xdr.ToArray();
-            }
-        }
 
         protected void Clear()
 		{
