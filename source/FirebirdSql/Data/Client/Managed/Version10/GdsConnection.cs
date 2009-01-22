@@ -234,7 +234,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             // socket is owned by network stream, so it'll be closed automatically
             if (this.networkStream != null)
             {
-#warning When closing events connection, in VS debugger (not in cmd etc.), server sends error 10054 into log, why?
                 this.networkStream.Close();
             }
 
