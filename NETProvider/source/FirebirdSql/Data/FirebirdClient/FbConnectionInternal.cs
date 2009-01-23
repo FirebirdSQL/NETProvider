@@ -174,16 +174,13 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 if (!this.disposed)
                 {
+                    // release any unmanaged resources
+                    this.Disconnect();
+
                     if (disposing)
                     {
-                        // Release managed resources here
-                        this.Disconnect();
+                        // release managed resources here
                     }
-
-                    // Call the appropriate methods to clean up 
-                    // unmanaged resources here.
-                    // If disposing is false, 
-                    // only the following code is executed.
 
                     this.disposed = true;
                 }
