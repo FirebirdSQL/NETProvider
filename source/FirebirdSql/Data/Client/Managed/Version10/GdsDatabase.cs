@@ -232,7 +232,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
         {
-            throw new NotSupportedException("Trusted Auth isn't supported on protocol version 10.");
+            throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
         }
 
         public virtual void Detach()
