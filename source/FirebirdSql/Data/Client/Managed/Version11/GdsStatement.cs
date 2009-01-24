@@ -202,7 +202,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             lock (this.database.SyncObject)
             {
                 DoFreePacket(option);
-#warning Lock?
                 (this.Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponse);
             }
         }
