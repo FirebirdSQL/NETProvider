@@ -36,7 +36,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private FbConnection connection;
         private RemoteEvent revent;
-        private bool disposed = false;
 
         #endregion
 
