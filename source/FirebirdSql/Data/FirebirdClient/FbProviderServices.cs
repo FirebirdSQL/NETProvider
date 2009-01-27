@@ -110,7 +110,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     }
                     else if (MetadataHelpers.IsPrimitiveType(elementType))
                     {
-                        //command.ExpectedColumnTypes = new PrimitiveType[1];
+                        command.ExpectedColumnTypes = new PrimitiveType[1];
                         command.ExpectedColumnTypes[0] = (PrimitiveType)elementType;
                     }
                     else
