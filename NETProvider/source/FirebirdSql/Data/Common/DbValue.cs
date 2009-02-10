@@ -156,7 +156,7 @@ namespace FirebirdSql.Data.Common
 		public DateTime GetDateTime()
 		{
             if (this.value is TimeSpan)
-                return new DateTime(((TimeSpan)this.value).Ticks);
+                return new DateTime(0 * 10000L + 621355968000000000 + ((TimeSpan)this.value).Ticks);
             else
                 return Convert.ToDateTime(this.value, CultureInfo.CurrentCulture.DateTimeFormat);
 		}
