@@ -496,6 +496,7 @@ namespace FirebirdSql.Data.Common
 
         public Type GetSystemType()
         {
+#warning What about using TypeHelper.GetSystemDataTypeName?
             switch (this.DbDataType)
             {
                 case DbDataType.Char:

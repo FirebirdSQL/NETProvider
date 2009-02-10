@@ -155,7 +155,10 @@ namespace FirebirdSql.Data.Common
 
 		public DateTime GetDateTime()
 		{
-			return Convert.ToDateTime(this.value, CultureInfo.CurrentCulture.DateTimeFormat);
+            if (this.value is TimeSpan)
+                return new DateTime(((TimeSpan)this.value).Ticks);
+            else
+                return Convert.ToDateTime(this.value, CultureInfo.CurrentCulture.DateTimeFormat);
 		}
 
 		public Array GetArray()
