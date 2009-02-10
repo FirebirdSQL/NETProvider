@@ -645,7 +645,6 @@ namespace FirebirdSql.Data.FirebirdClient
         public override DateTime GetDateTime(int i)
         {
             this.CheckPosition();
-
             this.CheckIndex(i);
 
             return this.row[i].GetDateTime();
