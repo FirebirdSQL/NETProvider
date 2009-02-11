@@ -118,8 +118,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                 if (this.eventsThread != null)
                 {
-                    this.eventsThread.Abort();
-                    this.eventsThread.Join();
+                    // we don't have here clue about disposing vs. finalizer
+                    if (!Environment.HasShutdownStarted)
+                    {
+                        this.eventsThread.Abort();
+                        this.eventsThread.Join();
+                    }
 
                     this.eventsThread = null;
                 }
