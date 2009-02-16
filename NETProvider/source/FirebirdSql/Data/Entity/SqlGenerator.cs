@@ -1713,20 +1713,34 @@ namespace FirebirdSql.Data.Entity
         {
             Debug.Assert(e.Count is DbConstantExpression || e.Count is DbParameterReferenceExpression, "DbSkipExpression.Count is of invalid expression type");
 
-            SqlSelectStatement result = VisitExpressionEnsureSqlStatement(e.Input.Expression, false);
+            //Visit the input
             Symbol fromSymbol;
+            SqlSelectStatement result = VisitInputExpression(e.Input.Expression, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
 
+            // Skip is not compatible with anything that OrderBy is not compatible with, as well as with distinct
             if (!IsCompatible(result, e.ExpressionKind))
             {
-                TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(e.Input.VariableType);
-
-                result = CreateNewSelectStatement(result, "skip", inputType, out fromSymbol);
-                AddFromSymbol(result, "skip", fromSymbol, false);
+                result = CreateNewSelectStatement(result, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
             }
 
-            ISqlFragment skipCount = HandleCountExpression(e.Count);
+            selectStatementStack.Push(result);
+            symbolTable.EnterScope();
 
+            AddFromSymbol(result, e.Input.VariableName, fromSymbol);
+
+            //Add the default columns
+            Debug.Assert(result.Select.IsEmpty);
+            AddDefaultColumns(result);
+
+            ISqlFragment skipCount = HandleCountExpression(e.Count);
             result.Skip = new SkipClause(skipCount);
+
+            // Add the sorting info
+            AddSortKeys(result.OrderBy, e.SortOrder);
+
+            symbolTable.ExitScope();
+            selectStatementStack.Pop();
+
             return result;
         }
 
