@@ -144,20 +144,20 @@ namespace FirebirdSql.Data.Entity
     {
         #region · Fields ·
 
-        private bool                        isDistinct;
-        private List<Symbol>                allJoinExtents;
-        private List<Symbol>                fromExtents;
-        private Dictionary<Symbol, bool>    outerExtents;
-        private FirstClause                 first;
-        private SkipClause                  skip;
-        private SqlBuilder                  select = new SqlBuilder();
-        private SqlBuilder                  from = new SqlBuilder();
-        private SqlBuilder                  where;
-        private SqlBuilder                  groupBy;
-        private SqlBuilder                  orderBy;
+        private bool isDistinct;
+        private List<Symbol> allJoinExtents;
+        private List<Symbol> fromExtents;
+        private Dictionary<Symbol, bool> outerExtents;
+        private FirstClause first;
+        private SkipClause skip;
+        private SqlBuilder select = new SqlBuilder();
+        private SqlBuilder from = new SqlBuilder();
+        private SqlBuilder where;
+        private SqlBuilder groupBy;
+        private SqlBuilder orderBy;
         //indicates whether it is the top most select statement, 
         // if not Order By should be omitted unless there is a corresponding TOP
-        private bool                        isTopMost;
+        private bool isTopMost;
 
         #endregion
 
@@ -187,7 +187,7 @@ namespace FirebirdSql.Data.Entity
             get { return this.isDistinct; }
             set { this.isDistinct = value; }
         }
-        
+
         internal List<Symbol> AllJoinExtents
         {
             get { return this.allJoinExtents; }
@@ -195,7 +195,7 @@ namespace FirebirdSql.Data.Entity
             // since we use this field only in special cases.
             set { this.allJoinExtents = value; }
         }
-        
+
         internal List<Symbol> FromExtents
         {
             get
@@ -207,7 +207,7 @@ namespace FirebirdSql.Data.Entity
                 return this.fromExtents;
             }
         }
-        
+
         internal Dictionary<Symbol, bool> OuterExtents
         {
             get
@@ -332,7 +332,7 @@ namespace FirebirdSql.Data.Entity
                         outerExtentAliases.Add(outerExtent.NewName);
                     }
                 }
-            }        
+            }
 
             // An then rename each of the FromExtents we have
             // If AllJoinExtents is non-null - it has precedence.
@@ -421,7 +421,7 @@ namespace FirebirdSql.Data.Entity
                 this.GroupBy.WriteSql(writer, sqlGenerator);
             }
 
-            if ((this.orderBy != null) && !this.OrderBy.IsEmpty && (this.IsTopMost || this.First != null))
+            if ((this.orderBy != null) && !this.OrderBy.IsEmpty && (this.IsTopMost || this.First != null || this.Skip != null))
             {
                 writer.WriteLine();
                 writer.Write("ORDER BY ");
