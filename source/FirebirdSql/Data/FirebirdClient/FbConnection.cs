@@ -503,7 +503,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     throw new InvalidOperationException("ChangeDatabase requires an open and available Connection.");
                 }
 
-                if (db == null || db.Trim().Length == 0)
+                if (string.IsNullOrEmpty(db))
                 {
                     throw new InvalidOperationException("Database name is not valid.");
                 }
