@@ -71,6 +71,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             get { return this.networkStream.DataAvailable; }
         }
 
+        internal IPAddress IPAddress { get; private set; }
+
         #endregion
 
         #region · Constructors ·
@@ -98,8 +100,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         {
             try
             {
-                IPAddress hostadd = this.GetIPAddress(this.dataSource, AddressFamily.InterNetwork);
-                IPEndPoint endPoint = new IPEndPoint(hostadd, this.portNumber);
+                this.IPAddress = this.GetIPAddress(this.dataSource, AddressFamily.InterNetwork);
+                IPEndPoint endPoint = new IPEndPoint(this.IPAddress, this.portNumber);
 
                 this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
