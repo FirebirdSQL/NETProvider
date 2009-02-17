@@ -406,12 +406,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
                     respLen -= 2;
 
+                    // * The address returned by the server may be incorrect if it is behind a NAT box
+                    // * so we must use the address that was used to connect the main socket, not the
+                    // * address reported by the server.
                     // sin_addr
                     buffer = this.ReadBytes(4);
-                    ipAddress = string.Format(
-                        CultureInfo.InvariantCulture,
-                        "{0}.{1}.{2}.{3}",
-                        buffer[0], buffer[1], buffer[2], buffer[3]);
+                    //ipAddress = string.Format(
+                    //    CultureInfo.InvariantCulture,
+                    //    "{0}.{1}.{2}.{3}",
+                    //    buffer[0], buffer[1], buffer[2], buffer[3]);
+                    ipAddress = this.connection.IPAddress.ToString();
                     respLen -= 4;
 
                     // garbage
