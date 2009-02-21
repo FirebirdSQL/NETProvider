@@ -140,11 +140,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public FbConnectionPool CreatePool(string connectionString)
         {
-            FbConnectionPool pool = null;
-
             lock (this.SyncObject)
             {
-                pool = this.FindPool(connectionString);
+                FbConnectionPool pool = this.FindPool(connectionString);
 
                 if (pool == null)
                 {
@@ -154,20 +152,18 @@ namespace FirebirdSql.Data.FirebirdClient
 
                         // Create an empty pool	handler
                         EmptyPoolEventHandler handler = new EmptyPoolEventHandler(this.OnEmptyPool);
-
-                        this.Handlers.Add(hashcode, handler);
-
                         // Create the new connection pool
                         pool = new FbConnectionPool(connectionString);
 
+                        this.Handlers.Add(hashcode, handler);
                         this.Pools.Add(hashcode, pool);
 
                         pool.EmptyPool += handler;
                     }
                 }
-            }
 
-            return pool;
+                return pool;
+            }
         }
 
         public void ClearAllPools()
