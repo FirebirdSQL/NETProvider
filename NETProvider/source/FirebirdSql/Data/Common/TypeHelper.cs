@@ -322,7 +322,7 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.VarChar:
 					return "VARCHAR";
 
-				case DbDataType.SmallInt:
+                case DbDataType.SmallInt:
 					return "SMALLINT";
 
 				case DbDataType.Integer:
@@ -449,6 +449,9 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.Guid:
 					return DbType.Guid;
+
+                case DbDataType.Boolean:
+                    return DbType.Boolean;
 
 				default:
 					throw new ArgumentException("Invalid data type");
