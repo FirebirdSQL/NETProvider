@@ -73,15 +73,16 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     {
                         numberOfResponses--;
                         GenericResponse allocateResponse = this.database.ReadGenericResponse();
-                        this.ProcessAllocateResponce(allocateResponse);
 
                         numberOfResponses--;
                         GenericResponse prepareResponse = this.database.ReadGenericResponse();
                         bool deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
-                        this.ProcessPrepareResponse(prepareResponse);
 
                         numberOfResponses--;
                         GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
+
+                        this.ProcessAllocateResponce(allocateResponse);
+                        this.ProcessPrepareResponse(prepareResponse);
                         this.statementType = this.ProcessStatementTypeInfoBuffer(this.ProcessInfoSqlResponse(statementTypeResponse));
                     }
                     finally
@@ -141,22 +142,28 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         (this.StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
                     try
                     {
+                        SqlResponse sqlStoredProcedureResponse = null;
                         if (this.StatementType == DbStatementType.StoredProcedure)
                         {
                             numberOfResponses--;
-                            SqlResponse sqlResponse = this.database.ReadSqlResponse();
-                            this.ProcessStoredProcedureExecuteResponse(sqlResponse);
+                            sqlStoredProcedureResponse = this.database.ReadSqlResponse();
                         }
 
                         numberOfResponses--;
                         GenericResponse executeResponse = this.database.ReadGenericResponse();
 
+                        GenericResponse rowsAffectedResponse = null;
                         if (readRowsAffectedResponse)
                         {
                             numberOfResponses--;
-                            GenericResponse rowsAffectedResponse = this.database.ReadGenericResponse();
-                            this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
+                            rowsAffectedResponse = this.database.ReadGenericResponse();
                         }
+
+                        if (sqlStoredProcedureResponse != null)
+                            this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
+                        this.ProcessExecuteResponse(executeResponse);
+                        if (rowsAffectedResponse != null)
+                            this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
                     }
                     finally
                     {
