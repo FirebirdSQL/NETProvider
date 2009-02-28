@@ -24,6 +24,7 @@ using System.Collections.Specialized;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
 using NUnit.Framework;
+using System.Text;
 
 namespace FirebirdSql.Data.UnitTests
 {
@@ -71,6 +72,33 @@ namespace FirebirdSql.Data.UnitTests
                     {
                         Assert.AreEqual(value, (string)reader[0]);
                     }
+                }
+            }
+        }
+
+        [Test]
+        public void DNET217()
+        {
+            StringBuilder cols = new StringBuilder();
+            string separator = string.Empty;
+            for (int i = 0; i < 1235; i++)
+            {
+                if (i % 2 == 0)
+                    cols.AppendFormat("{0}'r' as col{1}", separator, i);
+                else
+                    cols.AppendFormat("{0}24 as col{1}", separator, i);
+
+                separator = ",";
+            }
+            using (FbCommand cmd = Connection.CreateCommand())
+            {
+                cmd.CommandText = "select " + cols.ToString() + " from rdb$database where 'x' = @x or 'x' = @x and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y";
+                cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "-1" });
+                cmd.Parameters.Add(new FbParameter() { ParameterName = "@y", Value = DateTime.Now });
+                using (FbDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    { }
                 }
             }
         }
