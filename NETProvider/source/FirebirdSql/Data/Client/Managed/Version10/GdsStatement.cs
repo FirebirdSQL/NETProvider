@@ -18,7 +18,7 @@
  */
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
@@ -38,8 +38,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected StatementState	state;
 		protected DbStatementType   statementType;
 		protected bool			    allRowsFetched;
-		private Queue			    rows;
-		private Queue			    outputParams;
+		private Queue<DbValue[]>    rows;
+		private Queue<DbValue[]>    outputParams;
 		private int				    recordsAffected;
 		private int				    fetchSize;
         private bool                returnRecordsAffected;
@@ -159,8 +159,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             this.handle = IscCodes.INVALID_OBJECT;
             this.recordsAffected = -1;
 			this.fetchSize		= 200;
-			this.rows			= new Queue();
-			this.outputParams	= new Queue();
+			this.rows			= new Queue<DbValue[]>();
+			this.outputParams	= new Queue<DbValue[]>();
 
 			this.database = (GdsDatabase)db;
 
@@ -319,6 +319,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 
                     GenericResponse executeResponse = this.database.ReadGenericResponse();
+                    this.ProcessExecuteResponse(executeResponse);
  
 					// Updated number of records affected by the statement execution			
 					if (this.ReturnRecordsAffected &&
@@ -413,7 +414,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (this.rows != null && this.rows.Count > 0)
 			{
-				return (DbValue[])this.rows.Dequeue();
+				return this.rows.Dequeue();
 			}
 			else
 			{
@@ -427,7 +428,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (this.outputParams.Count > 0)
 			{
-				return (DbValue[])this.outputParams.Dequeue();
+				return this.outputParams.Dequeue();
 			}
 
 			return null;
@@ -462,9 +463,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         protected void ProcessPrepareResponse(GenericResponse response)
         {
-            int lastPosition = 0;
-            this.fields = this.ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref lastPosition);
-            this.parameters = this.ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref lastPosition);
+            Descriptor[] descriptors = new Descriptor[] { null, null };
+            this.ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref descriptors);
+            this.fields = descriptors[0];
+            this.parameters = descriptors[1];
         }
         #endregion
 
@@ -634,6 +636,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             }
         }
 
+        protected void ProcessExecuteResponse(GenericResponse response)
+        { 
+            // nothing to do here
+        }
+
         protected void ProcessStoredProcedureExecuteResponse(SqlResponse response)
         {
             try
@@ -690,127 +697,139 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return row;
         }
 
-        protected Descriptor ParseSqlInfo(byte[] info, byte[] items, ref int lastPosition)
-		{
-			Descriptor rowDesc = null;
-            int lastIndex;
+        protected void ParseSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
+        {
+            this.ParseTruncSqlInfo(info, items, ref rowDescs);
+        }
 
-			while (!this.ParseTruncSqlInfo(info, ref rowDesc, out lastIndex, ref lastPosition))
-			{
-				lastIndex--;			   // Is this OK ?
-
-				byte[] new_items = new byte[4 + items.Length];
-
-				new_items[0] = IscCodes.isc_info_sql_sqlda_start;
-				new_items[1] = 2;
-				new_items[2] = (byte)(lastIndex & 255);
-				new_items[3] = (byte)(lastIndex >> 8);
-
-				Array.Copy(items, 0, new_items, 4, items.Length);
-
-				info = this.GetSqlInfo(new_items, info.Length);
-			}
-
-			return rowDesc;
-		}
-
-        protected bool ParseTruncSqlInfo(byte[] info, ref Descriptor rowDesc, out int lastIndex, ref int currentPosition)
-		{
-			lastIndex = 0;
-            currentPosition = currentPosition + 2;
-
-			int len = IscHelper.VaxInteger(info, currentPosition, 2);
-			currentPosition += 2;
-			int n = IscHelper.VaxInteger(info, currentPosition, len);
-			currentPosition += len;
-
-			if (rowDesc == null)
-			{
-				rowDesc = new Descriptor((short)n);
-			}
-
-            byte item;
-            while (info[currentPosition] != IscCodes.isc_info_end &&
-                info[currentPosition] != IscCodes.isc_info_sql_select && info[currentPosition] != IscCodes.isc_info_sql_bind)
+        protected void ParseTruncSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
+        {
+            int currentPosition = 0;
+            int currentDescriptorIndex = -1;
+            int currentItemIndex = 0;
+            while (info[currentPosition] != IscCodes.isc_info_end)
             {
+                bool jumpOutOfInnerLoop = false;
+                byte item;
                 while ((item = info[currentPosition++]) != IscCodes.isc_info_sql_describe_end)
                 {
                     switch (item)
                     {
+                        case IscCodes.isc_info_truncated:
+                            currentItemIndex--;
+
+                            List<byte> newItems = new List<byte>(items.Length);
+                            int part = 0;
+                            int chock = 0;
+                            for (int i = 0; i < items.Length; i++)
+                            {
+                                if (items[i] == IscCodes.isc_info_sql_describe_end)
+                                {
+                                    newItems.Insert(chock, IscCodes.isc_info_sql_sqlda_start);
+                                    newItems.Insert(chock + 1, 2);
+                                    newItems.Insert(chock + 2, (byte)((part == currentDescriptorIndex ? currentItemIndex : 0) & 255));
+                                    newItems.Insert(chock + 3, (byte)((part == currentDescriptorIndex ? currentItemIndex : 0) >> 8));
+
+                                    part++;
+                                    chock = i + 4 + 1;
+                                }
+                                newItems.Add(items[i]);
+                            }
+
+                            info = this.GetSqlInfo(newItems.ToArray(), info.Length);
+
+                            currentPosition = 0;
+                            currentDescriptorIndex--;
+                            jumpOutOfInnerLoop = true;
+                            break;
+
+                        case IscCodes.isc_info_sql_select:
+                        case IscCodes.isc_info_sql_bind:
+                            currentDescriptorIndex++;
+
+                            currentPosition++;
+                            int len = IscHelper.VaxInteger(info, currentPosition, 2);
+                            currentPosition += 2;
+                            if (rowDescs[currentDescriptorIndex] == null)
+                            {
+                                int n = IscHelper.VaxInteger(info, currentPosition, len);
+                                rowDescs[currentDescriptorIndex] = new Descriptor((short)n);
+                                jumpOutOfInnerLoop = (n == 0);
+                            }
+                            currentPosition += len;
+                            break;
+
                         case IscCodes.isc_info_sql_sqlda_seq:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            lastIndex = IscHelper.VaxInteger(info, currentPosition, len);
+                            currentItemIndex = IscHelper.VaxInteger(info, currentPosition, len);
                             currentPosition += len;
                             break;
 
                         case IscCodes.isc_info_sql_type:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            rowDesc[lastIndex - 1].DataType = (short)IscHelper.VaxInteger(info, currentPosition, len);
+                            rowDescs[currentDescriptorIndex][currentItemIndex - 1].DataType = (short)IscHelper.VaxInteger(info, currentPosition, len);
                             currentPosition += len;
                             break;
 
                         case IscCodes.isc_info_sql_sub_type:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            rowDesc[lastIndex - 1].SubType = (short)IscHelper.VaxInteger(info, currentPosition, len);
+                            rowDescs[currentDescriptorIndex][currentItemIndex - 1].SubType = (short)IscHelper.VaxInteger(info, currentPosition, len);
                             currentPosition += len;
                             break;
 
                         case IscCodes.isc_info_sql_scale:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            rowDesc[lastIndex - 1].NumericScale = (short)IscHelper.VaxInteger(info, currentPosition, len);
+                            rowDescs[currentDescriptorIndex][currentItemIndex - 1].NumericScale = (short)IscHelper.VaxInteger(info, currentPosition, len);
                             currentPosition += len;
                             break;
 
                         case IscCodes.isc_info_sql_length:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            rowDesc[lastIndex - 1].Length = (short)IscHelper.VaxInteger(info, currentPosition, len);
+                            rowDescs[currentDescriptorIndex][currentItemIndex - 1].Length = (short)IscHelper.VaxInteger(info, currentPosition, len);
                             currentPosition += len;
                             break;
 
                         case IscCodes.isc_info_sql_field:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            rowDesc[lastIndex - 1].Name = this.database.Charset.GetString(info, currentPosition, len);
+                            rowDescs[currentDescriptorIndex][currentItemIndex - 1].Name = this.database.Charset.GetString(info, currentPosition, len);
                             currentPosition += len;
                             break;
 
                         case IscCodes.isc_info_sql_relation:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            rowDesc[lastIndex - 1].Relation = this.database.Charset.GetString(info, currentPosition, len);
+                            rowDescs[currentDescriptorIndex][currentItemIndex - 1].Relation = this.database.Charset.GetString(info, currentPosition, len);
                             currentPosition += len;
                             break;
 
                         case IscCodes.isc_info_sql_owner:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            rowDesc[lastIndex - 1].Owner = this.database.Charset.GetString(info, currentPosition, len);
+                            rowDescs[currentDescriptorIndex][currentItemIndex - 1].Owner = this.database.Charset.GetString(info, currentPosition, len);
                             currentPosition += len;
                             break;
 
                         case IscCodes.isc_info_sql_alias:
                             len = IscHelper.VaxInteger(info, currentPosition, 2);
                             currentPosition += 2;
-                            rowDesc[lastIndex - 1].Alias = this.database.Charset.GetString(info, currentPosition, len);
+                            rowDescs[currentDescriptorIndex][currentItemIndex - 1].Alias = this.database.Charset.GetString(info, currentPosition, len);
                             currentPosition += len;
                             break;
-
-                        case IscCodes.isc_info_truncated:
-                            return false;
 
                         default:
                             throw new IscException(IscCodes.isc_dsql_sqlda_err);
                     }
+                    if (jumpOutOfInnerLoop)
+                        break;
                 }
             }
-
-            return true;
-		}
+        }
 
         protected void Clear()
 		{
