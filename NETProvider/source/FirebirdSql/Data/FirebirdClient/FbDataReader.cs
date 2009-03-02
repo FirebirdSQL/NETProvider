@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
@@ -49,6 +50,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private bool isClosed;
         private int position;
         private int recordsAffected;
+        private Dictionary<string, int> columnsIndexes;
 
         #endregion
 
@@ -369,15 +371,19 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             this.CheckState();
 
-            for (int i = 0; i < this.fields.Count; i++)
+            if (columnsIndexes == null)
             {
-                if (name.ToLower(CultureInfo.InvariantCulture) == this.fields[i].Alias.ToLower(CultureInfo.InvariantCulture))
+                columnsIndexes = new Dictionary<string, int>(this.fields.Count);
+                for (int i = 0; i < this.fields.Count; i++)
                 {
-                    return i;
+                    columnsIndexes.Add(this.fields[i].Alias.ToUpper(), i);
                 }
             }
 
-            throw new IndexOutOfRangeException("Could not find specified column in results.");
+            int index;
+            if (!columnsIndexes.TryGetValue(name.ToUpper(), out index))
+                throw new IndexOutOfRangeException("Could not find specified column in results.");
+            return index;
         }
 
         public override string GetName(int i)
