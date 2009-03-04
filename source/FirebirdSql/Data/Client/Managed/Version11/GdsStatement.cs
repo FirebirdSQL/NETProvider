@@ -147,6 +147,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         {
                             numberOfResponses--;
                             sqlStoredProcedureResponse = this.database.ReadSqlResponse();
+                            this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
                         }
 
                         numberOfResponses--;
@@ -159,8 +160,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                             rowsAffectedResponse = this.database.ReadGenericResponse();
                         }
 
-                        if (sqlStoredProcedureResponse != null)
-                            this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
                         this.ProcessExecuteResponse(executeResponse);
                         if (rowsAffectedResponse != null)
                             this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
