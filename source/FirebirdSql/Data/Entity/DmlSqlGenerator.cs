@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Entity
     {
         #region · Static Fields ·
 
-        private static readonly int commandTextBuilderInitialCapacity = 256;
+        private const int CommandTextBuilderInitialCapacity = 256;
 
         #endregion
 
@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Entity
 
         internal static string GenerateUpdateSql(DbUpdateCommandTree tree, out List<DbParameter> parameters)
         {
-            StringBuilder commandText = new StringBuilder(commandTextBuilderInitialCapacity);
+            StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
             ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
             bool first = true;
 
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.Entity
 
         internal static string GenerateDeleteSql(DbDeleteCommandTree tree, out List<DbParameter> parameters)
         {
-            StringBuilder commandText = new StringBuilder(commandTextBuilderInitialCapacity);
+            StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
             ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, false);
 
             // delete [schemaName].[tableName]
@@ -130,7 +130,7 @@ namespace FirebirdSql.Data.Entity
 
         internal static string GenerateInsertSql(DbInsertCommandTree tree, out List<DbParameter> parameters)
         {
-            StringBuilder commandText = new StringBuilder(commandTextBuilderInitialCapacity);
+            StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
             ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
             bool first = true;
 
