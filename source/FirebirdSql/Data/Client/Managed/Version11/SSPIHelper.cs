@@ -251,7 +251,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		#endregion
 
-		#region Constrictors
+		#region Constructors
 
 		/// <summary>
 		/// Creates SSPIHelper with default "NTLM" security package and no remote principal and gets client credentials
