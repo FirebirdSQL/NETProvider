@@ -25,7 +25,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET;NET_20;NET_35;ENTITY_FRAMEWORK;VISUAL_STUDIO;EXTERNAL_ENGINE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_35;ENTITY_FRAMEWORK;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -33,7 +33,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'EntityFW|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\EntityFW\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET;NET_20;NET_35;ENTITY_FRAMEWORK;VISUAL_STUDIO;EXTERNAL_ENGINE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_35;ENTITY_FRAMEWORK;</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>false</Optimize>
     <DebugType>full</DebugType>
@@ -42,7 +42,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NET;NET_20;NET_35;ENTITY_FRAMEWORK;VISUAL_STUDIO</DefineConstants>
+    <DefineConstants>TRACE;NET_35;ENTITY_FRAMEWORK;</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -50,7 +50,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_20|AnyCPU' ">
     <OutputPath>bin\Release_20\</OutputPath>
-    <DefineConstants>TRACE;NET;NET_20;VISUAL_STUDIO</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>

@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Properties ·
 
-#if	(NET)
+#if	(!NET_CF)
         [Category("Data")]
         [DefaultValue("")]
         [RefreshProperties(RefreshProperties.All)]

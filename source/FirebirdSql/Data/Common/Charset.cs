@@ -98,7 +98,7 @@ namespace FirebirdSql.Data.Common
             charsets.Add(new Charset(21, "ISO8859_1", 1, "iso-8859-1"));
             // ISO 8859-2, Latin alphabet No. 2
             charsets.Add(new Charset(22, "ISO8859_2", 1, "iso-8859-2"));
-#if (NET)
+#if (!MONO)
             // Windows Korean	
             charsets.Add(new Charset(44, "KSC_5601", 2, "ks_c_5601-1987"));
 #endif

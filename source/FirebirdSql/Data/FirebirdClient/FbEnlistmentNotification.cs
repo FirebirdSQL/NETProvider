@@ -16,7 +16,7 @@
  *	All Rights Reserved.
  */
 
-#if (NET)
+#if (!NET_CF)
 
 using System;
 using System.Collections.Generic;

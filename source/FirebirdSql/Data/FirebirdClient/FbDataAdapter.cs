@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (NET)
+#if (!NET_CF)
     [DefaultEvent("RowUpdated")]
 #endif
     public sealed class FbDataAdapter : DbDataAdapter, ICloneable

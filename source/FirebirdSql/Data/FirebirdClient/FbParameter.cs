@@ -25,7 +25,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if	(NET)
+#if	(!NET_CF)
     [ParenthesizePropertyName(true)]
 #endif
     public sealed class FbParameter : DbParameter, ICloneable
