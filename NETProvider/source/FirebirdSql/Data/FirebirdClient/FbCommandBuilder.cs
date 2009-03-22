@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Properties ·
 
-#if (NET)
+#if (!NET_CF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if (NET)
+#if (!NET_CF)
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -155,7 +155,7 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if (NET)
+#if (!NET_CF)
         [DefaultValue(null)]
 #endif
         public new FbDataAdapter DataAdapter

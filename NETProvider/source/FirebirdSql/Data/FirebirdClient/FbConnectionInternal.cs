@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private bool pooled;
         private bool disposed;
 
-#if (NET)
+#if (!NET_CF)
         private FbEnlistmentNotification enlistmentNotification;
 #endif
 
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public bool IsEnlisted
         {
-#if (NET)
+#if (!NET_CF)
             get { return this.enlistmentNotification != null && !this.enlistmentNotification.IsCompleted; }
 #else
             get { return false; }
@@ -350,8 +350,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Transaction Enlistement ·
 
-#if (NET)
-
+#if (!NET_CF)
         public void EnlistTransaction(System.Transactions.Transaction transaction)
         {
             if (this.owningConnection != null && this.options.Enlist)
@@ -402,7 +401,6 @@ namespace FirebirdSql.Data.FirebirdClient
                     return this.BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
             }
         }
-
 #endif
 
         #endregion

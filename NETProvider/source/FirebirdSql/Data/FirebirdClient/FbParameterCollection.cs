@@ -31,7 +31,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if	(NET)
+#if	(!NET_CF)
     [ListBindable(false)]
 #endif
     public sealed class FbParameterCollection : DbParameterCollection

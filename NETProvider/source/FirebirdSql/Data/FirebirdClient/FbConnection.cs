@@ -179,7 +179,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Properties ·
 
-#if	(NET)
+#if	(!NET_CF)
         [Category("Data")]
         [SettingsBindable(true)]
         [RefreshProperties(RefreshProperties.All)]
@@ -432,8 +432,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Transaction Enlistement ·
 
-#if (NET)
-
+#if (!NET_CF)
         public override void EnlistTransaction(System.Transactions.Transaction transaction)
         {
             if (this.State != ConnectionState.Open)
@@ -443,7 +442,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
             this.innerConnection.EnlistTransaction(transaction);
         }
-
 #endif
 
         #endregion
@@ -545,7 +543,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 {
                     throw new InvalidOperationException("Connection already Open.");
                 }
-#if (NET)
+#if (!NET_CF)
                 if (this.options.Enlist && System.Transactions.Transaction.Current == null)
                 {
                     throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
@@ -570,7 +568,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         this.innerConnection.Connect();
                     }
 
-#if (NET)
+#if (!NET_CF)
                     try
                     {
                         this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
