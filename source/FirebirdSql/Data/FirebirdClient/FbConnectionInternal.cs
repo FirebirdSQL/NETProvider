@@ -532,13 +532,23 @@ namespace FirebirdSql.Data.FirebirdClient
                 dpb.Append(IscCodes.isc_dpb_password, options.Password);
             }
 
-#if (NET_CF) 
-            // for CF we can implement GetModuleFileName from coredll
-#else
-            dpb.Append(IscCodes.isc_dpb_process_name, Process.GetCurrentProcess().MainModule.FileName);
-#endif
+            dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
 
             return dpb;
+        }
+
+        private string GetProcessName()
+        {
+#if (NET_CF) 
+            // for CF we can implement GetModuleFileName from coredll
+            return "fbnetcf";
+#else
+            // showing ApplicationPhysicalPath may be wrong because of connection pooling; better idea?
+            if (System.Web.Hosting.HostingEnvironment.IsHosted)
+                return System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
+            else
+                return Process.GetCurrentProcess().MainModule.FileName;
+#endif
         }
 
         #endregion
