@@ -23,7 +23,6 @@
 using System;
 using System.Text;
 using System.Collections;
-using System.Security.Principal;
 using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
