@@ -16,6 +16,8 @@
  *	All Rights Reserved.
  */
 
+#if (!NET_CF)
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -282,3 +284,5 @@ namespace FirebirdSql.Data.Client.Native
 		}
 	}
 }
+
+#endif
