@@ -264,6 +264,8 @@ namespace FirebirdSql.Data.Entity
                 startBlock.Append(item.Value.ParameterName.Replace("@", ""));
                 startBlock.Append(" ");
                 startBlock.Append(SqlGenerator.GetSqlPrimitiveType(item.Key.TypeUsage));
+                if (item.Key.TypeUsage.EdmType.FullName == "FirebirdClient.varchar" || item.Key.TypeUsage.EdmType.FullName == "FirebirdClient.char")
+                    startBlock.Append(" character set utf8");
                 startBlock.Append(" = ");
                 startBlock.Append(item.Value.ParameterName);
 
