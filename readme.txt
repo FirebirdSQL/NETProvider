@@ -2,9 +2,10 @@ README - FirebirdClient ADO.NET 2.0 Data provider for Firebird
 ==============================================================
 
 This project is supported by:
----- ------- -- --------- ---
+-----------------------------
 
-	Sean Leyne ( Broadview Software )
+	Sean Leyne (Broadview Software)
+	SMS-Timing
 
 
 Developement list
@@ -15,9 +16,9 @@ You can subscribe to the developement list at:
 	http://lists.sourceforge.net/lists/listinfo/firebird-net-provider
 
 
-You can access to the lastest developement sources through CVS, see:
+You can access to the lastest developement sources through SVN, see:
 
-	http://sourceforge.net/cvs/?group_id=9028
+	http://firebird.svn.sourceforge.net/viewvc/firebird/NETProvider/
 
 
 Reporting Bugs
@@ -26,9 +27,9 @@ Reporting Bugs
 Yo can report bugs using two ways:
 
 1. Sending it to the developement list.
-2. If you have a Sourceforge ID you can send it using the Bugs section of the Firebird Project web page (category .Net Provider):
+2. Thru the Firebird Project tracker (category DNET):
 
 
-	http://sourceforge.net/tracker/?group_id=9028&atid=109028
+	http://tracker.firebirdsql.org/DNET
 
 
