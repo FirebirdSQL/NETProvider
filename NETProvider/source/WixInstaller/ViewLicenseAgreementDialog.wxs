@@ -21,9 +21,9 @@
 					<Publish Event="SpawnDialog" Value="CancelDialog">1</Publish>
 				</Control>
 				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" FixedSize="yes" TabSkip="no" Text="banner.bmp" />
-				<Control Id="AgreementText" Type="ScrollableText" X="20" Y="60" Width="330" Height="120" Sunken="yes" TabSkip="no">
-					<Text SourceFile="$(var.SolutionDir)../license.txt"/>
-				</Control>	
+        <Control Id="AgreementText" Type="ScrollableText" X="20" Y="60" Width="330" Height="120" Sunken="yes" TabSkip="no">
+					<Text SourceFile="$(var.SolutionDir)../license.rtf"/>
+				</Control>
 				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
 				<Control Id="BottomLine" Type="Line" X="4" Y="234" Width="370" Height="0" />
 				<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
