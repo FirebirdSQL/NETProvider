@@ -92,6 +92,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                             this.Flush();
                             response = this.ReadResponse();
                         }
+
                         // Save the database connection handle
                         this.handle = ((GenericResponse)response).ObjectHandle;
                     }
@@ -167,9 +168,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 // copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
                 Action<IResponse>[] methods = DeferredPackets.ToArray();
                 DeferredPackets.Clear();
-                foreach (var method in methods)
+                foreach (Action<IResponse> method in methods)
                 {
-#warning What about exceptions here?
                     method(ReadSingleResponse());
                 }
             }
