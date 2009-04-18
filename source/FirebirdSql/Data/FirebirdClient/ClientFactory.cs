@@ -82,6 +82,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
             switch (connection.ProtocolVersion)
             {
+                case IscCodes.PROTOCOL_VERSION12:
                 case IscCodes.PROTOCOL_VERSION11:
                     return new FirebirdSql.Data.Client.Managed.Version11.GdsDatabase(connection);
                 case IscCodes.PROTOCOL_VERSION10:
@@ -100,6 +101,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
             switch (connection.ProtocolVersion)
             {
+                case IscCodes.PROTOCOL_VERSION12:
                 case IscCodes.PROTOCOL_VERSION11:
                 case IscCodes.PROTOCOL_VERSION10:
                     return new FirebirdSql.Data.Client.Managed.Version10.GdsServiceManager(connection);
