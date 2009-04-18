@@ -107,12 +107,18 @@ namespace FirebirdSql.Data.Common
         public const int FB_PROTOCOL_FLAG = 0x8000;
         public const int FB_PROTOCOL_MASK = ~FB_PROTOCOL_FLAG;
 
-        // Protocol 11 has support for user authentication related 
-        // operations (op_update_account_info, op_authenticate_user and 
+        // Protocol 11 has support for user authentication related
+        // operations (op_update_account_info, op_authenticate_user and
         // op_trusted_auth). When specific operation is not supported,
         // we say "sorry".
 
         public const int PROTOCOL_VERSION11 = (FB_PROTOCOL_FLAG | 11);
+
+        // Protocol 12 has support for asynchronous call op_cancel.
+        // Currently implemented asynchronously only for TCP/IP
+        // on superserver and superclassic.
+
+        public const int PROTOCOL_VERSION12 = (FB_PROTOCOL_FLAG | 12);
 
         #endregion
 
@@ -311,6 +317,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_dpb_set_db_charset = 68;
 		public const int isc_dpb_trusted_auth = 73;
         public const int isc_dpb_process_name = 74;
+        public const int isc_dpb_utf8_filename = 77;
 
 		#endregion
 
