@@ -16,6 +16,8 @@
  *  All Rights Reserved.
  */
 
+#if (!NET_CF)
+
 using System;
 using System.Data;
 using FirebirdSql.Data.Common;
@@ -97,8 +99,8 @@ namespace FirebirdSql.Data.Client.ExternalEngine
             IntPtr valuePtr = marshaler.MarshalManagedToNative();
 
             bool result = SafeNativeMethods.isc_get_trigger_field(
-                statusVector, 
-                (oldValue) ? 0 : 1, 
+                statusVector,
+                (oldValue) ? 0 : 1,
                 fieldName,
                 valuePtr);
 
@@ -136,3 +138,5 @@ namespace FirebirdSql.Data.Client.ExternalEngine
         #endregion
     }
 }
+
+#endif

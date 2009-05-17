@@ -19,6 +19,8 @@
  *      Jiri Cincura (jiri@cincura.net)
  */
 
+#if (!NET_CF)
+
 using System;
 using System.Collections;
 using System.Threading;
@@ -27,86 +29,86 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-	internal sealed class FesDatabase : IDatabase
-	{
-		#region · Callbacks ·
+    internal sealed class FesDatabase : IDatabase
+    {
+        #region · Callbacks ·
 
-		public WarningMessageCallback WarningMessage
-		{
-			get { return this.warningMessage; }
-			set { this.warningMessage = value; }
-		}
+        public WarningMessageCallback WarningMessage
+        {
+            get { return this.warningMessage; }
+            set { this.warningMessage = value; }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Fields ·
+        #region · Fields ·
 
-		private WarningMessageCallback warningMessage;
+        private WarningMessageCallback warningMessage;
 
-		private int		handle;
-		private int		transactionCount;
-		private string	serverVersion;
-		private Charset charset;
-		private short	packetSize;
-		private short	dialect;
-		private bool	disposed;
-        private IntPtr[]   statusVector;
-        private object  syncObject;
+        private int handle;
+        private int transactionCount;
+        private string serverVersion;
+        private Charset charset;
+        private short packetSize;
+        private short dialect;
+        private bool disposed;
+        private IntPtr[] statusVector;
+        private object syncObject;
 
-		private IFbClient fbClient;
+        private IFbClient fbClient;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Properties ·
 
-		public int Handle
-		{
-			get { return this.handle; }
-		}
+        public int Handle
+        {
+            get { return this.handle; }
+        }
 
-		public int TransactionCount
-		{
-			get { return this.transactionCount; }
-			set { this.transactionCount = value; }
-		}
+        public int TransactionCount
+        {
+            get { return this.transactionCount; }
+            set { this.transactionCount = value; }
+        }
 
-		public string ServerVersion
-		{
-			get { return this.serverVersion; }
-		}
+        public string ServerVersion
+        {
+            get { return this.serverVersion; }
+        }
 
-		public Charset Charset
-		{
-			get { return this.charset; }
-			set { this.charset = value; }
-		}
+        public Charset Charset
+        {
+            get { return this.charset; }
+            set { this.charset = value; }
+        }
 
-		public short PacketSize
-		{
-			get { return this.packetSize; }
-			set { this.packetSize = value; }
-		}
+        public short PacketSize
+        {
+            get { return this.packetSize; }
+            set { this.packetSize = value; }
+        }
 
-		public short Dialect
-		{
-			get { return this.dialect; }
-			set { this.dialect = value; }
-		}
+        public short Dialect
+        {
+            get { return this.dialect; }
+            set { this.dialect = value; }
+        }
 
-		public bool HasRemoteEventSupport
-		{
-			get { return false; }
-		}
+        public bool HasRemoteEventSupport
+        {
+            get { return false; }
+        }
 
-		public IFbClient FbClient
-		{
-			get { return fbClient; }
-		}
+        public IFbClient FbClient
+        {
+            get { return fbClient; }
+        }
 
         public object SyncObject
         {
-            get 
-            { 
+            get
+            {
                 if (this.syncObject == null)
                 {
                     Interlocked.CompareExchange(ref this.syncObject, new object(), null);
@@ -116,51 +118,51 @@ namespace FirebirdSql.Data.Client.Native
             }
         }
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		public FesDatabase()
-			: this(null, null)
-		{
-		}
+        public FesDatabase()
+            : this(null, null)
+        {
+        }
 
-		public FesDatabase(string dllName, Charset charset)
-		{
-			this.fbClient       = FbClientFactory.GetFbClient(dllName);
-			this.charset        = (charset != null ? charset : Charset.DefaultCharset);
-			this.dialect        = 3;
-			this.packetSize     = 8192;
+        public FesDatabase(string dllName, Charset charset)
+        {
+            this.fbClient = FbClientFactory.GetFbClient(dllName);
+            this.charset = (charset != null ? charset : Charset.DefaultCharset);
+            this.dialect = 3;
+            this.packetSize = 8192;
             this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
-			GC.SuppressFinalize(this);
-		}
+            GC.SuppressFinalize(this);
+        }
 
-		#endregion
+        #endregion
 
-		#region · Finalizer ·
+        #region · Finalizer ·
 
-		~FesDatabase()
-		{
-			this.Dispose(false);
-		}
+        ~FesDatabase()
+        {
+            this.Dispose(false);
+        }
 
-		#endregion
+        #endregion
 
-		#region · IDisposable methods ·
+        #region · IDisposable methods ·
 
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		private void Dispose(bool disposing)
-		{
-			lock (this)
-			{
-				if (!this.disposed)
-				{
+        private void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (!this.disposed)
+                {
                     try
                     {
                         // release any unmanaged resources
@@ -169,129 +171,129 @@ namespace FirebirdSql.Data.Client.Native
                     catch
                     {
                     }
-					finally
-					{
+                    finally
+                    {
                         // release any managed resources
                         if (disposing)
                         {
-                            this.warningMessage     = null;
-                            this.charset            = null;
-                            this.serverVersion      = null;
-                            this.statusVector       = null;
-                            this.transactionCount   = 0;
-                            this.dialect            = 0;
-                            this.handle             = 0;
-                            this.packetSize         = 0;
+                            this.warningMessage = null;
+                            this.charset = null;
+                            this.serverVersion = null;
+                            this.statusVector = null;
+                            this.transactionCount = 0;
+                            this.dialect = 0;
+                            this.handle = 0;
+                            this.packetSize = 0;
                         }
 
-						this.disposed = true;
-					}
-				}
-			}
-		}
+                        this.disposed = true;
+                    }
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Database Methods ·
+        #region · Database Methods ·
 
-		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-		{
-			lock (this)
-			{
-                byte[]  databaseBuffer  = this.Charset.GetBytes(database);
-				int     dbHandle        = this.Handle;
+        public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+        {
+            lock (this)
+            {
+                byte[] databaseBuffer = this.Charset.GetBytes(database);
+                int dbHandle = this.Handle;
 
                 // Clear status vector
                 this.ClearStatusVector();
 
-				fbClient.isc_create_database(
-					this.statusVector,
+                fbClient.isc_create_database(
+                    this.statusVector,
                     (short)databaseBuffer.Length,
-					databaseBuffer,
-					ref	dbHandle,
-					(short)dpb.Length,
-					dpb.ToArray(),
-					0);
+                    databaseBuffer,
+                    ref	dbHandle,
+                    (short)dpb.Length,
+                    dpb.ToArray(),
+                    0);
 
-				this.ParseStatusVector(this.statusVector);
+                this.ParseStatusVector(this.statusVector);
 
-				this.handle = dbHandle;
+                this.handle = dbHandle;
 
-				this.Detach();
-			}
-		}
+                this.Detach();
+            }
+        }
 
-		public void DropDatabase()
-		{
-			lock (this)
-			{
-				int	dbHandle = this.Handle;
+        public void DropDatabase()
+        {
+            lock (this)
+            {
+                int dbHandle = this.Handle;
 
                 // Clear status vector
                 this.ClearStatusVector();
 
-				fbClient.isc_drop_database(this.statusVector, ref dbHandle);
+                fbClient.isc_drop_database(this.statusVector, ref dbHandle);
 
-				this.ParseStatusVector(this.statusVector);
+                this.ParseStatusVector(this.statusVector);
 
-				this.handle = 0;
-			}
-		}
+                this.handle = 0;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Remote Events Methods ·
+        #region · Remote Events Methods ·
 
-		void IDatabase.CloseEventManager()
-		{
-			throw new NotSupportedException();
-		}
+        void IDatabase.CloseEventManager()
+        {
+            throw new NotSupportedException();
+        }
 
-		RemoteEvent IDatabase.CreateEvent()
-		{
-			throw new NotSupportedException();
-		}
+        RemoteEvent IDatabase.CreateEvent()
+        {
+            throw new NotSupportedException();
+        }
 
-		void IDatabase.QueueEvents(RemoteEvent events)
-		{
-			throw new NotSupportedException();
-		}
+        void IDatabase.QueueEvents(RemoteEvent events)
+        {
+            throw new NotSupportedException();
+        }
 
-		void IDatabase.CancelEvents(RemoteEvent events)
-		{
-			throw new NotSupportedException();
-		}
+        void IDatabase.CancelEvents(RemoteEvent events)
+        {
+            throw new NotSupportedException();
+        }
 
-		#endregion
+        #endregion
 
-		#region · Methods ·
+        #region · Methods ·
 
         public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
         {
-	        lock (this)
-	        {
-                byte[]  databaseBuffer  = this.Charset.GetBytes(database);
-		        int     dbHandle        = 0;
+            lock (this)
+            {
+                byte[] databaseBuffer = this.Charset.GetBytes(database);
+                int dbHandle = 0;
 
                 // Clear status vector
                 this.ClearStatusVector();
 
-				fbClient.isc_attach_database(
-			        this.statusVector,
-			        (short)databaseBuffer.Length,
-			        databaseBuffer,
-			        ref dbHandle,
-			        (short)dpb.Length,
-			        dpb.ToArray());
+                fbClient.isc_attach_database(
+                    this.statusVector,
+                    (short)databaseBuffer.Length,
+                    databaseBuffer,
+                    ref dbHandle,
+                    (short)dpb.Length,
+                    dpb.ToArray());
 
-		        this.ParseStatusVector(this.statusVector);
+                this.ParseStatusVector(this.statusVector);
 
                 // Update the database handle
                 this.handle = dbHandle;
 
-		        // Get server version
-		        this.serverVersion = this.GetServerVersion();
-	        }
+                // Get server version
+                this.serverVersion = this.GetServerVersion();
+            }
         }
 
         public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
@@ -299,84 +301,84 @@ namespace FirebirdSql.Data.Client.Native
             throw new NotImplementedException("Trusted Auth isn't supported on Embedded Firebird.");
         }
 
-		public void Detach()
-		{
-			lock (this)
-			{
-				if (this.TransactionCount > 0)
-				{
-					throw new IscException(IscCodes.isc_open_trans, this.TransactionCount);
-				}
+        public void Detach()
+        {
+            lock (this)
+            {
+                if (this.TransactionCount > 0)
+                {
+                    throw new IscException(IscCodes.isc_open_trans, this.TransactionCount);
+                }
 
-				int dbHandle = this.Handle;
+                int dbHandle = this.Handle;
 
                 // Clear status vector
                 this.ClearStatusVector();
 
-				fbClient.isc_detach_database(this.statusVector, ref dbHandle);
+                fbClient.isc_detach_database(this.statusVector, ref dbHandle);
 
-				this.handle = dbHandle;
+                this.handle = dbHandle;
 
-				FesConnection.ParseStatusVector(this.statusVector, this.charset);
-			}
-		}
+                FesConnection.ParseStatusVector(this.statusVector, this.charset);
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Transaction Methods ·
+        #region · Transaction Methods ·
 
-		public ITransaction BeginTransaction(TransactionParameterBuffer tpb)
-		{
-			FesTransaction transaction = new FesTransaction(this);
-			transaction.BeginTransaction(tpb);
+        public ITransaction BeginTransaction(TransactionParameterBuffer tpb)
+        {
+            FesTransaction transaction = new FesTransaction(this);
+            transaction.BeginTransaction(tpb);
 
-			return transaction;
-		}
+            return transaction;
+        }
 
-		#endregion
+        #endregion
 
-		#region · Statement Creation Methods ·
+        #region · Statement Creation Methods ·
 
-		public StatementBase CreateStatement()
-		{
-			return new FesStatement(this);
-		}
+        public StatementBase CreateStatement()
+        {
+            return new FesStatement(this);
+        }
 
-		public StatementBase CreateStatement(ITransaction transaction)
-		{
-			return new FesStatement(this, transaction as FesTransaction);
-		}
+        public StatementBase CreateStatement(ITransaction transaction)
+        {
+            return new FesStatement(this, transaction as FesTransaction);
+        }
 
-		#endregion
+        #endregion
 
-		#region · Database Information Methods ·
+        #region · Database Information Methods ·
 
-		public string GetServerVersion()
-		{
-			byte[] items = new byte[]
+        public string GetServerVersion()
+        {
+            byte[] items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
 
-			return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_128)[0].ToString();
-		}
+            return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_128)[0].ToString();
+        }
 
-		public ArrayList GetDatabaseInfo(byte[] items)
-		{
-			return this.GetDatabaseInfo(items, IscCodes.MAX_BUFFER_SIZE);
-		}
+        public ArrayList GetDatabaseInfo(byte[] items)
+        {
+            return this.GetDatabaseInfo(items, IscCodes.MAX_BUFFER_SIZE);
+        }
 
-		public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
-		{
-			byte[] buffer = new byte[bufferLength];
+        public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
+        {
+            byte[] buffer = new byte[bufferLength];
 
-			this.DatabaseInfo(items, buffer, buffer.Length);
+            this.DatabaseInfo(items, buffer, buffer.Length);
 
-			return IscHelper.ParseDatabaseInfo(buffer);
-		}
+            return IscHelper.ParseDatabaseInfo(buffer);
+        }
 
-		#endregion
+        #endregion
 
         #region · Trigger Context Methods ·
 
@@ -390,52 +392,54 @@ namespace FirebirdSql.Data.Client.Native
         #region · Internal Methods ·
 
         internal void ParseStatusVector(IntPtr[] statusVector)
-		{
-			IscException ex = FesConnection.ParseStatusVector(statusVector, this.charset);
+        {
+            IscException ex = FesConnection.ParseStatusVector(statusVector, this.charset);
 
-			if (ex != null)
-			{
-				if (ex.IsWarning)
-				{
-					this.warningMessage(ex);
-				}
-				else
-				{
-					throw ex;
-				}
-			}
-		}
+            if (ex != null)
+            {
+                if (ex.IsWarning)
+                {
+                    this.warningMessage(ex);
+                }
+                else
+                {
+                    throw ex;
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region · Private Methods ·
+        #region · Private Methods ·
 
         private void ClearStatusVector()
         {
             Array.Clear(this.statusVector, 0, this.statusVector.Length);
         }
 
-		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
-		{
-			lock (this)
-			{
-				int dbHandle = this.Handle;
+        private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
+        {
+            lock (this)
+            {
+                int dbHandle = this.Handle;
 
                 // Clear status vector
                 this.ClearStatusVector();
 
-				fbClient.isc_database_info(
-					this.statusVector,
-					ref	dbHandle,
-					(short)items.Length,
-					items,
-					(short)bufferLength,
-					buffer);
+                fbClient.isc_database_info(
+                    this.statusVector,
+                    ref	dbHandle,
+                    (short)items.Length,
+                    items,
+                    (short)bufferLength,
+                    buffer);
 
-				this.ParseStatusVector(this.statusVector);
-			}
-		}
+                this.ParseStatusVector(this.statusVector);
+            }
+        }
 
-		#endregion
+        #endregion
     }
 }
+
+#endif

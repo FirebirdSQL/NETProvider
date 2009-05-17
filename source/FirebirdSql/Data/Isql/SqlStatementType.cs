@@ -16,6 +16,8 @@
  *  All Rights Reserved.
  */
 
+#if (!NET_CF)
+
 using System;
 
 namespace FirebirdSql.Data.Isql
@@ -23,9 +25,7 @@ namespace FirebirdSql.Data.Isql
     /// <summary>
     /// DSQL and ISQL statement types.
     /// </summary>
-#if (!NET_CF)
-	[Serializable]
-#endif
+    [Serializable]
     public enum SqlStatementType
     {
         /// <summary>
@@ -379,3 +379,5 @@ namespace FirebirdSql.Data.Isql
         Whenever
     }
 }
+
+#endif
