@@ -23,23 +23,23 @@ using System.Security;
 namespace FirebirdSql.Data.Client.ExternalEngine
 {
 #if (!NET_CF)
-	[SuppressUnmanagedCodeSecurity]
+    [SuppressUnmanagedCodeSecurity]
 #endif
-	internal sealed class SafeNativeMethods
-	{
-		#region · Conditional Constants ·
+    internal sealed class SafeNativeMethods
+    {
+        #region · Conditional Constants ·
 
-		public const string	DllPath = "clrexternalengine";
+        public const string DllPath = "clrexternalengine";
 
-		#endregion
+        #endregion
 
-		#region · Constructors ·
+        #region · Constructors ·
 
-		private SafeNativeMethods()
-		{
-		}
+        private SafeNativeMethods()
+        {
+        }
 
-		#endregion
+        #endregion
 
         #region · External Engine Functions ·
 
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
         public static extern bool isc_get_trigger_field(
             [In, Out] int[] statusVector,
             int isOldNew,
-            byte[] fieldName, 
+            byte[] fieldName,
             IntPtr paramdsc);
 
         [DllImport(SafeNativeMethods.DllPath, EntryPoint = "ext_set_trigger_field")]
@@ -328,5 +328,5 @@ namespace FirebirdSql.Data.Client.ExternalEngine
             byte[] buffer);
 
         #endregion
-	}
+    }
 }

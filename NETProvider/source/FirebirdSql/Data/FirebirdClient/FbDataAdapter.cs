@@ -24,7 +24,6 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Drawing;
 using System.Collections.Generic;
 
 namespace FirebirdSql.Data.FirebirdClient

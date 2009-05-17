@@ -16,6 +16,8 @@
  *	All Rights Reserved.
  */
 
+#if (!NET_CF)
+
 using System;
 using System.Collections.Generic;
 
@@ -25,3 +27,5 @@ namespace FirebirdSql.Data.Isql
     public class FbStatementCollection : List<string>
     { }
 }
+
+#endif

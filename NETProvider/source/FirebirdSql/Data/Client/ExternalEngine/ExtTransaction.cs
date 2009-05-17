@@ -16,6 +16,8 @@
  *	All Rights Reserved.
  */
 
+#if (!NET_CF)
+
 using System;
 using System.IO;
 using System.Data;
@@ -25,158 +27,158 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.ExternalEngine
 {
-	internal sealed class ExtTransaction : ITransaction, IDisposable
-	{
-		#region · Inner Structs ·
+    internal sealed class ExtTransaction : ITransaction, IDisposable
+    {
+        #region · Inner Structs ·
 
-		[StructLayout(LayoutKind.Sequential)]
-		struct IscTeb
-		{
-			public IntPtr dbb_ptr;
-			public int tpb_len;
-			public IntPtr tpb_ptr;
-		}
-
-		#endregion
-
-		#region · Events ·
-
-        public event TransactionUpdateEventHandler  Update;
+        [StructLayout(LayoutKind.Sequential)]
+        struct IscTeb
+        {
+            public IntPtr dbb_ptr;
+            public int tpb_len;
+            public IntPtr tpb_ptr;
+        }
 
         #endregion
 
-		#region · Fields ·
+        #region · Events ·
 
-		private int					handle;
-		private ExtDatabase			db;
-		private TransactionState	state;
-		private bool				disposed;
-        private int[]               statusVector;
+        public event TransactionUpdateEventHandler Update;
 
-		#endregion
+        #endregion
 
-		#region · Properties ·
+        #region · Fields ·
 
-		public int Handle
-		{
-			get { return this.handle; }
-		}
+        private int handle;
+        private ExtDatabase db;
+        private TransactionState state;
+        private bool disposed;
+        private int[] statusVector;
 
-		public TransactionState State
-		{
-			get { return this.state; }
-		}
+        #endregion
 
-		#endregion
+        #region · Properties ·
 
-		#region · Constructors ·
+        public int Handle
+        {
+            get { return this.handle; }
+        }
 
-		public ExtTransaction(IDatabase db)
-		{
-			if (!(db is ExtDatabase))
-			{
-				throw new ArgumentException("Specified argument is not of FesDatabase type.");
-			}
+        public TransactionState State
+        {
+            get { return this.state; }
+        }
 
-			this.db		        = (ExtDatabase)db;
-			this.state	        = TransactionState.NoTransaction;
-            this.statusVector   = new int[IscCodes.ISC_STATUS_LENGTH];
+        #endregion
 
-			GC.SuppressFinalize(this);
-		}
+        #region · Constructors ·
 
-		#endregion
+        public ExtTransaction(IDatabase db)
+        {
+            if (!(db is ExtDatabase))
+            {
+                throw new ArgumentException("Specified argument is not of FesDatabase type.");
+            }
 
-		#region · Finalizer ·
+            this.db = (ExtDatabase)db;
+            this.state = TransactionState.NoTransaction;
+            this.statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
 
-		~ExtTransaction()
-		{
-			this.Dispose(false);
-		}
+            GC.SuppressFinalize(this);
+        }
 
-		#endregion
+        #endregion
 
-		#region · IDisposable methods ·
+        #region · Finalizer ·
 
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        ~ExtTransaction()
+        {
+            this.Dispose(false);
+        }
 
-		private void Dispose(bool disposing)
-		{
-			lock (this)
-			{
-				if (!this.disposed)
-				{
-					try
-					{
-						// release any unmanaged resources
-						this.Rollback();
+        #endregion
 
-						// release any managed resources
-						if (disposing)
-						{
-							this.db             = null;
-							this.handle         = 0;
-							this.state          = TransactionState.NoTransaction;
-                            this.statusVector   = null;
-						}
-					}
-					finally
-					{
-						this.disposed = true;
-					}
-				}
-			}
-		}
+        #region · IDisposable methods ·
 
-		#endregion
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		#region · Methods ·
+        private void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (!this.disposed)
+                {
+                    try
+                    {
+                        // release any unmanaged resources
+                        this.Rollback();
 
-		public void BeginTransaction(TransactionParameterBuffer tpb)
-		{
+                        // release any managed resources
+                        if (disposing)
+                        {
+                            this.db = null;
+                            this.handle = 0;
+                            this.state = TransactionState.NoTransaction;
+                            this.statusVector = null;
+                        }
+                    }
+                    finally
+                    {
+                        this.disposed = true;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region · Methods ·
+
+        public void BeginTransaction(TransactionParameterBuffer tpb)
+        {
             // Clear the status vector
             this.ClearStatusVector();
 
             int trHandle = 0;
-            
+
             lock (this.db)
-			{
+            {
                 SafeNativeMethods.isc_get_current_transaction(this.statusVector, ref trHandle);
 
                 this.handle = trHandle;
                 this.state = TransactionState.Active;
             }
-		}
+        }
 
-		public void Commit()
-		{
+        public void Commit()
+        {
             if (this.Update != null)
             {
                 this.Update(this, new EventArgs());
             }
-		}
+        }
 
-		public void Rollback()
-		{
+        public void Rollback()
+        {
             if (this.Update != null)
             {
                 this.Update(this, new EventArgs());
             }
-		}
+        }
 
         public void CommitRetaining()
         {
         }
 
-		public void RollbackRetaining()
-		{
-		}
+        public void RollbackRetaining()
+        {
+        }
 
-		#endregion
+        #endregion
 
         #region · Two Phase Commit Methods ·
 
@@ -200,3 +202,5 @@ namespace FirebirdSql.Data.Client.ExternalEngine
         #endregion
     }
 }
+
+#endif

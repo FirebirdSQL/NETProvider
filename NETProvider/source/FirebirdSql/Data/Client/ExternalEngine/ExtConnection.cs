@@ -16,6 +16,8 @@
  *	All Rights Reserved.
  */
 
+#if (!NET_CF)
+
 using System;
 using System.Runtime.InteropServices;
 
@@ -23,8 +25,8 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.ExternalEngine
 {
-	internal sealed class ExtConnection
-	{
+    internal sealed class ExtConnection
+    {
         #region · Static Methods ·
 
         public static int[] GetNewStatusVector()
@@ -66,9 +68,9 @@ namespace FirebirdSql.Data.Client.ExternalEngine
                     case IscCodes.isc_arg_interpreted:
                     case IscCodes.isc_arg_string:
                         {
-                            IntPtr ptr          = new IntPtr(statusVector[i++]);
-                            string arg_value    = Marshal.PtrToStringAnsi(ptr);
-                            
+                            IntPtr ptr = new IntPtr(statusVector[i++]);
+                            string arg_value = Marshal.PtrToStringAnsi(ptr);
+
                             exception.Errors.Add(new IscError(arg, arg_value));
                         }
                         break;
@@ -77,8 +79,8 @@ namespace FirebirdSql.Data.Client.ExternalEngine
                         {
                             i++;
 
-                            IntPtr ptr          = new IntPtr(statusVector[i++]);
-                            string arg_value    = Marshal.PtrToStringAnsi(ptr);
+                            IntPtr ptr = new IntPtr(statusVector[i++]);
+                            string arg_value = Marshal.PtrToStringAnsi(ptr);
 
                             exception.Errors.Add(new IscError(arg, arg_value));
                         }
@@ -114,13 +116,15 @@ namespace FirebirdSql.Data.Client.ExternalEngine
         }
 
         #endregion
-        
+
         #region · Constructors ·
 
-		private ExtConnection()
-		{
-		}
+        private ExtConnection()
+        {
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
+
+#endif

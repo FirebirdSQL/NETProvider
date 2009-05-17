@@ -16,6 +16,8 @@
  *  All Rights Reserved.
  */
 
+#if (!NET_CF)
+
 using System;
 
 namespace FirebirdSql.Data.Isql
@@ -25,3 +27,5 @@ namespace FirebirdSql.Data.Isql
     /// </summary>
     public delegate void CommandExecutedEventHandler(object sender, CommandExecutedEventArgs e);
 }
+
+#endif
