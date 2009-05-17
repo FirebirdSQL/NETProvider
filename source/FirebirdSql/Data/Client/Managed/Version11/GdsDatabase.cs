@@ -67,6 +67,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
         #region Trusted Auth
         public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
         {
+#if (!LINUX)
             lock (this.SyncObject)
             {
                 try
@@ -113,6 +114,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                 // Get server version
                 this.serverVersion = this.GetServerVersion();
             }
+#else            
+            throw new NotSupportedException();
+#endif
         }
         #endregion
 
