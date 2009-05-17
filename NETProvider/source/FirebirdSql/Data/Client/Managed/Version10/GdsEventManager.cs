@@ -33,7 +33,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         private Thread eventsThread;
         private Hashtable events;
         private int handle;
+#if (NET_CF)
+        private System.Windows.Forms.Control syncControl;
+#else
         private SynchronizationContext syncContext;
+#endif
 
         #endregion
 
@@ -53,7 +57,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             this.events = new Hashtable();
             this.events = Hashtable.Synchronized(this.events);
             this.handle = handle;
-            this.syncContext = (SynchronizationContext.Current != null ? SynchronizationContext.Current : new SynchronizationContext());
+#if (NET_CF)
+            this.syncControl = new System.Windows.Forms.Control();
+            IntPtr h = this.syncControl.Handle; // force handle creation
+#else
+            this.syncContext = SynchronizationContext.Current ?? new SynchronizationContext();
+#endif
                     
 
             // Initialize the connection
@@ -88,13 +97,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     (this.eventsThread.ThreadState != ThreadState.Running &&
                     this.eventsThread.ThreadState != ThreadState.Background))
 #else
-				if (this.thread == null)
+                if (this.eventsThread == null)
 #endif
                 {
-                    this.eventsThread = new Thread(new ParameterizedThreadStart(ThreadHandler));
+#if (NET_CF)
+                    this.eventsThread = new Thread(new ThreadStart(() => ThreadHandler(this.syncControl)));
+#else
+                    this.eventsThread = new Thread(new ThreadStart(() => ThreadHandler(this.syncContext)));
+#endif
                     this.eventsThread.IsBackground = true;
                     this.eventsThread.Name = "FirebirdClient - Events Thread";
-                    this.eventsThread.Start(this.syncContext);
+                    this.eventsThread.Start();
                 }
             }
         }
@@ -118,8 +131,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                 if (this.eventsThread != null)
                 {
+#if (!NET_CF)
                     // we don't have here clue about disposing vs. finalizer
+#warning in CF this will cause problems again (how to detect this on CF?, maybe better to redesign these classes)
                     if (!Environment.HasShutdownStarted)
+#endif
                     {
                         this.eventsThread.Abort();
                         this.eventsThread.Join();
@@ -176,10 +192,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                                 }
 
                                 // Notify new event	counts
+#if (NET_CF)
+                                ((System.Windows.Forms.Control)o).Invoke((Action)delegate
+                                {
+                                    currentEvent.EventCounts(buffer);
+                                }, null);
+#else
                                 ((SynchronizationContext)o).Send(delegate
                                 {
                                     currentEvent.EventCounts(buffer);
                                 }, null);
+#endif
 
                                 if (this.events.Count == 0)
                                 {
