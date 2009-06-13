@@ -323,7 +323,7 @@ namespace FirebirdSql.Data.FirebirdClient
 							// Empty pool
 							if (this.EmptyPool != null)
 							{
-								this.EmptyPool(this.connectionString.GetHashCode(), null);
+								this.EmptyPool(this.connectionString, null);
 							}
 
 							// Stop	running
@@ -456,7 +456,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         // Raise EmptyPool event
                         if (this.EmptyPool != null)
                         {
-                            this.EmptyPool(this.connectionString.GetHashCode(), null);
+                            this.EmptyPool(this.connectionString, null);
                         }
 
                         // Clear lists

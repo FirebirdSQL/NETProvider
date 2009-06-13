@@ -127,11 +127,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
             lock (this.SyncObject)
             {
-                int hashCode = connectionString.GetHashCode();
-
-                if (this.Pools.ContainsKey(hashCode))
+                if (this.Pools.ContainsKey(connectionString))
                 {
-                    pool = (FbConnectionPool)this.Pools[hashCode];
+                    pool = (FbConnectionPool)this.Pools[connectionString];
                 }
             }
 
@@ -148,15 +146,13 @@ namespace FirebirdSql.Data.FirebirdClient
                 {
                     lock (this.Pools.SyncRoot)
                     {
-                        int hashcode = connectionString.GetHashCode();
-
                         // Create an empty pool	handler
                         EmptyPoolEventHandler handler = new EmptyPoolEventHandler(this.OnEmptyPool);
                         // Create the new connection pool
                         pool = new FbConnectionPool(connectionString);
 
-                        this.Handlers.Add(hashcode, handler);
-                        this.Pools.Add(hashcode, pool);
+                        this.Handlers.Add(connectionString, handler);
+                        this.Pools.Add(connectionString, pool);
 
                         pool.EmptyPool += handler;
                     }
@@ -195,11 +191,9 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 lock (this.Pools.SyncRoot)
                 {
-                    int hashCode = connectionString.GetHashCode();
-
-                    if (this.Pools.ContainsKey(hashCode))
+                    if (this.Pools.ContainsKey(connectionString))
                     {
-                        FbConnectionPool pool = (FbConnectionPool)this.Pools[hashCode];
+                        FbConnectionPool pool = (FbConnectionPool)this.Pools[connectionString];
 
                         // Clear pool
                         pool.Clear();
