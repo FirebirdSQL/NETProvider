@@ -39,296 +39,297 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Entity
 {
-    /// <summary>
-    /// Class generating SQL for a DML command tree.
-    /// </summary>
-    internal static class DmlSqlGenerator
-    {
-        #region · Static Fields ·
+	/// <summary>
+	/// Class generating SQL for a DML command tree.
+	/// </summary>
+	internal static class DmlSqlGenerator
+	{
+		#region · Static Fields ·
 
-        private const int CommandTextBuilderInitialCapacity = 256;
+		private const int CommandTextBuilderInitialCapacity = 256;
 
-        #endregion
+		#endregion
 
-        #region · Static Methods ·
+		#region · Static Methods ·
 
-        internal static string GenerateUpdateSql(DbUpdateCommandTree tree, out List<DbParameter> parameters)
-        {
-            StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
-            ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
-            bool first = true;
+		internal static string GenerateUpdateSql(DbUpdateCommandTree tree, out List<DbParameter> parameters)
+		{
+			StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
+			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
+			bool first = true;
 
-            // update [schemaName].[tableName]
-            commandText.Append("update ");
-            tree.Target.Expression.Accept(translator);
-            commandText.AppendLine();
+			// update [schemaName].[tableName]
+			commandText.Append("update ");
+			tree.Target.Expression.Accept(translator);
+			commandText.AppendLine();
 
-            // set c1 = ..., c2 = ..., ...            
-            commandText.Append("set ");
+			// set c1 = ..., c2 = ..., ...            
+			commandText.Append("set ");
 
-            foreach (DbSetClause setClause in tree.SetClauses)
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    commandText.Append(", ");
-                }
+			foreach (DbSetClause setClause in tree.SetClauses)
+			{
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					commandText.Append(", ");
+				}
 
-                setClause.Property.Accept(translator);
-                commandText.Append(" = ");
-                setClause.Value.Accept(translator);
+				setClause.Property.Accept(translator);
+				commandText.Append(" = ");
+				setClause.Value.Accept(translator);
 
-                translator.RegisterMemberValue(setClause.Property, setClause.Value);
-            }
+				translator.RegisterMemberValue(setClause.Property, setClause.Value);
+			}
 
-            if (first)
-            {
-                // If first is still true, it indicates there were no set
-                // clauses. Introduce a fake set clause so that:
-                // - we acquire the appropriate locks
-                // - server-gen columns (e.g. timestamp) get recomputed
-                
-                EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
-                // hope this column isn't indexed to not waste power
-                EdmMember someColumn = table.ElementType.Members.Last(x => !IsStoreGenerated(x));
-                commandText.AppendFormat("{0} = {0}", GenerateMemberSql(someColumn));
-            }
-            commandText.AppendLine();
+			if (first)
+			{
+				// If first is still true, it indicates there were no set
+				// clauses. Introduce a fake set clause so that:
+				// - we acquire the appropriate locks
+				// - server-gen columns (e.g. timestamp) get recomputed
 
-            // where c1 = ..., c2 = ...
-            commandText.Append("where ");
-            tree.Predicate.Accept(translator);
-            commandText.AppendLine();
+				EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
+				// hope this column isn't indexed to not waste power
+				EdmMember someColumn = table.ElementType.Members.Last(x => !IsStoreGenerated(x));
+				commandText.AppendFormat("{0} = {0}", GenerateMemberSql(someColumn));
+			}
+			commandText.AppendLine();
 
-            // generate returning sql
-            GenerateReturningSql(commandText, tree, translator, tree.Returning);
+			// where c1 = ..., c2 = ...
+			commandText.Append("where ");
+			tree.Predicate.Accept(translator);
+			commandText.AppendLine();
 
-            parameters = translator.Parameters;
-            return commandText.ToString();
-        }
+			// generate returning sql
+			GenerateReturningSql(commandText, tree, translator, tree.Returning);
 
-        internal static string GenerateDeleteSql(DbDeleteCommandTree tree, out List<DbParameter> parameters)
-        {
-            StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
-            ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, false);
+			parameters = translator.Parameters;
+			return commandText.ToString();
+		}
 
-            // delete [schemaName].[tableName]
-            commandText.Append("delete from ");
-            tree.Target.Expression.Accept(translator);
-            commandText.AppendLine();
+		internal static string GenerateDeleteSql(DbDeleteCommandTree tree, out List<DbParameter> parameters)
+		{
+			StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
+			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, false);
 
-            // where c1 = ... AND c2 = ...
-            commandText.Append("where ");
-            tree.Predicate.Accept(translator);
+			// delete [schemaName].[tableName]
+			commandText.Append("delete from ");
+			tree.Target.Expression.Accept(translator);
+			commandText.AppendLine();
 
-            parameters = translator.Parameters;
-            return commandText.ToString();
-        }
+			// where c1 = ... AND c2 = ...
+			commandText.Append("where ");
+			tree.Predicate.Accept(translator);
 
-        internal static string GenerateInsertSql(DbInsertCommandTree tree, out List<DbParameter> parameters)
-        {
-            StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
-            ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
-            bool first = true;
+			parameters = translator.Parameters;
+			return commandText.ToString();
+		}
 
-            // insert [schemaName].[tableName]
-            commandText.Append("insert into ");
-            tree.Target.Expression.Accept(translator);
+		internal static string GenerateInsertSql(DbInsertCommandTree tree, out List<DbParameter> parameters)
+		{
+			StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
+			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
+			bool first = true;
 
-            // (c1, c2, c3, ...)
-            commandText.Append("(");
+			// insert [schemaName].[tableName]
+			commandText.Append("insert into ");
+			tree.Target.Expression.Accept(translator);
 
-            foreach (DbSetClause setClause in tree.SetClauses)
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    commandText.Append(", ");
-                }
-                setClause.Property.Accept(translator);
-            }
-            commandText.AppendLine(")");
+			// (c1, c2, c3, ...)
+			commandText.Append("(");
 
-            // values c1, c2, ...
-            first = true;
-            commandText.Append("values (");
-            foreach (DbSetClause setClause in tree.SetClauses)
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    commandText.Append(", ");
-                }
+			foreach (DbSetClause setClause in tree.SetClauses)
+			{
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					commandText.Append(", ");
+				}
+				setClause.Property.Accept(translator);
+			}
+			commandText.AppendLine(")");
 
-                setClause.Value.Accept(translator);
+			// values c1, c2, ...
+			first = true;
+			commandText.Append("values (");
+			foreach (DbSetClause setClause in tree.SetClauses)
+			{
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					commandText.Append(", ");
+				}
 
-                translator.RegisterMemberValue(setClause.Property, setClause.Value);
-            }
-            commandText.AppendLine(")");
+				setClause.Value.Accept(translator);
 
-            // generate returning sql
-            GenerateReturningSql(commandText, tree, translator, tree.Returning);
+				translator.RegisterMemberValue(setClause.Property, setClause.Value);
+			}
+			commandText.AppendLine(")");
 
-            parameters = translator.Parameters;
-            return commandText.ToString();
-        }
+			// generate returning sql
+			GenerateReturningSql(commandText, tree, translator, tree.Returning);
 
-        // Generates SQL describing a member
-        // Requires: member must belong to an entity type (a safe requirement for DML
-        // SQL gen, where we only access table columns)
-        internal static string GenerateMemberSql(EdmMember member)
-        {
-            return SqlGenerator.QuoteIdentifier(member.Name);
-        }
+			parameters = translator.Parameters;
+			return commandText.ToString();
+		}
 
-        private static bool IsStoreGenerated(EdmMember member)
-        {
-            Facet item = null;
-            if (member.TypeUsage.Facets.TryGetValue(MetadataHelpers.StoreGeneratedPatternFacetName, false, out item) &&
-                (((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed || ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Identity))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+		// Generates SQL describing a member
+		// Requires: member must belong to an entity type (a safe requirement for DML
+		// SQL gen, where we only access table columns)
+		internal static string GenerateMemberSql(EdmMember member)
+		{
+			return SqlGenerator.QuoteIdentifier(member.Name);
+		}
 
-        /// <summary>
-        /// Generates SQL fragment returning server-generated values.
-        /// Requires: translator knows about member values so that we can figure out
-        /// how to construct the key predicate.
-        /// <code>
-        /// Sample SQL:
-        ///     
-        ///     select IdentityValue
-        ///     from dbo.MyTable
-        ///     where @@ROWCOUNT > 0 and IdentityValue = scope_identity()
-        /// 
-        /// or
-        /// 
-        ///     select TimestamptValue
-        ///     from dbo.MyTable
-        ///     where @@ROWCOUNT > 0 and Id = 1
-        /// 
-        /// Note that we filter on rowcount to ensure no rows are returned if no rows were modified.
-        /// </code>
-        /// </summary>
-        /// <param name="commandText">Builder containing command text</param>
-        /// <param name="tree">Modification command tree</param>
-        /// <param name="translator">Translator used to produce DML SQL statement
-        /// for the tree</param>
-        /// <param name="returning">Returning expression. If null, the method returns
-        /// immediately without producing a SELECT statement.</param>
-        private static void GenerateReturningSql(
-            StringBuilder commandText,
-            DbModificationCommandTree tree,
-            ExpressionTranslator translator,
-            DbExpression returning)
-        {
-            // Nothing to do if there is no Returning expression
-            if (returning == null)
-            {
-                return;
-            }
+		private static bool IsStoreGenerated(EdmMember member)
+		{
+			Facet item = null;
+			if (member.TypeUsage.Facets.TryGetValue(MetadataHelpers.StoreGeneratedPatternFacetName, false, out item) &&
+				(((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed || ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Identity))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 
-            EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
-            List<EdmMember> columnsToFetch = new List<EdmMember>();
+		/// <summary>
+		/// Generates SQL fragment returning server-generated values.
+		/// Requires: translator knows about member values so that we can figure out
+		/// how to construct the key predicate.
+		/// <code>
+		/// Sample SQL:
+		///     
+		///     select IdentityValue
+		///     from dbo.MyTable
+		///     where @@ROWCOUNT > 0 and IdentityValue = scope_identity()
+		/// 
+		/// or
+		/// 
+		///     select TimestamptValue
+		///     from dbo.MyTable
+		///     where @@ROWCOUNT > 0 and Id = 1
+		/// 
+		/// Note that we filter on rowcount to ensure no rows are returned if no rows were modified.
+		/// </code>
+		/// </summary>
+		/// <param name="commandText">Builder containing command text</param>
+		/// <param name="tree">Modification command tree</param>
+		/// <param name="translator">Translator used to produce DML SQL statement
+		/// for the tree</param>
+		/// <param name="returning">Returning expression. If null, the method returns
+		/// immediately without producing a SELECT statement.</param>
+		private static void GenerateReturningSql(
+			StringBuilder commandText,
+			DbModificationCommandTree tree,
+			ExpressionTranslator translator,
+			DbExpression returning)
+		{
+			// Nothing to do if there is no Returning expression
+			if (returning == null)
+			{
+				return;
+			}
 
-            foreach (EdmMember tableColumn in table.ElementType.Members)
-            {
-                if (IsStoreGenerated(tableColumn))
-                {
-                    columnsToFetch.Add(tableColumn);
-                }
-            }
+			EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
+			List<EdmMember> columnsToFetch = new List<EdmMember>();
 
-            StringBuilder startBlock = new StringBuilder();
-            string separator = string.Empty;
+			foreach (EdmMember tableColumn in table.ElementType.Members)
+			{
+				if (IsStoreGenerated(tableColumn))
+				{
+					columnsToFetch.Add(tableColumn);
+				}
+			}
 
-            startBlock.AppendLine("execute block (");
-            separator = string.Empty;
-            foreach (KeyValuePair<EdmMember, DbParameter> item in translator.MemberValues)
-            {
-                startBlock.Append(separator);
-                startBlock.Append(item.Value.ParameterName.Replace("@", ""));
-                startBlock.Append(" ");
-                startBlock.Append(SqlGenerator.GetSqlPrimitiveType(item.Key.TypeUsage));
-                if (item.Key.TypeUsage.EdmType.FullName == "FirebirdClient.varchar" || item.Key.TypeUsage.EdmType.FullName == "FirebirdClient.char")
-                    startBlock.Append(" character set utf8");
-                startBlock.Append(" = ");
-                startBlock.Append(item.Value.ParameterName);
+			StringBuilder startBlock = new StringBuilder();
+			string separator = string.Empty;
 
-                separator = ", ";
-            }
-            startBlock.AppendLine(") ");
+			startBlock.AppendLine("execute block (");
+			separator = string.Empty;
+			foreach (FbParameter param in translator.Parameters)
+			{
+				startBlock.Append(separator);
+				startBlock.Append(param.ParameterName.Replace("@", ""));
+				startBlock.Append(" ");
+				EdmMember member = translator.MemberValues.First(m => m.Value.Contains(param)).Key;
+				startBlock.Append(SqlGenerator.GetSqlPrimitiveType(member.TypeUsage));
+				if (param.FbDbType == FbDbType.VarChar || param.FbDbType == FbDbType.Char)
+					startBlock.Append(" character set utf8");
+				startBlock.Append(" = ");
+				startBlock.Append(param.ParameterName);
 
-            startBlock.AppendLine("returns (");
-            separator = string.Empty;
-            foreach (EdmMember m in columnsToFetch)
-            {
-                startBlock.Append(separator);
-                startBlock.Append(GenerateMemberSql(m));
-                startBlock.Append(" ");
-                startBlock.Append(SqlGenerator.GetSqlPrimitiveType(m.TypeUsage));
+				separator = ", ";
+			}
+			startBlock.AppendLine(") ");
 
-                separator = ", ";
-            }
-            startBlock.AppendLine(")");
-            startBlock.AppendLine("as begin");
+			startBlock.AppendLine("returns (");
+			separator = string.Empty;
+			foreach (EdmMember m in columnsToFetch)
+			{
+				startBlock.Append(separator);
+				startBlock.Append(GenerateMemberSql(m));
+				startBlock.Append(" ");
+				startBlock.Append(SqlGenerator.GetSqlPrimitiveType(m.TypeUsage));
 
-            string newCommand = ChangeParamsToPSQLParams(commandText.ToString(), translator.Parameters.Select(p => p.ParameterName).ToArray());
-            commandText.Remove(0, commandText.Length);
-            commandText.Insert(0, newCommand);
-            commandText.Insert(0, startBlock.ToString());
+				separator = ", ";
+			}
+			startBlock.AppendLine(")");
+			startBlock.AppendLine("as begin");
 
-            commandText.Append("returning ");
-            separator = string.Empty;
-            foreach (EdmMember m in columnsToFetch)
-            {
-                commandText.Append(separator);
-                commandText.Append(GenerateMemberSql(m));
+			string newCommand = ChangeParamsToPSQLParams(commandText.ToString(), translator.Parameters.Select(p => p.ParameterName).ToArray());
+			commandText.Remove(0, commandText.Length);
+			commandText.Insert(0, newCommand);
+			commandText.Insert(0, startBlock.ToString());
 
-                separator = ", ";
-            }
-            commandText.Append(" into ");
-            separator = string.Empty;
-            foreach (EdmMember m in columnsToFetch)
-            {
-                commandText.Append(separator);
-                commandText.Append(":" + GenerateMemberSql(m));
+			commandText.Append("returning ");
+			separator = string.Empty;
+			foreach (EdmMember m in columnsToFetch)
+			{
+				commandText.Append(separator);
+				commandText.Append(GenerateMemberSql(m));
 
-                separator = ", ";
-            }
+				separator = ", ";
+			}
+			commandText.Append(" into ");
+			separator = string.Empty;
+			foreach (EdmMember m in columnsToFetch)
+			{
+				commandText.Append(separator);
+				commandText.Append(":" + GenerateMemberSql(m));
 
-            commandText.AppendLine(";");
-            commandText.AppendLine("suspend;");
-            commandText.AppendLine("end");
+				separator = ", ";
+			}
 
-            Debug.WriteLine(commandText.ToString());
-        }
+			commandText.AppendLine(";");
+			commandText.AppendLine("suspend;");
+			commandText.AppendLine("end");
 
-        private static string ChangeParamsToPSQLParams(string commandText, string[] parametersUsed)
-        {
-            StringBuilder command = new StringBuilder(commandText);
-            foreach (string param in parametersUsed)
-            {
-                command.Replace(param, ":" + param.Remove(0, 1));
-            }
-            return command.ToString();
-        }
+			Debug.WriteLine(commandText.ToString());
+		}
 
-        #endregion
-    }
+		private static string ChangeParamsToPSQLParams(string commandText, string[] parametersUsed)
+		{
+			StringBuilder command = new StringBuilder(commandText);
+			foreach (string param in parametersUsed)
+			{
+				command.Replace(param, ":" + param.Remove(0, 1));
+			}
+			return command.ToString();
+		}
+
+		#endregion
+	}
 }
 #endif
