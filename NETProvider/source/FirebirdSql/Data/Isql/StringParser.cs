@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.Isql
             get { return this.token; }
             set
             {
-                if (value == null || value.Length == 0)
+                if (string.IsNullOrEmpty(value))
                 {
                     throw new Exception("Token is empty!");
                 }
@@ -247,51 +247,44 @@ namespace FirebirdSql.Data.Isql
         /// <returns>The index of the char next char after the <see cref="Token"/> end.</returns>
         /// <remarks>If nothing is parsed the method will return -1. Case the <see cref="Token"/> wasn't found until the end of the string the method returns 
         /// (in <see cref="Result"/>) the string found between the starting index and the end of the string.</remarks>
-        public int ParseNext()
-        {
-            if (this.currentIndex >= this.sourceLength)
-            {
-                return -1;
-            }
+		public int ParseNext()
+		{
+			if (this.currentIndex >= this.sourceLength)
+			{
+				return -1;
+			}
 
-            int i = this.currentIndex;
-            bool inLiteral = false;
+			int i = this.currentIndex;
+			bool inLiteral = false;
 
-            while (i < this.sourceLength)
-            {
-                if (this.source[i] == '\'')
-                {
-                    inLiteral = !inLiteral;
-                }
+			while (i < this.sourceLength)
+			{
+				if (this.source[i] == '\'')
+				{
+					inLiteral = !inLiteral;
+				}
 
-                if (!inLiteral)
-                {
-                    if (string.Compare(this.source[i].ToString(), this.token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
-                    {
-                        if (string.Compare(this.source.Substring(i, this.tokenLength), this.token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
-                        {
-                            i += this.tokenLength;
-                            break;
-                        }
-                    }
-                }
+				if (!inLiteral)
+				{
+					if (string.Compare(this.source[i].ToString(), this.token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
+					{
+						if (string.Compare(this.source.Substring(i, this.tokenLength), this.token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
+						{
+							i += this.tokenLength;
+							break;
+						}
+					}
+				}
 
-                i++;
-            }
+				i++;
+			}
 
-            if (i != this.sourceLength)
-            {
-                this.charsParsed = i - this.currentIndex;
-                this.result = this.source.Substring(this.currentIndex, i - this.currentIndex - this.tokenLength);
-            }
-            else
-            {
-                this.charsParsed = i - this.currentIndex;
-                this.result = this.source.Substring(this.currentIndex);
-            }
+			this.charsParsed = i - this.currentIndex;
+			bool subtractToken = (i != this.sourceLength) || this.source.EndsWith(this.token, !this.caseSensitive, CultureInfo.CurrentUICulture);
+			this.result = this.source.Substring(this.currentIndex, i - this.currentIndex - (subtractToken ? this.tokenLength : 0));
 
-            return this.currentIndex = i;
-        }
+			return this.currentIndex = i;
+		}
 
         /// <summary>
         /// Returns the index of the substring in the string. If the substring does not exists the method returns <b>-1</b>.
