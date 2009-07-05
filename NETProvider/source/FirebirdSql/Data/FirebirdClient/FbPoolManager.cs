@@ -217,20 +217,20 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             lock (this.Pools.SyncRoot)
             {
-                int hashCode = (int)sender;
+                string connectionString = (string)sender;
 
-                if (this.Pools.ContainsKey(hashCode))
+				if (this.Pools.ContainsKey(connectionString))
                 {
-                    FbConnectionPool pool = (FbConnectionPool)this.Pools[hashCode];
+					FbConnectionPool pool = (FbConnectionPool)this.Pools[connectionString];
 
                     lock (pool.SyncObject)
                     {
-                        EmptyPoolEventHandler handler = (EmptyPoolEventHandler)this.Handlers[hashCode];
+						EmptyPoolEventHandler handler = (EmptyPoolEventHandler)this.Handlers[connectionString];
 
                         pool.EmptyPool -= handler;
 
-                        this.Pools.Remove(hashCode);
-                        this.Handlers.Remove(hashCode);
+						this.Pools.Remove(connectionString);
+						this.Handlers.Remove(connectionString);
 
                         pool    = null;
                         handler = null;
