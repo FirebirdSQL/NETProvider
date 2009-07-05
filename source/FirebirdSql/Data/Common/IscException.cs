@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Common
             }
         }
 
-        public new string Message
+        public override string Message
         {
             get { return this.message; }
         }
