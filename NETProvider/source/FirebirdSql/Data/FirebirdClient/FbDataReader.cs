@@ -371,14 +371,16 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             this.CheckState();
 
-            if (columnsIndexes == null)
-            {
-                columnsIndexes = new Dictionary<string, int>(this.fields.Count);
-                for (int i = 0; i < this.fields.Count; i++)
-                {
-                    columnsIndexes.Add(this.fields[i].Alias.ToUpper(), i);
-                }
-            }
+			if (columnsIndexes == null)
+			{
+				columnsIndexes = new Dictionary<string, int>(this.fields.Count);
+				for (int i = 0; i < this.fields.Count; i++)
+				{
+					string field = this.fields[i].Alias.ToUpper();
+					if (!columnsIndexes.ContainsKey(field))
+						columnsIndexes.Add(field, i);
+				}
+			}
 
             int index;
             if (!columnsIndexes.TryGetValue(name.ToUpper(), out index))
