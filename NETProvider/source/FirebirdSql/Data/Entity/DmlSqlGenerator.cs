@@ -243,15 +243,10 @@ namespace FirebirdSql.Data.Entity
 			}
 
 			EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
-			List<EdmMember> columnsToFetch = new List<EdmMember>();
-
-			foreach (EdmMember tableColumn in table.ElementType.Members)
-			{
-				if (IsStoreGenerated(tableColumn))
-				{
-					columnsToFetch.Add(tableColumn);
-				}
-			}
+			IEnumerable<EdmMember> columnsToFetch =
+			table.ElementType.Members
+				.Where(m => IsStoreGenerated(m))
+				.Except((!(tree is DbInsertCommandTree) ? table.ElementType.KeyMembers : Enumerable.Empty<EdmMember>()));
 
 			StringBuilder startBlock = new StringBuilder();
 			string separator = string.Empty;
@@ -315,8 +310,6 @@ namespace FirebirdSql.Data.Entity
 			commandText.AppendLine(";");
 			commandText.AppendLine("suspend;");
 			commandText.AppendLine("end");
-
-			Debug.WriteLine(commandText.ToString());
 		}
 
 		private static string ChangeParamsToPSQLParams(string commandText, string[] parametersUsed)
