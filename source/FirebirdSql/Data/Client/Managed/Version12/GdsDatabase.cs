@@ -45,5 +45,14 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			this.WriteBuffer(Encoding.UTF8.GetBytes(database));				// Database	PATH
 			this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
 		}
+
+		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
+		{
+			this.Write(IscCodes.op_create);
+			this.Write((int)0);
+			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+			this.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			this.WriteBuffer(dpb.ToArray());
+		}
 	}
 }

@@ -315,17 +315,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             {
                 try
                 {
-                    this.Write(IscCodes.op_create);
-                    this.Write((int)0);
-                    this.Write(database);
-                    this.WriteBuffer(dpb.ToArray());
+					SendCreateToBuffer(dpb, database);
                     this.Flush();
 
                     try
                     {
-                        GenericResponse response = (GenericResponse)this.ReadResponse();
+                        ProcessCreateResponse(this.ReadGenericResponse());
 
-                        this.handle = response.ObjectHandle;
                         this.Detach();
                     }
                     catch (IscException)
@@ -347,6 +343,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                 }
             }
         }
+
+		protected virtual void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
+		{
+			this.Write(IscCodes.op_create);
+			this.Write((int)0);
+			this.Write(database);
+			this.WriteBuffer(dpb.ToArray());
+		}
+
+		protected virtual void ProcessCreateResponse(GenericResponse response)
+		{
+			this.handle = response.ObjectHandle;
+		}
 
         public virtual void DropDatabase()
         {
