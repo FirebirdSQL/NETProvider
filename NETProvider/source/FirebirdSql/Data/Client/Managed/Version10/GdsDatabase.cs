@@ -202,15 +202,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             {
                 try
                 {
-                    // Attach to the database
-                    this.Write(IscCodes.op_attach);
-                    this.Write((int)0);				    // Database	object ID
-                    this.Write(database);				// Database	PATH
-                    this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+					SendAttachToBuffer(dpb, database);
                     this.Flush();
-
-                    // Save the database connection handle
-                    this.handle = this.ReadGenericResponse().ObjectHandle;
+					ProcessAttachResponse(this.ReadGenericResponse());
                 }
                 catch (IOException)
                 {
@@ -229,6 +223,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                 this.serverVersion = this.GetServerVersion();
             }
         }
+
+		protected virtual void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
+		{
+			// Attach to the database
+			this.Write(IscCodes.op_attach);
+			this.Write((int)0);				    // Database	object ID
+			this.Write(database);				// Database	PATH
+			this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+		}
+
+		protected virtual void ProcessAttachResponse(GenericResponse response)
+		{
+			// Save the database connection handle
+			this.handle = response.ObjectHandle;
+		}
 
         public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
         {
