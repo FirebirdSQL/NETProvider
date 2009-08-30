@@ -82,7 +82,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
             switch (connection.ProtocolVersion)
             {
-                case IscCodes.PROTOCOL_VERSION12:
+				case IscCodes.PROTOCOL_VERSION12:
+					return new FirebirdSql.Data.Client.Managed.Version12.GdsDatabase(connection);
                 case IscCodes.PROTOCOL_VERSION11:
                     return new FirebirdSql.Data.Client.Managed.Version11.GdsDatabase(connection);
                 case IscCodes.PROTOCOL_VERSION10:
@@ -97,7 +98,7 @@ namespace FirebirdSql.Data.FirebirdClient
             FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
 
             connection.Connect();
-            connection.Identify(!String.IsNullOrEmpty(options.Database) ? options.Database : "");
+            connection.Identify(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty);
 
             switch (connection.ProtocolVersion)
             {

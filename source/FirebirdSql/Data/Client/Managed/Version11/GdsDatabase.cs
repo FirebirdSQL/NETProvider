@@ -75,27 +75,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     using (SSPIHelper sspiHelper = new SSPIHelper())
                     {
                         byte[] authData = sspiHelper.InitializeClientSecurity();
-                        dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
-
-                        // Attach to the database
-                        this.Write(IscCodes.op_attach);
-                        this.Write((int)0);				    // Database	object ID
-                        this.Write(database);				// Database	PATH
-                        this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+						SendTrustedAuthToBuffer(dpb, authData);
+						SendAttachToBuffer(dpb, database);
                         this.Flush();
 
                         IResponse response = this.ReadResponse();
-                        while (response is AuthResponse)
-                        {
-                            authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
-                            this.Write(IscCodes.op_trusted_auth);
-                            this.WriteBuffer(authData);
-                            this.Flush();
-                            response = this.ReadResponse();
-                        }
-
-                        // Save the database connection handle
-                        this.handle = ((GenericResponse)response).ObjectHandle;
+						ProcessTrustedAuthResponse(sspiHelper, ref response);
+                        ProcessAttachResponse((GenericResponse)response);
                     }
                 }
                 catch (IOException)
@@ -118,6 +104,23 @@ namespace FirebirdSql.Data.Client.Managed.Version11
             throw new NotSupportedException();
 #endif
         }
+
+		protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBuffer dpb, byte[] authData)
+		{
+			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
+		}
+
+		protected virtual void ProcessTrustedAuthResponse(SSPIHelper sspiHelper, ref IResponse response)
+		{
+			while (response is AuthResponse)
+			{
+				byte[] authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
+				this.Write(IscCodes.op_trusted_auth);
+				this.WriteBuffer(authData);
+				this.Flush();
+				response = this.ReadResponse();
+			}
+		}
         #endregion
 
         #region Public methods
