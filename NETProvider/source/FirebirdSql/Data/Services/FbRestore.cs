@@ -27,117 +27,117 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-    public sealed class FbRestore : FbService
-    {
-        #region · Fields ·
+	public sealed class FbRestore : FbService
+	{
+		#region · Fields ·
 
-        private FbBackupFileCollection backupFiles;
-        private FbRestoreFlags options;
-        private bool verbose;
-        private int pageBuffers;
-        private int pageSize;
+		private FbBackupFileCollection backupFiles;
+		private FbRestoreFlags options;
+		private bool verbose;
+		private int? pageBuffers;
+		private int? pageSize;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public FbBackupFileCollection BackupFiles
-        {
-            get { return this.backupFiles; }
-        }
+		public FbBackupFileCollection BackupFiles
+		{
+			get { return this.backupFiles; }
+		}
 
-        public bool Verbose
-        {
-            get { return this.verbose; }
-            set { this.verbose = value; }
-        }
+		public bool Verbose
+		{
+			get { return this.verbose; }
+			set { this.verbose = value; }
+		}
 
-        public int PageBuffers
-        {
-            get { return this.pageBuffers; }
-            set { this.pageBuffers = value; }
-        }
+		public int? PageBuffers
+		{
+			get { return this.pageBuffers; }
+			set { this.pageBuffers = value; }
+		}
 
-        public int PageSize
-        {
-            get { return this.pageSize; }
-            set
-            {
-                if (this.pageSize != 1024 && this.pageSize != 2048 &&
-                    this.pageSize != 4096 && this.pageSize != 8192 &&
-                    this.pageSize != 16384)
-                {
-                    throw new InvalidOperationException("Invalid page size.");
-                }
-                this.pageSize = value;
-            }
-        }
+		public int? PageSize
+		{
+			get { return this.pageSize; }
+			set
+			{
+				if (value != 1024 && value != 2048 &&
+					value != 4096 && value != 8192 &&
+					value != 16384)
+				{
+					throw new InvalidOperationException("Invalid page size.");
+				}
+				this.pageSize = value;
+			}
+		}
 
-        public FbRestoreFlags Options
-        {
-            get { return this.options; }
-            set { this.options = value; }
-        }
+		public FbRestoreFlags Options
+		{
+			get { return this.options; }
+			set { this.options = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FbRestore()
-            : base()
-        {
-            this.backupFiles = new FbBackupFileCollection();
-            this.pageSize = 4096;
-            this.pageBuffers = 2048;
-        }
+		public FbRestore()
+			: base()
+		{
+			this.backupFiles = new FbBackupFileCollection();
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public void Execute()
-        {
-            try
-            {
-                // Configure Spb
-                this.StartSpb = new ServiceParameterBuffer();
+		public void Execute()
+		{
+			try
+			{
+				// Configure Spb
+				this.StartSpb = new ServiceParameterBuffer();
 
-                this.StartSpb.Append(IscCodes.isc_action_svc_restore);
+				this.StartSpb.Append(IscCodes.isc_action_svc_restore);
 
-                foreach (FbBackupFile bkpFile in backupFiles)
-                {
-                    this.StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
-                }
+				foreach (FbBackupFile bkpFile in backupFiles)
+				{
+					this.StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
+				}
 
-                this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-                if (this.verbose)
-                {
-                    this.StartSpb.Append(IscCodes.isc_spb_verbose);
-                }
+				if (this.verbose)
+				{
+					this.StartSpb.Append(IscCodes.isc_spb_verbose);
+				}
 
-                this.StartSpb.Append(IscCodes.isc_spb_res_buffers, this.pageBuffers);
-                this.StartSpb.Append(IscCodes.isc_spb_res_page_size, this.pageSize);
-                this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+				if (this.pageBuffers.HasValue)
+					this.StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)this.pageBuffers);
+				if (this.pageSize.HasValue)
+					this.StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)this.pageSize);
+				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
-                // Start execution
-                this.StartTask();
+				// Start execution
+				this.StartTask();
 
-                if (this.verbose)
-                {
-                    this.ProcessServiceOutput();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new FbException(ex.Message, ex);
-            }
-            finally
-            {
-                this.Close();
-            }
-        }
+				if (this.verbose)
+				{
+					this.ProcessServiceOutput();
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+			finally
+			{
+				this.Close();
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
