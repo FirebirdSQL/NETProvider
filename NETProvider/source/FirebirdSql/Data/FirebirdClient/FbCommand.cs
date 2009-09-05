@@ -362,7 +362,7 @@ namespace FirebirdSql.Data.FirebirdClient
             this.designTimeVisible = true;
             this.commandTimeout = 30;
             this.fetchSize = 200;
-            this.commandText = "";
+            this.commandText = string.Empty;
 
             if (connection != null)
             {
@@ -1208,7 +1208,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private string BuildStoredProcedureSql(string spName, bool returnsSet)
         {
-            string sql = spName == null ? "" : spName.Trim();
+            string sql = spName == null ? string.Empty : spName.Trim();
 
             if (sql.Length > 0 &&
                 !sql.ToLower(CultureInfo.InvariantCulture).StartsWith("execute procedure ") &&
@@ -1236,7 +1236,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     }
                     paramsText.Append(")");
                     paramsText.Replace(",)", ")");
-                    paramsText.Replace("()", "");
+                    paramsText.Replace("()", string.Empty);
                 }
 
                 if (returnsSet)

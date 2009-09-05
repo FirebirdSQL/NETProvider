@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.FirebirdClient
         #region · Fields ·
 
         private FbErrorCollection errors = new FbErrorCollection();
-        private string message = String.Empty;
+        private string message = string.Empty;
 
         #endregion
 

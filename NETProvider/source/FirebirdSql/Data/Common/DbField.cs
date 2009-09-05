@@ -189,10 +189,10 @@ namespace FirebirdSql.Data.Common
         public DbField()
         {
             this.charCount = -1;
-            this.name = String.Empty;
-            this.relation = String.Empty;
-            this.owner = String.Empty;
-            this.alias = String.Empty;
+            this.name = string.Empty;
+            this.relation = string.Empty;
+            this.owner = string.Empty;
+            this.alias = string.Empty;
             this.dbValue = new DbValue(this, DBNull.Value);
         }
 

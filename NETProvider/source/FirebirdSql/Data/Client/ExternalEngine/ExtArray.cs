@@ -366,7 +366,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
                 {
                     case DbDataType.Char:
                         {
-                            string value = source != null ? (string)source : String.Empty;
+                            string value = source != null ? (string)source : string.Empty;
                             byte[] buffer = charset.GetBytes(value);
 
                             writer.Write(buffer);
@@ -383,7 +383,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
                     case DbDataType.VarChar:
                         {
-                            string value = source != null ? (string)source : String.Empty;
+                            string value = source != null ? (string)source : string.Empty;
 
                             byte[] buffer = charset.GetBytes(value);
                             writer.Write(buffer);

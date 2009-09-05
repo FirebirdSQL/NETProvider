@@ -486,19 +486,19 @@ namespace FirebirdSql.Data.Isql
                 throw new Exception("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
             }
             parser.ParseNext();
-            this.connectionString.Database = parser.Result.Replace("'", "");
+            this.connectionString.Database = parser.Result.Replace("'", string.Empty);
             while (parser.ParseNext() != -1)
             {
                 switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
                 {
                     case "USER":
                         parser.ParseNext();
-                        this.connectionString.UserID = parser.Result.Replace("'", "");
+                        this.connectionString.UserID = parser.Result.Replace("'", string.Empty);
                         break;
 
                     case "PASSWORD":
                         parser.ParseNext();
-                        this.connectionString.Password = parser.Result.Replace("'", "");
+                        this.connectionString.Password = parser.Result.Replace("'", string.Empty);
                         break;
 
                     case "CACHE":
@@ -507,7 +507,7 @@ namespace FirebirdSql.Data.Isql
 
                     case "ROLE":
                         parser.ParseNext();
-                        this.connectionString.Role = parser.Result.Replace("'", "");
+                        this.connectionString.Role = parser.Result.Replace("'", string.Empty);
                         break;
 
                     default:
@@ -541,19 +541,19 @@ namespace FirebirdSql.Data.Isql
             }
             parser.ParseNext(); // {DATABASE | SCHEMA}
             parser.ParseNext();
-            this.connectionString.Database = parser.Result.Replace("'", "");
+            this.connectionString.Database = parser.Result.Replace("'", string.Empty);
             while (parser.ParseNext() != -1)
             {
                 switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
                 {
                     case "USER":
                         parser.ParseNext();
-                        this.connectionString.UserID = parser.Result.Replace("'", "");
+                        this.connectionString.UserID = parser.Result.Replace("'", string.Empty);
                         break;
 
                     case "PASSWORD":
                         parser.ParseNext();
-                        this.connectionString.Password = parser.Result.Replace("'", "");
+                        this.connectionString.Password = parser.Result.Replace("'", string.Empty);
                         break;
 
                     case "PAGE_SIZE":
@@ -675,7 +675,7 @@ namespace FirebirdSql.Data.Isql
             }
             catch (Exception)
             {
-                sqlConnection.ConnectionString = "";
+                sqlConnection.ConnectionString = string.Empty;
             }
 
             StringParser parser	= new StringParser(sqlDialectStatement, false);

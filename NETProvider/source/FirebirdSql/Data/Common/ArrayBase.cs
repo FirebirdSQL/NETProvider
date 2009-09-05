@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Common
 		{
 			this.tableName		= tableName;
 			this.fieldName		= fieldName;
-			this.rdbFieldName	= String.Empty;
+			this.rdbFieldName	= string.Empty;
 		}
 
 		#endregion

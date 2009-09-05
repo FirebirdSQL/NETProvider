@@ -339,7 +339,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private string GenerateParameterName()
         {
             int index = this.Count + 1;
-            string name = String.Empty;
+            string name = string.Empty;
 
             while (index > 0)
             {

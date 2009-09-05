@@ -195,7 +195,7 @@ namespace FirebirdSql.Data.Common
 
 		public string GetExecutionPlan()
 		{
-			string	plan		= String.Empty;
+			string	plan		= string.Empty;
 			int		count		= 0;
 			int		bufferSize	= IscCodes.MAX_BUFFER_SIZE;
 			byte[]	buffer		= this.GetSqlInfo(DescribePlanInfoItems, bufferSize);

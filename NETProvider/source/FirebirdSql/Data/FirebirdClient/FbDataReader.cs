@@ -267,7 +267,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
             DataRow schemaRow = null;
             int tableCount = 0;
-            string currentTable = "";
+            string currentTable = string.Empty;
 
             this.schemaTable = this.GetSchemaTableStructure();
 

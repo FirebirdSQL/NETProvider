@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Services
 
                 if (value == null)
                 {
-                    this.connectionString = String.Empty;
+                    this.connectionString = string.Empty;
                 }
                 else
                 {
@@ -109,7 +109,7 @@ namespace FirebirdSql.Data.Services
         protected FbService()
         {
             this.state = FbServiceState.Closed;
-            this.connectionString = String.Empty;
+            this.connectionString = string.Empty;
             this.serviceName = "service_mgr";
             this.queryBufferSize = IscCodes.MAX_BUFFER_SIZE;
         }

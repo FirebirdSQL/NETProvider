@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Common
 						return this.errorCode.ToString(CultureInfo.InvariantCulture);
 
 					default:
-						return String.Empty;
+						return string.Empty;
 				}
 			}
 		}

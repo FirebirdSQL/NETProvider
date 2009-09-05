@@ -110,7 +110,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.Write(this.handle);			// Array id
 					this.database.Write(sliceLength);			// Slice length
 					this.database.WriteBuffer(sdl);				// Slice descriptor	language
-					this.database.Write(String.Empty);			// Slice parameters					
+					this.database.Write(string.Empty);			// Slice parameters					
 					this.database.Write(0);						// Slice proper
 					this.database.Flush();
 
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.Write((long)0);				    // Array Handle
 					this.database.Write(sliceLength);			    // Slice length
 					this.database.WriteBuffer(sdl);				    // Slice descriptor	language
-					this.database.Write(String.Empty);			    // Slice parameters
+					this.database.Write(string.Empty);			    // Slice parameters
 					this.database.Write(sliceLength);			    // Slice length
 					this.database.Write(slice, 0, slice.Length);    // Slice proper
 					this.database.Flush();

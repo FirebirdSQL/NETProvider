@@ -736,7 +736,7 @@ namespace FirebirdSql.Data.Entity
 
                 default:
                     Debug.Assert(false);  // The constructor should have prevented this
-                    throw new InvalidOperationException(String.Empty);
+                    throw new InvalidOperationException(string.Empty);
             }
 
             return result;
@@ -1151,7 +1151,7 @@ namespace FirebirdSql.Data.Entity
                 members.MoveNext();
                 Debug.Assert(result.Select.IsEmpty);
 
-                string separator = "";
+                string separator = string.Empty;
 
                 foreach (DbExpression key in e.Keys)
                 {
@@ -2017,7 +2017,7 @@ namespace FirebirdSql.Data.Entity
             bool isScalarElement = MetadataHelpers.IsPrimitiveType(collectionType.TypeUsage);
 
             SqlBuilder resultSql = new SqlBuilder();
-            string separator = "";
+            string separator = string.Empty;
 
             // handle empty table
             if (e.Arguments.Count == 0)
@@ -2114,14 +2114,14 @@ namespace FirebirdSql.Data.Entity
             // but the Join postprocessing is messy and prevents this reuse.
             symbolTable.EnterScope();
 
-            string separator = "";
+            string separator = string.Empty;
             bool isLeftMostInput = true;
             int inputCount = inputs.Count;
             for (int idx = 0; idx < inputCount; idx++)
             {
                 DbExpressionBinding input = inputs[idx];
 
-                if (separator != "")
+                if (separator != string.Empty)
                 {
                     result.From.AppendLine();
                 }
@@ -2330,7 +2330,7 @@ namespace FirebirdSql.Data.Entity
             if (null != rowType)
             {
                 ReadOnlyMetadataCollection<EdmProperty> members = rowType.Properties;
-                string separator = "";
+                string separator = string.Empty;
                 for (int i = 0; i < e.Arguments.Count; ++i)
                 {
                     DbExpression argument = e.Arguments[i];
@@ -2449,7 +2449,7 @@ namespace FirebirdSql.Data.Entity
             if (!isNiladicFunction)
             {
                 result.Append("(");
-                string separator = "";
+                string separator = string.Empty;
                 foreach (DbExpression arg in e.Arguments)
                 {
                     result.Append(separator);
@@ -2979,7 +2979,7 @@ namespace FirebirdSql.Data.Entity
             // collision detection.
             Dictionary<string, Symbol> columnDictionary = new Dictionary<string, Symbol>(StringComparer.OrdinalIgnoreCase);
 
-            string separator = "";
+            string separator = string.Empty;
             // The Select should usually be empty before we are called,
             // but we do not mind if it is not.
             if (!selectStatement.Select.IsEmpty)
