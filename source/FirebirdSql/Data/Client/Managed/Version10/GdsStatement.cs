@@ -13,7 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
- *	Copyright (c) 2007 - 2008 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2007 - 2009 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -727,8 +727,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                                 {
                                     newItems.Insert(chock, IscCodes.isc_info_sql_sqlda_start);
                                     newItems.Insert(chock + 1, 2);
-                                    newItems.Insert(chock + 2, (byte)((part == currentDescriptorIndex ? currentItemIndex : 0) & 255));
-                                    newItems.Insert(chock + 3, (byte)((part == currentDescriptorIndex ? currentItemIndex : 0) >> 8));
+									newItems.Insert(chock + 2, (byte)((part == currentDescriptorIndex ? currentItemIndex : rowDescs[part].Count) & 255));
+									newItems.Insert(chock + 3, (byte)((part == currentDescriptorIndex ? currentItemIndex : rowDescs[part].Count) >> 8));
 
                                     part++;
                                     chock = i + 4 + 1;
@@ -738,8 +738,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                             info = this.GetSqlInfo(newItems.ToArray(), info.Length);
 
-                            currentPosition = 0;
-                            currentDescriptorIndex--;
+							currentPosition = 0;
+							currentDescriptorIndex = -1;
                             jumpOutOfInnerLoop = true;
                             break;
 
