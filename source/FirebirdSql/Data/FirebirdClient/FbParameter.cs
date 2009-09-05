@@ -250,8 +250,8 @@ namespace FirebirdSql.Data.FirebirdClient
             this.fbDbType = FbDbType.VarChar;
             this.direction = ParameterDirection.Input;
             this.sourceVersion = DataRowVersion.Current;
-            this.sourceColumn = String.Empty;
-            this.parameterName = String.Empty;
+            this.sourceColumn = string.Empty;
+            this.parameterName = string.Empty;
             this.charset = FbCharset.Default;
         }
 

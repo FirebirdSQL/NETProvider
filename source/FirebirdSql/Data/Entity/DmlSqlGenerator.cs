@@ -256,7 +256,7 @@ namespace FirebirdSql.Data.Entity
 			foreach (FbParameter param in translator.Parameters)
 			{
 				startBlock.Append(separator);
-				startBlock.Append(param.ParameterName.Replace("@", ""));
+				startBlock.Append(param.ParameterName.Replace("@", string.Empty));
 				startBlock.Append(" ");
 				EdmMember member = translator.MemberValues.First(m => m.Value.Contains(param)).Key;
 				startBlock.Append(SqlGenerator.GetSqlPrimitiveType(member.TypeUsage));

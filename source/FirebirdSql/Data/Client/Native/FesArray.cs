@@ -376,7 +376,7 @@ namespace FirebirdSql.Data.Client.Native
                 {
                     case DbDataType.Char:
                         {
-                            string value = source != null ? (string)source : String.Empty;
+                            string value = source != null ? (string)source : string.Empty;
                             byte[] buffer = charset.GetBytes(value);
 
                             writer.Write(buffer);
@@ -393,7 +393,7 @@ namespace FirebirdSql.Data.Client.Native
 
                     case DbDataType.VarChar:
                         {
-                            string value = source != null ? (string)source : String.Empty;
+                            string value = source != null ? (string)source : string.Empty;
 
                             byte[] buffer = charset.GetBytes(value);
                             writer.Write(buffer);

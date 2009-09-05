@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 spName = spName.ToUpper(CultureInfo.CurrentUICulture);
             }
 
-            string paramsText = String.Empty;
+            string paramsText = string.Empty;
 
             command.Parameters.Clear();
 

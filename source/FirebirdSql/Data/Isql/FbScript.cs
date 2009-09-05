@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Isql
         /// <param name="sqlFilename">The filename for the SQL file.</param>
         public FbScript(string sqlFilename)
         {
-            string script = "";
+            string script = string.Empty;
 
             using (StreamReader reader = File.OpenText(sqlFilename))
             {
@@ -210,7 +210,7 @@ namespace FirebirdSql.Data.Isql
         {
             bool result = false;
 
-            newTerm = "";
+            newTerm = string.Empty;
 
             if (StringParser.StartsWith(statement, "SET TERM", true))
             {

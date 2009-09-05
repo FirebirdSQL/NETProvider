@@ -196,7 +196,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     {
                         if (value == null)
                         {
-                            value = "";
+                            value = string.Empty;
                         }
 
                         this.options.Load(value);
@@ -329,7 +329,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             this.options = new FbConnectionString();
             this.state = ConnectionState.Closed;
-            this.connectionString = "";
+            this.connectionString = string.Empty;
 
             if (!string.IsNullOrEmpty(connectionString))
             {
