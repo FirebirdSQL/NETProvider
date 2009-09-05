@@ -316,7 +316,7 @@ namespace FirebirdSql.Data.Isql
                             this.requiresNewConnection = true;
 
                             // raise the event
-                            this.OnCommandExecuted(null, null, -1);
+                            this.OnCommandExecuted(sqlStatement, null, -1);
                             break;
 
                         case SqlStatementType.DropDomain:
