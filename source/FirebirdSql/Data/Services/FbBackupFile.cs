@@ -14,45 +14,33 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
 
 namespace FirebirdSql.Data.Services
 {
-    public class FbBackupFile
-    {
-        #region · Fields ·
+	public class FbBackupFile
+	{
+		#region · Properties ·
 
-        private string backupFile;
-        private int backupLength;
+		public string BackupFile { get; set; }
 
-        #endregion
+		public int? BackupLength { get; set; }
 
-        #region · Properties ·
+		#endregion
 
-        public string BackupFile
-        {
-            get { return this.backupFile; }
-            set { this.backupFile = value; }
-        }
+		#region · Constructors ·
 
-        public int BackupLength
-        {
-            get { return this.backupLength; }
-            set { this.backupLength = value; }
-        }
+		public FbBackupFile(string fileName, int? fileLength)
+		{
+			this.BackupFile = fileName;
+			this.BackupLength = fileLength;
+		}
 
-        #endregion
-
-        #region · Constructors ·
-
-        public FbBackupFile(string fileName, int fileLength)
-        {
-            this.backupFile = fileName;
-            this.backupLength = fileLength;
-        }
-
-        #endregion
-    }
+		#endregion
+	}
 }

@@ -90,7 +90,8 @@ namespace FirebirdSql.Data.Services
                 foreach (FbBackupFile file in backupFiles)
                 {
                     this.StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
-                    this.StartSpb.Append(IscCodes.isc_spb_bkp_length, file.BackupLength);
+					if (file.BackupLength.HasValue)
+						this.StartSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
                 }
 
                 if (verbose)
