@@ -727,8 +727,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                                 {
                                     newItems.Insert(chock, IscCodes.isc_info_sql_sqlda_start);
                                     newItems.Insert(chock + 1, 2);
-									newItems.Insert(chock + 2, (byte)((part == currentDescriptorIndex ? currentItemIndex : rowDescs[part].Count) & 255));
-									newItems.Insert(chock + 3, (byte)((part == currentDescriptorIndex ? currentItemIndex : rowDescs[part].Count) >> 8));
+
+									int processedItems = (rowDescs[part] != null ? rowDescs[part].Count : 0);
+									newItems.Insert(chock + 2, (byte)((part == currentDescriptorIndex ? currentItemIndex : processedItems) & 255));
+									newItems.Insert(chock + 3, (byte)((part == currentDescriptorIndex ? currentItemIndex : processedItems) >> 8));
 
                                     part++;
                                     chock = i + 4 + 1;
