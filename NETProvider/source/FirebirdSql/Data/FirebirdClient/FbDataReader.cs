@@ -804,6 +804,9 @@ namespace FirebirdSql.Data.FirebirdClient
             return ((behavior & this.commandBehavior) == behavior);
         }
 
+#if (NET_20)
+		delegate TResult Func<TResult>();
+#endif
 		private T CheckedGetValue<T>(Func<T> f)
 		{
 			try
