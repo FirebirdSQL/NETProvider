@@ -168,7 +168,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     outputStream.Write(1);							// Architecture	of client -	Generic
 
                     outputStream.Write(database);					// Database	path
-                    outputStream.Write(3);							// Protocol	versions understood
+                    outputStream.Write(2);							// Protocol	versions understood
                     outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
 
                     outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
@@ -183,11 +183,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     outputStream.Write(5);							// Maximum type (ptype_lazy_send)
                     outputStream.Write(1);							// Preference weight
 
+#if false
 					outputStream.Write(IscCodes.PROTOCOL_VERSION12);//	Protocol version
 					outputStream.Write(1);							// Architecture	of client -	Generic
 					outputStream.Write(2);							// Minumum type (ptype_rpc)
 					outputStream.Write(5);							// Maximum type (ptype_lazy_send)
 					outputStream.Write(2);							// Preference weight
+#endif
                 }
                 outputStream.Flush();
 
@@ -199,7 +201,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                     if (this.protocolVersion < 0)
                     {
-                        //this.protocolVersion = (this.protocolVersion & IscCodes.FB_PROTOCOL_FLAG) | 11;
                         this.protocolVersion = (ushort)(this.protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
                     }
                 }

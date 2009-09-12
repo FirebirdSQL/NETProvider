@@ -105,6 +105,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 #endif
         }
 
+#if (!LINUX)
 		protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBuffer dpb, byte[] authData)
 		{
 			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
@@ -121,6 +122,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				response = this.ReadResponse();
 			}
 		}
+#endif
         #endregion
 
         #region Public methods
