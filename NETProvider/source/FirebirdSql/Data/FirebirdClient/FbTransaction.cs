@@ -417,6 +417,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     break;
 
                 case IsolationLevel.RepeatableRead:
+				case IsolationLevel.Snapshot:
                     options.TransactionBehavior |= FbTransactionBehavior.Concurrency;
                     break;
 
