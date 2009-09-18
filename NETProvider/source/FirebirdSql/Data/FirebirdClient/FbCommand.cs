@@ -1036,7 +1036,10 @@ namespace FirebirdSql.Data.FirebirdClient
                             case DbDataType.Text:
                                 {
                                     BlobBase blob = this.statement.CreateBlob();
-                                    blob.Write((string)this.Parameters[index].Value);
+									if (this.Parameters[index].Value.GetType() == typeof(byte[]))
+										blob.Write((byte[])this.Parameters[index].Value);
+									else
+									    blob.Write((string)this.Parameters[index].Value);
                                     this.statement.Parameters[i].Value = blob.Id;
                                 }
                                 break;
