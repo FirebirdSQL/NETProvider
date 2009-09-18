@@ -103,6 +103,18 @@ namespace FirebirdSql.Data.UnitTests
             }
         }
 
+		[Test]
+		public void DNET273()
+		{
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "insert into test (INT_FIELD, CLOB_FIELD) values (@INT_FIELD, @CLOB_FIELD)";
+				cmd.Parameters.Add("@INT_FIELD", FbDbType.Integer).Value = 100;
+				cmd.Parameters.Add("@CLOB_FIELD", FbDbType.Binary).Value = new byte[] { 0x00, 0x001 };
+				cmd.ExecuteNonQuery();
+			}
+		}
+
         #endregion
     }
 }
