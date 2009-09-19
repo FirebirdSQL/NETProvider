@@ -79,15 +79,20 @@ namespace FirebirdSql.Data.Common
 
         #region · Protected Methods ·
 
-        protected void WriteByte(int value)
-        {
-            this.WriteByte((byte)value);
-        }
+		protected void WriteByte(int value)
+		{
+			this.WriteByte((byte)value);
+		}
 
-        protected void WriteByte(byte value)
-        {
-            this.stream.WriteByte(value);
-        }
+		protected void WriteByte(byte value)
+		{
+			this.stream.WriteByte(value);
+		}
+
+		protected void Write(byte value)
+		{
+			this.WriteByte(value);
+		}
 
         protected void Write(short value)
         {
