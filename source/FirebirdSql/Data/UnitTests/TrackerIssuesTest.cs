@@ -23,11 +23,11 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Collections.Specialized;
+using System.Text;
 
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
 using NUnit.Framework;
-using System.Text;
 
 namespace FirebirdSql.Data.UnitTests
 {
