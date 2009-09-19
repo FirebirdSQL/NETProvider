@@ -56,18 +56,14 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ProviderManifestTokenTest()
 		{
-			DbProviderServices dbproviderservices = this.GetProviderServices();
-			using (DbConnection connection = FirebirdClientFactory.Instance.CreateConnection())
-			{
-				string token = dbproviderservices.GetProviderManifestToken(Connection);
-				Assert.IsNotNullOrEmpty(token);
-				Console.WriteLine(token);
-				Version v = new Version(token);
-				Assert.Greater(v.Major, 0);
-				Assert.Greater(v.Minor, 0);
-				Assert.AreEqual(v.Build, -1);
-				Assert.AreEqual(v.Revision, -1);
-			}
+			string token = this.GetProviderServices().GetProviderManifestToken(Connection);
+			Assert.IsNotNullOrEmpty(token);
+			Console.WriteLine(token);
+			Version v = new Version(token);
+			Assert.Greater(v.Major, 0);
+			Assert.Greater(v.Minor, 0);
+			Assert.AreEqual(v.Build, -1);
+			Assert.AreEqual(v.Revision, -1);
 		}
 
 		#endregion
