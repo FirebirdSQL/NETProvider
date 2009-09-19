@@ -483,111 +483,111 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-        [Test]
-        public void InsertDateTimeTest()
-        {
-            DateTime value = DateTime.Now;
+		[Test]
+		public void InsertDateTimeTest()
+		{
+			DateTime value = DateTime.Now;
 
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "insert into test (int_field, timestamp_field) values (1002, @dt)";
-                cmd.Parameters.Add("@dt", FbDbType.TimeStamp).Value = value;
-                
-                int ra = cmd.ExecuteNonQuery();
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "insert into test (int_field, timestamp_field) values (1002, @dt)";
+				cmd.Parameters.Add("@dt", FbDbType.TimeStamp).Value = value;
 
-                Assert.AreEqual(ra, 1);
-            }
+				int ra = cmd.ExecuteNonQuery();
 
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "select timestamp_field from test where int_field = 1002";
-                DateTime result = (DateTime)cmd.ExecuteScalar();
+				Assert.AreEqual(ra, 1);
+			}
 
-                Assert.AreEqual(value.ToString(), result.ToString());
-            }
-        }
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select timestamp_field from test where int_field = 1002";
+				DateTime result = (DateTime)cmd.ExecuteScalar();
 
-        [Test]
-        public void InsertTimeStampTest()
-        {
-            string value = DateTime.Now.ToString();
-            
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "insert into test (int_field, timestamp_field) values (1002, @ts)";
-                cmd.Parameters.Add("@ts", FbDbType.TimeStamp).Value = value;
+				Assert.AreEqual(value.ToString(), result.ToString());
+			}
+		}
 
-                int ra = cmd.ExecuteNonQuery();
+		[Test]
+		public void InsertTimeStampTest()
+		{
+			string value = DateTime.Now.ToString();
 
-                Assert.AreEqual(ra, 1);
-            }
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "insert into test (int_field, timestamp_field) values (1002, @ts)";
+				cmd.Parameters.Add("@ts", FbDbType.TimeStamp).Value = value;
 
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "select timestamp_field from test where int_field = 1002";
-                DateTime result = (DateTime)cmd.ExecuteScalar();
+				int ra = cmd.ExecuteNonQuery();
 
-                Assert.AreEqual(value, result.ToString());
-            }
-        }
+				Assert.AreEqual(ra, 1);
+			}
 
-        [Test]
-        public void InsertTimeTest()
-        {
-            TimeSpan t = new TimeSpan(0, 5, 6, 7, 231);
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select timestamp_field from test where int_field = 1002";
+				DateTime result = (DateTime)cmd.ExecuteScalar();
 
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "insert into test (int_field, time_field) values (2245, @t)";
-                cmd.Parameters.Add("@t", FbDbType.Time).Value = t;
+				Assert.AreEqual(value, result.ToString());
+			}
+		}
 
-                int ra = cmd.ExecuteNonQuery();
+		[Test]
+		public void InsertTimeTest()
+		{
+			TimeSpan t = new TimeSpan(0, 5, 6, 7, 231);
 
-                Assert.AreEqual(ra, 1);
-            }
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "insert into test (int_field, time_field) values (2245, @t)";
+				cmd.Parameters.Add("@t", FbDbType.Time).Value = t;
 
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "select time_field from test where int_field = 2245";
-                TimeSpan result = (TimeSpan)cmd.ExecuteScalar();
+				int ra = cmd.ExecuteNonQuery();
 
-                Assert.AreEqual(t.Hours, result.Hours, "hours are not same");
-                Assert.AreEqual(t.Minutes, result.Minutes, "minutes are not same");
-                Assert.AreEqual(t.Seconds, result.Seconds, "seconds are not same");
-                Assert.AreEqual(t.Milliseconds, result.Milliseconds, "milliseconds are not same");
-            }
-        }
+				Assert.AreEqual(ra, 1);
+			}
 
-        [Test]
-        public void InsertTimeOldTest()
-        {
-            DateTime t = DateTime.Today;
-            t = t.AddHours(5);
-            t = t.AddMinutes(6);
-            t = t.AddSeconds(7);
-            t = t.AddMilliseconds(231);
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select time_field from test where int_field = 2245";
+				TimeSpan result = (TimeSpan)cmd.ExecuteScalar();
 
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "insert into test (int_field, time_field) values (2245, @t)";
-                cmd.Parameters.Add("@t", FbDbType.Time).Value = t;
+				Assert.AreEqual(t.Hours, result.Hours, "hours are not same");
+				Assert.AreEqual(t.Minutes, result.Minutes, "minutes are not same");
+				Assert.AreEqual(t.Seconds, result.Seconds, "seconds are not same");
+				Assert.AreEqual(t.Milliseconds, result.Milliseconds, "milliseconds are not same");
+			}
+		}
 
-                int ra = cmd.ExecuteNonQuery();
+		[Test]
+		public void InsertTimeOldTest()
+		{
+			DateTime t = DateTime.Today;
+			t = t.AddHours(5);
+			t = t.AddMinutes(6);
+			t = t.AddSeconds(7);
+			t = t.AddMilliseconds(231);
 
-                Assert.AreEqual(ra, 1);
-            }
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "insert into test (int_field, time_field) values (2245, @t)";
+				cmd.Parameters.Add("@t", FbDbType.Time).Value = t;
 
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "select time_field from test where int_field = 2245";
-                TimeSpan result = (TimeSpan)cmd.ExecuteScalar();
+				int ra = cmd.ExecuteNonQuery();
 
-                Assert.AreEqual(t.Hour, result.Hours, "hours are not same");
-                Assert.AreEqual(t.Minute, result.Minutes, "minutes are not same");
-                Assert.AreEqual(t.Second, result.Seconds, "seconds are not same");
-                Assert.AreEqual(t.Millisecond, result.Milliseconds, "milliseconds are not same");
-            }
-        }
+				Assert.AreEqual(ra, 1);
+			}
+
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select time_field from test where int_field = 2245";
+				TimeSpan result = (TimeSpan)cmd.ExecuteScalar();
+
+				Assert.AreEqual(t.Hour, result.Hours, "hours are not same");
+				Assert.AreEqual(t.Minute, result.Minutes, "minutes are not same");
+				Assert.AreEqual(t.Second, result.Seconds, "seconds are not same");
+				Assert.AreEqual(t.Millisecond, result.Milliseconds, "milliseconds are not same");
+			}
+		}
 
 		[Test]
 		public void ParameterDescribeTest()
@@ -608,7 +608,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			using (IDbCommand command = this.Connection.CreateCommand())
 			{
-                using (IDbTransaction transaction = this.Connection.BeginTransaction(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Read, WaitTimeout = null }))
+				using (IDbTransaction transaction = this.Connection.BeginTransaction(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Read, WaitTimeout = null }))
 				{
 					try
 					{
@@ -631,12 +631,26 @@ namespace FirebirdSql.Data.UnitTests
 			DataTable tables = this.Connection.GetSchema("Tables", new string[] { null, null, null, null });
 
 			string selectSql = "SELECT * FROM TEST";
-			
+
 			FbCommand c1 = new FbCommand(selectSql, this.Connection);
 			IDataReader r = c1.ExecuteReader();
 
 			while (r.Read())
 			{
+			}
+		}
+
+		[Test]
+		public void ReturningClauseTest()
+		{
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				const string columnValue = "foobar";
+
+				cmd.CommandText = string.Format("update rdb$database set rdb$description = '{0}' returning rdb$description", columnValue);
+				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
+				cmd.ExecuteNonQuery();
+				Assert.AreEqual(columnValue, cmd.Parameters[0].Value);
 			}
 		}
 
