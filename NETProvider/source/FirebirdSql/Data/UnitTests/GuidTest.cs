@@ -59,10 +59,12 @@ namespace FirebirdSql.Data.UnitTests
 
 			// Select the value
 			FbCommand select = new FbCommand("SELECT * FROM GUID_TEST", Connection);
-			FbDataReader r = select.ExecuteReader();
-			if (r.Read())
+			using (FbDataReader r = select.ExecuteReader())
 			{
-				newGuid = r.GetGuid(0);
+				if (r.Read())
+				{
+					newGuid = r.GetGuid(0);
+				}
 			}
 
 			Assert.AreEqual(guidValue, newGuid);
@@ -84,12 +86,14 @@ namespace FirebirdSql.Data.UnitTests
 
 			// Select the value
 			FbCommand select = new FbCommand("SELECT * FROM GUID_TEST", Connection);
-			FbDataReader r = select.ExecuteReader();
-			if (r.Read())
+			using (FbDataReader r = select.ExecuteReader())
 			{
-				if (!r.IsDBNull(1))
+				if (r.Read())
 				{
-					throw new Exception();
+					if (!r.IsDBNull(1))
+					{
+						throw new Exception();
+					}
 				}
 			}
 		}

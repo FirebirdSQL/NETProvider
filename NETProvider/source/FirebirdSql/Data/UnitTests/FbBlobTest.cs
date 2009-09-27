@@ -117,18 +117,20 @@ namespace FirebirdSql.Data.UnitTests
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
 
-			FbDataReader reader = select.ExecuteReader();
-
-			int index = 0;
-			int segmentSize = 1000;
 			byte[] select_values = new byte[100000 * 4];
-			while (reader.Read())
-			{
-				while (index < 400000)
-				{
-					reader.GetBytes(0, index, select_values, index, segmentSize);
 
-					index += segmentSize;
+			using (FbDataReader reader = select.ExecuteReader())
+			{
+				int index = 0;
+				int segmentSize = 1000;
+				while (reader.Read())
+				{
+					while (index < 400000)
+					{
+						reader.GetBytes(0, index, select_values, index, segmentSize);
+
+						index += segmentSize;
+					}
 				}
 			}
 
