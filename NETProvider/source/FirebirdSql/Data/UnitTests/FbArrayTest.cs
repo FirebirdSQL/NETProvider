@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.UnitTests
 		#region · Unit Tests ·
 
 		[Test]
-		public void IntergerArrayTest()
+		public void IntegerArrayTest()
 		{
 			int id_value = this.GetId();
 
@@ -623,7 +623,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void IntergerArrayPartialUpdateTest()
+		public void IntegerArrayPartialUpdateTest()
 		{
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Integer Array Test");
