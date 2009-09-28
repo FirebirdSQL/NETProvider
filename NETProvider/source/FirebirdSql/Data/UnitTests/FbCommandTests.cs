@@ -29,11 +29,11 @@ using NUnit.Framework;
 namespace FirebirdSql.Data.UnitTests
 {
 	[TestFixture]
-	public class FbCommandTest : BaseTest
+	public class FbCommandTests : TestsBase
 	{
 		#region · Constructors ·
 
-		public FbCommandTest()
+		public FbCommandTests()
 			: base(false)
 		{
 		}

@@ -27,7 +27,7 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	public class BaseTest
+	public class TestsBase
 	{
 		#region	· Fields ·
 
@@ -54,12 +54,12 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region	· Constructors ·
 
-		public BaseTest()
+		public TestsBase()
 		{
 			this.withTransaction = false;
 		}
 
-		public BaseTest(bool withTransaction)
+		public TestsBase(bool withTransaction)
 		{
 			this.withTransaction = withTransaction;
 		}

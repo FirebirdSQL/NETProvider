@@ -28,7 +28,7 @@ using NUnit.Framework;
 namespace FirebirdSql.Data.UnitTests
 {
 	[TestFixture]
-	public class FbCommandBuilderTest : BaseTest
+	public class FbCommandBuilderTests : TestsBase
 	{
 		#region · Fields ·
 
@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region · Constructors ·
 
-		public FbCommandBuilderTest()
+		public FbCommandBuilderTests()
 			: base(false)
 		{
 		}
