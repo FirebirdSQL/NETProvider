@@ -31,80 +31,80 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-    [TestFixture]
-    public class TrackerIssuesTest : BaseTest
-    {
-        #region · Constructors ·
+	[TestFixture]
+	public class TrackerIssuesTest : BaseTest
+	{
+		#region · Constructors ·
 
-        public TrackerIssuesTest()
-        {
-        }
-
-        #endregion
-
-        #region · Unit Tests ·
-
-        [Test]
-        public void DNET60()
-        {
-            using (FbCommand command = Connection.CreateCommand())
-            {
-                command.CommandText = "select ' ' AS EmptyColumn from rdb$database";
-
-                using (FbDataReader r = command.ExecuteReader())
-                {
-                    while (r.Read())
-                    {
-                    }
-                }
-            }
+		public TrackerIssuesTest()
+		{
 		}
 
-        [Test]
-        public void DNET183()
-        {
-            const string value = "foo  ";
+		#endregion
 
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "select cast(@foo as varchar(5)) from rdb$database";
-                cmd.Parameters.Add(new FbParameter() { ParameterName = "@foo", FbDbType = FbDbType.VarChar, Size = 5, Value = value });
-                using (FbDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        Assert.AreEqual(value, (string)reader[0]);
-                    }
-                }
-            }
-        }
+		#region · Unit Tests ·
 
-        [Test]
-        public void DNET217()
-        {
-            StringBuilder cols = new StringBuilder();
-            string separator = string.Empty;
-            for (int i = 0; i < 1235; i++)
-            {
-                if (i % 2 == 0)
-                    cols.AppendFormat("{0}'r' as col{1}", separator, i);
-                else
-                    cols.AppendFormat("{0}24 as col{1}", separator, i);
+		[Test]
+		public void DNET60()
+		{
+			using (FbCommand command = Connection.CreateCommand())
+			{
+				command.CommandText = "select ' ' AS EmptyColumn from rdb$database";
 
-                separator = ",";
-            }
-            using (FbCommand cmd = Connection.CreateCommand())
-            {
-                cmd.CommandText = "select " + cols.ToString() + " from rdb$database where 'x' = @x or 'x' = @x and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y";
-                cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "-1" });
-                cmd.Parameters.Add(new FbParameter() { ParameterName = "@y", Value = DateTime.Now });
-                using (FbDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    { }
-                }
-            }
-        }
+				using (FbDataReader r = command.ExecuteReader())
+				{
+					while (r.Read())
+					{
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void DNET183()
+		{
+			const string value = "foo  ";
+
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast(@foo as varchar(5)) from rdb$database";
+				cmd.Parameters.Add(new FbParameter() { ParameterName = "@foo", FbDbType = FbDbType.VarChar, Size = 5, Value = value });
+				using (FbDataReader reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						Assert.AreEqual(value, (string)reader[0]);
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void DNET217()
+		{
+			StringBuilder cols = new StringBuilder();
+			string separator = string.Empty;
+			for (int i = 0; i < 1235; i++)
+			{
+				if (i % 2 == 0)
+					cols.AppendFormat("{0}'r' as col{1}", separator, i);
+				else
+					cols.AppendFormat("{0}24 as col{1}", separator, i);
+
+				separator = ",";
+			}
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select " + cols.ToString() + " from rdb$database where 'x' = @x or 'x' = @x and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y";
+				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "-1" });
+				cmd.Parameters.Add(new FbParameter() { ParameterName = "@y", Value = DateTime.Now });
+				using (FbDataReader reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{ }
+				}
+			}
+		}
 
 		[Test]
 		public void DNET260()
@@ -255,6 +255,15 @@ END
 			}
 		}
 
-        #endregion
-    }
+		[Test]
+		public void DNET274()
+		{
+			for (int i = 1000; i < 21000; i++)
+			{
+				new FbCommand() { CommandText = string.Format("insert into test (INT_FIELD) values ({0})", i), Connection = Connection }.ExecuteNonQuery();
+			}
+		}
+
+		#endregion
+	}
 }
