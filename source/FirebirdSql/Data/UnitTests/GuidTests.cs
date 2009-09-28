@@ -31,11 +31,11 @@ namespace FirebirdSql.Data.UnitTests
 	/// All the test in this TestFixture are using implicit transaction support.
 	/// </summary>
 	[TestFixture]
-	public class GuidTest : BaseTest
+	public class GuidTests : TestsBase
 	{
 		#region · Constructors ·
 
-		public GuidTest()
+		public GuidTests()
 			: base()
 		{
 		}

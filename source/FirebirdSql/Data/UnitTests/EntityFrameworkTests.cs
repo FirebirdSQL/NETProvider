@@ -28,11 +28,11 @@ using System.Reflection;
 namespace FirebirdSql.Data.UnitTests
 {
 	[TestFixture]
-	public class EntityFrameworkTest : BaseTest
+	public class EntityFrameworkTests : TestsBase
 	{
 		#region · Constructors ·
 
-		public EntityFrameworkTest()
+		public EntityFrameworkTests()
 		{ }
 
 		#endregion

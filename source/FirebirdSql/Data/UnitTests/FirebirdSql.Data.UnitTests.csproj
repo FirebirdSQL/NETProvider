@@ -51,28 +51,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TrackerIssuesTest.cs" />
+    <Compile Include="TrackerIssuesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BaseTest.cs" />
-    <Compile Include="FbArrayTest.cs" />
-    <Compile Include="FbBlobTest.cs" />
-    <Compile Include="FbCommandBuilderTest.cs" />
-    <Compile Include="FbCommandTest.cs" />
-    <Compile Include="FbConnectionTest.cs" />
-    <Compile Include="FbDataAdapterTest.cs" />
-    <Compile Include="FbDatabaseInfoTest.cs" />
-    <Compile Include="FbDatabaseSchemaTest.cs" />
-    <Compile Include="FbDataReaderTest.cs" />
-    <Compile Include="FbImplicitTransactionTest.cs" />
-    <Compile Include="FbParameterCollectionTest.cs" />
-    <Compile Include="FbParameterTest.cs" />
-    <Compile Include="FbScriptTest.cs" />
+    <Compile Include="TestsBase.cs" />
+    <Compile Include="FbArrayTests.cs" />
+    <Compile Include="FbBlobTests.cs" />
+    <Compile Include="FbCommandBuilderTests.cs" />
+    <Compile Include="FbCommandTests.cs" />
+    <Compile Include="FbConnectionTests.cs" />
+    <Compile Include="FbDataAdapterTests.cs" />
+    <Compile Include="FbDatabaseInfoTests.cs" />
+    <Compile Include="FbDatabaseSchemaTests.cs" />
+    <Compile Include="FbDataReaderTests.cs" />
+    <Compile Include="FbImplicitTransactionTests.cs" />
+    <Compile Include="FbParameterCollectionTests.cs" />
+    <Compile Include="FbParameterTests.cs" />
+    <Compile Include="FbScriptTests.cs" />
     <Compile Include="FbServicesTests.cs" />
-    <Compile Include="FbStoredProcCallsTest.cs" />
-    <Compile Include="FbTransactionTest.cs" />
-    <Compile Include="GuidTest.cs" />
-    <Compile Include="EntityFrameworkTest.cs" />
-    <Compile Include="TransactionScopeTest.cs" />
+    <Compile Include="FbStoredProcCallsTests.cs" />
+    <Compile Include="FbTransactionTests.cs" />
+    <Compile Include="GuidTests.cs" />
+    <Compile Include="EntityFrameworkTests.cs" />
+    <Compile Include="TransactionScopeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient.csproj">

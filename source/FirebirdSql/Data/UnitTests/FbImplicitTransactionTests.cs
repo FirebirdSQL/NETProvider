@@ -26,11 +26,11 @@ using FirebirdSql.Data.FirebirdClient;
 namespace FirebirdSql.Data.UnitTests
 {
 	[TestFixture]
-	public class FbImplicitTransactionTest : BaseTest
+	public class FbImplicitTransactionTests : TestsBase
 	{
 		#region · Constructors ·
 
-		public FbImplicitTransactionTest()
+		public FbImplicitTransactionTests()
 			: base(false)
 		{
 		}
