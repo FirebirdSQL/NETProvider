@@ -51,7 +51,6 @@ namespace FirebirdSql.Data.FirebirdClient
         private bool implicitTransaction;
         private int commandTimeout;
         private int fetchSize;
-        private bool addedToPrepared;
 
 #if (NET_35 && ENTITY_FRAMEWORK)
         // type coercions
@@ -782,31 +781,27 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        internal void Release()
-        {
-            // Rollback implicit transaction
-            this.RollbackImplicitTransaction();
+		internal void Release()
+		{
+			// Rollback implicit transaction
+			this.RollbackImplicitTransaction();
 
-            // If there	are	an active reader close it
-            this.CloseReader();
+			// If there	are	an active reader close it
+			this.CloseReader();
 
-            if (this.addedToPrepared)
-            {
-                // Remove the command from the Prepared commands list
-                if (this.connection != null && this.connection.State == ConnectionState.Open)
-                {
-                    this.connection.InnerConnection.RemovePreparedCommand(this);
-                }
-                this.addedToPrepared = false;
-            }
+			// Remove the command from the Prepared commands list
+			if (this.connection != null && this.connection.State == ConnectionState.Open)
+			{
+				this.connection.InnerConnection.RemovePreparedCommand(this);
+			}
 
-            // Dipose the inner statement
-            if (this.statement != null)
-            {
-                this.statement.Dispose();
-                this.statement = null;
-            }
-        }
+			// Dipose the inner statement
+			if (this.statement != null)
+			{
+				this.statement.Dispose();
+				this.statement = null;
+			}
+		}
 
         #endregion
 
@@ -1157,7 +1152,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 // Add this	command	to the active command list
                 innerConn.AddPreparedCommand(this);
-                this.addedToPrepared = true;
             }
             else
             {

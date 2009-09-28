@@ -633,7 +633,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             this.innerConnection.DisposeTransaction();
 
                             // Dispose all active statemenets
-                            this.innerConnection.DisposePreparedCommands();
+                            this.innerConnection.ReleasePreparedCommands();
 
                             // Close connection	or send	it back	to the pool
                             if (this.innerConnection.Pooled)

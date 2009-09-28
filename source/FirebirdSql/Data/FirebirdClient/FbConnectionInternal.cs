@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private IDatabase db;
         private FbTransaction activeTransaction;
-        private List<FbCommand> preparedCommands;
+        private List<WeakReference> preparedCommands;
         private FbConnectionString options;
         private FbConnection owningConnection;
         private long created;
@@ -84,19 +84,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-        public List<FbCommand> PreparedCommands
-        {
-            get
-            {
-                if (this.preparedCommands == null)
-                {
-                    this.preparedCommands = new List<FbCommand>();
-                }
-
-                return this.preparedCommands;
-            }
-        }
-
         public FbTransaction ActiveTransaction
         {
             get { return this.activeTransaction; }
@@ -133,7 +120,9 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         public FbConnectionInternal(FbConnectionString options, FbConnection owningConnection)
-        {
+		{
+			this.preparedCommands = new List<WeakReference>();
+
             this.options = options;
             this.owningConnection = owningConnection;
 
@@ -334,9 +323,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public void TransactionUpdated()
         {
-            for (int i = 0; i < this.PreparedCommands.Count; i++)
+            for (int i = 0; i < this.preparedCommands.Count; i++)
             {
-                FbCommand command = this.PreparedCommands[i];
+				if (!this.preparedCommands[i].IsAlive)
+					continue;
+
+                FbCommand command = this.preparedCommands[i].Target as FbCommand;
 
                 if (command.Transaction != null)
                 {
@@ -418,54 +410,66 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public void AddPreparedCommand(FbCommand command)
         {
-            if (!this.PreparedCommands.Contains(command))
-            {
-                this.PreparedCommands.Add(command);
-            }
+			int position = this.preparedCommands.Count;
+			for (int i = 0; i < this.preparedCommands.Count; i++)
+			{
+				if (!this.preparedCommands[i].IsAlive)
+				{
+					position = i;
+					break;
+				}
+				if (this.preparedCommands[i].Target == command)
+				{
+					return;
+				}
+			}
+			this.preparedCommands.Insert(position, new WeakReference(command));
         }
 
         public void RemovePreparedCommand(FbCommand command)
         {
-            this.PreparedCommands.Remove(command);
+            for (int i = 0; i < this.preparedCommands.Count; i++)
+			{
+				if (this.preparedCommands[i].Target == command)
+				{
+					this.preparedCommands[i].Target = null;
+					this.preparedCommands.RemoveAt(i);
+					return;
+				}
+			}
         }
 
-        public void DisposePreparedCommands()
-        {
-            if (this.preparedCommands != null)
-            {
-                if (this.PreparedCommands.Count > 0)
-                {
-                    FbCommand[] commands = this.PreparedCommands.ToArray();
+		public void ReleasePreparedCommands()
+		{
+			for (int i = 0; i < this.preparedCommands.Count; i++)
+			{
+				if (!this.preparedCommands[i].IsAlive)
+					continue;
 
-                    for (int i = 0; i < commands.Length; i++)
-                    {
-                        try
-                        {
-                            // Release statement handle
-                            commands[i].Release();
-                        }
-                        catch (System.IO.IOException)
-                        {
-                            // If an IO error occurs weh trying to release the command 
-                            // avoid it. ( It maybe the connection to the server was down 
-                            // for unknown reasons. )
-                        }
-                        catch (IscException iex)
-                        {
-                            if (iex.ErrorCode != IscCodes.isc_net_read_err &&
-                                iex.ErrorCode != IscCodes.isc_net_write_err &&
-                                iex.ErrorCode != IscCodes.isc_network_error)
-                            {
-                                throw;
-                            }
-                        }
-                    }
-                }
+				try
+				{
+					// Release statement handle
+					(this.preparedCommands[i].Target as FbCommand).Release();
+				}
+				catch (System.IO.IOException)
+				{
+					// If an IO error occurs weh trying to release the command 
+					// avoid it. ( It maybe the connection to the server was down 
+					// for unknown reasons. )
+				}
+				catch (IscException iex)
+				{
+					if (iex.ErrorCode != IscCodes.isc_net_read_err &&
+						iex.ErrorCode != IscCodes.isc_net_write_err &&
+						iex.ErrorCode != IscCodes.isc_network_error)
+					{
+						throw;
+					}
+				}
+			}
 
-                this.PreparedCommands.Clear();
-                this.preparedCommands = null;
-            }
-        }
+			this.preparedCommands.Clear();
+		}
 
         #endregion
 
