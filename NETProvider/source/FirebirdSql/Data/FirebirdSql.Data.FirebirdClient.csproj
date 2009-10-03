@@ -290,7 +290,7 @@
     <EmbeddedResource Include="Schema\FbMetaData.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Entity\ProviderManifest.xsd" />
+    <None Include="Entity\ProviderManifest.xsd" />
     <EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
     <EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
     <None Include="Entity\ConceptualSchemaDefinition.csdl" />
