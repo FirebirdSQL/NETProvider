@@ -64,7 +64,7 @@
         ,   null as "CharacterSetSchema"
         ,   null as "CharacterSetName"
         ,   0 as "IsMultiSet"
-        ,   0 as "IsIdentity"
+        ,   IIF(POSITION('#PK_GEN#', UPPER(rf.rdb$description)) > 0, 1, 0) as "IsIdentity"
         ,   IIF(f.rdb$computed_blr IS NULL, 0, 1) as "IsStoreGenerated"
         ,   COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
         FROM
@@ -140,7 +140,7 @@
         ,   null as "CharacterSetSchema"
         ,   null as "CharacterSetName"
         ,   0 as "IsMultiSet"
-        ,   0 as "IsIdentity"
+        ,   IIF(POSITION('#PK_GEN#', UPPER(rf.rdb$description)) > 0, 1, 0) as "IsIdentity"
         ,   IIF(f.rdb$computed_blr IS NULL, 0, 1) as "IsStoreGenerated"
         ,   COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
         FROM
