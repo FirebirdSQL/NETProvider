@@ -91,6 +91,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					this.database.Write(IscCodes.op_service_detach);
 					this.database.Write(this.Handle);
+					this.database.Write(IscCodes.op_disconnect);
 					this.database.Flush();
 
 					this.database.ReadResponse();
@@ -161,7 +162,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					this.database.Write(IscCodes.op_service_info);	//	operation
 					this.database.Write(this.Handle);				//	db_handle
-					this.database.Write((int)0);					//	incarnation					
+					this.database.Write(0);							//	incarnation					
 					this.database.WriteTyped(
 						IscCodes.isc_spb_version, spb.ToArray());	//	Service parameter buffer
 					this.database.WriteBuffer(
