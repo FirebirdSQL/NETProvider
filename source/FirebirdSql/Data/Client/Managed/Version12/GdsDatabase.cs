@@ -17,6 +17,8 @@
  *	All Rights Reserved.
  */
 
+#if (PROTOCOL_VERSION12)
+
 using System;
 using System.Collections;
 using System.Data;
@@ -40,7 +42,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		{
 			// Attach to the database
 			this.Write(IscCodes.op_attach);
-			this.Write((int)0);				    // Database	object ID
+			this.Write(0);				    // Database	object ID
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			this.WriteBuffer(Encoding.UTF8.GetBytes(database));				// Database	PATH
 			this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
@@ -49,10 +51,12 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			this.Write(IscCodes.op_create);
-			this.Write((int)0);
+			this.Write(0);
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			this.WriteBuffer(Encoding.UTF8.GetBytes(database));
 			this.WriteBuffer(dpb.ToArray());
 		}
 	}
 }
+
+#endif

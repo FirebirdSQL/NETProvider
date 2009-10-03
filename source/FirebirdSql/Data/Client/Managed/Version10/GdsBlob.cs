@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.Write(IscCodes.op_get_segment);
 					this.database.Write(this.blobHandle);
 					this.database.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
-					this.database.Write((int)0);	// Data	segment
+					this.database.Write(0);	// Data	segment
 					this.database.Flush();
 
                     GenericResponse response = this.database.ReadGenericResponse();
