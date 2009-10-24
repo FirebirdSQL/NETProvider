@@ -170,8 +170,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     outputStream.Write(database);					// Database	path
 #if (PROTOCOL_VERSION12)
                     outputStream.Write(3);							// Protocol	versions understood
-#endif
+#else
                     outputStream.Write(2);							// Protocol	versions understood
+#endif
                     outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
 
                     outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
