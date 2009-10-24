@@ -680,7 +680,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                             if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
                                 svalue.Length > param.CharCount)
                             {
-                                //throw new IscException(335544321);
+								//throw new IscException(IscCodes.isc_arith_except);
                                 svalue = svalue.Substring(0, param.CharCount);
                             }
 
@@ -700,7 +700,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                             if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
                                 svalue.Length > param.CharCount)
                             {
-                                //throw new IscException(335544321);
+								//throw new IscException(IscCodes.isc_arith_except);
                                 svalue = svalue.Substring(0, param.CharCount);
                             }
 

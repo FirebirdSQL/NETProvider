@@ -813,6 +813,7 @@ namespace FirebirdSql.Data.Common
         public const int isc_net_write_err  = 335544727;
         public const int isc_stack_trace    = 335544842;
         public const int isc_except2        = 335544848;
+		public const int isc_arith_except	= 335544321;
 
 		#endregion
 

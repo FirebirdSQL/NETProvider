@@ -224,7 +224,7 @@ namespace FirebirdSql.Data.Common
                         if ((this.Field.Length % this.Field.Charset.BytesPerCharacter) == 0 &&
                             svalue.Length > this.Field.CharCount)
                         {
-                            throw new IscException(335544321);
+							throw new IscException(IscCodes.isc_arith_except);
                         }
 
                         byte[] buffer = new byte[this.Field.Length];
@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.Common
                         if ((this.Field.Length % this.Field.Charset.BytesPerCharacter) == 0 &&
                             svalue.Length > this.Field.CharCount)
                         {
-                            throw new IscException(335544321);
+							throw new IscException(IscCodes.isc_arith_except);
                         }
 
                         byte[] sbuffer = this.Field.Charset.GetBytes(svalue);
