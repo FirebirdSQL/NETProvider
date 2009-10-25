@@ -95,17 +95,15 @@ namespace FirebirdSql.Data.Client.Native
                         break;
 
                     default:
-                        {
-                            IntPtr e = statusVector[i++];
-                            if (e != IntPtr.Zero)
-                            {
-                                if (exception == null)
-                                {
-                                    exception = new IscException();
-                                }
-                                exception.Errors.Add(new IscError(arg.ToInt32(), e.ToInt32()));
-                            }
-                        }
+						IntPtr e = statusVector[i++];
+						if (e != IntPtr.Zero)
+						{
+							if (exception == null)
+							{
+								exception = new IscException();
+							}
+							exception.Errors.Add(new IscError(arg.ToInt32(), e.ToInt32()));
+						}
                         break;
                 }
 

@@ -715,19 +715,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						exception.Errors.Add(new IscError(arg, this.ReadString()));
 						break;
 
-                    default:
-                        {
-                            int e = this.ReadInt32();
-                            if (e != 0)
-                            {
-                                if (exception == null)
-                                {
-                                    exception = new IscException();
-                                }
-                                exception.Errors.Add(new IscError(arg, e));
-                            }
-                        }
-                        break;
+					default:
+						int e = this.ReadInt32();
+						if (e != 0)
+						{
+							if (exception == null)
+							{
+								exception = new IscException();
+							}
+							exception.Errors.Add(new IscError(arg, e));
+						}
+						break;
                 }
             }
 

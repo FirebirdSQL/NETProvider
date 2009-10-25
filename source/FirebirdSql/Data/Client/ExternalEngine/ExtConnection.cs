@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2005 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 #if (!NET_CF)
@@ -92,18 +95,16 @@ namespace FirebirdSql.Data.Client.ExternalEngine
                         break;
 
                     default:
-                        {
-                            int e = statusVector[i++];
-                            if (e != 0)
-                            {
-                                if (exception == null)
-                                {
-                                    exception = new IscException();
-                                }
-                                exception.Errors.Add(new IscError(arg, e));
-                            }
-                        }
-                        break;
+						int e = statusVector[i++];
+						if (e != 0)
+						{
+							if (exception == null)
+							{
+								exception = new IscException();
+							}
+							exception.Errors.Add(new IscError(arg, e));
+						}
+						break;
                 }
 
                 if (eof)
