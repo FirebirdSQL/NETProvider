@@ -88,6 +88,15 @@ namespace FirebirdSql.Data.Common
 			this.BuildExceptionData();
 		}
 
+		/// <param name="dummy">This parameter is here only to differentiate sqlState and strParam.</param>
+		public IscException(string sqlState, int dummy)
+			: base()
+		{
+			this.Errors.Add(new IscError(IscCodes.isc_arg_sql_state, sqlState));
+
+			this.BuildExceptionData();
+		}
+
 		public IscException(string strParam)
 			: base()
 		{
@@ -96,11 +105,11 @@ namespace FirebirdSql.Data.Common
 			this.BuildExceptionData();
 		}
 
-		public IscException(int errorCode, int intparam)
+		public IscException(int errorCode, int intParam)
 			: base()
 		{
 			this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
-			this.Errors.Add(new IscError(IscCodes.isc_arg_number, intparam));
+			this.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
 
 			this.BuildExceptionData();
 		}
@@ -123,8 +132,6 @@ namespace FirebirdSql.Data.Common
 
 			this.BuildExceptionData();
 		}
-
-#warning Create ctor with SQLSTATE
 
 #if (!NET_CF)
 
