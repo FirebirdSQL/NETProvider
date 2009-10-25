@@ -697,7 +697,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     case IscCodes.isc_arg_end:
                         if (exception != null && exception.Errors.Count != 0)
                         {
-                            exception.BuildExceptionMessage();
+							exception.BuildExceptionData();
                         }
                         eof = true;
                         break;
@@ -710,6 +710,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     case IscCodes.isc_arg_number:
                         exception.Errors.Add(new IscError(arg, this.ReadInt32()));
                         break;
+
+					case IscCodes.isc_arg_sql_state:
+						exception.Errors.Add(new IscError(arg, this.ReadString()));
+						break;
 
                     default:
                         {

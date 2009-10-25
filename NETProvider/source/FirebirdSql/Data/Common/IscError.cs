@@ -57,6 +57,7 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.isc_arg_interpreted:
 					case IscCodes.isc_arg_string:
 					case IscCodes.isc_arg_cstring:
+					case IscCodes.isc_arg_sql_state:
 						return this.strParam;
 
 					case IscCodes.isc_arg_number:

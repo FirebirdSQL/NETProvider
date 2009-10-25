@@ -60,7 +60,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
                     case IscCodes.isc_arg_end:
                         if (exception != null && exception.Errors.Count != 0)
                         {
-                            exception.BuildExceptionMessage();
+							exception.BuildExceptionData();
                         }
                         eof = true;
                         break;
