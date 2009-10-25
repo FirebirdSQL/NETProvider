@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -31,240 +34,255 @@ using System.Security.Permissions;
 namespace FirebirdSql.Data.Common
 {
 #if (!NET_CF)
-    [Serializable]
+	[Serializable]
 #endif
-    internal sealed class IscException : Exception
-    {
-        #region · Fields ·
+	internal sealed class IscException : Exception
+	{
+		#region · Fields ·
+		private string _message;
+		#endregion
 
-        private List<IscError> errors;
-        private int errorCode;
-        private string message;
+		#region · Properties ·
 
-        #endregion
+		public List<IscError> Errors { get; private set; }
 
-        #region · Properties ·
+		public override string Message
+		{
+			get { return _message; }
+		}
 
-        public List<IscError> Errors
-        {
-            get
-            {
-                if (this.errors == null)
-                {
-                    this.errors = new List<IscError>();
-                }
+		public int ErrorCode { get; private set; }
 
-                return this.errors;
-            }
-        }
+		public string SQLSTATE { get; private set; }
 
-        public override string Message
-        {
-            get { return this.message; }
-        }
+		public bool IsWarning
+		{
+			get
+			{
+				if (this.Errors.Count > 0)
+				{
+					return this.Errors[0].IsWarning;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
 
-        public int ErrorCode
-        {
-            get { return this.errorCode; }
-        }
+		#endregion
 
-        public bool IsWarning
-        {
-            get
-            {
-                if (this.Errors.Count > 0)
-                {
-                    return this.Errors[0].IsWarning;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
+		#region · Constructors ·
 
-        #endregion
+		public IscException()
+			: base()
+		{
+			this.Errors = new List<IscError>();
+		}
 
-        #region · Constructors ·
+		public IscException(int errorCode)
+			: base()
+		{
+			this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 
-        public IscException()
-            : base()
-        {
-        }
+			this.BuildExceptionData();
+		}
 
-        public IscException(int errorCode)
-            : base()
-        {
-            this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+		public IscException(string strParam)
+			: base()
+		{
+			this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 
-            this.BuildExceptionMessage();
-        }
+			this.BuildExceptionData();
+		}
 
-        public IscException(string strParam)
-            : base()
-        {
-            this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
+		public IscException(int errorCode, int intparam)
+			: base()
+		{
+			this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+			this.Errors.Add(new IscError(IscCodes.isc_arg_number, intparam));
 
-            this.BuildExceptionMessage();
-        }
+			this.BuildExceptionData();
+		}
 
-        public IscException(int errorCode, int intparam)
-            : base()
-        {
-            this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
-            this.Errors.Add(new IscError(IscCodes.isc_arg_number, intparam));
+		public IscException(int type, int errorCode, string strParam)
+			: base()
+		{
+			this.Errors.Add(new IscError(type, errorCode));
+			this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 
-            this.BuildExceptionMessage();
-        }
+			this.BuildExceptionData();
+		}
 
-        public IscException(int type, int errorCode, string strParam)
-            : base()
-        {
-            this.Errors.Add(new IscError(type, errorCode));
-            this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
+		public IscException(int type, int errorCode, int intParam, string strParam)
+			: base()
+		{
+			this.Errors.Add(new IscError(type, errorCode));
+			this.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
+			this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 
-            this.BuildExceptionMessage();
-        }
+			this.BuildExceptionData();
+		}
 
-        public IscException(int type, int errorCode, int intParam, string strParam)
-            : base()
-        {
-            this.Errors.Add(new IscError(type, errorCode));
-            this.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
-            this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
-
-            this.BuildExceptionMessage();
-        }
+#warning Create ctor with SQLSTATE
 
 #if (!NET_CF)
 
-        internal IscException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            this.errors = (List<IscError>)info.GetValue("errors", typeof(List<IscError>));
-            this.errorCode = info.GetInt32("errorCode");
-        }
+		internal IscException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{
+			this.Errors = (List<IscError>)info.GetValue("errors", typeof(List<IscError>));
+			this.ErrorCode = info.GetInt32("errorCode");
+		}
 
 #endif
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Public Methods ·
 
-        public void BuildExceptionMessage()
-        {
-            string resources = "FirebirdSql.Resources.isc_error_msg";
-
-            StringBuilder builder = new StringBuilder();
-            ResourceManager rm = new ResourceManager(resources, Assembly.GetExecutingAssembly());
-
-            this.errorCode = (this.Errors.Count != 0) ? this.Errors[0].ErrorCode : 0;
-
-            for (int i = 0; i < this.Errors.Count; i++)
-            {
-                if (this.Errors[i].Type == IscCodes.isc_arg_gds ||
-                    this.Errors[i].Type == IscCodes.isc_arg_warning)
-                {
-                    int code = this.Errors[i].ErrorCode;
-                    string message = null;
-
-                    try
-                    {
-                        message = rm.GetString(code.ToString());
-                    }
-                    catch
-                    {
-                        message = string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
-                    }
-
-                    ArrayList param = new ArrayList();
-
-                    int index = i + 1;
-
-                    while (index < this.Errors.Count && this.Errors[index].IsArgument)
-                    {
-                        param.Add(this.Errors[index++].StrParam);
-                        i++;
-                    }
-
-                    object[] args = (object[])param.ToArray(typeof(object));
-
-                    try
-                    {
-                        if (code == IscCodes.isc_except)
-                        {
-                            // Custom exception	add	the	first argument as error	code
-                            this.errorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
-                        }
-                        else if (code == IscCodes.isc_except2)
-                        {
-                            // Custom exception. Next Error should be the exception name.
-                            // And the next one the Exception message
-                        }
-                        else if (code == IscCodes.isc_stack_trace)
-                        {
-                            // The next error contains the PSQL Stack Trace
-                            if (builder.Length > 0)
-                            {
-#if (NET_CF)
-								builder.Append("\r\n");
-#else
-                                builder.Append(Environment.NewLine);
-#endif
-                            }
-                            builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
-                        }
-                        else
-                        {
-                            if (builder.Length > 0)
-                            {
-#if (NET_CF)
-								builder.Append("\r\n");
-#else
-                                builder.Append(Environment.NewLine);
-#endif
-                            }
-
-                            builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
-                        }
-                    }
-                    catch
-                    {
-                        message = string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
-
-                        builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
-                    }
-                }
-            }
-
-            // Update error	collection only	with the main error
-            IscError mainError = new IscError(this.errorCode);
-            mainError.Message = builder.ToString();
-
-            this.Errors.Add(mainError);
-
-            // Update exception	message
-            this.message = builder.ToString();
-        }
+		public void BuildExceptionData()
+		{ 
+			this.BuildErrorCode();
+			this.BuildSqlState();
+			this.BuildExceptionMessage();
+		}
 
 #if (!NET_CF)
 
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("errors", this.Errors);
-            info.AddValue("errorCode", this.ErrorCode);
+		[SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("errors", this.Errors);
+			info.AddValue("errorCode", this.ErrorCode);
 
-            base.GetObjectData(info, context);
-        }
+			base.GetObjectData(info, context);
+		}
 
 #endif
 
-        public override string ToString()
-        {
-            return this.message;
-        }
+		public override string ToString()
+		{
+			return _message;
+		}
 
-        #endregion
-    }
+		#endregion
+
+		#region · Private Methods ·
+
+		private void BuildErrorCode()
+		{
+			this.ErrorCode = (this.Errors.Count != 0 ? this.Errors[0].ErrorCode : 0);
+		}
+
+		private void BuildSqlState()
+		{
+			IscError error = this.Errors.Find(e => e.Type == IscCodes.isc_arg_sql_state);
+			// step #1, maybe we already have a SQLSTATE stuffed in the status vector
+			if (error != null)
+			{
+				this.SQLSTATE = error.StrParam;
+			}
+			// step #2, see if we can find a mapping.
+			else
+			{
+				ResourceManager rm = new ResourceManager("FirebirdSql.Resources.sqlstate_mapping", Assembly.GetExecutingAssembly());
+				this.SQLSTATE = rm.GetString(this.ErrorCode.ToString());
+			}
+		}
+
+		private void BuildExceptionMessage()
+		{
+			StringBuilder builder = new StringBuilder();
+			ResourceManager rm = new ResourceManager("FirebirdSql.Resources.isc_error_msg", Assembly.GetExecutingAssembly());
+
+			for (int i = 0; i < this.Errors.Count; i++)
+			{
+				if (this.Errors[i].Type == IscCodes.isc_arg_gds ||
+					this.Errors[i].Type == IscCodes.isc_arg_warning)
+				{
+					int code = this.Errors[i].ErrorCode;
+					string message = null;
+
+					try
+					{
+						message = rm.GetString(code.ToString());
+					}
+					catch
+					{
+						message = string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
+					}
+
+					ArrayList param = new ArrayList();
+
+					int index = i + 1;
+
+					while (index < this.Errors.Count && this.Errors[index].IsArgument)
+					{
+						param.Add(this.Errors[index++].StrParam);
+						i++;
+					}
+
+					object[] args = (object[])param.ToArray(typeof(object));
+
+					try
+					{
+						if (code == IscCodes.isc_except)
+						{
+							// Custom exception	add	the	first argument as error	code
+							this.ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
+						}
+						else if (code == IscCodes.isc_except2)
+						{
+							// Custom exception. Next Error should be the exception name.
+							// And the next one the Exception message
+						}
+						else if (code == IscCodes.isc_stack_trace)
+						{
+							// The next error contains the PSQL Stack Trace
+							if (builder.Length > 0)
+							{
+#if (NET_CF)
+								builder.Append("\r\n");
+#else
+								builder.Append(Environment.NewLine);
+#endif
+							}
+							builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
+						}
+						else
+						{
+							if (builder.Length > 0)
+							{
+#if (NET_CF)
+								builder.Append("\r\n");
+#else
+								builder.Append(Environment.NewLine);
+#endif
+							}
+
+							builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
+						}
+					}
+					catch
+					{
+						message = string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
+
+						builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
+					}
+				}
+			}
+
+			// Update error	collection only	with the main error
+			IscError mainError = new IscError(this.ErrorCode);
+			mainError.Message = builder.ToString();
+
+			this.Errors.Add(mainError);
+
+			// Update exception	message
+			_message = builder.ToString();
+		}
+
+		#endregion
+	}
 }

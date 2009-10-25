@@ -799,6 +799,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_arg_netware    = 16;	// NetWare error code
 		public const int isc_arg_win32      = 17;	// Win32 error code
 		public const int isc_arg_warning    = 18;	// warning argument
+		public const int isc_arg_sql_state  = 19;	// SQLSTATE
 
         public const int isc_open_trans     = 335544357;
         public const int isc_segment        = 335544366;
@@ -823,7 +824,7 @@ namespace FirebirdSql.Data.Common
 		public const int blr_begin      = 2;
 		public const int blr_message    = 4;
 		public const int blr_eoc        = 76;
-		public const int blr_end        = 255;	/* note: defined as -1 in gds.h	*/
+		public const int blr_end        = 255;
 
 		public const int blr_text       = 14;
 		public const int blr_text2      = 15;
@@ -844,6 +845,8 @@ namespace FirebirdSql.Data.Common
 		public const int blr_sql_date   = 12;
 		public const int blr_sql_time   = 13;
 
+		public const int blr_null       = 45;
+
 		#endregion
 
 		#region · DataType Definitions ·
@@ -862,6 +865,7 @@ namespace FirebirdSql.Data.Common
 		public const int SQL_TYPE_TIME  = 560;
 		public const int SQL_TYPE_DATE  = 570;
 		public const int SQL_INT64      = 580;
+		public const int SQL_NULL       = 32766;
 
 		// Historical alias	for	pre	V6 applications
 		public const int SQL_DATE       = SQL_TIMESTAMP;

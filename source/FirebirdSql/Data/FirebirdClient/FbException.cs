@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -27,107 +30,120 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    [Serializable]
-    public sealed class FbException : DbException
-    {
-        #region · Fields ·
+	[Serializable]
+	public sealed class FbException : DbException
+	{
+		#region · Fields ·
 
-        private FbErrorCollection errors;
+		private FbErrorCollection errors;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
 #if (!NET_CF)
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 #endif
-        public FbErrorCollection Errors
-        {
-            get
-            {
-                if (this.errors == null)
-                {
-                    this.errors = new FbErrorCollection();
-                }
+		public FbErrorCollection Errors
+		{
+			get
+			{
+				if (this.errors == null)
+				{
+					this.errors = new FbErrorCollection();
+				}
 
-                return this.errors;
-            }
-        }
+				return this.errors;
+			}
+		}
 
-        public override int ErrorCode
-        {
-            get
-            {
-                if ((this.InnerException != null) && (this.InnerException is IscException))
-                {
-                    return ((IscException)this.InnerException).ErrorCode;
-                }
+		public override int ErrorCode
+		{
+			get
+			{
+				if ((this.InnerException != null) && (this.InnerException is IscException))
+				{
+					return ((IscException)this.InnerException).ErrorCode;
+				}
 
-                return base.ErrorCode;
-            }
-        }
+				return base.ErrorCode;
+			}
+		}
 
-        #endregion
+		public string SQLSTATE
+		{
+			get
+			{
+				if ((this.InnerException != null) && (this.InnerException is IscException))
+				{
+					return ((IscException)this.InnerException).SQLSTATE;
+				}
 
-        #region · Constructors ·
+				return null;
+			}
+		}
 
-        internal FbException()
-            : base()
-        {
-        }
+		#endregion
 
-        internal FbException(string message)
-            : base(message)
-        {
-        }
+		#region · Constructors ·
 
-        internal FbException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-            if (innerException is IscException)
-            {
-                this.ProcessIscExceptionErrors((IscException)innerException);
-            }
-        }
+		internal FbException()
+			: base()
+		{
+		}
+
+		internal FbException(string message)
+			: base(message)
+		{
+		}
+
+		internal FbException(string message, Exception innerException)
+			: base(message, innerException)
+		{
+			if (innerException is IscException)
+			{
+				this.ProcessIscExceptionErrors((IscException)innerException);
+			}
+		}
 
 #if (!NET_CF)
 
-        internal FbException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            this.errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
-        }
-
-#endif
-
-        #endregion
-
-        #region · Methods ·
-
-#if (!NET_CF)
-
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("errors", this.errors);
-
-            base.GetObjectData(info, context);
-        }
+		internal FbException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{
+			this.errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
+		}
 
 #endif
 
-        #endregion
+		#endregion
 
-        #region · Internal Methods ·
+		#region · Methods ·
 
-        internal void ProcessIscExceptionErrors(IscException innerException)
-        {
-            foreach (IscError error in innerException.Errors)
-            {
-                this.Errors.Add(error.Message, error.ErrorCode);
-            }
-        }
+#if (!NET_CF)
 
-        #endregion
-    }
+		[SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("errors", this.errors);
+
+			base.GetObjectData(info, context);
+		}
+
+#endif
+
+		#endregion
+
+		#region · Internal Methods ·
+
+		internal void ProcessIscExceptionErrors(IscException innerException)
+		{
+			foreach (IscError error in innerException.Errors)
+			{
+				this.Errors.Add(error.Message, error.ErrorCode);
+			}
+		}
+
+		#endregion
+	}
 }
