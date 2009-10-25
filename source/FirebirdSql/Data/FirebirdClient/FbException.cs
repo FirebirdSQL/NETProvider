@@ -27,12 +27,8 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (!NET_CF)
     [Serializable]
     public sealed class FbException : DbException
-#else
-	public sealed class FbException : SystemException
-#endif
     {
         #region · Fields ·
 
@@ -58,8 +54,6 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-#if (!NET_CF)
-
         public override int ErrorCode
         {
             get
@@ -72,8 +66,6 @@ namespace FirebirdSql.Data.FirebirdClient
                 return base.ErrorCode;
             }
         }
-
-#endif
 
         #endregion
 
@@ -94,7 +86,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             if (innerException is IscException)
             {
-                this.GetIscExceptionErrors((IscException)innerException);
+                this.ProcessIscExceptionErrors((IscException)innerException);
             }
         }
 
@@ -128,7 +120,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Internal Methods ·
 
-        internal void GetIscExceptionErrors(IscException innerException)
+        internal void ProcessIscExceptionErrors(IscException innerException)
         {
             foreach (IscError error in innerException.Errors)
             {
