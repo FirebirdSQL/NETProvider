@@ -496,52 +496,7 @@ namespace FirebirdSql.Data.Common
 
         public Type GetSystemType()
         {
-#warning What about using TypeHelper.GetSystemDataTypeName?
-            switch (this.DbDataType)
-            {
-                case DbDataType.Char:
-                case DbDataType.VarChar:
-                case DbDataType.Text:
-                    return Type.GetType("System.String");
-
-                case DbDataType.SmallInt:
-                    return Type.GetType("System.Int16");
-
-                case DbDataType.Integer:
-                    return Type.GetType("System.Int32");
-
-                case DbDataType.BigInt:
-                    return Type.GetType("System.Int64");
-
-                case DbDataType.Numeric:
-                case DbDataType.Decimal:
-                    return Type.GetType("System.Decimal");
-
-                case DbDataType.Float:
-                    return Type.GetType("System.Single");
-
-                case DbDataType.Guid:
-                    return Type.GetType("System.Guid");
-
-                case DbDataType.Double:
-                    return Type.GetType("System.Double");
-
-                case DbDataType.Date:
-                case DbDataType.TimeStamp:
-                    return Type.GetType("System.DateTime");
-
-                case DbDataType.Time:
-                    return Type.GetType("System.TimeSpan");
-
-                case DbDataType.Binary:
-                    return typeof(byte[]);
-
-                case DbDataType.Array:
-                    return Type.GetType("System.Array");
-
-                default:
-                    throw new SystemException("Invalid data type");
-            }
+			return Type.GetType(TypeHelper.GetSystemDataTypeName(this.DbDataType), true);
         }
 
         #endregion
@@ -663,6 +618,9 @@ namespace FirebirdSql.Data.Common
 
                 case IscCodes.SQL_ARRAY:
                     return DbDataType.Array;
+
+				case IscCodes.SQL_NULL:
+					return DbDataType.Null;
 
                 default:
                     throw new SystemException("Invalid data type");
