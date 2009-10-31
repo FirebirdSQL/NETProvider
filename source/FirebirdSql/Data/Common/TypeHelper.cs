@@ -365,7 +365,7 @@ namespace FirebirdSql.Data.Common
                     return "System.Array";
 
                 case DbDataType.Binary:
-                    return "System.Array";
+                    return "System.Byte[]";
 
                 case DbDataType.Text:
                 case DbDataType.Char:
