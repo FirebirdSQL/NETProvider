@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Common
 		}
 
 		public IscException(int errorCode)
-			: base()
+			: this()
 		{
 			this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.Common
 
 		/// <param name="dummy">This parameter is here only to differentiate sqlState and strParam.</param>
 		public IscException(string sqlState, int dummy)
-			: base()
+			: this()
 		{
 			this.Errors.Add(new IscError(IscCodes.isc_arg_sql_state, sqlState));
 
@@ -98,7 +98,7 @@ namespace FirebirdSql.Data.Common
 		}
 
 		public IscException(string strParam)
-			: base()
+			: this()
 		{
 			this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 
@@ -106,7 +106,7 @@ namespace FirebirdSql.Data.Common
 		}
 
 		public IscException(int errorCode, int intParam)
-			: base()
+			: this()
 		{
 			this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 			this.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.Common
 		}
 
 		public IscException(int type, int errorCode, string strParam)
-			: base()
+			: this()
 		{
 			this.Errors.Add(new IscError(type, errorCode));
 			this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
@@ -124,7 +124,7 @@ namespace FirebirdSql.Data.Common
 		}
 
 		public IscException(int type, int errorCode, int intParam, string strParam)
-			: base()
+			: this()
 		{
 			this.Errors.Add(new IscError(type, errorCode));
 			this.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
