@@ -23,7 +23,6 @@ using System.Data.Common;
 
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
-using System.Reflection;
 
 namespace FirebirdSql.Data.UnitTests
 {
