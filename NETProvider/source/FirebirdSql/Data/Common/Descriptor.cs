@@ -215,10 +215,16 @@ namespace FirebirdSql.Data.Common
                         case IscCodes.SQL_QUAD:
                             blr.WriteByte(IscCodes.blr_quad);
                             blr.WriteByte((byte)this.fields[i].NumericScale);
-                            break;
-                    }
+							break;
 
-                    blr.WriteByte(IscCodes.blr_short);
+						case IscCodes.SQL_NULL:
+							blr.WriteByte(IscCodes.blr_text);
+							blr.WriteByte((byte)(len & 255));
+							blr.WriteByte((byte)(len >> 8));
+							break;
+                    }
+            
+					blr.WriteByte(IscCodes.blr_short);
                     blr.WriteByte(0);
                 }
 
