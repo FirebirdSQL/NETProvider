@@ -662,108 +662,111 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void Write(DbField param)
 		{
-			param.FixNull();
-
 			try
 			{
-				switch (param.DbDataType)
+				if (param.DbDataType != DbDataType.Null)
 				{
-					case DbDataType.Char:
-                        if (param.Charset.IsOctetsCharset)
-                        {
-                            this.WriteOpaque(param.DbValue.GetBinary(), param.Length);
-                        }
-                        else
-					    {
-							string svalue = param.DbValue.GetString();
+					param.FixNull();
 
-                            if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
-                                svalue.Length > param.CharCount)
-                            {
-								//throw new IscException(IscCodes.isc_arith_except);
-                                svalue = svalue.Substring(0, param.CharCount);
-                            }
+					switch (param.DbDataType)
+					{
+						case DbDataType.Char:
+							if (param.Charset.IsOctetsCharset)
+							{
+								this.WriteOpaque(param.DbValue.GetBinary(), param.Length);
+							}
+							else
+							{
+								string svalue = param.DbValue.GetString();
 
-                            this.WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
-						}
-						break;
+								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
+									svalue.Length > param.CharCount)
+								{
+									//throw new IscException(IscCodes.isc_arith_except);
+									svalue = svalue.Substring(0, param.CharCount);
+								}
 
-					case DbDataType.VarChar:
-                        if (param.Charset.IsOctetsCharset)
-                        {
-                            this.WriteOpaque(param.DbValue.GetBinary(), param.Length);
-                        }
-                        else
-					    {
-                            string svalue = param.DbValue.GetString();
+								this.WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
+							}
+							break;
 
-                            if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
-                                svalue.Length > param.CharCount)
-                            {
-								//throw new IscException(IscCodes.isc_arith_except);
-                                svalue = svalue.Substring(0, param.CharCount);
-                            }
+						case DbDataType.VarChar:
+							if (param.Charset.IsOctetsCharset)
+							{
+								this.WriteOpaque(param.DbValue.GetBinary(), param.Length);
+							}
+							else
+							{
+								string svalue = param.DbValue.GetString();
 
-                            byte[] data = param.Charset.GetBytes(svalue);
+								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
+									svalue.Length > param.CharCount)
+								{
+									//throw new IscException(IscCodes.isc_arith_except);
+									svalue = svalue.Substring(0, param.CharCount);
+								}
 
-							this.WriteBuffer(data, data.Length);
-						}
-						break;
+								byte[] data = param.Charset.GetBytes(svalue);
 
-					case DbDataType.SmallInt:
-						this.Write(param.DbValue.GetInt16());
-						break;
+								this.WriteBuffer(data, data.Length);
+							}
+							break;
 
-					case DbDataType.Integer:
-						this.Write(param.DbValue.GetInt32());
-						break;
+						case DbDataType.SmallInt:
+							this.Write(param.DbValue.GetInt16());
+							break;
 
-					case DbDataType.BigInt:
-					case DbDataType.Array:
-					case DbDataType.Binary:
-					case DbDataType.Text:
-						this.Write(param.DbValue.GetInt64());
-						break;
+						case DbDataType.Integer:
+							this.Write(param.DbValue.GetInt32());
+							break;
 
-					case DbDataType.Decimal:
-					case DbDataType.Numeric:
-						this.Write(
-							param.DbValue.GetDecimal(),
-							param.DataType,
-							param.NumericScale);
-						break;
+						case DbDataType.BigInt:
+						case DbDataType.Array:
+						case DbDataType.Binary:
+						case DbDataType.Text:
+							this.Write(param.DbValue.GetInt64());
+							break;
 
-					case DbDataType.Float:
-						this.Write(param.DbValue.GetFloat());
-						break;
+						case DbDataType.Decimal:
+						case DbDataType.Numeric:
+							this.Write(
+								param.DbValue.GetDecimal(),
+								param.DataType,
+								param.NumericScale);
+							break;
 
-					case DbDataType.Guid:
-						this.WriteOpaque(param.DbValue.GetGuid().ToByteArray());
-						break;
+						case DbDataType.Float:
+							this.Write(param.DbValue.GetFloat());
+							break;
 
-					case DbDataType.Double:
-						this.Write(param.DbValue.GetDouble());
-						break;
+						case DbDataType.Guid:
+							this.WriteOpaque(param.DbValue.GetGuid().ToByteArray());
+							break;
 
-					case DbDataType.Date:
-						this.Write(param.DbValue.GetDate());
-						break;
+						case DbDataType.Double:
+							this.Write(param.DbValue.GetDouble());
+							break;
 
-					case DbDataType.Time:
-						this.Write(param.DbValue.GetTime());
-						break;
+						case DbDataType.Date:
+							this.Write(param.DbValue.GetDate());
+							break;
 
-					case DbDataType.TimeStamp:
-						this.Write(param.DbValue.GetDate());
-						this.Write(param.DbValue.GetTime());
-						break;
+						case DbDataType.Time:
+							this.Write(param.DbValue.GetTime());
+							break;
 
-                    case DbDataType.Boolean:
-                        this.Write(Convert.ToBoolean(param.Value));
-                        break;
+						case DbDataType.TimeStamp:
+							this.Write(param.DbValue.GetDate());
+							this.Write(param.DbValue.GetTime());
+							break;
 
-					default:
-						throw new IscException("Unknown sql data type: " + param.DataType);
+						case DbDataType.Boolean:
+							this.Write(Convert.ToBoolean(param.Value));
+							break;
+
+						default:
+							throw new IscException("Unknown sql data type: " + param.DataType);
+					}
 				}
 
 				this.Write(param.NullFlag);
