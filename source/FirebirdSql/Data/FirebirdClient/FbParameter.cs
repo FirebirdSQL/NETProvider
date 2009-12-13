@@ -349,7 +349,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public override void ResetDbType()
         {
-            throw new Exception("The method or operation is not implemented.");
+            throw new NotImplementedException();
         }
 
         #endregion
