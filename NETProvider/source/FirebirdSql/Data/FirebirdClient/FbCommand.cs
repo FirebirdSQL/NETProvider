@@ -893,9 +893,14 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         private bool BuildParameterDescriptor(Descriptor descriptor, FbParameter parameter, int index)
-        {
+		{
+			if (!parameter.IsTypeSet)
+			{
+				return false;
+			}
+			
+			FbDbType type = parameter.FbDbType;
             Charset charset = this.connection.InnerConnection.Database.Charset;
-            FbDbType type = parameter.FbDbType;
 
             // Check the parameter character set
             if (parameter.Charset == FbCharset.Octets && !(parameter.Value is byte[]))
