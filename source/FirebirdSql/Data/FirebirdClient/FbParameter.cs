@@ -241,6 +241,11 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
+		internal bool IsTypeSet
+		{
+			get { return this.isTypeSet; }
+		}
+
         #endregion
 
         #region · Constructors ·
@@ -320,22 +325,18 @@ namespace FirebirdSql.Data.FirebirdClient
 
         object ICloneable.Clone()
         {
-            FbParameter p = new FbParameter(
-                this.parameterName,
-                this.fbDbType,
-                this.size,
-                this.direction,
-                this.isNullable,
-                this.precision,
-                this.scale,
-                this.sourceColumn,
-                this.sourceVersion,
-                this.value);
-
-            // Set extra properties
-            p.Charset = this.charset;
-
-            return p;
+			return new FbParameter(
+				this.parameterName,
+				this.fbDbType,
+				this.size,
+				this.direction,
+				this.isNullable,
+				this.precision,
+				this.scale,
+				this.sourceColumn,
+				this.sourceVersion,
+				this.value) 
+				{ Charset = this.charset };
         }
 
         #endregion
