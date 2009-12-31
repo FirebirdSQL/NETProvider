@@ -435,20 +435,20 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         public override object GetValue(int i)
-        {
+		{
+#if (NET_35 && ENTITY_FRAMEWORK)
+			// type coercions for EF
+			// I think only bool datatype needs to be done explicitly
+			if (this.command.ExpectedColumnTypes != default(System.Data.Metadata.Edm.PrimitiveType[]))
+				if (this.command.ExpectedColumnTypes[i].ClrEquivalentType == typeof(bool))
+				{
+					return this.GetBoolean(i);
+				}
+#endif
+
             this.CheckState();
             this.CheckPosition();
             this.CheckIndex(i);
-
-#if (NET_35 && ENTITY_FRAMEWORK)
-            // type coercions for EF
-            // I think only bool datatype needs to be done explicitly
-            if (this.command.ExpectedColumnTypes != default(System.Data.Metadata.Edm.PrimitiveType[]))
-                if (this.command.ExpectedColumnTypes[i].ClrEquivalentType == typeof(bool))
-                {
-                    return this.GetBoolean(i);
-                }
-#endif
 
 			return this.CheckedGetValue(() => this.row[i].Value);
         }
@@ -469,6 +469,7 @@ namespace FirebirdSql.Data.FirebirdClient
         public override bool GetBoolean(int i)
         {
             this.CheckPosition();
+			this.CheckIndex(i);
 
 			return this.CheckedGetValue(() => this.row[i].GetBoolean());
         }
@@ -591,7 +592,6 @@ namespace FirebirdSql.Data.FirebirdClient
         public override Guid GetGuid(int i)
         {
             this.CheckPosition();
-
             this.CheckIndex(i);
 
             return this.CheckedGetValue(() => this.row[i].GetGuid());
