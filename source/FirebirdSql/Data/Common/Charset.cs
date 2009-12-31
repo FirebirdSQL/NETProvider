@@ -78,8 +78,10 @@ namespace FirebirdSql.Data.Common
             charsets.Add(new Charset(3, "UNICODE_FSS", 3, "UTF-8"));
             // UTF8
             charsets.Add(new Charset(4, "UTF8", 4, "UTF-8"));
+#if (!MONO)
             // Shift-JIS, Japanese
             charsets.Add(new Charset(5, "SJIS_0208", 2, "shift_jis"));
+#endif
             // JIS X 0201, 0208, 0212, EUC encoding, Japanese
             charsets.Add(new Charset(6, "EUCJ_0208", 2, "euc-jp"));
             // Windows Japanese	
