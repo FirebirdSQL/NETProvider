@@ -1087,7 +1087,7 @@ namespace FirebirdSql.Data.Isql
                     }
                     if (StringParser.StartsWith(sqlStatement, "SET NAMES", true))
                     {
-                        return SqlStatementType.SetGenerator;
+                        return SqlStatementType.SetNames;
                     }
                     if (StringParser.StartsWith(sqlStatement, "SET SQL DIALECT", true))
                     {
