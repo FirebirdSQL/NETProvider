@@ -75,10 +75,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region · Fields ·
 
-		private byte[]	buffer;
 		private Charset charset;
-		private Stream	innerStream;
-        private int     operation;
+		private Stream innerStream;
+		private int operation;
 
 		#endregion
 
@@ -114,26 +113,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region · Constructors ·
 
-		public XdrStream() : this(Charset.DefaultCharset)
-		{
-		}
+		public XdrStream()
+			: this(Charset.DefaultCharset)
+		{ }
 
-		public XdrStream(Charset charset) : this(new MemoryStream(), charset)
-		{
-		}
+		public XdrStream(Charset charset)
+			: this(new MemoryStream(), charset)
+		{ }
 
-		public XdrStream(byte[] buffer, Charset charset) : this(new MemoryStream(buffer), charset)
-		{
-		}
+		public XdrStream(byte[] buffer, Charset charset)
+			: this(new MemoryStream(buffer), charset)
+		{ }
 
-		public XdrStream(Stream innerStream, Charset charset) : base()
+		public XdrStream(Stream innerStream, Charset charset)
+			: base()
 		{
-			this.buffer			= new byte[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
-			this.innerStream	= innerStream;
-			this.charset		= charset;
-            this.operation      = -1;
+			this.innerStream = innerStream;
+			this.charset = charset;
+			this.operation = -1;
 
-            GC.SuppressFinalize(innerStream);
+			GC.SuppressFinalize(innerStream);
 		}
 
 		#endregion
@@ -142,22 +141,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void Close()
 		{
-            try
-            {
-                if (this.innerStream != null)
-                {
-                    this.innerStream.Close();
-                }
-            }
-            catch
-            {
-            }
-            finally
-            {
-                this.buffer = null;
-                this.charset = null;
-                this.innerStream = null;
-            }
+			try
+			{
+				if (this.innerStream != null)
+				{
+					this.innerStream.Close();
+				}
+			}
+			catch
+			{
+			}
+			finally
+			{
+				this.charset = null;
+				this.innerStream = null;
+			}
 		}
 
 		public override void Flush()
@@ -228,41 +226,47 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-        #region · Operation Identification Methods ·
+		#region · Operation Identification Methods ·
 
-        public virtual int ReadOperation()
-        {
-            int op = (this.operation >= 0) ? this.operation : this.ReadNextOperation();
+		public virtual int ReadOperation()
+		{
+			int op = (this.operation >= 0) ? this.operation : this.ReadNextOperation();
 
-            this.operation = -1;
+			this.operation = -1;
 
-            return op;
-        }
+			return op;
+		}
 
-        public virtual int ReadNextOperation()
-        {
-            do
-            {
-                /* loop	as long	as we are receiving	dummy packets, just
-                 * throwing	them away--note	that if	we are a server	we won't
-                 * be receiving	them, but it is	better to check	for	them at
-                 * this	level rather than try to catch them	in all places where
-                 * this	routine	is called 
-                 */
-                this.operation = this.ReadInt32();
-            } while (this.operation == IscCodes.op_dummy);
+		public virtual int ReadNextOperation()
+		{
+			do
+			{
+				/* loop	as long	as we are receiving	dummy packets, just
+				 * throwing	them away--note	that if	we are a server	we won't
+				 * be receiving	them, but it is	better to check	for	them at
+				 * this	level rather than try to catch them	in all places where
+				 * this	routine	is called 
+				 */
+				this.operation = this.ReadInt32();
+			} while (this.operation == IscCodes.op_dummy);
 
-            return this.operation;
-        }
+			return this.operation;
+		}
 
-        #endregion
+		#endregion
 
-        #region · XDR Read Methods ·
+		#region · XDR Read Methods ·
 
-        public byte[] ReadBytes(int count)
+		public byte[] ReadBytes(int count)
 		{
 			byte[] buffer = new byte[count];
-			this.Read(buffer, 0, buffer.Length);
+
+			int toRead = count;
+			int currentlyRead = -1;
+			while (toRead > 0 && currentlyRead != 0)
+			{
+				toRead -= (currentlyRead = this.Read(buffer, count - toRead, toRead));
+			}
 
 			return buffer;
 		}
@@ -270,20 +274,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public byte[] ReadOpaque(int length)
 		{
 			byte[] buffer = new byte[length];
-			int readed = 0;
 
-			if (length > 0)
+			buffer = this.ReadBytes(length);
+
+			int padLength = ((4 - length) & 3);
+			if (padLength > 0)
 			{
-				while (readed < length)
-				{
-					readed += this.Read(buffer, readed, length - readed);
-				}
-
-				int padLength = ((4 - length) & 3);
-				if (padLength > 0)
-				{
-					this.Read(Pad, 0, padLength);
-				}
+				this.Read(Pad, 0, padLength);
 			}
 
 			return buffer;
@@ -323,16 +320,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public int ReadInt32()
 		{
-			this.Read(buffer, 0, 4);
-
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(buffer, 0));
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(this.ReadBytes(4), 0));
 		}
 
 		public long ReadInt64()
 		{
-			this.Read(buffer, 0, 8);
-
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(buffer, 0));
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(this.ReadBytes(8), 0));
 		}
 
 		public Guid ReadGuid(int length)
@@ -372,7 +365,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			decimal value = 0;
 
-            switch (type & ~1)
+			switch (type & ~1)
 			{
 				case IscCodes.SQL_SHORT:
 					value = TypeDecoder.DecodeDecimal(this.ReadInt16(), scale, type);
@@ -404,11 +397,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			switch (field.DbDataType)
 			{
 				case DbDataType.Char:
-                    if (field.Charset.IsOctetsCharset)
-                    {
-                        fieldValue = this.ReadOpaque(field.Length);
-                    }
-                    else
+					if (field.Charset.IsOctetsCharset)
+					{
+						fieldValue = this.ReadOpaque(field.Length);
+					}
+					else
 					{
 						string s = this.ReadString(innerCharset, field.Length);
 
@@ -425,14 +418,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					break;
 
 				case DbDataType.VarChar:
-                    if (field.Charset.IsOctetsCharset)
-                    {
-                        fieldValue = this.ReadOpaque(field.Length);
-                    }
-                    else
-                    {
-                        fieldValue = this.ReadString(innerCharset);
-                    }
+					if (field.Charset.IsOctetsCharset)
+					{
+						fieldValue = this.ReadOpaque(field.Length);
+					}
+					else
+					{
+						fieldValue = this.ReadString(innerCharset);
+					}
 					break;
 
 				case DbDataType.SmallInt:
@@ -609,7 +602,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			object numeric = TypeEncoder.EncodeDecimal(value, scale, type);
 
-            switch (type & ~1)
+			switch (type & ~1)
 			{
 				case IscCodes.SQL_SHORT:
 					this.Write((short)numeric);
@@ -631,26 +624,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-        public void Write(bool value)
-        {
-            this.Write((short)(value ? 1 : 0));
-        }
+		public void Write(bool value)
+		{
+			this.Write((short)(value ? 1 : 0));
+		}
 
-        public void Write(DateTime value)
-        {
-            this.WriteDate(value);
-            this.WriteTime(TypeHelper.DateTimeToTimeSpan(value));
-        }
+		public void Write(DateTime value)
+		{
+			this.WriteDate(value);
+			this.WriteTime(TypeHelper.DateTimeToTimeSpan(value));
+		}
 
 		public void WriteDate(DateTime value)
 		{
 			this.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(value)));
 		}
 
-        public void WriteTime(TimeSpan value)
-        {
-            this.Write(TypeEncoder.EncodeTime(value));
-        }
+		public void WriteTime(TimeSpan value)
+		{
+			this.Write(TypeEncoder.EncodeTime(value));
+		}
 
 		public void Write(Descriptor descriptor)
 		{
