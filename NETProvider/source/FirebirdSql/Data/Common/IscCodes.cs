@@ -247,6 +247,7 @@ namespace FirebirdSql.Data.Common
 
 	    public const int op_partial				= 89;	// packet is not complete - delay processing
 	    public const int op_trusted_auth		= 90;
+		public const int op_cancel				= 91;
 
 		#endregion
 
@@ -895,5 +896,12 @@ namespace FirebirdSql.Data.Common
         public const int DTYPE_TYPE_MAX     = 20;
 
         #endregion
-    }
+
+		#region Cancel types
+		public const int fb_cancel_disable	= 1;
+		public const int fb_cancel_enable	= 2;
+		public const int fb_cancel_raise	= 3;
+		public const int fb_cancel_abort	= 4;
+		#endregion
+	}
 }

@@ -40,7 +40,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected bool			    allRowsFetched;
 		private Queue<DbValue[]>    rows;
 		private Queue<DbValue[]>    outputParams;
-		private int				    recordsAffected;
 		private int				    fetchSize;
         private bool                returnRecordsAffected;
 
@@ -91,11 +90,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return this.fields; }
 		}
 
-		public override int RecordsAffected
-		{
-			get { return this.recordsAffected; }
-            protected set { this.recordsAffected = value; }
-		}
+		public override int RecordsAffected { get; protected set; }
 
 		public override bool IsPrepared
 		{
@@ -157,7 +152,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
             this.handle = IscCodes.INVALID_OBJECT;
-            this.recordsAffected = -1;
+            this.RecordsAffected = -1;
 			this.fetchSize		= 200;
 			this.rows			= new Queue<DbValue[]>();
 			this.outputParams	= new Queue<DbValue[]>();
@@ -208,7 +203,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                             this.statementType      = DbStatementType.None;
                             this.handle             = 0;
                             this.fetchSize          = 0;
-                            this.recordsAffected    = 0;
+                            this.RecordsAffected    = 0;
                         }
                         
                         base.Dispose(disposing);
@@ -307,7 +302,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-                    this.recordsAffected = -1;
+                    this.RecordsAffected = -1;
 
                     this.SendExecuteToBuffer();
 
