@@ -39,5 +39,90 @@ namespace FirebirdSql.Data.Client.Managed.Version12
         { }
 
         #endregion
+
+		#region · Overriden Methods ·
+
+		public override void Execute()
+		{
+			if (this.state == StatementState.Deallocated)
+			{
+				throw new InvalidOperationException("Statement is not correctly created.");
+			}
+
+			// Clear data
+			this.Clear();
+
+			lock (this.database.SyncObject)
+			{
+				try
+				{
+					this.RecordsAffected = -1;
+
+					this.SendExecuteToBuffer();
+
+					this.database.Flush();
+
+					// sql?, execute
+					int numberOfResponses =
+						(this.StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
+					try
+					{
+						SqlResponse sqlStoredProcedureResponse = null;
+						if (this.StatementType == DbStatementType.StoredProcedure)
+						{
+							numberOfResponses--;
+							sqlStoredProcedureResponse = this.database.ReadSqlResponse();
+							this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
+						}
+
+						numberOfResponses--;
+						GenericResponse executeResponse = this.database.ReadGenericResponse();
+						this.ProcessExecuteResponse(executeResponse);
+					}
+					finally
+					{
+						SafeFinishFetching(ref numberOfResponses);
+					}
+
+					//we need to split this in two, to alloow server handle op_cancel properly
+
+					// Obtain records affected by query execution
+					if (this.ReturnRecordsAffected &&
+						(this.StatementType == DbStatementType.Insert ||
+						this.StatementType == DbStatementType.Delete ||
+						this.StatementType == DbStatementType.Update ||
+						this.StatementType == DbStatementType.StoredProcedure ||
+						this.StatementType == DbStatementType.Select))
+					{
+						// Grab rows affected
+						this.SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+						
+						this.database.Flush();
+
+						//rows affected
+						numberOfResponses = 1;
+						try
+						{
+							numberOfResponses--;
+							GenericResponse rowsAffectedResponse = this.database.ReadGenericResponse();
+							this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
+						}
+						finally
+						{
+							SafeFinishFetching(ref numberOfResponses);
+						}
+					}
+
+					this.state = StatementState.Executed;
+				}
+				catch (IOException)
+				{
+					this.state = StatementState.Error;
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
+
+		#endregion
     }
 }
