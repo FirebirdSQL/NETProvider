@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
 		}
 
-		protected virtual void ProcessTrustedAuthResponse(SSPIHelper sspiHelper, ref IResponse response)
+		protected void ProcessTrustedAuthResponse(SSPIHelper sspiHelper, ref IResponse response)
 		{
 			while (response is AuthResponse)
 			{

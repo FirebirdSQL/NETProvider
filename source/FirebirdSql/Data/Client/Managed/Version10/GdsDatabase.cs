@@ -353,7 +353,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			this.WriteBuffer(dpb.ToArray());
 		}
 
-		protected virtual void ProcessCreateResponse(GenericResponse response)
+		protected void ProcessCreateResponse(GenericResponse response)
 		{
 			this.handle = response.ObjectHandle;
 		}
@@ -560,6 +560,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         }
 
         #endregion
+
+		#region · Cancel Methods ·
+
+		public virtual void CancelOperation(int kind)
+		{
+			throw new NotSupportedException("Cancel Operation isn't supported on protocol 10.");
+		}
+
+		#endregion
 
         #region · Statement Creation Methods ·
 
@@ -834,9 +843,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         }
 
         protected void ProcessReleaseObjectResponse(IResponse response)
-        {
-
-        }
+        { }
 
         #endregion
 

@@ -24,7 +24,6 @@ using System.Text;
 using System.IO;
 
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Client.Managed.Version10;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
@@ -146,8 +145,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         if (this.StatementType == DbStatementType.StoredProcedure)
                         {
                             numberOfResponses--;
-                            sqlStoredProcedureResponse = this.database.ReadSqlResponse();
-                            this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
+							sqlStoredProcedureResponse = this.database.ReadSqlResponse();
+							this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
                         }
 
                         numberOfResponses--;
@@ -161,7 +160,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                         }
 
                         this.ProcessExecuteResponse(executeResponse);
-                        if (rowsAffectedResponse != null)
+                        if (readRowsAffectedResponse)
                             this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
                     }
                     finally
@@ -181,25 +180,21 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
         #endregion
 
-        #region · Private Methods ·
+		#region Protected methods
+		protected void SafeFinishFetching(ref int numberOfResponses)
+		{
+			while (numberOfResponses > 0)
+			{
+				numberOfResponses--;
+				try
+				{
+					this.database.ReadResponse();
+				}
+				catch (IscException)
+				{ }
+			}
+		}
 
-        private void SafeFinishFetching(ref int numberOfResponses)
-        {
-            while (numberOfResponses > 0)
-            {
-                numberOfResponses--;
-                try
-                {
-                    this.database.ReadResponse();
-                }
-                catch (IscException) 
-                { }
-            }
-        }
-
-        #endregion
-
-        #region Protected methods
         protected override void Free(int option)
         {
             if (FreeNotNeeded(option))
