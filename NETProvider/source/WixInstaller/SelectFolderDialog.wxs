@@ -16,16 +16,16 @@
 				<Control Id="Browse" Type="PushButton" X="276" Y="126" Width="90" Height="18" Text="[Button_Browse]">
 					<Publish Property="_BrowseProperty" Value="INSTALLDIR">1</Publish>
 					<Publish Event="SpawnDialog" Value="BrowseDialog">1</Publish>
-				</Control>		
+				</Control>
 				<Control Id="Text" Type="Text" X="25" Y="70" Width="320" Height="40">
 					<Text>To install in this folder, click "Next". To install to a different folder, enter it below or click "Browse".</Text>
 				</Control>
 				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" FixedSize="yes" Text="banner.bmp" />
-				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="374" Height="0" />		
-				<Control Id="BottomLine" Type="Line" X="4" Y="234" Width="370" Height="0" />	
+				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="374" Height="0" />
+				<Control Id="BottomLine" Type="Line" X="4" Y="234" Width="370" Height="0" />
 				<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
 					<Text>This is the folder where [ProductName] will be installed.</Text>
-				</Control>			
+				</Control>
 				<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
 					<Text>[TitleFont]Select Installation Folder</Text>
 				</Control>
