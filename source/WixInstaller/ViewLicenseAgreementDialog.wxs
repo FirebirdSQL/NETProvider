@@ -11,7 +11,7 @@
 				<Control Id="Buttons" Type="RadioButtonGroup" X="20" Y="187" Width="330" Height="40" Property="AcceptLicense" />
 				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="[Button_Back]">
 					<Publish Event="NewDialog" Value="WelcomeDialog">1</Publish>
-				</Control>		
+				</Control>
 				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="[Button_Next]">
 					<Publish Event="NewDialog" Value="SelectFolderDialog">AcceptLicense = "Yes"</Publish>
 					<Condition Action="disable">AcceptLicense &lt;&gt; "Yes"</Condition>
@@ -21,7 +21,7 @@
 					<Publish Event="SpawnDialog" Value="CancelDialog">1</Publish>
 				</Control>
 				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" FixedSize="yes" TabSkip="no" Text="banner.bmp" />
-        <Control Id="AgreementText" Type="ScrollableText" X="20" Y="60" Width="330" Height="120" Sunken="yes" TabSkip="no">
+				<Control Id="AgreementText" Type="ScrollableText" X="20" Y="60" Width="330" Height="120" Sunken="yes" TabSkip="no">
 					<Text SourceFile="$(var.SolutionDir)../license.rtf"/>
 				</Control>
 				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />

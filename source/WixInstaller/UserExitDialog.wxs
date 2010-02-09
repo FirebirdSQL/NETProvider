@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Fragment>
+	<Fragment>
 		<UI>
 			<Dialog Id="UserExit" Width="370" Height="270" Title="[ProductName] [Setup]">
 				<Control Id="Finish" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Cancel="yes" Text="[Button_Finish]">
