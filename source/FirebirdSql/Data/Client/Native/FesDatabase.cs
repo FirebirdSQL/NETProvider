@@ -244,22 +244,22 @@ namespace FirebirdSql.Data.Client.Native
 
         #region · Remote Events Methods ·
 
-        void IDatabase.CloseEventManager()
+        public void CloseEventManager()
         {
             throw new NotSupportedException();
         }
 
-        RemoteEvent IDatabase.CreateEvent()
+        public RemoteEvent CreateEvent()
         {
             throw new NotSupportedException();
         }
 
-        void IDatabase.QueueEvents(RemoteEvent events)
+        public void QueueEvents(RemoteEvent events)
         {
             throw new NotSupportedException();
         }
 
-        void IDatabase.CancelEvents(RemoteEvent events)
+        public void CancelEvents(RemoteEvent events)
         {
             throw new NotSupportedException();
         }
@@ -335,7 +335,16 @@ namespace FirebirdSql.Data.Client.Native
             return transaction;
         }
 
-        #endregion
+		#endregion
+
+		#region · Cancel Methods ·
+
+		public void CancelOperation(int kind)
+		{
+#warning Finish!!!
+		}
+
+		#endregion
 
         #region · Statement Creation Methods ·
 

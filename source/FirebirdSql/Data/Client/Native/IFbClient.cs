@@ -158,6 +158,10 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
+		#region · Cancel Functions ·
+
+		#endregion
+
 		#region · DSQL Functions ·
 
 		IntPtr isc_dsql_allocate_statement(
