@@ -273,9 +273,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] ReadOpaque(int length)
 		{
-			byte[] buffer = new byte[length];
-
-			buffer = this.ReadBytes(length);
+			byte[] buffer = this.ReadBytes(length);
 
 			int padLength = ((4 - length) & 3);
 			if (padLength > 0)
