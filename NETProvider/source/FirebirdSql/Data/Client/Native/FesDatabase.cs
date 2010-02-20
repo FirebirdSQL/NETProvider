@@ -341,7 +341,13 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void CancelOperation(int kind)
 		{
-#warning Finish!!!
+			int dbHandle = this.Handle;
+
+			IntPtr[] localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+
+			fbClient.fb_cancel_operation(localStatusVector, ref dbHandle, kind);
+
+			FesConnection.ParseStatusVector(localStatusVector, this.charset);
 		}
 
 		#endregion

@@ -160,6 +160,11 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region · Cancel Functions ·
 
+		IntPtr fb_cancel_operation(
+			[In, Out] IntPtr[] statusVector,
+			ref int dbHandle,
+			int option);
+
 		#endregion
 
 		#region · DSQL Functions ·
