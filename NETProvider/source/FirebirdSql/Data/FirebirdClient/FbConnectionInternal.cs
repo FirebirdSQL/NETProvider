@@ -546,10 +546,22 @@ namespace FirebirdSql.Data.FirebirdClient
             return "fbnetcf";
 #else
             // showing ApplicationPhysicalPath may be wrong because of connection pooling; better idea?
-            if (System.Web.Hosting.HostingEnvironment.IsHosted)
-                return System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
-            else
-                return Process.GetCurrentProcess().MainModule.FileName;
+			if (System.Web.Hosting.HostingEnvironment.IsHosted)
+			{
+				return System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
+			}
+			else
+			{
+				System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+				if (assembly != null)
+				{
+					return assembly.Location;
+				}
+				else // if we're not loaded from managed code
+				{
+					return Process.GetCurrentProcess().MainModule.FileName;
+				}
+			}
 #endif
         }
 
