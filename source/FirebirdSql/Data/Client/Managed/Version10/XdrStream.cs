@@ -418,7 +418,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				case DbDataType.VarChar:
 					if (field.Charset.IsOctetsCharset)
 					{
-						fieldValue = this.ReadOpaque(field.Length);
+						fieldValue = this.ReadBuffer();
 					}
 					else
 					{
