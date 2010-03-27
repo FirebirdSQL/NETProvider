@@ -25,6 +25,7 @@ using System.Data;
 
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
+using System.Text;
 
 namespace FirebirdSql.Data.UnitTests
 {
@@ -651,6 +652,51 @@ namespace FirebirdSql.Data.UnitTests
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
 				cmd.ExecuteNonQuery();
 				Assert.AreEqual(columnValue, cmd.Parameters[0].Value);
+			}
+		}
+
+		[Test]
+		public void ReadingVarcharOctets()
+		{
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				const string data = "1234";
+				byte[] read = null;
+
+				cmd.CommandText = string.Format("select cast('{0}' as varchar(10) character set octets) from rdb$database", data);
+				using (FbDataReader reader = cmd.ExecuteReader())
+				{
+					if (reader.Read())
+					{
+						read = (byte[])reader[0];
+					}
+				}
+
+				byte[] expected = Encoding.ASCII.GetBytes(data);
+				Assert.AreEqual(expected, read);
+			}
+		}
+
+		[Test]
+		public void ReadingCharOctets()
+		{
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				const string data = "1234";
+				byte[] read = null;
+
+				cmd.CommandText = string.Format("select cast('{0}' as char(10) character set octets) from rdb$database", data);
+				using (FbDataReader reader = cmd.ExecuteReader())
+				{
+					if (reader.Read())
+					{
+						read = (byte[])reader[0];
+					}
+				}
+
+				byte[] expected = new byte[10];
+				Encoding.ASCII.GetBytes(data).CopyTo(expected, 0);
+				Assert.AreEqual(expected, read);
 			}
 		}
 
