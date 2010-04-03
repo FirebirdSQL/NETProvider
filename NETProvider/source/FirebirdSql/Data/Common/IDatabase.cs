@@ -109,6 +109,8 @@ namespace FirebirdSql.Data.Common
 
         ITriggerContext GetTriggerContext();
 
+		void CancelOperation(int kind);
+
 		#endregion
 	}
 }

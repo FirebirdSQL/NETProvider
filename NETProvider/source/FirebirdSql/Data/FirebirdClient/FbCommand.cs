@@ -28,6 +28,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 
 using FirebirdSql.Data.Common;
 
@@ -455,7 +456,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public override void Cancel()
         {
-            throw new NotSupportedException();
+			this.connection.CancelCommand();
         }
 
         public new FbParameter CreateParameter()
@@ -489,122 +490,156 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         public override int ExecuteNonQuery()
-        {
-            lock (this)
-            {
-                this.CheckCommand();
+		{
+			lock (this)
+			{
+				this.CheckCommand();
 
-                try
-                {
-                    this.ExecuteCommand(CommandBehavior.Default);
+				try
+				{
+					this.ExecuteCommand(CommandBehavior.Default);
 
-                    if (this.statement.StatementType == DbStatementType.StoredProcedure)
-                    {
-                        this.SetOutputParameters();
-                    }
+					if (this.statement.StatementType == DbStatementType.StoredProcedure)
+					{
+						this.SetOutputParameters();
+					}
 
-                    this.CommitImplicitTransaction();
-                }
-                catch (IscException ex)
-                {
-                    this.DiscardImplicitTransaction();
+					this.CommitImplicitTransaction();
+				}
+				catch (IscException ex)
+				{
+					this.DiscardImplicitTransaction();
 
-                    throw new FbException(ex.Message, ex);
-                }
-                catch (Exception)
-                {
-                    this.DiscardImplicitTransaction();
+					throw new FbException(ex.Message, ex);
+				}
+				catch (Exception)
+				{
+					this.DiscardImplicitTransaction();
 
-                    throw;
-                }
-            }
+					throw;
+				}
+			}
 
-            return this.RecordsAffected;
+			return this.RecordsAffected;
         }
+		public IAsyncResult BeginExecuteNonQuery(AsyncCallback callback, object objectState)
+		{
+			return ((Func<int>)this.ExecuteNonQuery).BeginInvoke(callback, objectState);
+		}
+		public int EndExecuteNonQuery(IAsyncResult asyncResult)
+		{
+			return ((Func<int>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
+		}
 
         public new FbDataReader ExecuteReader()
         {
             return this.ExecuteReader(CommandBehavior.Default);
         }
-
         public new FbDataReader ExecuteReader(CommandBehavior behavior)
         {
-            lock (this)
-            {
-                this.CheckCommand();
+			lock (this)
+			{
+				this.CheckCommand();
 
-                try
-                {
-                    this.ExecuteCommand(behavior, true);
-                }
-                catch (IscException ex)
-                {
-                    this.DiscardImplicitTransaction();
+				try
+				{
+					this.ExecuteCommand(behavior, true);
+				}
+				catch (IscException ex)
+				{
+					this.DiscardImplicitTransaction();
 
-                    throw new FbException(ex.Message, ex);
-                }
-                catch
-                {
-                    this.DiscardImplicitTransaction();
+					throw new FbException(ex.Message, ex);
+				}
+				catch
+				{
+					this.DiscardImplicitTransaction();
 
-                    throw;
-                }
-            }
+					throw;
+				}
+			}
 
-            this.activeReader = new FbDataReader(this, this.connection, behavior);
+			this.activeReader = new FbDataReader(this, this.connection, behavior);
 
-            return this.activeReader;
+			return this.activeReader;
         }
+		public IAsyncResult BeginExecuteReader(AsyncCallback callback, object objectState)
+		{
+			return ((Func<FbDataReader>)this.ExecuteReader).BeginInvoke(callback, objectState);
+		}
+		public IAsyncResult BeginExecuteReader(CommandBehavior behavior, AsyncCallback callback, object objectState)
+		{
+			return ((Func<CommandBehavior, FbDataReader>)this.ExecuteReader).BeginInvoke(behavior, callback, objectState);
+		}
+		public FbDataReader EndExecuteReader(IAsyncResult asyncResult)
+		{
+			if ((asyncResult as AsyncResult).AsyncDelegate is Func<FbDataReader>)
+			{
+				return ((Func<FbDataReader>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
+			}
+			else
+			{
+				return ((Func<CommandBehavior, FbDataReader>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
+			}
+		}
 
         public override object ExecuteScalar()
         {
-            DbValue[] values = null;
-            object val = null;
+			DbValue[] values = null;
+			object val = null;
 
-            lock (this)
-            {
-                this.CheckCommand();
+			lock (this)
+			{
+				this.CheckCommand();
 
-                try
-                {
-                    this.ExecuteCommand(CommandBehavior.Default);
+				try
+				{
+					this.ExecuteCommand(CommandBehavior.Default);
 
-                    // Gets	only the values	of the first row or
-                    // the output parameters values if command is an Stored Procedure
-                    if (this.statement.StatementType == DbStatementType.StoredProcedure)
-                    {
-                        values = this.statement.GetOutputParameters();
-                        this.SetOutputParameters(values);
-                    }
-                    else
-                    {
-                        values = this.statement.Fetch();
-                    }
+					// Gets	only the values	of the first row or
+					// the output parameters values if command is an Stored Procedure
+					if (this.statement.StatementType == DbStatementType.StoredProcedure)
+					{
+						values = this.statement.GetOutputParameters();
+						this.SetOutputParameters(values);
+					}
+					else
+					{
+						values = this.statement.Fetch();
+					}
 
-                    // Get the return value
-                    if (values != null && values.Length > 0)
-                    {
-                        val = values[0].Value;
-                    }
+					// Get the return value
+					if (values != null && values.Length > 0)
+					{
+						val = values[0].Value;
+					}
 
-                    this.CommitImplicitTransaction();
-                }
-                catch (IscException ex)
-                {
-                    this.DiscardImplicitTransaction();
+					this.CommitImplicitTransaction();
+				}
+				catch (IscException ex)
+				{
+					this.DiscardImplicitTransaction();
 
-                    throw new FbException(ex.Message, ex);
-                }
-                catch (Exception)
-                {
-                    this.DiscardImplicitTransaction();
+					throw new FbException(ex.Message, ex);
+				}
+				catch (Exception)
+				{
+					this.DiscardImplicitTransaction();
 
-                    throw;
-                }
-            }
+					throw;
+				}
+			}
 
-            return val;
+			return val;
         }
+		public IAsyncResult BeginExecuteScalar(AsyncCallback callback, object objectState)
+		{
+			return ((Func<object>)this.ExecuteScalar).BeginInvoke(callback, objectState);
+		}
+		public object EndExecuteScalar(IAsyncResult asyncResult)
+		{
+			return ((Func<object>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
+		}
 
         #endregion
 

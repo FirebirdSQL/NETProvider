@@ -53,10 +53,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Properties ·
 
-        public IDatabase Database
-        {
-            get { return this.db; }
-        }
+		public IDatabase Database
+		{
+			get { return this.db; }
+		}
 
         public long Lifetime
         {
@@ -109,6 +109,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
         }
 
+		public bool CancelDisabled { get; set; }
 
         #endregion
 
@@ -566,5 +567,24 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         #endregion
-    }
+
+		#region Cancelation
+		public void EnableCancel()
+		{
+			this.db.CancelOperation(IscCodes.fb_cancel_enable);
+			this.CancelDisabled = false;
+		}
+
+		public void DisableCancel()
+		{
+			this.db.CancelOperation(IscCodes.fb_cancel_disable);
+			this.CancelDisabled = true;
+		}
+
+		public void CancelCommand()
+		{
+			this.db.CancelOperation(IscCodes.fb_cancel_raise);
+		}
+		#endregion
+	}
 }
