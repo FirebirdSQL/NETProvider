@@ -16,8 +16,8 @@
  *	All Rights Reserved.
  * 
  * Contributors:
- * 
  *      2007 - Dean Harding
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
