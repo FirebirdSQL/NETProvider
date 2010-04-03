@@ -565,7 +565,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual void CancelOperation(int kind)
 		{
-			throw new NotSupportedException("Cancel Operation isn't supported on protocol 10.");
+			throw new NotSupportedException("Cancel Operation isn't supported on < FB2.5.");
 		}
 
 		#endregion
