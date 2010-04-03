@@ -403,10 +403,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
         {
-            if (this.IsClosed)
-            {
-                throw new InvalidOperationException("BeginTransaction requires an open and available Connection.");
-            }
+			this.CheckClosed();
 
             return this.innerConnection.BeginTransaction(level, transactionName);
         }
@@ -418,10 +415,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
         {
-            if (this.IsClosed)
-            {
-                throw new InvalidOperationException("BeginTransaction requires an open and available Connection.");
-            }
+			this.CheckClosed();
 
             return this.innerConnection.BeginTransaction(options, transactionName);
         }
@@ -433,10 +427,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #if (!NET_CF)
         public override void EnlistTransaction(System.Transactions.Transaction transaction)
         {
-            if (this.State != ConnectionState.Open)
-            {
-                throw new Exception();
-            }
+			this.CheckClosed();
 
             this.innerConnection.EnlistTransaction(transaction);
         }
@@ -472,10 +463,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public override DataTable GetSchema(string collectionName, string[] restrictions)
         {
-            if (this.IsClosed)
-            {
-                throw new InvalidOperationException("The connection is closed.");
-            }
+			this.CheckClosed();
 
             return this.innerConnection.GetSchema(collectionName, restrictions);
         }
@@ -494,10 +482,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #if (!NET_CF)
             lock (this)
             {
-                if (this.IsClosed)
-                {
-                    throw new InvalidOperationException("ChangeDatabase requires an open and available Connection.");
-                }
+				this.CheckClosed();
 
                 if (string.IsNullOrEmpty(db))
                 {
@@ -638,6 +623,12 @@ namespace FirebirdSql.Data.FirebirdClient
                             // Close connection	or send	it back	to the pool
                             if (this.innerConnection.Pooled)
                             {
+								if (this.innerConnection.CancelDisabled)
+								{
+									// Enable fb_cancel_operation if going into pool
+									this.innerConnection.EnableCancel();
+								}
+
                                 // Send	connection to the Pool
                                 FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
                             }
@@ -675,6 +666,14 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
         }
 
+		private void CheckClosed()
+		{
+			if (this.IsClosed)
+			{
+				throw new InvalidOperationException("Operation requires an open and available connection.");
+			}
+		}
+
         #endregion
 
         #region · Event Handlers ·
@@ -697,5 +696,28 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         #endregion
-    }
+
+		#region Cancelation
+		public void EnableCancel()
+		{
+			this.CheckClosed();
+
+			this.innerConnection.EnableCancel();
+		}
+
+		public void DisableCancel()
+		{
+			this.CheckClosed();
+
+			this.innerConnection.DisableCancel(); 
+		}
+
+		internal void CancelCommand()
+		{
+			this.CheckClosed();
+
+			this.innerConnection.CancelCommand();
+		}
+		#endregion
+	}
 }
