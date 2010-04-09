@@ -524,6 +524,7 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 		public IAsyncResult BeginExecuteNonQuery(AsyncCallback callback, object objectState)
 		{
+			// BeginInvoke might be slow, but the query processing will make this irrelevant
 			return ((Func<int>)this.ExecuteNonQuery).BeginInvoke(callback, objectState);
 		}
 		public int EndExecuteNonQuery(IAsyncResult asyncResult)
@@ -565,10 +566,12 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 		public IAsyncResult BeginExecuteReader(AsyncCallback callback, object objectState)
 		{
+			// BeginInvoke might be slow, but the query processing will make this irrelevant
 			return ((Func<FbDataReader>)this.ExecuteReader).BeginInvoke(callback, objectState);
 		}
 		public IAsyncResult BeginExecuteReader(CommandBehavior behavior, AsyncCallback callback, object objectState)
 		{
+			// BeginInvoke might be slow, but the query processing will make this irrelevant
 			return ((Func<CommandBehavior, FbDataReader>)this.ExecuteReader).BeginInvoke(behavior, callback, objectState);
 		}
 		public FbDataReader EndExecuteReader(IAsyncResult asyncResult)
@@ -634,6 +637,7 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 		public IAsyncResult BeginExecuteScalar(AsyncCallback callback, object objectState)
 		{
+			// BeginInvoke might be slow, but the query processing will make this irrelevant
 			return ((Func<object>)this.ExecuteScalar).BeginInvoke(callback, objectState);
 		}
 		public object EndExecuteScalar(IAsyncResult asyncResult)
