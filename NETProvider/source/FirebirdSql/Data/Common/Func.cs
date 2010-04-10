@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
-#if (!NET_35)
+#if (NET_20)
 		delegate TResult Func<TResult>();
 		delegate TResult Func<T, TResult>();
 #endif
