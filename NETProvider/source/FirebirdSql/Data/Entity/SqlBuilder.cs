@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.Entity
         /// </summary>
         public void AppendLine()
         {
-            SqlFragments.Add("\r\n");
+            SqlFragments.Add(Environment.NewLine);
         }
 
         /// <summary>
