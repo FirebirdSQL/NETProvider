@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.FirebirdClient
         private int commandTimeout;
         private int fetchSize;
 
-#if (NET_35 && ENTITY_FRAMEWORK)
+#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
         // type coercions
         internal System.Data.Metadata.Edm.PrimitiveType[] ExpectedColumnTypes { get; set; }
 #endif
@@ -437,7 +437,7 @@ namespace FirebirdSql.Data.FirebirdClient
             command.FetchSize = this.FetchSize;
             command.UpdatedRowSource = this.UpdatedRowSource;
 
-#if (NET_35 && ENTITY_FRAMEWORK)
+#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
             if (this.ExpectedColumnTypes != default(System.Data.Metadata.Edm.PrimitiveType[]))
                 command.ExpectedColumnTypes = (System.Data.Metadata.Edm.PrimitiveType[])this.ExpectedColumnTypes.Clone();
 #endif

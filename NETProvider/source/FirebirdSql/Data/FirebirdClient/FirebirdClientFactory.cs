@@ -23,10 +23,7 @@ using System.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    public class FirebirdClientFactory : DbProviderFactory
-#if (NET_35)
-        , IServiceProvider
-#endif
+    public class FirebirdClientFactory : DbProviderFactory, IServiceProvider
     {
         #region · Static Properties ·
 
@@ -92,12 +89,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · IServiceProvider Members ·
 
-#if (NET_35)
         object IServiceProvider.GetService(Type serviceType)
-        {
-            #if (ENTITY_FRAMEWORK)
-
-            if (serviceType == typeof(DbProviderServices))
+		{
+#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
+			if (serviceType == typeof(DbProviderServices))
             {
                 return new FbProviderServices();
             }
@@ -105,12 +100,10 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 return null;
             }
-            
-            #else
-                return null;
-            #endif
-        } 
+#else
+			return null;
 #endif
+        }
 
         #endregion
     }
