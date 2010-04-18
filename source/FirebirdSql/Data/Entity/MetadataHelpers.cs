@@ -12,13 +12,11 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2010 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *  
- *  Based on the Microsoft Entity Framework Provider Sample SP1 Beta 1
  */
 
-#if (NET_35 && ENTITY_FRAMEWORK)
+#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
 
 using System;
 using System.Data;

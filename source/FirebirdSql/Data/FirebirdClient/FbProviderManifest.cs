@@ -12,13 +12,11 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2010 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *  
- *  Based on the Microsoft Entity Framework Provider Sample SP1 Beta 1
  */
 
-#if (NET_35 && ENTITY_FRAMEWORK)
+#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
 
 using System;
 using System.Collections.Generic;
@@ -40,9 +38,10 @@ namespace FirebirdSql.Data.FirebirdClient
     {
         #region Private Fields
 
-        internal const int binaryMaxSize = Int32.MaxValue;
-        internal const int varcharMaxSize = 32765;
-        internal const int nvarcharMaxSize = varcharMaxSize;
+        internal const int BinaryMaxSize = Int32.MaxValue;
+        internal const int VarcharMaxSize = 32765;
+        internal const int NVarcharMaxSize = VarcharMaxSize;
+		internal const char LikeEscapeCharacter = '\\';
 
         private System.Collections.ObjectModel.ReadOnlyCollection<PrimitiveType> _primitiveTypes = null;
         private System.Collections.ObjectModel.ReadOnlyCollection<EdmFunction> _functions = null;
@@ -309,7 +308,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         bool isFixedLength = null != facets[MetadataHelpers.FixedLengthFacetName].Value && (bool)facets[MetadataHelpers.FixedLengthFacetName].Value;
                         Facet f = facets[MetadataHelpers.MaxLengthFacetName];
 
-                        bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > binaryMaxSize;
+                        bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > BinaryMaxSize;
                         int maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
 
                         TypeUsage tu;
@@ -339,7 +338,7 @@ namespace FirebirdSql.Data.FirebirdClient
                         Facet f = facets[MetadataHelpers.MaxLengthFacetName];
                         // maxlen is true if facet value is unbounded, the value is bigger than the limited string sizes *or* the facet
                         // value is null. this is needed since functions still have maxlength facet value as null
-                        bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > (isUnicode ? nvarcharMaxSize : varcharMaxSize);
+                        bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > (isUnicode ? NVarcharMaxSize : VarcharMaxSize);
                         int maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
 
                         TypeUsage tu;
@@ -427,56 +426,22 @@ namespace FirebirdSql.Data.FirebirdClient
             return XmlReader.Create(stream);
         }
 
-        class TypeHelpers
-        {
-            public static bool TryGetPrecision(TypeUsage tu, out byte precision)
-            {
-                Facet f;
+#if (NET_40)
+		public override bool SupportsEscapingLikeArgument(out char escapeCharacter)
+		{
+			escapeCharacter = LikeEscapeCharacter;
+			return true;
+		}
 
-                precision = 0;
-                if (tu.Facets.TryGetValue("Precision", false, out f))
-                {
-                    if (!f.IsUnbounded && f.Value != null)
-                    {
-                        precision = (byte)f.Value;
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            public static bool TryGetMaxLength(TypeUsage tu, out int maxLength)
-            {
-                Facet f;
-
-                maxLength = 0;
-                if (tu.Facets.TryGetValue("MaxLength", false, out f))
-                {
-                    if (!f.IsUnbounded && f.Value != null)
-                    {
-                        maxLength = (int)f.Value;
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            public static bool TryGetScale(TypeUsage tu, out byte scale)
-            {
-                Facet f;
-
-                scale = 0;
-                if (tu.Facets.TryGetValue("Scale", false, out f))
-                {
-                    if (!f.IsUnbounded && f.Value != null)
-                    {
-                        scale = (byte)f.Value;
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }
+		public override string EscapeLikeArgument(string argument)
+		{
+			StringBuilder sb = new StringBuilder(argument);
+			sb.Replace(LikeEscapeCharacter.ToString(), LikeEscapeCharacter.ToString() + LikeEscapeCharacter.ToString());
+			sb.Replace("%", LikeEscapeCharacter + "%");
+			sb.Replace("_", LikeEscapeCharacter + "_");
+			return sb.ToString();
+		}
+#endif
     }
 }
 #endif

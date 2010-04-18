@@ -436,7 +436,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public override object GetValue(int i)
 		{
-#if (NET_35 && ENTITY_FRAMEWORK)
+#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
 			// type coercions for EF
 			// I think only bool datatype needs to be done explicitly
 			if (this.command.ExpectedColumnTypes != default(System.Data.Metadata.Edm.PrimitiveType[]))

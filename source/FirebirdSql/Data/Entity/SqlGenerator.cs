@@ -12,13 +12,11 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2010 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *  
- *  Based on the Microsoft Entity Framework Provider Sample SP1 Beta 1
  */
 
-#if (NET_35 && ENTITY_FRAMEWORK)
+#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
 
 using System;
 using System.Collections.Generic;
@@ -29,6 +27,7 @@ using System.Data.Common;
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 using System.Data;
+using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 
@@ -305,16 +304,20 @@ namespace FirebirdSql.Data.Entity
         {
             Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(16, StringComparer.Ordinal);
 
-            //Other Canonical Functions
+			#region Other Canonical Functions
             functionHandlers.Add("NewGuid", HandleCanonicalFunctionNewGuid);
+			#endregion
 
-            //Math Canonical Functions
+			#region Math Canonical Functions
             functionHandlers.Add("Abs", HandleCanonicalFunctionAbs);
             functionHandlers.Add("Ceiling", HandleCanonicalFunctionCeiling);
-            functionHandlers.Add("Floor", HandleCanonicalFunctionFloor);
+			functionHandlers.Add("Floor", HandleCanonicalFunctionFloor);
+			functionHandlers.Add("Power", HandleCanonicalFunctionPower);
             functionHandlers.Add("Round", HandleCanonicalFunctionRound);
+			functionHandlers.Add("Truncate", HandleCanonicalFunctionTruncate);
+			#endregion
 
-            //String Canonical Functions
+			#region String Canonical Functions
             functionHandlers.Add("Concat", HandleConcatFunction);
             functionHandlers.Add("IndexOf", HandleCanonicalFunctionIndexOf);
             functionHandlers.Add("Length", HandleCanonicalFunctionLength);
@@ -328,8 +331,12 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("Reverse", HandleCanonicalFunctionReverse);
             functionHandlers.Add("Replace", HandleCanonicalFunctionReplace);
             functionHandlers.Add("Substring", HandleCanonicalFunctionSubstring);
+			//Contains (string, target)
+			//EndsWith (string, target)
+			//StartsWith (string, target)
+			#endregion
 
-            //Date and Time Canonical Functions
+            #region Date and Time Canonical Functions
             functionHandlers.Add("Year", HandleCanonicalFunctionExtract);
             functionHandlers.Add("Month", HandleCanonicalFunctionExtract);
             functionHandlers.Add("Day", HandleCanonicalFunctionExtract);
@@ -343,12 +350,38 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("CurrentUtcDateTime", HandleCanonicalFunctionCurrentUtcDateTime); // not supported
             functionHandlers.Add("CurrentDateTimeOffset", HandleCanonicalFunctionCurrentDateTimeOffset); // not supported
             functionHandlers.Add("GetTotalOffsetMinutes", HandleCanonicalFunctionGetTotalOffsetMinutes); // not supported
+			//AddNanoseconds(expression, number)
+			//AddMicroseconds(expression, number)
+			//AddMilliseconds(expression, number)
+			//AddSeconds(expression, number)
+			//AddMinutes(expression, number)
+			//AddHours(expression, number)
+			//AddDays(expression, number)
+			//AddMonths(expression, number)
+			//AddYears(expression, number)
+			//CreateDateTime(year, month, day, hour, minute, second)
+			//CreateDateTimeOffset(year, month, day, hour, minute, second, tzoffset)
+			//CreateTime(hour, minute, second)
+			//GetTotalOffsetMinutes (datetimeoffset)
+			//DayOfYear(expression)
+			//DiffNanoseconds(startExpression, endExpression)
+			//DiffMilliseconds(startExpression, endExpression)
+			//DiffMicroseconds(startExpression, endExpression)
+			//DiffSeconds(startExpression, endExpression)
+			//DiffMinutes(startExpression, endExpression)
+			//DiffHours(startExpression, endExpression)
+			//DiffDays(startExpression, endExpression)
+			//DiffMonths(startExpression, endExpression)
+			//DiffYears(startExpression, endExpression)
+			//TruncateTime(expressio
+			#endregion
 
-            //Bitwise Canonical Functions
-            functionHandlers.Add("BitwiseAnd", HandleCanonicalFunctionBitwiseAnd);
+			#region Bitwise Canonical Functions
+			functionHandlers.Add("BitwiseAnd", HandleCanonicalFunctionBitwiseAnd);
             functionHandlers.Add("BitwiseNot", HandleCanonicalFunctionBitwiseNot); // not supported
             functionHandlers.Add("BitwiseOr", HandleCanonicalFunctionBitwiseOr);
             functionHandlers.Add("BitwiseXor", HandleCanonicalFunctionBitwiseXor);
+			#endregion
 
             return functionHandlers;
         }
@@ -2764,7 +2797,12 @@ namespace FirebirdSql.Data.Entity
         }
         #endregion
 
-        #region Math Canonical Functions
+		#region Math Canonical Functions
+		private static ISqlFragment HandleCanonicalFunctionAbs(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			return sqlgen.HandleFunctionDefaultGivenName(e, "ABS");
+		}
+
         private static ISqlFragment HandleCanonicalFunctionCeiling(SqlGenerator sqlgen, DbFunctionExpression e)
         {
             return sqlgen.HandleFunctionDefaultGivenName(e, "CEILING");
@@ -2775,27 +2813,20 @@ namespace FirebirdSql.Data.Entity
             return sqlgen.HandleFunctionDefaultGivenName(e, "FLOOR");
         }
 
-        private static ISqlFragment HandleCanonicalFunctionAbs(SqlGenerator sqlgen, DbFunctionExpression e)
-        {
-            return sqlgen.HandleFunctionDefaultGivenName(e, "ABS");
-        }
+		private static ISqlFragment HandleCanonicalFunctionPower(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			return sqlgen.HandleFunctionDefaultGivenName(e, "POWER");
+		}
 
-        /// <summary>
-        /// Round(numericExpression) -> ROUND(numericExpression, 0);
-        /// </summary>
-        private static ISqlFragment HandleCanonicalFunctionRound(SqlGenerator sqlgen, DbFunctionExpression e)
-        {
-            SqlBuilder result = new SqlBuilder();
+		private static ISqlFragment HandleCanonicalFunctionRound(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			return sqlgen.HandleFunctionDefaultGivenName(e, "ROUND");
+		}
 
-            result.Append("ROUND(");
-
-            Debug.Assert(e.Arguments.Count == 1, "Round should have one argument");
-            result.Append(e.Arguments[0].Accept(sqlgen));
-
-            result.Append(", 0)");
-
-            return result;
-        }
+		private static ISqlFragment HandleCanonicalFunctionTruncate(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			return sqlgen.HandleFunctionDefaultGivenName(e, "TRUNC");
+		}
         #endregion
 
         #endregion
@@ -3256,9 +3287,9 @@ namespace FirebirdSql.Data.Entity
                     {
                         // try to get maximum length, if not enough, server will return error
                         if (isUnicode)
-                            length = FbProviderManifest.nvarcharMaxSize.ToString(CultureInfo.InvariantCulture);
+                            length = FbProviderManifest.NVarcharMaxSize.ToString(CultureInfo.InvariantCulture);
                         else
-                            length = FbProviderManifest.varcharMaxSize.ToString(CultureInfo.InvariantCulture);
+                            length = FbProviderManifest.VarcharMaxSize.ToString(CultureInfo.InvariantCulture);
                     }
                     else
                     {
@@ -3272,7 +3303,7 @@ namespace FirebirdSql.Data.Entity
                     }
                     else
                     {
-                        if (int.Parse(length) > (isUnicode ? FbProviderManifest.nvarcharMaxSize : FbProviderManifest.varcharMaxSize))
+                        if (int.Parse(length) > (isUnicode ? FbProviderManifest.NVarcharMaxSize : FbProviderManifest.VarcharMaxSize))
                         {
                             typeName = "BLOB SUB_TYPE TEXT";
                         }
