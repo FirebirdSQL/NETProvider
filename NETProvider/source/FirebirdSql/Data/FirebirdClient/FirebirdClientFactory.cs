@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ * 
+ *  Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 #if (!NET_CF)
@@ -94,10 +97,10 @@ namespace FirebirdSql.Data.FirebirdClient
 #if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
 			if (serviceType == typeof(DbProviderServices))
             {
-                return new FbProviderServices();
+				return FbProviderServices.Instance;
             }
             else
-            {
+			{
                 return null;
             }
 #else
