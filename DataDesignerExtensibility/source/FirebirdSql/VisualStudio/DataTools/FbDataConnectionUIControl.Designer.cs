@@ -1,5 +1,5 @@
 /*
- *  Visual Studio DDEX Provider for Firebird
+ *  Visual Studio DDEX Provider for FirebirdClient
  * 
  *     The contents of this file are subject to the Initial 
  *     Developer's Public License Version 1.0 (the "License"); 
@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2005 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 namespace FirebirdSql.VisualStudio.DataTools

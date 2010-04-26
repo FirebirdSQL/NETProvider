@@ -1,5 +1,5 @@
 /*
- *  Visual Studio DDEX Provider for Firebird
+ *  Visual Studio DDEX Provider for FirebirdClient
  * 
  *     The contents of this file are subject to the Initial 
  *     Developer's Public License Version 1.0 (the "License"); 
@@ -14,15 +14,14 @@
  * 
  *  Copyright (c) 2005 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
-using System.Data;
-using System.Diagnostics;
-using System.ComponentModel.Design;
-using Microsoft.VisualStudio.Data.Framework;
-using Microsoft.VisualStudio.Data.Framework.AdoDotNet;
-using Microsoft.VisualStudio.Data.Services.SupportEntities;
+using Microsoft.VisualStudio.Data;
+using Microsoft.VisualStudio.Data.AdoDotNet;
 
 namespace FirebirdSql.VisualStudio.DataTools
 {
@@ -31,6 +30,7 @@ namespace FirebirdSql.VisualStudio.DataTools
         #region · Constructors ·
 
         public FbDataConnectionSupport() 
+            : base("FirebirdSql.Data.FirebirdClient")
         {
             System.Diagnostics.Trace.WriteLine("FbDataConnectionSupport()");
         }
@@ -39,38 +39,36 @@ namespace FirebirdSql.VisualStudio.DataTools
 
         #region · Protected Methods ·
 
-        protected override object CreateService(IServiceContainer container, Type serviceType)
+        protected override DataSourceInformation CreateDataSourceInformation()
         {
-            if (serviceType == typeof(IDSRefBuilder))
+            System.Diagnostics.Trace.WriteLine("FbDataConnectionSupport::CreateDataSourceInformation()");
+
+            return new FbDataSourceInformation(base.Site as DataConnection);
+        }
+
+        protected override DataObjectIdentifierConverter CreateObjectIdentifierConverter()
+        {
+            return new FbDataObjectIdentifierConverter(base.Site as DataConnection);
+        }
+
+        protected override object GetServiceImpl(Type serviceType)
+        {
+            System.Diagnostics.Trace.WriteLine(String.Format("FbDataConnectionSupport::GetServiceImpl({0})", serviceType.FullName));
+
+            if (serviceType == typeof(DataViewSupport))
             {
-                return new DSRefBuilder(Site);
+                return new FbDataViewSupport();
             }
-            if (serviceType == typeof(IVsDataObjectIdentifierConverter))
+            else if (serviceType == typeof(DataObjectSupport))
             {
-                return new FbDataObjectIdentifierConverter(Site);
+                return new FbDataObjectSupport();
             }
-            if (serviceType == typeof(IVsDataObjectIdentifierResolver))
+            else if (serviceType == typeof(DataObjectIdentifierResolver))
             {
-                return new FbDataObjectIdentifierResolver(Site);
-            }
-            //if (serviceType == typeof(IVsDataObjectMemberComparer))
-            //{
-            //    return new FbDataObjectMemberComparer(Site);
-            //}
-            //if (serviceType == typeof(IVsDataObjectSelector))
-            //{
-            //    return new FbDataObjectSelector(Site);
-            //}
-            if (serviceType == typeof(IVsDataObjectSupport))
-            {
-                return new DataObjectSupport(GetType().Namespace + ".FbDataObjectSupport", GetType().Assembly);
-            }
-            if (serviceType == typeof(IVsDataSourceInformation))
-            {
-                return new FbDataSourceInformation(Site);
+                return new FbDataObjectIdentifierResolver(base.Site as DataConnection);
             }
 
-            return base.CreateService(container, serviceType);
+            return base.GetServiceImpl(serviceType);
         }
 
         #endregion

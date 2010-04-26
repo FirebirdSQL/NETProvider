@@ -1,5 +1,5 @@
 /*
- *  Visual Studio DDEX Provider for Firebird
+ *  Visual Studio DDEX Provider for FirebirdClient
  * 
  *     The contents of this file are subject to the Initial 
  *     Developer's Public License Version 1.0 (the "License"); 
@@ -14,13 +14,16 @@
  * 
  *  Copyright (c) 2005 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
 using System.Diagnostics;
-using System.Data.SqlClient;
-using Microsoft.VisualStudio.Data.Services;
-using Microsoft.VisualStudio.Data.Framework.AdoDotNet;
+using System.Globalization;
+using Microsoft.VisualStudio.Data;
+using Microsoft.VisualStudio.Data.AdoDotNet;
 
 namespace FirebirdSql.VisualStudio.DataTools
 {
@@ -28,31 +31,31 @@ namespace FirebirdSql.VisualStudio.DataTools
     /// Provides information about an ADO.NET data source in the form of 
     /// properties passed as name/value pairs.
     /// </summary>
-    internal class FbDataSourceInformation : AdoDotNetSourceInformation
+    internal class FbDataSourceInformation : AdoDotNetDataSourceInformation
     {
         #region · Constructors ·
 
-        public FbDataSourceInformation(IVsDataConnection connection)
+        public FbDataSourceInformation(DataConnection connection)
             : base(connection)
         {
-            base.AddProperty(CatalogSupported, false);
-            base.AddProperty(CatalogSupportedInDml, false);
-            base.AddProperty(DefaultSchema);
-            base.AddProperty(DefaultCatalog, null);
-            base.AddProperty(DefaultSchema, null);
-            base.AddProperty(IdentifierOpenQuote, "\"");
-            base.AddProperty(IdentifierCloseQuote, "\"");
-            base.AddProperty(ParameterPrefix, "@");
-            base.AddProperty(ParameterPrefixInName, true);
-            base.AddProperty(ProcedureSupported, true);
-            base.AddProperty(QuotedIdentifierPartsCaseSensitive, true);
-            base.AddProperty(SchemaSupported, false);
-            base.AddProperty(SchemaSupportedInDml, false);
-            base.AddProperty(ServerSeparator, ".");
-            base.AddProperty(SupportsAnsi92Sql, true);
-            base.AddProperty(SupportsQuotedIdentifierParts, true);
-            base.AddProperty(SupportsCommandTimeout, false);
-            base.AddProperty(SupportsQuotedIdentifierParts, true);
+            base.AddProperty(AdoDotNetDataSourceInformation.CatalogSupported, false);
+            base.AddProperty(AdoDotNetDataSourceInformation.CatalogSupportedInDml, false);
+            base.AddProperty(AdoDotNetDataSourceInformation.DefaultSchema);
+            base.AddProperty(AdoDotNetDataSourceInformation.DefaultCatalog, null);
+            base.AddProperty(AdoDotNetDataSourceInformation.DefaultSchema, null);
+            base.AddProperty(AdoDotNetDataSourceInformation.IdentifierOpenQuote, "\"");
+            base.AddProperty(AdoDotNetDataSourceInformation.IdentifierCloseQuote, "\"");
+            base.AddProperty(AdoDotNetDataSourceInformation.ParameterPrefix, "@");
+            base.AddProperty(AdoDotNetDataSourceInformation.ParameterPrefixInName, true);
+            base.AddProperty(AdoDotNetDataSourceInformation.ProcedureSupported, true);
+            base.AddProperty(AdoDotNetDataSourceInformation.QuotedIdentifierPartsCaseSensitive, true);
+            base.AddProperty(AdoDotNetDataSourceInformation.SchemaSupported, false);
+            base.AddProperty(AdoDotNetDataSourceInformation.SchemaSupportedInDml, false);
+            base.AddProperty(AdoDotNetDataSourceInformation.ServerSeparator, ".");
+            base.AddProperty(AdoDotNetDataSourceInformation.SupportsAnsi92Sql, true);
+            base.AddProperty(AdoDotNetDataSourceInformation.SupportsQuotedIdentifierParts, true);
+            base.AddProperty(AdoDotNetDataSourceInformation.SupportsCommandTimeout, false);
+            base.AddProperty(AdoDotNetDataSourceInformation.SupportsQuotedIdentifierParts, true);
             base.AddProperty("DesktopDataSource", true);
             base.AddProperty("LocalDatabase", true);
         }

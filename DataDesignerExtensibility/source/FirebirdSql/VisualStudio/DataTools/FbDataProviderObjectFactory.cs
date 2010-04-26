@@ -1,5 +1,5 @@
 /*
- *  Visual Studio DDEX Provider for Firebird
+ *  Visual Studio DDEX Provider for FirebirdClient
  * 
  *     The contents of this file are subject to the Initial 
  *     Developer's Public License Version 1.0 (the "License"); 
@@ -14,17 +14,20 @@
  * 
  *  Copyright (c) 2005 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Data.Framework;
-using Microsoft.VisualStudio.Data.Services.SupportEntities;
+using Microsoft.VisualStudio.Data;
+using Microsoft.VisualStudio.Data.AdoDotNet;
 
 namespace FirebirdSql.VisualStudio.DataTools
 {
     [Guid(GuidList.GuidObjectFactoryServiceString)]
-    internal class FbDataProviderObjectFactory : DataProviderObjectFactory
+    internal class FbDataProviderObjectFactory : AdoDotNetProviderObjectFactory
     {
         #region · Constructors ·
 
@@ -41,25 +44,20 @@ namespace FirebirdSql.VisualStudio.DataTools
         {
             System.Diagnostics.Trace.WriteLine(String.Format("FbDataProviderObjectFactory::CreateObject({0})", objectType.FullName));
 
-            if (objectType == typeof(IVsDataConnectionProperties) ||
-                objectType == typeof(IVsDataConnectionUIProperties))
-            {
-                return new FbDataConnectionProperties();
-            }
-            if (objectType == typeof(IVsDataConnectionSupport))
+            if (objectType == typeof(DataConnectionSupport))
             {
                 return new FbDataConnectionSupport();
             }
-            if (objectType == typeof(IVsDataConnectionUIControl))
+            else if (objectType == typeof(DataConnectionUIControl))
             {
                 return new FbDataConnectionUIControl();
             }
-            if (objectType == typeof(IVsDataViewSupport))
+            else if (objectType == typeof(DataConnectionProperties))
             {
-                return new DataViewSupport(GetType().Namespace + ".FbDataViewSupport", GetType().Assembly);
+                return new FbDataConnectionProperties();
             }
 
-            return null;
+            return base.CreateObject(objectType);
         }
 
         #endregion

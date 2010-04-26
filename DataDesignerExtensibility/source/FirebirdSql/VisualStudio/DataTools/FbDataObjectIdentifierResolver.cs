@@ -1,5 +1,5 @@
 /*
- *  Visual Studio DDEX Provider for Firebird
+ *  Visual Studio DDEX Provider for FirebirdClient
  * 
  *     The contents of this file are subject to the Initial 
  *     Developer's Public License Version 1.0 (the "License"); 
@@ -14,203 +14,152 @@
  * 
  *  Copyright (c) 2005 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
-using System.Data;
-using System.Diagnostics;
-using System.Collections;
-using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Data.Services;
-using Microsoft.VisualStudio.Data.Framework;
-using Microsoft.VisualStudio.Data.Services.SupportEntities;
+using Microsoft.VisualStudio.Data;
 
 namespace FirebirdSql.VisualStudio.DataTools
 {
     internal class FbDataObjectIdentifierResolver : DataObjectIdentifierResolver
     {
-		#region Constructors
+        #region · Private Fields ·
 
-        public FbDataObjectIdentifierResolver(IVsDataConnection connection)
-			: base(connection)
-		{
-		}
+        private DataConnection connection;
 
-		#endregion
+        #endregion
 
-		#region Public Methods
+        #region · Constructors ·
 
-		public override object[] ExpandIdentifier(string typeName, object[] partialIdentifier)
-		{
-			if (typeName == null)
-			{
-				throw new ArgumentNullException("typeName");
-			}
+        public FbDataObjectIdentifierResolver(DataConnection connection) 
+            : base()
+        {
+            System.Diagnostics.Trace.WriteLine("FbDataObjectIdentifierResolver()");
+            this.connection = connection;
+        }
 
-			// Find the type in the data object support model
-			IVsDataObjectType           type                = null;
-			IVsDataObjectSupportModel   objectSupportModel  = Site.GetService(typeof(IVsDataObjectSupportModel)) as IVsDataObjectSupportModel;
+        #endregion
 
-			Debug.Assert(objectSupportModel != null);
+        #region · Methods ·
 
-			if (objectSupportModel != null && objectSupportModel.Types.ContainsKey(typeName))
-			{
-				type = objectSupportModel.Types[typeName];
-			}
+        protected override object[] QuickContractIdentifier(string typeName, object[] fullIdentifier)
+        {
+            System.Diagnostics.Trace.WriteLine(String.Format("FbDataObjectIdentifierResolver::QuickContractIdentifier({0},...)", typeName));
 
-			if (type == null)
-			{
-				throw new ArgumentException("Invalid type " + typeName + ".");
-			}
+            if (typeName == null)
+            {
+                throw new ArgumentNullException("typeName");
+            }
 
-			// Create an identifier array of the correct full length
-			object[] identifier = new object[type.Identifier.Count];
+            if (typeName == FbDataObjectTypes.Root)
+            {
+                return base.QuickContractIdentifier(typeName, fullIdentifier);
+            }
 
-			// If the input identifier is not null, copy it to the full
-			// identifier array.  If the input identifier's length is less
-			// than the full length we assume the more specific parts are
-			// specified and thus copy into the rightmost portion of the
-			// full identifier array.
-			if (partialIdentifier != null)
-			{
-				if (partialIdentifier.Length > type.Identifier.Count)
-				{
-					throw new ArgumentException("Invalid partial identifier.");
-				}
-				
-                partialIdentifier.CopyTo(identifier, type.Identifier.Count - partialIdentifier.Length);
-			}
+            object[] identifier = null;
+            int length = this.GetIdentifierLength(typeName);
+            if (length == -1)
+            {
+                throw new NotSupportedException();
+            }
+            identifier = new object[length];
 
-			// Get the data source information service
-			IVsDataSourceInformation sourceInformation = Site.GetService(typeof(IVsDataSourceInformation)) as IVsDataSourceInformation;
-			Debug.Assert(sourceInformation != null);
-			
-            if (sourceInformation == null)
-			{
-				// This should never occur
-				return identifier;
-			}
+            if (fullIdentifier != null)
+            {
+                fullIdentifier.CopyTo(identifier, length - fullIdentifier.Length);
+            }
 
-			// Now expand the identifier as required
-			if (type.Identifier.Count > 0)
-			{
-				// Fill in the current database if not specified
-				if (!(identifier[0] is string))
-				{
-					identifier[0] = sourceInformation[DataSourceInformation.DefaultCatalog] as string;
-				}
-			}
-			if (type.Identifier.Count > 1)
-			{
-				// Fill in the default schema if not specified
-				if (!(identifier[1] is string))
-				{
-					identifier[1] = sourceInformation[DataSourceInformation.DefaultSchema] as string;
-				}
-			}
+            if (identifier.Length > 0)
+            {
+                identifier[0] = null;
+            }
 
-			return identifier;
-		}
+            if (identifier.Length > 1)
+            {
+                identifier[1] = null;
+            }
 
-		public override object[] ContractIdentifier(string typeName, object[] fullIdentifier)
-		{
-			if (typeName == null)
-			{
-				throw new ArgumentNullException("typeName");
-			}
-			if (typeName == FbDataObjectTypes.Root)
-			{
-				// There is no contraction available
-				return base.ContractIdentifier(typeName, fullIdentifier);
-			}
+            return identifier;
+        }
 
-			// Find the type in the data object support model
-			IVsDataObjectType           type                = null;
-			IVsDataObjectSupportModel   objectSupportModel  = Site.GetService(typeof(IVsDataObjectSupportModel)) as IVsDataObjectSupportModel;
+        protected override object[] QuickExpandIdentifier(string typeName, object[] partialIdentifier)
+        {
+            System.Diagnostics.Trace.WriteLine(String.Format("FbDataObjectIdentifierResolver::QuickExpandIdentifier({0},...)", typeName));
 
-			Debug.Assert(objectSupportModel != null);
+            if (typeName == null)
+            {
+                throw new ArgumentNullException("typeName");
+            }
 
-			if (objectSupportModel != null && objectSupportModel.Types.ContainsKey(typeName))
-			{
-				type = objectSupportModel.Types[typeName];
-			}
+            // Create an identifier array of the correct full length based on
+            // the object type
+            object[] identifier = null;
+            int length = this.GetIdentifierLength(typeName);
+            if (length == -1)
+            {
+                throw new NotSupportedException();
+            }
+            identifier = new object[length];
 
-			if (type == null)
-			{
-				throw new ArgumentException("Invalid type " + typeName + ".");
-			}
+            // If the input identifier is not null, copy it to the full
+            // identifier array.  If the input identifier's length is less
+            // than the full length we assume the more specific parts are
+            // specified and thus copy into the rightmost portion of the
+            // full identifier array.
+            if (partialIdentifier != null)
+            {
+                if (partialIdentifier.Length > length)
+                {
+                    throw new InvalidOperationException();
+                }
 
-			// Create an identifier array of the correct full length
-			object[] identifier = new object[type.Identifier.Count];
+                partialIdentifier.CopyTo(identifier, length - partialIdentifier.Length);
+            }
 
-			// If the input identifier is not null, copy it to the full
-			// identifier array.  If the input identifier's length is less
-			// than the full length we assume the more specific parts are
-			// specified and thus copy into the rightmost portion of the
-			// full identifier array.
-			if (fullIdentifier != null)
-			{
-				if (fullIdentifier.Length > type.Identifier.Count)
-				{
-					throw new ArgumentException("Invalid full identifier.");
-				}
+            if (length > 0)
+            {
+                identifier[0] = null;
+            }
 
-				fullIdentifier.CopyTo(identifier, type.Identifier.Count - fullIdentifier.Length);
-			}
+            if (length > 1)
+            {
+                identifier[1] = null;
+            }
 
-			// Get the data source information service
-			IVsDataSourceInformation sourceInformation = Site.GetService(typeof(IVsDataSourceInformation)) as IVsDataSourceInformation;
-			
-            Debug.Assert(sourceInformation != null);
+            return identifier;
+        }
 
-			if (sourceInformation == null)
-			{
-				// This should never occur
-				return identifier;
-			}
+        #endregion
 
-			// Get the data object member comparer service
-			IVsDataObjectMemberComparer objectMemberComparer = Site.GetService(typeof(IVsDataObjectMemberComparer)) as IVsDataObjectMemberComparer;
+        #region · Private Methods ·
 
-			Debug.Assert(objectMemberComparer != null);
-			
-            if (objectMemberComparer == null)
-			{
-				// This should never occur
-				return identifier;
-			}
+        private int GetIdentifierLength(string typeName)
+        {
+            System.Diagnostics.Trace.WriteLine(String.Format("GetIdentifierLength({0})", typeName));
 
-			// Now contract the identifier where possible
-			if (type.Identifier.Count > 0)
-			{
-				// Remove the database if equal to the current database
-				if (identifier.Length > 0 && identifier[0] != null)
-				{
-					string database = sourceInformation[DataSourceInformation.DefaultCatalog] as string;
+            switch (typeName)
+            {
+                case FbDataObjectTypes.Root:
+                    return 0;
 
-					if (objectMemberComparer.Compare(FbDataObjectTypes.Root, identifier, 0, database) == 0)
-					{
-						identifier[0] = null;
-					}
-				}
-			}
-			if (type.Identifier.Count > 1)
-			{
-				// Fill in the default schema if not specified
-				if (identifier.Length > 1 && identifier[1] != null)
-				{
-					string schema = sourceInformation[DataSourceInformation.DefaultSchema] as string;
+                case FbDataObjectTypes.Table:
+                case FbDataObjectTypes.View:
+                case FbDataObjectTypes.StoredProcedure:
+                    return 3;
 
-                    if (objectMemberComparer.Compare(FbDataObjectTypes.Root, identifier, 1, schema) == 0)
-					{
-						identifier[1] = null;
-					}
-				}
-			}
+                case FbDataObjectTypes.TableColumn:
+                case FbDataObjectTypes.ViewColumn:
+                case FbDataObjectTypes.StoredProcedureParameter:
+                    return 4;
+                               
+                default:
+                    return -1;
+            }
+        }
 
-			return identifier;
-		}
-
-		#endregion
+        #endregion
     }
 }

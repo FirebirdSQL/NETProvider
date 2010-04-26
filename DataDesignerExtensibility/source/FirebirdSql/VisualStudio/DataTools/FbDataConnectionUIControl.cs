@@ -1,5 +1,5 @@
 /*
- *  Visual Studio DDEX Provider for Firebird
+ *  Visual Studio DDEX Provider for FirebirdClient
  * 
  *     The contents of this file are subject to the Initial 
  *     Developer's Public License Version 1.0 (the "License"); 
@@ -14,14 +14,19 @@
  * 
  *  Copyright (c) 2005 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *   
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
-
 
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Drawing;
+using System.Data;
+using System.Text;
 using System.Windows.Forms;
-using Microsoft.VisualStudio.Data.Framework;
+using Microsoft.VisualStudio.Data;
 
 namespace FirebirdSql.VisualStudio.DataTools
 {
@@ -101,21 +106,20 @@ namespace FirebirdSql.VisualStudio.DataTools
 
             try
             {
-                this.txtDataSource.Text = (string)Site["Data Source"];
-                this.txtUserName.Text   = (string)Site["User ID"];
-                this.txtDatabase.Text   = (string)Site["Initial Catalog"];
-                this.txtPassword.Text   = (string)Site["Password"];
-                this.txtRole.Text       = (string)Site["Role"];
-                this.cboCharset.Text    = (string)Site["Character Set"];
-
-                if (Site.ContainsKey("Port Number"))
+                this.txtDataSource.Text = (string)ConnectionProperties["Data Source"];
+                this.txtUserName.Text   = (string)ConnectionProperties["User ID"];
+                this.txtDatabase.Text   = (string)ConnectionProperties["Initial Catalog"];
+                this.txtPassword.Text   = (string)ConnectionProperties["Password"];
+                this.txtRole.Text       = (string)ConnectionProperties["Role"];
+                this.cboCharset.Text    = (string)ConnectionProperties["Character Set"];
+                if (this.ConnectionProperties.Contains("Port Number"))
                 {
-                    this.txtPort.Text = Site["Port Number"].ToString();
+                    this.txtPort.Text = ConnectionProperties["Port Number"].ToString();
                 }
 
-                if (Site.ContainsKey("Dialect"))
+                if (this.ConnectionProperties.Contains("Dialect"))
                 {
-                    if (Convert.ToInt32(Site["Dialect"]) == 1)
+                    if (Convert.ToInt32(ConnectionProperties["Dialect"]) == 1)
                     {
                         this.cboDialect.SelectedIndex = 0;
                     }
@@ -125,9 +129,9 @@ namespace FirebirdSql.VisualStudio.DataTools
                     }
                 }
 
-                if (Site.ContainsKey("Server Type"))
+                if (this.ConnectionProperties.Contains("Server Type"))
                 {
-                    if (Convert.ToInt32(Site["Server Type"]) == 0)
+                    if (Convert.ToInt32(ConnectionProperties["Server Type"]) == 0)
                     {
                         this.cboServerType.SelectedIndex = 0;
                     }
@@ -149,7 +153,7 @@ namespace FirebirdSql.VisualStudio.DataTools
 
         private void SetProperty(string propertyName, object value)
         {
-            Site[propertyName] = value;
+            this.ConnectionProperties[propertyName] = value;
         }
 
         #endregion
