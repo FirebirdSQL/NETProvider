@@ -1,5 +1,5 @@
 /*
- *  Visual Studio 2005 DDEX Provider for Firebird
+ *  Visual Studio DDEX Provider for Firebird
  * 
  *     The contents of this file are subject to the Initial 
  *     Developer's Public License Version 1.0 (the "License"); 
