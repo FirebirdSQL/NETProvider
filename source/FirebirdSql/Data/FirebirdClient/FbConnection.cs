@@ -308,7 +308,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         #region · Protected Properties ·
 
-#if (NET_35 && !NET_CF) 
+#if (!NET_CF) 
         protected override DbProviderFactory DbProviderFactory
         {
             get { return FirebirdClientFactory.Instance; }
