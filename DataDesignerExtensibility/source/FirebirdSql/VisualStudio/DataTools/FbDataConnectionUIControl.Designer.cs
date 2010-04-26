@@ -122,7 +122,7 @@ namespace FirebirdSql.VisualStudio.DataTools
             this.cboServerType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboServerType.FormattingEnabled = true;
             this.cboServerType.Items.AddRange(new object[] {
-            "Super/Classic Server",
+            "Standalone Server",
             "Embedded Server"});
             this.cboServerType.Location = new System.Drawing.Point(96, 24);
             this.cboServerType.Name = "cboServerType";
