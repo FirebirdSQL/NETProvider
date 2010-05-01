@@ -276,6 +276,8 @@ namespace FirebirdSql.Data.Entity
         /// </summary>
         bool isVarRefSingle = false;
 
+		bool shouldHandleBoolComparison = true;
+
         #endregion
 
         #region Statics
@@ -302,7 +304,7 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private static Dictionary<string, FunctionHandler> InitializeCanonicalFunctionHandlers()
         {
-            Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(16, StringComparer.Ordinal);
+            Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(StringComparer.Ordinal);
 
 			#region Other Canonical Functions
             functionHandlers.Add("NewGuid", HandleCanonicalFunctionNewGuid);
@@ -318,7 +320,9 @@ namespace FirebirdSql.Data.Entity
 			#endregion
 
 			#region String Canonical Functions
-            functionHandlers.Add("Concat", HandleConcatFunction);
+			functionHandlers.Add("Concat", HandleConcatFunction);
+			functionHandlers.Add("Contains", HandleContainsFunction);
+			functionHandlers.Add("EndsWith", HandleEndsWithFunction);
             functionHandlers.Add("IndexOf", HandleCanonicalFunctionIndexOf);
             functionHandlers.Add("Length", HandleCanonicalFunctionLength);
             functionHandlers.Add("ToLower", HandleCanonicalFunctionToLower);
@@ -329,51 +333,46 @@ namespace FirebirdSql.Data.Entity
             functionHandlers.Add("Left", HandleCanonicalFunctionLeft);
             functionHandlers.Add("Right", HandleCanonicalFunctionRight);
             functionHandlers.Add("Reverse", HandleCanonicalFunctionReverse);
-            functionHandlers.Add("Replace", HandleCanonicalFunctionReplace);
+			functionHandlers.Add("Replace", HandleCanonicalFunctionReplace);
+			functionHandlers.Add("StartsWith", HandleStartsWithFunction);
             functionHandlers.Add("Substring", HandleCanonicalFunctionSubstring);
-			//Contains (string, target)
-			//EndsWith (string, target)
-			//StartsWith (string, target)
 			#endregion
 
-            #region Date and Time Canonical Functions
-            functionHandlers.Add("Year", HandleCanonicalFunctionExtract);
-            functionHandlers.Add("Month", HandleCanonicalFunctionExtract);
-            functionHandlers.Add("Day", HandleCanonicalFunctionExtract);
-            functionHandlers.Add("Hour", HandleCanonicalFunctionExtract);
-            functionHandlers.Add("Minute", HandleCanonicalFunctionExtract);
-            functionHandlers.Add("Second", HandleCanonicalFunctionExtract);
-            functionHandlers.Add("Millisecond", HandleCanonicalFunctionExtract);
-            functionHandlers.Add("DateAdd", HandleCanonicalFunctionDateAdd);
-            functionHandlers.Add("DateDiff", HandleCanonicalFunctionDateDiff);
-            functionHandlers.Add("CurrentDateTime", HandleCanonicalFunctionCurrentDateTime);
-            functionHandlers.Add("CurrentUtcDateTime", HandleCanonicalFunctionCurrentUtcDateTime); // not supported
-            functionHandlers.Add("CurrentDateTimeOffset", HandleCanonicalFunctionCurrentDateTimeOffset); // not supported
-            functionHandlers.Add("GetTotalOffsetMinutes", HandleCanonicalFunctionGetTotalOffsetMinutes); // not supported
-			//AddNanoseconds(expression, number)
-			//AddMicroseconds(expression, number)
-			//AddMilliseconds(expression, number)
-			//AddSeconds(expression, number)
-			//AddMinutes(expression, number)
-			//AddHours(expression, number)
-			//AddDays(expression, number)
-			//AddMonths(expression, number)
-			//AddYears(expression, number)
-			//CreateDateTime(year, month, day, hour, minute, second)
-			//CreateDateTimeOffset(year, month, day, hour, minute, second, tzoffset)
-			//CreateTime(hour, minute, second)
-			//GetTotalOffsetMinutes (datetimeoffset)
-			//DayOfYear(expression)
-			//DiffNanoseconds(startExpression, endExpression)
-			//DiffMilliseconds(startExpression, endExpression)
-			//DiffMicroseconds(startExpression, endExpression)
-			//DiffSeconds(startExpression, endExpression)
-			//DiffMinutes(startExpression, endExpression)
-			//DiffHours(startExpression, endExpression)
-			//DiffDays(startExpression, endExpression)
-			//DiffMonths(startExpression, endExpression)
-			//DiffYears(startExpression, endExpression)
-			//TruncateTime(expressio
+			#region Date and Time Canonical Functions			
+			functionHandlers.Add("AddNanoseconds", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, null)); // not supported
+			functionHandlers.Add("AddMicroseconds", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, null)); // not supported
+			functionHandlers.Add("AddMilliseconds", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, "MILLISECOND"));
+			functionHandlers.Add("AddSeconds", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, "SECOND"));
+			functionHandlers.Add("AddMinutes", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, "MINUTE"));
+			functionHandlers.Add("AddHours", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, "HOUR"));
+			functionHandlers.Add("AddDays", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, "DAY"));
+			functionHandlers.Add("AddMonths", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, "MONTH"));
+			functionHandlers.Add("AddYears", (sqlgen, e) => HandleCanonicalFunctionDateTimeAdd(sqlgen, e, "YEAR"));
+			functionHandlers.Add("CreateDateTime", HandleCanonicalFunctionCreateDateTime);
+			functionHandlers.Add("CreateDateTimeOffset", HandleCanonicalFunctionCreateDateTimeOffset); // not supported
+			functionHandlers.Add("CreateTime", HandleCanonicalFunctionCreateTime);
+			functionHandlers.Add("CurrentDateTime", HandleCanonicalFunctionCurrentDateTime);
+			functionHandlers.Add("CurrentDateTimeOffset", HandleCanonicalFunctionCurrentDateTimeOffset); // not supported
+			functionHandlers.Add("CurrentUtcDateTime", HandleCanonicalFunctionCurrentUtcDateTime); // not supported
+			functionHandlers.Add("Day", (sqlgen, e) => HandleCanonicalFunctionExtract(sqlgen, e, "DAY"));
+			functionHandlers.Add("DayOfYear", (sqlgen, e) => HandleCanonicalFunctionExtract(sqlgen, e, "YEARDAY"));
+			functionHandlers.Add("DiffNanoseconds", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, null)); // not supported
+			functionHandlers.Add("DiffMicroseconds", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, null)); // not supported
+			functionHandlers.Add("DiffMilliseconds", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, "MILLISECOND"));
+			functionHandlers.Add("DiffSeconds", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, "SECOND"));
+			functionHandlers.Add("DiffMinutes", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, "MINUTE"));
+			functionHandlers.Add("DiffHours", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, "HOUR"));
+			functionHandlers.Add("DiffDays", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, "DAY"));
+			functionHandlers.Add("DiffMonths", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, "MONTH"));
+			functionHandlers.Add("DiffYears", (sqlgen, e) => HandleCanonicalFunctionDateTimeDiff(sqlgen, e, "YEAR"));
+			functionHandlers.Add("GetTotalOffsetMinutes", HandleCanonicalFunctionGetTotalOffsetMinutes); // not supported
+			functionHandlers.Add("Hour", (sqlgen, e) => HandleCanonicalFunctionExtract(sqlgen, e, "HOUR"));
+			functionHandlers.Add("Millisecond", (sqlgen, e) => HandleCanonicalFunctionExtract(sqlgen, e, "MILLISECOND"));
+			functionHandlers.Add("Minute", (sqlgen, e) => HandleCanonicalFunctionExtract(sqlgen, e, "MINUTE"));
+			functionHandlers.Add("Month", (sqlgen, e) => HandleCanonicalFunctionExtract(sqlgen, e, "MONTH"));
+			functionHandlers.Add("Second", (sqlgen, e) => HandleCanonicalFunctionExtract(sqlgen, e, "SECOND"));
+			functionHandlers.Add("TruncateTime", HandleCanonicalFunctionTruncateTime);
+			functionHandlers.Add("Year", (sqlgen, e) => HandleCanonicalFunctionExtract(sqlgen, e, "YEAR"));
 			#endregion
 
 			#region Bitwise Canonical Functions
@@ -393,8 +392,10 @@ namespace FirebirdSql.Data.Entity
         /// <returns></returns>
         private static Dictionary<string, string> InitializeFunctionNameToOperatorDictionary()
         {
-            Dictionary<string, string> functionNameToOperatorDictionary = new Dictionary<string, string>(1, StringComparer.Ordinal);
-            functionNameToOperatorDictionary.Add("Concat", "||");
+            Dictionary<string, string> functionNameToOperatorDictionary = new Dictionary<string, string>(StringComparer.Ordinal);
+			functionNameToOperatorDictionary.Add("Concat", "||");
+			functionNameToOperatorDictionary.Add("Contains", "CONTAINING");
+			functionNameToOperatorDictionary.Add("StartsWith", "STARTING WITH");
             return functionNameToOperatorDictionary;
         }
 
@@ -744,35 +745,26 @@ namespace FirebirdSql.Data.Entity
         /// <returns>A <see cref="SqlBuilder"/>.</returns>
         public override ISqlFragment Visit(DbComparisonExpression e)
         {
-            SqlBuilder result;
             switch (e.ExpressionKind)
             {
                 case DbExpressionKind.Equals:
-                    result = VisitBinaryExpression(" = ", e.Left, e.Right);
-                    break;
+					return VisitBinaryExpression(" = ", e.Left, e.Right);
                 case DbExpressionKind.LessThan:
-                    result = VisitBinaryExpression(" < ", e.Left, e.Right);
-                    break;
+                    return VisitBinaryExpression(" < ", e.Left, e.Right);
                 case DbExpressionKind.LessThanOrEquals:
-                    result = VisitBinaryExpression(" <= ", e.Left, e.Right);
-                    break;
+                    return VisitBinaryExpression(" <= ", e.Left, e.Right);
                 case DbExpressionKind.GreaterThan:
-                    result = VisitBinaryExpression(" > ", e.Left, e.Right);
-                    break;
+                    return VisitBinaryExpression(" > ", e.Left, e.Right);
                 case DbExpressionKind.GreaterThanOrEquals:
-                    result = VisitBinaryExpression(" >= ", e.Left, e.Right);
-                    break;
+                    return VisitBinaryExpression(" >= ", e.Left, e.Right);
                 // The parser does not generate the expression kind below.
                 case DbExpressionKind.NotEquals:
-                    result = VisitBinaryExpression(" <> ", e.Left, e.Right);
-                    break;
+                    return VisitBinaryExpression(" <> ", e.Left, e.Right);
 
                 default:
                     Debug.Assert(false);  // The constructor should have prevented this
                     throw new InvalidOperationException(string.Empty);
             }
-
-            return result;
         }
 
         /// <summary>
@@ -793,7 +785,7 @@ namespace FirebirdSql.Data.Entity
                 switch (typeKind)
                 {
                     case PrimitiveTypeKind.Boolean:
-                        result.Append((bool)e.Value ? "CAST(1 AS SMALLINT)" : "CAST(0 AS SMALLINT)");
+						result.Append((bool)e.Value ? "CAST(1 AS SMALLINT)" : "CAST(0 AS SMALLINT)");
                         break;
 
                     case PrimitiveTypeKind.Int16:
@@ -1878,20 +1870,16 @@ namespace FirebirdSql.Data.Entity
                 throw new NotSupportedException();
             }
 
-            if (MetadataHelpers.IsCanonicalFunction(functionAggregate.Function) && string.Equals(functionAggregate.Function.Name, "StDev", StringComparison.Ordinal))
+			if (MetadataHelpers.IsCanonicalFunction(functionAggregate.Function) && (
+				string.Equals(functionAggregate.Function.Name, "StDev", StringComparison.Ordinal) ||
+				string.Equals(functionAggregate.Function.Name, "StDevP", StringComparison.Ordinal) ||
+				string.Equals(functionAggregate.Function.Name, "Var", StringComparison.Ordinal) ||
+				string.Equals(functionAggregate.Function.Name, "VarP", StringComparison.Ordinal)))
             {
                 throw new NotSupportedException();
             }
 
-            // what about some rewrite of property and continuing normal to WriteFunctionName?
-            if (MetadataHelpers.IsCanonicalFunction(functionAggregate.Function) && string.Equals(functionAggregate.Function.Name, "BigCount", StringComparison.Ordinal))
-            {
-                aggregateResult.Append("COUNT");
-            }
-            else
-            {
-                WriteFunctionName(aggregateResult, functionAggregate.Function);
-            }
+            WriteFunctionName(aggregateResult, functionAggregate.Function);
 
             aggregateResult.Append("(");
 
@@ -1910,6 +1898,7 @@ namespace FirebirdSql.Data.Entity
         SqlBuilder VisitBinaryExpression(string op, DbExpression left, DbExpression right)
         {
             SqlBuilder result = new SqlBuilder();
+
             if (IsComplexExpression(left))
             {
                 result.Append("(");
@@ -1922,19 +1911,26 @@ namespace FirebirdSql.Data.Entity
                 result.Append(")");
             }
 
-            result.Append(op);
+			if (shouldHandleBoolComparison)
+			{
+				result.Append(op);
 
-            if (IsComplexExpression(right))
-            {
-                result.Append("(");
-            }
+				if (IsComplexExpression(right))
+				{
+					result.Append("(");
+				}
 
-            result.Append(right.Accept(this));
+				result.Append(right.Accept(this));
 
-            if (IsComplexExpression(right))
-            {
-                result.Append(")");
-            }
+				if (IsComplexExpression(right))
+				{
+					result.Append(")");
+				}
+			}
+			else
+			{
+				shouldHandleBoolComparison = true;
+			}
 
             return result;
         }
@@ -2523,8 +2519,8 @@ namespace FirebirdSql.Data.Entity
         {
             if (!handlers.ContainsKey(e.Function.Name))
                 throw new InvalidOperationException("Special handling should be called only for functions in the list of special functions");
-
-            return handlers[e.Function.Name](this, e);
+            
+			return handlers[e.Function.Name](this, e);
         }
 
         /// <summary>
@@ -2558,7 +2554,7 @@ namespace FirebirdSql.Data.Entity
             }
             result.Append(" ");
             Debug.Assert(_functionNameToOperatorDictionary.ContainsKey(e.Function.Name), "The function can not be mapped to an operator");
-            result.Append(_functionNameToOperatorDictionary[e.Function.Name]);
+			result.Append(_functionNameToOperatorDictionary[e.Function.Name]);
             result.Append(" ");
 
             if (parenthesiseArguments)
@@ -2574,13 +2570,29 @@ namespace FirebirdSql.Data.Entity
         }
 
         #region String Canonical Functions
-        /// <summary>
-        /// <see cref="HandleSpecialFunctionToOperator"></see>
-        /// </summary>
         private static ISqlFragment HandleConcatFunction(SqlGenerator sqlgen, DbFunctionExpression e)
         {
             return sqlgen.HandleSpecialFunctionToOperator(e, false);
         }
+
+		private static ISqlFragment HandleContainsFunction(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			sqlgen.shouldHandleBoolComparison = false;
+			return sqlgen.HandleSpecialFunctionToOperator(e, false);
+		}
+
+		private static ISqlFragment HandleEndsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			// should we do this thinking for developer or should (s)he create own solution???
+			sqlgen.shouldHandleBoolComparison = false;
+			SqlBuilder result = new SqlBuilder();
+			result.Append("REVERSE(");
+			result.Append(e.Arguments[0].Accept(sqlgen));
+			result.Append(") STARTING WITH REVERSE(");
+			result.Append(e.Arguments[1].Accept(sqlgen));
+			result.Append(")");
+			return result;
+		}
 
         private static ISqlFragment HandleCanonicalFunctionIndexOf(SqlGenerator sqlgen, DbFunctionExpression e)
         {
@@ -2646,6 +2658,12 @@ namespace FirebirdSql.Data.Entity
         {
             return sqlgen.HandleFunctionDefaultGivenName(e, "REPLACE");
         }
+
+		private static ISqlFragment HandleStartsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			sqlgen.shouldHandleBoolComparison = false;
+			return sqlgen.HandleSpecialFunctionToOperator(e, false);
+		}
 
         private static ISqlFragment HandleCanonicalFunctionSubstring(SqlGenerator sqlgen, DbFunctionExpression e)
         {
@@ -2726,68 +2744,108 @@ namespace FirebirdSql.Data.Entity
         /// For example:
         ///     Year(date) -> EXTRACT(YEAR from date)
         /// </summary>
-        private static ISqlFragment HandleCanonicalFunctionExtract(SqlGenerator sqlgen, DbFunctionExpression e)
+        private static ISqlFragment HandleCanonicalFunctionExtract(SqlGenerator sqlgen, DbFunctionExpression e, string extractPart)
         {
-            SqlBuilder result = new SqlBuilder();
-            result.Append("EXTRACT(");
-            result.Append(e.Function.Name.ToUpperInvariant());
-            result.Append(" FROM ");
+			if (extractPart == null)
+				throw new NotSupportedException();
 
+			SqlBuilder result = new SqlBuilder();
+            result.Append("EXTRACT(");
+            result.Append(extractPart);
+            result.Append(" FROM ");
             Debug.Assert(e.Arguments.Count == 1, "Canonical datepart functions should have exactly one argument");
             result.Append(e.Arguments[0].Accept(sqlgen));
-
             result.Append(")");
-
             return result;
         }
 
-        /// <summary>
-        /// DateDiff(datetime1, datetime2) -> DATEDIFF(<timestamp_part>, <date_time>, <date_time>) 
-        /// </summary>
-        /// <param name="sqlgen"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionDateDiff(SqlGenerator sqlgen, DbFunctionExpression e)
-        {
-            SqlBuilder result = new SqlBuilder();
-            result.Append("DATEDIFF(SECOND");
+		private static ISqlFragment HandleCanonicalFunctionDateTimeAdd(SqlGenerator sqlgen, DbFunctionExpression e, string addPart)
+		{
+			if (addPart == null)
+				throw new NotSupportedException();
 
-            Debug.Assert(e.Arguments.Count == 2, "Canonical datepart functions should have exactly two arguments");
+			SqlBuilder result = new SqlBuilder();
+			result.Append("DATEADD(");
+			result.Append(addPart);
+			result.Append(", ");
+            Debug.Assert(e.Arguments.Count == 2, "Canonical dateadd functions should have exactly two arguments");
+			result.Append(e.Arguments[1].Accept(sqlgen));
+			result.Append(", ");
+			result.Append(e.Arguments[0].Accept(sqlgen));
+			result.Append(")");
+			return result;
+		}
 
-            for (int i = 0; i < 2; i++)
-            {
-                result.Append(", ");
-                result.Append(e.Arguments[i].Accept(sqlgen));
-            }
+		private static ISqlFragment HandleCanonicalFunctionDateTimeDiff(SqlGenerator sqlgen, DbFunctionExpression e, string diffPart)
+		{
+			if (diffPart == null)
+				throw new NotSupportedException();
 
-            result.Append(")");
+			SqlBuilder result = new SqlBuilder();
+			result.Append("DATEDIFF(");
+			result.Append(diffPart);
+			result.Append(", ");
+			Debug.Assert(e.Arguments.Count == 2, "Canonical datediff functions should have exactly two arguments");
+			result.Append(e.Arguments[1].Accept(sqlgen));
+			result.Append(", ");
+			result.Append(e.Arguments[0].Accept(sqlgen));
+			result.Append(")");
+			return result;
+		}
 
-            return result;
-        }
+		/// <summary>
+		/// CCYY-MM-DD HH:NN:SS.nnnn
+		/// CreateDateTime(year, month, day, hour, minute, second)
+		/// </summary>
+		private static ISqlFragment HandleCanonicalFunctionCreateDateTime(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			SqlBuilder result = new SqlBuilder();
+			result.Append("CAST('");
+			result.Append(e.Arguments[0].Accept(sqlgen));
+			result.Append("-");
+			result.Append(e.Arguments[1].Accept(sqlgen));
+			result.Append("-");
+			result.Append(e.Arguments[2].Accept(sqlgen));
+			result.Append(" ");
+			result.Append(e.Arguments[3].Accept(sqlgen));
+			result.Append(":");
+			result.Append(e.Arguments[4].Accept(sqlgen));
+			result.Append(":");
+			result.Append(e.Arguments[5].Accept(sqlgen));
+			result.Append("' AS TIMESTAMP)");
+			return result;
+		}
 
-        /// <summary>
-        /// DateAdd(datetime, secondsToAdd) -> DATEADD(<timestamp_part>, <number>, <date_time>)
-        /// </summary>
-        /// <param name="sqlgen"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static ISqlFragment HandleCanonicalFunctionDateAdd(SqlGenerator sqlgen, DbFunctionExpression e)
-        {
-            SqlBuilder result = new SqlBuilder();
-            result.Append("DATEADD(SECOND");
+		private static ISqlFragment HandleCanonicalFunctionCreateDateTimeOffset(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			throw new NotSupportedException();
+		}
 
-            Debug.Assert(e.Arguments.Count == 2, "Canonical datepart functions should have exactly two arguments");
+		/// <summary>
+		/// HH:NN:SS.nnnn
+		/// CreateTime(hour, minute, second)
+		/// </summary>
+		private static ISqlFragment HandleCanonicalFunctionCreateTime(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			SqlBuilder result = new SqlBuilder();
+			result.Append("CAST('");
+			result.Append(e.Arguments[0].Accept(sqlgen));
+			result.Append(":");
+			result.Append(e.Arguments[1].Accept(sqlgen));
+			result.Append(":");
+			result.Append(e.Arguments[2].Accept(sqlgen));
+			result.Append("' AS TIME)");
+			return result;
+		}
 
-            for (int i = 1; i >= 0; i--)
-            {
-                result.Append(", ");
-                result.Append(e.Arguments[i].Accept(sqlgen));
-            }
-
-            result.Append(")");
-
-            return result;
-        }
+		private static ISqlFragment HandleCanonicalFunctionTruncateTime(SqlGenerator sqlgen, DbFunctionExpression e)
+		{
+			SqlBuilder result = new SqlBuilder();
+			result.Append("CAST(CAST(");
+			result.Append(e.Arguments[0].Accept(sqlgen));
+			result.Append(" as DATE) as TIMESTAMP)");
+			return result;
+		}
         #endregion
 
         #region Other Canonical Functions
@@ -3387,7 +3445,7 @@ namespace FirebirdSql.Data.Entity
         /// This is used to determine if a calling expression needs to place
         /// round brackets around the translation of the expression e.
         ///
-        /// Constants, parameters and properties do not require brackets,
+		/// Constants, parameters, properties and internal functions as operators do not require brackets,
         /// everything else does.
         /// </summary>
         /// <param name="e"></param>
@@ -3400,6 +3458,8 @@ namespace FirebirdSql.Data.Entity
                 case DbExpressionKind.ParameterReference:
                 case DbExpressionKind.Property:
                     return false;
+				case DbExpressionKind.Function:
+					return (!_functionNameToOperatorDictionary.ContainsKey((e as DbFunctionExpression).Function.Name));
 
                 default:
                     return true;
@@ -3656,18 +3716,20 @@ namespace FirebirdSql.Data.Entity
             {
                 storeFunctionName = function.Name;
             }
-
             // If the function is a builtin (ie) the BuiltIn attribute has been
             // specified, then, the function name should not be quoted; additionally,
             // no namespace should be used.
             if (IsBuiltInFunction(function))
             {
-                if (function.NamespaceName == "Edm")
+                if (MetadataHelpers.IsCanonicalFunction(function))
                 {
-                    switch (storeFunctionName.ToUpperInvariant())
+                    switch (storeFunctionName)
                     {
+						case "BigCount":
+							result.Append("COUNT");
+							break;
                         default:
-                            result.Append(storeFunctionName);
+							result.Append(storeFunctionName.ToUpperInvariant());
                             break;
                     }
 
