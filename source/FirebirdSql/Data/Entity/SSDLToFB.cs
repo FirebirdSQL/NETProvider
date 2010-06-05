@@ -226,7 +226,7 @@ namespace FirebirdSql.Data.Entity
         
         #line 53 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
-public StoreItemCollection StoreItemCollection { get; set; }
+public StoreItemCollection StoreItemCollection { private get; set; }
 
 private StoreItemCollection _storeItems;
 private StoreItemCollection StoreItems
