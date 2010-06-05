@@ -122,6 +122,11 @@
     <Compile Include="Entity\ISqlFragment.cs" />
     <Compile Include="Entity\JoinSymbol.cs" />
     <Compile Include="Entity\MetadataHelpers.cs" />
+    <Compile Include="Entity\SSDLToFB.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SSDLToFB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entity\SkipClause.cs" />
     <Compile Include="Entity\SqlBuilder.cs" />
     <Compile Include="Entity\SqlGenerator.cs" />
@@ -326,6 +331,11 @@
     <EmbeddedResource Include="Schema\FbMetaData.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Entity\SSDLToFB.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>SSDLToFB.cs</LastGenOutput>
+      <CustomToolNamespace>FirebirdSql.Data.Entity</CustomToolNamespace>
+    </None>
     <None Include="Entity\ProviderManifest.xsd" />
     <EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
     <EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
@@ -333,6 +343,7 @@
     <None Include="Properties\FirebirdSql.Data.FirebirdClient.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <ItemGroup>

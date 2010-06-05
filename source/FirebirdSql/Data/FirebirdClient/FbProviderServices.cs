@@ -31,6 +31,7 @@ using System.IO;
 using System.Diagnostics;
 
 using FirebirdSql.Data.Entity;
+using FirebirdSql.Data.Isql;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -44,6 +45,15 @@ namespace FirebirdSql.Data.FirebirdClient
             DbCommandDefinition result = this.CreateCommandDefinition(prototype);
             return result;
         }
+
+		protected FbConnection CheckAndCastToFbConnection(DbConnection connection)
+		{
+			if (!(connection is FbConnection))
+			{
+				throw new ArgumentException("The connection is not of type 'FbConnection'.");
+			}
+			return (FbConnection)connection;
+		}
 
         /// <summary>
         /// Create a SampleCommand object, given the provider manifest and command tree
@@ -177,11 +187,7 @@ namespace FirebirdSql.Data.FirebirdClient
             if (connection == null)
                 throw new ArgumentException("connection");
 
-            FbConnection fbConnection = connection as FbConnection;
-            if (fbConnection == null)
-            {
-                throw new ArgumentException("The connection is not of type 'FbConnection'.");
-            }
+			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
 
             if (string.IsNullOrEmpty(fbConnection.ConnectionString))
             {
@@ -261,7 +267,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
             return result;
         }
-
 
         /// <summary>
         /// Determines SqlDbType for the given primitive type. Extracts facet
@@ -407,6 +412,32 @@ namespace FirebirdSql.Data.FirebirdClient
 
             return FbDbType.Binary;
         }
+
+		protected override void DbCreateDatabase(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
+		{
+			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
+			string script = DbCreateDatabaseScript(GetDbProviderManifestToken(fbConnection), storeItemCollection);
+			FbScript fbScript = new FbScript(script);
+			fbScript.Parse();
+			FbConnection.CreateDatabase(fbConnection.ConnectionString);
+			new FbBatchExecution(fbConnection, fbScript).Execute();	
+		}
+
+		protected override string DbCreateDatabaseScript(string providerManifestToken, StoreItemCollection storeItemCollection)
+		{
+			return new SSDLToFB() { StoreItemCollection = storeItemCollection }.TransformText();
+		}
+
+		protected override bool DbDatabaseExists(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
+		{
+			throw new NotSupportedException();
+		}
+
+		protected override void DbDeleteDatabase(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
+		{
+			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
+			FbConnection.DropDatabase(connection.ConnectionString);
+		}
     }
 }
 #endif
