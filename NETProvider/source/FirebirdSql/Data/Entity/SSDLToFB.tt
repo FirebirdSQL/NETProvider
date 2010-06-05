@@ -1,0 +1,133 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data.Entity" #>
+<#@ assembly name="System.Xml" #>
+<#@ import namespace="System.Data.Metadata.Edm" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Runtime.Remoting.Messaging" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Xml" #>
+-- Created: <#=DateTime.Now.ToString("R")#>
+
+-- Tables
+<#
+	foreach (var entitySet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<EntitySet>())
+	{
+#>
+RECREATE TABLE <#=Quote(entitySet.Name)#> (
+<#
+		PushIndent("\t");
+		foreach (EdmProperty property in entitySet.ElementType.Properties)
+        {
+#>
+<#=GenerateColumn(property)#>,
+<#
+		}
+		PopIndent();
+#>
+CONSTRAINT <#=Quote("PK_" + entitySet.Name)#> PRIMARY KEY (<#=string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => Quote(pk.Name)).ToArray())#>)
+);
+
+<#
+	}
+#>
+-- Foreign Key Constraints
+<#
+	foreach (var associationSet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<AssociationSet>())
+	{
+		ReferentialConstraint constraint = associationSet.ElementType.ReferentialConstraints.Single<ReferentialConstraint>(); 
+		AssociationSetEnd end = associationSet.AssociationSetEnds[constraint.FromRole.Name];
+		AssociationSetEnd end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
+
+#>
+ALTER TABLE <#=Quote(end2.EntitySet.Name)#> ADD CONSTRAINT <#=Quote("FK_" + associationSet.Name)#> FOREIGN KEY (<#=string.Join(", ", constraint.ToProperties.Select(fk => Quote(fk.Name)).ToArray())#>)
+REFERENCES <#=Quote(end.EntitySet.Name)#>(<#=string.Join(", ", constraint.FromProperties.Select(pk => Quote(pk.Name)).ToArray())#>)
+ON DELETE <#=(end.CorrespondingAssociationEndMember.DeleteBehavior == OperationAction.Cascade ? "CASCADE" : "NO ACTION")#>
+;
+
+<#
+	}
+#>
+-- EOF
+<#+
+public StoreItemCollection StoreItemCollection { private get; set; }
+
+private StoreItemCollection _storeItems;
+private StoreItemCollection StoreItems
+{
+	private get
+	{
+		if (_storeItems == null)
+		{
+			if (StoreItemCollection != null)
+			{
+				_storeItems = StoreItemCollection;
+			}
+			else
+			{
+				 using (TextReader text = new StringReader(this.GetInput<string>("Ssdl")))
+				 {
+					using (XmlReader xml = XmlReader.Create(text))
+					{
+						_storeItems = new StoreItemCollection(new[] { xml });
+					}
+				}
+			}
+		}
+		return _storeItems;
+	}
+}
+
+private string Quote(string s)
+{
+	return "\"" + s + "\"";
+}
+
+private string GenerateColumn(EdmProperty property)
+{
+	StringBuilder result = new StringBuilder();
+	result.Append(Quote(property.Name));
+	result.Append(" ");
+	switch (property.TypeUsage.EdmType.Name)
+	{
+		case "varchar":
+		case "char":
+			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
+			result.AppendFormat("({0})", property.TypeUsage.Facets["MaxLength"].Value);
+			break;
+		case "decimal":
+		case "numeric":
+			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
+			result.AppendFormat("({0},{1})", property.TypeUsage.Facets["Precision"].Value, property.TypeUsage.Facets["Scale"].Value);
+			break;
+		case "clob":
+			result.Append("BLOB SUB_TYPE TEXT");
+			break;
+		case "blob":
+			result.Append("BLOB SUB_TYPE BINARY");
+			break;
+		case "smallint_bool":
+			result.AppendFormat("SMALLINT CHECK {0} IN (1,0)", Quote(property.Name));
+			break;
+		default:
+			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
+			break;
+	}
+	if (!property.Nullable)
+	{
+	  result.Append(" NOT NULL");
+	}
+	return result.ToString();
+}
+
+/// <summary>
+/// Retrieve data of type T from CallContext given a string-based identity.
+/// This is used to pass data from a workflow into the template since the workflow
+/// utilizes the VS TextTemplatingService which runs the template in a separate AppDomain.
+/// </summary>
+private T GetInput<T>(string identity) where T : class
+{
+    return CallContext.GetData(identity) as T;
+}
+#>
