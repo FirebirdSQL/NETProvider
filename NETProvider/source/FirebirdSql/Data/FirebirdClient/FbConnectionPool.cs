@@ -50,9 +50,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		private FbConnectionString	options;
 		private ArrayList			locked;
 		private ArrayList			unlocked;
-		private Thread				cleanupThread;
+		private Timer				cleanupTimer;
 		private string				connectionString;
-		private bool				isRunning;
 		private long				lifeTime;
 		private object				syncObject;
         private bool disposed = false;
@@ -114,15 +113,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			// If a	minimun	number of connections is requested initialize the pool
 			this.Initialize();
 
-			// Start the cleanup thread	only if	needed
+			// Start the cleanup only if needed
 			if (this.lifeTime != 0)
 			{
-				this.isRunning = true;
-
-                this.cleanupThread = new Thread(new ThreadStart(this.RunCleanup));
-                this.cleanupThread.IsBackground = true;
-				this.cleanupThread.Name = "FirebirdClient - Connection Pooling Cleanup Thread";
-				this.cleanupThread.Start();
+				long interval = Convert.ToInt64(TimeSpan.FromTicks(this.lifeTime).TotalMilliseconds);
+				this.cleanupTimer = new Timer(new TimerCallback(this.CleanupWorker), this, interval, interval);
 			}
 		}
 
@@ -299,42 +294,23 @@ namespace FirebirdSql.Data.FirebirdClient
             }
 		}
 
-		private void RunCleanup()
+		private void CleanupWorker(object state)
 		{
-			int interval = Convert.ToInt32(TimeSpan.FromTicks(this.lifeTime).TotalMilliseconds);
+			FbConnectionPool pool = state as FbConnectionPool;
 
-			if (interval > 60000)
-			{
-				interval = 60000;
-			}
+			pool.Cleanup();
 
-			try
+			if (pool.Count == 0)
 			{
-				while (this.isRunning)
+				lock (pool.SyncObject)
 				{
-					Thread.Sleep(interval);
-
-					this.Cleanup();
-
-					if (this.Count == 0)
+					// Empty pool
+					if (pool.EmptyPool != null)
 					{
-						lock (this.SyncObject)
-						{
-							// Empty pool
-							if (this.EmptyPool != null)
-							{
-								this.EmptyPool(this.connectionString, null);
-							}
-
-							// Stop	running
-							this.isRunning = false;
-						}
+						pool.EmptyPool(pool.connectionString, null);
 					}
 				}
-			}
-			catch (ThreadAbortException)
-			{
-				this.isRunning = false;
+				pool.cleanupTimer.Dispose();
 			}
 		}
 
@@ -427,12 +403,11 @@ namespace FirebirdSql.Data.FirebirdClient
                 {
                     if (disposing)
                     {
-                        // Stop	cleanup	thread
-                        if (this.cleanupThread != null)
-                        {
-                            this.cleanupThread.Abort();
-                            this.cleanupThread.Join();
-                        }
+                        // stop cleanup
+						if (this.cleanupTimer != null)
+						{
+							this.cleanupTimer.Dispose();
+						}
                     }
 
                     // Close all unlocked connections
@@ -467,7 +442,6 @@ namespace FirebirdSql.Data.FirebirdClient
                         this.unlocked = null;
                         this.locked = null;
                         this.connectionString = null;
-                        this.cleanupThread = null;
                         this.EmptyPool = null;
                     }
 
