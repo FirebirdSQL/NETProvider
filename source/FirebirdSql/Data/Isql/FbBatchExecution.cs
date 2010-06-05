@@ -148,7 +148,7 @@ namespace FirebirdSql.Data.Isql
         /// <summary>
         /// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
         /// </summary>
-        public virtual void Execute()
+        public void Execute()
         {
             this.Execute(true);
         }
@@ -157,7 +157,7 @@ namespace FirebirdSql.Data.Isql
         /// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
         /// </summary>
         /// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
-        public virtual void Execute(bool autoCommit)
+        public void Execute(bool autoCommit)
         {
             if (this.SqlStatements == null || this.SqlStatements.Count == 0)
             {
@@ -715,7 +715,7 @@ namespace FirebirdSql.Data.Isql
         /// The trigger function for <see cref="CommandExecuting"/>	event.
         /// </summary>
         /// <param name="sqlCommand">The SQL command that is going for execution.</param>
-        protected virtual void OnCommandExecuting(FbCommand sqlCommand)
+        protected void OnCommandExecuting(FbCommand sqlCommand)
         {
             if (CommandExecuting != null)
             {
@@ -734,7 +734,7 @@ namespace FirebirdSql.Data.Isql
         /// <param name="rowsAffected">The rows that were affected by the executed SQL command. If the executed 
         /// command is not meant to return this kind of information (ex: SELECT) this parameter must 
         /// be setled to <b>-1</b>.</param>
-        protected virtual void OnCommandExecuted(string commandText, FbDataReader dataReader, int rowsAffected)
+        protected void OnCommandExecuted(string commandText, FbDataReader dataReader, int rowsAffected)
         {
             if (CommandExecuted != null)
             {
