@@ -229,7 +229,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			// Attach to the database
 			this.Write(IscCodes.op_attach);
 			this.Write(0);				    	// Database	object ID
-			this.Write(database);				// Database	PATH
+			this.WriteBuffer(Encoding.Default.GetBytes(database));				// Database	PATH
 			this.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
 		}
 
@@ -349,7 +349,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			this.Write(IscCodes.op_create);
 			this.Write(0);
-			this.Write(database);
+			this.WriteBuffer(Encoding.Default.GetBytes(database));
 			this.WriteBuffer(dpb.ToArray());
 		}
 
