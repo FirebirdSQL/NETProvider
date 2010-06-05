@@ -24,6 +24,7 @@
 using System;
 using System.Collections;
 using System.Threading;
+using System.Text;
 
 using FirebirdSql.Data.Common;
 
@@ -200,7 +201,7 @@ namespace FirebirdSql.Data.Client.Native
         {
             lock (this)
             {
-                byte[] databaseBuffer = this.Charset.GetBytes(database);
+                byte[] databaseBuffer = Encoding.Default.GetBytes(database);
                 int dbHandle = this.Handle;
 
                 // Clear status vector
@@ -272,7 +273,7 @@ namespace FirebirdSql.Data.Client.Native
         {
             lock (this)
             {
-                byte[] databaseBuffer = this.Charset.GetBytes(database);
+                byte[] databaseBuffer = Encoding.Default.GetBytes(database);
                 int dbHandle = 0;
 
                 // Clear status vector
