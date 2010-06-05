@@ -27,202 +27,189 @@ using System.Text;
 
 namespace FirebirdSql.Data.Isql
 {
-    /// <summary>
-    /// FbScript parses a SQL file and returns its SQL statements. 
-    /// The class take in consideration that the statement separator can change in code. 
-    /// For instance, in Firebird databases the statement <c>SET TERM !! ;</c> will change the
-    /// statement token terminator <b>;</b> into <b>!!</b>.
-    /// </summary>
-    public class FbScript
-    {
-        #region · Fields ·
+	/// <summary>
+	/// FbScript parses a SQL file and returns its SQL statements. 
+	/// The class take in consideration that the statement separator can change in code. 
+	/// For instance, in Firebird databases the statement <c>SET TERM !! ;</c> will change the
+	/// statement token terminator <b>;</b> into <b>!!</b>.
+	/// </summary>
+	public class FbScript
+	{
+		#region · Fields ·
 
-        private StringParser parser;
-        private FbStatementCollection results;
+		private StringParser parser;
+		private FbStatementCollection results;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        /// <summary>
-        /// Returns a FbStatementCollection containing all the SQL statements (without comments) present on the file.
-        /// This property is loaded after the method call <see cref="Parse"/>.
-        /// </summary>
-        public FbStatementCollection Results
-        {
-            get { return this.results; }
-        }
+		/// <summary>
+		/// Returns a FbStatementCollection containing all the SQL statements (without comments) present on the file.
+		/// This property is loaded after the method call <see cref="Parse"/>.
+		/// </summary>
+		public FbStatementCollection Results
+		{
+			get { return this.results; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Static ·
+		/// <summary>
+		/// Creates FbScript reading content from file.
+		/// </summary>
+		public static FbScript LoadFromFile(string fileName)
+		{
+			return new FbScript(File.ReadAllText(fileName));
+		}
+		#endregion
 
-        /// <summary>
-        /// Creates an instance of FbScript class.
-        /// </summary>
-        /// <param name="sqlFilename">The filename for the SQL file.</param>
-        public FbScript(string sqlFilename)
-        {
-            string script = string.Empty;
+		#region · Constructors ·
 
-            using (StreamReader reader = File.OpenText(sqlFilename))
-            {
-                script = reader.ReadToEnd();
-            }
+		public FbScript(string script)
+		{
+			this.results = new FbStatementCollection();
+			this.parser = new StringParser(RemoveComments(script), false);
+			this.parser.Token = ";";
+		}
 
-            this.results = new FbStatementCollection();
-            this.parser = new StringParser(RemoveComments(script), false);
-            this.parser.Token = ";";
-        }
+		#endregion
 
-        /// <summary>
-        /// Creates an instance of FbScript class.
-        /// </summary>
-        /// <param name="sqlCode">A <see cref="TextReader"/> instance.</param>
-        /// <remarks>The all data in <see cref="TextReader"/> is read.</remarks>
-        public FbScript(TextReader sqlCode)
-        {
-            this.results = new FbStatementCollection();
-            this.parser = new StringParser(RemoveComments(sqlCode.ReadToEnd()), false);
-            this.parser.Token = ";";
-        }
+		#region · Methods ·
 
-        #endregion
+		/// <summary>
+		/// Parses the SQL code and loads the SQL statements into the StringCollection <see cref="Results"/>.
+		/// </summary>
+		/// <returns>The number of statements found.</returns>
+		public int Parse()
+		{
+			int index = 0;
+			string atomicResult;
+			string newParserToken;
 
-        #region · Methods ·
+			this.results.Clear();
 
-        /// <summary>
-        /// Parses the SQL code and loads the SQL statements into the StringCollection <see cref="Results"/>.
-        /// </summary>
-        /// <returns>The number of statements found.</returns>
-        public int Parse()
-        {
-            int index = 0;
-            string atomicResult;
-            string newParserToken;
+			while (index < this.parser.Length)
+			{
+				index = this.parser.ParseNext();
+				atomicResult = this.parser.Result.Trim();
 
-            this.results.Clear();
+				if (this.isSetTermStatement(atomicResult, out newParserToken))
+				{
+					this.parser.Token = newParserToken;
+					continue;
+				}
 
-            while (index < this.parser.Length)
-            {
-                index = this.parser.ParseNext();
-                atomicResult = this.parser.Result.Trim();
+				if (atomicResult != null && atomicResult.Length > 0)
+				{
+					this.results.Add(atomicResult);
+				}
+			}
 
-                if (this.isSetTermStatement(atomicResult, out newParserToken))
-                {
-                    this.parser.Token = newParserToken;
-                    continue;
-                }
+			return this.results.Count;
+		}
 
-                if (atomicResult != null && atomicResult.Length > 0)
-                {
-                    this.results.Add(atomicResult);
-                }
-            }
+		/// <summary>
+		/// Overrided method, returns the the SQL code to be parsed (with comments removed).
+		/// </summary>
+		/// <returns>The SQL code to be parsed (without comments).</returns>
+		public override string ToString()
+		{
+			return this.parser.ToString();
+		}
 
-            return this.results.Count;
-        }
+		#endregion
 
-        /// <summary>
-        /// Overrided method, returns the the SQL code to be parsed (with comments removed).
-        /// </summary>
-        /// <returns>The SQL code to be parsed (without comments).</returns>
-        public override string ToString()
-        {
-            return this.parser.ToString();
-        }
+		#region · Protected Static Methods ·
 
-        #endregion
+		/// <summary>
+		/// Removes from the SQL code all comments of the type: /*...*/ or --
+		/// </summary>
+		/// <param name="source">The string containing the original SQL code.</param>
+		/// <returns>A string containing the SQL code without comments.</returns>
+		protected static string RemoveComments(string source)
+		{
+			int i = 0;
+			int length = source.Length;
+			StringBuilder result = new StringBuilder();
+			bool insideComment = false;
+			bool insideLiteral = false;
 
-        #region · Protected Static Methods ·
+			while (i < length)
+			{
+				if (insideLiteral)
+				{
+					result.Append(source[i]);
 
-        /// <summary>
-        /// Removes from the SQL code all comments of the type: /*...*/ or --
-        /// </summary>
-        /// <param name="source">The string containing the original SQL code.</param>
-        /// <returns>A string containing the SQL code without comments.</returns>
-        protected static string RemoveComments(string source)
-        {
-            int i = 0;
-            int length = source.Length;
-            StringBuilder result = new StringBuilder();
-            bool insideComment = false;
-            bool insideLiteral = false;
+					if (source[i] == '\'')
+					{
+						insideLiteral = false;
+					}
+				}
+				else if (insideComment)
+				{
+					if (source[i] == '*')
+					{
+						if ((i < length - 1) && (source[i + 1] == '/'))
+						{
+							i++;
+							insideComment = false;
+						}
+					}
+				}
+				else if ((source[i] == '\'') && (i < length - 1))
+				{
+					result.Append(source[i]);
+					insideLiteral = true;
+				}
+				else if ((source[i] == '/') && (i < length - 1) && (source[i + 1] == '*'))
+				{
+					i++;
+					insideComment = true;
+				}
+				else if ((source[i] == '-' && (i < length - 1) && source[i + 1] == '-'))
+				{
+					i++;
+					while (source[i] != '\n')
+					{
+						i++;
+					}
+					i--;
+				}
+				else
+				{
+					result.Append(source[i]);
+				}
 
-            while (i < length)
-            {
-                if (insideLiteral)
-                {
-                    result.Append(source[i]);
+				i++;
+			}
 
-                    if (source[i] == '\'')
-                    {
-                        insideLiteral = false;
-                    }
-                }
-                else if (insideComment)
-                {
-                    if (source[i] == '*')
-                    {
-                        if ((i < length - 1) && (source[i + 1] == '/'))
-                        {
-                            i++;
-                            insideComment = false;
-                        }
-                    }
-                }
-                else if ((source[i] == '\'') && (i < length - 1))
-                {
-                    result.Append(source[i]);
-                    insideLiteral = true;
-                }
-                else if ((source[i] == '/') && (i < length - 1) && (source[i + 1] == '*'))
-                {
-                    i++;
-                    insideComment = true;
-                }
-                else if ((source[i] == '-' && (i < length - 1) && source[i + 1] == '-'))
-                {
-                    i++;
-                    while (source[i] != '\n')
-                    {
-                        i++;
-                    }
-                    i--;
-                }
-                else
-                {
-                    result.Append(source[i]);
-                }
+			return result.ToString();
+		}
 
-                i++;
-            }
+		#endregion
 
-            return result.ToString();
-        }
+		#region · Private Methods ·
 
-        #endregion
+		// method assumes that statement is trimmed 
+		private bool isSetTermStatement(string statement, out string newTerm)
+		{
+			bool result = false;
 
-        #region · Private Methods ·
+			newTerm = string.Empty;
 
-        // method assumes that statement is trimmed 
-        private bool isSetTermStatement(string statement, out string newTerm)
-        {
-            bool result = false;
+			if (StringParser.StartsWith(statement, "SET TERM", true))
+			{
+				newTerm = statement.Substring(8).Trim();
+				result = true;
+			}
 
-            newTerm = string.Empty;
+			return result;
+		}
 
-            if (StringParser.StartsWith(statement, "SET TERM", true))
-            {
-                newTerm = statement.Substring(8).Trim();
-                result = true;
-            }
-
-            return result;
-        }
-
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif
