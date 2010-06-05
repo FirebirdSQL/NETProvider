@@ -1,4 +1,5 @@
 ﻿<#@ template language="C#" #>
+<#@ output extension = ".sql" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="System.Data.Entity" #>
 <#@ assembly name="System.Xml" #>
@@ -9,36 +10,45 @@
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Xml" #>
 -- Created: <#=DateTime.Now.ToString("R")#>
-
+<# 
+	if (StoreItems == null)
+	{
+#>
+-- No input.
+<#
+	}
+	else
+	{
+ #>
 -- Tables
 <#
-	foreach (var entitySet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<EntitySet>())
-	{
+		foreach (var entitySet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<EntitySet>())
+		{
 #>
 RECREATE TABLE <#=Quote(entitySet.Name)#> (
 <#
-		PushIndent("\t");
-		foreach (EdmProperty property in entitySet.ElementType.Properties)
-        {
+			PushIndent("\t");
+			foreach (EdmProperty property in entitySet.ElementType.Properties)
+			{
 #>
 <#=GenerateColumn(property)#>,
 <#
-		}
-		PopIndent();
+			}
+			PopIndent();
 #>
 CONSTRAINT <#=Quote("PK_" + entitySet.Name)#> PRIMARY KEY (<#=string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => Quote(pk.Name)).ToArray())#>)
 );
 
 <#
-	}
+		}
 #>
 -- Foreign Key Constraints
 <#
-	foreach (var associationSet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<AssociationSet>())
-	{
-		ReferentialConstraint constraint = associationSet.ElementType.ReferentialConstraints.Single<ReferentialConstraint>(); 
-		AssociationSetEnd end = associationSet.AssociationSetEnds[constraint.FromRole.Name];
-		AssociationSetEnd end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
+		foreach (var associationSet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<AssociationSet>())
+		{
+			ReferentialConstraint constraint = associationSet.ElementType.ReferentialConstraints.Single<ReferentialConstraint>(); 
+			AssociationSetEnd end = associationSet.AssociationSetEnds[constraint.FromRole.Name];
+			AssociationSetEnd end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
 
 #>
 ALTER TABLE <#=Quote(end2.EntitySet.Name)#> ADD CONSTRAINT <#=Quote("FK_" + associationSet.Name)#> FOREIGN KEY (<#=string.Join(", ", constraint.ToProperties.Select(fk => Quote(fk.Name)).ToArray())#>)
@@ -46,6 +56,9 @@ REFERENCES <#=Quote(end.EntitySet.Name)#>(<#=string.Join(", ", constraint.FromPr
 ON DELETE <#=(end.CorrespondingAssociationEndMember.DeleteBehavior == OperationAction.Cascade ? "CASCADE" : "NO ACTION")#>
 ;
 
+<#
+		}
+#>
 <#
 	}
 #>
@@ -60,13 +73,15 @@ private StoreItemCollection StoreItems
 	{
 		if (_storeItems == null)
 		{
+			var ssdl = this.GetInput<string>("Ssdl");
+
 			if (StoreItemCollection != null)
 			{
 				_storeItems = StoreItemCollection;
 			}
-			else
+			else if (ssdl != null)
 			{
-				 using (TextReader text = new StringReader(this.GetInput<string>("Ssdl")))
+				 using (TextReader text = new StringReader(ssdl))
 				 {
 					using (XmlReader xml = XmlReader.Create(text))
 					{
