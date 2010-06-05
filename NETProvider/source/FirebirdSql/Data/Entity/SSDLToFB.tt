@@ -56,7 +56,7 @@ public StoreItemCollection StoreItemCollection { private get; set; }
 private StoreItemCollection _storeItems;
 private StoreItemCollection StoreItems
 {
-	private get
+	get
 	{
 		if (_storeItems == null)
 		{
