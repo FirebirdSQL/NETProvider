@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Diagnostics;
+using System.IO;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Schema;
@@ -543,28 +544,56 @@ namespace FirebirdSql.Data.FirebirdClient
         private string GetProcessName()
         {
 #if (NET_CF) 
-            // for CF we can implement GetModuleFileName from coredll
-            return "fbnetcf";
+			// for CF we can implement GetModuleFileName from coredll
+			return "fbnetcf";
 #else
-            // showing ApplicationPhysicalPath may be wrong because of connection pooling; better idea?
-			if (System.Web.Hosting.HostingEnvironment.IsHosted)
-			{
-				return System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
-			}
-			else
-			{
-				System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
-				if (assembly != null)
-				{
-					return assembly.Location;
-				}
-				else // if we're not loaded from managed code
-				{
-					return Process.GetCurrentProcess().MainModule.FileName;
-				}
-			}
+			// showing ApplicationPhysicalPath may be wrong because of connection pooling; better idea?
+			return GetHostingPath() ?? GetRealProcessName();
 #endif
         }
+
+
+		private string GetHostingPath()
+		{
+#if (NET_20)
+			const string assemblyName = "System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+#else
+			const string assemblyName = "System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+#endif
+			System.Reflection.Assembly assembly;
+			try
+			{
+				assembly = System.Reflection.Assembly.Load(assemblyName);
+			}
+			catch (FileNotFoundException)
+			{
+				return null;
+			}
+			catch (FileLoadException)
+			{
+				return null;
+			}
+			catch (BadImageFormatException)
+			{
+				return null;
+			}
+            return (string)assembly
+				.GetType("System.Web.Hosting.HostingEnvironment")
+				.GetProperty("ApplicationPhysicalPath")
+				.GetValue(null, null);
+		}
+		private string GetRealProcessName()
+		{
+			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+			if (assembly != null)
+			{
+				return assembly.Location;
+			}
+			else // if we're not loaded from managed code
+			{
+				return Process.GetCurrentProcess().MainModule.FileName;
+			}
+		}
 
         #endregion
 
