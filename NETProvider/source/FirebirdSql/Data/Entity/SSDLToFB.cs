@@ -314,7 +314,7 @@ private string GenerateColumn(EdmProperty property)
 			result.Append("BLOB SUB_TYPE BINARY");
 			break;
 		case "smallint_bool":
-			result.AppendFormat("SMALLINT CHECK {0} IN (1,0)", Quote(property.Name));
+			result.AppendFormat("SMALLINT CHECK ({0} IN (1,0))", Quote(property.Name));
 			break;
 		default:
 			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
