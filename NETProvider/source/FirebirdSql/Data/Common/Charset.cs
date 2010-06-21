@@ -82,8 +82,10 @@ namespace FirebirdSql.Data.Common
             // Shift-JIS, Japanese
             charsets.Add(new Charset(5, "SJIS_0208", 2, "shift_jis"));
 #endif
+#if (!MONO)
             // JIS X 0201, 0208, 0212, EUC encoding, Japanese
             charsets.Add(new Charset(6, "EUCJ_0208", 2, "euc-jp"));
+#endif
             // Windows Japanese	
             charsets.Add(new Charset(7, "ISO2022-JP", 2, "iso-2022-jp"));
             // MS-DOS United States, Australia, New Zealand, South Africa	
