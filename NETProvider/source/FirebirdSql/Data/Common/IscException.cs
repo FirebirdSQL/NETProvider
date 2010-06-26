@@ -217,7 +217,7 @@ namespace FirebirdSql.Data.Common
 					}
 					catch
 					{
-						message = string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
+						message = BuildDefaultErrorMessage(code);
 					}
 
 					ArrayList param = new ArrayList();
@@ -273,7 +273,7 @@ namespace FirebirdSql.Data.Common
 					}
 					catch
 					{
-						message = string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
+						message = BuildDefaultErrorMessage(code);
 
 						builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
 					}
@@ -288,6 +288,11 @@ namespace FirebirdSql.Data.Common
 
 			// Update exception	message
 			_message = builder.ToString();
+		}
+
+		private string BuildDefaultErrorMessage(int code)
+		{
+			return string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
 		}
 
 		#endregion
