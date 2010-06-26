@@ -802,20 +802,21 @@ namespace FirebirdSql.Data.Common
 		public const int isc_arg_warning    = 18;	// warning argument
 		public const int isc_arg_sql_state  = 19;	// SQLSTATE
 
-        public const int isc_open_trans     = 335544357;
-        public const int isc_segment        = 335544366;
-        public const int isc_segstr_eof     = 335544367;
-        public const int isc_connect_reject = 335544421;
-        public const int isc_invalid_dimension = 335544458;
-        public const int isc_tra_state      = 335544468;
-        public const int isc_except         = 335544517;
-        public const int isc_dsql_sqlda_err = 335544583;
-        public const int isc_network_error  = 335544721;
-        public const int isc_net_read_err   = 335544726;
-        public const int isc_net_write_err  = 335544727;
-        public const int isc_stack_trace    = 335544842;
-        public const int isc_except2        = 335544848;
-		public const int isc_arith_except	= 335544321;
+        public const int isc_open_trans			= 335544357;
+        public const int isc_segment			= 335544366;
+        public const int isc_segstr_eof			= 335544367;
+        public const int isc_connect_reject		= 335544421;
+        public const int isc_invalid_dimension	= 335544458;
+        public const int isc_tra_state			= 335544468;
+        public const int isc_except				= 335544517;
+        public const int isc_dsql_sqlda_err		= 335544583;
+        public const int isc_network_error		= 335544721;
+        public const int isc_net_read_err		= 335544726;
+        public const int isc_net_write_err		= 335544727;
+        public const int isc_stack_trace		= 335544842;
+        public const int isc_except2			= 335544848;
+		public const int isc_arith_except		= 335544321;
+		public const int isc_string_truncation	= 335544914;
 
 		#endregion
 
