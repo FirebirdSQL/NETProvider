@@ -88,6 +88,17 @@ namespace FirebirdSql.Data.Common
 			this.BuildExceptionData();
 		}
 
+		public IscException(IEnumerable<int> errorCodes)
+			: this()
+		{
+			foreach (int errorCode in errorCodes)
+			{
+				this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+			}
+
+			this.BuildExceptionData();
+		}
+
 		/// <param name="dummy">This parameter is here only to differentiate sqlState and strParam.</param>
 		public IscException(string sqlState, int dummy)
 			: this()
