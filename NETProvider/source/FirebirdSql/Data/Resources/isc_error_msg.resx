@@ -154,7 +154,7 @@
     <value>invalid transaction handle (expecting explicit transaction start)</value>
   </data>
   <data name="335544333" xml:space="preserve">
-    <value>internal gds software consistency check ({0})</value>
+    <value>internal Firebird consistency check ({0})</value>
   </data>
   <data name="335544334" xml:space="preserve">
     <value>conversion error from string "{0}"</value>
@@ -187,7 +187,7 @@
     <value>invalid request BLR at offset {0}</value>
   </data>
   <data name="335544344" xml:space="preserve">
-    <value>I/O error for file "{1}"</value>
+    <value>I/O error during "{0}" operation for file "{1}"</value>
   </data>
   <data name="335544345" xml:space="preserve">
     <value>lock conflict on no wait transaction</value>
@@ -265,7 +265,7 @@
     <value>attempted read of a new, open BLOB</value>
   </data>
   <data name="335544370" xml:space="preserve">
-    <value>attempted action on blob outside transaction</value>
+    <value>attempted action on BLOB outside transaction</value>
   </data>
   <data name="335544371" xml:space="preserve">
     <value>attempted write to read-only BLOB</value>
@@ -797,7 +797,7 @@
     <value>Cannot define constraints on views</value>
   </data>
   <data name="335544547" xml:space="preserve">
-    <value>internal gds software consistency check (invalid RDB$CONSTRAINT_TYPE)</value>
+    <value>internal Firebird consistency check (invalid RDB$CONSTRAINT_TYPE)</value>
   </data>
   <data name="335544548" xml:space="preserve">
     <value>Attempt to define a second PRIMARY KEY for the same table</value>
@@ -1891,6 +1891,240 @@
   <data name="335544911" xml:space="preserve">
     <value>Cannot take a table reservation isc_tpb_lock_write in TPB because the transaction is in read only mode</value>
   </data>
+  <data name="335544912" xml:space="preserve">
+    <value>value exceeds the range for a valid time</value>
+  </data>
+  <data name="335544913" xml:space="preserve">
+    <value>value exceeds the range for valid timestamps</value>
+  </data>
+  <data name="335544914" xml:space="preserve">
+    <value>string right truncation</value>
+  </data>
+  <data name="335544915" xml:space="preserve">
+    <value>blob truncation when converting to a string: length limit exceeded</value>
+  </data>
+  <data name="335544916" xml:space="preserve">
+    <value>numeric value is out of range</value>
+  </data>
+  <data name="335544917" xml:space="preserve">
+    <value>Firebird shutdown is still in progress after the specified timeout</value>
+  </data>
+  <data name="335544918" xml:space="preserve">
+    <value>Attachment handle is busy</value>
+  </data>
+  <data name="335544919" xml:space="preserve">
+    <value>Bad written UDF detected: pointer returned in FREE_IT function was not allocated by ib_util_malloc</value>
+  </data>
+  <data name="335544920" xml:space="preserve">
+    <value>External Data Source provider '{0}' not found</value>
+  </data>
+  <data name="335544921" xml:space="preserve">
+    <value>Execute statement error at {0} :
+{1}Data source : {2}</value>
+  </data>
+  <data name="335544922" xml:space="preserve">
+    <value>Execute statement preprocess SQL error</value>
+  </data>
+  <data name="335544923" xml:space="preserve">
+    <value>Statement expected</value>
+  </data>
+  <data name="335544924" xml:space="preserve">
+    <value>Parameter name expected</value>
+  </data>
+  <data name="335544925" xml:space="preserve">
+    <value>Unclosed comment found near '{0}'</value>
+  </data>
+  <data name="335544926" xml:space="preserve">
+    <value>Execute statement error at {0} :
+{1}Statement : {2}
+Data source : {3}</value>
+  </data>
+  <data name="335544927" xml:space="preserve">
+    <value>Input parameters mismatch</value>
+  </data>
+  <data name="335544928" xml:space="preserve">
+    <value>Output parameters mismatch</value>
+  </data>
+  <data name="335544929" xml:space="preserve">
+    <value>Input parameter '{0}' have no value set</value>
+  </data>
+  <data name="335544930" xml:space="preserve">
+    <value>BLR stream length {0} exceeds implementation limit {1}</value>
+  </data>
+  <data name="335544931" xml:space="preserve">
+    <value>Monitoring table space exhausted</value>
+  </data>
+  <data name="335544932" xml:space="preserve">
+    <value>module name or entrypoint could not be found</value>
+  </data>
+  <data name="335544933" xml:space="preserve">
+    <value>nothing to cancel</value>
+  </data>
+  <data name="335544934" xml:space="preserve">
+    <value>ib_util library has not been loaded to deallocate memory returned by FREE_IT function</value>
+  </data>
+  <data name="335544935" xml:space="preserve">
+    <value>Cannot have circular dependencies with computed fields</value>
+  </data>
+  <data name="335544936" xml:space="preserve">
+    <value>Security database error</value>
+  </data>
+  <data name="335544937" xml:space="preserve">
+    <value>Invalid data type in DATE/TIME/TIMESTAMP addition or subtraction in add_datettime()</value>
+  </data>
+  <data name="335544938" xml:space="preserve">
+    <value>Only a TIME value can be added to a DATE value</value>
+  </data>
+  <data name="335544939" xml:space="preserve">
+    <value>Only a DATE value can be added to a TIME value</value>
+  </data>
+  <data name="335544940" xml:space="preserve">
+    <value>TIMESTAMP values can be subtracted only from another TIMESTAMP value</value>
+  </data>
+  <data name="335544941" xml:space="preserve">
+    <value>Only one operand can be of type TIMESTAMP</value>
+  </data>
+  <data name="335544942" xml:space="preserve">
+    <value>Only HOUR, MINUTE, SECOND and MILLISECOND can be extracted from TIME values</value>
+  </data>
+  <data name="335544943" xml:space="preserve">
+    <value>HOUR, MINUTE, SECOND and MILLISECOND cannot be extracted from DATE values</value>
+  </data>
+  <data name="335544944" xml:space="preserve">
+    <value>Invalid argument for EXTRACT() not being of DATE/TIME/TIMESTAMP type</value>
+  </data>
+  <data name="335544945" xml:space="preserve">
+    <value>Arguments for {0} must be integral types or NUMERIC/DECIMAL without scale</value>
+  </data>
+  <data name="335544946" xml:space="preserve">
+    <value>First argument for {0} must be integral type or floating point type</value>
+  </data>
+  <data name="335544947" xml:space="preserve">
+    <value>Human readable UUID argument for {0} must be of string type</value>
+  </data>
+  <data name="335544948" xml:space="preserve">
+    <value>Human readable UUID argument for {1} must be of exact length {0}</value>
+  </data>
+  <data name="335544949" xml:space="preserve">
+    <value>Human readable UUID argument for {2} must have "-" at position {1} instead of "{0}"</value>
+  </data>
+  <data name="335544950" xml:space="preserve">
+    <value>Human readable UUID argument for {2} must have hex digit at position {1} instead of "{0}"</value>
+  </data>
+  <data name="335544951" xml:space="preserve">
+    <value>Only HOUR, MINUTE, SECOND and MILLISECOND can be added to TIME values in {0}</value>
+  </data>
+  <data name="335544952" xml:space="preserve">
+    <value>Invalid data type in addition of part to DATE/TIME/TIMESTAMP in {0}</value>
+  </data>
+  <data name="335544953" xml:space="preserve">
+    <value>Invalid part {0} to be added to a DATE/TIME/TIMESTAMP value in {1}</value>
+  </data>
+  <data name="335544954" xml:space="preserve">
+    <value>Expected DATE/TIME/TIMESTAMP type in evlDateAdd() result</value>
+  </data>
+  <data name="335544955" xml:space="preserve">
+    <value>Expected DATE/TIME/TIMESTAMP type as first and second argument to {0}</value>
+  </data>
+  <data name="335544956" xml:space="preserve">
+    <value>The result of TIME-&lt;value&gt; in {0} cannot be expressed in YEAR, MONTH, DAY or WEEK</value>
+  </data>
+  <data name="335544957" xml:space="preserve">
+    <value>The result of TIME-TIMESTAMP or TIMESTAMP-TIME in {0} cannot be expressed in HOUR, MINUTE, SECOND or MILLISECOND</value>
+  </data>
+  <data name="335544958" xml:space="preserve">
+    <value>The result of DATE-TIME or TIME-DATE in {0} cannot be expressed in HOUR, MINUTE, SECOND and MILLISECOND</value>
+  </data>
+  <data name="335544959" xml:space="preserve">
+    <value>Invalid part {0} to express the difference between two DATE/TIME/TIMESTAMP values in {1}</value>
+  </data>
+  <data name="335544960" xml:space="preserve">
+    <value>Argument for {0} must be positive</value>
+  </data>
+  <data name="335544961" xml:space="preserve">
+    <value>Base for {0} must be positive</value>
+  </data>
+  <data name="335544962" xml:space="preserve">
+    <value>Argument #{0} for {1} must be zero or positive</value>
+  </data>
+  <data name="335544963" xml:space="preserve">
+    <value>Argument #{0} for {1} must be positive</value>
+  </data>
+  <data name="335544964" xml:space="preserve">
+    <value>Base for {0} cannot be zero if exponent is negative</value>
+  </data>
+  <data name="335544965" xml:space="preserve">
+    <value>Base for {0} cannot be negative if exponent is not an integral value</value>
+  </data>
+  <data name="335544966" xml:space="preserve">
+    <value>The numeric scale must be between -128 and 127 in {0}</value>
+  </data>
+  <data name="335544967" xml:space="preserve">
+    <value>Argument for {0} must be zero or positive</value>
+  </data>
+  <data name="335544968" xml:space="preserve">
+    <value>Binary UUID argument for {0} must be of string type</value>
+  </data>
+  <data name="335544969" xml:space="preserve">
+    <value>Binary UUID argument for {1} must use {0} bytes</value>
+  </data>
+  <data name="335544970" xml:space="preserve">
+    <value>Missing required item {0} in service parameter block</value>
+  </data>
+  <data name="335544971" xml:space="preserve">
+    <value>{0} server is shutdown</value>
+  </data>
+  <data name="335544972" xml:space="preserve">
+    <value>Invalid connection string</value>
+  </data>
+  <data name="335544973" xml:space="preserve">
+    <value>Unrecognized events block</value>
+  </data>
+  <data name="335544974" xml:space="preserve">
+    <value>Could not start first worker thread - shutdown server</value>
+  </data>
+  <data name="335544975" xml:space="preserve">
+    <value>Timeout occurred while waiting for a secondary connection for event processing</value>
+  </data>
+  <data name="335544976" xml:space="preserve">
+    <value>Argument for {0} must be different than zero</value>
+  </data>
+  <data name="335544977" xml:space="preserve">
+    <value>Argument for {0} must be in the range [-1, 1]</value>
+  </data>
+  <data name="335544978" xml:space="preserve">
+    <value>Argument for {0} must be greater or equal than one</value>
+  </data>
+  <data name="335544979" xml:space="preserve">
+    <value>Argument for {0} must be in the range ]-1, 1[</value>
+  </data>
+  <data name="335544980" xml:space="preserve">
+    <value>Incorrect parameters provided to internal function {0}</value>
+  </data>
+  <data name="335544981" xml:space="preserve">
+    <value>Floating point overflow in built-in function {0}</value>
+  </data>
+  <data name="335544982" xml:space="preserve">
+    <value>Floating point overflow in result from UDF {0}</value>
+  </data>
+  <data name="335544983" xml:space="preserve">
+    <value>Invalid floating point value returned by UDF {0}</value>
+  </data>
+  <data name="335544984" xml:space="preserve">
+    <value>Database is probably already opened by another engine instance in another Windows session</value>
+  </data>
+  <data name="335544985" xml:space="preserve">
+    <value>No free space found in temporary directories</value>
+  </data>
+  <data name="335544986" xml:space="preserve">
+    <value>Explicit transaction control is not allowed</value>
+  </data>
+  <data name="335544987" xml:space="preserve">
+    <value>Use of TRUSTED switches in spb_command_line is prohibited</value>
+  </data>
+  <data name="335545017" xml:space="preserve">
+    <value>Asynchronous call is already running for this attachment</value>
+  </data>
   <data name="335740929" xml:space="preserve">
     <value>data base file name ({0}) already given</value>
   </data>
@@ -1971,9 +2205,6 @@
   </data>
   <data name="335741038" xml:space="preserve">
     <value>"read_only" or "read_write" required</value>
-  </data>
-  <data name="335741039" xml:space="preserve">
-    <value>	-sql_dialect	set database dialect n</value>
   </data>
   <data name="335741042" xml:space="preserve">
     <value>positive or zero numeric value required</value>
@@ -2065,6 +2296,9 @@
   <data name="336003103" xml:space="preserve">
     <value>Database trigger type can't be changed</value>
   </data>
+  <data name="336068740" xml:space="preserve">
+    <value>Table {0} already exists</value>
+  </data>
   <data name="336068784" xml:space="preserve">
     <value>column {0} does not exist in table/view {1}</value>
   </data>
@@ -2145,6 +2379,9 @@
   </data>
   <data name="336068858" xml:space="preserve">
     <value>Password should not be empty string</value>
+  </data>
+  <data name="336068859" xml:space="preserve">
+    <value>Index {0} already exists</value>
   </data>
   <data name="336330753" xml:space="preserve">
     <value>found unknown switch</value>
@@ -2264,7 +2501,7 @@
     <value>do not recognize record type {0}</value>
   </data>
   <data name="336330796" xml:space="preserve">
-    <value>Expected backup version 1..8.  Found {0}</value>
+    <value>Expected backup version 1..9.  Found {0}</value>
   </data>
   <data name="336330797" xml:space="preserve">
     <value>expected backup description record</value>
@@ -2398,6 +2635,12 @@
   <data name="336331034" xml:space="preserve">
     <value>restoring data only ignoring foreign key, unique, not null &amp; other constraints</value>
   </data>
+  <data name="336331093" xml:space="preserve">
+    <value>Invalid metadata detected. Use -FIX_FSS_METADATA option.</value>
+  </data>
+  <data name="336331094" xml:space="preserve">
+    <value>Invalid data detected. Use -FIX_FSS_DATA option.</value>
+  </data>
   <data name="336397205" xml:space="preserve">
     <value>ODS versions before ODS{0} are not supported</value>
   </data>
@@ -2495,10 +2738,67 @@
     <value>feature is not supported in dialect {0}</value>
   </data>
   <data name="336397237" xml:space="preserve">
-    <value>column {0} appears more than once in ALTER VIEW</value>
+    <value>CTE "{0}" is not used in query</value>
   </data>
   <data name="336397238" xml:space="preserve">
+    <value>column {0} appears more than once in ALTER VIEW</value>
+  </data>
+  <data name="336397239" xml:space="preserve">
     <value>{0} is not supported inside IN AUTONOMOUS TRANSACTION block</value>
+  </data>
+  <data name="336397240" xml:space="preserve">
+    <value>Unknown node type {0} in dsql/GEN_expr</value>
+  </data>
+  <data name="336397241" xml:space="preserve">
+    <value>Argument for {0} in dialect 1 must be string or numeric</value>
+  </data>
+  <data name="336397242" xml:space="preserve">
+    <value>Argument for {0} in dialect 3 must be numeric</value>
+  </data>
+  <data name="336397243" xml:space="preserve">
+    <value>Strings cannot be added to or subtracted from DATE or TIME types</value>
+  </data>
+  <data name="336397244" xml:space="preserve">
+    <value>Invalid data type for subtraction involving DATE, TIME or TIMESTAMP types</value>
+  </data>
+  <data name="336397245" xml:space="preserve">
+    <value>Adding two DATE values or two TIME values is not allowed</value>
+  </data>
+  <data name="336397246" xml:space="preserve">
+    <value>DATE value cannot be subtracted from the provided data type</value>
+  </data>
+  <data name="336397247" xml:space="preserve">
+    <value>Strings cannot be added or subtracted in dialect 3</value>
+  </data>
+  <data name="336397248" xml:space="preserve">
+    <value>Invalid data type for addition or subtraction in dialect 3</value>
+  </data>
+  <data name="336397249" xml:space="preserve">
+    <value>Invalid data type for multiplication in dialect 1</value>
+  </data>
+  <data name="336397250" xml:space="preserve">
+    <value>Strings cannot be multiplied in dialect 3</value>
+  </data>
+  <data name="336397251" xml:space="preserve">
+    <value>Invalid data type for multiplication in dialect 3</value>
+  </data>
+  <data name="336397252" xml:space="preserve">
+    <value>Division in dialect 1 must be between numeric data types</value>
+  </data>
+  <data name="336397253" xml:space="preserve">
+    <value>Strings cannot be divided in dialect 3</value>
+  </data>
+  <data name="336397254" xml:space="preserve">
+    <value>Invalid data type for division in dialect 3</value>
+  </data>
+  <data name="336397255" xml:space="preserve">
+    <value>Strings cannot be negated (applied the minus operator) in dialect 3</value>
+  </data>
+  <data name="336397256" xml:space="preserve">
+    <value>Invalid data type for negation (minus operator)</value>
+  </data>
+  <data name="336397257" xml:space="preserve">
+    <value>Cannot have more than 255 items in DISTINCT list</value>
   </data>
   <data name="336723983" xml:space="preserve">
     <value>unable to open database</value>
@@ -2694,6 +2994,21 @@
   </data>
   <data name="336986118" xml:space="preserve">
     <value>Unknown switch "{0}"</value>
+  </data>
+  <data name="336986159" xml:space="preserve">
+    <value>Wrong value for shutdown mode</value>
+  </data>
+  <data name="336986160" xml:space="preserve">
+    <value>could not open file {0}</value>
+  </data>
+  <data name="336986161" xml:space="preserve">
+    <value>could not read file {0}</value>
+  </data>
+  <data name="336986162" xml:space="preserve">
+    <value>empty file {0}</value>
+  </data>
+  <data name="336986164" xml:space="preserve">
+    <value>Invalid or missing parameter for switch {0}</value>
   </data>
   <data name="337051649" xml:space="preserve">
     <value>Switches trusted_svc and trusted_role are not supported from command line</value>
