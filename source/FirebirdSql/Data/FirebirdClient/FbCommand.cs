@@ -942,7 +942,7 @@ namespace FirebirdSql.Data.FirebirdClient
             Charset charset = this.connection.InnerConnection.Database.Charset;
 
             // Check the parameter character set
-            if (parameter.Charset == FbCharset.Octets && !(parameter.Value is byte[]))
+            if (parameter.Charset == FbCharset.Octets && !(parameter.InternalValue is byte[]))
             {
                 throw new InvalidOperationException("Value for char octets fields should be a byte array");
             }
@@ -1047,7 +1047,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 if (index != -1)
                 {
-                    if (this.Parameters[index].Value == DBNull.Value || this.Parameters[index].Value == null)
+                    if (this.Parameters[index].InternalValue == DBNull.Value || this.Parameters[index].InternalValue == null)
                     {
                         this.statement.Parameters[i].NullFlag = -1;
                         this.statement.Parameters[i].Value = DBNull.Value;
@@ -1067,7 +1067,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             case DbDataType.Binary:
                                 {
                                     BlobBase blob = this.statement.CreateBlob();
-                                    blob.Write((byte[])this.Parameters[index].Value);
+                                    blob.Write((byte[])this.Parameters[index].InternalValue);
                                     this.statement.Parameters[i].Value = blob.Id;
                                 }
                                 break;
@@ -1075,10 +1075,10 @@ namespace FirebirdSql.Data.FirebirdClient
                             case DbDataType.Text:
                                 {
                                     BlobBase blob = this.statement.CreateBlob();
-									if (this.Parameters[index].Value.GetType() == typeof(byte[]))
-										blob.Write((byte[])this.Parameters[index].Value);
+									if (this.Parameters[index].InternalValue.GetType() == typeof(byte[]))
+										blob.Write((byte[])this.Parameters[index].InternalValue);
 									else
-									    blob.Write((string)this.Parameters[index].Value);
+									    blob.Write((string)this.Parameters[index].InternalValue);
                                     this.statement.Parameters[i].Value = blob.Id;
                                 }
                                 break;
@@ -1099,22 +1099,22 @@ namespace FirebirdSql.Data.FirebirdClient
                                     }
 
                                     this.statement.Parameters[i].ArrayHandle.Handle = 0;
-                                    this.statement.Parameters[i].ArrayHandle.Write((System.Array)this.Parameters[index].Value);
+                                    this.statement.Parameters[i].ArrayHandle.Write((System.Array)this.Parameters[index].InternalValue);
                                     this.statement.Parameters[i].Value = this.statement.Parameters[i].ArrayHandle.Handle;
                                 }
                                 break;
 
                             case DbDataType.Guid:
-                                if (!(this.Parameters[index].Value is Guid) &&
-                                    !(this.Parameters[index].Value is byte[]))
+                                if (!(this.Parameters[index].InternalValue is Guid) &&
+                                    !(this.Parameters[index].InternalValue is byte[]))
                                 {
                                     throw new InvalidOperationException("Incorrect Guid value.");
                                 }
-                                this.statement.Parameters[i].Value = this.Parameters[index].Value;
+                                this.statement.Parameters[i].Value = this.Parameters[index].InternalValue;
                                 break;
 
                             default:
-                                this.statement.Parameters[i].Value = this.Parameters[index].Value;
+                                this.statement.Parameters[i].Value = this.Parameters[index].InternalValue;
                                 break;
                         }
                     }
@@ -1133,7 +1133,7 @@ namespace FirebirdSql.Data.FirebirdClient
             if (this.parameters != null)
                 foreach (FbParameter item in this.parameters)
                 {
-                    System.Diagnostics.Debug.WriteLine(string.Format("Name:{0} \t Type:{1} \t Value:{2}", item.InternalParameterName, item.FbDbType, item.Value));
+                    System.Diagnostics.Debug.WriteLine(string.Format("Name:{0} \t Type:{1} \t Value:{2}", item.InternalParameterName, item.FbDbType, item.InternalValue));
                 }
 #endif
 

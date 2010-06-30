@@ -48,7 +48,6 @@ namespace FirebirdSql.Data.FirebirdClient
         private object value;
         private string parameterName;
         private string sourceColumn;
-        private bool isTypeSet;
 
         #endregion
 
@@ -73,6 +72,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set
             {
                 this.size = value;
+				this.IsSizeSet = true;
 
                 // Hack for Clob parameters
                 if (value == 2147483647 &&
@@ -148,7 +148,7 @@ namespace FirebirdSql.Data.FirebirdClient
             set
             {
                 this.fbDbType = value;
-                this.isTypeSet = true;
+                this.IsTypeSet = true;
             }
         }
 
@@ -174,7 +174,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 this.value = value;
 
-                if (!this.isTypeSet)
+                if (!this.IsTypeSet)
                 {
                     this.SetFbDbType(value);
                 }
@@ -235,18 +235,34 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             get
             {
-                if (!String.IsNullOrEmpty(this.parameterName) && !this.parameterName.StartsWith("@"))
+                if (!string.IsNullOrEmpty(this.parameterName) && !this.parameterName.StartsWith("@"))
                 {
-                    return String.Format("@{0}", this.ParameterName);
+                    return string.Format("@{0}", this.ParameterName);
                 }
 
                 return this.ParameterName;
             }
         }
 
-		internal bool IsTypeSet
+		internal bool IsTypeSet { get; private set; }
+
+		internal bool IsSizeSet { get; private set; }
+
+		internal object InternalValue
 		{
-			get { return this.isTypeSet; }
+			get
+			{
+				if (this.IsSizeSet)
+				{
+					string svalue = (this.value as string);
+					if (svalue != null)
+						return svalue.Substring(0, Math.Min(this.size, svalue.Length));
+					else
+						return this.value;
+				}
+				
+				return this.value;
+			}
 		}
 
         #endregion
