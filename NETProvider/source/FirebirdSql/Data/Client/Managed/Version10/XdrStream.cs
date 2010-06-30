@@ -673,8 +673,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
 									svalue.Length > param.CharCount)
 								{
-									//throw new IscException(IscCodes.isc_arith_except);
-									svalue = svalue.Substring(0, param.CharCount);
+									throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 								}
 
 								this.WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
@@ -693,8 +692,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
 									svalue.Length > param.CharCount)
 								{
-									//throw new IscException(IscCodes.isc_arith_except);
-									svalue = svalue.Substring(0, param.CharCount);
+									throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 								}
 
 								byte[] data = param.Charset.GetBytes(svalue);
