@@ -430,7 +430,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override bool DbDatabaseExists(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
 		{
-			throw new NotSupportedException();
+			throw new NotSupportedException("Firebird doesn't allow to check database existence.");
 		}
 
 		protected override void DbDeleteDatabase(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
