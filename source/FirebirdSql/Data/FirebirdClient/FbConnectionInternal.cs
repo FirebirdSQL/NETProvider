@@ -536,7 +536,8 @@ namespace FirebirdSql.Data.FirebirdClient
                 dpb.Append(IscCodes.isc_dpb_password, options.Password);
             }
 
-            dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
+			dpb.Append(IscCodes.isc_dpb_process_id, GetProcessID());
+			dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
 
             return dpb;
         }
@@ -595,6 +596,25 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
+		private int GetProcessID()
+		{ 
+#if (NET_CF)
+			return -1;
+#else
+			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+			if (assembly != null)
+			{
+				if (assembly.IsFullyTrusted)
+					return Process.GetCurrentProcess().Id;
+				else
+					return -1;
+			}
+			else // if we're not loaded from managed code
+			{
+				return Process.GetCurrentProcess().Id;
+			}
+#endif
+		}
         #endregion
 
 		#region Cancelation
