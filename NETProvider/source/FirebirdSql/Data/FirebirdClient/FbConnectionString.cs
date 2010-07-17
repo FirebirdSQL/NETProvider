@@ -81,6 +81,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			{"enlist", "enlist"},
 			{"clientlibrary", "client library"},
 			{"client library", "client library"},
+			{"cache pages", "cache pages"},
+			{"cachepages", "cache pages"},
+			{"pagebuffers", "cache pages"},
+			{"page buffers", "cache pages"},
 		};
 
 		#endregion
@@ -197,6 +201,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		public string ClientLibrary
 		{
 			get { return this.GetString("client library"); }
+		}
+
+		public int DbCachePages
+		{
+			get { return this.GetInt32("cache pages"); }
 		}
 
 		#endregion
@@ -380,6 +389,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.options.Add("context connection", false);
 			this.options.Add("enlist", false);
 			this.options.Add("client library", "fbembed");
+			this.options.Add("cache pages", 0);
 		}
 
 		private void ParseConnectionInfo(string connectInfo)
