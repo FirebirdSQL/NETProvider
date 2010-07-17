@@ -14,6 +14,9 @@
  * 
  *  Copyright (c) 2004, 2005 Carlos Guzman Alvarez
  *  All Rights Reserved.
+ *  
+ *  Contributors:
+ *		Jiri Cincura (jiri@cincura.net)
  */
 
 #if (!NET_CF)
@@ -153,9 +156,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
         public string ClientLibrary
         {
-            get { return this.GetString("client library"); }
+            get { return this.GetString("Client Library"); }
             set { this.SetValue("Client Library", value); }
         }
+
+		public int DbCachePages
+		{
+			get { return this.GetInt32("Cache Pages"); }
+			set { this.SetValue("Cache Pages", value); }
+		}
 
         #endregion
 
