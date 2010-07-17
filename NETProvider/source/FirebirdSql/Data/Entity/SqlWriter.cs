@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Entity
         /// <param name="value"></param>
         public override void Write(string value)
         {
-            if (value == "\r\n")
+            if (value == Environment.NewLine)
             {
                 base.WriteLine();
                 this.atBeginningOfLine = true;

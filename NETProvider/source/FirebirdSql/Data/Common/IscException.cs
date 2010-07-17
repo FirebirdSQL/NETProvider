@@ -260,11 +260,7 @@ namespace FirebirdSql.Data.Common
 							// The next error contains the PSQL Stack Trace
 							if (builder.Length > 0)
 							{
-#if (NET_CF)
-								builder.Append("\r\n");
-#else
 								builder.Append(Environment.NewLine);
-#endif
 							}
 							builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
 						}
@@ -272,11 +268,7 @@ namespace FirebirdSql.Data.Common
 						{
 							if (builder.Length > 0)
 							{
-#if (NET_CF)
-								builder.Append("\r\n");
-#else
 								builder.Append(Environment.NewLine);
-#endif
 							}
 
 							builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
