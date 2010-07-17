@@ -1219,7 +1219,7 @@
     <ColumnSize>4</ColumnSize>
     <CreateFormat />
     <CreateParameters />
-    <DataType>System.DateTime</DataType>
+    <DataType>System.TimeSpan</DataType>
     <IsAutoIncrementable>false</IsAutoIncrementable>
     <IsBestMatch>false</IsBestMatch>
     <IsCaseSensitive>false</IsCaseSensitive>
