@@ -17,6 +17,7 @@
  * 
  * Contributors:
  *   Jiri Cincura (jiri@cincura.net)
+ *   Olivier Metod
  */
 
 #if (!NET_CF)
@@ -265,6 +266,7 @@ namespace FirebirdSql.Data.Isql
                             this.OnCommandExecuted(sqlStatement, null, -1);
                             break;
 
+						case SqlStatementType.CommentOn:
                         case SqlStatementType.CreateDomain:
                         case SqlStatementType.CreateException:
                         case SqlStatementType.CreateGenerator:
@@ -326,6 +328,7 @@ namespace FirebirdSql.Data.Isql
                         case SqlStatementType.DropGenerator:
                         case SqlStatementType.DropIndex:
                         case SqlStatementType.DropProcedure:
+						case SqlStatementType.DropSequence:
                         case SqlStatementType.DropRole:
                         case SqlStatementType.DropShadow:
                         case SqlStatementType.DropTable:
@@ -409,6 +412,7 @@ namespace FirebirdSql.Data.Isql
                             break;
 
                         case SqlStatementType.SetGenerator:
+						case SqlStatementType.AlterSequence:
                             // raise the event
                             this.OnCommandExecuting(this.sqlCommand);
 
@@ -781,6 +785,10 @@ namespace FirebirdSql.Data.Isql
                     {
                         return SqlStatementType.AlterProcedure;
                     }
+                    if (StringParser.StartsWith(sqlStatement, "ALTER SEQUENCE", true))
+                    {
+                        return SqlStatementType.AlterSequence;
+                    }
                     if (StringParser.StartsWith(sqlStatement, "ALTER TABLE", true))
                     {
                         return SqlStatementType.AlterTable;
@@ -802,6 +810,10 @@ namespace FirebirdSql.Data.Isql
                             throw new Exception("The type of the SQL statement could not be determinated.");
 
                         case 'O':
+							if (StringParser.StartsWith(sqlStatement, "COMMENT ON", true))
+                            {
+                                return SqlStatementType.CommentOn;
+                            }
                             if (StringParser.StartsWith(sqlStatement, "COMMIT", true))
                             {
                                 return SqlStatementType.Commit;
@@ -848,7 +860,7 @@ namespace FirebirdSql.Data.Isql
                             }
                             if (StringParser.StartsWith(sqlStatement, "CREATE SEQUENCE", true))
                             {
-                                return SqlStatementType.CreateSequence;
+								return SqlStatementType.CreateSequence;
                             }
                             if (StringParser.StartsWith(sqlStatement, "CREATE SHADOW", true))
                             {
@@ -956,6 +968,10 @@ namespace FirebirdSql.Data.Isql
                             {
                                 return SqlStatementType.DropProcedure;
                             }
+							if (StringParser.StartsWith(sqlStatement, "DROP SEQUENCE", true))
+							{
+								return SqlStatementType.DropSequence;
+							}
                             if (StringParser.StartsWith(sqlStatement, "DROP ROLE", true))
                             {
                                 return SqlStatementType.DropRole;
