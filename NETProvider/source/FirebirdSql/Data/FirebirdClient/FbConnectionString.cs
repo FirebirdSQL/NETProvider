@@ -324,7 +324,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     (this.UserID == null || this.UserID.Length == 0) ||
                     (this.Password == null || this.Password.Length == 0) ||
 #endif
-((this.Database == null || this.Database.Length == 0) && !this.isServiceConnectionString) ||
+					((this.Database == null || this.Database.Length == 0) && !this.isServiceConnectionString) ||
 					((this.DataSource == null || this.DataSource.Length == 0) && this.ServerType != FbServerType.Embedded) ||
 					(this.Charset == null || this.Charset.Length == 0) ||
 					(this.Port == 0) ||
@@ -347,6 +347,10 @@ namespace FirebirdSql.Data.FirebirdClient
 #else
                         throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, "\r\n"));
 #endif
+					}
+					if (this.DbCachePages < 0)
+					{
+						throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", this.DbCachePages, Environment.NewLine));
 					}
 
 					this.CheckIsolationLevel();
