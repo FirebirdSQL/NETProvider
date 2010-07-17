@@ -14,6 +14,10 @@
  * 
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
  *  All Rights Reserved.
+ *  
+ *	Contributors:
+ *		Jiri Cincura (jiri@cincura.net)
+ *		Olivier Metod
  */
 
 #if (!NET_CF)
@@ -46,12 +50,17 @@ namespace FirebirdSql.Data.Isql
         /// <summary>
         /// Represents the SQL statement: <b>ALTER INDEX</b>
         /// </summary>
-        AlterIndex,
+		AlterIndex,
 
-        /// <summary>
-        /// Represents the SQL statement: <b>ALTER PROCEDURE</b>
-        /// </summary>
-        AlterProcedure,
+		/// <summary>
+		/// Represents the SQL statement: <b>ALTER PROCEDURE</b>
+		/// </summary>
+		AlterProcedure,
+
+		/// <summary>
+		/// Represents the SQL statement: <b>ALTER SEQUENCE</b>
+		/// </summary>
+		AlterSequence,
 
         /// <summary>
         /// Represents the SQL statement: <b>ALTER TABLE</b>
@@ -67,6 +76,11 @@ namespace FirebirdSql.Data.Isql
         /// Represents the SQL statement: <b>CLOSE</b>
         /// </summary>
         Close,
+
+		/// <summary>
+        /// Represents the SQL statement: <b>COMMENT ON</b>
+        /// </summary>
+        CommentOn,
 
         /// <summary>
         /// Represents the SQL statement: <b>COMMIT</b>
@@ -211,12 +225,17 @@ namespace FirebirdSql.Data.Isql
         /// <summary>
         /// Represents the SQL statement: <b>DROP INDEX</b>
         /// </summary>
-        DropIndex,
+		DropIndex,
 
-        /// <summary>
-        /// Represents the SQL statement: <b>DROP PROCEDURE</b>
-        /// </summary>
-        DropProcedure,
+		/// <summary>
+		/// Represents the SQL statement: <b>DROP PROCEDURE</b>
+		/// </summary>
+		DropProcedure,
+
+		/// <summary>
+		/// Represents the SQL statement: <b>DROP SEQUENCE</b>
+		/// </summary>
+		DropSequence,
 
         /// <summary>
         /// Represents the SQL statement: <b>DROP ROLE</b>
