@@ -191,20 +191,24 @@ namespace FirebirdSql.Data.FirebirdClient
 
             if (string.IsNullOrEmpty(fbConnection.ConnectionString))
             {
-                throw new ArgumentException("Could not determine storage version; a valid storage connection or a version hint is required.");
+                throw new ArgumentException("Could not determine storage version; a valid storage connection is required.");
             }
 
             bool closeConnection = false;
-            try
-            {
-                if (fbConnection.State != ConnectionState.Open)
-                {
-                    fbConnection.Open();
-                    closeConnection = true;
-                }
+			try
+			{
+				if (fbConnection.State != ConnectionState.Open)
+				{
+					fbConnection.Open();
+					closeConnection = true;
+				}
 
-                return fbConnection.ServerVersionNumber.ToString(2);
-            }
+				return fbConnection.ServerVersionNumber.ToString(2);
+			}
+			catch (FbException ex)
+			{
+				throw new InvalidOperationException("Could not retrieve storage version.", ex);
+			}
             finally
             {
                 if (closeConnection)
