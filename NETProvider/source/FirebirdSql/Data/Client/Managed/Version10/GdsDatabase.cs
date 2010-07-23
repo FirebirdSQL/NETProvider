@@ -594,7 +594,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				IscCodes.isc_info_end
 			};
 
-            return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_128)[0].ToString();
+            return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256)[0].ToString();
         }
 
         public virtual ArrayList GetDatabaseInfo(byte[] items)
