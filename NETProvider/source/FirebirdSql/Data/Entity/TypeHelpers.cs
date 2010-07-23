@@ -16,6 +16,7 @@
  *  All Rights Reserved.
  */
 
+#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,3 +76,4 @@ namespace FirebirdSql.Data.Entity
 		}
 	}
 }
+#endif
