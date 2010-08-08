@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -36,5 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
         }
 
         public FbTransactionBehavior TransactionBehavior { get; set; }
+
+		public IDictionary<string, FbTransactionBehavior> LockTables { get; set; }
     }
 }

@@ -451,18 +451,6 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 tpb.Append(IscCodes.isc_tpb_concurrency);
             }
-            if ((options.TransactionBehavior & FbTransactionBehavior.Shared) == FbTransactionBehavior.Shared)
-            {
-                tpb.Append(IscCodes.isc_tpb_shared);
-            }
-            if ((options.TransactionBehavior & FbTransactionBehavior.Protected) == FbTransactionBehavior.Protected)
-            {
-                tpb.Append(IscCodes.isc_tpb_protected);
-            }
-            if ((options.TransactionBehavior & FbTransactionBehavior.Exclusive) == FbTransactionBehavior.Exclusive)
-            {
-                tpb.Append(IscCodes.isc_tpb_exclusive);
-            }
             if ((options.TransactionBehavior & FbTransactionBehavior.Wait) == FbTransactionBehavior.Wait)
             {
                 tpb.Append(IscCodes.isc_tpb_wait);
@@ -483,14 +471,39 @@ namespace FirebirdSql.Data.FirebirdClient
             {
                 tpb.Append(IscCodes.isc_tpb_write);
             }
-            if ((options.TransactionBehavior & FbTransactionBehavior.LockRead) == FbTransactionBehavior.LockRead)
-            {
-                tpb.Append(IscCodes.isc_tpb_lock_read);
-            }
-            if ((options.TransactionBehavior & FbTransactionBehavior.LockWrite) == FbTransactionBehavior.LockWrite)
-            {
-                tpb.Append(IscCodes.isc_tpb_lock_write);
-            }
+			foreach (var table in options.LockTables)
+			{
+				int lockType;
+				if ((table.Value & FbTransactionBehavior.LockRead) == FbTransactionBehavior.LockRead)
+				{
+					lockType = IscCodes.isc_tpb_lock_read;
+				}
+				else if ((table.Value & FbTransactionBehavior.LockWrite) == FbTransactionBehavior.LockWrite)
+				{
+					lockType = IscCodes.isc_tpb_lock_write;
+				}
+				else
+				{
+					throw new ArgumentException("Must specify either LockRead or LockWrite.");
+				}				
+				tpb.Append(lockType, table.Key);
+
+				int? lockBehavior = null;
+				if ((table.Value & FbTransactionBehavior.Exclusive) == FbTransactionBehavior.Exclusive)
+				{
+					lockBehavior = IscCodes.isc_tpb_exclusive;
+				}
+				else if ((table.Value & FbTransactionBehavior.Protected) == FbTransactionBehavior.Protected)
+				{
+					lockBehavior = IscCodes.isc_tpb_protected;
+				}
+				else if ((table.Value & FbTransactionBehavior.Shared) == FbTransactionBehavior.Shared)
+				{
+					lockBehavior = IscCodes.isc_tpb_shared;
+				}
+				if (lockBehavior.HasValue)
+					tpb.Append((int)lockBehavior);
+			}
             if ((options.TransactionBehavior & FbTransactionBehavior.ReadCommitted) == FbTransactionBehavior.ReadCommitted)
             {
                 tpb.Append(IscCodes.isc_tpb_read_committed);
