@@ -20,6 +20,7 @@
  */
 
 using System;
+using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
@@ -41,6 +42,18 @@ namespace FirebirdSql.Data.Common
             this.WriteByte(2);
             this.Write(value);
         }
+
+		public void Append(int type, string content)
+		{
+			this.Append(type, Encoding.Default.GetBytes(content));
+		}
+
+		public void Append(int type, byte[] buffer)
+		{
+			this.WriteByte(type);
+			this.WriteByte(buffer.Length);
+			this.Write(buffer);
+		}
 
         #endregion
     }
