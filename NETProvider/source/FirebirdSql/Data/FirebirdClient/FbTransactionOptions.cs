@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2010 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -21,23 +21,37 @@ using System.Collections.Generic;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    public struct FbTransactionOptions
-    {
-        private short? _waitTimeout;
-        public short? WaitTimeout
-        {
-            get { return _waitTimeout; }
-            set
-            {
-                if (value < 1)
-                    throw new ArgumentException("The property value assigned is less than 1.");
-                
-                _waitTimeout = value;
-            }
-        }
+	public struct FbTransactionOptions
+	{
+		private short? _waitTimeout;
+		public short? WaitTimeout
+		{
+			get { return _waitTimeout; }
+			set
+			{
+				if (value < 1)
+					throw new ArgumentException("The property value assigned is less than 1.");
 
-        public FbTransactionBehavior TransactionBehavior { get; set; }
+				_waitTimeout = value;
+			}
+		}
 
-		public IDictionary<string, FbTransactionBehavior> LockTables { get; set; }
-    }
+		public FbTransactionBehavior TransactionBehavior { get; set; }
+
+		private IDictionary<string, FbTransactionBehavior> _lockTables;
+		public IDictionary<string, FbTransactionBehavior> LockTables
+		{
+			get
+			{
+				return (_lockTables ?? (_lockTables = new Dictionary<string, FbTransactionBehavior>()));
+			}
+			set
+			{
+				if (value == null)
+					throw new ArgumentNullException("LockTables cannot be null.");
+
+				_lockTables = value;
+			}
+		}
+	}
 }
