@@ -808,7 +808,7 @@ namespace FirebirdSql.Data.Entity
                     case PrimitiveTypeKind.Double:
                         result.Append("CAST(");
                         result.Append(((Double)e.Value).ToString(CultureInfo.InvariantCulture));
-                        result.Append(" AS DOUBLE)");
+                        result.Append(" AS DOUBLE PRECISION)");
                         break;
 
                     case PrimitiveTypeKind.Single:
@@ -3318,7 +3318,7 @@ namespace FirebirdSql.Data.Entity
                     break;
 
                 case PrimitiveTypeKind.Double:
-                    typeName = "DOUBLE";
+                    typeName = "DOUBLE PRECISION";
                     break;
 
                 case PrimitiveTypeKind.Single:
