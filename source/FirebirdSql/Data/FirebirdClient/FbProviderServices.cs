@@ -321,6 +321,9 @@ namespace FirebirdSql.Data.FirebirdClient
                 case PrimitiveTypeKind.Time:
                     return FbDbType.Time;
 
+				case PrimitiveTypeKind.Guid:
+					return FbDbType.Guid;
+
                 default:
                     Debug.Fail("unknown PrimitiveTypeKind " + primitiveTypeKind);
                     throw new InvalidOperationException("unknown PrimitiveTypeKind " + primitiveTypeKind);

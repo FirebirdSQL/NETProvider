@@ -75,7 +75,8 @@ PROCESS
         <FixedLength DefaultValue="false" Constant="true" />
       </FacetDescriptions>
     </Type>
-
+		<Type Name="guid" PrimitiveTypeKind="Guid">
+		</Type>
   </Types>
   <Functions>
     <!-- BEGIN SYSTEM FUNCTIONS ##################################### -->

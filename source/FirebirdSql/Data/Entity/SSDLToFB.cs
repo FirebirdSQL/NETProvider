@@ -15,6 +15,7 @@ namespace FirebirdSql.Data.Entity
     using System.Runtime.Remoting.Messaging;
     using System.IO;
     using System.Xml;
+    using System.Collections.Generic;
     using System;
     
     
@@ -83,14 +84,14 @@ namespace FirebirdSql.Data.Entity
             this.GenerationEnvironment = null;
             this.Write("-- Created: ");
             
-            #line 12 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 13 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(DateTime.Now.ToString("R")));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 13 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 14 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
  
 	if (StoreItems == null)
 	{
@@ -100,7 +101,7 @@ namespace FirebirdSql.Data.Entity
             #line hidden
             this.Write("-- No input.\r\n");
             
-            #line 18 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 19 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 	}
 	else
@@ -111,24 +112,27 @@ namespace FirebirdSql.Data.Entity
             #line hidden
             this.Write("-- Tables\r\n");
             
-            #line 24 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 25 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
+
+		IDictionary<string, string> additionalColumnComments = new Dictionary<string, string>();
 		foreach (var entitySet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<EntitySet>())
 		{
+			additionalColumnComments.Clear();
 
             
             #line default
             #line hidden
             this.Write("RECREATE TABLE ");
             
-            #line 28 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 32 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Quote(entitySet.Name)));
             
             #line default
             #line hidden
             this.Write(" (\r\n");
             
-            #line 29 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 33 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 			PushIndent("\t");
 			foreach (EdmProperty property in entitySet.ElementType.Properties)
@@ -138,14 +142,14 @@ namespace FirebirdSql.Data.Entity
             #line default
             #line hidden
             
-            #line 34 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateColumn(property)));
+            #line 38 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateColumn(property, ref additionalColumnComments)));
             
             #line default
             #line hidden
             this.Write(",\r\n");
             
-            #line 35 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 39 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 			}
 			PopIndent();
@@ -155,22 +159,58 @@ namespace FirebirdSql.Data.Entity
             #line hidden
             this.Write("CONSTRAINT ");
             
-            #line 39 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 43 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Quote("PK_" + entitySet.Name)));
             
             #line default
             #line hidden
             this.Write(" PRIMARY KEY (");
             
-            #line 39 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 43 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => Quote(pk.Name)).ToArray())));
             
             #line default
             #line hidden
-            this.Write(")\r\n);\r\n\r\n");
+            this.Write(")\r\n);\r\n");
             
-            #line 42 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 45 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
+			foreach(string identity in entitySet.ElementType.KeyMembers.Where(pk => pk.TypeUsage.Facets.Contains("StoreGeneratedPattern") && (StoreGeneratedPattern)pk.TypeUsage.Facets["StoreGeneratedPattern"].Value == StoreGeneratedPattern.Identity).Select(i => i.Name))
+			{
+				additionalColumnComments.Add(identity, "#PK_GEN#");
+			}
+			foreach (KeyValuePair<string, string> comment in additionalColumnComments)
+			{
+
+            
+            #line default
+            #line hidden
+            this.Write("COMMENT ON COLUMN ");
+            
+            #line 53 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(entitySet.Name)));
+            
+            #line default
+            #line hidden
+            this.Write(".");
+            
+            #line 53 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(comment.Key)));
+            
+            #line default
+            #line hidden
+            this.Write(" IS \'");
+            
+            #line 53 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(comment.Value));
+            
+            #line default
+            #line hidden
+            this.Write("\';\r\n");
+            
+            #line 54 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+
+			}
 		}
 
             
@@ -178,7 +218,7 @@ namespace FirebirdSql.Data.Entity
             #line hidden
             this.Write("-- Foreign Key Constraints\r\n");
             
-            #line 46 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 59 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 		foreach (var associationSet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<AssociationSet>())
 		{
@@ -192,49 +232,49 @@ namespace FirebirdSql.Data.Entity
             #line hidden
             this.Write("ALTER TABLE ");
             
-            #line 54 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 67 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Quote(end2.EntitySet.Name)));
             
             #line default
             #line hidden
             this.Write(" ADD CONSTRAINT ");
             
-            #line 54 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 67 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Quote("FK_" + associationSet.Name)));
             
             #line default
             #line hidden
             this.Write(" FOREIGN KEY (");
             
-            #line 54 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 67 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", constraint.ToProperties.Select(fk => Quote(fk.Name)).ToArray())));
             
             #line default
             #line hidden
             this.Write(")\r\nREFERENCES ");
             
-            #line 55 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 68 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Quote(end.EntitySet.Name)));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 55 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 68 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", constraint.FromProperties.Select(pk => Quote(pk.Name)).ToArray())));
             
             #line default
             #line hidden
             this.Write(")\r\nON DELETE ");
             
-            #line 56 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 69 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture((end.CorrespondingAssociationEndMember.DeleteBehavior == OperationAction.Cascade ? "CASCADE" : "NO ACTION")));
             
             #line default
             #line hidden
             this.Write("\r\n;\r\n\r\n");
             
-            #line 59 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 72 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 		}
 
@@ -242,7 +282,7 @@ namespace FirebirdSql.Data.Entity
             #line default
             #line hidden
             
-            #line 62 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 75 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 	}
 
@@ -253,7 +293,7 @@ namespace FirebirdSql.Data.Entity
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 66 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+        #line 79 "C:\Users\Jiri\Desktop\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 public StoreItemCollection StoreItemCollection { private get; set; }
 
@@ -290,7 +330,7 @@ private string Quote(string s)
 	return "\"" + s + "\"";
 }
 
-private string GenerateColumn(EdmProperty property)
+private string GenerateColumn(EdmProperty property, ref IDictionary<string, string> columnComments)
 {
 	StringBuilder result = new StringBuilder();
 	result.Append(Quote(property.Name));
@@ -315,6 +355,11 @@ private string GenerateColumn(EdmProperty property)
 			break;
 		case "smallint_bool":
 			result.AppendFormat("SMALLINT CHECK ({0} IN (1,0))", Quote(property.Name));
+			columnComments.Add(property.Name, "#BOOL#");
+			break;
+		case "guid":
+			result.Append("CHAR(16) CHARACTER SET OCTETS");
+			columnComments.Add(property.Name, "#GUID#");
 			break;
 		default:
 			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());

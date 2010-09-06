@@ -160,10 +160,9 @@ namespace FirebirdSql.Data.FirebirdClient
                 case "int":
                 case "bigint":
                 case "smallint_bool":
-                    return TypeUsage.CreateDefaultTypeUsage(edmPrimitiveType);
-
                 case "float":
                 case "double":
+				case "guid":
                     return TypeUsage.CreateDefaultTypeUsage(edmPrimitiveType);
 
                 case "decimal":
@@ -214,7 +213,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     break;
 
                 default:
-                    throw new NotSupportedException(String.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
+                    throw new NotSupportedException(string.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
             }
 
             Debug.Assert(newPrimitiveTypeKind == PrimitiveTypeKind.String || newPrimitiveTypeKind == PrimitiveTypeKind.Binary, "at this point only string and binary types should be present");
@@ -403,6 +402,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
                 case PrimitiveTypeKind.Time:
                     return TypeUsage.CreateDefaultTypeUsage(StoreTypeNameToStorePrimitiveType["time"]);
+
+				case PrimitiveTypeKind.Guid:
+					return TypeUsage.CreateDefaultTypeUsage(StoreTypeNameToStorePrimitiveType["guid"]);
 
                 default:
                     throw new NotSupportedException(string.Format("There is no store type corresponding to the EDM type '{0}' of primitive type '{1}'.", edmType, primitiveType.PrimitiveTypeKind));

@@ -9,6 +9,7 @@
 <#@ import namespace="System.Runtime.Remoting.Messaging" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Collections.Generic" #>
 -- Created: <#=DateTime.Now.ToString("R")#>
 <# 
 	if (StoreItems == null)
@@ -22,8 +23,11 @@
  #>
 -- Tables
 <#
+
+		IDictionary<string, string> additionalColumnComments = new Dictionary<string, string>();
 		foreach (var entitySet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<EntitySet>())
 		{
+			additionalColumnComments.Clear();
 #>
 RECREATE TABLE <#=Quote(entitySet.Name)#> (
 <#
@@ -31,15 +35,24 @@ RECREATE TABLE <#=Quote(entitySet.Name)#> (
 			foreach (EdmProperty property in entitySet.ElementType.Properties)
 			{
 #>
-<#=GenerateColumn(property)#>,
+<#=GenerateColumn(property, ref additionalColumnComments)#>,
 <#
 			}
 			PopIndent();
 #>
 CONSTRAINT <#=Quote("PK_" + entitySet.Name)#> PRIMARY KEY (<#=string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => Quote(pk.Name)).ToArray())#>)
 );
-
 <#
+			foreach(string identity in entitySet.ElementType.KeyMembers.Where(pk => pk.TypeUsage.Facets.Contains("StoreGeneratedPattern") && (StoreGeneratedPattern)pk.TypeUsage.Facets["StoreGeneratedPattern"].Value == StoreGeneratedPattern.Identity).Select(i => i.Name))
+			{
+				additionalColumnComments.Add(identity, "#PK_GEN#");
+			}
+			foreach (KeyValuePair<string, string> comment in additionalColumnComments)
+			{
+#>
+COMMENT ON COLUMN <#=Quote(entitySet.Name)#>.<#=Quote(comment.Key)#> IS '<#=comment.Value#>';
+<#
+			}
 		}
 #>
 -- Foreign Key Constraints
@@ -99,7 +112,7 @@ private string Quote(string s)
 	return "\"" + s + "\"";
 }
 
-private string GenerateColumn(EdmProperty property)
+private string GenerateColumn(EdmProperty property, ref IDictionary<string, string> columnComments)
 {
 	StringBuilder result = new StringBuilder();
 	result.Append(Quote(property.Name));
@@ -124,6 +137,11 @@ private string GenerateColumn(EdmProperty property)
 			break;
 		case "smallint_bool":
 			result.AppendFormat("SMALLINT CHECK ({0} IN (1,0))", Quote(property.Name));
+			columnComments.Add(property.Name, "#BOOL#");
+			break;
+		case "guid":
+			result.Append("CHAR(16) CHARACTER SET OCTETS");
+			columnComments.Add(property.Name, "#GUID#");
 			break;
 		default:
 			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
