@@ -795,7 +795,7 @@ namespace FirebirdSql.Data.Entity
                         break;
 
                     case PrimitiveTypeKind.Int32:
-                        // default sql server type for integral values.
+                        // default for integral values.
                         result.Append(e.Value.ToString());
                         break;
 
@@ -852,11 +852,17 @@ namespace FirebirdSql.Data.Entity
                         break;
 
                     case PrimitiveTypeKind.DateTime:
-                        result.Append(EscapeSingleQuote(((System.DateTime)e.Value).ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture), false /* isUnicode */));
+                        result.Append(((DateTime)e.Value).ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture));
                         break;
                     case PrimitiveTypeKind.Time:
-                        result.Append(EscapeSingleQuote(((System.DateTime)e.Value).ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture), false /* isUnicode */));
+						result.Append(((DateTime)e.Value).ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture));
                         break;
+
+					case PrimitiveTypeKind.Guid:
+						result.Append("CHAR_TO_UUID('");
+						result.Append(((Guid)e.Value).ToString());
+						result.Append("')");
+						break;
 
                     default:
                         // all known scalar types should been handled already.
