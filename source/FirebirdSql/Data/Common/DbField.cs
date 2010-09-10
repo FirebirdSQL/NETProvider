@@ -507,7 +507,7 @@ namespace FirebirdSql.Data.Common
         {
             // Special case for Guid handling
             if (this.SqlType == IscCodes.SQL_TEXT && this.Length == 16 &&
-                (this.Charset != null && this.Charset.Name == "OCTETS"))
+                (this.Charset != null && this.Charset.Name.Equals("OCTETS", StringComparison.InvariantCultureIgnoreCase)))
             {
                 return DbDataType.Guid;
             }
