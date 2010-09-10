@@ -56,13 +56,12 @@ namespace FirebirdSql.Data.Entity
 			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
 			bool first = true;
 
-			// update [schemaName].[tableName]
-			commandText.Append("update ");
+			commandText.Append("UPDATE ");
 			tree.Target.Expression.Accept(translator);
 			commandText.AppendLine();
 
 			// set c1 = ..., c2 = ..., ...            
-			commandText.Append("set ");
+			commandText.Append("SET ");
 
 			foreach (DbSetClause setClause in tree.SetClauses)
 			{
@@ -97,7 +96,7 @@ namespace FirebirdSql.Data.Entity
 			commandText.AppendLine();
 
 			// where c1 = ..., c2 = ...
-			commandText.Append("where ");
+			commandText.Append("WHERE ");
 			tree.Predicate.Accept(translator);
 			commandText.AppendLine();
 
@@ -113,13 +112,12 @@ namespace FirebirdSql.Data.Entity
 			StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
 			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, false);
 
-			// delete [schemaName].[tableName]
-			commandText.Append("delete from ");
+			commandText.Append("DELETE FROM ");
 			tree.Target.Expression.Accept(translator);
 			commandText.AppendLine();
 
 			// where c1 = ... AND c2 = ...
-			commandText.Append("where ");
+			commandText.Append("WHERE ");
 			tree.Predicate.Accept(translator);
 
 			parameters = translator.Parameters;
@@ -132,8 +130,7 @@ namespace FirebirdSql.Data.Entity
 			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning);
 			bool first = true;
 
-			// insert [schemaName].[tableName]
-			commandText.Append("insert into ");
+			commandText.Append("INSERT INTO ");
 			tree.Target.Expression.Accept(translator);
 
 			// (c1, c2, c3, ...)
@@ -155,7 +152,7 @@ namespace FirebirdSql.Data.Entity
 
 			// values c1, c2, ...
 			first = true;
-			commandText.Append("values (");
+			commandText.Append("VALUES (");
 			foreach (DbSetClause setClause in tree.SetClauses)
 			{
 				if (first)
@@ -249,7 +246,7 @@ namespace FirebirdSql.Data.Entity
 			StringBuilder startBlock = new StringBuilder();
 			string separator = string.Empty;
 
-			startBlock.AppendLine("execute block (");
+			startBlock.AppendLine("EXECUTE BLOCK (");
 			separator = string.Empty;
 			foreach (FbParameter param in translator.Parameters)
 			{
@@ -259,7 +256,7 @@ namespace FirebirdSql.Data.Entity
 				EdmMember member = translator.MemberValues.First(m => m.Value.Contains(param)).Key;
 				startBlock.Append(SqlGenerator.GetSqlPrimitiveType(member.TypeUsage));
 				if (param.FbDbType == FbDbType.VarChar || param.FbDbType == FbDbType.Char)
-					startBlock.Append(" character set utf8");
+					startBlock.Append(" CHARACTER SET UTF8");
 				startBlock.Append(" = ");
 				startBlock.Append(param.ParameterName);
 
@@ -267,7 +264,7 @@ namespace FirebirdSql.Data.Entity
 			}
 			startBlock.AppendLine(") ");
 
-			startBlock.AppendLine("returns (");
+			startBlock.AppendLine("RETURNS (");
 			separator = string.Empty;
 			foreach (EdmMember m in columnsToFetch)
 			{
@@ -279,14 +276,14 @@ namespace FirebirdSql.Data.Entity
 				separator = ", ";
 			}
 			startBlock.AppendLine(")");
-			startBlock.AppendLine("as begin");
+			startBlock.AppendLine("AS BEGIN");
 
 			string newCommand = ChangeParamsToPSQLParams(commandText.ToString(), translator.Parameters.Select(p => p.ParameterName).ToArray());
 			commandText.Remove(0, commandText.Length);
 			commandText.Insert(0, newCommand);
 			commandText.Insert(0, startBlock.ToString());
 
-			commandText.Append("returning ");
+			commandText.Append("RETURNING ");
 			separator = string.Empty;
 			foreach (EdmMember m in columnsToFetch)
 			{
@@ -295,7 +292,7 @@ namespace FirebirdSql.Data.Entity
 
 				separator = ", ";
 			}
-			commandText.Append(" into ");
+			commandText.Append(" INTO ");
 			separator = string.Empty;
 			foreach (EdmMember m in columnsToFetch)
 			{
@@ -306,8 +303,8 @@ namespace FirebirdSql.Data.Entity
 			}
 
 			commandText.AppendLine(";");
-			commandText.AppendLine("suspend;");
-			commandText.AppendLine("end");
+			commandText.AppendLine("SUSPEND;");
+			commandText.AppendLine("END");
 		}
 
 		private static string ChangeParamsToPSQLParams(string commandText, string[] parametersUsed)
