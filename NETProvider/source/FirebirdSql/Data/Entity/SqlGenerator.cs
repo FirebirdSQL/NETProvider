@@ -3387,6 +3387,10 @@ namespace FirebirdSql.Data.Entity
                     typeName = "TIME";
                     break;
 
+				case PrimitiveTypeKind.Guid:
+					typeName = "CHAR(16) CHARACTER SET OCTETS";
+					break;
+
                 default:
                     throw new NotSupportedException("Unsupported EdmType: " + primitiveType.PrimitiveTypeKind);
             }
