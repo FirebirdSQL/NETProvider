@@ -71,6 +71,9 @@ namespace FirebirdSql.Data.FirebirdClient
             get { return this.size; }
             set
             {
+				if (value < 0)
+					throw new ArgumentOutOfRangeException("Size");
+
                 this.size = value;
 				this.IsSizeSet = true;
 
