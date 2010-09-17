@@ -68,14 +68,16 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
         public override int Size
         {
-            get { return this.size; }
+            get 
+			{
+				return (this.size != 0 ? this.size : this.GetSizeOfValue(this.value) ?? 0);
+			}
             set
             {
 				if (value < 0)
 					throw new ArgumentOutOfRangeException("Size");
 
                 this.size = value;
-				this.IsSizeSet = true;
 
                 // Hack for Clob parameters
                 if (value == 2147483647 &&
@@ -249,21 +251,22 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal bool IsTypeSet { get; private set; }
 
-		internal bool IsSizeSet { get; private set; }
-
 		internal object InternalValue
 		{
 			get
 			{
-				if (this.IsSizeSet)
+				string svalue = (this.value as string);
+				if (svalue != null)
 				{
-					string svalue = (this.value as string);
-					if (svalue != null)
-						return svalue.Substring(0, Math.Min(this.size, svalue.Length));
-					else
-						return this.value;
+					return svalue.Substring(0, this.Size);
 				}
-				
+				byte[] bvalue = (this.value as byte[]);
+				if (bvalue !=null)
+				{
+					byte[] result = new byte[this.Size];
+					Array.Copy(bvalue, result, result.Length);
+					return result;
+				}
 				return this.value;
 			}
 		}
@@ -453,6 +456,21 @@ namespace FirebirdSql.Data.FirebirdClient
                     break;
             }
         }
+
+		private int? GetSizeOfValue(object value)
+		{
+			string svalue = (value as string);
+			if (svalue != null)
+			{
+				return svalue.Length;
+			}
+			byte[] bvalue = (value as byte[]);
+			if (bvalue != null)
+			{
+				return bvalue.Length;
+			}
+			return null;
+		}
 
         #endregion
     }
