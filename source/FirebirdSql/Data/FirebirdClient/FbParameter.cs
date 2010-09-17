@@ -261,7 +261,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					return svalue.Substring(0, this.Size);
 				}
 				byte[] bvalue = (this.value as byte[]);
-				if (bvalue !=null)
+				if (bvalue != null)
 				{
 					byte[] result = new byte[this.Size];
 					Array.Copy(bvalue, result, result.Length);
@@ -304,7 +304,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             this.parameterName = parameterName;
             this.FbDbType = fbType;
-            this.size = size;
+            this.Size = size;
         }
 
         public FbParameter(string parameterName, FbDbType fbType, int size, string sourceColumn)
@@ -312,7 +312,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             this.parameterName = parameterName;
             this.FbDbType = fbType;
-            this.size = size;
+            this.Size = size;
             this.sourceColumn = sourceColumn;
         }
 
@@ -333,14 +333,14 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             this.parameterName = parameterName;
             this.FbDbType = dbType;
-            this.size = size;
+            this.Size = size;
             this.direction = direction;
             this.isNullable = isNullable;
             this.precision = precision;
             this.scale = scale;
             this.sourceColumn = sourceColumn;
             this.sourceVersion = sourceVersion;
-            this.value = value;
+            this.Value = value;
             this.charset = FbCharset.Default;
         }
 
