@@ -258,12 +258,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				string svalue = (this.value as string);
 				if (svalue != null)
 				{
-					return svalue.Substring(0, this.Size);
+					return svalue.Substring(0, Math.Min(this.Size, svalue.Length));
 				}
 				byte[] bvalue = (this.value as byte[]);
 				if (bvalue != null)
 				{
-					byte[] result = new byte[this.Size];
+					byte[] result = new byte[Math.Min(this.Size, bvalue.Length)];
 					Array.Copy(bvalue, result, result.Length);
 					return result;
 				}
