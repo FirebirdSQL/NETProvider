@@ -843,8 +843,8 @@ namespace FirebirdSql.Data.Entity
                         break;
 
                     case PrimitiveTypeKind.Binary:
-                        // Binary cannot be in sql text
-                        throw new NotSupportedException("PrimitiveTypeKind.Binary");
+                        result.Append(string.Format("x'{0}'", BitConverter.ToString((byte[])e.Value).Replace("-", string.Empty)));
+						break;
 
                     case PrimitiveTypeKind.String:
                         bool isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(e.ResultType, MetadataHelpers.UnicodeFacetName, true);
@@ -3341,7 +3341,8 @@ namespace FirebirdSql.Data.Entity
                     break;
 
                 case PrimitiveTypeKind.Binary:
-                    throw new NotSupportedException("PrimitiveTypeKind.Binary");
+					typeName = "BLOB SUB_TYPE BINARY";
+					break;
 
                 case PrimitiveTypeKind.String:
                     isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(type, MetadataHelpers.UnicodeFacetName, true);
