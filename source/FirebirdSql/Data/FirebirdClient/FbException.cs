@@ -125,9 +125,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		[SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("errors", this.errors);
-
 			base.GetObjectData(info, context);
+
+			info.AddValue("errors", this.errors);
 		}
 
 #endif
