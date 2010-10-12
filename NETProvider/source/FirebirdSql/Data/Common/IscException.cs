@@ -171,10 +171,10 @@ namespace FirebirdSql.Data.Common
 		[SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
+			base.GetObjectData(info, context);
+
 			info.AddValue("errors", this.Errors);
 			info.AddValue("errorCode", this.ErrorCode);
-
-			base.GetObjectData(info, context);
 		}
 
 #endif
