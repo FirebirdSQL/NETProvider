@@ -346,9 +346,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 #if (!NET_CF)
         public void EnlistTransaction(System.Transactions.Transaction transaction)
-        {
-            if (this.owningConnection != null && this.options.Enlist)
+        {			
+			if (this.owningConnection != null && this.options.Enlist)
             {
+				if (this.enlistmentNotification != null && this.enlistmentNotification.SystemTransaction == transaction)
+					return;
+
                 if (this.HasActiveTransaction)
                 {
                     throw new ArgumentException("Unable to enlist in transaction, a local transaction already exists");

@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2006 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 #if (!NET_CF)
@@ -48,6 +51,11 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             get { return (this.transaction == null); }
         }
+
+		public Transaction SystemTransaction
+		{
+			get { return this.systemTransaction; }
+		}
 
         #endregion
 
