@@ -22,10 +22,10 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Text;
 
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
-using System.Text;
 
 namespace FirebirdSql.Data.UnitTests
 {
@@ -656,7 +656,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void ReadingVarcharOctets()
+		public void ReadingVarcharOctetsTest()
 		{
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
@@ -678,7 +678,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void ReadingCharOctets()
+		public void ReadingCharOctetsTest()
 		{
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
@@ -697,6 +697,40 @@ namespace FirebirdSql.Data.UnitTests
 				byte[] expected = new byte[10];
 				Encoding.ASCII.GetBytes(data).CopyTo(expected, 0);
 				Assert.AreEqual(expected, read);
+			}
+		}
+
+		[Test]
+		public void CommandCancellationTest()
+		{
+			bool done = false;
+
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText =
+@"execute block as
+declare variable i int = 9999999;
+begin
+  while (i > 0) do
+    i = i-1;
+end";
+				cmd.BeginExecuteNonQuery((o) => 
+				{
+					try
+					{
+						cmd.EndExecuteNonQuery(o as IAsyncResult);
+					}
+					catch (FbException ex)
+					{
+						Assert.AreEqual("HY008", ex.SQLSTATE);
+						done = true;
+					}
+				}, null);
+				System.Threading.Thread.Sleep(1000);
+				cmd.Cancel();
+				System.Threading.Thread.Sleep(1000);
+				if (!done)
+					Assert.Fail();
 			}
 		}
 
