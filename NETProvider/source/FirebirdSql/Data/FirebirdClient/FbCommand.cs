@@ -1142,9 +1142,9 @@ namespace FirebirdSql.Data.FirebirdClient
             // Check if	we have	a valid	transaction
             if (this.transaction == null)
             {
-                if (this.connection.InnerConnection.IsEnlisted)
+				if (innerConn.IsEnlisted)
                 {
-                    this.transaction = this.connection.InnerConnection.ActiveTransaction;
+					this.transaction = innerConn.ActiveTransaction;
                 }
                 else
                 {
