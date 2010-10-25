@@ -46,5 +46,6 @@
 
 		<UIRef Id="WixUI_InstallDir" />
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+		<WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)..\license.rtf" />
 	</Product>
 </Wix>
