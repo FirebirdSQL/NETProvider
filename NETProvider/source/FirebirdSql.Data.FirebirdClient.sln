@@ -4,10 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdCl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests", "FirebirdSql\Data\UnitTests\FirebirdSql.Data.UnitTests.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WixInstaller", "WixInstaller\WixInstaller.wixproj", "{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172} = {D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}
-		{326A24F9-6259-45DB-835C-18DB80728460} = {326A24F9-6259-45DB-835C-18DB80728460}
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WiXInstaller", "WiXInstaller", "{3A776D06-2FF9-49D9-91ED-2CC486381B67}"
+	ProjectSection(SolutionItems) = preProject
+		WiXInstaller\build.bat = WiXInstaller\build.bat
+		WiXInstaller\Install.wxs = WiXInstaller\Install.wxs
 	EndProjectSection
 EndProject
 Global
@@ -75,25 +75,6 @@ Global
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Win32.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_20|Any CPU.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_20|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_20|Win32.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_35|Any CPU.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_35|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_35|Win32.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_Mono_w_Linux|Any CPU.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_Mono_w_Linux|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release_Mono_w_Linux|Win32.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{8E42CA8F-0BBC-42C4-B687-5F47B6E49519}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
