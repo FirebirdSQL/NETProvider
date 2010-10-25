@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="7D65E5D3-A191-4208-875A-43F149F9C36F"
+					 UpgradeCode="8A1FACD4-F003-4720-AD50-4161CA58E84B"
+					 Name="FirebirdClient !(bind.fileVersion.FirebirdSql.Data.FirebirdClient.dll)"
+					 Language="1033"
+					 Version="!(bind.fileVersion.FirebirdSql.Data.FirebirdClient.dll)"
+					 Manufacturer="FirebirdSQL">
+		<Package InstallerVersion="200" Compressed="yes" Description="ADO.NET Data Provider for Firebird" />
+
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" CompressionLevel="high" />
+
+		<Feature Id="FirebirdClientFeature" Title="Files" Level="1">
+			<ComponentRef Id="FirebirdClientAssemblyComponent" />
+			<ComponentRef Id="OtherFilesComponent" />
+		</Feature>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLDIR" Name="FirebirdClient">
+					<Component Id="FirebirdClientAssemblyComponent" Guid="5FC7B74A-949A-448E-9E5A-1893C3CE9184">
+						<File Id="FirebirdSql.Data.FirebirdClient.dll"
+									Name="FirebirdSql.Data.FirebirdClient.dll"
+									Source="$(var.SolutionDir)FirebirdSql\Data\bin\Release\FirebirdSql.Data.FirebirdClient.dll" />
+					</Component>
+					<Component Id="OtherFilesComponent" Guid="348EA22F-390E-4BA6-9C93-3879581E9297">
+						<File Id="readme.txt"
+									Name="readme.txt"
+									Source="$(var.SolutionDir)..\readme.txt" />
+						<File Id="license.txt"
+									Name="license.txt"
+									Source="$(var.SolutionDir)..\license.txt" />
+						<File Id="FirebirdSql.Data.FirebirdClient.pdb"
+									Name="FirebirdSql.Data.FirebirdClient.pdb"
+									Source="$(var.SolutionDir)FirebirdSql\Data\bin\Release\FirebirdSql.Data.FirebirdClient.pdb" />
+						<File Id="FirebirdSql.Data.UnitTests.dll"
+									Name="FirebirdSql.Data.UnitTests.dll"
+									Source="$(var.SolutionDir)FirebirdSql\Data\UnitTests\bin\Release\FirebirdSql.Data.UnitTests.dll" />
+						<File Id="FirebirdSql.Data.UnitTests.config"
+									Name="FirebirdSql.Data.UnitTests.dll.config"
+									Source="$(var.SolutionDir)FirebirdSql\Data\UnitTests\bin\Release\FirebirdSql.Data.UnitTests.dll.config" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<UIRef Id="WixUI_InstallDir" />
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+	</Product>
+</Wix>
