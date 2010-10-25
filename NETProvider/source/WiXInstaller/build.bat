@@ -1,4 +1,4 @@
-set WIX=C:\Program Files\Windows Installer XML v3.5\
+set WIX=C:\Program Files\Windows Installer XML v3.0\
 set SOLUTION_DIR=%~dp0%..\
 
 "%WIX%bin\candle.exe" -dSolutionDir=%SOLUTION_DIR% -out "%SOLUTION_DIR%WixInstaller\out\Install.wixobj" "%SOLUTION_DIR%WixInstaller\Install.wxs"
