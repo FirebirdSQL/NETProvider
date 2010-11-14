@@ -16,8 +16,6 @@
  *	All Rights Reserved.
  */
 
-#if (PROTOCOL_VERSION12)
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -128,5 +126,3 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		#endregion
     }
 }
-
-#endif

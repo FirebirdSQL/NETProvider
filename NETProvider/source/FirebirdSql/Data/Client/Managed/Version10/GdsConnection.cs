@@ -13,7 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
- *	Copyright (c) 2007 - 2008 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2007 - 2010 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -168,11 +168,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     outputStream.Write(1);							// Architecture	of client -	Generic
 
                     outputStream.Write(database);					// Database	path
-#if (PROTOCOL_VERSION12)
                     outputStream.Write(3);							// Protocol	versions understood
-#else
-                    outputStream.Write(2);							// Protocol	versions understood
-#endif
                     outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
 
                     outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
@@ -187,13 +183,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     outputStream.Write(5);							// Maximum type (ptype_lazy_send)
                     outputStream.Write(1);							// Preference weight
 
-#if (PROTOCOL_VERSION12)
 					outputStream.Write(IscCodes.PROTOCOL_VERSION12);//	Protocol version
 					outputStream.Write(1);							// Architecture	of client -	Generic
 					outputStream.Write(2);							// Minumum type (ptype_rpc)
 					outputStream.Write(5);							// Maximum type (ptype_lazy_send)
 					outputStream.Write(2);							// Preference weight
-#endif
 				}
                 outputStream.Flush();
 
