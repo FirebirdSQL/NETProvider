@@ -12,12 +12,10 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2009 Jiri Cincura (jiri@cincura.net) 
+ *	Copyright (c) 2009-2010 Jiri Cincura (jiri@cincura.net) 
  *      
  *	All Rights Reserved.
  */
-
-#if (PROTOCOL_VERSION12)
 
 using System;
 using System.Collections;
@@ -96,5 +94,3 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		#endregion
 	}
 }
-
-#endif
