@@ -617,7 +617,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				else
 					return -1;
 #else
-#warning Think about better solution
+				// Think about better solution
 				try
 				{
 					return Process.GetCurrentProcess().Id;
