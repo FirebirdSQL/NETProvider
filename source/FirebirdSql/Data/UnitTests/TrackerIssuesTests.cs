@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.UnitTests
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select " + cols.ToString() + " from rdb$database where 'x' = @x or 'x' = @x and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y";
-				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "-1" });
+				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "z" });
 				cmd.Parameters.Add(new FbParameter() { ParameterName = "@y", Value = DateTime.Now });
 				using (FbDataReader reader = cmd.ExecuteReader())
 				{
