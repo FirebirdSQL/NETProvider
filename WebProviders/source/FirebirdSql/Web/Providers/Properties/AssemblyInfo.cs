@@ -13,6 +13,7 @@
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2009-2010 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -29,6 +30,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FirebirdSQL")]
 [assembly: AssemblyProduct("FirebirdClient")]
-[assembly: AssemblyCopyright("(c) 2002-2009")]
-[assembly: AssemblyVersion("2.5.0.0")]
+[assembly: AssemblyCopyright("(c) 2002-2010")]
+[assembly: AssemblyVersion("2.6.0.0")]
 [assembly: AssemblyDelaySign(false)]
