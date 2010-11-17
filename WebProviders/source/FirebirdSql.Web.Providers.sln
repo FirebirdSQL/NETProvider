@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Web.Providers", "FirebirdSql\Web\Providers\FirebirdSql.Web.Providers.csproj", "{E4CE816A-20E4-4281-B547-B9C02F24F2E7}"
 EndProject
 Global

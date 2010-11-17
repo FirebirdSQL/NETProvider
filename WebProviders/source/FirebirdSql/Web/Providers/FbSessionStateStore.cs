@@ -13,7 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2005 Alessandro Petrelli
- *  Copyright (c) 2007 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2007-2010 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  *	 
  */
