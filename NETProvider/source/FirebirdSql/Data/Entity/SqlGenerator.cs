@@ -852,10 +852,14 @@ namespace FirebirdSql.Data.Entity
                         break;
 
                     case PrimitiveTypeKind.DateTime:
+						result.Append("'");
                         result.Append(((DateTime)e.Value).ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture));
+						result.Append("'");
                         break;
-                    case PrimitiveTypeKind.Time:
+					case PrimitiveTypeKind.Time:
+						result.Append("'");
 						result.Append(((DateTime)e.Value).ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture));
+						result.Append("'");
                         break;
 
 					case PrimitiveTypeKind.Guid:
