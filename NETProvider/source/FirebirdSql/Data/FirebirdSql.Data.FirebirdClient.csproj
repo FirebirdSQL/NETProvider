@@ -305,6 +305,8 @@
     <Compile Include="Services\FbBackupFlags.cs" />
     <Compile Include="Services\FbConfiguration.cs" />
     <Compile Include="Services\FbDatabasesInfo.cs" />
+    <Compile Include="Services\FbDatabaseTraceConfiguration.cs" />
+    <Compile Include="Services\FbDatabaseTraceEvents.cs" />
     <Compile Include="Services\FbLog.cs" />
     <Compile Include="Services\FbRestore.cs" />
     <Compile Include="Services\FbRestoreFlags.cs" />
@@ -313,9 +315,13 @@
     <Compile Include="Services\FbServerProperties.cs" />
     <Compile Include="Services\FbService.cs" />
     <Compile Include="Services\FbServiceState.cs" />
+    <Compile Include="Services\FbServiceTraceConfiguration.cs" />
+    <Compile Include="Services\FbServiceTraceEvents.cs" />
     <Compile Include="Services\FbShutdownMode.cs" />
     <Compile Include="Services\FbStatistical.cs" />
     <Compile Include="Services\FbStatisticalFlags.cs" />
+    <Compile Include="Services\FbTrace.cs" />
+    <Compile Include="Services\FbDatabaseTraceConfigurationCollection.cs" />
     <Compile Include="Services\FbUserData.cs" />
     <Compile Include="Services\FbValidation.cs" />
     <Compile Include="Services\FbValidationFlags.cs" />
