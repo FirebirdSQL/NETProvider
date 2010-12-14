@@ -389,6 +389,16 @@ namespace FirebirdSql.Data.Common
 		public const int isc_action_svc_remove_license = 10;	/* Removes a license from the license file */
 		public const int isc_action_svc_db_stats = 11;	/* Retrieves database statistics */
 		public const int isc_action_svc_get_ib_log = 12;	/* Retrieves the InterBase log file	from the server	*/
+		public const int isc_action_svc_nbak = 20;	/* Incremental nbackup */
+		public const int isc_action_svc_nrest = 21;	/* Incremental database restore */
+		public const int isc_action_svc_trace_start = 22;	// Start trace session
+		public const int isc_action_svc_trace_stop = 23;	// Stop trace session
+		public const int isc_action_svc_trace_suspend = 24;	// Suspend trace session
+		public const int isc_action_svc_trace_resume = 25;	// Resume trace session
+		public const int isc_action_svc_trace_list = 26;	// List existing sessions
+		public const int isc_action_svc_set_mapping = 27;	// Set auto admins mapping in security database
+		public const int isc_action_svc_drop_mapping = 28;	// Drop auto admins mapping in security database
+		public const int isc_action_svc_display_user_adm = 29;	// Displays user(s) from security database with admin info
 
 		#endregion
 
@@ -500,6 +510,14 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_sec_middlename = 11;
 		public const int isc_spb_sec_lastname = 12;
 
+		#endregion
+
+		#region · Trace Service ·
+		
+		public const int isc_spb_trc_id = 1;
+		public const int isc_spb_trc_name = 2;
+		public const int isc_spb_trc_cfg = 3;
+		
 		#endregion
 
 		#region · Configuration Keys ·
