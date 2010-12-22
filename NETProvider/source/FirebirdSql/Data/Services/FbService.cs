@@ -312,7 +312,7 @@ namespace FirebirdSql.Data.Services
 
         protected void ProcessServiceOutput()
         {
-            string line = null;
+			string line;
 
             while ((line = this.GetNextLine()) != null)
             {
