@@ -758,7 +758,7 @@ namespace FirebirdSql.Data.FirebirdClient
                 {
                     this.transaction.Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     this.RollbackImplicitTransaction();
 
