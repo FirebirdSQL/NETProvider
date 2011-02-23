@@ -25,22 +25,23 @@ using System.Data.Common;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Schema
 {
 	internal sealed class FbSchemaFactory
-    {
-        #region · Static Members ·
+	{
+		#region · Static Members ·
 
-        private static readonly string ResName = "FirebirdSql.Schema.FbMetaData.xml";
+		private static readonly string ResourceName = "FirebirdSql.Schema.FbMetaData.xml";
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        private FbSchemaFactory()
+		private FbSchemaFactory()
 		{
 		}
 
@@ -50,171 +51,182 @@ namespace FirebirdSql.Data.Schema
 
 		public static DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
-            string  filter      = String.Format("CollectionName = '{0}'", collectionName);
-            Stream  xmlStream   = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResName);            	
-            DataSet ds          = new DataSet();
+			string filter = String.Format("CollectionName = '{0}'", collectionName);
+			Stream xmlStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName);
+			DataSet ds = new DataSet();
 
-		    ds.ReadXml(xmlStream);            
+			CultureInfo oldCulture = Thread.CurrentThread.CurrentCulture;
+			try
+			{
+				Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+				// ReadXml contains error: http://connect.microsoft.com/VisualStudio/feedback/Validation.aspx?FeedbackID=95116
+				// that's the reason for temporarily changing culture
+				ds.ReadXml(xmlStream);
+			}
+			finally
+			{
+				Thread.CurrentThread.CurrentCulture = oldCulture;
+			}
 
-            DataRow[] collection = ds.Tables[DbMetaDataCollectionNames.MetaDataCollections].Select(filter);
+			DataRow[] collection = ds.Tables[DbMetaDataCollectionNames.MetaDataCollections].Select(filter);
 
-            if (collection.Length != 1)
-            {
-                throw new NotSupportedException("Unsupported collection name.");
-            }
+			if (collection.Length != 1)
+			{
+				throw new NotSupportedException("Unsupported collection name.");
+			}
 
-            if (restrictions != null && restrictions.Length > (int)collection[0]["NumberOfRestrictions"])
-            {
-                throw new InvalidOperationException("The number of specified restrictions is not valid.");
-            }
-            
-            if (ds.Tables[DbMetaDataCollectionNames.Restrictions].Select(filter).Length != (int)collection[0]["NumberOfRestrictions"])
-            {
-                throw new InvalidOperationException("Incorrect restriction definition.");
-            }
+			if (restrictions != null && restrictions.Length > (int)collection[0]["NumberOfRestrictions"])
+			{
+				throw new InvalidOperationException("The number of specified restrictions is not valid.");
+			}
 
-            switch (collection[0]["PopulationMechanism"].ToString())
-            {
-                case "PrepareCollection":
-                    return PrepareCollection(connection, collectionName, restrictions);
+			if (ds.Tables[DbMetaDataCollectionNames.Restrictions].Select(filter).Length != (int)collection[0]["NumberOfRestrictions"])
+			{
+				throw new InvalidOperationException("Incorrect restriction definition.");
+			}
 
-                case "DataTable":
-                    return ds.Tables[collection[0]["PopulationString"].ToString()].Copy();
+			switch (collection[0]["PopulationMechanism"].ToString())
+			{
+				case "PrepareCollection":
+					return PrepareCollection(connection, collectionName, restrictions);
 
-                case "SQLCommand":
-                    return SqlCommandSchema(connection, collectionName, restrictions);
+				case "DataTable":
+					return ds.Tables[collection[0]["PopulationString"].ToString()].Copy();
 
-                default:
-                    throw new NotSupportedException("Unsupported population mechanism");
-            }
+				case "SQLCommand":
+					return SqlCommandSchema(connection, collectionName, restrictions);
+
+				default:
+					throw new NotSupportedException("Unsupported population mechanism");
+			}
 		}
 
 		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private static DataTable PrepareCollection(FbConnection connection, string collectionName, string[] restrictions)
-        {
-            FbSchema returnSchema = null;
+		private static DataTable PrepareCollection(FbConnection connection, string collectionName, string[] restrictions)
+		{
+			FbSchema returnSchema = null;
 
-            switch (collectionName.ToLower(CultureInfo.InvariantCulture))
-            {
-                case "charactersets":
-                    returnSchema = new FbCharacterSets();
-                    break;
+			switch (collectionName.ToLower(CultureInfo.InvariantCulture))
+			{
+				case "charactersets":
+					returnSchema = new FbCharacterSets();
+					break;
 
-                case "checkconstraints":
-                    returnSchema = new FbCheckConstraints();
-                    break;
+				case "checkconstraints":
+					returnSchema = new FbCheckConstraints();
+					break;
 
-                case "checkconstraintsbytable":
-                    returnSchema = new FbChecksByTable();
-                    break;
+				case "checkconstraintsbytable":
+					returnSchema = new FbChecksByTable();
+					break;
 
-                case "collations":
-                    returnSchema = new FbCollations();
-                    break;
+				case "collations":
+					returnSchema = new FbCollations();
+					break;
 
-                case "columns":
-                    returnSchema = new FbColumns();
-                    break;
+				case "columns":
+					returnSchema = new FbColumns();
+					break;
 
-                case "columnprivileges":
-                    returnSchema = new FbColumnPrivileges();
-                    break;
+				case "columnprivileges":
+					returnSchema = new FbColumnPrivileges();
+					break;
 
-               case "domains":
-                    returnSchema = new FbDomains();
-                    break;
+				case "domains":
+					returnSchema = new FbDomains();
+					break;
 
-                case "foreignkeycolumns":
-                    returnSchema = new FbForeignKeyColumns();
-                    break;
+				case "foreignkeycolumns":
+					returnSchema = new FbForeignKeyColumns();
+					break;
 
-                case "foreignkeys":
-                    returnSchema = new FbForeignKeys();
-                    break;
+				case "foreignkeys":
+					returnSchema = new FbForeignKeys();
+					break;
 
-                case "functions":
-                    returnSchema = new FbFunctions();
-                    break;
+				case "functions":
+					returnSchema = new FbFunctions();
+					break;
 
-                case "generators":
-                    returnSchema = new FbGenerators();
-                    break;
+				case "generators":
+					returnSchema = new FbGenerators();
+					break;
 
-                case "indexcolumns":
-                    returnSchema = new FbIndexColumns();
-                    break;
+				case "indexcolumns":
+					returnSchema = new FbIndexColumns();
+					break;
 
-                case "indexes":
-                    returnSchema = new FbIndexes();
-                    break;
+				case "indexes":
+					returnSchema = new FbIndexes();
+					break;
 
-                case "primarykeys":
-                    returnSchema = new FbPrimaryKeys();
-                    break;
+				case "primarykeys":
+					returnSchema = new FbPrimaryKeys();
+					break;
 
-                case "procedures":
-                    returnSchema = new FbProcedures();
-                    break;
+				case "procedures":
+					returnSchema = new FbProcedures();
+					break;
 
-                case "procedureparameters":
-                    returnSchema = new FbProcedureParameters();
-                    break;
+				case "procedureparameters":
+					returnSchema = new FbProcedureParameters();
+					break;
 
-                case "procedureprivileges":
-                    returnSchema = new FbProcedurePrivilegesSchema();
-                    break;
+				case "procedureprivileges":
+					returnSchema = new FbProcedurePrivilegesSchema();
+					break;
 
-                case "roles":
-                    returnSchema = new FbRoles();
-                    break;
+				case "roles":
+					returnSchema = new FbRoles();
+					break;
 
-                case "tables":
-                    returnSchema = new FbTables();
-                    break;
+				case "tables":
+					returnSchema = new FbTables();
+					break;
 
-                case "tableconstraints":
-                    returnSchema = new FbTableConstraints();
-                    break;
+				case "tableconstraints":
+					returnSchema = new FbTableConstraints();
+					break;
 
-                case "tableprivileges":
-                    returnSchema = new FbTablePrivileges();
-                    break;
+				case "tableprivileges":
+					returnSchema = new FbTablePrivileges();
+					break;
 
-                case "triggers":
-                    returnSchema = new FbTriggers();
-                    break;
+				case "triggers":
+					returnSchema = new FbTriggers();
+					break;
 
-                case "uniquekeys":
-                    returnSchema = new FbUniqueKeys();
-                    break;
+				case "uniquekeys":
+					returnSchema = new FbUniqueKeys();
+					break;
 
-                case "viewcolumns":
-                    returnSchema = new FbViewColumns();
-                    break;
+				case "viewcolumns":
+					returnSchema = new FbViewColumns();
+					break;
 
-                case "views":
-                    returnSchema = new FbViews();
-                    break;
+				case "views":
+					returnSchema = new FbViews();
+					break;
 
-                case "viewprivileges":
-                    returnSchema = new FbViewPrivileges();
-                    break;
+				case "viewprivileges":
+					returnSchema = new FbViewPrivileges();
+					break;
 
-                default:
-                    throw new NotSupportedException("The specified metadata collection is not supported.");
-            }
+				default:
+					throw new NotSupportedException("The specified metadata collection is not supported.");
+			}
 
-            return returnSchema.GetSchema(connection, collectionName, restrictions);
-        }
+			return returnSchema.GetSchema(connection, collectionName, restrictions);
+		}
 
-        private static DataTable SqlCommandSchema(FbConnection connection, string collectionName, string[] restrictions)
-        {
-            throw new NotImplementedException();
-        }
+		private static DataTable SqlCommandSchema(FbConnection connection, string collectionName, string[] restrictions)
+		{
+			throw new NotImplementedException();
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
