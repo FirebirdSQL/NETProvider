@@ -587,7 +587,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     this.OnStateChange(this.state, ConnectionState.Closed);
                     throw new FbException(ex.Message, ex);
                 }
-                catch (Exception)
+                catch
                 {
                     this.OnStateChange(this.state, ConnectionState.Closed);
                     throw;

@@ -212,7 +212,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     {
                         this.Detach();
                     }
-                    catch (Exception)
+                    catch
                     {
                     }
 
@@ -331,7 +331,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                         {
                             this.CloseConnection();
                         }
-                        catch (Exception)
+                        catch
                         {
                         }
 

@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.Client.Native
                     // Update transaction count
                     this.db.TransactionCount++;
                 }
-                catch (Exception)
+                catch
                 {
                     throw;
                 }

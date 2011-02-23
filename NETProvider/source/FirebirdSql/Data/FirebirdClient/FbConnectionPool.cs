@@ -321,7 +321,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				connection.Dispose();
                 connection = null;
 			}
-			catch (Exception)
+			catch
 			{
                 // Do not raise an exception as the connection could be invalid due to several reasons
                 // ( network problems, server shutdown, ... )

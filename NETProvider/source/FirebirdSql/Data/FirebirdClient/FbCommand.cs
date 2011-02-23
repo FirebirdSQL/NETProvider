@@ -480,7 +480,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
                     throw new FbException(ex.Message, ex);
                 }
-                catch (Exception)
+                catch
                 {
                     this.DiscardImplicitTransaction();
 
@@ -512,7 +512,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					throw new FbException(ex.Message, ex);
 				}
-				catch (Exception)
+				catch
 				{
 					this.DiscardImplicitTransaction();
 
@@ -625,7 +625,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					throw new FbException(ex.Message, ex);
 				}
-				catch (Exception)
+				catch
 				{
 					this.DiscardImplicitTransaction();
 
