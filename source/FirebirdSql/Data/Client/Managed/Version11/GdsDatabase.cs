@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
                     {
                         this.Detach();
                     }
-                    catch (Exception)
+                    catch
                     {
                     }
 

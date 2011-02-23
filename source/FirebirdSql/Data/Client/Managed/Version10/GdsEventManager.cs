@@ -217,7 +217,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             {
                 return;
             }
-            catch (Exception)
+            catch
             {
                 return;
             }

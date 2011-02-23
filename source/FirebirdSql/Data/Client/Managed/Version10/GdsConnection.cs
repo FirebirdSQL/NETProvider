@@ -208,7 +208,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                     {
                         this.Disconnect();
                     }
-                    catch (Exception)
+                    catch
                     {
                     }
                     finally

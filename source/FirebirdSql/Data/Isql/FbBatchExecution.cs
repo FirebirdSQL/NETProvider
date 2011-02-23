@@ -677,7 +677,7 @@ namespace FirebirdSql.Data.Isql
             {
                 connectionString.Load(sqlConnection.ConnectionString);
             }
-            catch (Exception)
+            catch
             {
                 sqlConnection.ConnectionString = string.Empty;
             }

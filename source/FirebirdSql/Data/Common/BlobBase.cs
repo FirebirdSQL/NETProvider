@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.Common
 
 				this.Close();
 			}
-			catch (Exception)
+			catch
 			{
 				// Cancel the blob and rethrow the exception
 				this.Cancel();
@@ -166,7 +166,7 @@ namespace FirebirdSql.Data.Common
 
 				this.Close();
 			}
-			catch (Exception)
+			catch
 			{
 				// Cancel the blob and rethrow the exception
 				this.Cancel();
