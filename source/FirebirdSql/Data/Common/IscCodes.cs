@@ -57,6 +57,7 @@ namespace FirebirdSql.Data.Common
 		public const int MAX_BUFFER_SIZE            = 8192;
 		public const int ROWS_AFFECTED_BUFFER_SIZE  = 34;
 		public const int STATEMENT_TYPE_BUFFER_SIZE = 8;
+		public const int PREPARE_INFO_BUFFER_SIZE	= 32768;
 
 		#endregion
 
