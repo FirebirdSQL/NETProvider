@@ -453,7 +453,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
             this.database.Write((int)this.database.Dialect);
             this.database.Write(commandText);
             this.database.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
-            this.database.Write(IscCodes.MAX_BUFFER_SIZE);
+			this.database.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE);
         }
 
         protected void ProcessPrepareResponse(GenericResponse response)
@@ -743,6 +743,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                         case IscCodes.isc_info_sql_select:
                         case IscCodes.isc_info_sql_bind:
                             currentDescriptorIndex++;
+
+							if (info[currentPosition] == IscCodes.isc_info_truncated)
+								break;
 
                             currentPosition++;
                             int len = IscHelper.VaxInteger(info, currentPosition, 2);
