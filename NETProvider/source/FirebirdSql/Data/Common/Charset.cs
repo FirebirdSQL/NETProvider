@@ -78,67 +78,73 @@ namespace FirebirdSql.Data.Common
             charsets.Add(new Charset(3, "UNICODE_FSS", 3, "UTF-8"));
             // UTF8
             charsets.Add(new Charset(4, "UTF8", 4, "UTF-8"));
-#if (!MONO)
-            // Shift-JIS, Japanese
-            charsets.Add(new Charset(5, "SJIS_0208", 2, "shift_jis"));
-#endif
-#if (!MONO)
+            
+			// Shift-JIS, Japanese
+            TryAddCharset(charsets, () => new Charset(5, "SJIS_0208", 2, "shift_jis"));
             // JIS X 0201, 0208, 0212, EUC encoding, Japanese
-            charsets.Add(new Charset(6, "EUCJ_0208", 2, "euc-jp"));
-#endif
+            TryAddCharset(charsets, () => new Charset(6, "EUCJ_0208", 2, "euc-jp"));
             // Windows Japanese	
-            charsets.Add(new Charset(7, "ISO2022-JP", 2, "iso-2022-jp"));
+            TryAddCharset(charsets, () => new Charset(7, "ISO2022-JP", 2, "iso-2022-jp"));
             // MS-DOS United States, Australia, New Zealand, South Africa	
-            charsets.Add(new Charset(10, "DOS437", 1, "IBM437"));
+            TryAddCharset(charsets, () => new Charset(10, "DOS437", 1, "IBM437"));
             // MS-DOS Latin-1				
-            charsets.Add(new Charset(11, "DOS850", 1, "ibm850"));
+            TryAddCharset(charsets, () => new Charset(11, "DOS850", 1, "ibm850"));
             // MS-DOS Nordic	
-            charsets.Add(new Charset(12, "DOS865", 1, "IBM865"));
+            TryAddCharset(charsets, () => new Charset(12, "DOS865", 1, "IBM865"));
             // MS-DOS Portuguese	
-            charsets.Add(new Charset(13, "DOS860", 1, "IBM860"));
+            TryAddCharset(charsets, () => new Charset(13, "DOS860", 1, "IBM860"));
             // MS-DOS Canadian French	
-            charsets.Add(new Charset(14, "DOS863", 1, "IBM863"));
+            TryAddCharset(charsets, () => new Charset(14, "DOS863", 1, "IBM863"));
             // ISO 8859-1, Latin alphabet No. 1
-            charsets.Add(new Charset(21, "ISO8859_1", 1, "iso-8859-1"));
+            TryAddCharset(charsets, () => new Charset(21, "ISO8859_1", 1, "iso-8859-1"));
             // ISO 8859-2, Latin alphabet No. 2
-            charsets.Add(new Charset(22, "ISO8859_2", 1, "iso-8859-2"));
-#if (!MONO)
+            TryAddCharset(charsets, () => new Charset(22, "ISO8859_2", 1, "iso-8859-2"));
             // Windows Korean	
-            charsets.Add(new Charset(44, "KSC_5601", 2, "ks_c_5601-1987"));
-#endif
+            TryAddCharset(charsets, () => new Charset(44, "KSC_5601", 2, "ks_c_5601-1987"));
             // MS-DOS Icelandic	
-            charsets.Add(new Charset(47, "DOS861", 1, "ibm861"));
+            TryAddCharset(charsets, () => new Charset(47, "DOS861", 1, "ibm861"));
             // Windows Eastern European
-            charsets.Add(new Charset(51, "WIN1250", 1, "windows-1250"));
+            TryAddCharset(charsets, () => new Charset(51, "WIN1250", 1, "windows-1250"));
             // Windows Cyrillic
-            charsets.Add(new Charset(52, "WIN1251", 1, "windows-1251"));
+            TryAddCharset(charsets, () => new Charset(52, "WIN1251", 1, "windows-1251"));
             // Windows Latin-1
-            charsets.Add(new Charset(53, "WIN1252", 1, "windows-1252"));
+            TryAddCharset(charsets, () => new Charset(53, "WIN1252", 1, "windows-1252"));
             // Windows Greek
-            charsets.Add(new Charset(54, "WIN1253", 1, "windows-1253"));
+            TryAddCharset(charsets, () => new Charset(54, "WIN1253", 1, "windows-1253"));
             // Windows Turkish
-            charsets.Add(new Charset(55, "WIN1254", 1, "windows-1254"));
+            TryAddCharset(charsets, () => new Charset(55, "WIN1254", 1, "windows-1254"));
             // Big5, Traditional Chinese
-            charsets.Add(new Charset(56, "BIG_5", 2, "big5"));
+            TryAddCharset(charsets, () => new Charset(56, "BIG_5", 2, "big5"));
             // GB2312, EUC encoding, Simplified Chinese	
-            charsets.Add(new Charset(57, "GB_2312", 2, "gb2312"));
+            TryAddCharset(charsets, () => new Charset(57, "GB_2312", 2, "gb2312"));
             // Windows Hebrew
-            charsets.Add(new Charset(58, "WIN1255", 1, "windows-1255"));
+            TryAddCharset(charsets, () => new Charset(58, "WIN1255", 1, "windows-1255"));
             // Windows Arabic	
-            charsets.Add(new Charset(59, "WIN1256", 1, "windows-1256"));
+            TryAddCharset(charsets, () => new Charset(59, "WIN1256", 1, "windows-1256"));
             // Windows Baltic	
-            charsets.Add(new Charset(60, "WIN1257", 1, "windows-1257"));
+            TryAddCharset(charsets, () => new Charset(60, "WIN1257", 1, "windows-1257"));
             // UTF-16
-            // Charset.Add(new Charset(61, "UTF16", 4, "utf-16"));
+			//TryAddCharset(charsets, () => new Charset(61, "UTF16", 4, "utf-16"));
             // UTF-32
-            // Charset.Add(new Charset(62, "UTF32", 4, "utf-32"));
+			//TryAddCharset(charsets, () => new Charset(62, "UTF32", 4, "utf-32"));
             // Russian KOI8R
-            charsets.Add(new Charset(63, "KOI8R", 2, "koi8-r"));
+            TryAddCharset(charsets, () => new Charset(63, "KOI8R", 2, "koi8-r"));
             // Ukrainian KOI8U
-            charsets.Add(new Charset(64, "KOI8U", 2, "koi8-u"));
+            TryAddCharset(charsets, () => new Charset(64, "KOI8U", 2, "koi8-u"));
 
             return charsets;
         }
+
+		private static void TryAddCharset(List<Charset> charsets, Func<Charset> charsetCreator)
+		{
+			// mainly because of Mono dropping supported charsets
+			try
+			{
+				charsets.Add(charsetCreator());
+			}
+			catch
+			{ }
+		}
 
         #endregion
 
@@ -187,9 +193,7 @@ namespace FirebirdSql.Data.Common
 			this.systemName			= systemName;
             this.syncObject         = new object();
 
-#if (!NET_CF)
-            this.GetEncoding();
-#endif
+            this.SetEncoding();
 		}
 
 		#endregion
@@ -198,20 +202,12 @@ namespace FirebirdSql.Data.Common
 
 		public byte[] GetBytes(string s)
 		{
-#if (NET_CF)
-			return this.GetEncoding().GetBytes(s);
-#else
             return this.encoding.GetBytes(s);
-#endif
 		}
 
 		public int GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex)
 		{
-#if (NET_CF)
-			return this.GetEncoding().GetBytes(s, charIndex, charCount, bytes, byteIndex);
-#else
             return this.encoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
-#endif
 		}
 
 		public string GetString(byte[] buffer)
@@ -221,18 +217,14 @@ namespace FirebirdSql.Data.Common
 
 		public string GetString(byte[] buffer, int index, int count)
 		{
-#if (NET_CF)
-			return this.GetEncoding().GetString(buffer, index, count);
-#else
             return this.encoding.GetString(buffer, index, count);
-#endif
 		}
 
 		#endregion
 
 		#region · Private Methods ·
 
-		private Encoding GetEncoding()
+		private void SetEncoding()
 		{
             lock (this.syncObject)
             {
@@ -254,8 +246,6 @@ namespace FirebirdSql.Data.Common
                     }
                 }
             }
-
-            return this.encoding;
 		}
 
 		#endregion
