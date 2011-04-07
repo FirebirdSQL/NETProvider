@@ -200,27 +200,24 @@ namespace FirebirdSql.Data.Client.Managed.Version10
         {
             lock (this.SyncObject)
             {
-                try
-                {
+				try
+				{
 					SendAttachToBuffer(dpb, database);
-                    this.Flush();
+					this.Flush();
 					ProcessAttachResponse(this.ReadGenericResponse());
-                }
-                catch (IOException)
-                {
-                    try
-                    {
-                        this.Detach();
-                    }
-                    catch
-                    {
-                    }
+				}
+				catch (IscException)
+				{
+					SafelyDetach();
+					throw;
+				}
+				catch (IOException)
+				{
+					SafelyDetach();
+					throw new IscException(IscCodes.isc_net_write_err);
+				}
 
-                    throw new IscException(IscCodes.isc_net_write_err);
-                }
-
-                // Get server version
-                this.serverVersion = this.GetServerVersion();
+				AfterAttachActions();
             }
         }
 
@@ -239,6 +236,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			this.handle = response.ObjectHandle;
 		}
 
+		protected void AfterAttachActions()
+		{
+			// Get server version
+			this.serverVersion = this.GetServerVersion();
+		}
+
         public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
         {
             throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
@@ -255,8 +258,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
                 try
                 {
-                    this.Write(IscCodes.op_detach);
-                    this.Write(this.handle);
+					if (this.handle != 0)
+					{
+						this.Write(IscCodes.op_detach);
+						this.Write(this.handle);
+					}
 					this.Write(IscCodes.op_disconnect);
                     this.Flush();
 
@@ -305,6 +311,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
                 }
             }
         }
+
+		protected void SafelyDetach()
+		{
+			try
+			{
+				this.Detach();
+			}
+			catch
+			{ }
+		}
 
         #endregion
 

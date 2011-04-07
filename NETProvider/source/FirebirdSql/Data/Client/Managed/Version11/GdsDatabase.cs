@@ -70,35 +70,32 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 #if (!LINUX)
             lock (this.SyncObject)
             {
-                try
-                {
-                    using (SSPIHelper sspiHelper = new SSPIHelper())
-                    {
-                        byte[] authData = sspiHelper.InitializeClientSecurity();
+				try
+				{
+					using (SSPIHelper sspiHelper = new SSPIHelper())
+					{
+						byte[] authData = sspiHelper.InitializeClientSecurity();
 						SendTrustedAuthToBuffer(dpb, authData);
 						SendAttachToBuffer(dpb, database);
-                        this.Flush();
+						this.Flush();
 
-                        IResponse response = this.ReadResponse();
+						IResponse response = this.ReadResponse();
 						ProcessTrustedAuthResponse(sspiHelper, ref response);
-                        ProcessAttachResponse((GenericResponse)response);
-                    }
-                }
-                catch (IOException)
-                {
-                    try
-                    {
-                        this.Detach();
-                    }
-                    catch
-                    {
-                    }
+						ProcessAttachResponse((GenericResponse)response);
+					}
+				}
+				catch (IscException)
+				{
+					SafelyDetach();
+					throw;
+				}
+				catch (IOException)
+				{
+					SafelyDetach();
+					throw new IscException(IscCodes.isc_net_write_err);
+				}
 
-                    throw new IscException(IscCodes.isc_net_write_err);
-                }
-
-                // Get server version
-                this.serverVersion = this.GetServerVersion();
+				AfterAttachActions();
             }
 #else            
             throw new NotSupportedException();
