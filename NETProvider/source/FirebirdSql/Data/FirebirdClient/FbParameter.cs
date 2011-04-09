@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.FirebirdClient
         {
             get 
 			{
-				return (this.size != 0 ? this.size : this.GetSizeOfValue(this.value) ?? 0);
+				return (this.HasSize ? this.size : this.RealValueSize ?? 0);
 			}
             set
             {
@@ -271,6 +271,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
+		internal bool HasSize
+		{
+			get { return this.size != default(int); }
+		}
+
         #endregion
 
         #region · Constructors ·
@@ -457,21 +462,28 @@ namespace FirebirdSql.Data.FirebirdClient
             }
         }
 
-		private int? GetSizeOfValue(object value)
+		#endregion
+
+		#region · Private Properties ·
+
+		private int? RealValueSize
 		{
-			string svalue = (value as string);
-			if (svalue != null)
+			get
 			{
-				return svalue.Length;
+				string svalue = (value as string);
+				if (svalue != null)
+				{
+					return svalue.Length;
+				}
+				byte[] bvalue = (value as byte[]);
+				if (bvalue != null)
+				{
+					return bvalue.Length;
+				}
+				return null;
 			}
-			byte[] bvalue = (value as byte[]);
-			if (bvalue != null)
-			{
-				return bvalue.Length;
-			}
-			return null;
 		}
 
         #endregion
-    }
+	}
 }
