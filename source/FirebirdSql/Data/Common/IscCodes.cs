@@ -52,11 +52,11 @@ namespace FirebirdSql.Data.Common
 
 		#region · Buffer sizes ·
 
-		public const int BUFFER_SIZE_128            = 128;
-		public const int BUFFER_SIZE_256            = 256;
-		public const int MAX_BUFFER_SIZE            = 8192;
-		public const int ROWS_AFFECTED_BUFFER_SIZE  = 34;
-		public const int STATEMENT_TYPE_BUFFER_SIZE = 8;
+		public const int BUFFER_SIZE_128			= 128;
+		public const int BUFFER_SIZE_256			= 256;
+		public const int DEFAULT_MAX_BUFFER_SIZE	= 8192;
+		public const int ROWS_AFFECTED_BUFFER_SIZE	= 34;
+		public const int STATEMENT_TYPE_BUFFER_SIZE	= 8;
 		public const int PREPARE_INFO_BUFFER_SIZE	= 32768;
 
 		#endregion

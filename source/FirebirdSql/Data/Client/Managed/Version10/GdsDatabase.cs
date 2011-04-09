@@ -615,7 +615,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         public virtual ArrayList GetDatabaseInfo(byte[] items)
         {
-            return this.GetDatabaseInfo(items, IscCodes.MAX_BUFFER_SIZE);
+            return this.GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
         }
 
         public virtual ArrayList GetDatabaseInfo(byte[] items, int bufferLength)

@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.Services
             this.state = FbServiceState.Closed;
             this.connectionString = string.Empty;
             this.serviceName = "service_mgr";
-            this.queryBufferSize = IscCodes.MAX_BUFFER_SIZE;
+            this.queryBufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
         }
 
         #endregion

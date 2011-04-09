@@ -197,7 +197,7 @@ namespace FirebirdSql.Data.Common
 		{
 			string	plan		= string.Empty;
 			int		count		= 0;
-			int		bufferSize	= IscCodes.MAX_BUFFER_SIZE;
+			int		bufferSize	= IscCodes.DEFAULT_MAX_BUFFER_SIZE;
 			byte[]	buffer		= this.GetSqlInfo(DescribePlanInfoItems, bufferSize);
 
 			while (buffer[0] == IscCodes.isc_info_truncated && count < 4)
@@ -297,7 +297,7 @@ namespace FirebirdSql.Data.Common
 
 		protected byte[] GetSqlInfo(byte[] items)
 		{
-			return this.GetSqlInfo(items, IscCodes.MAX_BUFFER_SIZE);
+			return this.GetSqlInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
 		}
 
         protected int GetRecordsAffected()
