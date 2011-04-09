@@ -286,7 +286,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] ReadBuffer()
 		{
-			return this.ReadOpaque(this.ReadInt32());
+			return this.ReadOpaque((ushort)this.ReadInt32());
 		}
 
 		public string ReadString()
