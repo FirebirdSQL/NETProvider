@@ -980,7 +980,7 @@ namespace FirebirdSql.Data.FirebirdClient
                     {
                         descriptor[index].Length = (short)parameter.Size;
                     }
-                    else if (parameter.Size > 0)
+                    else if (parameter.HasSize)
                     {
                         short len = (short)(parameter.Size * charset.BytesPerCharacter);
                         descriptor[index].Length = len;
