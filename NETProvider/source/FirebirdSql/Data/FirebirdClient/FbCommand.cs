@@ -1075,7 +1075,7 @@ namespace FirebirdSql.Data.FirebirdClient
                             case DbDataType.Text:
                                 {
                                     BlobBase blob = this.statement.CreateBlob();
-									if (this.Parameters[index].InternalValue.GetType() == typeof(byte[]))
+									if (this.Parameters[index].InternalValue is byte[])
 										blob.Write((byte[])this.Parameters[index].InternalValue);
 									else
 									    blob.Write((string)this.Parameters[index].InternalValue);
