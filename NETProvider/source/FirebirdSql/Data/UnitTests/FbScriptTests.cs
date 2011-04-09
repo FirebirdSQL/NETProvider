@@ -54,6 +54,16 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
+		[Test]
+		public void OneLineCommentOnLastLineTest()
+		{
+			const string script =
+@"select * from foo
+-- comment";
+			FbScript isql = new FbScript(script);
+			Assert.DoesNotThrow(() => isql.Parse());
+		}
+
 		#endregion
 	}
 }

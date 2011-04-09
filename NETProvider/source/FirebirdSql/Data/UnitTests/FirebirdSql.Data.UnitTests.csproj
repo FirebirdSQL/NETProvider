@@ -98,6 +98,7 @@
     <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient.csproj">
       <Project>{326A24F9-6259-45DB-835C-18DB80728460}</Project>
       <Name>FirebirdSql.Data.FirebirdClient</Name>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

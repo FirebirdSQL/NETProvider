@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.Isql
 				else if ((source[i] == '-' && (i < length - 1) && source[i + 1] == '-'))
 				{
 					i++;
-					while (source[i] != '\n')
+					while (i < length && source[i] != '\n')
 					{
 						i++;
 					}
