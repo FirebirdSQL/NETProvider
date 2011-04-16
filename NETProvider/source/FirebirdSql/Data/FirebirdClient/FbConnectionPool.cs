@@ -298,11 +298,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			FbConnectionPool pool = state as FbConnectionPool;
 
-			pool.Cleanup();
-
-			if (pool.Count == 0)
+			lock (pool.SyncObject)
 			{
-				lock (pool.SyncObject)
+				if (pool.disposed)
+					return;
+
+				pool.Cleanup();
+
+				if (pool.Count == 0)
 				{
 					// Empty pool
 					if (pool.EmptyPool != null)
@@ -310,6 +313,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						pool.EmptyPool(pool.connectionString, null);
 					}
 				}
+				
 				pool.cleanupTimer.Dispose();
 			}
 		}
