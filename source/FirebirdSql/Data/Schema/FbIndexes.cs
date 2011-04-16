@@ -101,45 +101,13 @@ namespace FirebirdSql.Data.Schema
 
             foreach (DataRow row in schema.Rows)
             {
-                if (row["IS_UNIQUE"] == DBNull.Value ||
-                     Convert.ToInt32(row["IS_UNIQUE"], CultureInfo.InvariantCulture) == 0)
-                {
-                    row["IS_UNIQUE"] = false;
-                }
-                else
-                {
-                    row["IS_UNIQUE"] = true;
-                }
+				row["IS_UNIQUE"] = !(row["IS_UNIQUE"] == DBNull.Value || Convert.ToInt32(row["IS_UNIQUE"], CultureInfo.InvariantCulture) == 0);
 
-                if (row["PRIMARY_KEY"] == DBNull.Value ||
-                     Convert.ToInt32(row["PRIMARY_KEY"], CultureInfo.InvariantCulture) != 0)
-                {
-                    row["IS_PRIMARY"] = true;
-                }
-                else
-                {
-                    row["IS_PRIMARY"] = false;
-                }
+                row["IS_PRIMARY"] = !(row["PRIMARY_KEY"] == DBNull.Value || Convert.ToInt32(row["PRIMARY_KEY"], CultureInfo.InvariantCulture) == 0);
+                
+				row["IS_INACTIVE"] = !(row["IS_INACTIVE"] == DBNull.Value || Convert.ToInt32(row["IS_INACTIVE"], CultureInfo.InvariantCulture) == 0);
 
-                if (row["IS_INACTIVE"] == DBNull.Value ||
-                    Convert.ToInt32(row["IS_INACTIVE"], CultureInfo.InvariantCulture) == 0)
-                {
-                    row["IS_INACTIVE"] = false;
-                }
-                else
-                {
-                    row["IS_INACTIVE"] = true;
-                }
-
-                if (row["IS_SYSTEM_INDEX"] == DBNull.Value ||
-                    Convert.ToInt32(row["IS_SYSTEM_INDEX"], CultureInfo.InvariantCulture) == 0)
-                {
-                    row["IS_SYSTEM_INDEX"] = false;
-                }
-                else
-                {
-                    row["IS_SYSTEM_INDEX"] = true;
-                }
+				row["IS_SYSTEM_INDEX"] = !(row["IS_SYSTEM_INDEX"] == DBNull.Value || Convert.ToInt32(row["IS_SYSTEM_INDEX"], CultureInfo.InvariantCulture) == 0);
             }
 
             schema.EndLoadData();
