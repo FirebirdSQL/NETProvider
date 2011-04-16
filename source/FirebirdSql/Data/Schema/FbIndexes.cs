@@ -121,16 +121,6 @@ namespace FirebirdSql.Data.Schema
                     row["IS_PRIMARY"] = false;
                 }
 
-                if (row["PRIMARY_KEY"] == DBNull.Value ||
-                      Convert.ToInt32(row["PRIMARY_KEY"], CultureInfo.InvariantCulture) != 0)
-                {
-                    row["IS_PRIMARY"] = true;
-                }
-                else
-                {
-                    row["IS_UNIQUE"] = false;
-                }
-
                 if (row["IS_INACTIVE"] == DBNull.Value ||
                     Convert.ToInt32(row["IS_INACTIVE"], CultureInfo.InvariantCulture) == 0)
                 {
