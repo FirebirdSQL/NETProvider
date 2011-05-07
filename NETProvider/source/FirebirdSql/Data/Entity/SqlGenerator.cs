@@ -1394,7 +1394,7 @@ namespace FirebirdSql.Data.Entity
 			{
 				shouldCastParameter = false;
 			}
-			
+
 			result.Append(e.Argument.Accept(this));
 			result.Append(" LIKE ");
 			result.Append(e.Pattern.Accept(this));
@@ -1552,17 +1552,17 @@ namespace FirebirdSql.Data.Entity
 			string sqlPrimitiveType = null;
 			if (shouldCastParameter)
 			{
-			    sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType);
-			    result.Append("CAST(");
+				sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType);
+				result.Append("CAST(");
 			}
 			// Do not quote this name.
 			// We are not checking that e.Name has no illegal characters. e.g. space
 			result.Append("@" + e.ParameterName);
 			if (shouldCastParameter)
 			{
-			    result.Append(" AS ");
-			    result.Append(sqlPrimitiveType);
-			    result.Append(")");
+				result.Append(" AS ");
+				result.Append(sqlPrimitiveType);
+				result.Append(")");
 			}
 
 			return result;
