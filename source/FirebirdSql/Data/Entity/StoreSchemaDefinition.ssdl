@@ -220,7 +220,7 @@
       <DefiningQuery>
         -- SFunctionParameters
         SELECT
-        TRIM(fa.rdb$function_name) || 'x' || 'param' || TRIM(fa.rdb$argument_position) as "Id"
+        TRIM(fa.rdb$function_name) || 'x' || TRIM(fa.rdb$argument_position) as "Id"
         , TRIM(fa.rdb$function_name) as "ParentId"
         , 'param' || TRIM(fa.rdb$argument_position) as "Name"
         , fa.rdb$argument_position as "Ordinal"
@@ -417,16 +417,16 @@
         -- SViewConstraints
         SELECT
         CAST(NULL as varchar(1)) as "Id"
-        , CAST(NULL as varchar(256)) as "ParentId"
-        , CAST(NULL as varchar(256)) as "Name"
-        , CAST(NULL as varchar(256)) as "ConstraintType"
+        , CAST(NULL as varchar(1)) as "ParentId"
+        , CAST(NULL as varchar(1)) as "Name"
+        , CAST(NULL as varchar(1)) as "ConstraintType"
         , CAST(0 as smallint) as "IsDeferrable"
         , CAST(0 as smallint) as "IsInitiallyDeferred"
-        , CAST(NULL as varchar(1000)) as "Expression"
-        , CAST(NULL as varchar(11)) as "UpdateRule"
-        , CAST(NULL as varchar(11)) as "DeleteRule"
+        , CAST(NULL as varchar(1)) as "Expression"
+        , CAST(NULL as varchar(1)) as "UpdateRule"
+        , CAST(NULL as varchar(1)) as "DeleteRule"
         FROM rdb$database
-        WHERE 1=2
+        WHERE 0=1
       </DefiningQuery>
     </EntitySet>
     <EntitySet Name="SViewConstraintColumns" EntityType="Self.ConstraintColumn">
@@ -434,9 +434,9 @@
         -- SViewConstraintColumns
         SELECT
         CAST(NULL as varchar(1)) as "ConstraintId"
-        , CAST(NULL as varchar(1000)) as "ColumnId"
+        , CAST(NULL as varchar(1)) as "ColumnId"
         FROM rdb$database
-        WHERE 1=2
+        WHERE 0=1
       </DefiningQuery>
     </EntitySet>
     <EntitySet Name="SViewForeignKeys" EntityType="Self.ForeignKey">
@@ -444,72 +444,72 @@
         -- SViewForeignKeys
         SELECT
         CAST(NULL as varchar(1)) as "Id"
-        ,  CAST(NULL as varchar(100)) as "ToColumnId"
-        ,  CAST(NULL as varchar(100)) as "FromColumnId"
+        ,  CAST(NULL as varchar(1)) as "ToColumnId"
+        ,  CAST(NULL as varchar(1)) as "FromColumnId"
         ,  CAST(NULL as varchar(1)) as "ConstraintId"
         ,  0 as "Ordinal"
         FROM rdb$database
-        WHERE 1=2
+        WHERE 0=1
       </DefiningQuery>
     </EntitySet>
 
-    <AssociationSet Name="STableTableColumns" Association="Self.TableTableColumn" >
-      <End Role="Parent" EntitySet="STables"/>
-      <End Role="Column" EntitySet="STableColumns"/>
+    <AssociationSet Name="STableTableColumns" Association="Self.TableTableColumn">
+      <End Role="Parent" EntitySet="STables" />
+      <End Role="Column" EntitySet="STableColumns" />
     </AssociationSet>
-    <AssociationSet Name="STableConstraints" Association="Self.TableTableConstraint" >
-      <End Role="Parent" EntitySet="STables"/>
-      <End Role="Constraint" EntitySet="SConstraints"/>
+    <AssociationSet Name="STableConstraints" Association="Self.TableTableConstraint">
+      <End Role="Parent" EntitySet="STables" />
+      <End Role="Constraint" EntitySet="SConstraints" />
     </AssociationSet>
-    <AssociationSet Name="SConstraintConstraintColumns" Association="Self.ConstraintConstraintColumn" >
-      <End Role="ConstraintColumn" EntitySet="SConstraintColumns"/>
-      <End Role="Constraint" EntitySet="SConstraints"/>
+    <AssociationSet Name="SConstraintConstraintColumns" Association="Self.ConstraintConstraintColumn">
+      <End Role="ConstraintColumn" EntitySet="SConstraintColumns" />
+      <End Role="Constraint" EntitySet="SConstraints" />
     </AssociationSet>
-    <AssociationSet Name="SConstraintForeignKeys" Association="Self.ConstraintForeignKey" >
-      <End Role="ForeignKey" EntitySet="SForeignKeys"/>
-      <End Role="Constraint" EntitySet="SForeignKeyConstraints"/>
+    <AssociationSet Name="SConstraintForeignKeys" Association="Self.ConstraintForeignKey">
+      <End Role="ForeignKey" EntitySet="SForeignKeys" />
+      <End Role="Constraint" EntitySet="SForeignKeyConstraints" />
     </AssociationSet>
-    <AssociationSet Name="SFromForeignKeyColumns" Association="Self.FromForeignKeyColumn" >
-      <End Role="ForeignKey" EntitySet="SForeignKeys"/>
-      <End Role="Column" EntitySet="STableColumns"/>
+    <AssociationSet Name="SFromForeignKeyColumns" Association="Self.FromForeignKeyColumn">
+      <End Role="ForeignKey" EntitySet="SForeignKeys" />
+      <End Role="Column" EntitySet="STableColumns" />
     </AssociationSet>
-    <AssociationSet Name="SToForeignKeyColumns" Association="Self.ToForeignKeyColumn" >
-      <End Role="ForeignKey" EntitySet="SForeignKeys"/>
-      <End Role="Column" EntitySet="STableColumns"/>
+    <AssociationSet Name="SToForeignKeyColumns" Association="Self.ToForeignKeyColumn">
+      <End Role="ForeignKey" EntitySet="SForeignKeys" />
+      <End Role="Column" EntitySet="STableColumns" />
     </AssociationSet>
 
-    <AssociationSet Name="SViewViewColumns" Association="Self.ViewViewColumn" >
-      <End Role="Parent" EntitySet="SViews"/>
-      <End Role="Column" EntitySet="SViewColumns"/>
+    <AssociationSet Name="SViewViewColumns" Association="Self.ViewViewColumn">
+      <End Role="Parent" EntitySet="SViews" />
+      <End Role="Column" EntitySet="SViewColumns" />
     </AssociationSet>
-    <AssociationSet Name="SViewViewConstraints" Association="Self.ViewViewConstraint" >
-      <End Role="Parent" EntitySet="SViews"/>
-      <End Role="Constraint" EntitySet="SViewConstraints"/>
+    <AssociationSet Name="SViewViewConstraints" Association="Self.ViewViewConstraint">
+      <End Role="Parent" EntitySet="SViews" />
+      <End Role="Constraint" EntitySet="SViewConstraints" />
     </AssociationSet>
-    <AssociationSet Name="SViewConstraintConstraintColumns" Association="Self.ViewConstraintConstraintColumn" >
-      <End Role="ConstraintColumn" EntitySet="SViewConstraintColumns"/>
-      <End Role="Constraint" EntitySet="SViewConstraints"/>
+    <AssociationSet Name="SViewConstraintConstraintColumns" Association="Self.ViewConstraintConstraintColumn">
+      <End Role="ConstraintColumn" EntitySet="SViewConstraintColumns" />
+      <End Role="Constraint" EntitySet="SViewConstraints" />
     </AssociationSet>
-    <AssociationSet Name="SViewConstraintForeignKeys" Association="Self.ViewConstraintForeignKey" >
-      <End Role="ForeignKey" EntitySet="SViewForeignKeys"/>
-      <End Role="Constraint" EntitySet="SViewConstraints"/>
+    <AssociationSet Name="SViewConstraintForeignKeys" Association="Self.ViewConstraintForeignKey">
+      <End Role="ForeignKey" EntitySet="SViewForeignKeys" />
+      <End Role="Constraint" EntitySet="SViewConstraints" />
     </AssociationSet>
-    <AssociationSet Name="SFromForeignKeyViewColumns" Association="Self.FromForeignKeyViewColumn" >
-      <End Role="ForeignKey" EntitySet="SViewForeignKeys"/>
-      <End Role="Column" EntitySet="SViewColumns"/>
+    <AssociationSet Name="SFromForeignKeyViewColumns" Association="Self.FromForeignKeyViewColumn">
+      <End Role="ForeignKey" EntitySet="SViewForeignKeys" />
+      <End Role="Column" EntitySet="SViewColumns" />
     </AssociationSet>
-    <AssociationSet Name="SToForeignKeyViewColumns" Association="Self.ToForeignKeyViewColumn" >
-      <End Role="ForeignKey" EntitySet="SViewForeignKeys"/>
-      <End Role="Column" EntitySet="SViewColumns"/>
+    <AssociationSet Name="SToForeignKeyViewColumns" Association="Self.ToForeignKeyViewColumn">
+      <End Role="ForeignKey" EntitySet="SViewForeignKeys" />
+      <End Role="Column" EntitySet="SViewColumns" />
     </AssociationSet>
 
     <AssociationSet Name="FunctionFunctionParameters" Association="Self.FunctionFunctionParameter">
-      <End Role="Function" EntitySet="SFunctions"/>
-      <End Role="Parameter" EntitySet="SFunctionParameters"/>
+      <End Role="Function" EntitySet="SFunctions" />
+      <End Role="Parameter" EntitySet="SFunctionParameters" />
     </AssociationSet>
-    <AssociationSet Name="ProcedureProcedureParameters" Association="Self.ProcedureProcedureParameter" >
-      <End Role="Procedure" EntitySet="SProcedures"/>
-      <End Role="Parameter" EntitySet="SProcedureParameters"/>
+    <AssociationSet Name="ProcedureProcedureParameters" Association="Self.ProcedureProcedureParameter">
+      <End Role="Procedure" EntitySet="SProcedures" />
+      <End Role="Parameter" EntitySet="SProcedureParameters" />
     </AssociationSet>
     
   </EntityContainer>
@@ -518,19 +518,19 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
-    <Property Name="CatalogName" Type="varchar" MaxLength="256" />
-    <Property Name="SchemaName" Type="varchar" MaxLength="256" />
-    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256" />
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="CatalogName" Type="varchar" MaxLength="8" />
+    <Property Name="SchemaName" Type="varchar" MaxLength="8" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="31" />
   </EntityType>
 
-  <EntityType Name="TableColumn" >
+  <EntityType Name="TableColumn">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar"/>
-    <Property Name="ParentId" Nullable="false" Type="varchar"/>
-    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="63" />
+    <Property Name="ParentId" Nullable="false" MaxLength="31" Type="varchar" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="31" />
     <Property Name="Ordinal" Nullable="false" Type="int" />
     <Property Name="IsNullable" Nullable="false" Type="smallint_bool" />
     <Property Name="TypeName" Nullable="false" Type="varchar" MaxLength="256" />
@@ -547,17 +547,17 @@
     <Property Name="IsMultiSet" Nullable="false" Type="smallint_bool" />
     <Property Name="IsIdentity" Nullable="false" Type="smallint_bool" />
     <Property Name="IsStoreGenerated" Nullable="false" Type="smallint_bool" />
-    <Property Name="Default" Nullable="true" Type="varchar"/>
+    <Property Name="Default" Nullable="true" Type="varchar" />
   </EntityType>
 
   <EntityType Name="View">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
-    <Property Name="CatalogName" Type="varchar" MaxLength="256" />
-    <Property Name="SchemaName" Type="varchar" MaxLength="256" />
-    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256" />
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="CatalogName" Type="varchar" MaxLength="8" />
+    <Property Name="SchemaName" Type="varchar" MaxLength="8" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="31" />
     <Property Name="ViewDefinition" Nullable="true" Type="varchar" />
     <Property Name="IsUpdatable" Nullable="false" Type="smallint_bool" />
   </EntityType>
@@ -566,9 +566,9 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar"/>
-    <Property Name="ParentId" Nullable="false" Type="varchar"/>
-    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="63" />
+    <Property Name="ParentId" Nullable="false" MaxLength="31" Type="varchar" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="31" />
     <Property Name="Ordinal" Nullable="false" Type="int" />
     <Property Name="IsNullable" Nullable="false" Type="smallint_bool" />
     <Property Name="TypeName" Nullable="false" Type="varchar" MaxLength="256" />
@@ -585,17 +585,17 @@
     <Property Name="IsMultiSet" Nullable="false" Type="smallint_bool" />
     <Property Name="IsIdentity" Nullable="false" Type="smallint_bool" />
     <Property Name="IsStoreGenerated" Nullable="false" Type="smallint_bool" />
-    <Property Name="Default" Nullable="true" Type="varchar"/>
+    <Property Name="Default" Nullable="true" Type="varchar" />
   </EntityType>
 
   <EntityType Name="Function">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar"/>
-    <Property Name="CatalogName" Type="varchar" MaxLength="256"/>
-    <Property Name="SchemaName" Type="varchar" MaxLength="256"/>
-    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="CatalogName" Type="varchar" MaxLength="8" />
+    <Property Name="SchemaName" Type="varchar" MaxLength="8" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="31" />
     <Property Name="ReturnTypeName" Type="varchar" MaxLength="256" />
     <Property Name="ReturnMaxLength" Type="int" />
     <Property Name="ReturnPrecision" Type="int" />
@@ -617,20 +617,20 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar"/>
-    <Property Name="CatalogName" Type="varchar" MaxLength="256"/>
-    <Property Name="SchemaName" Type="varchar" MaxLength="256"/>
-    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="256"/>
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="CatalogName" Type="varchar" MaxLength="8" />
+    <Property Name="SchemaName" Type="varchar" MaxLength="8" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="31" />
   </EntityType>
 
   <EntityType Name="Parameter">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar"/>
-    <Property Name="ParentId" Nullable="false" Type="varchar"/>
-    <Property Name="Name" Nullable="false" Type="varchar" />
-    <Property Name="Ordinal" Nullable="false" Type="int"/>
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="63" />
+    <Property Name="ParentId" Nullable="false" MaxLength="31" Type="varchar" />
+    <Property Name="Name" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="Ordinal" Nullable="false" Type="int" />
     <Property Name="TypeName" Nullable="false" Type="varchar" MaxLength="256" />
     <Property Name="MaxLength" Nullable="true" Type="int" />
     <Property Name="Precision" Nullable="true" Type="int" />
@@ -651,9 +651,9 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
-    <Property Name="ParentId" Nullable="false" Type="varchar" />
-    <Property Name="Name" Nullable="false" MaxLength="256" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="ParentId" Nullable="false" MaxLength="31" Type="varchar" />
+    <Property Name="Name" Nullable="false" MaxLength="31" Type="varchar" />
     <Property Name="IsDeferrable" Nullable="false" Type="smallint_bool" />
     <Property Name="IsInitiallyDeferred" Nullable="false" Type="smallint_bool" />
     <Property Name="ConstraintType" Nullable="false" MaxLength="11" Type="varchar" />
@@ -663,8 +663,8 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
-    <Property Name="Expression" Nullable="true" MaxLength="4000" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="Expression" Nullable="true" MaxLength="1000" Type="varchar" />
   </EntityType>
 
   <EntityType Name="ConstraintColumn">
@@ -672,15 +672,15 @@
       <PropertyRef Name="ConstraintId" />
       <PropertyRef Name="ColumnId" />
     </Key>
-    <Property Name="ConstraintId" Nullable="false" Type="varchar" />
-    <Property Name="ColumnId" Nullable="false" Type="varchar" />
+    <Property Name="ConstraintId" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="ColumnId" Nullable="false" MaxLength="63" Type="varchar" />
   </EntityType>
 
   <EntityType Name="ForeignKeyConstraint">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
     <Property Name="UpdateRule" Nullable="false" MaxLength="11" Type="varchar" />
     <Property Name="DeleteRule" Nullable="false" MaxLength="11" Type="varchar" />
   </EntityType>
@@ -689,24 +689,24 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
     <Property Name="Ordinal" Nullable="false" Type="int" />
-    <Property Name="ConstraintId" Nullable="false" Type="varchar" />
-    <Property Name="FromColumnId" Nullable="false" Type="varchar" />
-    <Property Name="ToColumnId" Nullable="false" Type="varchar" />
+    <Property Name="ConstraintId" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="FromColumnId" Nullable="false" MaxLength="63" Type="varchar" />
+    <Property Name="ToColumnId" Nullable="false" MaxLength="63" Type="varchar" />
   </EntityType>
 
   <EntityType Name="ViewConstraint">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Nullable="false" Type="varchar" />
-    <Property Name="ParentId" Nullable="false" Type="varchar" />
-    <Property Name="Name" Nullable="false" MaxLength="256" Type="varchar" />
+    <Property Name="Id" Nullable="false" Type="varchar" MaxLength="31" />
+    <Property Name="ParentId" Nullable="false" MaxLength="31" Type="varchar" />
+    <Property Name="Name" Nullable="false" MaxLength="31" Type="varchar" />
     <Property Name="IsDeferrable" Nullable="false" Type="smallint_bool" />
     <Property Name="IsInitiallyDeferred" Nullable="false" Type="smallint_bool" />
     <Property Name="ConstraintType" Nullable="false" MaxLength="11" Type="varchar" />
-    <Property Name="Expression" Nullable="true" MaxLength="4000" Type="varchar" />
+    <Property Name="Expression" Nullable="true" MaxLength="1000" Type="varchar" />
     <Property Name="UpdateRule" Nullable="true" MaxLength="11" Type="varchar" />
     <Property Name="DeleteRule" Nullable="true" MaxLength="11" Type="varchar" />
   </EntityType>
