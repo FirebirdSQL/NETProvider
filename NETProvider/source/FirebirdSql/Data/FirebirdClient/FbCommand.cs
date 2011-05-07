@@ -29,8 +29,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
+using System.Diagnostics;
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -1128,14 +1130,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         private void Prepare(bool returnsSet)
         {
-#if (DEBUG)
-            System.Diagnostics.Debug.WriteLine(string.Format("Command:\n{0}", commandText));
-            if (this.parameters != null)
-                foreach (FbParameter item in this.parameters)
-                {
-                    System.Diagnostics.Debug.WriteLine(string.Format("Name:{0} \t Type:{1} \t Value:{2}", item.InternalParameterName, item.FbDbType, item.InternalValue));
-                }
-#endif
+			LogCommand();
 
             FbConnectionInternal innerConn = this.connection.InnerConnection;
 
@@ -1393,6 +1388,28 @@ namespace FirebirdSql.Data.FirebirdClient
                 throw new InvalidOperationException("The command text for this Command has not been set.");
             }
         }
+
+		[Conditional(TraceHelper.ConditionalSymbol)]
+		private void LogCommand()
+		{
+			TraceHelper.WriteLine("Command:\n{0}", commandText);
+			TraceHelper.WriteLine("Parameters:");
+			if (this.parameters != null)
+			{
+				using (TraceHelper.Indent())
+				{
+					foreach (FbParameter item in this.parameters)
+					{
+						TraceHelper.WriteLine("Name:{0}\tType:{1}\t Used Value:{2}", item.ParameterName, item.FbDbType, (!IsNullParameterValue(item.InternalValue) ? item.InternalValue : "<null>"));
+					}
+				}
+			}
+		}
+
+		private bool IsNullParameterValue(object value)
+		{
+			return (value == DBNull.Value || value == null);
+		}
 
         #endregion
     }
