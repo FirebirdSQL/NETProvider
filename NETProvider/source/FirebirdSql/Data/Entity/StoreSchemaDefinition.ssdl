@@ -336,6 +336,7 @@
         , NULL as "Default"
         FROM
         rdb$procedure_parameters pp INNER JOIN rdb$fields f ON (pp.rdb$field_source = f.rdb$field_name)
+        WHERE pp.rdb$parameter_type = 0 --Out params in EF are not results
       </DefiningQuery>
     </EntitySet>
 
