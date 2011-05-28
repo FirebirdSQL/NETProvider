@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Linq;
 
 namespace FirebirdSql.Data.Services
 {
@@ -27,7 +26,7 @@ namespace FirebirdSql.Data.Services
 	{
 		public override string ToString()
 		{
-			return string.Join(Environment.NewLine, this.Select(x => x.ToString()));
+			return string.Join(Environment.NewLine, this.ConvertAll(x => x.ToString()).ToArray());
 		}
 	}
 }

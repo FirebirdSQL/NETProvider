@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
@@ -39,9 +38,6 @@ namespace FirebirdSql.Data.Services
 		public FbDatabaseTraceConfigurationCollection DatabasesConfigurations { get; private set; }
 		public FbServiceTraceConfiguration ServiceConfiguration { get; set; }
 		#endregion
-
-#warning The "try" can be placed to closer to start task (everywhere)
-#warning Properties using automatic ones
 
 		#region Methods
 		public void Start(string sessionName)
