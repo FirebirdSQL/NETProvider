@@ -19,6 +19,8 @@
 using System;
 using System.Text;
 
+using FirebirdSql.Common;
+
 namespace FirebirdSql.Data.Services
 {
 	public class FbDatabaseTraceConfiguration
@@ -71,41 +73,41 @@ namespace FirebirdSql.Data.Services
 				sb.AppendFormat("exclude_filter {0}", this.ExcludeFilter);
 				sb.AppendLine();
 			}
-			sb.AppendFormat("log_connections {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.Connections) ? "true" : "false"));
+			sb.AppendFormat("log_connections {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.Connections) ? "true" : "false"));
 			sb.AppendLine();
 			sb.AppendFormat("connection_id {0}", this.ConnectionID);
 			sb.AppendLine();
-			sb.AppendFormat("log_transactions {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.Transactions) ? "true" : "false"));
+			sb.AppendFormat("log_transactions {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.Transactions) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_statement_prepare {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.StatementPrepare) ? "true" : "false"));
+			sb.AppendFormat("log_statement_prepare {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.StatementPrepare) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_statement_free {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.StatementFree) ? "true" : "false"));
+			sb.AppendFormat("log_statement_free {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.StatementFree) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_statement_start {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.StatementStart) ? "true" : "false"));
+			sb.AppendFormat("log_statement_start {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.StatementStart) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_statement_finish {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.StatementFinish) ? "true" : "false"));
+			sb.AppendFormat("log_statement_finish {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.StatementFinish) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_procedure_start {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.ProcedureStart) ? "true" : "false"));
+			sb.AppendFormat("log_procedure_start {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.ProcedureStart) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_procedure_finish {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.ProcedureFinish) ? "true" : "false"));
+			sb.AppendFormat("log_procedure_finish {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.ProcedureFinish) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_trigger_start {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.TriggerStart) ? "true" : "false"));
+			sb.AppendFormat("log_trigger_start {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.TriggerStart) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_trigger_finish {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.TriggerFinish) ? "true" : "false"));
+			sb.AppendFormat("log_trigger_finish {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.TriggerFinish) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_context {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.Context) ? "true" : "false"));
+			sb.AppendFormat("log_context {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.Context) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("print_plan {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.PrintPlan) ? "true" : "false"));
+			sb.AppendFormat("print_plan {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.PrintPlan) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("print_perf {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.PrintPerf) ? "true" : "false"));
+			sb.AppendFormat("print_perf {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.PrintPerf) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_blr_requests {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.BLRRequests) ? "true" : "false"));
+			sb.AppendFormat("log_blr_requests {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.BLRRequests) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("print_blr {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.PrintBLR) ? "true" : "false"));
+			sb.AppendFormat("print_blr {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.PrintBLR) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("log_dyn_requests {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.DYNRequests) ? "true" : "false"));
+			sb.AppendFormat("log_dyn_requests {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.DYNRequests) ? "true" : "false"));
 			sb.AppendLine();
-			sb.AppendFormat("print_dyn {0}", (this.Events.HasFlag(FbDatabaseTraceEvents.PrintDYN) ? "true" : "false"));
+			sb.AppendFormat("print_dyn {0}", (Extensions.HasFlag(this.Events, FbDatabaseTraceEvents.PrintDYN) ? "true" : "false"));
 			sb.AppendLine();
 			sb.AppendFormat("time_threshold {0}", this.TimeThreshold);
 			sb.AppendLine();
