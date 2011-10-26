@@ -180,12 +180,9 @@ namespace FirebirdSql.Data.Common
 
 		protected virtual void Dispose(bool disposing)
 		{
-			lock (this)
+			if (!this.disposed)
 			{
-				if (!this.disposed)
-				{
-					this.disposed = true;
-				}
+				this.disposed = true;
 			}
 		}
 
