@@ -325,7 +325,7 @@ namespace FirebirdSql.Data.Isql
         /// <summary>
         /// Represents the SQL statement: <b>RECREATE PROCEDURE</b>
         /// </summary>
-        RecereateProcedure,
+        RecreateProcedure,
 
         /// <summary>
         /// Represents the SQL statement: <b>RECREATE TABLE</b>

@@ -370,7 +370,7 @@ namespace FirebirdSql.Data.Isql
                             this.OnCommandExecuted(sqlStatement, null, rowsAffected);
                             break;
 
-                        case SqlStatementType.RecereateProcedure:
+                        case SqlStatementType.RecreateProcedure:
                         case SqlStatementType.RecreateTable:
                         case SqlStatementType.RecreateView:
                             // raise the event
@@ -1071,7 +1071,7 @@ namespace FirebirdSql.Data.Isql
                     }
                     if (StringParser.StartsWith(sqlStatement, "RECREATE PROCEDURE", true))
                     {
-                        return SqlStatementType.RecereateProcedure;
+                        return SqlStatementType.RecreateProcedure;
                     }
                     if (StringParser.StartsWith(sqlStatement, "RECREATE TABLE", true) ||
                         StringParser.StartsWith(sqlStatement, "RECREATE GLOBAL TEMPORARY TABLE", true))
