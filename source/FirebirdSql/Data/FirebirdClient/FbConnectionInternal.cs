@@ -32,389 +32,391 @@ using FirebirdSql.Data.Schema;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    internal class FbConnectionInternal : MarshalByRefObject, IDisposable
-    {
-        #region · Fields ·
+	internal class FbConnectionInternal : MarshalByRefObject, IDisposable
+	{
+		#region · Fields ·
 
-        private IDatabase db;
-        private FbTransaction activeTransaction;
-        private List<WeakReference> preparedCommands;
-        private FbConnectionString options;
-        private FbConnection owningConnection;
-        private long created;
-        private long lifetime;
-        private bool pooled;
-        private bool disposed;
+		private IDatabase db;
+		private FbTransaction activeTransaction;
+		private List<WeakReference> preparedCommands;
+		private FbConnectionString options;
+		private FbConnection owningConnection;
+		private long created;
+		private long lifetime;
+		private bool pooled;
+		private bool disposed;
+		private object preparedCommandsCleanupSyncRoot;
 
 #if (!NET_CF)
-        private FbEnlistmentNotification enlistmentNotification;
+		private FbEnlistmentNotification enlistmentNotification;
 #endif
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
 		public IDatabase Database
 		{
 			get { return this.db; }
 		}
 
-        public long Lifetime
-        {
-            get { return this.lifetime; }
-            set { this.lifetime = value; }
-        }
+		public long Lifetime
+		{
+			get { return this.lifetime; }
+			set { this.lifetime = value; }
+		}
 
-        public long Created
-        {
-            get { return this.created; }
-            set { this.created = value; }
-        }
+		public long Created
+		{
+			get { return this.created; }
+			set { this.created = value; }
+		}
 
-        public bool Pooled
-        {
-            get { return this.pooled; }
-            set { this.pooled = value; }
-        }
+		public bool Pooled
+		{
+			get { return this.pooled; }
+			set { this.pooled = value; }
+		}
 
-        public bool HasActiveTransaction
-        {
-            get
-            {
-                return this.activeTransaction != null && !this.activeTransaction.IsUpdated;
-            }
-        }
+		public bool HasActiveTransaction
+		{
+			get
+			{
+				return this.activeTransaction != null && !this.activeTransaction.IsUpdated;
+			}
+		}
 
-        public FbTransaction ActiveTransaction
-        {
-            get { return this.activeTransaction; }
-        }
+		public FbTransaction ActiveTransaction
+		{
+			get { return this.activeTransaction; }
+		}
 
-        public FbConnectionString ConnectionOptions
-        {
-            get { return this.options; }
-        }
+		public FbConnectionString ConnectionOptions
+		{
+			get { return this.options; }
+		}
 
-        public FbConnection OwningConnection
-        {
-            get { return this.owningConnection; }
-            set { this.owningConnection = value; }
-        }
+		public FbConnection OwningConnection
+		{
+			get { return this.owningConnection; }
+			set { this.owningConnection = value; }
+		}
 
-        public bool IsEnlisted
-        {
+		public bool IsEnlisted
+		{
 #if (!NET_CF)
-            get { return this.enlistmentNotification != null && !this.enlistmentNotification.IsCompleted; }
+			get { return this.enlistmentNotification != null && !this.enlistmentNotification.IsCompleted; }
 #else
-            get { return false; }
+			get { return false; }
 #endif
-        }
+		}
 
 		public bool CancelDisabled { get; set; }
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FbConnectionInternal(FbConnectionString options)
-            : this(options, null)
-        {
-        }
+		public FbConnectionInternal(FbConnectionString options)
+			: this(options, null)
+		{
+		}
 
-        public FbConnectionInternal(FbConnectionString options, FbConnection owningConnection)
+		public FbConnectionInternal(FbConnectionString options, FbConnection owningConnection)
 		{
 			this.preparedCommands = new List<WeakReference>();
+			this.preparedCommandsCleanupSyncRoot = new object();
 
-            this.options = options;
-            this.owningConnection = owningConnection;
+			this.options = options;
+			this.owningConnection = owningConnection;
 
-            GC.SuppressFinalize(this);
-        }
+			GC.SuppressFinalize(this);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Finalizer ·
+		#region · Finalizer ·
 
-        ~FbConnectionInternal()
-        {
-            // Do not re-create Dispose clean-up code here.
-            // Calling Dispose(false) is optimal in terms of
-            // readability and maintainability.
-            this.Dispose(false);
-        }
+		~FbConnectionInternal()
+		{
+			// Do not re-create Dispose clean-up code here.
+			// Calling Dispose(false) is optimal in terms of
+			// readability and maintainability.
+			this.Dispose(false);
+		}
 
-        #endregion
+		#endregion
 
-        #region · IDisposable Methods ·
+		#region · IDisposable Methods ·
 
-        public void Dispose()
-        {
-            this.Dispose(true);
+		public void Dispose()
+		{
+			this.Dispose(true);
 
-            // This object will be cleaned up by the Dispose method.
-            // Therefore, you should call GC.SupressFinalize to
-            // take this object off the finalization queue 
-            // and prevent finalization code for this object
-            // from executing a second time.
-            GC.SuppressFinalize(this);
-        }
+			// This object will be cleaned up by the Dispose method.
+			// Therefore, you should call GC.SupressFinalize to
+			// take this object off the finalization queue 
+			// and prevent finalization code for this object
+			// from executing a second time.
+			GC.SuppressFinalize(this);
+		}
 
-        protected void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (!this.disposed)
-                {
-                    // release any unmanaged resources
-                    this.Disconnect();
+		protected void Dispose(bool disposing)
+		{
+			lock (this)
+			{
+				if (!this.disposed)
+				{
+					// release any unmanaged resources
+					this.Disconnect();
 
-                    if (disposing)
-                    {
-                        // release managed resources here
-                    }
+					if (disposing)
+					{
+						// release managed resources here
+					}
 
-                    this.disposed = true;
-                }
-            }
-        }
+					this.disposed = true;
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Create and Drop database methods ·
+		#region · Create and Drop database methods ·
 
-        public void CreateDatabase(DatabaseParameterBuffer dpb)
-        {
-            IDatabase db = ClientFactory.CreateDatabase(this.options);
-            db.CreateDatabase(dpb, this.options.DataSource, this.options.Port, this.options.Database);
-        }
+		public void CreateDatabase(DatabaseParameterBuffer dpb)
+		{
+			IDatabase db = ClientFactory.CreateDatabase(this.options);
+			db.CreateDatabase(dpb, this.options.DataSource, this.options.Port, this.options.Database);
+		}
 
-        public void DropDatabase()
-        {
-            IDatabase db = ClientFactory.CreateDatabase(this.options);
-            db.Attach(this.BuildDpb(db, this.options), this.options.DataSource, this.options.Port, this.options.Database);
-            db.DropDatabase();
-        }
+		public void DropDatabase()
+		{
+			IDatabase db = ClientFactory.CreateDatabase(this.options);
+			db.Attach(this.BuildDpb(db, this.options), this.options.DataSource, this.options.Port, this.options.Database);
+			db.DropDatabase();
+		}
 
-        #endregion
+		#endregion
 
-        #region · Connect and Disconnect methods ·
+		#region · Connect and Disconnect methods ·
 
-        public void Connect()
-        {
-            if (Charset.GetCharset(this.options.Charset) == null)
-            {
-                throw new FbException("Invalid character set specified");
-            }
+		public void Connect()
+		{
+			if (Charset.GetCharset(this.options.Charset) == null)
+			{
+				throw new FbException("Invalid character set specified");
+			}
 
-            try
-            {
-                this.db = ClientFactory.CreateDatabase(this.options);
-                this.db.Charset = Charset.GetCharset(this.options.Charset);
-                this.db.Dialect = this.options.Dialect;
-                this.db.PacketSize = this.options.PacketSize;
+			try
+			{
+				this.db = ClientFactory.CreateDatabase(this.options);
+				this.db.Charset = Charset.GetCharset(this.options.Charset);
+				this.db.Dialect = this.options.Dialect;
+				this.db.PacketSize = this.options.PacketSize;
 
-                DatabaseParameterBuffer dpb = this.BuildDpb(this.db, options);
+				DatabaseParameterBuffer dpb = this.BuildDpb(this.db, options);
 
-                if (options.FallIntoTrustedAuth)
-                {
-                    this.db.AttachWithTrustedAuth(dpb, this.options.DataSource, this.options.Port, this.options.Database);
-                }
-                else
-                {
-                    this.db.Attach(dpb, this.options.DataSource, this.options.Port, this.options.Database);
-                }
-            }
-            catch (IscException ex)
-            {
-                throw new FbException(ex.Message, ex);
-            }
-        }
+				if (options.FallIntoTrustedAuth)
+				{
+					this.db.AttachWithTrustedAuth(dpb, this.options.DataSource, this.options.Port, this.options.Database);
+				}
+				else
+				{
+					this.db.Attach(dpb, this.options.DataSource, this.options.Port, this.options.Database);
+				}
+			}
+			catch (IscException ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+		}
 
-        public void Disconnect()
-        {
-            if (this.db != null)
-            {
-                try
-                {
-                    this.db.Dispose();
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    this.db = null;
-                    this.owningConnection = null;
-                    this.options = null;
-                    this.lifetime = 0;
-                    this.pooled = false;
-                }
-            }
-        }
+		public void Disconnect()
+		{
+			if (this.db != null)
+			{
+				try
+				{
+					this.db.Dispose();
+				}
+				catch
+				{
+				}
+				finally
+				{
+					this.db = null;
+					this.owningConnection = null;
+					this.options = null;
+					this.lifetime = 0;
+					this.pooled = false;
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Transaction Handling Methods ·
+		#region · Transaction Handling Methods ·
 
-        public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
-        {
-            lock (this)
-            {
-                if (this.HasActiveTransaction)
-                {
-                    throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
-                }
+		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
+		{
+			lock (this)
+			{
+				if (this.HasActiveTransaction)
+				{
+					throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
+				}
 
-                try
-                {
-                    this.activeTransaction = new FbTransaction(this.owningConnection, level);
-                    this.activeTransaction.BeginTransaction();
+				try
+				{
+					this.activeTransaction = new FbTransaction(this.owningConnection, level);
+					this.activeTransaction.BeginTransaction();
 
-                    if (transactionName != null)
-                    {
-                        this.activeTransaction.Save(transactionName);
-                    }
-                }
-                catch (IscException ex)
-                {
-                    throw new FbException(ex.Message, ex);
-                }
-            }
+					if (transactionName != null)
+					{
+						this.activeTransaction.Save(transactionName);
+					}
+				}
+				catch (IscException ex)
+				{
+					throw new FbException(ex.Message, ex);
+				}
+			}
 
-            return this.activeTransaction;
-        }
+			return this.activeTransaction;
+		}
 
-        public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
-        {
-            lock (this)
-            {
-                if (this.HasActiveTransaction)
-                {
-                    throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
-                }
+		public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
+		{
+			lock (this)
+			{
+				if (this.HasActiveTransaction)
+				{
+					throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
+				}
 
-                try
-                {
-                    this.activeTransaction = new FbTransaction(
-                        this.owningConnection, IsolationLevel.Unspecified);
+				try
+				{
+					this.activeTransaction = new FbTransaction(
+						this.owningConnection, IsolationLevel.Unspecified);
 
-                    this.activeTransaction.BeginTransaction(options);
+					this.activeTransaction.BeginTransaction(options);
 
-                    if (transactionName != null)
-                    {
-                        this.activeTransaction.Save(transactionName);
-                    }
-                }
-                catch (IscException ex)
-                {
-                    throw new FbException(ex.Message, ex);
-                }
-            }
+					if (transactionName != null)
+					{
+						this.activeTransaction.Save(transactionName);
+					}
+				}
+				catch (IscException ex)
+				{
+					throw new FbException(ex.Message, ex);
+				}
+			}
 
-            return this.activeTransaction;
-        }
+			return this.activeTransaction;
+		}
 
-        public void DisposeTransaction()
-        {
-            if (this.activeTransaction != null && !this.IsEnlisted)
-            {
-                this.activeTransaction.Dispose();
-                this.activeTransaction = null;
-            }
-        }
+		public void DisposeTransaction()
+		{
+			if (this.activeTransaction != null && !this.IsEnlisted)
+			{
+				this.activeTransaction.Dispose();
+				this.activeTransaction = null;
+			}
+		}
 
-        public void TransactionUpdated()
-        {
-            for (int i = 0; i < this.preparedCommands.Count; i++)
-            {
+		public void TransactionUpdated()
+		{
+			for (int i = 0; i < this.preparedCommands.Count; i++)
+			{
 				if (!this.preparedCommands[i].IsAlive)
 					continue;
 
-                FbCommand command = this.preparedCommands[i].Target as FbCommand;
+				FbCommand command = this.preparedCommands[i].Target as FbCommand;
 
-                if (command.Transaction != null)
-                {
-                    command.CloseReader();
-                    command.Transaction = null;
-                }
-            }
-        }
+				if (command.Transaction != null)
+				{
+					command.CloseReader();
+					command.Transaction = null;
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Transaction Enlistement ·
+		#region · Transaction Enlistement ·
 
 #if (!NET_CF)
-        public void EnlistTransaction(System.Transactions.Transaction transaction)
-        {			
+		public void EnlistTransaction(System.Transactions.Transaction transaction)
+		{
 			if (this.owningConnection != null && this.options.Enlist)
-            {
+			{
 				if (this.enlistmentNotification != null && this.enlistmentNotification.SystemTransaction == transaction)
 					return;
 
-                if (this.HasActiveTransaction)
-                {
-                    throw new ArgumentException("Unable to enlist in transaction, a local transaction already exists");
-                }
-                if (this.enlistmentNotification != null)
-                {
-                    throw new ArgumentException("Already enlisted in a transaction");
-                }
+				if (this.HasActiveTransaction)
+				{
+					throw new ArgumentException("Unable to enlist in transaction, a local transaction already exists");
+				}
+				if (this.enlistmentNotification != null)
+				{
+					throw new ArgumentException("Already enlisted in a transaction");
+				}
 
-                this.enlistmentNotification = new FbEnlistmentNotification(this, transaction);
-                this.enlistmentNotification.Completed += new EventHandler(EnlistmentCompleted);
-            }
-        }
+				this.enlistmentNotification = new FbEnlistmentNotification(this, transaction);
+				this.enlistmentNotification.Completed += new EventHandler(EnlistmentCompleted);
+			}
+		}
 
-        private void EnlistmentCompleted(object sender, EventArgs e)
-        {
-            this.enlistmentNotification = null;
-        }
+		private void EnlistmentCompleted(object sender, EventArgs e)
+		{
+			this.enlistmentNotification = null;
+		}
 
-        public FbTransaction BeginTransaction(System.Transactions.IsolationLevel isolationLevel)
-        {
-            switch (isolationLevel)
-            {
-                case System.Transactions.IsolationLevel.Chaos:
-                    return this.BeginTransaction(System.Data.IsolationLevel.Chaos, null);
+		public FbTransaction BeginTransaction(System.Transactions.IsolationLevel isolationLevel)
+		{
+			switch (isolationLevel)
+			{
+				case System.Transactions.IsolationLevel.Chaos:
+					return this.BeginTransaction(System.Data.IsolationLevel.Chaos, null);
 
-                case System.Transactions.IsolationLevel.ReadUncommitted:
-                    return this.BeginTransaction(System.Data.IsolationLevel.ReadUncommitted, null);
+				case System.Transactions.IsolationLevel.ReadUncommitted:
+					return this.BeginTransaction(System.Data.IsolationLevel.ReadUncommitted, null);
 
-                case System.Transactions.IsolationLevel.RepeatableRead:
-                    return this.BeginTransaction(System.Data.IsolationLevel.RepeatableRead, null);
+				case System.Transactions.IsolationLevel.RepeatableRead:
+					return this.BeginTransaction(System.Data.IsolationLevel.RepeatableRead, null);
 
-                case System.Transactions.IsolationLevel.Serializable:
-                    return this.BeginTransaction(System.Data.IsolationLevel.Serializable, null);
+				case System.Transactions.IsolationLevel.Serializable:
+					return this.BeginTransaction(System.Data.IsolationLevel.Serializable, null);
 
-                case System.Transactions.IsolationLevel.Snapshot:
-                    return this.BeginTransaction(System.Data.IsolationLevel.Snapshot, null);
+				case System.Transactions.IsolationLevel.Snapshot:
+					return this.BeginTransaction(System.Data.IsolationLevel.Snapshot, null);
 
-                case System.Transactions.IsolationLevel.Unspecified:
-                    return this.BeginTransaction(System.Data.IsolationLevel.Unspecified, null);
+				case System.Transactions.IsolationLevel.Unspecified:
+					return this.BeginTransaction(System.Data.IsolationLevel.Unspecified, null);
 
-                case System.Transactions.IsolationLevel.ReadCommitted:
-                default:
-                    return this.BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
-            }
-        }
+				case System.Transactions.IsolationLevel.ReadCommitted:
+				default:
+					return this.BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
+			}
+		}
 #endif
 
-        #endregion
+		#endregion
 
-        #region · Schema Methods ·
+		#region · Schema Methods ·
 
-        public DataTable GetSchema(string collectionName, string[] restrictions)
-        {
-            return FbSchemaFactory.GetSchema(this.owningConnection, collectionName, restrictions);
-        }
+		public DataTable GetSchema(string collectionName, string[] restrictions)
+		{
+			return FbSchemaFactory.GetSchema(this.owningConnection, collectionName, restrictions);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Prepared Commands Methods ·
+		#region · Prepared Commands Methods ·
 
-        public void AddPreparedCommand(FbCommand command)
-        {
+		public void AddPreparedCommand(FbCommand command)
+		{
 			int position = this.preparedCommands.Count;
 			for (int i = 0; i < this.preparedCommands.Count; i++)
 			{
@@ -429,20 +431,24 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 			this.preparedCommands.Insert(position, new WeakReference(command));
-        }
+		}
 
-        public void RemovePreparedCommand(FbCommand command)
-        {
-            for (int i = 0; i < this.preparedCommands.Count; i++)
+		public void RemovePreparedCommand(FbCommand command)
+		{
+			lock (preparedCommandsCleanupSyncRoot)
 			{
-				if (this.preparedCommands[i].Target == command)
+				for (int i = this.preparedCommands.Count - 1; i >= 0; i--)
 				{
-					this.preparedCommands[i].Target = null;
-					this.preparedCommands.RemoveAt(i);
-					return;
+					var cmd = this.preparedCommands[i];
+					if (cmd != null && cmd.Target == command)
+					{
+						cmd.Target = null;
+						this.preparedCommands.RemoveAt(i);
+						return;
+					}
 				}
 			}
-        }
+		}
 
 		public void ReleasePreparedCommands()
 		{
@@ -473,84 +479,87 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
-			this.preparedCommands.Clear();
+			lock (preparedCommandsCleanupSyncRoot)
+			{
+				this.preparedCommands.Clear();
+			}
 		}
 
-        #endregion
+		#endregion
 
-        #region · Firebird Events Methods ·
+		#region · Firebird Events Methods ·
 
-        public void CloseEventManager()
-        {
-            if (this.db != null && this.db.HasRemoteEventSupport)
-            {
-                lock (this.db)
-                {
-                    this.db.CloseEventManager();
-                }
-            }
-        }
+		public void CloseEventManager()
+		{
+			if (this.db != null && this.db.HasRemoteEventSupport)
+			{
+				lock (this.db)
+				{
+					this.db.CloseEventManager();
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Connection Verification ·
+		#region · Connection Verification ·
 
-        public bool Verify()
-        {
-            // Do not actually ask for any information
-            byte[] items = new byte[]
+		public bool Verify()
+		{
+			// Do not actually ask for any information
+			byte[] items = new byte[]
 			{
 				IscCodes.isc_info_end
 			};
 
-            try
-            {
-                this.db.GetDatabaseInfo(items, 16);
+			try
+			{
+				this.db.GetDatabaseInfo(items, 16);
 
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private DatabaseParameterBuffer BuildDpb(IDatabase db, FbConnectionString options)
-        {
-            DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
+		private DatabaseParameterBuffer BuildDpb(IDatabase db, FbConnectionString options)
+		{
+			DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
 
-            dpb.Append(IscCodes.isc_dpb_version1);
-            dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-            dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { Convert.ToByte(options.Dialect), 0, 0, 0 });
-            dpb.Append(IscCodes.isc_dpb_lc_ctype, options.Charset);
+			dpb.Append(IscCodes.isc_dpb_version1);
+			dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
+			dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { Convert.ToByte(options.Dialect), 0, 0, 0 });
+			dpb.Append(IscCodes.isc_dpb_lc_ctype, options.Charset);
 			if (options.DbCachePages > 0)
 			{
 				dpb.Append(IscCodes.isc_dpb_num_buffers, options.DbCachePages);
 			}
-            if (!string.IsNullOrEmpty(options.Role))
-            {
-                dpb.Append(IscCodes.isc_dpb_sql_role_name, options.Role);
-            }
-            dpb.Append(IscCodes.isc_dpb_connect_timeout, options.ConnectionTimeout);
+			if (!string.IsNullOrEmpty(options.Role))
+			{
+				dpb.Append(IscCodes.isc_dpb_sql_role_name, options.Role);
+			}
+			dpb.Append(IscCodes.isc_dpb_connect_timeout, options.ConnectionTimeout);
 
-            if (!options.FallIntoTrustedAuth)
-            {
-                dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
-                dpb.Append(IscCodes.isc_dpb_password, options.Password);
-            }
+			if (!options.FallIntoTrustedAuth)
+			{
+				dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
+				dpb.Append(IscCodes.isc_dpb_password, options.Password);
+			}
 
 			dpb.Append(IscCodes.isc_dpb_process_id, GetProcessID());
 			dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
 
-            return dpb;
-        }
+			return dpb;
+		}
 
-        private string GetProcessName()
-        {
+		private string GetProcessName()
+		{
 #if (NET_CF) 
 			// for CF we can implement GetModuleFileName from coredll
 			return "fbnetcf";
@@ -558,7 +567,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			// showing ApplicationPhysicalPath may be wrong because of connection pooling; better idea?
 			return GetHostingPath() ?? GetRealProcessName();
 #endif
-        }
+		}
 
 
 		private string GetHostingPath()
@@ -585,7 +594,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				return null;
 			}
-            return (string)assembly
+			return (string)assembly
 				.GetType("System.Web.Hosting.HostingEnvironment")
 				.GetProperty("ApplicationPhysicalPath")
 				.GetValue(null, null);
@@ -604,7 +613,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		private int GetProcessID()
-		{ 
+		{
 #if (NET_CF)
 			return -1;
 #else
@@ -634,7 +643,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 #endif
 		}
-        #endregion
+		#endregion
 
 		#region Cancelation
 		public void EnableCancel()
