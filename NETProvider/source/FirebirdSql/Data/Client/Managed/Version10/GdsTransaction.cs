@@ -38,6 +38,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private bool				disposed;
 		private GdsDatabase			database;
 		private TransactionState	state;
+		private object				stateSyncRoot;
 
 		#endregion
 
@@ -57,15 +58,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region · Constructors ·
 
+		private GdsTransaction()
+		{
+			stateSyncRoot = new object();
+		}
+
 		public GdsTransaction(IDatabase db)
+			: this()
 		{
 			if (!(db is GdsDatabase))
 			{
 				throw new ArgumentException("Specified argument is not of GdsDatabase type.");
 			}
 
-			this.database		= (GdsDatabase)db;
-			this.state	= TransactionState.NoTransaction;
+			this.database = (GdsDatabase)db;
+			this.state = TransactionState.NoTransaction;
 
 			GC.SuppressFinalize(this);
 		}
@@ -91,7 +98,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void Dispose(bool disposing)
 		{
-			lock (this)
+			lock (stateSyncRoot)
 			{
 				if (!this.disposed)
 				{
@@ -125,26 +132,30 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void BeginTransaction(TransactionParameterBuffer tpb)
 		{
-			if (this.state != TransactionState.NoTransaction)
+			lock (stateSyncRoot)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
-			}
+				if (this.state != TransactionState.NoTransaction)
+				{
+					throw GetNoValidTransactionException();
+				}
 
-			lock (this.database.SyncObject)
-			{
 				try
 				{
-					this.database.Write(IscCodes.op_transaction);
-					this.database.Write(this.database.Handle);
-					this.database.WriteBuffer(tpb.ToArray());
-					this.database.Flush();
+					GenericResponse response;
+					lock (this.database.SyncObject)
+					{
+						this.database.Write(IscCodes.op_transaction);
+						this.database.Write(this.database.Handle);
+						this.database.WriteBuffer(tpb.ToArray());
+						this.database.Flush();
 
-                    GenericResponse response = this.database.ReadGenericResponse();
+						response = this.database.ReadGenericResponse();
 
-                    this.handle = response.ObjectHandle;
-					this.state  = TransactionState.Active;
+						this.database.TransactionCount++;
+					}
 
-					this.database.TransactionCount++;
+					this.handle = response.ObjectHandle;
+					this.state = TransactionState.Active;
 				}
 				catch (IOException)
 				{
@@ -155,19 +166,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void Commit()
 		{
-			this.CheckTransactionState();
-
-			lock (this.database.SyncObject)
+			lock (stateSyncRoot)
 			{
+				this.CheckTransactionState();
+
 				try
 				{
-					this.database.Write(IscCodes.op_commit);
-					this.database.Write(this.handle);
-					this.database.Flush();
+					lock (this.database.SyncObject)
+					{
+						this.database.Write(IscCodes.op_commit);
+						this.database.Write(this.handle);
+						this.database.Flush();
 
-					this.database.ReadResponse();
+						this.database.ReadResponse();
 
-					this.database.TransactionCount--;
+						this.database.TransactionCount--;
+					}
 
 					if (this.Update != null)
 					{
@@ -185,19 +199,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void Rollback()
 		{
-			this.CheckTransactionState();
-
-			lock (this.database.SyncObject)
+			lock (stateSyncRoot)
 			{
+				this.CheckTransactionState();
+
 				try
 				{
-					this.database.Write(IscCodes.op_rollback);
-					this.database.Write(this.handle);
-					this.database.Flush();
+					lock (this.database.SyncObject)
+					{
+						this.database.Write(IscCodes.op_rollback);
+						this.database.Write(this.handle);
+						this.database.Flush();
 
-					this.database.ReadResponse();
+						this.database.ReadResponse();
 
-					this.database.TransactionCount--;
+						this.database.TransactionCount--;
+					}
 
 					if (this.Update != null)
 					{
@@ -215,17 +232,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void CommitRetaining()
 		{
-			this.CheckTransactionState();
-
-			lock (this.database.SyncObject)
+			lock (stateSyncRoot)
 			{
+				this.CheckTransactionState();
+
 				try
 				{
-					this.database.Write(IscCodes.op_commit_retaining);
-					this.database.Write(this.handle);
-					this.database.Flush();
+					lock (this.database.SyncObject)
+					{
+						this.database.Write(IscCodes.op_commit_retaining);
+						this.database.Write(this.handle);
+						this.database.Flush();
 
-					this.database.ReadResponse();
+						this.database.ReadResponse();
+					}
 
 					this.state = TransactionState.Active;
 				}
@@ -238,17 +258,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void RollbackRetaining()
 		{
-			this.CheckTransactionState();
-
-			lock (this.database.SyncObject)
+			lock (stateSyncRoot)
 			{
+				this.CheckTransactionState();
+
 				try
 				{
-					this.database.Write(IscCodes.op_rollback_retaining);
-					this.database.Write(this.handle);
-					this.database.Flush();
+					lock (this.database.SyncObject)
+					{
+						this.database.Write(IscCodes.op_rollback_retaining);
+						this.database.Write(this.handle);
+						this.database.Flush();
 
-					this.database.ReadResponse();
+						this.database.ReadResponse();
+					}
 
 					this.state = TransactionState.Active;
 				}
@@ -263,56 +286,62 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
         #region · Two Phase Commit Methods ·
 
-        public void Prepare()
-        {
-            this.CheckTransactionState();
+		public void Prepare()
+		{
+			lock (stateSyncRoot)
+			{
+				this.CheckTransactionState();
 
-            lock (this.database.SyncObject)
-            {
-                try
-                {
-                    this.state = TransactionState.NoTransaction;
+				try
+				{
+					this.state = TransactionState.NoTransaction;
 
-                    this.database.Write(IscCodes.op_prepare);
-                    this.database.Write(this.handle);
-                    this.database.Flush();
+					lock (this.database.SyncObject)
+					{
+						this.database.Write(IscCodes.op_prepare);
+						this.database.Write(this.handle);
+						this.database.Flush();
 
-                    this.database.ReadResponse();
+						this.database.ReadResponse();
+					}
 
-                    this.state = TransactionState.Prepared;
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
+					this.state = TransactionState.Prepared;
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
 
-        public void Prepare(byte[] buffer)
-        {
-            this.CheckTransactionState();
+		public void Prepare(byte[] buffer)
+		{
+			lock (stateSyncRoot)
+			{
+				this.CheckTransactionState();
 
-            lock (this.database.SyncObject)
-            {
-                try
-                {
-                    this.state = TransactionState.NoTransaction;
+				try
+				{
+					this.state = TransactionState.NoTransaction;
 
-                    this.database.Write(IscCodes.op_prepare2);
-                    this.database.Write(this.handle);
-                    this.database.WriteBuffer(buffer, buffer.Length);
-                    this.database.Flush();
+					lock (this.database.SyncObject)
+					{
+						this.database.Write(IscCodes.op_prepare2);
+						this.database.Write(this.handle);
+						this.database.WriteBuffer(buffer, buffer.Length);
+						this.database.Flush();
 
-                    this.database.ReadResponse();
+						this.database.ReadResponse();
+					}
 
-                    this.state = TransactionState.Prepared;
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
+					this.state = TransactionState.Prepared;
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
 
         #endregion
 
@@ -322,8 +351,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (this.state != TransactionState.Active)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
+				throw GetNoValidTransactionException();
 			}
+		}
+
+		private IscException GetNoValidTransactionException()
+		{
+			return new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
 		}
 
 		#endregion
