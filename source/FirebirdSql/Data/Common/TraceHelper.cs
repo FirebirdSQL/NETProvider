@@ -1,34 +1,24 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace FirebirdSql.Common
+namespace FirebirdSql.Data.Common
 {
 	static class TraceHelper
 	{
-		public const string CategoryName = "FirebirdClient";
+		public const string Name = "FirebirdSql.Data.FirebirdClient";
 		public const string ConditionalSymbol = "TRACE";
 
-		class IndentHolder : IDisposable
+		static TraceSource _instance;
+
+		static TraceHelper()
 		{
-			public void Dispose()
-			{
-				Trace.Unindent();
-			}
+			_instance = new TraceSource(Name, SourceLevels.All);
 		}
 
-		public static void WriteLine(string format, params object[] args)
+		public static void Trace(TraceEventType eventType, string format, params object[] args)
 		{
-#if (TRACE)
-			Trace.WriteLine(string.Format(format, args), CategoryName);
-#endif
-		}
-
-		public static IDisposable Indent()
-		{
-#if (TRACE)
-			Trace.Indent();
-			return new IndentHolder();
-#endif
+			_instance.TraceEvent(TraceEventType.Information, default(int), format, args);
+			_instance.Flush();
 		}
 	}
 }
