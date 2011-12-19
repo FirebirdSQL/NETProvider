@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FirebirdSql.Common
+namespace FirebirdSql.Data.Common
 {
 	static class Extensions
 	{
