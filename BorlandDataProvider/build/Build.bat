@@ -1,1 +1,0 @@
-d:\desarrollo\herramientas\nant\bin\nant -verbose > log.txt 

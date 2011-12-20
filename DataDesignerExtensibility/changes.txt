@@ -1,4 +1,0 @@
-What is New - Data Designer Extensibility - Visual Studio 2005 Integration for Firebird
----- -- --- - ---- -------- ------------- - ------ ------ ---- ----------- --- --------
-
-
