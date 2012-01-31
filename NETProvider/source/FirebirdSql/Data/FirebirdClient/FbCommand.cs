@@ -32,7 +32,6 @@ using System.Runtime.Remoting.Messaging;
 using System.Diagnostics;
 
 using FirebirdSql.Data.Common;
-using FirebirdSql.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
