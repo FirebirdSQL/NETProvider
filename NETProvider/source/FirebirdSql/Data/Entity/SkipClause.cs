@@ -23,73 +23,73 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Entity
 {
-    /// <summary>
-    /// SkipClause represents the SKIP expression in a SqlSelectStatement. 
-    /// It has a count property, which indicates how many rows should be skipped.
-    /// </summary>
-    internal class SkipClause : ISqlFragment
-    {
-        #region · Fields ·
+	/// <summary>
+	/// SkipClause represents the SKIP expression in a SqlSelectStatement. 
+	/// It has a count property, which indicates how many rows should be skipped.
+	/// </summary>
+	internal class SkipClause : ISqlFragment
+	{
+		#region · Fields ·
 
-        private ISqlFragment skipCount;
+		private ISqlFragment skipCount;
 
-        #endregion
+		#endregion
 
-        #region · Internal Properties ·
+		#region · Internal Properties ·
 
-        /// <summary>
-        /// How many rows should be skipped.
-        /// </summary>
-        internal ISqlFragment SkipCount
-        {
-            get { return this.skipCount; }
-        }
+		/// <summary>
+		/// How many rows should be skipped.
+		/// </summary>
+		internal ISqlFragment SkipCount
+		{
+			get { return this.skipCount; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        /// <summary>
-        /// Creates a SkipClause with the given skipCount.
-        /// </summary>
-        /// <param name="topCount"></param>
-        internal SkipClause(ISqlFragment skipCount)
-        {
-            this.skipCount = skipCount;
-        }
+		/// <summary>
+		/// Creates a SkipClause with the given skipCount.
+		/// </summary>
+		/// <param name="topCount"></param>
+		internal SkipClause(ISqlFragment skipCount)
+		{
+			this.skipCount = skipCount;
+		}
 
-        /// <summary>
-        /// Creates a SkipClause with the given skipCount.
-        /// </summary>
-        /// <param name="topCount"></param>
-        internal SkipClause(int skipCount)
-        {
-            SqlBuilder sqlBuilder = new SqlBuilder();
-            sqlBuilder.Append(skipCount.ToString(CultureInfo.InvariantCulture));
-            this.skipCount = sqlBuilder;
-        }
+		/// <summary>
+		/// Creates a SkipClause with the given skipCount.
+		/// </summary>
+		/// <param name="topCount"></param>
+		internal SkipClause(int skipCount)
+		{
+			SqlBuilder sqlBuilder = new SqlBuilder();
+			sqlBuilder.Append(skipCount.ToString(CultureInfo.InvariantCulture));
+			this.skipCount = sqlBuilder;
+		}
 
-        #endregion
+		#endregion
 
-        #region · ISqlFragment Members ·
+		#region · ISqlFragment Members ·
 
-        /// <summary>
-        /// Write out the SKIP part of sql select statement 
-        /// It basically writes SKIP (X).
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="sqlGenerator"></param>
-        public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
-        {
-            writer.Write("SKIP (");
-            this.SkipCount.WriteSql(writer, sqlGenerator);
-            writer.Write(")");
+		/// <summary>
+		/// Write out the SKIP part of sql select statement 
+		/// It basically writes SKIP (X).
+		/// </summary>
+		/// <param name="writer"></param>
+		/// <param name="sqlGenerator"></param>
+		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
+		{
+			writer.Write("SKIP (");
+			this.SkipCount.WriteSql(writer, sqlGenerator);
+			writer.Write(")");
 
-            writer.Write(" ");
-        }
+			writer.Write(" ");
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif

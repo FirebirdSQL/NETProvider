@@ -29,88 +29,88 @@ using System.Data.Common.CommandTrees;
 
 namespace FirebirdSql.Data.Entity
 {
-    /// <summary>
-    /// This extends StringWriter primarily to add the ability to add an indent
-    /// to each line that is written out.
-    /// </summary>
-    internal class SqlWriter : StringWriter
-    {
-        #region · Fields ·
+	/// <summary>
+	/// This extends StringWriter primarily to add the ability to add an indent
+	/// to each line that is written out.
+	/// </summary>
+	internal class SqlWriter : StringWriter
+	{
+		#region · Fields ·
 
-        // We start at -1, since the first select statement will increment it to 0.
-        private int     indent              = -1;
-        private bool    atBeginningOfLine   = true;
+		// We start at -1, since the first select statement will increment it to 0.
+		private int     indent              = -1;
+		private bool    atBeginningOfLine   = true;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        /// <summary>
-        /// The number of tabs to be added at the beginning of each new line.
-        /// </summary>
-        internal int Indent
-        {
-            get { return this.indent; }
-            set { this.indent = value; }
-        }
+		/// <summary>
+		/// The number of tabs to be added at the beginning of each new line.
+		/// </summary>
+		internal int Indent
+		{
+			get { return this.indent; }
+			set { this.indent = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="b"></param>
-        public SqlWriter(StringBuilder b) 
-            : base(b, System.Globalization.CultureInfo.InvariantCulture)
-        {
-        }
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="b"></param>
+		public SqlWriter(StringBuilder b) 
+			: base(b, System.Globalization.CultureInfo.InvariantCulture)
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        /// <summary>
-        /// Reset atBeginningofLine if we detect the newline string.
-        /// <see cref="SqlBuilder.AppendLine"/>
-        /// Add as many tabs as the value of indent if we are at the 
-        /// beginning of a line.
-        /// </summary>
-        /// <param name="value"></param>
-        public override void Write(string value)
-        {
-            if (value == Environment.NewLine)
-            {
-                base.WriteLine();
-                this.atBeginningOfLine = true;
-            }
-            else
-            {
-                if (this.atBeginningOfLine)
-                {
-                    if (indent > 0)
-                    {
-                        base.Write(new string('\t', indent));
-                    }
-                    this.atBeginningOfLine = false;
-                }
-                base.Write(value);
-            }
-        }
+		/// <summary>
+		/// Reset atBeginningofLine if we detect the newline string.
+		/// <see cref="SqlBuilder.AppendLine"/>
+		/// Add as many tabs as the value of indent if we are at the 
+		/// beginning of a line.
+		/// </summary>
+		/// <param name="value"></param>
+		public override void Write(string value)
+		{
+			if (value == Environment.NewLine)
+			{
+				base.WriteLine();
+				this.atBeginningOfLine = true;
+			}
+			else
+			{
+				if (this.atBeginningOfLine)
+				{
+					if (indent > 0)
+					{
+						base.Write(new string('\t', indent));
+					}
+					this.atBeginningOfLine = false;
+				}
+				base.Write(value);
+			}
+		}
 
-        /// <summary>
-        /// Writes a line terminator to the text stream.
-        /// </summary>
-        /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter"/> is closed. </exception>
-        /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-        public override void WriteLine()
-        {
-            base.WriteLine();
-            this.atBeginningOfLine = true;
-        }
+		/// <summary>
+		/// Writes a line terminator to the text stream.
+		/// </summary>
+		/// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter"/> is closed. </exception>
+		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+		public override void WriteLine()
+		{
+			base.WriteLine();
+			this.atBeginningOfLine = true;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 #endif

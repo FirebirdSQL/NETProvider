@@ -31,66 +31,66 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Entity
 {
-    /// <summary>
-    /// The SymbolPair exists to solve the record flattening problem.
-    /// <see cref="SqlGenerator.Visit(PropertyExpression)"/>
-    /// Consider a property expression D(v, "j3.j2.j1.a.x")
-    /// where v is a VarRef, j1, j2, j3 are joins, a is an extent and x is a columns.
-    /// This has to be translated eventually into {j'}.{x'}
-    /// 
-    /// The source field represents the outermost SqlStatement representing a join
-    /// expression (say j2) - this is always a Join symbol.
-    /// 
-    /// The column field keeps moving from one join symbol to the next, until it
-    /// stops at a non-join symbol.
-    /// 
-    /// This is returned by <see cref="SqlGenerator.Visit(PropertyExpression)"/>,
-    /// but never makes it into a SqlBuilder.
-    /// </summary>
-    internal class SymbolPair : ISqlFragment
-    {
-        #region · Fields ·
+	/// <summary>
+	/// The SymbolPair exists to solve the record flattening problem.
+	/// <see cref="SqlGenerator.Visit(PropertyExpression)"/>
+	/// Consider a property expression D(v, "j3.j2.j1.a.x")
+	/// where v is a VarRef, j1, j2, j3 are joins, a is an extent and x is a columns.
+	/// This has to be translated eventually into {j'}.{x'}
+	/// 
+	/// The source field represents the outermost SqlStatement representing a join
+	/// expression (say j2) - this is always a Join symbol.
+	/// 
+	/// The column field keeps moving from one join symbol to the next, until it
+	/// stops at a non-join symbol.
+	/// 
+	/// This is returned by <see cref="SqlGenerator.Visit(PropertyExpression)"/>,
+	/// but never makes it into a SqlBuilder.
+	/// </summary>
+	internal class SymbolPair : ISqlFragment
+	{
+		#region · Fields ·
 
-        private Symbol source;
-        private Symbol column;
+		private Symbol source;
+		private Symbol column;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public Symbol Source
-        {
-            get { return this.source; }
-            set { this.source = value; }
-        }
+		public Symbol Source
+		{
+			get { return this.source; }
+			set { this.source = value; }
+		}
 
-        public Symbol Column
-        {
-            get { return this.column; }
-            set { this.column = value; }
-        }
+		public Symbol Column
+		{
+			get { return this.column; }
+			set { this.column = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public SymbolPair(Symbol source, Symbol column)
-        {
-            this.Source = source;
-            this.Column = column;
-        }
+		public SymbolPair(Symbol source, Symbol column)
+		{
+			this.Source = source;
+			this.Column = column;
+		}
 
-        #endregion
+		#endregion
 
-        #region · ISqlFragment Members ·
+		#region · ISqlFragment Members ·
 
-        public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
-        {
-            // Symbol pair should never be part of a SqlBuilder.
-            Debug.Assert(false);
-        }
+		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
+		{
+			// Symbol pair should never be part of a SqlBuilder.
+			Debug.Assert(false);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 #endif
