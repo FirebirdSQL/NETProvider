@@ -22,19 +22,19 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Server
 {
-    public sealed class FbResultSet : IResultSet
+	public sealed class FbResultSet : IResultSet
 	{
 		#region · Fields ·
 
-        private DbDataReader reader;
+		private DbDataReader reader;
 
 		#endregion
 
 		#region · Constructors ·
 
-        public FbResultSet()
-        {
-        }
+		public FbResultSet()
+		{
+		}
 
 		public FbResultSet(DbDataReader reader)
 		{
@@ -47,40 +47,40 @@ namespace FirebirdSql.Data.Server
 
 		public void Close()
 		{
-            if (this.reader != null)
-            {
-                this.reader.Close();
-                this.reader = null;
-            }
+			if (this.reader != null)
+			{
+				this.reader.Close();
+				this.reader = null;
+			}
 		}
 
 		public bool Read()
 		{
-            if (this.reader == null)
-            {
-                return false;
-            }
+			if (this.reader == null)
+			{
+				return false;
+			}
 
 			return this.reader.Read();
 		}
 
 		public object GetValue(int i)
 		{
-            if (this.reader == null)
-            {
-                return null;
-            }
+			if (this.reader == null)
+			{
+				return null;
+			}
 
-            // If the field is a blob or a clob we will be returning the Blob ID
-            if (this.reader.GetDataTypeName(i).ToLower().StartsWith("blob"))
-            {
-                return this.reader.GetInt64(i);
-            }
+			// If the field is a blob or a clob we will be returning the Blob ID
+			if (this.reader.GetDataTypeName(i).ToLower().StartsWith("blob"))
+			{
+				return this.reader.GetInt64(i);
+			}
 
 			return this.reader.GetValue(i);
 		}
 
-        /*
+		/*
 		public bool GetBoolean(int i)
 		{
 			return this.reader.GetBoolean(i);
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.Server
 		{
 			return this.reader.IsDBNull(i);
 		}
-        */
+		*/
 
 		#endregion
 	}

@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *     The contents of this file are subject to the Initial 
@@ -20,14 +20,14 @@ using System;
 
 namespace FirebirdSql.Data.Server
 {
-    interface IResultSet
-    {
-        #region Â· Methods Â·
+	interface IResultSet
+	{
+		#region · Methods ·
 
-        void Close();
-        object GetValue(int i);
-        bool Read();
+		void Close();
+		object GetValue(int i);
+		bool Read();
 
-        #endregion
-    }
+		#endregion
+	}
 }
