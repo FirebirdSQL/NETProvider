@@ -27,22 +27,22 @@ namespace FirebirdSql.Data.Client.Common
 	{
 		#region · Static Fields ·
 
-        private static readonly ArrayDescMarshaler instance = new ArrayDescMarshaler();
+		private static readonly ArrayDescMarshaler instance = new ArrayDescMarshaler();
 
 		#endregion
 
-        #region · Static Properties ·
+		#region · Static Properties ·
 
 		public static ArrayDescMarshaler Instance
 		{
 			get { return ArrayDescMarshaler.instance; }
 		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        private ArrayDescMarshaler()
+		private ArrayDescMarshaler()
 		{
 		}
 

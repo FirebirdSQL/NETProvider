@@ -23,10 +23,10 @@ namespace FirebirdSql.Data.Client.Common
 {
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct ArrayDescMarshal
-    {
-        #region · Fields ·
+	{
+		#region · Fields ·
 
-        public byte DataType;
+		public byte DataType;
 		public byte Scale;
 		public short Length;
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
@@ -36,11 +36,11 @@ namespace FirebirdSql.Data.Client.Common
 		public short Dimensions;
 		public short Flags;
 
-        #endregion
+		#endregion
 
-        #region · Static Methods ·
+		#region · Static Methods ·
 
-        public static int ComputeLength(int n)
+		public static int ComputeLength(int n)
 		{
 			return (Marshal.SizeOf(typeof(ArrayDescMarshal)) + n * Marshal.SizeOf(typeof(ArrayBoundMarshal)));
 		}
