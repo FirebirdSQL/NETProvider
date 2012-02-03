@@ -173,20 +173,20 @@ namespace FirebirdSql.Data.UnitTests
 			transaction.Commit();
 		}
 
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void DeriveParametersNonExistingSP()
-        {
-            FbTransaction transaction = Connection.BeginTransaction();
+		[Test]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void DeriveParametersNonExistingSP()
+		{
+			FbTransaction transaction = Connection.BeginTransaction();
 
-            FbCommand command = new FbCommand("BlaBlaBla", Connection, transaction);
+			FbCommand command = new FbCommand("BlaBlaBla", Connection, transaction);
 
-            command.CommandType = CommandType.StoredProcedure;
+			command.CommandType = CommandType.StoredProcedure;
 
-            FbCommandBuilder.DeriveParameters(command);
+			FbCommandBuilder.DeriveParameters(command);
 
-            transaction.Commit();
-        }
+			transaction.Commit();
+		}
 
 		[Test]
 		public void TestWithClosedConnection()

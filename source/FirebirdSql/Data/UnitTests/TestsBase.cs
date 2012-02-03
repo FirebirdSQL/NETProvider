@@ -103,8 +103,8 @@ namespace FirebirdSql.Data.UnitTests
 			}
 			connection.Close();
 
-            string cs = this.BuildConnectionString();
-            DropDatabase(cs);
+			string cs = this.BuildConnectionString();
+			DropDatabase(cs);
 		}
 
 		#endregion
@@ -120,10 +120,10 @@ namespace FirebirdSql.Data.UnitTests
 				true);
 		}
 
-        private static void DropDatabase(string connectionString)
-        {
-            FbConnection.DropDatabase(connectionString);
-        }
+		private static void DropDatabase(string connectionString)
+		{
+			FbConnection.DropDatabase(connectionString);
+		}
 
 		private static void CreateTables(string connectionString)
 		{
@@ -257,9 +257,9 @@ namespace FirebirdSql.Data.UnitTests
 			commandText.Append("RETURNS	(\r\n");
 			commandText.Append("content	VARCHAR(128))\r\n");
 			commandText.Append("AS\r\n");
-            commandText.Append("begin\r\n");
-            commandText.Append("content	= 'test';\r\n");
-            commandText.Append("suspend;\r\n");
+			commandText.Append("begin\r\n");
+			commandText.Append("content	= 'test';\r\n");
+			commandText.Append("suspend;\r\n");
 			commandText.Append("end\r\n");
 
 			command = new FbCommand(commandText.ToString(), connection);
@@ -421,7 +421,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-            cs.DataSource   = ConfigurationManager.AppSettings["DataSource"];
+			cs.DataSource   = ConfigurationManager.AppSettings["DataSource"];
 			cs.UserID       = ConfigurationManager.AppSettings["User"];
 			cs.Password     = ConfigurationManager.AppSettings["Password"];
 			if (includeDatabase)
@@ -433,21 +433,21 @@ namespace FirebirdSql.Data.UnitTests
 			return cs.ToString();
 		}
 
-        public FbConnectionStringBuilder BuildConnectionStringBuilder()
-        {
-            FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
+		public FbConnectionStringBuilder BuildConnectionStringBuilder()
+		{
+			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-            cs.UserID       = ConfigurationManager.AppSettings["User"];
-            cs.Password     = ConfigurationManager.AppSettings["Password"];
-            cs.Database     = ConfigurationManager.AppSettings["Database"];
-            cs.DataSource   = ConfigurationManager.AppSettings["DataSource"];
-            cs.Port         = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
-            cs.Charset      = ConfigurationManager.AppSettings["Charset"];
-            cs.Pooling      = false;
-            cs.ServerType   = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
+			cs.UserID       = ConfigurationManager.AppSettings["User"];
+			cs.Password     = ConfigurationManager.AppSettings["Password"];
+			cs.Database     = ConfigurationManager.AppSettings["Database"];
+			cs.DataSource   = ConfigurationManager.AppSettings["DataSource"];
+			cs.Port         = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
+			cs.Charset      = ConfigurationManager.AppSettings["Charset"];
+			cs.Pooling      = false;
+			cs.ServerType   = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
 
-            return cs;
-        }
+			return cs;
+		}
 
 		#endregion
 

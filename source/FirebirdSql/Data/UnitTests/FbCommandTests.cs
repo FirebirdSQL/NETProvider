@@ -712,7 +712,7 @@ namespace FirebirdSql.Data.UnitTests
 declare variable i int = 9999999;
 begin
   while (i > 0) do
-    i = i-1;
+	i = i-1;
 end";
 				cmd.BeginExecuteNonQuery((o) => 
 				{

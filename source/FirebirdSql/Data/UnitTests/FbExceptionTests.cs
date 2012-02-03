@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *     The contents of this file are subject to the Initial 
@@ -28,14 +28,14 @@ namespace FirebirdSql.Data.UnitTests
 {
 	class FbExceptionTests : TestsBase
 	{
-		#region Â· Constructors Â·
+		#region · Constructors ·
 
 		public FbExceptionTests()
 		{ }
 
 		#endregion
 
-		#region Â· Unit Tests Â·
+		#region · Unit Tests ·
 
 		[Test]
 		public void SQLSTATETest()

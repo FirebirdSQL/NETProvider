@@ -27,17 +27,17 @@ namespace FirebirdSql.Data.UnitTests
 {
 	[TestFixture]
 	public class FbTransactionTests : TestsBase
-    {
-        #region · Constructors ·
+	{
+		#region · Constructors ·
 
-        public FbTransactionTests()
+		public FbTransactionTests()
 			: base(false)
 		{
-        }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Unit Tests ·
+		#region · Unit Tests ·
 
 		[Test]
 		public void CommitTest()
@@ -110,8 +110,8 @@ namespace FirebirdSql.Data.UnitTests
 					command.Dispose();
 				}
 			}
-        }
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

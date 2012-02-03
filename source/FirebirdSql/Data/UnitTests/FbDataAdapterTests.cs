@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			FbCommandBuilder builder = new FbCommandBuilder(adapter);
 
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			FbCommandBuilder builder = new FbCommandBuilder(adapter);
 
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbCommand command = new FbCommand("select * from TEST", Connection);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			FbCommandBuilder builder = new FbCommandBuilder(adapter);
 
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			FbCommandBuilder builder = new FbCommandBuilder(adapter);
 
@@ -177,7 +177,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -218,7 +218,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -259,7 +259,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -300,7 +300,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -341,7 +341,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -382,7 +382,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -423,7 +423,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -464,7 +464,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -505,7 +505,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -550,7 +550,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -561,7 +561,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-            TimeSpan dtValue = new TimeSpan(5, 6, 7);
+			TimeSpan dtValue = new TimeSpan(5, 6, 7);
 
 			ds.Tables["TEST"].Rows[0]["TIME_FIELD"] = dtValue;
 
@@ -579,7 +579,7 @@ namespace FirebirdSql.Data.UnitTests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-            TimeSpan val = (TimeSpan)command.ExecuteScalar();
+			TimeSpan val = (TimeSpan)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -595,7 +595,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -643,7 +643,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
@@ -671,7 +671,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbTransaction transaction = this.Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 10;
 
@@ -707,7 +707,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			// Set up the FbDataAdapter
 			FbDataAdapter adapter = new FbDataAdapter(select);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 			adapter.DeleteCommand = delete;
 
 			// Set up dataset
@@ -738,7 +738,7 @@ namespace FirebirdSql.Data.UnitTests
 			command.CommandText += "select int_field, char_field from test;";
 
 			FbDataAdapter adapter = new FbDataAdapter(command);
-            adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			DataSet ds = new DataSet();
 

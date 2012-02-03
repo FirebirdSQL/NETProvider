@@ -99,14 +99,14 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			DataTable foreignKeys = Connection.GetSchema("ForeignKeys");
 
-            foreach (DataRow row in foreignKeys.Rows)
-            {
-                DataTable foreignKeyColumns = Connection.GetSchema(
-                    "ForeignKeyColumns",
-                    new string[] { (string)row["TABLE_CATALOG"], (string)row["TABLE_SCHEMA"], (string)row["TABLE_NAME"], (string)row["CONSTRAINT_NAME"] });
-            }
+			foreach (DataRow row in foreignKeys.Rows)
+			{
+				DataTable foreignKeyColumns = Connection.GetSchema(
+					"ForeignKeyColumns",
+					new string[] { (string)row["TABLE_CATALOG"], (string)row["TABLE_SCHEMA"], (string)row["TABLE_NAME"], (string)row["CONSTRAINT_NAME"] });
+			}
 		}
-        
+		
 		[Test]
 		public void Functions()
 		{
@@ -125,13 +125,13 @@ namespace FirebirdSql.Data.UnitTests
 			Connection.GetSchema("Indexes");
 		}
 
-        [Test]
-        public void IndexColumns()
-        {
-            Connection.GetSchema("IndexColumns");
-        }
+		[Test]
+		public void IndexColumns()
+		{
+			Connection.GetSchema("IndexColumns");
+		}
 
-        [Test]
+		[Test]
 		public void PrimaryKeys()
 		{
 			DataTable primaryKeys = Connection.GetSchema("PrimaryKeys");
