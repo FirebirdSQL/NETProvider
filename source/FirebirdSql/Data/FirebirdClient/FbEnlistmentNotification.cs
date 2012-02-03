@@ -29,117 +29,117 @@ using System.Transactions;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    internal sealed class FbEnlistmentNotification : IEnlistmentNotification
-    {
-        #region · Events ·
+	internal sealed class FbEnlistmentNotification : IEnlistmentNotification
+	{
+		#region · Events ·
 
-        public event EventHandler Completed;
+		public event EventHandler Completed;
 
-        #endregion
+		#endregion
 
-        #region · Fields ·
+		#region · Fields ·
 
-        private FbConnectionInternal    connection;
-        private FbTransaction           transaction;
-        private Transaction             systemTransaction;
+		private FbConnectionInternal    connection;
+		private FbTransaction           transaction;
+		private Transaction             systemTransaction;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public bool IsCompleted
-        {
-            get { return (this.transaction == null); }
-        }
+		public bool IsCompleted
+		{
+			get { return (this.transaction == null); }
+		}
 
 		public Transaction SystemTransaction
 		{
 			get { return this.systemTransaction; }
 		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FbEnlistmentNotification(FbConnectionInternal connection, Transaction systemTransaction)
-        {            
-            this.connection         = connection;
-            this.transaction        = connection.BeginTransaction(systemTransaction.IsolationLevel);
-            this.systemTransaction  = systemTransaction;
+		public FbEnlistmentNotification(FbConnectionInternal connection, Transaction systemTransaction)
+		{            
+			this.connection         = connection;
+			this.transaction        = connection.BeginTransaction(systemTransaction.IsolationLevel);
+			this.systemTransaction  = systemTransaction;
 
-            this.systemTransaction.EnlistVolatile(this, System.Transactions.EnlistmentOptions.None);
-        }
+			this.systemTransaction.EnlistVolatile(this, System.Transactions.EnlistmentOptions.None);
+		}
 
-        #endregion
+		#endregion
 
-        #region · IEnlistmentNotification Members ·
+		#region · IEnlistmentNotification Members ·
 
-        public void Commit(Enlistment enlistment)
-        {
-            if (this.transaction != null && !this.transaction.IsUpdated)
-            {
-                this.transaction.Commit();
-                this.transaction = null;
+		public void Commit(Enlistment enlistment)
+		{
+			if (this.transaction != null && !this.transaction.IsUpdated)
+			{
+				this.transaction.Commit();
+				this.transaction = null;
 
-                if (this.Completed != null)
-                {
-                    this.Completed(this, new EventArgs());
-                }
+				if (this.Completed != null)
+				{
+					this.Completed(this, new EventArgs());
+				}
 
-                if (this.connection != null)
-                {
-                    if (!this.connection.Pooled && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
-                    {
-                        this.connection.Disconnect();
-                    }
-                }
-                this.connection         = null;
-                this.systemTransaction  = null;
+				if (this.connection != null)
+				{
+					if (!this.connection.Pooled && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
+					{
+						this.connection.Disconnect();
+					}
+				}
+				this.connection         = null;
+				this.systemTransaction  = null;
 
-                // Declare done on the enlistment
-                enlistment.Done();
-            }
-        }
+				// Declare done on the enlistment
+				enlistment.Done();
+			}
+		}
 
-        public void InDoubt(Enlistment enlistment)
-        {
-            throw new NotSupportedException("In Doubt transactions are not supported");
-        }
+		public void InDoubt(Enlistment enlistment)
+		{
+			throw new NotSupportedException("In Doubt transactions are not supported");
+		}
 
-        public void Prepare(PreparingEnlistment preparingEnlistment)
-        {
-            preparingEnlistment.Prepared();
-        }
+		public void Prepare(PreparingEnlistment preparingEnlistment)
+		{
+			preparingEnlistment.Prepared();
+		}
 
-        public void Rollback(Enlistment enlistment)
-        {
-            if (this.transaction != null && !this.transaction.IsUpdated)
-            {
-                this.transaction.Rollback();
-                this.transaction        = null;
+		public void Rollback(Enlistment enlistment)
+		{
+			if (this.transaction != null && !this.transaction.IsUpdated)
+			{
+				this.transaction.Rollback();
+				this.transaction        = null;
 
-                if (this.Completed != null)
-                {
-                    this.Completed(this, new EventArgs());
-                }
+				if (this.Completed != null)
+				{
+					this.Completed(this, new EventArgs());
+				}
 
-                if (this.connection != null)
-                {
-                    if (!this.connection.Pooled && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
-                    {
-                        this.connection.Disconnect();
-                    }
-                }
-                this.connection = null;
-                this.systemTransaction  = null;
+				if (this.connection != null)
+				{
+					if (!this.connection.Pooled && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
+					{
+						this.connection.Disconnect();
+					}
+				}
+				this.connection = null;
+				this.systemTransaction  = null;
 
-                // Declare done on the enlistment
-                enlistment.Done();
-            }
-        }
+				// Declare done on the enlistment
+				enlistment.Done();
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif

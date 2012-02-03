@@ -21,27 +21,27 @@ using System;
 namespace FirebirdSql.Data.FirebirdClient
 {
 #if (!NET_CF)
-    [Flags]
-    [Serializable]
+	[Flags]
+	[Serializable]
 #endif
-    public enum FbTransactionBehavior : int
-    {
-        Consistency = 1,
-        Concurrency = 2,
-        Shared = 4,
-        Protected = 8,
-        Exclusive = 16,
-        Wait = 32,
-        NoWait = 64,
-        Read = 128,
-        Write = 256,
-        LockRead = 512,
-        LockWrite = 1024,
-        ReadCommitted = 2048,
-        Autocommit = 4096,
-        RecVersion = 8192,
-        NoRecVersion = 16384,
-        RestartRequests = 32768,
-        NoAutoUndo = 65536
-    }
+	public enum FbTransactionBehavior : int
+	{
+		Consistency = 1,
+		Concurrency = 2,
+		Shared = 4,
+		Protected = 8,
+		Exclusive = 16,
+		Wait = 32,
+		NoWait = 64,
+		Read = 128,
+		Write = 256,
+		LockRead = 512,
+		LockWrite = 1024,
+		ReadCommitted = 2048,
+		Autocommit = 4096,
+		RecVersion = 8192,
+		NoRecVersion = 16384,
+		RestartRequests = 32768,
+		NoAutoUndo = 65536
+	}
 }

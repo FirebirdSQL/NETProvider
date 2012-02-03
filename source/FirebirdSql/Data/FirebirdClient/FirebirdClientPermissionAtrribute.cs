@@ -33,8 +33,8 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region · Constructors ·
 
-        public FirebirdClientPermissionAttribute(SecurityAction action)
-            : base(action)
+		public FirebirdClientPermissionAttribute(SecurityAction action)
+			: base(action)
 		{
 		}
 

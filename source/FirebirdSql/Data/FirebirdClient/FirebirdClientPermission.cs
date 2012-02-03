@@ -49,10 +49,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Internal Constructors ·
 
-        internal FirebirdClientPermission(string connectionString) : base(PermissionState.None)
-        {
-            this.Add(connectionString, string.Empty, KeyRestrictionBehavior.AllowOnly);
-        }
+		internal FirebirdClientPermission(string connectionString) : base(PermissionState.None)
+		{
+			this.Add(connectionString, string.Empty, KeyRestrictionBehavior.AllowOnly);
+		}
 
 		internal FirebirdClientPermission(DBDataPermission permission) : base (permission)
 		{

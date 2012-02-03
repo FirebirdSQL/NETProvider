@@ -22,5 +22,5 @@ using System.Text;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    internal delegate void EmptyPoolEventHandler(object sender, EventArgs e);
+	internal delegate void EmptyPoolEventHandler(object sender, EventArgs e);
 }

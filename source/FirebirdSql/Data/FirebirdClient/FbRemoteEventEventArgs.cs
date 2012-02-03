@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *     The contents of this file are subject to the Initial 
@@ -20,42 +20,42 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    public sealed class FbRemoteEventEventArgs : System.ComponentModel.CancelEventArgs
-    {
-        #region Â· Fields Â·
+	public sealed class FbRemoteEventEventArgs : System.ComponentModel.CancelEventArgs
+	{
+		#region · Fields ·
 
-        private string name;
-        private int counts;
+		private string name;
+		private int counts;
 
-        #endregion
+		#endregion
 
-        #region Â· Properties Â·
+		#region · Properties ·
 
-        public string Name
-        {
-            get { return this.name; }
-        }
+		public string Name
+		{
+			get { return this.name; }
+		}
 
-        public int Counts
-        {
-            get { return this.counts; }
-        }
+		public int Counts
+		{
+			get { return this.counts; }
+		}
 
-        #endregion
+		#endregion
 
-        #region Â· Constructors Â·
+		#region · Constructors ·
 
-        public FbRemoteEventEventArgs(string name, int counts)
-            : this(name, counts, false)
-        { }
+		public FbRemoteEventEventArgs(string name, int counts)
+			: this(name, counts, false)
+		{ }
 
-        public FbRemoteEventEventArgs(string name, int counts, bool cancel)
-            : base(cancel)
-        {
-            this.name = name;
-            this.counts = counts;
-        }
+		public FbRemoteEventEventArgs(string name, int counts, bool cancel)
+			: base(cancel)
+		{
+			this.name = name;
+			this.counts = counts;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

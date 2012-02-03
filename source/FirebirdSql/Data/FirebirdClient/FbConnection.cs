@@ -33,638 +33,638 @@ using FirebirdSql.Data.Common;
 namespace FirebirdSql.Data.FirebirdClient
 {
 #if	(!NET_CF)
-    [DefaultEvent("InfoMessage")]
+	[DefaultEvent("InfoMessage")]
 #endif
-    public sealed class FbConnection : DbConnection, ICloneable
-    {
-        #region · Static Properties ·
+	public sealed class FbConnection : DbConnection, ICloneable
+	{
+		#region · Static Properties ·
 
-        public static int ConnectionPoolsCount
-        {
-            get { return FbPoolManager.Instance.PoolsCount; }
-        }
+		public static int ConnectionPoolsCount
+		{
+			get { return FbPoolManager.Instance.PoolsCount; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Static Pool Handling Methods ·
+		#region · Static Pool Handling Methods ·
 
-        public static int GetPooledConnectionCount(FbConnection connection)
-        {
-            return FbPoolManager.Instance.GetPooledConnectionCount(connection.ConnectionString);
-        }
+		public static int GetPooledConnectionCount(FbConnection connection)
+		{
+			return FbPoolManager.Instance.GetPooledConnectionCount(connection.ConnectionString);
+		}
 
-        public static void ClearAllPools()
-        {
-            FbPoolManager.Instance.ClearAllPools();
-        }
+		public static void ClearAllPools()
+		{
+			FbPoolManager.Instance.ClearAllPools();
+		}
 
-        public static void ClearPool(FbConnection connection)
-        {
-            FbPoolManager.Instance.ClearPool(connection.ConnectionString);
-        }
+		public static void ClearPool(FbConnection connection)
+		{
+			FbPoolManager.Instance.ClearPool(connection.ConnectionString);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Static Database Creation/Drop methods ·
+		#region · Static Database Creation/Drop methods ·
 
-        public static void CreateDatabase(string connectionString)
-        {
-            FbConnection.CreateDatabase(connectionString, 4096, true, false);
-        }
+		public static void CreateDatabase(string connectionString)
+		{
+			FbConnection.CreateDatabase(connectionString, 4096, true, false);
+		}
 
-        public static void CreateDatabase(string connectionString, bool overwrite)
-        {
-            FbConnection.CreateDatabase(connectionString, 4096, true, overwrite);
-        }
+		public static void CreateDatabase(string connectionString, bool overwrite)
+		{
+			FbConnection.CreateDatabase(connectionString, 4096, true, overwrite);
+		}
 
-        public static void CreateDatabase(string connectionString, int pageSize, bool forcedWrites, bool overwrite)
-        {
-            FbConnectionString options = new FbConnectionString(connectionString);
-            options.Validate();
+		public static void CreateDatabase(string connectionString, int pageSize, bool forcedWrites, bool overwrite)
+		{
+			FbConnectionString options = new FbConnectionString(connectionString);
+			options.Validate();
 
-            try
-            {
-                // DPB configuration
-                DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
+			try
+			{
+				// DPB configuration
+				DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
 
-                // Dpb version
-                dpb.Append(IscCodes.isc_dpb_version1);
+				// Dpb version
+				dpb.Append(IscCodes.isc_dpb_version1);
 
-                // Dummy packet	interval
-                dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
+				// Dummy packet	interval
+				dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 
-                // User	name
-                dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
+				// User	name
+				dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
 
-                // User	password
-                dpb.Append(IscCodes.isc_dpb_password, options.Password);
+				// User	password
+				dpb.Append(IscCodes.isc_dpb_password, options.Password);
 
-                // Database	dialect
-                dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { options.Dialect, 0, 0, 0 });
+				// Database	dialect
+				dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { options.Dialect, 0, 0, 0 });
 
-                // Character set
-                if (options.Charset.Length > 0)
-                {
-                    Charset charset = Charset.GetCharset(options.Charset);
+				// Character set
+				if (options.Charset.Length > 0)
+				{
+					Charset charset = Charset.GetCharset(options.Charset);
 
-                    if (charset == null)
-                    {
-                        throw new ArgumentException("Character set is not valid.");
-                    }
-                    else
-                    {
-                        dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
-                    }
-                }
+					if (charset == null)
+					{
+						throw new ArgumentException("Character set is not valid.");
+					}
+					else
+					{
+						dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
+					}
+				}
 
-                // Forced writes
-                dpb.Append(IscCodes.isc_dpb_force_write, (short)(forcedWrites ? 1 : 0));
+				// Forced writes
+				dpb.Append(IscCodes.isc_dpb_force_write, (short)(forcedWrites ? 1 : 0));
 
-                // Database overwrite
-                dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
+				// Database overwrite
+				dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
 
-                // Page	Size
-                if (pageSize > 0)
-                {
-                    dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
-                }
+				// Page	Size
+				if (pageSize > 0)
+				{
+					dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
+				}
 
-                // Create the new database
-                FbConnectionInternal db = new FbConnectionInternal(options);
-                db.CreateDatabase(dpb);
-            }
-            catch (IscException ex)
-            {
-                throw new FbException(ex.Message, ex);
-            }
-        }
+				// Create the new database
+				FbConnectionInternal db = new FbConnectionInternal(options);
+				db.CreateDatabase(dpb);
+			}
+			catch (IscException ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+		}
 
-        public static void DropDatabase(string connectionString)
-        {
-            // Configure Attachment
-            FbConnectionString options = new FbConnectionString(connectionString);
-            options.Validate();
+		public static void DropDatabase(string connectionString)
+		{
+			// Configure Attachment
+			FbConnectionString options = new FbConnectionString(connectionString);
+			options.Validate();
 
-            try
-            {
-                // Drop	the	database	
-                FbConnectionInternal db = new FbConnectionInternal(options);
-                db.DropDatabase();
-            }
-            catch (IscException ex)
-            {
-                throw new FbException(ex.Message, ex);
-            }
-        }
+			try
+			{
+				// Drop	the	database	
+				FbConnectionInternal db = new FbConnectionInternal(options);
+				db.DropDatabase();
+			}
+			catch (IscException ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Events ·
+		#region · Events ·
 
-        public override event StateChangeEventHandler StateChange;
+		public override event StateChangeEventHandler StateChange;
 
-        public event FbInfoMessageEventHandler InfoMessage;
+		public event FbInfoMessageEventHandler InfoMessage;
 
-        #endregion
+		#endregion
 
-        #region · Fields ·
+		#region · Fields ·
 
-        private FbConnectionInternal innerConnection;
-        private ConnectionState state;
-        private FbConnectionString options;
-        private bool disposed;
-        private string connectionString;
+		private FbConnectionInternal innerConnection;
+		private ConnectionState state;
+		private FbConnectionString options;
+		private bool disposed;
+		private string connectionString;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
 #if	(!NET_CF)
-        [Category("Data")]
-        [SettingsBindable(true)]
-        [RefreshProperties(RefreshProperties.All)]
-        [DefaultValue("")]
+		[Category("Data")]
+		[SettingsBindable(true)]
+		[RefreshProperties(RefreshProperties.All)]
+		[DefaultValue("")]
 #endif
-        public override string ConnectionString
-        {
-            get { return this.connectionString; }
-            set
-            {
-                lock (this)
-                {
-                    if (this.state == ConnectionState.Closed)
-                    {
-                        if (value == null)
-                        {
-                            value = string.Empty;
-                        }
+		public override string ConnectionString
+		{
+			get { return this.connectionString; }
+			set
+			{
+				lock (this)
+				{
+					if (this.state == ConnectionState.Closed)
+					{
+						if (value == null)
+						{
+							value = string.Empty;
+						}
 
-                        this.options.Load(value);
-                        this.options.Validate();
-                        this.connectionString = value;
-                    }
-                }
-            }
-        }
+						this.options.Load(value);
+						this.options.Validate();
+						this.connectionString = value;
+					}
+				}
+			}
+		}
 
 #if	(!NET_CF)
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public override int ConnectionTimeout
-        {
-            get { return this.options.ConnectionTimeout; }
-        }
+		public override int ConnectionTimeout
+		{
+			get { return this.options.ConnectionTimeout; }
+		}
 
 #if	(!NET_CF)
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public override string Database
-        {
-            get { return this.options.Database; }
-        }
+		public override string Database
+		{
+			get { return this.options.Database; }
+		}
 
 #if	(!NET_CF)
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public override string DataSource
-        {
-            get { return this.options.DataSource; }
-        }
+		public override string DataSource
+		{
+			get { return this.options.DataSource; }
+		}
 
 #if	(!NET_CF)
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public override string ServerVersion
-        {
-            get
-            {
-                if (this.state == ConnectionState.Closed)
-                {
-                    throw new InvalidOperationException("The connection is closed.");
-                }
+		public override string ServerVersion
+		{
+			get
+			{
+				if (this.state == ConnectionState.Closed)
+				{
+					throw new InvalidOperationException("The connection is closed.");
+				}
 
-                if (this.innerConnection != null)
-                {
-                    return this.innerConnection.Database.ServerVersion;
-                }
+				if (this.innerConnection != null)
+				{
+					return this.innerConnection.Database.ServerVersion;
+				}
 
-                return string.Empty;
-            }
-        }
+				return string.Empty;
+			}
+		}
 
 #if	(!NET_CF)
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public Version ServerVersionNumber
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(this.ServerVersion))
-                    throw new InvalidOperationException("ServerVersion is not valid.");
-                
-                return new Version(Regex.Replace(this.ServerVersion, @"\w{2}-\w(\d+\.\d+\.\d+\.\d+) .*", "$1"));
-            }
-        }
+		public Version ServerVersionNumber
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(this.ServerVersion))
+					throw new InvalidOperationException("ServerVersion is not valid.");
+				
+				return new Version(Regex.Replace(this.ServerVersion, @"\w{2}-\w(\d+\.\d+\.\d+\.\d+) .*", "$1"));
+			}
+		}
 
 #if	(!NET_CF)
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public override ConnectionState State
-        {
-            get { return this.state; }
-        }
+		public override ConnectionState State
+		{
+			get { return this.state; }
+		}
 
 #if	(!NET_CF)
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public int PacketSize
-        {
-            get { return this.options.PacketSize; }
-        }
+		public int PacketSize
+		{
+			get { return this.options.PacketSize; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Internal Properties ·
+		#region · Internal Properties ·
 
-        internal FbConnectionInternal InnerConnection
-        {
-            get { return this.innerConnection; }
-        }
+		internal FbConnectionInternal InnerConnection
+		{
+			get { return this.innerConnection; }
+		}
 
-        internal FbConnectionString ConnectionOptions
-        {
-            get { return this.options; }
-        }
+		internal FbConnectionString ConnectionOptions
+		{
+			get { return this.options; }
+		}
 
-        internal bool IsClosed
-        {
-            get { return this.state == ConnectionState.Closed; }
-        }
+		internal bool IsClosed
+		{
+			get { return this.state == ConnectionState.Closed; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Protected Properties ·
+		#region · Protected Properties ·
 
 #if (!NET_CF) 
-        protected override DbProviderFactory DbProviderFactory
-        {
-            get { return FirebirdClientFactory.Instance; }
-        }
+		protected override DbProviderFactory DbProviderFactory
+		{
+			get { return FirebirdClientFactory.Instance; }
+		}
 #endif
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FbConnection()
-            : this(null)
-        {
-        }
+		public FbConnection()
+			: this(null)
+		{
+		}
 
-        public FbConnection(string connectionString)
-            : base()
-        {
-            this.options = new FbConnectionString();
-            this.state = ConnectionState.Closed;
-            this.connectionString = string.Empty;
+		public FbConnection(string connectionString)
+			: base()
+		{
+			this.options = new FbConnectionString();
+			this.state = ConnectionState.Closed;
+			this.connectionString = string.Empty;
 
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                this.ConnectionString = connectionString;
-            }
-        }
+			if (!string.IsNullOrEmpty(connectionString))
+			{
+				this.ConnectionString = connectionString;
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · IDisposable methods ·
+		#region · IDisposable methods ·
 
-        protected override void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (!this.disposed)
-                {
-                    try
-                    {
-                        // release any unmanaged resources
-                        this.Close();
+		protected override void Dispose(bool disposing)
+		{
+			lock (this)
+			{
+				if (!this.disposed)
+				{
+					try
+					{
+						// release any unmanaged resources
+						this.Close();
 
-                        if (disposing)
-                        {
-                            // release any managed resources
-                            this.innerConnection = null;
-                            this.options = null;
-                            this.connectionString = null;
-                        }
+						if (disposing)
+						{
+							// release any managed resources
+							this.innerConnection = null;
+							this.options = null;
+							this.connectionString = null;
+						}
 
-                        this.disposed = true;
-                    }
-                    catch
-                    {
-                    }
-                    finally
-                    {
-                        base.Dispose(disposing);
-                    }
-                }
-            }
-        }
+						this.disposed = true;
+					}
+					catch
+					{
+					}
+					finally
+					{
+						base.Dispose(disposing);
+					}
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · ICloneable Methods ·
+		#region · ICloneable Methods ·
 
-        object ICloneable.Clone()
-        {
-            return new FbConnection(this.ConnectionString);
-        }
+		object ICloneable.Clone()
+		{
+			return new FbConnection(this.ConnectionString);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Transaction Handling Methods ·
+		#region · Transaction Handling Methods ·
 
-        public new FbTransaction BeginTransaction()
-        {
-            return this.BeginTransaction(IsolationLevel.ReadCommitted, null);
-        }
+		public new FbTransaction BeginTransaction()
+		{
+			return this.BeginTransaction(IsolationLevel.ReadCommitted, null);
+		}
 
-        public new FbTransaction BeginTransaction(IsolationLevel level)
-        {
-            return this.BeginTransaction(level, null);
-        }
+		public new FbTransaction BeginTransaction(IsolationLevel level)
+		{
+			return this.BeginTransaction(level, null);
+		}
 
-        public FbTransaction BeginTransaction(string transactionName)
-        {
-            return this.BeginTransaction(IsolationLevel.ReadCommitted, transactionName);
-        }
+		public FbTransaction BeginTransaction(string transactionName)
+		{
+			return this.BeginTransaction(IsolationLevel.ReadCommitted, transactionName);
+		}
 
-        public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
-        {
+		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
+		{
 			this.CheckClosed();
 
-            return this.innerConnection.BeginTransaction(level, transactionName);
-        }
+			return this.innerConnection.BeginTransaction(level, transactionName);
+		}
 
-        public FbTransaction BeginTransaction(FbTransactionOptions options)
-        {
-            return this.BeginTransaction(options, null);
-        }
+		public FbTransaction BeginTransaction(FbTransactionOptions options)
+		{
+			return this.BeginTransaction(options, null);
+		}
 
-        public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
-        {
+		public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
+		{
 			this.CheckClosed();
 
-            return this.innerConnection.BeginTransaction(options, transactionName);
-        }
+			return this.innerConnection.BeginTransaction(options, transactionName);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Transaction Enlistement ·
+		#region · Transaction Enlistement ·
 
 #if (!NET_CF)
-        public override void EnlistTransaction(System.Transactions.Transaction transaction)
-        {
+		public override void EnlistTransaction(System.Transactions.Transaction transaction)
+		{
 			this.CheckClosed();
 
-            this.innerConnection.EnlistTransaction(transaction);
-        }
+			this.innerConnection.EnlistTransaction(transaction);
+		}
 #endif
 
-        #endregion
+		#endregion
 
-        #region · DbConnection methods ·
+		#region · DbConnection methods ·
 
-        protected override DbCommand CreateDbCommand()
-        {
-            return new FbCommand(null, this);
-        }
+		protected override DbCommand CreateDbCommand()
+		{
+			return new FbCommand(null, this);
+		}
 
-        protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
-        {
-            return this.BeginTransaction(isolationLevel);
-        }
+		protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
+		{
+			return this.BeginTransaction(isolationLevel);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Database Schema Methods ·
+		#region · Database Schema Methods ·
 
-        public override DataTable GetSchema()
-        {
-            return this.GetSchema("MetaDataCollections");
-        }
+		public override DataTable GetSchema()
+		{
+			return this.GetSchema("MetaDataCollections");
+		}
 
-        public override DataTable GetSchema(string collectionName)
-        {
-            return this.GetSchema(collectionName, null);
-        }
+		public override DataTable GetSchema(string collectionName)
+		{
+			return this.GetSchema(collectionName, null);
+		}
 
-        public override DataTable GetSchema(string collectionName, string[] restrictions)
-        {
+		public override DataTable GetSchema(string collectionName, string[] restrictions)
+		{
 			this.CheckClosed();
 
-            return this.innerConnection.GetSchema(collectionName, restrictions);
-        }
+			return this.innerConnection.GetSchema(collectionName, restrictions);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public new FbCommand CreateCommand()
-        {
-            return (FbCommand)this.CreateDbCommand();
-        }
+		public new FbCommand CreateCommand()
+		{
+			return (FbCommand)this.CreateDbCommand();
+		}
 
-        public override void ChangeDatabase(string db)
-        {
+		public override void ChangeDatabase(string db)
+		{
 #if (!NET_CF)
-            lock (this)
-            {
+			lock (this)
+			{
 				this.CheckClosed();
 
-                if (string.IsNullOrEmpty(db))
-                {
-                    throw new InvalidOperationException("Database name is not valid.");
-                }
+				if (string.IsNullOrEmpty(db))
+				{
+					throw new InvalidOperationException("Database name is not valid.");
+				}
 
-                string cs = this.connectionString;
+				string cs = this.connectionString;
 
-                try
-                {
-                    FbConnectionStringBuilder csb = new FbConnectionStringBuilder(this.connectionString);
+				try
+				{
+					FbConnectionStringBuilder csb = new FbConnectionStringBuilder(this.connectionString);
 
-                    /* Close current connection	*/
-                    this.Close();
+					/* Close current connection	*/
+					this.Close();
 
-                    /* Set up the new Database	*/
-                    csb.Database = db;
-                    this.ConnectionString = csb.ToString();
+					/* Set up the new Database	*/
+					csb.Database = db;
+					this.ConnectionString = csb.ToString();
 
-                    /* Open	new	connection	*/
-                    this.Open();
-                }
-                catch (IscException ex)
-                {
-                    this.ConnectionString = cs;
-                    throw new FbException(ex.Message, ex);
-                }
-            }
+					/* Open	new	connection	*/
+					this.Open();
+				}
+				catch (IscException ex)
+				{
+					this.ConnectionString = cs;
+					throw new FbException(ex.Message, ex);
+				}
+			}
 #endif
-        }
+		}
 
-        public override void Open()
-        {
-            lock (this)
-            {
-                if (string.IsNullOrEmpty(this.connectionString))
-                {
-                    throw new InvalidOperationException("Connection String is not initialized.");
-                }
-                if (!this.IsClosed && this.state != ConnectionState.Connecting)
-                {
-                    throw new InvalidOperationException("Connection already Open.");
-                }
+		public override void Open()
+		{
+			lock (this)
+			{
+				if (string.IsNullOrEmpty(this.connectionString))
+				{
+					throw new InvalidOperationException("Connection String is not initialized.");
+				}
+				if (!this.IsClosed && this.state != ConnectionState.Connecting)
+				{
+					throw new InvalidOperationException("Connection already Open.");
+				}
 #if (!NET_CF)
-                if (this.options.Enlist && System.Transactions.Transaction.Current == null)
-                {
-                    throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
-                }
+				if (this.options.Enlist && System.Transactions.Transaction.Current == null)
+				{
+					throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
+				}
 #endif
 
-                this.DemandPermission();
+				this.DemandPermission();
 
-                try
-                {
-                    this.OnStateChange(this.state, ConnectionState.Connecting);
+				try
+				{
+					this.OnStateChange(this.state, ConnectionState.Connecting);
 
-                    if (this.options.Pooling)
-                    {
-                        this.innerConnection = FbPoolManager.Instance.GetPool(this.connectionString).CheckOut();
-                        this.innerConnection.OwningConnection = this;
-                    }
-                    else
-                    {
-                        // Do not use Connection Pooling
-                        this.innerConnection = new FbConnectionInternal(this.options, this);
-                        this.innerConnection.Connect();
-                    }
+					if (this.options.Pooling)
+					{
+						this.innerConnection = FbPoolManager.Instance.GetPool(this.connectionString).CheckOut();
+						this.innerConnection.OwningConnection = this;
+					}
+					else
+					{
+						// Do not use Connection Pooling
+						this.innerConnection = new FbConnectionInternal(this.options, this);
+						this.innerConnection.Connect();
+					}
 
 #if (!NET_CF)
-                    try
-                    {
-                        this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
-                    }
-                    catch
-                    {
-                        // if enlistment fails clean up innerConnection
-                        this.innerConnection.DisposeTransaction();
+					try
+					{
+						this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
+					}
+					catch
+					{
+						// if enlistment fails clean up innerConnection
+						this.innerConnection.DisposeTransaction();
 
-                        if (this.innerConnection.Pooled)
-                        {
-                            // Send connection return back to the Pool
-                            FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
-                        }
-                        else
-                        {
-                            this.innerConnection.Dispose();
-                            this.innerConnection = null;
-                        }
+						if (this.innerConnection.Pooled)
+						{
+							// Send connection return back to the Pool
+							FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
+						}
+						else
+						{
+							this.innerConnection.Dispose();
+							this.innerConnection = null;
+						}
 
-                        throw;
-                    }
+						throw;
+					}
 #endif
 
-                    // Bind	Warning	messages event
-                    this.innerConnection.Database.WarningMessage = new WarningMessageCallback(this.OnWarningMessage);
+					// Bind	Warning	messages event
+					this.innerConnection.Database.WarningMessage = new WarningMessageCallback(this.OnWarningMessage);
 
-                    // Update the connection state
-                    this.OnStateChange(this.state, ConnectionState.Open);
-                }
-                catch (IscException ex)
-                {
-                    this.OnStateChange(this.state, ConnectionState.Closed);
-                    throw new FbException(ex.Message, ex);
-                }
-                catch
-                {
-                    this.OnStateChange(this.state, ConnectionState.Closed);
-                    throw;
-                }
-            }
-        }
+					// Update the connection state
+					this.OnStateChange(this.state, ConnectionState.Open);
+				}
+				catch (IscException ex)
+				{
+					this.OnStateChange(this.state, ConnectionState.Closed);
+					throw new FbException(ex.Message, ex);
+				}
+				catch
+				{
+					this.OnStateChange(this.state, ConnectionState.Closed);
+					throw;
+				}
+			}
+		}
 
-        public override void Close()
-        {
-            if (!this.IsClosed && this.innerConnection != null)
-            {
-                lock (this)
-                {
-                    try
-                    {
-                        lock (this.innerConnection)
-                        {
-                            // Close the Remote	Event Manager
-                            this.innerConnection.CloseEventManager();
+		public override void Close()
+		{
+			if (!this.IsClosed && this.innerConnection != null)
+			{
+				lock (this)
+				{
+					try
+					{
+						lock (this.innerConnection)
+						{
+							// Close the Remote	Event Manager
+							this.innerConnection.CloseEventManager();
 
-                            // Unbind Warning messages event
-                            if (this.innerConnection.Database != null)
-                            {
-                                this.innerConnection.Database.WarningMessage = null;
-                            }
+							// Unbind Warning messages event
+							if (this.innerConnection.Database != null)
+							{
+								this.innerConnection.Database.WarningMessage = null;
+							}
 
-                            // Dispose Transaction
-                            this.innerConnection.DisposeTransaction();
+							// Dispose Transaction
+							this.innerConnection.DisposeTransaction();
 
-                            // Dispose all active statemenets
-                            this.innerConnection.ReleasePreparedCommands();
+							// Dispose all active statemenets
+							this.innerConnection.ReleasePreparedCommands();
 
-                            // Close connection	or send	it back	to the pool
-                            if (this.innerConnection.Pooled)
-                            {
+							// Close connection	or send	it back	to the pool
+							if (this.innerConnection.Pooled)
+							{
 								if (this.innerConnection.CancelDisabled)
 								{
 									// Enable fb_cancel_operation if going into pool
 									this.innerConnection.EnableCancel();
 								}
 
-                                // Send	connection to the Pool
-                                FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
-                            }
-                            else
-                            {
-                                if (!this.innerConnection.IsEnlisted)
-                                {
-                                    this.innerConnection.Dispose();
-                                }
-                                this.innerConnection = null;
-                            }
-                        }
-                    }
-                    catch
-                    {
-                    }
-                    finally
-                    {
-                        // Update connection state
-                        this.OnStateChange(this.state, ConnectionState.Closed);
-                    }
-                }
-            }
-        }
+								// Send	connection to the Pool
+								FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
+							}
+							else
+							{
+								if (!this.innerConnection.IsEnlisted)
+								{
+									this.innerConnection.Dispose();
+								}
+								this.innerConnection = null;
+							}
+						}
+					}
+					catch
+					{
+					}
+					finally
+					{
+						// Update connection state
+						this.OnStateChange(this.state, ConnectionState.Closed);
+					}
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        internal void DemandPermission()
-        {
+		internal void DemandPermission()
+		{
 #if (!NET_CF)
-            FirebirdClientPermission permission = new FirebirdClientPermission(this.connectionString);
-            permission.Demand();
+			FirebirdClientPermission permission = new FirebirdClientPermission(this.connectionString);
+			permission.Demand();
 #endif
-        }
+		}
 
 		private void CheckClosed()
 		{
@@ -674,28 +674,28 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-        #endregion
+		#endregion
 
-        #region · Event Handlers ·
+		#region · Event Handlers ·
 
-        private void OnWarningMessage(IscException warning)
-        {
-            if (this.InfoMessage != null)
-            {
-                this.InfoMessage(this, new FbInfoMessageEventArgs(warning));
-            }
-        }
+		private void OnWarningMessage(IscException warning)
+		{
+			if (this.InfoMessage != null)
+			{
+				this.InfoMessage(this, new FbInfoMessageEventArgs(warning));
+			}
+		}
 
-        private void OnStateChange(ConnectionState originalState, ConnectionState currentState)
-        {
-            this.state = currentState;
-            if (this.StateChange != null)
-            {
-                this.StateChange(this, new StateChangeEventArgs(originalState, currentState));
-            }
-        }
+		private void OnStateChange(ConnectionState originalState, ConnectionState currentState)
+		{
+			this.state = currentState;
+			if (this.StateChange != null)
+			{
+				this.StateChange(this, new StateChangeEventArgs(originalState, currentState));
+			}
+		}
 
-        #endregion
+		#endregion
 
 		#region Cancelation
 		public void EnableCancel()

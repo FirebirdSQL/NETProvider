@@ -26,90 +26,90 @@ using System.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    public class FirebirdClientFactory : DbProviderFactory, IServiceProvider
-    {
-        #region · Static Properties ·
+	public class FirebirdClientFactory : DbProviderFactory, IServiceProvider
+	{
+		#region · Static Properties ·
 
-        public static readonly FirebirdClientFactory Instance = new FirebirdClientFactory();
+		public static readonly FirebirdClientFactory Instance = new FirebirdClientFactory();
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public override bool CanCreateDataSourceEnumerator
-        {
-            get { return false; }
-        }
+		public override bool CanCreateDataSourceEnumerator
+		{
+			get { return false; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        private FirebirdClientFactory() : base()
-        {
-        }
+		private FirebirdClientFactory() : base()
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public override DbCommand CreateCommand()
-        {
-            return new FbCommand();
-        }
+		public override DbCommand CreateCommand()
+		{
+			return new FbCommand();
+		}
 
-        public override DbConnection CreateConnection()
-        {
-            return new FbConnection();
-        }
+		public override DbConnection CreateConnection()
+		{
+			return new FbConnection();
+		}
 
-        public override DbConnectionStringBuilder CreateConnectionStringBuilder()
-        {
-            return new FbConnectionStringBuilder();
-        }
+		public override DbConnectionStringBuilder CreateConnectionStringBuilder()
+		{
+			return new FbConnectionStringBuilder();
+		}
 
-        public override DbDataAdapter CreateDataAdapter()
-        {
-            return new FbDataAdapter();
-        }
+		public override DbDataAdapter CreateDataAdapter()
+		{
+			return new FbDataAdapter();
+		}
 
-        public override DbParameter CreateParameter()
-        {
-            return new FbParameter();
-        }
+		public override DbParameter CreateParameter()
+		{
+			return new FbParameter();
+		}
 
-        public override System.Security.CodeAccessPermission CreatePermission(System.Security.Permissions.PermissionState state)
-        {
-            return new FirebirdClientPermission(state);
-        }
+		public override System.Security.CodeAccessPermission CreatePermission(System.Security.Permissions.PermissionState state)
+		{
+			return new FirebirdClientPermission(state);
+		}
 
-        public override DbCommandBuilder CreateCommandBuilder()
-        {
-            return new FbCommandBuilder();
-        }
+		public override DbCommandBuilder CreateCommandBuilder()
+		{
+			return new FbCommandBuilder();
+		}
 
-        #endregion
+		#endregion
 
-        #region · IServiceProvider Members ·
+		#region · IServiceProvider Members ·
 
-        object IServiceProvider.GetService(Type serviceType)
+		object IServiceProvider.GetService(Type serviceType)
 		{
 #if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
 			if (serviceType == typeof(DbProviderServices))
-            {
-				return FbProviderServices.Instance;
-            }
-            else
 			{
-                return null;
-            }
+				return FbProviderServices.Instance;
+			}
+			else
+			{
+				return null;
+			}
 #else
 			return null;
 #endif
-        }
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif
