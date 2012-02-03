@@ -29,72 +29,72 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-    internal sealed class FesConnection
-    {
-        #region · Static Methods ·
+	internal sealed class FesConnection
+	{
+		#region · Static Methods ·
 
-        public static IscException ParseStatusVector(IntPtr[] statusVector, Charset charset)
-        {
-            IscException exception = null;
-            bool eof = false;
+		public static IscException ParseStatusVector(IntPtr[] statusVector, Charset charset)
+		{
+			IscException exception = null;
+			bool eof = false;
 
-            for (int i = 0; i < statusVector.Length; )
-            {
-                IntPtr arg = statusVector[i++];
+			for (int i = 0; i < statusVector.Length; )
+			{
+				IntPtr arg = statusVector[i++];
 
-                switch (arg.ToInt32())
-                {
-                    case IscCodes.isc_arg_gds:
-                        IntPtr er = statusVector[i++];
-                        if (er != IntPtr.Zero)
-                        {
-                            if (exception == null)
-                            {
-                                exception = new IscException();
-                            }
-                            exception.Errors.Add(new IscError(arg.ToInt32(), er.ToInt32()));
-                        }
-                        break;
+				switch (arg.ToInt32())
+				{
+					case IscCodes.isc_arg_gds:
+						IntPtr er = statusVector[i++];
+						if (er != IntPtr.Zero)
+						{
+							if (exception == null)
+							{
+								exception = new IscException();
+							}
+							exception.Errors.Add(new IscError(arg.ToInt32(), er.ToInt32()));
+						}
+						break;
 
-                    case IscCodes.isc_arg_end:
-                        if (exception != null && exception.Errors.Count != 0)
-                        {
+					case IscCodes.isc_arg_end:
+						if (exception != null && exception.Errors.Count != 0)
+						{
 							exception.BuildExceptionData();
-                        }
-                        eof = true;
-                        break;
+						}
+						eof = true;
+						break;
 
-                    case IscCodes.isc_arg_interpreted:
-                    case IscCodes.isc_arg_string:
-                        {
-                            IntPtr ptr = statusVector[i++];
-                            string s = Marshal.PtrToStringAnsi(ptr);
-                            string arg_value = charset.GetString(
-                                System.Text.Encoding.Default.GetBytes(s));
+					case IscCodes.isc_arg_interpreted:
+					case IscCodes.isc_arg_string:
+						{
+							IntPtr ptr = statusVector[i++];
+							string s = Marshal.PtrToStringAnsi(ptr);
+							string arg_value = charset.GetString(
+								System.Text.Encoding.Default.GetBytes(s));
 
-                            exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
-                        }
-                        break;
+							exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
+						}
+						break;
 
-                    case IscCodes.isc_arg_cstring:
-                        {
-                            i++;
+					case IscCodes.isc_arg_cstring:
+						{
+							i++;
 
-                            IntPtr ptr = statusVector[i++];
-                            string s = Marshal.PtrToStringAnsi(ptr);
-                            string arg_value = charset.GetString(
-                                System.Text.Encoding.Default.GetBytes(s));
+							IntPtr ptr = statusVector[i++];
+							string s = Marshal.PtrToStringAnsi(ptr);
+							string arg_value = charset.GetString(
+								System.Text.Encoding.Default.GetBytes(s));
 
-                            exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
-                        }
-                        break;
+							exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
+						}
+						break;
 
-                    case IscCodes.isc_arg_win32:
-                    case IscCodes.isc_arg_number:
-                        exception.Errors.Add(new IscError(arg.ToInt32(), statusVector[i++].ToInt32()));
-                        break;
+					case IscCodes.isc_arg_win32:
+					case IscCodes.isc_arg_number:
+						exception.Errors.Add(new IscError(arg.ToInt32(), statusVector[i++].ToInt32()));
+						break;
 
-                    default:
+					default:
 						IntPtr e = statusVector[i++];
 						if (e != IntPtr.Zero)
 						{
@@ -104,27 +104,27 @@ namespace FirebirdSql.Data.Client.Native
 							}
 							exception.Errors.Add(new IscError(arg.ToInt32(), e.ToInt32()));
 						}
-                        break;
-                }
+						break;
+				}
 
-                if (eof)
-                {
-                    break;
-                }
-            }
+				if (eof)
+				{
+					break;
+				}
+			}
 
-            return exception;
-        }
+			return exception;
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        private FesConnection()
-        { }
+		private FesConnection()
+		{ }
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif

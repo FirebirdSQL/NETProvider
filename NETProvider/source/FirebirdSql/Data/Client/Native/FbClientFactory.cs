@@ -189,22 +189,22 @@ namespace FirebirdSql.Data.Client.Native
 			ILGenerator il = mb.GetILGenerator();
 			for (int i = 1; i <= pis.Count; i++)
 			{
-                if (i == 1)
-                {
-                    il.Emit(OpCodes.Ldarg_1);
-                }
-                else if (i == 2)
-                {
-                    il.Emit(OpCodes.Ldarg_2);
-                }
-                else if (i == 3)
-                {
-                    il.Emit(OpCodes.Ldarg_3);
-                }
-                else
-                {
-                    il.Emit(OpCodes.Ldarg_S, (short)i);
-                }
+				if (i == 1)
+				{
+					il.Emit(OpCodes.Ldarg_1);
+				}
+				else if (i == 2)
+				{
+					il.Emit(OpCodes.Ldarg_2);
+				}
+				else if (i == 3)
+				{
+					il.Emit(OpCodes.Ldarg_3);
+				}
+				else
+				{
+					il.Emit(OpCodes.Ldarg_S, (short)i);
+				}
 			}
 
 			il.EmitCall(OpCodes.Call, smb, null);
