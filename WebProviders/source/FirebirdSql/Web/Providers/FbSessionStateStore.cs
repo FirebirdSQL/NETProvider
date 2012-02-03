@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2005 Alessandro Petrelli
+ *  Copyright (c) 2005 Alessandro Petrelli
  *  Copyright (c) 2007-2010 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  *	 
@@ -73,22 +73,22 @@ namespace FirebirdSql.Web.Providers
 				name = "FbSessionStateStore";
 			}
 
-            if (string.IsNullOrEmpty(config["description"]))
-            {
-                config.Remove("description");
-                config.Add("description", "FB Session State Store");
-            }
+			if (string.IsNullOrEmpty(config["description"]))
+			{
+				config.Remove("description");
+				config.Add("description", "FB Session State Store");
+			}
 
 			base.Initialize(name, config);
 
 			if (config["applicationName"] == null || config["applicationName"].Trim() == "")
-            {
-                this.applicationName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
-            }
-            else
-            {
-                this.applicationName = config["applicationName"];
-            }
+			{
+				this.applicationName = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
+			}
+			else
+			{
+				this.applicationName = config["applicationName"];
+			}
 
 
 			Configuration cfg = WebConfigurationManager.OpenWebConfiguration(ApplicationName);
@@ -158,7 +158,7 @@ namespace FirebirdSql.Web.Providers
 						cmd.Parameters.Add("@SESSIONITEMS", FbDbType.Text, sessionItems.Length).Value = sessionItems;
 						cmd.Parameters.Add("@LOCKED", FbDbType.SmallInt).Value = false;
 						cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                        cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+						cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 						cmd.Parameters.Add("@LOCKID", FbDbType.Integer).Value = lockId;
 						cmd.ExecuteNonQuery();
 					}
@@ -190,7 +190,7 @@ namespace FirebirdSql.Web.Providers
 						"WHERE SESSIONID = @SESSIONID AND APPLICATIONNAME = @APPLICATIONNAME AND LOCKID = @LOCKID";
 					cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now.AddMinutes(this.config.Timeout.Minutes);
 					cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                    cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+					cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 					cmd.Parameters.Add("@LOCKID", FbDbType.Integer).Value = lockId;
 					cmd.ExecuteNonQuery();
 				}
@@ -208,7 +208,7 @@ namespace FirebirdSql.Web.Providers
 					cmd.CommandText = "DELETE FROM SESSIONS WHERE SESSIONID = @SESSIONID AND " +
 						"APPLICATIONNAME = @APPLICATIONNAME AND LOCKID = @LOCKID";
 					cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                    cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+					cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 					cmd.Parameters.Add("@LOCKID", FbDbType.Integer).Value = lockId;
 
 					cmd.ExecuteNonQuery();
@@ -229,7 +229,7 @@ namespace FirebirdSql.Web.Providers
 						"VALUES (@SESSIONID, @APPLICATIONNAME, @CREATED, @EXPIRES, @LOCKDATE, @LOCKID, " +
 						"@TIMEOUT, @LOCKED, @SESSIONITEMS, @FLAGS)";
 					cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                    cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+					cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 					cmd.Parameters.Add("@CREATED", FbDbType.TimeStamp).Value = DateTime.Now;
 					cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now.AddMinutes((Double)timeout);
 					cmd.Parameters.Add("@LOCKDATE", FbDbType.TimeStamp).Value = DateTime.Now;
@@ -261,7 +261,7 @@ namespace FirebirdSql.Web.Providers
 						"APPLICATIONNAME = @APPLICATIONNAME";
 					cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now.AddMinutes(this.config.Timeout.Minutes);
 					cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                    cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+					cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 
 					cmd.ExecuteNonQuery();
 				}
@@ -310,7 +310,7 @@ namespace FirebirdSql.Web.Providers
 						cmd.Parameters.Add("@LOCKED", FbDbType.SmallInt).Value = true;
 						cmd.Parameters.Add("@LOCKDATE", FbDbType.TimeStamp).Value = DateTime.Now;
 						cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                        cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+						cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 						cmd.Parameters.Add("@LOCKED2", FbDbType.Integer).Value = false;
 						cmd.Parameters.Add("@EXPIRES", FbDbType.TimeStamp).Value = DateTime.Now;
 
@@ -330,7 +330,7 @@ namespace FirebirdSql.Web.Providers
 					cmd.CommandText = "SELECT EXPIRES, SESSIONITEMS, LOCKID, LOCKDATE, FLAGS, TIMEOUT " +
 						"FROM SESSIONS WHERE SESSIONID = @SESSIONID AND APPLICATIONNAME = @APPLICATIONNAME";
 					cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                    cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+					cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 
 					using (FbDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
 					{
@@ -368,7 +368,7 @@ namespace FirebirdSql.Web.Providers
 					{
 						cmd.CommandText = "DELETE FROM SESSIONS WHERE SESSIONID = @SESSIONID AND APPLICATIONNAME = @APPLICATIONNAME";
 						cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                        cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+						cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 						cmd.ExecuteNonQuery();
 					}
 				}
@@ -384,7 +384,7 @@ namespace FirebirdSql.Web.Providers
 							"WHERE SESSIONID = @SESSIONID AND APPLICATIONNAME = @APPLICATIONNAME";
 						cmd.Parameters.Add("@LOCKID", FbDbType.Integer).Value = lockId;
 						cmd.Parameters.Add("@SESSIONID", FbDbType.VarChar, 80).Value = id;
-                        cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
+						cmd.Parameters.Add("@APPLICATIONNAME", FbDbType.VarChar, 100).Value = ApplicationName;
 
 						cmd.ExecuteNonQuery();
 					}
@@ -420,15 +420,15 @@ namespace FirebirdSql.Web.Providers
 
 		private SessionStateStoreData Deserialize(HttpContext context, string serializedItems, int timeout)
 		{
-            SessionStateItemCollection sessionItems;
+			SessionStateItemCollection sessionItems;
 
-            using (MemoryStream memory = new MemoryStream(Convert.FromBase64String(serializedItems)))
-            {
-                using (BinaryReader reader = new BinaryReader(memory))
-                {
-                    sessionItems = SessionStateItemCollection.Deserialize(reader);
-                }
-            }
+			using (MemoryStream memory = new MemoryStream(Convert.FromBase64String(serializedItems)))
+			{
+				using (BinaryReader reader = new BinaryReader(memory))
+				{
+					sessionItems = SessionStateItemCollection.Deserialize(reader);
+				}
+			}
 
 			return new SessionStateStoreData(sessionItems, SessionStateUtility.GetSessionStaticObjects(context), timeout);
 		}
