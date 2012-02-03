@@ -148,25 +148,25 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public FbTransaction BeginTransaction(IsolationLevel level)
-        {
-            switch (level)
-            {
-                case IsolationLevel.Unspecified:
-                    return Connection.BeginTransaction();
+		public FbTransaction BeginTransaction(IsolationLevel level)
+		{
+			switch (level)
+			{
+				case IsolationLevel.Unspecified:
+					return Connection.BeginTransaction();
 
-                default:
-                    return Connection.BeginTransaction(level);
-            }
-        }
+				default:
+					return Connection.BeginTransaction(level);
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Event Handlers ·
+		#region · Event Handlers ·
 
-        public void OnStateChange(object sender, StateChangeEventArgs e)
+		public void OnStateChange(object sender, StateChangeEventArgs e)
 		{
 			Console.WriteLine("OnStateChange");
 			Console.WriteLine("  event args: (" +

@@ -25,81 +25,81 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-    /// <summary>
-    /// All the test in this TestFixture are using implicit transaction support.
-    /// </summary>
-    [TestFixture]
-    public class TransactionScopeTests : TestsBase
-    {
-        #region · Constructors ·
+	/// <summary>
+	/// All the test in this TestFixture are using implicit transaction support.
+	/// </summary>
+	[TestFixture]
+	public class TransactionScopeTests : TestsBase
+	{
+		#region · Constructors ·
 
-        public TransactionScopeTests()
-            : base()
-        {
-        }
+		public TransactionScopeTests()
+			: base()
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Unit Tests ·
+		#region · Unit Tests ·
 
-        [Test]
-        public void SimpleSelectTest()
-        {
-            FbConnectionStringBuilder csb = base.BuildConnectionStringBuilder();
+		[Test]
+		public void SimpleSelectTest()
+		{
+			FbConnectionStringBuilder csb = base.BuildConnectionStringBuilder();
 
-            csb.Enlist = true;
+			csb.Enlist = true;
 
-            using (TransactionScope scope = new TransactionScope())
-            {
-                using (FbConnection c = new FbConnection(csb.ToString()))
-                {
-                    c.Open();
+			using (TransactionScope scope = new TransactionScope())
+			{
+				using (FbConnection c = new FbConnection(csb.ToString()))
+				{
+					c.Open();
 
-                    using (FbCommand command = new FbCommand("select * from TEST where (0=1)", c))
-                    {
-                        using (FbDataReader r = command.ExecuteReader())
-                        {
-                            while (r.Read())
-                            {
-                            }
-                        }
-                    }
-                }
+					using (FbCommand command = new FbCommand("select * from TEST where (0=1)", c))
+					{
+						using (FbDataReader r = command.ExecuteReader())
+						{
+							while (r.Read())
+							{
+							}
+						}
+					}
+				}
 
-                scope.Complete();
-            }
-        }
+				scope.Complete();
+			}
+		}
 
-        [Test]
-        public void InsertTest()
-        {
-            FbConnectionStringBuilder csb = base.BuildConnectionStringBuilder();
+		[Test]
+		public void InsertTest()
+		{
+			FbConnectionStringBuilder csb = base.BuildConnectionStringBuilder();
 
-            csb.Enlist = true;
+			csb.Enlist = true;
 
-            using (TransactionScope scope = new TransactionScope())
-            {
-                using (FbConnection c = new FbConnection(csb.ToString()))
-                {
-                    c.Open();
+			using (TransactionScope scope = new TransactionScope())
+			{
+				using (FbConnection c = new FbConnection(csb.ToString()))
+				{
+					c.Open();
 
-                    string sql = "insert into TEST (int_field, date_field) values (1002, @date)";
+					string sql = "insert into TEST (int_field, date_field) values (1002, @date)";
 
-                    using (FbCommand command = new FbCommand(sql, c))
-                    {
-                        command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
+					using (FbCommand command = new FbCommand(sql, c))
+					{
+						command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
 
-                        int ra = command.ExecuteNonQuery();
+						int ra = command.ExecuteNonQuery();
 
-                        Assert.AreEqual(ra, 1);
-                    }
-                }
+						Assert.AreEqual(ra, 1);
+					}
+				}
 
-                scope.Complete();
-            }
-        }
+				scope.Complete();
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 

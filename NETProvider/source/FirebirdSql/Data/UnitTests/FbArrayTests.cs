@@ -424,10 +424,10 @@ namespace FirebirdSql.Data.UnitTests
 			// Insert new Record
 			TimeSpan[] insert_values = new TimeSpan[4];
 
-            insert_values[0] = new TimeSpan(3, 9, 10);
+			insert_values[0] = new TimeSpan(3, 9, 10);
 			insert_values[1] = new TimeSpan(4, 11, 12);
-            insert_values[2] = new TimeSpan(6, 13, 14);
-            insert_values[3] = new TimeSpan(8, 15, 16); 
+			insert_values[2] = new TimeSpan(6, 13, 14);
+			insert_values[3] = new TimeSpan(8, 15, 16); 
 
 			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
@@ -447,7 +447,7 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				if (!reader.IsDBNull(0))
 				{
-                    TimeSpan[] select_values = new TimeSpan[insert_values.Length];
+					TimeSpan[] select_values = new TimeSpan[insert_values.Length];
 					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
 
 					for (int i = 0; i < insert_values.Length; i++)
@@ -809,10 +809,10 @@ namespace FirebirdSql.Data.UnitTests
 			string updateText = "update	TEST set tarray_field =	@array_field " +
 								"WHERE int_field = 1";
 
-            TimeSpan[] new_values = new TimeSpan[2];
+			TimeSpan[] new_values = new TimeSpan[2];
 
-            new_values[0] = new TimeSpan(11, 13,14);
-            new_values[1] = new TimeSpan(12, 15, 16);
+			new_values[0] = new TimeSpan(11, 13,14);
+			new_values[1] = new TimeSpan(12, 15, 16);
 
 			FbCommand update = new FbCommand(updateText, Connection, Transaction);
 

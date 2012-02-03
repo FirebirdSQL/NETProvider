@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbServicesTests : TestsBase
 	{
-        #region · Constructors ·
+		#region · Constructors ·
 
 		public FbServicesTests()
 			: base(false)
@@ -58,9 +58,9 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-        #region · Unit Tests ·
+		#region · Unit Tests ·
 
-        [Test]
+		[Test]
 		public void BackupTest()
 		{
 			FbBackup backupSvc = new FbBackup();
@@ -91,10 +91,10 @@ namespace FirebirdSql.Data.UnitTests
 
 			restoreSvc.Execute();
 
-            if (File.Exists(ConfigurationManager.AppSettings["BackupRestoreFile"]))
-            {
-                File.Delete(ConfigurationManager.AppSettings["BackupRestoreFile"]);
-            }
+			if (File.Exists(ConfigurationManager.AppSettings["BackupRestoreFile"]))
+			{
+				File.Delete(ConfigurationManager.AppSettings["BackupRestoreFile"]);
+			}
 		}
 
 		[Test]
