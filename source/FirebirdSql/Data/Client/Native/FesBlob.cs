@@ -28,217 +28,217 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-    internal sealed class FesBlob : BlobBase
-    {
-        #region · Fields ·
+	internal sealed class FesBlob : BlobBase
+	{
+		#region · Fields ·
 
-        private FesDatabase db;
-        private IntPtr[] statusVector;
+		private FesDatabase db;
+		private IntPtr[] statusVector;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public override IDatabase Database
-        {
-            get { return this.db; }
-        }
+		public override IDatabase Database
+		{
+			get { return this.db; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FesBlob(IDatabase db, ITransaction transaction)
-            : this(db, transaction, 0)
-        {
-        }
+		public FesBlob(IDatabase db, ITransaction transaction)
+			: this(db, transaction, 0)
+		{
+		}
 
-        public FesBlob(IDatabase db, ITransaction transaction, long blobId)
-            : base(db)
-        {
-            if (!(db is FesDatabase))
-            {
-                throw new ArgumentException("Specified argument is not of FesDatabase type.");
-            }
-            if (!(transaction is FesTransaction))
-            {
-                throw new ArgumentException("Specified argument is not of FesTransaction type.");
-            }
+		public FesBlob(IDatabase db, ITransaction transaction, long blobId)
+			: base(db)
+		{
+			if (!(db is FesDatabase))
+			{
+				throw new ArgumentException("Specified argument is not of FesDatabase type.");
+			}
+			if (!(transaction is FesTransaction))
+			{
+				throw new ArgumentException("Specified argument is not of FesTransaction type.");
+			}
 
-            this.db = (FesDatabase)db;
-            this.transaction = (FesTransaction)transaction;
-            this.position = 0;
-            this.blobHandle = 0;
-            this.blobId = blobId;
-            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-        }
+			this.db = (FesDatabase)db;
+			this.transaction = (FesTransaction)transaction;
+			this.position = 0;
+			this.blobHandle = 0;
+			this.blobId = blobId;
+			this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+		}
 
-        #endregion
+		#endregion
 
-        #region · Protected Methods ·
+		#region · Protected Methods ·
 
-        protected override void Create()
-        {
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+		protected override void Create()
+		{
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                int dbHandle = this.db.Handle;
-                int trHandle = this.transaction.Handle;
+				int dbHandle = this.db.Handle;
+				int trHandle = this.transaction.Handle;
 
-                db.FbClient.isc_create_blob2(
-                    this.statusVector,
-                    ref	dbHandle,
-                    ref	trHandle,
-                    ref	this.blobHandle,
-                    ref	this.blobId,
-                    0,
-                    new byte[0]);
+				db.FbClient.isc_create_blob2(
+					this.statusVector,
+					ref	dbHandle,
+					ref	trHandle,
+					ref	this.blobHandle,
+					ref	this.blobId,
+					0,
+					new byte[0]);
 
-                FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
 
-                this.RblAddValue(IscCodes.RBL_create);
-            }
-        }
+				this.RblAddValue(IscCodes.RBL_create);
+			}
+		}
 
-        protected override void Open()
-        {
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+		protected override void Open()
+		{
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                int dbHandle = this.db.Handle;
-                int trHandle = this.transaction.Handle;
+				int dbHandle = this.db.Handle;
+				int trHandle = this.transaction.Handle;
 
-                db.FbClient.isc_open_blob2(
-                    this.statusVector,
-                    ref	dbHandle,
-                    ref	trHandle,
-                    ref	this.blobHandle,
-                    ref	this.blobId,
-                    0,
-                    new byte[0]);
+				db.FbClient.isc_open_blob2(
+					this.statusVector,
+					ref	dbHandle,
+					ref	trHandle,
+					ref	this.blobHandle,
+					ref	this.blobId,
+					0,
+					new byte[0]);
 
-                FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
-            }
-        }
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+			}
+		}
 
-        protected override byte[] GetSegment()
-        {
-            short requested = (short)this.SegmentSize;
-            short segmentLength = 0;
+		protected override byte[] GetSegment()
+		{
+			short requested = (short)this.SegmentSize;
+			short segmentLength = 0;
 
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                using (MemoryStream segment = new MemoryStream())
-                {
-                    byte[] tmp = new byte[requested];
+				using (MemoryStream segment = new MemoryStream())
+				{
+					byte[] tmp = new byte[requested];
 
-                    IntPtr status = db.FbClient.isc_get_segment(
-                        this.statusVector,
-                        ref	this.blobHandle,
-                        ref	segmentLength,
-                        requested,
-                        tmp);
+					IntPtr status = db.FbClient.isc_get_segment(
+						this.statusVector,
+						ref	this.blobHandle,
+						ref	segmentLength,
+						requested,
+						tmp);
 
-                    if (segmentLength > 0)
-                    {
-                        segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
-                    }
+					if (segmentLength > 0)
+					{
+						segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
+					}
 
-                    this.RblRemoveValue(IscCodes.RBL_segment);
+					this.RblRemoveValue(IscCodes.RBL_segment);
 
-                    if (this.statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
-                    {
-                        segment.SetLength(0);
-                        this.RblAddValue(IscCodes.RBL_eof_pending);
-                    }
-                    else
-                    {
-                        if (status == IntPtr.Zero || this.statusVector[1] == new IntPtr(IscCodes.isc_segment))
-                        {
-                            this.RblAddValue(IscCodes.RBL_segment);
-                        }
-                        else
-                        {
-                            this.db.ParseStatusVector(this.statusVector);
-                        }
-                    }
+					if (this.statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
+					{
+						segment.SetLength(0);
+						this.RblAddValue(IscCodes.RBL_eof_pending);
+					}
+					else
+					{
+						if (status == IntPtr.Zero || this.statusVector[1] == new IntPtr(IscCodes.isc_segment))
+						{
+							this.RblAddValue(IscCodes.RBL_segment);
+						}
+						else
+						{
+							this.db.ParseStatusVector(this.statusVector);
+						}
+					}
 
-                    return segment.ToArray();
-                }
-            }
-        }
+					return segment.ToArray();
+				}
+			}
+		}
 
-        protected override void PutSegment(byte[] buffer)
-        {
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+		protected override void PutSegment(byte[] buffer)
+		{
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                db.FbClient.isc_put_segment(
-                    this.statusVector,
-                    ref	this.blobHandle,
-                    (short)buffer.Length,
-                    buffer);
+				db.FbClient.isc_put_segment(
+					this.statusVector,
+					ref	this.blobHandle,
+					(short)buffer.Length,
+					buffer);
 
-                FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
-            }
-        }
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+			}
+		}
 
-        protected override void Seek(int position)
-        {
-            throw new NotSupportedException();
-        }
+		protected override void Seek(int position)
+		{
+			throw new NotSupportedException();
+		}
 
-        protected override void GetBlobInfo()
-        {
-            throw new NotSupportedException();
-        }
+		protected override void GetBlobInfo()
+		{
+			throw new NotSupportedException();
+		}
 
-        protected override void Close()
-        {
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+		protected override void Close()
+		{
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                db.FbClient.isc_close_blob(this.statusVector, ref this.blobHandle);
+				db.FbClient.isc_close_blob(this.statusVector, ref this.blobHandle);
 
-                FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
-            }
-        }
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+			}
+		}
 
-        protected override void Cancel()
-        {
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+		protected override void Cancel()
+		{
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                db.FbClient.isc_cancel_blob(this.statusVector, ref this.blobHandle);
+				db.FbClient.isc_cancel_blob(this.statusVector, ref this.blobHandle);
 
-                FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
-            }
-        }
+				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private void ClearStatusVector()
-        {
-            Array.Clear(this.statusVector, 0, this.statusVector.Length);
-        }
+		private void ClearStatusVector()
+		{
+			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif

@@ -41,8 +41,8 @@ namespace FirebirdSql.Data.Client.Native
 			byte[] destArray,
 			ref	int sliceLength);
 
-        IntPtr isc_array_put_slice(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_array_put_slice(
+			[In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			ref	int trHandle,
 			ref	long arrayId,
@@ -54,8 +54,8 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region · Blob Functions ·
 
-        IntPtr isc_create_blob2(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_create_blob2(
+			[In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			ref	int trHandle,
 			ref	int blobHandle,
@@ -63,8 +63,8 @@ namespace FirebirdSql.Data.Client.Native
 			short bpbLength,
 			byte[] bpbAddress);
 
-        IntPtr isc_open_blob2(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_open_blob2(
+			[In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			ref	int trHandle,
 			ref	int blobHandle,
@@ -72,52 +72,52 @@ namespace FirebirdSql.Data.Client.Native
 			short bpbLength,
 			byte[] bpbAddress);
 
-        IntPtr isc_get_segment(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_get_segment(
+			[In, Out] IntPtr[] statusVector,
 			ref	int blobHandle,
 			ref	short actualSegLength,
 			short segBufferLength,
 			byte[] segBuffer);
 
-        IntPtr isc_put_segment(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_put_segment(
+			[In, Out] IntPtr[] statusVector,
 			ref	int blobHandle,
 			short segBufferLength,
 			byte[] segBuffer);
 
-        IntPtr isc_cancel_blob(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_cancel_blob(
+			[In, Out] IntPtr[] statusVector,
 			ref	int blobHandle);
 
-        IntPtr isc_close_blob(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_close_blob(
+			[In, Out] IntPtr[] statusVector,
 			ref	int blobHandle);
 
 		#endregion
 
 		#region · Database Functions ·
 
-        IntPtr isc_attach_database(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_attach_database(
+			[In, Out] IntPtr[] statusVector,
 			short dbNameLength,
 			byte[] dbName,
 			ref	int dbHandle,
 			short parmBufferLength,
 			byte[] parmBuffer);
 
-        IntPtr isc_detach_database(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_detach_database(
+			[In, Out] IntPtr[] statusVector,
 			ref	int dbHandle);
 
-        IntPtr isc_database_info(
-            [In, Out] IntPtr[] statusVector,
+		IntPtr isc_database_info(
+			[In, Out] IntPtr[] statusVector,
 			ref	int dbHandle,
 			short itemListBufferLength,
 			byte[] itemListBuffer,
 			short resultBufferLength,
 			byte[] resultBuffer);
 
-        IntPtr isc_create_database(
+		IntPtr isc_create_database(
 			[In, Out] IntPtr[] statusVector,
 			short dbNameLength,
 			byte[] dbName,

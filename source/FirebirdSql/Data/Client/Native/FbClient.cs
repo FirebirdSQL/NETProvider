@@ -23,7 +23,7 @@ using System.Security;
 namespace FirebirdSql.Data.Client.Native
 {
 #if (!NET_CF)
-    [SuppressUnmanagedCodeSecurity]
+	[SuppressUnmanagedCodeSecurity]
 #endif
 	internal sealed class FbClient
 	{
@@ -50,16 +50,16 @@ namespace FirebirdSql.Data.Client.Native
 			public const string	DllPath = "firebird32";
 	#elif (FYRACLE)
 			public const string	DllPath = "fyracle";
-    #else
+	#else
 			public const string DllPath = "fbembed";
-    #endif
+	#endif
 #endif
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        private FbClient()
+		private FbClient()
 		{
 		}
 
@@ -167,7 +167,7 @@ namespace FirebirdSql.Data.Client.Native
 		public static extern int isc_create_database(
 			[In, Out] int[] statusVector,
 			short dbNameLength,
-            byte[] dbName,
+			byte[] dbName,
 			ref	int dbHandle,
 			short parmBufferLength,
 			byte[] parmBuffer,

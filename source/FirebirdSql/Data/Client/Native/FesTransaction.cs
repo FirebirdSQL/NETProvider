@@ -27,322 +27,322 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-    internal sealed class FesTransaction : ITransaction, IDisposable
-    {
-        #region · Inner Structs ·
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct IscTeb
-        {
-            public IntPtr dbb_ptr;
-            public int tpb_len;
-            public IntPtr tpb_ptr;
-        }
-
-        #endregion
-
-        #region · Events ·
-
-        public event TransactionUpdateEventHandler Update;
-
-        #endregion
-
-        #region · Fields ·
-
-        private int handle;
-        private FesDatabase db;
-        private TransactionState state;
-        private bool disposed;
-        private IntPtr[] statusVector;
-
-        #endregion
-
-        #region · Properties ·
-
-        public int Handle
-        {
-            get { return this.handle; }
-        }
-
-        public TransactionState State
-        {
-            get { return this.state; }
-        }
-
-        #endregion
-
-        #region · Constructors ·
-
-        public FesTransaction(IDatabase db)
-        {
-            if (!(db is FesDatabase))
-            {
-                throw new ArgumentException("Specified argument is not of FesDatabase type.");
-            }
-
-            this.db = (FesDatabase)db;
-            this.state = TransactionState.NoTransaction;
-            this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
-
-        #region · Finalizer ·
-
-        ~FesTransaction()
-        {
-            this.Dispose(false);
-        }
-
-        #endregion
-
-        #region · IDisposable methods ·
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (!this.disposed)
-                {
-                    try
-                    {
-                        // release any unmanaged resources
-                        this.Rollback();
-                    }
-                    catch
-                    {
-                    }
-                    finally
-                    {
-                        // release any managed resources
-                        if (disposing)
-                        {
-                            this.db = null;
-                            this.handle = 0;
-                            this.state = TransactionState.NoTransaction;
-                            this.statusVector = null;
-                        }
-
-                        this.disposed = true;
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region · Methods ·
-
-        public void BeginTransaction(TransactionParameterBuffer tpb)
-        {
-            if (this.state != TransactionState.NoTransaction)
-            {
-                throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
-            }
-
-            lock (this.db)
-            {
-                IscTeb teb = new IscTeb();
-                IntPtr tebData = IntPtr.Zero;
-
-                try
-                {
-                    // Clear the status vector
-                    this.ClearStatusVector();
-
-                    // Set db handle
-                    teb.dbb_ptr = Marshal.AllocHGlobal(4);
-                    Marshal.WriteInt32(teb.dbb_ptr, this.db.Handle);
-
-                    // Set tpb length
-                    teb.tpb_len = tpb.Length;
-
-                    // Set TPB data
-                    teb.tpb_ptr = Marshal.AllocHGlobal(tpb.Length);
-                    Marshal.Copy(tpb.ToArray(), 0, teb.tpb_ptr, tpb.Length);
-
-                    // Alloc memory	for	the	IscTeb structure
-                    int size = Marshal.SizeOf(typeof(IscTeb));
-                    tebData = Marshal.AllocHGlobal(size);
-
-                    Marshal.StructureToPtr(teb, tebData, true);
-
-                    int trHandle = this.handle;
-
-                    db.FbClient.isc_start_multiple(
-                        this.statusVector,
-                        ref	trHandle,
-                        1,
-                        tebData);
-
-                    this.handle = trHandle;
-
-                    // Parse status	vector
-                    this.db.ParseStatusVector(this.statusVector);
+	internal sealed class FesTransaction : ITransaction, IDisposable
+	{
+		#region · Inner Structs ·
+
+		[StructLayout(LayoutKind.Sequential)]
+		struct IscTeb
+		{
+			public IntPtr dbb_ptr;
+			public int tpb_len;
+			public IntPtr tpb_ptr;
+		}
+
+		#endregion
+
+		#region · Events ·
+
+		public event TransactionUpdateEventHandler Update;
+
+		#endregion
+
+		#region · Fields ·
+
+		private int handle;
+		private FesDatabase db;
+		private TransactionState state;
+		private bool disposed;
+		private IntPtr[] statusVector;
+
+		#endregion
+
+		#region · Properties ·
+
+		public int Handle
+		{
+			get { return this.handle; }
+		}
+
+		public TransactionState State
+		{
+			get { return this.state; }
+		}
+
+		#endregion
+
+		#region · Constructors ·
+
+		public FesTransaction(IDatabase db)
+		{
+			if (!(db is FesDatabase))
+			{
+				throw new ArgumentException("Specified argument is not of FesDatabase type.");
+			}
+
+			this.db = (FesDatabase)db;
+			this.state = TransactionState.NoTransaction;
+			this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+
+			GC.SuppressFinalize(this);
+		}
+
+		#endregion
+
+		#region · Finalizer ·
+
+		~FesTransaction()
+		{
+			this.Dispose(false);
+		}
+
+		#endregion
+
+		#region · IDisposable methods ·
+
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool disposing)
+		{
+			lock (this)
+			{
+				if (!this.disposed)
+				{
+					try
+					{
+						// release any unmanaged resources
+						this.Rollback();
+					}
+					catch
+					{
+					}
+					finally
+					{
+						// release any managed resources
+						if (disposing)
+						{
+							this.db = null;
+							this.handle = 0;
+							this.state = TransactionState.NoTransaction;
+							this.statusVector = null;
+						}
+
+						this.disposed = true;
+					}
+				}
+			}
+		}
+
+		#endregion
+
+		#region · Methods ·
+
+		public void BeginTransaction(TransactionParameterBuffer tpb)
+		{
+			if (this.state != TransactionState.NoTransaction)
+			{
+				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
+			}
+
+			lock (this.db)
+			{
+				IscTeb teb = new IscTeb();
+				IntPtr tebData = IntPtr.Zero;
+
+				try
+				{
+					// Clear the status vector
+					this.ClearStatusVector();
+
+					// Set db handle
+					teb.dbb_ptr = Marshal.AllocHGlobal(4);
+					Marshal.WriteInt32(teb.dbb_ptr, this.db.Handle);
+
+					// Set tpb length
+					teb.tpb_len = tpb.Length;
+
+					// Set TPB data
+					teb.tpb_ptr = Marshal.AllocHGlobal(tpb.Length);
+					Marshal.Copy(tpb.ToArray(), 0, teb.tpb_ptr, tpb.Length);
+
+					// Alloc memory	for	the	IscTeb structure
+					int size = Marshal.SizeOf(typeof(IscTeb));
+					tebData = Marshal.AllocHGlobal(size);
+
+					Marshal.StructureToPtr(teb, tebData, true);
+
+					int trHandle = this.handle;
+
+					db.FbClient.isc_start_multiple(
+						this.statusVector,
+						ref	trHandle,
+						1,
+						tebData);
+
+					this.handle = trHandle;
+
+					// Parse status	vector
+					this.db.ParseStatusVector(this.statusVector);
 
-                    // Update transaction state
-                    this.state = TransactionState.Active;
+					// Update transaction state
+					this.state = TransactionState.Active;
 
-                    // Update transaction count
-                    this.db.TransactionCount++;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    // Free	memory
-                    if (teb.dbb_ptr != IntPtr.Zero)
-                    {
-                        Marshal.FreeHGlobal(teb.dbb_ptr);
-                    }
-                    if (teb.tpb_ptr != IntPtr.Zero)
-                    {
-                        Marshal.FreeHGlobal(teb.tpb_ptr);
-                    }
-                    if (tebData != IntPtr.Zero)
-                    {
-                        Marshal.DestroyStructure(tebData, typeof(IscTeb));
-                        Marshal.FreeHGlobal(tebData);
-                    }
-                }
-            }
-        }
+					// Update transaction count
+					this.db.TransactionCount++;
+				}
+				catch
+				{
+					throw;
+				}
+				finally
+				{
+					// Free	memory
+					if (teb.dbb_ptr != IntPtr.Zero)
+					{
+						Marshal.FreeHGlobal(teb.dbb_ptr);
+					}
+					if (teb.tpb_ptr != IntPtr.Zero)
+					{
+						Marshal.FreeHGlobal(teb.tpb_ptr);
+					}
+					if (tebData != IntPtr.Zero)
+					{
+						Marshal.DestroyStructure(tebData, typeof(IscTeb));
+						Marshal.FreeHGlobal(tebData);
+					}
+				}
+			}
+		}
 
-        public void Commit()
-        {
-            this.CheckTransactionState();
+		public void Commit()
+		{
+			this.CheckTransactionState();
 
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                int trHandle = this.handle;
+				int trHandle = this.handle;
 
-                db.FbClient.isc_commit_transaction(this.statusVector, ref trHandle);
+				db.FbClient.isc_commit_transaction(this.statusVector, ref trHandle);
 
-                this.handle = trHandle;
+				this.handle = trHandle;
 
-                this.db.ParseStatusVector(this.statusVector);
+				this.db.ParseStatusVector(this.statusVector);
 
-                this.db.TransactionCount--;
+				this.db.TransactionCount--;
 
-                if (this.Update != null)
-                {
-                    this.Update(this, new EventArgs());
-                }
+				if (this.Update != null)
+				{
+					this.Update(this, new EventArgs());
+				}
 
-                this.state = TransactionState.NoTransaction;
-            }
-        }
+				this.state = TransactionState.NoTransaction;
+			}
+		}
 
-        public void Rollback()
-        {
-            this.CheckTransactionState();
+		public void Rollback()
+		{
+			this.CheckTransactionState();
 
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                int trHandle = this.handle;
+				int trHandle = this.handle;
 
-                db.FbClient.isc_rollback_transaction(this.statusVector, ref trHandle);
+				db.FbClient.isc_rollback_transaction(this.statusVector, ref trHandle);
 
-                this.handle = trHandle;
+				this.handle = trHandle;
 
-                this.db.ParseStatusVector(this.statusVector);
+				this.db.ParseStatusVector(this.statusVector);
 
-                this.db.TransactionCount--;
+				this.db.TransactionCount--;
 
-                if (this.Update != null)
-                {
-                    this.Update(this, new EventArgs());
-                }
+				if (this.Update != null)
+				{
+					this.Update(this, new EventArgs());
+				}
 
-                this.state = TransactionState.NoTransaction;
-            }
-        }
+				this.state = TransactionState.NoTransaction;
+			}
+		}
 
-        public void CommitRetaining()
-        {
-            this.CheckTransactionState();
+		public void CommitRetaining()
+		{
+			this.CheckTransactionState();
 
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                int trHandle = this.handle;
+				int trHandle = this.handle;
 
-                db.FbClient.isc_commit_retaining(this.statusVector, ref trHandle);
+				db.FbClient.isc_commit_retaining(this.statusVector, ref trHandle);
 
-                this.db.ParseStatusVector(this.statusVector);
+				this.db.ParseStatusVector(this.statusVector);
 
-                this.state = TransactionState.Active;
-            }
-        }
+				this.state = TransactionState.Active;
+			}
+		}
 
-        public void RollbackRetaining()
-        {
-            this.CheckTransactionState();
+		public void RollbackRetaining()
+		{
+			this.CheckTransactionState();
 
-            lock (this.db)
-            {
-                // Clear the status vector
-                this.ClearStatusVector();
+			lock (this.db)
+			{
+				// Clear the status vector
+				this.ClearStatusVector();
 
-                int trHandle = this.handle;
+				int trHandle = this.handle;
 
-                db.FbClient.isc_rollback_retaining(this.statusVector, ref trHandle);
+				db.FbClient.isc_rollback_retaining(this.statusVector, ref trHandle);
 
-                this.db.ParseStatusVector(this.statusVector);
+				this.db.ParseStatusVector(this.statusVector);
 
-                this.state = TransactionState.Active;
-            }
-        }
+				this.state = TransactionState.Active;
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Two Phase Commit Methods ·
+		#region · Two Phase Commit Methods ·
 
-        void ITransaction.Prepare()
-        {
-        }
+		void ITransaction.Prepare()
+		{
+		}
 
-        void ITransaction.Prepare(byte[] buffer)
-        {
-        }
+		void ITransaction.Prepare(byte[] buffer)
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private void ClearStatusVector()
-        {
-            Array.Clear(this.statusVector, 0, this.statusVector.Length);
-        }
+		private void ClearStatusVector()
+		{
+			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+		}
 
-        private void CheckTransactionState()
-        {
-            if (this.state != TransactionState.Active)
-            {
-                throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
-            }
-        }
+		private void CheckTransactionState()
+		{
+			if (this.state != TransactionState.Active)
+			{
+				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif
