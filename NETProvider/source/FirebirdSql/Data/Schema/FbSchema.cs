@@ -30,11 +30,11 @@ namespace FirebirdSql.Data.Schema
 {
 	internal abstract class FbSchema
 	{
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FbSchema()
+		public FbSchema()
 		{
-        }
+		}
 
 		#endregion
 
@@ -48,13 +48,13 @@ namespace FirebirdSql.Data.Schema
 
 		public DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
-            DataTable dataTable = new DataTable(collectionName);
-            FbCommand command = this.BuildCommand(connection, collectionName, this.ParseRestrictions(restrictions));
+			DataTable dataTable = new DataTable(collectionName);
+			FbCommand command = this.BuildCommand(connection, collectionName, this.ParseRestrictions(restrictions));
 			FbDataAdapter adapter = new FbDataAdapter(command);
 
-            try
+			try
 			{
-                adapter.Fill(dataTable);
+				adapter.Fill(dataTable);
 			}
 			catch (Exception ex)
 			{
@@ -66,10 +66,10 @@ namespace FirebirdSql.Data.Schema
 				command.Dispose();
 			}
 
-            TrimStringFields(dataTable);
+			TrimStringFields(dataTable);
 
-            return this.ProcessResult(dataTable);
-        }
+			return this.ProcessResult(dataTable);
+		}
 
 		#endregion
 
@@ -77,33 +77,33 @@ namespace FirebirdSql.Data.Schema
 
 		protected FbCommand BuildCommand(FbConnection connection, string collectionName, string[] restrictions)
 		{
-            string          filter = String.Format("CollectionName='{0}'", collectionName);
-            StringBuilder	builder = this.GetCommandText(restrictions);
-            DataRow[]       restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
+			string          filter = String.Format("CollectionName='{0}'", collectionName);
+			StringBuilder	builder = this.GetCommandText(restrictions);
+			DataRow[]       restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
 			FbTransaction	transaction = connection.InnerConnection.ActiveTransaction;
 			FbCommand		command	= new FbCommand(builder.ToString(), connection, transaction);
 
 			if (restrictions != null && restrictions.Length > 0)
 			{
-                int index = 0;
+				int index = 0;
 
-                for (int i = 0; i < restrictions.Length; i++)
-                {
-                    string rname = restriction[i]["RestrictionName"].ToString();
-                    if (restrictions[i] != null)
-                    {
-                        // Catalog, Schema and TableType are no real restrictions
-                        if (rname != "Catalog" && rname != "Schema" && rname != "TableType")
-                        {
-                            string pname = String.Format(CultureInfo.CurrentUICulture, "@p{0}", index++);
+				for (int i = 0; i < restrictions.Length; i++)
+				{
+					string rname = restriction[i]["RestrictionName"].ToString();
+					if (restrictions[i] != null)
+					{
+						// Catalog, Schema and TableType are no real restrictions
+						if (rname != "Catalog" && rname != "Schema" && rname != "TableType")
+						{
+							string pname = String.Format(CultureInfo.CurrentUICulture, "@p{0}", index++);
 
-                            command.Parameters.Add(pname, FbDbType.VarChar, 255).Value = restrictions[i];
-                        }
-                    }
+							command.Parameters.Add(pname, FbDbType.VarChar, 255).Value = restrictions[i];
+						}
+					}
 				}
 			}					
 
-            return command;
+			return command;
 		}
 
 		protected virtual DataTable ProcessResult(DataTable schema)
@@ -129,7 +129,7 @@ namespace FirebirdSql.Data.Schema
 				for (int i = 0; i < schema.Columns.Count; i++)
 				{
 					if (!row.IsNull(schema.Columns[i]) &&
-                        schema.Columns[i].DataType == typeof(System.String))
+						schema.Columns[i].DataType == typeof(System.String))
 					{
 						row[schema.Columns[i]] = row[schema.Columns[i]].ToString().Trim();
 					}

@@ -26,17 +26,17 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-    internal class FbFunctions : FbSchema
-    {
-        #region · Protected Methods ·
+	internal class FbFunctions : FbSchema
+	{
+		#region · Protected Methods ·
 
-        protected override StringBuilder GetCommandText(string[] restrictions)
-        {
-            StringBuilder sql = new StringBuilder();
-            StringBuilder where = new StringBuilder();
+		protected override StringBuilder GetCommandText(string[] restrictions)
+		{
+			StringBuilder sql = new StringBuilder();
+			StringBuilder where = new StringBuilder();
 
-            sql.Append(
-                @"SELECT
+			sql.Append(
+				@"SELECT
 					null AS FUNCTION_CATALOG,
 					null AS FUNCTION_SCHEMA,
 					rdb$function_name AS FUNCTION_NAME,
@@ -49,71 +49,71 @@ namespace FirebirdSql.Data.Schema
 					rdb$description AS DESCRIPTION
 				FROM rdb$functions");
 
-            if (restrictions != null)
-            {
-                int index = 0;
+			if (restrictions != null)
+			{
+				int index = 0;
 
-                /* FUNCTION_CATALOG	*/
-                if (restrictions.Length >= 1 && restrictions[0] != null)
-                {
-                }
+				/* FUNCTION_CATALOG	*/
+				if (restrictions.Length >= 1 && restrictions[0] != null)
+				{
+				}
 
-                /* FUNCTION_SCHEMA */
-                if (restrictions.Length >= 2 && restrictions[1] != null)
-                {
-                }
+				/* FUNCTION_SCHEMA */
+				if (restrictions.Length >= 2 && restrictions[1] != null)
+				{
+				}
 
-                /* FUNCTION_NAME */
-                if (restrictions.Length >= 3 && restrictions[2] != null)
-                {
-                    where.AppendFormat(CultureInfo.CurrentCulture, "rdb$function_name = @p{0}", index++);
-                }
+				/* FUNCTION_NAME */
+				if (restrictions.Length >= 3 && restrictions[2] != null)
+				{
+					where.AppendFormat(CultureInfo.CurrentCulture, "rdb$function_name = @p{0}", index++);
+				}
 
-                /* IS_SYSTEM_FUNCTION */
-                if (restrictions.Length >= 4 && restrictions[3] != null)
-                {
-                    if (where.Length > 0)
-                    {
-                        where.Append(" AND ");
-                    }
+				/* IS_SYSTEM_FUNCTION */
+				if (restrictions.Length >= 4 && restrictions[3] != null)
+				{
+					if (where.Length > 0)
+					{
+						where.Append(" AND ");
+					}
 
-                    where.AppendFormat(CultureInfo.CurrentCulture, "rdb$system_flag = @p{0}", index++);
-                }
-            }
+					where.AppendFormat(CultureInfo.CurrentCulture, "rdb$system_flag = @p{0}", index++);
+				}
+			}
 
-            if (where.Length > 0)
-            {
-                sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
-            }
+			if (where.Length > 0)
+			{
+				sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
+			}
 
-            sql.Append(" ORDER BY rdb$function_name");
+			sql.Append(" ORDER BY rdb$function_name");
 
-            return sql;
-        }
+			return sql;
+		}
 
-        protected override DataTable ProcessResult(DataTable schema)
-        {
-            schema.BeginLoadData();
+		protected override DataTable ProcessResult(DataTable schema)
+		{
+			schema.BeginLoadData();
 
-            foreach (DataRow row in schema.Rows)
-            {
-                if (row["IS_SYSTEM_FUNCTION"] == DBNull.Value ||
-                    Convert.ToInt32(row["IS_SYSTEM_FUNCTION"], CultureInfo.InvariantCulture) == 0)
-                {
-                    row["IS_SYSTEM_FUNCTION"] = false;
-                }
-                else
-                {
-                    row["IS_SYSTEM_FUNCTION"] = true;
-                }
-            }
+			foreach (DataRow row in schema.Rows)
+			{
+				if (row["IS_SYSTEM_FUNCTION"] == DBNull.Value ||
+					Convert.ToInt32(row["IS_SYSTEM_FUNCTION"], CultureInfo.InvariantCulture) == 0)
+				{
+					row["IS_SYSTEM_FUNCTION"] = false;
+				}
+				else
+				{
+					row["IS_SYSTEM_FUNCTION"] = true;
+				}
+			}
 
-            schema.EndLoadData();
-            schema.AcceptChanges();
+			schema.EndLoadData();
+			schema.AcceptChanges();
 
-            return schema;
-        }
+			return schema;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
