@@ -22,10 +22,10 @@ using System;
 
 namespace FirebirdSql.Data.Isql
 {
-    /// <summary>
-    /// The event handler type trigged before a SQL statement execution.
-    /// </summary>
-    public delegate void CommandExecutingEventHandler(object sender, CommandExecutingEventArgs e);
+	/// <summary>
+	/// The event handler type trigged before a SQL statement execution.
+	/// </summary>
+	public delegate void CommandExecutingEventHandler(object sender, CommandExecutingEventArgs e);
 }
 
 #endif
