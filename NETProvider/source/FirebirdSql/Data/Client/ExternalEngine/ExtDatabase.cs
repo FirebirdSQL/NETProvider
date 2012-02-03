@@ -32,227 +32,227 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.ExternalEngine
 {
-    internal sealed class ExtDatabase : IDatabase
-    {
-        #region · Callbacks ·
+	internal sealed class ExtDatabase : IDatabase
+	{
+		#region · Callbacks ·
 
-        public WarningMessageCallback WarningMessage
-        {
-            get { return this.warningMessage; }
-            set { this.warningMessage = value; }
-        }
+		public WarningMessageCallback WarningMessage
+		{
+			get { return this.warningMessage; }
+			set { this.warningMessage = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Fields ·
+		#region · Fields ·
 
-        private WarningMessageCallback warningMessage;
+		private WarningMessageCallback warningMessage;
 
-        private int handle;
-        private int transactionCount;
-        private string serverVersion;
-        private Charset charset;
-        private short packetSize;
-        private short dialect;
-        private bool disposed;
-        private int[] statusVector;
-        private object syncObject;
+		private int handle;
+		private int transactionCount;
+		private string serverVersion;
+		private Charset charset;
+		private short packetSize;
+		private short dialect;
+		private bool disposed;
+		private int[] statusVector;
+		private object syncObject;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public int Handle
-        {
-            get { return this.handle; }
-        }
+		public int Handle
+		{
+			get { return this.handle; }
+		}
 
-        public int TransactionCount
-        {
-            get { return this.transactionCount; }
-            set { this.transactionCount = value; }
-        }
+		public int TransactionCount
+		{
+			get { return this.transactionCount; }
+			set { this.transactionCount = value; }
+		}
 
-        public string ServerVersion
-        {
-            get { return this.serverVersion; }
-        }
+		public string ServerVersion
+		{
+			get { return this.serverVersion; }
+		}
 
-        public Charset Charset
-        {
-            get { return this.charset; }
-            set { this.charset = value; }
-        }
+		public Charset Charset
+		{
+			get { return this.charset; }
+			set { this.charset = value; }
+		}
 
-        public short PacketSize
-        {
-            get { return this.packetSize; }
-            set { this.packetSize = value; }
-        }
+		public short PacketSize
+		{
+			get { return this.packetSize; }
+			set { this.packetSize = value; }
+		}
 
-        public short Dialect
-        {
-            get { return this.dialect; }
-            set { this.dialect = value; }
-        }
+		public short Dialect
+		{
+			get { return this.dialect; }
+			set { this.dialect = value; }
+		}
 
-        public bool HasRemoteEventSupport
-        {
-            get { return false; }
-        }
+		public bool HasRemoteEventSupport
+		{
+			get { return false; }
+		}
 
-        public object SyncObject
-        {
-            get
-            {
-                if (this.syncObject == null)
-                {
-                    Interlocked.CompareExchange(ref this.syncObject, new object(), null);
-                }
+		public object SyncObject
+		{
+			get
+			{
+				if (this.syncObject == null)
+				{
+					Interlocked.CompareExchange(ref this.syncObject, new object(), null);
+				}
 
-                return this.syncObject;
-            }
-        }
+				return this.syncObject;
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public ExtDatabase()
-        {
-            this.charset = Charset.DefaultCharset;
-            this.dialect = 3;
-            this.packetSize = 8192;
-            this.statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
+		public ExtDatabase()
+		{
+			this.charset = Charset.DefaultCharset;
+			this.dialect = 3;
+			this.packetSize = 8192;
+			this.statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
 
-            GC.SuppressFinalize(this);
-        }
+			GC.SuppressFinalize(this);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Finalizer ·
+		#region · Finalizer ·
 
-        ~ExtDatabase()
-        {
-            this.Dispose(false);
-        }
+		~ExtDatabase()
+		{
+			this.Dispose(false);
+		}
 
-        #endregion
+		#endregion
 
-        #region · IDisposable methods ·
+		#region · IDisposable methods ·
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-        private void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (!this.disposed)
-                {
-                    try
-                    {
-                        // release any unmanaged resources
-                        this.Detach();
+		private void Dispose(bool disposing)
+		{
+			lock (this)
+			{
+				if (!this.disposed)
+				{
+					try
+					{
+						// release any unmanaged resources
+						this.Detach();
 
-                        // release any managed resources
-                        if (disposing)
-                        {
-                            this.warningMessage = null;
-                            this.charset = null;
-                            this.serverVersion = null;
-                            this.transactionCount = 0;
-                            this.dialect = 0;
-                            this.handle = 0;
-                            this.packetSize = 0;
-                        }
-                    }
-                    finally
-                    {
-                        this.disposed = true;
-                    }
-                }
-            }
-        }
+						// release any managed resources
+						if (disposing)
+						{
+							this.warningMessage = null;
+							this.charset = null;
+							this.serverVersion = null;
+							this.transactionCount = 0;
+							this.dialect = 0;
+							this.handle = 0;
+							this.packetSize = 0;
+						}
+					}
+					finally
+					{
+						this.disposed = true;
+					}
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Database Methods ·
+		#region · Database Methods ·
 
-        public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-        {
-        }
+		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
+		}
 
-        public void DropDatabase()
-        {
-        }
+		public void DropDatabase()
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Remote Events Methods ·
+		#region · Remote Events Methods ·
 
 		public void CloseEventManager()
-        {
-            throw new NotSupportedException();
-        }
+		{
+			throw new NotSupportedException();
+		}
 
 		public RemoteEvent CreateEvent()
-        {
-            throw new NotSupportedException();
-        }
+		{
+			throw new NotSupportedException();
+		}
 
 		public void QueueEvents(RemoteEvent events)
-        {
-            throw new NotSupportedException();
-        }
+		{
+			throw new NotSupportedException();
+		}
 
-        public void CancelEvents(RemoteEvent events)
-        {
-            throw new NotSupportedException();
-        }
+		public void CancelEvents(RemoteEvent events)
+		{
+			throw new NotSupportedException();
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-        {
-            int dbHandle = 0;
+		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
+			int dbHandle = 0;
 
-            // Clear status vector
-            this.ClearStatusVector();
+			// Clear status vector
+			this.ClearStatusVector();
 
-            lock (this)
-            {
-                SafeNativeMethods.isc_get_current_database(this.statusVector, ref dbHandle);
+			lock (this)
+			{
+				SafeNativeMethods.isc_get_current_database(this.statusVector, ref dbHandle);
 
-                this.handle = dbHandle;
-            }
-        }
+				this.handle = dbHandle;
+			}
+		}
 
-        public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-        {
-            throw new NotSupportedException("Trusted Auth isn't supported on External Engine.");
-        }
+		public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
+			throw new NotSupportedException("Trusted Auth isn't supported on External Engine.");
+		}
 
-        public void Detach()
-        {
-        }
+		public void Detach()
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Transaction Methods ·
+		#region · Transaction Methods ·
 
-        public ITransaction BeginTransaction(TransactionParameterBuffer tpb)
-        {
-            ExtTransaction transaction = new ExtTransaction(this);
-            transaction.BeginTransaction(tpb);
+		public ITransaction BeginTransaction(TransactionParameterBuffer tpb)
+		{
+			ExtTransaction transaction = new ExtTransaction(this);
+			transaction.BeginTransaction(tpb);
 
-            return transaction;
-        }
+			return transaction;
+		}
 
 		#endregion
 
@@ -265,107 +265,107 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-        #region · Statement Creation Methods ·
+		#region · Statement Creation Methods ·
 
-        public StatementBase CreateStatement()
-        {
-            return new ExtStatement(this);
-        }
+		public StatementBase CreateStatement()
+		{
+			return new ExtStatement(this);
+		}
 
-        public StatementBase CreateStatement(ITransaction transaction)
-        {
-            return new ExtStatement(this, transaction as ExtTransaction);
-        }
+		public StatementBase CreateStatement(ITransaction transaction)
+		{
+			return new ExtStatement(this, transaction as ExtTransaction);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Database Information Methods ·
+		#region · Database Information Methods ·
 
-        public string GetServerVersion()
-        {
-            byte[] items = new byte[]
+		public string GetServerVersion()
+		{
+			byte[] items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
 
-            return this.GetDatabaseInfo(items, 50)[0].ToString();
-        }
+			return this.GetDatabaseInfo(items, 50)[0].ToString();
+		}
 
-        public ArrayList GetDatabaseInfo(byte[] items)
-        {
-            return this.GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
-        }
+		public ArrayList GetDatabaseInfo(byte[] items)
+		{
+			return this.GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+		}
 
-        public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
-        {
-            byte[] buffer = new byte[bufferLength];
+		public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
+		{
+			byte[] buffer = new byte[bufferLength];
 
-            this.DatabaseInfo(items, buffer, buffer.Length);
+			this.DatabaseInfo(items, buffer, buffer.Length);
 
-            return IscHelper.ParseDatabaseInfo(buffer);
-        }
+			return IscHelper.ParseDatabaseInfo(buffer);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Trigger Context Methods ·
+		#region · Trigger Context Methods ·
 
-        public ITriggerContext GetTriggerContext()
-        {
-            return new ExtTriggerContext(this);
-        }
+		public ITriggerContext GetTriggerContext()
+		{
+			return new ExtTriggerContext(this);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Internal Methods ·
+		#region · Internal Methods ·
 
-        internal void ParseStatusVector(int[] statusVector)
-        {
-            IscException ex = ExtConnection.ParseStatusVector(statusVector);
+		internal void ParseStatusVector(int[] statusVector)
+		{
+			IscException ex = ExtConnection.ParseStatusVector(statusVector);
 
-            if (ex != null)
-            {
-                if (ex.IsWarning)
-                {
-                    this.warningMessage(ex);
-                }
-                else
-                {
-                    throw ex;
-                }
-            }
-        }
+			if (ex != null)
+			{
+				if (ex.IsWarning)
+				{
+					this.warningMessage(ex);
+				}
+				else
+				{
+					throw ex;
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private void ClearStatusVector()
-        {
-            Array.Clear(this.statusVector, 0, this.statusVector.Length);
-        }
+		private void ClearStatusVector()
+		{
+			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+		}
 
-        private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
-        {
-            lock (this)
-            {
-                int[] statusVector = ExtConnection.GetNewStatusVector();
-                int dbHandle = this.Handle;
+		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
+		{
+			lock (this)
+			{
+				int[] statusVector = ExtConnection.GetNewStatusVector();
+				int dbHandle = this.Handle;
 
-                SafeNativeMethods.isc_database_info(
-                    statusVector,
-                    ref	dbHandle,
-                    (short)items.Length,
-                    items,
-                    (short)bufferLength,
-                    buffer);
+				SafeNativeMethods.isc_database_info(
+					statusVector,
+					ref	dbHandle,
+					(short)items.Length,
+					items,
+					(short)bufferLength,
+					buffer);
 
-                this.ParseStatusVector(statusVector);
-            }
-        }
+				this.ParseStatusVector(statusVector);
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif

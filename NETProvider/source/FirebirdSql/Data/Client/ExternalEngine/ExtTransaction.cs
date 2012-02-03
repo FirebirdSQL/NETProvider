@@ -27,180 +27,180 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.ExternalEngine
 {
-    internal sealed class ExtTransaction : ITransaction, IDisposable
-    {
-        #region · Inner Structs ·
+	internal sealed class ExtTransaction : ITransaction, IDisposable
+	{
+		#region · Inner Structs ·
 
-        [StructLayout(LayoutKind.Sequential)]
-        struct IscTeb
-        {
-            public IntPtr dbb_ptr;
-            public int tpb_len;
-            public IntPtr tpb_ptr;
-        }
+		[StructLayout(LayoutKind.Sequential)]
+		struct IscTeb
+		{
+			public IntPtr dbb_ptr;
+			public int tpb_len;
+			public IntPtr tpb_ptr;
+		}
 
-        #endregion
+		#endregion
 
-        #region · Events ·
+		#region · Events ·
 
-        public event TransactionUpdateEventHandler Update;
+		public event TransactionUpdateEventHandler Update;
 
-        #endregion
+		#endregion
 
-        #region · Fields ·
+		#region · Fields ·
 
-        private int handle;
-        private ExtDatabase db;
-        private TransactionState state;
-        private bool disposed;
-        private int[] statusVector;
+		private int handle;
+		private ExtDatabase db;
+		private TransactionState state;
+		private bool disposed;
+		private int[] statusVector;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public int Handle
-        {
-            get { return this.handle; }
-        }
+		public int Handle
+		{
+			get { return this.handle; }
+		}
 
-        public TransactionState State
-        {
-            get { return this.state; }
-        }
+		public TransactionState State
+		{
+			get { return this.state; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public ExtTransaction(IDatabase db)
-        {
-            if (!(db is ExtDatabase))
-            {
-                throw new ArgumentException("Specified argument is not of FesDatabase type.");
-            }
+		public ExtTransaction(IDatabase db)
+		{
+			if (!(db is ExtDatabase))
+			{
+				throw new ArgumentException("Specified argument is not of FesDatabase type.");
+			}
 
-            this.db = (ExtDatabase)db;
-            this.state = TransactionState.NoTransaction;
-            this.statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
+			this.db = (ExtDatabase)db;
+			this.state = TransactionState.NoTransaction;
+			this.statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
 
-            GC.SuppressFinalize(this);
-        }
+			GC.SuppressFinalize(this);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Finalizer ·
+		#region · Finalizer ·
 
-        ~ExtTransaction()
-        {
-            this.Dispose(false);
-        }
+		~ExtTransaction()
+		{
+			this.Dispose(false);
+		}
 
-        #endregion
+		#endregion
 
-        #region · IDisposable methods ·
+		#region · IDisposable methods ·
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-        private void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (!this.disposed)
-                {
-                    try
-                    {
-                        // release any unmanaged resources
-                        this.Rollback();
+		private void Dispose(bool disposing)
+		{
+			lock (this)
+			{
+				if (!this.disposed)
+				{
+					try
+					{
+						// release any unmanaged resources
+						this.Rollback();
 
-                        // release any managed resources
-                        if (disposing)
-                        {
-                            this.db = null;
-                            this.handle = 0;
-                            this.state = TransactionState.NoTransaction;
-                            this.statusVector = null;
-                        }
-                    }
-                    finally
-                    {
-                        this.disposed = true;
-                    }
-                }
-            }
-        }
+						// release any managed resources
+						if (disposing)
+						{
+							this.db = null;
+							this.handle = 0;
+							this.state = TransactionState.NoTransaction;
+							this.statusVector = null;
+						}
+					}
+					finally
+					{
+						this.disposed = true;
+					}
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public void BeginTransaction(TransactionParameterBuffer tpb)
-        {
-            // Clear the status vector
-            this.ClearStatusVector();
+		public void BeginTransaction(TransactionParameterBuffer tpb)
+		{
+			// Clear the status vector
+			this.ClearStatusVector();
 
-            int trHandle = 0;
+			int trHandle = 0;
 
-            lock (this.db)
-            {
-                SafeNativeMethods.isc_get_current_transaction(this.statusVector, ref trHandle);
+			lock (this.db)
+			{
+				SafeNativeMethods.isc_get_current_transaction(this.statusVector, ref trHandle);
 
-                this.handle = trHandle;
-                this.state = TransactionState.Active;
-            }
-        }
+				this.handle = trHandle;
+				this.state = TransactionState.Active;
+			}
+		}
 
-        public void Commit()
-        {
-            if (this.Update != null)
-            {
-                this.Update(this, new EventArgs());
-            }
-        }
+		public void Commit()
+		{
+			if (this.Update != null)
+			{
+				this.Update(this, new EventArgs());
+			}
+		}
 
-        public void Rollback()
-        {
-            if (this.Update != null)
-            {
-                this.Update(this, new EventArgs());
-            }
-        }
+		public void Rollback()
+		{
+			if (this.Update != null)
+			{
+				this.Update(this, new EventArgs());
+			}
+		}
 
-        public void CommitRetaining()
-        {
-        }
+		public void CommitRetaining()
+		{
+		}
 
-        public void RollbackRetaining()
-        {
-        }
+		public void RollbackRetaining()
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Two Phase Commit Methods ·
+		#region · Two Phase Commit Methods ·
 
-        void ITransaction.Prepare()
-        {
-        }
+		void ITransaction.Prepare()
+		{
+		}
 
-        void ITransaction.Prepare(byte[] buffer)
-        {
-        }
+		void ITransaction.Prepare(byte[] buffer)
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private void ClearStatusVector()
-        {
-            Array.Clear(this.statusVector, 0, this.statusVector.Length);
-        }
+		private void ClearStatusVector()
+		{
+			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif
