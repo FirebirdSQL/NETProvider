@@ -23,82 +23,82 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Isql
 {
-    /// <summary>
-    /// Summary description for CommandExecutedEventArgs.
-    /// </summary>
-    public class CommandExecutedEventArgs
-    {
-        #region · Fields ·
+	/// <summary>
+	/// Summary description for CommandExecutedEventArgs.
+	/// </summary>
+	public class CommandExecutedEventArgs
+	{
+		#region · Fields ·
 
-        private string commandText;
-        private FbDataReader dataReader;
-        private int rowsAffected;
+		private string commandText;
+		private FbDataReader dataReader;
+		private int rowsAffected;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        /// <summary>
-        /// Returns the <see cref="SqlStatementType"/> of the current <see cref="CommandText"/>.
-        /// </summary>
-        public SqlStatementType StatementType
-        {
-            get { return FbBatchExecution.GetStatementType(this.commandText); }
-        }
+		/// <summary>
+		/// Returns the <see cref="SqlStatementType"/> of the current <see cref="CommandText"/>.
+		/// </summary>
+		public SqlStatementType StatementType
+		{
+			get { return FbBatchExecution.GetStatementType(this.commandText); }
+		}
 
-        /// <summary>
-        /// Returns the SQL statement that was executed.
-        /// </summary>
-        public string CommandText
-        {
-            get { return this.commandText; }
-        }
+		/// <summary>
+		/// Returns the SQL statement that was executed.
+		/// </summary>
+		public string CommandText
+		{
+			get { return this.commandText; }
+		}
 
-        /// <summary>
-        /// Returns a <see cref="FbDataReader"/> instance case the executed SQL command returns data. If
-        /// the executed SQL command does not returns data, (for instance: the case of an UPDATE statement), 
-        /// the <b>DataReader</b> is setled to <b>null</b>.
-        /// </summary>
-        public FbDataReader DataReader
-        {
-            get { return this.dataReader; }
-        }
+		/// <summary>
+		/// Returns a <see cref="FbDataReader"/> instance case the executed SQL command returns data. If
+		/// the executed SQL command does not returns data, (for instance: the case of an UPDATE statement), 
+		/// the <b>DataReader</b> is setled to <b>null</b>.
+		/// </summary>
+		public FbDataReader DataReader
+		{
+			get { return this.dataReader; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        /// <summary>
-        /// Creates an instance of CommandExecutedEventArgs class.
-        /// </summary>
-        /// <param name="dataReader"></param>
-        /// <param name="commandText">The CommandText of the <see cref="FbCommand"/> that was executed.</param>
-        /// <param name="rowsAffected"></param>
-        public CommandExecutedEventArgs(
-            FbDataReader dataReader,
-            string commandText,
-            int rowsAffected)
-        {
-            this.dataReader = dataReader;
-            this.commandText = commandText;
-            this.rowsAffected = rowsAffected;
-        }
+		/// <summary>
+		/// Creates an instance of CommandExecutedEventArgs class.
+		/// </summary>
+		/// <param name="dataReader"></param>
+		/// <param name="commandText">The CommandText of the <see cref="FbCommand"/> that was executed.</param>
+		/// <param name="rowsAffected"></param>
+		public CommandExecutedEventArgs(
+			FbDataReader dataReader,
+			string commandText,
+			int rowsAffected)
+		{
+			this.dataReader = dataReader;
+			this.commandText = commandText;
+			this.rowsAffected = rowsAffected;
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        /// <summary>
-        /// Overrided. Returns the SQL statement that was executed.
-        /// </summary>
-        /// <returns>The SQL statement that will be executed.</returns>
-        public override string ToString()
-        {
-            return this.commandText;
-        }
+		/// <summary>
+		/// Overrided. Returns the SQL statement that was executed.
+		/// </summary>
+		/// <returns>The SQL statement that will be executed.</returns>
+		public override string ToString()
+		{
+			return this.commandText;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif

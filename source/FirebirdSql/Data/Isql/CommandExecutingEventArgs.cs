@@ -23,71 +23,71 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Isql
 {
-    /// <summary>
-    ///	CommandExecutingEventArgs encapsulates the events arguments for the event trigged 
-    ///	from the <see cref="FbBatchExecution"/> during the execution. 
-    /// </summary>
-    /// <remarks>
-    /// 
-    /// </remarks>
-    public class CommandExecutingEventArgs : EventArgs
-    {
-        #region · Fields ·
+	/// <summary>
+	///	CommandExecutingEventArgs encapsulates the events arguments for the event trigged 
+	///	from the <see cref="FbBatchExecution"/> during the execution. 
+	/// </summary>
+	/// <remarks>
+	/// 
+	/// </remarks>
+	public class CommandExecutingEventArgs : EventArgs
+	{
+		#region · Fields ·
 
-        private FbCommand sqlCommand;
+		private FbCommand sqlCommand;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        /// <summary>
-        /// Returns the <see cref="FbCommand"/> instance that created for the SQL statement that goes 
-        /// for execution. 
-        /// </summary>
-        public FbCommand SqlCommand
-        {
-            get { return this.sqlCommand; }
-        }
+		/// <summary>
+		/// Returns the <see cref="FbCommand"/> instance that created for the SQL statement that goes 
+		/// for execution. 
+		/// </summary>
+		public FbCommand SqlCommand
+		{
+			get { return this.sqlCommand; }
+		}
 
-        /// <summary>
-        /// Returns the <see cref="SqlStatementType"/> of the current <see cref="SqlCommand"/>.
-        /// </summary>
-        public SqlStatementType StatementType
-        {
-            get { return FbBatchExecution.GetStatementType(this.SqlCommand.CommandText); }
-        }
+		/// <summary>
+		/// Returns the <see cref="SqlStatementType"/> of the current <see cref="SqlCommand"/>.
+		/// </summary>
+		public SqlStatementType StatementType
+		{
+			get { return FbBatchExecution.GetStatementType(this.SqlCommand.CommandText); }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        /// <summary>
-        /// Creates an instance of CommandExecutingEventArgs class.
-        /// </summary>
-        /// <param name="sqlCommand">The FbCommand properly instanciated.</param>
-        /// <remarks>The <b>sqlCommand</b> should be proper instanciated with a valid 
-        /// <see cref="FbCommand"/> and with the SQL statement loaded in <see cref="FbCommand.CommandText"/>.
-        /// </remarks>
-        public CommandExecutingEventArgs(FbCommand sqlCommand)
-        {
-            this.sqlCommand = sqlCommand;
-        }
+		/// <summary>
+		/// Creates an instance of CommandExecutingEventArgs class.
+		/// </summary>
+		/// <param name="sqlCommand">The FbCommand properly instanciated.</param>
+		/// <remarks>The <b>sqlCommand</b> should be proper instanciated with a valid 
+		/// <see cref="FbCommand"/> and with the SQL statement loaded in <see cref="FbCommand.CommandText"/>.
+		/// </remarks>
+		public CommandExecutingEventArgs(FbCommand sqlCommand)
+		{
+			this.sqlCommand = sqlCommand;
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        /// <summary>
-        /// Overrided. Returns the SQL statement that goes for execution.
-        /// </summary>
-        /// <returns>The SQL statement that will be executed.</returns>
-        public override string ToString()
-        {
-            return this.sqlCommand.CommandText;
-        }
+		/// <summary>
+		/// Overrided. Returns the SQL statement that goes for execution.
+		/// </summary>
+		/// <returns>The SQL statement that will be executed.</returns>
+		public override string ToString()
+		{
+			return this.sqlCommand.CommandText;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif
