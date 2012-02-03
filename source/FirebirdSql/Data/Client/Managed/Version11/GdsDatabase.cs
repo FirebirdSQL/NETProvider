@@ -34,42 +34,42 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
-    internal class GdsDatabase : Version10.GdsDatabase
-    {
-        #region · Constructors ·
+	internal class GdsDatabase : Version10.GdsDatabase
+	{
+		#region · Constructors ·
 
-        public GdsDatabase(Version10.GdsConnection connection)
-            : base(connection)
-        {
-            this.DeferredPackets = new Queue<Action<IResponse>>();
-        }
+		public GdsDatabase(Version10.GdsConnection connection)
+			: base(connection)
+		{
+			this.DeferredPackets = new Queue<Action<IResponse>>();
+		}
 
-        #endregion
+		#endregion
 
-        #region Properties
-        public Queue<Action<IResponse>> DeferredPackets { get; private set; }
-        #endregion
+		#region Properties
+		public Queue<Action<IResponse>> DeferredPackets { get; private set; }
+		#endregion
 
-        #region · Override Statement Creation Methods ·
+		#region · Override Statement Creation Methods ·
 
-        public override StatementBase CreateStatement()
-        {
-            return new GdsStatement(this);
-        }
+		public override StatementBase CreateStatement()
+		{
+			return new GdsStatement(this);
+		}
 
-        public override StatementBase CreateStatement(ITransaction transaction)
-        {
-            return new GdsStatement(this, transaction);
-        }
+		public override StatementBase CreateStatement(ITransaction transaction)
+		{
+			return new GdsStatement(this, transaction);
+		}
 
-        #endregion
+		#endregion
 
-        #region Trusted Auth
-        public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-        {
+		#region Trusted Auth
+		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
 #if (!LINUX)
-            lock (this.SyncObject)
-            {
+			lock (this.SyncObject)
+			{
 				try
 				{
 					using (SSPIHelper sspiHelper = new SSPIHelper())
@@ -96,11 +96,11 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				}
 
 				AfterAttachActions();
-            }
+			}
 #else            
-            throw new NotSupportedException();
+			throw new NotSupportedException();
 #endif
-        }
+		}
 
 #if (!LINUX)
 		protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBuffer dpb, byte[] authData)
@@ -120,66 +120,66 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 #endif
-        #endregion
+		#endregion
 
-        #region Public methods
-        public override void ReleaseObject(int op, int id)
-        {
-            lock (this.SyncObject)
-            {
-                try
-                {
-                    DoReleaseObjectPacket(op, id);
-                    this.DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
+		#region Public methods
+		public override void ReleaseObject(int op, int id)
+		{
+			lock (this.SyncObject)
+			{
+				try
+				{
+					DoReleaseObjectPacket(op, id);
+					this.DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
 
-        public override int ReadOperation()
-        {
-            ProcessDeferredPackets();
-            return base.ReadOperation();
-        }
+		public override int ReadOperation()
+		{
+			ProcessDeferredPackets();
+			return base.ReadOperation();
+		}
 
-        public override int NextOperation()
-        {
-            ProcessDeferredPackets();
-            return base.NextOperation();
-        }
-        #endregion
+		public override int NextOperation()
+		{
+			ProcessDeferredPackets();
+			return base.NextOperation();
+		}
+		#endregion
 
-        #region Protected methods
-        protected override IResponse ProcessOperation(int operation)
-        {
-            switch (operation)
-            {
-                case IscCodes.op_trusted_auth:
-                    return new AuthResponse(this.ReadBuffer());
+		#region Protected methods
+		protected override IResponse ProcessOperation(int operation)
+		{
+			switch (operation)
+			{
+				case IscCodes.op_trusted_auth:
+					return new AuthResponse(this.ReadBuffer());
 
-                default:
-                    return base.ProcessOperation(operation);
-            }
-        }
-        #endregion
+				default:
+					return base.ProcessOperation(operation);
+			}
+		}
+		#endregion
 
-        #region Private methods
-        private void ProcessDeferredPackets()
-        {
-            if (DeferredPackets.Count > 0)
-            {
-                // copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
-                Action<IResponse>[] methods = DeferredPackets.ToArray();
-                DeferredPackets.Clear();
-                foreach (Action<IResponse> method in methods)
-                {
-                    method(ReadSingleResponse());
-                }
-            }
-        }
-        #endregion
-    }
+		#region Private methods
+		private void ProcessDeferredPackets()
+		{
+			if (DeferredPackets.Count > 0)
+			{
+				// copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
+				Action<IResponse>[] methods = DeferredPackets.ToArray();
+				DeferredPackets.Clear();
+				foreach (Action<IResponse> method in methods)
+				{
+					method(ReadSingleResponse());
+				}
+			}
+		}
+		#endregion
+	}
 }

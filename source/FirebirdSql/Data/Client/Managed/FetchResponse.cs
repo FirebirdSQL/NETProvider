@@ -21,37 +21,37 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
-    internal class FetchResponse : IResponse
-    {
-        #region · Fields ·
+	internal class FetchResponse : IResponse
+	{
+		#region · Fields ·
 
-        private int status;
-        private int count;
+		private int status;
+		private int count;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public int Status
-        {
-            get { return this.status; }
-        }
+		public int Status
+		{
+			get { return this.status; }
+		}
 
-        public int Count
-        {
-            get { return this.count; }
-        }
+		public int Count
+		{
+			get { return this.count; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FetchResponse(int status, int count)
-        {
-            this.status = status;
-            this.count  = count;
-        }
+		public FetchResponse(int status, int count)
+		{
+			this.status = status;
+			this.count  = count;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

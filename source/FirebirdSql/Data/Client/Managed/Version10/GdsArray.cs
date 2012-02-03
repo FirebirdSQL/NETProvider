@@ -142,7 +142,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.Write(slice, 0, slice.Length);    // Slice proper
 					this.database.Flush();
 
-                    GenericResponse response = this.database.ReadGenericResponse();
+					GenericResponse response = this.database.ReadGenericResponse();
 
 					this.handle = response.BlobId;
 				}
@@ -347,7 +347,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			type = TypeHelper.GetFbType(this.Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, subType, this.Descriptor.Scale);
 
-            foreach (object source in sourceArray)
+			foreach (object source in sourceArray)
 			{
 				switch (dbType)
 				{

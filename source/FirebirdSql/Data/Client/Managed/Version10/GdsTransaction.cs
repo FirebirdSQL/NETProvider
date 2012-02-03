@@ -102,25 +102,25 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (!this.disposed)
 				{
-                    try
-                    {
-                        // release any unmanaged resources
-                        this.Rollback();
-                    }
-                    catch
-                    {
-                    }
+					try
+					{
+						// release any unmanaged resources
+						this.Rollback();
+					}
+					catch
+					{
+					}
 					finally
 					{
-                        // release any managed resources
-                        if (disposing)
-                        {
-                            this.database     = null;
-                            this.handle = 0;
-                            this.state  = TransactionState.NoTransaction;
-                        }
-                        
-                        this.disposed = true;
+						// release any managed resources
+						if (disposing)
+						{
+							this.database     = null;
+							this.handle = 0;
+							this.state  = TransactionState.NoTransaction;
+						}
+						
+						this.disposed = true;
 					}
 				}
 			}
@@ -284,7 +284,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-        #region · Two Phase Commit Methods ·
+		#region · Two Phase Commit Methods ·
 
 		public void Prepare()
 		{
@@ -343,11 +343,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private void CheckTransactionState()
+		private void CheckTransactionState()
 		{
 			if (this.state != TransactionState.Active)
 			{

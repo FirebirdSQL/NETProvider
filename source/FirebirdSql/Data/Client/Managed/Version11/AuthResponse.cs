@@ -22,21 +22,21 @@ using FirebirdSql.Data.Client.Managed;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
-    internal class AuthResponse : IResponse
-    {
-        #region · Properties ·
-        
-        public byte[] Data { get; private set; }
+	internal class AuthResponse : IResponse
+	{
+		#region · Properties ·
+		
+		public byte[] Data { get; private set; }
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public AuthResponse(byte[] data)
-        {
-            this.Data = data;
-        }
+		public AuthResponse(byte[] data)
+		{
+			this.Data = data;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

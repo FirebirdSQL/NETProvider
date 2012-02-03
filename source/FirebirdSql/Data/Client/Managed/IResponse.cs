@@ -20,7 +20,7 @@ using System;
 
 namespace FirebirdSql.Data.Client.Managed
 {
-    interface IResponse
-    {
-    }
+	interface IResponse
+	{
+	}
 }

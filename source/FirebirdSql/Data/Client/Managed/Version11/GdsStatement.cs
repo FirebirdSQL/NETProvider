@@ -27,158 +27,158 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
-    internal class GdsStatement : Version10.GdsStatement
-    {
-        #region · Constructors ·
+	internal class GdsStatement : Version10.GdsStatement
+	{
+		#region · Constructors ·
 
-        public GdsStatement(IDatabase db)
-            : base(db)
-        { }
+		public GdsStatement(IDatabase db)
+			: base(db)
+		{ }
 
-        public GdsStatement(IDatabase db, ITransaction transaction)
-            : base(db, transaction)
-        { }
+		public GdsStatement(IDatabase db, ITransaction transaction)
+			: base(db, transaction)
+		{ }
 
-        #endregion
+		#endregion
 
-        #region · Overriden Methods ·
+		#region · Overriden Methods ·
 
-        public override void Prepare(string commandText)
-        {
-            // Clear data
-            this.ClearAll();
+		public override void Prepare(string commandText)
+		{
+			// Clear data
+			this.ClearAll();
 
-            lock (this.database.SyncObject)
-            {
-                try
-                {
-                    if (this.state == StatementState.Deallocated)
-                    {
-                        // Allocate statement
-                        this.SendAllocateToBuffer();
-                    }
+			lock (this.database.SyncObject)
+			{
+				try
+				{
+					if (this.state == StatementState.Deallocated)
+					{
+						// Allocate statement
+						this.SendAllocateToBuffer();
+					}
 
-                    // Prepare the statement
-                    this.SendPrepareToBuffer(commandText);
+					// Prepare the statement
+					this.SendPrepareToBuffer(commandText);
 
-                    // Grab statement type
-                    this.SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+					// Grab statement type
+					this.SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 
-                    this.database.Flush();
+					this.database.Flush();
 
-                    // allocate, prepare, statement type
-                    int numberOfResponses = 3;
-                    try
-                    {
-                        numberOfResponses--;
-                        GenericResponse allocateResponse = this.database.ReadGenericResponse();
+					// allocate, prepare, statement type
+					int numberOfResponses = 3;
+					try
+					{
+						numberOfResponses--;
+						GenericResponse allocateResponse = this.database.ReadGenericResponse();
 
-                        numberOfResponses--;
-                        GenericResponse prepareResponse = this.database.ReadGenericResponse();
-                        bool deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
+						numberOfResponses--;
+						GenericResponse prepareResponse = this.database.ReadGenericResponse();
+						bool deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
 
-                        numberOfResponses--;
-                        GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
+						numberOfResponses--;
+						GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
 
-                        this.ProcessAllocateResponce(allocateResponse);
-                        this.ProcessPrepareResponse(prepareResponse);
-                        this.statementType = this.ProcessStatementTypeInfoBuffer(this.ProcessInfoSqlResponse(statementTypeResponse));
-                    }
-                    finally
-                    {
-                        SafeFinishFetching(ref numberOfResponses);
-                    }
+						this.ProcessAllocateResponce(allocateResponse);
+						this.ProcessPrepareResponse(prepareResponse);
+						this.statementType = this.ProcessStatementTypeInfoBuffer(this.ProcessInfoSqlResponse(statementTypeResponse));
+					}
+					finally
+					{
+						SafeFinishFetching(ref numberOfResponses);
+					}
 
-                    this.state = StatementState.Prepared;
-                }
-                catch (IOException)
-                {
-                    // if the statement has been already allocated, it's now in error
-                    if (this.state == StatementState.Allocated)
-                        this.state = StatementState.Error;
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
+					this.state = StatementState.Prepared;
+				}
+				catch (IOException)
+				{
+					// if the statement has been already allocated, it's now in error
+					if (this.state == StatementState.Allocated)
+						this.state = StatementState.Error;
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
 
-        public override void Execute()
-        {
-            if (this.state == StatementState.Deallocated)
-            {
-                throw new InvalidOperationException("Statement is not correctly created.");
-            }
+		public override void Execute()
+		{
+			if (this.state == StatementState.Deallocated)
+			{
+				throw new InvalidOperationException("Statement is not correctly created.");
+			}
 
-            // Clear data
-            this.Clear();
+			// Clear data
+			this.Clear();
 
-            lock (this.database.SyncObject)
-            {
-                try
-                {
-                    this.RecordsAffected = -1;
+			lock (this.database.SyncObject)
+			{
+				try
+				{
+					this.RecordsAffected = -1;
 
-                    this.SendExecuteToBuffer();
+					this.SendExecuteToBuffer();
 
-                    bool readRowsAffectedResponse = false;
-                    // Obtain records affected by query execution
-                    if (this.ReturnRecordsAffected &&
-                        (this.StatementType == DbStatementType.Insert ||
-                        this.StatementType == DbStatementType.Delete ||
-                        this.StatementType == DbStatementType.Update ||
-                        this.StatementType == DbStatementType.StoredProcedure ||
-                        this.StatementType == DbStatementType.Select))
-                    {
-                        // Grab rows affected
-                        this.SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+					bool readRowsAffectedResponse = false;
+					// Obtain records affected by query execution
+					if (this.ReturnRecordsAffected &&
+						(this.StatementType == DbStatementType.Insert ||
+						this.StatementType == DbStatementType.Delete ||
+						this.StatementType == DbStatementType.Update ||
+						this.StatementType == DbStatementType.StoredProcedure ||
+						this.StatementType == DbStatementType.Select))
+					{
+						// Grab rows affected
+						this.SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
-                        readRowsAffectedResponse = true;
-                    }
+						readRowsAffectedResponse = true;
+					}
 
-                    this.database.Flush();
+					this.database.Flush();
 
-                    // sql?, execute, rows affected?
-                    int numberOfResponses =
-                        (this.StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
-                    try
-                    {
-                        SqlResponse sqlStoredProcedureResponse = null;
-                        if (this.StatementType == DbStatementType.StoredProcedure)
-                        {
-                            numberOfResponses--;
+					// sql?, execute, rows affected?
+					int numberOfResponses =
+						(this.StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
+					try
+					{
+						SqlResponse sqlStoredProcedureResponse = null;
+						if (this.StatementType == DbStatementType.StoredProcedure)
+						{
+							numberOfResponses--;
 							sqlStoredProcedureResponse = this.database.ReadSqlResponse();
 							this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
-                        }
+						}
 
-                        numberOfResponses--;
-                        GenericResponse executeResponse = this.database.ReadGenericResponse();
+						numberOfResponses--;
+						GenericResponse executeResponse = this.database.ReadGenericResponse();
 
-                        GenericResponse rowsAffectedResponse = null;
-                        if (readRowsAffectedResponse)
-                        {
-                            numberOfResponses--;
-                            rowsAffectedResponse = this.database.ReadGenericResponse();
-                        }
+						GenericResponse rowsAffectedResponse = null;
+						if (readRowsAffectedResponse)
+						{
+							numberOfResponses--;
+							rowsAffectedResponse = this.database.ReadGenericResponse();
+						}
 
-                        this.ProcessExecuteResponse(executeResponse);
-                        if (readRowsAffectedResponse)
-                            this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
-                    }
-                    finally
-                    {
-                        SafeFinishFetching(ref numberOfResponses);
-                    }
+						this.ProcessExecuteResponse(executeResponse);
+						if (readRowsAffectedResponse)
+							this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
+					}
+					finally
+					{
+						SafeFinishFetching(ref numberOfResponses);
+					}
 
-                    this.state = StatementState.Executed;
-                }
-                catch (IOException)
-                {
-                    this.state = StatementState.Error;
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
+					this.state = StatementState.Executed;
+				}
+				catch (IOException)
+				{
+					this.state = StatementState.Error;
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
 		#region Protected methods
 		protected void SafeFinishFetching(ref int numberOfResponses)
@@ -195,17 +195,17 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-        protected override void Free(int option)
-        {
-            if (FreeNotNeeded(option))
-                return;
+		protected override void Free(int option)
+		{
+			if (FreeNotNeeded(option))
+				return;
 
-            lock (this.database.SyncObject)
-            {
-                DoFreePacket(option);
-                (this.Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponse);
-            }
-        }
-        #endregion
-    }
+			lock (this.database.SyncObject)
+			{
+				DoFreePacket(option);
+				(this.Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponse);
+			}
+		}
+		#endregion
+	}
 }

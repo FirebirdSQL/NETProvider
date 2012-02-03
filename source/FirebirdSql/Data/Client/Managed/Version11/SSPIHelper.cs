@@ -398,18 +398,18 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		private void Dispose(bool disposing)
 		{
-            lock (this)
-            {
-                if (!this.disposed)
-                {
-                    if (disposing)
-                    {
-                    }
-                    CloseClientContext();
-                    CloseClientCredentials();
-                    this.disposed = true;
-                }
-            }
+			lock (this)
+			{
+				if (!this.disposed)
+				{
+					if (disposing)
+					{
+					}
+					CloseClientContext();
+					CloseClientCredentials();
+					this.disposed = true;
+				}
+			}
 		}
 
 		private void CloseClientContext()
