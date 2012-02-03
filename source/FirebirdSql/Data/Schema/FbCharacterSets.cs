@@ -26,57 +26,57 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-    internal class FbCharacterSets : FbSchema
-    {
-        #region · Protected Methods ·
+	internal class FbCharacterSets : FbSchema
+	{
+		#region · Protected Methods ·
 
-        protected override StringBuilder GetCommandText(string[] restrictions)
-        {
-            StringBuilder sql = new StringBuilder();
-            StringBuilder where = new StringBuilder();
+		protected override StringBuilder GetCommandText(string[] restrictions)
+		{
+			StringBuilder sql = new StringBuilder();
+			StringBuilder where = new StringBuilder();
 
-            sql.Append(
-                @"SELECT
-                    null AS CHARACTER_SET_CATALOG,
-                    null AS CHARACTER_SET_SCHEMA,
-                    rdb$character_set_name AS CHARACTER_SET_NAME,
-                    rdb$character_set_id AS CHARACTER_SET_ID,
+			sql.Append(
+				@"SELECT
+					null AS CHARACTER_SET_CATALOG,
+					null AS CHARACTER_SET_SCHEMA,
+					rdb$character_set_name AS CHARACTER_SET_NAME,
+					rdb$character_set_id AS CHARACTER_SET_ID,
 				    rdb$default_collate_name AS DEFAULT_COLLATION,
 				    rdb$bytes_per_character AS BYTES_PER_CHARACTER,
 				    rdb$description AS DESCRIPTION
 				 FROM rdb$character_sets");
 
-            if (restrictions != null)
-            {
-                int index = 0;
+			if (restrictions != null)
+			{
+				int index = 0;
 
-                /* CHARACTER_SET_CATALOG */
-                if (restrictions.Length >= 1 && restrictions[0] != null)
-                {
-                }
+				/* CHARACTER_SET_CATALOG */
+				if (restrictions.Length >= 1 && restrictions[0] != null)
+				{
+				}
 
-                /* CHARACTER_SET_SCHEMA */
-                if (restrictions.Length >= 2 && restrictions[1] != null)
-                {
-                }
+				/* CHARACTER_SET_SCHEMA */
+				if (restrictions.Length >= 2 && restrictions[1] != null)
+				{
+				}
 
-                /* CHARACTER_SET_NAME */
-                if (restrictions.Length >= 3 && restrictions[2] != null)
-                {
-                    where.AppendFormat(CultureInfo.CurrentUICulture, "rdb$character_set_name = @p{0}", index++);
-                }
-            }
+				/* CHARACTER_SET_NAME */
+				if (restrictions.Length >= 3 && restrictions[2] != null)
+				{
+					where.AppendFormat(CultureInfo.CurrentUICulture, "rdb$character_set_name = @p{0}", index++);
+				}
+			}
 
-            if (where.Length > 0)
-            {
-                sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
-            }
+			if (where.Length > 0)
+			{
+				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
+			}
 
-            sql.Append(" ORDER BY rdb$character_set_name");
+			sql.Append(" ORDER BY rdb$character_set_name");
 
-            return sql;
-        }
+			return sql;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

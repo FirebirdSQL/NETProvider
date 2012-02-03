@@ -26,81 +26,81 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-    internal class FbViews : FbSchema
-    {
-        #region · Protected Methods ·
+	internal class FbViews : FbSchema
+	{
+		#region · Protected Methods ·
 
-        protected override StringBuilder GetCommandText(string[] restrictions)
-        {
-            StringBuilder sql = new StringBuilder();
-            StringBuilder where = new StringBuilder();
+		protected override StringBuilder GetCommandText(string[] restrictions)
+		{
+			StringBuilder sql = new StringBuilder();
+			StringBuilder where = new StringBuilder();
 
-            sql.Append(
-                @"SELECT
-                    null AS VIEW_CATALOG,
-                    null AS VIEW_SCHEMA,
-                    rel.rdb$relation_name AS VIEW_NAME,
-                    rel.rdb$system_flag AS IS_SYSTEM_VIEW,
+			sql.Append(
+				@"SELECT
+					null AS VIEW_CATALOG,
+					null AS VIEW_SCHEMA,
+					rel.rdb$relation_name AS VIEW_NAME,
+					rel.rdb$system_flag AS IS_SYSTEM_VIEW,
 					rel.rdb$view_source AS DEFINITION,
 					rel.rdb$description AS DESCRIPTION
 				FROM rdb$relations rel");
 
-            where.Append("rel.rdb$view_source IS NOT NULL");
+			where.Append("rel.rdb$view_source IS NOT NULL");
 
-            if (restrictions != null)
-            {
-                int index = 0;
+			if (restrictions != null)
+			{
+				int index = 0;
 
-                /* VIEW_CATALOG */
-                if (restrictions.Length >= 1 && restrictions[0] != null)
-                {
-                }
+				/* VIEW_CATALOG */
+				if (restrictions.Length >= 1 && restrictions[0] != null)
+				{
+				}
 
-                /* VIEW_SCHEMA */
-                if (restrictions.Length >= 2 && restrictions[1] != null)
-                {
-                }
+				/* VIEW_SCHEMA */
+				if (restrictions.Length >= 2 && restrictions[1] != null)
+				{
+				}
 
-                /* VIEW_NAME */
-                if (restrictions.Length >= 3 && restrictions[2] != null)
-                {
-                    where.AppendFormat(CultureInfo.CurrentUICulture, " AND rel.rdb$relation_name = @p{0}", index++);
-                }
-            }
+				/* VIEW_NAME */
+				if (restrictions.Length >= 3 && restrictions[2] != null)
+				{
+					where.AppendFormat(CultureInfo.CurrentUICulture, " AND rel.rdb$relation_name = @p{0}", index++);
+				}
+			}
 
-            if (where.Length > 0)
-            {
-                sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
-            }
+			if (where.Length > 0)
+			{
+				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
+			}
 
-            sql.Append(" ORDER BY rel.rdb$relation_name");
+			sql.Append(" ORDER BY rel.rdb$relation_name");
 
-            return sql;
-        }
+			return sql;
+		}
 
-        protected override DataTable ProcessResult(DataTable schema)
-        {
-            schema.BeginLoadData();
+		protected override DataTable ProcessResult(DataTable schema)
+		{
+			schema.BeginLoadData();
 
-            foreach (DataRow row in schema.Rows)
-            {
-                if (row["IS_SYSTEM_VIEW"] == DBNull.Value ||
-                    Convert.ToInt32(row["IS_SYSTEM_VIEW"], CultureInfo.InvariantCulture) == 0)
-                {
-                    row["IS_SYSTEM_VIEW"] = false;
-                }
-                else
-                {
-                    row["IS_SYSTEM_VIEW"] = true;
-                }
-            }
+			foreach (DataRow row in schema.Rows)
+			{
+				if (row["IS_SYSTEM_VIEW"] == DBNull.Value ||
+					Convert.ToInt32(row["IS_SYSTEM_VIEW"], CultureInfo.InvariantCulture) == 0)
+				{
+					row["IS_SYSTEM_VIEW"] = false;
+				}
+				else
+				{
+					row["IS_SYSTEM_VIEW"] = true;
+				}
+			}
 
-            schema.EndLoadData();
-            schema.AcceptChanges();
+			schema.EndLoadData();
+			schema.AcceptChanges();
 
-            return schema;
-        }
+			return schema;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

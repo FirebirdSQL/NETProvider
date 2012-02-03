@@ -26,54 +26,54 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Schema
 {
-    internal class FbCheckConstraints : FbSchema
-    {
-        #region · Protected Methods ·
+	internal class FbCheckConstraints : FbSchema
+	{
+		#region · Protected Methods ·
 
-        protected override StringBuilder GetCommandText(string[] restrictions)
-        {
-            StringBuilder sql = new StringBuilder();
-            StringBuilder where = new StringBuilder();
+		protected override StringBuilder GetCommandText(string[] restrictions)
+		{
+			StringBuilder sql = new StringBuilder();
+			StringBuilder where = new StringBuilder();
 
-            sql.Append(
-                @"SELECT
-                    null AS CONSTRAINT_CATALOG,
-                    null AS CONSTRAINT_SCHEMA,
-                    chk.rdb$constraint_name AS CONSTRAINT_NAME,
-                    trig.rdb$trigger_source AS CHECK_CLAUSULE,
+			sql.Append(
+				@"SELECT
+					null AS CONSTRAINT_CATALOG,
+					null AS CONSTRAINT_SCHEMA,
+					chk.rdb$constraint_name AS CONSTRAINT_NAME,
+					trig.rdb$trigger_source AS CHECK_CLAUSULE,
 				    trig.rdb$description AS DESCRIPTION
 				FROM rdb$check_constraints chk
 				    INNER JOIN rdb$triggers trig ON chk.rdb$trigger_name = trig.rdb$trigger_name");
 
-            if (restrictions != null)
-            {
-                /* CONSTRAINT_CATALOG */
-                if (restrictions.Length >= 1 && restrictions[0] != null)
-                {
-                }
+			if (restrictions != null)
+			{
+				/* CONSTRAINT_CATALOG */
+				if (restrictions.Length >= 1 && restrictions[0] != null)
+				{
+				}
 
-                /* CONSTRAINT_SCHEMA */
-                if (restrictions.Length >= 2 && restrictions[1] != null)
-                {
-                }
+				/* CONSTRAINT_SCHEMA */
+				if (restrictions.Length >= 2 && restrictions[1] != null)
+				{
+				}
 
-                /* CONSTRAINT_NAME */
-                if (restrictions.Length >= 3 && restrictions[2] != null)
-                {
-                    where.Append("chk.rdb$constraint_name = @p0");
-                }
-            }
+				/* CONSTRAINT_NAME */
+				if (restrictions.Length >= 3 && restrictions[2] != null)
+				{
+					where.Append("chk.rdb$constraint_name = @p0");
+				}
+			}
 
-            if (where.Length > 0)
-            {
-                sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0}", where.ToString());
-            }
+			if (where.Length > 0)
+			{
+				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0}", where.ToString());
+			}
 
-            sql.Append(" ORDER BY chk.rdb$constraint_name");
+			sql.Append(" ORDER BY chk.rdb$constraint_name");
 
-            return sql;
-        }
+			return sql;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
