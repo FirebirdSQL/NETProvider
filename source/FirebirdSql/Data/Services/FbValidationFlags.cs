@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -20,15 +20,15 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-    [Flags]
-    public enum FbValidationFlags
-    {
-        ValidateDatabase = 0x01,
-        SweepDatabase = 0x02,
-        MendDatabase = 0x04,
-        CheckDatabase = 0x10,
-        IgnoreChecksum = 0x20,
-        KillShadows = 0x40,
-        Full = 0x80
-    }
+	[Flags]
+	public enum FbValidationFlags
+	{
+		ValidateDatabase = 0x01,
+		SweepDatabase = 0x02,
+		MendDatabase = 0x04,
+		CheckDatabase = 0x10,
+		IgnoreChecksum = 0x20,
+		KillShadows = 0x40,
+		Full = 0x80
+	}
 }

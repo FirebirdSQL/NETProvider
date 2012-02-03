@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Services
 {
 	public class FbBackupFile
 	{
-		#region Â· Properties Â·
+		#region · Properties ·
 
 		public string BackupFile { get; set; }
 
@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region Â· Constructors Â·
+		#region · Constructors ·
 
 		public FbBackupFile(string fileName, int? fileLength)
 		{

@@ -23,7 +23,7 @@ using FirebirdSql.Data.Services;
 
 namespace FirebirdSql.Data.Services
 {
-    public class FbBackupFileCollection : List<FbBackupFile>
-    {
-    }
+	public class FbBackupFileCollection : List<FbBackupFile>
+	{
+	}
 }

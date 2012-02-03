@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -24,35 +24,35 @@ using System.Collections.Generic;
 
 namespace FirebirdSql.Data.Services
 {
-    public struct FbDatabasesInfo
-    {
-        #region Â· Fields Â·
+	public struct FbDatabasesInfo
+	{
+		#region · Fields ·
 
-        private int connectionCount;
-        private List<string> databases;
+		private int connectionCount;
+		private List<string> databases;
 
-        #endregion
+		#endregion
 
-        #region Â· Properties Â·
+		#region · Properties ·
 
-        public int ConnectionCount
-        {
-            get { return this.connectionCount; }
-            set { this.connectionCount = value; }
-        }
+		public int ConnectionCount
+		{
+			get { return this.connectionCount; }
+			set { this.connectionCount = value; }
+		}
 
-        public List<string> Databases
-        {
-            get
-            {
-                if (this.databases == null)
-                {
-                    this.databases = new List<string>();
-                }
-                return this.databases;
-            }
-        }
+		public List<string> Databases
+		{
+			get
+			{
+				if (this.databases == null)
+				{
+					this.databases = new List<string>();
+				}
+				return this.databases;
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

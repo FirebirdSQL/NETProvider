@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -22,13 +22,13 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
-    [Flags]
-    public enum FbStatisticalFlags
-    {
-        DataPages = 0x01,
-        DatabaseLog = 0x02,
-        HeaderPages = 0x04,
-        IndexPages = 0x08,
-        SystemTablesRelations = 0x10,
-    }
+	[Flags]
+	public enum FbStatisticalFlags
+	{
+		DataPages = 0x01,
+		DatabaseLog = 0x02,
+		HeaderPages = 0x04,
+		IndexPages = 0x08,
+		SystemTablesRelations = 0x10,
+	}
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -20,16 +20,16 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-    [Flags]
-    public enum FbBackupFlags
-    {
-        IgnoreChecksums = 0x01,
-        IgnoreLimbo = 0x02,
-        MetaDataOnly = 0x04,
-        NoGarbageCollect = 0x08,
-        OldDescriptions = 0x10,
-        NonTransportable = 0x20,
-        Convert = 0x40,
-        Expand = 0x80
-    }
+	[Flags]
+	public enum FbBackupFlags
+	{
+		IgnoreChecksums = 0x01,
+		IgnoreLimbo = 0x02,
+		MetaDataOnly = 0x04,
+		NoGarbageCollect = 0x08,
+		OldDescriptions = 0x10,
+		NonTransportable = 0x20,
+		Convert = 0x40,
+		Expand = 0x80
+	}
 }

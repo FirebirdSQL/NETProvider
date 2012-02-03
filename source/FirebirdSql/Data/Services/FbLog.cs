@@ -23,44 +23,44 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-    public sealed class FbLog : FbService
-    {
-        #region · Constructors ·
+	public sealed class FbLog : FbService
+	{
+		#region · Constructors ·
 
-        public FbLog()
-            : base()
-        {
-        }
+		public FbLog()
+			: base()
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public void Execute()
-        {
-            try
-            {
-                // Configure Spb
-                this.StartSpb = new ServiceParameterBuffer();
+		public void Execute()
+		{
+			try
+			{
+				// Configure Spb
+				this.StartSpb = new ServiceParameterBuffer();
 
-                this.StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
+				this.StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
 
-                // Start execution
-                this.StartTask();
+				// Start execution
+				this.StartTask();
 
-                // Process service output
-                this.ProcessServiceOutput();
-            }
-            catch (Exception ex)
-            {
-                throw new FbException(ex.Message, ex);
-            }
-            finally
-            {
-                this.Close();
-            }
-        }
+				// Process service output
+				this.ProcessServiceOutput();
+			}
+			catch (Exception ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+			finally
+			{
+				this.Close();
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

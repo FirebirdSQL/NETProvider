@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -20,10 +20,10 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-    public enum FbShutdownMode
-    {
-        Forced,
-        DenyTransaction,
-        DenyConnection
-    }
+	public enum FbShutdownMode
+	{
+		Forced,
+		DenyTransaction,
+		DenyConnection
+	}
 }

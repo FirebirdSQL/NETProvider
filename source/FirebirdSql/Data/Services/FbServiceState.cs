@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -23,9 +23,9 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-    public enum FbServiceState
-    {
-        Closed = 0,
-        Open = 1
-    }
+	public enum FbServiceState
+	{
+		Closed = 0,
+		Open = 1
+	}
 }

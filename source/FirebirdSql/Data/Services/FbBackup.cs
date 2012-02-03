@@ -27,99 +27,99 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-    public sealed class FbBackup : FbService
-    {
-        #region · Fields ·
+	public sealed class FbBackup : FbService
+	{
+		#region · Fields ·
 
-        private bool verbose;
-        private int factor;
-        private FbBackupFileCollection backupFiles;
-        private FbBackupFlags options;
+		private bool verbose;
+		private int factor;
+		private FbBackupFileCollection backupFiles;
+		private FbBackupFlags options;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public FbBackupFileCollection BackupFiles
-        {
-            get { return this.backupFiles; }
-        }
+		public FbBackupFileCollection BackupFiles
+		{
+			get { return this.backupFiles; }
+		}
 
-        public bool Verbose
-        {
-            get { return this.verbose; }
-            set { this.verbose = value; }
-        }
+		public bool Verbose
+		{
+			get { return this.verbose; }
+			set { this.verbose = value; }
+		}
 
-        public int Factor
-        {
-            get { return this.factor; }
-            set { this.factor = value; }
-        }
+		public int Factor
+		{
+			get { return this.factor; }
+			set { this.factor = value; }
+		}
 
-        public FbBackupFlags Options
-        {
-            get { return this.options; }
-            set { this.options = value; }
-        }
+		public FbBackupFlags Options
+		{
+			get { return this.options; }
+			set { this.options = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FbBackup()
-            : base()
-        {
-            this.backupFiles = new FbBackupFileCollection();
-        }
+		public FbBackup()
+			: base()
+		{
+			this.backupFiles = new FbBackupFileCollection();
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public void Execute()
-        {
-            try
-            {
-                // Configure Spb
-                this.StartSpb = new ServiceParameterBuffer();
+		public void Execute()
+		{
+			try
+			{
+				// Configure Spb
+				this.StartSpb = new ServiceParameterBuffer();
 
-                this.StartSpb.Append(IscCodes.isc_action_svc_backup);
-                this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+				this.StartSpb.Append(IscCodes.isc_action_svc_backup);
+				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-                foreach (FbBackupFile file in backupFiles)
-                {
-                    this.StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
+				foreach (FbBackupFile file in backupFiles)
+				{
+					this.StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
 					if (file.BackupLength.HasValue)
 						this.StartSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
-                }
+				}
 
-                if (verbose)
-                {
-                    this.StartSpb.Append(IscCodes.isc_spb_verbose);
-                }
+				if (verbose)
+				{
+					this.StartSpb.Append(IscCodes.isc_spb_verbose);
+				}
 
-                this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
-                // Start execution
-                this.StartTask();
+				// Start execution
+				this.StartTask();
 
-                if (this.verbose)
-                {
-                    this.ProcessServiceOutput();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new FbException(ex.Message, ex);
-            }
-            finally
-            {
-                // Close
-                this.Close();
-            }
-        }
+				if (this.verbose)
+				{
+					this.ProcessServiceOutput();
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+			finally
+			{
+				// Close
+				this.Close();
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

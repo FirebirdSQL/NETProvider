@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -20,116 +20,116 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-    public sealed class FbUserData
-    {
-        #region Â· Fields Â·
+	public sealed class FbUserData
+	{
+		#region · Fields ·
 
-        private string userName;
-        private string firstName;
-        private string lastName;
-        private string middleName;
-        private string userPassword;
-        private string groupName;
-        private string roleName;
-        private int userID;
-        private int groupID;
+		private string userName;
+		private string firstName;
+		private string lastName;
+		private string middleName;
+		private string userPassword;
+		private string groupName;
+		private string roleName;
+		private int userID;
+		private int groupID;
 
-        #endregion
+		#endregion
 
-        #region Â· Properties Â·
+		#region · Properties ·
 
-        public string UserName
-        {
-            get { return this.userName; }
-            set
-            {
-                if (value == null)
-                {
-                    throw new InvalidOperationException("The user name cannot be null.");
-                }
-                if (value.Length > 31)
-                {
-                    throw new InvalidOperationException("The user name cannot have more than 31 characters.");
-                }
+		public string UserName
+		{
+			get { return this.userName; }
+			set
+			{
+				if (value == null)
+				{
+					throw new InvalidOperationException("The user name cannot be null.");
+				}
+				if (value.Length > 31)
+				{
+					throw new InvalidOperationException("The user name cannot have more than 31 characters.");
+				}
 
-                this.userName = value;
-            }
-        }
+				this.userName = value;
+			}
+		}
 
-        public string UserPassword
-        {
-            get { return this.userPassword; }
-            set
-            {
-                if (value == null)
-                {
-                    throw new InvalidOperationException("The user password cannot be null.");
-                }
-                if (value.Length > 31)
-                {
-                    throw new InvalidOperationException("The user password cannot have more than 31 characters.");
-                }
+		public string UserPassword
+		{
+			get { return this.userPassword; }
+			set
+			{
+				if (value == null)
+				{
+					throw new InvalidOperationException("The user password cannot be null.");
+				}
+				if (value.Length > 31)
+				{
+					throw new InvalidOperationException("The user password cannot have more than 31 characters.");
+				}
 
-                this.userPassword = value;
-            }
-        }
+				this.userPassword = value;
+			}
+		}
 
-        public string FirstName
-        {
-            get { return this.firstName; }
-            set { this.firstName = value; }
-        }
+		public string FirstName
+		{
+			get { return this.firstName; }
+			set { this.firstName = value; }
+		}
 
-        public string LastName
-        {
-            get { return this.lastName; }
-            set { this.lastName = value; }
-        }
+		public string LastName
+		{
+			get { return this.lastName; }
+			set { this.lastName = value; }
+		}
 
-        public string MiddleName
-        {
-            get { return this.middleName; }
-            set { this.middleName = value; }
-        }
+		public string MiddleName
+		{
+			get { return this.middleName; }
+			set { this.middleName = value; }
+		}
 
-        public int UserID
-        {
-            get { return this.userID; }
-            set { this.userID = value; }
-        }
+		public int UserID
+		{
+			get { return this.userID; }
+			set { this.userID = value; }
+		}
 
-        public int GroupID
-        {
-            get { return this.groupID; }
-            set { this.groupID = value; }
-        }
+		public int GroupID
+		{
+			get { return this.groupID; }
+			set { this.groupID = value; }
+		}
 
-        public string GroupName
-        {
-            get { return this.groupName; }
-            set { this.groupName = value; }
-        }
+		public string GroupName
+		{
+			get { return this.groupName; }
+			set { this.groupName = value; }
+		}
 
-        public string RoleName
-        {
-            get { return this.roleName; }
-            set { this.roleName = value; }
-        }
+		public string RoleName
+		{
+			get { return this.roleName; }
+			set { this.roleName = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region Â· Constructors Â·
+		#region · Constructors ·
 
-        public FbUserData()
-        {
-            this.userName = string.Empty;
-            this.firstName = string.Empty;
-            this.lastName = string.Empty;
-            this.middleName = string.Empty;
-            this.userPassword = string.Empty;
-            this.roleName = string.Empty;
-        }
+		public FbUserData()
+		{
+			this.userName = string.Empty;
+			this.firstName = string.Empty;
+			this.lastName = string.Empty;
+			this.middleName = string.Empty;
+			this.userPassword = string.Empty;
+			this.roleName = string.Empty;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

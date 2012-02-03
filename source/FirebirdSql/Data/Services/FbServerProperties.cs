@@ -23,98 +23,98 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
-    public sealed class FbServerProperties : FbService
-    {
-        #region · Properties ·
+	public sealed class FbServerProperties : FbService
+	{
+		#region · Properties ·
 
-        public int Version
-        {
-            get { return this.GetInt32(IscCodes.isc_info_svc_version); }
-        }
+		public int Version
+		{
+			get { return this.GetInt32(IscCodes.isc_info_svc_version); }
+		}
 
-        public string ServerVersion
-        {
-            get { return this.GetString(IscCodes.isc_info_svc_server_version); }
-        }
+		public string ServerVersion
+		{
+			get { return this.GetString(IscCodes.isc_info_svc_server_version); }
+		}
 
-        public string Implementation
-        {
-            get { return this.GetString(IscCodes.isc_info_svc_implementation); }
-        }
+		public string Implementation
+		{
+			get { return this.GetString(IscCodes.isc_info_svc_implementation); }
+		}
 
-        public string RootDirectory
-        {
-            get { return this.GetString(IscCodes.isc_info_svc_get_env); }
-        }
+		public string RootDirectory
+		{
+			get { return this.GetString(IscCodes.isc_info_svc_get_env); }
+		}
 
-        public string LockManager
-        {
-            get { return this.GetString(IscCodes.isc_info_svc_get_env_lock); }
-        }
+		public string LockManager
+		{
+			get { return this.GetString(IscCodes.isc_info_svc_get_env_lock); }
+		}
 
-        public string MessageFile
-        {
-            get { return this.GetString(IscCodes.isc_info_svc_get_env_msg); }
-        }
+		public string MessageFile
+		{
+			get { return this.GetString(IscCodes.isc_info_svc_get_env_msg); }
+		}
 
-        public FbDatabasesInfo DatabasesInfo
-        {
-            get
-            {
-                ArrayList info = this.GetInfo(IscCodes.isc_info_svc_svr_db_info);
+		public FbDatabasesInfo DatabasesInfo
+		{
+			get
+			{
+				ArrayList info = this.GetInfo(IscCodes.isc_info_svc_svr_db_info);
 
-                return info.Count != 0 ? (FbDatabasesInfo)info[0] : new FbDatabasesInfo();
-            }
-        }
+				return info.Count != 0 ? (FbDatabasesInfo)info[0] : new FbDatabasesInfo();
+			}
+		}
 
-        public FbServerConfig ServerConfig
-        {
-            get
-            {
-                ArrayList info = this.GetInfo(IscCodes.isc_info_svc_get_config);
+		public FbServerConfig ServerConfig
+		{
+			get
+			{
+				ArrayList info = this.GetInfo(IscCodes.isc_info_svc_get_config);
 
-                return info.Count != 0 ? (FbServerConfig)info[0] : new FbServerConfig();
-            }
-        }
+				return info.Count != 0 ? (FbServerConfig)info[0] : new FbServerConfig();
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FbServerProperties()
-            : base()
-        { }
+		public FbServerProperties()
+			: base()
+		{ }
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private string GetString(int item)
-        {
-            ArrayList info = this.GetInfo(item);
+		private string GetString(int item)
+		{
+			ArrayList info = this.GetInfo(item);
 
-            return info.Count != 0 ? (string)info[0] : null;
-        }
+			return info.Count != 0 ? (string)info[0] : null;
+		}
 
-        private int GetInt32(int item)
-        {
-            ArrayList info = this.GetInfo(item);
+		private int GetInt32(int item)
+		{
+			ArrayList info = this.GetInfo(item);
 
-            return info.Count != 0 ? (int)info[0] : 0;
-        }
+			return info.Count != 0 ? (int)info[0] : 0;
+		}
 
-        private ArrayList GetInfo(int item)
-        {
-            return this.GetInfo(new byte[] { (byte)item });
-        }
+		private ArrayList GetInfo(int item)
+		{
+			return this.GetInfo(new byte[] { (byte)item });
+		}
 
-        private ArrayList GetInfo(byte[] items)
-        {
-            byte[] buffer = this.QueryService(items);
+		private ArrayList GetInfo(byte[] items)
+		{
+			byte[] buffer = this.QueryService(items);
 
-            return this.ParseQueryInfo(buffer);
-        }
+			return this.ParseQueryInfo(buffer);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
