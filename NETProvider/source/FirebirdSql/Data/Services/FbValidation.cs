@@ -23,67 +23,67 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-    public sealed class FbValidation : FbService
-    {
-        #region · Fields ·
+	public sealed class FbValidation : FbService
+	{
+		#region · Fields ·
 
-        private FbValidationFlags options;
+		private FbValidationFlags options;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public FbValidationFlags Options
-        {
-            get { return this.options; }
-            set { this.options = value; }
-        }
+		public FbValidationFlags Options
+		{
+			get { return this.options; }
+			set { this.options = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public FbValidation()
-            : base()
-        {
-        }
+		public FbValidation()
+			: base()
+		{
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public void Execute()
-        {
-            if (String.IsNullOrEmpty(this.Database))
-            {
-                throw new FbException("Validation should be used against a specific database");
-            }
+		public void Execute()
+		{
+			if (String.IsNullOrEmpty(this.Database))
+			{
+				throw new FbException("Validation should be used against a specific database");
+			}
 
-            try
-            {
-                this.StartSpb = new ServiceParameterBuffer();
+			try
+			{
+				this.StartSpb = new ServiceParameterBuffer();
 
-                // Configure Spb
-                this.StartSpb.Append(IscCodes.isc_action_svc_repair);
-                this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-                this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+				// Configure Spb
+				this.StartSpb.Append(IscCodes.isc_action_svc_repair);
+				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
-                // Start execution
-                this.StartTask();
+				// Start execution
+				this.StartTask();
 
-                // Process service output
-                this.ProcessServiceOutput();
-            }
-            catch (Exception ex)
-            {
-                throw new FbException(ex.Message, ex);
-            }
-            finally
-            {
-                this.Close();
-            }
-        }
+				// Process service output
+				this.ProcessServiceOutput();
+			}
+			catch (Exception ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+			finally
+			{
+				this.Close();
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

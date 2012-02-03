@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -20,30 +20,30 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-    public sealed class ServiceOutputEventArgs : EventArgs
-    {
-        #region Â· Fields Â·
+	public sealed class ServiceOutputEventArgs : EventArgs
+	{
+		#region · Fields ·
 
-        private string message;
+		private string message;
 
-        #endregion
+		#endregion
 
-        #region Â· Properties Â·
+		#region · Properties ·
 
-        public string Message
-        {
-            get { return this.message; }
-        }
+		public string Message
+		{
+			get { return this.message; }
+		}
 
-        #endregion
+		#endregion
 
-        #region Â· Constructors Â·
+		#region · Constructors ·
 
-        public ServiceOutputEventArgs(string message)
-        {
-            this.message = message;
-        }
+		public ServiceOutputEventArgs(string message)
+		{
+			this.message = message;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
