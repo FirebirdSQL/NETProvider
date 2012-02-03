@@ -32,332 +32,332 @@ using FirebirdSql.Data.Common;
 namespace FirebirdSql.Data.FirebirdClient
 {
 #if	(!NET_CF)
-    [ListBindable(false)]
+	[ListBindable(false)]
 #endif
-    public sealed class FbParameterCollection : DbParameterCollection
-    {
-        #region · Fields ·
+	public sealed class FbParameterCollection : DbParameterCollection
+	{
+		#region · Fields ·
 
-        private List<FbParameter> parameters;
+		private List<FbParameter> parameters;
 
-        #endregion
+		#endregion
 
-        #region · Indexers ·
+		#region · Indexers ·
 
 #if	(!NET_CF)
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public new FbParameter this[string parameterName]
-        {
-            get { return this[this.IndexOf(parameterName)]; }
-            set { this[this.IndexOf(parameterName)] = value; }
-        }
+		public new FbParameter this[string parameterName]
+		{
+			get { return this[this.IndexOf(parameterName)]; }
+			set { this[this.IndexOf(parameterName)] = value; }
+		}
 
 #if	(!NET_CF)
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public new FbParameter this[int index]
-        {
-            get { return this.parameters[index]; }
-            set { this.parameters[index] = value; }
-        }
+		public new FbParameter this[int index]
+		{
+			get { return this.parameters[index]; }
+			set { this.parameters[index] = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · DbParameterCollection overriden properties ·
+		#region · DbParameterCollection overriden properties ·
 
 #if	(!NET_CF)
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 #endif
-        public override int Count
-        {
-            get { return this.parameters.Count; }
-        }
+		public override int Count
+		{
+			get { return this.parameters.Count; }
+		}
 
-        public override bool IsFixedSize
-        {
-            get { return ((IList)this.parameters).IsFixedSize; }
-        }
+		public override bool IsFixedSize
+		{
+			get { return ((IList)this.parameters).IsFixedSize; }
+		}
 
-        public override bool IsReadOnly
-        {
-            get { return ((IList)this.parameters).IsReadOnly; }
-        }
+		public override bool IsReadOnly
+		{
+			get { return ((IList)this.parameters).IsReadOnly; }
+		}
 
-        public override bool IsSynchronized
-        {
-            get { return ((ICollection)this.parameters).IsSynchronized; }
-        }
+		public override bool IsSynchronized
+		{
+			get { return ((ICollection)this.parameters).IsSynchronized; }
+		}
 
-        public override object SyncRoot
-        {
-            get { return ((ICollection)this.parameters).SyncRoot; }
-        }
+		public override object SyncRoot
+		{
+			get { return ((ICollection)this.parameters).SyncRoot; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        internal FbParameterCollection()
-        {
-            this.parameters = new List<FbParameter>();
-        }
+		internal FbParameterCollection()
+		{
+			this.parameters = new List<FbParameter>();
+		}
 
-        #endregion
+		#endregion
 
-        #region · DbParameterCollection overriden methods ·
+		#region · DbParameterCollection overriden methods ·
 
-        public void AddRange(FbParameter[] values)
-        {
-            this.AddRange((Array)values);
-        }
+		public void AddRange(FbParameter[] values)
+		{
+			this.AddRange((Array)values);
+		}
 
-        public override void AddRange(Array values)
-        {
-            foreach (FbParameter p in values)
-            {
-                this.Add(p);
-            }
-        }
+		public override void AddRange(Array values)
+		{
+			foreach (FbParameter p in values)
+			{
+				this.Add(p);
+			}
+		}
 
-        public FbParameter AddWithValue(string parameterName, object value)
-        {
-            return this.Add(new FbParameter(parameterName, value));
-        }
+		public FbParameter AddWithValue(string parameterName, object value)
+		{
+			return this.Add(new FbParameter(parameterName, value));
+		}
 
-        public FbParameter Add(string parameterName, object value)
-        {
-            return this.Add(new FbParameter(parameterName, value));
-        }
+		public FbParameter Add(string parameterName, object value)
+		{
+			return this.Add(new FbParameter(parameterName, value));
+		}
 
-        public FbParameter Add(string parameterName, FbDbType type)
-        {
-            return this.Add(new FbParameter(parameterName, type));
-        }
+		public FbParameter Add(string parameterName, FbDbType type)
+		{
+			return this.Add(new FbParameter(parameterName, type));
+		}
 
-        public FbParameter Add(string parameterName, FbDbType fbType, int size)
-        {
-            return this.Add(new FbParameter(parameterName, fbType, size));
-        }
+		public FbParameter Add(string parameterName, FbDbType fbType, int size)
+		{
+			return this.Add(new FbParameter(parameterName, fbType, size));
+		}
 
-        public FbParameter Add(string parameterName, FbDbType fbType, int size, string sourceColumn)
-        {
-            return this.Add(new FbParameter(parameterName, fbType, size, sourceColumn));
-        }
+		public FbParameter Add(string parameterName, FbDbType fbType, int size, string sourceColumn)
+		{
+			return this.Add(new FbParameter(parameterName, fbType, size, sourceColumn));
+		}
 
-        public FbParameter Add(FbParameter value)
-        {
-            lock (this.SyncRoot)
-            {
-                if (value == null)
-                {
-                    throw new ArgumentException("The value parameter is null.");
-                }
-                if (value.Parent != null)
-                {
-                    throw new ArgumentException("The FbParameter specified in the value parameter is already added to this or another FbParameterCollection.");
-                }
-                if (value.ParameterName == null ||
-                    value.ParameterName.Length == 0)
-                {
-                    value.ParameterName = this.GenerateParameterName();
-                }
-                else
-                {
-                    if (this.IndexOf(value) != -1)
-                    {
-                        throw new ArgumentException("FbParameterCollection already contains FbParameter with ParameterName '" + value.ParameterName + "'.");
-                    }
-                }
+		public FbParameter Add(FbParameter value)
+		{
+			lock (this.SyncRoot)
+			{
+				if (value == null)
+				{
+					throw new ArgumentException("The value parameter is null.");
+				}
+				if (value.Parent != null)
+				{
+					throw new ArgumentException("The FbParameter specified in the value parameter is already added to this or another FbParameterCollection.");
+				}
+				if (value.ParameterName == null ||
+					value.ParameterName.Length == 0)
+				{
+					value.ParameterName = this.GenerateParameterName();
+				}
+				else
+				{
+					if (this.IndexOf(value) != -1)
+					{
+						throw new ArgumentException("FbParameterCollection already contains FbParameter with ParameterName '" + value.ParameterName + "'.");
+					}
+				}
 
-                this.parameters.Add(value);
+				this.parameters.Add(value);
 
-                return value;
-            }
-        }
+				return value;
+			}
+		}
 
-        public override int Add(object value)
-        {
-            if (!(value is FbParameter))
-            {
-                throw new InvalidCastException("The parameter passed was not a FbParameter.");
-            }
+		public override int Add(object value)
+		{
+			if (!(value is FbParameter))
+			{
+				throw new InvalidCastException("The parameter passed was not a FbParameter.");
+			}
 
-            return this.IndexOf(this.Add(value as FbParameter));
-        }
+			return this.IndexOf(this.Add(value as FbParameter));
+		}
 
-        public bool Contains(FbParameter value)
-        {
-            return this.parameters.Contains(value);
-        }
+		public bool Contains(FbParameter value)
+		{
+			return this.parameters.Contains(value);
+		}
 
-        public override bool Contains(object value)
-        {
-            return this.parameters.Contains((FbParameter)value);
-        }
+		public override bool Contains(object value)
+		{
+			return this.parameters.Contains((FbParameter)value);
+		}
 
-        public override bool Contains(string parameterName)
-        {
-            return (-1 != this.IndexOf(parameterName));
-        }
+		public override bool Contains(string parameterName)
+		{
+			return (-1 != this.IndexOf(parameterName));
+		}
 
-        public int IndexOf(FbParameter value)
-        {
-            return this.parameters.IndexOf(value);
-        }
+		public int IndexOf(FbParameter value)
+		{
+			return this.parameters.IndexOf(value);
+		}
 
-        public override int IndexOf(object value)
-        {
-            return this.parameters.IndexOf((FbParameter)value);
-        }
+		public override int IndexOf(object value)
+		{
+			return this.parameters.IndexOf((FbParameter)value);
+		}
 
-        public override int IndexOf(string parameterName)
-        {
-            int index = 0;
-            foreach (FbParameter item in this.parameters)
-            {
-                if (GlobalizationHelper.CultureAwareCompare(item.ParameterName, parameterName) ||
-                    GlobalizationHelper.CultureAwareCompare(item.InternalParameterName, parameterName))
-                {
-                    return index;
-                }
-                index++;
-            }
-            return -1;
-        }
+		public override int IndexOf(string parameterName)
+		{
+			int index = 0;
+			foreach (FbParameter item in this.parameters)
+			{
+				if (GlobalizationHelper.CultureAwareCompare(item.ParameterName, parameterName) ||
+					GlobalizationHelper.CultureAwareCompare(item.InternalParameterName, parameterName))
+				{
+					return index;
+				}
+				index++;
+			}
+			return -1;
+		}
 
-        public void Insert(int index, FbParameter value)
-        {
-            this.parameters.Insert(index, value);
-        }
+		public void Insert(int index, FbParameter value)
+		{
+			this.parameters.Insert(index, value);
+		}
 
-        public override void Insert(int index, object value)
-        {
-            this.parameters.Insert(index, (FbParameter)value);
-        }
+		public override void Insert(int index, object value)
+		{
+			this.parameters.Insert(index, (FbParameter)value);
+		}
 
-        public void Remove(FbParameter value)
-        {
-            if (!(value is FbParameter))
-            {
-                throw new InvalidCastException("The parameter passed was not a FbParameter.");
-            }
-            if (!this.Contains(value))
-            {
-                throw new SystemException("The parameter does not exist in the collection.");
-            }
+		public void Remove(FbParameter value)
+		{
+			if (!(value is FbParameter))
+			{
+				throw new InvalidCastException("The parameter passed was not a FbParameter.");
+			}
+			if (!this.Contains(value))
+			{
+				throw new SystemException("The parameter does not exist in the collection.");
+			}
 
-            this.parameters.Remove(value);
+			this.parameters.Remove(value);
 
-            ((FbParameter)value).Parent = null;
-        }
+			((FbParameter)value).Parent = null;
+		}
 
-        public override void Remove(object value)
-        {
-            if (!(value is FbParameter))
-            {
-                throw new InvalidCastException("The parameter passed was not a FbParameter.");
-            }
-            if (!this.Contains(value))
-            {
-                throw new SystemException("The parameter does not exist in the collection.");
-            }
+		public override void Remove(object value)
+		{
+			if (!(value is FbParameter))
+			{
+				throw new InvalidCastException("The parameter passed was not a FbParameter.");
+			}
+			if (!this.Contains(value))
+			{
+				throw new SystemException("The parameter does not exist in the collection.");
+			}
 
-            this.parameters.Remove((FbParameter)value);
+			this.parameters.Remove((FbParameter)value);
 
-            ((FbParameter)value).Parent = null;
-        }
+			((FbParameter)value).Parent = null;
+		}
 
-        public override void RemoveAt(int index)
-        {
-            if (index < 0 || index > this.Count)
-            {
-                throw new IndexOutOfRangeException("The specified index does not exist.");
-            }
+		public override void RemoveAt(int index)
+		{
+			if (index < 0 || index > this.Count)
+			{
+				throw new IndexOutOfRangeException("The specified index does not exist.");
+			}
 
-            FbParameter parameter = this[index];
-            this.parameters.RemoveAt(index);
-            parameter.Parent = null;
-        }
+			FbParameter parameter = this[index];
+			this.parameters.RemoveAt(index);
+			parameter.Parent = null;
+		}
 
-        public override void RemoveAt(string parameterName)
-        {
-            this.RemoveAt(this.IndexOf(parameterName));
-        }
+		public override void RemoveAt(string parameterName)
+		{
+			this.RemoveAt(this.IndexOf(parameterName));
+		}
 
-        public void CopyTo(FbParameter[] array, int index)
-        {
-            this.parameters.CopyTo(array, index);
-        }
+		public void CopyTo(FbParameter[] array, int index)
+		{
+			this.parameters.CopyTo(array, index);
+		}
 
-        public override void CopyTo(Array array, int index)
-        {
-            ((IList)this.parameters).CopyTo(array, index);
-        }
+		public override void CopyTo(Array array, int index)
+		{
+			((IList)this.parameters).CopyTo(array, index);
+		}
 
-        public override void Clear()
-        {
-            this.parameters.Clear();
-        }
+		public override void Clear()
+		{
+			this.parameters.Clear();
+		}
 
-        public override IEnumerator GetEnumerator()
-        {
-            return this.parameters.GetEnumerator();
-        }
+		public override IEnumerator GetEnumerator()
+		{
+			return this.parameters.GetEnumerator();
+		}
 
-        #endregion
+		#endregion
 
-        #region · DbParameterCollection overriden protected methods ·
+		#region · DbParameterCollection overriden protected methods ·
 
-        protected override DbParameter GetParameter(string parameterName)
-        {
-            return this[parameterName];
-        }
+		protected override DbParameter GetParameter(string parameterName)
+		{
+			return this[parameterName];
+		}
 
-        protected override DbParameter GetParameter(int index)
-        {
-            return this[index];
-        }
+		protected override DbParameter GetParameter(int index)
+		{
+			return this[index];
+		}
 
-        protected override void SetParameter(int index, DbParameter value)
-        {
-            this[index] = (FbParameter)value;
-        }
+		protected override void SetParameter(int index, DbParameter value)
+		{
+			this[index] = (FbParameter)value;
+		}
 
-        protected override void SetParameter(string parameterName, DbParameter value)
-        {
-            this[parameterName] = (FbParameter)value;
-        }
+		protected override void SetParameter(string parameterName, DbParameter value)
+		{
+			this[parameterName] = (FbParameter)value;
+		}
 
-        #endregion
+		#endregion
 
-        #region · Private Methods ·
+		#region · Private Methods ·
 
-        private string GenerateParameterName()
-        {
-            int index = this.Count + 1;
-            string name = string.Empty;
+		private string GenerateParameterName()
+		{
+			int index = this.Count + 1;
+			string name = string.Empty;
 
-            while (index > 0)
-            {
-                name = "Parameter" + index.ToString(CultureInfo.InvariantCulture);
+			while (index > 0)
+			{
+				name = "Parameter" + index.ToString(CultureInfo.InvariantCulture);
 
-                if (this.IndexOf(name) == -1)
-                {
-                    index = -1;
-                }
-                else
-                {
-                    index++;
-                }
-            }
+				if (this.IndexOf(name) == -1)
+				{
+					index = -1;
+				}
+				else
+				{
+					index++;
+				}
+			}
 
-            return name;
-        }
+			return name;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

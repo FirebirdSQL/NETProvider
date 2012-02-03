@@ -29,23 +29,23 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	internal sealed class FbConnectionPool : MarshalByRefObject, IDisposable
 	{
-        #region · Inner Types ·
-        
-        private enum MoveType 
-        { 
-            LockedToUnlocked, 
-            UnlockedToLocked 
-        }
+		#region · Inner Types ·
+		
+		private enum MoveType 
+		{ 
+			LockedToUnlocked, 
+			UnlockedToLocked 
+		}
 
-        #endregion
+		#endregion
 
-        #region · Events ·
+		#region · Events ·
 
-        public event EmptyPoolEventHandler EmptyPool;
+		public event EmptyPoolEventHandler EmptyPool;
 
-        #endregion
-        
-        #region · Fields ·
+		#endregion
+		
+		#region · Fields ·
 
 		private FbConnectionString	options;
 		private ArrayList			locked;
@@ -54,40 +54,40 @@ namespace FirebirdSql.Data.FirebirdClient
 		private string				connectionString;
 		private long				lifeTime;
 		private object				syncObject;
-        private bool disposed = false;
+		private bool disposed = false;
 
 		#endregion
 
 		#region · Properties ·
 
-        public object SyncObject
-        {
-            get 
-            {
-                if (this.syncObject == null)
-                {
-                    Interlocked.CompareExchange(ref this.syncObject, new object(), null);
-                }
+		public object SyncObject
+		{
+			get 
+			{
+				if (this.syncObject == null)
+				{
+					Interlocked.CompareExchange(ref this.syncObject, new object(), null);
+				}
 
-                return this.syncObject; 
-            }
-        }
+				return this.syncObject; 
+			}
+		}
 
 		public int Count
 		{
 			get 
-            {
-                lock (this.unlocked.SyncRoot)
-                {
-                    return this.unlocked.Count + this.locked.Count;
-                }
-            }
+			{
+				lock (this.unlocked.SyncRoot)
+				{
+					return this.unlocked.Count + this.locked.Count;
+				}
+			}
 		}
 
-        public bool HasUnlocked
-        {
-            get { return this.unlocked.Count > 0; }
-        }
+		public bool HasUnlocked
+		{
+			get { return this.unlocked.Count > 0; }
+		}
 
 		#endregion
 
@@ -127,136 +127,136 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void CheckIn(FbConnectionInternal connection)
 		{
-            connection.OwningConnection = null;
-            connection.Created = System.DateTime.Now.Ticks;
+			connection.OwningConnection = null;
+			connection.Created = System.DateTime.Now.Ticks;
 
-            this.MoveConnection(connection, MoveType.LockedToUnlocked);
-        }
+			this.MoveConnection(connection, MoveType.LockedToUnlocked);
+		}
 
-        public FbConnectionInternal CheckOut()
-        {
+		public FbConnectionInternal CheckOut()
+		{
 	        FbConnectionInternal newConnection = null;
 
 	        lock (this.SyncObject)
 	        {
-                // 1. Try to Get a connection from the unlocked connection list.
-                newConnection = this.GetConnection();
-                if (newConnection != null)
-                {
-                    return newConnection;
-                }
+				// 1. Try to Get a connection from the unlocked connection list.
+				newConnection = this.GetConnection();
+				if (newConnection != null)
+				{
+					return newConnection;
+				}
 
-                // 2. Check if we have reached the max number of allowed connections
-                this.CheckMaxPoolSize();
+				// 2. Check if we have reached the max number of allowed connections
+				this.CheckMaxPoolSize();
 
-                // 3. Try to Get a connection from the unlocked connection list.
-                newConnection = this.GetConnection();
-                if (newConnection != null)
-                {
-                    return newConnection;
-                }
+				// 3. Try to Get a connection from the unlocked connection list.
+				newConnection = this.GetConnection();
+				if (newConnection != null)
+				{
+					return newConnection;
+				}
 
-                // 4. In any other case create a new connection
-                newConnection = this.Create();
+				// 4. In any other case create a new connection
+				newConnection = this.Create();
 
-                // Set connection pooling settings to the new connection
-                newConnection.Lifetime = this.options.ConnectionLifeTime;
-                newConnection.Pooled = true;
+				// Set connection pooling settings to the new connection
+				newConnection.Lifetime = this.options.ConnectionLifeTime;
+				newConnection.Pooled = true;
 
-                // Added to	the	locked connections list.
-                this.locked.Add(newConnection);
+				// Added to	the	locked connections list.
+				this.locked.Add(newConnection);
 	        }
 
 	        return newConnection;
-        }
+		}
 
 		public void Clear()
 		{
-            Dispose();
+			Dispose();
 		}
 
 		#endregion
 
 		#region · Private Methods ·
 
-        private void Initialize()
-        {
-            lock (this.SyncObject)
-            {
-                for (int i = 0; i < this.options.MinPoolSize; i++)
-                {
-                    this.unlocked.Add(this.Create());
-                }
-            }
-        }
+		private void Initialize()
+		{
+			lock (this.SyncObject)
+			{
+				for (int i = 0; i < this.options.MinPoolSize; i++)
+				{
+					this.unlocked.Add(this.Create());
+				}
+			}
+		}
 
-        private FbConnectionInternal Create()
-        {
-            FbConnectionInternal connection = new FbConnectionInternal(this.options);
-            connection.Connect();
+		private FbConnectionInternal Create()
+		{
+			FbConnectionInternal connection = new FbConnectionInternal(this.options);
+			connection.Connect();
 
-            connection.Pooled = true;
-            connection.Created = DateTime.Now.Ticks;
+			connection.Pooled = true;
+			connection.Created = DateTime.Now.Ticks;
 
-            return connection;
-        }
+			return connection;
+		}
 
-        private FbConnectionInternal GetConnection()
-        {
-            FbConnectionInternal result = null;
-            long check = -1;
+		private FbConnectionInternal GetConnection()
+		{
+			FbConnectionInternal result = null;
+			long check = -1;
 
-            lock (this.unlocked.SyncRoot)
-            {
-                FbConnectionInternal[] connections = (FbConnectionInternal[])this.unlocked.ToArray(typeof(FbConnectionInternal));
+			lock (this.unlocked.SyncRoot)
+			{
+				FbConnectionInternal[] connections = (FbConnectionInternal[])this.unlocked.ToArray(typeof(FbConnectionInternal));
 
-                for (int i = connections.Length - 1; i >= 0; i--) 
-                {
-                    if (connections[i].Verify())
-                    {
-                        if (this.lifeTime != 0)
-                        {
-                            long now    = DateTime.Now.Ticks;
-                            long expire = connections[i].Created + this.lifeTime;
+				for (int i = connections.Length - 1; i >= 0; i--) 
+				{
+					if (connections[i].Verify())
+					{
+						if (this.lifeTime != 0)
+						{
+							long now    = DateTime.Now.Ticks;
+							long expire = connections[i].Created + this.lifeTime;
 
-                            if (now >= expire)
-                            {
-                                if (this.CheckMinPoolSize())
-                                {
-                                    this.unlocked.Remove(connections[i]);
-                                    this.Expire(connections[i]);
-                                }
-                            }
-                            else
-                            {
-                                if (expire > check)
-                                {
-                                    check = expire;
-                                    result = connections[i];
-                                }
-                            }
-                        }
-                        else
-                        {
-                            result = connections[i];
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        this.unlocked.Remove(connections[i]);
-                        this.Expire(connections[i]);
-                    }
-                }
+							if (now >= expire)
+							{
+								if (this.CheckMinPoolSize())
+								{
+									this.unlocked.Remove(connections[i]);
+									this.Expire(connections[i]);
+								}
+							}
+							else
+							{
+								if (expire > check)
+								{
+									check = expire;
+									result = connections[i];
+								}
+							}
+						}
+						else
+						{
+							result = connections[i];
+							break;
+						}
+					}
+					else
+					{
+						this.unlocked.Remove(connections[i]);
+						this.Expire(connections[i]);
+					}
+				}
 
-                if (result != null)
-                {
-                    this.MoveConnection(result, MoveType.UnlockedToLocked);
-                }
-            }
+				if (result != null)
+				{
+					this.MoveConnection(result, MoveType.UnlockedToLocked);
+				}
+			}
 
-            return result;
-        }
+			return result;
+		}
 
 		private bool CheckMinPoolSize()
 		{
@@ -265,33 +265,33 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckMaxPoolSize()
 		{
-            if (this.options.MaxPoolSize > 0 && this.Count >= this.options.MaxPoolSize)
-            {
-                long timeout    = this.options.ConnectionTimeout * TimeSpan.TicksPerSecond;
-                long start      = DateTime.Now.Ticks;
+			if (this.options.MaxPoolSize > 0 && this.Count >= this.options.MaxPoolSize)
+			{
+				long timeout    = this.options.ConnectionTimeout * TimeSpan.TicksPerSecond;
+				long start      = DateTime.Now.Ticks;
 
-                /* 
-                 Loop brakes without errors in next situations:
-                    1. connection was returned from locked to unlocked by calling CheckIn in other thread (HasUnlocked = true) 
-                    2. connection was moved from locked to unlocked (by Checkin) and then cleaned (removed from unlocked by Cleanup)
-                */
-                while (true)
-                {
-                    if (this.Count >= this.options.MaxPoolSize && this.HasUnlocked == false)
-                    {
-                        if ((DateTime.Now.Ticks - start) > timeout)
-                        {
-                            throw new SystemException("Timeout exceeded.");
-                        }
+				/* 
+				 Loop brakes without errors in next situations:
+					1. connection was returned from locked to unlocked by calling CheckIn in other thread (HasUnlocked = true) 
+					2. connection was moved from locked to unlocked (by Checkin) and then cleaned (removed from unlocked by Cleanup)
+				*/
+				while (true)
+				{
+					if (this.Count >= this.options.MaxPoolSize && this.HasUnlocked == false)
+					{
+						if ((DateTime.Now.Ticks - start) > timeout)
+						{
+							throw new SystemException("Timeout exceeded.");
+						}
 
-                        Thread.Sleep(100);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
+						Thread.Sleep(100);
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
 		}
 
 		private void CleanupWorker(object state)
@@ -323,12 +323,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			try
 			{
 				connection.Dispose();
-                connection = null;
+				connection = null;
 			}
 			catch
 			{
-                // Do not raise an exception as the connection could be invalid due to several reasons
-                // ( network problems, server shutdown, ... )
+				// Do not raise an exception as the connection could be invalid due to several reasons
+				// ( network problems, server shutdown, ... )
 			}
 		}
 
@@ -358,102 +358,102 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-        private void MoveConnection(FbConnectionInternal connection, MoveType moveType)
-        {
-            if (connection != null)
-            {
-                lock (this.unlocked.SyncRoot)
-                {
-                    switch (moveType)
-                    {
-                        case MoveType.LockedToUnlocked:
-                            this.locked.Remove(connection);
-                            this.unlocked.Add(connection);
-                            break;
+		private void MoveConnection(FbConnectionInternal connection, MoveType moveType)
+		{
+			if (connection != null)
+			{
+				lock (this.unlocked.SyncRoot)
+				{
+					switch (moveType)
+					{
+						case MoveType.LockedToUnlocked:
+							this.locked.Remove(connection);
+							this.unlocked.Add(connection);
+							break;
 
-                        case MoveType.UnlockedToLocked:
-                            this.unlocked.Remove(connection);
-                            this.locked.Add(connection);
-                            break;
-                    }
-                }
-            }
-        }
+						case MoveType.UnlockedToLocked:
+							this.unlocked.Remove(connection);
+							this.locked.Add(connection);
+							break;
+					}
+				}
+			}
+		}
 
 		#endregion
-    
-        #region · Finalizer ·
+	
+		#region · Finalizer ·
 
-        ~FbConnectionPool()
-        {
-            this.Dispose(false);
-        }
+		~FbConnectionPool()
+		{
+			this.Dispose(false);
+		}
 
-        #endregion
+		#endregion
 
-        #region IDisposable Members
+		#region IDisposable Members
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-        private void Dispose(bool disposing)
-        {
-            lock (this.SyncObject)
-            {
-                if (!this.disposed)
-                {
-                    if (disposing)
-                    {
-                        // stop cleanup
+		private void Dispose(bool disposing)
+		{
+			lock (this.SyncObject)
+			{
+				if (!this.disposed)
+				{
+					if (disposing)
+					{
+						// stop cleanup
 						if (this.cleanupTimer != null)
 						{
 							this.cleanupTimer.Dispose();
 						}
-                    }
+					}
 
-                    // Close all unlocked connections
-                    FbConnectionInternal[] list = (FbConnectionInternal[])this.unlocked.ToArray(typeof(FbConnectionInternal));
+					// Close all unlocked connections
+					FbConnectionInternal[] list = (FbConnectionInternal[])this.unlocked.ToArray(typeof(FbConnectionInternal));
 
-                    foreach (FbConnectionInternal connection in list)
-                    {
-                        connection.Disconnect();
-                    }
+					foreach (FbConnectionInternal connection in list)
+					{
+						connection.Disconnect();
+					}
 
-                    // Close all locked	connections
-                    list = (FbConnectionInternal[])this.locked.ToArray(typeof(FbConnectionInternal));
+					// Close all locked	connections
+					list = (FbConnectionInternal[])this.locked.ToArray(typeof(FbConnectionInternal));
 
-                    foreach (FbConnectionInternal connection in list)
-                    {
-                        connection.Disconnect();
-                    }
+					foreach (FbConnectionInternal connection in list)
+					{
+						connection.Disconnect();
+					}
 
-                    if (disposing)
-                    {
-                        // Raise EmptyPool event
-                        if (this.EmptyPool != null)
-                        {
-                            this.EmptyPool(this.connectionString, null);
-                        }
+					if (disposing)
+					{
+						// Raise EmptyPool event
+						if (this.EmptyPool != null)
+						{
+							this.EmptyPool(this.connectionString, null);
+						}
 
-                        // Clear lists
-                        this.unlocked.Clear();
-                        this.locked.Clear();
+						// Clear lists
+						this.unlocked.Clear();
+						this.locked.Clear();
 
-                        // Reset fields
-                        this.unlocked = null;
-                        this.locked = null;
-                        this.connectionString = null;
-                        this.EmptyPool = null;
-                    }
+						// Reset fields
+						this.unlocked = null;
+						this.locked = null;
+						this.connectionString = null;
+						this.EmptyPool = null;
+					}
 
-                    this.disposed = true;
-                }
-            }
-        }
+					this.disposed = true;
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 	}
 }

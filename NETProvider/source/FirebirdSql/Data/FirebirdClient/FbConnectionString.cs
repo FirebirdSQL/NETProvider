@@ -321,8 +321,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (
 #if (LINUX)  // on Linux Trusted Auth isn't available
-                    (this.UserID == null || this.UserID.Length == 0) ||
-                    (this.Password == null || this.Password.Length == 0) ||
+					(this.UserID == null || this.UserID.Length == 0) ||
+					(this.Password == null || this.Password.Length == 0) ||
 #endif
 					((this.Database == null || this.Database.Length == 0) && !this.isServiceConnectionString) ||
 					((this.DataSource == null || this.DataSource.Length == 0) && this.ServerType != FbServerType.Embedded) ||
@@ -478,10 +478,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			string pattern = string.Format("{0}{1}?", Regex.Escape(dataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
 			return Regex.Replace(s, pattern, dataDirectoryLocation + Path.DirectorySeparatorChar, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 #else
-            if (s.ToUpper(CultureInfo.InvariantCulture).IndexOf(dataDirectoryKeyword.ToUpper(CultureInfo.InvariantCulture)) != -1 )
-                throw new NotImplementedException();
+			if (s.ToUpper(CultureInfo.InvariantCulture).IndexOf(dataDirectoryKeyword.ToUpper(CultureInfo.InvariantCulture)) != -1 )
+				throw new NotImplementedException();
 
-            return s;
+			return s;
 #endif
 		}
 

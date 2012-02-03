@@ -21,63 +21,63 @@ using System;
 namespace FirebirdSql.Data.FirebirdClient
 {
 #if (!NET_CF)
-    [Serializable]
+	[Serializable]
 #endif
-    public sealed class FbError
-    {
-        #region · Fields ·
+	public sealed class FbError
+	{
+		#region · Fields ·
 
-        private byte classError;
-        private int lineNumber;
-        private string message;
-        private int number;
+		private byte classError;
+		private int lineNumber;
+		private string message;
+		private int number;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public byte Class
-        {
-            get { return this.classError; }
-        }
+		public byte Class
+		{
+			get { return this.classError; }
+		}
 
-        public int LineNumber
-        {
-            get { return this.lineNumber; }
-        }
+		public int LineNumber
+		{
+			get { return this.lineNumber; }
+		}
 
-        public string Message
-        {
-            get { return this.message; }
-        }
+		public string Message
+		{
+			get { return this.message; }
+		}
 
-        public int Number
-        {
-            get { return this.number; }
-        }
+		public int Number
+		{
+			get { return this.number; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        internal FbError(string message, int number)
-            : this(0, 0, message, number)
-        {
-        }
+		internal FbError(string message, int number)
+			: this(0, 0, message, number)
+		{
+		}
 
-        internal FbError(byte classError, string message, int number)
-            : this(classError, 0, message, number)
-        {
-        }
+		internal FbError(byte classError, string message, int number)
+			: this(classError, 0, message, number)
+		{
+		}
 
-        internal FbError(byte classError, int line, string message, int number)
-        {
-            this.classError = classError;
-            this.lineNumber = line;
-            this.number = number;
-            this.message = message;
-        }
+		internal FbError(byte classError, int line, string message, int number)
+		{
+			this.classError = classError;
+			this.lineNumber = line;
+			this.number = number;
+			this.message = message;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

@@ -21,45 +21,45 @@ using System;
 namespace FirebirdSql.Data.FirebirdClient
 {
 #if (!NET_CF)
-    [Serializable]
+	[Serializable]
 #endif
-    public enum FbCharset : int
-    {
-        Default = -1,
-        None = 0,
-        Octets = 1,
-        Ascii = 2,
-        UnicodeFss = 3,
-        Utf8 = 4,
-        ShiftJis0208 = 5,
-        EucJapanese0208 = 6,
-        Iso2022Japanese = 7,
-        Dos437 = 10,
-        Dos850 = 11,
-        Dos865 = 12,
-        Dos860 = 13,
-        Dos863 = 14,
-        Iso8859_1 = 21,
-        Iso8859_2 = 22,
-        Ksc5601 = 44,
-        Dos861 = 47,
-        Windows1250 = 51,
-        Windows1251 = 52,
-        Windows1252 = 53,
-        Windows1253 = 54,
-        Windows1254 = 55,
-        Big5 = 56,
-        Gb2312 = 57,
-        Windows1255 = 58,
-        Windows1256 = 59,
-        Windows1257 = 60,
-        // UTF-16
-        // Utf16           = 61,
-        // UTF-32
-        // Utf32           = 62,
-        // Russian KOI8R
-        Koi8R = 63,
-        // Ukrainian KOI8U
-        Koi8U = 64
-    }
+	public enum FbCharset : int
+	{
+		Default = -1,
+		None = 0,
+		Octets = 1,
+		Ascii = 2,
+		UnicodeFss = 3,
+		Utf8 = 4,
+		ShiftJis0208 = 5,
+		EucJapanese0208 = 6,
+		Iso2022Japanese = 7,
+		Dos437 = 10,
+		Dos850 = 11,
+		Dos865 = 12,
+		Dos860 = 13,
+		Dos863 = 14,
+		Iso8859_1 = 21,
+		Iso8859_2 = 22,
+		Ksc5601 = 44,
+		Dos861 = 47,
+		Windows1250 = 51,
+		Windows1251 = 52,
+		Windows1252 = 53,
+		Windows1253 = 54,
+		Windows1254 = 55,
+		Big5 = 56,
+		Gb2312 = 57,
+		Windows1255 = 58,
+		Windows1256 = 59,
+		Windows1257 = 60,
+		// UTF-16
+		// Utf16           = 61,
+		// UTF-32
+		// Utf32           = 62,
+		// Russian KOI8R
+		Koi8R = 63,
+		// Ukrainian KOI8U
+		Koi8U = 64
+	}
 }

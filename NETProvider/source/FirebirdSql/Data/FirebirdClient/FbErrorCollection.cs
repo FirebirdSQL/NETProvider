@@ -29,102 +29,102 @@ using FirebirdSql.Data.Common;
 namespace FirebirdSql.Data.FirebirdClient
 {
 #if (!NET_CF)
-    [Serializable, ListBindable(false)]
+	[Serializable, ListBindable(false)]
 #endif
-    public sealed class FbErrorCollection : IEnumerable, ICollection
-    {
-        #region · Fields ·
+	public sealed class FbErrorCollection : IEnumerable, ICollection
+	{
+		#region · Fields ·
 
-        private List<FbError> errors;
+		private List<FbError> errors;
 
-        #endregion
+		#endregion
 
-        #region · Indexers ·
+		#region · Indexers ·
 
-        public FbError this[int index]
-        {
-            get { return this.errors[index]; }
-        }
+		public FbError this[int index]
+		{
+			get { return this.errors[index]; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        internal FbErrorCollection()
-        {
-            this.errors = new List<FbError>();
-        }
+		internal FbErrorCollection()
+		{
+			this.errors = new List<FbError>();
+		}
 
-        #endregion
+		#endregion
 
-        #region · ICollection Properties ·
+		#region · ICollection Properties ·
 
-        public int Count
-        {
-            get { return this.errors.Count; }
-        }
+		public int Count
+		{
+			get { return this.errors.Count; }
+		}
 
-        // implemented explicitly like in SqlErrorCollection
-        bool ICollection.IsSynchronized
-        {
-            get { return ((ICollection)this.errors).IsSynchronized; }
-        }
+		// implemented explicitly like in SqlErrorCollection
+		bool ICollection.IsSynchronized
+		{
+			get { return ((ICollection)this.errors).IsSynchronized; }
+		}
 
-        // implemented explicitly like in SqlErrorCollection
-        object ICollection.SyncRoot
-        {
-            get { return ((ICollection)this.errors).SyncRoot; }
-        }
+		// implemented explicitly like in SqlErrorCollection
+		object ICollection.SyncRoot
+		{
+			get { return ((ICollection)this.errors).SyncRoot; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · ICollection Methods ·
+		#region · ICollection Methods ·
 
-        public void CopyTo(Array array, int index)
-        {
-            ((ICollection)this.errors).CopyTo(array, index);
-        }
+		public void CopyTo(Array array, int index)
+		{
+			((ICollection)this.errors).CopyTo(array, index);
+		}
 
-        #endregion
+		#endregion
 
-        #region · IEnumerable Methods ·
+		#region · IEnumerable Methods ·
 
-        public IEnumerator GetEnumerator()
-        {
-            return this.errors.GetEnumerator();
-        }
+		public IEnumerator GetEnumerator()
+		{
+			return this.errors.GetEnumerator();
+		}
 
-        #endregion
+		#endregion
 
-        #region · Internal Methods ·
+		#region · Internal Methods ·
 
-        internal int IndexOf(string errorMessage)
-        {
-            int index = 0;
-            foreach (FbError item in this)
-            {
-                if (GlobalizationHelper.CultureAwareCompare(item.Message, errorMessage))
-                {
-                    return index;
-                }
-                index++;
-            }
+		internal int IndexOf(string errorMessage)
+		{
+			int index = 0;
+			foreach (FbError item in this)
+			{
+				if (GlobalizationHelper.CultureAwareCompare(item.Message, errorMessage))
+				{
+					return index;
+				}
+				index++;
+			}
 
-            return -1;
-        }
+			return -1;
+		}
 
-        internal FbError Add(FbError error)
-        {
-            this.errors.Add(error);
+		internal FbError Add(FbError error)
+		{
+			this.errors.Add(error);
 
-            return error;
-        }
+			return error;
+		}
 
-        internal FbError Add(string errorMessage, int number)
-        {
-            return this.Add(new FbError(errorMessage, number));
-        }
+		internal FbError Add(string errorMessage, int number)
+		{
+			return this.Add(new FbError(errorMessage, number));
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

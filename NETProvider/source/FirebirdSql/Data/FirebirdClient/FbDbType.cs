@@ -21,26 +21,26 @@ using System;
 namespace FirebirdSql.Data.FirebirdClient
 {
 #if (!NET_CF)
-    [Serializable]
+	[Serializable]
 #endif
-    public enum FbDbType
-    {
-        Array,
-        BigInt,
-        Binary,
-        Boolean,
-        Char,
-        Date,
-        Decimal,
-        Double,
-        Float,
-        Guid,
-        Integer,
-        Numeric,
-        SmallInt,
-        Text,
-        Time,
-        TimeStamp,
-        VarChar
-    }
+	public enum FbDbType
+	{
+		Array,
+		BigInt,
+		Binary,
+		Boolean,
+		Char,
+		Date,
+		Decimal,
+		Double,
+		Float,
+		Guid,
+		Integer,
+		Numeric,
+		SmallInt,
+		Text,
+		Time,
+		TimeStamp,
+		VarChar
+	}
 }

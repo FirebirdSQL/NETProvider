@@ -21,41 +21,41 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-    public sealed class FbInfoMessageEventArgs : EventArgs
-    {
-        #region · Fields ·
+	public sealed class FbInfoMessageEventArgs : EventArgs
+	{
+		#region · Fields ·
 
-        private FbErrorCollection errors = new FbErrorCollection();
-        private string message = string.Empty;
+		private FbErrorCollection errors = new FbErrorCollection();
+		private string message = string.Empty;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public FbErrorCollection Errors
-        {
-            get { return this.errors; }
-        }
+		public FbErrorCollection Errors
+		{
+			get { return this.errors; }
+		}
 
-        public string Message
-        {
-            get { return this.message; }
-        }
+		public string Message
+		{
+			get { return this.message; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        internal FbInfoMessageEventArgs(IscException ex)
-        {
-            this.message = ex.Message;
+		internal FbInfoMessageEventArgs(IscException ex)
+		{
+			this.message = ex.Message;
 
-            foreach (IscError error in ex.Errors)
-            {
-                this.errors.Add(error.Message, error.ErrorCode);
-            }
-        }
+			foreach (IscError error in ex.Errors)
+			{
+				this.errors.Add(error.Message, error.ErrorCode);
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
