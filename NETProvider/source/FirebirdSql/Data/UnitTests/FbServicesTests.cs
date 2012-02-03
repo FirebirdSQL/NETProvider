@@ -91,10 +91,9 @@ namespace FirebirdSql.Data.UnitTests
 
 			restoreSvc.Execute();
 
-			if (File.Exists(ConfigurationManager.AppSettings["BackupRestoreFile"]))
-			{
-				File.Delete(ConfigurationManager.AppSettings["BackupRestoreFile"]);
-			}
+			string backupPath = Path.Combine(ConfigurationManager.AppSettings["BackupRestoreLocation"], ConfigurationManager.AppSettings["BackupRestoreFile"]);
+			if (File.Exists(backupPath))
+				File.Delete(backupPath);
 		}
 
 		[Test]
