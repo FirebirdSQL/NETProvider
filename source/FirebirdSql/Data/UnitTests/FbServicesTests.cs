@@ -58,6 +58,18 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
+		#region · TestFixture TearDown Method ·
+
+		[TestFixtureTearDown]
+		public void TestFixtureTearDown()
+		{
+			string backupPath = Path.Combine(ConfigurationManager.AppSettings["BackupRestoreLocation"], ConfigurationManager.AppSettings["BackupRestoreFile"]);
+			if (File.Exists(backupPath))
+				File.Delete(backupPath);
+		}
+
+		#endregion
+
 		#region · Unit Tests ·
 
 		[Test]
@@ -90,10 +102,6 @@ namespace FirebirdSql.Data.UnitTests
 			restoreSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
 
 			restoreSvc.Execute();
-
-			string backupPath = Path.Combine(ConfigurationManager.AppSettings["BackupRestoreLocation"], ConfigurationManager.AppSettings["BackupRestoreFile"]);
-			if (File.Exists(backupPath))
-				File.Delete(backupPath);
 		}
 
 		[Test]
