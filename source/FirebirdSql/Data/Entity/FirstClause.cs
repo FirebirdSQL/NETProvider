@@ -23,74 +23,74 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Entity
 {
-    /// <summary>
-    /// FirstClause represents the FIRST expression in a SqlSelectStatement. 
-    /// It has a count property, which indicates how many FIRST rows should be selected and a 
-    /// boolen WithTies property.
-    /// </summary>
-    internal class FirstClause : ISqlFragment
-    {
-        #region · Fields ·
+	/// <summary>
+	/// FirstClause represents the FIRST expression in a SqlSelectStatement. 
+	/// It has a count property, which indicates how many FIRST rows should be selected and a 
+	/// boolen WithTies property.
+	/// </summary>
+	internal class FirstClause : ISqlFragment
+	{
+		#region · Fields ·
 
-        private ISqlFragment firstCount;
+		private ISqlFragment firstCount;
 
-        #endregion
+		#endregion
 
-        #region · Internal Properties ·
+		#region · Internal Properties ·
 
-        /// <summary>
-        /// How many first rows should be selected.
-        /// </summary>
-        internal ISqlFragment FirstCount
-        {
-            get { return this.firstCount; }
-        }
+		/// <summary>
+		/// How many first rows should be selected.
+		/// </summary>
+		internal ISqlFragment FirstCount
+		{
+			get { return this.firstCount; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        /// <summary>
-        /// Creates a FirstClause with the given topCount and withTies.
-        /// </summary>
-        /// <param name="topCount"></param>
-        internal FirstClause(ISqlFragment firstCount)
-        {
-            this.firstCount = firstCount;
-        }
+		/// <summary>
+		/// Creates a FirstClause with the given topCount and withTies.
+		/// </summary>
+		/// <param name="topCount"></param>
+		internal FirstClause(ISqlFragment firstCount)
+		{
+			this.firstCount = firstCount;
+		}
 
-        /// <summary>
-        /// Creates a TopClause with the given topCount and withTies.
-        /// </summary>
-        /// <param name="topCount"></param>
-        internal FirstClause(int firstCount)
-        {
-            SqlBuilder sqlBuilder = new SqlBuilder();
-            sqlBuilder.Append(firstCount.ToString(CultureInfo.InvariantCulture));
-            this.firstCount = sqlBuilder;
-        }
+		/// <summary>
+		/// Creates a TopClause with the given topCount and withTies.
+		/// </summary>
+		/// <param name="topCount"></param>
+		internal FirstClause(int firstCount)
+		{
+			SqlBuilder sqlBuilder = new SqlBuilder();
+			sqlBuilder.Append(firstCount.ToString(CultureInfo.InvariantCulture));
+			this.firstCount = sqlBuilder;
+		}
 
-        #endregion
+		#endregion
 
-        #region · ISqlFragment Members ·
+		#region · ISqlFragment Members ·
 
-        /// <summary>
-        /// Write out the FIRST part of sql select statement 
-        /// It basically writes FIRST (X).
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="sqlGenerator"></param>
-        public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
-        {
-            writer.Write("FIRST (");
-            this.FirstCount.WriteSql(writer, sqlGenerator);
-            writer.Write(")");
+		/// <summary>
+		/// Write out the FIRST part of sql select statement 
+		/// It basically writes FIRST (X).
+		/// </summary>
+		/// <param name="writer"></param>
+		/// <param name="sqlGenerator"></param>
+		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
+		{
+			writer.Write("FIRST (");
+			this.FirstCount.WriteSql(writer, sqlGenerator);
+			writer.Write(")");
 
-            writer.Write(" ");
-        }
+			writer.Write(" ");
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 
 #endif

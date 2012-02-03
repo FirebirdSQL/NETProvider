@@ -31,105 +31,105 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Entity
 {
-    /// <summary>
-    /// This class is like StringBuilder.  While traversing the tree for the first time, 
-    /// we do not know all the strings that need to be appended e.g. things that need to be
-    /// renamed, nested select statements etc.  So, we use a builder that can collect
-    /// all kinds of sql fragments.
-    /// </summary>
-    internal sealed class SqlBuilder : ISqlFragment
-    {
-        #region · Fields ·
+	/// <summary>
+	/// This class is like StringBuilder.  While traversing the tree for the first time, 
+	/// we do not know all the strings that need to be appended e.g. things that need to be
+	/// renamed, nested select statements etc.  So, we use a builder that can collect
+	/// all kinds of sql fragments.
+	/// </summary>
+	internal sealed class SqlBuilder : ISqlFragment
+	{
+		#region · Fields ·
 
-        private List<object> sqlFragments;
+		private List<object> sqlFragments;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        private List<object> SqlFragments
-        {
-            get
-            {
-                if (null == sqlFragments)
-                {
-                    sqlFragments = new List<object>();
-                }
-                return sqlFragments;
-            }
-        }
+		private List<object> SqlFragments
+		{
+			get
+			{
+				if (null == sqlFragments)
+				{
+					sqlFragments = new List<object>();
+				}
+				return sqlFragments;
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        /// <summary>
-        /// Add an object to the list - we do not verify that it is a proper sql fragment
-        /// since this is an internal method.
-        /// </summary>
-        /// <param name="s"></param>
-        public void Append(object s)
-        {
-            Debug.Assert(s != null);
-            SqlFragments.Add(s);
-        }
+		/// <summary>
+		/// Add an object to the list - we do not verify that it is a proper sql fragment
+		/// since this is an internal method.
+		/// </summary>
+		/// <param name="s"></param>
+		public void Append(object s)
+		{
+			Debug.Assert(s != null);
+			SqlFragments.Add(s);
+		}
 
-        /// <summary>
-        /// This is to pretty print the SQL.  The writer <see cref="SqlWriter.Write"/>
-        /// needs to know about new lines so that it can add the right amount of 
-        /// indentation at the beginning of lines.
-        /// </summary>
-        public void AppendLine()
-        {
-            SqlFragments.Add(Environment.NewLine);
-        }
+		/// <summary>
+		/// This is to pretty print the SQL.  The writer <see cref="SqlWriter.Write"/>
+		/// needs to know about new lines so that it can add the right amount of 
+		/// indentation at the beginning of lines.
+		/// </summary>
+		public void AppendLine()
+		{
+			SqlFragments.Add(Environment.NewLine);
+		}
 
-        /// <summary>
-        /// Whether the builder is empty.  This is used by the <see cref="SqlGenerator.Visit(ProjectExpression)"/>
-        /// to determine whether a sql statement can be reused.
-        /// </summary>
-        public bool IsEmpty
-        {
-            get { return ((null == sqlFragments) || (0 == sqlFragments.Count)); }
-        }
+		/// <summary>
+		/// Whether the builder is empty.  This is used by the <see cref="SqlGenerator.Visit(ProjectExpression)"/>
+		/// to determine whether a sql statement can be reused.
+		/// </summary>
+		public bool IsEmpty
+		{
+			get { return ((null == sqlFragments) || (0 == sqlFragments.Count)); }
+		}
 
-        #endregion
+		#endregion
 
-        #region · ISqlFragment Members ·
+		#region · ISqlFragment Members ·
 
-        /// <summary>
-        /// We delegate the writing of the fragment to the appropriate type.
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="sqlGenerator"></param>
-        public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
-        {
-            if (null != sqlFragments)
-            {
-                foreach (object o in sqlFragments)
-                {
-                    string str = (o as string);
-                    if (null != str)
-                    {
-                        writer.Write(str);
-                    }
-                    else
-                    {
-                        ISqlFragment sqlFragment = (o as ISqlFragment);
-                        if (null != sqlFragment)
-                        {
-                            sqlFragment.WriteSql(writer, sqlGenerator);
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException();
-                        }
-                    }
-                }
-            }
-        }
+		/// <summary>
+		/// We delegate the writing of the fragment to the appropriate type.
+		/// </summary>
+		/// <param name="writer"></param>
+		/// <param name="sqlGenerator"></param>
+		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
+		{
+			if (null != sqlFragments)
+			{
+				foreach (object o in sqlFragments)
+				{
+					string str = (o as string);
+					if (null != str)
+					{
+						writer.Write(str);
+					}
+					else
+					{
+						ISqlFragment sqlFragment = (o as ISqlFragment);
+						if (null != sqlFragment)
+						{
+							sqlFragment.WriteSql(writer, sqlGenerator);
+						}
+						else
+						{
+							throw new InvalidOperationException();
+						}
+					}
+				}
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
 #endif
