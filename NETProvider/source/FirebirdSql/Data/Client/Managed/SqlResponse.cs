@@ -21,30 +21,30 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
-    internal class SqlResponse : IResponse
-    {
-        #region · Fields ·
+	internal class SqlResponse : IResponse
+	{
+		#region · Fields ·
 
-        private int count;
+		private int count;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public int Count
-        {
-            get { return this.count; }
-        }
+		public int Count
+		{
+			get { return this.count; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public SqlResponse(int count)
-        {
-            this.count = count;
-        }
+		public SqlResponse(int count)
+		{
+			this.count = count;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

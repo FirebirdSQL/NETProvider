@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private int             handle;
 		private GdsDatabase     database;
-        private GdsConnection   connection;
+		private GdsConnection   connection;
 
 		#endregion
 
@@ -48,8 +48,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public GdsServiceManager(GdsConnection connection)
 		{
-            this.connection = connection;
-            this.database   = new GdsDatabase(this.connection);
+			this.connection = connection;
+			this.database   = new GdsDatabase(this.connection);
 		}
 
 		#endregion
@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
 		{
-            GenericResponse response = null;
+			GenericResponse response = null;
 
 			lock (this)
 			{
@@ -70,9 +70,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.WriteBuffer(spb.ToArray());
 					this.database.Flush();
 
-                    response = this.database.ReadGenericResponse();
+					response = this.database.ReadGenericResponse();
 
-                    this.handle = response.ObjectHandle;
+					this.handle = response.ObjectHandle;
 				}
 				catch (IOException)
 				{
@@ -104,19 +104,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				finally
 				{
-                    try
-                    {
-                        this.connection.Disconnect();
-                    }
-                    catch (IOException)
-                    {
-                        throw new IscException(IscCodes.isc_network_error);
-                    }
-                    finally
-                    {
-                        this.database   = null;
-                        this.connection = null;
-                    }
+					try
+					{
+						this.connection.Disconnect();
+					}
+					catch (IOException)
+					{
+						throw new IscException(IscCodes.isc_network_error);
+					}
+					finally
+					{
+						this.database   = null;
+						this.connection = null;
+					}
 				}
 			}
 		}
@@ -173,14 +173,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					GenericResponse response = this.database.ReadGenericResponse();
 
-                    int responseLength = bufferLength;
+					int responseLength = bufferLength;
 
-                    if (response.Data.Length < bufferLength)
-                    {
-                        responseLength = response.Data.Length;
-                    }
+					if (response.Data.Length < bufferLength)
+					{
+						responseLength = response.Data.Length;
+					}
 
-                    Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+					Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
 				}
 				catch (IOException)
 				{

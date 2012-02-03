@@ -107,19 +107,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.Write(0);	// Data	segment
 					this.database.Flush();
 
-                    GenericResponse response = this.database.ReadGenericResponse();
+					GenericResponse response = this.database.ReadGenericResponse();
 
 					this.RblRemoveValue(IscCodes.RBL_segment);
-                    if (response.ObjectHandle == 1)
+					if (response.ObjectHandle == 1)
 					{
 						this.RblAddValue(IscCodes.RBL_segment);
 					}
-                    else if (response.ObjectHandle == 2)
+					else if (response.ObjectHandle == 2)
 					{
 						this.RblAddValue(IscCodes.RBL_eof_pending);
 					}
 
-                    byte[] buffer = response.Data;
+					byte[] buffer = response.Data;
 
 					if (buffer.Length == 0)
 					{
@@ -185,9 +185,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.Write(position);			// Seek	offset
 					this.database.Flush();
 
-                    GenericResponse response = (GenericResponse)database.ReadResponse();
+					GenericResponse response = (GenericResponse)database.ReadResponse();
 
-                    this.position = response.ObjectHandle;
+					this.position = response.ObjectHandle;
 				}
 				catch (IOException)
 				{
@@ -230,10 +230,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.Write(this.blobId);
 					this.database.Flush();
 
-                    GenericResponse response = this.database.ReadGenericResponse();
+					GenericResponse response = this.database.ReadGenericResponse();
 
 					this.blobId     = response.BlobId;
-                    this.blobHandle = response.ObjectHandle;
+					this.blobHandle = response.ObjectHandle;
 				}
 				catch (IOException)
 				{

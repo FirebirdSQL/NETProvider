@@ -31,175 +31,175 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-    internal class GdsDatabase : IDatabase, IDatabaseStream
-    {
-        #region · Callbacks ·
+	internal class GdsDatabase : IDatabase, IDatabaseStream
+	{
+		#region · Callbacks ·
 
-        public WarningMessageCallback WarningMessage
-        {
-            get { return this.warningMessage; }
-            set { this.warningMessage = value; }
-        }
+		public WarningMessageCallback WarningMessage
+		{
+			get { return this.warningMessage; }
+			set { this.warningMessage = value; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Fields ·
+		#region · Fields ·
 
-        protected WarningMessageCallback warningMessage;
+		protected WarningMessageCallback warningMessage;
 
-        private GdsConnection connection;
-        private GdsEventManager eventManager;
-        private Charset charset;
-        protected int handle;
-        private int transactionCount;
-        protected string serverVersion;
-        private short packetSize;
-        private short dialect;
-        private int eventsId;
-        private int operation;
-        private bool disposed;
-        private XdrStream outputStream;
-        private XdrStream inputStream;
-        private object syncObject;
+		private GdsConnection connection;
+		private GdsEventManager eventManager;
+		private Charset charset;
+		protected int handle;
+		private int transactionCount;
+		protected string serverVersion;
+		private short packetSize;
+		private short dialect;
+		private int eventsId;
+		private int operation;
+		private bool disposed;
+		private XdrStream outputStream;
+		private XdrStream inputStream;
+		private object syncObject;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public int Handle
-        {
-            get { return this.handle; }
-            protected set { this.handle = value; }
-        }
+		public int Handle
+		{
+			get { return this.handle; }
+			protected set { this.handle = value; }
+		}
 
-        public int TransactionCount
-        {
-            get { return this.transactionCount; }
-            set { this.transactionCount = value; }
-        }
+		public int TransactionCount
+		{
+			get { return this.transactionCount; }
+			set { this.transactionCount = value; }
+		}
 
-        public string ServerVersion
-        {
-            get { return this.serverVersion; }
-            protected set { this.serverVersion = value; }
-        }
+		public string ServerVersion
+		{
+			get { return this.serverVersion; }
+			protected set { this.serverVersion = value; }
+		}
 
-        public Charset Charset
-        {
-            get { return this.charset; }
-            set { this.charset = value; }
-        }
+		public Charset Charset
+		{
+			get { return this.charset; }
+			set { this.charset = value; }
+		}
 
-        public short PacketSize
-        {
-            get { return this.packetSize; }
-            set { this.packetSize = value; }
-        }
+		public short PacketSize
+		{
+			get { return this.packetSize; }
+			set { this.packetSize = value; }
+		}
 
-        public short Dialect
-        {
-            get { return this.dialect; }
-            set { this.dialect = value; }
-        }
+		public short Dialect
+		{
+			get { return this.dialect; }
+			set { this.dialect = value; }
+		}
 
-        public bool HasRemoteEventSupport
-        {
-            get { return true; }
-        }
+		public bool HasRemoteEventSupport
+		{
+			get { return true; }
+		}
 
-        public object SyncObject
-        {
-            get
-            {
-                if (this.syncObject == null)
-                {
-                    Interlocked.CompareExchange(ref this.syncObject, new object(), null);
-                }
+		public object SyncObject
+		{
+			get
+			{
+				if (this.syncObject == null)
+				{
+					Interlocked.CompareExchange(ref this.syncObject, new object(), null);
+				}
 
-                return this.syncObject;
-            }
-        }
+				return this.syncObject;
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        public GdsDatabase(GdsConnection connection)
-        {
-            this.connection = connection;
-            this.charset = Charset.DefaultCharset;
-            this.dialect = 3;
-            this.packetSize = 8192;
-            this.inputStream = this.connection.CreateXdrStream();
-            this.outputStream = this.connection.CreateXdrStream();
+		public GdsDatabase(GdsConnection connection)
+		{
+			this.connection = connection;
+			this.charset = Charset.DefaultCharset;
+			this.dialect = 3;
+			this.packetSize = 8192;
+			this.inputStream = this.connection.CreateXdrStream();
+			this.outputStream = this.connection.CreateXdrStream();
 
-            GC.SuppressFinalize(this);
-        }
+			GC.SuppressFinalize(this);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Finalizer ·
+		#region · Finalizer ·
 
-        ~GdsDatabase()
-        {
-            this.Dispose(false);
-        }
+		~GdsDatabase()
+		{
+			this.Dispose(false);
+		}
 
-        #endregion
+		#endregion
 
-        #region · IDisposable methods ·
+		#region · IDisposable methods ·
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-        private void Dispose(bool disposing)
-        {
-            lock (this.SyncObject)
-            {
-                if (!this.disposed)
-                {
-                    try
-                    {
-                        // release any unmanaged resources
-                        this.Detach();
-                    }
-                    catch
-                    {
-                    }
-                    finally
-                    {
-                        // release any managed resources
-                        if (disposing)
-                        {
-                            this.connection = null;
-                            this.charset = null;
-                            this.eventManager = null;
-                            this.serverVersion = null;
-                            this.dialect = 0;
-                            this.eventsId = 0;
-                            this.handle = 0;
-                            this.packetSize = 0;
-                            this.warningMessage = null;
-                            this.transactionCount = 0;
-                        }
+		private void Dispose(bool disposing)
+		{
+			lock (this.SyncObject)
+			{
+				if (!this.disposed)
+				{
+					try
+					{
+						// release any unmanaged resources
+						this.Detach();
+					}
+					catch
+					{
+					}
+					finally
+					{
+						// release any managed resources
+						if (disposing)
+						{
+							this.connection = null;
+							this.charset = null;
+							this.eventManager = null;
+							this.serverVersion = null;
+							this.dialect = 0;
+							this.eventsId = 0;
+							this.handle = 0;
+							this.packetSize = 0;
+							this.warningMessage = null;
+							this.transactionCount = 0;
+						}
 
-                        this.disposed = true;
-                    }
-                }
-            }
-        }
+						this.disposed = true;
+					}
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Attach/Detach Methods ·
+		#region · Attach/Detach Methods ·
 
-        public virtual void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-        {
-            lock (this.SyncObject)
-            {
+		public virtual void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
+			lock (this.SyncObject)
+			{
 				try
 				{
 					SendAttachToBuffer(dpb, database);
@@ -218,8 +218,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 
 				AfterAttachActions();
-            }
-        }
+			}
+		}
 
 		protected virtual void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
@@ -242,75 +242,75 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			this.serverVersion = this.GetServerVersion();
 		}
 
-        public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-        {
-            throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
-        }
+		public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
+			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
+		}
 
-        public virtual void Detach()
-        {
-            lock (this.SyncObject)
-            {
-                if (this.TransactionCount > 0)
-                {
-                    throw new IscException(IscCodes.isc_open_trans, this.TransactionCount);
-                }
+		public virtual void Detach()
+		{
+			lock (this.SyncObject)
+			{
+				if (this.TransactionCount > 0)
+				{
+					throw new IscException(IscCodes.isc_open_trans, this.TransactionCount);
+				}
 
-                try
-                {
+				try
+				{
 					if (this.handle != 0)
 					{
 						this.Write(IscCodes.op_detach);
 						this.Write(this.handle);
 					}
 					this.Write(IscCodes.op_disconnect);
-                    this.Flush();
+					this.Flush();
 
-                    this.ReadResponse();
+					this.ReadResponse();
 
-                    // Close the Event Manager
-                    this.CloseEventManager();
+					// Close the Event Manager
+					this.CloseEventManager();
 
-                    // Disconnect
-                    this.CloseConnection();
+					// Disconnect
+					this.CloseConnection();
 
-                    // Close Input and Output streams
-                    if (this.inputStream != null)
-                    {
-                        this.inputStream.Close();
-                    }
-                    if (this.outputStream != null)
-                    {
-                        this.outputStream.Close();
-                    }
+					// Close Input and Output streams
+					if (this.inputStream != null)
+					{
+						this.inputStream.Close();
+					}
+					if (this.outputStream != null)
+					{
+						this.outputStream.Close();
+					}
 
-                    // Clear members
-                    this.transactionCount = 0;
-                    this.handle = 0;
-                    this.dialect = 0;
-                    this.packetSize = 0;
-                    this.operation = 0;
-                    this.outputStream = null;
-                    this.inputStream = null;
-                    this.charset = null;
-                    this.connection = null;
-                    this.serverVersion = null;
-                }
-                catch (IOException)
-                {
-                    try
-                    {
-                        this.CloseConnection();
-                    }
-                    catch (IOException)
-                    {
-                        throw new IscException(IscCodes.isc_network_error);
-                    }
+					// Clear members
+					this.transactionCount = 0;
+					this.handle = 0;
+					this.dialect = 0;
+					this.packetSize = 0;
+					this.operation = 0;
+					this.outputStream = null;
+					this.inputStream = null;
+					this.charset = null;
+					this.connection = null;
+					this.serverVersion = null;
+				}
+				catch (IOException)
+				{
+					try
+					{
+						this.CloseConnection();
+					}
+					catch (IOException)
+					{
+						throw new IscException(IscCodes.isc_network_error);
+					}
 
-                    throw new IscException(IscCodes.isc_network_error);
-                }
-            }
-        }
+					throw new IscException(IscCodes.isc_network_error);
+				}
+			}
+		}
 
 		protected void SafelyDetach()
 		{
@@ -322,44 +322,44 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{ }
 		}
 
-        #endregion
+		#endregion
 
-        #region · Database Methods ·
+		#region · Database Methods ·
 
-        public virtual void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
-        {
-            lock (this.SyncObject)
-            {
-                try
-                {
+		public virtual void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
+			lock (this.SyncObject)
+			{
+				try
+				{
 					SendCreateToBuffer(dpb, database);
-                    this.Flush();
+					this.Flush();
 
-                    try
-                    {
-                        ProcessCreateResponse(this.ReadGenericResponse());
+					try
+					{
+						ProcessCreateResponse(this.ReadGenericResponse());
 
-                        this.Detach();
-                    }
-                    catch (IscException)
-                    {
-                        try
-                        {
-                            this.CloseConnection();
-                        }
-                        catch
-                        {
-                        }
+						this.Detach();
+					}
+					catch (IscException)
+					{
+						try
+						{
+							this.CloseConnection();
+						}
+						catch
+						{
+						}
 
-                        throw;
-                    }
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_net_write_err);
-                }
-            }
-        }
+						throw;
+					}
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_net_write_err);
+				}
+			}
+		}
 
 		protected virtual void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
@@ -374,208 +374,208 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			this.handle = response.ObjectHandle;
 		}
 
-        public virtual void DropDatabase()
-        {
-            lock (this.SyncObject)
-            {
-                try
-                {
-                    this.Write(IscCodes.op_drop_database);
-                    this.Write(this.handle);
-                    this.Flush();
+		public virtual void DropDatabase()
+		{
+			lock (this.SyncObject)
+			{
+				try
+				{
+					this.Write(IscCodes.op_drop_database);
+					this.Write(this.handle);
+					this.Flush();
 
-                    this.ReadResponse();
+					this.ReadResponse();
 
-                    this.handle = 0;
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_network_error);
-                }
-                finally
-                {
-                    try
-                    {
-                        this.CloseConnection();
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-        }
+					this.handle = 0;
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_network_error);
+				}
+				finally
+				{
+					try
+					{
+						this.CloseConnection();
+					}
+					catch
+					{
+					}
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Auxiliary Connection Methods ·
+		#region · Auxiliary Connection Methods ·
 
-        public virtual void ConnectionRequest(out int auxHandle, out string ipAddress, out int portNumber)
-        {
-            lock (this.SyncObject)
-            {
-                try
-                {
-                    this.Write(IscCodes.op_connect_request);
-                    this.Write(IscCodes.P_REQ_async);	// Connection type
-                    this.Write(this.handle);			// Related object
-                    this.Write(0);						// Partner identification
+		public virtual void ConnectionRequest(out int auxHandle, out string ipAddress, out int portNumber)
+		{
+			lock (this.SyncObject)
+			{
+				try
+				{
+					this.Write(IscCodes.op_connect_request);
+					this.Write(IscCodes.P_REQ_async);	// Connection type
+					this.Write(this.handle);			// Related object
+					this.Write(0);						// Partner identification
 
-                    this.Flush();
+					this.Flush();
 
-                    this.ReadOperation();
+					this.ReadOperation();
 
-                    auxHandle = this.ReadInt32();
+					auxHandle = this.ReadInt32();
 
-                    // garbage
-                    this.ReadBytes(8);
+					// garbage
+					this.ReadBytes(8);
 
-                    int respLen = this.ReadInt32();
-                    respLen += respLen % 4;
+					int respLen = this.ReadInt32();
+					respLen += respLen % 4;
 
-                    // sin_family
-                    this.ReadBytes(2);
-                    respLen -= 2;
+					// sin_family
+					this.ReadBytes(2);
+					respLen -= 2;
 
-                    // sin_port
-                    byte[] buffer = this.ReadBytes(2);
-                    portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
-                    respLen -= 2;
+					// sin_port
+					byte[] buffer = this.ReadBytes(2);
+					portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+					respLen -= 2;
 
-                    // * The address returned by the server may be incorrect if it is behind a NAT box
-                    // * so we must use the address that was used to connect the main socket, not the
-                    // * address reported by the server.
-                    // sin_addr
-                    buffer = this.ReadBytes(4);
-                    //ipAddress = string.Format(
-                    //    CultureInfo.InvariantCulture,
-                    //    "{0}.{1}.{2}.{3}",
-                    //    buffer[0], buffer[1], buffer[2], buffer[3]);
-                    ipAddress = this.connection.IPAddress.ToString();
-                    respLen -= 4;
+					// * The address returned by the server may be incorrect if it is behind a NAT box
+					// * so we must use the address that was used to connect the main socket, not the
+					// * address reported by the server.
+					// sin_addr
+					buffer = this.ReadBytes(4);
+					//ipAddress = string.Format(
+					//    CultureInfo.InvariantCulture,
+					//    "{0}.{1}.{2}.{3}",
+					//    buffer[0], buffer[1], buffer[2], buffer[3]);
+					ipAddress = this.connection.IPAddress.ToString();
+					respLen -= 4;
 
-                    // garbage
-                    this.ReadBytes(respLen);
+					// garbage
+					this.ReadBytes(respLen);
 
-                    // Read	Status Vector
-                    this.ReadStatusVector();
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
+					// Read	Status Vector
+					this.ReadStatusVector();
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Connection Methods ·
-        public void CloseConnection()
-        {
-            this.connection.Disconnect();
-        }
-        #endregion
+		#region · Connection Methods ·
+		public void CloseConnection()
+		{
+			this.connection.Disconnect();
+		}
+		#endregion
 
-        #region · Remote Events Methods ·
+		#region · Remote Events Methods ·
 
-        public void CloseEventManager()
-        {
-            lock (this.SyncObject)
-            {
-                if (this.eventManager != null)
-                {
-                    this.eventManager.Close();
-                    this.eventManager = null;
-                }
-            }
-        }
+		public void CloseEventManager()
+		{
+			lock (this.SyncObject)
+			{
+				if (this.eventManager != null)
+				{
+					this.eventManager.Close();
+					this.eventManager = null;
+				}
+			}
+		}
 
-        public RemoteEvent CreateEvent()
-        {
-            return new RemoteEvent(this);
-        }
+		public RemoteEvent CreateEvent()
+		{
+			return new RemoteEvent(this);
+		}
 
-        public void QueueEvents(RemoteEvent events)
-        {
-            if (this.eventManager == null)
-            {
-                string ipAddress = string.Empty;
-                int portNumber = 0;
-                int auxHandle = 0;
+		public void QueueEvents(RemoteEvent events)
+		{
+			if (this.eventManager == null)
+			{
+				string ipAddress = string.Empty;
+				int portNumber = 0;
+				int auxHandle = 0;
 
-                this.ConnectionRequest(out auxHandle, out ipAddress, out portNumber);
+				this.ConnectionRequest(out auxHandle, out ipAddress, out portNumber);
 
-                this.eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
-            }
+				this.eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
+			}
 
-            lock (this.SyncObject)
-            {
-                try
-                {
-                    events.LocalId = ++this.eventsId;
+			lock (this.SyncObject)
+			{
+				try
+				{
+					events.LocalId = ++this.eventsId;
 
-                    EventParameterBuffer epb = events.ToEpb();
+					EventParameterBuffer epb = events.ToEpb();
 
-                    this.Write(IscCodes.op_que_events); // Op codes
-                    this.Write(this.handle);			// Database	object id
-                    this.WriteBuffer(epb.ToArray());	// Event description block
-                    this.Write(0);						// Address of ast routine
-                    this.Write(0);						// Argument	to ast routine						
-                    this.Write(events.LocalId);		    // Client side id of remote	event
+					this.Write(IscCodes.op_que_events); // Op codes
+					this.Write(this.handle);			// Database	object id
+					this.WriteBuffer(epb.ToArray());	// Event description block
+					this.Write(0);						// Address of ast routine
+					this.Write(0);						// Argument	to ast routine						
+					this.Write(events.LocalId);		    // Client side id of remote	event
 
-                    this.Flush();
+					this.Flush();
 
-                    GenericResponse response = (GenericResponse)this.ReadResponse();
+					GenericResponse response = (GenericResponse)this.ReadResponse();
 
-                    // Update event	Remote event ID
-                    events.RemoteId = response.ObjectHandle;
+					// Update event	Remote event ID
+					events.RemoteId = response.ObjectHandle;
 
-                    // Enqueue events in the event manager
-                    this.eventManager.QueueEvents(events);
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
+					// Enqueue events in the event manager
+					this.eventManager.QueueEvents(events);
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
 
-        public void CancelEvents(RemoteEvent events)
-        {
-            lock (this.SyncObject)
-            {
-                try
-                {
-                    this.Write(IscCodes.op_cancel_events);	// Op code
-                    this.Write(this.handle);				// Database	object id
-                    this.Write(events.LocalId);			    // Event ID
+		public void CancelEvents(RemoteEvent events)
+		{
+			lock (this.SyncObject)
+			{
+				try
+				{
+					this.Write(IscCodes.op_cancel_events);	// Op code
+					this.Write(this.handle);				// Database	object id
+					this.Write(events.LocalId);			    // Event ID
 
-                    this.Flush();
+					this.Flush();
 
-                    this.ReadResponse();
+					this.ReadResponse();
 
-                    this.eventManager.CancelEvents(events);
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
+					this.eventManager.CancelEvents(events);
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region · Transaction Methods ·
+		#region · Transaction Methods ·
 
-        public virtual ITransaction BeginTransaction(TransactionParameterBuffer tpb)
-        {
-            GdsTransaction transaction = new GdsTransaction(this);
+		public virtual ITransaction BeginTransaction(TransactionParameterBuffer tpb)
+		{
+			GdsTransaction transaction = new GdsTransaction(this);
 
-            transaction.BeginTransaction(tpb);
+			transaction.BeginTransaction(tpb);
 
-            return transaction;
-        }
+			return transaction;
+		}
 
-        #endregion
+		#endregion
 
 		#region · Cancel Methods ·
 
@@ -586,155 +586,155 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-        #region · Statement Creation Methods ·
+		#region · Statement Creation Methods ·
 
-        public virtual StatementBase CreateStatement()
-        {
-            return new GdsStatement(this);
-        }
+		public virtual StatementBase CreateStatement()
+		{
+			return new GdsStatement(this);
+		}
 
-        public virtual StatementBase CreateStatement(ITransaction transaction)
-        {
-            return new GdsStatement(this, transaction);
-        }
+		public virtual StatementBase CreateStatement(ITransaction transaction)
+		{
+			return new GdsStatement(this, transaction);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Database Information Methods ·
+		#region · Database Information Methods ·
 
-        public virtual string GetServerVersion()
-        {
-            byte[] items = new byte[]
+		public virtual string GetServerVersion()
+		{
+			byte[] items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
 
-            return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256)[0].ToString();
-        }
+			return this.GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256)[0].ToString();
+		}
 
-        public virtual ArrayList GetDatabaseInfo(byte[] items)
-        {
-            return this.GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
-        }
+		public virtual ArrayList GetDatabaseInfo(byte[] items)
+		{
+			return this.GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+		}
 
-        public virtual ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
-        {
-            byte[] buffer = new byte[bufferLength];
+		public virtual ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
+		{
+			byte[] buffer = new byte[bufferLength];
 
-            this.DatabaseInfo(items, buffer, buffer.Length);
+			this.DatabaseInfo(items, buffer, buffer.Length);
 
-            return IscHelper.ParseDatabaseInfo(buffer);
-        }
+			return IscHelper.ParseDatabaseInfo(buffer);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Trigger Context Methods ·
+		#region · Trigger Context Methods ·
 
-        public virtual ITriggerContext GetTriggerContext()
-        {
-            throw new NotSupportedException();
-        }
+		public virtual ITriggerContext GetTriggerContext()
+		{
+			throw new NotSupportedException();
+		}
 
-        #endregion
+		#endregion
 
-        #region · Response Methods ·
+		#region · Response Methods ·
 
-        protected void ProcessResponse(IResponse response)
-        {
-            if (response != null && response is GenericResponse)
-            {
-                if (((GenericResponse)response).Exception != null && !((GenericResponse)response).Exception.IsWarning)
-                {
-                    throw ((GenericResponse)response).Exception;
-                }
-            }
-        }
+		protected void ProcessResponse(IResponse response)
+		{
+			if (response != null && response is GenericResponse)
+			{
+				if (((GenericResponse)response).Exception != null && !((GenericResponse)response).Exception.IsWarning)
+				{
+					throw ((GenericResponse)response).Exception;
+				}
+			}
+		}
 
-        protected void ProcessResponseWarnings(IResponse response)
-        {
-            if (response is GenericResponse)
-            {
-                if (((GenericResponse)response).Exception != null &&
-                    ((GenericResponse)response).Exception.IsWarning &&
-                    this.warningMessage != null)
-                {
-                    this.warningMessage(((GenericResponse)response).Exception);
-                }
-            }
-        }
+		protected void ProcessResponseWarnings(IResponse response)
+		{
+			if (response is GenericResponse)
+			{
+				if (((GenericResponse)response).Exception != null &&
+					((GenericResponse)response).Exception.IsWarning &&
+					this.warningMessage != null)
+				{
+					this.warningMessage(((GenericResponse)response).Exception);
+				}
+			}
+		}
 
-        public virtual int ReadOperation()
-        {
-            return this.inputStream.ReadOperation();
-        }
+		public virtual int ReadOperation()
+		{
+			return this.inputStream.ReadOperation();
+		}
 
-        public virtual int NextOperation()
-        {
-            return this.inputStream.ReadNextOperation();
-        }
+		public virtual int NextOperation()
+		{
+			return this.inputStream.ReadNextOperation();
+		}
 
-        public virtual IResponse ReadResponse()
-        {
-            IResponse response = this.ReadSingleResponse();
+		public virtual IResponse ReadResponse()
+		{
+			IResponse response = this.ReadSingleResponse();
 
-            if (response is GenericResponse)
-            {
-                this.ProcessResponse(response);
-            }
+			if (response is GenericResponse)
+			{
+				this.ProcessResponse(response);
+			}
 
-            return response;
-        }
+			return response;
+		}
 
-        public virtual GenericResponse ReadGenericResponse()
-        {
-            return (GenericResponse)this.ReadResponse();
-        }
+		public virtual GenericResponse ReadGenericResponse()
+		{
+			return (GenericResponse)this.ReadResponse();
+		}
 
-        public virtual SqlResponse ReadSqlResponse()
-        {
-            return (SqlResponse)this.ReadResponse();
-        }
+		public virtual SqlResponse ReadSqlResponse()
+		{
+			return (SqlResponse)this.ReadResponse();
+		}
 
-        public virtual IscException ReadStatusVector()
-        {
-            IscException exception = null;
-            bool eof = false;
+		public virtual IscException ReadStatusVector()
+		{
+			IscException exception = null;
+			bool eof = false;
 
-            while (!eof)
-            {
-                int arg = this.ReadInt32();
+			while (!eof)
+			{
+				int arg = this.ReadInt32();
 
-                switch (arg)
-                {
-                    case IscCodes.isc_arg_gds:
-                        int er = this.ReadInt32();
-                        if (er != 0)
-                        {
-                            if (exception == null)
-                            {
-                                exception = new IscException();
-                            }
-                            exception.Errors.Add(new IscError(arg, er));
-                        }
-                        break;
+				switch (arg)
+				{
+					case IscCodes.isc_arg_gds:
+						int er = this.ReadInt32();
+						if (er != 0)
+						{
+							if (exception == null)
+							{
+								exception = new IscException();
+							}
+							exception.Errors.Add(new IscError(arg, er));
+						}
+						break;
 
-                    case IscCodes.isc_arg_end:
-                        if (exception != null && exception.Errors.Count != 0)
-                        {
+					case IscCodes.isc_arg_end:
+						if (exception != null && exception.Errors.Count != 0)
+						{
 							exception.BuildExceptionData();
-                        }
-                        eof = true;
-                        break;
+						}
+						eof = true;
+						break;
 
-                    case IscCodes.isc_arg_interpreted:
-                    case IscCodes.isc_arg_string:
-                        exception.Errors.Add(new IscError(arg, this.ReadString()));
-                        break;
+					case IscCodes.isc_arg_interpreted:
+					case IscCodes.isc_arg_string:
+						exception.Errors.Add(new IscError(arg, this.ReadString()));
+						break;
 
-                    case IscCodes.isc_arg_number:
-                        exception.Errors.Add(new IscError(arg, this.ReadInt32()));
-                        break;
+					case IscCodes.isc_arg_number:
+						exception.Errors.Add(new IscError(arg, this.ReadInt32()));
+						break;
 
 					case IscCodes.isc_arg_sql_state:
 						exception.Errors.Add(new IscError(arg, this.ReadString()));
@@ -751,319 +751,319 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							exception.Errors.Add(new IscError(arg, e));
 						}
 						break;
-                }
-            }
-
-            return exception;
-        }
-
-        public virtual void SetOperation(int operation)
-        {
-            this.operation = operation;
-        }
-
-        public virtual void ReleaseObject(int op, int id)
-        {
-            lock (this.SyncObject)
-            {
-                try
-                {
-                    DoReleaseObjectPacket(op, id);
-                    this.Flush();
-                    ProcessReleaseObjectResponse(this.ReadResponse());
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_net_read_err);
-                }
-            }
-        }
-
-        #endregion
-
-        #region · Protected Methods ·
-
-        protected virtual IResponse ReadSingleResponse()
-        {
-            int operation = this.ReadOperation();
-
-            IResponse response = ProcessOperation(operation);
-
-            ProcessResponseWarnings(response);
-
-            return response;
-        }
-
-        protected virtual IResponse ProcessOperation(int operation)
-        {
-            switch (operation)
-            {
-                case IscCodes.op_response:
-                    return new GenericResponse(
-                        this.ReadInt32(),
-                        this.ReadInt64(),
-                        this.ReadBuffer(),
-                        this.ReadStatusVector());
-
-                case IscCodes.op_fetch_response:
-                    return new FetchResponse(this.ReadInt32(), this.ReadInt32());
-
-                case IscCodes.op_sql_response:
-                    return new SqlResponse(this.ReadInt32());
-
-                default:
-                    return null;
-            }
-        }
-
-        /// <summary>
-        /// isc_database_info
-        /// </summary>
-        private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
-        {
-            lock (this.SyncObject)
-            {
-                try
-                {
-                    // see src/remote/protocol.h for packet	definition (p_info struct)					
-                    this.Write(IscCodes.op_info_database);	//	operation
-                    this.Write(this.handle);				//	db_handle
-                    this.Write(0);							//	incarnation
-                    this.WriteBuffer(items, items.Length);	//	items
-                    this.Write(bufferLength);				//	result buffer length
-
-                    this.Flush();
-
-                    GenericResponse response = (GenericResponse)this.ReadResponse();
-
-                    int responseLength = bufferLength;
-
-                    if (response.Data.Length < bufferLength)
-                    {
-                        responseLength = response.Data.Length;
-                    }
-
-                    Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
-                }
-                catch (IOException)
-                {
-                    throw new IscException(IscCodes.isc_network_error);
-                }
-            }
-        }
-
-        protected void DoReleaseObjectPacket(int op, int id)
-        {
-            this.Write(op);
-            this.Write(id);
-        }
-
-        protected void ProcessReleaseObjectResponse(IResponse response)
-        { }
-
-        #endregion
-
-        #region · Read Members ·
-
-        public byte[] ReadBytes(int count)
-        {
-            return this.inputStream.ReadBytes(count);
-        }
-
-        public byte[] ReadOpaque(int length)
-        {
-            return this.inputStream.ReadOpaque(length);
-        }
-
-        public byte[] ReadBuffer()
-        {
-            return this.inputStream.ReadBuffer();
-        }
-
-        public string ReadString()
-        {
-            return this.inputStream.ReadString();
-        }
-
-        public string ReadString(int length)
-        {
-            return this.inputStream.ReadString(length);
-        }
-
-        public string ReadString(Charset charset)
-        {
-            return this.inputStream.ReadString(charset);
-        }
-
-        public string ReadString(Charset charset, int length)
-        {
-            return this.inputStream.ReadString(charset, length);
-        }
-
-        public short ReadInt16()
-        {
-            return this.inputStream.ReadInt16();
-        }
-
-        public int ReadInt32()
-        {
-            return this.inputStream.ReadInt32();
-        }
-
-        public long ReadInt64()
-        {
-            return this.inputStream.ReadInt64();
-        }
-
-        public Guid ReadGuid(int length)
-        {
-            return this.inputStream.ReadGuid(length);
-        }
-
-        public float ReadSingle()
-        {
-            return this.inputStream.ReadSingle();
-        }
-
-        public double ReadDouble()
-        {
-            return this.inputStream.ReadDouble();
-        }
-
-        public DateTime ReadDateTime()
-        {
-            return this.inputStream.ReadDateTime();
-        }
-
-        public DateTime ReadDate()
-        {
-            return this.inputStream.ReadDate();
-        }
-
-        public TimeSpan ReadTime()
-        {
-            return this.inputStream.ReadTime();
-        }
-
-        public decimal ReadDecimal(int type, int scale)
-        {
-            return this.inputStream.ReadDecimal(type, scale);
-        }
-
-        public object ReadValue(DbField field)
-        {
-            return this.inputStream.ReadValue(field);
-        }
-
-        #endregion
-
-        #region · Write Methods ·
-
-        public void WriteOpaque(byte[] buffer)
-        {
-            this.outputStream.WriteOpaque(buffer);
-        }
-
-        public void WriteOpaque(byte[] buffer, int length)
-        {
-            this.outputStream.WriteOpaque(buffer, length);
-        }
-
-        public void WriteBuffer(byte[] buffer)
-        {
-            this.outputStream.WriteBuffer(buffer);
-        }
-
-        public void WriteBuffer(byte[] buffer, int length)
-        {
-            this.outputStream.WriteBuffer(buffer, length);
-        }
-
-        public void WriteBlobBuffer(byte[] buffer)
-        {
-            this.outputStream.WriteBlobBuffer(buffer);
-        }
-
-        public void WriteTyped(int type, byte[] buffer)
-        {
-            this.outputStream.WriteTyped(type, buffer);
-        }
-
-        public void Write(string value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(short value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(int value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(long value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(float value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(double value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(decimal value, int type, int scale)
-        {
-            this.outputStream.Write(value, type, scale);
-        }
-
-        public void Write(bool value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(DateTime value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void WriteDate(DateTime value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void WriteTime(DateTime value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(Descriptor value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(DbField value)
-        {
-            this.outputStream.Write(value);
-        }
-
-        public void Write(byte[] buffer, int offset, int count)
-        {
-            this.outputStream.Write(buffer, offset, count);
-        }
-
-        public void Flush()
-        {
-            this.outputStream.Flush();
-        }
-
-        #endregion
-    }
+				}
+			}
+
+			return exception;
+		}
+
+		public virtual void SetOperation(int operation)
+		{
+			this.operation = operation;
+		}
+
+		public virtual void ReleaseObject(int op, int id)
+		{
+			lock (this.SyncObject)
+			{
+				try
+				{
+					DoReleaseObjectPacket(op, id);
+					this.Flush();
+					ProcessReleaseObjectResponse(this.ReadResponse());
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_net_read_err);
+				}
+			}
+		}
+
+		#endregion
+
+		#region · Protected Methods ·
+
+		protected virtual IResponse ReadSingleResponse()
+		{
+			int operation = this.ReadOperation();
+
+			IResponse response = ProcessOperation(operation);
+
+			ProcessResponseWarnings(response);
+
+			return response;
+		}
+
+		protected virtual IResponse ProcessOperation(int operation)
+		{
+			switch (operation)
+			{
+				case IscCodes.op_response:
+					return new GenericResponse(
+						this.ReadInt32(),
+						this.ReadInt64(),
+						this.ReadBuffer(),
+						this.ReadStatusVector());
+
+				case IscCodes.op_fetch_response:
+					return new FetchResponse(this.ReadInt32(), this.ReadInt32());
+
+				case IscCodes.op_sql_response:
+					return new SqlResponse(this.ReadInt32());
+
+				default:
+					return null;
+			}
+		}
+
+		/// <summary>
+		/// isc_database_info
+		/// </summary>
+		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
+		{
+			lock (this.SyncObject)
+			{
+				try
+				{
+					// see src/remote/protocol.h for packet	definition (p_info struct)					
+					this.Write(IscCodes.op_info_database);	//	operation
+					this.Write(this.handle);				//	db_handle
+					this.Write(0);							//	incarnation
+					this.WriteBuffer(items, items.Length);	//	items
+					this.Write(bufferLength);				//	result buffer length
+
+					this.Flush();
+
+					GenericResponse response = (GenericResponse)this.ReadResponse();
+
+					int responseLength = bufferLength;
+
+					if (response.Data.Length < bufferLength)
+					{
+						responseLength = response.Data.Length;
+					}
+
+					Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+				}
+				catch (IOException)
+				{
+					throw new IscException(IscCodes.isc_network_error);
+				}
+			}
+		}
+
+		protected void DoReleaseObjectPacket(int op, int id)
+		{
+			this.Write(op);
+			this.Write(id);
+		}
+
+		protected void ProcessReleaseObjectResponse(IResponse response)
+		{ }
+
+		#endregion
+
+		#region · Read Members ·
+
+		public byte[] ReadBytes(int count)
+		{
+			return this.inputStream.ReadBytes(count);
+		}
+
+		public byte[] ReadOpaque(int length)
+		{
+			return this.inputStream.ReadOpaque(length);
+		}
+
+		public byte[] ReadBuffer()
+		{
+			return this.inputStream.ReadBuffer();
+		}
+
+		public string ReadString()
+		{
+			return this.inputStream.ReadString();
+		}
+
+		public string ReadString(int length)
+		{
+			return this.inputStream.ReadString(length);
+		}
+
+		public string ReadString(Charset charset)
+		{
+			return this.inputStream.ReadString(charset);
+		}
+
+		public string ReadString(Charset charset, int length)
+		{
+			return this.inputStream.ReadString(charset, length);
+		}
+
+		public short ReadInt16()
+		{
+			return this.inputStream.ReadInt16();
+		}
+
+		public int ReadInt32()
+		{
+			return this.inputStream.ReadInt32();
+		}
+
+		public long ReadInt64()
+		{
+			return this.inputStream.ReadInt64();
+		}
+
+		public Guid ReadGuid(int length)
+		{
+			return this.inputStream.ReadGuid(length);
+		}
+
+		public float ReadSingle()
+		{
+			return this.inputStream.ReadSingle();
+		}
+
+		public double ReadDouble()
+		{
+			return this.inputStream.ReadDouble();
+		}
+
+		public DateTime ReadDateTime()
+		{
+			return this.inputStream.ReadDateTime();
+		}
+
+		public DateTime ReadDate()
+		{
+			return this.inputStream.ReadDate();
+		}
+
+		public TimeSpan ReadTime()
+		{
+			return this.inputStream.ReadTime();
+		}
+
+		public decimal ReadDecimal(int type, int scale)
+		{
+			return this.inputStream.ReadDecimal(type, scale);
+		}
+
+		public object ReadValue(DbField field)
+		{
+			return this.inputStream.ReadValue(field);
+		}
+
+		#endregion
+
+		#region · Write Methods ·
+
+		public void WriteOpaque(byte[] buffer)
+		{
+			this.outputStream.WriteOpaque(buffer);
+		}
+
+		public void WriteOpaque(byte[] buffer, int length)
+		{
+			this.outputStream.WriteOpaque(buffer, length);
+		}
+
+		public void WriteBuffer(byte[] buffer)
+		{
+			this.outputStream.WriteBuffer(buffer);
+		}
+
+		public void WriteBuffer(byte[] buffer, int length)
+		{
+			this.outputStream.WriteBuffer(buffer, length);
+		}
+
+		public void WriteBlobBuffer(byte[] buffer)
+		{
+			this.outputStream.WriteBlobBuffer(buffer);
+		}
+
+		public void WriteTyped(int type, byte[] buffer)
+		{
+			this.outputStream.WriteTyped(type, buffer);
+		}
+
+		public void Write(string value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(short value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(int value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(long value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(float value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(double value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(decimal value, int type, int scale)
+		{
+			this.outputStream.Write(value, type, scale);
+		}
+
+		public void Write(bool value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(DateTime value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void WriteDate(DateTime value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void WriteTime(DateTime value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(Descriptor value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(DbField value)
+		{
+			this.outputStream.Write(value);
+		}
+
+		public void Write(byte[] buffer, int offset, int count)
+		{
+			this.outputStream.Write(buffer, offset, count);
+		}
+
+		public void Flush()
+		{
+			this.outputStream.Flush();
+		}
+
+		#endregion
+	}
 }

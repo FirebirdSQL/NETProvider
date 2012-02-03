@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Client.Managed
 			this.objectHandle	= objectHandle;
 			this.blobId			= blobId;
 			this.data			= data;
-            this.exception      = exception;
+			this.exception      = exception;
 		}
 
 		#endregion

@@ -26,19 +26,19 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version12
 {
-    internal class GdsStatement : Version11.GdsStatement
-    {
-        #region · Constructors ·
+	internal class GdsStatement : Version11.GdsStatement
+	{
+		#region · Constructors ·
 
-        public GdsStatement(IDatabase db)
-            : base(db)
-        { }
+		public GdsStatement(IDatabase db)
+			: base(db)
+		{ }
 
-        public GdsStatement(IDatabase db, ITransaction transaction)
-            : base(db, transaction)
-        { }
+		public GdsStatement(IDatabase db, ITransaction transaction)
+			: base(db, transaction)
+		{ }
 
-        #endregion
+		#endregion
 
 		#region · Overriden Methods ·
 
@@ -124,5 +124,5 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		}
 
 		#endregion
-    }
+	}
 }
