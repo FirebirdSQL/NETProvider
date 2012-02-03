@@ -22,13 +22,13 @@ using System.Runtime.InteropServices;
 namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	[StructLayout(LayoutKind.Sequential)]
-    internal struct ParamDsc
-    {
-        public byte	Type;
-        public byte	Scale;
-        public short Length;
-        public short SubType;
-        public short Flags;
-        public IntPtr Data;
-    }
+	internal struct ParamDsc
+	{
+		public byte	Type;
+		public byte	Scale;
+		public short Length;
+		public short SubType;
+		public short Flags;
+		public IntPtr Data;
+	}
 }
