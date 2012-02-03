@@ -53,14 +53,14 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-        #region · Protected Fields ·
+		#region · Protected Fields ·
 
-        protected long          blobId;
-        protected int           blobHandle;
-        protected int           position;
-        protected ITransaction  transaction;
+		protected long          blobId;
+		protected int           blobHandle;
+		protected int           position;
+		protected ITransaction  transaction;
 
-        #endregion
+		#endregion
 
 		#region · Protected Properties ·
 

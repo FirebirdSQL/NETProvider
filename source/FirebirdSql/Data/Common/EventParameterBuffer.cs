@@ -25,30 +25,30 @@ using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
-    internal sealed class EventParameterBuffer : ParameterBuffer
-    {
-        #region · Constructors ·
+	internal sealed class EventParameterBuffer : ParameterBuffer
+	{
+		#region · Constructors ·
 
-        public EventParameterBuffer()
-            : base(BitConverter.IsLittleEndian)
-        { }
+		public EventParameterBuffer()
+			: base(BitConverter.IsLittleEndian)
+		{ }
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public void Append(string content, int actualCount)
-        {
-            this.Append(Encoding.Default.GetBytes(content), actualCount);
-        }
+		public void Append(string content, int actualCount)
+		{
+			this.Append(Encoding.Default.GetBytes(content), actualCount);
+		}
 
-        public void Append(byte[] content, int actualCount)
-        {
-            this.WriteByte(content.Length);
-            this.Write(content);
-            this.Write(actualCount);
-        }
+		public void Append(byte[] content, int actualCount)
+		{
+			this.WriteByte(content.Length);
+			this.Write(content);
+			this.Write(actualCount);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

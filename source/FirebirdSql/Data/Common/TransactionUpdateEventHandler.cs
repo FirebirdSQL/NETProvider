@@ -20,5 +20,5 @@ using System;
 
 namespace FirebirdSql.Data.Common
 {
-    internal delegate void TransactionUpdateEventHandler(object sender, EventArgs e);
+	internal delegate void TransactionUpdateEventHandler(object sender, EventArgs e);
 }

@@ -20,5 +20,5 @@ using System;
 
 namespace FirebirdSql.Data.Common
 {
-    internal delegate void WarningMessageCallback(IscException warning);
+	internal delegate void WarningMessageCallback(IscException warning);
 }

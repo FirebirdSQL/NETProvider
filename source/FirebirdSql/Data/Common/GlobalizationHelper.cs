@@ -23,18 +23,18 @@ namespace FirebirdSql.Data.Common
 {
 	internal class GlobalizationHelper
 	{
-        #region · Static Methods ·
+		#region · Static Methods ·
 
-        public static bool CultureAwareCompare(string strA, string strB)
-        {
-            return CultureInfo.CurrentCulture.CompareInfo.Compare(
-                strA,
-                strB,
-                CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth |
-                CompareOptions.IgnoreCase) == 0 ? true : false;
-        }
+		public static bool CultureAwareCompare(string strA, string strB)
+		{
+			return CultureInfo.CurrentCulture.CompareInfo.Compare(
+				strA,
+				strB,
+				CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth |
+				CompareOptions.IgnoreCase) == 0 ? true : false;
+		}
 
-        #endregion
+		#endregion
 
 		#region · Constructors ·
 

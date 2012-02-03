@@ -77,7 +77,7 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsDBNull()
 		{
-            return TypeHelper.IsDBNull(this.value);
+			return TypeHelper.IsDBNull(this.value);
 		}
 
 		public string GetString()
@@ -86,10 +86,10 @@ namespace FirebirdSql.Data.Common
 			{
 				this.value = this.GetClobData((long)this.value);
 			}
-            if (this.value is byte[])
-            {
-                return this.Field.Charset.GetString((byte[])this.value);
-            }
+			if (this.value is byte[])
+			{
+				return this.Field.Charset.GetString((byte[])this.value);
+			}
 
 			return this.value.ToString();
 		}
@@ -155,10 +155,10 @@ namespace FirebirdSql.Data.Common
 
 		public DateTime GetDateTime()
 		{
-            if (this.value is TimeSpan)
-                return new DateTime(0 * 10000L + 621355968000000000 + ((TimeSpan)this.value).Ticks);
-            else
-                return Convert.ToDateTime(this.value, CultureInfo.CurrentCulture.DateTimeFormat);
+			if (this.value is TimeSpan)
+				return new DateTime(0 * 10000L + 621355968000000000 + ((TimeSpan)this.value).Ticks);
+			else
+				return Convert.ToDateTime(this.value, CultureInfo.CurrentCulture.DateTimeFormat);
 		}
 
 		public Array GetArray()
@@ -181,163 +181,163 @@ namespace FirebirdSql.Data.Common
 			return (byte[])this.value;
 		}
 
-        public int GetDate()
-        {
-            return TypeEncoder.EncodeDate(this.GetDateTime());
-        }
+		public int GetDate()
+		{
+			return TypeEncoder.EncodeDate(this.GetDateTime());
+		}
 
-        public int GetTime()
-        {
-            if (this.value is TimeSpan)
-                return TypeEncoder.EncodeTime((TimeSpan)this.value);
-            else
-                return TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(this.GetDateTime()));
-        }
+		public int GetTime()
+		{
+			if (this.value is TimeSpan)
+				return TypeEncoder.EncodeTime((TimeSpan)this.value);
+			else
+				return TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(this.GetDateTime()));
+		}
 
-        public byte[] GetBytes()
-        {
-            if (this.IsDBNull())
-            {
-                int length = field.Length;
+		public byte[] GetBytes()
+		{
+			if (this.IsDBNull())
+			{
+				int length = field.Length;
 
-                if (this.Field.SqlType == IscCodes.SQL_VARYING)
-                {
-                    // Add two bytes more for store	value length
-                    length += 2;
-                }
+				if (this.Field.SqlType == IscCodes.SQL_VARYING)
+				{
+					// Add two bytes more for store	value length
+					length += 2;
+				}
 
-                return new byte[length];
-            }
+				return new byte[length];
+			}
 
 
-            switch (this.Field.DbDataType)
-            {
-                case DbDataType.Char:
-                    if (this.Field.Charset.IsOctetsCharset)
-                    {
-                        return (byte[])this.value;
-                    }
-                    else
-                    {
-                        string svalue = this.GetString();
+			switch (this.Field.DbDataType)
+			{
+				case DbDataType.Char:
+					if (this.Field.Charset.IsOctetsCharset)
+					{
+						return (byte[])this.value;
+					}
+					else
+					{
+						string svalue = this.GetString();
 
-                        if ((this.Field.Length % this.Field.Charset.BytesPerCharacter) == 0 &&
-                            svalue.Length > this.Field.CharCount)
+						if ((this.Field.Length % this.Field.Charset.BytesPerCharacter) == 0 &&
+							svalue.Length > this.Field.CharCount)
 						{
 							throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-                        }
+						}
 
-                        byte[] buffer = new byte[this.Field.Length];
-                        for (int i = 0; i < buffer.Length; i++)
-                        {
-                            buffer[i] = 32;
-                        }
+						byte[] buffer = new byte[this.Field.Length];
+						for (int i = 0; i < buffer.Length; i++)
+						{
+							buffer[i] = 32;
+						}
 
-                        byte[] bytes = this.Field.Charset.GetBytes(svalue);
+						byte[] bytes = this.Field.Charset.GetBytes(svalue);
 
-                        Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
+						Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
 
-                        return buffer;
-                    }
+						return buffer;
+					}
 
-                case DbDataType.VarChar:
-                    if (this.Field.Charset.IsOctetsCharset)
-                    {
-                        return (byte[])this.value;
-                    }
-                    else
-                    {
-                        string svalue = this.GetString();
+				case DbDataType.VarChar:
+					if (this.Field.Charset.IsOctetsCharset)
+					{
+						return (byte[])this.value;
+					}
+					else
+					{
+						string svalue = this.GetString();
 
-                        if ((this.Field.Length % this.Field.Charset.BytesPerCharacter) == 0 &&
-                            svalue.Length > this.Field.CharCount)
+						if ((this.Field.Length % this.Field.Charset.BytesPerCharacter) == 0 &&
+							svalue.Length > this.Field.CharCount)
 						{
 							throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-                        }
+						}
 
-                        byte[] sbuffer = this.Field.Charset.GetBytes(svalue);
-                        byte[] buffer = new byte[this.Field.Length + 2];
+						byte[] sbuffer = this.Field.Charset.GetBytes(svalue);
+						byte[] buffer = new byte[this.Field.Length + 2];
 
-                        // Copy	length
-                        Buffer.BlockCopy(BitConverter.GetBytes((short)sbuffer.Length), 0, buffer, 0, 2);
+						// Copy	length
+						Buffer.BlockCopy(BitConverter.GetBytes((short)sbuffer.Length), 0, buffer, 0, 2);
 
-                        // Copy	string value
-                        Buffer.BlockCopy(sbuffer, 0, buffer, 2, sbuffer.Length);
+						// Copy	string value
+						Buffer.BlockCopy(sbuffer, 0, buffer, 2, sbuffer.Length);
 
-                        return buffer;
-                    }
+						return buffer;
+					}
 
-                case DbDataType.Numeric:
-                case DbDataType.Decimal:
-                    return this.GetNumericBytes();
+				case DbDataType.Numeric:
+				case DbDataType.Decimal:
+					return this.GetNumericBytes();
 
-                case DbDataType.SmallInt:
-                    return BitConverter.GetBytes(this.GetInt16());
+				case DbDataType.SmallInt:
+					return BitConverter.GetBytes(this.GetInt16());
 
-                case DbDataType.Integer:
-                    return BitConverter.GetBytes(this.GetInt32());
+				case DbDataType.Integer:
+					return BitConverter.GetBytes(this.GetInt32());
 
-                case DbDataType.Array:
-                case DbDataType.Binary:
-                case DbDataType.Text:
-                case DbDataType.BigInt:
-                    return BitConverter.GetBytes(this.GetInt64());
+				case DbDataType.Array:
+				case DbDataType.Binary:
+				case DbDataType.Text:
+				case DbDataType.BigInt:
+					return BitConverter.GetBytes(this.GetInt64());
 
-                case DbDataType.Float:
-                    return BitConverter.GetBytes(this.GetFloat());
+				case DbDataType.Float:
+					return BitConverter.GetBytes(this.GetFloat());
 
-                case DbDataType.Double:
-                    return BitConverter.GetBytes(this.GetDouble());
+				case DbDataType.Double:
+					return BitConverter.GetBytes(this.GetDouble());
 
-                case DbDataType.Date:
-                    return BitConverter.GetBytes(TypeEncoder.EncodeDate(this.GetDateTime()));
+				case DbDataType.Date:
+					return BitConverter.GetBytes(TypeEncoder.EncodeDate(this.GetDateTime()));
 
-                case DbDataType.Time:
-                    return BitConverter.GetBytes(this.GetTime());
+				case DbDataType.Time:
+					return BitConverter.GetBytes(this.GetTime());
 
-                case DbDataType.TimeStamp:
-                    byte[] date = BitConverter.GetBytes(TypeEncoder.EncodeDate(this.GetDateTime()));
-                    byte[] time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(this.GetDateTime())));
+				case DbDataType.TimeStamp:
+					byte[] date = BitConverter.GetBytes(TypeEncoder.EncodeDate(this.GetDateTime()));
+					byte[] time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(this.GetDateTime())));
 
-                    byte[] result = new byte[8];
+					byte[] result = new byte[8];
 
-                    Buffer.BlockCopy(date, 0, result, 0, date.Length);
-                    Buffer.BlockCopy(time, 0, result, 4, time.Length);
+					Buffer.BlockCopy(date, 0, result, 0, date.Length);
+					Buffer.BlockCopy(time, 0, result, 4, time.Length);
 
-                    return result;
+					return result;
 
-                case DbDataType.Guid:
-                    return this.GetGuid().ToByteArray();
+				case DbDataType.Guid:
+					return this.GetGuid().ToByteArray();
 
-                default:
-                    throw new NotSupportedException("Unknown data type");
-            }
-        }
+				default:
+					throw new NotSupportedException("Unknown data type");
+			}
+		}
 
-        private byte[] GetNumericBytes()
-        {
-            decimal value = this.GetDecimal();
-            object numeric = TypeEncoder.EncodeDecimal(value, this.Field.NumericScale, this.Field.DataType);
+		private byte[] GetNumericBytes()
+		{
+			decimal value = this.GetDecimal();
+			object numeric = TypeEncoder.EncodeDecimal(value, this.Field.NumericScale, this.Field.DataType);
 
-            switch (field.SqlType)
-            {
-                case IscCodes.SQL_SHORT:
-                    return BitConverter.GetBytes((short)numeric);
+			switch (field.SqlType)
+			{
+				case IscCodes.SQL_SHORT:
+					return BitConverter.GetBytes((short)numeric);
 
-                case IscCodes.SQL_LONG:
-                    return BitConverter.GetBytes((int)numeric);
+				case IscCodes.SQL_LONG:
+					return BitConverter.GetBytes((int)numeric);
 
-                case IscCodes.SQL_INT64:
-                case IscCodes.SQL_QUAD:
-                    return BitConverter.GetBytes((long)numeric);
+				case IscCodes.SQL_INT64:
+				case IscCodes.SQL_QUAD:
+					return BitConverter.GetBytes((long)numeric);
 
-                case IscCodes.SQL_DOUBLE:
-                    return BitConverter.GetBytes(this.GetDouble());
+				case IscCodes.SQL_DOUBLE:
+					return BitConverter.GetBytes(this.GetDouble());
 
-                default:
-                    return null;
-            }
-        }
+				default:
+					return null;
+			}
+		}
 
 		#endregion
 

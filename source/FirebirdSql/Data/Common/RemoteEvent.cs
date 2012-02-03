@@ -51,10 +51,10 @@ namespace FirebirdSql.Data.Common
 
 		#region · Properties ·
 
-        //public IDatabase Database
-        //{
-        //    get { return this.db; }
-        //}
+		//public IDatabase Database
+		//{
+		//    get { return this.db; }
+		//}
 
 		public int LocalId
 		{
@@ -139,7 +139,7 @@ namespace FirebirdSql.Data.Common
 		{
 			lock (this.db)
 			{
-                this.db.QueueEvents(this);
+				this.db.QueueEvents(this);
 			}
 		}
 
@@ -206,7 +206,7 @@ namespace FirebirdSql.Data.Common
 
 		public EventParameterBuffer ToEpb()
 		{
-            EventParameterBuffer epb = new EventParameterBuffer();
+			EventParameterBuffer epb = new EventParameterBuffer();
 
 			epb.Append(IscCodes.EPB_version1);
 

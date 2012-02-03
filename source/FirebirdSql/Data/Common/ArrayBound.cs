@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *     The contents of this file are subject to the Initial 
@@ -22,14 +22,14 @@ namespace FirebirdSql.Data.Common
 {
 	internal struct ArrayBound
 	{
-		#region Â· Fields Â·
+		#region · Fields ·
 
 		private int lowerBound;
 		private int upperBound;
 
 		#endregion
 
-		#region Â· Properties Â·
+		#region · Properties ·
 
 		public int LowerBound
 		{

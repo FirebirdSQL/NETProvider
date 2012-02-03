@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Common
 		public const int DSQL_drop                  = 2;
 		public const int ARRAY_DESC_COLUMN_MAJOR    = 1;	/* Set for FORTRAN */
 		public const int ISC_STATUS_LENGTH          = 20;
-        public const ushort INVALID_OBJECT          = 0xFFFF;
+		public const ushort INVALID_OBJECT          = 0xFFFF;
 
 		#endregion
 
@@ -101,31 +101,31 @@ namespace FirebirdSql.Data.Common
 		 */
 		public const int PROTOCOL_VERSION10 = 10;
 
-        // Since protocol 11 we must be separated from Borland Interbase.
-        // Therefore always set highmost bit in protocol version to 1.
-        // For unsigned protocol version this does not break version's compare.
+		// Since protocol 11 we must be separated from Borland Interbase.
+		// Therefore always set highmost bit in protocol version to 1.
+		// For unsigned protocol version this does not break version's compare.
 
-        public const int FB_PROTOCOL_FLAG = 0x8000;
-        public const int FB_PROTOCOL_MASK = ~FB_PROTOCOL_FLAG;
+		public const int FB_PROTOCOL_FLAG = 0x8000;
+		public const int FB_PROTOCOL_MASK = ~FB_PROTOCOL_FLAG;
 
-        // Protocol 11 has support for user authentication related
-        // operations (op_update_account_info, op_authenticate_user and
-        // op_trusted_auth). When specific operation is not supported,
-        // we say "sorry".
+		// Protocol 11 has support for user authentication related
+		// operations (op_update_account_info, op_authenticate_user and
+		// op_trusted_auth). When specific operation is not supported,
+		// we say "sorry".
 
-        public const int PROTOCOL_VERSION11 = (FB_PROTOCOL_FLAG | 11);
+		public const int PROTOCOL_VERSION11 = (FB_PROTOCOL_FLAG | 11);
 
-        // Protocol 12 has support for asynchronous call op_cancel.
-        // Currently implemented asynchronously only for TCP/IP
-        // on superserver and superclassic.
+		// Protocol 12 has support for asynchronous call op_cancel.
+		// Currently implemented asynchronously only for TCP/IP
+		// on superserver and superclassic.
 
-        public const int PROTOCOL_VERSION12 = (FB_PROTOCOL_FLAG | 12);
+		public const int PROTOCOL_VERSION12 = (FB_PROTOCOL_FLAG | 12);
 
-        #endregion
+		#endregion
 
-        #region · Statement Flags ·
+		#region · Statement Flags ·
 
-        public const int STMT_DEFER_EXECUTE = 4;
+		public const int STMT_DEFER_EXECUTE = 4;
 
 		#endregion
 
@@ -240,14 +240,14 @@ namespace FirebirdSql.Data.Common
 		public const int op_service_start       = 85;
 		public const int op_rollback_retaining  = 86;
 
-	    // Two following opcode are used in vulcan.
-	    // No plans to implement them completely for a while, but to 
-	    // support protocol 11, where they are used, have them here.
-        public const int op_update_account_info = 87;
-	    public const int op_authenticate_user	= 88;
+		// Two following opcode are used in vulcan.
+		// No plans to implement them completely for a while, but to 
+		// support protocol 11, where they are used, have them here.
+		public const int op_update_account_info = 87;
+		public const int op_authenticate_user	= 88;
 
-	    public const int op_partial				= 89;	// packet is not complete - delay processing
-	    public const int op_trusted_auth		= 90;
+		public const int op_partial				= 89;	// packet is not complete - delay processing
+		public const int op_trusted_auth		= 90;
 		public const int op_cancel				= 91;
 
 		#endregion
@@ -319,8 +319,8 @@ namespace FirebirdSql.Data.Common
 		public const int isc_dpb_set_db_charset = 68;
 		public const int isc_dpb_process_id = 71;
 		public const int isc_dpb_trusted_auth = 73;
-        public const int isc_dpb_process_name = 74;
-        public const int isc_dpb_utf8_filename = 77;
+		public const int isc_dpb_process_name = 74;
+		public const int isc_dpb_utf8_filename = 77;
 
 		#endregion
 
@@ -348,7 +348,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_tpb_no_rec_version = 18;
 		public const int isc_tpb_restart_requests = 19;
 		public const int isc_tpb_no_auto_undo = 20;
-        public const int isc_tpb_lock_timeout = 21;
+		public const int isc_tpb_lock_timeout = 21;
 
 		#endregion
 
@@ -580,28 +580,28 @@ namespace FirebirdSql.Data.Common
 		public const int isc_info_sql_get_plan = 22;
 		public const int isc_info_sql_records = 23;
 		public const int isc_info_sql_batch_fetch = 24;
-        public const int isc_info_sql_relation_alias = 25;
+		public const int isc_info_sql_relation_alias = 25;
 
 		#endregion
 
-        #region · SQL Information Return Values ·
+		#region · SQL Information Return Values ·
 
-        public const int isc_info_sql_stmt_select = 1;
-        public const int isc_info_sql_stmt_insert = 2;
-        public const int isc_info_sql_stmt_update = 3;
-        public const int isc_info_sql_stmt_delete = 4;
-        public const int isc_info_sql_stmt_ddl = 5;
-        public const int isc_info_sql_stmt_get_segment = 6;
-        public const int isc_info_sql_stmt_put_segment = 7;
-        public const int isc_info_sql_stmt_exec_procedure = 8;
-        public const int isc_info_sql_stmt_start_trans = 9;
-        public const int isc_info_sql_stmt_commit = 10;
-        public const int isc_info_sql_stmt_rollback = 11;
-        public const int isc_info_sql_stmt_select_for_upd = 12;
-        public const int isc_info_sql_stmt_set_generator = 13;
-        public const int isc_info_sql_stmt_savepoint = 14;
+		public const int isc_info_sql_stmt_select = 1;
+		public const int isc_info_sql_stmt_insert = 2;
+		public const int isc_info_sql_stmt_update = 3;
+		public const int isc_info_sql_stmt_delete = 4;
+		public const int isc_info_sql_stmt_ddl = 5;
+		public const int isc_info_sql_stmt_get_segment = 6;
+		public const int isc_info_sql_stmt_put_segment = 7;
+		public const int isc_info_sql_stmt_exec_procedure = 8;
+		public const int isc_info_sql_stmt_start_trans = 9;
+		public const int isc_info_sql_stmt_commit = 10;
+		public const int isc_info_sql_stmt_rollback = 11;
+		public const int isc_info_sql_stmt_select_for_upd = 12;
+		public const int isc_info_sql_stmt_set_generator = 13;
+		public const int isc_info_sql_stmt_savepoint = 14;
 
-        #endregion
+		#endregion
 
 		#region · Database Information ·
 
@@ -822,19 +822,19 @@ namespace FirebirdSql.Data.Common
 		public const int isc_arg_warning    = 18;	// warning argument
 		public const int isc_arg_sql_state  = 19;	// SQLSTATE
 
-        public const int isc_open_trans			= 335544357;
-        public const int isc_segment			= 335544366;
-        public const int isc_segstr_eof			= 335544367;
-        public const int isc_connect_reject		= 335544421;
-        public const int isc_invalid_dimension	= 335544458;
-        public const int isc_tra_state			= 335544468;
-        public const int isc_except				= 335544517;
-        public const int isc_dsql_sqlda_err		= 335544583;
-        public const int isc_network_error		= 335544721;
-        public const int isc_net_read_err		= 335544726;
-        public const int isc_net_write_err		= 335544727;
-        public const int isc_stack_trace		= 335544842;
-        public const int isc_except2			= 335544848;
+		public const int isc_open_trans			= 335544357;
+		public const int isc_segment			= 335544366;
+		public const int isc_segstr_eof			= 335544367;
+		public const int isc_connect_reject		= 335544421;
+		public const int isc_invalid_dimension	= 335544458;
+		public const int isc_tra_state			= 335544468;
+		public const int isc_except				= 335544517;
+		public const int isc_dsql_sqlda_err		= 335544583;
+		public const int isc_network_error		= 335544721;
+		public const int isc_net_read_err		= 335544726;
+		public const int isc_net_write_err		= 335544727;
+		public const int isc_stack_trace		= 335544842;
+		public const int isc_except2			= 335544848;
 		public const int isc_arith_except		= 335544321;
 		public const int isc_string_truncation	= 335544914;
 
@@ -894,29 +894,29 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-        #region · DSC Types ·
+		#region · DSC Types ·
 
-        public const int DSC_null           = 1;
-        public const int dtype_text         = 1;
-        public const int dtype_cstring      = 2;
-        public const int dtype_varying      = 3;
-        public const int dtype_packed       = 6;
-        public const int dtype_byte         = 7;
-        public const int dtype_short        = 8;
-        public const int dtype_long         = 9;
-        public const int dtype_quad         = 10;
-        public const int dtype_real         = 11;
-        public const int dtype_double       = 12;
-        public const int dtype_d_float      = 13;
-        public const int dtype_sql_date     = 14;
-        public const int dtype_sql_time     = 15;
-        public const int dtype_timestamp    = 16;
-        public const int dtype_blob         = 17;
-        public const int dtype_array        = 18;
-        public const int dtype_int64        = 19;
-        public const int DTYPE_TYPE_MAX     = 20;
+		public const int DSC_null           = 1;
+		public const int dtype_text         = 1;
+		public const int dtype_cstring      = 2;
+		public const int dtype_varying      = 3;
+		public const int dtype_packed       = 6;
+		public const int dtype_byte         = 7;
+		public const int dtype_short        = 8;
+		public const int dtype_long         = 9;
+		public const int dtype_quad         = 10;
+		public const int dtype_real         = 11;
+		public const int dtype_double       = 12;
+		public const int dtype_d_float      = 13;
+		public const int dtype_sql_date     = 14;
+		public const int dtype_sql_time     = 15;
+		public const int dtype_timestamp    = 16;
+		public const int dtype_blob         = 17;
+		public const int dtype_array        = 18;
+		public const int dtype_int64        = 19;
+		public const int DTYPE_TYPE_MAX     = 20;
 
-        #endregion
+		#endregion
 
 		#region Cancel types
 		public const int fb_cancel_disable	= 1;

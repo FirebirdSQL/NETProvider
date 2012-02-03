@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *     The contents of this file are subject to the Initial 
@@ -23,14 +23,14 @@ using System;
 
 namespace FirebirdSql.Data.Common
 {
-    internal sealed class BlobParameterBuffer : ParameterBuffer
-    {
-        #region Â· Constructors Â·
+	internal sealed class BlobParameterBuffer : ParameterBuffer
+	{
+		#region · Constructors ·
 
-        public BlobParameterBuffer()
-            : base(BitConverter.IsLittleEndian)
-        { }
+		public BlobParameterBuffer()
+			: base(BitConverter.IsLittleEndian)
+		{ }
 
-        #endregion
-    }
+		#endregion
+	}
 }

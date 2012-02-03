@@ -37,13 +37,13 @@ namespace FirebirdSql.Data.Common
 		};
 
 		// Records affected	items
-        protected static readonly byte[] RowsAffectedInfoItems = new byte[]
+		protected static readonly byte[] RowsAffectedInfoItems = new byte[]
 		{
 			IscCodes.isc_info_sql_records
 		};
 
 		// Describe	information	items
-        protected static readonly byte[] DescribeInfoAndBindInfoItems = new byte[] 
+		protected static readonly byte[] DescribeInfoAndBindInfoItems = new byte[] 
 		{ 
 			IscCodes.isc_info_sql_select,
 			IscCodes.isc_info_sql_describe_vars,
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.Common
 			// IscCodes.isc_info_sql_owner,
 			IscCodes.isc_info_sql_alias,
 			IscCodes.isc_info_sql_describe_end,
-            
+			
 			IscCodes.isc_info_sql_bind,
 			IscCodes.isc_info_sql_describe_vars,
 			IscCodes.isc_info_sql_sqlda_seq,
@@ -72,7 +72,7 @@ namespace FirebirdSql.Data.Common
 			IscCodes.isc_info_sql_describe_end 
 		};
 
-        protected static readonly byte[] StatementTypeInfoItems = new byte[]
+		protected static readonly byte[] StatementTypeInfoItems = new byte[]
 		{
 			IscCodes.isc_info_sql_stmt_type
 		};
@@ -91,66 +91,66 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-        #region · Abstract Properties ·
+		#region · Abstract Properties ·
 
-        public abstract IDatabase Database
-        {
-            get;
-        }
+		public abstract IDatabase Database
+		{
+			get;
+		}
 
-        public abstract ITransaction Transaction
-        {
-            get;
-            set;
-        }
+		public abstract ITransaction Transaction
+		{
+			get;
+			set;
+		}
 
-        public abstract Descriptor Parameters
-        {
-            get;
-            set;
-        }
+		public abstract Descriptor Parameters
+		{
+			get;
+			set;
+		}
 
-        public abstract Descriptor Fields
-        {
-            get;
-        }
+		public abstract Descriptor Fields
+		{
+			get;
+		}
 
-        public abstract int RecordsAffected
-        {
-            get;
-            protected set;
-        }
+		public abstract int RecordsAffected
+		{
+			get;
+			protected set;
+		}
 
-        public abstract bool IsPrepared
-        {
-            get;
-        }
+		public abstract bool IsPrepared
+		{
+			get;
+		}
 
-        public abstract DbStatementType StatementType
-        {
-            get;
-            protected set;
-        }
+		public abstract DbStatementType StatementType
+		{
+			get;
+			protected set;
+		}
 
-        public abstract StatementState State
-        {
-            get;
-            protected set;
-        }
+		public abstract StatementState State
+		{
+			get;
+			protected set;
+		}
 
-        public abstract int FetchSize
-        {
-            get;
-            set;
-        }
+		public abstract int FetchSize
+		{
+			get;
+			set;
+		}
 
-        public abstract bool ReturnRecordsAffected
-        {
-            get;
-            set;
-        }
+		public abstract bool ReturnRecordsAffected
+		{
+			get;
+			set;
+		}
 
-        #endregion
+		#endregion
 
 		#region · Protected Properties ·
 
@@ -229,18 +229,18 @@ namespace FirebirdSql.Data.Common
 					this.StatementType == DbStatementType.SelectForUpdate ||
 					this.StatementType == DbStatementType.StoredProcedure)
 				{
-                    if (this.State == StatementState.Allocated ||
-                        this.State == StatementState.Prepared ||
-                        this.State == StatementState.Executed)
-                    {
-                        try
-                        {
-                            this.Free(IscCodes.DSQL_close);
-                        }
-                        catch
-                        {
-                        }
-                    }
+					if (this.State == StatementState.Allocated ||
+						this.State == StatementState.Prepared ||
+						this.State == StatementState.Executed)
+					{
+						try
+						{
+							this.Free(IscCodes.DSQL_close);
+						}
+						catch
+						{
+						}
+					}
 					this.ClearArrayHandles();
 					this.State = StatementState.Closed;
 				}
@@ -257,7 +257,7 @@ namespace FirebirdSql.Data.Common
 
 			this.Free(IscCodes.DSQL_drop);
 
-            this.ClearArrayHandles();
+			this.ClearArrayHandles();
 			this.State          = StatementState.Deallocated;
 			this.StatementType  = DbStatementType.None;
 		}
@@ -284,8 +284,8 @@ namespace FirebirdSql.Data.Common
 
 		#region · Protected Abstract Methods ·
 
-        protected abstract void TransactionUpdated(object sender, EventArgs e);
-        protected abstract byte[] GetSqlInfo(byte[] items, int bufferLength);
+		protected abstract void TransactionUpdated(object sender, EventArgs e);
+		protected abstract byte[] GetSqlInfo(byte[] items, int bufferLength);
 		protected abstract void Free(int option);
 
 		#endregion
@@ -297,12 +297,12 @@ namespace FirebirdSql.Data.Common
 			return this.GetSqlInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
 		}
 
-        protected int GetRecordsAffected()
-        {
-            byte[] buffer = this.GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+		protected int GetRecordsAffected()
+		{
+			byte[] buffer = this.GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
-            return this.ProcessRecordsAffectedBuffer(buffer);
-        }
+			return this.ProcessRecordsAffectedBuffer(buffer);
+		}
 
 		protected int ProcessRecordsAffectedBuffer(byte[] buffer)
 		{
@@ -362,12 +362,12 @@ namespace FirebirdSql.Data.Common
 			return insertCount + updateCount + deleteCount;
 		}
 
-        protected DbStatementType GetStatementType()
-        {
-            byte[] buffer = this.GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+		protected DbStatementType GetStatementType()
+		{
+			byte[] buffer = this.GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 
-            return this.ProcessStatementTypeInfoBuffer(buffer);
-        }
+			return this.ProcessStatementTypeInfoBuffer(buffer);
+		}
 
 		protected DbStatementType ProcessStatementTypeInfoBuffer(byte[] buffer)
 		{
