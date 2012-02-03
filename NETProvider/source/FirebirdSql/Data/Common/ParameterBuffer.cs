@@ -26,58 +26,58 @@ using System.Net;
 
 namespace FirebirdSql.Data.Common
 {
-    internal abstract class ParameterBuffer
-    {
-        #region · Fields ·
+	internal abstract class ParameterBuffer
+	{
+		#region · Fields ·
 
-        private MemoryStream stream;
-        private bool isLittleEndian;
+		private MemoryStream stream;
+		private bool isLittleEndian;
 
-        #endregion
+		#endregion
 
-        #region · Properties ·
+		#region · Properties ·
 
-        public short Length
-        {
-            get { return (short)this.ToArray().Length; }
-        }
+		public short Length
+		{
+			get { return (short)this.ToArray().Length; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Protected Properties ·
+		#region · Protected Properties ·
 
-        protected bool IsLittleEndian
-        {
-            get { return this.isLittleEndian; }
-        }
+		protected bool IsLittleEndian
+		{
+			get { return this.isLittleEndian; }
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        protected ParameterBuffer(bool isLittleEndian)
-        {
-            this.stream = new MemoryStream();
-            this.isLittleEndian = isLittleEndian;
-        }
+		protected ParameterBuffer(bool isLittleEndian)
+		{
+			this.stream = new MemoryStream();
+			this.isLittleEndian = isLittleEndian;
+		}
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public virtual void Append(int type)
-        {
-            this.WriteByte(type);
-        }
+		public virtual void Append(int type)
+		{
+			this.WriteByte(type);
+		}
 
-        public byte[] ToArray()
-        {
-            return stream.ToArray();
-        }
+		public byte[] ToArray()
+		{
+			return stream.ToArray();
+		}
 
-        #endregion
+		#endregion
 
-        #region · Protected Methods ·
+		#region · Protected Methods ·
 
 		protected void WriteByte(int value)
 		{
@@ -94,40 +94,40 @@ namespace FirebirdSql.Data.Common
 			this.WriteByte(value);
 		}
 
-        protected void Write(short value)
-        {
-            if (!this.IsLittleEndian)
-            {
-                value = (short)IPAddress.NetworkToHostOrder(value);
-            }
+		protected void Write(short value)
+		{
+			if (!this.IsLittleEndian)
+			{
+				value = (short)IPAddress.NetworkToHostOrder(value);
+			}
 
-            byte[] buffer = BitConverter.GetBytes(value);
+			byte[] buffer = BitConverter.GetBytes(value);
 
-            this.stream.Write(buffer, 0, buffer.Length);
-        }
+			this.stream.Write(buffer, 0, buffer.Length);
+		}
 
-        protected void Write(int value)
-        {
-            if (!this.IsLittleEndian)
-            {
-                value = (int)IPAddress.NetworkToHostOrder(value);
-            }
+		protected void Write(int value)
+		{
+			if (!this.IsLittleEndian)
+			{
+				value = (int)IPAddress.NetworkToHostOrder(value);
+			}
 
-            byte[] buffer = BitConverter.GetBytes(value);
+			byte[] buffer = BitConverter.GetBytes(value);
 
-            this.stream.Write(buffer, 0, buffer.Length);
-        }
+			this.stream.Write(buffer, 0, buffer.Length);
+		}
 
-        protected void Write(byte[] buffer)
-        {
-            this.Write(buffer, 0, buffer.Length);
-        }
+		protected void Write(byte[] buffer)
+		{
+			this.Write(buffer, 0, buffer.Length);
+		}
 
-        protected void Write(byte[] buffer, int offset, int count)
-        {
-            this.stream.Write(buffer, offset, count);
-        }
+		protected void Write(byte[] buffer, int offset, int count)
+		{
+			this.stream.Write(buffer, offset, count);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

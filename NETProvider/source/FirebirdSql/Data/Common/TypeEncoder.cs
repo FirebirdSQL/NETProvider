@@ -24,81 +24,81 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
-    internal sealed class TypeEncoder
-    {
-        #region · Static Methods ·
+	internal sealed class TypeEncoder
+	{
+		#region · Static Methods ·
 
-        public static object EncodeDecimal(decimal d, int scale, int sqltype)
-        {
-            long multiplier = 1;
+		public static object EncodeDecimal(decimal d, int scale, int sqltype)
+		{
+			long multiplier = 1;
 
-            if (scale < 0)
-            {
-                multiplier = (long)System.Math.Pow(10, scale * (-1));
-            }
+			if (scale < 0)
+			{
+				multiplier = (long)System.Math.Pow(10, scale * (-1));
+			}
 
-            switch (sqltype & ~1)
-            {
-                case IscCodes.SQL_SHORT:
-                    return (short)(d * multiplier);
+			switch (sqltype & ~1)
+			{
+				case IscCodes.SQL_SHORT:
+					return (short)(d * multiplier);
 
-                case IscCodes.SQL_LONG:
-                    return (int)(d * multiplier);
+				case IscCodes.SQL_LONG:
+					return (int)(d * multiplier);
 
-                case IscCodes.SQL_QUAD:
-                case IscCodes.SQL_INT64:
-                    return (long)(d * multiplier);
+				case IscCodes.SQL_QUAD:
+				case IscCodes.SQL_INT64:
+					return (long)(d * multiplier);
 
-                case IscCodes.SQL_DOUBLE:
-                default:
-                    return d;
-            }
-        }
+				case IscCodes.SQL_DOUBLE:
+				default:
+					return d;
+			}
+		}
 
-        public static int EncodeTime(TimeSpan t)
-        {
-            return
-                (t.Hours * 3600000 +
-                t.Minutes * 60000 +
-                t.Seconds * 1000 +
-                t.Milliseconds) * 10;
-        }
+		public static int EncodeTime(TimeSpan t)
+		{
+			return
+				(t.Hours * 3600000 +
+				t.Minutes * 60000 +
+				t.Seconds * 1000 +
+				t.Milliseconds) * 10;
+		}
 
-        public static int EncodeDate(DateTime d)
-        {
-            int day, month, year;
-            int c, ya;
+		public static int EncodeDate(DateTime d)
+		{
+			int day, month, year;
+			int c, ya;
 
-            GregorianCalendar calendar = new GregorianCalendar();
+			GregorianCalendar calendar = new GregorianCalendar();
 
-            day = calendar.GetDayOfMonth(d);
-            month = calendar.GetMonth(d);
-            year = calendar.GetYear(d);
+			day = calendar.GetDayOfMonth(d);
+			month = calendar.GetMonth(d);
+			year = calendar.GetYear(d);
 
-            if (month > 2)
-            {
-                month -= 3;
-            }
-            else
-            {
-                month += 9;
-                year -= 1;
-            }
+			if (month > 2)
+			{
+				month -= 3;
+			}
+			else
+			{
+				month += 9;
+				year -= 1;
+			}
 
-            c = year / 100;
-            ya = year - 100 * c;
+			c = year / 100;
+			ya = year - 100 * c;
 
-            return ((146097 * c) / 4 + (1461 * ya) / 4 + (153 * month + 2) / 5 + day + 1721119 - 2400001);
-        }
+			return ((146097 * c) / 4 + (1461 * ya) / 4 + (153 * month + 2) / 5 + day + 1721119 - 2400001);
+		}
 
-        #endregion
+		#endregion
 
-        #region · Constructors ·
+		#region · Constructors ·
 
-        private TypeEncoder()
-        {
-        }
+		private TypeEncoder()
+		{
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

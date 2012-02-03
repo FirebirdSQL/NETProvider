@@ -25,23 +25,23 @@ namespace FirebirdSql.Data.Common
 {
 	internal enum DbDataType
 	{
-        Array,
-        BigInt,
-        Binary,
-        Boolean,
-        Char,
-        Date,
-        Decimal,
-        Double,
-        Float,
-        Guid,
-        Integer,
-        Numeric,
-        SmallInt,
-        Text,
-        Time,
-        TimeStamp,
-        VarChar,
+		Array,
+		BigInt,
+		Binary,
+		Boolean,
+		Char,
+		Date,
+		Decimal,
+		Double,
+		Float,
+		Guid,
+		Integer,
+		Numeric,
+		SmallInt,
+		Text,
+		Time,
+		TimeStamp,
+		VarChar,
 		Null
-    }
+	}
 }

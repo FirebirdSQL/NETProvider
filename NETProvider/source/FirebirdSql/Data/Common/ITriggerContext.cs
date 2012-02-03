@@ -21,16 +21,16 @@ using System.Data;
 
 namespace FirebirdSql.Data.Common
 {
-    internal interface ITriggerContext
-    {
-        #region · Methods ·
+	internal interface ITriggerContext
+	{
+		#region · Methods ·
 
-        string GetTableName();
-        int GetTriggerAction();
-        object GetOldValue(string name);
-        object GetNewValue(string name);
-        void SetNewValue(string name, object value);
+		string GetTableName();
+		int GetTriggerAction();
+		object GetOldValue(string name);
+		object GetNewValue(string name);
+		void SetNewValue(string name, object value);
 
-        #endregion
-    }
+		#endregion
+	}
 }

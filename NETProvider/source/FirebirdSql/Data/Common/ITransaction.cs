@@ -50,8 +50,8 @@ namespace FirebirdSql.Data.Common
 		void CommitRetaining();
 		void Rollback();
 		void RollbackRetaining();
-        void Prepare();
-        void Prepare(byte[] buffer);
+		void Prepare();
+		void Prepare(byte[] buffer);
 
 		#endregion
 	}

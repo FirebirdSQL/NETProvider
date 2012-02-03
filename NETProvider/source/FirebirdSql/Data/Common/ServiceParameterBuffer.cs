@@ -25,54 +25,54 @@ using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
-    internal sealed class ServiceParameterBuffer : ParameterBuffer
-    {
-        #region · Constructors ·
+	internal sealed class ServiceParameterBuffer : ParameterBuffer
+	{
+		#region · Constructors ·
 
-        public ServiceParameterBuffer()
-            : base(BitConverter.IsLittleEndian)
-        { }
+		public ServiceParameterBuffer()
+			: base(BitConverter.IsLittleEndian)
+		{ }
 
-        #endregion
+		#endregion
 
-        #region · Methods ·
+		#region · Methods ·
 
-        public void Append(int type, byte value)
-        {
-            this.WriteByte(type);
-            this.WriteByte(value);
-        }
+		public void Append(int type, byte value)
+		{
+			this.WriteByte(type);
+			this.WriteByte(value);
+		}
 
-        public void Append(int type, int value)
-        {
-            this.WriteByte(type);
-            this.Write(value);
-        }
+		public void Append(int type, int value)
+		{
+			this.WriteByte(type);
+			this.Write(value);
+		}
 
-        public void Append(int type, string value)
-        {
-            this.Append(type, Encoding.Default.GetBytes(value));
-        }
+		public void Append(int type, string value)
+		{
+			this.Append(type, Encoding.Default.GetBytes(value));
+		}
 
-        public void Append(byte type, string value)
-        {
-            this.Append(type, Encoding.Default.GetBytes(value));
-        }
+		public void Append(byte type, string value)
+		{
+			this.Append(type, Encoding.Default.GetBytes(value));
+		}
 
-        public void Append(int type, byte[] value)
-        {
-            this.WriteByte((byte)type);
-            this.Write((short)value.Length);
-            this.Write(value);
-        }
+		public void Append(int type, byte[] value)
+		{
+			this.WriteByte((byte)type);
+			this.Write((short)value.Length);
+			this.Write(value);
+		}
 
-        public void Append(byte type, byte[] value)
-        {
-            this.WriteByte(type);
-            this.WriteByte((byte)value.Length);
-            this.Write(value);
-        }
+		public void Append(byte type, byte[] value)
+		{
+			this.WriteByte(type);
+			this.WriteByte((byte)value.Length);
+			this.Write(value);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

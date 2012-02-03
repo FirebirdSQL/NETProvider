@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -24,24 +24,24 @@ using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
-    internal sealed class TransactionParameterBuffer : ParameterBuffer
-    {
-        #region Â· Constructors Â·
+	internal sealed class TransactionParameterBuffer : ParameterBuffer
+	{
+		#region · Constructors ·
 
-        public TransactionParameterBuffer()
-            : base(BitConverter.IsLittleEndian)
-        { }
+		public TransactionParameterBuffer()
+			: base(BitConverter.IsLittleEndian)
+		{ }
 
-        #endregion
+		#endregion
 
-        #region Â· Methods Â·
+		#region · Methods ·
 
-        public void Append(int type, short value)
-        {
-            this.WriteByte(type);
-            this.WriteByte(2);
-            this.Write(value);
-        }
+		public void Append(int type, short value)
+		{
+			this.WriteByte(type);
+			this.WriteByte(2);
+			this.Write(value);
+		}
 
 		public void Append(int type, string content)
 		{
@@ -55,6 +55,6 @@ namespace FirebirdSql.Data.Common
 			this.Write(buffer);
 		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

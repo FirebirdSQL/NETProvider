@@ -78,10 +78,10 @@ namespace FirebirdSql.Data.Common
 			get;
 		}
 
-        object SyncObject
-        {
-            get;
-        }
+		object SyncObject
+		{
+			get;
+		}
 
 		#endregion
 
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.Common
 		void QueueEvents(RemoteEvent events);
 		void CancelEvents(RemoteEvent events);
 
-        ITriggerContext GetTriggerContext();
+		ITriggerContext GetTriggerContext();
 
 		void CancelOperation(int kind);
 
