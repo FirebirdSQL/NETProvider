@@ -313,8 +313,6 @@ namespace FirebirdSql.Data.FirebirdClient
 						pool.EmptyPool(pool.connectionString, null);
 					}
 				}
-				
-				pool.cleanupTimer.Dispose();
 			}
 		}
 
