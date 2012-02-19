@@ -131,19 +131,46 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.DataSource	= ConfigurationManager.AppSettings["DataSource"];
-			cs.Database		= ConfigurationManager.AppSettings["Database"];
-			cs.Port			= Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
-			cs.UserID		= ConfigurationManager.AppSettings["User"];
-			cs.Password		= ConfigurationManager.AppSettings["Password"];
-			cs.ServerType	= (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
-			cs.Charset		= ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling		= Convert.ToBoolean(ConfigurationManager.AppSettings["Pooling"]);
+			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
+			cs.Database = ConfigurationManager.AppSettings["Database"];
+			cs.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
+			cs.UserID = ConfigurationManager.AppSettings["User"];
+			cs.Password = ConfigurationManager.AppSettings["Password"];
+			cs.ServerType = (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
+			cs.Charset = ConfigurationManager.AppSettings["Charset"];
+			cs.Pooling = Convert.ToBoolean(ConfigurationManager.AppSettings["Pooling"]);
 
 			using (FbConnection c = new FbConnection(cs.ToString()))
 			{
 				c.Open();
 			}
+		}
+
+		[Test]
+		public void ConnectionPoolingTimeOutTest()
+		{
+			// Using ActiveUsers as proxy for number of connections
+			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();
+			csb.Pooling = true;
+			csb.ConnectionLifeTime = 5;
+			string cs = csb.ToString();
+
+			int ActiveUsersAtStart = ActiveUserCount();
+
+			using (FbConnection
+				myConnection1 = new FbConnection(cs),
+				myConnection2 = new FbConnection(cs))
+			{
+				myConnection1.Open();
+				myConnection2.Open();
+
+				myConnection1.Close();
+				myConnection2.Close();
+			}
+
+			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
+
+			Assert.AreEqual(ActiveUsersAtStart, ActiveUserCount());
 		}
 
 		#endregion
@@ -159,6 +186,16 @@ namespace FirebirdSql.Data.UnitTests
 
 				default:
 					return Connection.BeginTransaction(level);
+			}
+		}
+
+		private int ActiveUserCount()
+		{
+			using (FbConnection dbinfo_connection = new FbConnection(this.BuildConnectionString(false)))
+			{
+				dbinfo_connection.Open();
+				FbDatabaseInfo dbinfo = new FbDatabaseInfo(dbinfo_connection);
+				return dbinfo.ActiveUsers.Count;
 			}
 		}
 
