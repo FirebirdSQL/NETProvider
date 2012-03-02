@@ -199,10 +199,12 @@ namespace FirebirdSql.Data.Services
 
 		protected void StartTask()
 		{
+			bool shouldClose = false;
 			if (this.state == FbServiceState.Closed)
 			{
 				// Attach to Service Manager
 				this.Open();
+				shouldClose = true;
 			}
 
 			try
@@ -214,14 +216,23 @@ namespace FirebirdSql.Data.Services
 			{
 				throw new FbException(ex.Message, ex);
 			}
+			finally
+			{
+				if (shouldClose)
+				{
+					this.Close();
+				}
+			}
 		}
 
 		protected byte[] QueryService(byte[] items)
 		{
+			bool shouldClose = false;
 			if (this.state == FbServiceState.Closed)
 			{
 				// Attach to Service Manager
 				this.Open();
+				shouldClose = true;
 			}
 
 			if (this.querySpb == null)
@@ -229,12 +240,20 @@ namespace FirebirdSql.Data.Services
 				this.querySpb = new ServiceParameterBuffer();
 			}
 
-			// Response	buffer
-			byte[] buffer = new byte[this.queryBufferSize];
-
-			this.svc.Query(this.querySpb, items.Length, items, buffer.Length, buffer);
-
-			return buffer;
+			try
+			{
+				// Response	buffer
+				byte[] buffer = new byte[this.queryBufferSize];
+				this.svc.Query(this.querySpb, items.Length, items, buffer.Length, buffer);
+				return buffer;
+			}
+			finally
+			{
+				if (shouldClose)
+				{
+					this.Close();
+				}
+			}
 		}
 
 		protected ArrayList ParseQueryInfo(byte[] buffer)
