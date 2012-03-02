@@ -32,6 +32,8 @@ using System.Diagnostics;
 
 using FirebirdSql.Data.Entity;
 using FirebirdSql.Data.Isql;
+using FirebirdSql.Data.Services;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -194,27 +196,15 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new ArgumentException("Could not determine storage version; a valid storage connection is required.");
 			}
 
-			bool closeConnection = false;
 			try
 			{
-				if (fbConnection.State != ConnectionState.Open)
-				{
-					fbConnection.Open();
-					closeConnection = true;
-				}
-
-				return fbConnection.ServerVersionNumber.ToString(2);
+				FbServerProperties serverProperties = new FbServerProperties() { ConnectionString = fbConnection.ConnectionString };
+				Version serverVersion = Extensions.ParseServerVersion(serverProperties.ServerVersion);
+				return serverVersion.ToString(2);
 			}
 			catch (FbException ex)
 			{
 				throw new InvalidOperationException("Could not retrieve storage version.", ex);
-			}
-			finally
-			{
-				if (closeConnection)
-				{
-					fbConnection.Close();
-				}
 			}
 		}
 
