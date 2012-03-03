@@ -278,6 +278,8 @@ namespace FirebirdSql.Data.Entity
 
 		bool shouldHandleBoolComparison = true;
 		bool shouldCastParameter = true;
+		
+		List<string> shortenedNames = new List<string>();
 
 		#endregion
 
@@ -1002,23 +1004,23 @@ namespace FirebirdSql.Data.Entity
 				//string schemaName = MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "Schema");
 				//if (!string.IsNullOrEmpty(schemaName))
 				//{
-				//    builder.Append(SqlGenerator.QuoteIdentifier(schemaName));
+				//    builder.Append(QuoteIdentifier(schemaName));
 				//    builder.Append(".");
 				//}
 				//else
 				//{
-				//    builder.Append(SqlGenerator.QuoteIdentifier(entitySetBase.EntityContainer.Name));
+				//    builder.Append(QuoteIdentifier(entitySetBase.EntityContainer.Name));
 				//    builder.Append(".");
 				//}
 
 				string tableName = MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "Table");
 				if (!string.IsNullOrEmpty(tableName))
 				{
-					builder.Append(SqlGenerator.QuoteIdentifier(tableName));
+					builder.Append(QuoteIdentifier(tableName));
 				}
 				else
 				{
-					builder.Append(SqlGenerator.QuoteIdentifier(entitySetBase.Name));
+					builder.Append(QuoteIdentifier(entitySetBase.Name));
 				}
 			}
 			return builder.ToString();
@@ -1144,20 +1146,21 @@ namespace FirebirdSql.Data.Entity
 		public override ISqlFragment Visit(DbGroupByExpression e)
 		{
 			Symbol fromSymbol;
+			string varName = ShortenName(e.Input.VariableName);
 			SqlSelectStatement innerQuery = VisitInputExpression(e.Input.Expression,
-				e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+				varName, e.Input.VariableType, out fromSymbol);
 
 			// GroupBy is compatible with Filter and OrderBy
 			// but not with Project, GroupBy
 			if (!IsCompatible(innerQuery, e.ExpressionKind))
 			{
-				innerQuery = CreateNewSelectStatement(innerQuery, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+				innerQuery = CreateNewSelectStatement(innerQuery, varName, e.Input.VariableType, out fromSymbol);
 			}
 
 			selectStatementStack.Push(innerQuery);
 			symbolTable.EnterScope();
 
-			AddFromSymbol(innerQuery, e.Input.VariableName, fromSymbol);
+			AddFromSymbol(innerQuery, varName, fromSymbol);
 			// This line is not present for other relational nodes.
 			symbolTable.Add(e.Input.GroupVariableName, fromSymbol);
 
@@ -1174,8 +1177,8 @@ namespace FirebirdSql.Data.Entity
 			if (needsInnerQuery)
 			{
 				//Create the inner query
-				result = CreateNewSelectStatement(innerQuery, e.Input.VariableName, e.Input.VariableType, false, out fromSymbol);
-				AddFromSymbol(result, e.Input.VariableName, fromSymbol, false);
+				result = CreateNewSelectStatement(innerQuery, varName, e.Input.VariableType, false, out fromSymbol);
+				AddFromSymbol(result, varName, fromSymbol, false);
 			}
 			else
 			{
@@ -1577,19 +1580,20 @@ namespace FirebirdSql.Data.Entity
 		public override ISqlFragment Visit(DbProjectExpression e)
 		{
 			Symbol fromSymbol;
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+			string varName = ShortenName(e.Input.VariableName);
+			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
 
 			// Project is compatible with Filter
 			// but not with Project, GroupBy
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
-				result = CreateNewSelectStatement(result, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+				result = CreateNewSelectStatement(result, varName, e.Input.VariableType, out fromSymbol);
 			}
 
 			selectStatementStack.Push(result);
 			symbolTable.EnterScope();
 
-			AddFromSymbol(result, e.Input.VariableName, fromSymbol);
+			AddFromSymbol(result, varName, fromSymbol);
 
 			// Project is the only node that can have DbNewInstanceExpression as a child
 			// so we have to check it here.
@@ -1636,6 +1640,7 @@ namespace FirebirdSql.Data.Entity
 		public override ISqlFragment Visit(DbPropertyExpression e)
 		{
 			SqlBuilder result;
+			string varName = e.Property.Name;
 
 			ISqlFragment instanceSql = e.Instance.Accept(this);
 
@@ -1651,26 +1656,27 @@ namespace FirebirdSql.Data.Entity
 			JoinSymbol joinSymbol = instanceSql as JoinSymbol;
 			if (joinSymbol != null)
 			{
-				Debug.Assert(joinSymbol.NameToExtent.ContainsKey(e.Property.Name));
+				varName = ShortenName(varName);
+				Debug.Assert(joinSymbol.NameToExtent.ContainsKey(varName));
 				if (joinSymbol.IsNestedJoin)
 				{
-					return new SymbolPair(joinSymbol, joinSymbol.NameToExtent[e.Property.Name]);
+					return new SymbolPair(joinSymbol, joinSymbol.NameToExtent[varName]);
 				}
 				else
 				{
-					return joinSymbol.NameToExtent[e.Property.Name];
+					return joinSymbol.NameToExtent[varName];
 				}
 			}
-
 			// ---------------------------------------
 			// We have seen the first nested SELECT statement, but not the column.
 			SymbolPair symbolPair = instanceSql as SymbolPair;
 			if (symbolPair != null)
 			{
+				varName = ShortenName(varName);
 				JoinSymbol columnJoinSymbol = symbolPair.Column as JoinSymbol;
 				if (columnJoinSymbol != null)
 				{
-					symbolPair.Column = columnJoinSymbol.NameToExtent[e.Property.Name];
+					symbolPair.Column = columnJoinSymbol.NameToExtent[varName];
 					return symbolPair;
 				}
 				else
@@ -1678,12 +1684,12 @@ namespace FirebirdSql.Data.Entity
 					// symbolPair.Column has the base extent.
 					// we need the symbol for the column, since it might have been renamed
 					// when handling a JOIN.
-					if (symbolPair.Column.Columns.ContainsKey(e.Property.Name))
+					if (symbolPair.Column.Columns.ContainsKey(varName))
 					{
 						result = new SqlBuilder();
 						result.Append(symbolPair.Source);
 						result.Append(".");
-						result.Append(symbolPair.Column.Columns[e.Property.Name]);
+						result.Append(symbolPair.Column.Columns[varName]);
 						return result;
 					}
 				}
@@ -1696,7 +1702,7 @@ namespace FirebirdSql.Data.Entity
 
 			// At this point the column name cannot be renamed, so we do
 			// not use a symbol.
-			result.Append(QuoteIdentifier(e.Property.Name));
+			result.Append(QuoteIdentifier(varName));
 
 			return result;
 		}
@@ -1772,18 +1778,19 @@ namespace FirebirdSql.Data.Entity
 
 			//Visit the input
 			Symbol fromSymbol;
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+			string varName = ShortenName(e.Input.VariableName);
+			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
 
 			// Skip is not compatible with anything that OrderBy is not compatible with, as well as with distinct
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
-				result = CreateNewSelectStatement(result, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+				result = CreateNewSelectStatement(result, varName, e.Input.VariableType, out fromSymbol);
 			}
 
 			selectStatementStack.Push(result);
 			symbolTable.EnterScope();
 
-			AddFromSymbol(result, e.Input.VariableName, fromSymbol);
+			AddFromSymbol(result, varName, fromSymbol);
 
 			//Add the default columns
 			Debug.Assert(result.Select.IsEmpty);
@@ -1810,19 +1817,20 @@ namespace FirebirdSql.Data.Entity
 		public override ISqlFragment Visit(DbSortExpression e)
 		{
 			Symbol fromSymbol;
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+			string varName = ShortenName(e.Input.VariableName);
+			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
 
 			// OrderBy is compatible with Filter
 			// and nothing else
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
-				result = CreateNewSelectStatement(result, e.Input.VariableName, e.Input.VariableType, out fromSymbol);
+				result = CreateNewSelectStatement(result, varName, e.Input.VariableType, out fromSymbol);
 			}
 
 			selectStatementStack.Push(result);
 			symbolTable.EnterScope();
 
-			AddFromSymbol(result, e.Input.VariableName, fromSymbol);
+			AddFromSymbol(result, varName, fromSymbol);
 
 			AddSortKeys(result.OrderBy, e.SortOrder);
 
@@ -1876,7 +1884,8 @@ namespace FirebirdSql.Data.Entity
 			}
 			isVarRefSingle = true; // This will be reset by DbPropertyExpression or MethodExpression
 
-			Symbol result = symbolTable.Lookup(e.VariableName);
+			string varName = ShortenName(e.VariableName);
+			Symbol result = symbolTable.Lookup(varName);
 			if (!CurrentSelectStatement.FromExtents.Contains(result))
 			{
 				CurrentSelectStatement.OuterExtents[result] = true;
@@ -2280,6 +2289,7 @@ namespace FirebirdSql.Data.Entity
 			DbExpressionBinding input, int fromSymbolStart)
 		{
 			Symbol fromSymbol = null;
+			string varName = ShortenName(input.VariableName);
 
 			if (result != fromExtentFragment)
 			{
@@ -2297,7 +2307,7 @@ namespace FirebirdSql.Data.Entity
 							|| IsApplyExpression(input.Expression))
 						{
 							List<Symbol> extents = sqlSelectStatement.FromExtents;
-							JoinSymbol newJoinSymbol = new JoinSymbol(input.VariableName, input.VariableType, extents);
+							JoinSymbol newJoinSymbol = new JoinSymbol(varName, input.VariableType, extents);
 							newJoinSymbol.IsNestedJoin = true;
 							newJoinSymbol.ColumnList = columns;
 
@@ -2316,7 +2326,7 @@ namespace FirebirdSql.Data.Entity
 							{
 								// Note: sqlSelectStatement.FromExtents will not do, since it might
 								// just be an alias of joinSymbol, and we want an actual JoinSymbol.
-								JoinSymbol newJoinSymbol = new JoinSymbol(input.VariableName, input.VariableType, oldJoinSymbol.ExtentList);
+								JoinSymbol newJoinSymbol = new JoinSymbol(varName, input.VariableType, oldJoinSymbol.ExtentList);
 								// This indicates that the sqlSelectStatement is a blocking scope
 								// i.e. it hides/renames extent columns
 								newJoinSymbol.IsNestedJoin = true;
@@ -2343,11 +2353,11 @@ namespace FirebirdSql.Data.Entity
 
 				if (fromSymbol == null) // i.e. not a join symbol
 				{
-					fromSymbol = new Symbol(input.VariableName, input.VariableType);
+					fromSymbol = new Symbol(varName, input.VariableType);
 				}
 
 
-				AddFromSymbol(result, input.VariableName, fromSymbol);
+				AddFromSymbol(result, varName, fromSymbol);
 				result.AllJoinExtents.Add(fromSymbol);
 			}
 			else // result == fromExtentFragment.  The child extents have been merged into the parent's.
@@ -2367,7 +2377,7 @@ namespace FirebirdSql.Data.Entity
 					extents.Add(result.FromExtents[i]);
 				}
 				result.FromExtents.RemoveRange(fromSymbolStart, result.FromExtents.Count - fromSymbolStart);
-				fromSymbol = new JoinSymbol(input.VariableName, input.VariableType, extents);
+				fromSymbol = new JoinSymbol(varName, input.VariableType, extents);
 				result.FromExtents.Add(fromSymbol);
 				// this Join Symbol does not have its own select statement, so we
 				// do not set IsNestedJoin
@@ -2375,7 +2385,7 @@ namespace FirebirdSql.Data.Entity
 
 				// We do not call AddFromSymbol(), since we do not want to add
 				// "AS alias" to the FROM clause- it has been done when the extent was added earlier.
-				symbolTable.Add(input.VariableName, fromSymbol);
+				symbolTable.Add(varName, fromSymbol);
 			}
 		}
 
@@ -3567,8 +3577,7 @@ namespace FirebirdSql.Data.Entity
 		}
 
 		/// <summary>
-		/// We use the normal box quotes for SQL server.  We do not deal with ANSI quotes
-		/// i.e. double quotes.
+		/// Decorate with double quotes and escape double quotes inside in Firebird.
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
@@ -3677,20 +3686,21 @@ namespace FirebirdSql.Data.Entity
 		SqlSelectStatement VisitFilterExpression(DbExpressionBinding input, DbExpression predicate, bool negatePredicate)
 		{
 			Symbol fromSymbol;
+			string varName = ShortenName(input.VariableName);
 			SqlSelectStatement result = VisitInputExpression(input.Expression,
-				input.VariableName, input.VariableType, out fromSymbol);
+				varName, input.VariableType, out fromSymbol);
 
 			// Filter is compatible with OrderBy
 			// but not with Project, another Filter or GroupBy
 			if (!IsCompatible(result, DbExpressionKind.Filter))
 			{
-				result = CreateNewSelectStatement(result, input.VariableName, input.VariableType, out fromSymbol);
+				result = CreateNewSelectStatement(result, varName, input.VariableType, out fromSymbol);
 			}
 
 			selectStatementStack.Push(result);
 			symbolTable.EnterScope();
 
-			AddFromSymbol(result, input.VariableName, fromSymbol);
+			AddFromSymbol(result, varName, fromSymbol);
 
 			if (negatePredicate)
 			{
@@ -3843,6 +3853,22 @@ namespace FirebirdSql.Data.Entity
 				return false;
 			}
 			return true;
+		}
+
+		/// <summary>
+		/// Shortens the name of variable (tables, etc.).
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		internal string ShortenName(string name)
+		{
+			int index = shortenedNames.IndexOf(name);
+			if (index == -1)
+			{
+				shortenedNames.Add(name);
+				index = shortenedNames.Count - 1;
+			}
+			return ((char)('A' + index)).ToString();
 		}
 
 		#endregion
