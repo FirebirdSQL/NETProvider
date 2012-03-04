@@ -23,22 +23,6 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbSecurity : FbService
 	{
-		#region · Properties ·
-
-		public string UsersDbPath
-		{
-			get
-			{
-				byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_user_dbpath });
-
-				System.Collections.ArrayList info = this.ParseQueryInfo(buffer);
-
-				return info.Count != 0 ? (string)info[0] : null;
-			}
-		}
-
-		#endregion
-
 		#region · Constructors ·
 
 		public FbSecurity()
@@ -240,6 +224,13 @@ namespace FirebirdSql.Data.Services
 			}
 
 			return (FbUserData[])info[0];
+		}
+
+		public string GetUsersDbPath()
+		{
+			byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_user_dbpath });
+			System.Collections.ArrayList info = this.ParseQueryInfo(buffer);
+			return info.Count != 0 ? (string)info[0] : null;
 		}
 
 		#endregion

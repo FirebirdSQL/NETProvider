@@ -25,65 +25,57 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbServerProperties : FbService
 	{
-		#region · Properties ·
-
-		public int Version
-		{
-			get { return this.GetInt32(IscCodes.isc_info_svc_version); }
-		}
-
-		public string ServerVersion
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_server_version); }
-		}
-
-		public string Implementation
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_implementation); }
-		}
-
-		public string RootDirectory
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_get_env); }
-		}
-
-		public string LockManager
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_get_env_lock); }
-		}
-
-		public string MessageFile
-		{
-			get { return this.GetString(IscCodes.isc_info_svc_get_env_msg); }
-		}
-
-		public FbDatabasesInfo DatabasesInfo
-		{
-			get
-			{
-				ArrayList info = this.GetInfo(IscCodes.isc_info_svc_svr_db_info);
-
-				return info.Count != 0 ? (FbDatabasesInfo)info[0] : new FbDatabasesInfo();
-			}
-		}
-
-		public FbServerConfig ServerConfig
-		{
-			get
-			{
-				ArrayList info = this.GetInfo(IscCodes.isc_info_svc_get_config);
-
-				return info.Count != 0 ? (FbServerConfig)info[0] : new FbServerConfig();
-			}
-		}
-
-		#endregion
-
 		#region · Constructors ·
 
 		public FbServerProperties()
 			: base()
 		{ }
+
+		#endregion
+
+		#region · Methods ·
+
+		public int GetVersion()
+		{
+			return this.GetInt32(IscCodes.isc_info_svc_version);
+		}
+
+		public string GetServerVersion()
+		{
+			return this.GetString(IscCodes.isc_info_svc_server_version);
+		}
+
+		public string GetImplementation()
+		{
+			return this.GetString(IscCodes.isc_info_svc_implementation);
+		}
+
+		public string GetRootDirectory()
+		{
+			return this.GetString(IscCodes.isc_info_svc_get_env);
+		}
+
+		public string GetLockManager()
+		{
+			return this.GetString(IscCodes.isc_info_svc_get_env_lock);
+		}
+
+		public string GetMessageFile()
+		{
+			return this.GetString(IscCodes.isc_info_svc_get_env_msg);
+		}
+
+		public FbDatabasesInfo GetDatabasesInfo()
+		{
+			ArrayList info = this.GetInfo(IscCodes.isc_info_svc_svr_db_info);
+			return info.Count != 0 ? (FbDatabasesInfo)info[0] : new FbDatabasesInfo();
+		}
+
+		public FbServerConfig GetServerConfig()
+		{
+			ArrayList info = this.GetInfo(IscCodes.isc_info_svc_get_config);
+			return info.Count != 0 ? (FbServerConfig)info[0] : new FbServerConfig();
+		}
 
 		#endregion
 
