@@ -53,7 +53,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		private Dictionary<string, int> columnsIndexesOrdinal;
 		private Dictionary<string, int> columnsIndexesOrdinalCI;
 		private Dictionary<string, int> columnsIndexesInvariantCI;
-		private Dictionary<string, int> columnsIndexesCI;
 
 		#endregion
 
@@ -723,7 +722,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			columnsIndexesOrdinal = new Dictionary<string, int>(this.fields.Count, StringComparer.Ordinal);
 			columnsIndexesOrdinalCI = new Dictionary<string, int>(this.fields.Count, StringComparer.OrdinalIgnoreCase);
 			columnsIndexesInvariantCI = new Dictionary<string, int>(this.fields.Count, StringComparer.InvariantCultureIgnoreCase);
-			columnsIndexesCI = new Dictionary<string, int>(this.fields.Count, StringComparer.CurrentCultureIgnoreCase);
 			for (int i = 0; i < this.fields.Count; i++)
 			{
 				string fieldName = this.fields[i].Alias;
@@ -733,14 +731,12 @@ namespace FirebirdSql.Data.FirebirdClient
 					columnsIndexesOrdinalCI.Add(fieldName, i);
 				if (!columnsIndexesInvariantCI.ContainsKey(fieldName))
 					columnsIndexesInvariantCI.Add(fieldName, i);
-				if (!columnsIndexesCI.ContainsKey(fieldName))
-					columnsIndexesCI.Add(fieldName, i);
 			}
 		}
 
 		private int GetColumnIndex(string name)
 		{
-			if (columnsIndexesOrdinal == null || columnsIndexesCI == null || columnsIndexesInvariantCI == null)
+			if (columnsIndexesOrdinal == null || columnsIndexesOrdinalCI == null || columnsIndexesInvariantCI == null)
 			{
 				this.InitializeColumnsIndexes();
 			}
@@ -748,7 +744,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (!columnsIndexesOrdinal.TryGetValue(name, out index))
 				if (!columnsIndexesOrdinalCI.TryGetValue(name, out index))
 					if (!columnsIndexesInvariantCI.TryGetValue(name, out index))
-						if (!columnsIndexesCI.TryGetValue(name, out index))
 							throw new IndexOutOfRangeException("Could not find specified column in results.");
 			return index;
 		}
