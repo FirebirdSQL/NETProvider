@@ -234,15 +234,15 @@ namespace FirebirdSql.Data.UnitTests
 
 			serverProp.ConnectionString = this.BuildServicesConnectionString(false);
 
-			FbServerConfig serverConfig = serverProp.ServerConfig;
-			FbDatabasesInfo databasesInfo = serverProp.DatabasesInfo;
+			FbServerConfig serverConfig = serverProp.GetServerConfig();
+			FbDatabasesInfo databasesInfo = serverProp.GetDatabasesInfo();
 
-			Console.WriteLine(serverProp.MessageFile);
-			Console.WriteLine(serverProp.LockManager);
-			Console.WriteLine(serverProp.RootDirectory);
-			Console.WriteLine(serverProp.Implementation);
-			Console.WriteLine(serverProp.ServerVersion);
-			Console.WriteLine(serverProp.Version);
+			Console.WriteLine(serverProp.GetMessageFile());
+			Console.WriteLine(serverProp.GetLockManager());
+			Console.WriteLine(serverProp.GetRootDirectory());
+			Console.WriteLine(serverProp.GetImplementation());
+			Console.WriteLine(serverProp.GetServerVersion());
+			Console.WriteLine(serverProp.GetVersion());
 		}
 
 		#endregion

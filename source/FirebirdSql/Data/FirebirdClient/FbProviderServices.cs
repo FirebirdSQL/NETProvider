@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			try
 			{
 				FbServerProperties serverProperties = new FbServerProperties() { ConnectionString = fbConnection.ConnectionString };
-				Version serverVersion = Extensions.ParseServerVersion(serverProperties.ServerVersion);
+				Version serverVersion = Extensions.ParseServerVersion(serverProperties.GetServerVersion());
 				return serverVersion.ToString(2);
 			}
 			catch (FbException ex)
