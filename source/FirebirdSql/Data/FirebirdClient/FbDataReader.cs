@@ -50,7 +50,10 @@ namespace FirebirdSql.Data.FirebirdClient
 		private bool isClosed;
 		private int position;
 		private int recordsAffected;
-		private Dictionary<string, int> columnsIndexes;
+		private Dictionary<string, int> columnsIndexesOrdinal;
+		private Dictionary<string, int> columnsIndexesOrdinalCI;
+		private Dictionary<string, int> columnsIndexesInvariantCI;
+		private Dictionary<string, int> columnsIndexesCI;
 
 		#endregion
 
@@ -269,11 +272,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			int tableCount = 0;
 			string currentTable = string.Empty;
 
-			this.schemaTable = this.GetSchemaTableStructure();
+			this.schemaTable = GetSchemaTableStructure();
 
 			/* Prepare statement for schema fields information	*/
 			FbCommand schemaCmd = new FbCommand(
-				this.GetSchemaCommandText(),
+				GetSchemaCommandText(),
 				this.command.Connection,
 				this.command.Connection.InnerConnection.ActiveTransaction);
 
@@ -299,11 +302,11 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					if (r.Read())
 					{
-						isReadOnly = (this.IsReadOnly(r) || this.IsExpression(r)) ? true : false;
+						isReadOnly = (IsReadOnly(r) || IsExpression(r)) ? true : false;
 						isKeyColumn = (r.GetInt32(2) == 1) ? true : false;
 						isUnique = (r.GetInt32(3) == 1) ? true : false;
 						precision = r.IsDBNull(4) ? -1 : r.GetInt32(4);
-						isExpression = this.IsExpression(r);
+						isExpression = IsExpression(r);
 					}
 				}
 
@@ -371,21 +374,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			this.CheckState();
 
-			if (columnsIndexes == null)
-			{
-				columnsIndexes = new Dictionary<string, int>(this.fields.Count);
-				for (int i = 0; i < this.fields.Count; i++)
-				{
-					string field = this.fields[i].Alias.ToUpper();
-					if (!columnsIndexes.ContainsKey(field))
-						columnsIndexes.Add(field, i);
-				}
-			}
-
-			int index;
-			if (!columnsIndexes.TryGetValue(name.ToUpper(), out index))
-				throw new IndexOutOfRangeException("Could not find specified column in results.");
-			return index;
+			return this.GetColumnIndex(name);
 		}
 
 		public override string GetName(int i)
@@ -450,7 +439,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].Value);
+			return CheckedGetValue(() => this.row[i].Value);
 		}
 
 		public override int GetValues(object[] values)
@@ -460,7 +449,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			for (int i = 0; i < this.fields.Count; i++)
 			{
-				values[i] = this.CheckedGetValue(() => this.GetValue(i));
+				values[i] = CheckedGetValue(() => this.GetValue(i));
 			}
 
 			return values.Length;
@@ -471,7 +460,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetBoolean());
+			return CheckedGetValue(() => this.row[i].GetBoolean());
 		}
 
 		public override byte GetByte(int i)
@@ -479,7 +468,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetByte());
+			return CheckedGetValue(() => this.row[i].GetByte());
 		}
 
 		public override long GetBytes(
@@ -503,12 +492,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return this.CheckedGetValue(() => (byte[])row[i].GetBinary()).Length;
+					return CheckedGetValue(() => (byte[])row[i].GetBinary()).Length;
 				}
 			}
 			else
 			{
-				byte[] byteArray = this.CheckedGetValue(() => (byte[])row[i].GetBinary());
+				byte[] byteArray = CheckedGetValue(() => (byte[])row[i].GetBinary());
 
 				if (length > (byteArray.Length - dataIndex))
 				{
@@ -536,7 +525,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetChar());
+			return CheckedGetValue(() => this.row[i].GetChar());
 		}
 
 		public override long GetChars(
@@ -557,13 +546,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return (this.CheckedGetValue(() => (string)this.GetValue(i))).ToCharArray().Length;
+					return (CheckedGetValue(() => (string)this.GetValue(i))).ToCharArray().Length;
 				}
 			}
 			else
 			{
 
-				char[] charArray = (this.CheckedGetValue(() => (string)this.GetValue(i))).ToCharArray();
+				char[] charArray = (CheckedGetValue(() => (string)this.GetValue(i))).ToCharArray();
 
 				int charsRead = 0;
 				int realLength = length;
@@ -594,7 +583,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetGuid());
+			return CheckedGetValue(() => this.row[i].GetGuid());
 		}
 
 		public override Int16 GetInt16(int i)
@@ -602,7 +591,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetInt16());
+			return CheckedGetValue(() => this.row[i].GetInt16());
 		}
 
 		public override Int32 GetInt32(int i)
@@ -610,7 +599,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetInt32());
+			return CheckedGetValue(() => this.row[i].GetInt32());
 		}
 
 		public override Int64 GetInt64(int i)
@@ -618,7 +607,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetInt64());
+			return CheckedGetValue(() => this.row[i].GetInt64());
 		}
 
 		public override float GetFloat(int i)
@@ -626,7 +615,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetFloat());
+			return CheckedGetValue(() => this.row[i].GetFloat());
 		}
 
 		public override double GetDouble(int i)
@@ -634,7 +623,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetDouble());
+			return CheckedGetValue(() => this.row[i].GetDouble());
 		}
 
 		public override string GetString(int i)
@@ -642,7 +631,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetString());
+			return CheckedGetValue(() => this.row[i].GetString());
 		}
 
 		public override Decimal GetDecimal(int i)
@@ -650,7 +639,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetDecimal());
+			return CheckedGetValue(() => this.row[i].GetDecimal());
 		}
 
 		public override DateTime GetDateTime(int i)
@@ -658,7 +647,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.CheckPosition();
 			this.CheckIndex(i);
 
-			return this.CheckedGetValue(() => this.row[i].GetDateTime());
+			return CheckedGetValue(() => this.row[i].GetDateTime());
 		}
 
 		public override bool IsDBNull(int i)
@@ -712,12 +701,68 @@ namespace FirebirdSql.Data.FirebirdClient
 			return (FbDbType)this.fields[i].DbDataType;
 		}
 
-		private bool IsReadOnly(FbDataReader r)
+		private void UpdateRecordsAffected()
+		{
+			if (this.command != null && !this.command.IsDisposed)
+			{
+				if (this.command.RecordsAffected != -1)
+				{
+					this.recordsAffected = this.recordsAffected == -1 ? 0 : this.recordsAffected;
+					this.recordsAffected += this.command.RecordsAffected;
+				}
+			}
+		}
+
+		private bool IsCommandBehavior(CommandBehavior behavior)
+		{
+			return Extensions.HasFlag(this.commandBehavior, behavior);
+		}
+
+		private void InitializeColumnsIndexes()
+		{
+			columnsIndexesOrdinal = new Dictionary<string, int>(this.fields.Count, StringComparer.Ordinal);
+			columnsIndexesOrdinalCI = new Dictionary<string, int>(this.fields.Count, StringComparer.OrdinalIgnoreCase);
+			columnsIndexesInvariantCI = new Dictionary<string, int>(this.fields.Count, StringComparer.InvariantCultureIgnoreCase);
+			columnsIndexesCI = new Dictionary<string, int>(this.fields.Count, StringComparer.CurrentCultureIgnoreCase);
+			for (int i = 0; i < this.fields.Count; i++)
+			{
+				string fieldName = this.fields[i].Alias;
+				if (!columnsIndexesOrdinal.ContainsKey(fieldName))
+					columnsIndexesOrdinal.Add(fieldName, i);
+				if (!columnsIndexesOrdinalCI.ContainsKey(fieldName))
+					columnsIndexesOrdinalCI.Add(fieldName, i);
+				if (!columnsIndexesInvariantCI.ContainsKey(fieldName))
+					columnsIndexesInvariantCI.Add(fieldName, i);
+				if (!columnsIndexesCI.ContainsKey(fieldName))
+					columnsIndexesCI.Add(fieldName, i);
+			}
+		}
+
+		private int GetColumnIndex(string name)
+		{
+			if (columnsIndexesOrdinal == null || columnsIndexesCI == null || columnsIndexesInvariantCI == null)
+			{
+				this.InitializeColumnsIndexes();
+			}
+			int index;
+			if (!columnsIndexesOrdinal.TryGetValue(name, out index))
+				if (!columnsIndexesOrdinalCI.TryGetValue(name, out index))
+					if (!columnsIndexesInvariantCI.TryGetValue(name, out index))
+						if (!columnsIndexesCI.TryGetValue(name, out index))
+							throw new IndexOutOfRangeException("Could not find specified column in results.");
+			return index;
+		}
+
+		#endregion
+
+		#region · Static Methods ·
+
+		private static bool IsReadOnly(FbDataReader r)
 		{
 			return IsExpression(r);
 		}
 
-		public bool IsExpression(FbDataReader r)
+		public static bool IsExpression(FbDataReader r)
 		{
 			/* [0] = COMPUTED_BLR
 			 * [1] = COMPUTED_SOURCE
@@ -730,7 +775,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return false;
 		}
 
-		private DataTable GetSchemaTableStructure()
+		private static DataTable GetSchemaTableStructure()
 		{
 			DataTable schema = new DataTable("Schema");
 
@@ -759,7 +804,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return schema;
 		}
 
-		private string GetSchemaCommandText()
+		private static string GetSchemaCommandText()
 		{
 			const string sql =
 				@"SELECT
@@ -787,24 +832,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return sql;
 		}
 
-		private void UpdateRecordsAffected()
-		{
-			if (this.command != null && !this.command.IsDisposed)
-			{
-				if (this.command.RecordsAffected != -1)
-				{
-					this.recordsAffected = this.recordsAffected == -1 ? 0 : this.recordsAffected;
-					this.recordsAffected += this.command.RecordsAffected;
-				}
-			}
-		}
-
-		private bool IsCommandBehavior(CommandBehavior behavior)
-		{
-			return ((behavior & this.commandBehavior) == behavior);
-		}
-
-		private T CheckedGetValue<T>(Func<T> f)
+		private static T CheckedGetValue<T>(Func<T> f)
 		{
 			try
 			{
