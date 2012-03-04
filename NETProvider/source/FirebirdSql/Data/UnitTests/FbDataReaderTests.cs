@@ -71,9 +71,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - Read Method - Test");
-
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
@@ -93,14 +90,10 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - Read Method - Test");
-
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
 				Console.Write(reader.GetString(reader.GetOrdinal("bigint_field")) + "\t");
-
 				Console.WriteLine();
 			}
 
@@ -116,9 +109,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - Read Method - Test");
-
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
@@ -129,7 +119,6 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					Console.Write(values[i] + "\t");
 				}
-
 				Console.WriteLine();
 			}
 
@@ -145,9 +134,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - Read Method - Test");
-
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
@@ -155,7 +141,6 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					Console.Write(reader[i] + "\t");
 				}
-
 				Console.WriteLine();
 			}
 
@@ -171,9 +156,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - Read Method - Test");
-
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
@@ -181,7 +163,6 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					Console.Write(reader[reader.GetName(i)] + "\t");
 				}
-
 				Console.WriteLine();
 			}
 
@@ -200,9 +181,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			DataTable schema = reader.GetSchemaTable();
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - GetSchemaTable Method- Test");
-
 			DataRow[] currRows = schema.Select(null, null, DataViewRowState.CurrentRows);
 
 			foreach (DataColumn myCol in schema.Columns)
@@ -218,7 +196,6 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					Console.Write("{0}\t\t", myRow[myCol]);
 				}
-
 				Console.WriteLine();
 			}
 
@@ -237,9 +214,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			DataTable schema = reader.GetSchemaTable();
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - GetSchemaTable Method- Test");
-
 			DataRow[] currRows = schema.Select(null, null, DataViewRowState.CurrentRows);
 
 			foreach (DataColumn myCol in schema.Columns)
@@ -255,7 +229,6 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					Console.Write("{0}\t\t", myRow[myCol]);
 				}
-
 				Console.WriteLine();
 			}
 
@@ -276,30 +249,25 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbDataReader reader = command.ExecuteReader();
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - NextResult Method - Test ( First Result )");
-
 			while (reader.Read())
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
 					Console.Write(reader.GetValue(i) + "\t");
 				}
-
 				Console.WriteLine();
 			}
 
+			Console.WriteLine("===");
+
 			if (reader.NextResult())
 			{
-				Console.WriteLine("DataReader - NextResult Method - Test ( Second Result )");
-
 				while (reader.Read())
 				{
 					for (int i = 0; i < reader.FieldCount; i++)
 					{
 						Console.Write(reader.GetValue(i) + "\t");
 					}
-
 					Console.WriteLine();
 				}
 			}
@@ -406,6 +374,37 @@ namespace FirebirdSql.Data.UnitTests
 					}
 				}
 			}
+		}
+
+		[Test]
+		public void GetOrdinalTest()
+		{
+			FbTransaction transaction = Connection.BeginTransaction();
+
+			FbCommand command = new FbCommand("select first 1 0 as fOo, 0 as \"BaR\", 0 as BAR from TEST", Connection, transaction);
+
+			IDataReader reader = command.ExecuteReader();
+			while (reader.Read())
+			{
+				int foo = reader.GetOrdinal("foo");
+				int FOO = reader.GetOrdinal("FOO");
+				int fOo = reader.GetOrdinal("fOo");
+				Assert.AreEqual(0, foo);
+				Assert.AreEqual(0, FOO);
+				Assert.AreEqual(0, fOo);
+
+				int bar = reader.GetOrdinal("bar");
+				int BaR = reader.GetOrdinal("BaR");
+				Assert.AreEqual(1, bar);
+				Assert.AreEqual(1, BaR);
+
+				int BAR = reader.GetOrdinal("BAR");
+				Assert.AreEqual(2, BAR);
+			}
+
+			reader.Close();
+			transaction.Rollback();
+			command.Dispose();
 		}
 
 		#endregion
