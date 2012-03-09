@@ -21,7 +21,7 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
-	internal class GlobalizationHelper
+	internal static class GlobalizationHelper
 	{
 		#region · Static Methods ·
 
@@ -32,14 +32,6 @@ namespace FirebirdSql.Data.Common
 				strB,
 				CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth |
 				CompareOptions.IgnoreCase) == 0 ? true : false;
-		}
-
-		#endregion
-
-		#region · Constructors ·
-
-		private GlobalizationHelper()
-		{
 		}
 
 		#endregion
