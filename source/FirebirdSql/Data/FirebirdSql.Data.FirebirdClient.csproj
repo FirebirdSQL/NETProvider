@@ -203,7 +203,6 @@
     <Compile Include="Common\DbValue.cs" />
     <Compile Include="Common\Descriptor.cs" />
     <Compile Include="Common\EventParameterBuffer.cs" />
-    <Compile Include="Common\GlobalizationHelper.cs" />
     <Compile Include="Common\IDatabase.cs" />
     <Compile Include="Common\IscCodes.cs" />
     <Compile Include="Common\IscError.cs" />

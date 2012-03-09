@@ -219,8 +219,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			int index = 0;
 			foreach (FbParameter item in this.parameters)
 			{
-				if (GlobalizationHelper.CultureAwareCompare(item.ParameterName, parameterName) ||
-					GlobalizationHelper.CultureAwareCompare(item.InternalParameterName, parameterName))
+				if (Extensions.CultureAwareEquals(item.ParameterName, parameterName) ||
+					Extensions.CultureAwareEquals(item.InternalParameterName, parameterName))
 				{
 					return index;
 				}
