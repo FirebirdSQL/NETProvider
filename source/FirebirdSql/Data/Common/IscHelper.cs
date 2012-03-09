@@ -24,7 +24,7 @@ using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class IscHelper
+	internal static class IscHelper
 	{
 		#region · Static Methods ·
 
@@ -319,14 +319,6 @@ namespace FirebirdSql.Data.Common
 			}
 
 			return newValue;
-		}
-
-		#endregion
-		
-		#region · Constructors ·
-
-		private IscHelper()
-		{
 		}
 
 		#endregion

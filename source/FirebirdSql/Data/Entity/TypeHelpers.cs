@@ -25,7 +25,7 @@ using System.Data.Metadata.Edm;
 
 namespace FirebirdSql.Data.Entity
 {
-	class TypeHelpers
+	static class TypeHelpers
 	{
 		public static bool TryGetPrecision(TypeUsage tu, out byte precision)
 		{

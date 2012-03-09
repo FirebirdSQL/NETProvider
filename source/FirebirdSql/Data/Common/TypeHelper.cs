@@ -25,16 +25,8 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class TypeHelper
+	internal static class TypeHelper
 	{
-		#region · Constructors ·
-
-		private TypeHelper()
-		{
-		}
-
-		#endregion
-
 		#region · Static Methods ·
 
 		public static bool IsDBNull(object value)
