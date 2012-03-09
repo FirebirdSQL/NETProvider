@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
@@ -30,6 +31,19 @@ namespace FirebirdSql.Data.Common
 			if (!m.Success)
 				return null;
 			return new Version(m.Groups[1].Value);
+		}
+
+		public static bool CultureAwareEquals(
+#if (!NET_20)
+			this 
+#endif
+			string string1, string string2)
+		{
+			return CultureInfo.CurrentCulture.CompareInfo.Compare(
+				string1,
+				string2,
+				CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth |
+				CompareOptions.IgnoreCase) == 0 ? true : false;
 		}
 	}
 }

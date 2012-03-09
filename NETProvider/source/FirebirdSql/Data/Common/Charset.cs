@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Common
 		{
 			foreach (Charset charset in supportedCharsets)
 			{
-				if (GlobalizationHelper.CultureAwareCompare(charset.Name, charsetName))
+				if (Extensions.CultureAwareEquals(charset.Name, charsetName))
 					return charset;
 			}
 			return null;
