@@ -29,7 +29,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 {
 	internal sealed class SSPIHelper : IDisposable
 	{
-
 		private enum SecBufferType
 		{
 			SECBUFFER_VERSION = 0,
