@@ -266,8 +266,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.Write(IscCodes.op_disconnect);
 					this.Flush();
 
-					this.ReadResponse();
-
 					// Close the Event Manager
 					this.CloseEventManager();
 

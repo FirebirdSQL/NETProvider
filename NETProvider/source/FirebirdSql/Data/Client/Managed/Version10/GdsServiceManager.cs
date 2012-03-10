@@ -94,8 +94,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					this.database.Write(IscCodes.op_disconnect);
 					this.database.Flush();
 
-					this.database.ReadResponse();
-
 					this.handle = 0;
 				}
 				catch (IOException)

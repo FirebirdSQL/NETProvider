@@ -130,7 +130,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			this.innerStream = innerStream;
 			this.charset = charset;
-			this.operation = -1;
+			this.ResetOperation();
 
 			GC.SuppressFinalize(innerStream);
 		}
@@ -230,10 +230,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual int ReadOperation()
 		{
-			int op = (this.operation >= 0) ? this.operation : this.ReadNextOperation();
-
-			this.operation = -1;
-
+			int op = this.ValidOperationAvailable ? this.operation : this.ReadNextOperation();
+			this.ResetOperation();
 			return op;
 		}
 
@@ -261,11 +259,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			byte[] buffer = new byte[count];
 
-			int toRead = count;
-			int currentlyRead = -1;
-			while (toRead > 0 && currentlyRead != 0)
+			if (count > 0)
 			{
-				toRead -= (currentlyRead = this.Read(buffer, count - toRead, toRead));
+				int toRead = count;
+				int currentlyRead = -1;
+				while (toRead > 0 && currentlyRead != 0)
+				{
+					toRead -= (currentlyRead = this.Read(buffer, count - toRead, toRead));
+				}
+				if (toRead == count)
+				{
+					throw new IOException();
+				}
 			}
 
 			return buffer;
@@ -776,6 +781,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				throw new ObjectDisposedException("The XdrStream is closed.");
 			}
+		}
+
+		private void ResetOperation()
+		{
+			this.operation = -1;
+		}
+
+		#endregion
+
+		#region · Private Methods ·
+
+		private bool ValidOperationAvailable
+		{
+			get { return this.operation >= 0; }
 		}
 
 		#endregion
