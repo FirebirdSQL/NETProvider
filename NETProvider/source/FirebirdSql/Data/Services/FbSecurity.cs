@@ -219,6 +219,8 @@ namespace FirebirdSql.Data.Services
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_display_user);
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
