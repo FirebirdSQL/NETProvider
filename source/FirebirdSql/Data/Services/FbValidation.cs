@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Services
 
 		public void Execute()
 		{
-			if (String.IsNullOrEmpty(this.Database))
+			if (string.IsNullOrEmpty(this.Database))
 			{
 				throw new FbException("Validation should be used against a specific database");
 			}
@@ -67,6 +67,8 @@ namespace FirebirdSql.Data.Services
 				this.StartSpb.Append(IscCodes.isc_action_svc_repair);
 				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+
+				this.Open();
 
 				// Start execution
 				this.StartTask();

@@ -101,6 +101,8 @@ namespace FirebirdSql.Data.Services
 
 				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
+				this.Open();
+
 				// Start execution
 				this.StartTask();
 
