@@ -44,6 +44,8 @@ namespace FirebirdSql.Data.Services
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 			this.StartSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
@@ -59,6 +61,8 @@ namespace FirebirdSql.Data.Services
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 			this.StartSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
@@ -73,6 +77,8 @@ namespace FirebirdSql.Data.Services
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 			this.StartSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
+
+			this.Open();
 
 			// Start execution
 			this.StartTask();
@@ -118,6 +124,8 @@ namespace FirebirdSql.Data.Services
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 			this.StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
@@ -132,6 +140,8 @@ namespace FirebirdSql.Data.Services
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 			this.StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
+
+			this.Open();
 
 			// Start execution
 			this.StartTask();
@@ -157,6 +167,8 @@ namespace FirebirdSql.Data.Services
 				this.StartSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_async);
 			}
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
@@ -180,6 +192,8 @@ namespace FirebirdSql.Data.Services
 				this.StartSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res_use_full);
 			}
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
@@ -202,6 +216,8 @@ namespace FirebirdSql.Data.Services
 			{
 				this.StartSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)IscCodes.isc_spb_prp_am_readwrite);
 			}
+
+			this.Open();
 
 			// Start execution
 			this.StartTask();

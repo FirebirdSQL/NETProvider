@@ -120,6 +120,8 @@ namespace FirebirdSql.Data.Services
 					this.StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)this.pageSize);
 				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
 
+				this.Open();
+
 				// Start execution
 				this.StartTask();
 

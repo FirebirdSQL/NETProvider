@@ -17,6 +17,8 @@
  */
 
 using System;
+using System.Collections;
+
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
@@ -88,6 +90,8 @@ namespace FirebirdSql.Data.Services
 				this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
 			}
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
@@ -112,6 +116,8 @@ namespace FirebirdSql.Data.Services
 			{
 				this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
 			}
+
+			this.Open();
 
 			// Start execution
 			this.StartTask();
@@ -169,6 +175,8 @@ namespace FirebirdSql.Data.Services
 				this.StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
 			}
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
@@ -183,12 +191,14 @@ namespace FirebirdSql.Data.Services
 			this.StartSpb.Append(IscCodes.isc_action_svc_display_user);
 			this.StartSpb.Append(IscCodes.isc_spb_sec_username, userName);
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
 			byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_get_users });
 
-			System.Collections.ArrayList info = base.ParseQueryInfo(buffer);
+			ArrayList info = base.ParseQueryInfo(buffer);
 
 			this.Close();
 
@@ -214,7 +224,7 @@ namespace FirebirdSql.Data.Services
 
 			byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_get_users });
 
-			System.Collections.ArrayList info = base.ParseQueryInfo(buffer);
+			ArrayList info = base.ParseQueryInfo(buffer);
 
 			this.Close();
 

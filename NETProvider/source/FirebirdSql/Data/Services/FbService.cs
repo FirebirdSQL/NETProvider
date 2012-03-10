@@ -199,12 +199,9 @@ namespace FirebirdSql.Data.Services
 
 		protected void StartTask()
 		{
-			bool shouldClose = false;
 			if (this.state == FbServiceState.Closed)
 			{
-				// Attach to Service Manager
-				this.Open();
-				shouldClose = true;
+				throw new InvalidOperationException("Service is Closed.");
 			}
 
 			try
@@ -215,13 +212,6 @@ namespace FirebirdSql.Data.Services
 			catch (Exception ex)
 			{
 				throw new FbException(ex.Message, ex);
-			}
-			finally
-			{
-				if (shouldClose)
-				{
-					this.Close();
-				}
 			}
 		}
 

@@ -53,6 +53,7 @@ namespace FirebirdSql.Data.Services
 					this.StartSpb.Append(IscCodes.isc_spb_trc_name, sessionName);
 				this.StartSpb.Append(IscCodes.isc_spb_trc_cfg, config);
 
+				this.Open();
 				this.StartTask();
 				this.ProcessServiceOutput();
 			}
@@ -97,6 +98,7 @@ namespace FirebirdSql.Data.Services
 				if (sessionID.HasValue)
 					this.StartSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
 
+				this.Open();
 				this.StartTask();
 				this.ProcessServiceOutput();
 			}
