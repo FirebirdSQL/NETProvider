@@ -714,7 +714,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private bool IsCommandBehavior(CommandBehavior behavior)
 		{
-			return Extensions.HasFlag(this.commandBehavior, behavior);
+			return this.commandBehavior.HasFlag(behavior);
 		}
 
 		private void InitializeColumnsIndexes()
