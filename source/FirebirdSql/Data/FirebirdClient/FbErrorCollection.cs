@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			int index = 0;
 			foreach (FbError item in this.errors)
 			{
-				if (Extensions.CultureAwareEquals(item.Message, errorMessage))
+				if (item.Message.CultureAwareEquals(errorMessage))
 				{
 					return index;
 				}

@@ -53,9 +53,9 @@ namespace FirebirdSql.Data.Services
 				sb.AppendFormat("exclude_filter {0}", this.ExcludeFilter);
 				sb.AppendLine();
 			}
-			sb.AppendFormat("log_services {0}", (Extensions.HasFlag(this.Events, FbServiceTraceEvents.Services) ? "true" : "false"));
+			sb.AppendFormat("log_services {0}", this.Events.HasFlag(FbServiceTraceEvents.Services) ? "true" : "false");
 			sb.AppendLine();
-			sb.AppendFormat("log_service_query {0}", (Extensions.HasFlag(this.Events, FbServiceTraceEvents.ServiceQuery) ? "true" : "false"));
+			sb.AppendFormat("log_service_query {0}", this.Events.HasFlag(FbServiceTraceEvents.ServiceQuery) ? "true" : "false");
 			sb.AppendLine("</services>");
 			return sb.ToString();
 		}

@@ -264,7 +264,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				if (string.IsNullOrEmpty(this.ServerVersion))
 					throw new InvalidOperationException("ServerVersion is not valid.");
 
-				return Extensions.ParseServerVersion(this.ServerVersion);
+				return this.ServerVersion.ParseServerVersion();
 			}
 		}
 
