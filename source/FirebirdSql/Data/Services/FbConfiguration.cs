@@ -109,6 +109,8 @@ namespace FirebirdSql.Data.Services
 					break;
 			}
 
+			this.Open();
+
 			// Start execution
 			this.StartTask();
 
