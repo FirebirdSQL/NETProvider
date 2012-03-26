@@ -468,11 +468,11 @@ namespace FirebirdSql.Data.FirebirdClient
 					// avoid it. ( It maybe the connection to the server was down 
 					// for unknown reasons. )
 				}
-				catch (IscException iex)
+				catch (IscException ex)
 				{
-					if (iex.ErrorCode != IscCodes.isc_net_read_err &&
-						iex.ErrorCode != IscCodes.isc_net_write_err &&
-						iex.ErrorCode != IscCodes.isc_network_error)
+					if (ex.ErrorCode != IscCodes.isc_net_read_err &&
+						ex.ErrorCode != IscCodes.isc_net_write_err &&
+						ex.ErrorCode != IscCodes.isc_network_error)
 					{
 						throw;
 					}
