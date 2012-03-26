@@ -7,9 +7,9 @@
         -- STables
         SELECT
         TRIM(rdb$relation_name) as "Id"
-        ,   'Firebird' as "CatalogName"
-        ,   'Firebird' as "SchemaName" 
-        ,   TRIM(rdb$relation_name) as "Name"
+        , 'Firebird' as "CatalogName"
+        , 'Firebird' as "SchemaName" 
+        , TRIM(rdb$relation_name) as "Name"
         FROM
         rdb$relations
         WHERE
@@ -20,57 +20,57 @@
       <DefiningQuery>
         -- STableColumns
         SELECT TRIM(rf.rdb$relation_name) || 'x' || TRIM(rf.rdb$field_name) as "Id"
-        ,   TRIM(rf.rdb$relation_name) as "ParentId"
-        ,   TRIM(rf.rdb$field_name) as "Name"
-        ,   rf.rdb$field_position+1 as "Ordinal"
-        ,   IIF(COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL, 1, 0) as "IsNullable"
-        ,   TRIM(CASE 
-        WHEN POSITION('#BOOL#', UPPER(rf.rdb$description)) > 0 THEN 'smallint_bool'
-				WHEN POSITION('#GUID#', UPPER(rf.rdb$description)) > 0 THEN 'guid'
-				ELSE CASE f.rdb$field_type
-					WHEN 7 THEN CASE f.rdb$field_sub_type
-						WHEN 0 THEN 'smallint'
-						WHEN 1 THEN 'numeric'
-						WHEN 2 THEN 'decimal'
-						END
-					WHEN 8 THEN CASE f.rdb$field_sub_type
-						WHEN 0 THEN 'int'
-						WHEN 1 THEN 'numeric'
-						WHEN 2 THEN 'decimal'
-						END
-					WHEN 16 THEN CASE f.rdb$field_sub_type
-						WHEN 0 THEN 'bigint'
-						WHEN 1 THEN 'numeric'
-						WHEN 2 THEN 'decimal'
-						END
-					WHEN 10 THEN 'float'
-					WHEN 27 THEN 'double'
-					WHEN 12 THEN 'date'
-					WHEN 13 THEN 'time'
-					WHEN 35 THEN 'timestamp'
-					WHEN 261 THEN CASE f.rdb$field_sub_type
-						WHEN 1 THEN 'clob'
-						ELSE 'blob'
-						END
-					WHEN 37 THEN 'varchar'
-					WHEN 14 THEN 'char'
-					WHEN 40 THEN 'cstring'
-					END
-				END) as "TypeName"
-        ,   IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
-        ,   f.rdb$field_precision as "Precision"
-        ,   4 as "DateTimePrecision"
-        ,   f.rdb$field_scale * (-1) as "Scale"
-        ,   null as "CollationCatalog"
-        ,   null as "CollationSchema"
-        ,   null as "CollationName"
-        ,   null as "CharacterSetCatalog"
-        ,   null as "CharacterSetSchema"
-        ,   null as "CharacterSetName"
-        ,   0 as "IsMultiSet"
-        ,   IIF(POSITION('#PK_GEN#', UPPER(rf.rdb$description)) > 0, 1, 0) as "IsIdentity"
-        ,   IIF(f.rdb$computed_blr IS NULL, 0, 1) as "IsStoreGenerated"
-        ,   COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
+        , TRIM(rf.rdb$relation_name) as "ParentId"
+        , TRIM(rf.rdb$field_name) as "Name"
+        , rf.rdb$field_position+1 as "Ordinal"
+        , IIF(COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL, 1, 0) as "IsNullable"
+        , TRIM(CASE 
+        WHEN POSITION('#BOOL#', UPPER(rf.rdb$description)) &gt; 0 THEN 'smallint_bool'
+        WHEN POSITION('#GUID#', UPPER(rf.rdb$description)) &gt; 0 THEN 'guid'
+        ELSE CASE f.rdb$field_type
+          WHEN 7 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'smallint'
+            END
+          WHEN 8 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'int'
+            END
+          WHEN 16 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'bigint'
+            END
+          WHEN 10 THEN 'float'
+          WHEN 27 THEN 'double'
+          WHEN 12 THEN 'date'
+          WHEN 13 THEN 'time'
+          WHEN 35 THEN 'timestamp'
+          WHEN 261 THEN CASE f.rdb$field_sub_type
+            WHEN 1 THEN 'clob'
+            ELSE 'blob'
+            END
+          WHEN 37 THEN 'varchar'
+          WHEN 14 THEN 'char'
+          WHEN 40 THEN 'cstring'
+          END
+        END) as "TypeName"
+        , IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
+        , IIF(f.rdb$field_precision = 0 AND f.rdb$field_scale &lt; 0, 18, f.rdb$field_precision) as "Precision"
+				, 4 as "DateTimePrecision"
+				, f.rdb$field_scale * (-1) as "Scale"
+				, null as "CollationCatalog"
+				, null as "CollationSchema"
+				, null as "CollationName"
+				, null as "CharacterSetCatalog"
+				, null as "CharacterSetSchema"
+				, null as "CharacterSetName"
+				, 0 as "IsMultiSet"
+				, IIF(POSITION('#PK_GEN#', UPPER(rf.rdb$description)) &gt; 0, 1, 0) as "IsIdentity"
+        , IIF(f.rdb$computed_blr IS NULL, 0, 1) as "IsStoreGenerated"
+        , COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
         FROM
         rdb$relation_fields rf
         INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
@@ -85,11 +85,11 @@
         -- SViews
         SELECT
         TRIM(rdb$relation_name) as "Id"
-        ,   'Firebird' as "CatalogName"
-        ,   'Firebird' as "SchemaName"
-        ,   TRIM(rdb$relation_name) as "Name"
-        ,   rdb$view_source as "ViewDefinition"
-        ,   1 as "IsUpdatable"
+        , 'Firebird' as "CatalogName"
+        , 'Firebird' as "SchemaName"
+        , TRIM(rdb$relation_name) as "Name"
+        , rdb$view_source as "ViewDefinition"
+        , 1 as "IsUpdatable"
         FROM
         rdb$relations
         WHERE
@@ -100,57 +100,57 @@
       <DefiningQuery>
         -- SViewColumns
         SELECT TRIM(rf.rdb$relation_name) || 'x' || TRIM(rf.rdb$field_name) as "Id"
-        ,   TRIM(rf.rdb$relation_name) as "ParentId"
-        ,   TRIM(rf.rdb$field_name) as "Name"
-        ,   rf.rdb$field_position+1 as "Ordinal"
-        ,   IIF(COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL, 1, 0) as "IsNullable"
-        ,   TRIM(CASE 
-        WHEN POSITION('#BOOL#', UPPER(rf.rdb$description)) > 0 THEN 'smallint_bool'
-				WHEN POSITION('#GUID#', UPPER(rf.rdb$description)) > 0 THEN 'guid'
-				ELSE CASE f.rdb$field_type
-					WHEN 7 THEN CASE f.rdb$field_sub_type
-						WHEN 0 THEN 'smallint'
-						WHEN 1 THEN 'numeric'
-						WHEN 2 THEN 'decimal'
-						END
-					WHEN 8 THEN CASE f.rdb$field_sub_type
-						WHEN 0 THEN 'int'
-						WHEN 1 THEN 'numeric'
-						WHEN 2 THEN 'decimal'
-						END
-					WHEN 16 THEN CASE f.rdb$field_sub_type
-						WHEN 0 THEN 'bigint'
-						WHEN 1 THEN 'numeric'
-						WHEN 2 THEN 'decimal'
-						END
-					WHEN 10 THEN 'float'
-					WHEN 27 THEN 'double'
-					WHEN 12 THEN 'date'
-					WHEN 13 THEN 'time'
-					WHEN 35 THEN 'timestamp'
-					WHEN 261 THEN CASE f.rdb$field_sub_type
-						WHEN 1 THEN 'clob'
-						ELSE 'blob'
-						END
-					WHEN 37 THEN 'varchar'
-					WHEN 14 THEN 'char'
-					WHEN 40 THEN 'cstring'
-					END
-				END) as "TypeName"
-        ,   IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
-        ,   f.rdb$field_precision as "Precision"
-        ,   4 as "DateTimePrecision"
-        ,   f.rdb$field_scale * (-1) as "Scale"
-        ,   null as "CollationCatalog"
-        ,   null as "CollationSchema"
-        ,   null as "CollationName"
-        ,   null as "CharacterSetCatalog"
-        ,   null as "CharacterSetSchema"
-        ,   null as "CharacterSetName"
-        ,   0 as "IsMultiSet"
-        ,   IIF(POSITION('#PK_GEN#', UPPER(rf.rdb$description)) > 0, 1, 0) as "IsIdentity"
-        ,   IIF(f.rdb$computed_blr IS NULL, 0, 1) as "IsStoreGenerated"
-        ,   COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
+        , TRIM(rf.rdb$relation_name) as "ParentId"
+        , TRIM(rf.rdb$field_name) as "Name"
+        , rf.rdb$field_position+1 as "Ordinal"
+        , IIF(COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL, 1, 0) as "IsNullable"
+        , TRIM(CASE 
+        WHEN POSITION('#BOOL#', UPPER(rf.rdb$description)) &gt; 0 THEN 'smallint_bool'
+        WHEN POSITION('#GUID#', UPPER(rf.rdb$description)) &gt; 0 THEN 'guid'
+        ELSE CASE f.rdb$field_type
+          WHEN 7 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'smallint'
+            END
+          WHEN 8 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'int'
+            END
+          WHEN 16 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'bigint'
+            END
+          WHEN 10 THEN 'float'
+          WHEN 27 THEN 'double'
+          WHEN 12 THEN 'date'
+          WHEN 13 THEN 'time'
+          WHEN 35 THEN 'timestamp'
+          WHEN 261 THEN CASE f.rdb$field_sub_type
+            WHEN 1 THEN 'clob'
+            ELSE 'blob'
+            END
+          WHEN 37 THEN 'varchar'
+          WHEN 14 THEN 'char'
+          WHEN 40 THEN 'cstring'
+          END
+        END) as "TypeName"
+        , IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
+        , IIF(f.rdb$field_precision = 0 AND f.rdb$field_scale &lt; 0, 18, f.rdb$field_precision) as "Precision"
+        , 4 as "DateTimePrecision"
+        , f.rdb$field_scale * (-1) as "Scale"
+        , null as "CollationCatalog"
+        , null as "CollationSchema"
+        , null as "CollationName"
+        , null as "CharacterSetCatalog"
+        , null as "CharacterSetSchema"
+        , null as "CharacterSetName"
+        , 0 as "IsMultiSet"
+        , IIF(POSITION('#PK_GEN#', UPPER(rf.rdb$description)) &gt; 0, 1, 0) as "IsIdentity"
+        , IIF(f.rdb$computed_blr IS NULL, 0, 1) as "IsStoreGenerated"
+        , COALESCE(rf.rdb$default_source, f.rdb$default_source) as "Default"
         FROM
         rdb$relation_fields rf
         INNER JOIN rdb$fields f ON (rf.rdb$field_source = f.rdb$field_name)
@@ -168,53 +168,57 @@
         , 'Firebird' as "CatalogName"
         , 'Firebird' as "SchemaName"
         , TRIM(f.rdb$function_name) as "Name"
-        , TRIM(CASE fa.rdb$field_type
-        WHEN 7 THEN CASE fa.rdb$field_sub_type
-          WHEN 0 THEN 'smallint'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 8 THEN CASE fa.rdb$field_sub_type
-          WHEN 0 THEN 'int'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 16 THEN CASE fa.rdb$field_sub_type
-          WHEN 0 THEN 'bigint'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 10 THEN 'float'
-        WHEN 27 THEN 'double'
-        WHEN 12 THEN 'date'
-        WHEN 13 THEN 'time'
-        WHEN 35 THEN 'timestamp'
-        WHEN 261 THEN CASE fa.rdb$field_sub_type
-          WHEN 1 THEN 'clob'
-          ELSE 'blob'
-        END
-        WHEN 37 THEN 'varchar'
-        WHEN 14 THEN 'char'
-        WHEN 40 THEN 'cstring'
+        , TRIM(/*CASE 
+        WHEN POSITION('#BOOL#', UPPER(fa.rdb$description)) &gt; 0 THEN 'smallint_bool'
+        WHEN POSITION('#GUID#', UPPER(fa.rdb$description)) &gt; 0 THEN 'guid'
+        ELSE*/ CASE fa.rdb$field_type
+          WHEN 7 THEN CASE
+            WHEN ((fa.rdb$field_sub_type = 2) OR (fa.rdb$field_sub_type = 0 AND fa.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN fa.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'smallint'
+            END
+          WHEN 8 THEN CASE
+            WHEN ((fa.rdb$field_sub_type = 2) OR (fa.rdb$field_sub_type = 0 AND fa.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN fa.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'int'
+            END
+          WHEN 16 THEN CASE
+            WHEN ((fa.rdb$field_sub_type = 2) OR (fa.rdb$field_sub_type = 0 AND fa.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN fa.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'bigint'
+            END
+          WHEN 10 THEN 'float'
+          WHEN 27 THEN 'double'
+          WHEN 12 THEN 'date'
+          WHEN 13 THEN 'time'
+          WHEN 35 THEN 'timestamp'
+          WHEN 261 THEN CASE fa.rdb$field_sub_type
+            WHEN 1 THEN 'clob'
+            ELSE 'blob'
+            END
+          WHEN 37 THEN 'varchar'
+          WHEN 14 THEN 'char'
+          WHEN 40 THEN 'cstring'
+          /*END*/
         END) as "ReturnTypeName"
         , fa.rdb$character_length as "ReturnMaxLength"
-        , fa.rdb$field_precision as "ReturnPrecision"
-        , 4 as "ReturnDateTimePrecision"
-        , fa.rdb$field_scale * (-1) as "ReturnScale"
-        , null as "ReturnCollationCatalog"
-        , null as "ReturnCollationSchema"
-        , null as "ReturnCollationName"
-        , null as "ReturnCharacterSetCatalog"
-        , null as "ReturnCharacterSetSchema"
-        , null as "ReturnCharacterSetName"
-        , 0 as "ReturnIsMultiSet"
-        , 0 as "IsAggregate"
-        , 0 as "IsBuiltIn"
-        , 0 as "IsNiladic" --CAST((select CASE COUNT(*) WHEN 1 THEN 1 ELSE 0 END FROM rdb$function_arguments fa WHERE fa.rdb$function_name = f.rdb$function_name) as smallint) as "IsNiladic"
-        FROM
-        rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument = fa.rdb$argument_position)
-        WHERE f.rdb$system_flag = 0
-      </DefiningQuery>
+				, IIF(fa.rdb$field_precision = 0 AND fa.rdb$field_scale &lt; 0, 18, fa.rdb$field_precision) as "ReturnPrecision"
+				, 4 as "ReturnDateTimePrecision"
+				, fa.rdb$field_scale * (-1) as "ReturnScale"
+				, null as "ReturnCollationCatalog"
+				, null as "ReturnCollationSchema"
+				, null as "ReturnCollationName"
+				, null as "ReturnCharacterSetCatalog"
+				, null as "ReturnCharacterSetSchema"
+				, null as "ReturnCharacterSetName"
+				, 0 as "ReturnIsMultiSet"
+				, 0 as "IsAggregate"
+				, 0 as "IsBuiltIn"
+				, 0 as "IsNiladic" --CAST((select CASE COUNT(*) WHEN 1 THEN 1 ELSE 0 END FROM rdb$function_arguments fa WHERE fa.rdb$function_name = f.rdb$function_name) as smallint) as "IsNiladic"
+				FROM
+				rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument = fa.rdb$argument_position)
+				WHERE f.rdb$system_flag = 0
+			</DefiningQuery>
     </EntitySet>
     <EntitySet Name="SFunctionParameters" EntityType="Self.Parameter">
       <DefiningQuery>
@@ -224,37 +228,41 @@
         , TRIM(fa.rdb$function_name) as "ParentId"
         , 'param' || TRIM(fa.rdb$argument_position) as "Name"
         , fa.rdb$argument_position as "Ordinal"
-        , TRIM(CASE fa.rdb$field_type
-        WHEN 7 THEN CASE fa.rdb$field_sub_type
-          WHEN 0 THEN 'smallint'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 8 THEN CASE fa.rdb$field_sub_type
-          WHEN 0 THEN 'int'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 16 THEN CASE fa.rdb$field_sub_type
-          WHEN 0 THEN 'bigint'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 10 THEN 'float'
-        WHEN 27 THEN 'double'
-        WHEN 12 THEN 'date'
-        WHEN 13 THEN 'time'
-        WHEN 35 THEN 'timestamp'
-        WHEN 261 THEN CASE fa.rdb$field_sub_type
-          WHEN 1 THEN 'clob'
-          ELSE 'blob'
-        END
-        WHEN 37 THEN 'varchar'
-        WHEN 14 THEN 'char'
-        WHEN 40 THEN 'cstring'
+        , TRIM(/*CASE 
+        WHEN POSITION('#BOOL#', UPPER(fa.rdb$description)) &gt; 0 THEN 'smallint_bool'
+        WHEN POSITION('#GUID#', UPPER(fa.rdb$description)) &gt; 0 THEN 'guid'
+        ELSE*/ CASE fa.rdb$field_type
+          WHEN 7 THEN CASE
+            WHEN ((fa.rdb$field_sub_type = 2) OR (fa.rdb$field_sub_type = 0 AND fa.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN fa.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'smallint'
+            END
+          WHEN 8 THEN CASE
+            WHEN ((fa.rdb$field_sub_type = 2) OR (fa.rdb$field_sub_type = 0 AND fa.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN fa.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'int'
+            END
+          WHEN 16 THEN CASE
+            WHEN ((fa.rdb$field_sub_type = 2) OR (fa.rdb$field_sub_type = 0 AND fa.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN fa.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'bigint'
+            END
+          WHEN 10 THEN 'float'
+          WHEN 27 THEN 'double'
+          WHEN 12 THEN 'date'
+          WHEN 13 THEN 'time'
+          WHEN 35 THEN 'timestamp'
+          WHEN 261 THEN CASE fa.rdb$field_sub_type
+            WHEN 1 THEN 'clob'
+            ELSE 'blob'
+            END
+          WHEN 37 THEN 'varchar'
+          WHEN 14 THEN 'char'
+          WHEN 40 THEN 'cstring'
+          /*END*/
         END) as "TypeName"
         , fa.rdb$character_length as "MaxLength"
-        , fa.rdb$field_precision as "Precision"
+        , IIF(fa.rdb$field_precision = 0 AND fa.rdb$field_scale &lt; 0, 18, fa.rdb$field_precision) as "Precision"
         , 4 as "DateTimePrecision"
         , fa.rdb$field_scale * (-1) as "Scale"
         , null as "CollationCatalog"
@@ -267,7 +275,7 @@
         , 'IN' as "Mode"
         , null as "Default"
         FROM
-        rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument != fa.rdb$argument_position)
+        rdb$functions f INNER JOIN rdb$function_arguments fa ON (f.rdb$function_name = fa.rdb$function_name AND f.rdb$return_argument &lt;&gt; fa.rdb$argument_position)
         WHERE f.rdb$system_flag = 0
       </DefiningQuery>
     </EntitySet>
@@ -292,37 +300,41 @@
         , TRIM(pp.rdb$procedure_name) as "ParentId"
         , TRIM(pp.rdb$parameter_name) as "Name"
         , pp.rdb$parameter_number+1 as "Ordinal"
-        , TRIM(CASE f.rdb$field_type
-        WHEN 7 THEN CASE f.rdb$field_sub_type
-          WHEN 0 THEN 'smallint'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 8 THEN CASE f.rdb$field_sub_type
-          WHEN 0 THEN 'int'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 16 THEN CASE f.rdb$field_sub_type
-          WHEN 0 THEN 'bigint'
-          WHEN 1 THEN 'numeric'
-          WHEN 2 THEN 'decimal'
-        END
-        WHEN 10 THEN 'float'
-        WHEN 27 THEN 'double'
-        WHEN 12 THEN 'date'
-        WHEN 13 THEN 'time'
-        WHEN 35 THEN 'timestamp'
-        WHEN 261 THEN CASE f.rdb$field_sub_type
-          WHEN 1 THEN 'clob'
-          ELSE 'blob'
-        END
-        WHEN 37 THEN 'varchar'
-        WHEN 14 THEN 'char'
-        WHEN 40 THEN 'cstring'
+        ,   TRIM(CASE 
+        WHEN POSITION('#BOOL#', UPPER(pp.rdb$description)) &gt; 0 THEN 'smallint_bool'
+        WHEN POSITION('#GUID#', UPPER(pp.rdb$description)) &gt; 0 THEN 'guid'
+        ELSE CASE f.rdb$field_type
+          WHEN 7 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'smallint'
+            END
+          WHEN 8 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'int'
+            END
+          WHEN 16 THEN CASE
+            WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+            WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+            ELSE 'bigint'
+            END
+          WHEN 10 THEN 'float'
+          WHEN 27 THEN 'double'
+          WHEN 12 THEN 'date'
+          WHEN 13 THEN 'time'
+          WHEN 35 THEN 'timestamp'
+          WHEN 261 THEN CASE f.rdb$field_sub_type
+            WHEN 1 THEN 'clob'
+            ELSE 'blob'
+            END
+          WHEN 37 THEN 'varchar'
+          WHEN 14 THEN 'char'
+          WHEN 40 THEN 'cstring'
+          END
         END) as "TypeName"
         , IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
-        , f.rdb$field_precision as "Precision"
+        , IIF(f.rdb$field_precision = 0 AND f.rdb$field_scale &lt; 0, 18, f.rdb$field_precision) as "Precision"
         , 4 as "DateTimePrecision"
         , f.rdb$field_scale * (-1) as "Scale"
         , null as "CollationCatalog"
@@ -345,11 +357,11 @@
         -- SConstraints
         SELECT
         TRIM(rc.rdb$constraint_name) as "Id"
-        ,   TRIM(rc.rdb$relation_name) as "ParentId"
-        ,   TRIM(rc.rdb$constraint_name) as "Name"
-        ,   TRIM(rc.rdb$constraint_type) as "ConstraintType"
-        ,   0 as "IsDeferrable"
-        ,   0 "IsInitiallyDeferred"
+        , TRIM(rc.rdb$relation_name) as "ParentId"
+        , TRIM(rc.rdb$constraint_name) as "Name"
+        , TRIM(rc.rdb$constraint_type) as "ConstraintType"
+        , 0 as "IsDeferrable"
+        , 0 "IsInitiallyDeferred"
         FROM
         rdb$relation_constraints rc
         WHERE
@@ -361,7 +373,7 @@
         -- SCheckConstraints
         SELECT
         TRIM(rc.rdb$constraint_name) as "Id"
-        ,   TRIM(SUBSTRING(trg.rdb$trigger_source from 6)) as "Expression"
+        , TRIM(SUBSTRING(trg.rdb$trigger_source from 6)) as "Expression"
         FROM
         rdb$relation_constraints rc
         INNER JOIN rdb$check_constraints cc on (rc.rdb$constraint_name = cc.rdb$constraint_name)
@@ -375,7 +387,7 @@
         -- SConstraintColumns
         SELECT
         TRIM(rc.rdb$constraint_name) as "ConstraintId"
-        ,   TRIM(rc.rdb$relation_name) || 'x' || TRIM(ise.rdb$field_name) as "ColumnId"
+        , TRIM(rc.rdb$relation_name) || 'x' || TRIM(ise.rdb$field_name) as "ColumnId"
         FROM
         rdb$relation_constraints rc INNER JOIN rdb$index_segments ise ON (rc.rdb$index_name = ise.rdb$index_name)
         WHERE
@@ -445,10 +457,10 @@
         -- SViewForeignKeys
         SELECT
         CAST(NULL as varchar(1)) as "Id"
-        ,  CAST(NULL as varchar(1)) as "ToColumnId"
-        ,  CAST(NULL as varchar(1)) as "FromColumnId"
-        ,  CAST(NULL as varchar(1)) as "ConstraintId"
-        ,  0 as "Ordinal"
+        , CAST(NULL as varchar(1)) as "ToColumnId"
+        , CAST(NULL as varchar(1)) as "FromColumnId"
+        , CAST(NULL as varchar(1)) as "ConstraintId"
+        , 0 as "Ordinal"
         FROM rdb$database
         WHERE 0=1
       </DefiningQuery>
