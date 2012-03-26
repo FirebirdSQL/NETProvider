@@ -452,15 +452,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void ReleasePreparedCommands()
 		{
-			for (int i = 0; i < this.preparedCommands.Count; i++)
+			WeakReference[] toProcess = new WeakReference[this.preparedCommands.Count];
+			this.preparedCommands.CopyTo(toProcess);
+			for (int i = 0; i < toProcess.Length; i++)
 			{
-				if (!this.preparedCommands[i].IsAlive)
+				WeakReference current = toProcess[i];
+
+				if (!current.IsAlive)
 					continue;
 
 				try
 				{
 					// Release statement handle
-					(this.preparedCommands[i].Target as FbCommand).Release();
+					(current.Target as FbCommand).Release();
 				}
 				catch (System.IO.IOException)
 				{
