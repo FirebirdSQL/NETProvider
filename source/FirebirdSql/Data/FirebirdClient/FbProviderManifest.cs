@@ -78,15 +78,28 @@ namespace FirebirdSql.Data.FirebirdClient
 		/// <returns>An XmlReader at the begining of the information requested.</returns>
 		protected override XmlReader GetDbInformation(string informationType)
 		{
-			if (informationType == DbProviderManifest.StoreSchemaDefinition)
+			if (informationType == DbProviderManifest.StoreSchemaDefinition
+#if (NET_45)
+				|| informationType == DbProviderManifest.StoreSchemaDefinitionVersion3
+#endif
+				)
 			{
-				return GetStoreSchemaDescription();
+				return GetStoreSchemaDescription(informationType);
 			}
-
-			if (informationType == DbProviderManifest.StoreSchemaMapping)
+			if (informationType == DbProviderManifest.StoreSchemaMapping
+#if (NET_45)
+				|| informationType == DbProviderManifest.StoreSchemaMappingVersion3
+#endif
+				)
 			{
-				return GetStoreSchemaMapping();
+				return GetStoreSchemaMapping(informationType);
 			}
+#if (NET_45)
+			if (informationType == DbProviderManifest.ConceptualSchemaDefinition || informationType == DbProviderManifest.ConceptualSchemaDefinitionVersion3)
+			{
+				return null;
+			}
+#endif
 
 			throw new ProviderIncompatibleException(String.Format("The provider returned null for the informationType '{0}'.", informationType));
 		}
@@ -411,12 +424,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		private XmlReader GetStoreSchemaMapping()
+		private XmlReader GetStoreSchemaMapping(string mslName)
 		{
 			return GetXmlResource("FirebirdSql.Entity.StoreSchemaMapping.msl");
 		}
 
-		private XmlReader GetStoreSchemaDescription()
+		private XmlReader GetStoreSchemaDescription(string ssdlName)
 		{
 			return GetXmlResource("FirebirdSql.Entity.StoreSchemaDefinition.ssdl");
 		}
