@@ -278,8 +278,8 @@ namespace FirebirdSql.Data.Entity
 
 		bool shouldHandleBoolComparison = true;
 		bool shouldCastParameter = true;
-		
-		List<string> shortenedNames = new List<string>();
+
+		Dictionary<string, string> shortenedNames = new Dictionary<string, string>();
 
 		#endregion
 
@@ -1146,7 +1146,7 @@ namespace FirebirdSql.Data.Entity
 		public override ISqlFragment Visit(DbGroupByExpression e)
 		{
 			Symbol fromSymbol;
-			string varName = ShortenName(e.Input.VariableName);
+			string varName = GetShortenedName(e.Input.VariableName);
 			SqlSelectStatement innerQuery = VisitInputExpression(e.Input.Expression,
 				varName, e.Input.VariableType, out fromSymbol);
 
@@ -1580,7 +1580,7 @@ namespace FirebirdSql.Data.Entity
 		public override ISqlFragment Visit(DbProjectExpression e)
 		{
 			Symbol fromSymbol;
-			string varName = ShortenName(e.Input.VariableName);
+			string varName = GetShortenedName(e.Input.VariableName);
 			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
 
 			// Project is compatible with Filter
@@ -1656,7 +1656,7 @@ namespace FirebirdSql.Data.Entity
 			JoinSymbol joinSymbol = instanceSql as JoinSymbol;
 			if (joinSymbol != null)
 			{
-				varName = ShortenName(varName);
+				varName = GetShortenedName(varName);
 				Debug.Assert(joinSymbol.NameToExtent.ContainsKey(varName));
 				if (joinSymbol.IsNestedJoin)
 				{
@@ -1672,10 +1672,11 @@ namespace FirebirdSql.Data.Entity
 			SymbolPair symbolPair = instanceSql as SymbolPair;
 			if (symbolPair != null)
 			{
-				varName = ShortenName(varName);
+				varName = GetShortenedName(varName);
 				JoinSymbol columnJoinSymbol = symbolPair.Column as JoinSymbol;
 				if (columnJoinSymbol != null)
 				{
+					Debug.Assert(columnJoinSymbol.NameToExtent.ContainsKey(varName));
 					symbolPair.Column = columnJoinSymbol.NameToExtent[varName];
 					return symbolPair;
 				}
@@ -1684,12 +1685,12 @@ namespace FirebirdSql.Data.Entity
 					// symbolPair.Column has the base extent.
 					// we need the symbol for the column, since it might have been renamed
 					// when handling a JOIN.
-					if (symbolPair.Column.Columns.ContainsKey(varName))
+					if (symbolPair.Column.Columns.ContainsKey(e.Property.Name))
 					{
 						result = new SqlBuilder();
 						result.Append(symbolPair.Source);
 						result.Append(".");
-						result.Append(symbolPair.Column.Columns[varName]);
+						result.Append(symbolPair.Column.Columns[e.Property.Name]);
 						return result;
 					}
 				}
@@ -1778,7 +1779,7 @@ namespace FirebirdSql.Data.Entity
 
 			//Visit the input
 			Symbol fromSymbol;
-			string varName = ShortenName(e.Input.VariableName);
+			string varName = GetShortenedName(e.Input.VariableName);
 			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
 
 			// Skip is not compatible with anything that OrderBy is not compatible with, as well as with distinct
@@ -1817,7 +1818,7 @@ namespace FirebirdSql.Data.Entity
 		public override ISqlFragment Visit(DbSortExpression e)
 		{
 			Symbol fromSymbol;
-			string varName = ShortenName(e.Input.VariableName);
+			string varName = GetShortenedName(e.Input.VariableName);
 			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
 
 			// OrderBy is compatible with Filter
@@ -1884,7 +1885,7 @@ namespace FirebirdSql.Data.Entity
 			}
 			isVarRefSingle = true; // This will be reset by DbPropertyExpression or MethodExpression
 
-			string varName = ShortenName(e.VariableName);
+			string varName = GetShortenedName(e.VariableName);
 			Symbol result = symbolTable.Lookup(varName);
 			if (!CurrentSelectStatement.FromExtents.Contains(result))
 			{
@@ -2289,7 +2290,7 @@ namespace FirebirdSql.Data.Entity
 			DbExpressionBinding input, int fromSymbolStart)
 		{
 			Symbol fromSymbol = null;
-			string varName = ShortenName(input.VariableName);
+			string varName = GetShortenedName(input.VariableName);
 
 			if (result != fromExtentFragment)
 			{
@@ -3686,7 +3687,7 @@ namespace FirebirdSql.Data.Entity
 		SqlSelectStatement VisitFilterExpression(DbExpressionBinding input, DbExpression predicate, bool negatePredicate)
 		{
 			Symbol fromSymbol;
-			string varName = ShortenName(input.VariableName);
+			string varName = GetShortenedName(input.VariableName);
 			SqlSelectStatement result = VisitInputExpression(input.Expression,
 				varName, input.VariableType, out fromSymbol);
 
@@ -3860,15 +3861,29 @@ namespace FirebirdSql.Data.Entity
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		internal string ShortenName(string name)
+		internal string GetShortenedName(string name)
 		{
-			int index = shortenedNames.IndexOf(name);
-			if (index == -1)
-			{
-				shortenedNames.Add(name);
-				index = shortenedNames.Count - 1;
+			string shortened;
+			if (!this.shortenedNames.TryGetValue(name, out shortened))
+			{ 
+				shortened = BuildName(this.shortenedNames.Count);
+				this.shortenedNames[name] = shortened;
 			}
-			return ((char)('A' + index)).ToString();
+			return shortened;
+		}
+
+		internal static string BuildName(int index)
+		{
+			const int offset = (int)'A';
+			const int length = (int)'Z' - offset;
+			if (index <= length)
+			{
+				return ((char)(offset + index)).ToString();
+			}
+			else
+			{
+				return BuildName(index / length) + BuildName(index % length);
+			}
 		}
 
 		#endregion
