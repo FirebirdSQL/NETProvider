@@ -30,5 +30,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("FirebirdSQL")]
 [assembly: AssemblyProduct("FirebirdClient")]
 [assembly: AssemblyCopyright("(c) 2002-2012")]
-[assembly: AssemblyVersion("2.7.0.0")]
+[assembly: AssemblyVersion("2.7.5.0")]
 [assembly: AssemblyDelaySign(false)]
