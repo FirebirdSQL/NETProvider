@@ -73,6 +73,11 @@ namespace FirebirdSql.Data.Isql
 		AlterTrigger,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>ALTER VIEW</b>
+		/// </summary>
+		AlterView,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>CLOSE</b>
 		/// </summary>
 		Close,
