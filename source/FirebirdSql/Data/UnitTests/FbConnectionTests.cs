@@ -41,39 +41,77 @@ namespace FirebirdSql.Data.UnitTests
 		#region · Unit Tests ·
 
 		[Test]
-		public void BeginTrasactionTest()
+		public void BeginTransactionILUnspecifiedTest()
 		{
-			string connectionString = this.BuildConnectionString();
+			BeginTransactionILTestsHelper(IsolationLevel.Unspecified);
+		}
 
-			FbConnection conn01 = new FbConnection(connectionString);
-			conn01.Open();
-			FbTransaction txn01 = conn01.BeginTransaction(IsolationLevel.Unspecified);
-			txn01.Rollback();
-			conn01.Close();
+		[Test]
+		public void BeginTransactionILReadCommittedTest()
+		{
+			BeginTransactionILTestsHelper(IsolationLevel.ReadCommitted);
+		}
 
-			FbConnection conn02 = new FbConnection(connectionString);
-			conn02.Open();
-			FbTransaction txn02 = conn02.BeginTransaction(IsolationLevel.ReadCommitted);
-			txn02.Rollback();
-			conn02.Close();
+		[Test]
+		public void BeginTransactionILReadUncommittedTest()
+		{
+			BeginTransactionILTestsHelper(IsolationLevel.ReadUncommitted);
+		}
 
-			FbConnection conn03 = new FbConnection(connectionString);
-			conn03.Open();
-			FbTransaction txn03 = conn03.BeginTransaction(IsolationLevel.ReadUncommitted);
-			txn03.Rollback();
-			conn03.Close();
+		[Test]
+		public void BeginTransactionILRepeatableReadTest()
+		{
+			BeginTransactionILTestsHelper(IsolationLevel.RepeatableRead);
+		}
 
-			FbConnection conn04 = new FbConnection(connectionString);
-			conn04.Open();
-			FbTransaction txn04 = conn04.BeginTransaction(IsolationLevel.RepeatableRead);
-			txn04.Rollback();
-			conn04.Close();
+		[Test]
+		public void BeginTransactionILSerializableTest()
+		{
+			BeginTransactionILTestsHelper(IsolationLevel.Serializable);
+		}
 
-			FbConnection conn05 = new FbConnection(connectionString);
-			conn05.Open();
-			FbTransaction txn05 = conn05.BeginTransaction(IsolationLevel.Serializable);
-			txn05.Rollback();
-			conn05.Close();
+		[Test]
+		public void BeginTransactionNoWaitTimeoutTest()
+		{
+			using (FbConnection conn = new FbConnection(this.BuildConnectionString()))
+			{
+				conn.Open();
+				FbTransaction tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = null });
+				Assert.NotNull(tx);
+				tx.Rollback();
+			}
+		}
+
+		[Test]
+		public void BeginTransactionWithWaitTimeoutTest()
+		{
+			using (FbConnection conn = new FbConnection(this.BuildConnectionString()))
+			{
+				conn.Open();
+				FbTransaction tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromSeconds(10) });
+				Assert.NotNull(tx);
+				tx.Rollback();
+			}
+		}
+
+		[Test]
+		public void BeginTransactionWithWaitTimeoutInvalidValue1Test()
+		{
+			using (FbConnection conn = new FbConnection(this.BuildConnectionString()))
+			{
+				conn.Open();
+				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromDays(9999) }));
+			}
+		}
+
+		[Test]
+		public void BeginTransactionWithWaitTimeoutInvalidValue2Test()
+		{
+			using (FbConnection conn = new FbConnection(this.BuildConnectionString()))
+			{
+				conn.Open();
+				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromMilliseconds(1) }));
+			}
 		}
 
 		[Test]
@@ -196,6 +234,17 @@ namespace FirebirdSql.Data.UnitTests
 				dbinfo_connection.Open();
 				FbDatabaseInfo dbinfo = new FbDatabaseInfo(dbinfo_connection);
 				return dbinfo.ActiveUsers.Count;
+			}
+		}
+
+		private void BeginTransactionILTestsHelper(IsolationLevel level)
+		{
+			using (FbConnection conn = new FbConnection(this.BuildConnectionString()))
+			{
+				conn.Open();
+				FbTransaction tx = conn.BeginTransaction(level);
+				Assert.NotNull(tx);
+				tx.Rollback();
 			}
 		}
 

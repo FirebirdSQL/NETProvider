@@ -23,17 +23,25 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public struct FbTransactionOptions
 	{
-		private short? _waitTimeout;
-		public short? WaitTimeout
+		private TimeSpan? _waitTimeout;
+		public TimeSpan? WaitTimeout
 		{
 			get { return _waitTimeout; }
 			set
 			{
-				if (value < 1)
-					throw new ArgumentException("The property value assigned is less than 1.");
+				if (value.HasValue)
+				{
+					double secs = ((TimeSpan)value).TotalSeconds;
+					if (secs < 1 || secs > short.MaxValue)
+						throw new ArgumentException("The property value assigned is less than 1 or greater then short.MaxValue.");
+				}
 
 				_waitTimeout = value;
 			}
+		}
+		internal short? WaitTimeoutTPBValue
+		{
+			get { return _waitTimeout != null ? (short?)((TimeSpan)_waitTimeout).TotalSeconds : null; }
 		}
 
 		public FbTransactionBehavior TransactionBehavior { get; set; }

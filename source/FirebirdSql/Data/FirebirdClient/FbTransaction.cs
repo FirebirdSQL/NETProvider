@@ -454,9 +454,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			if ((options.TransactionBehavior & FbTransactionBehavior.Wait) == FbTransactionBehavior.Wait)
 			{
 				tpb.Append(IscCodes.isc_tpb_wait);
-				if (options.WaitTimeout.HasValue)
+				if (options.WaitTimeoutTPBValue.HasValue)
 				{
-					tpb.Append(IscCodes.isc_tpb_lock_timeout, (short)options.WaitTimeout);
+					tpb.Append(IscCodes.isc_tpb_lock_timeout, (short)options.WaitTimeoutTPBValue);
 				}
 			}
 			if ((options.TransactionBehavior & FbTransactionBehavior.NoWait) == FbTransactionBehavior.NoWait)
