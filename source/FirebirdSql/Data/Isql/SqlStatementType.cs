@@ -338,6 +338,11 @@ namespace FirebirdSql.Data.Isql
 		RecreateTable,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>RECREATE TRIGGER</b>
+		/// </summary>
+		RecreateTrigger,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>RECREATE VIEW</b>
 		/// </summary>
 		RecreateView,
