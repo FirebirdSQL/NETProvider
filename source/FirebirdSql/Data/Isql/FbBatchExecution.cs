@@ -221,6 +221,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterProcedure:
 						case SqlStatementType.AlterTable:
 						case SqlStatementType.AlterTrigger:
+						case SqlStatementType.AlterView:
 							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
@@ -797,6 +798,10 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.AlterTrigger;
 					}
+					if (StringParser.StartsWith(sqlStatement, "ALTER VIEW", true))
+					{
+						return SqlStatementType.AlterView;
+					}
 					throw new Exception("The type of the SQL statement could not be determinated.");
 
 				case 'C':
@@ -884,7 +889,8 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.CreateIndex;
 							}
-							if (StringParser.StartsWith(sqlStatement, "CREATE VIEW", true))
+							if (StringParser.StartsWith(sqlStatement, "CREATE VIEW", true) ||
+								StringParser.StartsWith(sqlStatement, "CREATE OR ALTER VIEW", true))
 							{
 								return SqlStatementType.CreateView;
 							}
