@@ -838,7 +838,8 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.CreateDomain;
 							}
-							if (StringParser.StartsWith(sqlStatement, "CREATE EXCEPTION", true))
+							if (StringParser.StartsWith(sqlStatement, "CREATE EXCEPTION", true) ||
+								StringParser.StartsWith(sqlStatement, "CREATE OR ALTER EXCEPTION", true))
 							{
 								return SqlStatementType.CreateException;
 							}
