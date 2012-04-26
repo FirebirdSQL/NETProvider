@@ -93,9 +93,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 
 #if	(!NET_CF)
-				if (this.eventsThread == null ||
-					(this.eventsThread.ThreadState != ThreadState.Running &&
-					this.eventsThread.ThreadState != ThreadState.Background))
+				if (this.eventsThread == null || this.eventsThread.ThreadState.HasFlag(ThreadState.Stopped | ThreadState.Unstarted))
 #else
 				if (this.eventsThread == null)
 #endif
