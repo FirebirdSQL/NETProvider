@@ -144,12 +144,26 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void QueueEvents()
 		{
-			this.revent.QueueEvents();
+			try
+			{
+				this.revent.QueueEvents();
+			}
+			catch (IscException ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
 		}
 
 		public void CancelEvents()
 		{
-			this.revent.CancelEvents();
+			try
+			{
+				this.revent.CancelEvents();
+			}
+			catch (IscException ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
 		}
 
 		#endregion
