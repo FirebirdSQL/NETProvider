@@ -53,8 +53,8 @@ namespace FirebirdSql.Data.Schema
 					INNER JOIN rdb$ref_constraints ref ON co.rdb$constraint_name = ref.rdb$constraint_name
 					INNER JOIN rdb$indices tempidx ON co.rdb$index_name = tempidx.rdb$index_name
 					INNER JOIN rdb$index_segments coidxseg ON co.rdb$index_name = coidxseg.rdb$index_name
-					INNER JOIN rdb$index_segments refidxseg ON coidxseg.rdb$field_position = refidxseg.rdb$field_position
-					INNER JOIN rdb$indices refidx ON refidxseg.rdb$index_name = refidx.rdb$index_name");
+					INNER JOIN rdb$indices refidx ON refidx.rdb$index_name = tempidx.rdb$foreign_key
+					INNER JOIN rdb$index_segments refidxseg ON refidxseg.rdb$index_name = refidx.rdb$index_name AND refidxseg.rdb$field_position = coidxseg.rdb$field_position");
 
 			where.Append("co.rdb$constraint_type = 'FOREIGN KEY'");
 
