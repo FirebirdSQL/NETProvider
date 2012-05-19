@@ -1162,7 +1162,7 @@ namespace FirebirdSql.Data.Entity
 
 			AddFromSymbol(innerQuery, varName, fromSymbol);
 			// This line is not present for other relational nodes.
-			symbolTable.Add(e.Input.GroupVariableName, fromSymbol);
+			symbolTable.Add(GetShortenedName(e.Input.GroupVariableName), fromSymbol);
 
 
 			// The enumerator is shared by both the keys and the aggregates,
