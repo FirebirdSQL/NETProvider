@@ -36,55 +36,58 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) 
 		{
-			{"data source", "data source"},
-			{"datasource", "data source"},
-			{"server", "data source"},
-			{"host", "data source"},
-			{"port", "port number"},
-			{"port number", "port number"},
-			{"database", "initial catalog"},
-			{"initial catalog", "initial catalog"},
-			{"user id", "user id"},
-			{"userid", "user id"},
-			{"uid", "user id"},
-			{"user", "user id"},
-			{"user name", "user id"},
-			{"username", "user id"},
-			{"password", "password"},
-			{"user password", "password"},
-			{"userpassword", "password"},
-			{"dialect", "dialect"},
-			{"pooling", "pooling"},
-			{"max pool size", "max pool size"},
-			{"maxpoolsize", "max pool size"},
-			{"min pool size", "min pool size"},
-			{"minpoolsize", "min pool size"},
-			{"character set", "character set"},
-			{"charset", "character set"},
-			{"connection lifetime", "connection lifetime"},
-			{"connectionlifetime", "connection lifetime"},
-			{"timeout", "connection timeout"},
-			{"connection timeout", "connection timeout"},
-			{"connectiontimeout", "connection timeout"},
-			{"packet size", "packet size"},
-			{"packetsize", "packet size"},
-			{"role", "role name"},
-			{"role name", "role name"},
-			{"fetch size", "fetch size"},
-			{"fetchsize", "fetch size"},
-			{"server type", "server type"},
-			{"servertype", "server type"},
-			{"isolation level", "isolation level"},
-			{"isolationlevel", "isolation level"},
-			{"records affected", "records affected"},
-			{"context connection", "context connection"},
-			{"enlist", "enlist"},
-			{"clientlibrary", "client library"},
-			{"client library", "client library"},
-			{"cache pages", "cache pages"},
-			{"cachepages", "cache pages"},
-			{"pagebuffers", "cache pages"},
-			{"page buffers", "cache pages"},
+			{ "data source", "data source" },
+			{ "datasource", "data source" },
+			{ "server", "data source" },
+			{ "host", "data source" },
+			{ "port", "port number" },
+			{ "port number", "port number" },
+			{ "database", "initial catalog" },
+			{ "initial catalog", "initial catalog" },
+			{ "user id", "user id" },
+			{ "userid", "user id" },
+			{ "uid", "user id" },
+			{ "user", "user id" },
+			{ "user name", "user id" },
+			{ "username", "user id" },
+			{ "password", "password" },
+			{ "user password", "password" },
+			{ "userpassword", "password" },
+			{ "dialect", "dialect" },
+			{ "pooling", "pooling" },
+			{ "max pool size", "max pool size" },
+			{ "maxpoolsize", "max pool size" },
+			{ "min pool size", "min pool size" },
+			{ "minpoolsize", "min pool size" },
+			{ "character set", "character set" },
+			{ "charset", "character set" },
+			{ "connection lifetime", "connection lifetime" },
+			{ "connectionlifetime", "connection lifetime" },
+			{ "timeout", "connection timeout" },
+			{ "connection timeout", "connection timeout" },
+			{ "connectiontimeout", "connection timeout" },
+			{ "packet size", "packet size" },
+			{ "packetsize", "packet size" },
+			{ "role", "role name" },
+			{ "role name", "role name" },
+			{ "fetch size", "fetch size" },
+			{ "fetchsize", "fetch size" },
+			{ "server type", "server type" },
+			{ "servertype", "server type" },
+			{ "isolation level", "isolation level" },
+			{ "isolationlevel", "isolation level" },
+			{ "records affected", "records affected" },
+			{ "context connection", "context connection" },
+			{ "enlist", "enlist" },
+			{ "clientlibrary", "client library" },
+			{ "client library", "client library" },
+			{ "cache pages", "cache pages" },
+			{ "cachepages", "cache pages" },
+			{ "pagebuffers", "cache pages" },
+			{ "page buffers", "cache pages" },
+			{ "no db triggers", "no db triggers" },
+			{ "nodbtriggers", "no db triggers" },
+			{ "no dbtriggers", "no db triggers" },
 		};
 
 		#endregion
@@ -208,6 +211,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return this.GetInt32("cache pages"); }
 		}
 
+		public bool NoDBTriggers
+		{
+			get { return this.GetBoolean("no db triggers"); }
+		}
+
 		#endregion
 
 		#region · Internal Properties ·
@@ -321,12 +329,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (
 #if (LINUX)  // on Linux Trusted Auth isn't available
-					(this.UserID == null || this.UserID.Length == 0) ||
-					(this.Password == null || this.Password.Length == 0) ||
+					(string.IsNullOrEmpty(this.UserID)) ||
+					(string.IsNullOrEmpty(this.Password)) ||
 #endif
-					((this.Database == null || this.Database.Length == 0) && !this.isServiceConnectionString) ||
-					((this.DataSource == null || this.DataSource.Length == 0) && this.ServerType != FbServerType.Embedded) ||
-					(this.Charset == null || this.Charset.Length == 0) ||
+					(string.IsNullOrEmpty(this.Database) && !this.isServiceConnectionString) ||
+					(string.IsNullOrEmpty(this.DataSource) && this.ServerType != FbServerType.Embedded) ||
+					(string.IsNullOrEmpty(this.Charset)) ||
 					(this.Port == 0) ||
 					(!Enum.IsDefined(typeof(FbServerType), this.ServerType)) ||
 					(this.MinPoolSize > this.MaxPoolSize)
@@ -334,23 +342,24 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
 				}
-				else
+				if (this.Dialect < 1 || this.Dialect > 3)
 				{
-					if (this.Dialect < 1 || this.Dialect > 3)
-					{
-						throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
-					}
-					if (this.PacketSize < 512 || this.PacketSize > 32767)
-					{
-						throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
-					}
-					if (this.DbCachePages < 0)
-					{
-						throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", this.DbCachePages, Environment.NewLine));
-					}
-
-					this.CheckIsolationLevel();
+					throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
 				}
+				if (this.PacketSize < 512 || this.PacketSize > 32767)
+				{
+					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
+				}
+				if (this.DbCachePages < 0)
+				{
+					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", this.DbCachePages, Environment.NewLine));
+				}
+				if (this.Pooling && this.NoDBTriggers)
+				{
+					throw new ArgumentException("Cannot use Pooling and NoDBTriggers together.");
+				}
+
+				this.CheckIsolationLevel();
 			}
 		}
 
@@ -390,6 +399,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.options.Add("enlist", false);
 			this.options.Add("client library", "fbembed");
 			this.options.Add("cache pages", 0);
+			this.options.Add("no db triggers", false);
 		}
 
 		private void ParseConnectionInfo(string connectInfo)
