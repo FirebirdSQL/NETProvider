@@ -211,6 +211,15 @@ namespace FirebirdSql.Data.UnitTests
 			Assert.AreEqual(ActiveUsersAtStart, ActiveUserCount());
 		}
 
+		[Test]
+		public void NoDatabaseTriggersWrongConnectionString()
+		{
+			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();
+			csb.Pooling = true;
+			csb.NoDatabaseTriggers = true;
+			Assert.Throws<ArgumentException>(() => new FbConnection(csb.ToString()));
+		}
+
 		#endregion
 
 		#region · Methods ·

@@ -166,6 +166,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Cache Pages", value); }
 		}
 
+		public bool NoDatabaseTriggers
+		{
+			get { return this.GetBoolean("No DB Triggers"); }
+			set { this.SetValue("No DB Triggers", value); }
+		}
+
 		#endregion
 
 		#region · Constructors ·
@@ -224,7 +230,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return Convert.ToBoolean(this[this.GetKey(keyword)]);
 		}
 
-		private void SetValue(string keyword, object value)
+		private void SetValue<T>(string keyword, T value)
 		{
 			this[this.GetKey(keyword)] = value;
 		}
