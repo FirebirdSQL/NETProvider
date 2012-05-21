@@ -91,11 +91,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return this.activeTransaction; }
 		}
 
-		public FbConnectionString ConnectionOptions
-		{
-			get { return this.options; }
-		}
-
 		public FbConnection OwningConnection
 		{
 			get { return this.owningConnection; }
@@ -555,9 +550,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
 				dpb.Append(IscCodes.isc_dpb_password, options.Password);
 			}
-
 			dpb.Append(IscCodes.isc_dpb_process_id, GetProcessID());
 			dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
+			if (options.NoDatabaseTriggers)
+			{
+				dpb.Append(IscCodes.isc_dpb_no_db_triggers, 1);
+			}
 
 			return dpb;
 		}

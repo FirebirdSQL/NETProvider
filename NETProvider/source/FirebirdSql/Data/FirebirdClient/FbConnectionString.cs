@@ -88,6 +88,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			{ "no db triggers", "no db triggers" },
 			{ "nodbtriggers", "no db triggers" },
 			{ "no dbtriggers", "no db triggers" },
+			{ "no database triggers", "no db triggers" },
+			{ "nodatabasetriggers", "no db triggers" },
 		};
 
 		#endregion
@@ -211,7 +213,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return this.GetInt32("cache pages"); }
 		}
 
-		public bool NoDBTriggers
+		public bool NoDatabaseTriggers
 		{
 			get { return this.GetBoolean("no db triggers"); }
 		}
@@ -354,7 +356,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", this.DbCachePages, Environment.NewLine));
 				}
-				if (this.Pooling && this.NoDBTriggers)
+				if (this.Pooling && this.NoDatabaseTriggers)
 				{
 					throw new ArgumentException("Cannot use Pooling and NoDBTriggers together.");
 				}
