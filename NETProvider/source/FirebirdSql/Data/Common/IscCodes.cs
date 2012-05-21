@@ -463,7 +463,6 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_bkp_file = 5;
 		public const int isc_spb_bkp_factor = 6;
 		public const int isc_spb_bkp_length = 7;
-		public const int isc_spb_bkp_no_triggers = 0x8000;
 
 		#endregion
 
