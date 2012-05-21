@@ -30,6 +30,7 @@ namespace FirebirdSql.Data.Services
 		OldDescriptions = 0x10,
 		NonTransportable = 0x20,
 		Convert = 0x40,
-		Expand = 0x80
+		Expand = 0x80,
+		NoDatabaseTriggers = 0x8000,
 	}
 }
