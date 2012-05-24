@@ -1762,14 +1762,7 @@ namespace FirebirdSql.Data.Entity
 		}
 
 		/// <summary>
-		/// For Sql9 it translates to:
-		/// SELECT Y.x1, Y.x2, ..., Y.xn
-		/// FROM (
-		///     SELECT X.x1, X.x2, ..., X.xn, row_number() OVER (ORDER BY sk1, sk2, ...) AS [row_number] 
-		///     FROM input as X 
-		///     ) as Y
-		/// WHERE Y.[row_number] > count 
-		/// ORDER BY sk1, sk2, ...
+		///  Translates to SKIP expression.
 		/// </summary>
 		/// <param name="e"></param>
 		/// <returns>A <see cref="SqlBuilder"/></returns>
@@ -1777,30 +1770,27 @@ namespace FirebirdSql.Data.Entity
 		{
 			Debug.Assert(e.Count is DbConstantExpression || e.Count is DbParameterReferenceExpression, "DbSkipExpression.Count is of invalid expression type");
 
-			//Visit the input
-			Symbol fromSymbol;
 			string varName = GetShortenedName(e.Input.VariableName);
+			Symbol fromSymbol;
 			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
 
-			// Skip is not compatible with anything that OrderBy is not compatible with, as well as with distinct
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
-				result = CreateNewSelectStatement(result, varName, e.Input.VariableType, out fromSymbol);
+				TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(e.ResultType);
+
+				result = CreateNewSelectStatement(result, varName, inputType, out fromSymbol);
+				AddFromSymbol(result, varName, fromSymbol, false);
 			}
+
+			ISqlFragment skipCount = HandleCountExpression(e.Count);
+
+			result.Skip = new SkipClause(skipCount);
 
 			selectStatementStack.Push(result);
 			symbolTable.EnterScope();
 
 			AddFromSymbol(result, varName, fromSymbol);
 
-			//Add the default columns
-			Debug.Assert(result.Select.IsEmpty);
-			AddDefaultColumns(result);
-
-			ISqlFragment skipCount = HandleCountExpression(e.Count);
-			result.Skip = new SkipClause(skipCount);
-
-			// Add the sorting info
 			AddSortKeys(result.OrderBy, e.SortOrder);
 
 			symbolTable.ExitScope();
