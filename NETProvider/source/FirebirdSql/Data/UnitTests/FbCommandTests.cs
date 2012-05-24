@@ -703,7 +703,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void CommandCancellationTest()
 		{
-			bool done = false;
+			bool cancelled = false;
 
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
@@ -722,15 +722,13 @@ end";
 					}
 					catch (FbException ex)
 					{
-						Assert.AreEqual("HY008", ex.SQLSTATE);
-						done = true;
+						cancelled = "HY008" == ex.SQLSTATE;
 					}
 				}, null);
-				System.Threading.Thread.Sleep(1000);
+				System.Threading.Thread.Sleep(2000);
 				cmd.Cancel();
-				System.Threading.Thread.Sleep(1000);
-				if (!done)
-					Assert.Fail();
+				System.Threading.Thread.Sleep(2000);
+				Assert.IsTrue(cancelled);
 			}
 		}
 
