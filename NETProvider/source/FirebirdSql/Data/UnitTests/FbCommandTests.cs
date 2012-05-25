@@ -149,15 +149,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void PrepareTest()
 		{
-			// Create a	new	test table
-			FbCommand create = new FbCommand("create table PrepareTest(test_field varchar(20));", Connection);
-			create.ExecuteNonQuery();
-			create.Dispose();
-
 			// Insert data using a prepared	statement
-			FbCommand command = new FbCommand(
-				"insert	into PrepareTest(test_field) values(@test_field);",
-				Connection);
+			FbCommand command = new FbCommand("insert	into PrepareTest(test_field) values(@test_field);", Connection);
 
 			command.Parameters.Add("@test_field", FbDbType.VarChar).Value = DBNull.Value;
 			command.Prepare();
@@ -177,39 +170,25 @@ namespace FirebirdSql.Data.UnitTests
 
 			command.Dispose();
 
-			try
+			// Check that data is correct
+			FbCommand select = new FbCommand("select * from	PrepareTest", Connection);
+			FbDataReader reader = select.ExecuteReader();
+			int count = 0;
+			while (reader.Read())
 			{
-				// Check that data is correct
-				FbCommand select = new FbCommand("select * from	PrepareTest", Connection);
-				FbDataReader reader = select.ExecuteReader();
-				int count = 0;
-				while (reader.Read())
+				if (count == 0)
 				{
-					if (count == 0)
-					{
-						Assert.AreEqual(DBNull.Value, reader[0], "Invalid value.");
-					}
-					else
-					{
-						Assert.AreEqual(count, reader.GetInt32(0), "Invalid	value.");
-					}
-
-					count++;
+					Assert.AreEqual(DBNull.Value, reader[0], "Invalid value.");
 				}
-				reader.Close();
-				select.Dispose();
+				else
+				{
+					Assert.AreEqual(count, reader.GetInt32(0), "Invalid	value.");
+				}
+
+				count++;
 			}
-			catch (Exception)
-			{
-				throw;
-			}
-			finally
-			{
-				// Drop	table
-				FbCommand drop = new FbCommand("drop table PrepareTest", Connection);
-				drop.ExecuteNonQuery();
-				drop.Dispose();
-			}
+			reader.Close();
+			select.Dispose();
 		}
 
 		[Test]
@@ -714,7 +693,7 @@ begin
   while (i > 0) do
 	i = i-1;
 end";
-				cmd.BeginExecuteNonQuery((o) => 
+				cmd.BeginExecuteNonQuery((o) =>
 				{
 					try
 					{

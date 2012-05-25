@@ -292,7 +292,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			using (FbCommand cmd = conn.CreateCommand())
 			{
-				cmd.CommandText = "select count(*) from test where varchar_field = '_log'";
+				cmd.CommandText = "select count(*) from log where text = 'on connect'";
 				return (int)cmd.ExecuteScalar();
 			}
 		}
