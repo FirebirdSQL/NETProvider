@@ -22,6 +22,7 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Linq;
+using System.Collections.Generic;
 
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
@@ -81,10 +82,10 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-		class QueryTest1Context : DbContext
+		class QueryTest1Context : FbTestDbContext
 		{
 			public QueryTest1Context(FbConnection conn)
-				: base(conn, false)
+				: base(conn)
 			{ }
 
 			protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -100,16 +101,122 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
+		#region Query2
+
+		[Test]
+		public void QueryTest2()
+		{
+			Database.SetInitializer<QueryTest1Context>(null);
+			Connection.Close();
+			using (var c = new QueryTest2Context(Connection))
+			{
+				var q = c.Foos
+					.OrderBy(x => x.ID)
+					.Take(45).Skip(0)
+					.Select(x => new
+					{
+						x.ID,
+						x.BazID,
+						BazID2 = x.Baz.ID,
+						x.Baz.BazString,
+					});
+				Assert.DoesNotThrow(() =>
+				{
+					Console.WriteLine(q.ToString());
+				});
+			}
+		}
+
+		class QueryTest2Context : FbTestDbContext
+		{
+			public QueryTest2Context(FbConnection conn)
+				: base(conn)
+			{ }
+
+			protected override void OnModelCreating(DbModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+			}
+
+			public IDbSet<Foo> Foos { get; set; }
+		}
+
+		#endregion
+
+		#region Query3
+
+		[Test]
+		public void QueryTest3()
+		{
+			Database.SetInitializer<QueryTest1Context>(null);
+			Connection.Close();
+			using (var c = new QueryTest3Context(Connection))
+			{
+				var q = c.Foos
+					 .OrderByDescending(m => m.Bars.Count())
+					 .Skip(3)
+					 .SelectMany(m => m.Bars);
+				Assert.DoesNotThrow(() =>
+				{
+					Console.WriteLine(q.ToString());
+				});
+			}
+		}
+
+		class QueryTest3Context : FbTestDbContext
+		{
+			public QueryTest3Context(FbConnection conn)
+				: base(conn)
+			{ }
+
+			protected override void OnModelCreating(DbModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+			}
+
+			public IDbSet<Foo> Foos { get; set; }
+		}
+
+		#endregion
+
 		#endregion
 
 		private DbProviderServices GetProviderServices()
 		{
 			return (DbProviderServices)(FirebirdClientFactory.Instance as IServiceProvider).GetService(typeof(DbProviderServices));
 		}
+
+		class FbTestDbContext : DbContext
+		{
+			public FbTestDbContext(FbConnection conn)
+				: base(conn, false)
+			{ }
+		}
 	}
 
 	class QueryTest1Entity
 	{
 		public int ID { get; set; }
+	}
+
+	public class Foo
+	{
+		public int ID { get; set; }
+		public int BazID { get; set; }
+		public ICollection<Bar> Bars { get; set; }
+		public Baz Baz { get; set; }
+	}
+	public class Bar
+	{
+		public int ID { get; set; }
+		public int FooID { get; set; }
+		public string BarString { get; set; }
+		public Foo Foo { get; set; }
+	}
+	public class Baz
+	{
+		public int ID { get; set; }
+		public string BazString { get; set; }
+		public ICollection<Foo> Foos { get; set; }
 	}
 }
