@@ -20,6 +20,8 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Data.Common;
+using System.Data.Entity;
+using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
@@ -66,11 +68,48 @@ namespace FirebirdSql.Data.UnitTests
 			Assert.AreEqual(v.Revision, -1);
 		}
 
+		#region Query1
+
+		[Test]
+		public void QueryTest1()
+		{
+			Database.SetInitializer<QueryTest1Context>(null);
+			Connection.Close();
+			using (var c = new QueryTest1Context(Connection))
+			{
+				Assert.DoesNotThrow(() => c.QueryTest1Entity.Max(x => x.ID));
+			}
+		}
+
+		class QueryTest1Context : DbContext
+		{
+			public QueryTest1Context(FbConnection conn)
+				: base(conn, false)
+			{ }
+
+			protected override void OnModelCreating(DbModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+				var queryTest1Entity = modelBuilder.Entity<QueryTest1Entity>();
+				queryTest1Entity.Property(x => x.ID).HasColumnName("INT_FIELD");
+				queryTest1Entity.ToTable("TEST");
+			}
+
+			public IDbSet<QueryTest1Entity> QueryTest1Entity { get; set; }
+		}
+
+		#endregion
+
 		#endregion
 
 		private DbProviderServices GetProviderServices()
 		{
 			return (DbProviderServices)(FirebirdClientFactory.Instance as IServiceProvider).GetService(typeof(DbProviderServices));
 		}
+	}
+
+	class QueryTest1Entity
+	{
+		public int ID { get; set; }
 	}
 }
