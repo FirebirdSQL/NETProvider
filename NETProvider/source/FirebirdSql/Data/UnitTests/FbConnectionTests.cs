@@ -212,12 +212,43 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void NoDatabaseTriggersWrongConnectionString()
+		public void NoDatabaseTriggersWrongConnectionStringTest()
 		{
 			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();
 			csb.Pooling = true;
 			csb.NoDatabaseTriggers = true;
 			Assert.Throws<ArgumentException>(() => new FbConnection(csb.ToString()));
+		}
+
+		[Test]
+		public void DatabaseTriggersTest()
+		{
+			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();
+			csb.Pooling = false;
+
+			int rows;
+
+			csb.NoDatabaseTriggers = false;
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
+				rows = LogRowsCount(conn);
+				Console.WriteLine(rows);
+			}
+
+			csb.NoDatabaseTriggers = true;
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
+				Assert.AreEqual(rows, LogRowsCount(conn));
+			}
+
+			csb.NoDatabaseTriggers = false;
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
+				Assert.AreEqual(rows + 1, LogRowsCount(conn));
+			}
 		}
 
 		#endregion
@@ -254,6 +285,15 @@ namespace FirebirdSql.Data.UnitTests
 				FbTransaction tx = conn.BeginTransaction(level);
 				Assert.NotNull(tx);
 				tx.Rollback();
+			}
+		}
+
+		private int LogRowsCount(FbConnection conn)
+		{
+			using (FbCommand cmd = conn.CreateCommand())
+			{
+				cmd.CommandText = "select count(*) from test where varchar_field = '_log'";
+				return (int)cmd.ExecuteScalar();
 			}
 		}
 

@@ -318,6 +318,19 @@ namespace FirebirdSql.Data.UnitTests
 			command.ExecuteNonQuery();
 			command.Dispose();
 
+			// database trigger
+			commandText = new StringBuilder();
+
+			commandText.Append("create trigger log active on connect\r\n");
+			commandText.Append("as\r\n");
+			commandText.Append("begin\r\n");
+			commandText.Append("insert into test (int_field, varchar_field, timestamp_field) values ((select count(*) from test), '_log', current_timestamp);\r\n");
+			commandText.Append("end");
+
+			command = new FbCommand(commandText.ToString(), connection);
+			command.ExecuteNonQuery();
+			command.Dispose();
+
 			connection.Close();
 		}
 
