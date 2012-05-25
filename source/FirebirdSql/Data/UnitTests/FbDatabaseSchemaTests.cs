@@ -186,11 +186,11 @@ namespace FirebirdSql.Data.UnitTests
 
 			tables = Connection.GetSchema("Tables", new string[] { null, null, "TEST" });
 
-			Assert.AreEqual(tables.Rows.Count, 1);
+			Assert.AreEqual(1, tables.Rows.Count);
 
 			tables = Connection.GetSchema("Tables", new string[] { null, null, null, "TABLE" });
 
-			Assert.AreEqual(tables.Rows.Count, 1);
+			Assert.AreEqual(3, tables.Rows.Count);
 		}
 
 		[Test]

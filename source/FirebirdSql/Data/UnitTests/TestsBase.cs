@@ -168,6 +168,14 @@ namespace FirebirdSql.Data.UnitTests
 			command.ExecuteNonQuery();
 			command.Dispose();
 
+			command = new FbCommand("create table PrepareTest(test_field varchar(20));", connection);
+			command.ExecuteNonQuery();
+			command.Dispose();
+
+			command = new FbCommand("create table log(occured timestamp, text varchar(20));", connection);
+			command.ExecuteNonQuery();
+			command.Dispose();
+
 			connection.Close();
 		}
 
@@ -324,7 +332,7 @@ namespace FirebirdSql.Data.UnitTests
 			commandText.Append("create trigger log active on connect\r\n");
 			commandText.Append("as\r\n");
 			commandText.Append("begin\r\n");
-			commandText.Append("insert into test (int_field, varchar_field, timestamp_field) values ((select count(*) from test), '_log', current_timestamp);\r\n");
+			commandText.Append("insert into log (occured, text) values (current_timestamp, 'on connect');\r\n");
 			commandText.Append("end");
 
 			command = new FbCommand(commandText.ToString(), connection);
