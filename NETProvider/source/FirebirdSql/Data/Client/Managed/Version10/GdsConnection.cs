@@ -13,7 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
- *	Copyright (c) 2007 - 2010 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2007 - 2012 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -30,6 +30,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal class GdsConnection
 	{
+		const ulong KeepAliveTime = 1800000; //30min
+		const ulong KeepAliveInterval = 1800000; //30min
+
 		#region · Fields ·
 
 		private Socket socket;
@@ -114,6 +117,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 #endif
 				// Disables	the	Nagle algorithm	for	send coalescing.
 				this.socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
+
+				// Start sending keepalive packets every 30min after 30min of idle connection
+				this.socket.SetKeepAlive(KeepAliveTime, KeepAliveInterval);
 
 				// Make	the	socket to connect to the Server
 				this.socket.Connect(endPoint);
