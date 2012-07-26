@@ -83,5 +83,23 @@ namespace FirebirdSql.Data.UnitTests
 			var cs = new FbConnectionString(ConnectionString);
 			Assert.AreEqual(6, cs.ConnectionLifeTime);
 		}
+
+		[Test]
+		public void ParsingWithEndingSemicolonConnectionStringTest()
+		{
+			const string ConnectionString = "user=testuser;password=testpwd;";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("testuser", cs.UserID);
+			Assert.AreEqual("testpwd", cs.Password);
+		}
+
+		[Test]
+		public void ParsingWithoutEndingSemicolonConnectionStringTest()
+		{
+			const string ConnectionString = "user=testuser;password=testpwd";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("testuser", cs.UserID);
+			Assert.AreEqual("testpwd", cs.Password);
+		}
 	}
 }
