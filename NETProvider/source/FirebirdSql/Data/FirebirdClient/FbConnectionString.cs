@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Load(string connectionString)
 		{
-			const string KeyPairsRegex = "(([\\w\\s\\d]*)\\s*=\\s*([^\"'][^;]*[^\"';])|([\\w\\s\\d]*)\\s*=\\s*\"([^\"]*)\"|([\\w\\s\\d]*)\\s*=\\s*'([^']*)')";
+			const string KeyPairsRegex = "(([\\w\\s\\d]*)\\s*=\\s*\"([^\"]*)\"|([\\w\\s\\d]*)\\s*=\\s*'([^']*)'|([\\w\\s\\d]*)\\s*=\\s*([^\"'][^;]*))";
 
 			this.SetDefaultOptions();
 
