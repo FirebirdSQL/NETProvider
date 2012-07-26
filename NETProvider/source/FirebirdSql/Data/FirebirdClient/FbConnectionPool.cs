@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			// Start the cleanup only if needed
 			if (this.lifeTime != 0)
 			{
-				long interval = Convert.ToInt64(TimeSpan.FromTicks(this.lifeTime).TotalMilliseconds);
+				TimeSpan interval = TimeSpan.FromTicks(this.lifeTime);
 				this.cleanupTimer = new Timer(new TimerCallback(this.CleanupWorker), this, interval, interval);
 			}
 		}
