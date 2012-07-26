@@ -252,34 +252,40 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Load(string connectionString)
 		{
+			const string KeyPairsRegex = "(([\\w\\s\\d]*)\\s*=\\s*([^\"'][^;]*[^\"';])|([\\w\\s\\d]*)\\s*=\\s*\"([^\"]*)\"|([\\w\\s\\d]*)\\s*=\\s*'([^']*)')";
+
 			this.SetDefaultOptions();
 
 			if (connectionString != null && connectionString.Length > 0)
 			{
-				MatchCollection keyPairs = Regex.Matches(connectionString, @"([\w\s\d]*)\s*=\s*([^;]*)");
+				MatchCollection keyPairs = Regex.Matches(connectionString, KeyPairsRegex);
 
 				foreach (Match keyPair in keyPairs)
 				{
-					if (keyPair.Groups.Count == 3)
+					if (keyPair.Groups.Count == 8)
 					{
 						string[] values = new string[] 
 						{
-							keyPair.Groups[1].Value.Trim(),
-							keyPair.Groups[2].Value.Trim()
+							(keyPair.Groups[2].Success ? keyPair.Groups[2].Value
+								: keyPair.Groups[4].Success ? keyPair.Groups[4].Value
+									: keyPair.Groups[6].Success ? keyPair.Groups[6].Value
+										: string.Empty)
+							.Trim().ToLowerInvariant(),
+							(keyPair.Groups[3].Success ? keyPair.Groups[3].Value
+								: keyPair.Groups[5].Success ? keyPair.Groups[5].Value
+									: keyPair.Groups[7].Success ? keyPair.Groups[7].Value
+										: string.Empty)
+							.Trim()
 						};
 
-						if (values.Length == 2 &&
-							values[0] != null && values[0].Length > 0 &&
-							values[1] != null && values[1].Length > 0)
+						if (values.Length == 2 && !string.IsNullOrEmpty(values[0]) && !string.IsNullOrEmpty(values[1]))
 						{
-							values[0] = values[0].ToLower(CultureInfo.InvariantCulture);
-
-							if (Synonyms.ContainsKey(values[0]))
+							string key;
+							if (Synonyms.TryGetValue(values[0], out key))
 							{
-								string key = Synonyms[values[0]];
 								if (key == "server type")
 								{
-									switch (this.UnquoteString(values[1].Trim()))
+									switch (values[1])
 									{
 										case "Default":
 											this.options[key] = FbServerType.Default;
@@ -294,13 +300,12 @@ namespace FirebirdSql.Data.FirebirdClient
 											break;
 
 										default:
-											this.options[key] = this.UnquoteString(values[1].Trim());
-											break;
+											throw new NotSupportedException("Not supported 'server type'.");
 									}
 								}
 								else
 								{
-									this.options[key] = this.UnquoteString(values[1].Trim());
+									this.options[key] = values[1];
 								}
 							}
 						}
@@ -604,22 +609,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				default:
 					throw new ArgumentException("Specified Isolation Level is not valid.");
 			}
-		}
-
-		private string UnquoteString(string value)
-		{
-			string unquoted = value;
-
-			if (unquoted.StartsWith("\""))
-			{
-				unquoted = unquoted.Remove(0, 1);
-			}
-			if (unquoted.EndsWith("\""))
-			{
-				unquoted = unquoted.Remove(unquoted.Length - 1, 1);
-			}
-
-			return unquoted;
 		}
 
 		#endregion
