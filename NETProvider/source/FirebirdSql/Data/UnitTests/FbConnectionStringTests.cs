@@ -27,7 +27,7 @@ using NUnit.Framework;
 namespace FirebirdSql.Data.UnitTests
 {
 	[TestFixture]
-	public class FbConnectionStringTests
+	public class FbConnectionStringTests : TestsBase
 	{
 		[Test]
 		public void ParsingNormalConnectionStringTest()
@@ -66,6 +66,22 @@ namespace FirebirdSql.Data.UnitTests
 			const string ConnectionString = "datasource=testserver;database=testdb.fdb;user=testuser;password=test\"pwd";
 			var cs = new FbConnectionString(ConnectionString);
 			Assert.AreEqual("test\"pwd", cs.Password);
+		}
+
+		[Test]
+		public void ParsingSpacesInKeyConnectionStringTest()
+		{
+			const string ConnectionString = "data source=testserver";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("testserver", cs.DataSource);
+		}
+
+		[Test]
+		public void ParsingOneCharValueConnectionStringTest()
+		{
+			const string ConnectionString = "connection lifetime=6";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual(6, cs.ConnectionLifeTime);
 		}
 	}
 }
