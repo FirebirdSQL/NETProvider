@@ -193,7 +193,7 @@ namespace FirebirdSql.Data.UnitTests
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
 
-			int ActiveUsersAtStart = ActiveUserCount();
+			int active = ActiveConnections();
 
 			using (FbConnection
 				myConnection1 = new FbConnection(cs),
@@ -202,13 +202,15 @@ namespace FirebirdSql.Data.UnitTests
 				myConnection1.Open();
 				myConnection2.Open();
 
+				Assert.AreEqual(active + 2, ActiveConnections());
+
 				myConnection1.Close();
 				myConnection2.Close();
 			}
 
 			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
 
-			Assert.AreEqual(ActiveUsersAtStart, ActiveUserCount());
+			Assert.AreEqual(active, ActiveConnections());
 		}
 
 		[Test]
@@ -267,13 +269,16 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-		private int ActiveUserCount()
+		private int ActiveConnections()
 		{
-			using (FbConnection dbinfo_connection = new FbConnection(this.BuildConnectionString(false)))
+			using (FbConnection conn = new FbConnection(this.BuildConnectionString(false)))
 			{
-				dbinfo_connection.Open();
-				FbDatabaseInfo dbinfo = new FbDatabaseInfo(dbinfo_connection);
-				return dbinfo.ActiveUsers.Count;
+				conn.Open();
+				using (FbCommand cmd = conn.CreateCommand())
+				{
+					cmd.CommandText = "select count(*) from mon$attachments where mon$attachment_id <> current_connection";
+					return (int)cmd.ExecuteScalar();
+				}
 			}
 		}
 
