@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Entity
 
 
 		IDictionary<string, string> additionalColumnComments = new Dictionary<string, string>();
-		foreach (var entitySet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<EntitySet>())
+		foreach (EntitySet entitySet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<EntitySet>())
 		{
 			additionalColumnComments.Clear();
 
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Entity
             this.Write("RECREATE TABLE ");
             
             #line 32 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(entitySet.Name)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(TableName(entitySet))));
             
             #line default
             #line hidden
@@ -103,14 +103,14 @@ namespace FirebirdSql.Data.Entity
             this.Write("CONSTRAINT ");
             
             #line 43 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Quote("PK_" + entitySet.Name)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Quote("PK_" + TableName(entitySet))));
             
             #line default
             #line hidden
             this.Write(" PRIMARY KEY (");
             
             #line 43 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => Quote(pk.Name)).ToArray())));
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => Quote(ColumnName(pk))).ToArray())));
             
             #line default
             #line hidden
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.Entity
             
             #line 45 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
-			foreach(string identity in entitySet.ElementType.KeyMembers.Where(pk => pk.TypeUsage.Facets.Contains("StoreGeneratedPattern") && (StoreGeneratedPattern)pk.TypeUsage.Facets["StoreGeneratedPattern"].Value == StoreGeneratedPattern.Identity).Select(i => i.Name))
+			foreach(string identity in entitySet.ElementType.KeyMembers.Where(pk => pk.TypeUsage.Facets.Contains("StoreGeneratedPattern") && (StoreGeneratedPattern)pk.TypeUsage.Facets["StoreGeneratedPattern"].Value == StoreGeneratedPattern.Identity).Select(i => ColumnName(i)))
 			{
 				additionalColumnComments.Add(identity, "#PK_GEN#");
 			}
@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.Entity
             this.Write("COMMENT ON COLUMN ");
             
             #line 53 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(entitySet.Name)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(TableName(entitySet))));
             
             #line default
             #line hidden
@@ -163,61 +163,60 @@ namespace FirebirdSql.Data.Entity
             
             #line 59 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
-		foreach (var associationSet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<AssociationSet>())
+		foreach (AssociationSet associationSet in StoreItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<AssociationSet>())
 		{
 			ReferentialConstraint constraint = associationSet.ElementType.ReferentialConstraints.Single<ReferentialConstraint>(); 
 			AssociationSetEnd end = associationSet.AssociationSetEnds[constraint.FromRole.Name];
 			AssociationSetEnd end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
-
 
             
             #line default
             #line hidden
             this.Write("ALTER TABLE ");
             
-            #line 67 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(end2.EntitySet.Name)));
+            #line 66 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(TableName(end2.EntitySet))));
             
             #line default
             #line hidden
             this.Write(" ADD CONSTRAINT ");
             
-            #line 67 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Quote("FK_" + associationSet.Name)));
+            #line 66 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Quote("FK_" + AssociationSetName(associationSet))));
             
             #line default
             #line hidden
             this.Write(" FOREIGN KEY (");
             
-            #line 67 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", constraint.ToProperties.Select(fk => Quote(fk.Name)).ToArray())));
+            #line 66 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", constraint.ToProperties.Select(fk => Quote(ColumnName(fk))).ToArray())));
             
             #line default
             #line hidden
             this.Write(")\r\nREFERENCES ");
             
-            #line 68 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(end.EntitySet.Name)));
+            #line 67 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Quote(TableName(end.EntitySet))));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 68 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", constraint.FromProperties.Select(pk => Quote(pk.Name)).ToArray())));
+            #line 67 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", constraint.FromProperties.Select(pk => Quote(ColumnName(pk))).ToArray())));
             
             #line default
             #line hidden
             this.Write(")\r\nON DELETE ");
             
-            #line 69 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 68 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture((end.CorrespondingAssociationEndMember.DeleteBehavior == OperationAction.Cascade ? "CASCADE" : "NO ACTION")));
             
             #line default
             #line hidden
             this.Write("\r\n;\r\n\r\n");
             
-            #line 72 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 71 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 		}
 
@@ -225,7 +224,7 @@ namespace FirebirdSql.Data.Entity
             #line default
             #line hidden
             
-            #line 75 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+            #line 74 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 	}
 
@@ -236,7 +235,7 @@ namespace FirebirdSql.Data.Entity
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 79 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
+        #line 78 "C:\Dev\NETProvider\source\FirebirdSql\Data\Entity\SSDLToFB.tt"
 
 public StoreItemCollection StoreItemCollection { private get; set; }
 
@@ -276,7 +275,7 @@ private string Quote(string s)
 private string GenerateColumn(EdmProperty property, ref IDictionary<string, string> columnComments)
 {
 	StringBuilder result = new StringBuilder();
-	result.Append(Quote(property.Name));
+	result.Append(Quote(ColumnName(property)));
 	result.Append(" ");
 	switch (property.TypeUsage.EdmType.Name)
 	{
@@ -297,12 +296,12 @@ private string GenerateColumn(EdmProperty property, ref IDictionary<string, stri
 			result.Append("BLOB SUB_TYPE BINARY");
 			break;
 		case "smallint_bool":
-			result.AppendFormat("SMALLINT CHECK ({0} IN (1,0))", Quote(property.Name));
+			result.AppendFormat("SMALLINT CHECK ({0} IN (1,0))", Quote(ColumnName(property)));
 			columnComments.Add(property.Name, "#BOOL#");
 			break;
 		case "guid":
 			result.Append("CHAR(16) CHARACTER SET OCTETS");
-			columnComments.Add(property.Name, "#GUID#");
+			columnComments.Add(ColumnName(property), "#GUID#");
 			break;
 		default:
 			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
@@ -315,11 +314,21 @@ private string GenerateColumn(EdmProperty property, ref IDictionary<string, stri
 	return result.ToString();
 }
 
-/// <summary>
-/// Retrieve data of type T from CallContext given a string-based identity.
-/// This is used to pass data from a workflow into the template since the workflow
-/// utilizes the VS TextTemplatingService which runs the template in a separate AppDomain.
-/// </summary>
+private string ColumnName(EdmMember member)
+{
+	return (string)member.MetadataProperties["Name"].Value;
+}
+
+private string TableName(EntitySet entitySet)
+{
+	return (string)entitySet.MetadataProperties["Table"].Value ?? (string)entitySet.MetadataProperties["Name"].Value;
+}
+
+private string AssociationSetName(AssociationSet associationSet)
+{
+	return (string)associationSet.MetadataProperties["Name"].Value;
+}
+
 private T GetInput<T>(string identity) where T : class
 {
     return CallContext.GetData(identity) as T;
