@@ -73,13 +73,3 @@ namespace FirebirdSql.Data.Common
 		}
 	}
 }
-
-#if (NET_20)
-namespace System.Runtime.CompilerServices
-{
-	[AttributeUsageAttribute(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
-	public class ExtensionAttribute : Attribute
-	{
-	}
-}
-#endif
