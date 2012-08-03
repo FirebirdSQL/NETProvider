@@ -410,7 +410,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return FbDbType.Binary;
 		}
 
-#if (NET_40)
+#if (!NET_35)
 		protected override void DbCreateDatabase(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
 		{
 			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
