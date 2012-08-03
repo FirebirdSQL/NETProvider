@@ -574,15 +574,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetHostingPath()
 		{
-#if (NET_20 || NET_35)
-			const string assemblyName = "System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-#else
-			const string assemblyName = "System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-#endif
 			System.Reflection.Assembly assembly;
 			try
 			{
-				assembly = System.Reflection.Assembly.Load(assemblyName);
+				assembly = System.Reflection.Assembly.Load(string.Format("System.Web, Version={0}.{1}.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", Environment.Version.Major, Environment.Version.Minor));
 			}
 			catch (FileNotFoundException)
 			{

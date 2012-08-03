@@ -16,7 +16,7 @@
  *  All Rights Reserved.
  */
 
-#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
+#if (!(NET_35 && !ENTITY_FRAMEWORK))
 
 using System;
 using System.Data;

@@ -94,7 +94,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		object IServiceProvider.GetService(Type serviceType)
 		{
-#if ((NET_35 && ENTITY_FRAMEWORK) || (NET_40))
+#if (!(NET_35 && !ENTITY_FRAMEWORK))
 			if (serviceType == typeof(DbProviderServices))
 			{
 				return FbProviderServices.Instance;
