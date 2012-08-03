@@ -617,7 +617,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
 			if (assembly != null)
 			{
-#if (NET_40)
+#if (!NET_35)
 				if (assembly.IsFullyTrusted)
 					return Process.GetCurrentProcess().Id;
 				else

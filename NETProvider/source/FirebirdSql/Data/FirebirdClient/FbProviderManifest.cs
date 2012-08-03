@@ -441,7 +441,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return XmlReader.Create(stream);
 		}
 
-#if (NET_40)
+#if (!NET_35)
 		public override bool SupportsEscapingLikeArgument(out char escapeCharacter)
 		{
 			escapeCharacter = LikeEscapeCharacter;
