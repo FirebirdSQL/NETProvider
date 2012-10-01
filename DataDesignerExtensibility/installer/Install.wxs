@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="FD91E41B-6B32-47A3-B440-27A0158DD679"
+					 UpgradeCode="0FD0277A-371E-4C1F-A486-0A6DB552E4B1"
+					 Name="DDEX Provider for Firebird !(bind.fileVersion.FirebirdSql.VisualStudio.DataTools.dll)"
+					 Language="1033"
+					 Version="!(bind.fileVersion.FirebirdSql.VisualStudio.DataTools.dll)"
+					 Manufacturer="FirebirdSQL">
+		<Package InstallerVersion="200" Compressed="yes" Description="DDEX Provider for Firebird" />
+
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" CompressionLevel="high" />
+
+		<Feature Id="FirebirdDDEXFeature" Title="DDEX Provider for Firebird" Level="1" Absent="disallow">
+			<ComponentRef Id="FirebirdDDEXComponent" />
+			<ComponentRef Id="OtherFilesComponent" />
+		</Feature>
+		<Feature Id="VS2012Registry64Feature" Title="Visual Studio 2012 Support (64bit OS)" Level="1">
+			<ComponentRef Id="VS2012Registry64Component" />
+		</Feature>
+		<Feature Id="VS2012Registry32Feature" Title="Visual Studio 2012 Support (32bit OS)" Level="1">
+			<ComponentRef Id="VS2012Registry32Component" />
+		</Feature>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="APPLICATIONFOLDER" Name="FirebirdDDEX">
+					<Component Id="FirebirdDDEXComponent" Guid="5FC7B74A-949A-448E-9E5A-1893C3CE9184">
+						<File Id="FirebirdSql.VisualStudio.DataTools.dll"
+									Name="FirebirdSql.VisualStudio.DataTools.dll"
+									Source="$(var.BaseDir)installer\in\FirebirdSql.VisualStudio.DataTools.dll" />
+						<File Id="FirebirdSql.VisualStudio.DataToolsUI.dll"
+									Name="FirebirdSql.VisualStudio.DataToolsUI.dll"
+									Source="$(var.BaseDir)installer\in\FirebirdSql.VisualStudio.DataToolsUI.dll" />
+					</Component>
+					<Component Id="OtherFilesComponent" Guid="348EA22F-390E-4BA6-9C93-3879581E9297">
+						<File Id="ReadMe.txt"
+									Name="ReadMe.txt"
+									Source="$(var.BaseDir)ReadMe.txt" />
+						<File Id="license.txt"
+									Name="license.txt"
+									Source="$(var.BaseDir)license.txt" />
+					</Component>
+					<Directory Id="RegFilesFolder" Name="reg_files">
+						<Directory Id="RegFilesVS2012Folder" Name="VS2012">
+							<Component Id="VS2012Registry64Component" Guid="1EE0A43F-A0F6-4772-AF93-F4D1AFB5752B">
+								<File Id="VS2012FirebirdDDEXProvider64.reg"
+											Name="FirebirdDDEXProvider64.reg"
+											Source="$(var.BaseDir)reg_files\VS2012\FirebirdDDEXProvider64.reg" />
+							</Component>
+							<Component Id="VS2012Registry32Component" Guid="1EE0A43F-A0F6-4772-AF93-F4D1AFB5752B">
+								<File Id="VS2012FirebirdDDEXProvider32.reg"
+											Name="FirebirdDDEXProvider32.reg"
+											Source="$(var.BaseDir)reg_files\VS2012\FirebirdDDEXProvider32.reg" />
+							</Component>
+						</Directory>
+					</Directory>
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<UIRef Id="WixUI_Advanced" />
+		<Property Id="ApplicationFolderName" Value="FirebirdDDEX" />
+		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+		<WixVariable Id="WixUISupportPerUser" Value="0" />
+		<Property Id='ALLUSERS' Value='1' />
+		<!--<WixVariable Id="WixUILicenseRtf" Value="$(var.BaseDir)license.rtf" />-->
+	</Product>
+</Wix>
