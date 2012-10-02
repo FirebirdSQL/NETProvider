@@ -9,7 +9,7 @@
 		<RegistryValue Name="DisplayName" Value="Provider_DisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources" Type="string" />
 		<RegistryValue Name="ShortDisplayName" Value="Provider_ShortDisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources" Type="string" />
 		<RegistryValue Name="Description" Value="Provider_Description, FirebirdSql.VisualStudio.DataTools.Properties.Resources" Type="string" />
-		<RegistryValue Name="CodeBase" Value="[APPLICATIONFOLDER]\FirebirdSql.VisualStudio.DataTools.dll" Type="string" />
+		<RegistryValue Name="CodeBase" Value="[APPLICATIONFOLDER]FirebirdSql.VisualStudio.DataTools.dll" Type="string" />
 		<RegistryValue Name="InvariantName" Value="FirebirdSql.Data.FirebirdClient" Type="string" />
 		<RegistryValue Name="Technology" Value="{77AB9A9D-78B9-4ba7-91AC-873F5338F1D2}" Type="string" />
 	</RegistryKey>
