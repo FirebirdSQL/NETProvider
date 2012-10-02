@@ -98,7 +98,7 @@
 		</Directory>
 
 		<UIRef Id="WixUI_Advanced" />
-		<Property Id="ApplicationFolderName" Value="FirebirdDDEX" />
+		<Property Id="ApplicationFolderName" Value="FirebirdClient" />
 		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
 		<WixVariable Id="WixUISupportPerUser" Value="0" />
 		<Property Id='ALLUSERS' Value='1' />
