@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Id="7D65E5D3-A191-4208-875A-43F149F9C36F"
 					 UpgradeCode="8A1FACD4-F003-4720-AD50-4161CA58E84B"
 					 Name="FirebirdClient !(bind.fileVersion.FirebirdSql.Data.FirebirdClient.dll)"
@@ -10,14 +10,18 @@
 
 		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" CompressionLevel="high" />
 
-		<Feature Id="FirebirdClientFeature" Title="Files" Level="1">
+		<Feature Id="FirebirdClientFeature" Title="Files" Level="1" Absent="disallow">
 			<ComponentRef Id="FirebirdClientAssemblyComponent" />
 			<ComponentRef Id="OtherFilesComponent" />
+		</Feature>
+		<Feature Id="GACAndMachineConfigFeature" Title ="GAC and machine.config registration" Level="1">
+			<ComponentRef Id="FirebirdClientGACComponent" />
+			<ComponentRef Id="FirebirdClientMachineConfigComponent" />
 		</Feature>
 
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="ProgramFilesFolder">
-				<Directory Id="INSTALLDIR" Name="FirebirdClient">
+				<Directory Id="APPLICATIONFOLDER" Name="FirebirdClient">
 					<Component Id="FirebirdClientAssemblyComponent" Guid="5FC7B74A-949A-448E-9E5A-1893C3CE9184">
 						<File Id="FirebirdSql.Data.FirebirdClient.dll"
 									Name="FirebirdSql.Data.FirebirdClient.dll"
@@ -42,10 +46,62 @@
 					</Component>
 				</Directory>
 			</Directory>
+			
+			<Component Id="FirebirdClientGACComponent" Guid="58016F1C-35F3-4049-A138-D6F577FB9D3F">
+				<File Id="FirebirdSql.Data.FirebirdClient.dll_GAC"
+							Name="FirebirdSql.Data.FirebirdClient.dll"
+							Assembly=".net"
+							KeyPath="yes"
+							Source="$(var.BaseDir)\source\FirebirdSql\Data\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll" />
+			</Component>
+			<Component Id="FirebirdClientMachineConfigComponent" Guid="CBA6E615-0521-4D14-8576-351EEF79DD1D">
+				<util:XmlConfig Id="MachineConfigDbProviderFactories"
+									 File="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\Config\machine.Config"
+									 Action="create"
+									 On="install"
+									 ElementPath="//configuration/system.data/DbProviderFactories"
+									 Name="add"
+									 Node="element"
+									 Sequence="1" />
+				<util:XmlConfig Id="MachineConfigDbProviderFactories_Name"
+									 File="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\Config\machine.Config"
+									 ElementPath="MachineConfigDbProviderFactories"
+									 Name="name"
+									 Value="FirebirdClient Data Provider"
+									 Sequence="2" />
+				<util:XmlConfig Id="MachineConfigDbProviderFactories_Invariant"
+									 File="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\Config\machine.Config"
+									 ElementPath="MachineConfigDbProviderFactories"
+									 Name="invariant"
+									 Value="FirebirdSql.Data.FirebirdClient"
+									 Sequence="2" />
+				<util:XmlConfig Id="MachineConfigDbProviderFactories_Description"
+									 File="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\Config\machine.Config"
+									 ElementPath="MachineConfigDbProviderFactories"
+									 Name="description"
+									 Value=".NET Framework Data Provider for Firebird"
+									 Sequence="2" />
+				<util:XmlConfig Id="MachineConfigDbProviderFactories_Type"
+									 File="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\Config\machine.Config"
+									 ElementPath="MachineConfigDbProviderFactories"
+									 Name="type"
+									 Value="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Version=!(bind.fileVersion.FirebirdSql.Data.FirebirdClient.dll), Culture=neutral, PublicKeyToken=3750abcc3150b00c"
+									 Sequence="2" />
+
+				<util:XmlConfig Id="MachineConfigDbProviderFactories_Uninstall"
+									 File="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\Config\machine.Config"
+									 Action="delete"
+									 On="uninstall"
+									 ElementPath="//configuration/system.data/DbProviderFactories/add[\[]@invariant='FirebirdSql.Data.FirebirdClient'[\]]"
+									 Sequence="1" />
+			</Component>
 		</Directory>
 
-		<UIRef Id="WixUI_InstallDir" />
-		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+		<UIRef Id="WixUI_Advanced" />
+		<Property Id="ApplicationFolderName" Value="FirebirdDDEX" />
+		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+		<WixVariable Id="WixUISupportPerUser" Value="0" />
+		<Property Id='ALLUSERS' Value='1' />
 		<WixVariable Id="WixUILicenseRtf" Value="$(var.BaseDir)\license.rtf" />
 	</Product>
 </Wix>
