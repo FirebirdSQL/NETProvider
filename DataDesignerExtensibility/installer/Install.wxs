@@ -46,20 +46,21 @@
 									Name="license.txt"
 									Source="$(var.BaseDir)\license.txt" />
 					</Component>
-					<Component Id="VS2012Registry64Component" Guid="6A5ED58E-F4A5-4985-9281-B41F3C5CE1DB">
-						<?include $(var.BaseDir)\installer\VS2012Registry64.wsx ?>
-					</Component>
-					<Component Id="VS2012Registry32Component" Guid="5796FC82-143F-432B-B8E4-648EE630479D">
-						<?include $(var.BaseDir)\installer\VS2012Registry32.wsx ?>
-					</Component>
-					<Component Id="VS2010Registry64Component" Guid="6A5ED58E-F4A5-4985-9281-B41F3C5CE1DB">
-						<?include $(var.BaseDir)\installer\VS2010Registry64.wsx ?>
-					</Component>
-					<Component Id="VS2010Registry32Component" Guid="5796FC82-143F-432B-B8E4-648EE630479D">
-						<?include $(var.BaseDir)\installer\VS2010Registry32.wsx ?>
-					</Component>
 				</Directory>
 			</Directory>
+
+			<Component Id="VS2012Registry64Component" Guid="6A5ED58E-F4A5-4985-9281-B41F3C5CE1DB">
+				<?include $(var.BaseDir)\installer\VS2012Registry64.wsx ?>
+			</Component>
+			<Component Id="VS2012Registry32Component" Guid="5796FC82-143F-432B-B8E4-648EE630479D">
+				<?include $(var.BaseDir)\installer\VS2012Registry32.wsx ?>
+			</Component>
+			<Component Id="VS2010Registry64Component" Guid="6A5ED58E-F4A5-4985-9281-B41F3C5CE1DB">
+				<?include $(var.BaseDir)\installer\VS2010Registry64.wsx ?>
+			</Component>
+			<Component Id="VS2010Registry32Component" Guid="5796FC82-143F-432B-B8E4-648EE630479D">
+				<?include $(var.BaseDir)\installer\VS2010Registry32.wsx ?>
+			</Component>
 		</Directory>
 
 		<UIRef Id="WixUI_Advanced" />
