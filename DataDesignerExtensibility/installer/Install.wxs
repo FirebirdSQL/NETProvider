@@ -17,19 +17,19 @@
 		<Feature Id="VS2012Registry64Feature" Title="Visual Studio 2012 Support (64bit OS)" Level="1">
 			<ComponentRef Id="VS2012Registry64Component" />
 		</Feature>
-		<Feature Id="VS2012Registry32Feature" Title="Visual Studio 2012 Support (32bit OS)" Level="1">
+		<Feature Id="VS2012Registry32Feature" Title="Visual Studio 2012 Support (32bit OS)" Level="2">
 			<ComponentRef Id="VS2012Registry32Component" />
 		</Feature>
-		<Feature Id="VS2010Registry64Feature" Title="Visual Studio 2010 Support (64bit OS)" Level="1">
+		<Feature Id="VS2010Registry64Feature" Title="Visual Studio 2010 Support (64bit OS)" Level="2">
 			<ComponentRef Id="VS2010Registry64Component" />
 		</Feature>
-		<Feature Id="VS2010Registry32Feature" Title="Visual Studio 2010 Support (32bit OS)" Level="1">
+		<Feature Id="VS2010Registry32Feature" Title="Visual Studio 2010 Support (32bit OS)" Level="2">
 			<ComponentRef Id="VS2010Registry32Component" />
 		</Feature>
-		<Feature Id="VS2008Registry64Feature" Title="Visual Studio 2008 Support (64bit OS)" Level="1">
+		<Feature Id="VS2008Registry64Feature" Title="Visual Studio 2008 Support (64bit OS)" Level="2">
 			<ComponentRef Id="VS2008Registry64Component" />
 		</Feature>
-		<Feature Id="VS2008Registry32Feature" Title="Visual Studio 2008 Support (32bit OS)" Level="1">
+		<Feature Id="VS2008Registry32Feature" Title="Visual Studio 2008 Support (32bit OS)" Level="2">
 			<ComponentRef Id="VS2008Registry32Component" />
 		</Feature>
 
@@ -80,6 +80,6 @@
 		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
 		<WixVariable Id="WixUISupportPerUser" Value="0" />
 		<Property Id='ALLUSERS' Value='1' />
-		<!--<WixVariable Id="WixUILicenseRtf" Value="$(var.BaseDir)license.rtf" />-->
+		<WixVariable Id="WixUILicenseRtf" Value="$(var.BaseDir)\license.rtf" />
 	</Product>
 </Wix>
