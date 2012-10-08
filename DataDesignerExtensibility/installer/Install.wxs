@@ -26,6 +26,12 @@
 		<Feature Id="VS2010Registry32Feature" Title="Visual Studio 2010 Support (32bit OS)" Level="1">
 			<ComponentRef Id="VS2010Registry32Component" />
 		</Feature>
+		<Feature Id="VS2008Registry64Feature" Title="Visual Studio 2008 Support (64bit OS)" Level="1">
+			<ComponentRef Id="VS2008Registry64Component" />
+		</Feature>
+		<Feature Id="VS2008Registry32Feature" Title="Visual Studio 2008 Support (32bit OS)" Level="1">
+			<ComponentRef Id="VS2008Registry32Component" />
+		</Feature>
 
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="ProgramFilesFolder">
@@ -55,11 +61,17 @@
 			<Component Id="VS2012Registry32Component" Guid="5796FC82-143F-432B-B8E4-648EE630479D">
 				<?include $(var.BaseDir)\installer\VS2012Registry32.wsx ?>
 			</Component>
-			<Component Id="VS2010Registry64Component" Guid="6A5ED58E-F4A5-4985-9281-B41F3C5CE1DB">
+			<Component Id="VS2010Registry64Component" Guid="609DD8AA-A626-4067-9559-1C1DCA899177">
 				<?include $(var.BaseDir)\installer\VS2010Registry64.wsx ?>
 			</Component>
-			<Component Id="VS2010Registry32Component" Guid="5796FC82-143F-432B-B8E4-648EE630479D">
+			<Component Id="VS2010Registry32Component" Guid="46C5304F-B3D2-4E4A-88BF-EF3C36D05253">
 				<?include $(var.BaseDir)\installer\VS2010Registry32.wsx ?>
+			</Component>
+			<Component Id="VS2008Registry64Component" Guid="23BBAB15-91E9-431E-91B3-6D10EFEBCA25">
+				<?include $(var.BaseDir)\installer\VS2008Registry64.wsx ?>
+			</Component>
+			<Component Id="VS2008Registry32Component" Guid="C9B66F06-FA93-4B24-BBDE-10A6FADE974A">
+				<?include $(var.BaseDir)\installer\VS2008Registry32.wsx ?>
 			</Component>
 		</Directory>
 

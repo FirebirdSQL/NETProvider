@@ -3,7 +3,7 @@
 	<RegistryKey Key="SOFTWARE\Microsoft\VisualStudio\10.0\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}" Root="HKLM">
 		<RegistryValue Value="Firebird Data Source" Type="string" />
 	</RegistryKey>
-	<RegistryKey Action="createAndRemoveOnUninstall" Key="SOFTWARE\Microsoft\VisualStudio\10.0\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}\SupportingProviders\{92421248-F044-483A-8237-74C7FBC62971}" Root="HKLM" />
+	<RegistryKey Key="SOFTWARE\Microsoft\VisualStudio\10.0\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}\SupportingProviders\{92421248-F044-483A-8237-74C7FBC62971}" Root="HKLM" />
 	<RegistryKey Key="SOFTWARE\Microsoft\VisualStudio\10.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}" Root="HKLM">
 		<RegistryValue Value=".NET Framework Data Provider for Firebird" Type="string" />
 		<RegistryValue Name="DisplayName" Value="Provider_DisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources" Type="string" />
@@ -13,7 +13,7 @@
 		<RegistryValue Name="InvariantName" Value="FirebirdSql.Data.FirebirdClient" Type="string" />
 		<RegistryValue Name="Technology" Value="{77AB9A9D-78B9-4ba7-91AC-873F5338F1D2}" Type="string" />
 	</RegistryKey>
-	<RegistryKey Action="createAndRemoveOnUninstall" Key="SOFTWARE\Microsoft\VisualStudio\10.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects" Root="HKLM" />
+	<RegistryKey Key="SOFTWARE\Microsoft\VisualStudio\10.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects" Root="HKLM" />
 	<RegistryKey Key="SOFTWARE\Microsoft\VisualStudio\10.0\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionSupport" Root="HKLM">
 		<RegistryValue Value="FirebirdSql.VisualStudio.DataTools.FbDataConnectionSupport" Type="string" />
 	</RegistryKey>
