@@ -407,9 +407,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			options.WaitTimeout = null;
 			options.TransactionBehavior = FbTransactionBehavior.Write;
 
-			options.TransactionBehavior |= FbTransactionBehavior.Wait;
+			options.TransactionBehavior |= FbTransactionBehavior.NoWait;
 
-			/* Isolation level */
 			switch (this.isolationLevel)
 			{
 				case IsolationLevel.Serializable:
@@ -421,19 +420,14 @@ namespace FirebirdSql.Data.FirebirdClient
 					options.TransactionBehavior |= FbTransactionBehavior.Concurrency;
 					break;
 
+				case IsolationLevel.ReadCommitted:
 				case IsolationLevel.ReadUncommitted:
+				default:
 					options.TransactionBehavior |= FbTransactionBehavior.ReadCommitted;
 					options.TransactionBehavior |= FbTransactionBehavior.RecVersion;
 					break;
-
-				case IsolationLevel.ReadCommitted:
-				default:
-					options.TransactionBehavior |= FbTransactionBehavior.ReadCommitted;
-					options.TransactionBehavior |= FbTransactionBehavior.NoRecVersion;
-					break;
 			}
 
-			// just empty FbTransactionOptionsValues struct
 			return this.BuildTpb(options);
 		}
 
