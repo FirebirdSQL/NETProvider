@@ -31,6 +31,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("FirebirdClient")]
 [assembly: AssemblyCopyright("(c) 2002-2012")]
 [assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
 [assembly: AssemblyDelaySign(false)]
-[assembly: AssemblyKeyFile("")]
-[assembly: AssemblyKeyName("")]
