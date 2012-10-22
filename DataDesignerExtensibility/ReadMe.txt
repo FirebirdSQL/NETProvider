@@ -1,4 +1,4 @@
-Visual Studio 2005/2008/2010 DDEX Provider for Firebird
+Visual Studio 2005/2008/2010/2012 DDEX Provider for Firebird
 =======================================================
 
 This project is supported by:
@@ -21,12 +21,6 @@ You can use gacutil utility to do this or to check whether it's correctly instal
 Modify it like this (for 64bit systems you have to edit "32bit version" of this file, because Visual Studio is 32bit, but there's no problem with editing the "64bit version" too):
 
 <configuration>
-  <configSections>
-    ...
-    <section name="firebirdsql.data.firebirdclient" type="System.Data.Common.DbProviderConfigurationHandler, System.Data, Version=%RuntimeVersion%, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-    ...
-  <configSections>
-...
   <system.data>
     <DbProviderFactories>
       ...
@@ -36,8 +30,7 @@ Modify it like this (for 64bit systems you have to edit "32bit version" of this 
   </system.data>
 </configuration>
 
-And substitute (these informations you can find using gacutil):
-  - %RuntimeVersion% with either 2.0.0.0 (.NET 2.0, .NET 3.0, .NET 3.5) or 4.0.0.0 (.NET 4). 
+And substitute (these informations you can find using gacutil): 
   - %Version% with the version of the provider assembly that you have in the GAC.
   - %Culture% with the culture of the provider assembly that you have in the GAC.
   - %PublicKeyToken% with the PublicKeyToken of the provider assembly that you have in the GAC.
