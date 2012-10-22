@@ -3,7 +3,7 @@
 	<RegistryKey Key="Software\Microsoft\VisualStudio\11.0_Config\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}" Root="HKCU">
 		<RegistryValue Value="Firebird Data Source" Type="string" />
 	</RegistryKey>
-	<RegistryKey Key="Software\Microsoft\VisualStudio\11.0_Config\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}\SupportingProviders\{92421248-F044-483A-8237-74C7FBC62971}" Root="HKCU" />
+	<RegistryKey Key="Software\Microsoft\VisualStudio\11.0_Config\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}\SupportingProviders\{92421248-F044-483A-8237-74C7FBC62971}" Root="HKCU" ForceCreateOnInstall="yes" />
 	<RegistryKey Key="Software\Microsoft\VisualStudio\11.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}" Root="HKCU">
 		<RegistryValue Value=".NET Framework Data Provider for Firebird" Type="string" />
 		<RegistryValue Name="DisplayName" Value="Provider_DisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources" Type="string" />
