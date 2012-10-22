@@ -49,7 +49,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_40|AnyCPU' ">
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Release_40\</OutputPath>
     <DefineConstants>TRACE;NET_40</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
