@@ -101,5 +101,25 @@ namespace FirebirdSql.Data.UnitTests
 			Assert.AreEqual("testuser", cs.UserID);
 			Assert.AreEqual("testpwd", cs.Password);
 		}
+
+		[Test]
+		public void ParsingMultilineConnectionStringTest()
+		{
+			const string ConnectionString = @"DataSource=S05-04; 
+ User= SYSDBA; 
+ Password= masterkey; 
+ Role= ; 
+ Database=Termine; 
+ Port=3050; 
+ Dialect=3; 
+ Charset=ISO8859_1; 
+ Connection lifetime=0; 
+ Connection timeout=15; 
+ Pooling=True; 
+ Packet Size=8192;";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("Termine", cs.Database);
+			Assert.AreEqual("", cs.Role);
+		}
 	}
 }
