@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Load(string connectionString)
 		{
-			const string KeyPairsRegex = "(([\\w\\s\\d]*)\\s*=\\s*\"([^\"]*)\"|([\\w\\s\\d]*)\\s*=\\s*'([^']*)'|([\\w\\s\\d]*)\\s*=\\s*([^\"'][^;]*))";
+			const string KeyPairsRegex = "(([\\w\\s\\d]*)\\s*?=\\s*?\"([^\"]*)\"|([\\w\\s\\d]*)\\s*?=\\s*?'([^']*)'|([\\w\\s\\d]*)\\s*?=\\s*?([^\"'][^;]*))";
 
 			this.SetDefaultOptions();
 
@@ -285,23 +285,12 @@ namespace FirebirdSql.Data.FirebirdClient
 							{
 								if (key == "server type")
 								{
-									switch (values[1])
+									FbServerType serverType;
+									if (!Enum.TryParse(values[1], true, out serverType))
 									{
-										case "Default":
-											this.options[key] = FbServerType.Default;
-											break;
-
-										case "Embedded":
-											this.options[key] = FbServerType.Embedded;
-											break;
-
-										case "Context":
-											this.options[key] = FbServerType.Context;
-											break;
-
-										default:
-											throw new NotSupportedException("Not supported 'server type'.");
+										throw new NotSupportedException("Not supported 'server type'.");
 									}
+									this.options[key] = serverType;
 								}
 								else
 								{
