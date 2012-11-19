@@ -285,8 +285,12 @@ namespace FirebirdSql.Data.FirebirdClient
 							{
 								if (key == "server type")
 								{
-									FbServerType serverType;
-									if (!Enum.TryParse(values[1], true, out serverType))
+									FbServerType serverType = default(FbServerType);
+									try
+									{
+										Enum.Parse(typeof(FbServerType), values[1], true);
+									}
+									catch
 									{
 										throw new NotSupportedException("Not supported 'server type'.");
 									}
