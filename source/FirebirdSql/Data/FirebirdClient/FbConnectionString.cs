@@ -288,7 +288,7 @@ namespace FirebirdSql.Data.FirebirdClient
 									FbServerType serverType = default(FbServerType);
 									try
 									{
-										Enum.Parse(typeof(FbServerType), values[1], true);
+										serverType = (FbServerType)Enum.Parse(typeof(FbServerType), values[1], true);
 									}
 									catch
 									{
