@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2010 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2010-2012 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -23,7 +23,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
-	public class FbServiceTraceConfiguration
+	public class FbServiceTraceConfiguration : FbTraceConfiguration
 	{
 		public FbServiceTraceConfiguration()
 		{
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Services
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine("<services>");
-			sb.AppendFormat("enabled {0}", (this.Enabled ? "true" : "false"));
+			sb.AppendFormat("enabled {0}", BoolValue(this.Enabled));
 			sb.AppendLine();
 			if (!string.IsNullOrEmpty(this.IncludeFilter))
 			{
@@ -53,9 +53,12 @@ namespace FirebirdSql.Data.Services
 				sb.AppendFormat("exclude_filter {0}", this.ExcludeFilter);
 				sb.AppendLine();
 			}
-			sb.AppendFormat("log_services {0}", this.Events.HasFlag(FbServiceTraceEvents.Services) ? "true" : "false");
+			sb.AppendFormat("log_services {0}", BoolValue(this.Events.HasFlag(FbServiceTraceEvents.Services)));
 			sb.AppendLine();
-			sb.AppendFormat("log_service_query {0}", this.Events.HasFlag(FbServiceTraceEvents.ServiceQuery) ? "true" : "false");
+			sb.AppendFormat("log_service_query {0}", BoolValue(this.Events.HasFlag(FbServiceTraceEvents.ServiceQuery)));
+			sb.AppendLine();
+			sb.AppendFormat("log_errors {0}", BoolValue(this.Events.HasFlag(FbServiceTraceEvents.Errors)));
+			sb.AppendLine();
 			sb.AppendLine("</services>");
 			return sb.ToString();
 		}

@@ -1,4 +1,4 @@
-/*
+﻿/*
  *	Firebird ADO.NET Data provider for .NET and Mono 
  * 
  *	   The contents of this file are subject to the Initial 
@@ -12,19 +12,23 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2010-2012 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2012 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Services
 {
-	[Flags]
-	public enum FbServiceTraceEvents
+	public abstract class FbTraceConfiguration
 	{
-		Services		= 0x01,
-		ServiceQuery	= 0x02,
-		Errors			= 0x04
+		protected static string BoolValue(bool b)
+		{
+			return b ? "true" : "false";
+		}
 	}
 }

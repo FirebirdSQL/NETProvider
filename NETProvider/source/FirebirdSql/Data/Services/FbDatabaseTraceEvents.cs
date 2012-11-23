@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2010 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2010-2012 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -40,5 +40,7 @@ namespace FirebirdSql.Data.Services
 		PrintBLR			= 0x04000,
 		DYNRequests			= 0x08000,
 		PrintDYN			= 0x10000,
+		Errors				= 0x20000,
+		Sweep				= 0x40000,
 	}
 }

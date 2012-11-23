@@ -331,6 +331,7 @@
     <Compile Include="Services\FbStatisticalFlags.cs" />
     <Compile Include="Services\FbTrace.cs" />
     <Compile Include="Services\FbDatabaseTraceConfigurationCollection.cs" />
+    <Compile Include="Services\FbTraceConfiguration.cs" />
     <Compile Include="Services\FbUserData.cs" />
     <Compile Include="Services\FbValidation.cs" />
     <Compile Include="Services\FbValidationFlags.cs" />
