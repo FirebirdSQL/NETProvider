@@ -41,23 +41,23 @@ namespace FirebirdSql.Data.Services
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine("<services>");
-			sb.AppendFormat("enabled {0}", BoolValue(this.Enabled));
+			sb.AppendFormat("enabled {0}", WriteBoolValue(this.Enabled));
 			sb.AppendLine();
 			if (!string.IsNullOrEmpty(this.IncludeFilter))
 			{
-				sb.AppendFormat("include_filter {0}", this.IncludeFilter);
+				sb.AppendFormat("include_filter {0}", WriteRegEx(this.IncludeFilter));
 				sb.AppendLine();
 			}
 			if (!string.IsNullOrEmpty(this.ExcludeFilter))
 			{
-				sb.AppendFormat("exclude_filter {0}", this.ExcludeFilter);
+				sb.AppendFormat("exclude_filter {0}", WriteRegEx(this.ExcludeFilter));
 				sb.AppendLine();
 			}
-			sb.AppendFormat("log_services {0}", BoolValue(this.Events.HasFlag(FbServiceTraceEvents.Services)));
+			sb.AppendFormat("log_services {0}", WriteBoolValue(this.Events.HasFlag(FbServiceTraceEvents.Services)));
 			sb.AppendLine();
-			sb.AppendFormat("log_service_query {0}", BoolValue(this.Events.HasFlag(FbServiceTraceEvents.ServiceQuery)));
+			sb.AppendFormat("log_service_query {0}", WriteBoolValue(this.Events.HasFlag(FbServiceTraceEvents.ServiceQuery)));
 			sb.AppendLine();
-			sb.AppendFormat("log_errors {0}", BoolValue(this.Events.HasFlag(FbServiceTraceEvents.Errors)));
+			sb.AppendFormat("log_errors {0}", WriteBoolValue(this.Events.HasFlag(FbServiceTraceEvents.Errors)));
 			sb.AppendLine();
 			sb.AppendLine("</services>");
 			return sb.ToString();
