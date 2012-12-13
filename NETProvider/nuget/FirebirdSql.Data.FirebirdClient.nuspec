@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>FirebirdSql.Data.FirebirdClient</id>
+    <version>3.0.2.1</version>
+    <title>Firebird ADO.NET Data provider</title>
+    <description>Firebird ADO.NET Data provider</description>
+    <authors>FirebirdSQL</authors>
+    <owners>FirebirdSQL</owners>
+    <licenseUrl>http://firebird.svn.sourceforge.net/viewvc/firebird/NETProvider/trunk/NETProvider/license.txt</licenseUrl>
+    <projectUrl>http://www.firebirdsql.org/en/net-provider/</projectUrl>
+    <iconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>firebird firebirsql firebirdclient adonet database</tags>
+  </metadata>
+  <files>
+    <file src="..\source\FirebirdSql\Data\bin\Release_35\FirebirdSql.Data.FirebirdClient.dll" target="lib\net35" />
+    <file src="..\source\FirebirdSql\Data\bin\Release_35\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net35" />
+    <file src="..\source\FirebirdSql\Data\bin\Release_40\FirebirdSql.Data.FirebirdClient.dll" target="lib\net40-client" />
+    <file src="..\source\FirebirdSql\Data\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net40-client" />
+    <file src="..\source\FirebirdSql\Data\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll" target="lib\net45" />
+    <file src="..\source\FirebirdSql\Data\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net45" />
+  </files>
+</package>
