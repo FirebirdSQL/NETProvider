@@ -1391,15 +1391,22 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Conditional(TraceHelper.ConditionalSymbol)]
 		private void LogCommand()
 		{
-			TraceHelper.Trace(TraceEventType.Information, "Command:\n{0}", commandText);
-			TraceHelper.Trace(TraceEventType.Information, "Parameters:\n");
+			StringBuilder message = new StringBuilder();
+			message.AppendLine("Command:");
+			message.AppendLine(commandText);
+			message.AppendLine("Parameters:");
 			if (this.parameters != null)
 			{
 				foreach (FbParameter item in this.parameters)
 				{
-					TraceHelper.Trace(TraceEventType.Information, "Name:{0}\tType:{1}\tUsed Value:{2}", item.ParameterName, item.FbDbType, (!IsNullParameterValue(item.InternalValue) ? item.InternalValue : "<null>"));
+					message.AppendLine(string.Format("Name:{0}\tType:{1}\tUsed Value:{2}", item.ParameterName, item.FbDbType, (!IsNullParameterValue(item.InternalValue) ? item.InternalValue : "<null>")));
 				}
 			}
+			else
+			{
+				message.AppendLine("<no parameters>");
+			}
+			TraceHelper.Trace(TraceEventType.Information, message.ToString());
 		}
 
 		private bool IsNullParameterValue(object value)

@@ -142,6 +142,9 @@ private string GenerateColumn(EdmProperty property, ref IDictionary<string, stri
 			result.Append("CHAR(16) CHARACTER SET OCTETS");
 			columnComments.Add(ColumnName(property), "#GUID#");
 			break;
+		case "double":
+			result.Append("DOUBLE PRECISION");
+			break;
 		default:
 			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
 			break;

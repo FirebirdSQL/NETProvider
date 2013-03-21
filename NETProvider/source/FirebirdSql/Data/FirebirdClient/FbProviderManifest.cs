@@ -39,8 +39,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Private Fields
 
 		internal const int BinaryMaxSize = Int32.MaxValue;
-		internal const int VarcharMaxSize = 32765;
-		internal const int NVarcharMaxSize = VarcharMaxSize;
+		internal const int AsciiVarcharMaxSize = 32765;
+		internal const int UnicodeVarcharMaxSize = AsciiVarcharMaxSize;
 		internal const char LikeEscapeCharacter = '\\';
 
 		private System.Collections.ObjectModel.ReadOnlyCollection<PrimitiveType> _primitiveTypes = null;
@@ -350,7 +350,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						Facet f = facets[MetadataHelpers.MaxLengthFacetName];
 						// maxlen is true if facet value is unbounded, the value is bigger than the limited string sizes *or* the facet
 						// value is null. this is needed since functions still have maxlength facet value as null
-						bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > (isUnicode ? NVarcharMaxSize : VarcharMaxSize);
+						bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > (isUnicode ? UnicodeVarcharMaxSize : AsciiVarcharMaxSize);
 						int maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
 
 						TypeUsage tu;

@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Common
 		public DbValue(DbField field, object value)
 		{
 			this.field = field;
-			this.value = (value == null) ? System.DBNull.Value : value;
+			this.value = value ?? DBNull.Value;
 		}
 
 		public DbValue(StatementBase statement, DbField field)
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Common
 		{
 			this.statement	= statement;
 			this.field		= field;
-			this.value		= (value == null) ? System.DBNull.Value : value;
+			this.value		= value ?? DBNull.Value;
 		}
 
 		#endregion
@@ -157,6 +157,8 @@ namespace FirebirdSql.Data.Common
 		{
 			if (this.value is TimeSpan)
 				return new DateTime(0 * 10000L + 621355968000000000 + ((TimeSpan)this.value).Ticks);
+			else if (this.value is DateTimeOffset)
+				return Convert.ToDateTime(((DateTimeOffset)this.value).DateTime, CultureInfo.CurrentCulture.DateTimeFormat);
 			else
 				return Convert.ToDateTime(this.value, CultureInfo.CurrentCulture.DateTimeFormat);
 		}

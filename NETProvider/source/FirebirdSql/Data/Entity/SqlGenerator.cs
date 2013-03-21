@@ -851,7 +851,10 @@ namespace FirebirdSql.Data.Entity
 
 					case PrimitiveTypeKind.String:
 						bool isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(e.ResultType, MetadataHelpers.UnicodeFacetName, true);
-						result.Append(EscapeSingleQuote(e.Value as string, isUnicode));
+						int length =
+							MetadataHelpers.GetFacetValueOrDefault<int?>(e.ResultType, MetadataHelpers.MaxLengthFacetName, null)
+							?? (isUnicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize);
+						result.Append(EscapeSingleQuote(e.Value as string, isUnicode, length));
 						break;
 
 					case PrimitiveTypeKind.DateTime:
@@ -3316,9 +3319,10 @@ namespace FirebirdSql.Data.Entity
 		/// <param name="s"></param>
 		/// <param name="isUnicode"></param>
 		/// <returns>The escaped sql string.</returns>
-		private string EscapeSingleQuote(string s, bool isUnicode)
+		private string EscapeSingleQuote(string s, bool isUnicode, int length)
 		{
-			return (isUnicode ? "_UTF8'" : "'") + s.Replace("'", "''") + "'";
+			string inner = (isUnicode ? "_UTF8'" : "'") + s.Replace("'", "''") + "'";
+			return "CAST(" + inner + " AS VARCHAR(" + length + "))";
 		}
 
 		/// <summary>
@@ -3387,9 +3391,9 @@ namespace FirebirdSql.Data.Entity
 					{
 						// try to get maximum length, if not enough, server will return error
 						if (isUnicode)
-							length = FbProviderManifest.NVarcharMaxSize.ToString(CultureInfo.InvariantCulture);
+							length = FbProviderManifest.UnicodeVarcharMaxSize.ToString(CultureInfo.InvariantCulture);
 						else
-							length = FbProviderManifest.VarcharMaxSize.ToString(CultureInfo.InvariantCulture);
+							length = FbProviderManifest.AsciiVarcharMaxSize.ToString(CultureInfo.InvariantCulture);
 					}
 					else
 					{
@@ -3403,7 +3407,7 @@ namespace FirebirdSql.Data.Entity
 					}
 					else
 					{
-						if (int.Parse(length) > (isUnicode ? FbProviderManifest.NVarcharMaxSize : FbProviderManifest.VarcharMaxSize))
+						if (int.Parse(length) > (isUnicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize))
 						{
 							typeName = "BLOB SUB_TYPE TEXT";
 						}
@@ -3855,7 +3859,7 @@ namespace FirebirdSql.Data.Entity
 		{
 			string shortened;
 			if (!this.shortenedNames.TryGetValue(name, out shortened))
-			{ 
+			{
 				shortened = BuildName(this.shortenedNames.Count);
 				this.shortenedNames[name] = shortened;
 			}

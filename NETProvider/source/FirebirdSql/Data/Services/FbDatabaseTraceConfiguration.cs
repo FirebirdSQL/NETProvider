@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Services
 		{
 			this.Enabled = false;
 			this.ConnectionID = 0;
-			this.TimeThreshold = 100;
+			this.TimeThreshold = TimeSpan.FromMilliseconds(100);
 			this.MaxSQLLength = 300;
 			this.MaxBLRLength = 500;
 			this.MaxDYNLength = 500;
@@ -43,9 +43,9 @@ namespace FirebirdSql.Data.Services
 
 		public FbDatabaseTraceEvents Events { get; set; }
 
-		public uint ConnectionID { get; set; }
+		public int ConnectionID { get; set; }
 
-		public int TimeThreshold { get; set; }
+		public TimeSpan TimeThreshold { get; set; }
 		public int MaxSQLLength { get; set; }
 		public int MaxBLRLength { get; set; }
 		public int MaxDYNLength { get; set; }
@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.Services
 			sb.AppendLine();
 			sb.AppendFormat("print_dyn {0}", WriteBoolValue(this.Events.HasFlag(FbDatabaseTraceEvents.PrintDYN)));
 			sb.AppendLine();
-			sb.AppendFormat("time_threshold {0}", WriteNumber(this.TimeThreshold));
+			sb.AppendFormat("time_threshold {0}", WriteNumber((int)this.TimeThreshold.TotalMilliseconds));
 			sb.AppendLine();
 			sb.AppendFormat("max_sql_length {0}", WriteNumber(this.MaxSQLLength));
 			sb.AppendLine();

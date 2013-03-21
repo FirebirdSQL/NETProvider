@@ -25,7 +25,9 @@ using System.Data.Common;
 #if (!NET_CF)
 using System.Runtime.Serialization;
 #endif
+using System.Security;
 using System.Security.Permissions;
+
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
@@ -122,7 +124,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 #if (!NET_CF)
 
-		[SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+		[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+		[SecurityCritical]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);

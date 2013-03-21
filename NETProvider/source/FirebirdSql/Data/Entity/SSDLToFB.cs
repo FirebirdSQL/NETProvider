@@ -26,6 +26,7 @@ namespace FirebirdSql.Data.Entity
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "11.0.0.0")]
     public partial class SSDLToFB : SSDLToFBBase
     {
+#line hidden
         /// <summary>
         /// Create the template output
         /// </summary>
@@ -308,6 +309,9 @@ private string GenerateColumn(EdmProperty property, ref IDictionary<string, stri
 		case "guid":
 			result.Append("CHAR(16) CHARACTER SET OCTETS");
 			columnComments.Add(ColumnName(property), "#GUID#");
+			break;
+		case "double":
+			result.Append("DOUBLE PRECISION");
 			break;
 		default:
 			result.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());

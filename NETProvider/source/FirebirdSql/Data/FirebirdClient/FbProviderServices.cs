@@ -377,9 +377,9 @@ namespace FirebirdSql.Data.FirebirdClient
 				int? maxLength;
 				if (!MetadataHelpers.TryGetMaxLength(type, out maxLength))
 				{
-					maxLength = (unicode ? FbProviderManifest.NVarcharMaxSize : FbProviderManifest.VarcharMaxSize);
+					maxLength = (unicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize);
 				}
-				if (maxLength == default(int?) || maxLength > (unicode ? FbProviderManifest.NVarcharMaxSize : FbProviderManifest.VarcharMaxSize))
+				if (maxLength == default(int?) || maxLength > (unicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize))
 				{
 					dbType = FbDbType.Text;
 				}

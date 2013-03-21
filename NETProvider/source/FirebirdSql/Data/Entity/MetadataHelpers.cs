@@ -212,9 +212,6 @@ namespace FirebirdSql.Data.Entity
 		#endregion
 
 		#region Facet Support
-		internal static readonly int UnicodeStringMaxMaxLength = Int32.MaxValue / 2;
-		internal static readonly int AsciiStringMaxMaxLength = Int32.MaxValue;
-		internal static readonly int BinaryMaxMaxLength = Int32.MaxValue;
 
 		#region Facet Names
 		/// <summary>

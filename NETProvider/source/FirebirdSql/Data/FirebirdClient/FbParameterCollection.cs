@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
+using System.Linq;
 
 using FirebirdSql.Data.Common;
 
@@ -110,17 +111,17 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · DbParameterCollection overriden methods ·
 
-		public void AddRange(FbParameter[] values)
+		public void AddRange(IEnumerable<FbParameter> values)
 		{
-			this.AddRange((Array)values);
+			foreach (var p in values)
+			{
+				this.Add(p);
+			}
 		}
 
 		public override void AddRange(Array values)
 		{
-			foreach (FbParameter p in values)
-			{
-				this.Add(p);
-			}
+			this.AddRange(values.Cast<FbParameter>());
 		}
 
 		public FbParameter AddWithValue(string parameterName, object value)

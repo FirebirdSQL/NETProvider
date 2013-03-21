@@ -342,7 +342,9 @@
     <Compile Include="Server\IResultSet.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Schema\FbMetaData.xml" />
+    <EmbeddedResource Include="Schema\FbMetaData.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Entity\ProviderManifest.xsd" />
