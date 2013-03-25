@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.Schema
 					if (restrictions[i] != null)
 					{
 						// Catalog, Schema and TableType are no real restrictions
-						if (rname != "Catalog" && rname != "Schema" && rname != "TableType")
+						if (!rname.EndsWith("Catalog") && !rname.EndsWith("Schema") && rname != "TableType")
 						{
 							string pname = String.Format(CultureInfo.CurrentUICulture, "@p{0}", index++);
 
