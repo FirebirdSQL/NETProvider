@@ -168,6 +168,16 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
+		public void Procedures_ShouldSkipSchemaAndProperlyUseParametersForProcedureName()
+		{
+			DataTable procedures = Connection.GetSchema("Procedures");
+
+			procedures = Connection.GetSchema("Procedures", new string[] { null, "DUMMY_SCHEMA", "SELECT_DATA" });
+
+			Assert.AreEqual(1, procedures.Rows.Count);
+		}
+
+		[Test]
 		public void DataTypes()
 		{
 			Connection.GetSchema("DataTypes");
