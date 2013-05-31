@@ -41,11 +41,6 @@ namespace FirebirdSql.Data.Services
 			return i.ToString();
 		}
 
-		protected static string WriteNumber(uint i)
-		{
-			return i.ToString();
-		}
-
 		protected static string WriteRegEx(string re)
 		{
 			return WriteString(re.Replace(@"\", @"\\").Replace("'", @"\'"));
