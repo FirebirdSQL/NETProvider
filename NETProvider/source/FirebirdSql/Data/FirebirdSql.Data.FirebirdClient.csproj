@@ -41,7 +41,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_45;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_45;EF_6</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -94,13 +94,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\..\lib\EntityFramework\v6\net45\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -144,6 +146,7 @@
     <Compile Include="Entity\SymbolPair.cs" />
     <Compile Include="Entity\SymbolTable.cs" />
     <Compile Include="Entity\TypeHelpers.cs" />
+    <Compile Include="FirebirdClient\FbConnectionFactory.cs" />
     <Compile Include="FirebirdClient\FbProviderManifest.cs" />
     <Compile Include="FirebirdClient\FbProviderServices.cs" />
     <Compile Include="FirebirdClient\FbTransactionOptions.cs" />

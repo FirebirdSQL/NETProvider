@@ -26,11 +26,15 @@ using System.IO;
 using System.Text;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
+#if (!EF_6)
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 using System.Data.Common.Utils;
 using System.Data.Mapping.Update.Internal;
+#else
+using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity.Core.Metadata.Edm;
+#endif
 
 using FirebirdSql.Data.FirebirdClient;
 

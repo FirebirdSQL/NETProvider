@@ -23,6 +23,10 @@
 
 using System;
 using System.Data.Common;
+#if (!EF_6)
+#else
+using System.Data.Entity.Core.Common;
+#endif
 
 namespace FirebirdSql.Data.FirebirdClient
 {

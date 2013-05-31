@@ -26,9 +26,15 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Xml;
 using System.Data;
-using System.Data.Metadata.Edm;
 using System.Reflection;
 using System.IO;
+#if (!EF_6)
+using System.Data.Metadata.Edm;
+#else
+using System.Data.Entity.Core;
+using System.Data.Entity.Core.Common;
+using System.Data.Entity.Core.Metadata.Edm;
+#endif
 
 using FirebirdSql.Data.Entity;
 

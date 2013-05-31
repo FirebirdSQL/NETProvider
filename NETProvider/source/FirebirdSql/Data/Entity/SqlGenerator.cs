@@ -24,8 +24,13 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Data.Common;
+#if (!EF_6)
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
+#else
+using System.Data.Entity.Core.Metadata.Edm;
+using System.Data.Entity.Core.Common.CommandTrees;
+#endif
 using System.Data;
 using System.Linq;
 

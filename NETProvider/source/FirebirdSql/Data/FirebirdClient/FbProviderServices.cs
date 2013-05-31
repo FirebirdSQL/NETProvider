@@ -23,12 +23,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using System.Data.Common;
-using System.Data.Common.CommandTrees;
-using System.Data.Metadata.Edm;
 using System.Xml;
 using System.Reflection;
 using System.IO;
 using System.Diagnostics;
+#if (!EF_6)
+using System.Data.Common.CommandTrees;
+using System.Data.Metadata.Edm;
+#else
+using System.Data.Entity.Core.Common;
+using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity.Core.Metadata.Edm;
+#endif
 
 using FirebirdSql.Data.Entity;
 using FirebirdSql.Data.Isql;
