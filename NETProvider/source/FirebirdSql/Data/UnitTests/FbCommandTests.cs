@@ -150,7 +150,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void PrepareTest()
 		{
 			// Insert data using a prepared	statement
-			FbCommand command = new FbCommand("insert	into PrepareTest(test_field) values(@test_field);", Connection);
+			FbCommand command = new FbCommand("insert into PrepareTest(test_field) values(@test_field);", Connection);
 
 			command.Parameters.Add("@test_field", FbDbType.VarChar).Value = DBNull.Value;
 			command.Prepare();
@@ -708,6 +708,19 @@ end";
 				cmd.Cancel();
 				System.Threading.Thread.Sleep(2000);
 				Assert.IsTrue(cancelled);
+			}
+		}
+
+		[Test]
+		public void NoCommandPlanTest()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "recreate table NoCommandPlanTest (id int)";
+				cmd.ExecuteNonQuery();
+				var plan = default(string);
+				Assert.DoesNotThrow(() => { plan=cmd.CommandPlan; });
+				Assert.IsEmpty(plan);
 			}
 		}
 

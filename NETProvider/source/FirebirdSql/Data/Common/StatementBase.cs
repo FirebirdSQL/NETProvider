@@ -192,10 +192,14 @@ namespace FirebirdSql.Data.Common
 
 		public string GetExecutionPlan()
 		{
-			string	plan		= string.Empty;
 			int		count		= 0;
 			int		bufferSize	= IscCodes.DEFAULT_MAX_BUFFER_SIZE;
 			byte[]	buffer		= this.GetSqlInfo(DescribePlanInfoItems, bufferSize);
+
+			if (buffer[0] == IscCodes.isc_info_end)
+			{
+				return string.Empty;
+			}
 
 			while (buffer[0] == IscCodes.isc_info_truncated && count < 4)
 			{
@@ -203,7 +207,6 @@ namespace FirebirdSql.Data.Common
 				buffer = this.GetSqlInfo(DescribePlanInfoItems, bufferSize);
 				count++;
 			}
-
 			if (count > 3)
 			{
 				return null;
@@ -211,13 +214,14 @@ namespace FirebirdSql.Data.Common
 
 			int len = buffer[1];
 			len += buffer[2] << 8;
-
 			if (len > 0)
 			{
-				plan = this.Database.Charset.GetString(buffer, 4, --len);
+				return this.Database.Charset.GetString(buffer, 4, --len);
 			}
-
-			return plan;
+			else
+			{
+				return string.Empty;
+			}
 		}
 
 		public virtual void Close()
