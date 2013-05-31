@@ -1893,6 +1893,27 @@ namespace FirebirdSql.Data.Entity
 			return result;
 		}
 
+		public override ISqlFragment Visit(DbInExpression e)
+		{
+			SqlBuilder result = new SqlBuilder();
+
+			result.Append(e.Item.Accept(this));
+			result.Append(" IN (");
+
+			var separator = string.Empty;
+			foreach (var item in e.List)
+			{
+				result.Append(separator);
+				result.Append(item.Accept(this));
+
+				separator = ", ";
+			}
+
+			result.Append(")");
+
+			return result;
+		}
+
 		#region Visits shared by multiple nodes
 		/// <summary>
 		/// Aggregates are not visited by the normal visitor walk.
@@ -2456,7 +2477,6 @@ namespace FirebirdSql.Data.Entity
 
 
 		#endregion
-
 
 		#region Function Handling Helpers
 		/// <summary>

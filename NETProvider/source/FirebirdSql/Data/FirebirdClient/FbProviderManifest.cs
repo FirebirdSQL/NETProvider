@@ -463,6 +463,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			return sb.ToString();
 		}
 #endif
+
+#if (EF_6)
+		public override bool SupportsInExpression()
+		{
+			return true;
+		}
+#endif
 	}
 }
 #endif
