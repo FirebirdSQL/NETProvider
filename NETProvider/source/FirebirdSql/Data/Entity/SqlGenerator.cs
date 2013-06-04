@@ -1906,7 +1906,7 @@ namespace FirebirdSql.Data.Entity
 				result.Append(separator);
 				result.Append(item.Accept(this));
 
-				separator = ", ";
+				separator = ",";
 			}
 
 			result.Append(")");
