@@ -141,16 +141,7 @@
     <Compile Include="Entity\SqlGenerator.cs" />
     <Compile Include="Entity\SqlSelectStatement.cs" />
     <Compile Include="Entity\SqlWriter.cs" />
-    <Compile Include="Entity\SSDLToFB.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SSDLToFB.tt</DependentUpon>
-    </Compile>
-    <None Include="Entity\SSDLToFB.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>SSDLToFB.cs</LastGenOutput>
-      <CustomToolNamespace>FirebirdSql.Data.Entity</CustomToolNamespace>
-    </None>
+    <Compile Include="Entity\SsdlToFb.cs" />
     <Compile Include="Entity\Symbol.cs" />
     <Compile Include="Entity\SymbolPair.cs" />
     <Compile Include="Entity\SymbolTable.cs" />

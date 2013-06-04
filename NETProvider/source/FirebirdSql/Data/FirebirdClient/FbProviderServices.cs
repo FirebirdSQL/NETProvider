@@ -429,7 +429,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override string DbCreateDatabaseScript(string providerManifestToken, StoreItemCollection storeItemCollection)
 		{
-			return new SSDLToFB() { StoreItemCollection = storeItemCollection }.TransformText();
+			return SsdlToFb.Transform(storeItemCollection, providerManifestToken);
 		}
 
 		protected override bool DbDatabaseExists(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
