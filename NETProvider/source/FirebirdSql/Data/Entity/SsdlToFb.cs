@@ -50,6 +50,7 @@ namespace FirebirdSql.Data.Entity
 					var column = GenerateColumn(property);
 					result.Append("\t");
 					result.Append(column.Item1);
+					result.Append(",");
 					result.AppendLine();
 					foreach (var item in column.Item2)
 						additionalColumnComments.Add(item.Key, item.Value);
@@ -57,6 +58,7 @@ namespace FirebirdSql.Data.Entity
 				result.AppendFormat("CONSTRAINT {0} PRIMARY KEY ({1})",
 					Quote(string.Format("PK_{0}", TableName(entitySet))),
 					string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => Quote(ColumnName(pk)))));
+				result.AppendLine();
 				result.Append(");");
 				result.AppendLine();
 				foreach (var identity in entitySet.ElementType.KeyMembers.Where(pk => pk.TypeUsage.Facets.Contains("StoreGeneratedPattern") && (StoreGeneratedPattern)pk.TypeUsage.Facets["StoreGeneratedPattern"].Value == StoreGeneratedPattern.Identity).Select(i => ColumnName(i)))
@@ -65,7 +67,7 @@ namespace FirebirdSql.Data.Entity
 				}
 				foreach (var comment in additionalColumnComments)
 				{
-					result.AppendFormat("COMMENT ON COLUMN {0}.{1} IS '{2}'",
+					result.AppendFormat("COMMENT ON COLUMN {0}.{1} IS '{2}';",
 						Quote(TableName(entitySet)),
 						Quote(comment.Key),
 						comment.Value);
@@ -80,7 +82,7 @@ namespace FirebirdSql.Data.Entity
 			foreach (var associationSet in storeItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<AssociationSet>())
 			{
 				var result = new StringBuilder();
-				ReferentialConstraint constraint = associationSet.ElementType.ReferentialConstraints.Single<ReferentialConstraint>(); 
+				ReferentialConstraint constraint = associationSet.ElementType.ReferentialConstraints.Single<ReferentialConstraint>();
 				AssociationSetEnd end = associationSet.AssociationSetEnds[constraint.FromRole.Name];
 				AssociationSetEnd end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
 				result.AppendFormat("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2})",
@@ -110,37 +112,15 @@ namespace FirebirdSql.Data.Entity
 			var columnComments = new Dictionary<string, string>();
 			column.Append(Quote(ColumnName(property)));
 			column.Append(" ");
-			switch (property.TypeUsage.EdmType.Name)
+			column.Append(SqlGenerator.GetSqlPrimitiveType(property.TypeUsage));
+			switch (MetadataHelpers.GetEdmType<PrimitiveType>(property.TypeUsage).PrimitiveTypeKind)
 			{
-				case "varchar":
-				case "char":
-					column.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
-					column.AppendFormat("({0})", property.TypeUsage.Facets["MaxLength"].Value);
-					break;
-				case "decimal":
-				case "numeric":
-					column.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
-					column.AppendFormat("({0},{1})", property.TypeUsage.Facets["Precision"].Value, property.TypeUsage.Facets["Scale"].Value);
-					break;
-				case "clob":
-					column.Append("BLOB SUB_TYPE TEXT");
-					break;
-				case "blob":
-					column.Append("BLOB SUB_TYPE BINARY");
-					break;
-				case "smallint_bool":
-					column.AppendFormat("SMALLINT CHECK ({0} IN (1,0))", Quote(ColumnName(property)));
+				case PrimitiveTypeKind.Boolean:
+					column.AppendFormat(" CHECK ({0} IN (1,0))", Quote(ColumnName(property)));
 					columnComments.Add(ColumnName(property), "#BOOL#");
 					break;
-				case "guid":
-					column.Append("CHAR(16) CHARACTER SET OCTETS");
+				case PrimitiveTypeKind.Guid:
 					columnComments.Add(ColumnName(property), "#GUID#");
-					break;
-				case "double":
-					column.Append("DOUBLE PRECISION");
-					break;
-				default:
-					column.Append(property.TypeUsage.EdmType.Name.ToUpperInvariant());
 					break;
 			}
 			if (!property.Nullable)
