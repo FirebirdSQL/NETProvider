@@ -94,7 +94,7 @@ namespace FirebirdSql.Data.Entity
 
 				EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
 				// hope this column isn't indexed to not waste power
-				EdmMember someColumn = table.ElementType.Members.Last(x => !IsStoreGenerated(x));
+				EdmMember someColumn = table.ElementType.Members.Last(x => !MetadataHelpers.IsStoreGenerated(x));
 				commandText.AppendFormat("{0} = {0}", GenerateMemberSql(someColumn));
 			}
 			commandText.AppendLine();
@@ -189,20 +189,6 @@ namespace FirebirdSql.Data.Entity
 			return SqlGenerator.QuoteIdentifier(member.Name);
 		}
 
-		private static bool IsStoreGenerated(EdmMember member)
-		{
-			Facet item = null;
-			if (member.TypeUsage.Facets.TryGetValue(MetadataHelpers.StoreGeneratedPatternFacetName, false, out item) &&
-				(((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Computed || ((StoreGeneratedPattern)item.Value) == StoreGeneratedPattern.Identity))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
 		/// <summary>
 		/// Generates SQL fragment returning server-generated values.
 		/// Requires: translator knows about member values so that we can figure out
@@ -244,7 +230,7 @@ namespace FirebirdSql.Data.Entity
 			EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
 			IEnumerable<EdmMember> columnsToFetch =
 			table.ElementType.Members
-				.Where(m => IsStoreGenerated(m))
+				.Where(m => MetadataHelpers.IsStoreGenerated(m))
 				.Except((!(tree is DbInsertCommandTree) ? table.ElementType.KeyMembers : Enumerable.Empty<EdmMember>()));
 
 			StringBuilder startBlock = new StringBuilder();

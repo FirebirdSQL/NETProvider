@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.Entity
 				result.AppendLine();
 				result.Append(");");
 				result.AppendLine();
-				foreach (var identity in entitySet.ElementType.KeyMembers.Where(pk => pk.TypeUsage.Facets.Contains("StoreGeneratedPattern") && (StoreGeneratedPattern)pk.TypeUsage.Facets["StoreGeneratedPattern"].Value == StoreGeneratedPattern.Identity).Select(i => i.Name))
+				foreach (var identity in entitySet.ElementType.KeyMembers.Where(pk => MetadataHelpers.IsStoreGeneratedIdentity(pk)).Select(i => i.Name))
 				{
 					additionalColumnComments.Add(identity, "#PK_GEN#");
 				}
