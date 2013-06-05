@@ -1021,15 +1021,7 @@ namespace FirebirdSql.Data.Entity
 				//    builder.Append(".");
 				//}
 
-				string tableName = MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "Table");
-				if (!string.IsNullOrEmpty(tableName))
-				{
-					builder.Append(QuoteIdentifier(tableName));
-				}
-				else
-				{
-					builder.Append(QuoteIdentifier(entitySetBase.Name));
-				}
+				builder.Append(QuoteIdentifier(MetadataHelpers.GetTableName(entitySetBase)));
 			}
 			return builder.ToString();
 		}

@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Entity
 			{
 				var result = new StringBuilder();
 				var additionalColumnComments = new Dictionary<string, string>();
-				result.AppendFormat("RECREATE TABLE {0} (", Quote(TableName(entitySet)));
+				result.AppendFormat("RECREATE TABLE {0} (", SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(entitySet)));
 				result.AppendLine();
 				foreach (var property in entitySet.ElementType.Properties)
 				{
@@ -56,8 +56,8 @@ namespace FirebirdSql.Data.Entity
 						additionalColumnComments.Add(item.Key, item.Value);
 				}
 				result.AppendFormat("CONSTRAINT {0} PRIMARY KEY ({1})",
-					Quote(string.Format("PK_{0}", TableName(entitySet))),
-					string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => Quote(ColumnName(pk)))));
+					SqlGenerator.QuoteIdentifier(string.Format("PK_{0}", MetadataHelpers.GetTableName(entitySet))),
+					string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => SqlGenerator.QuoteIdentifier(ColumnName(pk)))));
 				result.AppendLine();
 				result.Append(");");
 				result.AppendLine();
@@ -68,8 +68,8 @@ namespace FirebirdSql.Data.Entity
 				foreach (var comment in additionalColumnComments)
 				{
 					result.AppendFormat("COMMENT ON COLUMN {0}.{1} IS '{2}';",
-						Quote(TableName(entitySet)),
-						Quote(comment.Key),
+						SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(entitySet)),
+						SqlGenerator.QuoteIdentifier(comment.Key),
 						comment.Value);
 					result.AppendLine();
 				}
@@ -86,13 +86,13 @@ namespace FirebirdSql.Data.Entity
 				AssociationSetEnd end = associationSet.AssociationSetEnds[constraint.FromRole.Name];
 				AssociationSetEnd end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
 				result.AppendFormat("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2})",
-					Quote(TableName(end2.EntitySet)),
-					Quote(string.Format("FK_{0}", AssociationSetName(associationSet))),
-					string.Join(", ", constraint.ToProperties.Select(fk => Quote(ColumnName(fk)))));
+					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end2.EntitySet)),
+					SqlGenerator.QuoteIdentifier(string.Format("FK_{0}", AssociationSetName(associationSet))),
+					string.Join(", ", constraint.ToProperties.Select(fk => SqlGenerator.QuoteIdentifier(ColumnName(fk)))));
 				result.AppendLine();
 				result.AppendFormat("REFERENCES {0}({1})",
-					Quote(TableName(end.EntitySet)),
-					string.Join(", ", constraint.FromProperties.Select(pk => Quote(ColumnName(pk)))));
+					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end.EntitySet)),
+					string.Join(", ", constraint.FromProperties.Select(pk => SqlGenerator.QuoteIdentifier(ColumnName(pk)))));
 				result.AppendLine();
 				result.AppendFormat("ON DELETE {0}",
 					end.CorrespondingAssociationEndMember.DeleteBehavior == OperationAction.Cascade ? "CASCADE" : "NO ACTION");
@@ -101,22 +101,17 @@ namespace FirebirdSql.Data.Entity
 			}
 		}
 
-		static string Quote(string s)
-		{
-			return "\"" + s + "\"";
-		}
-
 		static Tuple<string, IDictionary<string, string>> GenerateColumn(EdmProperty property)
 		{
 			var column = new StringBuilder();
 			var columnComments = new Dictionary<string, string>();
-			column.Append(Quote(ColumnName(property)));
+			column.Append(SqlGenerator.QuoteIdentifier(ColumnName(property)));
 			column.Append(" ");
 			column.Append(SqlGenerator.GetSqlPrimitiveType(property.TypeUsage));
 			switch (MetadataHelpers.GetEdmType<PrimitiveType>(property.TypeUsage).PrimitiveTypeKind)
 			{
 				case PrimitiveTypeKind.Boolean:
-					column.AppendFormat(" CHECK ({0} IN (1,0))", Quote(ColumnName(property)));
+					column.AppendFormat(" CHECK ({0} IN (1,0))", SqlGenerator.QuoteIdentifier(ColumnName(property)));
 					columnComments.Add(ColumnName(property), "#BOOL#");
 					break;
 				case PrimitiveTypeKind.Guid:
@@ -133,11 +128,6 @@ namespace FirebirdSql.Data.Entity
 		static string ColumnName(EdmMember member)
 		{
 			return (string)member.MetadataProperties["Name"].Value;
-		}
-
-		static string TableName(EntitySet entitySet)
-		{
-			return (string)entitySet.MetadataProperties["Table"].Value ?? (string)entitySet.MetadataProperties["Name"].Value;
 		}
 
 		static string AssociationSetName(AssociationSet associationSet)

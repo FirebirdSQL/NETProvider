@@ -449,6 +449,11 @@ namespace FirebirdSql.Data.Entity
 					return default(ParameterDirection);
 			}
 		}
+
+		internal static string GetTableName(EntitySetBase entitySetBase)
+		{
+			return MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "Table") ?? entitySetBase.Name;
+		}
 	}
 }
 #endif
