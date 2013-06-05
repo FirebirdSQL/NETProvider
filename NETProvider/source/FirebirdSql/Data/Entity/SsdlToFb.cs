@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.Entity
 				var additionalColumnComments = new Dictionary<string, string>();
 				result.AppendFormat("RECREATE TABLE {0} (", SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(entitySet)));
 				result.AppendLine();
-				foreach (var property in entitySet.ElementType.Properties)
+				foreach (var property in MetadataHelpers.GetProperties(entitySet.ElementType))
 				{
 					var column = GenerateColumn(property);
 					result.Append("\t");
@@ -57,11 +57,11 @@ namespace FirebirdSql.Data.Entity
 				}
 				result.AppendFormat("CONSTRAINT {0} PRIMARY KEY ({1})",
 					SqlGenerator.QuoteIdentifier(string.Format("PK_{0}", MetadataHelpers.GetTableName(entitySet))),
-					string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => SqlGenerator.QuoteIdentifier(ColumnName(pk)))));
+					string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name))));
 				result.AppendLine();
 				result.Append(");");
 				result.AppendLine();
-				foreach (var identity in entitySet.ElementType.KeyMembers.Where(pk => pk.TypeUsage.Facets.Contains("StoreGeneratedPattern") && (StoreGeneratedPattern)pk.TypeUsage.Facets["StoreGeneratedPattern"].Value == StoreGeneratedPattern.Identity).Select(i => ColumnName(i)))
+				foreach (var identity in entitySet.ElementType.KeyMembers.Where(pk => pk.TypeUsage.Facets.Contains("StoreGeneratedPattern") && (StoreGeneratedPattern)pk.TypeUsage.Facets["StoreGeneratedPattern"].Value == StoreGeneratedPattern.Identity).Select(i => i.Name))
 				{
 					additionalColumnComments.Add(identity, "#PK_GEN#");
 				}
@@ -87,12 +87,12 @@ namespace FirebirdSql.Data.Entity
 				AssociationSetEnd end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
 				result.AppendFormat("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2})",
 					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end2.EntitySet)),
-					SqlGenerator.QuoteIdentifier(string.Format("FK_{0}", AssociationSetName(associationSet))),
-					string.Join(", ", constraint.ToProperties.Select(fk => SqlGenerator.QuoteIdentifier(ColumnName(fk)))));
+					SqlGenerator.QuoteIdentifier(string.Format("FK_{0}", associationSet.Name)),
+					string.Join(", ", constraint.ToProperties.Select(fk => SqlGenerator.QuoteIdentifier(fk.Name))));
 				result.AppendLine();
 				result.AppendFormat("REFERENCES {0}({1})",
 					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end.EntitySet)),
-					string.Join(", ", constraint.FromProperties.Select(pk => SqlGenerator.QuoteIdentifier(ColumnName(pk)))));
+					string.Join(", ", constraint.FromProperties.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name))));
 				result.AppendLine();
 				result.AppendFormat("ON DELETE {0}",
 					end.CorrespondingAssociationEndMember.DeleteBehavior == OperationAction.Cascade ? "CASCADE" : "NO ACTION");
@@ -105,17 +105,17 @@ namespace FirebirdSql.Data.Entity
 		{
 			var column = new StringBuilder();
 			var columnComments = new Dictionary<string, string>();
-			column.Append(SqlGenerator.QuoteIdentifier(ColumnName(property)));
+			column.Append(SqlGenerator.QuoteIdentifier(property.Name));
 			column.Append(" ");
 			column.Append(SqlGenerator.GetSqlPrimitiveType(property.TypeUsage));
 			switch (MetadataHelpers.GetEdmType<PrimitiveType>(property.TypeUsage).PrimitiveTypeKind)
 			{
 				case PrimitiveTypeKind.Boolean:
-					column.AppendFormat(" CHECK ({0} IN (1,0))", SqlGenerator.QuoteIdentifier(ColumnName(property)));
-					columnComments.Add(ColumnName(property), "#BOOL#");
+					column.AppendFormat(" CHECK ({0} IN (1,0))", SqlGenerator.QuoteIdentifier(property.Name));
+					columnComments.Add(property.Name, "#BOOL#");
 					break;
 				case PrimitiveTypeKind.Guid:
-					columnComments.Add(ColumnName(property), "#GUID#");
+					columnComments.Add(property.Name, "#GUID#");
 					break;
 			}
 			if (!property.Nullable)
@@ -124,16 +124,5 @@ namespace FirebirdSql.Data.Entity
 			}
 			return Tuple.Create<string, IDictionary<string, string>>(column.ToString(), columnComments);
 		}
-
-		static string ColumnName(EdmMember member)
-		{
-			return (string)member.MetadataProperties["Name"].Value;
-		}
-
-		static string AssociationSetName(AssociationSet associationSet)
-		{
-			return (string)associationSet.MetadataProperties["Name"].Value;
-		}
-
 	}
 }
