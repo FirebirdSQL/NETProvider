@@ -89,13 +89,12 @@ namespace FirebirdSql.Data.FirebirdClient
 					StructuralType resultsAsStructuralType = resultsType as StructuralType;
 					if (resultsAsStructuralType != null)
 					{
-						command.ExpectedColumnTypes = new PrimitiveType[resultsAsStructuralType.Members.Count];
+						command.ExpectedColumnTypes = new Type[resultsAsStructuralType.Members.Count];
 
 						for (int ordinal = 0; ordinal < resultsAsStructuralType.Members.Count; ordinal++)
 						{
 							EdmMember member = resultsAsStructuralType.Members[ordinal];
-							PrimitiveType primitiveType = member.TypeUsage.EdmType as PrimitiveType;
-							command.ExpectedColumnTypes[ordinal] = primitiveType;
+							command.ExpectedColumnTypes[ordinal] = ((PrimitiveType)member.TypeUsage.EdmType).ClrEquivalentType;
 						}
 					}
 				}
@@ -114,20 +113,20 @@ namespace FirebirdSql.Data.FirebirdClient
 					if (MetadataHelpers.IsRowType(elementType))
 					{
 						ReadOnlyMetadataCollection<EdmMember> members = ((RowType)elementType).Members;
-						command.ExpectedColumnTypes = new PrimitiveType[members.Count];
+						command.ExpectedColumnTypes = new Type[members.Count];
 
 						for (int ordinal = 0; ordinal < members.Count; ordinal++)
 						{
 							EdmMember member = members[ordinal];
 							PrimitiveType primitiveType = (PrimitiveType)member.TypeUsage.EdmType;
-							command.ExpectedColumnTypes[ordinal] = primitiveType;
+							command.ExpectedColumnTypes[ordinal] = primitiveType.ClrEquivalentType;
 						}
 
 					}
 					else if (MetadataHelpers.IsPrimitiveType(elementType))
 					{
-						command.ExpectedColumnTypes = new PrimitiveType[1];
-						command.ExpectedColumnTypes[0] = (PrimitiveType)elementType;
+						command.ExpectedColumnTypes = new Type[1];
+						command.ExpectedColumnTypes[0] = ((PrimitiveType)elementType).ClrEquivalentType;
 					}
 					else
 					{

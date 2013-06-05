@@ -25,11 +25,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
-#if (!EF_6)
-using System.Data.Metadata.Edm;
-#else
-using System.Data.Entity.Core.Metadata.Edm;
-#endif
+using System.Linq;
 
 using FirebirdSql.Data.Common;
 
@@ -431,9 +427,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 #if (!(NET_35 && !ENTITY_FRAMEWORK))
 			// type coercions for EF
-			// I think only bool datatype needs to be done explicitly
-			if (this.command.ExpectedColumnTypes != default(PrimitiveType[]))
-				if (this.command.ExpectedColumnTypes[i].ClrEquivalentType == typeof(bool))
+			if (this.command.ExpectedColumnTypes != null)
+				if (this.command.ExpectedColumnTypes.ElementAtOrDefault(i) == typeof(bool))
 				{
 					return this.GetBoolean(i);
 				}

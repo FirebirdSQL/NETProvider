@@ -30,11 +30,6 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using System.Diagnostics;
-#if (!EF_6)
-using System.Data.Metadata.Edm;
-#else
-using System.Data.Entity.Core.Metadata.Edm;
-#endif
 
 using FirebirdSql.Data.Common;
 
@@ -61,7 +56,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 #if (!(NET_35 && !ENTITY_FRAMEWORK))
 		// type coercions
-		internal PrimitiveType[] ExpectedColumnTypes { get; set; }
+		internal Type[] ExpectedColumnTypes { get; set; }
 #endif
 
 		#endregion
@@ -444,8 +439,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			command.UpdatedRowSource = this.UpdatedRowSource;
 
 #if (!(NET_35 && !ENTITY_FRAMEWORK))
-			if (this.ExpectedColumnTypes != default(PrimitiveType[]))
-				command.ExpectedColumnTypes = (PrimitiveType[])this.ExpectedColumnTypes.Clone();
+			if (this.ExpectedColumnTypes != null)
+				command.ExpectedColumnTypes = (Type[])this.ExpectedColumnTypes.Clone();
 #endif
 
 			for (int i = 0; i < this.Parameters.Count; i++)
