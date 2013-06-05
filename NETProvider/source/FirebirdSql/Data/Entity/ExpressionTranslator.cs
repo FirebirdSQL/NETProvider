@@ -277,7 +277,7 @@ namespace FirebirdSql.Data.Entity
 
 		public override void Visit(DbScanExpression expression)
 		{
-			commandText.Append(SqlGenerator.GetTargetTSql(expression.Target));
+			commandText.Append(SqlGenerator.GetTargetSql(expression.Target));
 		}
 
 		public override void Visit(DbPropertyExpression expression)

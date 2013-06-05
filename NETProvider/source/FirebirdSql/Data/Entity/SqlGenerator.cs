@@ -977,14 +977,14 @@ namespace FirebirdSql.Data.Entity
 			if (IsParentAJoin)
 			{
 				SqlBuilder result = new SqlBuilder();
-				result.Append(GetTargetTSql(target));
+				result.Append(GetTargetSql(target));
 
 				return result;
 			}
 			else
 			{
 				SqlSelectStatement result = new SqlSelectStatement();
-				result.From.Append(GetTargetTSql(target));
+				result.From.Append(GetTargetSql(target));
 
 				return result;
 			}
@@ -995,7 +995,7 @@ namespace FirebirdSql.Data.Entity
 		/// Gets escaped TSql identifier describing this entity set.
 		/// </summary>
 		/// <returns></returns>
-		internal static string GetTargetTSql(EntitySetBase entitySetBase)
+		internal static string GetTargetSql(EntitySetBase entitySetBase)
 		{
 			// construct escaped T-SQL referencing entity set
 			StringBuilder builder = new StringBuilder(50);
