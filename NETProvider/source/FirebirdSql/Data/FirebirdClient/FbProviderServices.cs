@@ -74,67 +74,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (commandTree == null)
 				throw new ArgumentNullException("commandTree");
 
-			FbCommand command = new FbCommand();
+			var expectedTypes = PrepareTypeCoercions(commandTree);
 
-			#region Type coercions
-			// Set expected column types for DbQueryCommandTree
-			DbQueryCommandTree queryTree = commandTree as DbQueryCommandTree;
-			if (queryTree != null)
-			{
-				DbProjectExpression projectExpression = queryTree.Query as DbProjectExpression;
-				if (projectExpression != null)
-				{
-					EdmType resultsType = projectExpression.Projection.ResultType.EdmType;
-
-					StructuralType resultsAsStructuralType = resultsType as StructuralType;
-					if (resultsAsStructuralType != null)
-					{
-						command.ExpectedColumnTypes = new Type[resultsAsStructuralType.Members.Count];
-
-						for (int ordinal = 0; ordinal < resultsAsStructuralType.Members.Count; ordinal++)
-						{
-							EdmMember member = resultsAsStructuralType.Members[ordinal];
-							command.ExpectedColumnTypes[ordinal] = ((PrimitiveType)member.TypeUsage.EdmType).ClrEquivalentType;
-						}
-					}
-				}
-			}
-
-			// Set expected column types for DbFunctionCommandTree
-			DbFunctionCommandTree functionTree = commandTree as DbFunctionCommandTree;
-			if (functionTree != null)
-			{
-				if (functionTree.ResultType != null)
-				{
-					Debug.Assert(MetadataHelpers.IsCollectionType(functionTree.ResultType.EdmType), "Result type of a function is expected to be a collection of RowType or PrimitiveType");
-
-					EdmType elementType = MetadataHelpers.GetElementTypeUsage(functionTree.ResultType).EdmType;
-
-					if (MetadataHelpers.IsRowType(elementType))
-					{
-						ReadOnlyMetadataCollection<EdmMember> members = ((RowType)elementType).Members;
-						command.ExpectedColumnTypes = new Type[members.Count];
-
-						for (int ordinal = 0; ordinal < members.Count; ordinal++)
-						{
-							EdmMember member = members[ordinal];
-							PrimitiveType primitiveType = (PrimitiveType)member.TypeUsage.EdmType;
-							command.ExpectedColumnTypes[ordinal] = primitiveType.ClrEquivalentType;
-						}
-
-					}
-					else if (MetadataHelpers.IsPrimitiveType(elementType))
-					{
-						command.ExpectedColumnTypes = new Type[1];
-						command.ExpectedColumnTypes[0] = ((PrimitiveType)elementType).ClrEquivalentType;
-					}
-					else
-					{
-						Debug.Fail("Result type of a function is expected to be a collection of RowType or PrimitiveType");
-					}
-				}
-			}
-			#endregion
+			FbCommand command = new FbCommand(expectedTypes);
 
 			List<DbParameter> parameters;
 			CommandType commandType;
@@ -413,6 +355,71 @@ namespace FirebirdSql.Data.FirebirdClient
 			//}
 
 			return FbDbType.Binary;
+		}
+
+		private static Type[] PrepareTypeCoercions(DbCommandTree commandTree)
+		{
+			// Set expected column types for DbQueryCommandTree
+			var queryTree = commandTree as DbQueryCommandTree;
+			if (queryTree != null)
+			{
+				var projectExpression = queryTree.Query as DbProjectExpression;
+				if (projectExpression != null)
+				{
+					var resultsType = projectExpression.Projection.ResultType.EdmType;
+
+					var resultsAsStructuralType = resultsType as StructuralType;
+					if (resultsAsStructuralType != null)
+					{
+						var result = new Type[resultsAsStructuralType.Members.Count];
+
+						for (int i = 0; i < resultsAsStructuralType.Members.Count; i++)
+						{
+							var member = resultsAsStructuralType.Members[i];
+							result[i] = ((PrimitiveType)member.TypeUsage.EdmType).ClrEquivalentType;
+						}
+
+						return result;
+					}
+				}
+			}
+
+			// Set expected column types for DbFunctionCommandTree
+			var functionTree = commandTree as DbFunctionCommandTree;
+			if (functionTree != null)
+			{
+				if (functionTree.ResultType != null)
+				{
+					Debug.Assert(MetadataHelpers.IsCollectionType(functionTree.ResultType.EdmType), "Result type of a function is expected to be a collection of RowType or PrimitiveType");
+
+					var elementType = MetadataHelpers.GetElementTypeUsage(functionTree.ResultType).EdmType;
+
+					if (MetadataHelpers.IsRowType(elementType))
+					{
+						var members = ((RowType)elementType).Members;
+						var result = new Type[members.Count];
+
+						for (int i = 0; i < members.Count; i++)
+						{
+							var member = members[i];
+							var primitiveType = (PrimitiveType)member.TypeUsage.EdmType;
+							result[i] = primitiveType.ClrEquivalentType;
+						}
+
+						return result;
+					}
+					else if (MetadataHelpers.IsPrimitiveType(elementType))
+					{
+						return new Type[] { ((PrimitiveType)elementType).ClrEquivalentType };
+					}
+					else
+					{
+						Debug.Fail("Result type of a function is expected to be a collection of RowType or PrimitiveType");
+					}
+				}
+			}
+
+			return null;
 		}
 
 #if (!NET_35)

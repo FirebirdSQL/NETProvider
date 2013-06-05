@@ -54,11 +54,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		private int commandTimeout;
 		private int fetchSize;
 
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
-		// type coercions
-		internal Type[] ExpectedColumnTypes { get; set; }
-#endif
-
 		#endregion
 
 		#region · Properties ·
@@ -235,6 +230,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
+#if (!(NET_35 && !ENTITY_FRAMEWORK))
+		// type coercions
+		internal Type[] ExpectedColumnTypes { get; private set; }
+#endif
+
 		#endregion
 
 		#region · Protected DbCommand Properties ·
@@ -377,6 +377,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			this.Connection = connection;
 			this.transaction = transaction;
+		}
+
+		internal FbCommand(Type[] expectedColumnTypes)
+			: this()
+		{
+			this.ExpectedColumnTypes = expectedColumnTypes;
 		}
 
 		#endregion
