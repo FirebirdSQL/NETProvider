@@ -174,14 +174,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			FbParameter result = new FbParameter(name, value);
 
-			// .Direction
 			ParameterDirection direction = MetadataHelpers.ParameterModeToParameterDirection(mode);
 			if (result.Direction != direction)
 			{
 				result.Direction = direction;
 			}
 
-			// .Size and .SqlDbType
 			// output parameters are handled differently (we need to ensure there is space for return
 			// values where the user has not given a specific Size/MaxLength)
 			bool isOutParam = mode != ParameterMode.In;
@@ -199,7 +197,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				result.Size = size.Value;
 			}
 
-			// .IsNullable
 			bool isNullable = MetadataHelpers.IsNullable(type);
 			if (isOutParam || isNullable != result.IsNullable)
 			{
