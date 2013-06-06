@@ -328,9 +328,9 @@ namespace FirebirdSql.Data.Entity
 			#endregion
 
 			#region String Canonical Functions
-			functionHandlers.Add("Concat", HandleConcatFunction);
-			functionHandlers.Add("Contains", HandleContainsFunction);
-			functionHandlers.Add("EndsWith", HandleEndsWithFunction);
+			functionHandlers.Add("Concat", HandleCanonicalConcatFunction);
+			functionHandlers.Add("Contains", HandleCanonicalContainsFunction);
+			functionHandlers.Add("EndsWith", HandleCanonicalEndsWithFunction);
 			functionHandlers.Add("IndexOf", HandleCanonicalFunctionIndexOf);
 			functionHandlers.Add("Length", HandleCanonicalFunctionLength);
 			functionHandlers.Add("ToLower", HandleCanonicalFunctionToLower);
@@ -342,7 +342,7 @@ namespace FirebirdSql.Data.Entity
 			functionHandlers.Add("Right", HandleCanonicalFunctionRight);
 			functionHandlers.Add("Reverse", HandleCanonicalFunctionReverse);
 			functionHandlers.Add("Replace", HandleCanonicalFunctionReplace);
-			functionHandlers.Add("StartsWith", HandleStartsWithFunction);
+			functionHandlers.Add("StartsWith", HandleCanonicalStartsWithFunction);
 			functionHandlers.Add("Substring", HandleCanonicalFunctionSubstring);
 			#endregion
 
@@ -2631,18 +2631,18 @@ namespace FirebirdSql.Data.Entity
 		}
 
 		#region String Canonical Functions
-		private static ISqlFragment HandleConcatFunction(SqlGenerator sqlgen, DbFunctionExpression e)
+		private static ISqlFragment HandleCanonicalConcatFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
 			return sqlgen.HandleSpecialFunctionToOperator(e, false);
 		}
 
-		private static ISqlFragment HandleContainsFunction(SqlGenerator sqlgen, DbFunctionExpression e)
+		private static ISqlFragment HandleCanonicalContainsFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
 			sqlgen.shouldHandleBoolComparison = false;
 			return sqlgen.HandleSpecialFunctionToOperator(e, false);
 		}
 
-		private static ISqlFragment HandleEndsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
+		private static ISqlFragment HandleCanonicalEndsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
 			// should we do this thinking for developer or should (s)he create own solution???
 			sqlgen.shouldHandleBoolComparison = false;
@@ -2720,7 +2720,7 @@ namespace FirebirdSql.Data.Entity
 			return sqlgen.HandleFunctionDefaultGivenName(e, "REPLACE");
 		}
 
-		private static ISqlFragment HandleStartsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
+		private static ISqlFragment HandleCanonicalStartsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
 			sqlgen.shouldHandleBoolComparison = false;
 			return sqlgen.HandleSpecialFunctionToOperator(e, false);
