@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
-####################################################################################################################
-
-BE AWARE THAT THE ORDER IN WHICH TYPES ARE DESCRIBED IN THE PROVIDER MANIFEST IS RELEVANT AND HAVE IMPACT IN LOOKUP
-PROCESS
-
-#################################################################################################################### 
--->
 <ProviderManifest Namespace="FirebirdClient" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/providermanifest">
   <Types>
     <Type Name="smallint" PrimitiveTypeKind="Int16">
