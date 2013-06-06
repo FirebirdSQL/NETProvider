@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008-2010 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2013 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -238,12 +238,12 @@ namespace FirebirdSql.Data.Entity
 
 		public override void Visit(DbAndExpression expression)
 		{
-			VisitBinary(expression, " and ");
+			VisitBinary(expression, " AND ");
 		}
 
 		public override void Visit(DbOrExpression expression)
 		{
-			VisitBinary(expression, " or ");
+			VisitBinary(expression, " OR ");
 		}
 
 		public override void Visit(DbComparisonExpression expression)
@@ -259,12 +259,12 @@ namespace FirebirdSql.Data.Entity
 		public override void Visit(DbIsNullExpression expression)
 		{
 			expression.Argument.Accept(this);
-			commandText.Append(" is null");
+			commandText.Append(" IS NULL");
 		}
 
 		public override void Visit(DbNotExpression expression)
 		{
-			commandText.Append("not (");
+			commandText.Append("NOT (");
 			expression.Accept(this);
 			commandText.Append(")");
 		}
@@ -287,7 +287,7 @@ namespace FirebirdSql.Data.Entity
 
 		public override void Visit(DbNullExpression expression)
 		{
-			commandText.Append("null");
+			commandText.Append("NULL");
 		}
 
 		public override void Visit(DbNewInstanceExpression expression)
