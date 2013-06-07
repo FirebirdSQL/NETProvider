@@ -2644,7 +2644,6 @@ namespace FirebirdSql.Data.Entity
 
 		private static ISqlFragment HandleCanonicalEndsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			// should we do this thinking for developer or should (s)he create own solution???
 			sqlgen.shouldHandleBoolComparison = false;
 			SqlBuilder result = new SqlBuilder();
 			result.Append("REVERSE(");
