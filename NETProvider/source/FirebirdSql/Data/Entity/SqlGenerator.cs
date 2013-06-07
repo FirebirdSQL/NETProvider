@@ -997,8 +997,8 @@ namespace FirebirdSql.Data.Entity
 		/// <returns></returns>
 		internal static string GetTargetSql(EntitySetBase entitySetBase)
 		{
-			// construct escaped T-SQL referencing entity set
-			StringBuilder builder = new StringBuilder(50);
+			// construct escaped SQL referencing entity set
+			StringBuilder builder = new StringBuilder();
 			string definingQuery = MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "DefiningQuery");
 			if (!string.IsNullOrEmpty(definingQuery))
 			{
