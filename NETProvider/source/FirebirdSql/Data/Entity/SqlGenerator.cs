@@ -776,7 +776,7 @@ namespace FirebirdSql.Data.Entity
 		}
 
 		/// <summary>
-		/// Constants will be send to the store as part of the generated TSQL, not as parameters
+		/// Constants will be send to the store as part of the generated SQL, not as parameters.
 		/// </summary>
 		/// <param name="e"></param>
 		/// <returns>A <see cref="SqlBuilder"/>.  Strings are wrapped in single
@@ -992,7 +992,7 @@ namespace FirebirdSql.Data.Entity
 
 
 		/// <summary>
-		/// Gets escaped TSql identifier describing this entity set.
+		/// Gets escaped SQL identifier describing this entity set.
 		/// </summary>
 		/// <returns></returns>
 		internal static string GetTargetSql(EntitySetBase entitySetBase)
@@ -2585,7 +2585,7 @@ namespace FirebirdSql.Data.Entity
 		}
 
 		/// <summary>
-		/// Handles functions that are translated into TSQL operators.
+		/// Handles functions that are translated into SQL operators.
 		/// The given function should have one or two arguments. 
 		/// Functions with one arguemnt are translated into 
 		///     op arg
