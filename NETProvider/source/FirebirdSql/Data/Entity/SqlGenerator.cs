@@ -873,12 +873,12 @@ namespace FirebirdSql.Data.Entity
 
 					case PrimitiveTypeKind.DateTime:
 						result.Append("'");
-						result.Append(((DateTime)e.Value).ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture));
+						result.Append(((DateTime)e.Value).ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture));
 						result.Append("'");
 						break;
 					case PrimitiveTypeKind.Time:
 						result.Append("'");
-						result.Append(((DateTime)e.Value).ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture));
+						result.Append(((DateTime)e.Value).ToString("HH:mm:ss.ffff", CultureInfo.InvariantCulture));
 						result.Append("'");
 						break;
 
