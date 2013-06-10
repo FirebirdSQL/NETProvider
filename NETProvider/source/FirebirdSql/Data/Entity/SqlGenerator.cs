@@ -786,8 +786,6 @@ namespace FirebirdSql.Data.Entity
 			SqlBuilder result = new SqlBuilder();
 
 			PrimitiveTypeKind typeKind;
-			// Model Types can be (at the time of this implementation):
-			//      Binary, Boolean, Byte, DateTime, Decimal, Double, Guid, Int16, Int32, Int64, Single, String
 			if (MetadataHelpers.TryGetPrimitiveTypeKind(e.ResultType, out typeKind))
 			{
 				switch (typeKind)
@@ -799,7 +797,9 @@ namespace FirebirdSql.Data.Entity
 					case PrimitiveTypeKind.Int16:
 						result.Append("CAST(");
 						result.Append(e.Value.ToString());
-						result.Append(" AS SMALLINT)");
+						result.Append(" AS ");
+						result.Append(GetSqlPrimitiveType(e.ResultType));
+						result.Append(")");
 						break;
 
 					case PrimitiveTypeKind.Int32:
@@ -810,22 +810,29 @@ namespace FirebirdSql.Data.Entity
 					case PrimitiveTypeKind.Int64:
 						result.Append("CAST(");
 						result.Append(e.Value.ToString());
-						result.Append(" AS BIGINT)");
+						result.Append(" AS ");
+						result.Append(GetSqlPrimitiveType(e.ResultType));
+						result.Append(")");
 						break;
 
 					case PrimitiveTypeKind.Double:
 						result.Append("CAST(");
 						result.Append(((Double)e.Value).ToString(CultureInfo.InvariantCulture));
-						result.Append(" AS DOUBLE PRECISION)");
+						result.Append(" AS ");
+						result.Append(GetSqlPrimitiveType(e.ResultType));
+						result.Append(")");
 						break;
 
 					case PrimitiveTypeKind.Single:
 						result.Append("CAST(");
 						result.Append(((Single)e.Value).ToString(CultureInfo.InvariantCulture));
-						result.Append(" AS FLOAT)");
+						result.Append(" AS ");
+						result.Append(GetSqlPrimitiveType(e.ResultType));
+						result.Append(")");
 						break;
 
 					case PrimitiveTypeKind.Decimal:
+						var sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType);
 						string strDecimal = ((Decimal)e.Value).ToString(CultureInfo.InvariantCulture);
 
 						int pointPosition = strDecimal.IndexOf('.');
@@ -843,7 +850,9 @@ namespace FirebirdSql.Data.Entity
 
 						result.Append("CAST(");
 						result.Append(strDecimal);
-						result.Append(" AS DECIMAL(");
+						result.Append(" AS ");
+						result.Append(sqlPrimitiveType.Substring(0, sqlPrimitiveType.IndexOf('(')));
+						result.Append("(");
 						result.Append(precision.ToString(CultureInfo.InvariantCulture));
 						result.Append(",");
 						result.Append(maxScale.ToString(CultureInfo.InvariantCulture));
