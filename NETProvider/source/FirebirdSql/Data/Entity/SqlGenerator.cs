@@ -2123,7 +2123,7 @@ namespace FirebirdSql.Data.Entity
 				Debug.Assert(isScalarElement);
 				resultSql.Append(" SELECT CAST(NULL AS ");
 				resultSql.Append(GetSqlPrimitiveType(collectionType.TypeUsage));
-				resultSql.Append(") AS X FROM (SELECT 1 FROM RDB$DATABASE) AS Y WHERE 1=0");
+				resultSql.Append(") AS X FROM (SELECT 1 FROM RDB$DATABASE) WHERE 1=0");
 			}
 
 			foreach (DbExpression arg in e.Arguments)
