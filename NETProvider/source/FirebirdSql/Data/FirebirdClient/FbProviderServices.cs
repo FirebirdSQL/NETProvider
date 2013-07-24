@@ -448,7 +448,11 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				finally
 				{
-					connection.Close();
+					try
+					{
+						connection.Close();
+					}
+					catch { }
 				}
 			}
 		}
