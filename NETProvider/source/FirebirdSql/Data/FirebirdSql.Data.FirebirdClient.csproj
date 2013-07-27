@@ -37,7 +37,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_45;EF_6</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -120,6 +120,12 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
   </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\..\lib\EF5\net45\EntityFramework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_35|AnyCPU'">
     <Reference Include="System.Data.Entity" />
   </ItemGroup>
