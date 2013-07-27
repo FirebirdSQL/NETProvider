@@ -62,7 +62,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
-      <HintPath>..\..\..\..\lib\EntityFramework\v6\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\..\..\..\lib\EF5\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\..\..\..\lib\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
