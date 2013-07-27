@@ -688,12 +688,14 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				cmd.CommandText =
 @"execute block as
-declare variable i int = 9999999;
+declare variable start_time timestamp;
 begin
-  while (i > 0) do
-	i = i-1;
+  start_time = cast('now' as timestamp);
+  while (datediff(second from start_time to cast('now' as timestamp)) <= 10) do
+  begin
+  end
 end";
-				cmd.BeginExecuteNonQuery((o) =>
+				cmd.BeginExecuteNonQuery(o =>
 				{
 					try
 					{
