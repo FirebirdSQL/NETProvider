@@ -1894,6 +1894,7 @@ namespace FirebirdSql.Data.Entity
 			return result;
 		}
 
+#if (EF_6)
 		public override ISqlFragment Visit(DbInExpression e)
 		{
 			SqlBuilder result = new SqlBuilder();
@@ -1914,6 +1915,7 @@ namespace FirebirdSql.Data.Entity
 
 			return result;
 		}
+#endif
 
 		#region Visits shared by multiple nodes
 		/// <summary>
