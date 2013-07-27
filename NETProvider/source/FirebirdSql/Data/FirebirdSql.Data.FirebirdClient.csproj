@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -61,16 +61,15 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_Mono_w_Linux|AnyCPU' ">
     <OutputPath>bin\Release_Mono_w_Linux\</OutputPath>
-    <DefineConstants>TRACE;MONO;LINUX;NET_35</DefineConstants>
+    <DefineConstants>TRACE;MONO;LINUX;NET_40</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_35|AnyCPU'">
     <OutputPath>bin\Release_35\</OutputPath>
@@ -118,7 +117,7 @@
     <Reference Include="EntityFramework">
       <HintPath>..\..\..\lib\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
-  </ItemGroup>                                
+  </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_45|AnyCPU' ">
     <Reference Include="System.Data.Entity" />
     <Reference Include="EntityFramework">
@@ -371,7 +370,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="Entity\ProviderManifest.xsd" />
     <EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
     <EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
