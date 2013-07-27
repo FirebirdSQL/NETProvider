@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -32,7 +32,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -47,30 +47,6 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_40|AnyCPU' ">
-    <OutputPath>bin\Release_40\</OutputPath>
-    <DefineConstants>TRACE;NET_40</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_Mono_w_Linux|AnyCPU' ">
-    <OutputPath>bin\Release_Mono_w_Linux\</OutputPath>
-    <DefineConstants>TRACE;MONO;LINUX;NET_40</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_35|AnyCPU'">
     <OutputPath>bin\Release_35\</OutputPath>
     <DefineConstants>TRACE;NET_35;ENTITY_FRAMEWORK</DefineConstants>
@@ -84,6 +60,18 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_40|AnyCPU'">
+    <OutputPath>bin\Release_40\</OutputPath>
+    <DefineConstants>TRACE;NET_40</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_45|AnyCPU'">
     <OutputPath>bin\Release_45\</OutputPath>
     <DefineConstants>TRACE;NET_45</DefineConstants>
@@ -96,6 +84,18 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_Mono_w_Linux|AnyCPU'">
+    <OutputPath>bin\Release_Mono_w_Linux\</OutputPath>
+    <DefineConstants>TRACE;MONO;LINUX;NET_40</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_NET_45_EF_6|AnyCPU'">
     <OutputPath>bin\Release_NET_45_EF_6\</OutputPath>
@@ -112,22 +112,27 @@
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_35|AnyCPU'">
     <Reference Include="System.Data.Entity" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_40|AnyCPU' ">
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_40|AnyCPU'">
     <Reference Include="System.Data.Entity" />
     <Reference Include="EntityFramework">
-      <HintPath>..\..\..\lib\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
+      <HintPath>..\..\..\lib\EF5\net40\EntityFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_Mono_w_Linux|AnyCPU' ">
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_45|AnyCPU'">
     <Reference Include="System.Data.Entity" />
     <Reference Include="EntityFramework">
-      <HintPath>..\..\..\lib\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
+      <HintPath>..\..\..\lib\EF5\net45\EntityFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_45|AnyCPU' ">
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_Mono_w_Linux|AnyCPU'">
     <Reference Include="System.Data.Entity" />
     <Reference Include="EntityFramework">
-      <HintPath>..\..\..\lib\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\..\..\lib\EF5\net40\EntityFramework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_NET_45_EF_6|AnyCPU'">
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\..\lib\EF6\net45\EntityFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -380,7 +385,6 @@
     <EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
     <EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
     <None Include="Entity\ConceptualSchemaDefinition.csdl" />
-    <None Include="packages.config" />
     <None Include="Properties\FirebirdSql.Data.FirebirdClient.snk" />
   </ItemGroup>
   <ItemGroup>
