@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2012 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2012-2013 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Services
 {
