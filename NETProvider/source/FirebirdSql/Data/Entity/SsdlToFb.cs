@@ -26,6 +26,8 @@ using System.Data.Metadata.Edm;
 using System.Data.Entity.Core.Metadata.Edm;
 #endif
 
+using FirebirdSql.Data.Common;
+
 namespace FirebirdSql.Data.Entity
 {
 	static class SsdlToFb
@@ -42,11 +44,11 @@ namespace FirebirdSql.Data.Entity
 
 			result.Append("-- Tables");
 			result.AppendLine();
-			result.Append(string.Join(Environment.NewLine, Tables(storeItems)));
+			result.Append(Tables(storeItems).StringJoin(Environment.NewLine));
 			result.AppendLine();
 			result.Append("-- Foreign Key Constraints");
 			result.AppendLine();
-			result.Append(string.Join(Environment.NewLine, ForeignKeyConstraints(storeItems)));
+			result.Append(ForeignKeyConstraints(storeItems).StringJoin(Environment.NewLine));
 			result.AppendLine();
 			result.AppendLine();
 			result.Append("-- EOF");
@@ -66,15 +68,15 @@ namespace FirebirdSql.Data.Entity
 				{
 					var column = GenerateColumn(property);
 					result.Append("\t");
-					result.Append(column.Item1);
+					result.Append(column.ColumnName);
 					result.Append(",");
 					result.AppendLine();
-					foreach (var item in column.Item2)
+					foreach (var item in column.ColumnComments)
 						additionalColumnComments.Add(item.Key, item.Value);
 				}
 				result.AppendFormat("CONSTRAINT {0} PRIMARY KEY ({1})",
 					SqlGenerator.QuoteIdentifier(string.Format("PK_{0}", MetadataHelpers.GetTableName(entitySet))),
-					string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name))));
+					entitySet.ElementType.KeyMembers.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name)).StringJoin(", "));
 				result.AppendLine();
 				result.Append(");");
 				result.AppendLine();
@@ -105,11 +107,11 @@ namespace FirebirdSql.Data.Entity
 				result.AppendFormat("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2})",
 					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end2.EntitySet)),
 					SqlGenerator.QuoteIdentifier(string.Format("FK_{0}", associationSet.Name)),
-					string.Join(", ", constraint.ToProperties.Select(fk => SqlGenerator.QuoteIdentifier(fk.Name))));
+					constraint.ToProperties.Select(fk => SqlGenerator.QuoteIdentifier(fk.Name)).StringJoin(", "));
 				result.AppendLine();
 				result.AppendFormat("REFERENCES {0}({1})",
 					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end.EntitySet)),
-					string.Join(", ", constraint.FromProperties.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name))));
+					constraint.FromProperties.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name)).StringJoin(", "));
 				result.AppendLine();
 				result.AppendFormat("ON DELETE {0}",
 					end.CorrespondingAssociationEndMember.DeleteBehavior == OperationAction.Cascade ? "CASCADE" : "NO ACTION");
@@ -118,7 +120,12 @@ namespace FirebirdSql.Data.Entity
 			}
 		}
 
-		static Tuple<string, IDictionary<string, string>> GenerateColumn(EdmProperty property)
+		class GenerateColumnResult
+		{
+			public string ColumnName { get; set; }
+			public IDictionary<string, string> ColumnComments { get; set; }
+		}
+		static GenerateColumnResult GenerateColumn(EdmProperty property)
 		{
 			var column = new StringBuilder();
 			var columnComments = new Dictionary<string, string>();
@@ -139,7 +146,7 @@ namespace FirebirdSql.Data.Entity
 			{
 				column.Append(" NOT NULL");
 			}
-			return Tuple.Create<string, IDictionary<string, string>>(column.ToString(), columnComments);
+			return new GenerateColumnResult() { ColumnName = column.ToString(), ColumnComments = columnComments };
 		}
 	}
 }

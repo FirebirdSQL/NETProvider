@@ -1,9 +1,27 @@
+/*
+ *  Firebird ADO.NET Data provider for .NET and Mono 
+ * 
+ *     The contents of this file are subject to the Initial 
+ *     Developer's Public License Version 1.0 (the "License"); 
+ *     you may not use this file except in compliance with the 
+ *     License. You may obtain a copy of the License at 
+ *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *     Software distributed under the License is distributed on 
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
+ *     express or implied.  See the License for the specific 
+ *     language governing rights and limitations under the License.
+ * 
+ *  Copyright (c) 2011-2013 Jiri Cincura (jiri@cincura.net)
+ *  All Rights Reserved.
+ */
+
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Linq;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 
 namespace FirebirdSql.Data.Common
 {
@@ -33,6 +51,15 @@ namespace FirebirdSql.Data.Common
 				string2,
 				CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth |
 				CompareOptions.IgnoreCase) == 0 ? true : false;
+		}
+
+		public static string StringJoin(this IEnumerable<string> data, string separator)
+		{
+#if (NET_35)
+			return string.Join(separator, data.ToArray());
+#else
+			return string.Join(separator, data);
+#endif
 		}
 
 		public static bool SetKeepAlive(this Socket socket, ulong time, ulong interval)
