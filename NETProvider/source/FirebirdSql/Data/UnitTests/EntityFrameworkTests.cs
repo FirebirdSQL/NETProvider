@@ -179,6 +179,36 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
+		#region ProperVarcharLengthForConstant
+
+		[Test]
+		public void ProperVarcharLengthForConstantTest()
+		{
+			Database.SetInitializer<ProperVarcharLengthForConstantContext>(null);
+			Connection.Close();
+			using (var c = new ProperVarcharLengthForConstantContext(Connection))
+			{
+				var q = c.Bars.Where(x => x.BarString == "TEST");
+				StringAssert.Contains("CAST(_UTF8'TEST' AS VARCHAR(8191))", q.ToString());
+			}
+		}
+
+		class ProperVarcharLengthForConstantContext : FbTestDbContext
+		{
+			public ProperVarcharLengthForConstantContext(FbConnection conn)
+				: base(conn)
+			{ }
+
+			protected override void OnModelCreating(DbModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+			}
+
+			public IDbSet<Bar> Bars { get; set; }
+		}
+
+		#endregion
+
 		#endregion
 
 		private DbProviderServices GetProviderServices()
