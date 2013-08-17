@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal const int BinaryMaxSize = Int32.MaxValue;
 		internal const int AsciiVarcharMaxSize = 32765;
-		internal const int UnicodeVarcharMaxSize = AsciiVarcharMaxSize;
+		internal const int UnicodeVarcharMaxSize = AsciiVarcharMaxSize / 4;
 		internal const char LikeEscapeCharacter = '\\';
 
 		private System.Collections.ObjectModel.ReadOnlyCollection<PrimitiveType> _primitiveTypes = null;
