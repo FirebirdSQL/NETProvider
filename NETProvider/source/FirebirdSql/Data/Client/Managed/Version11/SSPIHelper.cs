@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008 Vladimir Bodecek, Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008 Vladimir Bodecek, Nathan Fox, Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *  
  *  Adapted from pinvoke.net.
@@ -38,6 +38,37 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		}
 
 		#region Structures used in native Win API calls
+
+		[StructLayout(LayoutKind.Sequential)]
+		public struct SecHandle
+		{
+			public IntPtr LowPart;
+			public IntPtr HighPart;
+
+			public SecHandle(int? dummy = null)
+			{
+				LowPart = IntPtr.Zero;
+				HighPart = IntPtr.Zero;
+			}
+
+			public bool IsInvalid
+			{
+				get { return LowPart == IntPtr.Zero && HighPart == IntPtr.Zero; }
+			}
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		public struct SecInteger
+		{
+			public uint LowPart;
+			public int HighPart;
+
+			public SecInteger(int? dummy = null)
+			{
+				LowPart = 0;
+				HighPart = 0;
+			}
+		}
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct SecBuffer : IDisposable
@@ -140,7 +171,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#region Constants used in native Win API calls
 
 		const int TOKEN_QUERY = 0x00008;
-		
+
 		const int SEC_E_OK = 0;
 		const int SEC_I_CONTINUE_NEEDED = 0x90312;
 
@@ -177,8 +208,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		const int STANDARD_CONTEXT_ATTRIBUTES = ISC_REQ_CONFIDENTIALITY | ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_CONNECTION;
 
-		const ulong INVALID_SEC_HANDLE = 0xFFFFFFFFFFFFFFFF;
-
 		#endregion
 
 		#region Prototypes of native Win API functions
@@ -192,13 +221,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			IntPtr pAuthData,//PVOID
 			int pGetKeyFn, //SEC_GET_KEY_FN
 			IntPtr pvGetKeyArgument, //PVOID
-			out ulong phCredential, //SecHandle //PCtxtHandle ref
-			out ulong ptsExpiry //PTimeStamp //TimeStamp ref
+			out SecHandle phCredential, //SecHandle //PCtxtHandle ref
+			out SecInteger ptsExpiry //PTimeStamp //TimeStamp ref
 		);
 
 		[DllImport("secur32", CharSet = CharSet.Auto, SetLastError = true)]
 		static extern int InitializeSecurityContext(
-			ref ulong phCredential,//PCredHandle
+			ref SecHandle phCredential,//PCredHandle
 			IntPtr phContext, //PCtxtHandle
 			string pszTargetName,
 			int fContextReq,
@@ -206,42 +235,42 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			int TargetDataRep,
 			IntPtr pInput, //PSecBufferDesc SecBufferDesc
 			int Reserved2,
-			out ulong phNewContext, //PCtxtHandle
+			out SecHandle phNewContext, //PCtxtHandle
 			ref SecBufferDesc pOutput, //PSecBufferDesc SecBufferDesc
 			out uint pfContextAttr, //managed ulong == 64 bits!!!
-			out ulong ptsExpiry //PTimeStamp
-		); 
+			out SecInteger ptsExpiry //PTimeStamp
+		);
 
 		// 2 signatures of this API function needed because different usage
 
 		[DllImport("secur32", CharSet = CharSet.Auto, SetLastError = true)]
 		static extern int InitializeSecurityContext(
-			ref ulong phCredential,//PCredHandle
-			ref ulong phContext, //PCtxtHandle
+			ref SecHandle phCredential,//PCredHandle
+			ref SecHandle phContext, //PCtxtHandle
 			string pszTargetName,
 			int fContextReq,
 			int Reserved1,
 			int TargetDataRep,
 			ref SecBufferDesc SecBufferDesc, //PSecBufferDesc SecBufferDesc
 			int Reserved2,
-			out ulong phNewContext, //PCtxtHandle
+			out SecHandle phNewContext, //PCtxtHandle
 			ref SecBufferDesc pOutput, //PSecBufferDesc SecBufferDesc
 			out uint pfContextAttr, //managed ulong == 64 bits!!!
-			out ulong ptsExpiry //PTimeStamp
+			out SecInteger ptsExpiry //PTimeStamp
 		);
 
 		[DllImport("secur32")]
-		static extern int FreeCredentialsHandle(ref ulong phCredential); //PCredHandle 
+		static extern int FreeCredentialsHandle(ref SecHandle phCredential); //PCredHandle
 
 		[DllImport("secur32")]
-		static extern int DeleteSecurityContext(ref ulong phContext); //PCtxtHandle 
+		static extern int DeleteSecurityContext(ref SecHandle phContext); //PCtxtHandle
 
 		#endregion
 
 		#region Private members
 
-		private ulong clientCredentials = INVALID_SEC_HANDLE;
-		private ulong clientContext = INVALID_SEC_HANDLE;
+		private SecHandle clientCredentials = new SecHandle();
+		private SecHandle clientContext = new SecHandle();
 		private bool disposed = false;
 
 		private string securPackage;
@@ -254,7 +283,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// <summary>
 		/// Creates SSPIHelper with default "NTLM" security package and no remote principal and gets client credentials
 		/// </summary>
-		public SSPIHelper () : this("NTLM")
+		public SSPIHelper()
+			: this("NTLM")
 		{
 		}
 
@@ -262,7 +292,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// Creates SSPIHelper with given security package and no remote principal and gets client credentials
 		/// </summary>
 		/// <param name="securPackage">Name of security package (e.g. NTLM, Kerberos, ...)</param>
-		public SSPIHelper(string securPackage) : this(securPackage, null)
+		public SSPIHelper(string securPackage)
+			: this(securPackage, null)
 		{
 		}
 
@@ -275,7 +306,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		{
 			this.securPackage = securPackage;
 			this.remotePrincipal = remotePrincipal;
-			ulong expiry;
+			SecInteger expiry = new SecInteger();
 			if (AcquireCredentialsHandle(null, securPackage, SECPKG_CRED_OUTBOUND,
 																	IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero,
 																	out clientCredentials, out expiry) != SEC_E_OK)
@@ -295,7 +326,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			if (disposed)
 				throw new ObjectDisposedException("SSPIHelper");
 			CloseClientContext();
-			ulong expiry;
+			SecInteger expiry = new SecInteger(0);
 			uint contextAttributes;
 			SecBufferDesc clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
 			try
@@ -334,9 +365,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		{
 			if (disposed)
 				throw new ObjectDisposedException("SSPIHelper");
-			if (clientContext == INVALID_SEC_HANDLE)
+			if (clientContext.IsInvalid)
 				throw new InvalidOperationException("InitializeClientSecurity not called");
-			ulong expiry;
+			SecInteger expiry = new SecInteger();
 			uint contextAttributes;
 			SecBufferDesc clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
 			try
@@ -413,19 +444,19 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		private void CloseClientContext()
 		{
-			if (clientContext != INVALID_SEC_HANDLE)
+			if (!clientContext.IsInvalid)
 			{
 				DeleteSecurityContext(ref clientContext);
-				clientContext = INVALID_SEC_HANDLE;
+				clientContext = new SecHandle();
 			}
 		}
 
 		private void CloseClientCredentials()
 		{
-			if (clientCredentials != INVALID_SEC_HANDLE)
+			if (!clientCredentials.IsInvalid)
 			{
 				FreeCredentialsHandle(ref clientCredentials);
-				clientCredentials = INVALID_SEC_HANDLE;
+				clientCredentials = new SecHandle();
 			}
 		}
 
