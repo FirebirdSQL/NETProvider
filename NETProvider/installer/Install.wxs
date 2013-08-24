@@ -101,6 +101,7 @@
 									 Sequence="1" />
 			</Component>
 			<Component Id="FirebirdClientMachineConfig64Component" Guid="BEFFCC7B-0EE0-47DD-BB9F-8AD8838D789C">
+				<Condition>VersionNT64</Condition>
 				<util:XmlConfig Id="MachineConfig64DbProviderFactories"
 									 File="[WindowsFolder]Microsoft.NET\Framework64\v4.0.30319\Config\machine.config"
 									 Action="create"
