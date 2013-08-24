@@ -17,8 +17,8 @@ Global
 		Release_40|Any CPU = Release_40|Any CPU
 		Release_45|Any CPU = Release_45|Any CPU
 		Release_Mono_w_Linux|Any CPU = Release_Mono_w_Linux|Any CPU
-		Release_NET_40_EF_6|Any CPU = Release_NET_40_EF_6|Any CPU
-		Release_NET_45_EF_6|Any CPU = Release_NET_45_EF_6|Any CPU
+		Release_40_EF6|Any CPU = Release_40_EF6|Any CPU
+		Release_45_EF6|Any CPU = Release_45_EF6|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{326A24F9-6259-45DB-835C-18DB80728460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -31,10 +31,10 @@ Global
 		{326A24F9-6259-45DB-835C-18DB80728460}.Release_45|Any CPU.Build.0 = Release_45|Any CPU
 		{326A24F9-6259-45DB-835C-18DB80728460}.Release_Mono_w_Linux|Any CPU.ActiveCfg = Release_Mono_w_Linux|Any CPU
 		{326A24F9-6259-45DB-835C-18DB80728460}.Release_Mono_w_Linux|Any CPU.Build.0 = Release_Mono_w_Linux|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release_NET_40_EF_6|Any CPU.ActiveCfg = Release_NET_40_EF_6|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release_NET_40_EF_6|Any CPU.Build.0 = Release_NET_40_EF_6|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release_NET_45_EF_6|Any CPU.ActiveCfg = Release_NET_45_EF_6|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release_NET_45_EF_6|Any CPU.Build.0 = Release_NET_45_EF_6|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release_40_EF6|Any CPU.ActiveCfg = Release_40_EF6|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release_40_EF6|Any CPU.Build.0 = Release_40_EF6|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release_45_EF6|Any CPU.ActiveCfg = Release_45_EF6|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release_45_EF6|Any CPU.Build.0 = Release_45_EF6|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_35|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,8 +42,8 @@ Global
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.Build.0 = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_Mono_w_Linux|Any CPU.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_NET_40_EF_6|Any CPU.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_NET_45_EF_6|Any CPU.ActiveCfg = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_40_EF6|Any CPU.ActiveCfg = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45_EF6|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
