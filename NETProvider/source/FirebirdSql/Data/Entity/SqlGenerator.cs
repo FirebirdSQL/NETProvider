@@ -865,6 +865,8 @@ namespace FirebirdSql.Data.Entity
 
 					case PrimitiveTypeKind.String:
 						bool isUnicode = MetadataHelpers.GetFacetValueOrDefault<bool>(e.ResultType, MetadataHelpers.UnicodeFacetName, true);
+						// constant is always considered Unicode
+						isUnicode = true;
 						int length =
 							MetadataHelpers.GetFacetValueOrDefault<int?>(e.ResultType, MetadataHelpers.MaxLengthFacetName, null)
 							?? (isUnicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize);
