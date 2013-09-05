@@ -63,9 +63,12 @@ namespace FirebirdSql.Data.UnitTests
 		[TestFixtureTearDown]
 		public void TestFixtureTearDown()
 		{
-			string backupPath = Path.Combine(ConfigurationManager.AppSettings["BackupRestoreLocation"], ConfigurationManager.AppSettings["BackupRestoreFile"]);
-			if (File.Exists(backupPath))
-				File.Delete(backupPath);
+			var brLocation = ConfigurationManager.AppSettings["BackupRestoreLocation"];
+			if (!string.IsNullOrWhiteSpace(brLocation))
+			{
+				foreach (var file in Directory.EnumerateFiles(brLocation, ConfigurationManager.AppSettings["BackupRestoreFile"] + "*"))
+					File.Delete(file);
+			}
 		}
 
 		#endregion
@@ -243,6 +246,27 @@ namespace FirebirdSql.Data.UnitTests
 			Console.WriteLine(serverProp.GetImplementation());
 			Console.WriteLine(serverProp.GetServerVersion());
 			Console.WriteLine(serverProp.GetVersion());
+		}
+
+		[Test]
+		public void NBackupTest()
+		{
+			Action<int> doLevel = l =>
+				{
+					var nbak = new FbNBackup();
+
+					nbak.ConnectionString = this.BuildServicesConnectionString();
+					nbak.Level = l;
+					nbak.BackupFile = ConfigurationManager.AppSettings["BackupRestoreFile"] + l.ToString();
+
+					nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
+
+					nbak.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+
+					nbak.Execute();
+				};
+			doLevel(0);
+			doLevel(1);
 		}
 
 		#endregion
