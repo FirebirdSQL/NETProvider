@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal sealed class IscCodes
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		private IscCodes()
 		{
@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · General ·
+		#region General
 
 		public const int SQLDA_VERSION1             = 1;
 		public const int SQL_DIALECT_V5             = 1;
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Buffer sizes ·
+		#region Buffer sizes
 
 		public const int BUFFER_SIZE_128			= 128;
 		public const int BUFFER_SIZE_256			= 256;
@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protocol Codes ·
+		#region Protocol Codes
 
 		/* The protocol	is defined blocks, rather than messages, to
 		 * separate	the	protocol from the transport	layer.	
@@ -123,20 +123,20 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Statement Flags ·
+		#region Statement Flags
 
 		public const int STMT_DEFER_EXECUTE = 4;
 
 		#endregion
 
-		#region · Server Class ·
+		#region Server Class
 
 		public const int isc_info_db_class_classic_access   = 13;
 		public const int isc_info_db_class_server_access    = 14;
 
 		#endregion
 
-		#region · Operation Codes ·
+		#region Operation Codes
 
 		// Operation (packet) types
 		public const int op_void            = 0;	// Packet has been voided
@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Database Parameter Block ·
+		#region Database Parameter Block
 
 		public const int isc_dpb_version1 = 1;
 		public const int isc_dpb_cdd_pathname = 1;
@@ -325,7 +325,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Transaction Parameter Block ·
+		#region Transaction Parameter Block
 
 		public const int isc_tpb_version1 = 1;
 		public const int isc_tpb_version3 = 3;
@@ -353,7 +353,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Services Parameter Block ·
+		#region Services Parameter Block
 
 		public const int isc_spb_version1 = 1;
 		public const int isc_spb_current_version = 2;
@@ -377,7 +377,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Services Actions ·
+		#region Services Actions
 
 		public const int isc_action_svc_backup = 1;	/* Starts database backup process on the server	*/
 		public const int isc_action_svc_restore = 2;	/* Starts database restore process on the server */
@@ -404,7 +404,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Services Information ·
+		#region Services Information
 
 		public const int isc_info_svc_svr_db_info = 50;	/* Retrieves the number	of attachments and databases */
 		public const int isc_info_svc_get_license = 51;	/* Retrieves all license keys and IDs from the license file	*/
@@ -428,7 +428,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Services Properties ·
+		#region Services Properties
 
 		public const int isc_spb_prp_page_buffers = 5;
 		public const int isc_spb_prp_sweep_interval = 6;
@@ -458,7 +458,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Backup Service ·
+		#region Backup Service
 
 		public const int isc_spb_bkp_file = 5;
 		public const int isc_spb_bkp_factor = 6;
@@ -466,7 +466,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Restore Service ·
+		#region Restore Service
 
 		public const int isc_spb_res_buffers = 9;
 		public const int isc_spb_res_page_size = 10;
@@ -478,7 +478,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Repair Service ·
+		#region Repair Service
 
 		public const int isc_spb_rpr_commit_trans = 15;
 		public const int isc_spb_rpr_rollback_trans = 34;
@@ -501,7 +501,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Security Service ·
+		#region Security Service
 
 		public const int isc_spb_sec_userid = 5;
 		public const int isc_spb_sec_groupid = 6;
@@ -514,7 +514,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Trace Service ·
+		#region Trace Service
 		
 		public const int isc_spb_trc_id = 1;
 		public const int isc_spb_trc_name = 2;
@@ -522,7 +522,7 @@ namespace FirebirdSql.Data.Common
 		
 		#endregion
 
-		#region · Configuration Keys ·
+		#region Configuration Keys
 
 		public const int ISCCFG_LOCKMEM_KEY = 0;
 		public const int ISCCFG_LOCKSEM_KEY = 1;
@@ -548,7 +548,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Common Structural Codes ·
+		#region Common Structural Codes
 
 		public const int isc_info_end = 1;
 		public const int isc_info_truncated = 2;
@@ -558,7 +558,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · SQL Information ·
+		#region SQL Information
 
 		public const int isc_info_sql_select = 4;
 		public const int isc_info_sql_bind = 5;
@@ -585,7 +585,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · SQL Information Return Values ·
+		#region SQL Information Return Values
 
 		public const int isc_info_sql_stmt_select = 1;
 		public const int isc_info_sql_stmt_insert = 2;
@@ -604,7 +604,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Database Information ·
+		#region Database Information
 
 		public const int isc_info_db_id = 4;
 		public const int isc_info_reads = 5;
@@ -685,7 +685,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Information Request ·
+		#region Information Request
 
 		public const int isc_info_number_messages = 4;
 		public const int isc_info_max_message = 5;
@@ -703,7 +703,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Array Slice Description Language ·
+		#region Array Slice Description Language
 
 		public const int isc_sdl_version1 = 1;
 		public const int isc_sdl_eoc = 255;
@@ -745,7 +745,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Blob Parameter Block ·
+		#region Blob Parameter Block
 
 		public const int isc_bpb_version1 = 1;
 		public const int isc_bpb_source_type = 1;
@@ -765,7 +765,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Blob Information ·
+		#region Blob Information
 
 		public const int isc_info_blob_num_segments = 4;
 		public const int isc_info_blob_max_segment = 5;
@@ -774,14 +774,14 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Event Codes ·
+		#region Event Codes
 
 		public const int P_REQ_async = 1;	// Auxiliary asynchronous port
 		public const int EPB_version1 = 1;
 
 		#endregion
 
-		#region · Facilities ·
+		#region Facilities
 
 		public const int JRD = 0;
 		public const int GFIX = 3;
@@ -794,13 +794,13 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Error code generation ·
+		#region Error code generation
 
 		public const int ISC_MASK = 0x14000000;	// Defines the code	as a valid ISC code
 
 		#endregion
 
-		#region · ISC Error codes ·
+		#region ISC Error codes
 
 		public const int isc_facility       = 20;
 		public const int isc_err_base       = 335544320;
@@ -841,7 +841,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · BLR Codes ·
+		#region BLR Codes
 
 		public const int blr_version5   = 5;
 		public const int blr_begin      = 2;
@@ -872,7 +872,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · DataType Definitions ·
+		#region DataType Definitions
 
 		public const int SQL_TEXT       = 452;
 		public const int SQL_VARYING    = 448;
@@ -895,7 +895,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · DSC Types ·
+		#region DSC Types
 
 		public const int DSC_null           = 1;
 		public const int dtype_text         = 1;
