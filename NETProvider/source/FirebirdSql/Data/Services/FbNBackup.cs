@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Services
 	public sealed class FbNBackup : FbService
 	{
 		#region Properties
-		int level;
+		private int level;
 		public int Level
 		{
 			get { return this.level; }
