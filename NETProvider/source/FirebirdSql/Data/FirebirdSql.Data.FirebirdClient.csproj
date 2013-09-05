@@ -8,7 +8,7 @@
     <ProjectGuid>{326A24F9-6259-45DB-835C-18DB80728460}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FirebirdSql</RootNamespace>
+    <RootNamespace>FirebirdSql.Data</RootNamespace>
     <AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
