@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.Services
 
 				this.StartSpb.Append(IscCodes.isc_action_svc_restore);
 
-				foreach (FbBackupFile bkpFile in backupFiles)
+				foreach (FbBackupFile bkpFile in this.backupFiles)
 				{
 					this.StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
 				}
