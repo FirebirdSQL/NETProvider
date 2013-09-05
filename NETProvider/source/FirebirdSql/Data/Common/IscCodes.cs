@@ -514,8 +514,15 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
+		#region NBackup Service
+		public const int isc_spb_nbk_level = 5;
+		public const int isc_spb_nbk_file = 6;
+		public const int isc_spb_nbk_direct = 7;
+		public const int isc_spb_nbk_no_triggers = 0x01;
+		#endregion
+
 		#region Trace Service
-		
+
 		public const int isc_spb_trc_id = 1;
 		public const int isc_spb_trc_name = 2;
 		public const int isc_spb_trc_cfg = 3;
