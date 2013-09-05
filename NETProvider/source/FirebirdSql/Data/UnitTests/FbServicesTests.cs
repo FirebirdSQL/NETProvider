@@ -24,6 +24,7 @@ using System.Configuration;
 using System.IO;
 using System.Data;
 using System.Text;
+using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Services;
@@ -268,6 +269,22 @@ namespace FirebirdSql.Data.UnitTests
 				};
 			doLevel(0);
 			doLevel(1);
+		}
+
+		[Test]
+		public void NRestoreTest()
+		{
+			FbConnection.DropDatabase(BuildConnectionString());
+
+			var nrest = new FbNRestore();
+
+			nrest.ConnectionString = this.BuildServicesConnectionString();
+			nrest.BackupFiles = Enumerable.Range(0, 2).Select(l => ConfigurationManager.AppSettings["BackupRestoreFile"] + l.ToString());
+			nrest.DirectIO = true;
+
+			nrest.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+
+			nrest.Execute();
 		}
 
 		#endregion
