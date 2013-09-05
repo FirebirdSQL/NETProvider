@@ -258,6 +258,7 @@ namespace FirebirdSql.Data.UnitTests
 					nbak.ConnectionString = this.BuildServicesConnectionString();
 					nbak.Level = l;
 					nbak.BackupFile = ConfigurationManager.AppSettings["BackupRestoreFile"] + l.ToString();
+					nbak.DirectIO = true;
 
 					nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
 
