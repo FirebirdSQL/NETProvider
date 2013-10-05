@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Schema
 	{
 		#region · Static Members ·
 
-		private static readonly string ResourceName = "FirebirdSql.Schema.FbMetaData.xml";
+		private static readonly string ResourceName = "FirebirdSql.Data.Schema.FbMetaData.xml";
 
 		#endregion
 
@@ -52,20 +52,21 @@ namespace FirebirdSql.Data.Schema
 		public static DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
 			string filter = String.Format("CollectionName = '{0}'", collectionName);
-			Stream xmlStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName);
 			DataSet ds = new DataSet();
-
-			CultureInfo oldCulture = Thread.CurrentThread.CurrentCulture;
-			try
+			using (var xmlStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName))
 			{
-				Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-				// ReadXml contains error: http://connect.microsoft.com/VisualStudio/feedback/Validation.aspx?FeedbackID=95116
-				// that's the reason for temporarily changing culture
-				ds.ReadXml(xmlStream);
-			}
-			finally
-			{
-				Thread.CurrentThread.CurrentCulture = oldCulture;
+				CultureInfo oldCulture = Thread.CurrentThread.CurrentCulture;
+				try
+				{
+					Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+					// ReadXml contains error: http://connect.microsoft.com/VisualStudio/feedback/Validation.aspx?FeedbackID=95116
+					// that's the reason for temporarily changing culture
+					ds.ReadXml(xmlStream);
+				}
+				finally
+				{
+					Thread.CurrentThread.CurrentCulture = oldCulture;
+				}
 			}
 
 			DataRow[] collection = ds.Tables[DbMetaDataCollectionNames.MetaDataCollections].Select(filter);
