@@ -206,7 +206,7 @@ namespace FirebirdSql.Data.Common
 			// step #2, see if we can find a mapping.
 			else
 			{
-				ResourceManager rm = new ResourceManager("FirebirdSql.Resources.sqlstate_mapping", Assembly.GetExecutingAssembly());
+				ResourceManager rm = new ResourceManager("FirebirdSql.Data.Resources.sqlstate_mapping", Assembly.GetExecutingAssembly());
 				this.SQLSTATE = rm.GetString(this.ErrorCode.ToString());
 			}
 		}
@@ -214,7 +214,7 @@ namespace FirebirdSql.Data.Common
 		private void BuildExceptionMessage()
 		{
 			StringBuilder builder = new StringBuilder();
-			ResourceManager rm = new ResourceManager("FirebirdSql.Resources.isc_error_msg", Assembly.GetExecutingAssembly());
+			ResourceManager rm = new ResourceManager("FirebirdSql.Data.Resources.isc_error_msg", Assembly.GetExecutingAssembly());
 
 			for (int i = 0; i < this.Errors.Count; i++)
 			{
