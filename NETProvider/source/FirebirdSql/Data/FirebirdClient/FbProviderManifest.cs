@@ -72,7 +72,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal static XmlReader GetProviderManifest()
 		{
-			return GetXmlResource("FirebirdSql.Entity.ProviderManifest.xml");
+			return GetXmlResource("FirebirdSql.Data.Entity.ProviderManifest.xml");
 		}
 
 		/// <summary>
@@ -432,12 +432,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private XmlReader GetStoreSchemaMapping(string mslName)
 		{
-			return GetXmlResource("FirebirdSql.Entity.StoreSchemaMapping.msl");
+			return GetXmlResource("FirebirdSql.Data.Entity.StoreSchemaMapping.msl");
 		}
 
 		private XmlReader GetStoreSchemaDescription(string ssdlName)
 		{
-			return GetXmlResource("FirebirdSql.Entity.StoreSchemaDefinition.ssdl");
+			return GetXmlResource("FirebirdSql.Data.Entity.StoreSchemaDefinition.ssdl");
 		}
 
 		internal static XmlReader GetXmlResource(string resourceName)
