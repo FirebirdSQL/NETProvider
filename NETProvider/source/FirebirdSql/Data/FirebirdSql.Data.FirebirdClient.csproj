@@ -200,6 +200,7 @@
     <Compile Include="Entity\SymbolTable.cs" />
     <Compile Include="Entity\TypeHelpers.cs" />
     <Compile Include="FirebirdClient\FbConnectionFactory.cs" />
+    <Compile Include="FirebirdClient\FbConnectionPoolManager.cs" />
     <Compile Include="FirebirdClient\FbProviderManifest.cs" />
     <Compile Include="FirebirdClient\FbProviderServices.cs" />
     <Compile Include="FirebirdClient\FbTransactionOptions.cs" />
@@ -283,7 +284,6 @@
     <Compile Include="Common\TypeHelper.cs" />
     <Compile Include="Common\WarningMessageCallback.cs" />
     <Compile Include="FirebirdClient\ClientFactory.cs" />
-    <Compile Include="FirebirdClient\EmptyPoolEventHandler.cs" />
     <Compile Include="FirebirdClient\FbCharset.cs" />
     <Compile Include="FirebirdClient\FbCommand.cs">
       <SubType>Component</SubType>
@@ -295,7 +295,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FirebirdClient\FbConnectionInternal.cs" />
-    <Compile Include="FirebirdClient\FbConnectionPool.cs" />
     <Compile Include="FirebirdClient\FbConnectionString.cs" />
     <Compile Include="FirebirdClient\FbConnectionStringBuilder.cs" />
     <Compile Include="FirebirdClient\FbDataAdapter.cs">
@@ -312,7 +311,6 @@
     <Compile Include="FirebirdClient\FbInfoMessageEventHandler.cs" />
     <Compile Include="FirebirdClient\FbParameter.cs" />
     <Compile Include="FirebirdClient\FbParameterCollection.cs" />
-    <Compile Include="FirebirdClient\FbPoolManager.cs" />
     <Compile Include="Server\FbResultSet.cs" />
     <Compile Include="FirebirdClient\FbServerType.cs" />
     <Compile Include="FirebirdClient\FirebirdClientPermission.cs" />

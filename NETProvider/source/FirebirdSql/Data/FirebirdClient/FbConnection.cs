@@ -39,29 +39,31 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region · Static Properties ·
 
-		public static int ConnectionPoolsCount
-		{
-			get { return FbPoolManager.Instance.PoolsCount; }
-		}
+#warning Finish
+		//public static int ConnectionPoolsCount
+		//{
+		//	get { return FbPoolManager.Instance.PoolsCount; }
+		//}
 
 		#endregion
 
 		#region · Static Pool Handling Methods ·
 
-		public static int GetPooledConnectionCount(FbConnection connection)
-		{
-			return FbPoolManager.Instance.GetPooledConnectionCount(connection.ConnectionString);
-		}
+#warning Finish
+		//public static int GetPooledConnectionCount(FbConnection connection)
+		//{
+		//	return FbPoolManager.Instance.GetPooledConnectionCount(connection.ConnectionString);
+		//}
 
-		public static void ClearAllPools()
-		{
-			FbPoolManager.Instance.ClearAllPools();
-		}
+		//public static void ClearAllPools()
+		//{
+		//	FbPoolManager.Instance.ClearAllPools();
+		//}
 
-		public static void ClearPool(FbConnection connection)
-		{
-			FbPoolManager.Instance.ClearPool(connection.ConnectionString);
-		}
+		//public static void ClearPool(FbConnection connection)
+		//{
+		//	FbPoolManager.Instance.ClearPool(connection.ConnectionString);
+		//}
 
 		#endregion
 
@@ -130,7 +132,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 
 				// Create the new database
-				FbConnectionInternal db = new FbConnectionInternal(options);
+				FbConnectionInternal db = new FbConnectionInternal(options, null);
 				db.CreateDatabase(dpb);
 			}
 			catch (IscException ex)
@@ -148,7 +150,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			try
 			{
 				// Drop	the	database	
-				FbConnectionInternal db = new FbConnectionInternal(options);
+				FbConnectionInternal db = new FbConnectionInternal(options, null);
 				db.DropDatabase();
 			}
 			catch (IscException ex)
@@ -541,13 +543,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					if (this.options.Pooling)
 					{
-						this.innerConnection = FbPoolManager.Instance.GetPool(this.connectionString).CheckOut();
-						this.innerConnection.OwningConnection = this;
+						this.innerConnection = FbConnectionPoolManager.Instance.Get(this.connectionString);
 					}
 					else
 					{
 						// Do not use Connection Pooling
-						this.innerConnection = new FbConnectionInternal(this.options, this);
+						this.innerConnection = new FbConnectionInternal(this.options, null);
 						this.innerConnection.Connect();
 					}
 
@@ -561,10 +562,10 @@ namespace FirebirdSql.Data.FirebirdClient
 						// if enlistment fails clean up innerConnection
 						this.innerConnection.DisposeTransaction();
 
-						if (this.innerConnection.Pooled)
+						if (this.options.Pooling)
 						{
 							// Send connection return back to the Pool
-							FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
+							FbConnectionPoolManager.Instance.Release(this.innerConnection);
 						}
 						else
 						{
@@ -621,7 +622,7 @@ namespace FirebirdSql.Data.FirebirdClient
 							this.innerConnection.ReleasePreparedCommands();
 
 							// Close connection	or send	it back	to the pool
-							if (this.innerConnection.Pooled)
+							if (this.options.Pooling)
 							{
 								if (this.innerConnection.CancelDisabled)
 								{
@@ -630,7 +631,7 @@ namespace FirebirdSql.Data.FirebirdClient
 								}
 
 								// Send	connection to the Pool
-								FbPoolManager.Instance.GetPool(this.connectionString).CheckIn(this.innerConnection);
+								FbConnectionPoolManager.Instance.Release(this.innerConnection);
 							}
 							else
 							{

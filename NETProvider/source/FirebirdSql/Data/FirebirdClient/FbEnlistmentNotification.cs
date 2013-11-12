@@ -88,10 +88,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (this.connection != null)
 				{
-					if (!this.connection.Pooled && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
-					{
-						this.connection.Disconnect();
-					}
+#warning Finish
+					//if (!this.connection.Pooled && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
+					//{
+					//	this.connection.Disconnect();
+					//}
 				}
 				this.connection         = null;
 				this.systemTransaction  = null;
@@ -125,10 +126,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (this.connection != null)
 				{
-					if (!this.connection.Pooled && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
-					{
-						this.connection.Disconnect();
-					}
+#warning Finish
+					//if (!this.connection.Pooled && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
+					//{
+					//	this.connection.Disconnect();
+					//}
 				}
 				this.connection = null;
 				this.systemTransaction  = null;

@@ -20,11 +20,12 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.IO;
-using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 using FirebirdSql.Data.Common;
 
@@ -225,6 +226,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			// on non-Win the UserID/Password is checked in Validate method
 			get { return string.IsNullOrEmpty(this.UserID) && string.IsNullOrEmpty(this.Password); }
+		}
+
+		internal string NormalizedConnectionString
+		{
+			get { return this.options.Keys.OrderBy(x => x).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(this.options[key].ToString()))).StringJoin(";"); }
 		}
 		#endregion
 
@@ -602,6 +608,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				default:
 					throw new ArgumentException("Specified Isolation Level is not valid.");
 			}
+		}
+
+		private string WrapValueIfNeeded(string value)
+		{
+			if (value != null && value.Contains(";"))
+				return "'" + value + "'";
+			return value;
 		}
 
 		#endregion

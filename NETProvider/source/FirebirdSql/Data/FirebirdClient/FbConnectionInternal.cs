@@ -41,9 +41,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		private List<WeakReference> preparedCommands;
 		private FbConnectionString options;
 		private FbConnection owningConnection;
-		private long created;
-		private long lifetime;
-		private bool pooled;
 		private bool disposed;
 		private object preparedCommandsCleanupSyncRoot;
 
@@ -58,24 +55,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		public IDatabase Database
 		{
 			get { return this.db; }
-		}
-
-		public long Lifetime
-		{
-			get { return this.lifetime; }
-			set { this.lifetime = value; }
-		}
-
-		public long Created
-		{
-			get { return this.created; }
-			set { this.created = value; }
-		}
-
-		public bool Pooled
-		{
-			get { return this.pooled; }
-			set { this.pooled = value; }
 		}
 
 		public bool HasActiveTransaction
@@ -106,16 +85,16 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
 		}
 
+		public FbConnectionString Options
+		{
+			get { return this.options; }
+		}
+
 		public bool CancelDisabled { get; set; }
 
 		#endregion
 
 		#region · Constructors ·
-
-		public FbConnectionInternal(FbConnectionString options)
-			: this(options, null)
-		{
-		}
 
 		public FbConnectionInternal(FbConnectionString options, FbConnection owningConnection)
 		{
@@ -241,10 +220,9 @@ namespace FirebirdSql.Data.FirebirdClient
 				finally
 				{
 					this.db = null;
-					this.owningConnection = null;
+					//this.owningConnection = null;
 					this.options = null;
-					this.lifetime = 0;
-					this.pooled = false;
+					//this.pooled = false;
 				}
 			}
 		}

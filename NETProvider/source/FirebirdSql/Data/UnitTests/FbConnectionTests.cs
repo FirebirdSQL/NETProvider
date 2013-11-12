@@ -161,7 +161,8 @@ namespace FirebirdSql.Data.UnitTests
 			myConnection3.Close();
 
 			// Clear pools
-			FbConnection.ClearAllPools();
+#warning Finish
+			//FbConnection.ClearAllPools();
 		}
 
 		[Test]
