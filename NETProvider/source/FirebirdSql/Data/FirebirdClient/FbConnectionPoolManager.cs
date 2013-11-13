@@ -144,6 +144,8 @@ namespace FirebirdSql.Data.FirebirdClient
 					CheckDisposedImpl();
 
 					CleanConnectionsImpl();
+					_available.Clear();
+					_busy.Clear();
 				}
 			}
 
