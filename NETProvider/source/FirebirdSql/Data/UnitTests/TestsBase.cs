@@ -414,11 +414,6 @@ namespace FirebirdSql.Data.UnitTests
 
 		public string BuildConnectionString()
 		{
-			return this.BuildConnectionString(false);
-		}
-
-		public string BuildConnectionString(bool pooling)
-		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
 			cs.UserID		= ConfigurationManager.AppSettings["User"];
@@ -427,7 +422,7 @@ namespace FirebirdSql.Data.UnitTests
 			cs.DataSource	= ConfigurationManager.AppSettings["DataSource"];
 			cs.Port			= Int32.Parse(ConfigurationManager.AppSettings["Port"]);
 			cs.Charset		= ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling		= pooling;
+			cs.Pooling		= false;
 			cs.ServerType	= (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
 
 			return cs.ToString();

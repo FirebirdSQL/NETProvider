@@ -125,7 +125,10 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ConnectionPoolingTest()
 		{
-			string cs = this.BuildConnectionString(true);
+			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();
+			csb.Pooling = true;
+			csb.ConnectionLifeTime = 5;
+			string cs = csb.ToString();
 
 			FbConnection myConnection1 = new FbConnection(cs);
 			FbConnection myConnection2 = new FbConnection(cs);
@@ -161,8 +164,7 @@ namespace FirebirdSql.Data.UnitTests
 			myConnection3.Close();
 
 			// Clear pools
-#warning Finish
-			//FbConnection.ClearAllPools();
+			FbConnection.ClearAllPools();
 		}
 
 		[Test]
@@ -212,6 +214,8 @@ namespace FirebirdSql.Data.UnitTests
 			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
 
 			Assert.AreEqual(active, ActiveConnections());
+
+			FbConnection.ClearAllPools();
 		}
 
 		[Test]
@@ -272,7 +276,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		private int ActiveConnections()
 		{
-			using (FbConnection conn = new FbConnection(this.BuildConnectionString(false)))
+			using (FbConnection conn = new FbConnection(this.BuildConnectionString()))
 			{
 				conn.Open();
 				using (FbCommand cmd = conn.CreateCommand())
