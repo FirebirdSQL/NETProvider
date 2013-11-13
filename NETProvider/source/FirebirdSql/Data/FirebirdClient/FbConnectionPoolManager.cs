@@ -70,7 +70,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			bool _disposed;
 			object _syncRoot;
 			FbConnectionString _connectionString;
-			TimeSpan _lifeTime;
 			Queue<Item> _available;
 			List<FbConnectionInternal> _busy;
 
@@ -91,14 +90,13 @@ namespace FirebirdSql.Data.FirebirdClient
 						return;
 					_disposed = true;
 					_connectionString = null;
-					_lifeTime = default(TimeSpan);
 					CleanConnectionsImpl();
 					_available = null;
 					_busy = null;
 				}
 			}
 
-			public FbConnectionInternal GetConnection()
+			public FbConnectionInternal GetConnection(FbConnection owner)
 			{
 				lock (_syncRoot)
 				{
@@ -106,7 +104,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					var connection = _available.Any()
 						? _available.Dequeue().Connection
-						: CreateNewConnection(_connectionString);
+						: CreateNewConnection(_connectionString, owner);
 					_busy.Add(connection);
 					return connection;
 				}
@@ -132,22 +130,33 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					var now = DateTimeOffset.UtcNow;
 					var available = _available.ToArray();
-					var keep = available.Where(x => x.Created.Add(_lifeTime) > now).ToArray();
+					var keep = available.Where(x => x.Created.AddSeconds(_connectionString.ConnectionLifeTime) > now).ToArray();
 					var release = available.Except(keep).ToArray();
-					release.AsParallel().ForAll(x => x.Connection.Dispose());
+					release.AsParallel().ForAll(x => x.Dispose());
 					_available = new Queue<Item>(keep);
 				}
 			}
 
-			static FbConnectionInternal CreateNewConnection(FbConnectionString connectionString)
+			public void ClearPool()
 			{
-				var result = new FbConnectionInternal(connectionString);
+				lock (_syncRoot)
+				{
+					CheckDisposedImpl();
+
+					CleanConnectionsImpl();
+				}
+			}
+
+			static FbConnectionInternal CreateNewConnection(FbConnectionString connectionString, FbConnection owner)
+			{
+				var result = new FbConnectionInternal(connectionString, owner);
 				result.Connect();
 				return result;
 			}
 
 			void CleanConnectionsImpl()
 			{
+#warning Parallel
 				foreach (var item in _available)
 					item.Dispose();
 				foreach (var item in _busy)
@@ -169,20 +178,39 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_disposed = 0;
 			_pools = new ConcurrentDictionary<string, Pool>();
+			_cleanupTimer = new Timer(CleanupCallback, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 		}
 
-		public FbConnectionInternal Get(string connectionString)
+		public FbConnectionInternal Get(FbConnectionString connectionString, FbConnection owner)
 		{
 			CheckDisposed();
 
-			return _pools.GetOrAdd(connectionString, CreateNewPool).GetConnection();
+			return _pools.GetOrAdd(connectionString.NormalizedConnectionString, _ => new Pool(connectionString)).GetConnection(owner);
 		}
 
 		public void Release(FbConnectionInternal connection)
 		{
 			CheckDisposed();
 
-			_pools.GetOrAdd(connection.Options.NormalizedConnectionString, CreateNewPool).ReleaseConnection(connection);
+			_pools.GetOrAdd(connection.Options.NormalizedConnectionString, _ => new Pool(connection.Options)).ReleaseConnection(connection);
+		}
+
+		public void ClearAllPools()
+		{
+			CheckDisposed();
+
+			_pools.Values.AsParallel().ForAll(p => p.ClearPool());
+		}
+
+		public void ClearPool(string connectionString)
+		{
+			CheckDisposed();
+
+			var pool = default(Pool);
+			if (_pools.TryGetValue(connectionString, out pool))
+			{
+				pool.ClearPool();
+			}
 		}
 
 		public void Dispose()
@@ -195,17 +223,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			_pools = null;
 		}
 
-		static Pool CreateNewPool(string connectionString)
-		{
-			var pool = new Pool(new FbConnectionString(connectionString));
-			return pool;
-		}
-
 		void CleanupCallback(object o)
 		{
 			if (Volatile.Read(ref _disposed) == 1)
 				return;
-			_pools.Values.AsParallel().ForAll(p => p.CleanupPool());
+			foreach (var item in _pools.Values)
+			{
+				item.CleanupPool();
+			}
 		}
 
 		void CheckDisposed()

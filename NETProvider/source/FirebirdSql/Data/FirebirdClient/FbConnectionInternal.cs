@@ -73,7 +73,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbConnection OwningConnection
 		{
 			get { return this.owningConnection; }
-			set { this.owningConnection = value; }
 		}
 
 		public bool IsEnlisted
@@ -220,9 +219,8 @@ namespace FirebirdSql.Data.FirebirdClient
 				finally
 				{
 					this.db = null;
-					//this.owningConnection = null;
+					this.owningConnection = null;
 					this.options = null;
-					//this.pooled = false;
 				}
 			}
 		}

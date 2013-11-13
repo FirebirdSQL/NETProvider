@@ -303,8 +303,7 @@ namespace FirebirdSql.Data.Isql
 							this.OnCommandExecuting(null);
 
 							this.sqlConnection.Close();
-#warning Finish
-							//FbConnection.ClearPool(this.sqlConnection);
+							FbConnection.ClearPool(this.sqlConnection);
 							this.requiresNewConnection = false;
 
 							// raise the event

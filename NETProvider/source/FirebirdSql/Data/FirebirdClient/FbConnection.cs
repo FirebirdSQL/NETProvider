@@ -37,33 +37,17 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
 	public sealed class FbConnection : DbConnection, ICloneable
 	{
-		#region · Static Properties ·
-
-#warning Finish
-		//public static int ConnectionPoolsCount
-		//{
-		//	get { return FbPoolManager.Instance.PoolsCount; }
-		//}
-
-		#endregion
-
 		#region · Static Pool Handling Methods ·
 
-#warning Finish
-		//public static int GetPooledConnectionCount(FbConnection connection)
-		//{
-		//	return FbPoolManager.Instance.GetPooledConnectionCount(connection.ConnectionString);
-		//}
+		public static void ClearAllPools()
+		{
+			FbConnectionPoolManager.Instance.ClearAllPools();
+		}
 
-		//public static void ClearAllPools()
-		//{
-		//	FbPoolManager.Instance.ClearAllPools();
-		//}
-
-		//public static void ClearPool(FbConnection connection)
-		//{
-		//	FbPoolManager.Instance.ClearPool(connection.ConnectionString);
-		//}
+		public static void ClearPool(FbConnection connection)
+		{
+			FbConnectionPoolManager.Instance.ClearPool(connection.ConnectionString);
+		}
 
 		#endregion
 
@@ -543,12 +527,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					if (this.options.Pooling)
 					{
-						this.innerConnection = FbConnectionPoolManager.Instance.Get(this.connectionString);
+						this.innerConnection = FbConnectionPoolManager.Instance.Get(this.options, this);
 					}
 					else
 					{
 						// Do not use Connection Pooling
-						this.innerConnection = new FbConnectionInternal(this.options, null);
+						this.innerConnection = new FbConnectionInternal(this.options, this);
 						this.innerConnection.Connect();
 					}
 
