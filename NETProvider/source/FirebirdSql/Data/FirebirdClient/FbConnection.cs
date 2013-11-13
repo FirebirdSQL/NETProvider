@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 
 				// Create the new database
-				FbConnectionInternal db = new FbConnectionInternal(options, null);
+				FbConnectionInternal db = new FbConnectionInternal(options);
 				db.CreateDatabase(dpb);
 			}
 			catch (IscException ex)
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			try
 			{
 				// Drop	the	database	
-				FbConnectionInternal db = new FbConnectionInternal(options, null);
+				FbConnectionInternal db = new FbConnectionInternal(options);
 				db.DropDatabase();
 			}
 			catch (IscException ex)
@@ -532,7 +532,8 @@ namespace FirebirdSql.Data.FirebirdClient
 					else
 					{
 						// Do not use Connection Pooling
-						this.innerConnection = new FbConnectionInternal(this.options, this);
+						this.innerConnection = new FbConnectionInternal(this.options);
+						this.innerConnection.SetOwningConnection(this);
 						this.innerConnection.Connect();
 					}
 

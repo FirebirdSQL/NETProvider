@@ -105,6 +105,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					var connection = _available.Any()
 						? _available.Dequeue().Connection
 						: CreateNewConnection(_connectionString, owner);
+					connection.SetOwningConnection(owner);
 					_busy.Add(connection);
 					return connection;
 				}
@@ -151,7 +152,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			static FbConnectionInternal CreateNewConnection(FbConnectionString connectionString, FbConnection owner)
 			{
-				var result = new FbConnectionInternal(connectionString, owner);
+				var result = new FbConnectionInternal(connectionString);
+				result.SetOwningConnection(owner);
 				result.Connect();
 				return result;
 			}

@@ -95,13 +95,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Constructors ·
 
-		public FbConnectionInternal(FbConnectionString options, FbConnection owningConnection)
+		public FbConnectionInternal(FbConnectionString options)
 		{
 			this.preparedCommands = new List<WeakReference>();
 			this.preparedCommandsCleanupSyncRoot = new object();
 
 			this.options = options;
-			this.owningConnection = owningConnection;
 
 			GC.SuppressFinalize(this);
 		}
@@ -634,6 +633,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		public void CancelCommand()
 		{
 			this.db.CancelOperation(IscCodes.fb_cancel_raise);
+		}
+		#endregion
+
+		#region Infrastructure
+		public FbConnectionInternal SetOwningConnection(FbConnection owningConnection)
+		{
+			this.owningConnection = owningConnection;
+			return this;
 		}
 		#endregion
 	}
