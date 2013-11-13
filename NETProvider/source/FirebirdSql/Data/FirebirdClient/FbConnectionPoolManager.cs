@@ -158,11 +158,17 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			void CleanConnectionsImpl()
 			{
-#warning Parallel
-				foreach (var item in _available)
-					item.Dispose();
-				foreach (var item in _busy)
-					item.Dispose();
+				Parallel.Invoke(
+					() =>
+					{
+						foreach (var item in _available)
+							item.Dispose();
+					},
+					() =>
+					{
+						foreach (var item in _busy)
+							item.Dispose();
+					});
 			}
 
 			void CheckDisposedImpl()
@@ -229,10 +235,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (Volatile.Read(ref _disposed) == 1)
 				return;
-			foreach (var item in _pools.Values)
-			{
-				item.CleanupPool();
-			}
+			_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
 		}
 
 		void CheckDisposed()
