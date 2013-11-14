@@ -123,6 +123,26 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
+		public void FbConnectionStringBuilderTest()
+		{
+			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
+
+			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
+			cs.Database = ConfigurationManager.AppSettings["Database"];
+			cs.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
+			cs.UserID = ConfigurationManager.AppSettings["User"];
+			cs.Password = ConfigurationManager.AppSettings["Password"];
+			cs.ServerType = (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
+			cs.Charset = ConfigurationManager.AppSettings["Charset"];
+			cs.Pooling = Convert.ToBoolean(ConfigurationManager.AppSettings["Pooling"]);
+
+			using (FbConnection c = new FbConnection(cs.ToString()))
+			{
+				c.Open();
+			}
+		}
+
+		[Test]
 		public void ConnectionPoolingTest()
 		{
 			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();
@@ -165,26 +185,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			// Clear pools
 			FbConnection.ClearAllPools();
-		}
-
-		[Test]
-		public void FbConnectionStringBuilderTest()
-		{
-			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
-
-			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
-			cs.Database = ConfigurationManager.AppSettings["Database"];
-			cs.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
-			cs.UserID = ConfigurationManager.AppSettings["User"];
-			cs.Password = ConfigurationManager.AppSettings["Password"];
-			cs.ServerType = (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
-			cs.Charset = ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling = Convert.ToBoolean(ConfigurationManager.AppSettings["Pooling"]);
-
-			using (FbConnection c = new FbConnection(cs.ToString()))
-			{
-				c.Open();
-			}
 		}
 
 		[Test]
