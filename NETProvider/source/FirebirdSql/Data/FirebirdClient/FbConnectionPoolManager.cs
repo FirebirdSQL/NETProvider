@@ -188,7 +188,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_disposed = 0;
 			_pools = new ConcurrentDictionary<string, Pool>();
-			_cleanupTimer = new Timer(CleanupCallback, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+			_cleanupTimer = new Timer(CleanupCallback, null, TimeSpan.FromSeconds(2), Timeout.InfiniteTimeSpan);
 		}
 
 		public FbConnectionInternal Get(FbConnectionString connectionString, FbConnection owner)
@@ -238,6 +238,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (Volatile.Read(ref _disposed) == 1)
 				return;
 			_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
+			_cleanupTimer.Change(TimeSpan.FromSeconds(2), Timeout.InfiniteTimeSpan);
 		}
 
 		void CheckDisposed()
