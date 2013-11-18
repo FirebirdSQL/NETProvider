@@ -47,19 +47,6 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_35|AnyCPU'">
-    <OutputPath>bin\Release_35\</OutputPath>
-    <DefineConstants>TRACE;NET_35;ENTITY_FRAMEWORK</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_40|AnyCPU'">
     <OutputPath>bin\Release_40\</OutputPath>
     <DefineConstants>TRACE;NET_40</DefineConstants>
@@ -125,9 +112,6 @@
     <Reference Include="EntityFramework">
       <HintPath>..\..\..\lib\EF5\net45\EntityFramework.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_35|AnyCPU'">
-    <Reference Include="System.Data.Entity" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_40|AnyCPU'">
     <Reference Include="System.Data.Entity" />
