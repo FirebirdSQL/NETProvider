@@ -23,6 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -188,7 +189,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_disposed = 0;
 			_pools = new ConcurrentDictionary<string, Pool>();
-			_cleanupTimer = new Timer(CleanupCallback, null, TimeSpan.FromSeconds(2), Timeout.InfiniteTimeSpan);
+			_cleanupTimer = new Timer(CleanupCallback, null, TimeSpan.FromSeconds(2), TimeoutHelper.InfiniteTimeSpan);
 		}
 
 		public FbConnectionInternal Get(FbConnectionString connectionString, FbConnection owner)
@@ -235,15 +236,23 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		void CleanupCallback(object o)
 		{
+#if (NET_40)
+			if (Thread.VolatileRead(ref _disposed) == 1)
+#else
 			if (Volatile.Read(ref _disposed) == 1)
+#endif
 				return;
 			_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
-			_cleanupTimer.Change(TimeSpan.FromSeconds(2), Timeout.InfiniteTimeSpan);
+			_cleanupTimer.Change(TimeSpan.FromSeconds(2), TimeoutHelper.InfiniteTimeSpan);
 		}
 
 		void CheckDisposed()
 		{
+#if (NET_40)
+			if (Thread.VolatileRead(ref _disposed) == 1)
+#else
 			if (Volatile.Read(ref _disposed) == 1)
+#endif
 				throw new ObjectDisposedException(typeof(FbConnectionPoolManager).Name);
 		}
 	}
