@@ -43,7 +43,9 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
+#pragma warning disable 3009
 	public class FbProviderServices : DbProviderServices
+#pragma warning restore 3009
 	{
 		internal static readonly FbProviderServices Instance = new FbProviderServices();
 
@@ -412,7 +414,10 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 #if (!NET_35)
-		protected override void DbCreateDatabase(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
+		protected override void DbCreateDatabase(DbConnection connection, int? commandTimeout,
+#pragma warning disable 3001
+			StoreItemCollection storeItemCollection)
+#pragma warning restore 3001
 		{
 			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
 			string script = DbCreateDatabaseScript(GetDbProviderManifestToken(fbConnection), storeItemCollection);
@@ -422,12 +427,18 @@ namespace FirebirdSql.Data.FirebirdClient
 			new FbBatchExecution(fbConnection, fbScript).Execute();	
 		}
 
-		protected override string DbCreateDatabaseScript(string providerManifestToken, StoreItemCollection storeItemCollection)
+		protected override string DbCreateDatabaseScript(string providerManifestToken,
+#pragma warning disable 3001
+			StoreItemCollection storeItemCollection)
+#pragma warning restore 3001
 		{
 			return SsdlToFb.Transform(storeItemCollection, providerManifestToken);
 		}
 
-		protected override bool DbDatabaseExists(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
+		protected override bool DbDatabaseExists(DbConnection connection, int? commandTimeout,
+#pragma warning disable 3001
+			StoreItemCollection storeItemCollection)
+#pragma warning restore 3001
 		{
 			if (connection.State == ConnectionState.Open
 				   || connection.State == ConnectionState.Executing
@@ -457,7 +468,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		protected override void DbDeleteDatabase(DbConnection connection, int? commandTimeout, StoreItemCollection storeItemCollection)
+		protected override void DbDeleteDatabase(DbConnection connection, int? commandTimeout, 
+#pragma warning disable 3001
+			StoreItemCollection storeItemCollection)
+#pragma warning restore 3001
 		{
 			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
 			FbConnection.DropDatabase(connection.ConnectionString);
