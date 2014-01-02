@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					var connection = _available.Any()
 						? _available.Dequeue().Connection
-						: CreateNewConnection(_connectionString, owner);
+						: CreateNewConnectionIfPossibleImpl(_connectionString, owner);
 					connection.SetOwningConnection(owner);
 					_busy.Add(connection);
 					return connection;
@@ -151,6 +151,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
+
 			static FbConnectionInternal CreateNewConnection(FbConnectionString connectionString, FbConnection owner)
 			{
 				var result = new FbConnectionInternal(connectionString);
@@ -178,6 +179,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (_disposed)
 					throw new ObjectDisposedException(typeof(Pool).Name);
+			}
+
+			FbConnectionInternal CreateNewConnectionIfPossibleImpl(FbConnectionString connectionString, FbConnection owner)
+			{
+				if (_busy.Count() + 1 > connectionString.MaxPoolSize)
+					throw new InvalidOperationException("Connection pool is full.");
+				return CreateNewConnection(connectionString, owner);
 			}
 		}
 
