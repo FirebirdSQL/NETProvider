@@ -17,10 +17,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Reflection;
-
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
@@ -145,6 +145,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ConnectionPoolingTest()
 		{
+			// Using ActiveUsers as proxy for number of connections
 			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
@@ -152,7 +153,8 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbConnection myConnection1 = new FbConnection(cs);
 			FbConnection myConnection2 = new FbConnection(cs);
-			FbConnection myConnection3 = new FbConnection(cs);
+
+			int active = ActiveConnections();
 
 			// Open two connections.
 			Console.WriteLine("Open two connections.");
@@ -165,23 +167,7 @@ namespace FirebirdSql.Data.UnitTests
 			myConnection1.Close();
 			myConnection2.Close();
 
-			// Get a connection out of the pool.
-			Console.WriteLine("Open a connection from the pool.");
-			myConnection1.Open();
-
-			// Get a second connection out of the pool.
-			Console.WriteLine("Open a second connection from the pool.");
-			myConnection2.Open();
-
-			// Open a third connection.
-			Console.WriteLine("Open a third connection.");
-			myConnection3.Open();
-
-			// Return the all connections to the pool.  
-			Console.WriteLine("Return all three connections to the pool.");
-			myConnection1.Close();
-			myConnection2.Close();
-			myConnection3.Close();
+			Assert.AreEqual(active + 2, ActiveConnections());
 
 			// Clear pools
 			FbConnection.ClearAllPools();
