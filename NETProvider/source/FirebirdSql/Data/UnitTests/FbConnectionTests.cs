@@ -249,6 +249,40 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
+		public void ConnectionPoolingMinPoolSizeTest()
+		{
+			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();
+			csb.Pooling = true;
+			csb.ConnectionLifeTime = 5;
+			csb.MinPoolSize = 3;
+			string cs = csb.ToString();
+
+			int active = ActiveConnections();
+
+			var connections = new List<FbConnection>();
+			try
+			{
+				for (int i = 0; i < csb.MinPoolSize * 2; i++)
+				{
+					var connection = new FbConnection(cs);
+					Assert.DoesNotThrow(() => connection.Open());
+					connections.Add(connection);
+				}
+			}
+			finally
+			{
+				connections.ForEach(x => x.Dispose());
+			}
+
+			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
+
+			Assert.AreEqual(active + csb.MinPoolSize, ActiveConnections());
+
+			FbConnection.ClearAllPools();
+
+		}
+
+		[Test]
 		public void NoDatabaseTriggersWrongConnectionStringTest()
 		{
 			FbConnectionStringBuilder csb = this.BuildConnectionStringBuilder();

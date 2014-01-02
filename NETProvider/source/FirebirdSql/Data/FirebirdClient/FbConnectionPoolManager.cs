@@ -133,6 +133,9 @@ namespace FirebirdSql.Data.FirebirdClient
 					var now = DateTimeOffset.UtcNow;
 					var available = _available.ToArray();
 					var keep = available.Where(x => x.Created.AddSeconds(_connectionString.ConnectionLifeTime) > now).ToArray();
+					var keepCount = keep.Count();
+					if (keepCount < _connectionString.MinPoolSize)
+						keep = available.Except(keep).Take(_connectionString.MinPoolSize - keepCount).ToArray();
 					var release = available.Except(keep).ToArray();
 					release.AsParallel().ForAll(x => x.Dispose());
 					_available = new Queue<Item>(keep);
