@@ -161,7 +161,7 @@ namespace FirebirdSql.Data.Common
 		#region · Public Methods ·
 
 		public void BuildExceptionData()
-		{ 
+		{
 			this.BuildErrorCode();
 			this.BuildSqlState();
 			this.BuildExceptionMessage();
@@ -206,81 +206,85 @@ namespace FirebirdSql.Data.Common
 			// step #2, see if we can find a mapping.
 			else
 			{
-				ResourceManager rm = new ResourceManager("FirebirdSql.Data.Resources.sqlstate_mapping", Assembly.GetExecutingAssembly());
-				this.SQLSTATE = rm.GetString(this.ErrorCode.ToString());
+				using (var rs = CreateResourceSet("FirebirdSql.Data.Resources.sqlstate_mapping"))
+				{
+					this.SQLSTATE = rs.GetString(this.ErrorCode.ToString());
+				}
 			}
 		}
 
 		private void BuildExceptionMessage()
 		{
 			StringBuilder builder = new StringBuilder();
-			ResourceManager rm = new ResourceManager("FirebirdSql.Data.Resources.isc_error_msg", Assembly.GetExecutingAssembly());
 
-			for (int i = 0; i < this.Errors.Count; i++)
+			using (var rs = CreateResourceSet("FirebirdSql.Data.Resources.isc_error_msg"))
 			{
-				if (this.Errors[i].Type == IscCodes.isc_arg_gds ||
-					this.Errors[i].Type == IscCodes.isc_arg_warning)
+				for (int i = 0; i < this.Errors.Count; i++)
 				{
-					int code = this.Errors[i].ErrorCode;
-					string message = null;
-
-					try
+					if (this.Errors[i].Type == IscCodes.isc_arg_gds ||
+						this.Errors[i].Type == IscCodes.isc_arg_warning)
 					{
-						message = rm.GetString(code.ToString());
-					}
-					catch
-					{
-						message = BuildDefaultErrorMessage(code);
-					}
+						int code = this.Errors[i].ErrorCode;
+						string message = null;
 
-					ArrayList param = new ArrayList();
-
-					int index = i + 1;
-
-					while (index < this.Errors.Count && this.Errors[index].IsArgument)
-					{
-						param.Add(this.Errors[index++].StrParam);
-						i++;
-					}
-
-					object[] args = (object[])param.ToArray(typeof(object));
-
-					try
-					{
-						if (code == IscCodes.isc_except)
+						try
 						{
-							// Custom exception	add	the	first argument as error	code
-							this.ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
+							message = rs.GetString(code.ToString());
 						}
-						else if (code == IscCodes.isc_except2)
+						catch
 						{
-							// Custom exception. Next Error should be the exception name.
-							// And the next one the Exception message
+							message = BuildDefaultErrorMessage(code);
 						}
-						else if (code == IscCodes.isc_stack_trace)
+
+						ArrayList param = new ArrayList();
+
+						int index = i + 1;
+
+						while (index < this.Errors.Count && this.Errors[index].IsArgument)
 						{
-							// The next error contains the PSQL Stack Trace
-							if (builder.Length > 0)
+							param.Add(this.Errors[index++].StrParam);
+							i++;
+						}
+
+						object[] args = (object[])param.ToArray(typeof(object));
+
+						try
+						{
+							if (code == IscCodes.isc_except)
 							{
-								builder.Append(Environment.NewLine);
+								// Custom exception	add	the	first argument as error	code
+								this.ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
 							}
-							builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
-						}
-						else
-						{
-							if (builder.Length > 0)
+							else if (code == IscCodes.isc_except2)
 							{
-								builder.Append(Environment.NewLine);
+								// Custom exception. Next Error should be the exception name.
+								// And the next one the Exception message
 							}
+							else if (code == IscCodes.isc_stack_trace)
+							{
+								// The next error contains the PSQL Stack Trace
+								if (builder.Length > 0)
+								{
+									builder.Append(Environment.NewLine);
+								}
+								builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
+							}
+							else
+							{
+								if (builder.Length > 0)
+								{
+									builder.Append(Environment.NewLine);
+								}
+
+								builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
+							}
+						}
+						catch
+						{
+							message = BuildDefaultErrorMessage(code);
 
 							builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
 						}
-					}
-					catch
-					{
-						message = BuildDefaultErrorMessage(code);
-
-						builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
 					}
 				}
 			}
@@ -298,6 +302,14 @@ namespace FirebirdSql.Data.Common
 		private string BuildDefaultErrorMessage(int code)
 		{
 			return string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
+		}
+
+		private ResourceSet CreateResourceSet(string resourceName)
+		{
+			using (var resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName + ".resources"))
+			{
+				return new ResourceSet(resourceStream);
+			}
 		}
 
 		#endregion
