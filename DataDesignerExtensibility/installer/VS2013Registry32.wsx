@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}" Root="HKCU">
+		<RegistryValue Value="Firebird Data Source" Type="string" />
+	</RegistryKey>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataSources\{2979569E-416D-4DD8-B06B-EBCB70DE7A4E}\SupportingProviders\{92421248-F044-483A-8237-74C7FBC62971}" Root="HKCU" ForceCreateOnInstall="yes" />
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}" Root="HKCU">
+		<RegistryValue Value=".NET Framework Data Provider for Firebird" Type="string" />
+		<RegistryValue Name="DisplayName" Value="Provider_DisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources" Type="string" />
+		<RegistryValue Name="ShortDisplayName" Value="Provider_ShortDisplayName, FirebirdSql.VisualStudio.DataTools.Properties.Resources" Type="string" />
+		<RegistryValue Name="Description" Value="Provider_Description, FirebirdSql.VisualStudio.DataTools.Properties.Resources" Type="string" />
+		<RegistryValue Name="CodeBase" Value="[APPLICATIONFOLDER]FirebirdSql.VisualStudio.DataTools.dll" Type="string" />
+		<RegistryValue Name="InvariantName" Value="FirebirdSql.Data.FirebirdClient" Type="string" />
+		<RegistryValue Name="Technology" Value="{77AB9A9D-78B9-4ba7-91AC-873F5338F1D2}" Type="string" />
+	</RegistryKey>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects" Root="HKCU" />
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionSupport" Root="HKCU">
+		<RegistryValue Value="FirebirdSql.VisualStudio.DataTools.FbDataConnectionSupport" Type="string" />
+	</RegistryKey>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionProperties" Root="HKCU">
+		<RegistryValue Value="FirebirdSql.VisualStudio.DataTools.FbDataConnectionProperties" Type="string" />
+	</RegistryKey>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataConnectionUIControl" Root="HKCU">
+		<RegistryValue Value="FirebirdSql.VisualStudio.DataTools.FbDataConnectionUIControl" Type="string" />
+	</RegistryKey>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataSourceInformation" Root="HKCU">
+		<RegistryValue Value="FirebirdSql.VisualStudio.DataTools.FbDataSourceInformation" Type="string" />
+	</RegistryKey>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataObjectSupport" Root="HKCU">
+		<RegistryValue Value="FirebirdSql.VisualStudio.DataTools.FbDataObjectSupport" Type="string" />
+	</RegistryKey>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\DataProviders\{92421248-F044-483A-8237-74C7FBC62971}\SupportedObjects\DataViewSupport" Root="HKCU">
+		<RegistryValue Value="FirebirdSql.VisualStudio.DataTools.FbDataViewSupport" Type="string" />
+	</RegistryKey>
+	<RegistryKey Key="Software\Microsoft\VisualStudio\12.0_Config\Services\{AEF32AEC-2167-4438-81FF-AE6603341536}" Root="HKCU">
+		<RegistryValue Value="{8d9358ba-ccc9-4169-9fd6-a52b8aee2d50}" Type="string" />
+		<RegistryValue Name="Name" Value="Firebird Provider Object Factory" Type="string" />
+	</RegistryKey>
+</Include>
