@@ -24,7 +24,7 @@ Modify it like this (for 64bit systems you have to edit "32bit version" of this 
   <system.data>
     <DbProviderFactories>
       ...
-      <add name="FirebirdClient Data Provider" invariant="FirebirdSql.Data.FirebirdClient" description=".NET Framework Data Provider for Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Version=%Version%, Culture=%Culture%, PublicKeyToken=%PublicKeyToken%" />
+      <add name="FirebirdClient Data Provider" invariant="FirebirdSql.Data.FirebirdClient" description=".NET Framework Data Provider for Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Version=%Version%, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
       ...
     </DbProviderFactories>
   </system.data>
@@ -32,8 +32,6 @@ Modify it like this (for 64bit systems you have to edit "32bit version" of this 
 
 And substitute (these informations you can find using gacutil): 
   - %Version% with the version of the provider assembly that you have in the GAC.
-  - %Culture% with the culture of the provider assembly that you have in the GAC.
-  - %PublicKeyToken% with the PublicKeyToken of the provider assembly that you have in the GAC.
 
 Note:
   Notice, that in configSections there isn't signature of FirebirdClient but the signature of assembly from framework.
