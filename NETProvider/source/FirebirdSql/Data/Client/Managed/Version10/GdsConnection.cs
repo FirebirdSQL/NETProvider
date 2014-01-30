@@ -108,16 +108,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-#if	(!NET_CF)
 				// Set Receive Buffer size.
 				this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, packetSize);
-
 				// Set Send	Buffer size.
 				this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, packetSize);
-#endif
 				// Disables	the	Nagle algorithm	for	send coalescing.
 				this.socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
-
 				// Start sending keepalive packets every 30min after 30min of idle connection
 				this.socket.SetKeepAlive(KeepAliveTime, KeepAliveInterval);
 
@@ -144,13 +140,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				// Here	we identify	the	user to	the	engine.	 
 				// This	may	or may not be used as login	info to	a database.				
-#if	(!NET_CF)
 				byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
 				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
-#else
-				byte[] user = Encoding.Default.GetBytes("fbnetcf");
-				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
-#endif
 
 				using (MemoryStream user_id = new MemoryStream())
 				{
@@ -231,11 +222,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public XdrStream CreateXdrStream()
 		{
-#if	(NET_CF)
-			return new XdrStream(this.networkStream, this.characterSet);
-#else
 			return new XdrStream(new BufferedStream(this.networkStream), this.characterSet);
-#endif
 		}
 
 		public virtual void Disconnect()
@@ -256,8 +243,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private IPAddress GetIPAddress(string dataSource, AddressFamily addressFamily)
 		{
-#if (!NET_CF)
-
 			IPAddress ipaddress = null;
 
 			if (IPAddress.TryParse(dataSource, out ipaddress))
@@ -277,40 +262,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
 			return addresses[0];
-#else
-
-			try
-			{
-				IPAddress[] addresses = Dns.GetHostEntry(dataSource).AddressList;
-
-				// Try to avoid problems with IPV6 addresses
-				foreach (IPAddress address in addresses)
-				{
-					if (address.AddressFamily == addressFamily)
-					{
-						return address;
-					}
-				}
-
-				return addresses[0];
-			}
-			catch (Exception ex)
-			{
-				// If it's not possible to get the list of IP adress associated to 
-				// the Data Source we try to check if Data Source is already an IP Address
-				// and return it
-				try
-				{
-					return IPAddress.Parse(dataSource);
-				}
-				catch
-				{
-					// In this case we want to rethrow the first exception
-					throw ex;
-				}
-			}
-
-#endif
 		}
 
 		#endregion

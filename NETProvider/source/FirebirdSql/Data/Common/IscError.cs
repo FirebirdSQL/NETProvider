@@ -24,9 +24,7 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
-#if (!NET_CF)
 	[Serializable]
-#endif
 	internal sealed class IscError
 	{
 		#region · Fields ·

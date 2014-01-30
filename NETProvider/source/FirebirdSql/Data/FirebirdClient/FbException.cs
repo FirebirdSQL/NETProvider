@@ -22,9 +22,7 @@
 using System;
 using System.ComponentModel;
 using System.Data.Common;
-#if (!NET_CF)
 using System.Runtime.Serialization;
-#endif
 using System.Security;
 using System.Security.Permissions;
 
@@ -43,9 +41,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Properties ·
 
-#if (!NET_CF)
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-#endif
 		public FbErrorCollection Errors
 		{
 			get
@@ -108,21 +104,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if (!NET_CF)
-
 		internal FbException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
 			this.errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
 		}
 
-#endif
-
 		#endregion
 
 		#region · Methods ·
-
-#if (!NET_CF)
 
 		[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
 		[SecurityCritical]
@@ -132,8 +122,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			info.AddValue("errors", this.errors);
 		}
-
-#endif
 
 		#endregion
 

@@ -58,11 +58,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Properties ·
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue("")]
 		[RefreshProperties(RefreshProperties.All)]
-#endif
 		public override string CommandText
 		{
 			get { return this.commandText; }
@@ -80,10 +78,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue(CommandType.Text), RefreshProperties(RefreshProperties.All)]
-#endif
 		public override CommandType CommandType
 		{
 			get { return this.commandType; }
@@ -104,9 +100,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Browsable(false)]
-#endif
 		public string CommandPlan
 		{
 			get
@@ -119,10 +113,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Category("Behavior")]
 		[DefaultValue(null)]
-#endif
 		public new FbConnection Connection
 		{
 			get { return this.connection; }
@@ -152,10 +144,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-#endif
 		public new FbParameterCollection Parameters
 		{
 			get
@@ -168,10 +158,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public new FbTransaction Transaction
 		{
 			get { return this.implicitTransaction ? null : this.transaction; }
@@ -203,20 +191,16 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Category("Behavior")]
 		[DefaultValue(UpdateRowSource.Both)]
-#endif
 		public override UpdateRowSource UpdatedRowSource
 		{
 			get { return this.updatedRowSource; }
 			set { this.updatedRowSource = value; }
 		}
 
-#if	(!NET_CF)
 		[Category("Behavior")]
 		[DefaultValue(200)]
-#endif
 		public int FetchSize
 		{
 			get { return this.fetchSize; }
@@ -260,20 +244,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Design-Time properties ·
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignOnly(true)]
 		[DefaultValue(true)]
-#endif
 		public override bool DesignTimeVisible
 		{
 			get { return this.designTimeVisible; }
 			set
 			{
 				this.designTimeVisible = value;
-#if	(!NET_CF)
 				TypeDescriptor.Refresh(this);
-#endif
 			}
 		}
 

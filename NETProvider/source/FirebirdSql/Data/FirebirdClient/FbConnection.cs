@@ -32,9 +32,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if	(!NET_CF)
 	[DefaultEvent("InfoMessage")]
-#endif
 	public sealed class FbConnection : DbConnection, ICloneable
 	{
 		#region · Static Pool Handling Methods ·
@@ -165,12 +163,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Properties ·
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[SettingsBindable(true)]
 		[RefreshProperties(RefreshProperties.All)]
 		[DefaultValue("")]
-#endif
 		public override string ConnectionString
 		{
 			get { return this.connectionString; }
@@ -193,34 +189,26 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public override int ConnectionTimeout
 		{
 			get { return this.options.ConnectionTimeout; }
 		}
 
-#if	(!NET_CF)
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public override string Database
 		{
 			get { return this.options.Database; }
 		}
 
-#if	(!NET_CF)
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public override string DataSource
 		{
 			get { return this.options.DataSource; }
 		}
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public override string ServerVersion
 		{
 			get
@@ -239,10 +227,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public Version ServerVersionNumber
 		{
 			get
@@ -254,18 +240,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public override ConnectionState State
 		{
 			get { return this.state; }
 		}
 
-#if	(!NET_CF)
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public int PacketSize
 		{
 			get { return this.options.PacketSize; }
@@ -294,12 +276,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Protected Properties ·
 
-#if (!NET_CF) 
 		protected override DbProviderFactory DbProviderFactory
 		{
 			get { return FirebirdClientFactory.Instance; }
 		}
-#endif
 
 		#endregion
 
@@ -410,14 +390,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Transaction Enlistement ·
 
-#if (!NET_CF)
 		public override void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
 			this.CheckClosed();
 
 			this.innerConnection.EnlistTransaction(transaction);
 		}
-#endif
 
 		#endregion
 
@@ -465,7 +443,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override void ChangeDatabase(string db)
 		{
-#if (!NET_CF)
 			lock (this)
 			{
 				this.CheckClosed();
@@ -497,7 +474,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					throw new FbException(ex.Message, ex);
 				}
 			}
-#endif
 		}
 
 		public override void Open()
@@ -512,12 +488,10 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					throw new InvalidOperationException("Connection already Open.");
 				}
-#if (!NET_CF)
 				if (this.options.Enlist && System.Transactions.Transaction.Current == null)
 				{
 					throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
 				}
-#endif
 
 				this.DemandPermission();
 
@@ -537,7 +511,6 @@ namespace FirebirdSql.Data.FirebirdClient
 						this.innerConnection.Connect();
 					}
 
-#if (!NET_CF)
 					try
 					{
 						this.innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
@@ -560,7 +533,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 						throw;
 					}
-#endif
 
 					// Bind	Warning	messages event
 					this.innerConnection.Database.WarningMessage = new WarningMessageCallback(this.OnWarningMessage);
@@ -646,10 +618,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal void DemandPermission()
 		{
-#if (!NET_CF)
 			FirebirdClientPermission permission = new FirebirdClientPermission(this.connectionString);
 			permission.Demand();
-#endif
 		}
 
 		private void CheckClosed()

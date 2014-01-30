@@ -20,8 +20,6 @@
  *		Olivier Metod
  */
 
-#if (!NET_CF)
-
 using System;
 
 namespace FirebirdSql.Data.Isql
@@ -408,5 +406,3 @@ namespace FirebirdSql.Data.Isql
 		Whenever
 	}
 }
-
-#endif

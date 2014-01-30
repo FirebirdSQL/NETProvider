@@ -26,17 +26,13 @@ using System.Globalization;
 using System.Text;
 using System.Reflection;
 using System.Resources;
-#if (!NET_CF)
 using System.Runtime.Serialization;
-#endif
 using System.Security;
 using System.Security.Permissions;
 
 namespace FirebirdSql.Data.Common
 {
-#if (!NET_CF)
 	[Serializable]
-#endif
 	internal sealed class IscException : Exception
 	{
 		#region · Fields ·
@@ -145,16 +141,12 @@ namespace FirebirdSql.Data.Common
 			this.BuildExceptionData();
 		}
 
-#if (!NET_CF)
-
 		internal IscException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
 			this.Errors = (List<IscError>)info.GetValue("errors", typeof(List<IscError>));
 			this.ErrorCode = info.GetInt32("errorCode");
 		}
-
-#endif
 
 		#endregion
 
@@ -167,8 +159,6 @@ namespace FirebirdSql.Data.Common
 			this.BuildExceptionMessage();
 		}
 
-#if (!NET_CF)
-
 		[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
 		[SecurityCritical]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -178,8 +168,6 @@ namespace FirebirdSql.Data.Common
 			info.AddValue("errors", this.Errors);
 			info.AddValue("errorCode", this.ErrorCode);
 		}
-
-#endif
 
 		public override string ToString()
 		{

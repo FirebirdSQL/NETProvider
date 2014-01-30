@@ -20,9 +20,7 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (!NET_CF)
 	[Serializable]
-#endif
 	public enum FbDbType
 	{
 		Array,

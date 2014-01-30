@@ -32,9 +32,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if	(!NET_CF)
 	[ListBindable(false)]
-#endif
 	public sealed class FbParameterCollection : DbParameterCollection
 	{
 		#region · Fields ·
@@ -45,20 +43,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Indexers ·
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public new FbParameter this[string parameterName]
 		{
 			get { return this[this.IndexOf(parameterName)]; }
 			set { this[this.IndexOf(parameterName)] = value; }
 		}
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public new FbParameter this[int index]
 		{
 			get { return this.parameters[index]; }
@@ -69,10 +63,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · DbParameterCollection overriden properties ·
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public override int Count
 		{
 			get { return this.parameters.Count; }

@@ -130,14 +130,10 @@ namespace FirebirdSql.Data.Common
 			return count;
 		}
 
-#if (!NET_CF)
-
 		public override string GetString(byte[] bytes)
 		{
 			return BytesToString(bytes);
 		}
-
-#endif
 
 		public override string GetString(byte[] bytes, int index, int count)
 		{

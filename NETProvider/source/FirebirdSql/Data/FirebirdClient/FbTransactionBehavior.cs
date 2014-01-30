@@ -20,10 +20,8 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (!NET_CF)
 	[Flags]
 	[Serializable]
-#endif
 	public enum FbTransactionBehavior : int
 	{
 		Consistency = 1,

@@ -113,11 +113,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Properties ·
 
-#if (!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
-#endif
 		public override string QuotePrefix
 		{
 			get { return base.QuotePrefix; }
@@ -134,11 +132,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if (!NET_CF)
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		[EditorBrowsable(EditorBrowsableState.Never)]
-#endif
 		public override string QuoteSuffix
 		{
 			get { return base.QuoteSuffix; }
@@ -155,9 +151,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if (!NET_CF)
 		[DefaultValue(null)]
-#endif
 		public new FbDataAdapter DataAdapter
 		{
 			get { return (FbDataAdapter)base.DataAdapter; }

@@ -20,8 +20,6 @@
  *   Olivier Metod
  */
 
-#if (!NET_CF)
-
 using System;
 using System.Data;
 using System.Collections;
@@ -431,11 +429,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.SetStatistics:
 						case SqlStatementType.SetTransaction:
 						case SqlStatementType.ShowSQLDialect:
-#if (!NET_CF)
 							throw new NotImplementedException();
-#else
-							throw new NotSupportedException();
-#endif
 
 						case SqlStatementType.Update:
 						case SqlStatementType.Whenever:
@@ -594,11 +588,7 @@ namespace FirebirdSql.Data.Isql
 		/// <returns></returns>
 		protected internal FbConnection SetDatabase(string setDbStatement)
 		{
-#if (!NET_CF)
 			throw new NotImplementedException();
-#else
-			throw new NotSupportedException();
-#endif
 		}
 
 		/// <summary>
@@ -1157,5 +1147,3 @@ namespace FirebirdSql.Data.Isql
 		#endregion
 	}
 }
-
-#endif

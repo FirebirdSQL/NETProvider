@@ -16,8 +16,6 @@
  *	All Rights Reserved.
  */
 
-#if (!NET_CF)
-
 using System;
 using System.Collections;
 using System.Text;
@@ -699,5 +697,3 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		#endregion
 	}
 }
-
-#endif

@@ -43,10 +43,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private FbConnection owningConnection;
 		private bool disposed;
 		private object preparedCommandsCleanupSyncRoot;
-
-#if (!NET_CF)
 		private FbEnlistmentNotification enlistmentNotification;
-#endif
 
 		#endregion
 
@@ -77,11 +74,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public bool IsEnlisted
 		{
-#if (!NET_CF)
 			get { return this.enlistmentNotification != null && !this.enlistmentNotification.IsCompleted; }
-#else
-			get { return false; }
-#endif
 		}
 
 		public FbConnectionString Options
@@ -316,7 +309,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Transaction Enlistement ·
 
-#if (!NET_CF)
 		public void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
 			if (this.owningConnection != null && this.options.Enlist)
@@ -370,7 +362,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					return this.BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
 			}
 		}
-#endif
 
 		#endregion
 
@@ -537,13 +528,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetProcessName()
 		{
-#if (NET_CF) 
-			// for CF we can implement GetModuleFileName from coredll
-			return "fbnetcf";
-#else
 			// showing ApplicationPhysicalPath may be wrong because of connection pooling; better idea?
 			return GetHostingPath() ?? GetRealProcessName();
-#endif
 		}
 
 
@@ -586,9 +572,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private int GetProcessID()
 		{
-#if (NET_CF)
-			return -1;
-#else
 			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
 			if (assembly != null)
 			{
@@ -613,7 +596,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				return Process.GetCurrentProcess().Id;
 			}
-#endif
 		}
 		#endregion
 

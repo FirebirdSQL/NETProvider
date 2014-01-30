@@ -22,9 +22,7 @@ using System.Security;
 
 namespace FirebirdSql.Data.Client.ExternalEngine
 {
-#if (!NET_CF)
 	[SuppressUnmanagedCodeSecurity]
-#endif
 	internal sealed class SafeNativeMethods
 	{
 		#region · Conditional Constants ·

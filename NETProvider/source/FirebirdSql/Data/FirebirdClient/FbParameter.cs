@@ -28,9 +28,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if	(!NET_CF)
 	[ParenthesizePropertyName(true)]
-#endif
 	public sealed class FbParameter : DbParameter, ICloneable
 	{
 		#region · Fields ·
@@ -53,19 +51,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · DbParameter properties ·
 
-#if	(!NET_CF)
 		[DefaultValue("")]
-#endif
 		public override string ParameterName
 		{
 			get { return this.parameterName; }
 			set { this.parameterName = value; }
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue(0)]
-#endif
 		public override int Size
 		{
 			get 
@@ -88,65 +82,53 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue(ParameterDirection.Input)]
-#endif
 		public override ParameterDirection Direction
 		{
 			get { return this.direction; }
 			set { this.direction = value; }
 		}
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[DesignOnly(true)]
 		[DefaultValue(false)]
 		[EditorBrowsable(EditorBrowsableState.Advanced)]
-#endif
 		public override bool IsNullable
 		{
 			get { return this.isNullable; }
 			set { this.isNullable = value; }
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue("")]
-#endif
 		public override string SourceColumn
 		{
 			get { return this.sourceColumn; }
 			set { this.sourceColumn = value; }
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue(DataRowVersion.Current)]
-#endif
 		public override DataRowVersion SourceVersion
 		{
 			get { return this.sourceVersion; }
 			set { this.sourceVersion = value; }
 		}
 
-#if	(!NET_CF)
 		[Browsable(false)]
 		[Category("Data")]
 		[RefreshProperties(RefreshProperties.All)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-#endif
 		public override DbType DbType
 		{
 			get { return TypeHelper.GetDbType((DbDataType)this.fbDbType); }
 			set { this.FbDbType = (FbDbType)TypeHelper.GetDbDataType(value); }
 		}
 
-#if	(!NET_CF)
 		[RefreshProperties(RefreshProperties.All)]
 		[Category("Data")]
 		[DefaultValue(FbDbType.VarChar)]
-#endif
 		public FbDbType FbDbType
 		{
 			get { return this.fbDbType; }
@@ -157,10 +139,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[TypeConverter(typeof(StringConverter)), DefaultValue(null)]
-#endif
 		public override object Value
 		{
 			get { return this.value; }
@@ -186,10 +166,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue(FbCharset.Default)]
-#endif
 		public FbCharset Charset
 		{
 			get { return this.charset; }
@@ -206,20 +184,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Properties ·
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue((byte)0)]
-#endif
 		public byte Precision
 		{
 			get { return this.precision; }
 			set { this.precision = value; }
 		}
 
-#if	(!NET_CF)
 		[Category("Data")]
 		[DefaultValue((byte)0)]
-#endif
 		public byte Scale
 		{
 			get { return this.scale; }
@@ -321,9 +295,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.sourceColumn = sourceColumn;
 		}
 
-#if	(!NET_CF)
 		[EditorBrowsable(EditorBrowsableState.Advanced)]
-#endif
 		public FbParameter(
 			string parameterName,
 			FbDbType dbType,

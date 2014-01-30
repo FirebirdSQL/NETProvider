@@ -19,8 +19,6 @@
  *    Jiri Cincura (jiri@cincura.net)
  */
 
-#if (!NET_CF)
-
 using System;
 using System.Collections;
 using System.Globalization;
@@ -476,5 +474,3 @@ namespace FirebirdSql.Data.Client.Native
 		#endregion
 	}
 }
-
-#endif

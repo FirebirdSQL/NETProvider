@@ -19,8 +19,6 @@
  *    Jiri Cincura (jiri@cincura.net)
  */
 
-#if (!NET_CF)
-
 using System;
 using System.Runtime.InteropServices;
 
@@ -127,5 +125,3 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		#endregion
 	}
 }
-
-#endif

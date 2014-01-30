@@ -36,7 +36,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					// Managed Client
 					return CreateManagedDatabase(options);
 
-#if (!NET_CF)
 				case FbServerType.Embedded:
 					// Native (PInvoke) Client
 					return new FirebirdSql.Data.Client.Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
@@ -44,7 +43,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				case FbServerType.Context:
 					// External Engine (PInvoke) Client
 					return new FirebirdSql.Data.Client.ExternalEngine.ExtDatabase();
-#endif
 
 				default:
 					throw new NotSupportedException("Specified server type is not correct.");
@@ -58,11 +56,9 @@ namespace FirebirdSql.Data.FirebirdClient
 				case FbServerType.Default:
 					return CreateManagedServiceManager(options);
 
-#if (!NET_CF)
 				case FbServerType.Embedded:
 					// PInvoke Client
 					return new FirebirdSql.Data.Client.Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset));
-#endif
 
 				default:
 					throw new NotSupportedException("Specified server type is not correct.");

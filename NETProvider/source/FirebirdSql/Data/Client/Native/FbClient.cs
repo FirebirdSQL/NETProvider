@@ -22,9 +22,7 @@ using System.Security;
 
 namespace FirebirdSql.Data.Client.Native
 {
-#if (!NET_CF)
 	[SuppressUnmanagedCodeSecurity]
-#endif
 	internal sealed class FbClient
 	{
 		#region · Conditional Constants ·

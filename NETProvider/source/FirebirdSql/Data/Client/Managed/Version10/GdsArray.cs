@@ -181,11 +181,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
 			// Create arrays
-#if	(NET_CF)
-			sliceData = Array.CreateInstance(systemType, lengths);
-#else
 			sliceData = Array.CreateInstance(systemType, lengths, lowerBounds);
-#endif
 			tempData = Array.CreateInstance(systemType, sliceData.Length);
 
 			// Infer Firebird and Db datatypes

@@ -28,9 +28,7 @@ using System.Collections.Generic;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if (!NET_CF)
 	[DefaultEvent("RowUpdated")]
-#endif
 	public sealed class FbDataAdapter : DbDataAdapter, ICloneable
 	{
 		#region · Static Fields ·
@@ -79,40 +77,32 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region · Properties ·
 
-#if (!NET_CF)
 		[Category("Fill")]
 		[DefaultValue(null)]
-#endif
 		public new FbCommand SelectCommand
 		{
 			get { return (FbCommand)base.SelectCommand; }
 			set { base.SelectCommand = value; }
 		}
 
-#if (!NET_CF)
 		[Category("Update")]
 		[DefaultValue(null)]
-#endif
 		public new FbCommand InsertCommand
 		{
 			get { return (FbCommand)base.InsertCommand; }
 			set { base.InsertCommand = value; }
 		}
 
-#if (!NET_CF)
 		[Category("Update")]
 		[DefaultValue(null)]
-#endif
 		public new FbCommand UpdateCommand
 		{
 			get { return (FbCommand)base.UpdateCommand; }
 			set { base.UpdateCommand = value; }
 		}
 
-#if (!NET_CF)
 		[Category("Update")]
 		[DefaultValue(null)]
-#endif
 		public new FbCommand DeleteCommand
 		{
 			get { return (FbCommand)base.DeleteCommand; }

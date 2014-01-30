@@ -20,8 +20,6 @@
  *      
  */
 
-#if (!NET_CF)
-
 using System;
 using System.Runtime.InteropServices;
 
@@ -126,5 +124,3 @@ namespace FirebirdSql.Data.Client.Native
 		#endregion
 	}
 }
-
-#endif
