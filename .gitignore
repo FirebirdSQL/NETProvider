@@ -2,4 +2,5 @@
 *.user
 bin
 obj
-out
+*/installer/out/
+DataDesignerExtensibility/installer/in/
