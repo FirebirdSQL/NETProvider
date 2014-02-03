@@ -138,54 +138,33 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				// Here	we identify	the	user to	the	engine.	 
-				// This	may	or may not be used as login	info to	a database.				
-				byte[] user = Encoding.Default.GetBytes(System.Environment.UserName);
-				byte[] host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
+				outputStream.Write(IscCodes.op_connect);
+				outputStream.Write(IscCodes.op_attach);
+				outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
+				outputStream.Write(1);							// Architecture	of client -	Generic
 
-				using (MemoryStream user_id = new MemoryStream())
-				{
-					// User	Name
-					user_id.WriteByte(1);
-					user_id.WriteByte((byte)user.Length);
-					user_id.Write(user, 0, user.Length);
+				outputStream.Write(database);					// Database	path
+				outputStream.Write(3);							// Protocol	versions understood
+				outputStream.WriteBuffer(UserIdentificationStuff());	// User	identification Stuff
 
-					// Host	name
-					user_id.WriteByte(4);
-					user_id.WriteByte((byte)host.Length);
-					user_id.Write(host, 0, host.Length);
+				outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
+				outputStream.Write(1);							// Architecture	of client -	Generic
+				outputStream.Write(2);							// Minimum type (ptype_rpc)
+				outputStream.Write(3);							// Maximum type (ptype_batch_send)
+				outputStream.Write(0);							// Preference weight
 
-					// Attach/create using this connection will use user verification
-					user_id.WriteByte(6);
-					user_id.WriteByte(0);
+				outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
+				outputStream.Write(1);							// Architecture	of client -	Generic
+				outputStream.Write(2);							// Minumum type (ptype_rpc)
+				outputStream.Write(5);							// Maximum type (ptype_lazy_send)
+				outputStream.Write(1);							// Preference weight
 
-					outputStream.Write(IscCodes.op_connect);
-					outputStream.Write(IscCodes.op_attach);
-					outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
-					outputStream.Write(1);							// Architecture	of client -	Generic
+				outputStream.Write(IscCodes.PROTOCOL_VERSION12);//	Protocol version
+				outputStream.Write(1);							// Architecture	of client -	Generic
+				outputStream.Write(2);							// Minumum type (ptype_rpc)
+				outputStream.Write(5);							// Maximum type (ptype_lazy_send)
+				outputStream.Write(2);							// Preference weight
 
-					outputStream.Write(database);					// Database	path
-					outputStream.Write(3);							// Protocol	versions understood
-					outputStream.WriteBuffer(user_id.ToArray());	// User	identification Stuff
-
-					outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
-					outputStream.Write(1);							// Architecture	of client -	Generic
-					outputStream.Write(2);							// Minimum type (ptype_rpc)
-					outputStream.Write(3);							// Maximum type (ptype_batch_send)
-					outputStream.Write(0);							// Preference weight
-
-					outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
-					outputStream.Write(1);							// Architecture	of client -	Generic
-					outputStream.Write(2);							// Minumum type (ptype_rpc)
-					outputStream.Write(5);							// Maximum type (ptype_lazy_send)
-					outputStream.Write(1);							// Preference weight
-
-					outputStream.Write(IscCodes.PROTOCOL_VERSION12);//	Protocol version
-					outputStream.Write(1);							// Architecture	of client -	Generic
-					outputStream.Write(2);							// Minumum type (ptype_rpc)
-					outputStream.Write(5);							// Maximum type (ptype_lazy_send)
-					outputStream.Write(2);							// Preference weight
-				}
 				outputStream.Flush();
 
 				if (inputStream.ReadOperation() == IscCodes.op_accept)
@@ -262,6 +241,33 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
 			return addresses[0];
+		}
+
+		private byte[] UserIdentificationStuff()
+		{
+			// Here	we identify	the	user to	the	engine.
+			// This	may	or may not be used as login	info to	a database.
+			var user = Encoding.Default.GetBytes(System.Environment.UserName);
+			var host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
+
+			using (var user_id = new MemoryStream())
+			{
+				// User	Name
+				user_id.WriteByte(1);
+				user_id.WriteByte((byte)user.Length);
+				user_id.Write(user, 0, user.Length);
+
+				// Host	name
+				user_id.WriteByte(4);
+				user_id.WriteByte((byte)host.Length);
+				user_id.Write(host, 0, host.Length);
+
+				// Attach/create using this connection will use user verification
+				user_id.WriteByte(6);
+				user_id.WriteByte(0);
+
+				return user_id.ToArray();
+			}
 		}
 
 		#endregion
