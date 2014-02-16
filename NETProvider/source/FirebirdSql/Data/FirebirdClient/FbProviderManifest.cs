@@ -418,12 +418,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private XmlReader GetStoreSchemaMapping(string mslName)
 		{
-			return GetXmlResource("FirebirdSql.Data.Entity.StoreSchemaMapping.msl");
+			return GetXmlResource(string.Format("FirebirdSql.Data.Entity.{0}.msl", mslName));
 		}
 
 		private XmlReader GetStoreSchemaDescription(string ssdlName)
 		{
-			return GetXmlResource("FirebirdSql.Data.Entity.StoreSchemaDefinition.ssdl");
+			return GetXmlResource(string.Format("FirebirdSql.Data.Entity.{0}.ssdl", ssdlName));
 		}
 
 		internal static XmlReader GetXmlResource(string resourceName)
