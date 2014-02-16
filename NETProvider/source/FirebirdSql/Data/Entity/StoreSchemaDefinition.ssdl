@@ -423,7 +423,6 @@
       </DefiningQuery>
     </EntitySet>
 
-    <!--In sample (MSSQL/ORA) it's not implemented. And for FB not related.-->
     <EntitySet Name="SViewConstraints" EntityType="Self.ViewConstraint">
       <DefiningQuery>
         -- SViewConstraints
