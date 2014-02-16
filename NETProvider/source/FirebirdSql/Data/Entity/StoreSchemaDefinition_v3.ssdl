@@ -250,37 +250,63 @@
     </EntitySet>
 	<EntitySet Name="SFunctionReturnTableColumns" EntityType="Self.FunctionReturnTableColumn">
 		<DefiningQuery>
+			-- SFunctionReturnTableColumns
 			SELECT
-			quotename(c.TABLE_SCHEMA) + quotename(c.TABLE_NAME) + quotename(c.COLUMN_NAME) [Id]
-			,   quotename(c.TABLE_SCHEMA) + quotename(c.TABLE_NAME) [ParentId]
-			,   c.COLUMN_NAME  [Name]
-			,   c.ORDINAL_POSITION [Ordinal]
-			,   CAST( CASE c.IS_NULLABLE WHEN 'YES' THEN 1 WHEN 'NO' THEN 0 ELSE 0 END as bit) [IsNullable]
-			,   CASE
-			WHEN c.DATA_TYPE in ('varchar', 'nvarchar', 'varbinary') and c.CHARACTER_MAXIMUM_LENGTH = -1 THEN c.DATA_TYPE + '(max)'
-			ELSE c.DATA_TYPE
-			END as [TypeName]
-			,   c.CHARACTER_MAXIMUM_LENGTH [MaxLength]
-			,   CAST(c.NUMERIC_PRECISION as integer) [Precision]
-			,   CAST(c.DATETIME_PRECISION as integer)[DateTimePrecision]
-			,   CAST(c.NUMERIC_SCALE as integer) [Scale]
-			,   c.COLLATION_CATALOG [CollationCatalog]
-			,   c.COLLATION_SCHEMA [CollationSchema]
-			,   c.COLLATION_NAME [CollationName]
-			,   c.CHARACTER_SET_CATALOG [CharacterSetCatalog]
-			,   c.CHARACTER_SET_SCHEMA [CharacterSetSchema]
-			,   c.CHARACTER_SET_NAME [CharacterSetName]
-			,   CAST(0 as bit) as [IsMultiSet]
-			,   CAST(columnproperty( object_id(quotename(c.TABLE_SCHEMA) + '.' + quotename(c.TABLE_NAME)), c.COLUMN_NAME, 'IsIdentity' ) as bit) as [IsIdentity]
-			,   CAST(columnproperty( object_id(quotename(c.TABLE_SCHEMA) + '.' + quotename(c.TABLE_NAME)), c.COLUMN_NAME, 'IsComputed' ) | CASE WHEN c.DATA_TYPE = 'timestamp' THEN 1 ELSE 0 END as bit) as [IsStoreGenerated]
-			, c.COLUMN_DEFAULT as [Default]
+			TRIM(pp.rdb$procedure_name) || 'x' || TRIM(pp.rdb$parameter_name) as "Id"
+			, TRIM(pp.rdb$procedure_name) as "ParentId"
+			, TRIM(pp.rdb$parameter_name) as "Name"
+			, pp.rdb$parameter_number+1 as "Ordinal"
+			, IIF(f.rdb$null_flag IS NULL, 1, 0) as "IsNullable"
+			, TRIM(CASE
+			WHEN POSITION('#BOOL#', UPPER(pp.rdb$description)) &gt; 0 THEN 'smallint_bool'
+			WHEN POSITION('#GUID#', UPPER(pp.rdb$description)) &gt; 0 THEN 'guid'
+			ELSE CASE f.rdb$field_type
+			  WHEN 7 THEN CASE
+				WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+				WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+				ELSE 'smallint'
+				END
+			  WHEN 8 THEN CASE
+				WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+				WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+				ELSE 'int'
+				END
+			  WHEN 16 THEN CASE
+				WHEN ((f.rdb$field_sub_type = 2) OR (f.rdb$field_sub_type = 0 AND f.rdb$field_scale &lt; 0)) THEN 'decimal'
+				WHEN f.rdb$field_sub_type = 1 THEN 'numeric'
+				ELSE 'bigint'
+				END
+			  WHEN 10 THEN 'float'
+			  WHEN 27 THEN 'double'
+			  WHEN 12 THEN 'date'
+			  WHEN 13 THEN 'time'
+			  WHEN 35 THEN 'timestamp'
+			  WHEN 261 THEN CASE f.rdb$field_sub_type
+				WHEN 1 THEN 'clob'
+				ELSE 'blob'
+				END
+			  WHEN 37 THEN 'varchar'
+			  WHEN 14 THEN 'char'
+			  WHEN 40 THEN 'cstring'
+			  END
+			END) as "TypeName"
+			, IIF(f.rdb$character_length = 0, 32765, f.rdb$character_length) as "MaxLength" --hot fix for CORE-2228
+			, IIF(f.rdb$field_precision = 0 AND f.rdb$field_scale &lt; 0, 18, f.rdb$field_precision) as "Precision"
+			, 4 as "DateTimePrecision"
+			, f.rdb$field_scale * (-1) as "Scale"
+			, NULL as "CollationCatalog"
+			, NULL as "CollationSchema"
+			, NULL "CollationName"
+			, NULL as "CharacterSetCatalog"
+			, NULL as "CharacterSetSchema"
+			, NULL as "CharacterSetName"
+			, 0 as "IsMultiSet"
+			, 0 as "IsIdentity"
+			, 0 as "IsStoreGenerated"
+			, NULL as "Default"
 			FROM
-			INFORMATION_SCHEMA.ROUTINE_COLUMNS c
-			INNER JOIN
-			INFORMATION_SCHEMA.ROUTINES f ON
-			c.TABLE_CATALOG = f.SPECIFIC_CATALOG AND
-			c.TABLE_SCHEMA = f.SPECIFIC_SCHEMA   AND
-			c.TABLE_NAME = f.SPECIFIC_NAME
+			rdb$procedure_parameters pp INNER JOIN rdb$fields f ON (pp.rdb$field_source = f.rdb$field_name)
+			WHERE pp.rdb$parameter_type = 1
 		</DefiningQuery>
 	</EntitySet>
 
