@@ -342,7 +342,7 @@
         , null as "CharacterSetCatalog"
         , null as "CharacterSetSchema"
         , null as "CharacterSetName"
-        , CAST(0 as smallint) as "IsMultiSet"
+        , 0 as "IsMultiSet"
         , TRIM(IIF(pp.rdb$parameter_type = 1, 'OUT', 'IN')) as "Mode"
         , NULL as "Default"
         FROM
