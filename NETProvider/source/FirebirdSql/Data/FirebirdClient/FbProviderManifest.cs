@@ -114,14 +114,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (this._primitiveTypes == null)
 			{
-				//if (this._version == StoreVersion.Sql9 || this._version == StoreVersion.Sql10)
-				//{
 				this._primitiveTypes = base.GetStoreTypes();
-				//}
-				//else
-				//{
-				//    throw new ArgumentException("SQL Server 2000 not supported via sample provider.");
-				//}
 			}
 
 			return this._primitiveTypes;
@@ -131,14 +124,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (this._functions == null)
 			{
-				//if (this._version == StoreVersion.Sql9 || this._version == StoreVersion.Sql10)
-				//{
 				this._functions = base.GetStoreFunctions();
-				//}
-				//else
-				//{
-				//    throw new ArgumentException("SQL Server 2000 not supported via sample provider.");
-				//}
 			}
 
 			return this._functions;
