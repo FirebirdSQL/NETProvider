@@ -23,7 +23,7 @@
         , TRIM(rf.rdb$field_name) as "Name"
         , rf.rdb$field_position+1 as "Ordinal"
         , IIF(COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL, 1, 0) as "IsNullable"
-        , TRIM(CASE 
+        , TRIM(CASE
         WHEN POSITION('#BOOL#', UPPER(rf.rdb$description)) &gt; 0 THEN 'smallint_bool'
         WHEN POSITION('#GUID#', UPPER(rf.rdb$description)) &gt; 0 THEN 'guid'
         ELSE CASE f.rdb$field_type
@@ -103,7 +103,7 @@
         , TRIM(rf.rdb$field_name) as "Name"
         , rf.rdb$field_position+1 as "Ordinal"
         , IIF(COALESCE(rf.rdb$null_flag, f.rdb$null_flag) IS NULL, 1, 0) as "IsNullable"
-        , TRIM(CASE 
+        , TRIM(CASE
         WHEN POSITION('#BOOL#', UPPER(rf.rdb$description)) &gt; 0 THEN 'smallint_bool'
         WHEN POSITION('#GUID#', UPPER(rf.rdb$description)) &gt; 0 THEN 'guid'
         ELSE CASE f.rdb$field_type
@@ -299,7 +299,7 @@
         , TRIM(pp.rdb$procedure_name) as "ParentId"
         , TRIM(pp.rdb$parameter_name) as "Name"
         , pp.rdb$parameter_number+1 as "Ordinal"
-        ,   TRIM(CASE 
+        , TRIM(CASE
         WHEN POSITION('#BOOL#', UPPER(pp.rdb$description)) &gt; 0 THEN 'smallint_bool'
         WHEN POSITION('#GUID#', UPPER(pp.rdb$description)) &gt; 0 THEN 'guid'
         ELSE CASE f.rdb$field_type
