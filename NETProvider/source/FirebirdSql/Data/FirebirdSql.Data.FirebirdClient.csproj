@@ -389,10 +389,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Entity\ProviderManifest.xsd" />
     <EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
     <EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
     <None Include="Entity\ConceptualSchemaDefinition.csdl" />
+    <EmbeddedResource Include="Entity\StoreSchemaDefinitionVersion3.ssdl" />
+    <EmbeddedResource Include="Entity\StoreSchemaMappingVersion3.msl" />
     <None Include="Properties\FirebirdSql.Data.FirebirdClient.snk" />
   </ItemGroup>
   <ItemGroup>
