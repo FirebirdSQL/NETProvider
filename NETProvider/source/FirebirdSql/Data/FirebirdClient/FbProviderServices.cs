@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return result;
 		}
 
-		protected FbConnection CheckAndCastToFbConnection(DbConnection connection)
+		private FbConnection CheckAndCastToFbConnection(DbConnection connection)
 		{
 			if (!(connection is FbConnection))
 			{
