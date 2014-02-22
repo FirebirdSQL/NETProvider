@@ -3,7 +3,7 @@
   <EntityContainer Name="Schema">
     <EntitySet Name="STables" EntityType="Self.Table">
       <DefiningQuery>
-        -- STables
+        -- STables3
         SELECT
         TRIM(rdb$relation_name) as "Id"
         , 'Firebird' as "CatalogName"
@@ -17,7 +17,7 @@
     </EntitySet>    
     <EntitySet Name="STableColumns" EntityType="Self.TableColumn">
       <DefiningQuery>
-        -- STableColumns
+        -- STableColumns3
         SELECT TRIM(rf.rdb$relation_name) || 'x' || TRIM(rf.rdb$field_name) as "Id"
         , TRIM(rf.rdb$relation_name) as "ParentId"
         , TRIM(rf.rdb$field_name) as "Name"
@@ -81,7 +81,7 @@
 
     <EntitySet Name="SViews" EntityType="Self.View">
       <DefiningQuery>
-        -- SViews
+        -- SViews3
         SELECT
         TRIM(rdb$relation_name) as "Id"
         , 'Firebird' as "CatalogName"
@@ -97,7 +97,7 @@
     </EntitySet>   
     <EntitySet Name="SViewColumns" EntityType="Self.ViewColumn">
       <DefiningQuery>
-        -- SViewColumns
+        -- SViewColumns3
         SELECT TRIM(rf.rdb$relation_name) || 'x' || TRIM(rf.rdb$field_name) as "Id"
         , TRIM(rf.rdb$relation_name) as "ParentId"
         , TRIM(rf.rdb$field_name) as "Name"
@@ -161,7 +161,7 @@
 
     <EntitySet Name="SFunctions" EntityType="Self.Function">
       <DefiningQuery>
-		  -- SFunctions
+		  -- SFunctions3
 		  SELECT
 		  TRIM(rdb$procedure_name) as "Id"
 		  , 'Firebird' as "CatalogName"
@@ -191,7 +191,7 @@
     </EntitySet>
     <EntitySet Name="SFunctionParameters" EntityType="Self.Parameter">
       <DefiningQuery>
-        -- SFunctionParameters        
+        -- SFunctionParameters3
         SELECT
         TRIM(pp.rdb$procedure_name) || 'x' || TRIM(pp.rdb$parameter_name) as "Id"
         , TRIM(pp.rdb$procedure_name) as "ParentId"
@@ -250,7 +250,7 @@
     </EntitySet>
 	<EntitySet Name="SFunctionReturnTableColumns" EntityType="Self.FunctionReturnTableColumn">
 		<DefiningQuery>
-			-- SFunctionReturnTableColumns
+			-- SFunctionReturnTableColumns3
 			SELECT
 			TRIM(pp.rdb$procedure_name) || 'x' || TRIM(pp.rdb$parameter_name) as "Id"
 			, TRIM(pp.rdb$procedure_name) as "ParentId"
@@ -312,7 +312,7 @@
 
     <EntitySet Name="SProcedures" EntityType="Self.Procedure">
       <DefiningQuery>
-        -- SProcedures
+        -- SProcedures3
         SELECT
         TRIM(rdb$procedure_name) as "Id"
         , 'Firebird' as "CatalogName"
@@ -326,7 +326,7 @@
     </EntitySet>
     <EntitySet Name="SProcedureParameters" EntityType="Self.Parameter">
       <DefiningQuery>
-        -- SProcedureParameters
+        -- SProcedureParameters3
         SELECT
         TRIM(pp.rdb$procedure_name) || 'x' || TRIM(pp.rdb$parameter_name) as "Id"
         , TRIM(pp.rdb$procedure_name) as "ParentId"
@@ -386,7 +386,7 @@
 
     <EntitySet Name="SConstraints" EntityType="Self.Constraint">
       <DefiningQuery>
-        -- SConstraints
+        -- SConstraints3
         SELECT
         TRIM(rc.rdb$constraint_name) as "Id"
         , TRIM(rc.rdb$relation_name) as "ParentId"
@@ -402,7 +402,7 @@
     </EntitySet>
     <EntitySet Name="SCheckConstraints" EntityType="Self.CheckConstraint">
       <DefiningQuery>
-        -- SCheckConstraints
+        -- SCheckConstraints3
         SELECT
         TRIM(rc.rdb$constraint_name) as "Id"
         , TRIM(SUBSTRING(trg.rdb$trigger_source from 6)) as "Expression"
@@ -416,7 +416,7 @@
     </EntitySet>
     <EntitySet Name="SConstraintColumns" EntityType="Self.ConstraintColumn">
       <DefiningQuery>
-        -- SConstraintColumns
+        -- SConstraintColumns3
         SELECT
         TRIM(rc.rdb$constraint_name) as "ConstraintId"
         , TRIM(rc.rdb$relation_name) || 'x' || TRIM(ise.rdb$field_name) as "ColumnId"
@@ -429,7 +429,7 @@
     
     <EntitySet Name="SForeignKeyConstraints" EntityType="Self.ForeignKeyConstraint">
       <DefiningQuery>
-        -- SForeignKeyConstraints
+        -- SForeignKeyConstraints3
         SELECT
         TRIM(rc.rdb$constraint_name) as "Id"
         , rc.rdb$update_rule "UpdateRule"
@@ -440,7 +440,7 @@
     </EntitySet>
     <EntitySet Name="SForeignKeys" EntityType="Self.ForeignKey">
       <DefiningQuery>
-        -- SForeignKeys
+        -- SForeignKeys3
         SELECT
         TRIM(refc.rdb$constraint_name) || 'x' || TRIM(is2.rdb$field_position+1) as "Id"
         , TRIM(relc1.rdb$relation_name) || 'x' || TRIM(is1.rdb$field_name) as "FromColumnId"
@@ -458,7 +458,7 @@
 
     <EntitySet Name="SViewConstraints" EntityType="Self.ViewConstraint">
       <DefiningQuery>
-        -- SViewConstraints
+        -- SViewConstraints3
         SELECT
         CAST(NULL as varchar(1)) as "Id"
         , CAST(NULL as varchar(1)) as "ParentId"
@@ -475,7 +475,7 @@
     </EntitySet>
     <EntitySet Name="SViewConstraintColumns" EntityType="Self.ConstraintColumn">
       <DefiningQuery>
-        -- SViewConstraintColumns
+        -- SViewConstraintColumns3
         SELECT
         CAST(NULL as varchar(1)) as "ConstraintId"
         , CAST(NULL as varchar(1)) as "ColumnId"
@@ -485,7 +485,7 @@
     </EntitySet>
     <EntitySet Name="SViewForeignKeys" EntityType="Self.ForeignKey">
       <DefiningQuery>
-        -- SViewForeignKeys
+        -- SViewForeignKeys3
         SELECT
         CAST(NULL as varchar(1)) as "Id"
         , CAST(NULL as varchar(1)) as "ToColumnId"
