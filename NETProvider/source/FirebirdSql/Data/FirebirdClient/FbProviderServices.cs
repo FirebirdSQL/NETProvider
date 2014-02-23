@@ -34,6 +34,8 @@ using System.Data.Metadata.Edm;
 using System.Data.Entity.Core.Common;
 using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.Entity.Core.Metadata.Edm;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Infrastructure.DependencyResolution;
 #endif
 
 using FirebirdSql.Data.Entity;
@@ -47,7 +49,14 @@ namespace FirebirdSql.Data.FirebirdClient
 	public class FbProviderServices : DbProviderServices
 #pragma warning restore 3009
 	{
-		internal static readonly FbProviderServices Instance = new FbProviderServices();
+		public static readonly FbProviderServices Instance = new FbProviderServices();
+
+		FbProviderServices()
+		{
+#if (EF_6)
+			AddDependencyResolver(new SingletonDependencyResolver<IDbConnectionFactory>(new FbConnectionFactory()));
+#endif
+		}
 
 		protected override DbCommandDefinition CreateDbCommandDefinition(DbProviderManifest manifest, DbCommandTree commandTree)
 		{
