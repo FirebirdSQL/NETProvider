@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		protected override XmlReader GetDbInformation(string informationType)
 		{
 			if (informationType == DbProviderManifest.StoreSchemaDefinition
-#if (NET_45)
+#if (NET_45 || EF_6)
 				|| informationType == DbProviderManifest.StoreSchemaDefinitionVersion3
 #endif
 				)
@@ -93,14 +93,14 @@ namespace FirebirdSql.Data.FirebirdClient
 				return GetStoreSchemaDescription(informationType);
 			}
 			if (informationType == DbProviderManifest.StoreSchemaMapping
-#if (NET_45)
+#if (NET_45 || EF_6)
 				|| informationType == DbProviderManifest.StoreSchemaMappingVersion3
 #endif
 				)
 			{
 				return GetStoreSchemaMapping(informationType);
 			}
-#if (NET_45)
+#if (NET_45 || EF_6)
 			if (informationType == DbProviderManifest.ConceptualSchemaDefinition || informationType == DbProviderManifest.ConceptualSchemaDefinitionVersion3)
 			{
 				return null;
