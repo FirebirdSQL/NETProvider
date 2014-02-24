@@ -181,7 +181,7 @@
 		  , 0 as "ReturnIsMultiSet"
 		  , 0 as "IsAggregate"
 		  , 0 as "IsBuiltIn"
-		  , IIF(COALESCE(rdb$procedure_outputs, 0) = 0, 1, 0) as "IsNiladic"
+		  , IIF(COALESCE(rdb$procedure_inputs, 0) = 0, 1, 0) as "IsNiladic"
 		  , 1 as "IsTvf"
 		  FROM
 		  rdb$procedures
