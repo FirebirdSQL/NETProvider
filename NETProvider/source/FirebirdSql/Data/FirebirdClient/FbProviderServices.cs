@@ -381,7 +381,12 @@ namespace FirebirdSql.Data.FirebirdClient
 						for (int i = 0; i < resultsAsStructuralType.Members.Count; i++)
 						{
 							var member = resultsAsStructuralType.Members[i];
-							result[i] = ((PrimitiveType)member.TypeUsage.EdmType).ClrEquivalentType;
+							var type = ((PrimitiveType)member.TypeUsage.EdmType).ClrEquivalentType;
+							if (type.IsValueType && MetadataHelpers.IsNullable(member.TypeUsage))
+							{
+								type = typeof(Nullable<>).MakeGenericType(type);
+							}
+							result[i] = type;
 						}
 						return result;
 					}

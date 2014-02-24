@@ -428,10 +428,21 @@ namespace FirebirdSql.Data.FirebirdClient
 #if (!(NET_35 && !ENTITY_FRAMEWORK))
 			// type coercions for EF
 			if (this.command.ExpectedColumnTypes != null)
-				if (this.command.ExpectedColumnTypes.ElementAtOrDefault(i) == typeof(bool))
+			{
+				var type = this.command.ExpectedColumnTypes.ElementAtOrDefault(i);
+				var nullableUnderlying = Nullable.GetUnderlyingType(type);
+				if (nullableUnderlying != null && nullableUnderlying == typeof(bool))
+				{
+					return this.IsDBNull(i)
+						? (bool?)null
+						: this.GetBoolean(i);
+
+				}
+				if (type == typeof(bool))
 				{
 					return this.GetBoolean(i);
 				}
+			}
 #endif
 
 			this.CheckState();
