@@ -655,7 +655,7 @@
     <Property Name="ReturnCharacterSetCatalog" Type="varchar" MaxLength="128" />
     <Property Name="ReturnCharacterSetSchema" Type="varchar" MaxLength="128" />
     <Property Name="ReturnCharacterSetName" Type="varchar" MaxLength="128" />
-    <Property Name="ReturnIsMultiSet" Nullable="false" Type="smallint_bool" />
+    <Property Name="ReturnIsMultiSet" Type="smallint_bool" />
     <Property Name="IsAggregate" Type="smallint_bool" />
     <Property Name="IsBuiltIn" Type="smallint_bool" />
     <Property Name="IsNiladic" Type="smallint_bool" />
