@@ -431,12 +431,16 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				var type = this.command.ExpectedColumnTypes.ElementAtOrDefault(i);
 				var nullableUnderlying = Nullable.GetUnderlyingType(type);
-				if (nullableUnderlying != null && nullableUnderlying == typeof(bool))
+				if (nullableUnderlying != null)
 				{
-					return this.IsDBNull(i)
-						? (bool?)null
-						: this.GetBoolean(i);
-
+					if (this.IsDBNull(i))
+					{
+						return null;
+					}
+					if (nullableUnderlying == typeof(bool))
+					{
+						return this.GetBoolean(i);
+					}
 				}
 				if (type == typeof(bool))
 				{
@@ -755,7 +759,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (!columnsIndexesOrdinal.TryGetValue(name, out index))
 				if (!columnsIndexesOrdinalCI.TryGetValue(name, out index))
 					if (!columnsIndexesInvariantCI.TryGetValue(name, out index))
-							throw new IndexOutOfRangeException("Could not find specified column in results.");
+						throw new IndexOutOfRangeException("Could not find specified column in results.");
 			return index;
 		}
 
