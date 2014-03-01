@@ -62,8 +62,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		/// <param name="manifestToken">A token used to infer the capabilities of the store</param>
 		public FbProviderManifest(string manifestToken)
 			: base(FbProviderManifest.GetProviderManifest())
-		{
-		}
+		{ }
 
 		#endregion
 

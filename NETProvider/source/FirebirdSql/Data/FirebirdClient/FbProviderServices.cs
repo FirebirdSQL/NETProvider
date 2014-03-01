@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		public static readonly FbProviderServices Instance = new FbProviderServices();
 
-		FbProviderServices()
+		private FbProviderServices()
 		{
 #if (EF_6)
 			AddDependencyResolver(new SingletonDependencyResolver<IDbConnectionFactory>(new FbConnectionFactory()));
