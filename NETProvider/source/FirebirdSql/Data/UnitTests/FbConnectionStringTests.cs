@@ -19,8 +19,9 @@
 using System;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Reflection;
-
+using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
@@ -120,6 +121,19 @@ namespace FirebirdSql.Data.UnitTests
 			var cs = new FbConnectionString(ConnectionString);
 			Assert.AreEqual("Termine", cs.Database);
 			Assert.AreEqual("", cs.Role);
+		}
+
+		[Test]
+		public void NormalizedConnectionStringIgnoresCultureTest()
+		{
+			const string ConnectionString = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd";
+			var cs = new FbConnectionString(ConnectionString);
+			Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-GB");
+			var s1 = cs.NormalizedConnectionString;
+			Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("cs-CZ");
+			var s2 = cs.NormalizedConnectionString;
+
+			Assert.AreEqual(s1, s2);
 		}
 	}
 }
