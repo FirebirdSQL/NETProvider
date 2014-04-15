@@ -137,43 +137,49 @@ namespace FirebirdSql.Data.Entity
 			commandText.Append("INSERT INTO ");
 			tree.Target.Expression.Accept(translator);
 
-			// (c1, c2, c3, ...)
-			commandText.Append("(");
-
-			foreach (DbSetClause setClause in tree.SetClauses)
+			if (tree.SetClauses.Any())
 			{
-				if (first)
-				{
-					first = false;
-				}
-				else
-				{
-					commandText.Append(", ");
-				}
-				setClause.Property.Accept(translator);
-			}
-			commandText.AppendLine(")");
+				// (c1, c2, c3, ...)
+				commandText.Append("(");
 
-			// values c1, c2, ...
-			first = true;
-			commandText.Append("VALUES (");
-			foreach (DbSetClause setClause in tree.SetClauses)
+				foreach (DbSetClause setClause in tree.SetClauses)
+				{
+					if (first)
+					{
+						first = false;
+					}
+					else
+					{
+						commandText.Append(", ");
+					}
+					setClause.Property.Accept(translator);
+				}
+				commandText.AppendLine(")");
+
+				// values c1, c2, ...
+				first = true;
+				commandText.Append("VALUES (");
+				foreach (DbSetClause setClause in tree.SetClauses)
+				{
+					if (first)
+					{
+						first = false;
+					}
+					else
+					{
+						commandText.Append(", ");
+					}
+
+					setClause.Value.Accept(translator);
+
+					translator.RegisterMemberValue(setClause.Property, setClause.Value);
+				}
+				commandText.AppendLine(")");
+			}
+			else
 			{
-				if (first)
-				{
-					first = false;
-				}
-				else
-				{
-					commandText.Append(", ");
-				}
-
-				setClause.Value.Accept(translator);
-
-				translator.RegisterMemberValue(setClause.Property, setClause.Value);
+				commandText.AppendLine("DEFAULT VALUES");
 			}
-			commandText.AppendLine(")");
-
 			// generate returning sql
 			GenerateReturningSql(commandText, tree, translator, tree.Returning);
 
@@ -236,23 +242,28 @@ namespace FirebirdSql.Data.Entity
 			StringBuilder startBlock = new StringBuilder();
 			string separator = string.Empty;
 
-			startBlock.AppendLine("EXECUTE BLOCK (");
-			separator = string.Empty;
-			foreach (FbParameter param in translator.Parameters)
+			startBlock.Append("EXECUTE BLOCK ");
+			if (translator.Parameters.Any())
 			{
-				startBlock.Append(separator);
-				startBlock.Append(param.ParameterName.Replace("@", string.Empty));
-				startBlock.Append(" ");
-				EdmMember member = translator.MemberValues.First(m => m.Value.Contains(param)).Key;
-				startBlock.Append(SqlGenerator.GetSqlPrimitiveType(member.TypeUsage));
-				if (param.FbDbType == FbDbType.VarChar || param.FbDbType == FbDbType.Char)
-					startBlock.Append(" CHARACTER SET UTF8");
-				startBlock.Append(" = ");
-				startBlock.Append(param.ParameterName);
+				startBlock.AppendLine("(");
+				separator = string.Empty;
+				foreach (FbParameter param in translator.Parameters)
+				{
+					startBlock.Append(separator);
+					startBlock.Append(param.ParameterName.Replace("@", string.Empty));
+					startBlock.Append(" ");
+					EdmMember member = translator.MemberValues.First(m => m.Value.Contains(param)).Key;
+					startBlock.Append(SqlGenerator.GetSqlPrimitiveType(member.TypeUsage));
+					if (param.FbDbType == FbDbType.VarChar || param.FbDbType == FbDbType.Char)
+						startBlock.Append(" CHARACTER SET UTF8");
+					startBlock.Append(" = ");
+					startBlock.Append(param.ParameterName);
 
-				separator = ", ";
+					separator = ", ";
+				}
+				startBlock.AppendLine();
+				startBlock.Append(") ");
 			}
-			startBlock.AppendLine(") ");
 
 			startBlock.AppendLine("RETURNS (");
 			separator = string.Empty;
