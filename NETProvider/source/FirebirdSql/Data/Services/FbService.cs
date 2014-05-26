@@ -214,29 +214,49 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		protected ArrayList GetNext(byte[] items)
+		protected ArrayList Query(byte[] items)
 		{
 			var result = new ArrayList();
-			var truncated = default(bool);
-			do
+			this.Query(items, (truncated, item) =>
 			{
-#warning If truncated append to previous
-				var buffer = this.QueryService(items);
-				var item = this.ParseQueryInfo(buffer, out truncated);
-				result.AddRange(item);
-			} while (truncated);
+				var stringItem = item as string;
+				if (stringItem != null)
+				{
+					if (!truncated)
+					{
+						result.Add(stringItem);
+					}
+					else
+					{
+						var lastValue = result[result.Count - 1] as string;
+						result[result.Count - 1] = lastValue + stringItem;
+					}
+					return;
+				}
+
+				var byteArrayItem = item as byte[];
+				if (byteArrayItem != null)
+				{
+					if (!truncated)
+					{
+						result.Add(byteArrayItem);
+					}
+					else
+					{
+						var lastValue = result[result.Count - 1] as byte[];
+						var lastValueLength = lastValue.Length;
+						Array.Resize(ref lastValue, lastValue.Length + byteArrayItem.Length);
+						Array.Copy(byteArrayItem, 0, lastValue, lastValueLength, byteArrayItem.Length);
+					}
+					return;
+				}
+			});
 			return result;
 		}
 
-		protected void GetNext()
-		{ }
-
-		protected string GetNextLine()
+		protected void Query(byte[] items, Action<bool, object> resultAction)
 		{
-			ArrayList info = this.GetNext(new byte[] { IscCodes.isc_info_svc_line });
-			if (info.Count == 0)
-				return null;
-			return info[0] as string;
+			this.ProcessQuery(items, resultAction);
 		}
 
 		protected void ProcessServiceOutput()
@@ -252,9 +272,94 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
+		protected string GetNextLine()
+		{
+			var info = this.Query(new byte[] { IscCodes.isc_info_svc_line });
+			if (info.Count == 0)
+				return null;
+			return info[0] as string;
+		}
+
 		#endregion
 
 		#region · Private Methods ·
+
+		private void ProcessQuery(byte[] items, Action<bool, object> queryResponseAction)
+		{
+			var pos = 0;
+			var truncated = false;
+			var type = default(int);
+			var length = default(int);
+
+			var buffer = this.QueryService(items);
+
+			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
+			{
+				if (type == IscCodes.isc_info_truncated)
+				{
+					buffer = this.QueryService(items);
+					pos = 0;
+					truncated = true;
+					continue;
+				}
+
+				length = IscHelper.VaxInteger(buffer, pos, 2);
+				pos += 2;
+
+				if (length != 0)
+				{
+					switch (type)
+					{
+						case IscCodes.isc_info_svc_version:
+						case IscCodes.isc_info_svc_get_license_mask:
+						case IscCodes.isc_info_svc_capabilities:
+						case IscCodes.isc_info_svc_get_licensed_users:
+							queryResponseAction(truncated, IscHelper.VaxInteger(buffer, pos, 4));
+							pos += length;
+							truncated = false;
+							break;
+
+						case IscCodes.isc_info_svc_server_version:
+						case IscCodes.isc_info_svc_implementation:
+						case IscCodes.isc_info_svc_get_env:
+						case IscCodes.isc_info_svc_get_env_lock:
+						case IscCodes.isc_info_svc_get_env_msg:
+						case IscCodes.isc_info_svc_user_dbpath:
+						case IscCodes.isc_info_svc_line:
+							{
+								queryResponseAction(truncated, Encoding.Default.GetString(buffer, pos, length));
+								pos += length;
+								truncated = false;
+							}
+							break;
+						case IscCodes.isc_info_svc_to_eof:
+							{
+								var block = new byte[length];
+								Array.Copy(buffer, pos, block, 0, length);
+								queryResponseAction(truncated, block);
+								pos += length;
+								truncated = false;
+							}
+							break;
+
+						case IscCodes.isc_info_svc_svr_db_info:
+							queryResponseAction(truncated, ParseDatabasesInfo(buffer, ref pos));
+							truncated = false;
+							break;
+
+						case IscCodes.isc_info_svc_get_users:
+							queryResponseAction(truncated, ParseUserData(buffer, ref pos));
+							truncated = false;
+							break;
+
+						case IscCodes.isc_info_svc_get_config:
+							queryResponseAction(truncated, ParseServerConfig(buffer, ref pos));
+							truncated = false;
+							break;
+					}
+				}
+			}
+		}
 
 		private byte[] QueryService(byte[] items)
 		{
@@ -284,73 +389,6 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private ArrayList ParseQueryInfo(byte[] buffer, out bool truncated)
-		{
-			truncated = false;
-			int pos = 0;
-			int length = 0;
-			int type = 0;
-
-			ArrayList items = new ArrayList();
-
-			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
-			{
-				if (type == IscCodes.isc_info_truncated)
-				{
-					truncated = true;
-					break;
-				}
-
-				length = IscHelper.VaxInteger(buffer, pos, 2);
-				pos += 2;
-
-				if (length != 0)
-				{
-					switch (type)
-					{
-						case IscCodes.isc_info_svc_version:
-						case IscCodes.isc_info_svc_get_license_mask:
-						case IscCodes.isc_info_svc_capabilities:
-						case IscCodes.isc_info_svc_get_licensed_users:
-							items.Add(IscHelper.VaxInteger(buffer, pos, 4));
-							pos += length;
-							break;
-
-						case IscCodes.isc_info_svc_server_version:
-						case IscCodes.isc_info_svc_implementation:
-						case IscCodes.isc_info_svc_get_env:
-						case IscCodes.isc_info_svc_get_env_lock:
-						case IscCodes.isc_info_svc_get_env_msg:
-						case IscCodes.isc_info_svc_user_dbpath:
-						case IscCodes.isc_info_svc_line:
-							items.Add(Encoding.Default.GetString(buffer, pos, length));
-							pos += length;
-							break;
-						case IscCodes.isc_info_svc_to_eof:
-							var block = new byte[length];
-							Array.Copy(buffer, pos, block, 0, length);
-							items.Add(block);
-							pos += length;
-							break;
-
-						case IscCodes.isc_info_svc_svr_db_info:
-							items.Add(ParseDatabasesInfo(buffer, ref pos));
-							break;
-
-						case IscCodes.isc_info_svc_get_users:
-							items.Add(ParseUserData(buffer, ref	pos));
-							break;
-
-						case IscCodes.isc_info_svc_get_config:
-							items.Add(ParseServerConfig(buffer, ref	pos));
-							break;
-					}
-				}
-			}
-
-			return items;
-		}
-		
 		#endregion
 
 		#region · Private Static Methods ·

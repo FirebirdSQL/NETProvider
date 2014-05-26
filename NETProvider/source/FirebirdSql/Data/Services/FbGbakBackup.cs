@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Services
 	{
 		public FbBackupFlags Options { get; set; }
 		public Stream OutputStream { get; set; }
-		
+
 		public void Execute()
 		{
 			try
@@ -66,18 +66,11 @@ namespace FirebirdSql.Data.Services
 
 		void ReadOutput()
 		{
-			ArrayList info;
-			while (true)
+			this.Query(new byte[] { IscCodes.isc_info_svc_to_eof }, (_, x)=>
 			{
-				info = this.GetNext(new byte[] { IscCodes.isc_info_svc_to_eof });
-				if (info.Count == 0)
-					break;
-				foreach (var item in info)
-				{
-					var buffer = item as byte[];
-					OutputStream.Write(buffer, 0, buffer.Length);
-				}
-			}
+				var buffer = x as byte[];
+				OutputStream.Write(buffer, 0, buffer.Length);
+			});
 		}
 	}
 }

@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.Services
 
 		private ArrayList GetInfo(byte[] items)
 		{
-			return this.GetNext(items);
+			return this.Query(items);
 		}
 
 		#endregion
