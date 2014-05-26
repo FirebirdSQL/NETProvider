@@ -234,14 +234,9 @@ namespace FirebirdSql.Data.Services
 		protected string GetNextLine()
 		{
 			ArrayList info = this.GetNext(new byte[] { IscCodes.isc_info_svc_line });
-			if (info.Count != 0)
-			{
-				return info[0] as string;
-			}
-			else
-			{
+			if (info.Count == 0)
 				return null;
-			}
+			return info[0] as string;
 		}
 
 		protected void ProcessServiceOutput()
