@@ -43,7 +43,6 @@ namespace FirebirdSql.Data.Services
 
 		private IServiceManager svc;
 		private FbServiceState state;
-		private ServiceParameterBuffer querySpb;
 		private FbConnectionString csManager;
 		private string connectionString;
 		private string serviceName;
@@ -215,104 +214,26 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		protected byte[] QueryService(byte[] items)
-		{
-			bool shouldClose = false;
-			if (this.state == FbServiceState.Closed)
-			{
-				// Attach to Service Manager
-				this.Open();
-				shouldClose = true;
-			}
-
-			if (this.querySpb == null)
-			{
-				this.querySpb = new ServiceParameterBuffer();
-			}
-
-			try
-			{
-				// Response	buffer
-				byte[] buffer = new byte[this.queryBufferSize];
-				this.svc.Query(this.querySpb, items.Length, items, buffer.Length, buffer);
-				return buffer;
-			}
-			finally
-			{
-				if (shouldClose)
-				{
-					this.Close();
-				}
-			}
-		}
-
-		protected ArrayList ParseQueryInfo(byte[] buffer)
-		{
-			int pos = 0;
-			int length = 0;
-			int type = 0;
-
-			ArrayList items = new ArrayList();
-
-			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
-			{
-				length = IscHelper.VaxInteger(buffer, pos, 2);
-				pos += 2;
-
-				if (length != 0)
-				{
-					switch (type)
-					{
-						case IscCodes.isc_info_svc_version:
-						case IscCodes.isc_info_svc_get_license_mask:
-						case IscCodes.isc_info_svc_capabilities:
-						case IscCodes.isc_info_svc_get_licensed_users:
-							items.Add(IscHelper.VaxInteger(buffer, pos, 4));
-							pos += length;
-							break;
-
-						case IscCodes.isc_info_svc_server_version:
-						case IscCodes.isc_info_svc_implementation:
-						case IscCodes.isc_info_svc_get_env:
-						case IscCodes.isc_info_svc_get_env_lock:
-						case IscCodes.isc_info_svc_get_env_msg:
-						case IscCodes.isc_info_svc_user_dbpath:
-						case IscCodes.isc_info_svc_line:
-						case IscCodes.isc_info_svc_to_eof:
-							items.Add(Encoding.Default.GetString(buffer, pos, length));
-							pos += length;
-							break;
-
-						case IscCodes.isc_info_svc_svr_db_info:
-							items.Add(ParseDatabasesInfo(buffer, ref pos));
-							break;
-
-						case IscCodes.isc_info_svc_get_users:
-							items.Add(ParseUserData(buffer, ref	pos));
-							break;
-
-						case IscCodes.isc_info_svc_get_config:
-							items.Add(ParseServerConfig(buffer, ref	pos));
-							break;
-					}
-				}
-			}
-
-			return items;
-		}
-
 		protected ArrayList GetNext(byte[] items)
 		{
-			this.querySpb = new ServiceParameterBuffer();
-
-			byte[] buffer = this.QueryService(items);
-
-			return this.ParseQueryInfo(buffer);
+			var result = new ArrayList();
+			var truncated = default(bool);
+			do
+			{
+#warning If truncated append to previous
+				var buffer = this.QueryService(items);
+				var item = this.ParseQueryInfo(buffer, out truncated);
+				result.AddRange(item);
+			} while (truncated);
+			return result;
 		}
+
+		protected void GetNext()
+		{ }
 
 		protected string GetNextLine()
 		{
-			ArrayList info = GetNext(new byte[] { IscCodes.isc_info_svc_line });
+			ArrayList info = this.GetNext(new byte[] { IscCodes.isc_info_svc_line });
 			if (info.Count != 0)
 			{
 				return info[0] as string;
@@ -336,6 +257,105 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
+		#endregion
+
+		#region · Private Methods ·
+
+		private byte[] QueryService(byte[] items)
+		{
+			bool shouldClose = false;
+			if (this.state == FbServiceState.Closed)
+			{
+				// Attach to Service Manager
+				this.Open();
+				shouldClose = true;
+			}
+
+			var querySpb = new ServiceParameterBuffer();
+
+			try
+			{
+				// Response	buffer
+				byte[] buffer = new byte[this.queryBufferSize];
+				this.svc.Query(querySpb, items.Length, items, buffer.Length, buffer);
+				return buffer;
+			}
+			finally
+			{
+				if (shouldClose)
+				{
+					this.Close();
+				}
+			}
+		}
+
+		private ArrayList ParseQueryInfo(byte[] buffer, out bool truncated)
+		{
+			truncated = false;
+			int pos = 0;
+			int length = 0;
+			int type = 0;
+
+			ArrayList items = new ArrayList();
+
+			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
+			{
+				if (type == IscCodes.isc_info_truncated)
+				{
+					truncated = true;
+					break;
+				}
+
+				length = IscHelper.VaxInteger(buffer, pos, 2);
+				pos += 2;
+
+				if (length != 0)
+				{
+					switch (type)
+					{
+						case IscCodes.isc_info_svc_version:
+						case IscCodes.isc_info_svc_get_license_mask:
+						case IscCodes.isc_info_svc_capabilities:
+						case IscCodes.isc_info_svc_get_licensed_users:
+							items.Add(IscHelper.VaxInteger(buffer, pos, 4));
+							pos += length;
+							break;
+
+						case IscCodes.isc_info_svc_server_version:
+						case IscCodes.isc_info_svc_implementation:
+						case IscCodes.isc_info_svc_get_env:
+						case IscCodes.isc_info_svc_get_env_lock:
+						case IscCodes.isc_info_svc_get_env_msg:
+						case IscCodes.isc_info_svc_user_dbpath:
+						case IscCodes.isc_info_svc_line:
+							items.Add(Encoding.Default.GetString(buffer, pos, length));
+							pos += length;
+							break;
+						case IscCodes.isc_info_svc_to_eof:
+							var block = new byte[length];
+							Array.Copy(buffer, pos, block, 0, length);
+							items.Add(block);
+							pos += length;
+							break;
+
+						case IscCodes.isc_info_svc_svr_db_info:
+							items.Add(ParseDatabasesInfo(buffer, ref pos));
+							break;
+
+						case IscCodes.isc_info_svc_get_users:
+							items.Add(ParseUserData(buffer, ref	pos));
+							break;
+
+						case IscCodes.isc_info_svc_get_config:
+							items.Add(ParseServerConfig(buffer, ref	pos));
+							break;
+					}
+				}
+			}
+
+			return items;
+		}
+		
 		#endregion
 
 		#region · Private Static Methods ·

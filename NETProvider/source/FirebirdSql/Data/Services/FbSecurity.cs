@@ -196,9 +196,7 @@ namespace FirebirdSql.Data.Services
 			// Start execution
 			this.StartTask();
 
-			byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_get_users });
-
-			ArrayList info = base.ParseQueryInfo(buffer);
+			ArrayList info = this.GetNext(new byte[] { IscCodes.isc_info_svc_get_users });
 
 			this.Close();
 
@@ -224,9 +222,7 @@ namespace FirebirdSql.Data.Services
 			// Start execution
 			this.StartTask();
 
-			byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_get_users });
-
-			ArrayList info = base.ParseQueryInfo(buffer);
+			ArrayList info = this.GetNext(new byte[] { IscCodes.isc_info_svc_get_users });
 
 			this.Close();
 
@@ -240,8 +236,7 @@ namespace FirebirdSql.Data.Services
 
 		public string GetUsersDbPath()
 		{
-			byte[] buffer = this.QueryService(new byte[] { IscCodes.isc_info_svc_user_dbpath });
-			System.Collections.ArrayList info = this.ParseQueryInfo(buffer);
+			ArrayList info = this.GetNext(new byte[] { IscCodes.isc_info_svc_user_dbpath });
 			return info.Count != 0 ? (string)info[0] : null;
 		}
 
