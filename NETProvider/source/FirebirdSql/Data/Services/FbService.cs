@@ -250,6 +250,8 @@ namespace FirebirdSql.Data.Services
 					}
 					return;
 				}
+
+				result.Add(item);
 			});
 			return result;
 		}
