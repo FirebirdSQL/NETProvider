@@ -301,14 +301,18 @@ namespace FirebirdSql.Data.Services
 			return items;
 		}
 
-		protected string GetNextLine()
+		protected ArrayList GetNext(byte[] items)
 		{
 			this.querySpb = new ServiceParameterBuffer();
 
-			byte[] items = new byte[] { IscCodes.isc_info_svc_line };
 			byte[] buffer = this.QueryService(items);
 
-			ArrayList info = this.ParseQueryInfo(buffer);
+			return this.ParseQueryInfo(buffer);
+		}
+
+		protected string GetNextLine()
+		{
+			ArrayList info = GetNext(new byte[] { IscCodes.isc_info_svc_line });
 			if (info.Count != 0)
 			{
 				return info[0] as string;
