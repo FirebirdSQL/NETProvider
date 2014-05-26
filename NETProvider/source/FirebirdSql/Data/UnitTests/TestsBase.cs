@@ -20,6 +20,8 @@ using System;
 using System.Text;
 using System.Configuration;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 
 using NUnit.Framework;
@@ -416,14 +418,14 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.UserID		= ConfigurationManager.AppSettings["User"];
-			cs.Password		= ConfigurationManager.AppSettings["Password"];
-			cs.Database		= ConfigurationManager.AppSettings["Database"];
-			cs.DataSource	= ConfigurationManager.AppSettings["DataSource"];
-			cs.Port			= Int32.Parse(ConfigurationManager.AppSettings["Port"]);
-			cs.Charset		= ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling		= false;
-			cs.ServerType	= (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
+			cs.UserID = ConfigurationManager.AppSettings["User"];
+			cs.Password = ConfigurationManager.AppSettings["Password"];
+			cs.Database = ConfigurationManager.AppSettings["Database"];
+			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
+			cs.Port = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
+			cs.Charset = ConfigurationManager.AppSettings["Charset"];
+			cs.Pooling = false;
+			cs.ServerType = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
 
 			return cs.ToString();
 		}
@@ -437,14 +439,14 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.DataSource   = ConfigurationManager.AppSettings["DataSource"];
-			cs.UserID       = ConfigurationManager.AppSettings["User"];
-			cs.Password     = ConfigurationManager.AppSettings["Password"];
+			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
+			cs.UserID = ConfigurationManager.AppSettings["User"];
+			cs.Password = ConfigurationManager.AppSettings["Password"];
 			if (includeDatabase)
 			{
 				cs.Database = ConfigurationManager.AppSettings["Database"];
 			}
-			cs.ServerType   = (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
+			cs.ServerType = (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
 
 			return cs.ToString();
 		}
@@ -453,14 +455,14 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.UserID       = ConfigurationManager.AppSettings["User"];
-			cs.Password     = ConfigurationManager.AppSettings["Password"];
-			cs.Database     = ConfigurationManager.AppSettings["Database"];
-			cs.DataSource   = ConfigurationManager.AppSettings["DataSource"];
-			cs.Port         = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
-			cs.Charset      = ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling      = false;
-			cs.ServerType   = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
+			cs.UserID = ConfigurationManager.AppSettings["User"];
+			cs.Password = ConfigurationManager.AppSettings["Password"];
+			cs.Database = ConfigurationManager.AppSettings["Database"];
+			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
+			cs.Port = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
+			cs.Charset = ConfigurationManager.AppSettings["Charset"];
+			cs.Pooling = false;
+			cs.ServerType = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
 
 			return cs;
 		}
@@ -469,7 +471,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region	· Methods ·
 
-		public int GetId()
+		public static int GetId()
 		{
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
 

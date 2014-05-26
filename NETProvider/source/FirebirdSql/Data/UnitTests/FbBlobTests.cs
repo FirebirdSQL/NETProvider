@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BinaryBlobTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			string selectText = "SELECT blob_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)";
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ReaderGetBytes()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			string selectText = "SELECT blob_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)";
