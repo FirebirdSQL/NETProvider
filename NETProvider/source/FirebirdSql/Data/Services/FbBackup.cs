@@ -31,10 +31,7 @@ namespace FirebirdSql.Data.Services
 	{
 		#region · Fields ·
 
-		private bool verbose;
-		private int factor;
 		private FbBackupFileCollection backupFiles;
-		private FbBackupFlags options;
 
 		#endregion
 
@@ -45,23 +42,9 @@ namespace FirebirdSql.Data.Services
 			get { return this.backupFiles; }
 		}
 
-		public bool Verbose
-		{
-			get { return this.verbose; }
-			set { this.verbose = value; }
-		}
-
-		public int Factor
-		{
-			get { return this.factor; }
-			set { this.factor = value; }
-		}
-
-		public FbBackupFlags Options
-		{
-			get { return this.options; }
-			set { this.options = value; }
-		}
+		public bool Verbose { get; set; }
+		public int Factor { get; set; }
+		public FbBackupFlags Options { get; set; }
 
 		#endregion
 
@@ -94,19 +77,19 @@ namespace FirebirdSql.Data.Services
 						this.StartSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
 				}
 
-				if (verbose)
+				if (this.Verbose)
 				{
 					this.StartSpb.Append(IscCodes.isc_spb_verbose);
 				}
 
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.Options);
 
 				this.Open();
 
 				// Start execution
 				this.StartTask();
 
-				if (this.verbose)
+				if (this.Verbose)
 				{
 					this.ProcessServiceOutput();
 				}
