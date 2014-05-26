@@ -82,14 +82,45 @@ namespace FirebirdSql.Data.UnitTests
 			FbBackup backupSvc = new FbBackup();
 
 			backupSvc.ConnectionString = this.BuildServicesConnectionString();
+			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 			backupSvc.BackupFiles.Add(new FbBackupFile(ConfigurationManager.AppSettings["BackupRestoreFile"], 2048));
 			backupSvc.Verbose = true;
-
-			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 
 			backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
 
 			backupSvc.Execute();
+
+			var startLocation = Environment.GetEnvironmentVariable("HOMEDRIVE") + @"\";
+			var backup = SearchFiles(startLocation, ConfigurationManager.AppSettings["BackupRestoreFile"]).SingleOrDefault();
+			Assert.IsNotNull(backup);
+			Assert.Greater(new FileInfo(backup).Length, 0);
+		}
+
+		[Test]
+		public void BackupGbakTest()
+		{
+			FbGbakBackup backupSvc = new FbGbakBackup();
+			var backupLength = default(long);
+
+			using (var ms = new MemoryStream())
+			{
+				backupSvc.ConnectionString = this.BuildServicesConnectionString();
+				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
+				backupSvc.OutputStream = ms;
+
+				backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+
+				backupSvc.Execute();
+
+				backupLength = ms.Length;
+			}
+
+			Assert.Greater(backupLength, 0);
+			// suppose the BackupTest is done and the file is somewhere
+			var startLocation = Environment.GetEnvironmentVariable("HOMEDRIVE") + @"\";
+			var backup = SearchFiles(startLocation, ConfigurationManager.AppSettings["BackupRestoreFile"]).SingleOrDefault();
+			Assert.IsNotNull(backup);
+			Assert.AreEqual(new FileInfo(backup).Length, backupLength);
 		}
 
 		[Test]
