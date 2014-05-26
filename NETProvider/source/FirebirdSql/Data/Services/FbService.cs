@@ -23,8 +23,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Net;
+using System.Text;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
