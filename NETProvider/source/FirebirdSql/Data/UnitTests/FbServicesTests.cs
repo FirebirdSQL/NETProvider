@@ -77,7 +77,7 @@ namespace FirebirdSql.Data.UnitTests
 		#region · Unit Tests ·
 
 		[Test]
-		public void BackupTest()
+		public void BackupRestore_A_Backup01Test()
 		{
 			FbBackup backupSvc = new FbBackup();
 
@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void BackupGbakTest()
+		public void BackupRestore_A_Backup02GbakTest()
 		{
 			FbGbakBackup backupSvc = new FbGbakBackup();
 			var backupLength = default(long);
@@ -124,7 +124,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void RestoreTest()
+		public void BackupRestore_B_Restore01Test()
 		{
 			FbRestore restoreSvc = new FbRestore();
 
@@ -281,7 +281,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void NBackupTest()
+		public void NBackup_A_NBackupTest()
 		{
 			Action<int> doLevel = l =>
 				{
@@ -303,7 +303,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void NRestoreTest()
+		public void NBackup_B_NRestoreTest()
 		{
 			FbConnection.DropDatabase(BuildConnectionString());
 
