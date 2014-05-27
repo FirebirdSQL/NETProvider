@@ -358,6 +358,13 @@ namespace FirebirdSql.Data.Services
 							queryResponseAction(truncated, ParseServerConfig(buffer, ref pos));
 							truncated = false;
 							break;
+
+						case IscCodes.isc_info_svc_stdin:
+							pos -= 2;
+							length = IscHelper.VaxInteger(buffer, pos, 4);
+							queryResponseAction(truncated, length);
+							pos += 4;
+							break;
 					}
 				}
 			}
