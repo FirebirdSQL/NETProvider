@@ -357,6 +357,7 @@
     <Compile Include="Services\FbDatabaseTraceConfiguration.cs" />
     <Compile Include="Services\FbDatabaseTraceEvents.cs" />
     <Compile Include="Services\FbGbakBackup.cs" />
+    <Compile Include="Services\FbGbakRestore.cs" />
     <Compile Include="Services\FbLog.cs" />
     <Compile Include="Services\FbNBackup.cs" />
     <Compile Include="Services\FbNBackupFlags.cs" />
