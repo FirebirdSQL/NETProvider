@@ -29,14 +29,9 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbBackup : FbService
 	{
-		#region · Fields ·
-
-		private FbBackupFileCollection backupFiles;
-
-		#endregion
-
 		#region · Properties ·
 
+		private FbBackupFileCollection backupFiles;
 		public FbBackupFileCollection BackupFiles
 		{
 			get { return this.backupFiles; }
