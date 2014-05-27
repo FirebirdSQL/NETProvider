@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		void ReadOutput()
+		private void ReadOutput()
 		{
 			this.Query(new byte[] { IscCodes.isc_info_svc_to_eof }, (_, x)=>
 			{
