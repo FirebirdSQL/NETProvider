@@ -292,7 +292,6 @@ namespace FirebirdSql.Data.Services
 			var pos = 0;
 			var truncated = false;
 			var type = default(int);
-			var length = default(int);
 
 			var buffer = this.QueryService(items);
 
@@ -306,67 +305,89 @@ namespace FirebirdSql.Data.Services
 					continue;
 				}
 
-				length = IscHelper.VaxInteger(buffer, pos, 2);
-				pos += 2;
-
-				if (length != 0)
+				switch (type)
 				{
-					switch (type)
-					{
-						case IscCodes.isc_info_svc_version:
-						case IscCodes.isc_info_svc_get_license_mask:
-						case IscCodes.isc_info_svc_capabilities:
-						case IscCodes.isc_info_svc_get_licensed_users:
+					case IscCodes.isc_info_svc_version:
+					case IscCodes.isc_info_svc_get_license_mask:
+					case IscCodes.isc_info_svc_capabilities:
+					case IscCodes.isc_info_svc_get_licensed_users:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
 							queryResponseAction(truncated, IscHelper.VaxInteger(buffer, pos, 4));
 							pos += length;
 							truncated = false;
 							break;
+						}
 
-						case IscCodes.isc_info_svc_server_version:
-						case IscCodes.isc_info_svc_implementation:
-						case IscCodes.isc_info_svc_get_env:
-						case IscCodes.isc_info_svc_get_env_lock:
-						case IscCodes.isc_info_svc_get_env_msg:
-						case IscCodes.isc_info_svc_user_dbpath:
-						case IscCodes.isc_info_svc_line:
-							{
-								queryResponseAction(truncated, Encoding.Default.GetString(buffer, pos, length));
-								pos += length;
-								truncated = false;
-							}
+					case IscCodes.isc_info_svc_server_version:
+					case IscCodes.isc_info_svc_implementation:
+					case IscCodes.isc_info_svc_get_env:
+					case IscCodes.isc_info_svc_get_env_lock:
+					case IscCodes.isc_info_svc_get_env_msg:
+					case IscCodes.isc_info_svc_user_dbpath:
+					case IscCodes.isc_info_svc_line:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							queryResponseAction(truncated, Encoding.Default.GetString(buffer, pos, length));
+							pos += length;
+							truncated = false;
 							break;
-						case IscCodes.isc_info_svc_to_eof:
-							{
-								var block = new byte[length];
-								Array.Copy(buffer, pos, block, 0, length);
-								queryResponseAction(truncated, block);
-								pos += length;
-								truncated = false;
-							}
+						}
+					case IscCodes.isc_info_svc_to_eof:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							var block = new byte[length];
+							Array.Copy(buffer, pos, block, 0, length);
+							queryResponseAction(truncated, block);
+							pos += length;
+							truncated = false;
 							break;
+						}
 
-						case IscCodes.isc_info_svc_svr_db_info:
+					case IscCodes.isc_info_svc_svr_db_info:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
 							queryResponseAction(truncated, ParseDatabasesInfo(buffer, ref pos));
 							truncated = false;
 							break;
+						}
 
-						case IscCodes.isc_info_svc_get_users:
+					case IscCodes.isc_info_svc_get_users:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
 							queryResponseAction(truncated, ParseUserData(buffer, ref pos));
 							truncated = false;
 							break;
+						}
 
-						case IscCodes.isc_info_svc_get_config:
+					case IscCodes.isc_info_svc_get_config:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
 							queryResponseAction(truncated, ParseServerConfig(buffer, ref pos));
 							truncated = false;
 							break;
+						}
 
-						case IscCodes.isc_info_svc_stdin:
-							pos -= 2;
-							length = IscHelper.VaxInteger(buffer, pos, 4);
+					case IscCodes.isc_info_svc_stdin:
+						{
+							var length = GetLength(buffer, 4, ref pos);
+							if (length == 0)
+								continue;
 							queryResponseAction(truncated, length);
-							pos += 4;
 							break;
-					}
+						}
 				}
 			}
 		}
@@ -599,6 +620,13 @@ namespace FirebirdSql.Data.Services
 			pos--;
 
 			return users.ToArray();
+		}
+
+		private static int GetLength(byte[] buffer, int size, ref int pos)
+		{
+			var result = IscHelper.VaxInteger(buffer, pos, size);
+			pos += size;
+			return result;
 		}
 
 		#endregion
