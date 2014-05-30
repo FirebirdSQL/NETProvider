@@ -53,6 +53,7 @@ namespace FirebirdSql.Data.Services
 		#region · Protected Fields ·
 
 		internal ServiceParameterBuffer StartSpb;
+		internal ServiceParameterBuffer QuerySpb;
 
 		#endregion
 
@@ -380,13 +381,16 @@ namespace FirebirdSql.Data.Services
 				shouldClose = true;
 			}
 
-			var querySpb = new ServiceParameterBuffer();
+			if (this.QuerySpb == null)
+			{
+				this.QuerySpb = new ServiceParameterBuffer();
+			}
 
 			try
 			{
 				// Response	buffer
 				byte[] buffer = new byte[this.queryBufferSize];
-				this.svc.Query(querySpb, items.Length, items, buffer.Length, buffer);
+				this.svc.Query(this.QuerySpb, items.Length, items, buffer.Length, buffer);
 				return buffer;
 			}
 			finally
