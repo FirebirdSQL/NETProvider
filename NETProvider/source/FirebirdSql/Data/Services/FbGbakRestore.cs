@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Services
 		}
 
 		public Stream InputStream { get; set; }
-		//public bool Verbose { get; set; }
+		public bool Verbose { get; set; }
 		public int? PageBuffers { get; set; }
 		public FbRestoreFlags Options { get; set; }
 
@@ -62,10 +62,10 @@ namespace FirebirdSql.Data.Services
 
 				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-				//if (this.Verbose)
-				//{
-				//	this.StartSpb.Append(IscCodes.isc_spb_verbose);
-				//}
+				if (this.Verbose)
+				{
+					this.StartSpb.Append(IscCodes.isc_spb_verbose);
+				}
 
 				if (this.PageBuffers.HasValue)
 					this.StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)this.PageBuffers);
