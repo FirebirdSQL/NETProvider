@@ -97,9 +97,9 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void BackupRestore_A_Backup02GbakTest()
+		public void BackupRestore_A_Backup02StreamingTest()
 		{
-			FbGbakBackup backupSvc = new FbGbakBackup();
+			FbStreamingBackup backupSvc = new FbStreamingBackup();
 			var backupLength = default(long);
 
 			using (var ms = new MemoryStream())

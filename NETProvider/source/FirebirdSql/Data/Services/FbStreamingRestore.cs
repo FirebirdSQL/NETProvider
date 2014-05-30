@@ -28,7 +28,7 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-	public class FbGbakRestore : FbService
+	public class FbStreamingRestore : FbService
 	{
 		private int? pageSize;
 		public int? PageSize

@@ -27,7 +27,7 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services
 {
-	public sealed class FbGbakBackup : FbService
+	public sealed class FbStreamingBackup : FbService
 	{
 		public FbBackupFlags Options { get; set; }
 		public Stream OutputStream { get; set; }
