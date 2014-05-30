@@ -97,10 +97,41 @@ namespace FirebirdSql.Data.Services
 
 		void Do()
 		{
-			this.Query(new byte[] { IscCodes.isc_info_svc_stdin }, (_, x) =>
+			var items = this.Verbose
+				? new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line }
+				: new byte[] { IscCodes.isc_info_svc_stdin };
+			var init = this.Query(items);
+			var length = (int)init[0];
+			while (true)
 			{
-				System.Diagnostics.Debugger.Break();
-			});
+				var buffer = new byte[length];
+				var read = InputStream.Read(buffer, 0, length);
+				if (read == 0)
+					break;
+				Array.Resize(ref buffer, read);
+				var spb = new ServiceParameterBuffer();
+				spb.Append(IscCodes.isc_info_svc_line, buffer);
+				this.QuerySpb = spb;
+				var step = this.Query(items);
+				foreach (var item in step)
+				{
+					Console.WriteLine(item);
+				}
+				this.QuerySpb = null;
+
+				//System.Threading.Thread.Sleep(200);
+			}
+
+			while (true)
+			{
+				var final = this.Query(items);
+				if (final.Count == 0)
+					break;
+				foreach (var item in final)
+				{
+					Console.WriteLine(item);
+				}
+			}
 		}
 	}
 }

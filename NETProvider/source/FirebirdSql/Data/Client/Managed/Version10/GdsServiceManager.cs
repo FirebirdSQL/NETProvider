@@ -158,14 +158,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					this.database.Write(IscCodes.op_service_info);	//	operation
-					this.database.Write(this.Handle);				//	db_handle
-					this.database.Write(0);							//	incarnation					
-					this.database.WriteTyped(
-						IscCodes.isc_spb_version, spb.ToArray());	//	Service parameter buffer
-					this.database.WriteBuffer(
-						requestBuffer, requestLength);				//	request	buffer
-					this.database.Write(bufferLength);				//	result buffer length
+					this.database.Write(IscCodes.op_service_info);				//	operation
+					this.database.Write(this.Handle);							//	db_handle
+					this.database.Write(0);										//	incarnation
+					this.database.WriteBuffer(spb.ToArray(), spb.Length);		//	Service parameter buffer
+					this.database.WriteBuffer(requestBuffer, requestLength);	//	request	buffer
+					this.database.Write(bufferLength);							//	result buffer length
 
 					this.database.Flush();
 
