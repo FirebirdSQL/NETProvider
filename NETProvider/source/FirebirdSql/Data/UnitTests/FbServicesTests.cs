@@ -59,17 +59,22 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · TestFixture TearDown Method ·
+		#region · Event Handlers ·
 
-		[TestFixtureTearDown]
-		public void TestFixtureTearDown()
+		void ServiceOutput(object sender, ServiceOutputEventArgs e)
 		{
-			var brLocation = ConfigurationManager.AppSettings["BackupRestoreLocation"];
-			if (!string.IsNullOrWhiteSpace(brLocation))
-			{
-				foreach (var file in Directory.EnumerateFiles(brLocation, ConfigurationManager.AppSettings["BackupRestoreFile"] + "*"))
-					File.Delete(file);
-			}
+			Console.WriteLine(e.Message);
+		}
+
+		#endregion
+
+		#region · Static Helpers ·
+
+		string GetBackupRestoreFullPath()
+		{
+			var startLocation = Environment.GetEnvironmentVariable("HOMEDRIVE") + @"\";
+			var backupRestoreFile = SearchFiles(startLocation, ConfigurationManager.AppSettings["BackupRestoreFile"]).SingleOrDefault();
+			return backupRestoreFile;
 		}
 
 		#endregion
@@ -90,8 +95,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			backupSvc.Execute();
 
-			var startLocation = Environment.GetEnvironmentVariable("HOMEDRIVE") + @"\";
-			var backup = SearchFiles(startLocation, ConfigurationManager.AppSettings["BackupRestoreFile"]).SingleOrDefault();
+			var backup = GetBackupRestoreFullPath();
 			Assert.IsNotNull(backup);
 			Assert.Greater(new FileInfo(backup).Length, 0);
 		}
@@ -116,9 +120,8 @@ namespace FirebirdSql.Data.UnitTests
 			}
 
 			Assert.Greater(backupLength, 0);
-			// suppose the BackupTest is done and the file is somewhere
-			var startLocation = Environment.GetEnvironmentVariable("HOMEDRIVE") + @"\";
-			var backup = SearchFiles(startLocation, ConfigurationManager.AppSettings["BackupRestoreFile"]).SingleOrDefault();
+			// suppose the "previous" test is done and the file is somewhere
+			var backup = GetBackupRestoreFullPath();
 			Assert.IsNotNull(backup);
 			Assert.AreEqual(new FileInfo(backup).Length, backupLength);
 		}
@@ -129,14 +132,37 @@ namespace FirebirdSql.Data.UnitTests
 			FbRestore restoreSvc = new FbRestore();
 
 			restoreSvc.ConnectionString = this.BuildServicesConnectionString();
-			restoreSvc.BackupFiles.Add(new FbBackupFile(ConfigurationManager.AppSettings["BackupRestoreFile"], 2048));
-			restoreSvc.Verbose = true;
-			restoreSvc.PageSize = 4096;
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
+			restoreSvc.PageSize = 4096;
+			restoreSvc.Verbose = true;
+			restoreSvc.BackupFiles.Add(new FbBackupFile(ConfigurationManager.AppSettings["BackupRestoreFile"], 2048));
 
 			restoreSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
 
 			restoreSvc.Execute();
+
+			// some validation
+		}
+
+		[Test]
+		public void BackupRestore_B_Restore02StreamingTest()
+		{
+			FbStreamingRestore restoreSvc = new FbStreamingRestore();
+
+			using (var fs = File.OpenRead(GetBackupRestoreFullPath()))
+			{
+				restoreSvc.ConnectionString = this.BuildServicesConnectionString();
+				restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
+				restoreSvc.PageSize = 4096;
+				restoreSvc.Verbose = true;
+				restoreSvc.InputStream = fs;
+
+				restoreSvc.ServiceOutput += ServiceOutput;
+
+				restoreSvc.Execute();
+			}
+
+			// some validation
 		}
 
 		[Test]
@@ -147,7 +173,7 @@ namespace FirebirdSql.Data.UnitTests
 			validationSvc.ConnectionString = this.BuildServicesConnectionString();
 			validationSvc.Options = FbValidationFlags.ValidateDatabase;
 
-			validationSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+			validationSvc.ServiceOutput += ServiceOutput;
 
 			validationSvc.Execute();
 		}
@@ -160,7 +186,7 @@ namespace FirebirdSql.Data.UnitTests
 			validationSvc.ConnectionString = this.BuildServicesConnectionString();
 			validationSvc.Options = FbValidationFlags.SweepDatabase;
 
-			validationSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+			validationSvc.ServiceOutput += ServiceOutput;
 
 			validationSvc.Execute();
 		}
@@ -187,7 +213,7 @@ namespace FirebirdSql.Data.UnitTests
 			statisticalSvc.ConnectionString = this.BuildServicesConnectionString();
 			statisticalSvc.Options = FbStatisticalFlags.SystemTablesRelations;
 
-			statisticalSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+			statisticalSvc.ServiceOutput += ServiceOutput;
 
 			statisticalSvc.Execute();
 		}
@@ -199,7 +225,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			logSvc.ConnectionString = this.BuildServicesConnectionString(false);
 
-			logSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+			logSvc.ServiceOutput += ServiceOutput;
 
 			logSvc.Execute();
 		}
@@ -294,7 +320,7 @@ namespace FirebirdSql.Data.UnitTests
 
 					nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
 
-					nbak.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+					nbak.ServiceOutput += ServiceOutput;
 
 					nbak.Execute();
 				};
@@ -313,18 +339,9 @@ namespace FirebirdSql.Data.UnitTests
 			nrest.BackupFiles = Enumerable.Range(0, 2).Select(l => ConfigurationManager.AppSettings["BackupRestoreFile"] + l.ToString());
 			nrest.DirectIO = true;
 
-			nrest.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+			nrest.ServiceOutput += ServiceOutput;
 
 			nrest.Execute();
-		}
-
-		#endregion
-
-		#region · Event Handlers ·
-
-		void ServiceOutput(object sender, ServiceOutputEventArgs e)
-		{
-			Console.WriteLine(e.Message);
 		}
 
 		#endregion
