@@ -268,10 +268,7 @@ namespace FirebirdSql.Data.Services
 
 			while ((line = this.GetNextLine()) != null)
 			{
-				if (this.ServiceOutput != null)
-				{
-					this.ServiceOutput(this, new ServiceOutputEventArgs(line));
-				}
+				WriteServiceOutputChecked(line);
 			}
 		}
 
@@ -281,6 +278,14 @@ namespace FirebirdSql.Data.Services
 			if (info.Count == 0)
 				return null;
 			return info[0] as string;
+		}
+
+		protected void WriteServiceOutputChecked(string s)
+		{
+			if (this.ServiceOutput != null)
+			{
+				this.ServiceOutput(this, new ServiceOutputEventArgs(s));
+			}
 		}
 
 		#endregion
