@@ -17,10 +17,12 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using FirebirdSql.Data.Common;
@@ -33,13 +35,13 @@ namespace FirebirdSql.Data.Services
 		private int? pageSize;
 		public int? PageSize
 		{
-			get { return this.pageSize; }
+			get { return pageSize; }
 			set
 			{
 				if (value.HasValue && !PageSizeHelper.IsValidPageSize((int)value))
 					throw new InvalidOperationException("Invalid page size.");
 
-				this.pageSize = value;
+				pageSize = value;
 			}
 		}
 
@@ -53,35 +55,23 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				// Configure Spb
-				this.StartSpb = new ServiceParameterBuffer();
-
-				this.StartSpb.Append(IscCodes.isc_action_svc_restore);
-
-				this.StartSpb.Append(IscCodes.isc_spb_bkp_file, "stdin");
-
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-
-				if (this.Verbose)
+				StartSpb = new ServiceParameterBuffer();
+				StartSpb.Append(IscCodes.isc_action_svc_restore);
+				StartSpb.Append(IscCodes.isc_spb_bkp_file, "stdin");
+				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+				if (Verbose)
 				{
-					this.StartSpb.Append(IscCodes.isc_spb_verbose);
+					StartSpb.Append(IscCodes.isc_spb_verbose);
 				}
+				if (PageBuffers.HasValue)
+					StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
+				if (pageSize.HasValue)
+					StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)pageSize);
+				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
-				if (this.PageBuffers.HasValue)
-					this.StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)this.PageBuffers);
-				if (this.pageSize.HasValue)
-					this.StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)this.pageSize);
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.Options);
+				Open();
 
-				this.Open();
-
-				// Start execution
-				this.StartTask();
-
-				//if (this.Verbose)
-				//{
-				//	this.ProcessServiceOutput();
-				//}
+				StartTask();
 
 				Do();
 			}
@@ -91,47 +81,60 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				this.Close();
+				Close();
 			}
 		}
 
 		void Do()
 		{
-			var items = this.Verbose
+			var items = Verbose
 				? new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line }
 				: new byte[] { IscCodes.isc_info_svc_stdin };
-			var init = this.Query(items);
-			var length = (int)init[0];
-			while (true)
+			var response = Query(items);
+			var length = GetLength(response);
+			while (InputStream.Position < InputStream.Length)
 			{
-				var buffer = new byte[length];
-				var read = InputStream.Read(buffer, 0, length);
-				if (read == 0)
-					break;
-				Array.Resize(ref buffer, read);
-				var spb = new ServiceParameterBuffer();
-				spb.Append(IscCodes.isc_info_svc_line, buffer);
-				this.QuerySpb = spb;
-				var step = this.Query(items);
-				foreach (var item in step)
+				if (length > 0)
 				{
-					Console.WriteLine(item);
+					var buffer = new byte[length];
+					var read = InputStream.Read(buffer, 0, length);
+					Array.Resize(ref buffer, read);
+					var spb = new ServiceParameterBuffer();
+					spb.Append(IscCodes.isc_info_svc_line, buffer);
+					QuerySpb = spb;
 				}
-				this.QuerySpb = null;
-
-				//System.Threading.Thread.Sleep(200);
+				response = Query(items);
+				QuerySpb = null;
+				length = GetLength(response);
+				ProcessMessages(response);
 			}
-
-			while (true)
+			if (Verbose)
 			{
-				var final = this.Query(items);
-				if (final.Count == 0)
-					break;
-				foreach (var item in final)
-				{
-					Console.WriteLine(item);
-				}
+				while (ProcessMessages(Query(items))) ;
 			}
+		}
+
+		bool ProcessMessages(ArrayList items)
+		{
+			var message = GetMessage(items);
+			if (message == null)
+				return false;
+			WriteServiceOutputChecked(message);
+			return true;
+		}
+
+		static int GetLength(ArrayList items)
+		{
+			return items[0] is int ? (int)items[0] : 0;
+		}
+
+		static string GetMessage(ArrayList items)
+		{
+			if (items[0] is string)
+				return (string)items[0];
+			if (items.Count > 1)
+				return (string)items[1];
+			return null;
 		}
 	}
 }

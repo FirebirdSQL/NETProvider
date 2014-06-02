@@ -388,8 +388,6 @@ namespace FirebirdSql.Data.Services
 					case IscCodes.isc_info_svc_stdin:
 						{
 							var length = GetLength(buffer, 4, ref pos);
-							if (length == 0)
-								continue;
 							queryResponseAction(truncated, length);
 							break;
 						}
