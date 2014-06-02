@@ -108,10 +108,7 @@ namespace FirebirdSql.Data.Services
 				length = GetLength(response);
 				ProcessMessages(response);
 			}
-			if (Verbose)
-			{
-				while (ProcessMessages(Query(items))) ;
-			}
+			while (ProcessMessages(Query(items))) ;
 		}
 
 		bool ProcessMessages(ArrayList items)
