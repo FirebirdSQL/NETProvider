@@ -36,22 +36,17 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				// Configure Spb
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
+				StartSpb.Append(IscCodes.isc_action_svc_backup);
+				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+				StartSpb.Append(IscCodes.isc_spb_bkp_file, "stdout");
+				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_backup);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+				Open();
 
-				this.StartSpb.Append(IscCodes.isc_spb_bkp_file, "stdout");
+				StartTask();
 
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.Options);
-
-				this.Open();
-
-				// Start execution
-				this.StartTask();
-
-				this.ReadOutput();
+				ReadOutput();
 			}
 			catch (Exception ex)
 			{
@@ -59,14 +54,13 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				// Close
-				this.Close();
+				Close();
 			}
 		}
 
-		private void ReadOutput()
+		void ReadOutput()
 		{
-			this.Query(new byte[] { IscCodes.isc_info_svc_to_eof }, (_, x)=>
+			Query(new byte[] { IscCodes.isc_info_svc_to_eof }, (_, x)=>
 			{
 				var buffer = x as byte[];
 				OutputStream.Write(buffer, 0, buffer.Length);
