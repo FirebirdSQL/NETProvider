@@ -53,6 +53,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		private bool implicitTransaction;
 		private int commandTimeout;
 		private int fetchSize;
+#if (!(NET_35 && !ENTITY_FRAMEWORK))
+		private Type[] expectedColumnTypes;
+#endif
 
 		#endregion
 
@@ -214,11 +217,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
-		// type coercions
-		internal Type[] ExpectedColumnTypes { get; private set; }
-#endif
-
 		#endregion
 
 		#region · Protected DbCommand Properties ·
@@ -315,6 +313,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return (this.statement != null && this.statement.StatementType == DbStatementType.DDL); }
 		}
 
+		internal Type[] ExpectedColumnTypes
+		{
+			get { return this.expectedColumnTypes; }
+		}
+
 		#endregion
 
 		#region · Constructors ·
@@ -359,10 +362,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.transaction = transaction;
 		}
 
-		internal FbCommand(Type[] expectedColumnTypes)
-			: this()
+		public static FbCommand CreateWithTypeCoercions(Type[] expectedColumnTypes)
 		{
-			this.ExpectedColumnTypes = expectedColumnTypes;
+			var result = new FbCommand();
+			result.expectedColumnTypes = expectedColumnTypes;
+			return result;
 		}
 
 		#endregion
@@ -425,8 +429,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			command.UpdatedRowSource = this.UpdatedRowSource;
 
 #if (!(NET_35 && !ENTITY_FRAMEWORK))
-			if (this.ExpectedColumnTypes != null)
-				command.ExpectedColumnTypes = (Type[])this.ExpectedColumnTypes.Clone();
+			if (this.expectedColumnTypes != null)
+				command.expectedColumnTypes = (Type[])this.expectedColumnTypes.Clone();
 #endif
 
 			for (int i = 0; i < this.Parameters.Count; i++)

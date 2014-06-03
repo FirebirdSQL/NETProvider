@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 			var expectedTypes = PrepareTypeCoercions(commandTree);
 
-			FbCommand command = new FbCommand(expectedTypes);
+			FbCommand command = FbCommand.CreateWithTypeCoercions(expectedTypes);
 
 			List<DbParameter> parameters;
 			CommandType commandType;
