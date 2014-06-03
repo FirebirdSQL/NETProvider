@@ -27,15 +27,6 @@ namespace FirebirdSql.Data.Common
 {
 	static class Extensions
 	{
-		public static bool HasFlag(this Enum e, Enum flag)
-		{
-#if (!NET_40)
-			return ((Convert.ToInt32(e) & Convert.ToInt32(flag)) != 0);
-#else
-			return e.HasFlag(flag);
-#endif
-		}
-
 		public static Version ParseServerVersion(this string s)
 		{
 			Match m = Regex.Match(s, @"\w{2}-\w(\d+\.\d+\.\d+\.\d+) .*");
