@@ -29,7 +29,11 @@ using System.Data.Metadata.Edm;
 using System.Data.Entity.Core.Metadata.Edm;
 #endif
 
+#if (!EF_6)
 namespace FirebirdSql.Data.Entity
+#else
+namespace FirebirdSql.Data.EntityFramework6
+#endif
 {
 	/// <summary>
 	/// A set of static helpers for type metadata

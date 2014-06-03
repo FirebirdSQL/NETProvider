@@ -68,6 +68,12 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\FirebirdSql\Data\Entity\MetadataHelpers.cs">
+      <Link>MetadataHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\TypeHelpers.cs">
+      <Link>TypeHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\FirebirdSql\Data\FirebirdClient\FbProviderManifest.cs">
       <Link>FbProviderManifest.cs</Link>
     </Compile>
