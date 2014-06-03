@@ -31,15 +31,18 @@ using System.Linq;
 #if (!EF_6)
 using System.Data.Common.CommandTrees;
 using System.Data.Metadata.Edm;
+
+using FirebirdSql.Data.Entity;
 #else
 using System.Data.Entity.Core.Common;
 using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Infrastructure.DependencyResolution;
+
+using FirebirdSql.Data.EntityFramework6.SqlGen;
 #endif
 
-using FirebirdSql.Data.Entity;
 using FirebirdSql.Data.Isql;
 using FirebirdSql.Data.Services;
 using FirebirdSql.Data.Common;
