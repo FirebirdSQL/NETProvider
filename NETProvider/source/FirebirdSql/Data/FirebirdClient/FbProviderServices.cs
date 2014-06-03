@@ -163,7 +163,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			try
 			{
 				FbServerProperties serverProperties = new FbServerProperties() { ConnectionString = fbConnection.ConnectionString };
-				Version serverVersion = serverProperties.GetServerVersion().ParseServerVersion();
+				Version serverVersion = FbServerProperties.ParseServerVersion(serverProperties.GetServerVersion());
 				return serverVersion.ToString(2);
 			}
 			catch (FbException ex)

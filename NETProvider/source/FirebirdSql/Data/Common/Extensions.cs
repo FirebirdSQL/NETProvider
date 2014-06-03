@@ -27,14 +27,6 @@ namespace FirebirdSql.Data.Common
 {
 	static class Extensions
 	{
-		public static Version ParseServerVersion(this string s)
-		{
-			Match m = Regex.Match(s, @"\w{2}-\w(\d+\.\d+\.\d+\.\d+) .*");
-			if (!m.Success)
-				return null;
-			return new Version(m.Groups[1].Value);
-		}
-
 		public static bool CultureAwareEquals(this string string1, string string2)
 		{
 			return CultureInfo.CurrentCulture.CompareInfo.Compare(

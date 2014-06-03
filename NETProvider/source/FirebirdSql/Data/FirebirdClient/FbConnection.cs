@@ -29,6 +29,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Services;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -236,7 +237,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				if (string.IsNullOrEmpty(this.ServerVersion))
 					throw new InvalidOperationException("ServerVersion is not valid.");
 
-				return this.ServerVersion.ParseServerVersion();
+				return FbServerProperties.ParseServerVersion(this.ServerVersion);
 			}
 		}
 

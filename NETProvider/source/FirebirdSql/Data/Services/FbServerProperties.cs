@@ -13,11 +13,13 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
 using System;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 using FirebirdSql.Data.Common;
 
@@ -105,6 +107,18 @@ namespace FirebirdSql.Data.Services
 			byte[] buffer = this.QueryService(items);
 
 			return this.ParseQueryInfo(buffer);
+		}
+
+		#endregion
+
+		#region · Constructors ·
+
+		public static Version ParseServerVersion(string version)
+		{
+			var m = Regex.Match(version, @"\w{2}-\w(\d+\.\d+\.\d+\.\d+) .*");
+			if (!m.Success)
+				return null;
+			return new Version(m.Groups[1].Value);
 		}
 
 		#endregion
