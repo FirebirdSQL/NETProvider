@@ -12,12 +12,10 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2013 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2013-2014 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  *	
  */
-
-#if (EF_6)
 
 using System;
 using System.Collections.Generic;
@@ -27,8 +25,9 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.Client.EntityFramework6
 {
 	public class FbConnectionFactory : IDbConnectionFactory
 	{
@@ -51,4 +50,3 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 	}
 }
-#endif
