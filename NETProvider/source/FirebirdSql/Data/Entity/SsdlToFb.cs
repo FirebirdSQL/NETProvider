@@ -44,11 +44,11 @@ namespace FirebirdSql.Data.Entity
 
 			result.Append("-- Tables");
 			result.AppendLine();
-			result.Append(Tables(storeItems).StringJoin(Environment.NewLine));
+			result.Append(string.Join(Environment.NewLine, Tables(storeItems)));
 			result.AppendLine();
 			result.Append("-- Foreign Key Constraints");
 			result.AppendLine();
-			result.Append(ForeignKeyConstraints(storeItems).StringJoin(Environment.NewLine));
+			result.Append(string.Join(Environment.NewLine, ForeignKeyConstraints(storeItems)));
 			result.AppendLine();
 			result.AppendLine();
 			result.Append("-- EOF");
@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.Entity
 				}
 				result.AppendFormat("CONSTRAINT {0} PRIMARY KEY ({1})",
 					SqlGenerator.QuoteIdentifier(string.Format("PK_{0}", MetadataHelpers.GetTableName(entitySet))),
-					entitySet.ElementType.KeyMembers.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name)).StringJoin(", "));
+					string.Join(", ", entitySet.ElementType.KeyMembers.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name))));
 				result.AppendLine();
 				result.Append(");");
 				result.AppendLine();
@@ -107,11 +107,11 @@ namespace FirebirdSql.Data.Entity
 				result.AppendFormat("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2})",
 					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end2.EntitySet)),
 					SqlGenerator.QuoteIdentifier(string.Format("FK_{0}", associationSet.Name)),
-					constraint.ToProperties.Select(fk => SqlGenerator.QuoteIdentifier(fk.Name)).StringJoin(", "));
+					string.Join(", ", constraint.ToProperties.Select(fk => SqlGenerator.QuoteIdentifier(fk.Name))));
 				result.AppendLine();
 				result.AppendFormat("REFERENCES {0}({1})",
 					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end.EntitySet)),
-					constraint.FromProperties.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name)).StringJoin(", "));
+					string.Join(", ", constraint.FromProperties.Select(pk => SqlGenerator.QuoteIdentifier(pk.Name))));
 				result.AppendLine();
 				result.AppendFormat("ON DELETE {0}",
 					end.CorrespondingAssociationEndMember.DeleteBehavior == OperationAction.Cascade ? "CASCADE" : "NO ACTION");

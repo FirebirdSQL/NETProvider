@@ -44,15 +44,6 @@ namespace FirebirdSql.Data.Common
 				CompareOptions.IgnoreCase) == 0 ? true : false;
 		}
 
-		public static string StringJoin(this IEnumerable<string> data, string separator)
-		{
-#if (NET_35)
-			return string.Join(separator, data.ToArray());
-#else
-			return string.Join(separator, data);
-#endif
-		}
-
 		public static bool SetKeepAlive(this Socket socket, ulong time, ulong interval)
 		{
 			const int BytesPerLong = 4;

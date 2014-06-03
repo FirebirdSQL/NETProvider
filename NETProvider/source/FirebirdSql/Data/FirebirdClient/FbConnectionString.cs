@@ -230,7 +230,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal string NormalizedConnectionString
 		{
-			get { return this.options.Keys.OrderBy(x => x, StringComparer.InvariantCulture).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(this.options[key].ToString()))).StringJoin(";"); }
+			get { return string.Join(";", this.options.Keys.OrderBy(x => x, StringComparer.InvariantCulture).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(this.options[key].ToString())))); }
 		}
 		#endregion
 
