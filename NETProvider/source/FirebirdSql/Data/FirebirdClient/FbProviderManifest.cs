@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008-2013 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -38,7 +38,11 @@ using System.Data.Entity.Core.Metadata.Edm;
 
 using FirebirdSql.Data.Entity;
 
+#if (!EF_6)
 namespace FirebirdSql.Data.FirebirdClient
+#else
+namespace FirebirdSql.Data.Client.EntityFramework6
+#endif
 {
 	public class FbProviderManifest : DbXmlEnabledProviderManifest
 	{

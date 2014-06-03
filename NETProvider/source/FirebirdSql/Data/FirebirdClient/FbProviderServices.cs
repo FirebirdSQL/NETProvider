@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008-2013 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -44,7 +44,11 @@ using FirebirdSql.Data.Isql;
 using FirebirdSql.Data.Services;
 using FirebirdSql.Data.Common;
 
+#if (!EF_6)
 namespace FirebirdSql.Data.FirebirdClient
+#else
+namespace FirebirdSql.Data.Client.EntityFramework6
+#endif
 {
 #pragma warning disable 3009
 	public class FbProviderServices : DbProviderServices
