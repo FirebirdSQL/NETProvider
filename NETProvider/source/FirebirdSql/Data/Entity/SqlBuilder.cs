@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008-2013 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -31,7 +31,11 @@ using System.Data.Common.CommandTrees;
 
 using FirebirdSql.Data.FirebirdClient;
 
+#if (!EF_6)
 namespace FirebirdSql.Data.Entity
+#else
+namespace FirebirdSql.Data.EntityFramework6.SqlGen
+#endif
 {
 	/// <summary>
 	/// This class is like StringBuilder.  While traversing the tree for the first time, 

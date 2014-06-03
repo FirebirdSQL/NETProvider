@@ -68,8 +68,50 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\FirebirdSql\Data\Entity\DmlSqlGenerator.cs">
+      <Link>SqlGen\DmlSqlGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\ExpressionTranslator.cs">
+      <Link>SqlGen\ExpressionTranslator.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\FirstClause.cs">
+      <Link>SqlGen\FirstClause.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\ISqlFragment.cs">
+      <Link>SqlGen\ISqlFragment.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\JoinSymbol.cs">
+      <Link>SqlGen\JoinSymbol.cs</Link>
+    </Compile>
     <Compile Include="..\FirebirdSql\Data\Entity\MetadataHelpers.cs">
       <Link>MetadataHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\SkipClause.cs">
+      <Link>SqlGen\SkipClause.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\SqlBuilder.cs">
+      <Link>SqlGen\SqlBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\SqlGenerator.cs">
+      <Link>SqlGen\SqlGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\SqlSelectStatement.cs">
+      <Link>SqlGen\SqlSelectStatement.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\SqlWriter.cs">
+      <Link>SqlGen\SqlWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\SsdlToFb.cs">
+      <Link>SsdlToFb.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\Symbol.cs">
+      <Link>SqlGen\Symbol.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\SymbolPair.cs">
+      <Link>SqlGen\SymbolPair.cs</Link>
+    </Compile>
+    <Compile Include="..\FirebirdSql\Data\Entity\SymbolTable.cs">
+      <Link>SqlGen\SymbolTable.cs</Link>
     </Compile>
     <Compile Include="..\FirebirdSql\Data\Entity\TypeHelpers.cs">
       <Link>TypeHelpers.cs</Link>

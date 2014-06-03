@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
- *  Copyright (c) 2008-2013 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -29,7 +29,11 @@ using System.Data.Common.CommandTrees;
 #else
 #endif
 
+#if (!EF_6)
 namespace FirebirdSql.Data.Entity
+#else
+namespace FirebirdSql.Data.EntityFramework6.SqlGen
+#endif
 {
 	/// <summary>
 	/// A SqlSelectStatement represents a canonical SQL SELECT statement.
