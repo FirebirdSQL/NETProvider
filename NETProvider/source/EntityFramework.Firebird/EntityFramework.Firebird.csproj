@@ -7,7 +7,7 @@
     <ProjectGuid>{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FirebirdSql.Data.Client.EntityFramework6</RootNamespace>
+    <RootNamespace>FirebirdSql.Data.EntityFramework6</RootNamespace>
     <AssemblyName>EntityFramework.Firebird</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

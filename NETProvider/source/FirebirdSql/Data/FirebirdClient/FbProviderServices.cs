@@ -48,7 +48,7 @@ using FirebirdSql.Data.FirebirdClient;
 #if (!EF_6)
 namespace FirebirdSql.Data.FirebirdClient
 #else
-namespace FirebirdSql.Data.Client.EntityFramework6
+namespace FirebirdSql.Data.EntityFramework6
 #endif
 {
 #pragma warning disable 3009

@@ -41,7 +41,7 @@ using FirebirdSql.Data.Entity;
 #if (!EF_6)
 namespace FirebirdSql.Data.FirebirdClient
 #else
-namespace FirebirdSql.Data.Client.EntityFramework6
+namespace FirebirdSql.Data.EntityFramework6
 #endif
 {
 	public class FbProviderManifest : DbXmlEnabledProviderManifest

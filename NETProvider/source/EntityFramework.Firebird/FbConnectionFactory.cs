@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.Client.EntityFramework6
+namespace FirebirdSql.Data.EntityFramework6
 {
 	public class FbConnectionFactory : IDbConnectionFactory
 	{

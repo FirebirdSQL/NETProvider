@@ -16,7 +16,14 @@
  *  All Rights Reserved.
  */
 
-static class VersionInfo
+#if (EF_6)
+namespace FirebirdSql.Data.EntityFramework6.Properties
+#else
+namespace FirebirdSql.Data.FirebirdClient.Properties
+#endif
 {
-	internal const string Version = "4.1.5.0";
+	static class VersionInfo
+	{
+		internal const string Version = "4.1.5.0";
+	}
 }

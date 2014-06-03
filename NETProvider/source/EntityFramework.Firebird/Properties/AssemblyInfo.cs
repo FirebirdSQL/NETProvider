@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("(c) 2014")]
 [assembly: AssemblyTitle("FirebirdClient - Entity Framework Provider")]
 [assembly: AssemblyDescription("FirebirdClient - Entity Framework Provider")]
-[assembly: AssemblyVersion(VersionInfo.Version)]
-[assembly: AssemblyFileVersion(VersionInfo.Version)]
+[assembly: AssemblyVersion(FirebirdSql.Data.EntityFramework6.Properties.VersionInfo.Version)]
+[assembly: AssemblyFileVersion(FirebirdSql.Data.EntityFramework6.Properties.VersionInfo.Version)]
