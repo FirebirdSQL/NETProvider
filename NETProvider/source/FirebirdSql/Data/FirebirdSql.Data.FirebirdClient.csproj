@@ -382,6 +382,7 @@
     <Compile Include="Server\FbTriggerActionType.cs" />
     <Compile Include="Server\FbTriggerContext.cs" />
     <Compile Include="Server\IResultSet.cs" />
+    <Compile Include="Properties\VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Schema\FbMetaData.xml">

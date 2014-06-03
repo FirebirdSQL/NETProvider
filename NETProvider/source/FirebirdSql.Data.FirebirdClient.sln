@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient", "FirebirdSql\Data\FirebirdSql.Data.FirebirdClient.csproj", "{326A24F9-6259-45DB-835C-18DB80728460}"
 EndProject
@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "installer", "installer", "{
 		..\installer\build.bat = ..\installer\build.bat
 		..\installer\Install.wxs = ..\installer\Install.wxs
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Firebird", "EntityFramework.Firebird\EntityFramework.Firebird.csproj", "{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,10 +40,22 @@ Global
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_40_EF6|Any CPU.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_40|Any CPU.ActiveCfg = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_40|Any CPU.Build.0 = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45_EF6|Any CPU.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.Build.0 = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_Mono_w_Linux|Any CPU.ActiveCfg = Release|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_40_EF6|Any CPU.ActiveCfg = Release_40|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_40_EF6|Any CPU.Build.0 = Release_40|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_40|Any CPU.ActiveCfg = Release_40|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_40|Any CPU.Build.0 = Release_40|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_45_EF6|Any CPU.ActiveCfg = Release_45|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_45_EF6|Any CPU.Build.0 = Release_45|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_45|Any CPU.ActiveCfg = Release_40|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_45|Any CPU.Build.0 = Release_40|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_Mono_w_Linux|Any CPU.ActiveCfg = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
