@@ -43,6 +43,7 @@ using FirebirdSql.Data.Entity;
 using FirebirdSql.Data.Isql;
 using FirebirdSql.Data.Services;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
 
 #if (!EF_6)
 namespace FirebirdSql.Data.FirebirdClient
