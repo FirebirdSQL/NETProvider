@@ -441,7 +441,7 @@ namespace FirebirdSql.Data.EntityFramework6
 #if (!EF_6)
 			return "FirebirdSql.Data.Entity.ProviderManifest.xml";
 #else
-			return "FirebirdSql.Data.EntityFramework6.Resources.Providermanifest.xml";
+			return "FirebirdSql.Data.EntityFramework6.Resources.ProviderManifest.xml";
 #endif
 		}
 
