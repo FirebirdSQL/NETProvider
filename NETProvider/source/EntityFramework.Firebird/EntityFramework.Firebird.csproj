@@ -129,6 +129,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\FirebirdSql\Data\Entity\StoreSchemaDefinition.ssdl">
+      <Link>Resources\StoreSchemaDefinition.ssdl</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\FirebirdSql\Data\Entity\StoreSchemaDefinitionVersion3.ssdl">
+      <Link>Resources\StoreSchemaDefinitionVersion3.ssdl</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\FirebirdSql\Data\Entity\StoreSchemaMapping.msl">
+      <Link>Resources\StoreSchemaMapping.msl</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\FirebirdSql\Data\Entity\StoreSchemaMappingVersion3.msl">
+      <Link>Resources\StoreSchemaMappingVersion3.msl</Link>
+    </EmbeddedResource>
     <None Include="Properties\EntityFramework.Firebird.snk" />
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +148,11 @@
       <Project>{326a24f9-6259-45db-835c-18db80728460}</Project>
       <Name>FirebirdSql.Data.FirebirdClient</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\FirebirdSql\Data\Entity\ProviderManifest.xml">
+      <Link>Resources\ProviderManifest.xml</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		internal static XmlReader GetProviderManifest()
 		{
-			return GetXmlResource("FirebirdSql.Data.Entity.ProviderManifest.xml");
+			return GetXmlResource(GetManifestResourceName());
 		}
 
 		/// <summary>
@@ -89,17 +89,17 @@ namespace FirebirdSql.Data.EntityFramework6
 		{
 			if (informationType == DbProviderManifest.StoreSchemaDefinition
 #if (NET_45 || EF_6)
-				|| informationType == DbProviderManifest.StoreSchemaDefinitionVersion3
+ || informationType == DbProviderManifest.StoreSchemaDefinitionVersion3
 #endif
-				)
+)
 			{
 				return GetStoreSchemaDescription(informationType);
 			}
 			if (informationType == DbProviderManifest.StoreSchemaMapping
 #if (NET_45 || EF_6)
-				|| informationType == DbProviderManifest.StoreSchemaMappingVersion3
+ || informationType == DbProviderManifest.StoreSchemaMappingVersion3
 #endif
-				)
+)
 			{
 				return GetStoreSchemaMapping(informationType);
 			}
@@ -211,8 +211,8 @@ namespace FirebirdSql.Data.EntityFramework6
 					newPrimitiveTypeKind = PrimitiveTypeKind.Binary;
 					isUnbounded = true;
 					isFixedLen = false;
-					break;     
-		  
+					break;
+
 				case "clob":
 					newPrimitiveTypeKind = PrimitiveTypeKind.String;
 					isUnbounded = true;
@@ -421,19 +421,37 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		private XmlReader GetStoreSchemaMapping(string mslName)
 		{
-			return GetXmlResource(string.Format("FirebirdSql.Data.Entity.{0}.msl", mslName));
+			return GetXmlResource(GetStoreSchemaResourceName(mslName, "msl"));
 		}
 
 		private XmlReader GetStoreSchemaDescription(string ssdlName)
 		{
-			return GetXmlResource(string.Format("FirebirdSql.Data.Entity.{0}.ssdl", ssdlName));
+			return GetXmlResource(GetStoreSchemaResourceName(ssdlName, "ssdl"));
 		}
 
-		internal static XmlReader GetXmlResource(string resourceName)
+		private static XmlReader GetXmlResource(string resourceName)
 		{
 			Assembly executingAssembly = Assembly.GetExecutingAssembly();
 			Stream stream = executingAssembly.GetManifestResourceStream(resourceName);
 			return XmlReader.Create(stream);
+		}
+
+		private static string GetManifestResourceName()
+		{
+#if (!EF_6)
+			return "FirebirdSql.Data.Entity.ProviderManifest.xml";
+#else
+			return "FirebirdSql.Data.EntityFramework6.Resources.Providermanifest.xml";
+#endif
+		}
+
+		private static string GetStoreSchemaResourceName(string name, string type)
+		{
+#if (!EF_6)
+			return string.Format("FirebirdSql.Data.Entity.{0}.{1}", name, type);
+#else
+			return string.Format("FirebirdSql.Data.EntityFramework6.Resources.{0}.{1}", name, type);
+#endif
 		}
 
 #if (!NET_35)
