@@ -4,3 +4,4 @@ bin
 obj
 */installer/out/
 DataDesignerExtensibility/installer/in/
+*.nupkg
