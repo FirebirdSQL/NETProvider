@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Services
 
 				StartTask();
 
-				Do();
+				ReadInput();
 			}
 			catch (Exception ex)
 			{
@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		void Do()
+		void ReadInput()
 		{
 			var items = Verbose
 				? new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line }
