@@ -25,16 +25,8 @@ using System;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class IscCodes
+	internal static class IscCodes
 	{
-		#region Constructors
-
-		private IscCodes()
-		{
-		}
-
-		#endregion
-
 		#region General
 
 		public const int SQLDA_VERSION1             = 1;
