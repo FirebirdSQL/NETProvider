@@ -84,29 +84,6 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_40_EF6|AnyCPU'">
-    <OutputPath>bin\Release_40_EF6\</OutputPath>
-    <DefineConstants>TRACE;NET_40;EF_6</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_45_EF6|AnyCPU'">
-    <OutputPath>bin\Release_45_EF6\</OutputPath>
-    <DefineConstants>TRACE;NET_45;EF_6</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-  </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <Reference Include="System.Data.Entity" />
     <Reference Include="EntityFramework">
@@ -129,16 +106,6 @@
     <Reference Include="System.Data.Entity" />
     <Reference Include="EntityFramework">
       <HintPath>..\..\..\lib\EF5\net40\EntityFramework.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_40_EF6|AnyCPU'">
-    <Reference Include="EntityFramework">
-      <HintPath>..\..\..\lib\EF6\net40\EntityFramework.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_45_EF6|AnyCPU'">
-    <Reference Include="EntityFramework">
-      <HintPath>..\..\..\lib\EF6\net45\EntityFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
