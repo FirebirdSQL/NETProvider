@@ -122,7 +122,7 @@ namespace FirebirdSql.Data.Services
 
 		int GetLength(ArrayList items)
 		{
-			var maxLength = (32 * 1024) - 4;
+			const int maxLength = (32 * 1024) - 4;
 			return Math.Min(items[0] is int ? (int)items[0] : 0, maxLength);
 		}
 
