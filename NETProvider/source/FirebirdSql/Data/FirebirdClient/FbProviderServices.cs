@@ -74,18 +74,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			return result;
 		}
 
-		private FbConnection CheckAndCastToFbConnection(DbConnection connection)
-		{
-			if (!(connection is FbConnection))
-			{
-				throw new ArgumentException("The connection is not of type 'FbConnection'.");
-			}
-			return (FbConnection)connection;
-		}
-
-		/// <summary>
-		/// Create a SampleCommand object, given the provider manifest and command tree
-		/// </summary>
 		private DbCommand CreateCommand(DbProviderManifest manifest, DbCommandTree commandTree)
 		{
 			if (manifest == null)
@@ -153,25 +141,27 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected override string GetDbProviderManifestToken(DbConnection connection)
 		{
-			if (connection == null)
-				throw new ArgumentException("connection");
-
-			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
-
-			if (string.IsNullOrEmpty(fbConnection.ConnectionString))
+			var shouldClose = false;
+			if (connection.State == ConnectionState.Closed)
 			{
-				throw new ArgumentException("Could not determine storage version; a valid storage connection is required.");
+				connection.Open();
+				shouldClose = true;
 			}
-
 			try
 			{
-				FbServerProperties serverProperties = new FbServerProperties() { ConnectionString = fbConnection.ConnectionString };
-				Version serverVersion = FbServerProperties.ParseServerVersion(serverProperties.GetServerVersion());
+				Version serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
 				return serverVersion.ToString(2);
 			}
-			catch (FbException ex)
+			catch (Exception ex)
 			{
 				throw new InvalidOperationException("Could not retrieve storage version.", ex);
+			}
+			finally
+			{
+				if (shouldClose)
+				{
+					connection.Close();
+				}
 			}
 		}
 
@@ -185,9 +175,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			return new FbProviderManifest(versionHint);
 		}
 
-		/// <summary>
-		/// Creates a SqlParameter given a name, type, and direction
-		/// </summary>
 		internal static FbParameter CreateSqlParameter(string name, TypeUsage type, ParameterMode mode, object value)
 		{
 			int? size;
@@ -226,10 +213,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			return result;
 		}
 
-		/// <summary>
-		/// Determines SqlDbType for the given primitive type. Extracts facet
-		/// information as well.
-		/// </summary>
 		private static FbDbType GetSqlDbType(TypeUsage type, bool isOutParam, out int? size)
 		{
 			// only supported for primitive type
@@ -284,10 +267,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 		}
 
-		/// <summary>
-		/// Determines preferred value for SqlParameter.Size. Returns null
-		/// where there is no preference.
-		/// </summary>
 		private static int? GetParameterSize(TypeUsage type, bool isOutParam)
 		{
 			int? maxLength;
@@ -309,9 +288,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 		}
 
-		/// <summary>
-		/// Chooses the appropriate FbDbType for the given string type.
-		/// </summary>
 		private static FbDbType GetStringDbType(TypeUsage type)
 		{
 			Debug.Assert(type.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType &&
@@ -356,9 +332,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			return dbType;
 		}
 
-		/// <summary>
-		/// Chooses the appropriate FbDbType for the given binary type.
-		/// </summary>
 		private static FbDbType GetBinaryDbType(TypeUsage type)
 		{
 			Debug.Assert(type.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType &&
@@ -439,12 +412,15 @@ namespace FirebirdSql.Data.EntityFramework6
 			StoreItemCollection storeItemCollection)
 #pragma warning restore 3001
 		{
-			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
-			string script = DbCreateDatabaseScript(GetDbProviderManifestToken(fbConnection), storeItemCollection);
+			FbConnection.CreateDatabase(connection.ConnectionString);
+			string script = DbCreateDatabaseScript(GetDbProviderManifestToken(connection), storeItemCollection);
 			FbScript fbScript = new FbScript(script);
 			fbScript.Parse();
-			FbConnection.CreateDatabase(fbConnection.ConnectionString);
-			new FbBatchExecution(fbConnection, fbScript).Execute();	
+			using (var fbConnection = new FbConnection(connection.ConnectionString))
+			{
+				var execution = new FbBatchExecution(fbConnection, fbScript);
+				execution.Execute();
+			}
 		}
 
 		protected override string DbCreateDatabaseScript(string providerManifestToken,
@@ -493,7 +469,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			StoreItemCollection storeItemCollection)
 #pragma warning restore 3001
 		{
-			FbConnection fbConnection = CheckAndCastToFbConnection(connection);
 			FbConnection.DropDatabase(connection.ConnectionString);
 		}
 #endif
