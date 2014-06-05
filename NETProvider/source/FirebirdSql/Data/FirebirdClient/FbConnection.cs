@@ -230,19 +230,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public Version ServerVersionNumber
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(this.ServerVersion))
-					throw new InvalidOperationException("ServerVersion is not valid.");
-
-				return FbServerProperties.ParseServerVersion(this.ServerVersion);
-			}
-		}
-
-		[Browsable(false)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public override ConnectionState State
 		{
 			get { return this.state; }
