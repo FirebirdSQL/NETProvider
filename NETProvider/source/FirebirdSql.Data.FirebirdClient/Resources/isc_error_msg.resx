@@ -1,0 +1,3016 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="335544321" xml:space="preserve">
+    <value>arithmetic exception, numeric overflow, or string truncation</value>
+  </data>
+  <data name="335544322" xml:space="preserve">
+    <value>invalid database key</value>
+  </data>
+  <data name="335544323" xml:space="preserve">
+    <value>file {0} is not a valid database</value>
+  </data>
+  <data name="335544324" xml:space="preserve">
+    <value>invalid database handle (no active connection)</value>
+  </data>
+  <data name="335544325" xml:space="preserve">
+    <value>bad parameters on attach or create database</value>
+  </data>
+  <data name="335544326" xml:space="preserve">
+    <value>unrecognized database parameter block</value>
+  </data>
+  <data name="335544327" xml:space="preserve">
+    <value>invalid request handle</value>
+  </data>
+  <data name="335544328" xml:space="preserve">
+    <value>invalid BLOB handle</value>
+  </data>
+  <data name="335544329" xml:space="preserve">
+    <value>invalid BLOB ID</value>
+  </data>
+  <data name="335544330" xml:space="preserve">
+    <value>invalid parameter in transaction parameter block</value>
+  </data>
+  <data name="335544331" xml:space="preserve">
+    <value>invalid format for transaction parameter block</value>
+  </data>
+  <data name="335544332" xml:space="preserve">
+    <value>invalid transaction handle (expecting explicit transaction start)</value>
+  </data>
+  <data name="335544333" xml:space="preserve">
+    <value>internal Firebird consistency check ({0})</value>
+  </data>
+  <data name="335544334" xml:space="preserve">
+    <value>conversion error from string "{0}"</value>
+  </data>
+  <data name="335544335" xml:space="preserve">
+    <value>database file appears corrupt ({0})</value>
+  </data>
+  <data name="335544336" xml:space="preserve">
+    <value>deadlock</value>
+  </data>
+  <data name="335544337" xml:space="preserve">
+    <value>attempt to start more than {0} transactions</value>
+  </data>
+  <data name="335544338" xml:space="preserve">
+    <value>no match for first value expression</value>
+  </data>
+  <data name="335544339" xml:space="preserve">
+    <value>information type inappropriate for object specified</value>
+  </data>
+  <data name="335544340" xml:space="preserve">
+    <value>no information of this type available for object specified</value>
+  </data>
+  <data name="335544341" xml:space="preserve">
+    <value>unknown information item</value>
+  </data>
+  <data name="335544342" xml:space="preserve">
+    <value>action cancelled by trigger ({0}) to preserve data integrity</value>
+  </data>
+  <data name="335544343" xml:space="preserve">
+    <value>invalid request BLR at offset {0}</value>
+  </data>
+  <data name="335544344" xml:space="preserve">
+    <value>I/O error during "{0}" operation for file "{1}"</value>
+  </data>
+  <data name="335544345" xml:space="preserve">
+    <value>lock conflict on no wait transaction</value>
+  </data>
+  <data name="335544346" xml:space="preserve">
+    <value>corrupt system table</value>
+  </data>
+  <data name="335544347" xml:space="preserve">
+    <value>validation error for column {0}, value "{1}"</value>
+  </data>
+  <data name="335544348" xml:space="preserve">
+    <value>no current record for fetch operation</value>
+  </data>
+  <data name="335544349" xml:space="preserve">
+    <value>attempt to store duplicate value (visible to active transactions) in unique index "{0}"</value>
+  </data>
+  <data name="335544350" xml:space="preserve">
+    <value>program attempted to exit without finishing database</value>
+  </data>
+  <data name="335544351" xml:space="preserve">
+    <value>unsuccessful metadata update</value>
+  </data>
+  <data name="335544352" xml:space="preserve">
+    <value>no permission for {0} access to {1} {2}</value>
+  </data>
+  <data name="335544353" xml:space="preserve">
+    <value>transaction is not in limbo</value>
+  </data>
+  <data name="335544354" xml:space="preserve">
+    <value>invalid database key</value>
+  </data>
+  <data name="335544355" xml:space="preserve">
+    <value>BLOB was not closed</value>
+  </data>
+  <data name="335544356" xml:space="preserve">
+    <value>metadata is obsolete</value>
+  </data>
+  <data name="335544357" xml:space="preserve">
+    <value>cannot disconnect database with open transactions ({0} active)</value>
+  </data>
+  <data name="335544358" xml:space="preserve">
+    <value>message length error (encountered {0}, expected {1})</value>
+  </data>
+  <data name="335544359" xml:space="preserve">
+    <value>attempted update of read-only column</value>
+  </data>
+  <data name="335544360" xml:space="preserve">
+    <value>attempted update of read-only table</value>
+  </data>
+  <data name="335544361" xml:space="preserve">
+    <value>attempted update during read-only transaction</value>
+  </data>
+  <data name="335544362" xml:space="preserve">
+    <value>cannot update read-only view {0}</value>
+  </data>
+  <data name="335544363" xml:space="preserve">
+    <value>no transaction for request</value>
+  </data>
+  <data name="335544364" xml:space="preserve">
+    <value>request synchronization error</value>
+  </data>
+  <data name="335544365" xml:space="preserve">
+    <value>request referenced an unavailable database</value>
+  </data>
+  <data name="335544366" xml:space="preserve">
+    <value>segment buffer length shorter than expected</value>
+  </data>
+  <data name="335544367" xml:space="preserve">
+    <value>attempted retrieval of more segments than exist</value>
+  </data>
+  <data name="335544368" xml:space="preserve">
+    <value>attempted invalid operation on a BLOB</value>
+  </data>
+  <data name="335544369" xml:space="preserve">
+    <value>attempted read of a new, open BLOB</value>
+  </data>
+  <data name="335544370" xml:space="preserve">
+    <value>attempted action on BLOB outside transaction</value>
+  </data>
+  <data name="335544371" xml:space="preserve">
+    <value>attempted write to read-only BLOB</value>
+  </data>
+  <data name="335544372" xml:space="preserve">
+    <value>attempted reference to BLOB in unavailable database</value>
+  </data>
+  <data name="335544373" xml:space="preserve">
+    <value>operating system directive {0} failed</value>
+  </data>
+  <data name="335544374" xml:space="preserve">
+    <value>attempt to fetch past the last record in a record stream</value>
+  </data>
+  <data name="335544375" xml:space="preserve">
+    <value>unavailable database</value>
+  </data>
+  <data name="335544376" xml:space="preserve">
+    <value>table {0} was omitted from the transaction reserving list</value>
+  </data>
+  <data name="335544377" xml:space="preserve">
+    <value>request includes a DSRI extension not supported in this implementation</value>
+  </data>
+  <data name="335544378" xml:space="preserve">
+    <value>feature is not supported</value>
+  </data>
+  <data name="335544379" xml:space="preserve">
+    <value>unsupported on-disk structure for file {0}; found {1}.{2}, support {3}.{4}</value>
+  </data>
+  <data name="335544380" xml:space="preserve">
+    <value>wrong number of arguments on call</value>
+  </data>
+  <data name="335544381" xml:space="preserve">
+    <value>Implementation limit exceeded</value>
+  </data>
+  <data name="335544382" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="335544383" xml:space="preserve">
+    <value>unrecoverable conflict with limbo transaction {0}</value>
+  </data>
+  <data name="335544384" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544385" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544386" xml:space="preserve">
+    <value>too many requests</value>
+  </data>
+  <data name="335544387" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544388" xml:space="preserve">
+    <value>block size exceeds implementation restriction</value>
+  </data>
+  <data name="335544389" xml:space="preserve">
+    <value>buffer exhausted</value>
+  </data>
+  <data name="335544390" xml:space="preserve">
+    <value>BLR syntax error: expected {0} at offset {1}, encountered {2}</value>
+  </data>
+  <data name="335544391" xml:space="preserve">
+    <value>buffer in use</value>
+  </data>
+  <data name="335544392" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544393" xml:space="preserve">
+    <value>request in use</value>
+  </data>
+  <data name="335544394" xml:space="preserve">
+    <value>incompatible version of on-disk structure</value>
+  </data>
+  <data name="335544395" xml:space="preserve">
+    <value>table {0} is not defined</value>
+  </data>
+  <data name="335544396" xml:space="preserve">
+    <value>column {0} is not defined in table {1}</value>
+  </data>
+  <data name="335544397" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544398" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544399" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544400" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544401" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544402" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544403" xml:space="preserve">
+    <value>page {0} is of wrong type (expected {1}, found {2})</value>
+  </data>
+  <data name="335544404" xml:space="preserve">
+    <value>database corrupted</value>
+  </data>
+  <data name="335544405" xml:space="preserve">
+    <value>checksum error on database page {0}</value>
+  </data>
+  <data name="335544406" xml:space="preserve">
+    <value>index is broken</value>
+  </data>
+  <data name="335544407" xml:space="preserve">
+    <value>database handle not zero</value>
+  </data>
+  <data name="335544408" xml:space="preserve">
+    <value>transaction handle not zero</value>
+  </data>
+  <data name="335544409" xml:space="preserve">
+    <value>transaction--request mismatch (synchronization error)</value>
+  </data>
+  <data name="335544410" xml:space="preserve">
+    <value>bad handle count</value>
+  </data>
+  <data name="335544411" xml:space="preserve">
+    <value>wrong version of transaction parameter block</value>
+  </data>
+  <data name="335544412" xml:space="preserve">
+    <value>unsupported BLR version (expected {0}, encountered {1})</value>
+  </data>
+  <data name="335544413" xml:space="preserve">
+    <value>wrong version of database parameter block</value>
+  </data>
+  <data name="335544414" xml:space="preserve">
+    <value>BLOB and array data types are not supported for {0} operation</value>
+  </data>
+  <data name="335544415" xml:space="preserve">
+    <value>database corrupted</value>
+  </data>
+  <data name="335544416" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544417" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544418" xml:space="preserve">
+    <value>transaction in limbo</value>
+  </data>
+  <data name="335544419" xml:space="preserve">
+    <value>transaction not in limbo</value>
+  </data>
+  <data name="335544420" xml:space="preserve">
+    <value>transaction outstanding</value>
+  </data>
+  <data name="335544421" xml:space="preserve">
+    <value>connection rejected by remote interface</value>
+  </data>
+  <data name="335544422" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544423" xml:space="preserve">
+    <value>internal error</value>
+  </data>
+  <data name="335544424" xml:space="preserve">
+    <value>no lock manager available</value>
+  </data>
+  <data name="335544425" xml:space="preserve">
+    <value>context already in use (BLR error)</value>
+  </data>
+  <data name="335544426" xml:space="preserve">
+    <value>context not defined (BLR error)</value>
+  </data>
+  <data name="335544427" xml:space="preserve">
+    <value>data operation not supported</value>
+  </data>
+  <data name="335544428" xml:space="preserve">
+    <value>undefined message number</value>
+  </data>
+  <data name="335544429" xml:space="preserve">
+    <value>bad parameter number</value>
+  </data>
+  <data name="335544430" xml:space="preserve">
+    <value>unable to allocate memory from operating system</value>
+  </data>
+  <data name="335544431" xml:space="preserve">
+    <value>blocking signal has been received</value>
+  </data>
+  <data name="335544432" xml:space="preserve">
+    <value>lock manager error</value>
+  </data>
+  <data name="335544433" xml:space="preserve">
+    <value>communication error with journal "{0}"</value>
+  </data>
+  <data name="335544434" xml:space="preserve">
+    <value>key size exceeds implementation restriction for index "{0}"</value>
+  </data>
+  <data name="335544435" xml:space="preserve">
+    <value>null segment of UNIQUE KEY</value>
+  </data>
+  <data name="335544436" xml:space="preserve">
+    <value>SQL error code = {0}</value>
+  </data>
+  <data name="335544437" xml:space="preserve">
+    <value>wrong DYN version</value>
+  </data>
+  <data name="335544438" xml:space="preserve">
+    <value>function {0} is not defined</value>
+  </data>
+  <data name="335544439" xml:space="preserve">
+    <value>function {0} could not be matched</value>
+  </data>
+  <data name="335544440" xml:space="preserve">
+    <value />
+  </data>
+  <data name="335544441" xml:space="preserve">
+    <value>database detach completed with errors</value>
+  </data>
+  <data name="335544442" xml:space="preserve">
+    <value>database system cannot read argument {0}</value>
+  </data>
+  <data name="335544443" xml:space="preserve">
+    <value>database system cannot write argument {0}</value>
+  </data>
+  <data name="335544444" xml:space="preserve">
+    <value>operation not supported</value>
+  </data>
+  <data name="335544445" xml:space="preserve">
+    <value>{0} extension error</value>
+  </data>
+  <data name="335544446" xml:space="preserve">
+    <value>not updatable</value>
+  </data>
+  <data name="335544447" xml:space="preserve">
+    <value>no rollback performed</value>
+  </data>
+  <data name="335544448" xml:space="preserve">
+    <value />
+  </data>
+  <data name="335544449" xml:space="preserve">
+    <value />
+  </data>
+  <data name="335544450" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="335544451" xml:space="preserve">
+    <value>update conflicts with concurrent update</value>
+  </data>
+  <data name="335544452" xml:space="preserve">
+    <value>product {0} is not licensed</value>
+  </data>
+  <data name="335544453" xml:space="preserve">
+    <value>object {0} is in use</value>
+  </data>
+  <data name="335544454" xml:space="preserve">
+    <value>filter not found to convert type {0} to type {1}</value>
+  </data>
+  <data name="335544455" xml:space="preserve">
+    <value>cannot attach active shadow file</value>
+  </data>
+  <data name="335544456" xml:space="preserve">
+    <value>invalid slice description language at offset {0}</value>
+  </data>
+  <data name="335544457" xml:space="preserve">
+    <value>subscript out of bounds</value>
+  </data>
+  <data name="335544458" xml:space="preserve">
+    <value>column not array or invalid dimensions (expected {0}, encountered {1})</value>
+  </data>
+  <data name="335544459" xml:space="preserve">
+    <value>record from transaction {0} is stuck in limbo</value>
+  </data>
+  <data name="335544460" xml:space="preserve">
+    <value>a file in manual shadow {0} is unavailable</value>
+  </data>
+  <data name="335544461" xml:space="preserve">
+    <value>secondary server attachments cannot validate databases</value>
+  </data>
+  <data name="335544462" xml:space="preserve">
+    <value>secondary server attachments cannot start journaling</value>
+  </data>
+  <data name="335544463" xml:space="preserve">
+    <value>generator {0} is not defined</value>
+  </data>
+  <data name="335544464" xml:space="preserve">
+    <value>secondary server attachments cannot start logging</value>
+  </data>
+  <data name="335544465" xml:space="preserve">
+    <value>invalid BLOB type for operation</value>
+  </data>
+  <data name="335544466" xml:space="preserve">
+    <value>violation of FOREIGN KEY constraint "{0}" on table "{1}"</value>
+  </data>
+  <data name="335544467" xml:space="preserve">
+    <value>minor version too high found {0} expected {1}</value>
+  </data>
+  <data name="335544468" xml:space="preserve">
+    <value>transaction {0} is {1}</value>
+  </data>
+  <data name="335544469" xml:space="preserve">
+    <value>transaction marked invalid by I/O error</value>
+  </data>
+  <data name="335544470" xml:space="preserve">
+    <value>cache buffer for page {0} invalid</value>
+  </data>
+  <data name="335544471" xml:space="preserve">
+    <value>there is no index in table {0} with id {1}</value>
+  </data>
+  <data name="335544472" xml:space="preserve">
+    <value>Your user name and password are not defined. Ask your database administrator to set up a Firebird login.</value>
+  </data>
+  <data name="335544473" xml:space="preserve">
+    <value>invalid bookmark handle</value>
+  </data>
+  <data name="335544474" xml:space="preserve">
+    <value>invalid lock level {0}</value>
+  </data>
+  <data name="335544475" xml:space="preserve">
+    <value>lock on table {0} conflicts with existing lock</value>
+  </data>
+  <data name="335544476" xml:space="preserve">
+    <value>requested record lock conflicts with existing lock</value>
+  </data>
+  <data name="335544477" xml:space="preserve">
+    <value>maximum indexes per table ({0}) exceeded</value>
+  </data>
+  <data name="335544478" xml:space="preserve">
+    <value>enable journal for database before starting online dump</value>
+  </data>
+  <data name="335544479" xml:space="preserve">
+    <value>online dump failure. Retry dump</value>
+  </data>
+  <data name="335544480" xml:space="preserve">
+    <value>an online dump is already in progress</value>
+  </data>
+  <data name="335544481" xml:space="preserve">
+    <value>no more disk/tape space.  Cannot continue online dump</value>
+  </data>
+  <data name="335544482" xml:space="preserve">
+    <value>journaling allowed only if database has Write-ahead Log</value>
+  </data>
+  <data name="335544483" xml:space="preserve">
+    <value>maximum number of online dump files that can be specified is 16</value>
+  </data>
+  <data name="335544484" xml:space="preserve">
+    <value>error in opening Write-ahead Log file during recovery</value>
+  </data>
+  <data name="335544485" xml:space="preserve">
+    <value>invalid statement handle</value>
+  </data>
+  <data name="335544486" xml:space="preserve">
+    <value>Write-ahead log subsystem failure</value>
+  </data>
+  <data name="335544487" xml:space="preserve">
+    <value>WAL Writer error</value>
+  </data>
+  <data name="335544488" xml:space="preserve">
+    <value>Log file header of {0} too small</value>
+  </data>
+  <data name="335544489" xml:space="preserve">
+    <value>Invalid version of log file {0}</value>
+  </data>
+  <data name="335544490" xml:space="preserve">
+    <value>Log file {0} not latest in the chain but open flag still set</value>
+  </data>
+  <data name="335544491" xml:space="preserve">
+    <value>Log file {0} not closed properly; database recovery may be required</value>
+  </data>
+  <data name="335544492" xml:space="preserve">
+    <value>Database name in the log file {0} is different</value>
+  </data>
+  <data name="335544493" xml:space="preserve">
+    <value>Unexpected end of log file {0} at offset {1}</value>
+  </data>
+  <data name="335544494" xml:space="preserve">
+    <value>Incomplete log record at offset {0} in log file {1}</value>
+  </data>
+  <data name="335544495" xml:space="preserve">
+    <value>Log record header too small at offset {0} in log file {1}</value>
+  </data>
+  <data name="335544496" xml:space="preserve">
+    <value>Log block too small at offset {0} in log file {1}</value>
+  </data>
+  <data name="335544497" xml:space="preserve">
+    <value>Illegal attempt to attach to an uninitialized WAL segment for {0}</value>
+  </data>
+  <data name="335544498" xml:space="preserve">
+    <value>Invalid WAL parameter block option {0}</value>
+  </data>
+  <data name="335544499" xml:space="preserve">
+    <value>Cannot roll over to the next log file {0}</value>
+  </data>
+  <data name="335544500" xml:space="preserve">
+    <value>database does not use Write-ahead Log</value>
+  </data>
+  <data name="335544501" xml:space="preserve">
+    <value>cannot drop log file when journaling is enabled</value>
+  </data>
+  <data name="335544502" xml:space="preserve">
+    <value>reference to invalid stream number</value>
+  </data>
+  <data name="335544503" xml:space="preserve">
+    <value>WAL subsystem encountered error</value>
+  </data>
+  <data name="335544504" xml:space="preserve">
+    <value>WAL subsystem corrupted</value>
+  </data>
+  <data name="335544505" xml:space="preserve">
+    <value>must specify archive file when enabling long term journal for databases with round-robin log files</value>
+  </data>
+  <data name="335544506" xml:space="preserve">
+    <value>database {0} shutdown in progress</value>
+  </data>
+  <data name="335544507" xml:space="preserve">
+    <value>refresh range number {0} already in use</value>
+  </data>
+  <data name="335544508" xml:space="preserve">
+    <value>refresh range number {0} not found</value>
+  </data>
+  <data name="335544509" xml:space="preserve">
+    <value>CHARACTER SET {0} is not defined</value>
+  </data>
+  <data name="335544510" xml:space="preserve">
+    <value>lock time-out on wait transaction</value>
+  </data>
+  <data name="335544511" xml:space="preserve">
+    <value>procedure {0} is not defined</value>
+  </data>
+  <data name="335544512" xml:space="preserve">
+    <value>Input parameter mismatch for procedure {0}</value>
+  </data>
+  <data name="335544513" xml:space="preserve">
+    <value>Database {0}: WAL subsystem bug for pid {1}
+{2}</value>
+  </data>
+  <data name="335544514" xml:space="preserve">
+    <value>Could not expand the WAL segment for database {0}</value>
+  </data>
+  <data name="335544515" xml:space="preserve">
+    <value>status code {0} unknown</value>
+  </data>
+  <data name="335544516" xml:space="preserve">
+    <value>exception {0} not defined</value>
+  </data>
+  <data name="335544517" xml:space="preserve">
+    <value>exception {0}</value>
+  </data>
+  <data name="335544518" xml:space="preserve">
+    <value>restart shared cache manager</value>
+  </data>
+  <data name="335544519" xml:space="preserve">
+    <value>invalid lock handle</value>
+  </data>
+  <data name="335544520" xml:space="preserve">
+    <value>long-term journaling already enabled</value>
+  </data>
+  <data name="335544521" xml:space="preserve">
+    <value>Unable to roll over please see Firebird log.</value>
+  </data>
+  <data name="335544522" xml:space="preserve">
+    <value>WAL I/O error.  Please see Firebird log.</value>
+  </data>
+  <data name="335544523" xml:space="preserve">
+    <value>WAL writer - Journal server communication error.  Please see Firebird log.</value>
+  </data>
+  <data name="335544524" xml:space="preserve">
+    <value>WAL buffers cannot be increased.  Please see Firebird log.</value>
+  </data>
+  <data name="335544525" xml:space="preserve">
+    <value>WAL setup error.  Please see Firebird log.</value>
+  </data>
+  <data name="335544526" xml:space="preserve">
+    <value>obsolete</value>
+  </data>
+  <data name="335544527" xml:space="preserve">
+    <value>Cannot start WAL writer for the database {0}</value>
+  </data>
+  <data name="335544528" xml:space="preserve">
+    <value>database {0} shutdown</value>
+  </data>
+  <data name="335544529" xml:space="preserve">
+    <value>cannot modify an existing user privilege</value>
+  </data>
+  <data name="335544530" xml:space="preserve">
+    <value>Cannot delete PRIMARY KEY being used in FOREIGN KEY definition.</value>
+  </data>
+  <data name="335544531" xml:space="preserve">
+    <value>Column used in a PRIMARY constraint must be NOT NULL.</value>
+  </data>
+  <data name="335544532" xml:space="preserve">
+    <value>Name of Referential Constraint not defined in constraints table.</value>
+  </data>
+  <data name="335544533" xml:space="preserve">
+    <value>Non-existent PRIMARY or UNIQUE KEY specified for FOREIGN KEY.</value>
+  </data>
+  <data name="335544534" xml:space="preserve">
+    <value>Cannot update constraints (RDB$REF_CONSTRAINTS).</value>
+  </data>
+  <data name="335544535" xml:space="preserve">
+    <value>Cannot update constraints (RDB$CHECK_CONSTRAINTS).</value>
+  </data>
+  <data name="335544536" xml:space="preserve">
+    <value>Cannot delete CHECK constraint entry (RDB$CHECK_CONSTRAINTS)</value>
+  </data>
+  <data name="335544537" xml:space="preserve">
+    <value>Cannot delete index segment used by an Integrity Constraint</value>
+  </data>
+  <data name="335544538" xml:space="preserve">
+    <value>Cannot update index segment used by an Integrity Constraint</value>
+  </data>
+  <data name="335544539" xml:space="preserve">
+    <value>Cannot delete index used by an Integrity Constraint</value>
+  </data>
+  <data name="335544540" xml:space="preserve">
+    <value>Cannot modify index used by an Integrity Constraint</value>
+  </data>
+  <data name="335544541" xml:space="preserve">
+    <value>Cannot delete trigger used by a CHECK Constraint</value>
+  </data>
+  <data name="335544542" xml:space="preserve">
+    <value>Cannot update trigger used by a CHECK Constraint</value>
+  </data>
+  <data name="335544543" xml:space="preserve">
+    <value>Cannot delete column being used in an Integrity Constraint.</value>
+  </data>
+  <data name="335544544" xml:space="preserve">
+    <value>Cannot rename column being used in an Integrity Constraint.</value>
+  </data>
+  <data name="335544545" xml:space="preserve">
+    <value>Cannot update constraints (RDB$RELATION_CONSTRAINTS).</value>
+  </data>
+  <data name="335544546" xml:space="preserve">
+    <value>Cannot define constraints on views</value>
+  </data>
+  <data name="335544547" xml:space="preserve">
+    <value>internal Firebird consistency check (invalid RDB$CONSTRAINT_TYPE)</value>
+  </data>
+  <data name="335544548" xml:space="preserve">
+    <value>Attempt to define a second PRIMARY KEY for the same table</value>
+  </data>
+  <data name="335544549" xml:space="preserve">
+    <value>cannot modify or erase a system trigger</value>
+  </data>
+  <data name="335544550" xml:space="preserve">
+    <value>only the owner of a table may reassign ownership</value>
+  </data>
+  <data name="335544551" xml:space="preserve">
+    <value>could not find table/procedure for GRANT</value>
+  </data>
+  <data name="335544552" xml:space="preserve">
+    <value>could not find column for GRANT</value>
+  </data>
+  <data name="335544553" xml:space="preserve">
+    <value>user does not have GRANT privileges for operation</value>
+  </data>
+  <data name="335544554" xml:space="preserve">
+    <value>table/procedure has non-SQL security class defined</value>
+  </data>
+  <data name="335544555" xml:space="preserve">
+    <value>column has non-SQL security class defined</value>
+  </data>
+  <data name="335544556" xml:space="preserve">
+    <value>Write-ahead Log without shared cache configuration not allowed</value>
+  </data>
+  <data name="335544557" xml:space="preserve">
+    <value>database shutdown unsuccessful</value>
+  </data>
+  <data name="335544558" xml:space="preserve">
+    <value>Operation violates CHECK constraint {0} on view or table {1}</value>
+  </data>
+  <data name="335544559" xml:space="preserve">
+    <value>invalid service handle</value>
+  </data>
+  <data name="335544560" xml:space="preserve">
+    <value>database {0} shutdown in {1} seconds</value>
+  </data>
+  <data name="335544561" xml:space="preserve">
+    <value>wrong version of service parameter block</value>
+  </data>
+  <data name="335544562" xml:space="preserve">
+    <value>unrecognized service parameter block</value>
+  </data>
+  <data name="335544563" xml:space="preserve">
+    <value>service {0} is not defined</value>
+  </data>
+  <data name="335544564" xml:space="preserve">
+    <value>long-term journaling not enabled</value>
+  </data>
+  <data name="335544565" xml:space="preserve">
+    <value>Cannot transliterate character between character sets</value>
+  </data>
+  <data name="335544566" xml:space="preserve">
+    <value>WAL defined; Cache Manager must be started first</value>
+  </data>
+  <data name="335544567" xml:space="preserve">
+    <value>Overflow log specification required for round-robin log</value>
+  </data>
+  <data name="335544568" xml:space="preserve">
+    <value>Implementation of text subtype {0} not located.</value>
+  </data>
+  <data name="335544569" xml:space="preserve">
+    <value>Dynamic SQL Error</value>
+  </data>
+  <data name="335544570" xml:space="preserve">
+    <value>Invalid command</value>
+  </data>
+  <data name="335544571" xml:space="preserve">
+    <value>Data type for constant unknown</value>
+  </data>
+  <data name="335544572" xml:space="preserve">
+    <value>Invalid cursor reference</value>
+  </data>
+  <data name="335544573" xml:space="preserve">
+    <value>Data type unknown</value>
+  </data>
+  <data name="335544574" xml:space="preserve">
+    <value>Invalid cursor declaration</value>
+  </data>
+  <data name="335544575" xml:space="preserve">
+    <value>Cursor {0} is not updatable</value>
+  </data>
+  <data name="335544576" xml:space="preserve">
+    <value>Attempt to reopen an open cursor</value>
+  </data>
+  <data name="335544577" xml:space="preserve">
+    <value>Attempt to reclose a closed cursor</value>
+  </data>
+  <data name="335544578" xml:space="preserve">
+    <value>Column unknown</value>
+  </data>
+  <data name="335544579" xml:space="preserve">
+    <value>Internal error</value>
+  </data>
+  <data name="335544580" xml:space="preserve">
+    <value>Table unknown</value>
+  </data>
+  <data name="335544581" xml:space="preserve">
+    <value>Procedure unknown</value>
+  </data>
+  <data name="335544582" xml:space="preserve">
+    <value>Request unknown</value>
+  </data>
+  <data name="335544583" xml:space="preserve">
+    <value>SQLDA missing or incorrect version, or incorrect number/type of variables</value>
+  </data>
+  <data name="335544584" xml:space="preserve">
+    <value>Count of read-write columns does not equal count of values</value>
+  </data>
+  <data name="335544585" xml:space="preserve">
+    <value>Invalid statement handle</value>
+  </data>
+  <data name="335544586" xml:space="preserve">
+    <value>Function unknown</value>
+  </data>
+  <data name="335544587" xml:space="preserve">
+    <value>Column is not a BLOB</value>
+  </data>
+  <data name="335544588" xml:space="preserve">
+    <value>COLLATION {0} for CHARACTER SET {1} is not defined</value>
+  </data>
+  <data name="335544589" xml:space="preserve">
+    <value>COLLATION {0} is not valid for specified CHARACTER SET</value>
+  </data>
+  <data name="335544590" xml:space="preserve">
+    <value>Option specified more than once</value>
+  </data>
+  <data name="335544591" xml:space="preserve">
+    <value>Unknown transaction option</value>
+  </data>
+  <data name="335544592" xml:space="preserve">
+    <value>Invalid array reference</value>
+  </data>
+  <data name="335544593" xml:space="preserve">
+    <value>Array declared with too many dimensions</value>
+  </data>
+  <data name="335544594" xml:space="preserve">
+    <value>Illegal array dimension range</value>
+  </data>
+  <data name="335544595" xml:space="preserve">
+    <value>Trigger unknown</value>
+  </data>
+  <data name="335544596" xml:space="preserve">
+    <value>Subselect illegal in this context</value>
+  </data>
+  <data name="335544597" xml:space="preserve">
+    <value>Cannot prepare a CREATE DATABASE/SCHEMA statement</value>
+  </data>
+  <data name="335544598" xml:space="preserve">
+    <value>must specify column name for view select expression</value>
+  </data>
+  <data name="335544599" xml:space="preserve">
+    <value>number of columns does not match select list</value>
+  </data>
+  <data name="335544600" xml:space="preserve">
+    <value>Only simple column names permitted for VIEW WITH CHECK OPTION</value>
+  </data>
+  <data name="335544601" xml:space="preserve">
+    <value>No WHERE clause for VIEW WITH CHECK OPTION</value>
+  </data>
+  <data name="335544602" xml:space="preserve">
+    <value>Only one table allowed for VIEW WITH CHECK OPTION</value>
+  </data>
+  <data name="335544603" xml:space="preserve">
+    <value>DISTINCT, GROUP or HAVING not permitted for VIEW WITH CHECK OPTION</value>
+  </data>
+  <data name="335544604" xml:space="preserve">
+    <value>FOREIGN KEY column count does not match PRIMARY KEY</value>
+  </data>
+  <data name="335544605" xml:space="preserve">
+    <value>No subqueries permitted for VIEW WITH CHECK OPTION</value>
+  </data>
+  <data name="335544606" xml:space="preserve">
+    <value>expression evaluation not supported</value>
+  </data>
+  <data name="335544607" xml:space="preserve">
+    <value>gen.c: node not supported</value>
+  </data>
+  <data name="335544608" xml:space="preserve">
+    <value>Unexpected end of command</value>
+  </data>
+  <data name="335544609" xml:space="preserve">
+    <value>INDEX {0}</value>
+  </data>
+  <data name="335544610" xml:space="preserve">
+    <value>EXCEPTION {0}</value>
+  </data>
+  <data name="335544611" xml:space="preserve">
+    <value>COLUMN {0}</value>
+  </data>
+  <data name="335544612" xml:space="preserve">
+    <value>Token unknown</value>
+  </data>
+  <data name="335544613" xml:space="preserve">
+    <value>union not supported</value>
+  </data>
+  <data name="335544614" xml:space="preserve">
+    <value>Unsupported DSQL construct</value>
+  </data>
+  <data name="335544615" xml:space="preserve">
+    <value>column used with aggregate</value>
+  </data>
+  <data name="335544616" xml:space="preserve">
+    <value>invalid column reference</value>
+  </data>
+  <data name="335544617" xml:space="preserve">
+    <value>invalid ORDER BY clause</value>
+  </data>
+  <data name="335544618" xml:space="preserve">
+    <value>Return mode by value not allowed for this data type</value>
+  </data>
+  <data name="335544619" xml:space="preserve">
+    <value>External functions cannot have more than 10 parameters</value>
+  </data>
+  <data name="335544620" xml:space="preserve">
+    <value>alias {0} conflicts with an alias in the same statement</value>
+  </data>
+  <data name="335544621" xml:space="preserve">
+    <value>alias {0} conflicts with a procedure in the same statement</value>
+  </data>
+  <data name="335544622" xml:space="preserve">
+    <value>alias {0} conflicts with a table in the same statement</value>
+  </data>
+  <data name="335544623" xml:space="preserve">
+    <value>Illegal use of keyword VALUE</value>
+  </data>
+  <data name="335544624" xml:space="preserve">
+    <value>segment count of 0 defined for index {0}</value>
+  </data>
+  <data name="335544625" xml:space="preserve">
+    <value>A node name is not permitted in a secondary, shadow, cache or log file name</value>
+  </data>
+  <data name="335544626" xml:space="preserve">
+    <value>TABLE {0}</value>
+  </data>
+  <data name="335544627" xml:space="preserve">
+    <value>PROCEDURE {0}</value>
+  </data>
+  <data name="335544628" xml:space="preserve">
+    <value>cannot create index {0}</value>
+  </data>
+  <data name="335544629" xml:space="preserve">
+    <value>Write-ahead Log with shadowing configuration not allowed</value>
+  </data>
+  <data name="335544630" xml:space="preserve">
+    <value>there are {0} dependencies</value>
+  </data>
+  <data name="335544631" xml:space="preserve">
+    <value>too many keys defined for index {0}</value>
+  </data>
+  <data name="335544632" xml:space="preserve">
+    <value>Preceding file did not specify length, so {0} must include starting page number</value>
+  </data>
+  <data name="335544633" xml:space="preserve">
+    <value>Shadow number must be a positive integer</value>
+  </data>
+  <data name="335544634" xml:space="preserve">
+    <value>Token unknown - line {0}, column {1}</value>
+  </data>
+  <data name="335544635" xml:space="preserve">
+    <value>there is no alias or table named {0} at this scope level</value>
+  </data>
+  <data name="335544636" xml:space="preserve">
+    <value>there is no index {0} for table {1}</value>
+  </data>
+  <data name="335544637" xml:space="preserve">
+    <value>table {0} is not referenced in plan</value>
+  </data>
+  <data name="335544638" xml:space="preserve">
+    <value>table {0} is referenced more than once in plan; use aliases to distinguish</value>
+  </data>
+  <data name="335544639" xml:space="preserve">
+    <value>table {0} is referenced in the plan but not the from list</value>
+  </data>
+  <data name="335544640" xml:space="preserve">
+    <value>Invalid use of CHARACTER SET or COLLATE</value>
+  </data>
+  <data name="335544641" xml:space="preserve">
+    <value>Specified domain or source column {0} does not exist</value>
+  </data>
+  <data name="335544642" xml:space="preserve">
+    <value>index {0} cannot be used in the specified plan</value>
+  </data>
+  <data name="335544643" xml:space="preserve">
+    <value>the table {0} is referenced twice; use aliases to differentiate</value>
+  </data>
+  <data name="335544644" xml:space="preserve">
+    <value>illegal operation when at beginning of stream</value>
+  </data>
+  <data name="335544645" xml:space="preserve">
+    <value>the current position is on a crack</value>
+  </data>
+  <data name="335544646" xml:space="preserve">
+    <value>database or file exists</value>
+  </data>
+  <data name="335544647" xml:space="preserve">
+    <value>invalid comparison operator for find operation</value>
+  </data>
+  <data name="335544648" xml:space="preserve">
+    <value>Connection lost to pipe server</value>
+  </data>
+  <data name="335544649" xml:space="preserve">
+    <value>bad checksum</value>
+  </data>
+  <data name="335544650" xml:space="preserve">
+    <value>wrong page type</value>
+  </data>
+  <data name="335544651" xml:space="preserve">
+    <value>Cannot insert because the file is readonly or is on a read only medium.</value>
+  </data>
+  <data name="335544652" xml:space="preserve">
+    <value>multiple rows in singleton select</value>
+  </data>
+  <data name="335544653" xml:space="preserve">
+    <value>cannot attach to password database</value>
+  </data>
+  <data name="335544654" xml:space="preserve">
+    <value>cannot start transaction for password database</value>
+  </data>
+  <data name="335544655" xml:space="preserve">
+    <value>invalid direction for find operation</value>
+  </data>
+  <data name="335544656" xml:space="preserve">
+    <value>variable {0} conflicts with parameter in same procedure</value>
+  </data>
+  <data name="335544657" xml:space="preserve">
+    <value>Array/BLOB/DATE data types not allowed in arithmetic</value>
+  </data>
+  <data name="335544658" xml:space="preserve">
+    <value>{0} is not a valid base table of the specified view</value>
+  </data>
+  <data name="335544659" xml:space="preserve">
+    <value>table {0} is referenced twice in view; use an alias to distinguish</value>
+  </data>
+  <data name="335544660" xml:space="preserve">
+    <value>view {0} has more than one base table; use aliases to distinguish</value>
+  </data>
+  <data name="335544661" xml:space="preserve">
+    <value>cannot add index, index root page is full.</value>
+  </data>
+  <data name="335544662" xml:space="preserve">
+    <value>BLOB SUB_TYPE {0} is not defined</value>
+  </data>
+  <data name="335544663" xml:space="preserve">
+    <value>Too many concurrent executions of the same request</value>
+  </data>
+  <data name="335544664" xml:space="preserve">
+    <value>duplicate specification of {0} - not supported</value>
+  </data>
+  <data name="335544665" xml:space="preserve">
+    <value>violation of PRIMARY or UNIQUE KEY constraint "{0}" on table "{1}"</value>
+  </data>
+  <data name="335544666" xml:space="preserve">
+    <value>server version too old to support all CREATE DATABASE options</value>
+  </data>
+  <data name="335544667" xml:space="preserve">
+    <value>drop database completed with errors</value>
+  </data>
+  <data name="335544668" xml:space="preserve">
+    <value>procedure {0} does not return any values</value>
+  </data>
+  <data name="335544669" xml:space="preserve">
+    <value>count of column list and variable list do not match</value>
+  </data>
+  <data name="335544670" xml:space="preserve">
+    <value>attempt to index BLOB column in index {0}</value>
+  </data>
+  <data name="335544671" xml:space="preserve">
+    <value>attempt to index array column in index {0}</value>
+  </data>
+  <data name="335544672" xml:space="preserve">
+    <value>too few key columns found for index {0} (incorrect column name?)</value>
+  </data>
+  <data name="335544673" xml:space="preserve">
+    <value>cannot delete</value>
+  </data>
+  <data name="335544674" xml:space="preserve">
+    <value>last column in a table cannot be deleted</value>
+  </data>
+  <data name="335544675" xml:space="preserve">
+    <value>sort error</value>
+  </data>
+  <data name="335544676" xml:space="preserve">
+    <value>sort error: not enough memory</value>
+  </data>
+  <data name="335544677" xml:space="preserve">
+    <value>too many versions</value>
+  </data>
+  <data name="335544678" xml:space="preserve">
+    <value>invalid key position</value>
+  </data>
+  <data name="335544679" xml:space="preserve">
+    <value>segments not allowed in expression index {0}</value>
+  </data>
+  <data name="335544680" xml:space="preserve">
+    <value>sort error: corruption in data structure</value>
+  </data>
+  <data name="335544681" xml:space="preserve">
+    <value>new record size of {0} bytes is too big</value>
+  </data>
+  <data name="335544682" xml:space="preserve">
+    <value>Inappropriate self-reference of column</value>
+  </data>
+  <data name="335544683" xml:space="preserve">
+    <value>request depth exceeded. (Recursive definition?)</value>
+  </data>
+  <data name="335544684" xml:space="preserve">
+    <value>cannot access column {0} in view {1}</value>
+  </data>
+  <data name="335544685" xml:space="preserve">
+    <value>dbkey not available for multi-table views</value>
+  </data>
+  <data name="335544686" xml:space="preserve">
+    <value>journal file wrong format</value>
+  </data>
+  <data name="335544687" xml:space="preserve">
+    <value>intermediate journal file full</value>
+  </data>
+  <data name="335544688" xml:space="preserve">
+    <value>The prepare statement identifies a prepare statement with an open cursor</value>
+  </data>
+  <data name="335544689" xml:space="preserve">
+    <value>Firebird error</value>
+  </data>
+  <data name="335544690" xml:space="preserve">
+    <value>Cache redefined</value>
+  </data>
+  <data name="335544691" xml:space="preserve">
+    <value>Insufficient memory to allocate page buffer cache</value>
+  </data>
+  <data name="335544692" xml:space="preserve">
+    <value>Log redefined</value>
+  </data>
+  <data name="335544693" xml:space="preserve">
+    <value>Log size too small</value>
+  </data>
+  <data name="335544694" xml:space="preserve">
+    <value>Log partition size too small</value>
+  </data>
+  <data name="335544695" xml:space="preserve">
+    <value>Partitions not supported in series of log file specification</value>
+  </data>
+  <data name="335544696" xml:space="preserve">
+    <value>Total length of a partitioned log must be specified</value>
+  </data>
+  <data name="335544697" xml:space="preserve">
+    <value>Precision must be from 1 to 18</value>
+  </data>
+  <data name="335544698" xml:space="preserve">
+    <value>Scale must be between zero and precision</value>
+  </data>
+  <data name="335544699" xml:space="preserve">
+    <value>Short integer expected</value>
+  </data>
+  <data name="335544700" xml:space="preserve">
+    <value>Long integer expected</value>
+  </data>
+  <data name="335544701" xml:space="preserve">
+    <value>Unsigned short integer expected</value>
+  </data>
+  <data name="335544702" xml:space="preserve">
+    <value>Invalid ESCAPE sequence</value>
+  </data>
+  <data name="335544703" xml:space="preserve">
+    <value>service {0} does not have an associated executable</value>
+  </data>
+  <data name="335544704" xml:space="preserve">
+    <value>Failed to locate host machine.</value>
+  </data>
+  <data name="335544705" xml:space="preserve">
+    <value>Undefined service {0}/{1}.</value>
+  </data>
+  <data name="335544706" xml:space="preserve">
+    <value>The specified name was not found in the hosts file or Domain Name Services.</value>
+  </data>
+  <data name="335544707" xml:space="preserve">
+    <value>user does not have GRANT privileges on base table/view for operation</value>
+  </data>
+  <data name="335544708" xml:space="preserve">
+    <value>Ambiguous column reference.</value>
+  </data>
+  <data name="335544709" xml:space="preserve">
+    <value>Invalid aggregate reference</value>
+  </data>
+  <data name="335544710" xml:space="preserve">
+    <value>navigational stream {0} references a view with more than one base table</value>
+  </data>
+  <data name="335544711" xml:space="preserve">
+    <value>Attempt to execute an unprepared dynamic SQL statement.</value>
+  </data>
+  <data name="335544712" xml:space="preserve">
+    <value>Positive value expected</value>
+  </data>
+  <data name="335544713" xml:space="preserve">
+    <value>Incorrect values within SQLDA structure</value>
+  </data>
+  <data name="335544714" xml:space="preserve">
+    <value>invalid blob id</value>
+  </data>
+  <data name="335544715" xml:space="preserve">
+    <value>Operation not supported for EXTERNAL FILE table {0}</value>
+  </data>
+  <data name="335544716" xml:space="preserve">
+    <value>Service is currently busy: {0}</value>
+  </data>
+  <data name="335544717" xml:space="preserve">
+    <value>stack size insufficent to execute current request</value>
+  </data>
+  <data name="335544718" xml:space="preserve">
+    <value>Invalid key for find operation</value>
+  </data>
+  <data name="335544719" xml:space="preserve">
+    <value>Error initializing the network software.</value>
+  </data>
+  <data name="335544720" xml:space="preserve">
+    <value>Unable to load required library {0}.</value>
+  </data>
+  <data name="335544721" xml:space="preserve">
+    <value>Unable to complete network request to host "{0}".</value>
+  </data>
+  <data name="335544722" xml:space="preserve">
+    <value>Failed to establish a connection.</value>
+  </data>
+  <data name="335544723" xml:space="preserve">
+    <value>Error while listening for an incoming connection.</value>
+  </data>
+  <data name="335544724" xml:space="preserve">
+    <value>Failed to establish a secondary connection for event processing.</value>
+  </data>
+  <data name="335544725" xml:space="preserve">
+    <value>Error while listening for an incoming event connection request.</value>
+  </data>
+  <data name="335544726" xml:space="preserve">
+    <value>Error reading data from the connection.</value>
+  </data>
+  <data name="335544727" xml:space="preserve">
+    <value>Error writing data to the connection.</value>
+  </data>
+  <data name="335544728" xml:space="preserve">
+    <value>Cannot deactivate index used by an integrity constraint</value>
+  </data>
+  <data name="335544729" xml:space="preserve">
+    <value>Cannot deactivate index used by a PRIMARY/UNIQUE constraint</value>
+  </data>
+  <data name="335544730" xml:space="preserve">
+    <value>Client/Server Express not supported in this release</value>
+  </data>
+  <data name="335544731" xml:space="preserve">
+    <value />
+  </data>
+  <data name="335544732" xml:space="preserve">
+    <value>Access to databases on file servers is not supported.</value>
+  </data>
+  <data name="335544733" xml:space="preserve">
+    <value>Error while trying to create file</value>
+  </data>
+  <data name="335544734" xml:space="preserve">
+    <value>Error while trying to open file</value>
+  </data>
+  <data name="335544735" xml:space="preserve">
+    <value>Error while trying to close file</value>
+  </data>
+  <data name="335544736" xml:space="preserve">
+    <value>Error while trying to read from file</value>
+  </data>
+  <data name="335544737" xml:space="preserve">
+    <value>Error while trying to write to file</value>
+  </data>
+  <data name="335544738" xml:space="preserve">
+    <value>Error while trying to delete file</value>
+  </data>
+  <data name="335544739" xml:space="preserve">
+    <value>Error while trying to access file</value>
+  </data>
+  <data name="335544740" xml:space="preserve">
+    <value>A fatal exception occurred during the execution of a user defined function.</value>
+  </data>
+  <data name="335544741" xml:space="preserve">
+    <value>connection lost to database</value>
+  </data>
+  <data name="335544742" xml:space="preserve">
+    <value>User cannot write to RDB$USER_PRIVILEGES</value>
+  </data>
+  <data name="335544743" xml:space="preserve">
+    <value>token size exceeds limit</value>
+  </data>
+  <data name="335544744" xml:space="preserve">
+    <value>Maximum user count exceeded.  Contact your database administrator.</value>
+  </data>
+  <data name="335544745" xml:space="preserve">
+    <value>Your login {0} is same as one of the SQL role name. Ask your database administrator to set up a valid Firebird login.</value>
+  </data>
+  <data name="335544746" xml:space="preserve">
+    <value>"REFERENCES table" without "(column)" requires PRIMARY KEY on referenced table</value>
+  </data>
+  <data name="335544747" xml:space="preserve">
+    <value>The username entered is too long.  Maximum length is 31 bytes.</value>
+  </data>
+  <data name="335544748" xml:space="preserve">
+    <value>The password specified is too long.  Maximum length is 8 bytes.</value>
+  </data>
+  <data name="335544749" xml:space="preserve">
+    <value>A username is required for this operation.</value>
+  </data>
+  <data name="335544750" xml:space="preserve">
+    <value>A password is required for this operation</value>
+  </data>
+  <data name="335544751" xml:space="preserve">
+    <value>The network protocol specified is invalid</value>
+  </data>
+  <data name="335544752" xml:space="preserve">
+    <value>A duplicate user name was found in the security database</value>
+  </data>
+  <data name="335544753" xml:space="preserve">
+    <value>The user name specified was not found in the security database</value>
+  </data>
+  <data name="335544754" xml:space="preserve">
+    <value>An error occurred while attempting to add the user.</value>
+  </data>
+  <data name="335544755" xml:space="preserve">
+    <value>An error occurred while attempting to modify the user record.</value>
+  </data>
+  <data name="335544756" xml:space="preserve">
+    <value>An error occurred while attempting to delete the user record.</value>
+  </data>
+  <data name="335544757" xml:space="preserve">
+    <value>An error occurred while updating the security database.</value>
+  </data>
+  <data name="335544758" xml:space="preserve">
+    <value>sort record size of {0} bytes is too big</value>
+  </data>
+  <data name="335544759" xml:space="preserve">
+    <value>can not define a not null column with NULL as default value</value>
+  </data>
+  <data name="335544760" xml:space="preserve">
+    <value>invalid clause --- '{0}'</value>
+  </data>
+  <data name="335544761" xml:space="preserve">
+    <value>too many open handles to database</value>
+  </data>
+  <data name="335544762" xml:space="preserve">
+    <value>size of optimizer block exceeded</value>
+  </data>
+  <data name="335544763" xml:space="preserve">
+    <value>a string constant is delimited by double quotes</value>
+  </data>
+  <data name="335544764" xml:space="preserve">
+    <value>DATE must be changed to TIMESTAMP</value>
+  </data>
+  <data name="335544765" xml:space="preserve">
+    <value>attempted update on read-only database</value>
+  </data>
+  <data name="335544766" xml:space="preserve">
+    <value>SQL dialect {0} is not supported in this database</value>
+  </data>
+  <data name="335544767" xml:space="preserve">
+    <value>A fatal exception occurred during the execution of a blob filter.</value>
+  </data>
+  <data name="335544768" xml:space="preserve">
+    <value>Access violation.  The code attempted to access a virtual address without privilege to do so.</value>
+  </data>
+  <data name="335544769" xml:space="preserve">
+    <value>Datatype misalignment.  The attempted to read or write a value that was not stored on a memory boundary.</value>
+  </data>
+  <data name="335544770" xml:space="preserve">
+    <value>Array bounds exceeded.  The code attempted to access an array element that is out of bounds.</value>
+  </data>
+  <data name="335544771" xml:space="preserve">
+    <value>Float denormal operand.  One of the floating-point operands is too small to represent a standard float value.</value>
+  </data>
+  <data name="335544772" xml:space="preserve">
+    <value>Floating-point divide by zero.  The code attempted to divide a floating-point value by zero.</value>
+  </data>
+  <data name="335544773" xml:space="preserve">
+    <value>Floating-point inexact result.  The result of a floating-point operation cannot be represented as a deciaml fraction.</value>
+  </data>
+  <data name="335544774" xml:space="preserve">
+    <value>Floating-point invalid operand.  An indeterminant error occurred during a floating-point operation.</value>
+  </data>
+  <data name="335544775" xml:space="preserve">
+    <value>Floating-point overflow.  The exponent of a floating-point operation is greater than the magnitude allowed.</value>
+  </data>
+  <data name="335544776" xml:space="preserve">
+    <value>Floating-point stack check.  The stack overflowed or underflowed as the result of a floating-point operation.</value>
+  </data>
+  <data name="335544777" xml:space="preserve">
+    <value>Floating-point underflow.  The exponent of a floating-point operation is less than the magnitude allowed.</value>
+  </data>
+  <data name="335544778" xml:space="preserve">
+    <value>Integer divide by zero.  The code attempted to divide an integer value by an integer divisor of zero.</value>
+  </data>
+  <data name="335544779" xml:space="preserve">
+    <value>Integer overflow.  The result of an integer operation caused the most significant bit of the result to carry.</value>
+  </data>
+  <data name="335544780" xml:space="preserve">
+    <value>An exception occurred that does not have a description.  Exception number {0}.</value>
+  </data>
+  <data name="335544781" xml:space="preserve">
+    <value>Stack overflow.  The resource requirements of the runtime stack have exceeded the memory available to it.</value>
+  </data>
+  <data name="335544782" xml:space="preserve">
+    <value>Segmentation Fault. The code attempted to access memory without priviledges.</value>
+  </data>
+  <data name="335544783" xml:space="preserve">
+    <value>Illegal Instruction. The Code attempted to perfrom an illegal operation.</value>
+  </data>
+  <data name="335544784" xml:space="preserve">
+    <value>Bus Error. The Code caused a system bus error.</value>
+  </data>
+  <data name="335544785" xml:space="preserve">
+    <value>Floating Point Error. The Code caused an Arithmetic Exception or a floating point exception.</value>
+  </data>
+  <data name="335544786" xml:space="preserve">
+    <value>Cannot delete rows from external files.</value>
+  </data>
+  <data name="335544787" xml:space="preserve">
+    <value>Cannot update rows in external files.</value>
+  </data>
+  <data name="335544788" xml:space="preserve">
+    <value>Unable to perform operation.  You must be either SYSDBA or owner of the database</value>
+  </data>
+  <data name="335544789" xml:space="preserve">
+    <value>Specified EXTRACT part does not exist in input datatype</value>
+  </data>
+  <data name="335544790" xml:space="preserve">
+    <value>Service {0} requires SYSDBA permissions.  Reattach to the Service Manager using the SYSDBA account.</value>
+  </data>
+  <data name="335544791" xml:space="preserve">
+    <value>The file {0} is currently in use by another process.  Try again later.</value>
+  </data>
+  <data name="335544792" xml:space="preserve">
+    <value>Cannot attach to services manager</value>
+  </data>
+  <data name="335544793" xml:space="preserve">
+    <value>Metadata update statement is not allowed by the current database SQL dialect {0}</value>
+  </data>
+  <data name="335544794" xml:space="preserve">
+    <value>operation was cancelled</value>
+  </data>
+  <data name="335544795" xml:space="preserve">
+    <value>unexpected item in service parameter block, expected {0}</value>
+  </data>
+  <data name="335544796" xml:space="preserve">
+    <value>Client SQL dialect {0} does not support reference to {1} datatype</value>
+  </data>
+  <data name="335544797" xml:space="preserve">
+    <value>user name and password are required while attaching to the services manager</value>
+  </data>
+  <data name="335544798" xml:space="preserve">
+    <value>You created an indirect dependency on uncommitted metadata. You must roll back the current transaction.</value>
+  </data>
+  <data name="335544799" xml:space="preserve">
+    <value>The service name was not specified.</value>
+  </data>
+  <data name="335544800" xml:space="preserve">
+    <value>Too many Contexts of Relation/Procedure/Views. Maximum allowed is 255</value>
+  </data>
+  <data name="335544801" xml:space="preserve">
+    <value>data type not supported for arithmetic</value>
+  </data>
+  <data name="335544802" xml:space="preserve">
+    <value>Database dialect being changed from 3 to 1</value>
+  </data>
+  <data name="335544803" xml:space="preserve">
+    <value>Database dialect not changed.</value>
+  </data>
+  <data name="335544804" xml:space="preserve">
+    <value>Unable to create database {0}</value>
+  </data>
+  <data name="335544805" xml:space="preserve">
+    <value>Database dialect {0} is not a valid dialect.</value>
+  </data>
+  <data name="335544806" xml:space="preserve">
+    <value>Valid database dialects are {0}.</value>
+  </data>
+  <data name="335544807" xml:space="preserve">
+    <value>SQL warning code = {0}</value>
+  </data>
+  <data name="335544808" xml:space="preserve">
+    <value>DATE data type is now called TIMESTAMP</value>
+  </data>
+  <data name="335544809" xml:space="preserve">
+    <value>Function {0} is in {1}, which is not in a permitted directory for external functions.</value>
+  </data>
+  <data name="335544810" xml:space="preserve">
+    <value>value exceeds the range for valid dates</value>
+  </data>
+  <data name="335544811" xml:space="preserve">
+    <value>passed client dialect {0} is not a valid dialect.</value>
+  </data>
+  <data name="335544812" xml:space="preserve">
+    <value>Valid client dialects are {0}.</value>
+  </data>
+  <data name="335544813" xml:space="preserve">
+    <value>Unsupported field type specified in BETWEEN predicate.</value>
+  </data>
+  <data name="335544814" xml:space="preserve">
+    <value>Services functionality will be supported in a later version  of the product</value>
+  </data>
+  <data name="335544815" xml:space="preserve">
+    <value>GENERATOR {0}</value>
+  </data>
+  <data name="335544816" xml:space="preserve">
+    <value>UDF {0}</value>
+  </data>
+  <data name="335544817" xml:space="preserve">
+    <value>Invalid parameter to FIRST.  Only integers &gt;= 0 are allowed.</value>
+  </data>
+  <data name="335544818" xml:space="preserve">
+    <value>Invalid parameter to SKIP.  Only integers &gt;= 0 are allowed.</value>
+  </data>
+  <data name="335544819" xml:space="preserve">
+    <value>File exceeded maximum size of 2GB.  Add another database file or use a 64 bit I/O version of Firebird.</value>
+  </data>
+  <data name="335544820" xml:space="preserve">
+    <value>Unable to find savepoint with name {0} in transaction context</value>
+  </data>
+  <data name="335544821" xml:space="preserve">
+    <value>Invalid column position used in the {0} clause</value>
+  </data>
+  <data name="335544822" xml:space="preserve">
+    <value>Cannot use an aggregate function in a WHERE clause, use HAVING instead</value>
+  </data>
+  <data name="335544823" xml:space="preserve">
+    <value>Cannot use an aggregate function in a GROUP BY clause</value>
+  </data>
+  <data name="335544824" xml:space="preserve">
+    <value>Invalid expression in the {0} (not contained in either an aggregate function or the GROUP BY clause)</value>
+  </data>
+  <data name="335544825" xml:space="preserve">
+    <value>Invalid expression in the {0} (neither an aggregate function nor a part of the GROUP BY clause)</value>
+  </data>
+  <data name="335544826" xml:space="preserve">
+    <value>Nested aggregate functions are not allowed</value>
+  </data>
+  <data name="335544827" xml:space="preserve">
+    <value>Invalid argument in EXECUTE STATEMENT - cannot convert to string</value>
+  </data>
+  <data name="335544828" xml:space="preserve">
+    <value>Wrong request type in EXECUTE STATEMENT '{0}'</value>
+  </data>
+  <data name="335544829" xml:space="preserve">
+    <value>Variable type (position {0}) in EXECUTE STATEMENT '{1}' INTO does not match returned column type</value>
+  </data>
+  <data name="335544830" xml:space="preserve">
+    <value>Too many recursion levels of EXECUTE STATEMENT</value>
+  </data>
+  <data name="335544831" xml:space="preserve">
+    <value>Access to {0} "{1}" is denied by server administrator</value>
+  </data>
+  <data name="335544832" xml:space="preserve">
+    <value>Cannot change difference file name while database is in backup mode</value>
+  </data>
+  <data name="335544833" xml:space="preserve">
+    <value>Physical backup is not allowed while Write-Ahead Log is in use</value>
+  </data>
+  <data name="335544834" xml:space="preserve">
+    <value>Cursor is not open</value>
+  </data>
+  <data name="335544835" xml:space="preserve">
+    <value>Target shutdown mode is invalid for database "{0}"</value>
+  </data>
+  <data name="335544836" xml:space="preserve">
+    <value>Concatenation overflow. Resulting string cannot exceed 32K in length.</value>
+  </data>
+  <data name="335544837" xml:space="preserve">
+    <value>Invalid offset parameter {0} to SUBSTRING. Only positive integers are allowed.</value>
+  </data>
+  <data name="335544838" xml:space="preserve">
+    <value>Foreign key reference target does not exist</value>
+  </data>
+  <data name="335544839" xml:space="preserve">
+    <value>Foreign key references are present for the record</value>
+  </data>
+  <data name="335544840" xml:space="preserve">
+    <value>cannot update</value>
+  </data>
+  <data name="335544841" xml:space="preserve">
+    <value>Cursor is already open</value>
+  </data>
+  <data name="335544842" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="335544843" xml:space="preserve">
+    <value>Context variable {0} is not found in namespace {1}</value>
+  </data>
+  <data name="335544844" xml:space="preserve">
+    <value>Invalid namespace name {0} passed to {1}</value>
+  </data>
+  <data name="335544845" xml:space="preserve">
+    <value>Too many context variables</value>
+  </data>
+  <data name="335544846" xml:space="preserve">
+    <value>Invalid argument passed to {0}</value>
+  </data>
+  <data name="335544847" xml:space="preserve">
+    <value>BLR syntax error. Identifier {0}... is too long</value>
+  </data>
+  <data name="335544848" xml:space="preserve">
+    <value>exception {0}</value>
+  </data>
+  <data name="335544849" xml:space="preserve">
+    <value>Malformed string</value>
+  </data>
+  <data name="335544850" xml:space="preserve">
+    <value>Output parameter mismatch for procedure {0}</value>
+  </data>
+  <data name="335544851" xml:space="preserve">
+    <value>Unexpected end of command - line {0}, column {1}</value>
+  </data>
+  <data name="335544852" xml:space="preserve">
+    <value>partner index segment no {0} has incompatible data type</value>
+  </data>
+  <data name="335544853" xml:space="preserve">
+    <value>Invalid length parameter {0} to SUBSTRING. Negative integers are not allowed.</value>
+  </data>
+  <data name="335544854" xml:space="preserve">
+    <value>CHARACTER SET {0} is not installed</value>
+  </data>
+  <data name="335544855" xml:space="preserve">
+    <value>COLLATION {0} for CHARACTER SET {1} is not installed</value>
+  </data>
+  <data name="335544856" xml:space="preserve">
+    <value>connection shutdown</value>
+  </data>
+  <data name="335544857" xml:space="preserve">
+    <value>Maximum BLOB size exceeded</value>
+  </data>
+  <data name="335544858" xml:space="preserve">
+    <value>Can't have relation with only computed fields or constraints</value>
+  </data>
+  <data name="335544859" xml:space="preserve">
+    <value>Time precision exceeds allowed range (0-{0})</value>
+  </data>
+  <data name="335544860" xml:space="preserve">
+    <value>Unsupported conversion to target type BLOB (subtype {0})</value>
+  </data>
+  <data name="335544861" xml:space="preserve">
+    <value>Unsupported conversion to target type ARRAY</value>
+  </data>
+  <data name="335544862" xml:space="preserve">
+    <value>Stream does not support record locking</value>
+  </data>
+  <data name="335544863" xml:space="preserve">
+    <value>Cannot create foreign key constraint {0}. Partner index does not exist or is inactive.</value>
+  </data>
+  <data name="335544864" xml:space="preserve">
+    <value>Transactions count exceeded. Perform backup and restore to make database operable again</value>
+  </data>
+  <data name="335544865" xml:space="preserve">
+    <value>Column has been unexpectedly deleted</value>
+  </data>
+  <data name="335544866" xml:space="preserve">
+    <value>{0} cannot depend on {1}</value>
+  </data>
+  <data name="335544867" xml:space="preserve">
+    <value>Blob sub_types bigger than 1 (text) are for internal use only</value>
+  </data>
+  <data name="335544868" xml:space="preserve">
+    <value>Procedure {0} is not selectable (it does not contain a SUSPEND statement)</value>
+  </data>
+  <data name="335544869" xml:space="preserve">
+    <value>Datatype {0} is not supported for sorting operation</value>
+  </data>
+  <data name="335544870" xml:space="preserve">
+    <value>COLLATION {0}</value>
+  </data>
+  <data name="335544871" xml:space="preserve">
+    <value>DOMAIN {0}</value>
+  </data>
+  <data name="335544872" xml:space="preserve">
+    <value>domain {0} is not defined</value>
+  </data>
+  <data name="335544873" xml:space="preserve">
+    <value>Array data type can use up to {0} dimensions</value>
+  </data>
+  <data name="335544874" xml:space="preserve">
+    <value>A multi database transaction cannot span more than {0} databases</value>
+  </data>
+  <data name="335544875" xml:space="preserve">
+    <value>Bad debug info format</value>
+  </data>
+  <data name="335544876" xml:space="preserve">
+    <value>Error while parsing procedure {0}'s BLR</value>
+  </data>
+  <data name="335544877" xml:space="preserve">
+    <value>index key too big</value>
+  </data>
+  <data name="335544878" xml:space="preserve">
+    <value>concurrent transaction number is {0}</value>
+  </data>
+  <data name="335544879" xml:space="preserve">
+    <value>validation error for variable {0}, value "{1}"</value>
+  </data>
+  <data name="335544880" xml:space="preserve">
+    <value>validation error for {0}, value "{1}"</value>
+  </data>
+  <data name="335544881" xml:space="preserve">
+    <value>Difference file name should be set explicitly for database on raw device</value>
+  </data>
+  <data name="335544882" xml:space="preserve">
+    <value>Login name too long ({0} characters, maximum allowed {1})</value>
+  </data>
+  <data name="335544883" xml:space="preserve">
+    <value>column {0} is not defined in procedure {1}</value>
+  </data>
+  <data name="335544884" xml:space="preserve">
+    <value>Invalid SIMILAR TO pattern</value>
+  </data>
+  <data name="335544885" xml:space="preserve">
+    <value>Invalid TEB format</value>
+  </data>
+  <data name="335544886" xml:space="preserve">
+    <value>Found more than one transaction isolation in TPB</value>
+  </data>
+  <data name="335544887" xml:space="preserve">
+    <value>Table reservation lock type {0} requires table name before in TPB</value>
+  </data>
+  <data name="335544888" xml:space="preserve">
+    <value>Found more than one {0} specification in TPB</value>
+  </data>
+  <data name="335544889" xml:space="preserve">
+    <value>Option {0} requires READ COMMITTED isolation in TPB</value>
+  </data>
+  <data name="335544890" xml:space="preserve">
+    <value>Option {0} is not valid if {1} was used previously in TPB</value>
+  </data>
+  <data name="335544891" xml:space="preserve">
+    <value>Table name length missing after table reservation {0} in TPB</value>
+  </data>
+  <data name="335544892" xml:space="preserve">
+    <value>Table name length {0} is too long after table reservation {1} in TPB</value>
+  </data>
+  <data name="335544893" xml:space="preserve">
+    <value>Table name length {0} without table name after table reservation {1} in TPB</value>
+  </data>
+  <data name="335544894" xml:space="preserve">
+    <value>Table name length {0} goes beyond the remaining TPB size after table reservation {1}</value>
+  </data>
+  <data name="335544895" xml:space="preserve">
+    <value>Table name length is zero after table reservation {0} in TPB</value>
+  </data>
+  <data name="335544896" xml:space="preserve">
+    <value>Table or view {0} not defined in system tables after table reservation {1} in TPB</value>
+  </data>
+  <data name="335544897" xml:space="preserve">
+    <value>Base table or view {0} for view {1} not defined in system tables after table reservation {2} in TPB</value>
+  </data>
+  <data name="335544898" xml:space="preserve">
+    <value>Option length missing after option {0} in TPB</value>
+  </data>
+  <data name="335544899" xml:space="preserve">
+    <value>Option length {0} without value after option {1} in TPB</value>
+  </data>
+  <data name="335544900" xml:space="preserve">
+    <value>Option length {0} goes beyond the remaining TPB size after option {1}</value>
+  </data>
+  <data name="335544901" xml:space="preserve">
+    <value>Option length is zero after table reservation {0} in TPB</value>
+  </data>
+  <data name="335544902" xml:space="preserve">
+    <value>Option length {0} exceeds the range for option {1} in TPB</value>
+  </data>
+  <data name="335544903" xml:space="preserve">
+    <value>Option value {0} is invalid for the option {1} in TPB</value>
+  </data>
+  <data name="335544904" xml:space="preserve">
+    <value>Preserving previous table reservation {0} for table {1}, stronger than new {2} in TPB</value>
+  </data>
+  <data name="335544905" xml:space="preserve">
+    <value>Table reservation {0} for table {1} already specified and is stronger than new {2} in TPB</value>
+  </data>
+  <data name="335544906" xml:space="preserve">
+    <value>Table reservation reached maximum recursion of {0} when expanding views in TPB</value>
+  </data>
+  <data name="335544907" xml:space="preserve">
+    <value>Table reservation in TPB cannot be applied to {0} because it's a virtual table</value>
+  </data>
+  <data name="335544908" xml:space="preserve">
+    <value>Table reservation in TPB cannot be applied to {0} because it's a system table</value>
+  </data>
+  <data name="335544909" xml:space="preserve">
+    <value>Table reservation {0} or {1} in TPB cannot be applied to {2} because it's a temporary table</value>
+  </data>
+  <data name="335544910" xml:space="preserve">
+    <value>Cannot set the transaction in read only mode after a table reservation isc_tpb_lock_write in TPB</value>
+  </data>
+  <data name="335544911" xml:space="preserve">
+    <value>Cannot take a table reservation isc_tpb_lock_write in TPB because the transaction is in read only mode</value>
+  </data>
+  <data name="335544912" xml:space="preserve">
+    <value>value exceeds the range for a valid time</value>
+  </data>
+  <data name="335544913" xml:space="preserve">
+    <value>value exceeds the range for valid timestamps</value>
+  </data>
+  <data name="335544914" xml:space="preserve">
+    <value>string right truncation</value>
+  </data>
+  <data name="335544915" xml:space="preserve">
+    <value>blob truncation when converting to a string: length limit exceeded</value>
+  </data>
+  <data name="335544916" xml:space="preserve">
+    <value>numeric value is out of range</value>
+  </data>
+  <data name="335544917" xml:space="preserve">
+    <value>Firebird shutdown is still in progress after the specified timeout</value>
+  </data>
+  <data name="335544918" xml:space="preserve">
+    <value>Attachment handle is busy</value>
+  </data>
+  <data name="335544919" xml:space="preserve">
+    <value>Bad written UDF detected: pointer returned in FREE_IT function was not allocated by ib_util_malloc</value>
+  </data>
+  <data name="335544920" xml:space="preserve">
+    <value>External Data Source provider '{0}' not found</value>
+  </data>
+  <data name="335544921" xml:space="preserve">
+    <value>Execute statement error at {0} :
+{1}Data source : {2}</value>
+  </data>
+  <data name="335544922" xml:space="preserve">
+    <value>Execute statement preprocess SQL error</value>
+  </data>
+  <data name="335544923" xml:space="preserve">
+    <value>Statement expected</value>
+  </data>
+  <data name="335544924" xml:space="preserve">
+    <value>Parameter name expected</value>
+  </data>
+  <data name="335544925" xml:space="preserve">
+    <value>Unclosed comment found near '{0}'</value>
+  </data>
+  <data name="335544926" xml:space="preserve">
+    <value>Execute statement error at {0} :
+{1}Statement : {2}
+Data source : {3}</value>
+  </data>
+  <data name="335544927" xml:space="preserve">
+    <value>Input parameters mismatch</value>
+  </data>
+  <data name="335544928" xml:space="preserve">
+    <value>Output parameters mismatch</value>
+  </data>
+  <data name="335544929" xml:space="preserve">
+    <value>Input parameter '{0}' have no value set</value>
+  </data>
+  <data name="335544930" xml:space="preserve">
+    <value>BLR stream length {0} exceeds implementation limit {1}</value>
+  </data>
+  <data name="335544931" xml:space="preserve">
+    <value>Monitoring table space exhausted</value>
+  </data>
+  <data name="335544932" xml:space="preserve">
+    <value>module name or entrypoint could not be found</value>
+  </data>
+  <data name="335544933" xml:space="preserve">
+    <value>nothing to cancel</value>
+  </data>
+  <data name="335544934" xml:space="preserve">
+    <value>ib_util library has not been loaded to deallocate memory returned by FREE_IT function</value>
+  </data>
+  <data name="335544935" xml:space="preserve">
+    <value>Cannot have circular dependencies with computed fields</value>
+  </data>
+  <data name="335544936" xml:space="preserve">
+    <value>Security database error</value>
+  </data>
+  <data name="335544937" xml:space="preserve">
+    <value>Invalid data type in DATE/TIME/TIMESTAMP addition or subtraction in add_datettime()</value>
+  </data>
+  <data name="335544938" xml:space="preserve">
+    <value>Only a TIME value can be added to a DATE value</value>
+  </data>
+  <data name="335544939" xml:space="preserve">
+    <value>Only a DATE value can be added to a TIME value</value>
+  </data>
+  <data name="335544940" xml:space="preserve">
+    <value>TIMESTAMP values can be subtracted only from another TIMESTAMP value</value>
+  </data>
+  <data name="335544941" xml:space="preserve">
+    <value>Only one operand can be of type TIMESTAMP</value>
+  </data>
+  <data name="335544942" xml:space="preserve">
+    <value>Only HOUR, MINUTE, SECOND and MILLISECOND can be extracted from TIME values</value>
+  </data>
+  <data name="335544943" xml:space="preserve">
+    <value>HOUR, MINUTE, SECOND and MILLISECOND cannot be extracted from DATE values</value>
+  </data>
+  <data name="335544944" xml:space="preserve">
+    <value>Invalid argument for EXTRACT() not being of DATE/TIME/TIMESTAMP type</value>
+  </data>
+  <data name="335544945" xml:space="preserve">
+    <value>Arguments for {0} must be integral types or NUMERIC/DECIMAL without scale</value>
+  </data>
+  <data name="335544946" xml:space="preserve">
+    <value>First argument for {0} must be integral type or floating point type</value>
+  </data>
+  <data name="335544947" xml:space="preserve">
+    <value>Human readable UUID argument for {0} must be of string type</value>
+  </data>
+  <data name="335544948" xml:space="preserve">
+    <value>Human readable UUID argument for {1} must be of exact length {0}</value>
+  </data>
+  <data name="335544949" xml:space="preserve">
+    <value>Human readable UUID argument for {2} must have "-" at position {1} instead of "{0}"</value>
+  </data>
+  <data name="335544950" xml:space="preserve">
+    <value>Human readable UUID argument for {2} must have hex digit at position {1} instead of "{0}"</value>
+  </data>
+  <data name="335544951" xml:space="preserve">
+    <value>Only HOUR, MINUTE, SECOND and MILLISECOND can be added to TIME values in {0}</value>
+  </data>
+  <data name="335544952" xml:space="preserve">
+    <value>Invalid data type in addition of part to DATE/TIME/TIMESTAMP in {0}</value>
+  </data>
+  <data name="335544953" xml:space="preserve">
+    <value>Invalid part {0} to be added to a DATE/TIME/TIMESTAMP value in {1}</value>
+  </data>
+  <data name="335544954" xml:space="preserve">
+    <value>Expected DATE/TIME/TIMESTAMP type in evlDateAdd() result</value>
+  </data>
+  <data name="335544955" xml:space="preserve">
+    <value>Expected DATE/TIME/TIMESTAMP type as first and second argument to {0}</value>
+  </data>
+  <data name="335544956" xml:space="preserve">
+    <value>The result of TIME-&lt;value&gt; in {0} cannot be expressed in YEAR, MONTH, DAY or WEEK</value>
+  </data>
+  <data name="335544957" xml:space="preserve">
+    <value>The result of TIME-TIMESTAMP or TIMESTAMP-TIME in {0} cannot be expressed in HOUR, MINUTE, SECOND or MILLISECOND</value>
+  </data>
+  <data name="335544958" xml:space="preserve">
+    <value>The result of DATE-TIME or TIME-DATE in {0} cannot be expressed in HOUR, MINUTE, SECOND and MILLISECOND</value>
+  </data>
+  <data name="335544959" xml:space="preserve">
+    <value>Invalid part {0} to express the difference between two DATE/TIME/TIMESTAMP values in {1}</value>
+  </data>
+  <data name="335544960" xml:space="preserve">
+    <value>Argument for {0} must be positive</value>
+  </data>
+  <data name="335544961" xml:space="preserve">
+    <value>Base for {0} must be positive</value>
+  </data>
+  <data name="335544962" xml:space="preserve">
+    <value>Argument #{0} for {1} must be zero or positive</value>
+  </data>
+  <data name="335544963" xml:space="preserve">
+    <value>Argument #{0} for {1} must be positive</value>
+  </data>
+  <data name="335544964" xml:space="preserve">
+    <value>Base for {0} cannot be zero if exponent is negative</value>
+  </data>
+  <data name="335544965" xml:space="preserve">
+    <value>Base for {0} cannot be negative if exponent is not an integral value</value>
+  </data>
+  <data name="335544966" xml:space="preserve">
+    <value>The numeric scale must be between -128 and 127 in {0}</value>
+  </data>
+  <data name="335544967" xml:space="preserve">
+    <value>Argument for {0} must be zero or positive</value>
+  </data>
+  <data name="335544968" xml:space="preserve">
+    <value>Binary UUID argument for {0} must be of string type</value>
+  </data>
+  <data name="335544969" xml:space="preserve">
+    <value>Binary UUID argument for {1} must use {0} bytes</value>
+  </data>
+  <data name="335544970" xml:space="preserve">
+    <value>Missing required item {0} in service parameter block</value>
+  </data>
+  <data name="335544971" xml:space="preserve">
+    <value>{0} server is shutdown</value>
+  </data>
+  <data name="335544972" xml:space="preserve">
+    <value>Invalid connection string</value>
+  </data>
+  <data name="335544973" xml:space="preserve">
+    <value>Unrecognized events block</value>
+  </data>
+  <data name="335544974" xml:space="preserve">
+    <value>Could not start first worker thread - shutdown server</value>
+  </data>
+  <data name="335544975" xml:space="preserve">
+    <value>Timeout occurred while waiting for a secondary connection for event processing</value>
+  </data>
+  <data name="335544976" xml:space="preserve">
+    <value>Argument for {0} must be different than zero</value>
+  </data>
+  <data name="335544977" xml:space="preserve">
+    <value>Argument for {0} must be in the range [-1, 1]</value>
+  </data>
+  <data name="335544978" xml:space="preserve">
+    <value>Argument for {0} must be greater or equal than one</value>
+  </data>
+  <data name="335544979" xml:space="preserve">
+    <value>Argument for {0} must be in the range ]-1, 1[</value>
+  </data>
+  <data name="335544980" xml:space="preserve">
+    <value>Incorrect parameters provided to internal function {0}</value>
+  </data>
+  <data name="335544981" xml:space="preserve">
+    <value>Floating point overflow in built-in function {0}</value>
+  </data>
+  <data name="335544982" xml:space="preserve">
+    <value>Floating point overflow in result from UDF {0}</value>
+  </data>
+  <data name="335544983" xml:space="preserve">
+    <value>Invalid floating point value returned by UDF {0}</value>
+  </data>
+  <data name="335544984" xml:space="preserve">
+    <value>Database is probably already opened by another engine instance in another Windows session</value>
+  </data>
+  <data name="335544985" xml:space="preserve">
+    <value>No free space found in temporary directories</value>
+  </data>
+  <data name="335544986" xml:space="preserve">
+    <value>Explicit transaction control is not allowed</value>
+  </data>
+  <data name="335544987" xml:space="preserve">
+    <value>Use of TRUSTED switches in spb_command_line is prohibited</value>
+  </data>
+  <data name="335545017" xml:space="preserve">
+    <value>Asynchronous call is already running for this attachment</value>
+  </data>
+  <data name="335740929" xml:space="preserve">
+    <value>data base file name ({0}) already given</value>
+  </data>
+  <data name="335740930" xml:space="preserve">
+    <value>invalid switch {0}</value>
+  </data>
+  <data name="335740932" xml:space="preserve">
+    <value>incompatible switch combination</value>
+  </data>
+  <data name="335740933" xml:space="preserve">
+    <value>replay log pathname required</value>
+  </data>
+  <data name="335740934" xml:space="preserve">
+    <value>number of page buffers for cache required</value>
+  </data>
+  <data name="335740935" xml:space="preserve">
+    <value>numeric value required</value>
+  </data>
+  <data name="335740936" xml:space="preserve">
+    <value>positive numeric value required</value>
+  </data>
+  <data name="335740937" xml:space="preserve">
+    <value>number of transactions per sweep required</value>
+  </data>
+  <data name="335740940" xml:space="preserve">
+    <value>"full" or "reserve" required</value>
+  </data>
+  <data name="335740941" xml:space="preserve">
+    <value>user name required</value>
+  </data>
+  <data name="335740942" xml:space="preserve">
+    <value>password required</value>
+  </data>
+  <data name="335740943" xml:space="preserve">
+    <value>subsystem name</value>
+  </data>
+  <data name="335740944" xml:space="preserve">
+    <value>"wal" required</value>
+  </data>
+  <data name="335740945" xml:space="preserve">
+    <value>number of seconds required</value>
+  </data>
+  <data name="335740946" xml:space="preserve">
+    <value>numeric value between 0 and 32767 inclusive required</value>
+  </data>
+  <data name="335740947" xml:space="preserve">
+    <value>must specify type of shutdown</value>
+  </data>
+  <data name="335740948" xml:space="preserve">
+    <value>please retry, specifying an option</value>
+  </data>
+  <data name="335740951" xml:space="preserve">
+    <value>please retry, giving a database name</value>
+  </data>
+  <data name="335740991" xml:space="preserve">
+    <value>internal block exceeds maximum size</value>
+  </data>
+  <data name="335740992" xml:space="preserve">
+    <value>corrupt pool</value>
+  </data>
+  <data name="335740993" xml:space="preserve">
+    <value>virtual memory exhausted</value>
+  </data>
+  <data name="335740994" xml:space="preserve">
+    <value>bad pool id</value>
+  </data>
+  <data name="335740995" xml:space="preserve">
+    <value>Transaction state {0} not in valid range.</value>
+  </data>
+  <data name="335741012" xml:space="preserve">
+    <value>unexpected end of input</value>
+  </data>
+  <data name="335741018" xml:space="preserve">
+    <value>failed to reconnect to a transaction in database {0}</value>
+  </data>
+  <data name="335741036" xml:space="preserve">
+    <value>Transaction description item unknown</value>
+  </data>
+  <data name="335741038" xml:space="preserve">
+    <value>"read_only" or "read_write" required</value>
+  </data>
+  <data name="335741042" xml:space="preserve">
+    <value>positive or zero numeric value required</value>
+  </data>
+  <data name="336003074" xml:space="preserve">
+    <value>Cannot SELECT RDB$DB_KEY from a stored procedure.</value>
+  </data>
+  <data name="336003075" xml:space="preserve">
+    <value>Precision 10 to 18 changed from DOUBLE PRECISION in SQL dialect 1 to 64-bit scaled integer in SQL dialect 3</value>
+  </data>
+  <data name="336003076" xml:space="preserve">
+    <value>Use of {0} expression that returns different results in dialect 1 and dialect 3</value>
+  </data>
+  <data name="336003077" xml:space="preserve">
+    <value>Database SQL dialect {0} does not support reference to {1} datatype</value>
+  </data>
+  <data name="336003079" xml:space="preserve">
+    <value>DB dialect {0} and client dialect {1} conflict with respect to numeric precision {2}.</value>
+  </data>
+  <data name="336003080" xml:space="preserve">
+    <value>WARNING: Numeric literal {0} is interpreted as a floating-point</value>
+  </data>
+  <data name="336003081" xml:space="preserve">
+    <value>value in SQL dialect 1, but as an exact numeric value in SQL dialect 3.</value>
+  </data>
+  <data name="336003082" xml:space="preserve">
+    <value>WARNING: NUMERIC and DECIMAL fields with precision 10 or greater are stored</value>
+  </data>
+  <data name="336003083" xml:space="preserve">
+    <value>as approximate floating-point values in SQL dialect 1, but as 64-bit</value>
+  </data>
+  <data name="336003084" xml:space="preserve">
+    <value>integers in SQL dialect 3.</value>
+  </data>
+  <data name="336003085" xml:space="preserve">
+    <value>Ambiguous field name between {0} and {1}</value>
+  </data>
+  <data name="336003086" xml:space="preserve">
+    <value>External function should have return position between 1 and {0}</value>
+  </data>
+  <data name="336003087" xml:space="preserve">
+    <value>Label {0} {1} in the current scope</value>
+  </data>
+  <data name="336003088" xml:space="preserve">
+    <value>Datatypes {0}are not comparable in expression {1}</value>
+  </data>
+  <data name="336003089" xml:space="preserve">
+    <value>Empty cursor name is not allowed</value>
+  </data>
+  <data name="336003090" xml:space="preserve">
+    <value>Statement already has a cursor {0} assigned</value>
+  </data>
+  <data name="336003091" xml:space="preserve">
+    <value>Cursor {0} is not found in the current context</value>
+  </data>
+  <data name="336003092" xml:space="preserve">
+    <value>Cursor {0} already exists in the current context</value>
+  </data>
+  <data name="336003093" xml:space="preserve">
+    <value>Relation {0} is ambiguous in cursor {1}</value>
+  </data>
+  <data name="336003094" xml:space="preserve">
+    <value>Relation {0} is not found in cursor {1}</value>
+  </data>
+  <data name="336003095" xml:space="preserve">
+    <value>Cursor is not open</value>
+  </data>
+  <data name="336003096" xml:space="preserve">
+    <value>Data type {0} is not supported for EXTERNAL TABLES. Relation '{1}', field '{2}'</value>
+  </data>
+  <data name="336003097" xml:space="preserve">
+    <value>Feature not supported on ODS version older than {0}.{1}</value>
+  </data>
+  <data name="336003098" xml:space="preserve">
+    <value>Primary key required on table {0}</value>
+  </data>
+  <data name="336003099" xml:space="preserve">
+    <value>UPDATE OR INSERT field list does not match primary key of table {0}</value>
+  </data>
+  <data name="336003100" xml:space="preserve">
+    <value>UPDATE OR INSERT field list does not match MATCHING clause</value>
+  </data>
+  <data name="336003101" xml:space="preserve">
+    <value>UPDATE OR INSERT without MATCHING could not be used with views based on more than one table</value>
+  </data>
+  <data name="336003102" xml:space="preserve">
+    <value>Incompatible trigger type</value>
+  </data>
+  <data name="336003103" xml:space="preserve">
+    <value>Database trigger type can't be changed</value>
+  </data>
+  <data name="336068740" xml:space="preserve">
+    <value>Table {0} already exists</value>
+  </data>
+  <data name="336068784" xml:space="preserve">
+    <value>column {0} does not exist in table/view {1}</value>
+  </data>
+  <data name="336068796" xml:space="preserve">
+    <value>SQL role {0} does not exist</value>
+  </data>
+  <data name="336068797" xml:space="preserve">
+    <value>user {0} has no grant admin option on SQL role {1}</value>
+  </data>
+  <data name="336068798" xml:space="preserve">
+    <value>user {0} is not a member of SQL role {1}</value>
+  </data>
+  <data name="336068799" xml:space="preserve">
+    <value>{0} is not the owner of SQL role {1}</value>
+  </data>
+  <data name="336068800" xml:space="preserve">
+    <value>{0} is a SQL role and not a user</value>
+  </data>
+  <data name="336068801" xml:space="preserve">
+    <value>user name {0} could not be used for SQL role</value>
+  </data>
+  <data name="336068802" xml:space="preserve">
+    <value>SQL role {0} already exists</value>
+  </data>
+  <data name="336068803" xml:space="preserve">
+    <value>keyword {0} can not be used as a SQL role name</value>
+  </data>
+  <data name="336068804" xml:space="preserve">
+    <value>SQL roles are not supported in on older versions of the database.  A backup and restore of the database is required.</value>
+  </data>
+  <data name="336068812" xml:space="preserve">
+    <value>Cannot rename domain {0} to {1}.  A domain with that name already exists.</value>
+  </data>
+  <data name="336068813" xml:space="preserve">
+    <value>Cannot rename column {0} to {1}.  A column with that name already exists in table {2}.</value>
+  </data>
+  <data name="336068814" xml:space="preserve">
+    <value>Column {0} from table {1} is referenced in {2}</value>
+  </data>
+  <data name="336068815" xml:space="preserve">
+    <value>Cannot change datatype for column {0}.  Changing datatype is not supported for BLOB or ARRAY columns.</value>
+  </data>
+  <data name="336068816" xml:space="preserve">
+    <value>New size specified for column {0} must be at least {1} characters.</value>
+  </data>
+  <data name="336068817" xml:space="preserve">
+    <value>Cannot change datatype for {0}.  Conversion from base type {1} to {2} is not supported.</value>
+  </data>
+  <data name="336068818" xml:space="preserve">
+    <value>Cannot change datatype for column {0} from a character type to a non-character type.</value>
+  </data>
+  <data name="336068820" xml:space="preserve">
+    <value>Zero length identifiers are not allowed</value>
+  </data>
+  <data name="336068829" xml:space="preserve">
+    <value>Maximum number of collations per character set exceeded</value>
+  </data>
+  <data name="336068830" xml:space="preserve">
+    <value>Invalid collation attributes</value>
+  </data>
+  <data name="336068840" xml:space="preserve">
+    <value>{0} cannot reference {1}</value>
+  </data>
+  <data name="336068852" xml:space="preserve">
+    <value>New scale specified for column {0} must be at most {1}.</value>
+  </data>
+  <data name="336068853" xml:space="preserve">
+    <value>New precision specified for column {0} must be at least {1}.</value>
+  </data>
+  <data name="336068855" xml:space="preserve">
+    <value>Warning: {0} on {1} is not granted to {2}.</value>
+  </data>
+  <data name="336068856" xml:space="preserve">
+    <value>Feature '{0}' is not supported in ODS {1}.{2}</value>
+  </data>
+  <data name="336068857" xml:space="preserve">
+    <value>Cannot add or remove COMPUTED from column {0}</value>
+  </data>
+  <data name="336068858" xml:space="preserve">
+    <value>Password should not be empty string</value>
+  </data>
+  <data name="336068859" xml:space="preserve">
+    <value>Index {0} already exists</value>
+  </data>
+  <data name="336330753" xml:space="preserve">
+    <value>found unknown switch</value>
+  </data>
+  <data name="336330754" xml:space="preserve">
+    <value>page size parameter missing</value>
+  </data>
+  <data name="336330755" xml:space="preserve">
+    <value>Page size specified ({0}) greater than limit (16384 bytes)</value>
+  </data>
+  <data name="336330756" xml:space="preserve">
+    <value>redirect location for output is not specified</value>
+  </data>
+  <data name="336330757" xml:space="preserve">
+    <value>conflicting switches for backup/restore</value>
+  </data>
+  <data name="336330758" xml:space="preserve">
+    <value>device type {0} not known</value>
+  </data>
+  <data name="336330759" xml:space="preserve">
+    <value>protection is not there yet</value>
+  </data>
+  <data name="336330760" xml:space="preserve">
+    <value>page size is allowed only on restore or create</value>
+  </data>
+  <data name="336330761" xml:space="preserve">
+    <value>multiple sources or destinations specified</value>
+  </data>
+  <data name="336330762" xml:space="preserve">
+    <value>requires both input and output filenames</value>
+  </data>
+  <data name="336330763" xml:space="preserve">
+    <value>input and output have the same name.  Disallowed.</value>
+  </data>
+  <data name="336330764" xml:space="preserve">
+    <value>expected page size, encountered "{0}"</value>
+  </data>
+  <data name="336330765" xml:space="preserve">
+    <value>REPLACE specified, but the first file {0} is a database</value>
+  </data>
+  <data name="336330766" xml:space="preserve">
+    <value>database {0} already exists.  To replace it, use the -REP switch</value>
+  </data>
+  <data name="336330767" xml:space="preserve">
+    <value>device type not specified</value>
+  </data>
+  <data name="336330772" xml:space="preserve">
+    <value>gds_$blob_info failed</value>
+  </data>
+  <data name="336330773" xml:space="preserve">
+    <value>do not understand BLOB INFO item {0}</value>
+  </data>
+  <data name="336330774" xml:space="preserve">
+    <value>gds_$get_segment failed</value>
+  </data>
+  <data name="336330775" xml:space="preserve">
+    <value>gds_$close_blob failed</value>
+  </data>
+  <data name="336330776" xml:space="preserve">
+    <value>gds_$open_blob failed</value>
+  </data>
+  <data name="336330777" xml:space="preserve">
+    <value>Failed in put_blr_gen_id</value>
+  </data>
+  <data name="336330778" xml:space="preserve">
+    <value>data type {0} not understood</value>
+  </data>
+  <data name="336330779" xml:space="preserve">
+    <value>gds_$compile_request failed</value>
+  </data>
+  <data name="336330780" xml:space="preserve">
+    <value>gds_$start_request failed</value>
+  </data>
+  <data name="336330781" xml:space="preserve">
+    <value>gds_$receive failed</value>
+  </data>
+  <data name="336330782" xml:space="preserve">
+    <value>gds_$release_request failed</value>
+  </data>
+  <data name="336330783" xml:space="preserve">
+    <value>gds_$database_info failed</value>
+  </data>
+  <data name="336330784" xml:space="preserve">
+    <value>Expected database description record</value>
+  </data>
+  <data name="336330785" xml:space="preserve">
+    <value>failed to create database {0}</value>
+  </data>
+  <data name="336330786" xml:space="preserve">
+    <value>RESTORE: decompression length error</value>
+  </data>
+  <data name="336330787" xml:space="preserve">
+    <value>cannot find table {0}</value>
+  </data>
+  <data name="336330788" xml:space="preserve">
+    <value>Cannot find column for BLOB</value>
+  </data>
+  <data name="336330789" xml:space="preserve">
+    <value>gds_$create_blob failed</value>
+  </data>
+  <data name="336330790" xml:space="preserve">
+    <value>gds_$put_segment failed</value>
+  </data>
+  <data name="336330791" xml:space="preserve">
+    <value>expected record length</value>
+  </data>
+  <data name="336330792" xml:space="preserve">
+    <value>wrong length record, expected {0} encountered {1}</value>
+  </data>
+  <data name="336330793" xml:space="preserve">
+    <value>expected data attribute</value>
+  </data>
+  <data name="336330794" xml:space="preserve">
+    <value>Failed in store_blr_gen_id</value>
+  </data>
+  <data name="336330795" xml:space="preserve">
+    <value>do not recognize record type {0}</value>
+  </data>
+  <data name="336330796" xml:space="preserve">
+    <value>Expected backup version 1..9.  Found {0}</value>
+  </data>
+  <data name="336330797" xml:space="preserve">
+    <value>expected backup description record</value>
+  </data>
+  <data name="336330798" xml:space="preserve">
+    <value>string truncated</value>
+  </data>
+  <data name="336330799" xml:space="preserve">
+    <value>warning -- record could not be restored</value>
+  </data>
+  <data name="336330800" xml:space="preserve">
+    <value>gds_$send failed</value>
+  </data>
+  <data name="336330801" xml:space="preserve">
+    <value>no table name for data</value>
+  </data>
+  <data name="336330802" xml:space="preserve">
+    <value>unexpected end of file on backup file</value>
+  </data>
+  <data name="336330803" xml:space="preserve">
+    <value>database format {0} is too old to restore to</value>
+  </data>
+  <data name="336330804" xml:space="preserve">
+    <value>array dimension for column {0} is invalid</value>
+  </data>
+  <data name="336330807" xml:space="preserve">
+    <value>Expected XDR record length</value>
+  </data>
+  <data name="336330817" xml:space="preserve">
+    <value>cannot open backup file {0}</value>
+  </data>
+  <data name="336330818" xml:space="preserve">
+    <value>cannot open status and error output file {0}</value>
+  </data>
+  <data name="336330934" xml:space="preserve">
+    <value>blocking factor parameter missing</value>
+  </data>
+  <data name="336330935" xml:space="preserve">
+    <value>expected blocking factor, encountered "{0}"</value>
+  </data>
+  <data name="336330936" xml:space="preserve">
+    <value>a blocking factor may not be used in conjunction with device CT</value>
+  </data>
+  <data name="336330940" xml:space="preserve">
+    <value>user name parameter missing</value>
+  </data>
+  <data name="336330941" xml:space="preserve">
+    <value>password parameter missing</value>
+  </data>
+  <data name="336330952" xml:space="preserve">
+    <value>missing parameter for the number of bytes to be skipped</value>
+  </data>
+  <data name="336330953" xml:space="preserve">
+    <value>expected number of bytes to be skipped, encountered "{0}"</value>
+  </data>
+  <data name="336330965" xml:space="preserve">
+    <value>character set</value>
+  </data>
+  <data name="336330967" xml:space="preserve">
+    <value>collation</value>
+  </data>
+  <data name="336330972" xml:space="preserve">
+    <value>Unexpected I/O error while reading from backup file</value>
+  </data>
+  <data name="336330973" xml:space="preserve">
+    <value>Unexpected I/O error while writing to backup file</value>
+  </data>
+  <data name="336330985" xml:space="preserve">
+    <value>could not drop database {0} (database might be in use)</value>
+  </data>
+  <data name="336330990" xml:space="preserve">
+    <value>System memory exhausted</value>
+  </data>
+  <data name="336331002" xml:space="preserve">
+    <value>SQL role</value>
+  </data>
+  <data name="336331005" xml:space="preserve">
+    <value>SQL role parameter missing</value>
+  </data>
+  <data name="336331010" xml:space="preserve">
+    <value>page buffers parameter missing</value>
+  </data>
+  <data name="336331011" xml:space="preserve">
+    <value>expected page buffers, encountered "{0}"</value>
+  </data>
+  <data name="336331012" xml:space="preserve">
+    <value>page buffers is allowed only on restore or create</value>
+  </data>
+  <data name="336331014" xml:space="preserve">
+    <value>size specification either missing or incorrect for file {0}</value>
+  </data>
+  <data name="336331015" xml:space="preserve">
+    <value>file {0} out of sequence</value>
+  </data>
+  <data name="336331016" xml:space="preserve">
+    <value>can't join -- one of the files missing</value>
+  </data>
+  <data name="336331017" xml:space="preserve">
+    <value>standard input is not supported when using join operation</value>
+  </data>
+  <data name="336331018" xml:space="preserve">
+    <value>standard output is not supported when using split operation</value>
+  </data>
+  <data name="336331019" xml:space="preserve">
+    <value>backup file {0} might be corrupt</value>
+  </data>
+  <data name="336331020" xml:space="preserve">
+    <value>database file specification missing</value>
+  </data>
+  <data name="336331021" xml:space="preserve">
+    <value>can't write a header record to file {0}</value>
+  </data>
+  <data name="336331022" xml:space="preserve">
+    <value>free disk space exhausted</value>
+  </data>
+  <data name="336331023" xml:space="preserve">
+    <value>file size given ({0}) is less than minimum allowed ({1})</value>
+  </data>
+  <data name="336331025" xml:space="preserve">
+    <value>service name parameter missing</value>
+  </data>
+  <data name="336331026" xml:space="preserve">
+    <value>Cannot restore over current database, must be SYSDBA or owner of the existing database.</value>
+  </data>
+  <data name="336331031" xml:space="preserve">
+    <value>"read_only" or "read_write" required</value>
+  </data>
+  <data name="336331033" xml:space="preserve">
+    <value>just data ignore all constraints etc.</value>
+  </data>
+  <data name="336331034" xml:space="preserve">
+    <value>restoring data only ignoring foreign key, unique, not null &amp; other constraints</value>
+  </data>
+  <data name="336331093" xml:space="preserve">
+    <value>Invalid metadata detected. Use -FIX_FSS_METADATA option.</value>
+  </data>
+  <data name="336331094" xml:space="preserve">
+    <value>Invalid data detected. Use -FIX_FSS_DATA option.</value>
+  </data>
+  <data name="336397205" xml:space="preserve">
+    <value>ODS versions before ODS{0} are not supported</value>
+  </data>
+  <data name="336397206" xml:space="preserve">
+    <value>Table {0} does not exist</value>
+  </data>
+  <data name="336397207" xml:space="preserve">
+    <value>View {0} does not exist</value>
+  </data>
+  <data name="336397208" xml:space="preserve">
+    <value>At line {0}, column {1}</value>
+  </data>
+  <data name="336397209" xml:space="preserve">
+    <value>At unknown line and column</value>
+  </data>
+  <data name="336397210" xml:space="preserve">
+    <value>Column {0} cannot be repeated in {1} statement</value>
+  </data>
+  <data name="336397211" xml:space="preserve">
+    <value>Too many values (more than {0}) in member list to match against</value>
+  </data>
+  <data name="336397212" xml:space="preserve">
+    <value>Array and BLOB data types not allowed in computed field</value>
+  </data>
+  <data name="336397213" xml:space="preserve">
+    <value>Implicit domain name {0} not allowed in user created domain</value>
+  </data>
+  <data name="336397214" xml:space="preserve">
+    <value>scalar operator used on field {0} which is not an array</value>
+  </data>
+  <data name="336397215" xml:space="preserve">
+    <value>cannot sort on more than 255 items</value>
+  </data>
+  <data name="336397216" xml:space="preserve">
+    <value>cannot group on more than 255 items</value>
+  </data>
+  <data name="336397217" xml:space="preserve">
+    <value>Cannot include the same field ({0}.{1}) twice in the ORDER BY clause with conflicting sorting options</value>
+  </data>
+  <data name="336397218" xml:space="preserve">
+    <value>column list from derived table {0} has more columns than the number of items in its SELECT statement</value>
+  </data>
+  <data name="336397219" xml:space="preserve">
+    <value>column list from derived table {0} has less columns than the number of items in its SELECT statement</value>
+  </data>
+  <data name="336397220" xml:space="preserve">
+    <value>no column name specified for column number {0} in derived table {1}</value>
+  </data>
+  <data name="336397221" xml:space="preserve">
+    <value>column {0} was specified multiple times for derived table {1}</value>
+  </data>
+  <data name="336397222" xml:space="preserve">
+    <value>Internal dsql error: alias type expected by pass1_expand_select_node</value>
+  </data>
+  <data name="336397223" xml:space="preserve">
+    <value>Internal dsql error: alias type expected by pass1_field</value>
+  </data>
+  <data name="336397224" xml:space="preserve">
+    <value>Internal dsql error: column position out of range in pass1_union_auto_cast</value>
+  </data>
+  <data name="336397225" xml:space="preserve">
+    <value>Recursive CTE member ({0}) can refer itself only in FROM clause</value>
+  </data>
+  <data name="336397226" xml:space="preserve">
+    <value>CTE '{0}' has cyclic dependencies</value>
+  </data>
+  <data name="336397227" xml:space="preserve">
+    <value>Recursive member of CTE can't be member of an outer join</value>
+  </data>
+  <data name="336397228" xml:space="preserve">
+    <value>Recursive member of CTE can't reference itself more than once</value>
+  </data>
+  <data name="336397229" xml:space="preserve">
+    <value>Recursive CTE ({0}) must be an UNION</value>
+  </data>
+  <data name="336397230" xml:space="preserve">
+    <value>CTE '{0}' defined non-recursive member after recursive</value>
+  </data>
+  <data name="336397231" xml:space="preserve">
+    <value>Recursive member of CTE '{0}' has {1} clause</value>
+  </data>
+  <data name="336397232" xml:space="preserve">
+    <value>Recursive members of CTE ({0}) must be linked with another members via UNION ALL</value>
+  </data>
+  <data name="336397233" xml:space="preserve">
+    <value>Non-recursive member is missing in CTE '{0}'</value>
+  </data>
+  <data name="336397234" xml:space="preserve">
+    <value>WITH clause can't be nested</value>
+  </data>
+  <data name="336397235" xml:space="preserve">
+    <value>column {0} appears more than once in USING clause</value>
+  </data>
+  <data name="336397236" xml:space="preserve">
+    <value>feature is not supported in dialect {0}</value>
+  </data>
+  <data name="336397237" xml:space="preserve">
+    <value>CTE "{0}" is not used in query</value>
+  </data>
+  <data name="336397238" xml:space="preserve">
+    <value>column {0} appears more than once in ALTER VIEW</value>
+  </data>
+  <data name="336397239" xml:space="preserve">
+    <value>{0} is not supported inside IN AUTONOMOUS TRANSACTION block</value>
+  </data>
+  <data name="336397240" xml:space="preserve">
+    <value>Unknown node type {0} in dsql/GEN_expr</value>
+  </data>
+  <data name="336397241" xml:space="preserve">
+    <value>Argument for {0} in dialect 1 must be string or numeric</value>
+  </data>
+  <data name="336397242" xml:space="preserve">
+    <value>Argument for {0} in dialect 3 must be numeric</value>
+  </data>
+  <data name="336397243" xml:space="preserve">
+    <value>Strings cannot be added to or subtracted from DATE or TIME types</value>
+  </data>
+  <data name="336397244" xml:space="preserve">
+    <value>Invalid data type for subtraction involving DATE, TIME or TIMESTAMP types</value>
+  </data>
+  <data name="336397245" xml:space="preserve">
+    <value>Adding two DATE values or two TIME values is not allowed</value>
+  </data>
+  <data name="336397246" xml:space="preserve">
+    <value>DATE value cannot be subtracted from the provided data type</value>
+  </data>
+  <data name="336397247" xml:space="preserve">
+    <value>Strings cannot be added or subtracted in dialect 3</value>
+  </data>
+  <data name="336397248" xml:space="preserve">
+    <value>Invalid data type for addition or subtraction in dialect 3</value>
+  </data>
+  <data name="336397249" xml:space="preserve">
+    <value>Invalid data type for multiplication in dialect 1</value>
+  </data>
+  <data name="336397250" xml:space="preserve">
+    <value>Strings cannot be multiplied in dialect 3</value>
+  </data>
+  <data name="336397251" xml:space="preserve">
+    <value>Invalid data type for multiplication in dialect 3</value>
+  </data>
+  <data name="336397252" xml:space="preserve">
+    <value>Division in dialect 1 must be between numeric data types</value>
+  </data>
+  <data name="336397253" xml:space="preserve">
+    <value>Strings cannot be divided in dialect 3</value>
+  </data>
+  <data name="336397254" xml:space="preserve">
+    <value>Invalid data type for division in dialect 3</value>
+  </data>
+  <data name="336397255" xml:space="preserve">
+    <value>Strings cannot be negated (applied the minus operator) in dialect 3</value>
+  </data>
+  <data name="336397256" xml:space="preserve">
+    <value>Invalid data type for negation (minus operator)</value>
+  </data>
+  <data name="336397257" xml:space="preserve">
+    <value>Cannot have more than 255 items in DISTINCT list</value>
+  </data>
+  <data name="336723983" xml:space="preserve">
+    <value>unable to open database</value>
+  </data>
+  <data name="336723984" xml:space="preserve">
+    <value>error in switch specifications</value>
+  </data>
+  <data name="336723985" xml:space="preserve">
+    <value>no operation specified</value>
+  </data>
+  <data name="336723986" xml:space="preserve">
+    <value>no user name specified</value>
+  </data>
+  <data name="336723987" xml:space="preserve">
+    <value>add record error</value>
+  </data>
+  <data name="336723988" xml:space="preserve">
+    <value>modify record error</value>
+  </data>
+  <data name="336723989" xml:space="preserve">
+    <value>find/modify record error</value>
+  </data>
+  <data name="336723990" xml:space="preserve">
+    <value>record not found for user: {0}</value>
+  </data>
+  <data name="336723991" xml:space="preserve">
+    <value>delete record error</value>
+  </data>
+  <data name="336723992" xml:space="preserve">
+    <value>find/delete record error</value>
+  </data>
+  <data name="336723996" xml:space="preserve">
+    <value>find/display record error</value>
+  </data>
+  <data name="336723997" xml:space="preserve">
+    <value>invalid parameter, no switch defined</value>
+  </data>
+  <data name="336723998" xml:space="preserve">
+    <value>operation already specified</value>
+  </data>
+  <data name="336723999" xml:space="preserve">
+    <value>password already specified</value>
+  </data>
+  <data name="336724000" xml:space="preserve">
+    <value>uid already specified</value>
+  </data>
+  <data name="336724001" xml:space="preserve">
+    <value>gid already specified</value>
+  </data>
+  <data name="336724002" xml:space="preserve">
+    <value>project already specified</value>
+  </data>
+  <data name="336724003" xml:space="preserve">
+    <value>organization already specified</value>
+  </data>
+  <data name="336724004" xml:space="preserve">
+    <value>first name already specified</value>
+  </data>
+  <data name="336724005" xml:space="preserve">
+    <value>middle name already specified</value>
+  </data>
+  <data name="336724006" xml:space="preserve">
+    <value>last name already specified</value>
+  </data>
+  <data name="336724008" xml:space="preserve">
+    <value>invalid switch specified</value>
+  </data>
+  <data name="336724009" xml:space="preserve">
+    <value>ambiguous switch specified</value>
+  </data>
+  <data name="336724010" xml:space="preserve">
+    <value>no operation specified for parameters</value>
+  </data>
+  <data name="336724011" xml:space="preserve">
+    <value>no parameters allowed for this operation</value>
+  </data>
+  <data name="336724012" xml:space="preserve">
+    <value>incompatible switches specified</value>
+  </data>
+  <data name="336724044" xml:space="preserve">
+    <value>Invalid user name (maximum 31 bytes allowed)</value>
+  </data>
+  <data name="336724045" xml:space="preserve">
+    <value>Warning - maximum 8 significant bytes of password used</value>
+  </data>
+  <data name="336724046" xml:space="preserve">
+    <value>database already specified</value>
+  </data>
+  <data name="336724047" xml:space="preserve">
+    <value>database administrator name already specified</value>
+  </data>
+  <data name="336724048" xml:space="preserve">
+    <value>database administrator password already specified</value>
+  </data>
+  <data name="336724049" xml:space="preserve">
+    <value>SQL role name already specified</value>
+  </data>
+  <data name="336789504" xml:space="preserve">
+    <value>The license file does not exist or could not be opened for read</value>
+  </data>
+  <data name="336789523" xml:space="preserve">
+    <value>operation already specified</value>
+  </data>
+  <data name="336789524" xml:space="preserve">
+    <value>no operation specified</value>
+  </data>
+  <data name="336789525" xml:space="preserve">
+    <value>invalid switch</value>
+  </data>
+  <data name="336789526" xml:space="preserve">
+    <value>invalid switch combination</value>
+  </data>
+  <data name="336789527" xml:space="preserve">
+    <value>illegal operation/switch combination</value>
+  </data>
+  <data name="336789528" xml:space="preserve">
+    <value>ambiguous switch</value>
+  </data>
+  <data name="336789529" xml:space="preserve">
+    <value>invalid parameter, no switch specified</value>
+  </data>
+  <data name="336789530" xml:space="preserve">
+    <value>switch does not take any parameter</value>
+  </data>
+  <data name="336789531" xml:space="preserve">
+    <value>switch requires a parameter</value>
+  </data>
+  <data name="336789532" xml:space="preserve">
+    <value>syntax error in command line</value>
+  </data>
+  <data name="336789534" xml:space="preserve">
+    <value>The certificate was not added.  A duplicate ID exists in the license file.</value>
+  </data>
+  <data name="336789535" xml:space="preserve">
+    <value>The certificate was not added.  Invalid certificate ID / Key combination.</value>
+  </data>
+  <data name="336789536" xml:space="preserve">
+    <value>The certificate was not removed.  The key does not exist or corresponds to a temporary evaluation license.</value>
+  </data>
+  <data name="336789537" xml:space="preserve">
+    <value>An error occurred updating the license file.  Operation cancelled.</value>
+  </data>
+  <data name="336789538" xml:space="preserve">
+    <value>The certificate could not be validated based on the information given.  Please recheck the ID and key information.</value>
+  </data>
+  <data name="336789539" xml:space="preserve">
+    <value>Operation failed.  An unknown error occurred.</value>
+  </data>
+  <data name="336789540" xml:space="preserve">
+    <value>Add license operation failed, KEY: {0} ID: {1}</value>
+  </data>
+  <data name="336789541" xml:space="preserve">
+    <value>Remove license operation failed, KEY: {0}</value>
+  </data>
+  <data name="336789563" xml:space="preserve">
+    <value>The evaluation license has already been used on this server.  You need to purchase a non-evaluation license.</value>
+  </data>
+  <data name="336920577" xml:space="preserve">
+    <value>found unknown switch</value>
+  </data>
+  <data name="336920578" xml:space="preserve">
+    <value>please retry, giving a database name</value>
+  </data>
+  <data name="336920579" xml:space="preserve">
+    <value>Wrong ODS version, expected {0}, encountered {1}</value>
+  </data>
+  <data name="336920580" xml:space="preserve">
+    <value>Unexpected end of database file.</value>
+  </data>
+  <data name="336920605" xml:space="preserve">
+    <value>Can't open database file {0}</value>
+  </data>
+  <data name="336920606" xml:space="preserve">
+    <value>Can't read a database page</value>
+  </data>
+  <data name="336920607" xml:space="preserve">
+    <value>System memory exhausted</value>
+  </data>
+  <data name="336986113" xml:space="preserve">
+    <value>Wrong value for access mode</value>
+  </data>
+  <data name="336986114" xml:space="preserve">
+    <value>Wrong value for write mode</value>
+  </data>
+  <data name="336986115" xml:space="preserve">
+    <value>Wrong value for reserve space</value>
+  </data>
+  <data name="336986116" xml:space="preserve">
+    <value>Unknown tag ({0}) in info_svr_db_info block after isc_svc_query()</value>
+  </data>
+  <data name="336986117" xml:space="preserve">
+    <value>Unknown tag ({0}) in isc_svc_query() results</value>
+  </data>
+  <data name="336986118" xml:space="preserve">
+    <value>Unknown switch "{0}"</value>
+  </data>
+  <data name="336986159" xml:space="preserve">
+    <value>Wrong value for shutdown mode</value>
+  </data>
+  <data name="336986160" xml:space="preserve">
+    <value>could not open file {0}</value>
+  </data>
+  <data name="336986161" xml:space="preserve">
+    <value>could not read file {0}</value>
+  </data>
+  <data name="336986162" xml:space="preserve">
+    <value>empty file {0}</value>
+  </data>
+  <data name="336986164" xml:space="preserve">
+    <value>Invalid or missing parameter for switch {0}</value>
+  </data>
+  <data name="337051649" xml:space="preserve">
+    <value>Switches trusted_svc and trusted_role are not supported from command line</value>
+  </data>
+</root>

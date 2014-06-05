@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient", "FirebirdSql\Data\FirebirdSql.Data.FirebirdClient.csproj", "{326A24F9-6259-45DB-835C-18DB80728460}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj", "{326A24F9-6259-45DB-835C-18DB80728460}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests", "FirebirdSql\Data\UnitTests\FirebirdSql.Data.UnitTests.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests", "FirebirdSql.Data.UnitTests\FirebirdSql.Data.UnitTests.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "installer", "installer", "{D5D2A0BC-7109-4039-8861-7917D0F0E7A2}"
 	ProjectSection(SolutionItems) = preProject

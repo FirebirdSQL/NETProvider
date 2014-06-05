@@ -14,9 +14,9 @@
     <tags>firebird firebirsql firebirdclient adonet database</tags>
   </metadata>
   <files>
-    <file src="..\..\source\FirebirdSql\Data\bin\Release_40\FirebirdSql.Data.FirebirdClient.dll" target="lib\net40-client" />
-    <file src="..\..\source\FirebirdSql\Data\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net40-client" />
-    <file src="..\..\source\FirebirdSql\Data\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll" target="lib\net45" />
-    <file src="..\..\source\FirebirdSql\Data\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net45" />
+    <file src="..\..\source\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.dll" target="lib\net40-client" />
+    <file src="..\..\source\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net40-client" />
+    <file src="..\..\source\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll" target="lib\net45" />
+    <file src="..\..\source\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net45" />
   </files>
 </package>
