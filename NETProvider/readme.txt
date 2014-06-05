@@ -18,7 +18,7 @@ You can subscribe to the developement list at:
 
 You can access to the lastest developement sources through SVN, see:
 
-	http://firebird.svn.sourceforge.net/viewvc/firebird/NETProvider/
+	https://sourceforge.net/p/firebird/NETProvider/
 
 
 Reporting Bugs
