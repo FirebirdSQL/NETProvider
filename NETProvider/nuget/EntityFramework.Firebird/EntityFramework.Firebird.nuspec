@@ -20,10 +20,10 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\source\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.dll" target="lib\net40-client" />
-    <file src="..\..\source\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.pdb" target="lib\net40-client" />
-    <file src="..\..\source\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.dll" target="lib\net45" />
-    <file src="..\..\source\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.pdb" target="lib\net45" />
+    <file src="..\..\src\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.dll" target="lib\net40-client" />
+    <file src="..\..\src\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.pdb" target="lib\net40-client" />
+    <file src="..\..\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.dll" target="lib\net45" />
+    <file src="..\..\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.pdb" target="lib\net45" />
     <file src="tools\install.ps1" target="tools" />
   </files>
 </package>
