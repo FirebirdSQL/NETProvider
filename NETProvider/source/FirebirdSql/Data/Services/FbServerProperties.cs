@@ -104,9 +104,7 @@ namespace FirebirdSql.Data.Services
 
 		private ArrayList GetInfo(byte[] items)
 		{
-			byte[] buffer = this.QueryService(items);
-
-			return this.ParseQueryInfo(buffer);
+			return this.Query(items);
 		}
 
 		#endregion

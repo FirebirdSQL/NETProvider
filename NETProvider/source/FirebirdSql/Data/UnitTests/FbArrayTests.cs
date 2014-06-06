@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void IntegerArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Integer Array Test");
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ShortArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Short Array Test");
@@ -148,7 +148,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BigIntArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("BigInt Array	Test");
@@ -201,7 +201,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void FloatArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Float Array Test");
@@ -254,7 +254,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DoubleArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Double Array	Test");
@@ -307,7 +307,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NumericArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Numeric/Decimal Array Test");
@@ -360,7 +360,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DateArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Date	Array Test");
@@ -413,7 +413,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void TimeArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Time	Array Test");
@@ -466,7 +466,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void TimeStampArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("TimeStamp Array Test");
@@ -519,7 +519,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void CharArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("Char	Array Test");
@@ -572,7 +572,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void VarCharArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 
 			Console.WriteLine("\r\n");
 			Console.WriteLine("VarChar Array Test");
@@ -902,7 +902,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BigArrayTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 			int elements = short.MaxValue;
 
 			string selectText = "SELECT	big_array FROM TEST	WHERE int_field	= " + id_value.ToString();
@@ -961,7 +961,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void PartialUpdatesTest()
 		{
-			int id_value = this.GetId();
+			int id_value = GetId();
 			int elements = 16384;
 
 			string selectText = "SELECT	big_array FROM TEST	WHERE int_field	= " + id_value.ToString();

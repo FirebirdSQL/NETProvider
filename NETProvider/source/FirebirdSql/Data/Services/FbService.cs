@@ -23,8 +23,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Net;
+using System.Text;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
@@ -43,7 +43,6 @@ namespace FirebirdSql.Data.Services
 
 		private IServiceManager svc;
 		private FbServiceState state;
-		private ServiceParameterBuffer querySpb;
 		private FbConnectionString csManager;
 		private string connectionString;
 		private string serviceName;
@@ -54,6 +53,7 @@ namespace FirebirdSql.Data.Services
 		#region · Protected Fields ·
 
 		internal ServiceParameterBuffer StartSpb;
+		internal ServiceParameterBuffer QuerySpb;
 
 		#endregion
 
@@ -215,7 +215,187 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		protected byte[] QueryService(byte[] items)
+		protected ArrayList Query(byte[] items)
+		{
+			var result = new ArrayList();
+			this.Query(items, (truncated, item) =>
+			{
+				var stringItem = item as string;
+				if (stringItem != null)
+				{
+					if (!truncated)
+					{
+						result.Add(stringItem);
+			}
+					else
+					{
+						var lastValue = result[result.Count - 1] as string;
+						result[result.Count - 1] = lastValue + stringItem;
+					}
+					return;
+				}
+
+				var byteArrayItem = item as byte[];
+				if (byteArrayItem != null)
+			{
+					if (!truncated)
+					{
+						result.Add(byteArrayItem);
+			}
+					else
+					{
+						var lastValue = result[result.Count - 1] as byte[];
+						var lastValueLength = lastValue.Length;
+						Array.Resize(ref lastValue, lastValue.Length + byteArrayItem.Length);
+						Array.Copy(byteArrayItem, 0, lastValue, lastValueLength, byteArrayItem.Length);
+					}
+					return;
+				}
+
+				result.Add(item);
+			});
+			return result;
+		}
+
+		protected void Query(byte[] items, Action<bool, object> resultAction)
+			{
+			this.ProcessQuery(items, resultAction);
+			}
+
+		protected void ProcessServiceOutput()
+			{
+			string line;
+
+			while ((line = this.GetNextLine()) != null)
+				{
+				WriteServiceOutputChecked(line);
+				}
+			}
+
+		protected string GetNextLine()
+		{
+			var info = this.Query(new byte[] { IscCodes.isc_info_svc_line });
+			if (info.Count == 0)
+				return null;
+			return info[0] as string;
+		}
+
+		protected void WriteServiceOutputChecked(string s)
+		{
+			if (this.ServiceOutput != null)
+			{
+				this.ServiceOutput(this, new ServiceOutputEventArgs(s));
+			}
+		}
+
+		#endregion
+
+		#region · Private Methods ·
+
+		private void ProcessQuery(byte[] items, Action<bool, object> queryResponseAction)
+		{
+			var pos = 0;
+			var truncated = false;
+			var type = default(int);
+
+			var buffer = this.QueryService(items);
+
+			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
+			{
+				if (type == IscCodes.isc_info_truncated)
+				{
+					buffer = this.QueryService(items);
+					pos = 0;
+					truncated = true;
+					continue;
+				}
+
+					switch (type)
+					{
+						case IscCodes.isc_info_svc_version:
+						case IscCodes.isc_info_svc_get_license_mask:
+						case IscCodes.isc_info_svc_capabilities:
+						case IscCodes.isc_info_svc_get_licensed_users:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							queryResponseAction(truncated, IscHelper.VaxInteger(buffer, pos, 4));
+							pos += length;
+							truncated = false;
+							break;
+						}
+
+						case IscCodes.isc_info_svc_server_version:
+						case IscCodes.isc_info_svc_implementation:
+						case IscCodes.isc_info_svc_get_env:
+						case IscCodes.isc_info_svc_get_env_lock:
+						case IscCodes.isc_info_svc_get_env_msg:
+						case IscCodes.isc_info_svc_user_dbpath:
+						case IscCodes.isc_info_svc_line:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							queryResponseAction(truncated, Encoding.Default.GetString(buffer, pos, length));
+							pos += length;
+							truncated = false;
+							break;
+						}
+						case IscCodes.isc_info_svc_to_eof:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							var block = new byte[length];
+							Array.Copy(buffer, pos, block, 0, length);
+							queryResponseAction(truncated, block);
+							pos += length;
+							truncated = false;
+							break;
+						}
+
+						case IscCodes.isc_info_svc_svr_db_info:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							queryResponseAction(truncated, ParseDatabasesInfo(buffer, ref pos));
+							truncated = false;
+							break;
+						}
+
+						case IscCodes.isc_info_svc_get_users:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							queryResponseAction(truncated, ParseUserData(buffer, ref pos));
+							truncated = false;
+							break;
+						}
+
+						case IscCodes.isc_info_svc_get_config:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							queryResponseAction(truncated, ParseServerConfig(buffer, ref pos));
+							truncated = false;
+							break;
+					}
+
+					case IscCodes.isc_info_svc_stdin:
+						{
+							var length = GetLength(buffer, 4, ref pos);
+							queryResponseAction(truncated, length);
+							break;
+				}
+			}
+		}
+		}
+
+		private byte[] QueryService(byte[] items)
 		{
 			bool shouldClose = false;
 			if (this.state == FbServiceState.Closed)
@@ -225,16 +405,16 @@ namespace FirebirdSql.Data.Services
 				shouldClose = true;
 			}
 
-			if (this.querySpb == null)
+			if (this.QuerySpb == null)
 			{
-				this.querySpb = new ServiceParameterBuffer();
+				this.QuerySpb = new ServiceParameterBuffer();
 			}
 
 			try
-			{
+		{
 				// Response	buffer
 				byte[] buffer = new byte[this.queryBufferSize];
-				this.svc.Query(this.querySpb, items.Length, items, buffer.Length, buffer);
+				this.svc.Query(this.QuerySpb, items.Length, items, buffer.Length, buffer);
 				return buffer;
 			}
 			finally
@@ -242,92 +422,6 @@ namespace FirebirdSql.Data.Services
 				if (shouldClose)
 				{
 					this.Close();
-				}
-			}
-		}
-
-		protected ArrayList ParseQueryInfo(byte[] buffer)
-		{
-			int pos = 0;
-			int length = 0;
-			int type = 0;
-
-			ArrayList items = new ArrayList();
-
-			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
-			{
-				length = IscHelper.VaxInteger(buffer, pos, 2);
-				pos += 2;
-
-				if (length != 0)
-				{
-					switch (type)
-					{
-						case IscCodes.isc_info_svc_version:
-						case IscCodes.isc_info_svc_get_license_mask:
-						case IscCodes.isc_info_svc_capabilities:
-						case IscCodes.isc_info_svc_get_licensed_users:
-							items.Add(IscHelper.VaxInteger(buffer, pos, 4));
-							pos += length;
-							break;
-
-						case IscCodes.isc_info_svc_server_version:
-						case IscCodes.isc_info_svc_implementation:
-						case IscCodes.isc_info_svc_get_env:
-						case IscCodes.isc_info_svc_get_env_lock:
-						case IscCodes.isc_info_svc_get_env_msg:
-						case IscCodes.isc_info_svc_user_dbpath:
-						case IscCodes.isc_info_svc_line:
-						case IscCodes.isc_info_svc_to_eof:
-							items.Add(Encoding.Default.GetString(buffer, pos, length));
-							pos += length;
-							break;
-
-						case IscCodes.isc_info_svc_svr_db_info:
-							items.Add(ParseDatabasesInfo(buffer, ref pos));
-							break;
-
-						case IscCodes.isc_info_svc_get_users:
-							items.Add(ParseUserData(buffer, ref	pos));
-							break;
-
-						case IscCodes.isc_info_svc_get_config:
-							items.Add(ParseServerConfig(buffer, ref	pos));
-							break;
-					}
-				}
-			}
-
-			return items;
-		}
-
-		protected string GetNextLine()
-		{
-			this.querySpb = new ServiceParameterBuffer();
-
-			byte[] items = new byte[] { IscCodes.isc_info_svc_line };
-			byte[] buffer = this.QueryService(items);
-
-			ArrayList info = this.ParseQueryInfo(buffer);
-			if (info.Count != 0)
-			{
-				return info[0] as string;
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		protected void ProcessServiceOutput()
-		{
-			string line;
-
-			while ((line = this.GetNextLine()) != null)
-			{
-				if (this.ServiceOutput != null)
-				{
-					this.ServiceOutput(this, new ServiceOutputEventArgs(line));
 				}
 			}
 		}
@@ -529,6 +623,13 @@ namespace FirebirdSql.Data.Services
 			pos--;
 
 			return users.ToArray();
+		}
+
+		private static int GetLength(byte[] buffer, int size, ref int pos)
+		{
+			var result = IscHelper.VaxInteger(buffer, pos, size);
+			pos += size;
+			return result;
 		}
 
 		#endregion

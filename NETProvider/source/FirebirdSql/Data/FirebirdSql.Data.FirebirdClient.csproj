@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -133,6 +133,7 @@
     <Compile Include="Client\Managed\Version12\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version12\GdsStatement.cs" />
     <Compile Include="Common\Extensions.cs" />
+    <Compile Include="Common\PageSizeHelper.cs" />
     <Compile Include="Common\TimeoutHelper.cs" />
     <Compile Include="Common\TraceHelper.cs" />
     <Compile Include="Entity\DmlSqlGenerator.cs" />
@@ -321,6 +322,8 @@
     <Compile Include="Services\FbDatabasesInfo.cs" />
     <Compile Include="Services\FbDatabaseTraceConfiguration.cs" />
     <Compile Include="Services\FbDatabaseTraceEvents.cs" />
+    <Compile Include="Services\FbStreamingBackup.cs" />
+    <Compile Include="Services\FbStreamingRestore.cs" />
     <Compile Include="Services\FbLog.cs" />
     <Compile Include="Services\FbNBackup.cs" />
     <Compile Include="Services\FbNBackupFlags.cs" />

@@ -29,55 +29,30 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbRestore : FbService
 	{
-		#region · Fields ·
-
-		private FbBackupFileCollection backupFiles;
-		private FbRestoreFlags options;
-		private bool verbose;
-		private int? pageBuffers;
-		private int? pageSize;
-
-		#endregion
-
 		#region · Properties ·
 
+		private FbBackupFileCollection backupFiles;
 		public FbBackupFileCollection BackupFiles
 		{
 			get { return this.backupFiles; }
 		}
 
-		public bool Verbose
-		{
-			get { return this.verbose; }
-			set { this.verbose = value; }
-		}
-
-		public int? PageBuffers
-		{
-			get { return this.pageBuffers; }
-			set { this.pageBuffers = value; }
-		}
-
+		private int? pageSize;
 		public int? PageSize
 		{
 			get { return this.pageSize; }
 			set
 			{
-				if (value != 1024 && value != 2048 &&
-					value != 4096 && value != 8192 &&
-					value != 16384)
-				{
+				if (value.HasValue && !PageSizeHelper.IsValidPageSize((int)value))
 					throw new InvalidOperationException("Invalid page size.");
-				}
+
 				this.pageSize = value;
 			}
 		}
 
-		public FbRestoreFlags Options
-		{
-			get { return this.options; }
-			set { this.options = value; }
-		}
+		public bool Verbose { get; set; }
+		public int? PageBuffers { get; set; }
+		public FbRestoreFlags Options { get; set; }
 
 		#endregion
 
@@ -109,23 +84,23 @@ namespace FirebirdSql.Data.Services
 
 				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-				if (this.verbose)
+				if (this.Verbose)
 				{
 					this.StartSpb.Append(IscCodes.isc_spb_verbose);
 				}
 
-				if (this.pageBuffers.HasValue)
-					this.StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)this.pageBuffers);
+				if (this.PageBuffers.HasValue)
+					this.StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)this.PageBuffers);
 				if (this.pageSize.HasValue)
 					this.StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)this.pageSize);
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.Options);
 
 				this.Open();
 
 				// Start execution
 				this.StartTask();
 
-				if (this.verbose)
+				if (this.Verbose)
 				{
 					this.ProcessServiceOutput();
 				}

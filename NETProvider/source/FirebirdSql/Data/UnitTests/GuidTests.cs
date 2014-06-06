@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			// Insert the Guid
 			FbCommand insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection);
-			insert.Parameters.Add("@IntField", FbDbType.Integer).Value = this.GetId();
+			insert.Parameters.Add("@IntField", FbDbType.Integer).Value = GetId();
 			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = DBNull.Value;
 			insert.ExecuteNonQuery();
 			insert.Dispose();
