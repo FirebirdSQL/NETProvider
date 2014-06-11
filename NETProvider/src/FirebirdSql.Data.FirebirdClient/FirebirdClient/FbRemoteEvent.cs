@@ -20,6 +20,7 @@
  */
 
 using System;
+using System.Threading;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
@@ -36,6 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private FbConnection connection;
 		private RemoteEvent revent;
+		private SynchronizationContext synchronizationContext;
 
 		#endregion
 
@@ -93,6 +95,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.connection = connection;
 			this.revent = connection.InnerConnection.Database.CreateEvent();
 			this.revent.EventCountsCallback = new RemoteEventCountsCallback(this.OnRemoteEventCounts);
+			this.synchronizationContext = SynchronizationContext.Current ?? new SynchronizationContext();
 
 			if (events != null)
 			{
@@ -174,40 +177,43 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			bool canceled = false;
 
-			if (this.RemoteEventCounts != null)
+			int[] actualCounts = (int[])this.revent.ActualCounts.Clone();
+			if (this.revent.PreviousCounts != null)
 			{
-				int[] actualCounts = (int[])this.revent.ActualCounts.Clone();
-				if (this.revent.PreviousCounts != null)
+				for (int i = 0; i < this.revent.ActualCounts.Length; i++)
 				{
-					for (int i = 0; i < this.revent.ActualCounts.Length; i++)
+					actualCounts[i] -= this.revent.PreviousCounts[i];
+				}
+			}
+
+			// Send individual event notifications
+			for (int i = 0; i < actualCounts.Length; i++)
+			{
+				FbRemoteEventEventArgs args = new FbRemoteEventEventArgs(this.revent.Events[i], actualCounts[i]);
+				if (this.RemoteEventCounts != null)
+				{
+					this.synchronizationContext.Send(_ =>
 					{
-						actualCounts[i] -= this.revent.PreviousCounts[i];
-					}
+						this.RemoteEventCounts(this, args);
+					}, null);
 				}
 
-				// Send individual event notifications
-				for (int i = 0; i < actualCounts.Length; i++)
+				if (args.Cancel)
 				{
-					FbRemoteEventEventArgs args = new FbRemoteEventEventArgs(this.revent.Events[i], actualCounts[i]);
-					this.RemoteEventCounts(this, args);
+					canceled = true;
+					break;
+				}
+			}
 
-					if (args.Cancel)
-					{
-						canceled = true;
-						break;
-					}
-				}
-
-				if (canceled)
-				{
-					// Requeque
-					this.CancelEvents();
-				}
-				else
-				{
-					// Requeque
-					this.QueueEvents();
-				}
+			if (canceled)
+			{
+				// Requeque
+				this.CancelEvents();
+			}
+			else
+			{
+				// Requeque
+				this.QueueEvents();
 			}
 		}
 
