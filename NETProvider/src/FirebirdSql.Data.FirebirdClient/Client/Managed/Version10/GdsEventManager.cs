@@ -36,15 +36,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Properties ·
-
-		//public Hashtable EventList
-		//{
-		//    get { return this.events; }
-		//}
-
-		#endregion
-
 		#region · Constructors ·
 
 		public GdsEventManager(int handle, string ipAddress, int portNumber)
@@ -128,14 +119,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				var getEventsCount = (Func<int>)(() =>
-				{
-					lock (this.events)
-					{
-						return this.events.Count;
-					}
-				});
-				while (getEventsCount() > 0)
+				while (GetEventsCountLocked() > 0)
 				{
 					var operation = this.database.NextOperation();
 
@@ -167,7 +151,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 									// Notify new event counts
 									currentEvent.EventCounts(buffer);
-									
+
 									if (this.events.Count == 0)
 									{
 										return;
@@ -185,6 +169,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			catch
 			{
 				return;
+			}
+		}
+
+		private int GetEventsCountLocked()
+		{
+			lock (this.events)
+			{
+				return this.events.Count;
 			}
 		}
 
