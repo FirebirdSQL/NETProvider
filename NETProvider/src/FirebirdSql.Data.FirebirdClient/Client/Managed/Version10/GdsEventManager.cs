@@ -151,11 +151,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 									// Notify new event counts
 									currentEvent.EventCounts(buffer);
-
-									if (this.events.Count == 0)
-									{
-										return;
-									}
 								}
 							}
 							break;
