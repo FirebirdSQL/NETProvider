@@ -17,7 +17,7 @@
  */
 
 using System;
-using System.Collections;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 
@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private GdsDatabase database;
 		private Thread eventsThread;
-		private Hashtable events;
+		private ConcurrentDictionary<int, RemoteEvent> events;
 		private int handle;
 
 		#endregion
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public GdsEventManager(int handle, string ipAddress, int portNumber)
 		{
-			this.events = new Hashtable();
+			this.events = new ConcurrentDictionary<int, RemoteEvent>();
 			this.handle = handle;
 
 			// Initialize the connection
@@ -62,13 +62,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			lock (this)
 			{
-				lock (this.events)
-				{
-					if (!this.events.ContainsKey(remoteEvent.LocalId))
-					{
-						this.events.Add(remoteEvent.LocalId, remoteEvent);
-					}
-				}
+				this.events[remoteEvent.LocalId] = remoteEvent;
 
 				if (this.eventsThread == null || this.eventsThread.ThreadState.HasFlag(ThreadState.Stopped | ThreadState.Unstarted))
 				{
@@ -82,10 +76,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void CancelEvents(RemoteEvent remoteEvent)
 		{
-			lock (this.events)
-			{
-				this.events.Remove(remoteEvent.LocalId);
-			}
+			RemoteEvent dummy;
+			this.events.TryRemove(remoteEvent.LocalId, out dummy);
 		}
 
 		public void Close()
@@ -127,7 +119,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					{
 						case IscCodes.op_response:
 							this.database.ReadResponse();
-							break;
+							continue;
 
 						case IscCodes.op_exit:
 						case IscCodes.op_disconnect:
@@ -140,20 +132,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							var ast = this.database.ReadBytes(8);
 							var eventId = this.database.ReadInt32();
 
-							lock (this.events)
+							RemoteEvent currentEvent;
+							if (this.events.TryRemove(eventId, out currentEvent))
 							{
-								if (this.events.ContainsKey(eventId))
-								{
-									RemoteEvent currentEvent = (RemoteEvent)this.events[eventId];
-
-									// Remove event	from the list
-									this.events.Remove(eventId);
-
-									// Notify new event counts
-									currentEvent.EventCounts(buffer);
-								}
+								// Notify new event counts
+								currentEvent.EventCounts(buffer);
 							}
-							break;
+
+							continue;
 					}
 				}
 			}
@@ -169,10 +155,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private int GetEventsCountLocked()
 		{
-			lock (this.events)
-			{
-				return this.events.Count;
-			}
+			return this.events.Count;
 		}
 
 		#endregion
