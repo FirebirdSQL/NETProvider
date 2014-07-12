@@ -52,26 +52,33 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				try
 				{
+					int numberOfResponses = 0;
 					if (this.state == StatementState.Deallocated)
 					{
 						// Allocate statement
 						this.SendAllocateToBuffer();
+						numberOfResponses++;
 					}
 
 					// Prepare the statement
 					this.SendPrepareToBuffer(commandText);
+					numberOfResponses++;
 
 					// Grab statement type
 					this.SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+					numberOfResponses++;
 
 					this.database.Flush();
 
 					// allocate, prepare, statement type
-					int numberOfResponses = 3;
 					try
 					{
-						numberOfResponses--;
-						GenericResponse allocateResponse = this.database.ReadGenericResponse();
+						GenericResponse allocateResponse = null;
+						if (this.state == StatementState.Deallocated)
+						{
+							numberOfResponses--;
+							allocateResponse = this.database.ReadGenericResponse();
+						}
 
 						numberOfResponses--;
 						GenericResponse prepareResponse = this.database.ReadGenericResponse();
@@ -80,7 +87,10 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 						numberOfResponses--;
 						GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
 
-						this.ProcessAllocateResponce(allocateResponse);
+						if (allocateResponse != null)
+						{
+							this.ProcessAllocateResponce(allocateResponse);
+						}
 						this.ProcessPrepareResponse(prepareResponse);
 						this.statementType = this.ProcessStatementTypeInfoBuffer(this.ProcessInfoSqlResponse(statementTypeResponse));
 					}
