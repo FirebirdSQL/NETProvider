@@ -381,7 +381,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 					if (!memberValues.ContainsKey(property))
 						memberValues.Add(property, new List<DbParameter>(new[] { p }));
 					else
-						memberValues[property].Add(parameters[parameters.Count - 1]);
+						memberValues[property].Add(p);
 				}
 			}
 		}
