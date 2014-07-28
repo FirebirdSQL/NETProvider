@@ -17,7 +17,7 @@
  */
 
 using System;
-using System.Collections;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 
@@ -31,18 +31,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private GdsDatabase database;
 		private Thread eventsThread;
-		private Hashtable events;
+		private ConcurrentDictionary<int, RemoteEvent> events;
 		private int handle;
-		private SynchronizationContext syncContext;
-
-		#endregion
-
-		#region · Properties ·
-
-		//public Hashtable EventList
-		//{
-		//    get { return this.events; }
-		//}
 
 		#endregion
 
@@ -50,10 +40,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public GdsEventManager(int handle, string ipAddress, int portNumber)
 		{
-			this.events = new Hashtable();
-			this.events = Hashtable.Synchronized(this.events);
+			this.events = new ConcurrentDictionary<int, RemoteEvent>();
 			this.handle = handle;
-			this.syncContext = SynchronizationContext.Current ?? new SynchronizationContext();
 
 			// Initialize the connection
 			if (this.database == null)
@@ -74,17 +62,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			lock (this)
 			{
-				if (!this.events.ContainsKey(remoteEvent.LocalId))
-				{
-					lock (this.events.SyncRoot)
-					{
-						this.events.Add(remoteEvent.LocalId, remoteEvent);
-					}
-				}
+				this.events[remoteEvent.LocalId] = remoteEvent;
 
+				// Jiri Cincura: I'm pretty sure this is a race condition.
 				if (this.eventsThread == null || this.eventsThread.ThreadState.HasFlag(ThreadState.Stopped | ThreadState.Unstarted))
 				{
-					this.eventsThread = new Thread(new ThreadStart(() => ThreadHandler(this.syncContext)));
+					this.eventsThread = new Thread(ThreadHandler);
 					this.eventsThread.IsBackground = true;
 					this.eventsThread.Name = "FirebirdClient - Events Thread";
 					this.eventsThread.Start();
@@ -94,10 +77,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void CancelEvents(RemoteEvent remoteEvent)
 		{
-			lock (this.events.SyncRoot)
-			{
-				this.events.Remove(remoteEvent.LocalId);
-			}
+			RemoteEvent dummy;
+			this.events.TryRemove(remoteEvent.LocalId, out dummy);
 		}
 
 		public void Close()
@@ -131,7 +112,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				while (this.events.Count > 0)
+				while (GetEventsCountLocked() > 0)
 				{
 					var operation = this.database.NextOperation();
 
@@ -139,7 +120,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					{
 						case IscCodes.op_response:
 							this.database.ReadResponse();
-							break;
+							continue;
 
 						case IscCodes.op_exit:
 						case IscCodes.op_disconnect:
@@ -152,28 +133,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							var ast = this.database.ReadBytes(8);
 							var eventId = this.database.ReadInt32();
 
-							if (this.events.ContainsKey(eventId))
+							RemoteEvent currentEvent;
+							if (this.events.TryRemove(eventId, out currentEvent))
 							{
-								RemoteEvent currentEvent = (RemoteEvent)this.events[eventId];
-
-								lock (this.events.SyncRoot)
-								{
-									// Remove event	from the list
-									this.events.Remove(eventId);
-								}
-
-								// Notify new event	counts
-								((SynchronizationContext)o).Send(delegate
-								{
-									currentEvent.EventCounts(buffer);
-								}, null);
-
-								if (this.events.Count == 0)
-								{
-									return;
-								}
+								// Notify new event counts
+								currentEvent.EventCounts(buffer);
 							}
-							break;
+
+							continue;
 					}
 				}
 			}
@@ -185,6 +152,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				return;
 			}
+		}
+
+		private int GetEventsCountLocked()
+		{
+			return this.events.Count;
 		}
 
 		#endregion

@@ -509,7 +509,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					events.LocalId = ++this.eventsId;
+					events.LocalId = Interlocked.Increment(ref this.eventsId);
+					
+					// Enqueue events in the event manager
+					this.eventManager.QueueEvents(events);
 
 					EventParameterBuffer epb = events.ToEpb();
 
@@ -526,9 +529,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					// Update event	Remote event ID
 					events.RemoteId = response.ObjectHandle;
-
-					// Enqueue events in the event manager
-					this.eventManager.QueueEvents(events);
 				}
 				catch (IOException)
 				{

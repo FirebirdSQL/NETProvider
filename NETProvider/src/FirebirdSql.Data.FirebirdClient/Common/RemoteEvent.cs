@@ -51,11 +51,6 @@ namespace FirebirdSql.Data.Common
 
 		#region · Properties ·
 
-		//public IDatabase Database
-		//{
-		//    get { return this.db; }
-		//}
-
 		public int LocalId
 		{
 			get { return this.localId; }
@@ -137,7 +132,7 @@ namespace FirebirdSql.Data.Common
 
 		public void QueueEvents()
 		{
-			lock (this.db)
+			lock (this.db.SyncObject)
 			{
 				this.db.QueueEvents(this);
 			}
@@ -145,7 +140,7 @@ namespace FirebirdSql.Data.Common
 
 		public void CancelEvents()
 		{
-			lock (this.db)
+			lock (this.db.SyncObject)
 			{
 				this.db.CancelEvents(this);
 				this.ResetCounts();
