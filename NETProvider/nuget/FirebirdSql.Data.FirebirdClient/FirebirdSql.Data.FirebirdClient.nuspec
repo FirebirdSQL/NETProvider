@@ -18,5 +18,6 @@
     <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net40-client" />
     <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll" target="lib\net45" />
     <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net45" />
+    <file src="..\..\readme.txt" target="" />
   </files>
 </package>
