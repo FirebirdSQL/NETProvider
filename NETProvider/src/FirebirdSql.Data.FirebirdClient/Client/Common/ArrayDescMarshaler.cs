@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -60,8 +63,7 @@ namespace FirebirdSql.Data.Client.Common
 				// Destroy ArrayBound structures
 				for (int i = 0; i < 16; i++)
 				{
-					Marshal.DestroyStructure(
-						(IntPtr)(pNativeData.AsInt() + ArrayDescMarshal.ComputeLength(i)),
+					Marshal.DestroyStructure(pNativeData + ArrayDescMarshal.ComputeLength(i),
 						typeof(ArrayBoundMarshal));
 				}
 
