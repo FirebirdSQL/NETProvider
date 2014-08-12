@@ -499,6 +499,11 @@ namespace FirebirdSql.Data.Common
 			return Type.GetType(TypeHelper.GetSystemDataTypeName(this.DbDataType), true);
 		}
 
+		public bool HasDataType()
+		{
+			return this.dataType != 0;
+		}
+
 		#endregion
 
 		#region · Private Methods ·

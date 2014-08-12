@@ -118,9 +118,16 @@ namespace FirebirdSql.Data.Client.Common
 				xsqlvar[i].sqllen       = descriptor[i].Length;
 
 				// Create a	new	pointer	for	the	xsqlvar	data
-				byte[] buffer = descriptor[i].DbValue.GetBytes();
-				xsqlvar[i].sqldata = Marshal.AllocHGlobal(buffer.Length);
-				Marshal.Copy(buffer, 0, xsqlvar[i].sqldata, buffer.Length);
+				if (descriptor[i].HasDataType() && descriptor[i].DbDataType != DbDataType.Null)
+				{
+					byte[] buffer = descriptor[i].DbValue.GetBytes();
+					xsqlvar[i].sqldata = Marshal.AllocHGlobal(buffer.Length);
+					Marshal.Copy(buffer, 0, xsqlvar[i].sqldata, buffer.Length);
+				}
+				else
+				{
+					xsqlvar[i].sqldata = Marshal.AllocHGlobal(0);
+				}
 
 				// Create a	new	pointer	for	the	sqlind value
 				xsqlvar[i].sqlind = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Int16)));
