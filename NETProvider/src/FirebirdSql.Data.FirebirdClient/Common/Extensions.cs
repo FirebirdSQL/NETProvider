@@ -72,5 +72,10 @@ namespace FirebirdSql.Data.Common
 			}
 			return true;
 		}
+
+		public static int AsInt(this IntPtr ptr)
+		{
+			return (int)ptr.ToInt64();
+		}
 	}
 }

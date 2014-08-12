@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *
+ *  Contributors:
+ *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -60,9 +63,7 @@ namespace FirebirdSql.Data.Client.Common
 				// Destroy ArrayBound structures
 				for (int i = 0; i < 16; i++)
 				{
-					Marshal.DestroyStructure(
-						(IntPtr)(pNativeData.ToInt32() + ArrayDescMarshal.ComputeLength(i)),
-						typeof(ArrayBoundMarshal));
+					Marshal.DestroyStructure(pNativeData + ArrayDescMarshal.ComputeLength(i), typeof(ArrayBoundMarshal));
 				}
 
 				// Free	pointer	memory
@@ -103,10 +104,7 @@ namespace FirebirdSql.Data.Client.Common
 			Marshal.StructureToPtr(arrayDesc, ptr, true);
 			for (int i = 0; i < arrayBounds.Length; i++)
 			{
-				Marshal.StructureToPtr(
-					arrayBounds[i],
-					(IntPtr)(ptr.ToInt32() + ArrayDescMarshal.ComputeLength(i)),
-					true);
+				Marshal.StructureToPtr(arrayBounds[i], ptr + ArrayDescMarshal.ComputeLength(i), true);
 			}
 
 			return ptr;

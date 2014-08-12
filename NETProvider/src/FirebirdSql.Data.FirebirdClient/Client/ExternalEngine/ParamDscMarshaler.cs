@@ -187,7 +187,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		private IntPtr GetIntPtr(IntPtr ptr, int offset)
 		{
-			return (IntPtr)(ptr.ToInt32() + offset);
+			return (IntPtr)(ptr.AsInt() + offset);
 		}
 
 		private ParamDsc BuildDescriptor(Charset charset, object value)
