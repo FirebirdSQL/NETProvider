@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				IntPtr arg = statusVector[i++];
 
-				switch (arg.ToInt32())
+				switch (arg.AsInt())
 				{
 					case IscCodes.isc_arg_gds:
 						IntPtr er = statusVector[i++];
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Client.Native
 							{
 								exception = new IscException();
 							}
-							exception.Errors.Add(new IscError(arg.ToInt32(), er.ToInt32()));
+							exception.Errors.Add(new IscError(arg.AsInt(), er.AsInt()));
 						}
 						break;
 
@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.Client.Native
 							string arg_value = charset.GetString(
 								System.Text.Encoding.Default.GetBytes(s));
 
-							exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
+							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
 
@@ -83,13 +83,13 @@ namespace FirebirdSql.Data.Client.Native
 							string arg_value = charset.GetString(
 								System.Text.Encoding.Default.GetBytes(s));
 
-							exception.Errors.Add(new IscError(arg.ToInt32(), arg_value));
+							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
 
 					case IscCodes.isc_arg_win32:
 					case IscCodes.isc_arg_number:
-						exception.Errors.Add(new IscError(arg.ToInt32(), statusVector[i++].ToInt32()));
+						exception.Errors.Add(new IscError(arg.AsInt(), statusVector[i++].AsInt()));
 						break;
 
 					default:
@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.Client.Native
 							{
 								exception = new IscException();
 							}
-							exception.Errors.Add(new IscError(arg.ToInt32(), e.ToInt32()));
+							exception.Errors.Add(new IscError(arg.AsInt(), e.AsInt()));
 						}
 						break;
 				}

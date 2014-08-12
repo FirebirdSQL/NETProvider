@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.Client.Common
 				for (int i = 0; i < 16; i++)
 				{
 					Marshal.DestroyStructure(
-						(IntPtr)(pNativeData.ToInt32() + ArrayDescMarshal.ComputeLength(i)),
+						(IntPtr)(pNativeData.AsInt() + ArrayDescMarshal.ComputeLength(i)),
 						typeof(ArrayBoundMarshal));
 				}
 
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.Client.Common
 			{
 				Marshal.StructureToPtr(
 					arrayBounds[i],
-					(IntPtr)(ptr.ToInt32() + ArrayDescMarshal.ComputeLength(i)),
+					(IntPtr)(ptr.AsInt() + ArrayDescMarshal.ComputeLength(i)),
 					true);
 			}
 
