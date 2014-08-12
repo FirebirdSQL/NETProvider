@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.Client.Common
 			{
 				Marshal.StructureToPtr(
 					arrayBounds[i],
-					(IntPtr)(ptr.AsInt() + ArrayDescMarshal.ComputeLength(i)),
+					ptr + ArrayDescMarshal.ComputeLength(i),
 					true);
 			}
 
