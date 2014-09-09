@@ -141,27 +141,23 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected override string GetDbProviderManifestToken(DbConnection connection)
 		{
-			var shouldClose = false;
-			if (connection.State == ConnectionState.Closed)
-			{
-				connection.Open();
-				shouldClose = true;
-			}
 			try
 			{
-				Version serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
+				var serverVersion = default(Version);
+				if (connection.State == ConnectionState.Open)
+				{
+					serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
+				}
+				else
+				{
+					var serverProperties = new FbServerProperties() { ConnectionString = connection.ConnectionString };
+					serverVersion = FbServerProperties.ParseServerVersion(serverProperties.GetServerVersion());
+				}
 				return serverVersion.ToString(2);
 			}
 			catch (Exception ex)
 			{
 				throw new InvalidOperationException("Could not retrieve storage version.", ex);
-			}
-			finally
-			{
-				if (shouldClose)
-				{
-					connection.Close();
-				}
 			}
 		}
 
