@@ -24,10 +24,8 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class TypeDecoder
+	internal static class TypeDecoder
 	{
-		#region · Static Methods ·
-
 		public static decimal DecodeDecimal(object value, int scale, int sqltype)
 		{
 			long divisor = 1;
@@ -95,15 +93,5 @@ namespace FirebirdSql.Data.Common
 
 			return date.Date;
 		}
-
-		#endregion
-
-		#region · Constructors ·
-
-		private TypeDecoder()
-		{
-		}
-
-		#endregion
 	}
 }

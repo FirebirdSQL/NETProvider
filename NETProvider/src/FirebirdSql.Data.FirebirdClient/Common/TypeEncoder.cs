@@ -24,10 +24,8 @@ using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class TypeEncoder
+	internal static class TypeEncoder
 	{
-		#region · Static Methods ·
-
 		public static object EncodeDecimal(decimal d, int scale, int sqltype)
 		{
 			long multiplier = 1;
@@ -90,15 +88,5 @@ namespace FirebirdSql.Data.Common
 
 			return ((146097 * c) / 4 + (1461 * ya) / 4 + (153 * month + 2) / 5 + day + 1721119 - 2400001);
 		}
-
-		#endregion
-
-		#region · Constructors ·
-
-		private TypeEncoder()
-		{
-		}
-
-		#endregion
 	}
 }
