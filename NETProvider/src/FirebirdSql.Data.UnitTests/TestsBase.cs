@@ -14,6 +14,9 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All	Rights Reserved.
+ *  
+ *  Contributors:
+ *   Jiri Cincura (jiri@cincura.net)  
  */
 
 using System;
@@ -22,6 +25,7 @@ using System.Configuration;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 
 using NUnit.Framework;
@@ -492,7 +496,7 @@ namespace FirebirdSql.Data.UnitTests
 				string[] next = null;
 				try
 				{
-					next = Directory.GetFiles(path, searchPattern);
+					next = Directory.GetFiles(path, searchPattern).Where(x => !File.GetAttributes(x).HasFlag(FileAttributes.ReparsePoint)).ToArray();
 				}
 				catch { }
 				if (next != null && next.Length != 0)
@@ -500,7 +504,7 @@ namespace FirebirdSql.Data.UnitTests
 						yield return file;
 				try
 				{
-					next = Directory.GetDirectories(path);
+					next = Directory.GetDirectories(path).Where(x => !new DirectoryInfo(x).Attributes.HasFlag(FileAttributes.ReparsePoint)).ToArray();
 					foreach (var subdir in next)
 						pending.Push(subdir);
 				}
