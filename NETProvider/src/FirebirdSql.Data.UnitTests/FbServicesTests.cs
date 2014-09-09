@@ -71,11 +71,11 @@ namespace FirebirdSql.Data.UnitTests
 		#region · Static Helpers ·
 
 		string GetBackupRestoreFullPath()
-			{
+		{
 			var startLocation = Environment.GetEnvironmentVariable("HOMEDRIVE") + @"\";
 			var backupRestoreFile = SearchFiles(startLocation, ConfigurationManager.AppSettings["BackupRestoreFile"]).SingleOrDefault();
 			return backupRestoreFile;
-			}
+		}
 
 		#endregion
 
@@ -109,15 +109,15 @@ namespace FirebirdSql.Data.UnitTests
 			using (var ms = new MemoryStream())
 			{
 				backupSvc.ConnectionString = this.BuildServicesConnectionString();
-			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
+				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 				backupSvc.OutputStream = ms;
 
-			backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+				backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
 
-			backupSvc.Execute();
+				backupSvc.Execute();
 
 				backupLength = ms.Length;
-		}
+			}
 
 			Assert.Greater(backupLength, 0);
 			// suppose the "previous" test is done and the file is somewhere
@@ -345,5 +345,5 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		#endregion
-		}
+	}
 }
