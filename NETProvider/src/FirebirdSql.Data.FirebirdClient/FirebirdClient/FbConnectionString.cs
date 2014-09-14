@@ -91,6 +91,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			{ "no dbtriggers", "no db triggers" },
 			{ "no database triggers", "no db triggers" },
 			{ "nodatabasetriggers", "no db triggers" },
+			{ "no garbage collect", "no garbage collect"},
+			{ "nograbagecollect", "no garbage collect"}
 		};
 
 		#endregion
@@ -218,6 +220,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get { return this.GetBoolean("no db triggers"); }
 		}
+
+        public bool NoGarbageCollect
+        {
+            get { return this.GetBoolean("no garbage collect"); }
+        }
 
 		#endregion
 
@@ -406,6 +413,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.options.Add("client library", "fbembed");
 			this.options.Add("cache pages", 0);
 			this.options.Add("no db triggers", false);
+            this.options.Add("no garbage collect", false);
 		}
 
 		private void ParseConnectionInfo(string connectInfo)
