@@ -170,6 +170,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("No DB Triggers", value); }
 		}
 
+        public bool NoGarbageCollect
+        {
+            get { return this.GetBoolean("No Garbage Collect"); }
+            set { this.SetValue("No Garbage Collect", value); }
+        }
+
 		#endregion
 
 		#region · Constructors ·
