@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{ "no database triggers", "no db triggers" },
 			{ "nodatabasetriggers", "no db triggers" },
 			{ "no garbage collect", "no garbage collect"},
-			{ "nograbagecollect", "no garbage collect"}
+			{ "nogarbagecollect", "no garbage collect"}
 		};
 
 		#endregion
