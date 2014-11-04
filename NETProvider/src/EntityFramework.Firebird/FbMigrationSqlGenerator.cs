@@ -140,7 +140,12 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(DropProcedureOperation operation)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				writer.Write("DROP PROCEDURE ");
+				writer.Write(Quote(operation.Name));
+				yield return Statement(writer);
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(DropTableOperation operation)
