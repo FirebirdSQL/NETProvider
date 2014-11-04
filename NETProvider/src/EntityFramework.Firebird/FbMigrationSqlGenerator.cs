@@ -74,7 +74,23 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AddForeignKeyOperation operation)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				writer.Write("ALTER TABLE ");
+				writer.Write(Quote(operation.DependentTable));
+				writer.Write(" ADD FOREIGN KEY (");
+				WriteColumns(writer, operation.DependentColumns.Select(Quote));
+				writer.Write(") REFERENCES ");
+				writer.Write(Quote(operation.PrincipalTable));
+				writer.Write(" (");
+				WriteColumns(writer, operation.PrincipalColumns.Select(Quote));
+				writer.Write(")");
+				if (operation.CascadeDelete)
+				{
+					writer.Write(" ON DELETE CASCADE");
+				}
+				yield return Statement(writer);
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AddPrimaryKeyOperation operation)
