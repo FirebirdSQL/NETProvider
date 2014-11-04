@@ -170,7 +170,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(RenameTableOperation operation)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException("Renaming table is not supported by Firebird.");
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(HistoryOperation operation)
@@ -223,7 +223,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		{
 			return DbConfiguration.DependencyResolver.GetService<DbProviderFactory>(FbProviderServices.ProviderInvariantName).CreateConnection();
 		}
-		
+
 		#endregion
 	}
 }
