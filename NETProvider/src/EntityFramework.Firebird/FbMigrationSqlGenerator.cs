@@ -160,7 +160,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(RenameIndexOperation operation)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException("Renaming index is not supported by Firebird.");
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(RenameProcedureOperation operation)
