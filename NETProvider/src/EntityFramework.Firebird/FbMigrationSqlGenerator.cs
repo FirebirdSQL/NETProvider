@@ -170,7 +170,16 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(RenameColumnOperation operation)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				writer.Write("ALTER TABLE ");
+				writer.Write(Quote(operation.Table));
+				writer.Write(" ALTER COLUMN ");
+				writer.Write(Quote(operation.Name));
+				writer.Write(" TO ");
+				writer.Write(Quote(operation.NewName));
+				yield return Statement(writer);
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(RenameIndexOperation operation)
