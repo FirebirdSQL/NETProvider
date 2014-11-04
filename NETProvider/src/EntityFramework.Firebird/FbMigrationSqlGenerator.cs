@@ -79,7 +79,18 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AddPrimaryKeyOperation operation)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				writer.Write("ALTER TABLE ");
+				writer.Write(Quote(operation.Table));
+				writer.Write(" ADD CONSTRAINT ");
+				writer.Write(Quote(operation.Name));
+				writer.Write(" PRIMARY KEY ");
+				writer.Write("(");
+				WriteColumns(writer, operation.Columns.Select(Quote));
+				writer.Write(")");
+				yield return Statement(writer);
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AlterColumnOperation operation)
@@ -284,11 +295,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			return SqlGenerator.QuoteIdentifier(name);
 		}
 
-		IEnumerable<MigrationStatement> GenerateStatements(IEnumerable<MigrationOperation> operations)
-		{
-			return operations.Select<dynamic, IEnumerable<MigrationStatement>>(x => Generate(x)).SelectMany(x => x);
-		}
-
 		static SqlWriter SqlWriter()
 		{
 			var result = new SqlWriter(new StringBuilder());
@@ -296,9 +302,30 @@ namespace FirebirdSql.Data.EntityFramework6
 			return result;
 		}
 
+		static void WriteColumns(SqlWriter writer, IEnumerable<string> columns, bool separateLines = false)
+		{
+			var separator = (string)null;
+			foreach (var column in columns)
+			{
+				if (separator != null)
+				{
+					writer.Write(separator);
+					if (separateLines)
+						writer.WriteLine();
+				}
+				writer.Write(column);
+				separator = ", ";
+			}
+		}
+
 		static DbConnection CreateConnection()
 		{
 			return DbConfiguration.DependencyResolver.GetService<DbProviderFactory>(FbProviderServices.ProviderInvariantName).CreateConnection();
+		}
+
+		IEnumerable<MigrationStatement> GenerateStatements(IEnumerable<MigrationOperation> operations)
+		{
+			return operations.Select<dynamic, IEnumerable<MigrationStatement>>(x => Generate(x)).SelectMany(x => x);
 		}
 
 		#endregion
