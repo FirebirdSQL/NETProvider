@@ -235,7 +235,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <summary>
 		/// Basic constructor.
 		/// </summary>
-		private SqlGenerator()
+		internal SqlGenerator()
 		{
 		}
 		#endregion
@@ -413,10 +413,16 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			StringBuilder builder = new StringBuilder(1024);
 			using (SqlWriter writer = new SqlWriter(builder))
 			{
-				sqlStatement.WriteSql(writer, this);
+				WriteSql(writer, sqlStatement);
 			}
 
 			return builder.ToString();
+		}
+
+		internal SqlWriter WriteSql(SqlWriter writer, ISqlFragment sqlStatement)
+		{
+			sqlStatement.WriteSql(writer, this);
+			return writer;
 		}
 		#endregion
 

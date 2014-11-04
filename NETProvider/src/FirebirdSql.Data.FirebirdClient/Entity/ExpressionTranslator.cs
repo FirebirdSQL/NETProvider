@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono
  *
  *     The contents of this file are subject to the Initial
@@ -269,8 +269,19 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		public override void Visit(DbConstantExpression expression)
 		{
-			FbParameter parameter = CreateParameter(expression.Value, expression.ResultType);
+			if (generateParameters)
+			{
+				var parameter = CreateParameter(expression.Value, expression.ResultType);
 			_commandText.Append(parameter.ParameterName);
+		}
+			else
+			{
+				using (var writer = new SqlWriter(commandText))
+				{
+					var sqlGenerator = new SqlGenerator();
+					sqlGenerator.WriteSql(writer, expression.Accept(sqlGenerator));
+				}
+			}
 		}
 
 		public override void Visit(DbScanExpression expression)
@@ -323,7 +334,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		internal ExpressionTranslator(
 			StringBuilder commandText,
 			DbModificationCommandTree commandTree,
-			bool preserveMemberValues)
+			bool preserveMemberValues,
+			bool generateParameters)
 		{
 			Debug.Assert(null != commandText);
 			Debug.Assert(null != commandTree);
@@ -332,6 +344,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			_commandTree = commandTree;
 			_parameters = new List<DbParameter>();
 			_memberValues = preserveMemberValues ? new Dictionary<EdmMember, List<DbParameter>>() : null;
+			this.generateParameters = generateParameters;
 		}
 
 		// generate parameter (name based on parameter ordinal)
