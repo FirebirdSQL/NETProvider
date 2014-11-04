@@ -56,6 +56,7 @@ namespace FirebirdSql.Data.EntityFramework6
 	public class FbProviderServices : DbProviderServices
 #pragma warning restore 3009
 	{
+		public const string ProviderInvariantName = "FirebirdSql.Data.FirebirdClient";
 		public static readonly FbProviderServices Instance = new FbProviderServices();
 
 		public FbProviderServices()

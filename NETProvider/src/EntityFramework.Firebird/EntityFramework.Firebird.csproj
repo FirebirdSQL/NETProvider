@@ -72,6 +72,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -137,6 +138,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="FbConnectionFactory.cs" />
+    <Compile Include="FbMigrationSqlGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
