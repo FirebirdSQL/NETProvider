@@ -145,12 +145,12 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(MoveProcedureOperation operation)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException("Moving procedure is not supported by Firebird.");
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(MoveTableOperation operation)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException("Moving table is not supported by Firebird.");
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(RenameColumnOperation operation)
@@ -197,6 +197,10 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		#region Helpers
 
+		static MigrationStatement Statement(SqlWriter sqlWriter, bool suppressTransaction = false)
+		{
+			return Statement(sqlWriter.ToString(), suppressTransaction);
+		}
 		protected static MigrationStatement Statement(string sql, bool suppressTransaction = false)
 		{
 			return new MigrationStatement
@@ -207,7 +211,12 @@ namespace FirebirdSql.Data.EntityFramework6
 			};
 		}
 
-		static IEnumerable<MigrationStatement> GenerateStatements(IEnumerable<MigrationOperation> operations)
+		protected static string Quote(string name)
+		{
+			return SqlGenerator.QuoteIdentifier(name);
+		}
+
+		IEnumerable<MigrationStatement> GenerateStatements(IEnumerable<MigrationOperation> operations)
 		{
 			return operations.Select<dynamic, IEnumerable<MigrationStatement>>(x => Generate(x)).SelectMany(x => x);
 		}
