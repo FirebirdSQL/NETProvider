@@ -165,7 +165,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(RenameProcedureOperation operation)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException("Renaming procedure is not supported by Firebird.");
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(RenameTableOperation operation)
