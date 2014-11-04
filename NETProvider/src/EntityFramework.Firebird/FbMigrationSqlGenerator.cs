@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AlterProcedureOperation operation)
 		{
-			throw new NotImplementedException();
+			return Generate(operation, "ALTER");
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AlterTableOperation operation)
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(CreateProcedureOperation operation)
 		{
-			throw new NotImplementedException();
+			return Generate(operation, "CREATE");
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(CreateTableOperation operation)
@@ -290,7 +290,45 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(ProcedureOperation operation, string action)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				var inputParameters = operation.Parameters.Where(x => !x.IsOutParameter).ToArray();
+				var outputParameters = operation.Parameters.Where(x => x.IsOutParameter).ToArray();
+
+				writer.Write(action);
+				writer.Write(" PROCEDURE ");
+				writer.Write(Quote(operation.Name));
+				if (inputParameters.Any())
+				{
+					writer.Write(" (");
+					writer.WriteLine();
+					writer.Indent++;
+					WriteColumns(writer, inputParameters.Select(Generate), true);
+					writer.Indent--;
+					writer.WriteLine();
+					writer.Write(")");
+				}
+				if (outputParameters.Any())
+				{
+					writer.WriteLine();
+					writer.Write("RETURNS (");
+					writer.WriteLine();
+					writer.Indent++;
+					WriteColumns(writer, outputParameters.Select(Generate), true);
+					writer.Indent--;
+					writer.WriteLine();
+					writer.Write(")");
+				}
+				writer.WriteLine();
+				writer.Write("AS");
+				writer.WriteLine();
+				writer.Write("BEGIN");
+				writer.WriteLine();
+				writer.Write(operation.BodySql);
+				writer.WriteLine();
+				writer.Write("END");
+				yield return Statement(writer);
+			}
 		}
 
 		protected virtual string Generate(ColumnModel column)
@@ -300,7 +338,11 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual string Generate(ParameterModel parameter)
 		{
-			throw new NotImplementedException();
+			var builder = new StringBuilder();
+			builder.Append(Quote(parameter.Name));
+			builder.Append(" ");
+			builder.Append(BuildPropertyType(parameter));
+			return builder.ToString();
 		}
 
 		#endregion
@@ -324,6 +366,17 @@ namespace FirebirdSql.Data.EntityFramework6
 		protected static string Quote(string name)
 		{
 			return SqlGenerator.QuoteIdentifier(name);
+		}
+
+		string BuildPropertyType(PropertyModel propertyModel)
+		{
+			var storeTypeName = propertyModel.StoreType;
+			var typeUsage = ProviderManifest.GetStoreType(propertyModel.TypeUsage);
+			if (!string.IsNullOrWhiteSpace(storeTypeName))
+			{
+				typeUsage = BuildStoreTypeUsage(storeTypeName, propertyModel) ?? typeUsage;
+			}
+			return SqlGenerator.GetSqlPrimitiveType(typeUsage);
 		}
 
 		static SqlWriter SqlWriter()
