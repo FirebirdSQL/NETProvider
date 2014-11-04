@@ -111,7 +111,22 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(CreateIndexOperation operation)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				writer.Write("CREATE ");
+				if (operation.IsUnique)
+				{
+					writer.Write("UNIQUE ");
+				}
+				writer.Write("INDEX ");
+				writer.Write(Quote(operation.Name));
+				writer.Write(" ON ");
+				writer.Write(Quote(operation.Table));
+				writer.Write("(");
+				WriteColumns(writer, operation.Columns.Select(Quote));
+				writer.Write(")");
+				yield return Statement(writer);
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(CreateProcedureOperation operation)
