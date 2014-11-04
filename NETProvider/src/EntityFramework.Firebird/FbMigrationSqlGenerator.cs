@@ -115,7 +115,14 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(DropColumnOperation operation)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				writer.Write("ALTER TABLE ");
+				writer.Write(Quote(operation.Table));
+				writer.Write(" DROP COLUMN ");
+				writer.Write(Quote(operation.Name));
+				yield return Statement(writer);
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(DropForeignKeyOperation operation)
