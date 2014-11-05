@@ -2597,7 +2597,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		private static ISqlFragment HandleCanonicalFunctionBitwiseNot(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			throw new NotSupportedException();
+			throw new NotSupportedException("BitwiseNot is not supported by Firebird.");
 		}
 
 		private static ISqlFragment HandleCanonicalFunctionBitwiseOr(SqlGenerator sqlgen, DbFunctionExpression e)
@@ -2614,17 +2614,17 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		#region Date and Time Canonical Functions
 		private static ISqlFragment HandleCanonicalFunctionCurrentUtcDateTime(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			throw new NotSupportedException();
+			throw new NotSupportedException("CurrentUtcDateTime is not supported by Firebird.");
 		}
 
 		private static ISqlFragment HandleCanonicalFunctionCurrentDateTimeOffset(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			throw new NotSupportedException();
+			throw new NotSupportedException("CurrentDateTimeOffset is not supported by Firebird.");
 		}
 
 		private static ISqlFragment HandleCanonicalFunctionGetTotalOffsetMinutes(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			throw new NotSupportedException();
+			throw new NotSupportedException("GetTotalOffsetMinutes is not supported by Firebird.");
 		}
 
 		private static ISqlFragment HandleCanonicalFunctionCurrentDateTime(SqlGenerator sqlgen, DbFunctionExpression e)
@@ -2713,7 +2713,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		private static ISqlFragment HandleCanonicalFunctionCreateDateTimeOffset(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			throw new NotSupportedException();
+			throw new NotSupportedException("CreateDateTimeOffset is not supported by Firebird.");
 		}
 
 		/// <summary>
