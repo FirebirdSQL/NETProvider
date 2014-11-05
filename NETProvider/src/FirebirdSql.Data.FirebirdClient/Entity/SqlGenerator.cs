@@ -619,7 +619,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				switch (typeKind)
 				{
 					case PrimitiveTypeKind.Boolean:
-						result.Append((bool)e.Value ? "CAST(1 AS SMALLINT)" : "CAST(0 AS SMALLINT)");
+						result.Append(FormatBoolean((bool)e.Value));
 						break;
 
 					case PrimitiveTypeKind.Int16:
@@ -688,7 +688,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 						break;
 
 					case PrimitiveTypeKind.Binary:
-						result.Append(string.Format("x'{0}'", BitConverter.ToString((byte[])e.Value).Replace("-", string.Empty)));
+						result.Append(FormatBinary((byte[])e.Value));
 						break;
 
 					case PrimitiveTypeKind.String:
@@ -698,24 +698,18 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 						int length =
 							MetadataHelpers.GetFacetValueOrDefault<int?>(e.ResultType, MetadataHelpers.MaxLengthFacetName, null)
 							?? (isUnicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize);
-						result.Append(EscapeSingleQuote(e.Value as string, isUnicode, length));
+						result.Append(FormatString((string)e.Value, true, length));
 						break;
 
 					case PrimitiveTypeKind.DateTime:
-						result.Append("'");
-						result.Append(((DateTime)e.Value).ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture));
-						result.Append("'");
+						result.Append(FormatDateTime((DateTime)e.Value));
 						break;
 					case PrimitiveTypeKind.Time:
-						result.Append("'");
-						result.Append(((DateTime)e.Value).ToString("HH:mm:ss.ffff", CultureInfo.InvariantCulture));
-						result.Append("'");
+						result.Append(FormatTime((DateTime)e.Value));
 						break;
 
 					case PrimitiveTypeKind.Guid:
-						result.Append("CHAR_TO_UUID('");
-						result.Append(((Guid)e.Value).ToString());
-						result.Append("')");
+						result.Append(FormatGuid((Guid)e.Value));
 						break;
 
 					default:
@@ -3168,18 +3162,61 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			return selectStatement;
 		}
 
-
-		/// <summary>
-		/// Before we embed a string literal in a SQL string, we should
-		/// convert all ' to '', and enclose the whole string in single quotes.
-		/// </summary>
-		/// <param name="s"></param>
-		/// <param name="isUnicode"></param>
-		/// <returns>The escaped sql string.</returns>
-		private string EscapeSingleQuote(string s, bool isUnicode, int length)
+		internal static string FormatBoolean(bool value)
 		{
-			string inner = (isUnicode ? "_UTF8'" : "'") + s.Replace("'", "''") + "'";
-			return "CAST(" + inner + " AS VARCHAR(" + length + "))";
+			return value ? "CAST(1 AS SMALLINT)" : "CAST(0 AS SMALLINT)";
+		}
+
+		internal static string FormatBinary(byte[] value)
+		{
+			return string.Format("x'{0}'", BitConverter.ToString(value).Replace("-", string.Empty));
+		}
+
+		internal static string FormatString(string value, bool isUnicode, int length)
+		{
+			var result = new StringBuilder();
+			result.Append("CAST(");
+			if (isUnicode)
+			{
+				result.Append("_UTF8");
+			}
+			result.Append("'");
+			result.Append(value.Replace("'", "''"));
+			result.Append("' AS VARCHAR(");
+			result.Append(length);
+			result.Append("))");
+			return result.ToString();
+		}
+
+		internal static string FormatDateTime(DateTime value)
+		{
+			var result = new StringBuilder();
+			result.Append("'");
+			result.Append(value.ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture));
+			result.Append("'");
+			return result.ToString();
+		}
+
+		internal static string FormatTime(DateTime value)
+		{
+			var result = new StringBuilder();
+			result.Append("'");
+			result.Append(value.ToString("HH:mm:ss.ffff", CultureInfo.InvariantCulture));
+			result.Append("'");
+			return result.ToString();
+		}
+		internal static string FormatTime(TimeSpan value)
+		{
+			return FormatTime(DateTime.Today.Add(value));
+		}
+
+		internal static string FormatGuid(Guid value)
+		{
+			var result = new StringBuilder();
+			result.Append("CHAR_TO_UUID('");
+			result.Append(value.ToString());
+			result.Append("')");
+			return result.ToString();
 		}
 
 		/// <summary>
