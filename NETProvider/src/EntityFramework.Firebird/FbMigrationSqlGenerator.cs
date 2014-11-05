@@ -172,7 +172,24 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(CreateTableOperation operation)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				writer.Write("CREATE TABLE ");
+				writer.Write(Quote(operation.Name));
+				writer.Write(" (");
+				writer.WriteLine();
+				writer.Indent++;
+				WriteColumns(writer, operation.Columns.Select(Generate), true);
+				writer.Indent--;
+				writer.WriteLine();
+				writer.Write(")");
+				yield return Statement(writer);
+			}
+			if (operation.PrimaryKey != null)
+			{
+				foreach (var item in Generate(operation.PrimaryKey))
+					yield return item;
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(DropColumnOperation operation)
