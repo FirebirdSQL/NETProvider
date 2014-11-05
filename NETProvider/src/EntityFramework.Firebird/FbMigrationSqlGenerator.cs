@@ -24,9 +24,11 @@ using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Core.Common;
 using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure.DependencyResolution;
 using System.Data.Entity.Migrations.Model;
 using System.Data.Entity.Migrations.Sql;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -69,7 +71,25 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AddColumnOperation operation)
 		{
-			throw new NotImplementedException();
+			using (var writer = SqlWriter())
+			{
+				writer.Write("ALTER TABLE ");
+				writer.Write(Quote(operation.Table));
+				writer.Write(" ADD ");
+				var column = operation.Column;
+				writer.Write(Generate(column));
+				if (column.IsNullable != null
+					&& !column.IsNullable.Value
+					&& column.DefaultValue == null
+					&& string.IsNullOrWhiteSpace(column.DefaultValueSql)
+					&& !column.IsIdentity
+					&& !column.IsTimestamp)
+				{
+					writer.Write(" DEFAULT ");
+					writer.Write(WriteValue((dynamic)column.ClrDefaultValue));
+				}
+				yield return Statement(writer);
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AddForeignKeyOperation operation)
@@ -333,7 +353,33 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual string Generate(ColumnModel column)
 		{
-			throw new NotImplementedException();
+			var builder = new StringBuilder();
+			builder.Append(Quote(column.Name));
+			builder.Append(" ");
+			builder.Append(BuildPropertyType(column));
+
+			if ((column.IsNullable != null)
+				&& !column.IsNullable.Value)
+			{
+				builder.Append(" NOT NULL");
+			}
+
+			if (column.DefaultValue != null)
+			{
+				builder.Append(" DEFAULT ");
+				builder.Append(WriteValue((dynamic)column.DefaultValue));
+			}
+			else if (!string.IsNullOrWhiteSpace(column.DefaultValueSql))
+			{
+				builder.Append(" DEFAULT ");
+				builder.Append(column.DefaultValueSql);
+			}
+			else if (column.IsIdentity)
+			{
+#warning Not supported on FB. What to do reasonably?
+			}
+
+			return builder.ToString();
 		}
 
 		protected virtual string Generate(ParameterModel parameter)
@@ -366,6 +412,41 @@ namespace FirebirdSql.Data.EntityFramework6
 		protected static string Quote(string name)
 		{
 			return SqlGenerator.QuoteIdentifier(name);
+		}
+
+		protected static string WriteValue(object value)
+		{
+			return string.Format(CultureInfo.InvariantCulture, "{0}", value);
+		}
+
+		protected static string WriteValue(DateTime value)
+		{
+			return SqlGenerator.FormatDateTime(value);
+		}
+
+		protected static string WriteValue(byte[] value)
+		{
+			return SqlGenerator.FormatBinary(value);
+		}
+
+		protected static string WriteValue(bool value)
+		{
+			return SqlGenerator.FormatBoolean(value);
+		}
+
+		protected static string WriteValue(Guid value)
+		{
+			return SqlGenerator.FormatGuid(value);
+		}
+
+		protected static string WriteValue(string value)
+		{
+			return SqlGenerator.FormatString(value, true, value.Length);
+		}
+
+		protected static string WriteValue(TimeSpan value)
+		{
+			return SqlGenerator.FormatTime(value);
 		}
 
 		string BuildPropertyType(PropertyModel propertyModel)
