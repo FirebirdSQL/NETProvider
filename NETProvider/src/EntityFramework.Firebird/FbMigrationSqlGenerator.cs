@@ -131,7 +131,47 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AlterColumnOperation operation)
 		{
-			throw new NotImplementedException();
+			var column = operation.Column;
+			using (var writer = SqlWriter())
+			{
+				writer.Write("ALTER TABLE ");
+				writer.Write(Quote(operation.Table));
+				writer.Write(" ALTER COLUMN ");
+				writer.Write(Quote(column.Name));
+				writer.Write(" TYPE ");
+				writer.Write(BuildPropertyType(column));
+#warning Dropping NOT NULL?
+				//if (column.IsNullable != null && !column.IsNullable.Value)
+				//{
+				//	writer.Write(" NOT");
+				//}
+				//writer.Write(" NULL");
+				yield return Statement(writer);
+			}
+
+			if (column.DefaultValue != null || !string.IsNullOrWhiteSpace(column.DefaultValueSql))
+			{
+				using (var writer = SqlWriter())
+				{
+					writer.Write("ALTER TABLE ");
+					writer.Write(Quote(operation.Table));
+					writer.Write(" ALTER COLUMN ");
+					writer.Write(Quote(column.Name));
+					writer.Write(" DROP DEFAULT");
+					yield return Statement(writer);
+				}
+
+				using (var writer = SqlWriter())
+				{
+					writer.Write("ALTER TABLE ");
+					writer.Write(Quote(operation.Table));
+					writer.Write(" ALTER COLUMN ");
+					writer.Write(Quote(column.Name));
+					writer.Write(" SET DEFAULT ");
+					writer.Write(column.DefaultValue != null ? WriteValue((dynamic)column.DefaultValue) : column.DefaultValueSql);
+					yield return Statement(writer);
+				}
+			}
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AlterProcedureOperation operation)
