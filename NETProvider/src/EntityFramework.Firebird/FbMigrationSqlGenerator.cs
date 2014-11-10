@@ -408,7 +408,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 		}
 
-		protected virtual string Generate(ColumnModel column)
+		protected string Generate(ColumnModel column)
 		{
 			var builder = new StringBuilder();
 			builder.Append(Quote(column.Name));
@@ -439,7 +439,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			return builder.ToString();
 		}
 
-		protected virtual string Generate(ParameterModel parameter)
+		protected string Generate(ParameterModel parameter)
 		{
 			var builder = new StringBuilder();
 			builder.Append(Quote(parameter.Name));
