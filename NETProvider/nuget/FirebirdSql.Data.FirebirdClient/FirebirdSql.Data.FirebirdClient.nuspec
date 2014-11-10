@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>FirebirdSql.Data.FirebirdClient</id>
-    <version>4.5.1.0</version>
+    <version>4.5.2.0</version>
     <title>Firebird ADO.NET Data provider</title>
     <description>Firebird ADO.NET Data provider</description>
     <authors>FirebirdSQL</authors>
@@ -19,5 +19,7 @@
     <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll" target="lib\net45" />
     <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net45" />
     <file src="..\..\readme.txt" target="" />
+    <file src="app.config.transform" target="content" />
+    <file src="web.config.transform" target="content" />
   </files>
 </package>
