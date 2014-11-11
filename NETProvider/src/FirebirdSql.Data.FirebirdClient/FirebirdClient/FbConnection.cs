@@ -45,7 +45,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public static void ClearPool(FbConnection connection)
 		{
-			FbConnectionPoolManager.Instance.ClearPool(connection.ConnectionString);
+			if (connection == null)
+				throw new ArgumentNullException("connection");
+
+			FbConnectionPoolManager.Instance.ClearPool(connection.options);
 		}
 
 		#endregion
