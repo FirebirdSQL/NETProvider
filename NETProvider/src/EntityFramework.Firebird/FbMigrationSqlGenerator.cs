@@ -132,6 +132,49 @@ namespace FirebirdSql.Data.EntityFramework6
 		protected virtual IEnumerable<MigrationStatement> Generate(AlterColumnOperation operation)
 		{
 			var column = operation.Column;
+			// drop NOT NULL first, either it will be recreated or it was to drop
+			using(var writer = SqlWriter())
+			{
+				writer.Write("EXECUTE BLOCK");
+				writer.WriteLine();
+				writer.Write("AS");
+				writer.WriteLine();
+				writer.Write("declare constraint_name type of column rdb$relation_constraints.rdb$constraint_name;");
+				writer.WriteLine();
+				writer.Write("BEGIN");
+				writer.WriteLine();
+				writer.Indent++;
+				writer.Write("select rc.rdb$constraint_name");
+				writer.WriteLine();
+				writer.Write("from rdb$relation_constraints rc");
+				writer.WriteLine();
+				writer.Write("join rdb$check_constraints cc on rc.rdb$constraint_name = cc.rdb$constraint_name");
+				writer.WriteLine();
+				writer.Write("where rc.rdb$constraint_type = 'NOT NULL' and rc.rdb$relation_name = '");
+				writer.Write(operation.Table);
+				writer.Write("' and cc.rdb$trigger_name  = '");
+				writer.Write(column.Name);
+				writer.Write("'");
+				writer.WriteLine();
+				writer.Write("into :constraint_name;");
+				writer.WriteLine();
+				writer.Write("if (constraint_name is not null) then");
+				writer.WriteLine();
+				writer.Write("begin");
+				writer.WriteLine();
+				writer.Indent++;
+				writer.Write("execute statement 'alter table ");
+				writer.Write(Quote(operation.Table));
+				writer.Write(" drop constraint ' || :constraint_name;");
+				writer.WriteLine();
+				writer.Indent--;
+				writer.Write("end");
+				writer.WriteLine();
+				writer.Indent--;
+				writer.Write("END");
+				writer.WriteLine();
+				yield return Statement(writer);
+			}
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
@@ -140,12 +183,11 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write(Quote(column.Name));
 				writer.Write(" TYPE ");
 				writer.Write(BuildPropertyType(column));
-#warning Dropping NOT NULL?
-				//if (column.IsNullable != null && !column.IsNullable.Value)
-				//{
-				//	writer.Write(" NOT");
-				//}
-				//writer.Write(" NULL");
+				// possible NOT NULL drop was dropped with statement above
+				if (column.IsNullable != null && !column.IsNullable.Value)
+				{
+					writer.Write(" NOT NULL");
+				}
 				yield return Statement(writer);
 			}
 
