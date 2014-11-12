@@ -9,7 +9,7 @@
  *
  *     Software distributed under the License is distributed on 
  *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     express or implied. See the License for the specific 
  *     language governing rights and limitations under the License.
  * 
  *  Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
