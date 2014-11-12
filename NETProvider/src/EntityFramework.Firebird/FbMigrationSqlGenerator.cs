@@ -74,7 +74,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(operation.Table));
+				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" ADD ");
 				var column = operation.Column;
 				writer.Write(Generate(column));
@@ -97,11 +97,11 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(operation.DependentTable));
+				writer.Write(Quote(ExtractName(operation.DependentTable)));
 				writer.Write(" ADD FOREIGN KEY (");
 				WriteColumns(writer, operation.DependentColumns.Select(Quote));
 				writer.Write(") REFERENCES ");
-				writer.Write(Quote(operation.PrincipalTable));
+				writer.Write(Quote(ExtractName(operation.PrincipalTable)));
 				writer.Write(" (");
 				WriteColumns(writer, operation.PrincipalColumns.Select(Quote));
 				writer.Write(")");
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(operation.Table));
+				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" ADD CONSTRAINT ");
 				writer.Write(Quote(operation.Name));
 				writer.Write(" PRIMARY KEY ");
@@ -144,7 +144,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.WriteLine("from rdb$relation_constraints rc");
 				writer.WriteLine("join rdb$check_constraints cc on rc.rdb$constraint_name = cc.rdb$constraint_name");
 				writer.Write("where rc.rdb$constraint_type = 'NOT NULL' and rc.rdb$relation_name = '");
-				writer.Write(operation.Table);
+				writer.Write(ExtractName(operation.Table));
 				writer.Write("' and cc.rdb$trigger_name  = '");
 				writer.Write(column.Name);
 				writer.Write("'");
@@ -154,7 +154,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.WriteLine("begin");
 				writer.Indent++;
 				writer.Write("execute statement 'alter table ");
-				writer.Write(Quote(operation.Table));
+				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" drop constraint ' || :constraint_name;");
 				writer.WriteLine();
 				writer.Indent--;
@@ -166,7 +166,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(operation.Table));
+				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" ALTER COLUMN ");
 				writer.Write(Quote(column.Name));
 				writer.Write(" TYPE ");
@@ -184,7 +184,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				using (var writer = SqlWriter())
 				{
 					writer.Write("ALTER TABLE ");
-					writer.Write(Quote(operation.Table));
+					writer.Write(Quote(ExtractName(operation.Table)));
 					writer.Write(" ALTER COLUMN ");
 					writer.Write(Quote(column.Name));
 					writer.Write(" DROP DEFAULT");
@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				using (var writer = SqlWriter())
 				{
 					writer.Write("ALTER TABLE ");
-					writer.Write(Quote(operation.Table));
+					writer.Write(Quote(ExtractName(operation.Table)));
 					writer.Write(" ALTER COLUMN ");
 					writer.Write(Quote(column.Name));
 					writer.Write(" SET DEFAULT ");
@@ -227,7 +227,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write("INDEX ");
 				writer.Write(Quote(operation.Name));
 				writer.Write(" ON ");
-				writer.Write(Quote(operation.Table));
+				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write("(");
 				WriteColumns(writer, operation.Columns.Select(Quote));
 				writer.Write(")");
@@ -245,7 +245,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("CREATE TABLE ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(ExtractName(operation.Name)));
 				writer.Write(" (");
 				writer.WriteLine();
 				writer.Indent++;
@@ -267,7 +267,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(operation.Table));
+				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" DROP COLUMN ");
 				writer.Write(Quote(operation.Name));
 				yield return Statement(writer);
@@ -279,7 +279,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(operation.DependentTable));
+				writer.Write(Quote(ExtractName(operation.DependentTable)));
 				writer.Write(" DROP CONSTRAINT ");
 				writer.Write(Quote(operation.Name));
 				yield return Statement(writer);
@@ -301,7 +301,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(operation.Table));
+				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" DROP CONSTRAINT ");
 				writer.Write(Quote(operation.Name));
 				yield return Statement(writer);
@@ -313,7 +313,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("DROP PROCEDURE ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(ExtractName(operation.Name)));
 				yield return Statement(writer);
 			}
 		}
@@ -323,7 +323,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("DROP TABLE ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(ExtractName(operation.Name)));
 				yield return Statement(writer);
 			}
 		}
@@ -343,7 +343,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(operation.Table));
+				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" ALTER COLUMN ");
 				writer.Write(Quote(operation.Name));
 				writer.Write(" TO ");
@@ -404,7 +404,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 				writer.Write(action);
 				writer.Write(" PROCEDURE ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(ExtractName(operation.Name)));
 				if (inputParameters.Any())
 				{
 					writer.Write(" (");
@@ -543,6 +543,11 @@ namespace FirebirdSql.Data.EntityFramework6
 				typeUsage = BuildStoreTypeUsage(storeTypeName, propertyModel) ?? typeUsage;
 			}
 			return SqlGenerator.GetSqlPrimitiveType(typeUsage);
+		}
+
+		string ExtractName(string name)
+		{
+			return name.Substring(name.LastIndexOf('.') + 1);
 		}
 
 		static SqlWriter SqlWriter()
