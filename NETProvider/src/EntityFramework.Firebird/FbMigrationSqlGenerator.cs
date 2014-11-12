@@ -31,7 +31,6 @@ using System.Data.Entity.Migrations.Sql;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using FirebirdSql.Data.EntityFramework6.SqlGen;
 
 namespace FirebirdSql.Data.EntityFramework6
