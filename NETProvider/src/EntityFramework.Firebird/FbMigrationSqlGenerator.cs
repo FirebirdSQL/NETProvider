@@ -553,7 +553,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		static string CreateItemName(string name)
 		{
-			return Regex.Replace(name, @"(?<prefix>.*_).+?\.(?<suffix>.*)", "${prefix}${suffix}");
+			return Regex.Replace(name, @"^(?<prefix>.+_)[^.]+\.(?<suffix>.+)$", "${prefix}${suffix}");
 		}
 
 		static SqlWriter SqlWriter()
