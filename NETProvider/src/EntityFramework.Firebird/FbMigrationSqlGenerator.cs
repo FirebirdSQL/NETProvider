@@ -546,7 +546,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			return SqlGenerator.GetSqlPrimitiveType(typeUsage);
 		}
 
-		string ExtractName(string name)
+		static string ExtractName(string name)
 		{
 			return name.Substring(name.LastIndexOf('.') + 1);
 		}
