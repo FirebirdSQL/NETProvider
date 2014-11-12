@@ -31,6 +31,7 @@ using System.Data.Entity.Migrations.Sql;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using FirebirdSql.Data.EntityFramework6.SqlGen;
 
 namespace FirebirdSql.Data.EntityFramework6
@@ -98,7 +99,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write("ALTER TABLE ");
 				writer.Write(Quote(ExtractName(operation.DependentTable)));
 				writer.Write(" ADD CONSTRAINT ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(CreateItemName(operation.Name)));
 				writer.Write(" ADD FOREIGN KEY (");
 				WriteColumns(writer, operation.DependentColumns.Select(Quote));
 				writer.Write(") REFERENCES ");
@@ -121,7 +122,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write("ALTER TABLE ");
 				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" ADD CONSTRAINT ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(CreateItemName(operation.Name)));
 				writer.Write(" PRIMARY KEY (");
 				WriteColumns(writer, operation.Columns.Select(Quote));
 				writer.Write(")");
@@ -225,7 +226,7 @@ namespace FirebirdSql.Data.EntityFramework6
 					writer.Write("UNIQUE ");
 				}
 				writer.Write("INDEX ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(CreateItemName(operation.Name)));
 				writer.Write(" ON ");
 				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write("(");
@@ -281,7 +282,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write("ALTER TABLE ");
 				writer.Write(Quote(ExtractName(operation.DependentTable)));
 				writer.Write(" DROP CONSTRAINT ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(CreateItemName(operation.Name)));
 				yield return Statement(writer);
 			}
 		}
@@ -291,7 +292,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("DROP INDEX ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(CreateItemName(operation.Name)));
 				yield return Statement(writer);
 			}
 		}
@@ -303,7 +304,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write("ALTER TABLE ");
 				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" DROP CONSTRAINT ");
-				writer.Write(Quote(operation.Name));
+				writer.Write(Quote(CreateItemName(operation.Name)));
 				yield return Statement(writer);
 			}
 		}
@@ -548,6 +549,11 @@ namespace FirebirdSql.Data.EntityFramework6
 		static string ExtractName(string name)
 		{
 			return name.Substring(name.LastIndexOf('.') + 1);
+		}
+
+		static string CreateItemName(string name)
+		{
+			return Regex.Replace(name, @"(?<prefix>.*_).+?\.(?<suffix>.*)", "${prefix}${suffix}");
 		}
 
 		static SqlWriter SqlWriter()
