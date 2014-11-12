@@ -98,6 +98,8 @@ namespace FirebirdSql.Data.EntityFramework6
 			{
 				writer.Write("ALTER TABLE ");
 				writer.Write(Quote(ExtractName(operation.DependentTable)));
+				writer.Write(" ADD CONSTRAINT ");
+				writer.Write(Quote(operation.Name));
 				writer.Write(" ADD FOREIGN KEY (");
 				WriteColumns(writer, operation.DependentColumns.Select(Quote));
 				writer.Write(") REFERENCES ");
