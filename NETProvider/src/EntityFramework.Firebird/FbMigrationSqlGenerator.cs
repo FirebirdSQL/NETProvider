@@ -121,8 +121,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" ADD CONSTRAINT ");
 				writer.Write(Quote(operation.Name));
-				writer.Write(" PRIMARY KEY ");
-				writer.Write("(");
+				writer.Write(" PRIMARY KEY (");
 				WriteColumns(writer, operation.Columns.Select(Quote));
 				writer.Write(")");
 				yield return Statement(writer);
