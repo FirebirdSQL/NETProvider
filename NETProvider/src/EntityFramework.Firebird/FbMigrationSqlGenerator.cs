@@ -38,6 +38,13 @@ namespace FirebirdSql.Data.EntityFramework6
 {
 	public class FbMigrationSqlGenerator : MigrationSqlGenerator
 	{
+		IFbMigrationSqlGeneratorBehavior _behavior;
+
+		public FbMigrationSqlGenerator(IFbMigrationSqlGeneratorBehavior behavior = null)
+		{
+			_behavior = behavior ?? new DefaultFbMigrationSqlGeneratorBehavior();
+		}
+
 		public override IEnumerable<MigrationStatement> Generate(IEnumerable<MigrationOperation> migrationOperations, string providerManifestToken)
 		{
 			InitializeProviderServices(providerManifestToken);
@@ -77,7 +84,8 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write(Quote(ExtractName(operation.Table)));
 				writer.Write(" ADD ");
 				var column = operation.Column;
-				writer.Write(Generate(column));
+				var columnData = Generate(column);
+				writer.Write(columnData.Item1);
 				if (column.IsNullable != null
 					&& !column.IsNullable.Value
 					&& column.DefaultValue == null
@@ -243,6 +251,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(CreateTableOperation operation)
 		{
+			var columnsData = operation.Columns.Select(Generate).ToArray();
 			using (var writer = SqlWriter())
 			{
 				writer.Write("CREATE TABLE ");
@@ -250,7 +259,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write(" (");
 				writer.WriteLine();
 				writer.Indent++;
-				WriteColumns(writer, operation.Columns.Select(Generate), true);
+				WriteColumns(writer, columnsData.Select(x => x.Item1), true);
 				writer.Indent--;
 				writer.WriteLine();
 				writer.Write(")");
@@ -261,6 +270,8 @@ namespace FirebirdSql.Data.EntityFramework6
 				foreach (var item in Generate(operation.PrimaryKey))
 					yield return item;
 			}
+			foreach (var item in columnsData.SelectMany(x => x.Item2).Select(x => Statement(x)))
+				yield return item;
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(DropColumnOperation operation)
@@ -437,12 +448,15 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 		}
 
-		protected string Generate(ColumnModel column)
+		protected Tuple<string, IEnumerable<string>> Generate(ColumnModel column)
 		{
 			var builder = new StringBuilder();
+			var additionalCommands = new List<string>();
+
+			var columnType = BuildPropertyType(column);
 			builder.Append(Quote(column.Name));
 			builder.Append(" ");
-			builder.Append(BuildPropertyType(column));
+			builder.Append(columnType);
 
 			if ((column.IsNullable != null)
 				&& !column.IsNullable.Value)
@@ -462,10 +476,14 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 			else if (column.IsIdentity)
 			{
-#warning Not supported on FB. What to do reasonably?
+				var identity=_behavior.GenerateIdentityForColumn();
+				if (!string.IsNullOrWhiteSpace(identity))
+				{
+					additionalCommands.Add(identity);
+				}
 			}
 
-			return builder.ToString();
+			return Tuple.Create(builder.ToString(), additionalCommands.AsEnumerable());
 		}
 
 		protected string Generate(ParameterModel parameter)

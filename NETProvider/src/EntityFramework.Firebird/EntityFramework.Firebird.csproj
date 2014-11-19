@@ -138,9 +138,11 @@
     <Compile Include="..\FirebirdSql.Data.FirebirdClient\Properties\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="DefaultFbMigrationSqlGeneratorBehavior.cs" />
     <Compile Include="FbConnectionFactory.cs" />
     <Compile Include="FbHistoryContext.cs" />
     <Compile Include="FbMigrationSqlGenerator.cs" />
+    <Compile Include="IFbMigrationSqlGeneratorBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
