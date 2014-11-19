@@ -23,8 +23,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: CLSCompliant(true)]
-[assembly: ComVisible(false)]
-[assembly: AssemblyConfiguration("")]
+[assembly: ComVisible(true)]
+[assembly: Guid("F37B8373-51FA-4CC6-934E-DF147DFBD9F1")]
 [assembly: AssemblyCompany("FirebirdSQL")]
 [assembly: AssemblyProduct("FirebirdClient")]
 [assembly: AssemblyDelaySign(false)]
