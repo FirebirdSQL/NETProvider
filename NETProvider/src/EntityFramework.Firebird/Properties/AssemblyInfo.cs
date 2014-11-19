@@ -23,7 +23,6 @@ using System.Runtime.InteropServices;
 
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
-[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FirebirdSQL")]
 [assembly: AssemblyProduct("FirebirdClient")]
 [assembly: AssemblyDelaySign(false)]
