@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		{
 			var column = operation.Column;
 			// drop NOT NULL first, either it will be recreated or it was to drop
-			using(var writer = SqlWriter())
+			using (var writer = SqlWriter())
 			{
 				writer.WriteLine("EXECUTE BLOCK");
 				writer.WriteLine("AS");
