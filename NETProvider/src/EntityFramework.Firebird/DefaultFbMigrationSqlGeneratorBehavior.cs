@@ -11,10 +11,8 @@ namespace FirebirdSql.Data.EntityFramework6
 	{
 		const string IdentitySequenceName = "GEN_IDENTITY";
 
-		public IEnumerable<string> GenerateIdentityForColumn(string columnName, string tableName)
+		public IEnumerable<string> CreateIdentityForColumn(string columnName, string tableName)
 		{
-			var triggerName = string.Format("ID_{0}_{1}", tableName, columnName);
-
 			using (var writer = FbMigrationSqlGenerator.SqlWriter())
 			{
 				writer.WriteLine("EXECUTE BLOCK");
@@ -42,7 +40,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			{
 
 				writer.Write("CREATE OR ALTER TRIGGER ");
-				writer.Write(FbMigrationSqlGenerator.Quote(triggerName));
+				writer.Write(FbMigrationSqlGenerator.Quote(CreateTriggerName(columnName, tableName)));
 				writer.Write(" ACTIVE BEFORE INSERT ON ");
 				writer.Write(FbMigrationSqlGenerator.Quote(tableName));
 				writer.WriteLine();
@@ -67,6 +65,38 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write("END");
 				yield return writer.ToString();
 			}
+		}
+
+		public IEnumerable<string> DropIdentityForColumn(string columnName, string tableName)
+		{
+			var triggerName = CreateTriggerName(columnName, tableName);
+			using (var writer = FbMigrationSqlGenerator.SqlWriter())
+			{
+				writer.WriteLine("EXECUTE BLOCK");
+				writer.WriteLine("AS");
+				writer.WriteLine("BEGIN");
+				writer.Indent++;
+				writer.Write("if exists(select 1 from rdb$triggers where rdb$trigger_name = '");
+				writer.Write(triggerName);
+				writer.Write("') then");
+				writer.WriteLine();
+				writer.WriteLine("begin");
+				writer.Indent++;
+				writer.Write("execute statement 'drop trigger ");
+				writer.Write(FbMigrationSqlGenerator.Quote(triggerName));
+				writer.Write("';");
+				writer.WriteLine();
+				writer.Indent--;
+				writer.WriteLine("end");
+				writer.Indent--;
+				writer.Write("END");
+				yield return writer.ToString();
+			}
+		}
+
+		static string CreateTriggerName(string columnName, string tableName)
+		{
+			return string.Format("ID_{0}_{1}", tableName, columnName);
 		}
 	}
 }

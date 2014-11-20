@@ -142,6 +142,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		protected virtual IEnumerable<MigrationStatement> Generate(AlterColumnOperation operation)
 		{
 			var column = operation.Column;
+			var tableName = ExtractName(operation.Table);
 			// drop NOT NULL first, either it will be recreated or it was to drop
 			using (var writer = SqlWriter())
 			{
@@ -154,7 +155,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.WriteLine("from rdb$relation_constraints rc");
 				writer.WriteLine("join rdb$check_constraints cc on rc.rdb$constraint_name = cc.rdb$constraint_name");
 				writer.Write("where rc.rdb$constraint_type = 'NOT NULL' and rc.rdb$relation_name = '");
-				writer.Write(ExtractName(operation.Table));
+				writer.Write(tableName);
 				writer.Write("' and cc.rdb$trigger_name  = '");
 				writer.Write(column.Name);
 				writer.Write("'");
@@ -164,7 +165,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.WriteLine("begin");
 				writer.Indent++;
 				writer.Write("execute statement 'alter table ");
-				writer.Write(Quote(ExtractName(operation.Table)));
+				writer.Write(Quote(tableName));
 				writer.Write(" drop constraint ' || :constraint_name;");
 				writer.WriteLine();
 				writer.Indent--;
@@ -173,10 +174,14 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write("END");
 				yield return Statement(writer);
 			}
+			// drop identity trigger first, either it will be recreated or it was to drop
+			foreach (var item in _behavior.DropIdentityForColumn(column.Name, tableName))
+				yield return Statement(item);
+
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(ExtractName(operation.Table)));
+				writer.Write(Quote(tableName));
 				writer.Write(" ALTER COLUMN ");
 				writer.Write(Quote(column.Name));
 				writer.Write(" TYPE ");
@@ -194,7 +199,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				using (var writer = SqlWriter())
 				{
 					writer.Write("ALTER TABLE ");
-					writer.Write(Quote(ExtractName(operation.Table)));
+					writer.Write(Quote(tableName));
 					writer.Write(" ALTER COLUMN ");
 					writer.Write(Quote(column.Name));
 					writer.Write(" DROP DEFAULT");
@@ -204,13 +209,19 @@ namespace FirebirdSql.Data.EntityFramework6
 				using (var writer = SqlWriter())
 				{
 					writer.Write("ALTER TABLE ");
-					writer.Write(Quote(ExtractName(operation.Table)));
+					writer.Write(Quote(tableName));
 					writer.Write(" ALTER COLUMN ");
 					writer.Write(Quote(column.Name));
 					writer.Write(" SET DEFAULT ");
 					writer.Write(column.DefaultValue != null ? WriteValue((dynamic)column.DefaultValue) : column.DefaultValueSql);
 					yield return Statement(writer);
 				}
+			}
+
+			if (column.IsIdentity)
+			{
+				foreach (var item in _behavior.CreateIdentityForColumn(column.Name, tableName))
+					yield return Statement(item);
 			}
 		}
 
@@ -478,7 +489,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 			else if (column.IsIdentity)
 			{
-				var identity = _behavior.GenerateIdentityForColumn(column.Name, tableName);
+				var identity = _behavior.CreateIdentityForColumn(column.Name, tableName);
 				additionalCommands.AddRange(identity.Where(x => !string.IsNullOrWhiteSpace(x)));
 			}
 

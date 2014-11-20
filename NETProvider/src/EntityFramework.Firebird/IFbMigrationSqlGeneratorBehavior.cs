@@ -8,6 +8,7 @@ namespace FirebirdSql.Data.EntityFramework6
 {
 	public interface IFbMigrationSqlGeneratorBehavior
 	{
-		IEnumerable<string> GenerateIdentityForColumn(string columnName, string tableName);
+		IEnumerable<string> CreateIdentityForColumn(string columnName, string tableName);
+		IEnumerable<string> DropIdentityForColumn(string columnName, string tableName);
 	}
 }
