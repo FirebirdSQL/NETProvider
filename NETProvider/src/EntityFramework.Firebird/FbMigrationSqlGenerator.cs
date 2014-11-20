@@ -78,13 +78,14 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AddColumnOperation operation)
 		{
+			var tableName = ExtractName(operation.Table);
 			using (var writer = SqlWriter())
 			{
 				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(ExtractName(operation.Table)));
+				writer.Write(Quote(tableName));
 				writer.Write(" ADD ");
 				var column = operation.Column;
-				var columnData = Generate(column);
+				var columnData = Generate(column, tableName);
 				writer.Write(columnData.Item1);
 				if (column.IsNullable != null
 					&& !column.IsNullable.Value
@@ -251,11 +252,12 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected virtual IEnumerable<MigrationStatement> Generate(CreateTableOperation operation)
 		{
-			var columnsData = operation.Columns.Select(Generate).ToArray();
+			var tableName = ExtractName(operation.Name);
+			var columnsData = operation.Columns.Select(x => Generate(x, tableName)).ToArray();
 			using (var writer = SqlWriter())
 			{
 				writer.Write("CREATE TABLE ");
-				writer.Write(Quote(ExtractName(operation.Name)));
+				writer.Write(Quote(tableName));
 				writer.Write(" (");
 				writer.WriteLine();
 				writer.Indent++;
@@ -448,7 +450,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 		}
 
-		protected Tuple<string, IEnumerable<string>> Generate(ColumnModel column)
+		protected Tuple<string, IEnumerable<string>> Generate(ColumnModel column, string tableName)
 		{
 			var builder = new StringBuilder();
 			var additionalCommands = new List<string>();
@@ -476,11 +478,8 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 			else if (column.IsIdentity)
 			{
-				var identity=_behavior.GenerateIdentityForColumn();
-				if (!string.IsNullOrWhiteSpace(identity))
-				{
-					additionalCommands.Add(identity);
-				}
+				var identity = _behavior.GenerateIdentityForColumn(column.Name, tableName);
+				additionalCommands.AddRange(identity.Where(x => !string.IsNullOrWhiteSpace(x)));
 			}
 
 			return Tuple.Create(builder.ToString(), additionalCommands.AsEnumerable());
@@ -511,11 +510,6 @@ namespace FirebirdSql.Data.EntityFramework6
 				SuppressTransaction = suppressTransaction,
 				BatchTerminator = ";",
 			};
-		}
-
-		protected static string Quote(string name)
-		{
-			return SqlGenerator.QuoteIdentifier(name);
 		}
 
 		protected static string WriteValue(object value)
@@ -553,6 +547,18 @@ namespace FirebirdSql.Data.EntityFramework6
 			return SqlGenerator.FormatTime(value);
 		}
 
+		protected internal static string Quote(string name)
+		{
+			return SqlGenerator.QuoteIdentifier(name);
+		}
+
+		internal static SqlWriter SqlWriter()
+		{
+			var result = new SqlWriter(new StringBuilder());
+			result.Indent++;
+			return result;
+		}
+
 		string BuildPropertyType(PropertyModel propertyModel)
 		{
 			var storeTypeName = propertyModel.StoreType;
@@ -572,13 +578,6 @@ namespace FirebirdSql.Data.EntityFramework6
 		static string CreateItemName(string name)
 		{
 			return Regex.Replace(name, @"^(?<prefix>.+_)[^.]+\.(?<suffix>.+)$", "${prefix}${suffix}");
-		}
-
-		static SqlWriter SqlWriter()
-		{
-			var result = new SqlWriter(new StringBuilder());
-			result.Indent++;
-			return result;
 		}
 
 		static void WriteColumns(SqlWriter writer, IEnumerable<string> columns, bool separateLines = false)
