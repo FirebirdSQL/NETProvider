@@ -43,24 +43,27 @@ namespace FirebirdSql.Data.EntityFramework6
 
 				writer.Write("CREATE OR ALTER TRIGGER ");
 				writer.Write(FbMigrationSqlGenerator.Quote(triggerName));
-				writer.Write("ACTIVE BEFORE INSERT ON ");
+				writer.Write(" ACTIVE BEFORE INSERT ON ");
 				writer.Write(FbMigrationSqlGenerator.Quote(tableName));
 				writer.WriteLine();
 				writer.WriteLine("AS");
 				writer.WriteLine("BEGIN");
+				writer.Indent++;
 				writer.Write("if (new.");
 				writer.Write(FbMigrationSqlGenerator.Quote(columnName));
 				writer.Write(" is null) then");
 				writer.WriteLine();
 				writer.WriteLine("begin");
 				writer.Indent++;
-				writer.WriteLine("new.");
+				writer.Write("new.");
 				writer.Write(FbMigrationSqlGenerator.Quote(columnName));
 				writer.Write(" = next value for ");
 				writer.Write(IdentitySequenceName);
-				writer.Write(" ;");
+				writer.Write(";");
+				writer.WriteLine();
 				writer.Indent--;
 				writer.WriteLine("end");
+				writer.Indent--;
 				writer.Write("END");
 				yield return writer.ToString();
 			}
