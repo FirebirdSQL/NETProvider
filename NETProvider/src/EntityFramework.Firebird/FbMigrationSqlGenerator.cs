@@ -109,7 +109,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write(Quote(ExtractName(operation.DependentTable)));
 				writer.Write(" ADD CONSTRAINT ");
 				writer.Write(Quote(CreateItemName(operation.Name)));
-				writer.Write(" ADD FOREIGN KEY (");
+				writer.Write(" FOREIGN KEY (");
 				WriteColumns(writer, operation.DependentColumns.Select(Quote));
 				writer.Write(") REFERENCES ");
 				writer.Write(Quote(ExtractName(operation.PrincipalTable)));
