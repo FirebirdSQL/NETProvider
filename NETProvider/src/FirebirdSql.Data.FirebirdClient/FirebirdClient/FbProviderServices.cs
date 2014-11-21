@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono
  *
  *     The contents of this file are subject to the Initial
@@ -414,12 +414,15 @@ namespace FirebirdSql.Data.EntityFramework6
 			string script = DbCreateDatabaseScript(GetDbProviderManifestToken(connection), storeItemCollection);
 			FbScript fbScript = new FbScript(script);
 			fbScript.Parse();
+			if (fbScript.Results.Any())
+			{
 			using (var fbConnection = new FbConnection(connection.ConnectionString))
 			{
 				var execution = new FbBatchExecution(fbConnection);
 				execution.AppendSqlStatements(fbScript);
 				execution.Execute();
 			}
+		}
 		}
 
 		protected override string DbCreateDatabaseScript(string providerManifestToken,
