@@ -588,7 +588,14 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		static string CreateItemName(string name)
 		{
-			return Regex.Replace(name, @"^(?<prefix>.+_)[^.]+\.(?<suffix>.+)$", "${prefix}${suffix}");
+			while (true)
+			{
+				var match = Regex.Match(name, @"^(?<prefix>.+_)[^.]+\.(?<suffix>.+)$");
+				if (!match.Success)
+					break;
+				name = match.Result("${prefix}${suffix}");
+			}
+			return name;
 		}
 
 		static void WriteColumns(SqlWriter writer, IEnumerable<string> columns, bool separateLines = false)
