@@ -19,9 +19,9 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.WriteLine("AS");
 				writer.WriteLine("BEGIN");
 				writer.Indent++;
-				writer.Write("if not exists(select 1 from rdb$generators where rdb$generator_name = '");
+				writer.Write("if (not exists(select 1 from rdb$generators where rdb$generator_name = '");
 				writer.Write(IdentitySequenceName);
-				writer.Write("') then");
+				writer.Write("')) then");
 				writer.WriteLine();
 				writer.WriteLine("begin");
 				writer.Indent++;
@@ -76,9 +76,9 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.WriteLine("AS");
 				writer.WriteLine("BEGIN");
 				writer.Indent++;
-				writer.Write("if exists(select 1 from rdb$triggers where rdb$trigger_name = '");
+				writer.Write("if (exists(select 1 from rdb$triggers where rdb$trigger_name = '");
 				writer.Write(triggerName);
-				writer.Write("') then");
+				writer.Write("')) then");
 				writer.WriteLine();
 				writer.WriteLine("begin");
 				writer.Indent++;
