@@ -1,8 +1,8 @@
 Firebird BDP (Borland Data Provider)
-======== ===  =====================
+====================================
 
 This project is supported by:
----- ------- -- --------- ---
+-----------------------------
 
 	Sean Leyne ( Broadview Software )
 
@@ -15,9 +15,9 @@ You can subscribe to the developement list at:
 	http://lists.sourceforge.net/lists/listinfo/firebird-net-provider
 
 
-You can access to the lastest developement sources through CVS, see:
+You can access to the lastest developement sources through Git, see:
 
-	http://sourceforge.net/cvs/?group_id=9028
+	https://sourceforge.net/p/firebird/NETProvider/ci/master/tree/
 
 
 Methods Missing for BDP
