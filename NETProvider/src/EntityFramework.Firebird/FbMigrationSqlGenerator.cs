@@ -550,7 +550,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected static string WriteValue(string value)
 		{
-			return SqlGenerator.FormatString(value, true, value.Length);
+			return SqlGenerator.FormatString(value, true);
 		}
 
 		protected static string WriteValue(TimeSpan value)
