@@ -38,7 +38,9 @@ namespace FirebirdSql.Data.EntityFramework6
 {
 	public class FbMigrationSqlGenerator : MigrationSqlGenerator
 	{
-		IFbMigrationSqlGeneratorBehavior _behavior;
+		readonly IFbMigrationSqlGeneratorBehavior _behavior;
+
+		string _migrationsHistoryTableName;
 
 		public FbMigrationSqlGenerator(IFbMigrationSqlGeneratorBehavior behavior = null)
 		{
@@ -48,6 +50,15 @@ namespace FirebirdSql.Data.EntityFramework6
 		public override IEnumerable<MigrationStatement> Generate(IEnumerable<MigrationOperation> migrationOperations, string providerManifestToken)
 		{
 			InitializeProviderServices(providerManifestToken);
+
+			var lastOperation = migrationOperations.Last();
+			var updateDatabaseOperation = lastOperation as UpdateDatabaseOperation;
+			var historyOperation = updateDatabaseOperation != null
+				? updateDatabaseOperation.Migrations.First().Operations.OfType<HistoryOperation>().First()
+				: (HistoryOperation)lastOperation;
+			var modify = historyOperation.CommandTrees.First();
+			_migrationsHistoryTableName = (modify.Target.Expression as DbScanExpression).Target.Table;
+
 			return GenerateStatements(migrationOperations).ToArray();
 		}
 
@@ -264,9 +275,20 @@ namespace FirebirdSql.Data.EntityFramework6
 		protected virtual IEnumerable<MigrationStatement> Generate(CreateTableOperation operation)
 		{
 			var tableName = ExtractName(operation.Name);
+			var isMigrationsHistoryTable = tableName.Equals(_migrationsHistoryTableName, StringComparison.InvariantCulture);
 			var columnsData = operation.Columns.Select(x => Generate(x, tableName)).ToArray();
 			using (var writer = SqlWriter())
 			{
+				if (isMigrationsHistoryTable)
+				{
+					writer.WriteLine("EXECUTE BLOCK");
+					writer.WriteLine("AS");
+					writer.WriteLine("BEGIN");
+					writer.Indent++;
+					writer.WriteLine("EXECUTE STATEMENT");
+					writer.Indent++;
+					writer.Write("'");
+				}
 				writer.Write("CREATE TABLE ");
 				writer.Write(Quote(tableName));
 				writer.Write(" (");
@@ -276,6 +298,14 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Indent--;
 				writer.WriteLine();
 				writer.Write(")");
+				if (isMigrationsHistoryTable)
+				{
+					writer.WriteLine("'");
+					writer.Indent--;
+					writer.WriteLine("WITH AUTONOMOUS TRANSACTION;");
+					writer.Indent--;
+					writer.Write("END");
+				}
 				yield return Statement(writer);
 			}
 			if (operation.PrimaryKey != null)
