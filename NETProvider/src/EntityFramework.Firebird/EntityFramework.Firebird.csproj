@@ -140,8 +140,10 @@
     </Compile>
     <Compile Include="DefaultFbMigrationSqlGeneratorBehavior.cs" />
     <Compile Include="FbConnectionFactory.cs" />
+    <Compile Include="FbDbConfiguration.cs" />
     <Compile Include="FbMigrationSqlGenerator.cs" />
     <Compile Include="IFbMigrationSqlGeneratorBehavior.cs" />
+    <Compile Include="MigrationsTransactionsInterceptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
