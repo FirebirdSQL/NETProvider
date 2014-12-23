@@ -38,6 +38,8 @@ using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Infrastructure.DependencyResolution;
 using System.Data.Entity.Migrations.Sql;
+using System.Data.Entity.Migrations.History;
+using System.Data.Entity.Infrastructure.Interception;
 
 using FirebirdSql.Data.EntityFramework6.SqlGen;
 #endif
@@ -46,7 +48,6 @@ using FirebirdSql.Data.Isql;
 using FirebirdSql.Data.Services;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
-using System.Data.Entity.Migrations.History;
 
 #if (!EF_6)
 namespace FirebirdSql.Data.FirebirdClient
@@ -66,7 +67,6 @@ namespace FirebirdSql.Data.EntityFramework6
 #if (EF_6)
 			AddDependencyResolver(new SingletonDependencyResolver<IDbConnectionFactory>(new FbConnectionFactory()));
 			AddDependencyResolver(new SingletonDependencyResolver<Func<MigrationSqlGenerator>>(() => new FbMigrationSqlGenerator(), ProviderInvariantName));
-			AddDependencyResolver(new SingletonDependencyResolver<Func<DbConnection, string, HistoryContext>>((existingConnection, defaultSchema) => new FbHistoryContext(existingConnection, defaultSchema)));
 #endif
 		}
 
