@@ -92,23 +92,28 @@ namespace FirebirdSql.Data.Services
 				: new byte[] { IscCodes.isc_info_svc_stdin };
 			var response = Query(items);
 			var length = GetLength(response);
-			while (InputStream.Position < InputStream.Length)
+			while (true)
 			{
 				if (length > 0)
 				{
 					var buffer = new byte[length];
 					var read = InputStream.Read(buffer, 0, length);
-					Array.Resize(ref buffer, read);
-					var spb = new ServiceParameterBuffer();
-					spb.Append(IscCodes.isc_info_svc_line, buffer);
-					QuerySpb = spb;
+					if (read != 0)
+					{
+						Array.Resize(ref buffer, read);
+						var spb = new ServiceParameterBuffer();
+						spb.Append(IscCodes.isc_info_svc_line, buffer);
+						QuerySpb = spb;
+					}
 				}
 				response = Query(items);
 				QuerySpb = null;
 				length = GetLength(response);
-				ProcessMessages(response);
+				if (length == 0 && !ProcessMessages(response))
+				{
+					break;
+				}
 			}
-			while (ProcessMessages(Query(items))) ;
 		}
 
 		bool ProcessMessages(ArrayList items)
