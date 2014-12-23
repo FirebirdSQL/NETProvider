@@ -410,7 +410,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			StoreItemCollection storeItemCollection)
 #pragma warning restore 3001
 		{
-			FbConnection.CreateDatabase(connection.ConnectionString, 16384, true, false);
+			FbConnection.CreateDatabase(connection.ConnectionString, pageSize: 16384);
 			string script = DbCreateDatabaseScript(GetDbProviderManifestToken(connection), storeItemCollection);
 			FbScript fbScript = new FbScript(script);
 			fbScript.Parse();
