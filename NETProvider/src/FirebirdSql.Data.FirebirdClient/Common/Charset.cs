@@ -22,49 +22,46 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace FirebirdSql.Data.Common
 {
 	internal sealed class Charset
 	{
-		#region · Static Fields ·
+		#region · Static ·
 
-		private readonly static List<Charset> supportedCharsets = Charset.InitializeSupportedCharsets();
+		private readonly static Dictionary<int, Charset> charsetsById;
+		private readonly static Dictionary<string, Charset> charsetsByName;
 
-		#endregion
-
-		#region · Static Properties ·
+		static Charset()
+		{
+			var charsets = GetSupportedCharsets();
+			charsetsById = charsets.ToDictionary(x => x.Identifier);
+			charsetsByName = charsets.ToDictionary(x => x.Name, CultureAwareEqualityComparer.Instance);
+		}
 
 		public static Charset DefaultCharset
 		{
-			get { return Charset.supportedCharsets[0]; }
+			get { return charsetsById.First().Value; }
 		}
-
-		#endregion
-
-		#region · Static Methods ·
 
 		public static Charset GetCharset(int charsetId)
 		{
-			foreach (Charset charset in supportedCharsets)
-			{
-				if (charset.Identifier == charsetId)
-					return charset;
-			}
+			var value = default(Charset);
+			if (charsetsById.TryGetValue(charsetId, out value))
+				return value;
 			return null;
 		}
 
 		public static Charset GetCharset(string charsetName)
 		{
-			foreach (Charset charset in supportedCharsets)
-			{
-				if (charset.Name.CultureAwareEquals(charsetName))
-					return charset;
-			}
+			var value = default(Charset);
+			if (charsetsByName.TryGetValue(charsetName, out value))
+				return value;
 			return null;
 		}
 
-		private static List<Charset> InitializeSupportedCharsets()
+		private static List<Charset> GetSupportedCharsets()
 		{
 			List<Charset> charsets = new List<Charset>();
 

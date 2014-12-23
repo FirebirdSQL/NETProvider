@@ -27,15 +27,6 @@ namespace FirebirdSql.Data.Common
 {
 	static class Extensions
 	{
-		public static bool CultureAwareEquals(this string string1, string string2)
-		{
-			return CultureInfo.CurrentCulture.CompareInfo.Compare(
-				string1,
-				string2,
-				CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth |
-				CompareOptions.IgnoreCase) == 0 ? true : false;
-		}
-
 		public static bool SetKeepAlive(this Socket socket, ulong time, ulong interval)
 		{
 			const int BytesPerLong = 4;
