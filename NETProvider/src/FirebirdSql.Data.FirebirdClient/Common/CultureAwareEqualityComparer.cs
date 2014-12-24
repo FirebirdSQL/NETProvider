@@ -34,13 +34,17 @@ namespace FirebirdSql.Data.Common
 
 		public bool Equals(string x, string y)
 		{
-			return CultureInfo.CurrentCulture.CompareInfo.Compare(x, y, CultureAwareCompareOptions) == 0;
+			return CurrentCompareInfo.Compare(x, y, CultureAwareCompareOptions) == 0;
 		}
 
 		public int GetHashCode(string obj)
 		{
-			// force to use Equals
-			return default(int);
+			return CurrentCompareInfo.GetSortKey(obj, CultureAwareCompareOptions).GetHashCode();
+		}
+
+		CompareInfo CurrentCompareInfo
+		{
+			get { return CultureInfo.CurrentCulture.CompareInfo; }
 		}
 	}
 }
