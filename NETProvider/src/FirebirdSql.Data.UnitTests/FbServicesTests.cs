@@ -201,8 +201,17 @@ namespace FirebirdSql.Data.UnitTests
 			configurationSvc.SetSweepInterval(1000);
 			configurationSvc.SetReserveSpace(true);
 			configurationSvc.SetForcedWrites(true);
-			configurationSvc.DatabaseShutdown(FbShutdownMode.Forced, 10);
-			configurationSvc.DatabaseOnline();
+		}
+
+		[Test]
+		public void ShutdownOnlineTest()
+		{
+			FbConfiguration configurationSvc = new FbConfiguration();
+
+			configurationSvc.ConnectionString = this.BuildServicesConnectionString();
+
+			configurationSvc.DatabaseShutdown(FbShutdownOnlineMode.Full, FbShutdownType.ForceShutdown, 10);
+			configurationSvc.DatabaseOnline(FbShutdownOnlineMode.Normal);
 		}
 
 		[Test]
