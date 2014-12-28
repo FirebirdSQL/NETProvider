@@ -37,7 +37,6 @@ namespace FirebirdSql.Data.Services
 
 		public void SetSqlDialect(int sqlDialect)
 		{
-			// Configure Spb
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
@@ -46,7 +45,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
@@ -54,7 +52,6 @@ namespace FirebirdSql.Data.Services
 
 		public void SetSweepInterval(int sweepInterval)
 		{
-			// Configure Spb
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
@@ -63,7 +60,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
@@ -71,7 +67,6 @@ namespace FirebirdSql.Data.Services
 
 		public void SetPageBuffers(int pageBuffers)
 		{
-			// Configure Spb
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
@@ -80,7 +75,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
@@ -88,7 +82,6 @@ namespace FirebirdSql.Data.Services
 
 		public void DatabaseShutdown(FbShutdownMode mode, int seconds)
 		{
-			// Configure Spb
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
@@ -111,7 +104,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
@@ -119,7 +111,6 @@ namespace FirebirdSql.Data.Services
 
 		public void DatabaseOnline()
 		{
-			// Configure Spb
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
@@ -128,7 +119,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
@@ -136,7 +126,6 @@ namespace FirebirdSql.Data.Services
 
 		public void ActivateShadows()
 		{
-			// Configure Spb
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
@@ -145,7 +134,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
@@ -153,13 +141,11 @@ namespace FirebirdSql.Data.Services
 
 		public void SetForcedWrites(bool forcedWrites)
 		{
-			// Configure Spb
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-			// WriteMode
 			if (forcedWrites)
 			{
 				this.StartSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
@@ -171,7 +157,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
@@ -184,7 +169,6 @@ namespace FirebirdSql.Data.Services
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-			// Reserve Space
 			if (reserveSpace)
 			{
 				this.StartSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
@@ -196,7 +180,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
@@ -204,7 +187,6 @@ namespace FirebirdSql.Data.Services
 
 		public void SetAccessMode(bool readOnly)
 		{
-			// Configure Spb
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
@@ -221,7 +203,6 @@ namespace FirebirdSql.Data.Services
 
 			this.Open();
 
-			// Start execution
 			this.StartTask();
 
 			this.Close();
