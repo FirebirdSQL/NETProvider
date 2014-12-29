@@ -103,6 +103,12 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BackupRestore_A_Backup02StreamingTest()
 		{
+			if (GetServerVersion() < new Version("2.5.0.0"))
+			{
+				Assert.Inconclusive("Not supported on this version.");
+				return;
+			}
+
 			FbStreamingBackup backupSvc = new FbStreamingBackup();
 			var backupLength = default(long);
 
@@ -147,6 +153,12 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BackupRestore_B_Restore02StreamingTest()
 		{
+			if (GetServerVersion() < new Version("2.5.0.0"))
+			{
+				Assert.Inconclusive("Not supported on this version.");
+				return;
+			}
+
 			FbStreamingRestore restoreSvc = new FbStreamingRestore();
 
 			using (var fs = File.OpenRead(GetBackupRestoreFullPath()))
@@ -335,6 +347,12 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NBackup_A_NBackupTest()
 		{
+			if (GetServerVersion() < new Version("2.5.0.0"))
+			{
+				Assert.Inconclusive("Not supported on this version.");
+				return;
+			}
+
 			Action<int> doLevel = l =>
 				{
 					var nbak = new FbNBackup();
@@ -357,6 +375,12 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NBackup_B_NRestoreTest()
 		{
+			if (GetServerVersion() < new Version("2.5.0.0"))
+			{
+				Assert.Inconclusive("Not supported on this version.");
+				return;
+			}
+
 			FbConnection.DropDatabase(BuildConnectionString());
 
 			var nrest = new FbNRestore();
