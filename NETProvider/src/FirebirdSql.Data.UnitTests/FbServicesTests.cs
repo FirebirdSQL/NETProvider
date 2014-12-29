@@ -217,6 +217,12 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ShutdownOnline2Test()
 		{
+			if (GetServerVersion() < new Version("2.5.0.0"))
+			{
+				Assert.Inconclusive("Not supported on this version.");
+				return;
+			}
+
 			FbConfiguration configurationSvc = new FbConfiguration();
 
 			configurationSvc.ConnectionString = BuildServicesConnectionString();

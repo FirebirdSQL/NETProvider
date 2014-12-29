@@ -513,6 +513,13 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
+		public static Version GetServerVersion()
+		{
+			var server = new FbServerProperties();
+			server.ConnectionString = BuildServicesConnectionString();
+			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
+		}
+
 		#endregion
 	}
 }
