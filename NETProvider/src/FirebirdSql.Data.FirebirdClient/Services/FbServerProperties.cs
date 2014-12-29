@@ -109,7 +109,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Constructors ·
+		#region · Static Methods ·
 
 		public static Version ParseServerVersion(string version)
 		{
