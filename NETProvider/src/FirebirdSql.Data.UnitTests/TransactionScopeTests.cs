@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void SimpleSelectTest()
 		{
-			FbConnectionStringBuilder csb = base.BuildConnectionStringBuilder();
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
 
 			csb.Enlist = true;
 
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void InsertTest()
 		{
-			FbConnectionStringBuilder csb = base.BuildConnectionStringBuilder();
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
 
 			csb.Enlist = true;
 

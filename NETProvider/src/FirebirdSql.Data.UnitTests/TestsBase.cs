@@ -30,6 +30,7 @@ using System.Security.Cryptography;
 
 using NUnit.Framework;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Services;
 
 namespace FirebirdSql.Data.UnitTests
 {
@@ -77,7 +78,7 @@ namespace FirebirdSql.Data.UnitTests
 		[SetUp]
 		public virtual void SetUp()
 		{
-			string cs = this.BuildConnectionString();
+			string cs = BuildConnectionString();
 
 			CreateDatabase(cs);
 			CreateTables(cs);
@@ -109,7 +110,7 @@ namespace FirebirdSql.Data.UnitTests
 			}
 			connection.Close();
 
-			string cs = this.BuildConnectionString();
+			string cs = BuildConnectionString();
 			DropDatabase(cs);
 		}
 
@@ -418,55 +419,55 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region	· ConnectionString Building methods ·
 
-		public string BuildConnectionString()
+		public static string BuildConnectionString()
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.UserID		= ConfigurationManager.AppSettings["User"];
-			cs.Password		= ConfigurationManager.AppSettings["Password"];
-			cs.Database		= ConfigurationManager.AppSettings["Database"];
-			cs.DataSource	= ConfigurationManager.AppSettings["DataSource"];
-			cs.Port			= Int32.Parse(ConfigurationManager.AppSettings["Port"]);
-			cs.Charset		= ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling		= false;
-			cs.ServerType	= (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
+			cs.UserID = ConfigurationManager.AppSettings["User"];
+			cs.Password = ConfigurationManager.AppSettings["Password"];
+			cs.Database = ConfigurationManager.AppSettings["Database"];
+			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
+			cs.Port = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
+			cs.Charset = ConfigurationManager.AppSettings["Charset"];
+			cs.Pooling = false;
+			cs.ServerType = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
 
 			return cs.ToString();
 		}
 
-		public string BuildServicesConnectionString()
+		public static string BuildServicesConnectionString()
 		{
-			return this.BuildServicesConnectionString(true);
+			return BuildServicesConnectionString(true);
 		}
 
-		public string BuildServicesConnectionString(bool includeDatabase)
+		public static string BuildServicesConnectionString(bool includeDatabase)
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.DataSource   = ConfigurationManager.AppSettings["DataSource"];
-			cs.UserID       = ConfigurationManager.AppSettings["User"];
-			cs.Password     = ConfigurationManager.AppSettings["Password"];
+			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
+			cs.UserID = ConfigurationManager.AppSettings["User"];
+			cs.Password = ConfigurationManager.AppSettings["Password"];
 			if (includeDatabase)
 			{
 				cs.Database = ConfigurationManager.AppSettings["Database"];
 			}
-			cs.ServerType   = (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
+			cs.ServerType = (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
 
 			return cs.ToString();
 		}
 
-		public FbConnectionStringBuilder BuildConnectionStringBuilder()
+		public static FbConnectionStringBuilder BuildConnectionStringBuilder()
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.UserID       = ConfigurationManager.AppSettings["User"];
-			cs.Password     = ConfigurationManager.AppSettings["Password"];
-			cs.Database     = ConfigurationManager.AppSettings["Database"];
-			cs.DataSource   = ConfigurationManager.AppSettings["DataSource"];
-			cs.Port         = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
-			cs.Charset      = ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling      = false;
-			cs.ServerType   = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
+			cs.UserID = ConfigurationManager.AppSettings["User"];
+			cs.Password = ConfigurationManager.AppSettings["Password"];
+			cs.Database = ConfigurationManager.AppSettings["Database"];
+			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
+			cs.Port = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
+			cs.Charset = ConfigurationManager.AppSettings["Charset"];
+			cs.Pooling = false;
+			cs.ServerType = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
 
 			return cs;
 		}
