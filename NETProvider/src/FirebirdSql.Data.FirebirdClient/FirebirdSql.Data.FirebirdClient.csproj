@@ -327,6 +327,7 @@
 		<Compile Include="Services\FbDatabasesInfo.cs" />
 		<Compile Include="Services\FbDatabaseTraceConfiguration.cs" />
 		<Compile Include="Services\FbDatabaseTraceEvents.cs" />
+		<Compile Include="Services\FbShutdownMode.cs" />
 		<Compile Include="Services\FbShutdownOnlineMode.cs" />
 		<Compile Include="Services\FbStreamingBackup.cs" />
 		<Compile Include="Services\FbStreamingRestore.cs" />

@@ -210,8 +210,19 @@ namespace FirebirdSql.Data.UnitTests
 
 			configurationSvc.ConnectionString = this.BuildServicesConnectionString();
 
-			configurationSvc.DatabaseShutdown(FbShutdownOnlineMode.Full, FbShutdownType.ForceShutdown, 10);
-			configurationSvc.DatabaseOnline(FbShutdownOnlineMode.Normal);
+			configurationSvc.DatabaseShutdown(FbShutdownMode.Forced, 10);
+			configurationSvc.DatabaseOnline();
+		}
+
+		[Test]
+		public void ShutdownOnline2Test()
+		{
+			FbConfiguration configurationSvc = new FbConfiguration();
+
+			configurationSvc.ConnectionString = this.BuildServicesConnectionString();
+
+			configurationSvc.DatabaseShutdown2(FbShutdownOnlineMode.Full, FbShutdownType.ForceShutdown, 10);
+			configurationSvc.DatabaseOnline2(FbShutdownOnlineMode.Normal);
 		}
 
 		[Test]

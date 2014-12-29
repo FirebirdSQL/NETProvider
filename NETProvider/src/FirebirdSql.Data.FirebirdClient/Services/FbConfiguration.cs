@@ -81,7 +81,36 @@ namespace FirebirdSql.Data.Services
 			this.Close();
 		}
 
-		public void DatabaseShutdown(FbShutdownOnlineMode mode, FbShutdownType type, int seconds)
+		public void DatabaseShutdown(FbShutdownMode mode, int seconds)
+		{
+			this.StartSpb = new ServiceParameterBuffer();
+
+			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
+			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+
+			switch (mode)
+			{
+				case FbShutdownMode.Forced:
+					this.StartSpb.Append(IscCodes.isc_spb_prp_shutdown_db, seconds);
+					break;
+
+				case FbShutdownMode.DenyTransaction:
+					this.StartSpb.Append(IscCodes.isc_spb_prp_deny_new_transactions, seconds);
+					break;
+
+				case FbShutdownMode.DenyConnection:
+					this.StartSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
+					break;
+			}
+
+			this.Open();
+
+			this.StartTask();
+
+			this.Close();
+		}
+
+		public void DatabaseShutdown2(FbShutdownOnlineMode mode, FbShutdownType type, int seconds)
 		{
 			this.StartSpb = new ServiceParameterBuffer();
 
@@ -112,7 +141,22 @@ namespace FirebirdSql.Data.Services
 			this.Close();
 		}
 
-		public void DatabaseOnline(FbShutdownOnlineMode mode)
+		public void DatabaseOnline()
+		{
+			this.StartSpb = new ServiceParameterBuffer();
+
+			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
+			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+			this.StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
+
+			this.Open();
+
+			this.StartTask();
+
+			this.Close();
+		}
+
+		public void DatabaseOnline2(FbShutdownOnlineMode mode)
 		{
 			this.StartSpb = new ServiceParameterBuffer();
 
