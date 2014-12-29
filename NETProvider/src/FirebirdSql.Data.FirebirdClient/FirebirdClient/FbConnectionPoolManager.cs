@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					var now = DateTimeOffset.UtcNow;
 					var available = _available.ToArray();
-					var keep = available.Where(x => x.Created.AddSeconds(_connectionString.ConnectionLifeTime) > now).ToArray();
+					var keep = available.Where(x => IsAlive(_connectionString.ConnectionLifeTime, x.Created, now)).ToArray();
 					var keepCount = keep.Count();
 					if (keepCount < _connectionString.MinPoolSize)
 						keep = available.Except(keep).Take(_connectionString.MinPoolSize - keepCount).ToArray();
@@ -154,13 +154,19 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
-
 			static FbConnectionInternal CreateNewConnection(FbConnectionString connectionString, FbConnection owner)
 			{
 				var result = new FbConnectionInternal(connectionString);
 				result.SetOwningConnection(owner);
 				result.Connect();
 				return result;
+			}
+
+			static bool IsAlive(long connectionLifeTime, DateTimeOffset created, DateTimeOffset now)
+			{
+				if (connectionLifeTime == 0)
+					return true;
+				return created.AddSeconds(connectionLifeTime) > now;
 			}
 
 			void CleanConnectionsImpl()
