@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific 
  *	   language governing rights and limitations under the License.
  * 
- *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -20,10 +20,10 @@ using System;
 
 namespace FirebirdSql.Data.Services
 {
-	public enum FbShutdownMode
+	public enum FbShutdownType
 	{
-		Forced,
-		DenyTransaction,
-		DenyConnection
+		ForceShutdown,
+		AttachmentsShutdown,
+		TransactionsShutdown,
 	}
 }

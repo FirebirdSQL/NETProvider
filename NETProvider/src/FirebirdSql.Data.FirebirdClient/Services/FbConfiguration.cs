@@ -13,6 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -80,25 +81,27 @@ namespace FirebirdSql.Data.Services
 			this.Close();
 		}
 
-		public void DatabaseShutdown(FbShutdownMode mode, int seconds)
+		public void DatabaseShutdown(FbShutdownOnlineMode mode, FbShutdownType type, int seconds)
 		{
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
 
-			switch (mode)
+			this.StartSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
+
+			switch (type)
 			{
-				case FbShutdownMode.Forced:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_shutdown_db, seconds);
+				case FbShutdownType.ForceShutdown:
+					this.StartSpb.Append(IscCodes.isc_spb_prp_force_shutdown, seconds);
 					break;
 
-				case FbShutdownMode.DenyTransaction:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_deny_new_transactions, seconds);
+				case FbShutdownType.AttachmentsShutdown:
+					this.StartSpb.Append(IscCodes.isc_spb_prp_attachments_shutdown, seconds);
 					break;
 
-				case FbShutdownMode.DenyConnection:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
+				case FbShutdownType.TransactionsShutdown:
+					this.StartSpb.Append(IscCodes.isc_spb_prp_transactions_shutdown, seconds);
 					break;
 			}
 
@@ -109,13 +112,14 @@ namespace FirebirdSql.Data.Services
 			this.Close();
 		}
 
-		public void DatabaseOnline()
+		public void DatabaseOnline(FbShutdownOnlineMode mode)
 		{
 			this.StartSpb = new ServiceParameterBuffer();
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-			this.StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
+
+			this.StartSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
 
 			this.Open();
 
@@ -206,6 +210,27 @@ namespace FirebirdSql.Data.Services
 			this.StartTask();
 
 			this.Close();
+		}
+
+		#endregion
+
+		#region · Private Methods ·
+
+		byte FbShutdownOnlineModeToIscCode(FbShutdownOnlineMode mode)
+		{
+			switch (mode)
+			{
+				case FbShutdownOnlineMode.Normal:
+					return IscCodes.isc_spb_prp_sm_normal;
+				case FbShutdownOnlineMode.Multi:
+					return IscCodes.isc_spb_prp_sm_multi;
+				case FbShutdownOnlineMode.Single:
+					return IscCodes.isc_spb_prp_sm_single;
+				case FbShutdownOnlineMode.Full:
+					return IscCodes.isc_spb_prp_sm_full;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		#endregion

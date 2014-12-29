@@ -327,6 +327,7 @@
 		<Compile Include="Services\FbDatabasesInfo.cs" />
 		<Compile Include="Services\FbDatabaseTraceConfiguration.cs" />
 		<Compile Include="Services\FbDatabaseTraceEvents.cs" />
+		<Compile Include="Services\FbShutdownOnlineMode.cs" />
 		<Compile Include="Services\FbStreamingBackup.cs" />
 		<Compile Include="Services\FbStreamingRestore.cs" />
 		<Compile Include="Services\FbLog.cs" />
@@ -342,7 +343,7 @@
 		<Compile Include="Services\FbServiceState.cs" />
 		<Compile Include="Services\FbServiceTraceConfiguration.cs" />
 		<Compile Include="Services\FbServiceTraceEvents.cs" />
-		<Compile Include="Services\FbShutdownMode.cs" />
+		<Compile Include="Services\FbShutdownType.cs" />
 		<Compile Include="Services\FbStatistical.cs" />
 		<Compile Include="Services\FbStatisticalFlags.cs" />
 		<Compile Include="Services\FbTrace.cs" />

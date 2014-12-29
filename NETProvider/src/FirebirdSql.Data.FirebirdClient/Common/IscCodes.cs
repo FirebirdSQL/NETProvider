@@ -29,27 +29,27 @@ namespace FirebirdSql.Data.Common
 	{
 		#region General
 
-		public const int SQLDA_VERSION1             = 1;
-		public const int SQL_DIALECT_V5             = 1;
-		public const int SQL_DIALECT_V6_TRANSITION  = 2;
-		public const int SQL_DIALECT_V6             = 3;
-		public const int SQL_DIALECT_CURRENT        = SQL_DIALECT_V6;
-		public const int DSQL_close                 = 1;
-		public const int DSQL_drop                  = 2;
-		public const int ARRAY_DESC_COLUMN_MAJOR    = 1;	/* Set for FORTRAN */
-		public const int ISC_STATUS_LENGTH          = 20;
-		public const ushort INVALID_OBJECT          = 0xFFFF;
+		public const int SQLDA_VERSION1 = 1;
+		public const int SQL_DIALECT_V5 = 1;
+		public const int SQL_DIALECT_V6_TRANSITION = 2;
+		public const int SQL_DIALECT_V6 = 3;
+		public const int SQL_DIALECT_CURRENT = SQL_DIALECT_V6;
+		public const int DSQL_close = 1;
+		public const int DSQL_drop = 2;
+		public const int ARRAY_DESC_COLUMN_MAJOR = 1;	/* Set for FORTRAN */
+		public const int ISC_STATUS_LENGTH = 20;
+		public const ushort INVALID_OBJECT = 0xFFFF;
 
 		#endregion
 
 		#region Buffer sizes
 
-		public const int BUFFER_SIZE_128			= 128;
-		public const int BUFFER_SIZE_256			= 256;
-		public const int DEFAULT_MAX_BUFFER_SIZE	= 8192;
-		public const int ROWS_AFFECTED_BUFFER_SIZE	= 34;
-		public const int STATEMENT_TYPE_BUFFER_SIZE	= 8;
-		public const int PREPARE_INFO_BUFFER_SIZE	= 32768;
+		public const int BUFFER_SIZE_128 = 128;
+		public const int BUFFER_SIZE_256 = 256;
+		public const int DEFAULT_MAX_BUFFER_SIZE = 8192;
+		public const int ROWS_AFFECTED_BUFFER_SIZE = 34;
+		public const int STATEMENT_TYPE_BUFFER_SIZE = 8;
+		public const int PREPARE_INFO_BUFFER_SIZE = 32768;
 
 		#endregion
 
@@ -123,124 +123,124 @@ namespace FirebirdSql.Data.Common
 
 		#region Server Class
 
-		public const int isc_info_db_class_classic_access   = 13;
-		public const int isc_info_db_class_server_access    = 14;
+		public const int isc_info_db_class_classic_access = 13;
+		public const int isc_info_db_class_server_access = 14;
 
 		#endregion
 
 		#region Operation Codes
 
 		// Operation (packet) types
-		public const int op_void            = 0;	// Packet has been voided
-		public const int op_connect         = 1;	// Connect to remote server
-		public const int op_exit            = 2;	// Remote end has exitted
-		public const int op_accept          = 3;	// Server accepts connection
-		public const int op_reject          = 4;	// Server rejects connection
-		public const int op_protocol        = 5;	// Protocol	selection
-		public const int op_disconnect      = 6;	// Connect is going	away
-		public const int op_credit          = 7;	// Grant (buffer) credits
-		public const int op_continuation    = 8;	// Continuation	packet
-		public const int op_response        = 9;	// Generic response	block
+		public const int op_void = 0;	// Packet has been voided
+		public const int op_connect = 1;	// Connect to remote server
+		public const int op_exit = 2;	// Remote end has exitted
+		public const int op_accept = 3;	// Server accepts connection
+		public const int op_reject = 4;	// Server rejects connection
+		public const int op_protocol = 5;	// Protocol	selection
+		public const int op_disconnect = 6;	// Connect is going	away
+		public const int op_credit = 7;	// Grant (buffer) credits
+		public const int op_continuation = 8;	// Continuation	packet
+		public const int op_response = 9;	// Generic response	block
 
 		// Page	server operations
-		public const int op_open_file       = 10;	// Open	file for page service
-		public const int op_create_file     = 11;	// Create file for page	service
-		public const int op_close_file      = 12;	// Close file for page service
-		public const int op_read_page       = 13;	// optionally lock and read	page
-		public const int op_write_page      = 14;	// write page and optionally release lock
-		public const int op_lock            = 15;	// sieze lock
-		public const int op_convert_lock    = 16;	// convert existing	lock
-		public const int op_release_lock    = 17;	// release existing	lock
-		public const int op_blocking        = 18;	// blocking	lock message
+		public const int op_open_file = 10;	// Open	file for page service
+		public const int op_create_file = 11;	// Create file for page	service
+		public const int op_close_file = 12;	// Close file for page service
+		public const int op_read_page = 13;	// optionally lock and read	page
+		public const int op_write_page = 14;	// write page and optionally release lock
+		public const int op_lock = 15;	// sieze lock
+		public const int op_convert_lock = 16;	// convert existing	lock
+		public const int op_release_lock = 17;	// release existing	lock
+		public const int op_blocking = 18;	// blocking	lock message
 
 		// Full	context	server operations
-		public const int op_attach          = 19;	// Attach database
-		public const int op_create          = 20;	// Create database
-		public const int op_detach          = 21;	// Detach database
-		public const int op_compile         = 22;	// Request based operations
-		public const int op_start           = 23;
-		public const int op_start_and_send  = 24;
-		public const int op_send            = 25;
-		public const int op_receive         = 26;
-		public const int op_unwind          = 27;
-		public const int op_release         = 28;
+		public const int op_attach = 19;	// Attach database
+		public const int op_create = 20;	// Create database
+		public const int op_detach = 21;	// Detach database
+		public const int op_compile = 22;	// Request based operations
+		public const int op_start = 23;
+		public const int op_start_and_send = 24;
+		public const int op_send = 25;
+		public const int op_receive = 26;
+		public const int op_unwind = 27;
+		public const int op_release = 28;
 
-		public const int op_transaction     = 29;	// Transaction operations
-		public const int op_commit          = 30;
-		public const int op_rollback        = 31;
-		public const int op_prepare         = 32;
-		public const int op_reconnect       = 33;
+		public const int op_transaction = 29;	// Transaction operations
+		public const int op_commit = 30;
+		public const int op_rollback = 31;
+		public const int op_prepare = 32;
+		public const int op_reconnect = 33;
 
-		public const int op_create_blob     = 34;	// Blob	operations //
-		public const int op_open_blob       = 35;
-		public const int op_get_segment     = 36;
-		public const int op_put_segment     = 37;
-		public const int op_cancel_blob     = 38;
-		public const int op_close_blob      = 39;
+		public const int op_create_blob = 34;	// Blob	operations //
+		public const int op_open_blob = 35;
+		public const int op_get_segment = 36;
+		public const int op_put_segment = 37;
+		public const int op_cancel_blob = 38;
+		public const int op_close_blob = 39;
 
-		public const int op_info_database   = 40;	// Information services
-		public const int op_info_request    = 41;
+		public const int op_info_database = 40;	// Information services
+		public const int op_info_request = 41;
 		public const int op_info_transaction = 42;
-		public const int op_info_blob       = 43;
+		public const int op_info_blob = 43;
 
-		public const int op_batch_segments  = 44;	// Put a bunch of blob segments
+		public const int op_batch_segments = 44;	// Put a bunch of blob segments
 
-		public const int op_mgr_set_affinity    = 45;	// Establish server	affinity
-		public const int op_mgr_clear_affinity  = 46;	// Break server	affinity
-		public const int op_mgr_report          = 47;	// Report on server
+		public const int op_mgr_set_affinity = 45;	// Establish server	affinity
+		public const int op_mgr_clear_affinity = 46;	// Break server	affinity
+		public const int op_mgr_report = 47;	// Report on server
 
-		public const int op_que_events          = 48;	// Que event notification request
-		public const int op_cancel_events       = 49;	// Cancel event	notification request
-		public const int op_commit_retaining    = 50;	// Commit retaining	(what else)
-		public const int op_prepare2            = 51;	// Message form	of prepare
-		public const int op_event               = 52;	// Completed event request (asynchronous)
-		public const int op_connect_request     = 53;	// Request to establish	connection
-		public const int op_aux_connect         = 54;	// Establish auxiliary connection
-		public const int op_ddl                 = 55;	// DDL call
-		public const int op_open_blob2          = 56;
-		public const int op_create_blob2        = 57;
-		public const int op_get_slice           = 58;
-		public const int op_put_slice           = 59;
-		public const int op_slice               = 60;	// Successful response to public const int op_get_slice
-		public const int op_seek_blob           = 61;	// Blob	seek operation
+		public const int op_que_events = 48;	// Que event notification request
+		public const int op_cancel_events = 49;	// Cancel event	notification request
+		public const int op_commit_retaining = 50;	// Commit retaining	(what else)
+		public const int op_prepare2 = 51;	// Message form	of prepare
+		public const int op_event = 52;	// Completed event request (asynchronous)
+		public const int op_connect_request = 53;	// Request to establish	connection
+		public const int op_aux_connect = 54;	// Establish auxiliary connection
+		public const int op_ddl = 55;	// DDL call
+		public const int op_open_blob2 = 56;
+		public const int op_create_blob2 = 57;
+		public const int op_get_slice = 58;
+		public const int op_put_slice = 59;
+		public const int op_slice = 60;	// Successful response to public const int op_get_slice
+		public const int op_seek_blob = 61;	// Blob	seek operation
 
 		// DSQL	operations //
-		public const int op_allocate_statement  = 62;	// allocate	a statment handle
-		public const int op_execute             = 63;	// execute a prepared statement
-		public const int op_exec_immediate      = 64;	// execute a statement
-		public const int op_fetch               = 65;	// fetch a record
-		public const int op_fetch_response      = 66;	// response	for	record fetch
-		public const int op_free_statement      = 67;	// free	a statement
-		public const int op_prepare_statement   = 68;	// prepare a statement
-		public const int op_set_cursor          = 69;	// set a cursor	name
-		public const int op_info_sql            = 70;
-		public const int op_dummy               = 71;	// dummy packet	to detect loss of client
-		public const int op_response_piggyback  = 72;	// response	block for piggybacked messages
-		public const int op_start_and_receive   = 73;
+		public const int op_allocate_statement = 62;	// allocate	a statment handle
+		public const int op_execute = 63;	// execute a prepared statement
+		public const int op_exec_immediate = 64;	// execute a statement
+		public const int op_fetch = 65;	// fetch a record
+		public const int op_fetch_response = 66;	// response	for	record fetch
+		public const int op_free_statement = 67;	// free	a statement
+		public const int op_prepare_statement = 68;	// prepare a statement
+		public const int op_set_cursor = 69;	// set a cursor	name
+		public const int op_info_sql = 70;
+		public const int op_dummy = 71;	// dummy packet	to detect loss of client
+		public const int op_response_piggyback = 72;	// response	block for piggybacked messages
+		public const int op_start_and_receive = 73;
 		public const int op_start_send_and_receive = 74;
 
-		public const int op_exec_immediate2     = 75;	// execute an immediate	statement with msgs
-		public const int op_execute2            = 76;	// execute a statement with	msgs
-		public const int op_insert              = 77;
-		public const int op_sql_response        = 78;	// response	from execute; exec immed; insert
-		public const int op_transact            = 79;
-		public const int op_transact_response   = 80;
-		public const int op_drop_database       = 81;
-		public const int op_service_attach      = 82;
-		public const int op_service_detach      = 83;
-		public const int op_service_info        = 84;
-		public const int op_service_start       = 85;
-		public const int op_rollback_retaining  = 86;
+		public const int op_exec_immediate2 = 75;	// execute an immediate	statement with msgs
+		public const int op_execute2 = 76;	// execute a statement with	msgs
+		public const int op_insert = 77;
+		public const int op_sql_response = 78;	// response	from execute; exec immed; insert
+		public const int op_transact = 79;
+		public const int op_transact_response = 80;
+		public const int op_drop_database = 81;
+		public const int op_service_attach = 82;
+		public const int op_service_detach = 83;
+		public const int op_service_info = 84;
+		public const int op_service_start = 85;
+		public const int op_rollback_retaining = 86;
 
 		// Two following opcode are used in vulcan.
 		// No plans to implement them completely for a while, but to 
 		// support protocol 11, where they are used, have them here.
 		public const int op_update_account_info = 87;
-		public const int op_authenticate_user	= 88;
+		public const int op_authenticate_user = 88;
 
-		public const int op_partial				= 89;	// packet is not complete - delay processing
-		public const int op_trusted_auth		= 90;
-		public const int op_cancel				= 91;
+		public const int op_partial = 89;	// packet is not complete - delay processing
+		public const int op_trusted_auth = 90;
+		public const int op_cancel = 91;
 
 		#endregion
 
@@ -433,6 +433,21 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_prp_access_mode = 13;
 		public const int isc_spb_prp_set_sql_dialect = 14;
 
+		public const int isc_spb_prp_force_shutdown = 41;
+		public const int isc_spb_prp_attachments_shutdown = 42;
+		public const int isc_spb_prp_transactions_shutdown = 43;
+		public const int isc_spb_prp_shutdown_mode = 44;
+		public const int isc_spb_prp_online_mode = 45;
+
+		public const int isc_spb_prp_sm_normal = 0;
+		public const int isc_spb_prp_sm_multi = 1;
+		public const int isc_spb_prp_sm_single = 2;
+		public const int isc_spb_prp_sm_full = 3;
+
+		// RESERVE_SPACE_PARAMETERS
+		public const int isc_spb_prp_res_use_full = 35;
+		public const int isc_spb_prp_res = 36;
+
 		// WRITE_MODE_PARAMETERS
 		public const int isc_spb_prp_wm_async = 37;
 		public const int isc_spb_prp_wm_sync = 38;
@@ -440,10 +455,6 @@ namespace FirebirdSql.Data.Common
 		// ACCESS_MODE_PARAMETERS
 		public const int isc_spb_prp_am_readonly = 39;
 		public const int isc_spb_prp_am_readwrite = 40;
-
-		// RESERVE_SPACE_PARAMETERS
-		public const int isc_spb_prp_res_use_full = 35;
-		public const int isc_spb_prp_res = 36;
 
 		// Option Flags		
 		public const int isc_spb_prp_activate = 0x0100;
@@ -519,7 +530,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_trc_id = 1;
 		public const int isc_spb_trc_name = 2;
 		public const int isc_spb_trc_cfg = 3;
-		
+
 		#endregion
 
 		#region Configuration Keys
@@ -802,128 +813,128 @@ namespace FirebirdSql.Data.Common
 
 		#region ISC Error codes
 
-		public const int isc_facility       = 20;
-		public const int isc_err_base       = 335544320;
-		public const int isc_err_factor     = 1;
-		public const int isc_arg_end        = 0;    // end of argument list
-		public const int isc_arg_gds        = 1;    // generic DSRI	status value
-		public const int isc_arg_string     = 2;	// string argument
-		public const int isc_arg_cstring    = 3;	// count & string argument
-		public const int isc_arg_number     = 4;	// numeric argument	(long)
+		public const int isc_facility = 20;
+		public const int isc_err_base = 335544320;
+		public const int isc_err_factor = 1;
+		public const int isc_arg_end = 0;    // end of argument list
+		public const int isc_arg_gds = 1;    // generic DSRI	status value
+		public const int isc_arg_string = 2;	// string argument
+		public const int isc_arg_cstring = 3;	// count & string argument
+		public const int isc_arg_number = 4;	// numeric argument	(long)
 		public const int isc_arg_interpreted = 5;	// interpreted status code (string)
-		public const int isc_arg_vms        = 6;	// VAX/VMS status code (long)
-		public const int isc_arg_unix       = 7;	// UNIX	error code
-		public const int isc_arg_domain     = 8;	// Apollo/Domain error code
-		public const int isc_arg_dos        = 9;	// MSDOS/OS2 error code
-		public const int isc_arg_mpexl      = 10;	// HP MPE/XL error code
-		public const int isc_arg_mpexl_ipc  = 11;	// HP MPE/XL IPC error code
-		public const int isc_arg_next_mach  = 15;	// NeXT/Mach error code
-		public const int isc_arg_netware    = 16;	// NetWare error code
-		public const int isc_arg_win32      = 17;	// Win32 error code
-		public const int isc_arg_warning    = 18;	// warning argument
-		public const int isc_arg_sql_state  = 19;	// SQLSTATE
+		public const int isc_arg_vms = 6;	// VAX/VMS status code (long)
+		public const int isc_arg_unix = 7;	// UNIX	error code
+		public const int isc_arg_domain = 8;	// Apollo/Domain error code
+		public const int isc_arg_dos = 9;	// MSDOS/OS2 error code
+		public const int isc_arg_mpexl = 10;	// HP MPE/XL error code
+		public const int isc_arg_mpexl_ipc = 11;	// HP MPE/XL IPC error code
+		public const int isc_arg_next_mach = 15;	// NeXT/Mach error code
+		public const int isc_arg_netware = 16;	// NetWare error code
+		public const int isc_arg_win32 = 17;	// Win32 error code
+		public const int isc_arg_warning = 18;	// warning argument
+		public const int isc_arg_sql_state = 19;	// SQLSTATE
 
-		public const int isc_open_trans			= 335544357;
-		public const int isc_segment			= 335544366;
-		public const int isc_segstr_eof			= 335544367;
-		public const int isc_connect_reject		= 335544421;
-		public const int isc_invalid_dimension	= 335544458;
-		public const int isc_tra_state			= 335544468;
-		public const int isc_except				= 335544517;
-		public const int isc_dsql_sqlda_err		= 335544583;
-		public const int isc_network_error		= 335544721;
-		public const int isc_net_read_err		= 335544726;
-		public const int isc_net_write_err		= 335544727;
-		public const int isc_stack_trace		= 335544842;
-		public const int isc_except2			= 335544848;
-		public const int isc_arith_except		= 335544321;
-		public const int isc_string_truncation	= 335544914;
+		public const int isc_open_trans = 335544357;
+		public const int isc_segment = 335544366;
+		public const int isc_segstr_eof = 335544367;
+		public const int isc_connect_reject = 335544421;
+		public const int isc_invalid_dimension = 335544458;
+		public const int isc_tra_state = 335544468;
+		public const int isc_except = 335544517;
+		public const int isc_dsql_sqlda_err = 335544583;
+		public const int isc_network_error = 335544721;
+		public const int isc_net_read_err = 335544726;
+		public const int isc_net_write_err = 335544727;
+		public const int isc_stack_trace = 335544842;
+		public const int isc_except2 = 335544848;
+		public const int isc_arith_except = 335544321;
+		public const int isc_string_truncation = 335544914;
 
 		#endregion
 
 		#region BLR Codes
 
-		public const int blr_version5   = 5;
-		public const int blr_begin      = 2;
-		public const int blr_message    = 4;
-		public const int blr_eoc        = 76;
-		public const int blr_end        = 255;
+		public const int blr_version5 = 5;
+		public const int blr_begin = 2;
+		public const int blr_message = 4;
+		public const int blr_eoc = 76;
+		public const int blr_end = 255;
 
-		public const int blr_text       = 14;
-		public const int blr_text2      = 15;
-		public const int blr_short      = 7;
-		public const int blr_long       = 8;
-		public const int blr_quad       = 9;
-		public const int blr_int64      = 16;
-		public const int blr_float      = 10;
-		public const int blr_double     = 27;
-		public const int blr_d_float    = 11;
-		public const int blr_timestamp  = 35;
-		public const int blr_varying    = 37;
-		public const int blr_varying2   = 38;
-		public const int blr_blob       = 261;
-		public const int blr_cstring    = 40;
-		public const int blr_cstring2   = 41;
-		public const int blr_blob_id    = 45;
-		public const int blr_sql_date   = 12;
-		public const int blr_sql_time   = 13;
+		public const int blr_text = 14;
+		public const int blr_text2 = 15;
+		public const int blr_short = 7;
+		public const int blr_long = 8;
+		public const int blr_quad = 9;
+		public const int blr_int64 = 16;
+		public const int blr_float = 10;
+		public const int blr_double = 27;
+		public const int blr_d_float = 11;
+		public const int blr_timestamp = 35;
+		public const int blr_varying = 37;
+		public const int blr_varying2 = 38;
+		public const int blr_blob = 261;
+		public const int blr_cstring = 40;
+		public const int blr_cstring2 = 41;
+		public const int blr_blob_id = 45;
+		public const int blr_sql_date = 12;
+		public const int blr_sql_time = 13;
 
-		public const int blr_null       = 45;
+		public const int blr_null = 45;
 
 		#endregion
 
 		#region DataType Definitions
 
-		public const int SQL_TEXT       = 452;
-		public const int SQL_VARYING    = 448;
-		public const int SQL_SHORT      = 500;
-		public const int SQL_LONG       = 496;
-		public const int SQL_FLOAT      = 482;
-		public const int SQL_DOUBLE     = 480;
-		public const int SQL_D_FLOAT    = 530;
-		public const int SQL_TIMESTAMP  = 510;
-		public const int SQL_BLOB       = 520;
-		public const int SQL_ARRAY      = 540;
-		public const int SQL_QUAD       = 550;
-		public const int SQL_TYPE_TIME  = 560;
-		public const int SQL_TYPE_DATE  = 570;
-		public const int SQL_INT64      = 580;
-		public const int SQL_NULL       = 32766;
+		public const int SQL_TEXT = 452;
+		public const int SQL_VARYING = 448;
+		public const int SQL_SHORT = 500;
+		public const int SQL_LONG = 496;
+		public const int SQL_FLOAT = 482;
+		public const int SQL_DOUBLE = 480;
+		public const int SQL_D_FLOAT = 530;
+		public const int SQL_TIMESTAMP = 510;
+		public const int SQL_BLOB = 520;
+		public const int SQL_ARRAY = 540;
+		public const int SQL_QUAD = 550;
+		public const int SQL_TYPE_TIME = 560;
+		public const int SQL_TYPE_DATE = 570;
+		public const int SQL_INT64 = 580;
+		public const int SQL_NULL = 32766;
 
 		// Historical alias	for	pre	V6 applications
-		public const int SQL_DATE       = SQL_TIMESTAMP;
+		public const int SQL_DATE = SQL_TIMESTAMP;
 
 		#endregion
 
 		#region DSC Types
 
-		public const int DSC_null           = 1;
-		public const int dtype_text         = 1;
-		public const int dtype_cstring      = 2;
-		public const int dtype_varying      = 3;
-		public const int dtype_packed       = 6;
-		public const int dtype_byte         = 7;
-		public const int dtype_short        = 8;
-		public const int dtype_long         = 9;
-		public const int dtype_quad         = 10;
-		public const int dtype_real         = 11;
-		public const int dtype_double       = 12;
-		public const int dtype_d_float      = 13;
-		public const int dtype_sql_date     = 14;
-		public const int dtype_sql_time     = 15;
-		public const int dtype_timestamp    = 16;
-		public const int dtype_blob         = 17;
-		public const int dtype_array        = 18;
-		public const int dtype_int64        = 19;
-		public const int DTYPE_TYPE_MAX     = 20;
+		public const int DSC_null = 1;
+		public const int dtype_text = 1;
+		public const int dtype_cstring = 2;
+		public const int dtype_varying = 3;
+		public const int dtype_packed = 6;
+		public const int dtype_byte = 7;
+		public const int dtype_short = 8;
+		public const int dtype_long = 9;
+		public const int dtype_quad = 10;
+		public const int dtype_real = 11;
+		public const int dtype_double = 12;
+		public const int dtype_d_float = 13;
+		public const int dtype_sql_date = 14;
+		public const int dtype_sql_time = 15;
+		public const int dtype_timestamp = 16;
+		public const int dtype_blob = 17;
+		public const int dtype_array = 18;
+		public const int dtype_int64 = 19;
+		public const int DTYPE_TYPE_MAX = 20;
 
 		#endregion
 
 		#region Cancel types
-		public const int fb_cancel_disable	= 1;
-		public const int fb_cancel_enable	= 2;
-		public const int fb_cancel_raise	= 3;
-		public const int fb_cancel_abort	= 4;
+		public const int fb_cancel_disable = 1;
+		public const int fb_cancel_enable = 2;
+		public const int fb_cancel_raise = 3;
+		public const int fb_cancel_abort = 4;
 		#endregion
 	}
 }
