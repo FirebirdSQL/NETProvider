@@ -67,6 +67,7 @@ namespace FirebirdSql.Data.EntityFramework6
 #if (EF_6)
 			AddDependencyResolver(new SingletonDependencyResolver<IDbConnectionFactory>(new FbConnectionFactory()));
 			AddDependencyResolver(new SingletonDependencyResolver<Func<MigrationSqlGenerator>>(() => new FbMigrationSqlGenerator(), ProviderInvariantName));
+			DbInterception.Add(new FbMigrationsTransactionsInterceptor());
 #endif
 		}
 

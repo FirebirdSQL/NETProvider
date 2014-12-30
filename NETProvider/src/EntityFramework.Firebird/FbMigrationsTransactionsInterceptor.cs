@@ -23,16 +23,18 @@ using System.Data.Common;
 using System.Data.Entity.Infrastructure.Interception;
 using System.Diagnostics;
 using System.Linq;
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.EntityFramework6
 {
 	// Migrations are executed in Serializable transaction. Because of my "AUTONOMOUS TRANSACTION" usage
 	// I better use ReadCommitted. Here I plug in, in case of Migrations.
-	class MigrationsTransactionsInterceptor : IDbConnectionInterceptor
+	class FbMigrationsTransactionsInterceptor : IDbConnectionInterceptor
 	{
 		public void BeginningTransaction(DbConnection connection, BeginTransactionInterceptionContext interceptionContext)
 		{
-			if (interceptionContext.IsolationLevel == IsolationLevel.Serializable
+			if (connection is FbConnection
+				&& interceptionContext.IsolationLevel == IsolationLevel.Serializable
 				&& IsInMigrations())
 			{
 				interceptionContext.Result = connection.BeginTransaction(IsolationLevel.ReadCommitted);
