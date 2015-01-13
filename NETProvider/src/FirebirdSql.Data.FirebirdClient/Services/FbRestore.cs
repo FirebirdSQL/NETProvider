@@ -72,7 +72,6 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				// Configure Spb
 				this.StartSpb = new ServiceParameterBuffer();
 
 				this.StartSpb.Append(IscCodes.isc_action_svc_restore);
@@ -97,7 +96,6 @@ namespace FirebirdSql.Data.Services
 
 				this.Open();
 
-				// Start execution
 				this.StartTask();
 
 				if (this.Verbose)
