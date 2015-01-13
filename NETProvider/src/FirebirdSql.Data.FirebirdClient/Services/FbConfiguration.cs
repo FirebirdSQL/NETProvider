@@ -239,15 +239,7 @@ namespace FirebirdSql.Data.Services
 
 			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
 			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-
-			if (readOnly)
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)IscCodes.isc_spb_prp_am_readonly);
-			}
-			else
-			{
-				this.StartSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)IscCodes.isc_spb_prp_am_readwrite);
-			}
+			this.StartSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
 
 			this.Open();
 
