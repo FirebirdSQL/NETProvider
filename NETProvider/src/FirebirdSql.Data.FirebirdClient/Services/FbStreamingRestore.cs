@@ -130,13 +130,13 @@ namespace FirebirdSql.Data.Services
 			return true;
 		}
 
-		int GetLength(ArrayList items)
+		static int GetLength(ArrayList items)
 		{
 			const int maxLength = (32 * 1024) - 4;
 			return Math.Min(items[0] is int ? (int)items[0] : 0, maxLength);
 		}
 
-		string GetMessage(ArrayList items)
+		static string GetMessage(ArrayList items)
 		{
 			if (items[0] is string)
 				return (string)items[0];
