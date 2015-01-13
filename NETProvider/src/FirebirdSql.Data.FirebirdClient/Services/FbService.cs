@@ -109,7 +109,7 @@ namespace FirebirdSql.Data.Services
 		protected FbService(string connectionString = null)
 		{
 			this.state = FbServiceState.Closed;
-			this.connectionString = connectionString ?? string.Empty;
+			this.ConnectionString = connectionString;
 			this.serviceName = "service_mgr";
 			this.queryBufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
 		}
@@ -226,7 +226,7 @@ namespace FirebirdSql.Data.Services
 					if (!truncated)
 					{
 						result.Add(stringItem);
-			}
+					}
 					else
 					{
 						var lastValue = result[result.Count - 1] as string;
@@ -237,11 +237,11 @@ namespace FirebirdSql.Data.Services
 
 				var byteArrayItem = item as byte[];
 				if (byteArrayItem != null)
-			{
+				{
 					if (!truncated)
 					{
 						result.Add(byteArrayItem);
-			}
+					}
 					else
 					{
 						var lastValue = result[result.Count - 1] as byte[];
@@ -258,19 +258,19 @@ namespace FirebirdSql.Data.Services
 		}
 
 		protected void Query(byte[] items, Action<bool, object> resultAction)
-			{
+		{
 			this.ProcessQuery(items, resultAction);
-			}
+		}
 
 		protected void ProcessServiceOutput()
-			{
+		{
 			string line;
 
 			while ((line = this.GetNextLine()) != null)
-				{
+			{
 				WriteServiceOutputChecked(line);
-				}
 			}
+		}
 
 		protected string GetNextLine()
 		{
@@ -310,12 +310,12 @@ namespace FirebirdSql.Data.Services
 					continue;
 				}
 
-					switch (type)
-					{
-						case IscCodes.isc_info_svc_version:
-						case IscCodes.isc_info_svc_get_license_mask:
-						case IscCodes.isc_info_svc_capabilities:
-						case IscCodes.isc_info_svc_get_licensed_users:
+				switch (type)
+				{
+					case IscCodes.isc_info_svc_version:
+					case IscCodes.isc_info_svc_get_license_mask:
+					case IscCodes.isc_info_svc_capabilities:
+					case IscCodes.isc_info_svc_get_licensed_users:
 						{
 							var length = GetLength(buffer, 2, ref pos);
 							if (length == 0)
@@ -326,13 +326,13 @@ namespace FirebirdSql.Data.Services
 							break;
 						}
 
-						case IscCodes.isc_info_svc_server_version:
-						case IscCodes.isc_info_svc_implementation:
-						case IscCodes.isc_info_svc_get_env:
-						case IscCodes.isc_info_svc_get_env_lock:
-						case IscCodes.isc_info_svc_get_env_msg:
-						case IscCodes.isc_info_svc_user_dbpath:
-						case IscCodes.isc_info_svc_line:
+					case IscCodes.isc_info_svc_server_version:
+					case IscCodes.isc_info_svc_implementation:
+					case IscCodes.isc_info_svc_get_env:
+					case IscCodes.isc_info_svc_get_env_lock:
+					case IscCodes.isc_info_svc_get_env_msg:
+					case IscCodes.isc_info_svc_user_dbpath:
+					case IscCodes.isc_info_svc_line:
 						{
 							var length = GetLength(buffer, 2, ref pos);
 							if (length == 0)
@@ -342,7 +342,7 @@ namespace FirebirdSql.Data.Services
 							truncated = false;
 							break;
 						}
-						case IscCodes.isc_info_svc_to_eof:
+					case IscCodes.isc_info_svc_to_eof:
 						{
 							var length = GetLength(buffer, 2, ref pos);
 							if (length == 0)
@@ -355,7 +355,7 @@ namespace FirebirdSql.Data.Services
 							break;
 						}
 
-						case IscCodes.isc_info_svc_svr_db_info:
+					case IscCodes.isc_info_svc_svr_db_info:
 						{
 							var length = GetLength(buffer, 2, ref pos);
 							if (length == 0)
@@ -365,7 +365,7 @@ namespace FirebirdSql.Data.Services
 							break;
 						}
 
-						case IscCodes.isc_info_svc_get_users:
+					case IscCodes.isc_info_svc_get_users:
 						{
 							var length = GetLength(buffer, 2, ref pos);
 							if (length == 0)
@@ -375,7 +375,7 @@ namespace FirebirdSql.Data.Services
 							break;
 						}
 
-						case IscCodes.isc_info_svc_get_config:
+					case IscCodes.isc_info_svc_get_config:
 						{
 							var length = GetLength(buffer, 2, ref pos);
 							if (length == 0)
@@ -383,16 +383,16 @@ namespace FirebirdSql.Data.Services
 							queryResponseAction(truncated, ParseServerConfig(buffer, ref pos));
 							truncated = false;
 							break;
-					}
+						}
 
 					case IscCodes.isc_info_svc_stdin:
 						{
 							var length = GetLength(buffer, 4, ref pos);
 							queryResponseAction(truncated, length);
 							break;
+						}
 				}
 			}
-		}
 		}
 
 		private byte[] QueryService(byte[] items)
@@ -411,7 +411,7 @@ namespace FirebirdSql.Data.Services
 			}
 
 			try
-		{
+			{
 				// Response	buffer
 				byte[] buffer = new byte[this.queryBufferSize];
 				this.svc.Query(this.QuerySpb, items.Length, items, buffer.Length, buffer);
