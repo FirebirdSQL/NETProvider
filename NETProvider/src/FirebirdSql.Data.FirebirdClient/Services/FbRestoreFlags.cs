@@ -13,6 +13,7 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -26,12 +27,13 @@ namespace FirebirdSql.Data.Services
 	[Flags]
 	public enum FbRestoreFlags
 	{
-		DeactivateIndexes	= 0x0100,
-		NoShadow			= 0x0200,
-		NoValidity			= 0x0400,
-		IndividualCommit	= 0x0800,
-		Replace				= 0x1000,
-		Create				= 0x2000,
-		UseAllSpace			= 0x4000
+		DeactivateIndexes = IscCodes.isc_spb_res_deactivate_idx,
+		NoShadow = IscCodes.isc_spb_res_no_shadow,
+		NoValidity = IscCodes.isc_spb_res_no_validity,
+		IndividualCommit = IscCodes.isc_spb_res_one_at_a_time,
+		Replace = IscCodes.isc_spb_res_replace,
+		Create = IscCodes.isc_spb_res_create,
+		UseAllSpace = IscCodes.isc_spb_res_use_all_space,
+		MetaDataOnly = IscCodes.isc_spb_res_metadata_only,
 	}
 }
