@@ -95,26 +95,23 @@ namespace FirebirdSql.Data.Services
 			var items = Verbose
 				? new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line }
 				: new byte[] { IscCodes.isc_info_svc_stdin };
+			var readAheadBuffer = new List<byte>(32 * 1024);
+			ReadAheadBuffering(readAheadBuffer, InputStream, 0);
 			var response = Query(items);
 			var length = GetLength(response);
 			while (true)
 			{
 				if (length > 0)
 				{
-					var buffer = new byte[length];
-					var read = InputStream.Read(buffer, 0, length);
-					if (read != 0)
-					{
-						Array.Resize(ref buffer, read);
-						var spb = new ServiceParameterBuffer();
-						spb.Append(IscCodes.isc_info_svc_line, buffer);
-						QuerySpb = spb;
-					}
+					var data = ReadAheadBuffering(readAheadBuffer, InputStream, length);
+					var spb = new ServiceParameterBuffer();
+					spb.Append(IscCodes.isc_info_svc_line, data);
+					QuerySpb = spb;
 				}
 				response = Query(items);
 				QuerySpb = null;
 				length = GetLength(response);
-				if (length == 0 && !ProcessMessages(response))
+				if (!readAheadBuffer.Any() && !ProcessMessages(response))
 				{
 					break;
 				}
@@ -143,6 +140,24 @@ namespace FirebirdSql.Data.Services
 			if (items.Count > 1)
 				return (string)items[1];
 			return null;
+		}
+
+		static byte[] ReadAheadBuffering(List<byte> readAheadBuffer, Stream stream, int length)
+		{
+			if (readAheadBuffer.Count < readAheadBuffer.Capacity)
+			{
+				var buffer = new byte[readAheadBuffer.Capacity - readAheadBuffer.Count];
+				var read = stream.Read(buffer, 0, buffer.Length);
+				if (read != 0)
+				{
+					Array.Resize(ref buffer, read);
+					readAheadBuffer.AddRange(buffer);
+				}
+			}
+			var result = new byte[Math.Min(length, readAheadBuffer.Count)];
+			readAheadBuffer.CopyTo(0, result, 0, result.Length);
+			readAheadBuffer.RemoveRange(0, result.Length);
+			return result;
 		}
 	}
 }
