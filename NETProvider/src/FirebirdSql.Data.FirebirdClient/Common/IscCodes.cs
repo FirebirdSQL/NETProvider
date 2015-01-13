@@ -13,10 +13,8 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *	
- *  Contributors:
- *      Jiri Cincura (jiri@cincura.net)
  * 
  *	This file was originally ported	from Jaybird
  */
@@ -468,6 +466,16 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_bkp_factor = 6;
 		public const int isc_spb_bkp_length = 7;
 
+		public const int isc_spb_bkp_ignore_checksums = 0x01;
+		public const int isc_spb_bkp_ignore_limbo = 0x02;
+		public const int isc_spb_bkp_metadata_only = 0x04;
+		public const int isc_spb_bkp_no_garbage_collect = 0x08;
+		public const int isc_spb_bkp_old_descriptions = 0x10;
+		public const int isc_spb_bkp_non_transportable = 0x20;
+		public const int isc_spb_bkp_convert = 0x40;
+		public const int isc_spb_bkp_expand = 0x80;
+		public const int isc_spb_bkp_no_triggers = 0x8000;
+
 		#endregion
 
 		#region Restore Service
@@ -476,6 +484,15 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_res_page_size = 10;
 		public const int isc_spb_res_length = 11;
 		public const int isc_spb_res_access_mode = 12;
+
+		public const int isc_spb_res_metadata_only = isc_spb_bkp_metadata_only;
+		public const int isc_spb_res_deactivate_idx = 0x0100;
+		public const int isc_spb_res_no_shadow = 0x0200;
+		public const int isc_spb_res_no_validity = 0x0400;
+		public const int isc_spb_res_one_at_a_time = 0x0800;
+		public const int isc_spb_res_replace = 0x1000;
+		public const int isc_spb_res_create = 0x2000;
+		public const int isc_spb_res_use_all_space = 0x4000;
 
 		public const int isc_spb_res_am_readonly = isc_spb_prp_am_readonly;
 		public const int isc_spb_res_am_readwrite = isc_spb_prp_am_readwrite;
