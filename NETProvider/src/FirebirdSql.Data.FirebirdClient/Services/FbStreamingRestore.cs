@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Services
 			var items = Verbose
 				? new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line }
 				: new byte[] { IscCodes.isc_info_svc_stdin };
-			var readAheadBuffer = new List<byte>(32 * 1024);
+			var readAheadBuffer = new List<byte>((32 * 1024) + 1);
 			ReadAheadBuffering(readAheadBuffer, InputStream, 0);
 			var response = Query(items);
 			var length = GetLength(response);
@@ -111,7 +111,8 @@ namespace FirebirdSql.Data.Services
 				response = Query(items);
 				QuerySpb = null;
 				length = GetLength(response);
-				if (!readAheadBuffer.Any() && !ProcessMessages(response))
+				var messages = ProcessMessages(response);
+				if (!readAheadBuffer.Any() && !messages)
 				{
 					break;
 				}
@@ -144,6 +145,7 @@ namespace FirebirdSql.Data.Services
 
 		static byte[] ReadAheadBuffering(List<byte> readAheadBuffer, Stream stream, int length)
 		{
+			var giveLast = false;
 			if (readAheadBuffer.Count < readAheadBuffer.Capacity)
 			{
 				var buffer = new byte[readAheadBuffer.Capacity - readAheadBuffer.Count];
@@ -153,8 +155,12 @@ namespace FirebirdSql.Data.Services
 					Array.Resize(ref buffer, read);
 					readAheadBuffer.AddRange(buffer);
 				}
+				else
+				{
+					giveLast = true;
+				}
 			}
-			var result = new byte[Math.Min(length, readAheadBuffer.Count)];
+			var result = new byte[Math.Min(length, readAheadBuffer.Count - (giveLast ? 0 : 1))];
 			readAheadBuffer.CopyTo(0, result, 0, result.Length);
 			readAheadBuffer.RemoveRange(0, result.Length);
 			return result;
