@@ -48,6 +48,7 @@ namespace FirebirdSql.Data.Services
 		public Stream InputStream { get; set; }
 		public bool Verbose { get; set; }
 		public int? PageBuffers { get; set; }
+		public bool ReadOnly { get; set; }
 		public FbRestoreFlags Options { get; set; }
 
 		public FbStreamingRestore(string connectionString = null)
@@ -70,6 +71,7 @@ namespace FirebirdSql.Data.Services
 					StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
 				if (pageSize.HasValue)
 					StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)pageSize);
+				this.StartSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(this.ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
