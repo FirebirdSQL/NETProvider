@@ -117,6 +117,9 @@ namespace FirebirdSql.Data.Services
 					break;
 				}
 			}
+			while (Query(new byte[] { IscCodes.isc_info_svc_line }).Count != 0)
+			{ }
+
 		}
 
 		bool ProcessMessages(ArrayList items)
