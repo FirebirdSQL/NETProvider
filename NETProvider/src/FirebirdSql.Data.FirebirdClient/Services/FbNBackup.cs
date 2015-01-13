@@ -43,10 +43,9 @@ namespace FirebirdSql.Data.Services
 		#endregion
 
 		#region Constructors
-		public FbNBackup()
-			: base()
-		{
-		}
+		public FbNBackup(string connectionString = null)
+			: base(connectionString)
+		{ }
 		#endregion
 
 		#region Methods

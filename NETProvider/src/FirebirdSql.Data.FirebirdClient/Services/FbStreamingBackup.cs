@@ -32,6 +32,10 @@ namespace FirebirdSql.Data.Services
 		public FbBackupFlags Options { get; set; }
 		public Stream OutputStream { get; set; }
 
+		public FbStreamingBackup(string connectionString = null)
+			: base(connectionString)
+		{ }
+
 		public void Execute()
 		{
 			try
@@ -60,7 +64,7 @@ namespace FirebirdSql.Data.Services
 
 		void ReadOutput()
 		{
-			Query(new byte[] { IscCodes.isc_info_svc_to_eof }, (_, x)=>
+			Query(new byte[] { IscCodes.isc_info_svc_to_eof }, (_, x) =>
 			{
 				var buffer = x as byte[];
 				OutputStream.Write(buffer, 0, buffer.Length);

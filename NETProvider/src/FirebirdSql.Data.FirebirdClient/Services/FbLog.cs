@@ -27,10 +27,9 @@ namespace FirebirdSql.Data.Services
 	{
 		#region · Constructors ·
 
-		public FbLog()
-			: base()
-		{
-		}
+		public FbLog(string connectionString = null)
+			: base(connectionString)
+		{ }
 
 		#endregion
 

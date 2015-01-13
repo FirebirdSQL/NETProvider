@@ -50,6 +50,9 @@ namespace FirebirdSql.Data.Services
 		public int? PageBuffers { get; set; }
 		public FbRestoreFlags Options { get; set; }
 
+		public FbStreamingRestore(string connectionString = null)
+			: base(connectionString)
+		{ }
 
 		public void Execute()
 		{

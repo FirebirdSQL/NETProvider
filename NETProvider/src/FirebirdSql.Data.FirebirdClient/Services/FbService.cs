@@ -106,10 +106,10 @@ namespace FirebirdSql.Data.Services
 
 		#region · Constructors ·
 
-		protected FbService()
+		protected FbService(string connectionString = null)
 		{
 			this.state = FbServiceState.Closed;
-			this.connectionString = string.Empty;
+			this.connectionString = connectionString ?? string.Empty;
 			this.serviceName = "service_mgr";
 			this.queryBufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
 		}

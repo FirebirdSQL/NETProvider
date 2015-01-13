@@ -43,8 +43,8 @@ namespace FirebirdSql.Data.Services
 
 		#region · Constructors ·
 
-		public FbStatistical()
-			: base()
+		public FbStatistical(string connectionString = null)
+			: base(connectionString)
 		{ }
 
 		#endregion

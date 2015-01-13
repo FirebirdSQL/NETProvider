@@ -43,10 +43,9 @@ namespace FirebirdSql.Data.Services
 
 		#region · Constructors ·
 
-		public FbValidation()
-			: base()
-		{
-		}
+		public FbValidation(string connectionString = null)
+			: base(connectionString)
+		{ }
 
 		#endregion
 

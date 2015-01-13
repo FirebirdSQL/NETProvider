@@ -27,8 +27,8 @@ namespace FirebirdSql.Data.Services
 	public sealed class FbTrace : FbService
 	{
 		#region Constructors
-		public FbTrace()
-			: base()
+		public FbTrace(string connectionString = null)
+			: base(connectionString)
 		{
 			this.DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
 		}

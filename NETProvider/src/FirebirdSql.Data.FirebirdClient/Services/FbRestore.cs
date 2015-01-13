@@ -59,8 +59,8 @@ namespace FirebirdSql.Data.Services
 
 		#region · Constructors ·
 
-		public FbRestore()
-			: base()
+		public FbRestore(string connectionString = null)
+			: base(connectionString)
 		{
 			this.backupFiles = new FbBackupFileCollection();
 		}
