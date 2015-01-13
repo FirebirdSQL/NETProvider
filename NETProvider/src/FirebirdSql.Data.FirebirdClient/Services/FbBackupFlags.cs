@@ -14,23 +14,28 @@
  * 
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ * 
+ *  Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
+
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
 	[Flags]
 	public enum FbBackupFlags
 	{
-		IgnoreChecksums = 0x01,
-		IgnoreLimbo = 0x02,
-		MetaDataOnly = 0x04,
-		NoGarbageCollect = 0x08,
-		OldDescriptions = 0x10,
-		NonTransportable = 0x20,
-		Convert = 0x40,
-		Expand = 0x80,
-		NoDatabaseTriggers = 0x8000,
+		IgnoreChecksums = IscCodes.isc_spb_bkp_ignore_checksums,
+		IgnoreLimbo = IscCodes.isc_spb_bkp_ignore_limbo,
+		MetaDataOnly = IscCodes.isc_spb_bkp_metadata_only,
+		NoGarbageCollect = IscCodes.isc_spb_bkp_no_garbage_collect,
+		OldDescriptions = IscCodes.isc_spb_bkp_old_descriptions,
+		NonTransportable = IscCodes.isc_spb_bkp_non_transportable,
+		Convert = IscCodes.isc_spb_bkp_convert,
+		Expand = IscCodes.isc_spb_bkp_expand,
+		NoDatabaseTriggers = IscCodes.isc_spb_bkp_no_triggers,
 	}
 }
