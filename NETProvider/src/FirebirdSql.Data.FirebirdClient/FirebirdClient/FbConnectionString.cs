@@ -462,7 +462,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else if (portSep < 0 && dataSource.Length == 1)
 				{
-					if (this.DataSource == null || this.DataSource.Length == 0)
+					if (string.IsNullOrEmpty(this.DataSource))
 					{
 						dataSource = "localhost";
 					}
