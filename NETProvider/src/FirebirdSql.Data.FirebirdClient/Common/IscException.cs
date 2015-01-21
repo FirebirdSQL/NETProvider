@@ -194,10 +194,7 @@ namespace FirebirdSql.Data.Common
 			// step #2, see if we can find a mapping.
 			else
 			{
-				using (var rs = CreateResourceSet("FirebirdSql.Data.Resources.sqlstate_mapping"))
-				{
-					this.SQLSTATE = rs.GetString(this.ErrorCode.ToString());
-				}
+				this.SQLSTATE = SqlStateMapping.Values[this.ErrorCode];
 			}
 		}
 
