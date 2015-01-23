@@ -281,7 +281,7 @@ namespace FirebirdSql.Data.Common
 
 		#region · Static Methods ·
 
-		private static string GetValueOrDefault(IReadOnlyDictionary<int, string> dictionary, int key, Func<int, string> defaultValueFactory)
+		private static string GetValueOrDefault(IDictionary<int, string> dictionary, int key, Func<int, string> defaultValueFactory)
 		{
 			string result;
 			if (!dictionary.TryGetValue(key, out result))

@@ -9,7 +9,7 @@ namespace FirebirdSql.Data.Common
 {
 	static class IscErrorMessages
 	{
-		static IReadOnlyDictionary<int, string> _messages = new ReadOnlyDictionary<int, string>(new Dictionary<int, string>()
+		static IDictionary<int, string> _messages = new Dictionary<int, string>()
 		{
 			{335544321, "arithmetic exception, numeric overflow, or string truncation"},		/* 1, arith_except */
 			{335544322, "invalid database key"},		/* 2, bad_dbkey */
@@ -979,9 +979,9 @@ Data source : {3}"},		/* 606, eds_statement */
 			{336986162, "empty file {0}"},		/* 962, fbsvcmgr_fp_empty */
 			{336986164, "Invalid or missing parameter for switch {0}"},		/* 963, fbsvcmgr_bad_arg */
 			{337051649, "Switches trusted_svc and trusted_role are not supported from command line"},		/* 964, utl_trusted_switch */
-		});
+		};
 
-		public static IReadOnlyDictionary<int, string> Values
+		public static IDictionary<int, string> Values
 		{
 			get { return _messages; }
 		}

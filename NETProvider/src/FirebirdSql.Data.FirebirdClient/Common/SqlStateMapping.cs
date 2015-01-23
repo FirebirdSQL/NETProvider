@@ -23,7 +23,7 @@ namespace FirebirdSql.Data.Common
 {
 	static class SqlStateMapping
 	{
-		static IReadOnlyDictionary<int, string> _mapping = new ReadOnlyDictionary<int, string>(new Dictionary<int, string>()
+		static IDictionary<int, string> _mapping = new Dictionary<int, string>()
 		{
 			{335544321, "22000"}, //   1 arith_except
 			{335544322, "HY000"}, //   2 bad_dbkey
@@ -989,9 +989,9 @@ namespace FirebirdSql.Data.Common
 			{336986162, "00000"}, //  50 fbsvcmgr_fp_empty
 			{336986164, "00000"}, //  52 fbsvcmgr_bad_arg
 			{337051649, "00000"}, //   1 utl_trusted_switch
-		});
+		};
 
-		public static IReadOnlyDictionary<int, string> Values
+		public static IDictionary<int, string> Values
 		{
 			get { return _mapping; }
 		}
