@@ -138,7 +138,9 @@
 		<Compile Include="Client\Managed\Version12\GdsStatement.cs" />
 		<Compile Include="Common\CultureAwareEqualityComparer.cs" />
 		<Compile Include="Common\Extensions.cs" />
+		<Compile Include="Common\IscErrorMessages.cs" />
 		<Compile Include="Common\PageSizeHelper.cs" />
+		<Compile Include="Common\SqlStateMapping.cs" />
 		<Compile Include="Common\TimeoutHelper.cs" />
 		<Compile Include="Common\TraceHelper.cs" />
 		<Compile Include="Entity\DmlSqlGenerator.cs" />
@@ -378,12 +380,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Entity\ProviderManifest.xml" />
-		<EmbeddedResource Include="Resources\isc_error_msg.resx">
-			<SubType>Designer</SubType>
-		</EmbeddedResource>
-		<EmbeddedResource Include="Resources\sqlstate_mapping.resx">
-			<SubType>Designer</SubType>
-		</EmbeddedResource>
 	</ItemGroup>
 	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 	<PropertyGroup>

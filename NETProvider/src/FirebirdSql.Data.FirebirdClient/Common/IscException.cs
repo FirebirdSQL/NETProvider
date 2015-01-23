@@ -194,10 +194,7 @@ namespace FirebirdSql.Data.Common
 			// step #2, see if we can find a mapping.
 			else
 			{
-				using (var rs = CreateResourceSet("FirebirdSql.Data.Resources.sqlstate_mapping"))
-				{
-					this.SQLSTATE = rs.GetString(this.ErrorCode.ToString());
-				}
+				this.SQLSTATE = GetValueOrDefault(SqlStateMapping.Values, this.ErrorCode, _ => string.Empty);
 			}
 		}
 
@@ -205,74 +202,62 @@ namespace FirebirdSql.Data.Common
 		{
 			StringBuilder builder = new StringBuilder();
 
-			using (var rs = CreateResourceSet("FirebirdSql.Data.Resources.isc_error_msg"))
+			for (int i = 0; i < this.Errors.Count; i++)
 			{
-				for (int i = 0; i < this.Errors.Count; i++)
+				if (this.Errors[i].Type == IscCodes.isc_arg_gds ||
+					this.Errors[i].Type == IscCodes.isc_arg_warning)
 				{
-					if (this.Errors[i].Type == IscCodes.isc_arg_gds ||
-						this.Errors[i].Type == IscCodes.isc_arg_warning)
+					int code = this.Errors[i].ErrorCode;
+					string message = GetValueOrDefault(IscErrorMessages.Values, code, BuildDefaultErrorMessage);
+
+					ArrayList param = new ArrayList();
+
+					int index = i + 1;
+
+					while (index < this.Errors.Count && this.Errors[index].IsArgument)
 					{
-						int code = this.Errors[i].ErrorCode;
-						string message = null;
+						param.Add(this.Errors[index++].StrParam);
+						i++;
+					}
 
-						try
+					object[] args = (object[])param.ToArray(typeof(object));
+
+					try
+					{
+						if (code == IscCodes.isc_except)
 						{
-							message = rs.GetString(code.ToString());
+							// Custom exception	add	the	first argument as error	code
+							this.ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
 						}
-						catch
+						else if (code == IscCodes.isc_except2)
 						{
-							message = BuildDefaultErrorMessage(code);
+							// Custom exception. Next Error should be the exception name.
+							// And the next one the Exception message
 						}
-
-						ArrayList param = new ArrayList();
-
-						int index = i + 1;
-
-						while (index < this.Errors.Count && this.Errors[index].IsArgument)
+						else if (code == IscCodes.isc_stack_trace)
 						{
-							param.Add(this.Errors[index++].StrParam);
-							i++;
+							// The next error contains the PSQL Stack Trace
+							if (builder.Length > 0)
+							{
+								builder.Append(Environment.NewLine);
+							}
+							builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
 						}
-
-						object[] args = (object[])param.ToArray(typeof(object));
-
-						try
+						else
 						{
-							if (code == IscCodes.isc_except)
+							if (builder.Length > 0)
 							{
-								// Custom exception	add	the	first argument as error	code
-								this.ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
+								builder.Append(Environment.NewLine);
 							}
-							else if (code == IscCodes.isc_except2)
-							{
-								// Custom exception. Next Error should be the exception name.
-								// And the next one the Exception message
-							}
-							else if (code == IscCodes.isc_stack_trace)
-							{
-								// The next error contains the PSQL Stack Trace
-								if (builder.Length > 0)
-								{
-									builder.Append(Environment.NewLine);
-								}
-								builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
-							}
-							else
-							{
-								if (builder.Length > 0)
-								{
-									builder.Append(Environment.NewLine);
-								}
-
-								builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
-							}
-						}
-						catch
-						{
-							message = BuildDefaultErrorMessage(code);
 
 							builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
 						}
+					}
+					catch
+					{
+						message = BuildDefaultErrorMessage(code);
+
+						builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
 					}
 				}
 			}
@@ -292,12 +277,18 @@ namespace FirebirdSql.Data.Common
 			return string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
 		}
 
-		private ResourceSet CreateResourceSet(string resourceName)
+		#endregion
+
+		#region · Static Methods ·
+
+		private static string GetValueOrDefault(IDictionary<int, string> dictionary, int key, Func<int, string> defaultValueFactory)
 		{
-			using (var resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName + ".resources"))
+			string result;
+			if (!dictionary.TryGetValue(key, out result))
 			{
-				return new ResourceSet(resourceStream);
+				result = defaultValueFactory(key);
 			}
+			return result;
 		}
 
 		#endregion
