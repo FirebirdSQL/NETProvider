@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Services
 {
 	public class FbBackupFile
 	{
-		#region · Properties ·
+		#region Properties
 
 		public string BackupFile { get; set; }
 
@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbBackupFile(string fileName, int? fileLength = null)
 		{

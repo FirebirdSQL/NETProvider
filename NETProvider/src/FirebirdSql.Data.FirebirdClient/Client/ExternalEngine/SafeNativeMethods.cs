@@ -25,13 +25,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 	[SuppressUnmanagedCodeSecurity]
 	internal sealed class SafeNativeMethods
 	{
-		#region · Conditional Constants ·
+		#region Conditional Constants
 
 		public const string DllPath = "clrexternalengine";
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private SafeNativeMethods()
 		{
@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · External Engine Functions ·
+		#region External Engine Functions
 
 		[DllImport(SafeNativeMethods.DllPath, EntryPoint = "ext_get_current_database")]
 		public static extern int isc_get_current_database([In, Out] int[] statusVector, ref int dbHandle);
@@ -72,7 +72,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Array Functions ·
+		#region Array Functions
 
 		[DllImport(SafeNativeMethods.DllPath, EntryPoint = "ext_array_get_slice")]
 		public static extern int isc_array_get_slice(
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Blob Functions ·
+		#region Blob Functions
 
 		[DllImport(SafeNativeMethods.DllPath, EntryPoint = "ext_create_blob2")]
 		public static extern int isc_create_blob2(
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Database Functions ·
+		#region Database Functions
 
 		[DllImport(SafeNativeMethods.DllPath, EntryPoint = "ext_attach_database")]
 		public static extern int isc_attach_database(
@@ -187,7 +187,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Transaction Functions ·
+		#region Transaction Functions
 
 		[DllImport(SafeNativeMethods.DllPath, EntryPoint = "ext_commit_transaction")]
 		public static extern int isc_commit_transaction(
@@ -211,7 +211,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · DSQL Functions ·
+		#region DSQL Functions
 
 		[DllImport(SafeNativeMethods.DllPath, EntryPoint = "ext_dsql_allocate_statement")]
 		public static extern int isc_dsql_allocate_statement(
@@ -289,7 +289,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Services Functions ·
+		#region Services Functions
 
 		[DllImport(SafeNativeMethods.DllPath, EntryPoint = "ext_service_attach")]
 		public static extern int isc_service_attach(

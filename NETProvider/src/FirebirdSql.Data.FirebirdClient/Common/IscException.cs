@@ -35,11 +35,11 @@ namespace FirebirdSql.Data.Common
 	[Serializable]
 	internal sealed class IscException : Exception
 	{
-		#region · Fields ·
+		#region Fields
 		private string _message;
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public List<IscError> Errors { get; private set; }
 
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public IscException()
 			: base()
@@ -150,7 +150,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Public Methods ·
+		#region Public Methods
 
 		public void BuildExceptionData()
 		{
@@ -176,7 +176,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void BuildErrorCode()
 		{
@@ -279,7 +279,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Static Methods ·
+		#region Static Methods
 
 		private static string GetValueOrDefault(IDictionary<int, string> dictionary, int key, Func<int, string> defaultValueFactory)
 		{

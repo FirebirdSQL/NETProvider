@@ -29,13 +29,13 @@ namespace FirebirdSql.Data.Client.Common
 {
 	internal sealed class XsqldaMarshaler
 	{
-		#region · Static Fields ·
+		#region Static Fields
 
 		private static readonly XsqldaMarshaler instance = new XsqldaMarshaler();
 
 		#endregion
 
-		#region · Static Properties ·
+		#region Static Properties
 
 		public static XsqldaMarshaler Instance
 		{
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Client.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private XsqldaMarshaler()
 		{
@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.Client.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void CleanUpNativeData(ref IntPtr pNativeData)
 		{
@@ -229,7 +229,7 @@ namespace FirebirdSql.Data.Client.Common
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private IntPtr GetIntPtr(IntPtr ptr, int offset)
 		{

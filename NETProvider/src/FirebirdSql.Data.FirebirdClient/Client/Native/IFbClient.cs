@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.Client.Native
 	/// </summary>
 	public interface IFbClient
 	{
-		#region · Array Functions ·
+		#region Array Functions
 
 		IntPtr isc_array_get_slice(
 			[In, Out] IntPtr[] statusVector,
@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Blob Functions ·
+		#region Blob Functions
 
 		IntPtr isc_create_blob2(
 			[In, Out] IntPtr[] statusVector,
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Database Functions ·
+		#region Database Functions
 
 		IntPtr isc_attach_database(
 			[In, Out] IntPtr[] statusVector,
@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Transaction Functions ·
+		#region Transaction Functions
 
 		IntPtr isc_start_multiple(
 			[In, Out]	IntPtr[] statusVector,
@@ -158,7 +158,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Cancel Functions ·
+		#region Cancel Functions
 
 		IntPtr fb_cancel_operation(
 			[In, Out] IntPtr[] statusVector,
@@ -167,7 +167,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · DSQL Functions ·
+		#region DSQL Functions
 
 		IntPtr isc_dsql_allocate_statement(
 			[In, Out] IntPtr[] statusVector,
@@ -235,7 +235,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Services Functions ·
+		#region Services Functions
 
 		IntPtr isc_service_attach(
 			[In, Out] IntPtr[] statusVector,

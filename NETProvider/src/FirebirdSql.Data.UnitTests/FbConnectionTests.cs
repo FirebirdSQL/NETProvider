@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbConnectionTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbConnectionTests()
 			: base(false)
@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void BeginTransactionILUnspecifiedTest()
@@ -324,7 +324,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public FbTransaction BeginTransaction(IsolationLevel level)
 		{
@@ -373,7 +373,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Event Handlers ·
+		#region Event Handlers
 
 		public void OnStateChange(object sender, StateChangeEventArgs e)
 		{

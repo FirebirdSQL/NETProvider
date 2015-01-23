@@ -30,13 +30,13 @@ namespace FirebirdSql.Data.Isql
 	/// </remarks>
 	public class CommandExecutingEventArgs : EventArgs
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbCommand sqlCommand;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		/// <summary>
 		/// Returns the <see cref="FbCommand"/> instance that created for the SQL statement that goes 
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		/// <summary>
 		/// Creates an instance of CommandExecutingEventArgs class.
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		/// <summary>
 		/// Overrided. Returns the SQL statement that goes for execution.

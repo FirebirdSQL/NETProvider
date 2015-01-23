@@ -29,13 +29,13 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	internal sealed class FbEnlistmentNotification : IEnlistmentNotification
 	{
-		#region · Events ·
+		#region Events
 
 		public event EventHandler Completed;
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private FbConnectionInternal    connection;
 		private FbTransaction           transaction;
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public bool IsCompleted
 		{
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbEnlistmentNotification(FbConnectionInternal connection, Transaction systemTransaction)
 		{            
@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · IEnlistmentNotification Members ·
+		#region IEnlistmentNotification Members
 
 		public void Commit(Enlistment enlistment)
 		{

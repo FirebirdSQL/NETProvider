@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	internal class FbConnectionInternal : MarshalByRefObject, IDisposable
 	{
-		#region · Fields ·
+		#region Fields
 
 		private IDatabase db;
 		private FbTransaction activeTransaction;
@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public IDatabase Database
 		{
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbConnectionInternal(FbConnectionString options)
 		{
@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~FbConnectionInternal()
 		{
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · IDisposable Methods ·
+		#region IDisposable Methods
 
 		public void Dispose()
 		{
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Create and Drop database methods ·
+		#region Create and Drop database methods
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb)
 		{
@@ -164,7 +164,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Connect and Disconnect methods ·
+		#region Connect and Disconnect methods
 
 		public void Connect()
 		{
@@ -219,7 +219,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Transaction Handling Methods ·
+		#region Transaction Handling Methods
 
 		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
 		{
@@ -307,7 +307,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Transaction Enlistement ·
+		#region Transaction Enlistement
 
 		public void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
@@ -365,7 +365,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Schema Methods ·
+		#region Schema Methods
 
 		public DataTable GetSchema(string collectionName, string[] restrictions)
 		{
@@ -374,7 +374,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Prepared Commands Methods ·
+		#region Prepared Commands Methods
 
 		public void AddPreparedCommand(FbCommand command)
 		{
@@ -452,7 +452,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Firebird Events Methods ·
+		#region Firebird Events Methods
 
 		public void CloseEventManager()
 		{
@@ -467,7 +467,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Connection Verification ·
+		#region Connection Verification
 
 		public bool Verify()
 		{
@@ -491,7 +491,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private DatabaseParameterBuffer BuildDpb(IDatabase db, FbConnectionString options)
 		{

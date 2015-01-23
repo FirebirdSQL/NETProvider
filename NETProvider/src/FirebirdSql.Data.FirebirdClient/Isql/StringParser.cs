@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Isql
 	/// </example>
 	public class StringParser
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int charsParsed;
 		private string source;
@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		/// <summary>
 		/// Loaded after a parsing operation with the number of chars parsed.
@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		/// <summary>
 		/// Creates an instance of StringParser.
@@ -170,7 +170,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		/// <summary>
 		/// Parses target string attempting to determine the (sub)string between the beginning of this string and the <see cref="Token"/>.
@@ -365,7 +365,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Static Methods ·
+		#region Static Methods
 
 		/// <summary>
 		/// Indicates if the string specified as <b>source</b> starts with the <b>token</b> string.

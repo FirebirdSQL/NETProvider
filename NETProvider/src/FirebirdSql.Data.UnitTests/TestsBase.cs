@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.UnitTests
 {
 	public class TestsBase
 	{
-		#region	· Fields ·
+		#region	Fields
 
 		private FbConnection connection;
 		private FbTransaction transaction;
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region	· Properties ·
+		#region	Properties
 
 		public FbConnection Connection
 		{
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region	· Constructors ·
+		#region	Constructors
 
 		public TestsBase()
 		{
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region	· SetUp and TearDown Methods ·
+		#region	SetUp and TearDown Methods
 
 		[SetUp]
 		public virtual void SetUp()
@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region	· Database Creation Methods ·
+		#region	Database Creation Methods
 
 		private static void CreateDatabase(string connectionString)
 		{
@@ -417,7 +417,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region	· ConnectionString Building methods ·
+		#region	ConnectionString Building methods
 
 		public static string BuildConnectionString()
 		{
@@ -474,7 +474,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region	· Methods ·
+		#region	Methods
 
 		public static int GetId()
 		{

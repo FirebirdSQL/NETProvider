@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ExtConnection
 	{
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static int[] GetNewStatusVector()
 		{
@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private ExtConnection()
 		{

@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class GuidTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public GuidTests()
 			: base()
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void InsertGuidTest()

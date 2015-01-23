@@ -33,13 +33,13 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbDataReader : DbDataReader
 	{
-		#region · Constants ·
+		#region Constants
 
 		private const int STARTPOS = -1;
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private DataTable schemaTable;
 		private FbCommand command;
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbDataReader Indexers ·
+		#region DbDataReader Indexers
 
 		public override object this[int i]
 		{
@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		internal FbDataReader()
 			: base()
@@ -94,7 +94,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~FbDataReader()
 		{
@@ -103,7 +103,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		//protected override void Dispose(bool disposing)
 		//{
@@ -129,7 +129,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbDataReader overriden Properties ·
+		#region DbDataReader overriden Properties
 
 		public override int Depth
 		{
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbDataReader overriden methods ·
+		#region DbDataReader overriden methods
 
 		public override void Close()
 		{
@@ -684,7 +684,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void CheckPosition()
 		{
@@ -765,7 +765,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Static Methods ·
+		#region Static Methods
 
 		private static bool IsReadOnly(FbDataReader r)
 		{

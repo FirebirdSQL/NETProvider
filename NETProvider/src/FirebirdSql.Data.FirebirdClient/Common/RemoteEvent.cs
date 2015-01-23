@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal class RemoteEvent
 	{
-		#region · Callbacks ·
+		#region Callbacks
 
 		public RemoteEventCountsCallback EventCountsCallback
 		{
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private RemoteEventCountsCallback eventCountsCallback;
 		private List<string>	events;
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int LocalId
 		{
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public RemoteEvent(IDatabase db) : this(db, 0, 0, new List<string>())
 		{
@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void QueueEvents()
 		{

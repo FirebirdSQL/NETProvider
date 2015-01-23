@@ -22,14 +22,14 @@ namespace FirebirdSql.Data.Common
 {
 	internal struct ArrayBound
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int lowerBound;
 		private int upperBound;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int LowerBound
 		{

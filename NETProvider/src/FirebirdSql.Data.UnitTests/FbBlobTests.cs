@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbBlobTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbBlobTests()
 			: base(false)
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void BinaryBlobTest()

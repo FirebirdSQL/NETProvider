@@ -146,7 +146,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </remarks>
 	internal sealed class SqlSelectStatement : ISqlFragment
 	{
-		#region · Fields ·
+		#region Fields
 
 		private bool isDistinct;
 		private List<Symbol> allJoinExtents;
@@ -165,7 +165,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public SqlBuilder OrderBy
 		{
@@ -181,7 +181,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 
 		/// <summary>
 		/// Do we need to add a DISTINCT at the beginning of the SELECT
@@ -286,7 +286,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · ISqlFragment Members ·
+		#region ISqlFragment Members
 
 		/// <summary>
 		/// Write out a SQL select statement as a string.

@@ -24,7 +24,7 @@ namespace FirebirdSql.Data.Client.Common
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct ArrayDescMarshal
 	{
-		#region · Fields ·
+		#region Fields
 
 		public byte DataType;
 		public byte Scale;
@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Client.Common
 
 		#endregion
 
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static int ComputeLength(int n)
 		{

@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ExtTransaction : ITransaction, IDisposable
 	{
-		#region · Inner Structs ·
+		#region Inner Structs
 
 		[StructLayout(LayoutKind.Sequential)]
 		struct IscTeb
@@ -39,13 +39,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Events ·
+		#region Events
 
 		public event TransactionUpdateEventHandler Update;
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private int handle;
 		private ExtDatabase db;
@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public ExtTransaction(IDatabase db)
 		{
@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~ExtTransaction()
 		{
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		public void Dispose()
 		{
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void BeginTransaction(TransactionParameterBuffer tpb)
 		{
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Two Phase Commit Methods ·
+		#region Two Phase Commit Methods
 
 		void ITransaction.Prepare()
 		{
@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ClearStatusVector()
 		{

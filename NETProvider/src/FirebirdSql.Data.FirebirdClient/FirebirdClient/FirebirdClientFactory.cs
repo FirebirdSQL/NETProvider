@@ -30,13 +30,13 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public class FirebirdClientFactory : DbProviderFactory, IServiceProvider
 	{
-		#region · Static Properties ·
+		#region Static Properties
 
 		public static readonly FirebirdClientFactory Instance = new FirebirdClientFactory();
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override bool CanCreateDataSourceEnumerator
 		{
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private FirebirdClientFactory() : base()
 		{
@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override DbCommand CreateCommand()
 		{
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · IServiceProvider Members ·
+		#region IServiceProvider Members
 
 		object IServiceProvider.GetService(Type serviceType)
 		{

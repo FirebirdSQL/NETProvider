@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbDatabaseSchemaTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbDatabaseSchemaTests()
 			: base(false)
@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void CharacterSets()

@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbTransaction : DbTransaction
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbConnection connection;
 		private ITransaction transaction;
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public new FbConnection Connection
 		{
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 
 		internal ITransaction Transaction
 		{
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbTransaction Protected properties ·
+		#region DbTransaction Protected properties
 
 		protected override DbConnection DbConnection
 		{
@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		internal FbTransaction(FbConnection connection)
 			: this(connection, IsolationLevel.ReadCommitted)
@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~FbTransaction()
 		{
@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		protected override void Dispose(bool disposing)
 		{
@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbTransaction Methods ·
+		#region DbTransaction Methods
 
 		public override void Commit()
 		{
@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Save(string savePointName)
 		{
@@ -351,7 +351,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Internal Methods ·
+		#region Internal Methods
 
 		internal void BeginTransaction()
 		{
@@ -387,7 +387,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void UpdateTransaction()
 		{

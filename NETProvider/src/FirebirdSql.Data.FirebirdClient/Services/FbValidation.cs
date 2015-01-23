@@ -25,13 +25,13 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbValidation : FbService
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbValidationFlags options;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public FbValidationFlags Options
 		{
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbValidation(string connectionString = null)
 			: base(connectionString)
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Execute()
 		{

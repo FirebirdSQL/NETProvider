@@ -28,14 +28,14 @@ namespace FirebirdSql.Data.UnitTests
 {
 	class FbExceptionTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbExceptionTests()
 		{ }
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void SQLSTATETest()

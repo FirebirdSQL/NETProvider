@@ -27,13 +27,13 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbDatabaseInfo
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbConnection connection;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public FbConnection Connection
 		{
@@ -223,7 +223,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbDatabaseInfo()
 		{
@@ -236,7 +236,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private string GetString(byte item)
 		{

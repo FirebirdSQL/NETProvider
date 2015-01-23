@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal abstract class BlobBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int		rblFlags;
 		private Charset charset;
@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Fields ·
+		#region Protected Fields
 
 		protected long          blobId;
 		protected int           blobHandle;
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Properties ·
+		#region Protected Properties
 
 		protected int SegmentSize
 		{
@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Abstract Properties ·
+		#region Abstract Properties
 
 		public abstract IDatabase Database
 		{
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		protected BlobBase(IDatabase db)
 		{
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public string ReadString()
 		{
@@ -177,7 +177,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Abstract Methods ·
+		#region Protected Abstract Methods
 
 		protected abstract void Create();
 		protected abstract void Open();
@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected void RblAddValue(int rblValue)
 		{

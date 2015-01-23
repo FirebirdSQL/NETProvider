@@ -23,13 +23,13 @@ namespace FirebirdSql.Data.Common
 {
 	internal interface ITransaction : IDisposable
 	{
-		#region · Events ·
+		#region Events
 
 		event TransactionUpdateEventHandler Update;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		int Handle
 		{
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		void BeginTransaction(TransactionParameterBuffer tpb);
 		void Commit();

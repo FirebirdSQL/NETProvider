@@ -22,7 +22,7 @@ namespace FirebirdSql.Data.Services
 {
 	public struct FbServerConfig
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int lockMemSize;
 		private int lockSemCount;
@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int LockMemSize
 		{

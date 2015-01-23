@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal abstract class StatementBase : IDisposable
 	{
-		#region · Protected Static Fields ·
+		#region Protected Static Fields
 
 		// Plan	information	items
 		protected static readonly byte[] DescribePlanInfoItems = new byte[] 
@@ -79,19 +79,19 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private bool disposed;
 
 		#endregion
 
-		#region · Protected Fields ·
+		#region Protected Fields
 
 		protected TransactionUpdateEventHandler TransactionUpdate;
 
 		#endregion
 
-		#region · Abstract Properties ·
+		#region Abstract Properties
 
 		public abstract IDatabase Database
 		{
@@ -152,7 +152,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Properties ·
+		#region Protected Properties
 
 		protected bool IsDisposed
 		{
@@ -161,7 +161,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~StatementBase()
 		{
@@ -170,7 +170,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		public void Dispose()
 		{
@@ -188,7 +188,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public string GetExecutionPlan()
 		{
@@ -268,7 +268,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Abstract Methods ·
+		#region Abstract Methods
 
 		public abstract void Describe();
 		public abstract void DescribeParameters();
@@ -286,7 +286,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Abstract Methods ·
+		#region Protected Abstract Methods
 
 		protected abstract void TransactionUpdated(object sender, EventArgs e);
 		protected abstract byte[] GetSqlInfo(byte[] items, int bufferLength);
@@ -294,7 +294,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected byte[] GetSqlInfo(byte[] items)
 		{

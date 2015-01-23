@@ -30,13 +30,13 @@ namespace FirebirdSql.Data.FirebirdClient
 	[Serializable, ListBindable(false)]
 	public sealed class FbErrorCollection : ICollection<FbError>
 	{
-		#region · Fields ·
+		#region Fields
 
 		private List<FbError> errors;
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		internal FbErrorCollection()
 		{
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Count
 		{
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		internal int IndexOf(string errorMessage)
 		{

@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal sealed class EventParameterBuffer : ParameterBuffer
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public EventParameterBuffer()
 			: base(BitConverter.IsLittleEndian)
@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Append(string content, int actualCount)
 		{

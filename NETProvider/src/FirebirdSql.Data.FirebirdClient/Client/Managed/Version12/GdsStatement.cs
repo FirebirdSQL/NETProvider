@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 {
 	internal class GdsStatement : Version11.GdsStatement
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsStatement(IDatabase db)
 			: base(db)
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		#endregion
 
-		#region · Overriden Methods ·
+		#region Overriden Methods
 
 		public override void Execute()
 		{

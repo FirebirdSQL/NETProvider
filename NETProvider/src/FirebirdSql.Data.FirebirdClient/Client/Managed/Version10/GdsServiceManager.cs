@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal sealed class GdsServiceManager : IServiceManager
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int             handle;
 		private GdsDatabase     database;
@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsServiceManager(GdsConnection connection)
 		{
@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
 		{

@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Common
 	/// </remarks>
 	internal sealed class Descriptor : ICloneable
 	{
-		#region · Fields ·
+		#region Fields
 
 		private short version;
 		private short count;
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public short Version
 		{
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Indexers ·
+		#region Indexers
 
 		public DbField this[int index]
 		{
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public Descriptor(short n)
 		{
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · ICloneable Methods ·
+		#region ICloneable Methods
 
 		public object Clone()
 		{
@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void ResetValues()
 		{

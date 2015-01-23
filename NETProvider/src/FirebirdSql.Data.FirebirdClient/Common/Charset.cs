@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal sealed class Charset
 	{
-		#region · Static ·
+		#region Static
 
 		private readonly static Dictionary<int, Charset> charsetsById;
 		private readonly static Dictionary<string, Charset> charsetsByName;
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private int		    id;
 		private int		    bytesPerCharacter;
@@ -156,7 +156,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Identifier
 		{
@@ -180,7 +180,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public Charset(int id, string name, int bytesPerCharacter, string systemName)
 		{
@@ -195,7 +195,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public byte[] GetBytes(string s)
 		{
@@ -219,7 +219,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void SetEncoding()
 		{

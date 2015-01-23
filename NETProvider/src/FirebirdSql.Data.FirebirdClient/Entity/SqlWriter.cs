@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal class SqlWriter : StringWriter
 	{
-		#region · Fields ·
+		#region Fields
 
 		// We start at -1, since the first select statement will increment it to 0.
 		private int     indent              = -1;
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		/// <summary>
 		/// The number of tabs to be added at the beginning of each new line.
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		/// <summary>
 		/// 
@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		/// <summary>
 		/// Reset atBeginningofLine if we detect the newline string.

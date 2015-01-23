@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Isql
 	/// </summary>
 	public class CommandExecutedEventArgs
 	{
-		#region · Fields ·
+		#region Fields
 
 		private string commandText;
 		private FbDataReader dataReader;
@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		/// <summary>
 		/// Returns the <see cref="SqlStatementType"/> of the current <see cref="CommandText"/>.
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		/// <summary>
 		/// Creates an instance of CommandExecutedEventArgs class.
@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		/// <summary>
 		/// Overrided. Returns the SQL statement that was executed.

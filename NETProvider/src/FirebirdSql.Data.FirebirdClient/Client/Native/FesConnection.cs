@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesConnection
 	{
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static IscException ParseStatusVector(IntPtr[] statusVector, Charset charset)
 		{
@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private FesConnection()
 		{ }

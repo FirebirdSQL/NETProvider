@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal sealed class DbField
 	{
-		#region · Fields ·
+		#region Fields
 
 		private short dataType;
 		private short numericScale;
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public DbDataType DbDataType
 		{
@@ -184,7 +184,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public DbField()
 		{
@@ -198,7 +198,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public bool IsNumeric()
 		{
@@ -506,7 +506,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private DbDataType GetDbDataType()
 		{

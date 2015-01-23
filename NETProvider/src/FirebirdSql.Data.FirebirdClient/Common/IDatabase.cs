@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal interface IDatabase : IDisposable
 	{
-		#region · Callbacks ·
+		#region Callbacks
 
 		WarningMessageCallback WarningMessage
 		{
@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		int Handle
 		{
@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database);
 		void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database);

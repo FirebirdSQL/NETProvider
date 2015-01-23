@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbServerProperties : FbService
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbServerProperties(string connectionString = null)
 			: base(connectionString)
@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public int GetVersion()
 		{
@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private string GetString(int item)
 		{
@@ -109,7 +109,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static Version ParseServerVersion(string version)
 		{

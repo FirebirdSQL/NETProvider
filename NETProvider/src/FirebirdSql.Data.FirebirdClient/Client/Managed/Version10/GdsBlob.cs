@@ -25,13 +25,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal sealed class GdsBlob : BlobBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private GdsDatabase database;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override IDatabase Database
 		{
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsBlob(IDatabase db, ITransaction transaction) : this(db, transaction, 0)
 		{
@@ -66,7 +66,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override void Create()
 		{
@@ -213,7 +213,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Private API Methods ·
+		#region Private API Methods
 
 		private void CreateOrOpen(int op, BlobParameterBuffer bpb)
 		{

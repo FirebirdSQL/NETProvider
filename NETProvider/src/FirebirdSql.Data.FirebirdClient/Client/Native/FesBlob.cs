@@ -28,14 +28,14 @@ namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesBlob : BlobBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FesDatabase db;
 		private IntPtr[] statusVector;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override IDatabase Database
 		{
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FesBlob(IDatabase db, ITransaction transaction)
 			: this(db, transaction, 0)
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override void Create()
 		{
@@ -228,7 +228,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ClearStatusVector()
 		{

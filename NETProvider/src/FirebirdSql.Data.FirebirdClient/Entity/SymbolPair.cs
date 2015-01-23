@@ -55,14 +55,14 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal class SymbolPair : ISqlFragment
 	{
-		#region · Fields ·
+		#region Fields
 
 		private Symbol source;
 		private Symbol column;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public Symbol Source
 		{
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public SymbolPair(Symbol source, Symbol column)
 		{
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · ISqlFragment Members ·
+		#region ISqlFragment Members
 
 		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
 		{

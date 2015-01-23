@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			this.WriteBuffer(dpb.ToArray());
 		}
 
-		#region · Override Statement Creation Methods ·
+		#region Override Statement Creation Methods
 
 		public override StatementBase CreateStatement()
 		{
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		#endregion
 
-		#region · Cancel Methods ·
+		#region Cancel Methods
 
 		public override void CancelOperation(int kind)
 		{

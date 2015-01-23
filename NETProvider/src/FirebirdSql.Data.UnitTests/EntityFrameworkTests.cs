@@ -32,14 +32,14 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class EntityFrameworkTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public EntityFrameworkTests()
 		{ }
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void DbProviderServicesTest()

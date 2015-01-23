@@ -33,13 +33,13 @@ namespace FirebirdSql.Data.Schema
 {
 	internal sealed class FbSchemaFactory
 	{
-		#region · Static Members ·
+		#region Static Members
 
 		private static readonly string ResourceName = "FirebirdSql.Data.Schema.FbMetaData.xml";
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private FbSchemaFactory()
 		{
@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Schema
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public static DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.Schema
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private static DataTable PrepareCollection(FbConnection connection, string collectionName, string[] restrictions)
 		{

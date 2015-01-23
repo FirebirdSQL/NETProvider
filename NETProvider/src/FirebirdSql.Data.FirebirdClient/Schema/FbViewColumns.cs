@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Schema
 {
 	internal class FbViewColumns : FbSchema
 	{
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override StringBuilder GetCommandText(string[] restrictions)
 		{

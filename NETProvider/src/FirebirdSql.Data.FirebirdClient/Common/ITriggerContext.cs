@@ -23,7 +23,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal interface ITriggerContext
 	{
-		#region · Methods ·
+		#region Methods
 
 		string GetTableName();
 		int GetTriggerAction();

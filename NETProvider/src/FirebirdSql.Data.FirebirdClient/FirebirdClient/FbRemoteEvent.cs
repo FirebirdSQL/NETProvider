@@ -27,13 +27,13 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbRemoteEvent
 	{
-		#region · Events ·
+		#region Events
 
 		public event FbRemoteEventEventHandler RemoteEventCounts;
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private FbConnection connection;
 		private RemoteEvent revent;
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Indexers ·
+		#region Indexers
 
 		public string this[int index]
 		{
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public FbConnection Connection
 		{
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbRemoteEvent(FbConnection connection)
 			: this(connection, null)
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void AddEvents(params string[] events)
 		{
@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Callbacks Handlers ·
+		#region Callbacks Handlers
 
 		private void OnRemoteEventCounts()
 		{

@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbCommandBuilder : DbCommandBuilder
 	{
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static void DeriveParameters(FbCommand command)
 		{
@@ -105,13 +105,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private FbRowUpdatingEventHandler rowUpdatingHandler;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -160,7 +160,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbCommandBuilder()
 			: this(null)
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbCommandBuilder methods ·
+		#region DbCommandBuilder methods
 
 		public new FbCommand GetInsertCommand()
 		{
@@ -243,7 +243,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Protected DbCommandBuilder methods ·
+		#region Protected DbCommandBuilder methods
 
 		protected override void ApplyParameterInfo(DbParameter p, DataRow row, StatementType statementType, bool whereClause)
 		{
@@ -289,7 +289,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Event Handlers ·
+		#region Event Handlers
 
 		private void RowUpdatingHandler(object sender, FbRowUpdatingEventArgs e)
 		{

@@ -22,14 +22,14 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbRemoteEventEventArgs : System.ComponentModel.CancelEventArgs
 	{
-		#region · Fields ·
+		#region Fields
 
 		private string name;
 		private int counts;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public string Name
 		{
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbRemoteEventEventArgs(string name, int counts)
 			: this(name, counts, false)

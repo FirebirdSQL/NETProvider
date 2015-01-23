@@ -24,7 +24,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbRowUpdatingEventArgs : RowUpdatingEventArgs
 	{
-		#region · Properties ·
+		#region Properties
 
 		public new FbCommand Command
 		{
@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbRowUpdatingEventArgs(
 			DataRow				row, 

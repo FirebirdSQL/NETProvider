@@ -54,13 +54,13 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal sealed class SymbolTable
 	{
-		#region · Fields ·
+		#region Fields
 
 		private List<Dictionary<string, Symbol>> symbols = new List<Dictionary<string, Symbol>>();
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		internal void EnterScope()
 		{

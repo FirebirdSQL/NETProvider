@@ -23,14 +23,14 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbInfoMessageEventArgs : EventArgs
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbErrorCollection errors = new FbErrorCollection();
 		private string message = string.Empty;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public FbErrorCollection Errors
 		{
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		internal FbInfoMessageEventArgs(IscException ex)
 		{

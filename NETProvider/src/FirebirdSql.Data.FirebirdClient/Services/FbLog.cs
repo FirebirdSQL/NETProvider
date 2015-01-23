@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbLog : FbService
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbLog(string connectionString = null)
 			: base(connectionString)
@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Execute()
 		{

@@ -26,13 +26,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal sealed class GdsTransaction : ITransaction, IDisposable
 	{
-		#region · Events ·
+		#region Events
 
 		public event TransactionUpdateEventHandler Update;
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private int					handle;
 		private bool				disposed;
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private GdsTransaction()
 		{
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~GdsTransaction()
 		{
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		public void Dispose()
 		{
@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void BeginTransaction(TransactionParameterBuffer tpb)
 		{
@@ -284,7 +284,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Two Phase Commit Methods ·
+		#region Two Phase Commit Methods
 
 		public void Prepare()
 		{
@@ -345,7 +345,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void CheckTransactionState()
 		{

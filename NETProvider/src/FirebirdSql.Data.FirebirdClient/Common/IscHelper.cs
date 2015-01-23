@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal static class IscHelper
 	{
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static ArrayList ParseDatabaseInfo(byte[] buffer)
 		{

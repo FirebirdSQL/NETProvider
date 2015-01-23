@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Schema
 {
 	internal class FbViewPrivileges : FbSchema
 	{
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override StringBuilder GetCommandText(string[] restrictions)
 		{

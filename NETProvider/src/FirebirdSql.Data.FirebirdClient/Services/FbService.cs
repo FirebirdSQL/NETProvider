@@ -33,13 +33,13 @@ namespace FirebirdSql.Data.Services
 {
 	public abstract class FbService
 	{
-		#region · Events ·
+		#region Events
 
 		public event ServiceOutputEventHandler ServiceOutput;
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private IServiceManager svc;
 		private FbServiceState state;
@@ -50,14 +50,14 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Protected Fields ·
+		#region Protected Fields
 
 		internal ServiceParameterBuffer StartSpb;
 		internal ServiceParameterBuffer QuerySpb;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public FbServiceState State
 		{
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Protected Properties ·
+		#region Protected Properties
 
 		protected string Database
 		{
@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		protected FbService(string connectionString = null)
 		{
@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Internal Methods ·
+		#region Internal Methods
 
 		internal ServiceParameterBuffer BuildSpb()
 		{
@@ -139,7 +139,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected void Open()
 		{
@@ -290,7 +290,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ProcessQuery(byte[] items, Action<bool, object> queryResponseAction)
 		{
@@ -428,7 +428,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Private Static Methods ·
+		#region Private Static Methods
 
 		private static FbServerConfig ParseServerConfig(byte[] buffer, ref int pos)
 		{

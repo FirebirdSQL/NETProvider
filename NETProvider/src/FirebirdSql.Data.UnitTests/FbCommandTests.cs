@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbCommandTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbCommandTests()
 			: base(false)
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void ExecuteNonQueryTest()

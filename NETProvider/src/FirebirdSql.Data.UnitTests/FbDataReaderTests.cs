@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbDataReaderTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbDataReaderTests()
 			: base(false)
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void ReadTest()

@@ -22,7 +22,7 @@ namespace FirebirdSql.Data.Server
 {
 	interface IResultSet
 	{
-		#region · Methods ·
+		#region Methods
 
 		void Close();
 		object GetValue(int i);

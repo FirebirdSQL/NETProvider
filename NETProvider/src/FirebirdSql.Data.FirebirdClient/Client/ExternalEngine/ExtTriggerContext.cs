@@ -24,13 +24,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ExtTriggerContext : ITriggerContext
 	{
-		#region · Fields ·
+		#region Fields
 
 		private IDatabase database;
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public ExtTriggerContext(IDatabase database)
 		{
@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public string GetTableName()
 		{
@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private object GetValue(string name, bool oldValue)
 		{

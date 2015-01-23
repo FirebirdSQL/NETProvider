@@ -25,13 +25,13 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbStatistical : FbService
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbStatisticalFlags options;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public FbStatisticalFlags Options
 		{
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbStatistical(string connectionString = null)
 			: base(connectionString)
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Execute()
 		{

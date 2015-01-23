@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbArrayTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbArrayTests()
 			: base(true)
@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void IntegerArrayTest()
@@ -1019,7 +1019,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void PrintArrayValues(System.Array array, bool original)
 		{

@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbSecurity : FbService
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbSecurity(string connectionString = null)
 			: base(connectionString)
@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void AddUser(FbUserData user)
 		{

@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbCommand : DbCommand, ICloneable
 	{
-		#region · Fields ·
+		#region Fields
 
 		private CommandType commandType;
 		private UpdateRowSource updatedRowSource;
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		[Category("Data")]
 		[DefaultValue("")]
@@ -219,7 +219,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Protected DbCommand Properties ·
+		#region Protected DbCommand Properties
 
 		protected override DbConnection DbConnection
 		{
@@ -240,7 +240,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Design-Time properties ·
+		#region Design-Time properties
 
 		[Browsable(false)]
 		[DesignOnly(true)]
@@ -257,7 +257,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 
 		internal int RecordsAffected
 		{
@@ -320,7 +320,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbCommand()
 			: this(null, null, null)
@@ -371,7 +371,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		protected override void Dispose(bool disposing)
 		{
@@ -413,7 +413,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · ICloneable Methods ·
+		#region ICloneable Methods
 
 		object ICloneable.Clone()
 		{
@@ -443,7 +443,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override void Cancel()
 		{
@@ -638,7 +638,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbCommand Protected Methods ·
+		#region DbCommand Protected Methods
 
 		protected override DbParameter CreateDbParameter()
 		{
@@ -652,7 +652,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Internal Methods ·
+		#region Internal Methods
 
 		internal void CloseReader()
 		{
@@ -835,7 +835,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Input parameter descriptor generation methods ·
+		#region Input parameter descriptor generation methods
 
 		private void DescribeInput()
 		{
@@ -1115,7 +1115,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void Prepare(bool returnsSet)
 		{

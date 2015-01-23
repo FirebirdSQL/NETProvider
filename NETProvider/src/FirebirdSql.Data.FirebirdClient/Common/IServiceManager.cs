@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal interface IServiceManager
 	{
-		#region · Properties ·
+		#region Properties
 
 		int Handle
 		{
@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service);
 

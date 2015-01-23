@@ -24,13 +24,13 @@ namespace FirebirdSql.Data.Server
 {
 	public sealed class FbResultSet : IResultSet
 	{
-		#region · Fields ·
+		#region Fields
 
 		private DbDataReader reader;
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbResultSet()
 		{
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Server
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Close()
 		{

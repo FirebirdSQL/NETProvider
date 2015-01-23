@@ -35,13 +35,13 @@ namespace FirebirdSql.Data.FirebirdClient
 	[ListBindable(false)]
 	public sealed class FbParameterCollection : DbParameterCollection
 	{
-		#region · Fields ·
+		#region Fields
 
 		private List<FbParameter> parameters;
 
 		#endregion
 
-		#region · Indexers ·
+		#region Indexers
 
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbParameterCollection overriden properties ·
+		#region DbParameterCollection overriden properties
 
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		internal FbParameterCollection()
 		{
@@ -101,7 +101,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbParameterCollection overriden methods ·
+		#region DbParameterCollection overriden methods
 
 		public void AddRange(IEnumerable<FbParameter> values)
 		{
@@ -303,7 +303,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbParameterCollection overriden protected methods ·
+		#region DbParameterCollection overriden protected methods
 
 		protected override DbParameter GetParameter(string parameterName)
 		{
@@ -327,7 +327,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private string GenerateParameterName()
 		{

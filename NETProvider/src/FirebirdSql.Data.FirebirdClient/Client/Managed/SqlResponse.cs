@@ -23,13 +23,13 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal class SqlResponse : IResponse
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int count;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Count
 		{
@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public SqlResponse(int count)
 		{

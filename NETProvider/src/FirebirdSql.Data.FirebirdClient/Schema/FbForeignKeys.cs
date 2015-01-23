@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Schema
 {
 	internal class FbForeignKeys : FbSchema
 	{
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override StringBuilder GetCommandText(string[] restrictions)
 		{

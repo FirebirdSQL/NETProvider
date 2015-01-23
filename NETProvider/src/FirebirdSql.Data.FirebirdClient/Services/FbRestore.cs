@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbRestore : FbService
 	{
-		#region · Properties ·
+		#region Properties
 
 		private FbBackupFileCollection backupFiles;
 		public FbBackupFileCollection BackupFiles
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbRestore(string connectionString = null)
 			: base(connectionString)
@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Execute()
 		{

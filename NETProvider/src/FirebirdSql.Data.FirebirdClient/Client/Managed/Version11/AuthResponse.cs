@@ -24,13 +24,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 {
 	internal class AuthResponse : IResponse
 	{
-		#region · Properties ·
+		#region Properties
 		
 		public byte[] Data { get; private set; }
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public AuthResponse(byte[] data)
 		{

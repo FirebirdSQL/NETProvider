@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	internal sealed class ClientFactory
 	{
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static IDatabase CreateDatabase(FbConnectionString options)
 		{
@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private ClientFactory()
 		{ }

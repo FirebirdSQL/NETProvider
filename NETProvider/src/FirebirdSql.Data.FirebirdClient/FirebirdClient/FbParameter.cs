@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	[ParenthesizePropertyName(true)]
 	public sealed class FbParameter : DbParameter, ICloneable
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbParameterCollection parent;
 		private FbDbType fbDbType;
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbParameter properties ·
+		#region DbParameter properties
 
 		[DefaultValue("")]
 		public override string ParameterName
@@ -182,7 +182,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		[Category("Data")]
 		[DefaultValue((byte)0)]
@@ -202,7 +202,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 
 		internal FbParameterCollection Parent
 		{
@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbParameter()
 		{
@@ -323,7 +323,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · ICloneable Methods ·
+		#region ICloneable Methods
 
 		object ICloneable.Clone()
 		{
@@ -343,7 +343,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · DbParameter methods ·
+		#region DbParameter methods
 
 		public override string ToString()
 		{
@@ -357,7 +357,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void SetFbDbType(object value)
 		{
@@ -436,7 +436,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Properties ·
+		#region Private Properties
 
 		private int? RealValueSize
 		{

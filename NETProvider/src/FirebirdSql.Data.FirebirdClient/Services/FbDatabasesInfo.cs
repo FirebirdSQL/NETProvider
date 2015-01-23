@@ -26,14 +26,14 @@ namespace FirebirdSql.Data.Services
 {
 	public struct FbDatabasesInfo
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int connectionCount;
 		private List<string> databases;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int ConnectionCount
 		{

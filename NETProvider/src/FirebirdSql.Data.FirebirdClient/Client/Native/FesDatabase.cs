@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesDatabase : IDatabase
 	{
-		#region · Callbacks ·
+		#region Callbacks
 
 		public WarningMessageCallback WarningMessage
 		{
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private WarningMessageCallback warningMessage;
 
@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -119,7 +119,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FesDatabase()
 			: this(null, null)
@@ -139,7 +139,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~FesDatabase()
 		{
@@ -148,7 +148,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		public void Dispose()
 		{
@@ -193,7 +193,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Database Methods ·
+		#region Database Methods
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
@@ -241,7 +241,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Remote Events Methods ·
+		#region Remote Events Methods
 
 		public void CloseEventManager()
 		{
@@ -265,7 +265,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
@@ -324,7 +324,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Transaction Methods ·
+		#region Transaction Methods
 
 		public ITransaction BeginTransaction(TransactionParameterBuffer tpb)
 		{
@@ -336,7 +336,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Cancel Methods ·
+		#region Cancel Methods
 
 		public void CancelOperation(int kind)
 		{
@@ -351,7 +351,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Statement Creation Methods ·
+		#region Statement Creation Methods
 
 		public StatementBase CreateStatement()
 		{
@@ -365,7 +365,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Database Information Methods ·
+		#region Database Information Methods
 
 		public string GetServerVersion()
 		{
@@ -394,7 +394,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Trigger Context Methods ·
+		#region Trigger Context Methods
 
 		public ITriggerContext GetTriggerContext()
 		{
@@ -403,7 +403,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Internal Methods ·
+		#region Internal Methods
 
 		internal void ParseStatusVector(IntPtr[] statusVector)
 		{
@@ -424,7 +424,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ClearStatusVector()
 		{

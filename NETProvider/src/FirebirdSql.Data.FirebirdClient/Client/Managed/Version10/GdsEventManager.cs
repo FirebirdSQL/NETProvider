@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal class GdsEventManager
 	{
-		#region · Fields ·
+		#region Fields
 
 		private GdsDatabase database;
 		private Thread eventsThread;
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsEventManager(int handle, string ipAddress, int portNumber)
 		{
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void QueueEvents(RemoteEvent remoteEvent)
 		{
@@ -106,7 +106,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ThreadHandler(object o)
 		{

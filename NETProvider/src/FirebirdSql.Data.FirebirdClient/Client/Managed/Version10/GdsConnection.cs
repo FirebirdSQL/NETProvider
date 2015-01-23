@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		const ulong KeepAliveTime = 1800000; //30min
 		const ulong KeepAliveInterval = 1800000; //30min
 
-		#region · Fields ·
+		#region Fields
 
 		private Socket socket;
 		private NetworkStream networkStream;
@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public bool IsConnected
 		{
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsConnection(string dataSource, int port)
 			: this(dataSource, port, 8192, Charset.DefaultCharset)
@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public virtual void Connect()
 		{
@@ -218,7 +218,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private IPAddress GetIPAddress(string dataSource, AddressFamily addressFamily)
 		{

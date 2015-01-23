@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal class GdsDatabase : IDatabase, IDatabaseStream
 	{
-		#region · Callbacks ·
+		#region Callbacks
 
 		public WarningMessageCallback WarningMessage
 		{
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		protected WarningMessageCallback warningMessage;
 
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -122,7 +122,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsDatabase(GdsConnection connection)
 		{
@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~GdsDatabase()
 		{
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		public void Dispose()
 		{
@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Attach/Detach Methods ·
+		#region Attach/Detach Methods
 
 		public virtual void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
@@ -322,7 +322,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Database Methods ·
+		#region Database Methods
 
 		public virtual void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
@@ -405,7 +405,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Auxiliary Connection Methods ·
+		#region Auxiliary Connection Methods
 
 		public virtual void ConnectionRequest(out int auxHandle, out string ipAddress, out int portNumber)
 		{
@@ -466,14 +466,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Connection Methods ·
+		#region Connection Methods
 		public void CloseConnection()
 		{
 			this.connection.Disconnect();
 		}
 		#endregion
 
-		#region · Remote Events Methods ·
+		#region Remote Events Methods
 
 		public void CloseEventManager()
 		{
@@ -562,7 +562,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Transaction Methods ·
+		#region Transaction Methods
 
 		public virtual ITransaction BeginTransaction(TransactionParameterBuffer tpb)
 		{
@@ -575,7 +575,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Cancel Methods ·
+		#region Cancel Methods
 
 		public virtual void CancelOperation(int kind)
 		{
@@ -584,7 +584,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Statement Creation Methods ·
+		#region Statement Creation Methods
 
 		public virtual StatementBase CreateStatement()
 		{
@@ -598,7 +598,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Database Information Methods ·
+		#region Database Information Methods
 
 		public virtual string GetServerVersion()
 		{
@@ -627,7 +627,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Trigger Context Methods ·
+		#region Trigger Context Methods
 
 		public virtual ITriggerContext GetTriggerContext()
 		{
@@ -636,7 +636,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Response Methods ·
+		#region Response Methods
 
 		protected void ProcessResponse(IResponse response)
 		{
@@ -779,7 +779,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected virtual IResponse ReadSingleResponse()
 		{
@@ -861,7 +861,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Read Members ·
+		#region Read Members
 
 		public byte[] ReadBytes(int count)
 		{
@@ -955,7 +955,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Write Methods ·
+		#region Write Methods
 
 		public void WriteOpaque(byte[] buffer)
 		{

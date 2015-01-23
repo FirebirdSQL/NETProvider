@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal static class TypeHelper
 	{
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static bool IsDBNull(object value)
 		{

@@ -23,7 +23,7 @@ namespace FirebirdSql.Data.Server
 {
 	public sealed class FbTriggerContext
 	{
-		#region · Properties ·
+		#region Properties
 
 		public string TableName
 		{
@@ -53,13 +53,13 @@ namespace FirebirdSql.Data.Server
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private FbConnection connection;
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbTriggerContext(FbConnection connection)
 		{
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Server
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public object GetOldValue(string name)
 		{

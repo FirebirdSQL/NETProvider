@@ -30,13 +30,13 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbCommandBuilderTests : TestsBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbDataAdapter adapter;
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbCommandBuilderTests()
 			: base(false)
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · SetUp and TearDown methods ·
+		#region SetUp and TearDown methods
 
 		[SetUp]
 		public override void SetUp()
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void GetInsertCommandTest()

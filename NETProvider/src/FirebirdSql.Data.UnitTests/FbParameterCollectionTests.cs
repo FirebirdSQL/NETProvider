@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbParameterCollectionTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbParameterCollectionTests()
 			: base()
@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void AddTest()

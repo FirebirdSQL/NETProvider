@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	[Serializable]
 	public sealed class FirebirdClientPermission : DBDataPermission 
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		[Obsolete("FbPermission() is obsolte call FbPermission(PermissionState.None)", true)]
 		public FirebirdClientPermission() : this(PermissionState.None)
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		
 		#endregion
 
-		#region · Internal Constructors ·
+		#region Internal Constructors
 
 		internal FirebirdClientPermission(string connectionString) : base(PermissionState.None)
 		{
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override IPermission Copy()
 		{

@@ -31,14 +31,14 @@ namespace FirebirdSql.Data.FirebirdClient
 	[DefaultEvent("RowUpdated")]
 	public sealed class FbDataAdapter : DbDataAdapter, ICloneable
 	{
-		#region · Static Fields ·
+		#region Static Fields
 
 		private static readonly object EventRowUpdated = new object();
 		private static readonly object EventRowUpdating = new object();
 
 		#endregion
 
-		#region · Events ·
+		#region Events
 
 		public event FbRowUpdatedEventHandler RowUpdated
 		{
@@ -68,14 +68,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private bool disposed;
 		private bool shouldDisposeSelectCommand;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		[Category("Fill")]
 		[DefaultValue(null)]
@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbDataAdapter()
 			: base()
@@ -175,7 +175,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override RowUpdatingEventArgs CreateRowUpdatingEvent(
 			DataRow dataRow,
@@ -225,7 +225,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Update DataRow Collection ·
+		#region Update DataRow Collection
 
 		/// <summary>
 		/// Review .NET	Framework documentation.
@@ -470,7 +470,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private string CreateExceptionMessage(StatementType statementType)
 		{

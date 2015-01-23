@@ -23,7 +23,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	[Serializable]
 	public sealed class FbError
 	{
-		#region · Fields ·
+		#region Fields
 
 		private byte classError;
 		private int lineNumber;
@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public byte Class
 		{
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		internal FbError(string message, int number)
 			: this(0, 0, message, number)

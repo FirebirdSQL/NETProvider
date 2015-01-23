@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesServiceManager : IServiceManager
 	{
-		#region · Fields ·
+		#region Fields
 
 		private IFbClient fbClient;
 		private int handle;
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FesServiceManager()
 			: this(null, null)
@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
 		{
@@ -156,7 +156,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ClearStatusVector()
 		{

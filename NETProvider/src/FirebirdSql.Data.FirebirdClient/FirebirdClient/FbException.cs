@@ -33,13 +33,13 @@ namespace FirebirdSql.Data.FirebirdClient
 	[Serializable]
 	public sealed class FbException : DbException
 	{
-		#region · Fields ·
+		#region Fields
 
 		private FbErrorCollection errors;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 		public FbErrorCollection Errors
@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		internal FbException()
 			: base()
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
 		[SecurityCritical]
@@ -125,7 +125,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Internal Methods ·
+		#region Internal Methods
 
 		internal void ProcessIscExceptionErrors(IscException innerException)
 		{

@@ -32,14 +32,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal class XdrStream : Stream
 	{
-		#region · Static Fields ·
+		#region Static Fields
 
 		private static byte[] fill;
 		private static byte[] pad;
 
 		#endregion
 
-		#region · Static Properties ·
+		#region Static Properties
 
 		internal static byte[] Fill
 		{
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private Charset charset;
 		private Stream innerStream;
@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Stream Properties ·
+		#region Stream Properties
 
 		public override bool CanWrite
 		{
@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public XdrStream()
 			: this(Charset.DefaultCharset)
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Stream methods ·
+		#region Stream methods
 
 		public override void Close()
 		{
@@ -226,7 +226,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Operation Identification Methods ·
+		#region Operation Identification Methods
 
 		public virtual int ReadOperation()
 		{
@@ -253,7 +253,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · XDR Read Methods ·
+		#region XDR Read Methods
 
 		public byte[] ReadBytes(int count)
 		{
@@ -494,7 +494,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · XDR Write Methods ·
+		#region XDR Write Methods
 
 		public void WriteOpaque(byte[] buffer)
 		{
@@ -773,7 +773,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void CheckDisposed()
 		{
@@ -790,7 +790,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private bool ValidOperationAvailable
 		{

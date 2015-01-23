@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.Schema
 {
 	internal abstract class FbSchema
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbSchema()
 		{
@@ -38,13 +38,13 @@ namespace FirebirdSql.Data.Schema
 
 		#endregion
 
-		#region · Abstract Methods ·
+		#region Abstract Methods
 
 		protected abstract StringBuilder GetCommandText(string[] restrictions);
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Schema
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected FbCommand BuildCommand(FbConnection connection, string collectionName, string[] restrictions)
 		{
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.Schema
 		
 		#endregion
 
-		#region · Private Static Methods ·
+		#region Private Static Methods
 
 		private static void TrimStringFields(DataTable schema)
 		{

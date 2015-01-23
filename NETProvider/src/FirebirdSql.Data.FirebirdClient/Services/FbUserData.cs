@@ -22,7 +22,7 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbUserData
 	{
-		#region · Fields ·
+		#region Fields
 
 		private string userName;
 		private string firstName;
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public string UserName
 		{
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbUserData()
 		{

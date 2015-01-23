@@ -27,13 +27,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ExtServiceManager : IServiceManager
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int handle;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public ExtServiceManager()
 		{
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
 		{
@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ParseStatusVector(int[] statusVector)
 		{

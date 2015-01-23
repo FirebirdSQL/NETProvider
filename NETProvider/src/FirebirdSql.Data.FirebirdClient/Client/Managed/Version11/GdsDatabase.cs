@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 {
 	internal class GdsDatabase : Version10.GdsDatabase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsDatabase(Version10.GdsConnection connection)
 			: base(connection)
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		public Queue<Action<IResponse>> DeferredPackets { get; private set; }
 		#endregion
 
-		#region · Override Statement Creation Methods ·
+		#region Override Statement Creation Methods
 
 		public override StatementBase CreateStatement()
 		{

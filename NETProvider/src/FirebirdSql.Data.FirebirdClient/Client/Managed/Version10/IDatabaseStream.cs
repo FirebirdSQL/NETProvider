@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal interface IDatabaseStream
 	{
-		#region · Read Methods ·
+		#region Read Methods
 
 		byte[] ReadBytes(int count);
 
@@ -66,7 +66,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Write Methods ·
+		#region Write Methods
 
 		void WriteOpaque(byte[] buffer);
 
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Reponse Methods ·
+		#region Reponse Methods
 
 		int ReadOperation();
 

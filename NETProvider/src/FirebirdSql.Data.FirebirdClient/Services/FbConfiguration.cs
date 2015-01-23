@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbConfiguration : FbService
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbConfiguration(string connectionString = null)
 			: base(connectionString)
@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void SetSqlDialect(int sqlDialect)
 		{
@@ -249,7 +249,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		byte FbShutdownOnlineModeToIscCode(FbShutdownOnlineMode mode)
 		{

@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal class Symbol : ISqlFragment
 	{
-		#region · Fields ·
+		#region Fields
 
 		private Dictionary<string, Symbol> columns = new Dictionary<string, Symbol>(StringComparer.CurrentCultureIgnoreCase);
 		private bool needsRenaming = false;
@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Public Properties ·
+		#region Public Properties
 
 		public string Name
 		{
@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 
 		internal Dictionary<string, Symbol> Columns
 		{
@@ -109,7 +109,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public Symbol(string name, TypeUsage type)
 		{
@@ -120,7 +120,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · ISqlFragment Members ·
+		#region ISqlFragment Members
 
 		/// <summary>
 		/// Write this symbol out as a string for sql.  This is just

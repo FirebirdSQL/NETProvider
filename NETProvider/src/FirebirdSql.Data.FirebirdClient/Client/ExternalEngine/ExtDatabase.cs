@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ExtDatabase : IDatabase
 	{
-		#region · Callbacks ·
+		#region Callbacks
 
 		public WarningMessageCallback WarningMessage
 		{
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private WarningMessageCallback warningMessage;
 
@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public ExtDatabase()
 		{
@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~ExtDatabase()
 		{
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		public void Dispose()
 		{
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Database Methods ·
+		#region Database Methods
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Remote Events Methods ·
+		#region Remote Events Methods
 
 		public void CloseEventManager()
 		{
@@ -214,7 +214,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
@@ -242,7 +242,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Transaction Methods ·
+		#region Transaction Methods
 
 		public ITransaction BeginTransaction(TransactionParameterBuffer tpb)
 		{
@@ -254,7 +254,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Cancel Methods ·
+		#region Cancel Methods
 
 		public void CancelOperation(int kind)
 		{
@@ -263,7 +263,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Statement Creation Methods ·
+		#region Statement Creation Methods
 
 		public StatementBase CreateStatement()
 		{
@@ -277,7 +277,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Database Information Methods ·
+		#region Database Information Methods
 
 		public string GetServerVersion()
 		{
@@ -306,7 +306,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Trigger Context Methods ·
+		#region Trigger Context Methods
 
 		public ITriggerContext GetTriggerContext()
 		{
@@ -315,7 +315,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Internal Methods ·
+		#region Internal Methods
 
 		internal void ParseStatusVector(int[] statusVector)
 		{
@@ -336,7 +336,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ClearStatusVector()
 		{

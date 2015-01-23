@@ -23,7 +23,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal struct ArrayDesc
 	{
-		#region · Fields ·
+		#region Fields
 
 		private byte	dataType;
 		private short	scale;
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public byte DataType
 		{

@@ -25,13 +25,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ExtBlob : BlobBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private ExtDatabase db;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override IDatabase Database
 		{
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public ExtBlob(IDatabase db, ITransaction transaction)
 			: this(db, transaction, 0)
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override void Create()
 		{

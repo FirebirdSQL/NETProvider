@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		AttributeTargets.Constructor | AttributeTargets.Method, AllowMultiple=true, Inherited=false)]
 	public sealed class FirebirdClientPermissionAttribute : DBDataPermissionAttribute 
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FirebirdClientPermissionAttribute(SecurityAction action)
 			: base(action)
@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override IPermission CreatePermission() 
 		{

@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ExtArray : ArrayBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private long handle;
 		private ExtDatabase db;
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override long Handle
 		{
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public ExtArray(ArrayDesc descriptor)
 			: base(descriptor)
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override byte[] GetSlice(int sliceLength)
 		{
@@ -179,7 +179,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override System.Array DecodeSlice(byte[] slice)
 		{
@@ -344,7 +344,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Private Metods ·
+		#region Private Metods
 
 		private byte[] EncodeSlice(ArrayDesc desc, Array sourceArray, int length)
 		{

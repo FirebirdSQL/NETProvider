@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	internal sealed class FbConnectionString
 	{
-		#region · Static Fields ·
+		#region Static Fields
 
 		public static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) 
 		{
@@ -97,14 +97,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private Dictionary<string, object> options;
 		private bool isServiceConnectionString;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public string UserID
 		{
@@ -228,7 +228,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 		internal bool FallIntoTrustedAuth
 		{
 			// on non-Win the UserID/Password is checked in Validate method
@@ -241,7 +241,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbConnectionString()
 		{
@@ -261,7 +261,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void Load(string connectionString)
 		{
@@ -378,7 +378,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void SetDefaultOptions()
 		{

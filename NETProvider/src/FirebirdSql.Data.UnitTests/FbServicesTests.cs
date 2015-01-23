@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class FbServicesTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public FbServicesTests()
 			: base(false)
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Setup Method ·
+		#region Setup Method
 
 		[SetUp]
 		public override void SetUp()
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Event Handlers ·
+		#region Event Handlers
 
 		void ServiceOutput(object sender, ServiceOutputEventArgs e)
 		{
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Static Helpers ·
+		#region Static Helpers
 
 		string GetBackupRestoreFullPath()
 		{
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void BackupRestore_A_Backup01Test()

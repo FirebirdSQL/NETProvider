@@ -33,14 +33,14 @@ namespace FirebirdSql.Data.Isql
 	/// </summary>
 	public class FbScript
 	{
-		#region · Fields ·
+		#region Fields
 
 		private StringParser parser;
 		private FbStatementCollection results;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		/// <summary>
 		/// Returns a FbStatementCollection containing all the SQL statements (without comments) present on the file.
@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Static ·
+		#region Static
 		/// <summary>
 		/// Creates FbScript reading content from file.
 		/// </summary>
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Isql
 		}
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbScript(string script)
 		{
@@ -74,7 +74,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		/// <summary>
 		/// Parses the SQL code and loads the SQL statements into the StringCollection <see cref="Results"/>.
@@ -119,7 +119,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Protected Static Methods ·
+		#region Protected Static Methods
 
 		/// <summary>
 		/// Removes from the SQL code all comments of the type: /*...*/ or --
@@ -188,7 +188,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		// method assumes that statement is trimmed 
 		private bool isSetTermStatement(string statement, out string newTerm)

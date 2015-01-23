@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture]
 	public class TrackerIssuesTests : TestsBase
 	{
-		#region · Constructors ·
+		#region Constructors
 
 		public TrackerIssuesTests()
 		{
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region · Unit Tests ·
+		#region Unit Tests
 
 		[Test]
 		public void DNET60()

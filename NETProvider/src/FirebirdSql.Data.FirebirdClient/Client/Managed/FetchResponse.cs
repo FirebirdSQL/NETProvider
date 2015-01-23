@@ -23,14 +23,14 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal class FetchResponse : IResponse
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int status;
 		private int count;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Status
 		{
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FetchResponse(int status, int count)
 		{

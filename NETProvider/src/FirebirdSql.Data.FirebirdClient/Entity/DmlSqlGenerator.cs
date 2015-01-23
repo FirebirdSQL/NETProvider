@@ -50,13 +50,13 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal static class DmlSqlGenerator
 	{
-		#region · Static Fields ·
+		#region Static Fields
 
 		private const int CommandTextBuilderInitialCapacity = 256;
 
 		#endregion
 
-		#region · Static Methods ·
+		#region Static Methods
 
 		internal static string GenerateUpdateSql(DbUpdateCommandTree tree, out List<DbParameter> parameters)
 		{

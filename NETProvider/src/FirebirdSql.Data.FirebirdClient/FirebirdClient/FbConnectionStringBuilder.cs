@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public class FbConnectionStringBuilder : DbConnectionStringBuilder
 	{
-		#region · Properties ·
+		#region Properties
 
 		public string UserID
 		{
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FbConnectionStringBuilder()
 		{
@@ -191,7 +191,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region · Private methods ·
+		#region Private methods
 
 		private int GetInt32(string keyword)
 		{

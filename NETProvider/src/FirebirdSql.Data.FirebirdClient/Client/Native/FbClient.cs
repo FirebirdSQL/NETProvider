@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Client.Native
 	[SuppressUnmanagedCodeSecurity]
 	internal sealed class FbClient
 	{
-		#region · Conditional Constants ·
+		#region Conditional Constants
 
 #if	(LINUX)
 	#if	(FBCLIENT)
@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private FbClient()
 		{
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Array Functions ·
+		#region Array Functions
 
 		[DllImport(FbClient.DllPath)]
 		public static extern int isc_array_get_slice(
@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Blob Functions ·
+		#region Blob Functions
 
 		[DllImport(FbClient.DllPath)]
 		public static extern int isc_create_blob2(
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Database Functions ·
+		#region Database Functions
 
 		[DllImport(FbClient.DllPath)]
 		public static extern int isc_attach_database(
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Transaction Functions ·
+		#region Transaction Functions
 
 		[DllImport(FbClient.DllPath)]
 		public static extern int isc_start_multiple(
@@ -209,7 +209,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · DSQL Functions ·
+		#region DSQL Functions
 
 		[DllImport(FbClient.DllPath)]
 		public static extern int isc_dsql_allocate_statement(
@@ -287,7 +287,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Services Functions ·
+		#region Services Functions
 
 		[DllImport(FbClient.DllPath)]
 		public static extern int isc_service_attach(

@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesTransaction : ITransaction, IDisposable
 	{
-		#region · Inner Structs ·
+		#region Inner Structs
 
 		[StructLayout(LayoutKind.Sequential)]
 		struct IscTeb
@@ -39,13 +39,13 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Events ·
+		#region Events
 
 		public event TransactionUpdateEventHandler Update;
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private int handle;
 		private FesDatabase db;
@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public int Handle
 		{
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FesTransaction(IDatabase db)
 		{
@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Finalizer ·
+		#region Finalizer
 
 		~FesTransaction()
 		{
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		public void Dispose()
 		{
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void BeginTransaction(TransactionParameterBuffer tpb)
 		{
@@ -312,7 +312,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Two Phase Commit Methods ·
+		#region Two Phase Commit Methods
 
 		void ITransaction.Prepare()
 		{
@@ -324,7 +324,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ClearStatusVector()
 		{

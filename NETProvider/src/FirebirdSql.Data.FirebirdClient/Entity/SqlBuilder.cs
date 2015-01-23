@@ -45,13 +45,13 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal sealed class SqlBuilder : ISqlFragment
 	{
-		#region · Fields ·
+		#region Fields
 
 		private List<object> sqlFragments;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		private List<object> SqlFragments
 		{
@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		/// <summary>
 		/// Add an object to the list - we do not verify that it is a proper sql fragment
@@ -101,7 +101,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · ISqlFragment Members ·
+		#region ISqlFragment Members
 
 		/// <summary>
 		/// We delegate the writing of the fragment to the appropriate type.

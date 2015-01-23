@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal class GdsStatement : StatementBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		protected int			    handle;
 		protected GdsDatabase       database;
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override IDatabase Database
 		{
@@ -133,7 +133,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsStatement(IDatabase db)
 			: this(db, null)
@@ -169,7 +169,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		protected override void Dispose(bool disposing)
 		{
@@ -214,7 +214,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Blob Creation Metods ·
+		#region Blob Creation Metods
 
 		public override BlobBase CreateBlob()
 		{
@@ -228,7 +228,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Array Creation Methods ·
+		#region Array Creation Methods
 
 		public override ArrayBase CreateArray(ArrayDesc descriptor)
 		{
@@ -247,7 +247,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override void Prepare(string commandText)
 		{
@@ -442,7 +442,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		#region op_prepare methods
 		protected void SendPrepareToBuffer(string commandText)

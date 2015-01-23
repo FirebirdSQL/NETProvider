@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal sealed class GdsArray : ArrayBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private long			handle;
 		private GdsDatabase		database;
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override long Handle
 		{
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public GdsArray(ArrayDesc descriptor) : base(descriptor)
 		{
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override byte[] GetSlice(int sliceLength)
 		{
@@ -155,7 +155,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override System.Array DecodeSlice(byte[] slice)
 		{
@@ -262,7 +262,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private byte[] ReceiveSliceResponse(ArrayDesc desc)
 		{

@@ -34,13 +34,13 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal class FirstClause : ISqlFragment
 	{
-		#region · Fields ·
+		#region Fields
 
 		private ISqlFragment firstCount;
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 
 		/// <summary>
 		/// How many first rows should be selected.
@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		/// <summary>
 		/// Creates a FirstClause with the given topCount and withTies.
@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · ISqlFragment Members ·
+		#region ISqlFragment Members
 
 		/// <summary>
 		/// Write out the FIRST part of sql select statement 

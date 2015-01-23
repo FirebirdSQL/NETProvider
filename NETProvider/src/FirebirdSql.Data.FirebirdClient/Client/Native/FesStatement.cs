@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesStatement : StatementBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int handle;
 		private FesDatabase db;
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override IDatabase Database
 		{
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FesStatement(IDatabase db)
 			: this(db, null)
@@ -167,7 +167,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		protected override void Dispose(bool disposing)
 		{
@@ -209,7 +209,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Blob Creation Metods ·
+		#region Blob Creation Metods
 
 		public override BlobBase CreateBlob()
 		{
@@ -223,7 +223,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Array Creation Methods ·
+		#region Array Creation Methods
 
 		public override ArrayBase CreateArray(ArrayDesc descriptor)
 		{
@@ -242,7 +242,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override void Release()
 		{
@@ -594,7 +594,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override void Free(int option)
 		{
@@ -674,7 +674,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void ClearStatusVector()
 		{

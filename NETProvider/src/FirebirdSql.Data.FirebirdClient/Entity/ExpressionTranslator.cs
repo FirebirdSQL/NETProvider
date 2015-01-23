@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	class ExpressionTranslator : DbExpressionVisitor
 	{
-		#region · Fields ·
+		#region Fields
 
 		private readonly StringBuilder commandText;
 		private readonly DbModificationCommandTree commandTree;
@@ -60,7 +60,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 
 		internal List<DbParameter> Parameters
 		{
@@ -74,7 +74,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Unsupported Visit Methods ·
+		#region Unsupported Visit Methods
 
 		public override void Visit(DbApplyExpression expression)
 		{
@@ -238,7 +238,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override void Visit(DbAndExpression expression)
 		{
@@ -316,7 +316,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Internal Methods ·
+		#region Internal Methods
 
 		/// <summary>
 		/// Initialize a new expression translator populating the given string builder
@@ -388,7 +388,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void VisitBinary(DbBinaryExpression expression, string separator)
 		{

@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Common
 	[Serializable]
 	internal sealed class IscError
 	{
-		#region · Fields ·
+		#region Fields
 
 		private string	message;
 		private int		type;
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public string Message
 		{
@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		internal IscError(int errorCode)
 		{

@@ -28,13 +28,13 @@ namespace FirebirdSql.Data.Client.Common
 {
 	internal class ArrayDescMarshaler
 	{
-		#region · Static Fields ·
+		#region Static Fields
 
 		private static readonly ArrayDescMarshaler instance = new ArrayDescMarshaler();
 
 		#endregion
 
-		#region · Static Properties ·
+		#region Static Properties
 
 		public static ArrayDescMarshaler Instance
 		{
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private ArrayDescMarshaler()
 		{
@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Client.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void CleanUpNativeData(ref IntPtr pNativeData)
 		{

@@ -22,13 +22,13 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class ServiceOutputEventArgs : EventArgs
 	{
-		#region · Fields ·
+		#region Fields
 
 		private string message;
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public string Message
 		{
@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.Services
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public ServiceOutputEventArgs(string message)
 		{

@@ -16,7 +16,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal class BinaryEncoding : Encoding
 	{
-		#region · Static Methods ·
+		#region Static Methods
 
 		public static string BytesToString(byte[] byteArray)
 		{
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override int GetByteCount(char[] chars, int index, int count)
 		{

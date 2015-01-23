@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesArray : ArrayBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private long handle;
 		private FesDatabase db;
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override long Handle
 		{
@@ -65,7 +65,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public FesArray(ArrayDesc descriptor)
 			: base(descriptor)
@@ -108,7 +108,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override byte[] GetSlice(int sliceLength)
 		{
@@ -184,7 +184,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override System.Array DecodeSlice(byte[] slice)
 		{
@@ -349,7 +349,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region · Private Metods ·
+		#region Private Metods
 
 		private void ClearStatusVector()
 		{

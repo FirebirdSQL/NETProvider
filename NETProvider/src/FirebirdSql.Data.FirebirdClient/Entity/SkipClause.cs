@@ -33,13 +33,13 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal class SkipClause : ISqlFragment
 	{
-		#region · Fields ·
+		#region Fields
 
 		private ISqlFragment skipCount;
 
 		#endregion
 
-		#region · Internal Properties ·
+		#region Internal Properties
 
 		/// <summary>
 		/// How many rows should be skipped.
@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		/// <summary>
 		/// Creates a SkipClause with the given skipCount.
@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · ISqlFragment Members ·
+		#region ISqlFragment Members
 
 		/// <summary>
 		/// Write out the SKIP part of sql select statement 

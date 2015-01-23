@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ExtStatement : StatementBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private int handle;
 		private ExtDatabase db;
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public override IDatabase Database
 		{
@@ -135,7 +135,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public ExtStatement(IDatabase db)
 			: this(db, null)
@@ -163,7 +163,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · IDisposable methods ·
+		#region IDisposable methods
 
 		protected override void Dispose(bool disposing)
 		{
@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Blob Creation Metods ·
+		#region Blob Creation Metods
 
 		public override BlobBase CreateBlob()
 		{
@@ -213,7 +213,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Array Creation Methods ·
+		#region Array Creation Methods
 
 		public override ArrayBase CreateArray(ArrayDesc descriptor)
 		{
@@ -232,7 +232,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public override void Prepare(string commandText)
 		{
@@ -562,7 +562,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected override void Free(int option)
 		{
@@ -638,7 +638,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private void Clear()
 		{

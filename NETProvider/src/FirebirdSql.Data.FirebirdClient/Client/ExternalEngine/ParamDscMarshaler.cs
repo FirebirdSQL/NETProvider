@@ -24,7 +24,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 {
 	internal sealed class ParamDscMarshaler
 	{
-		#region · Constants ·
+		#region Constants
 
 		public const int DSC_null           = 1;
 		public const int DSC_no_subtype		= 2;	/* dsc has no sub type specified */
@@ -36,13 +36,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Static Fields ·
+		#region Static Fields
 
 		private static readonly ParamDscMarshaler instance = new ParamDscMarshaler();
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public static ParamDscMarshaler Instance
 		{
@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		private ParamDscMarshaler()
 		{
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public void CleanUpNativeData(ref IntPtr pNativeData)
 		{
@@ -119,7 +119,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private object GetValue(ParamDsc descriptor, Charset charset)
 		{

@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal abstract class ArrayBase
 	{
-		#region · Fields ·
+		#region Fields
 
 		private ArrayDesc	descriptor;
 		private string		tableName;
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public ArrayDesc Descriptor
 		{
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Abstract Properties ·
+		#region Abstract Properties
 
 		public abstract long Handle
 		{
@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		protected ArrayBase(ArrayDesc descriptor)
 		{
@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public Array Read()
 		{
@@ -173,7 +173,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Protected Methods ·
+		#region Protected Methods
 
 		protected int GetSliceLength(bool read)
 		{
@@ -292,20 +292,20 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Abstract Methods ·
+		#region Abstract Methods
 
 		public abstract byte[] GetSlice(int slice_length);
 		public abstract void PutSlice(System.Array source_array, int slice_length);
 
 		#endregion
 
-		#region · Protected Abstract Methods ·
+		#region Protected Abstract Methods
 
 		protected abstract System.Array DecodeSlice(byte[] slice);
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private string GetArrayDesc()
 		{

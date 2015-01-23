@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Isql
 	/// </summary>
 	public class FbBatchExecution
 	{
-		#region · Events ·
+		#region Events
 
 		/// <summary>
 		/// The event trigged before a SQL statement goes for execution.
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Fields ·
+		#region Fields
 
 		private FbStatementCollection sqlStatements;
 		private FbConnection sqlConnection;
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		/// <summary>
 		/// Represents the list of SQL statements for batch execution.
@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		/// <summary>
 		/// Creates an instance of FbBatchExecution engine.
@@ -142,7 +142,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		/// <summary>
 		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
@@ -468,7 +468,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Protected Internal Methods ·
+		#region Protected Internal Methods
 
 		/// <summary>
 		/// Updates the connection string with the data parsed from the parameter and opens a connection
@@ -705,7 +705,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Event Handlers ·
+		#region Event Handlers
 
 		/// <summary>
 		/// The trigger function for <see cref="CommandExecuting"/>	event.
@@ -741,7 +741,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region · Static Methods ·
+		#region Static Methods
 
 		/// <summary>
 		/// Determines the <see cref="SqlStatementType"/> of the provided SQL statement.

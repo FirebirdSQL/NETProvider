@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	/// </summary>
 	internal sealed class JoinSymbol : Symbol
 	{
-		#region · Fields ·
+		#region Fields
 
 		private List<Symbol> columnList;
 		private List<Symbol> extentList;
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		internal List<Symbol> ColumnList
 		{
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public JoinSymbol(string name, TypeUsage type, List<Symbol> extents)
 			: base(name, type)

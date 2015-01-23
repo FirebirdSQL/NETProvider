@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal sealed class DbValue
 	{
-		#region · Fields ·
+		#region Fields
 
 		private StatementBase	statement;
 		private DbField			field;
@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Properties ·
+		#region Properties
 
 		public DbField Field
 		{
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Constructors ·
+		#region Constructors
 
 		public DbValue(DbField field, object value)
 		{
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Methods ·
+		#region Methods
 
 		public bool IsDBNull()
 		{
@@ -344,7 +344,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region · Private Methods ·
+		#region Private Methods
 
 		private object GetValue()
 		{
