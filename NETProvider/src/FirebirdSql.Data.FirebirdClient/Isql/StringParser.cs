@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Isql
 	///	Parsing	result:	class?!
 	/// </code>
 	/// </example>
-	public class StringParser
+	class StringParser
 	{
 		#region Fields
 
