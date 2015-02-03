@@ -66,7 +66,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Connection")]
 		[DisplayName("Database")]
-		[Description("The name of the actual database or the database to be used when a connection is open.")]
+		[Description("The name of the actual database or the database to be " +
+			"used when a connection is open.")]
 		[DefaultValue("")]
 		public string Database
 		{
@@ -86,7 +87,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Advanced")]
 		[DisplayName("PacketSize")]
-		[Description("The size (in bytes) of network packets. PacketSize may be in the range 512-32767 bytes.")]
+		[Description("The size (in bytes) of network packets. PacketSize may " +
+			"be in the range 512-32767 bytes.")]
 		[DefaultValue(8192)]
 		public int PacketSize
 		{
@@ -136,7 +138,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Advanced")]
 		[DisplayName("Pooling")]
-		[Description("When true the connection is grabbed from a pool or, if necessary, created and added to the appropriate pool.")]
+		[Description("When true the connection is grabbed from a pool or, " +
+			"if necessary, created and added to the appropriate pool.")]
 		[DefaultValue(true)]
 		public bool Pooling
 		{
@@ -230,7 +233,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Advanced")]
 		[DisplayName("Enlist")]
-		[Description("When true, enlists the connections in the current transaction.")]
+		[Description("If true, enlists the connections in the current transaction.")]
 		[DefaultValue(false)]
 		public bool Enlist
 		{            
@@ -250,7 +253,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Advanced")]
 		[DisplayName("Cache Pages")]
-		[Description("How many cache buffers to use for this session (for Firebird Classic Server only).")]
+		[Description("How many cache buffers to use for this session.")]
 		[DefaultValue(0)]
 		public int DbCachePages
 		{
@@ -270,7 +273,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
         [Category("Advanced")]
         [DisplayName("NoGarbageCollect")]
-        [Description("When true, disables sweeping the database upon attachment.")]
+        [Description("If true, disables sweeping the database upon attachment.")]
         [DefaultValue(false)]
         public bool NoGarbageCollect
         {
