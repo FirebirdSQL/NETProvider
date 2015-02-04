@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Password", value); }
 		}
 
-		[Category("Connection")]
+		[Category("Source")]
 		[DisplayName("DataSource")]
 		[Description("The name of the Firebird server to which to connect.")]
 		[DefaultValue("")]
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Data Source", value); }
 		}
 
-		[Category("Connection")]
+		[Category("Source")]
 		[DisplayName("Database")]
 		[Description("The name of the actual database or the database to be " +
 			"used when a connection is open.")]
@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Initial Catalog", value); }
 		}
 
-		[Category("Connection")]
+		[Category("Source")]
 		[DisplayName("Port")]
 		[Description("Port to use for TCP/IP connections")]
 		[DefaultValue(3050)]
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Connection Timeout", value); }
 		}
 
-		[Category("Advanced")]
+		[Category("Pooling")]
 		[DisplayName("Pooling")]
 		[Description("When true the connection is grabbed from a pool or, " +
 			"if necessary, created and added to the appropriate pool.")]
@@ -160,7 +160,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Connection Lifetime", value); }
 		}
 
-		[Category("Advanced")]
+		[Category("Pooling")]
 		[DisplayName("MinPoolSize")]
 		[Description("The minimun number of connections allowed in the pool.")]
 		[DefaultValue(0)]
@@ -170,7 +170,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Min Pool Size", value); }
 		}
 
-		[Category("Advanced")]
+		[Category("Pooling")]
 		[DisplayName("MaxPoolSize")]
 		[Description("The maximum number of connections allowed in the pool.")]
 		[DefaultValue(100)]
@@ -191,7 +191,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Fetch Size", value); }
 		}
 
-		[Category("Connection")]
+		[Category("Source")]
 		[DisplayName("ServerType")]
 		[Description("The type of server used.")]
 		[DefaultValue(FbServerType.Default)]
@@ -221,7 +221,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Records Affected", value); }
 		}
 
-		[Category("Advanced")]
+		[Category("Source")]
 		[DisplayName("ContextConnection")]
 		//[Description("")]
 		[DefaultValue(false)]
@@ -231,7 +231,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { this.SetValue("Context Connection", value); }
 		}
 
-		[Category("Advanced")]
+		[Category("Pooling")]
 		[DisplayName("Enlist")]
 		[Description("If true, enlists the connections in the current transaction.")]
 		[DefaultValue(false)]
