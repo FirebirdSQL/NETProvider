@@ -67,7 +67,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Source")]
 		[DisplayName("Database")]
 		[Description("The name of the actual database or the database to be " +
-			"used when a connection is open.")]
+			"used when a connection is open. It is normally the path to an .FDB " +
+			"file or an alias.")]
 		[DefaultValue("")]
 		public string Database
 		{
