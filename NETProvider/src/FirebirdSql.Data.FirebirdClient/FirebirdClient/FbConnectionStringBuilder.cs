@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Security")]
 		[DisplayName("User ID")]
 		[Description("Indicates the User ID to be used when connecting to the data source.")]
-		[DefaultValue("")]
+		[DefaultValue(FbConnectionString.DefaultUserId)]
 		public string UserID
 		{
 			get { return this.GetString("User ID"); }
@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DisplayName("Password")]
 		[Description("Indicates the password to be used when connecting to the data source.")]
 		[PasswordPropertyText(true)]
-		[DefaultValue("")]
+		[DefaultValue(FbConnectionString.DefaultPassword)]
 		public string Password
 		{
 			get { return this.GetString("Password"); }
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Source")]
 		[DisplayName("DataSource")]
 		[Description("The name of the Firebird server to which to connect.")]
-		[DefaultValue("")]
+		[DefaultValue(FbConnectionString.DefaultDataSource)]
 		public string DataSource
 		{
 			get { return this.GetString("Data Source"); }
@@ -66,10 +66,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Source")]
 		[DisplayName("Database")]
-		[Description("The name of the actual database or the database to be " +
-			"used when a connection is open. It is normally the path to an .FDB " +
-			"file or an alias.")]
-		[DefaultValue("")]
+		[Description("The name of the actual database or the database to be used when a connection is open. It is normally the path to an .FDB file or an alias.")]
+		[DefaultValue(FbConnectionString.DefaultCatalog)]
 		public string Database
 		{
 			get { return this.GetString("Initial Catalog"); }
@@ -79,7 +77,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Source")]
 		[DisplayName("Port")]
 		[Description("Port to use for TCP/IP connections")]
-		[DefaultValue(3050)]
+		[DefaultValue(FbConnectionString.DefaultPortNumber)]
 		public int Port
 		{
 			get { return this.GetInt32("Port Number"); }
@@ -88,9 +86,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Advanced")]
 		[DisplayName("PacketSize")]
-		[Description("The size (in bytes) of network packets. PacketSize may " +
-			"be in the range 512-32767 bytes.")]
-		[DefaultValue(8192)]
+		[Description("The size (in bytes) of network packets. PacketSize may be in the range 512-32767 bytes.")]
+		[DefaultValue(FbConnectionString.DefaultPacketSize)]
 		public int PacketSize
 		{
 			get { return this.GetInt32("Packet Size"); }
@@ -100,7 +97,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Security")]
 		[DisplayName("Role")]
 		[Description("The user role.")]
-		[DefaultValue("")]
+		[DefaultValue(FbConnectionString.DefaultRoleName)]
 		public string Role
 		{
 			get { return this.GetString("Role Name"); }
@@ -110,7 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Advanced")]
 		[DisplayName("Dialect")]
 		[Description("The database SQL dialect.")]
-		[DefaultValue(3)]
+		[DefaultValue(FbConnectionString.DefaultDialect)]
 		public int Dialect
 		{
 			get { return this.GetInt32("Dialect"); }
@@ -120,7 +117,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Advanced")]
 		[DisplayName("Character Set")]
 		[Description("The connection character set encoding.")]
-		[DefaultValue("NONE")]
+		[DefaultValue(FbConnectionString.DefaultCharacterSet)]
 		public string Charset
 		{
 			get { return this.GetString("Character Set"); }
@@ -130,7 +127,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Connection")]
 		[DisplayName("Connection Timeout")]
 		[Description("The time (in seconds) to wait for a connection to open.")]
-		[DefaultValue(15)]
+		[DefaultValue(FbConnectionString.DefaultConnectionTimeout)]
 		public int ConnectionTimeout
 		{
 			get { return this.GetInt32("Connection Timeout"); }
@@ -139,9 +136,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Pooling")]
 		[DisplayName("Pooling")]
-		[Description("When true the connection is grabbed from a pool or, " +
-			"if necessary, created and added to the appropriate pool.")]
-		[DefaultValue(true)]
+		[Description("When true the connection is grabbed from a pool or, if necessary, created and added to the appropriate pool.")]
+		[DefaultValue(FbConnectionString.DefaultPooling)]
 		public bool Pooling
 		{
 			get { return this.GetBoolean("Pooling"); }
@@ -150,11 +146,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Connection")]
 		[DisplayName("Connection LifeTime")]
-		[Description("When a connection is returned to the pool, its creation " +
-			"time is compared with the current time, and the connection is " +
-			"destroyed if that time span (in seconds) exceeds the value " +
-			"specified by connection lifetime.")]
-		[DefaultValue(0)]
+		[Description("When a connection is returned to the pool, its creation time is compared with the current time, and the connection is destroyed if that time span (in seconds) exceeds the value specified by connection lifetime.")]
+		[DefaultValue(FbConnectionString.DefautlConnectionLifetime)]
 		public int ConnectionLifeTime
 		{
 			get { return this.GetInt32("Connection Lifetime"); }
@@ -164,7 +157,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Pooling")]
 		[DisplayName("MinPoolSize")]
 		[Description("The minimun number of connections allowed in the pool.")]
-		[DefaultValue(0)]
+		[DefaultValue(FbConnectionString.DefaultMinPoolSize)]
 		public int MinPoolSize
 		{
 			get { return this.GetInt32("Min Pool Size"); }
@@ -174,7 +167,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Pooling")]
 		[DisplayName("MaxPoolSize")]
 		[Description("The maximum number of connections allowed in the pool.")]
-		[DefaultValue(100)]
+		[DefaultValue(FbConnectionString.DefaultMaxPoolSize)]
 		public int MaxPoolSize
 		{
 			get { return this.GetInt32("Max Pool Size"); }
@@ -183,9 +176,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Advanced")]
 		[DisplayName("FetchSize")]
-		[Description("The maximum number of rows to be fetched in a single " +
-			"call to read into the internal row buffer.")]
-		[DefaultValue(200)]
+		[Description("The maximum number of rows to be fetched in a single call to read into the internal row buffer.")]
+		[DefaultValue(FbConnectionString.DefaultFetchSize)]
 		public int FetchSize
 		{
 			get { return this.GetInt32("Fetch Size"); }
@@ -195,7 +187,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Source")]
 		[DisplayName("ServerType")]
 		[Description("The type of server used.")]
-		[DefaultValue(FbServerType.Default)]
+		[DefaultValue(FbConnectionString.DefaultServerType)]
 		public FbServerType ServerType
 		{
 			get { return this.GetServerType("Server Type"); }
@@ -205,7 +197,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Advanced")]
 		[DisplayName("IsolationLevel")]
 		[Description("The default Isolation Level for implicit transactions.")]
-		[DefaultValue(IsolationLevel.ReadCommitted)]
+		[DefaultValue(FbConnectionString.DefaultIsolationLevel)]
 		public IsolationLevel IsolationLevel
 		{
 			get { return (IsolationLevel)this.GetInt32("Isolation Level"); }
@@ -215,17 +207,17 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Advanced")]
 		[DisplayName("Records Affected")]
 		[Description("Get the number of rows affected by a command when true.")]
-		[DefaultValue(true)]
+		[DefaultValue(FbConnectionString.DefaultRecordsAffected)]
 		public bool ReturnRecordsAffected
 		{
 			get { return this.GetBoolean("Records Affected"); }
 			set { this.SetValue("Records Affected", value); }
 		}
 
-		[Category("Source")]
+		[Category("Advanced")]
 		[DisplayName("ContextConnection")]
-		//[Description("")]
-		[DefaultValue(false)]
+		[Description("Use ContextConnection or not.")]
+		[DefaultValue(FbConnectionString.DefaultContextConnection)]
 		public bool ContextConnection
 		{
 			get { return this.GetBoolean("Context Connection"); }
@@ -235,7 +227,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Pooling")]
 		[DisplayName("Enlist")]
 		[Description("If true, enlists the connections in the current transaction.")]
-		[DefaultValue(false)]
+		[DefaultValue(FbConnectionString.DefaultPooling)]
 		public bool Enlist
 		{            
 			get { return this.GetBoolean("Enlist"); }
@@ -245,7 +237,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Advanced")]
 		[DisplayName("Client Library")]
 		[Description("Client library for Firebird Embedded Server.")]
-		[DefaultValue("fbembed")]
+		[DefaultValue(FbConnectionString.DefaultClientLibrary)]
 		public string ClientLibrary
 		{
 			get { return this.GetString("Client Library"); }
@@ -255,7 +247,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Advanced")]
 		[DisplayName("Cache Pages")]
 		[Description("How many cache buffers to use for this session.")]
-		[DefaultValue(0)]
+		[DefaultValue(FbConnectionString.DefaultCachePages)]
 		public int DbCachePages
 		{
 			get { return this.GetInt32("Cache Pages"); }
@@ -265,7 +257,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Advanced")]
 		[DisplayName("No Triggers")]
 		[Description("Disables database triggers for this connection.")]
-		[DefaultValue(false)]
+		[DefaultValue(FbConnectionString.DefaultNoDbTriggers)]
 		public bool NoDatabaseTriggers
 		{
 			get { return this.GetBoolean("No DB Triggers"); }
@@ -275,7 +267,7 @@ namespace FirebirdSql.Data.FirebirdClient
         [Category("Advanced")]
         [DisplayName("NoGarbageCollect")]
         [Description("If true, disables sweeping the database upon attachment.")]
-        [DefaultValue(false)]
+        [DefaultValue(FbConnectionString.DefaultNoGarbageCollect)]
         public bool NoGarbageCollect
         {
             get { return this.GetBoolean("No Garbage Collect"); }

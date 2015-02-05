@@ -13,10 +13,8 @@
  *	   language governing rights and limitations under the License.
  * 
  *	Copyright (c) 2004-2005 Carlos Guzman Alvarez
+ *	Copyright (c) 2014-2015 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *	
- *  Contributors:
- *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -33,6 +31,33 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	internal sealed class FbConnectionString
 	{
+		#region Constants
+		internal const string DefaultDataSource = "";
+		internal const int DefaultPortNumber = 3050;
+		internal const string DefaultUserId = "";
+		internal const string DefaultPassword = "";
+		internal const string DefaultRoleName = "";
+		internal const string DefaultCatalog = "";
+		internal const string DefaultCharacterSet = "NONE";
+		internal const int DefaultDialect = 3;
+		internal const int DefaultPacketSize = 8192;
+		internal const bool DefaultPooling = true;
+		internal const int DefautlConnectionLifetime = 0;
+		internal const int DefaultMinPoolSize = 0;
+		internal const int DefaultMaxPoolSize = 100;
+		internal const int DefaultConnectionTimeout = 15;
+		internal const int DefaultFetchSize = 200;
+		internal const FbServerType DefaultServerType = FbServerType.Default;
+		internal const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
+		internal const bool DefaultRecordsAffected = true;
+		internal const bool DefaultContextConnection = false;
+		internal const bool DefaultEnlist = false;
+		internal const string DefaultClientLibrary = "fbembed";
+		internal const int DefaultCachePages = 0;
+		internal const bool DefaultNoDbTriggers = false;
+		internal const bool DefaultNoGarbageCollect = false;
+		#endregion
+
 		#region Static Fields
 
 		public static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) 
@@ -221,10 +246,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return this.GetBoolean("no db triggers"); }
 		}
 
-        public bool NoGarbageCollect
-        {
-            get { return this.GetBoolean("no garbage collect"); }
-        }
+		public bool NoGarbageCollect
+		{
+			get { return this.GetBoolean("no garbage collect"); }
+		}
 
 		#endregion
 
@@ -345,7 +370,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					(string.IsNullOrEmpty(this.UserID)) ||
 					(string.IsNullOrEmpty(this.Password)) ||
 #endif
-					(string.IsNullOrEmpty(this.Database) && !this.isServiceConnectionString) ||
+(string.IsNullOrEmpty(this.Database) && !this.isServiceConnectionString) ||
 					(string.IsNullOrEmpty(this.DataSource) && this.ServerType != FbServerType.Embedded) ||
 					(string.IsNullOrEmpty(this.Charset)) ||
 					(this.Port == 0) ||
@@ -389,31 +414,30 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			this.options.Clear();
 
-			// Add default key pairs values
-			this.options.Add("data source", string.Empty);
-			this.options.Add("port number", 3050);
-			this.options.Add("user id", string.Empty);
-			this.options.Add("password", string.Empty);
-			this.options.Add("role name", string.Empty);
-			this.options.Add("catalog", string.Empty);
-			this.options.Add("character set", "NONE");
-			this.options.Add("dialect", 3);
-			this.options.Add("packet size", 8192);
-			this.options.Add("pooling", true);
-			this.options.Add("connection lifetime", 0);
-			this.options.Add("min pool size", 0);
-			this.options.Add("max pool size", 100);
-			this.options.Add("connection timeout", 15);
-			this.options.Add("fetch size", 200);
-			this.options.Add("server type", FbServerType.Default);
-			this.options.Add("isolation level", IsolationLevel.ReadCommitted.ToString());
-			this.options.Add("records affected", true);
-			this.options.Add("context connection", false);
-			this.options.Add("enlist", false);
-			this.options.Add("client library", "fbembed");
-			this.options.Add("cache pages", 0);
-			this.options.Add("no db triggers", false);
-            this.options.Add("no garbage collect", false);
+			this.options.Add("data source", DefaultDataSource);
+			this.options.Add("port number", DefaultPortNumber);
+			this.options.Add("user id", DefaultUserId);
+			this.options.Add("password", DefaultPassword);
+			this.options.Add("role name", DefaultRoleName);
+			this.options.Add("catalog", DefaultCatalog);
+			this.options.Add("character set", DefaultCharacterSet);
+			this.options.Add("dialect", DefaultDialect);
+			this.options.Add("packet size", DefaultPacketSize);
+			this.options.Add("pooling", DefaultPooling);
+			this.options.Add("connection lifetime", DefautlConnectionLifetime);
+			this.options.Add("min pool size", DefaultMinPoolSize);
+			this.options.Add("max pool size", DefaultMaxPoolSize);
+			this.options.Add("connection timeout", DefaultConnectionTimeout);
+			this.options.Add("fetch size", DefaultFetchSize);
+			this.options.Add("server type", DefaultServerType);
+			this.options.Add("isolation level", DefaultIsolationLevel);
+			this.options.Add("records affected", DefaultRecordsAffected);
+			this.options.Add("context connection", DefaultContextConnection);
+			this.options.Add("enlist", DefaultEnlist);
+			this.options.Add("client library", DefaultClientLibrary);
+			this.options.Add("cache pages", DefaultCachePages);
+			this.options.Add("no db triggers", DefaultNoDbTriggers);
+			this.options.Add("no garbage collect", DefaultNoGarbageCollect);
 		}
 
 		private void ParseConnectionInfo(string connectInfo)
