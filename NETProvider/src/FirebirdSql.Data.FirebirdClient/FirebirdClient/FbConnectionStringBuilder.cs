@@ -25,6 +25,7 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
+using System.ComponentModel;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -32,144 +33,249 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Properties
 
+		[Category("Security")]
+		[DisplayName("User ID")]
+		[Description("Indicates the User ID to be used when connecting to the data source.")]
+		[DefaultValue("")]
 		public string UserID
 		{
 			get { return this.GetString("User ID"); }
 			set { this.SetValue("User ID", value); }
 		}
 
+		[Category("Security")]
+		[DisplayName("Password")]
+		[Description("Indicates the password to be used when connecting to the data source.")]
+		[PasswordPropertyText(true)]
+		[DefaultValue("")]
 		public string Password
 		{
 			get { return this.GetString("Password"); }
 			set { this.SetValue("Password", value); }
 		}
 
+		[Category("Source")]
+		[DisplayName("DataSource")]
+		[Description("The name of the Firebird server to which to connect.")]
+		[DefaultValue("")]
 		public string DataSource
 		{
 			get { return this.GetString("Data Source"); }
 			set { this.SetValue("Data Source", value); }
 		}
 
+		[Category("Source")]
+		[DisplayName("Database")]
+		[Description("The name of the actual database or the database to be " +
+			"used when a connection is open. It is normally the path to an .FDB " +
+			"file or an alias.")]
+		[DefaultValue("")]
 		public string Database
 		{
 			get { return this.GetString("Initial Catalog"); }
 			set { this.SetValue("Initial Catalog", value); }
 		}
 
+		[Category("Source")]
+		[DisplayName("Port")]
+		[Description("Port to use for TCP/IP connections")]
+		[DefaultValue(3050)]
 		public int Port
 		{
 			get { return this.GetInt32("Port Number"); }
 			set { this.SetValue("Port Number", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("PacketSize")]
+		[Description("The size (in bytes) of network packets. PacketSize may " +
+			"be in the range 512-32767 bytes.")]
+		[DefaultValue(8192)]
 		public int PacketSize
 		{
 			get { return this.GetInt32("Packet Size"); }
 			set { this.SetValue("Packet Size", value); }
 		}
 
+		[Category("Security")]
+		[DisplayName("Role")]
+		[Description("The user role.")]
+		[DefaultValue("")]
 		public string Role
 		{
 			get { return this.GetString("Role Name"); }
 			set { this.SetValue("Role Name", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("Dialect")]
+		[Description("The database SQL dialect.")]
+		[DefaultValue(3)]
 		public int Dialect
 		{
 			get { return this.GetInt32("Dialect"); }
 			set { this.SetValue("Dialect", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("Character Set")]
+		[Description("The connection character set encoding.")]
+		[DefaultValue("NONE")]
 		public string Charset
 		{
 			get { return this.GetString("Character Set"); }
 			set { this.SetValue("Character Set", value); }
 		}
 
+		[Category("Connection")]
+		[DisplayName("Connection Timeout")]
+		[Description("The time (in seconds) to wait for a connection to open.")]
+		[DefaultValue(15)]
 		public int ConnectionTimeout
 		{
 			get { return this.GetInt32("Connection Timeout"); }
 			set { this.SetValue("Connection Timeout", value); }
 		}
 
+		[Category("Pooling")]
+		[DisplayName("Pooling")]
+		[Description("When true the connection is grabbed from a pool or, " +
+			"if necessary, created and added to the appropriate pool.")]
+		[DefaultValue(true)]
 		public bool Pooling
 		{
 			get { return this.GetBoolean("Pooling"); }
 			set { this.SetValue("Pooling", value); }
 		}
 
+		[Category("Connection")]
+		[DisplayName("Connection LifeTime")]
+		[Description("When a connection is returned to the pool, its creation " +
+			"time is compared with the current time, and the connection is " +
+			"destroyed if that time span (in seconds) exceeds the value " +
+			"specified by connection lifetime.")]
+		[DefaultValue(0)]
 		public int ConnectionLifeTime
 		{
 			get { return this.GetInt32("Connection Lifetime"); }
 			set { this.SetValue("Connection Lifetime", value); }
 		}
 
+		[Category("Pooling")]
+		[DisplayName("MinPoolSize")]
+		[Description("The minimun number of connections allowed in the pool.")]
+		[DefaultValue(0)]
 		public int MinPoolSize
 		{
 			get { return this.GetInt32("Min Pool Size"); }
 			set { this.SetValue("Min Pool Size", value); }
 		}
 
+		[Category("Pooling")]
+		[DisplayName("MaxPoolSize")]
+		[Description("The maximum number of connections allowed in the pool.")]
+		[DefaultValue(100)]
 		public int MaxPoolSize
 		{
 			get { return this.GetInt32("Max Pool Size"); }
 			set { this.SetValue("Max Pool Size", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("FetchSize")]
+		[Description("The maximum number of rows to be fetched in a single " +
+			"call to read into the internal row buffer.")]
+		[DefaultValue(200)]
 		public int FetchSize
 		{
 			get { return this.GetInt32("Fetch Size"); }
 			set { this.SetValue("Fetch Size", value); }
 		}
 
+		[Category("Source")]
+		[DisplayName("ServerType")]
+		[Description("The type of server used.")]
+		[DefaultValue(FbServerType.Default)]
 		public FbServerType ServerType
 		{
 			get { return this.GetServerType("Server Type"); }
 			set { this.SetValue("Server Type", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("IsolationLevel")]
+		[Description("The default Isolation Level for implicit transactions.")]
+		[DefaultValue(IsolationLevel.ReadCommitted)]
 		public IsolationLevel IsolationLevel
 		{
 			get { return (IsolationLevel)this.GetInt32("Isolation Level"); }
 			set { this.SetValue("Isolation Level", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("Records Affected")]
+		[Description("Get the number of rows affected by a command when true.")]
+		[DefaultValue(true)]
 		public bool ReturnRecordsAffected
 		{
 			get { return this.GetBoolean("Records Affected"); }
 			set { this.SetValue("Records Affected", value); }
 		}
 
+		[Category("Source")]
+		[DisplayName("ContextConnection")]
+		//[Description("")]
+		[DefaultValue(false)]
 		public bool ContextConnection
 		{
 			get { return this.GetBoolean("Context Connection"); }
 			set { this.SetValue("Context Connection", value); }
 		}
 
+		[Category("Pooling")]
+		[DisplayName("Enlist")]
+		[Description("If true, enlists the connections in the current transaction.")]
+		[DefaultValue(false)]
 		public bool Enlist
 		{            
 			get { return this.GetBoolean("Enlist"); }
 			set { this.SetValue("Enlist", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("Client Library")]
+		[Description("Client library for Firebird Embedded Server.")]
+		[DefaultValue("fbembed")]
 		public string ClientLibrary
 		{
 			get { return this.GetString("Client Library"); }
 			set { this.SetValue("Client Library", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("Cache Pages")]
+		[Description("How many cache buffers to use for this session.")]
+		[DefaultValue(0)]
 		public int DbCachePages
 		{
 			get { return this.GetInt32("Cache Pages"); }
 			set { this.SetValue("Cache Pages", value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("No Triggers")]
+		[Description("Disables database triggers for this connection.")]
+		[DefaultValue(false)]
 		public bool NoDatabaseTriggers
 		{
 			get { return this.GetBoolean("No DB Triggers"); }
 			set { this.SetValue("No DB Triggers", value); }
 		}
 
+        [Category("Advanced")]
+        [DisplayName("NoGarbageCollect")]
+        [Description("If true, disables sweeping the database upon attachment.")]
+        [DefaultValue(false)]
         public bool NoGarbageCollect
         {
             get { return this.GetBoolean("No Garbage Collect"); }
