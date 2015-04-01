@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.Isql
 				index = this.parser.ParseNext();
 				atomicResult = this.parser.Result.Trim();
 
-				if (this.isSetTermStatement(atomicResult, out newParserToken))
+				if (this.IsSetTermStatement(atomicResult, out newParserToken))
 				{
 					this.parser.Token = newParserToken;
 					continue;
@@ -191,7 +191,7 @@ namespace FirebirdSql.Data.Isql
 		#region Private Methods
 
 		// method assumes that statement is trimmed 
-		private bool isSetTermStatement(string statement, out string newTerm)
+		private bool IsSetTermStatement(string statement, out string newTerm)
 		{
 			bool result = false;
 
