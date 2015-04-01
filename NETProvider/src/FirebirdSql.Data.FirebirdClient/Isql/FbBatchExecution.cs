@@ -649,60 +649,6 @@ namespace FirebirdSql.Data.Isql
 			return rowsAffected;
 		}
 
-		/*
-		/// <summary>
-		/// Changes the <see cref="FbConnection.ConnectionString"/> of the current (not open) Firebird connection.
-		/// </summary>
-		/// <param name="sqlDialectStatement">The SET SQL Dialect statement.</param>
-		/// <remarks>This method expects the FB Connection in Closed state.</remarks>
-		protected internal void SetSqlDialect(string sqlDialectStatement)
-		{
-			if (sqlConnection.State != ConnectionState.Closed)
-			{
-				throw new Exception("Attempting to set an SQL dialect for the database while the connection is not closed.");
-			}
-			if (connectionString == null)
-			{
-				throw new Exception("Cannot execute the statement SET SQL DIALECT because you already provied an instance of FbConnection");
-			}
-			try
-			{
-				connectionString.Load(sqlConnection.ConnectionString);
-			}
-			catch
-			{
-				sqlConnection.ConnectionString = string.Empty;
-			}
-
-			StringParser parser	= new StringParser(sqlDialectStatement, false);
-			parser.Token = " ";
-			parser.ParseNext();										    
-			if (parser.Result.ToUpper().CompareTo("SET") != 0)
-				throw new Exception("Expected the keyword SET but something else was found.");
-			parser.ParseNext();
-			if (parser.Result.ToUpper().CompareTo("SQL") != 0)
-				throw new Exception("Expected the keyword SQL but something else was found.");
-			parser.ParseNext();
-			if (parser.Result.ToUpper().CompareTo("DIALECT") != 0)
-				throw new Exception("Expected the keyword DIALECT but something else was found.");
-			parser.ParseNext();
-			int i = int.Parse(parser.Result);
-			if ((i < 0) || (i > 3))
-				throw new Exception("Invalid sql dialect. Available dialects are: 1, 2 and 3");
-			
-			this.attachParams.Dialect = i;
-		}
- 
-		protected internal FbTransaction ProvideTransaction()
-		{
-			if (this.requiresNewTransaction)
-			{
-				this.sqlTransaction = sqlConnection.BeginTransaction();
-			}
-			return this.sqlTransaction;
-		}
-		*/
-
 		#endregion
 
 		#region Event Handlers
