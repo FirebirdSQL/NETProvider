@@ -748,7 +748,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		/// <param name="sqlStatement">The string containing the SQL statement.</param>
 		/// <returns>The <see cref="SqlStatementType"/> of the <b>sqlStatement</b>.</returns>
-		/// <remarks>If the type of <b>sqlStatement</b> could not be determinated this 
+		/// <remarks>If the type of <b>sqlStatement</b> could not be determined this 
 		/// method will throw an exception.</remarks>
 		public static SqlStatementType GetStatementType(string sqlStatement)
 		{
@@ -793,7 +793,7 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.AlterView;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'C':
 					switch (char.ToUpper(sqlStatement[1], CultureInfo.CurrentUICulture))
@@ -803,7 +803,7 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.Close;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							throw new Exception("The type of the SQL statement could not be determined.");
 
 						case 'O':
 							if (StringParser.StartsWith(sqlStatement, "COMMENT ON", true))
@@ -818,7 +818,7 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.Connect;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							throw new Exception("The type of the SQL statement could not be determined.");
 
 						case 'R':
 							if (StringParser.StartsWith(sqlStatement, "CREATE DATABASE", true))
@@ -886,10 +886,10 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.CreateView;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							throw new Exception("The type of the SQL statement could not be determined.");
 
 						default:
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							throw new Exception("The type of the SQL statement could not be determined.");
 					}
 
 				case 'D':
@@ -924,14 +924,14 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.Describe;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							throw new Exception("The type of the SQL statement could not be determined.");
 
 						case 'I':
 							if (StringParser.StartsWith(sqlStatement, "DISCONNECT", true))
 							{
 								return SqlStatementType.Disconnect;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							throw new Exception("The type of the SQL statement could not be determined.");
 
 						case 'R':
 							if (StringParser.StartsWith(sqlStatement, "DROP DATABASE", true))
@@ -990,10 +990,10 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.DropView;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							throw new Exception("The type of the SQL statement could not be determined.");
 
 						default:
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							throw new Exception("The type of the SQL statement could not be determined.");
 					}
 
 				case 'E':
@@ -1021,21 +1021,21 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.EndDeclareSection;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'F':
 					if (StringParser.StartsWith(sqlStatement, "FETCH", true))
 					{
 						return SqlStatementType.Fetch;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'G':
 					if (StringParser.StartsWith(sqlStatement, "GRANT", true))
 					{
 						return SqlStatementType.Grant;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'I':
 					if (StringParser.StartsWith(sqlStatement, "INSERT CURSOR", true))
@@ -1046,21 +1046,21 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.Insert;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'O':
 					if (StringParser.StartsWith(sqlStatement, "OPEN", true))
 					{
 						return SqlStatementType.Open;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'P':
 					if (StringParser.StartsWith(sqlStatement, "PREPARE", true))
 					{
 						return SqlStatementType.Prepare;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'R':
 					if (StringParser.StartsWith(sqlStatement, "REVOKE", true))
@@ -1088,7 +1088,7 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.Rollback;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'S':
 					if (StringParser.StartsWith(sqlStatement, "SELECT", true))
@@ -1123,24 +1123,24 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.ShowSQLDialect;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'U':
 					if (StringParser.StartsWith(sqlStatement, "UPDATE", true))
 					{
 						return SqlStatementType.Update;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				case 'W':
 					if (StringParser.StartsWith(sqlStatement, "WHENEVER", true))
 					{
 						return SqlStatementType.Whenever;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 
 				default:
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					throw new Exception("The type of the SQL statement could not be determined.");
 			}
 		}
 
