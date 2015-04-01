@@ -119,14 +119,14 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region Protected Static Methods
+		#region Internal Static Methods
 
 		/// <summary>
 		/// Removes from the SQL code all comments of the type: /*...*/ or --
 		/// </summary>
 		/// <param name="source">The string containing the original SQL code.</param>
 		/// <returns>A string containing the SQL code without comments.</returns>
-		protected static string RemoveComments(string source)
+		internal static string RemoveComments(string source)
 		{
 			int i = 0;
 			int length = source.Length;
@@ -184,6 +184,14 @@ namespace FirebirdSql.Data.Isql
 			}
 
 			return result.ToString();
+		}
+
+		internal static string PutOnSingleLine(string source, string separator)
+		{
+			return source
+				.Replace("\r\n", separator)
+				.Replace("\r", separator)
+				.Replace("\n", separator);
 		}
 
 		#endregion
