@@ -36,6 +36,10 @@ namespace FirebirdSql.Data.Isql
 	/// </summary>
 	public class FbBatchExecution
 	{
+		#region Constants
+		const string StatementToken = " ";
+		#endregion
+
 		#region Events
 
 		/// <summary>
@@ -477,9 +481,13 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="connectDbStatement"></param>
 		protected internal void ConnectToDatabase(string connectDbStatement)
 		{
-			// CONNECT 'filespec' [USER 'username'][PASSWORD 'password'] [CACHE int] [ROLE 'rolename']
-			StringParser parser = new StringParser(connectDbStatement, false);
-			parser.Token = " ";
+			// CONNECT 'filespec'
+			// [USER 'username']
+			// [PASSWORD 'password']
+			// [CACHE int]
+			// [ROLE 'rolename']
+			StringParser parser = new StringParser(FbScript.PutOnSingleLine(connectDbStatement, StatementToken), false);
+			parser.Token = StatementToken;
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CONNECT")
 			{
@@ -532,8 +540,8 @@ namespace FirebirdSql.Data.Isql
 			// [DEFAULT CHARACTER SET charset]
 			// [<secondary_file>];	
 			int pageSize = 0;
-			StringParser parser = new StringParser(createDbStatement, false);
-			parser.Token = " ";
+			StringParser parser = new StringParser(FbScript.PutOnSingleLine(createDbStatement, StatementToken), false);
+			parser.Token = StatementToken;
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
 			{
