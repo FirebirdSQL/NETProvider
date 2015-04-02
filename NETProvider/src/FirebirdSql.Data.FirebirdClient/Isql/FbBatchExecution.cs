@@ -436,8 +436,18 @@ namespace FirebirdSql.Data.Isql
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
-						case SqlStatementType.SetDatabase:
 						case SqlStatementType.SetSQLDialect:
+							// raise the event
+							this.OnCommandExecuting(null);
+
+							this.SetSqlDialect(sqlStatement);
+							this.requiresNewConnection = true;
+
+							// raise the event
+							this.OnCommandExecuted(sqlStatement, null, -1);
+							break;
+
+						case SqlStatementType.SetDatabase:
 						case SqlStatementType.SetStatistics:
 						case SqlStatementType.SetTransaction:
 						case SqlStatementType.ShowSQLDialect:
@@ -615,6 +625,28 @@ namespace FirebirdSql.Data.Isql
 			parser.ParseNext(); // NAMES
 			parser.ParseNext();
 			this.connectionString.Charset = parser.Result;
+		}
+
+		/// <summary>
+		/// Parses the isql statement SET SQL DIALECT and sets the dialect set to current connection string.
+		/// </summary>
+		/// <param name="setSqlDialectStatement">The set sql dialect statement.</param>
+		protected void SetSqlDialect(string setSqlDialectStatement)
+		{
+			// SET SQL DIALECT dialect
+			StringParser parser = new StringParser(FbScript.PutOnSingleLine(setSqlDialectStatement, StatementToken), false);
+			parser.Token = StatementToken;
+			parser.ParseNext();
+			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			{
+				throw new Exception("Malformed isql SET statement. Expected keyword SET but something else was found.");
+			}
+			parser.ParseNext(); // SQL
+			parser.ParseNext(); // DIALECT
+			parser.ParseNext();
+			int dialect = 3;
+			int.TryParse(parser.Result, out dialect);
+			this.connectionString.Dialect = dialect;
 		}
 
 		protected FbCommand ProvideCommand()
