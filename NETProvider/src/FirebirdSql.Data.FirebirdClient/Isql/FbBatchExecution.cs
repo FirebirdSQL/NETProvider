@@ -262,7 +262,6 @@ namespace FirebirdSql.Data.Isql
 							this.OnCommandExecuting(null);
 
 							this.CreateDatabase(sqlStatement);
-
 							this.requiresNewConnection = false;
 
 							// raise the event
@@ -317,7 +316,6 @@ namespace FirebirdSql.Data.Isql
 							this.OnCommandExecuting(null);
 
 							FbConnection.DropDatabase(this.connectionString.ToString());
-							//this.sqlConnection = null;
 							this.requiresNewConnection = true;
 
 							// raise the event
@@ -427,8 +425,18 @@ namespace FirebirdSql.Data.Isql
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
-						case SqlStatementType.SetDatabase:
 						case SqlStatementType.SetNames:
+							// raise the event
+							this.OnCommandExecuting(null);
+
+							this.SetNames(sqlStatement);
+							this.requiresNewConnection = true;
+
+							// raise the event
+							this.OnCommandExecuted(sqlStatement, null, -1);
+							break;
+
+						case SqlStatementType.SetDatabase:
 						case SqlStatementType.SetSQLDialect:
 						case SqlStatementType.SetStatistics:
 						case SqlStatementType.SetTransaction:
@@ -472,7 +480,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region Protected Internal Methods
+		#region Protected Methods
 
 		/// <summary>
 		/// Updates the connection string with the data parsed from the parameter and opens a connection
@@ -530,8 +538,8 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// Parses the isql statement CREATE DATABASE and creates the database and opens a connection to the recently created database.
 		/// </summary>
-		/// <param name="createDbStatement">the create database statement.</param>
-		protected internal void CreateDatabase(string createDbStatement)
+		/// <param name="createDatabaseStatement">The create database statement.</param>
+		protected void CreateDatabase(string createDatabaseStatement)
 		{
 			// CREATE {DATABASE | SCHEMA} 'filespec'
 			// [USER 'username' [PASSWORD 'password']]
@@ -540,7 +548,7 @@ namespace FirebirdSql.Data.Isql
 			// [DEFAULT CHARACTER SET charset]
 			// [<secondary_file>];	
 			int pageSize = 0;
-			StringParser parser = new StringParser(FbScript.PutOnSingleLine(createDbStatement, StatementToken), false);
+			StringParser parser = new StringParser(FbScript.PutOnSingleLine(createDatabaseStatement, StatementToken), false);
 			parser.Token = StatementToken;
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
@@ -591,19 +599,25 @@ namespace FirebirdSql.Data.Isql
 		}
 
 		/// <summary>
-		/// 
+		/// Parses the isql statement SET NAMES and sets the character set to current connection string.
 		/// </summary>
-		/// <returns></returns>
-		protected internal FbConnection SetDatabase(string setDbStatement)
+		/// <param name="setNamesStatement">The set names statement.</param>
+		protected void SetNames(string setNamesStatement)
 		{
-			throw new NotImplementedException();
+			// SET NAMES charset
+			StringParser parser = new StringParser(FbScript.PutOnSingleLine(setNamesStatement, StatementToken), false);
+			parser.Token = StatementToken;
+			parser.ParseNext();
+			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			{
+				throw new Exception("Malformed isql SET statement. Expected keyword SET but something else was found.");
+			}
+			parser.ParseNext(); // NAMES
+			parser.ParseNext();
+			this.connectionString.Charset = parser.Result;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-		protected internal FbCommand ProvideCommand()
+		protected FbCommand ProvideCommand()
 		{
 			if (this.sqlCommand == null)
 			{
@@ -615,11 +629,7 @@ namespace FirebirdSql.Data.Isql
 			return this.sqlCommand;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-		protected internal FbConnection ProvideConnection()
+		protected FbConnection ProvideConnection()
 		{
 			if (requiresNewConnection)
 			{
@@ -646,7 +656,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="command">Command to execute.</param>
 		/// <param name="autocommit">true to commit the transaction after execution; or false if not.</param>
 		/// <returns>The number of rows affected by the query execution.</returns>
-		protected internal int ExecuteCommand(FbCommand command, bool autocommit)
+		protected int ExecuteCommand(FbCommand command, bool autocommit)
 		{
 			int rowsAffected = command.ExecuteNonQuery();
 			if (autocommit && command.IsDDLCommand && command.Transaction != null)
