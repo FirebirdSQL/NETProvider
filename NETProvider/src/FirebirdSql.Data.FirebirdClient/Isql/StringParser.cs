@@ -119,10 +119,10 @@ namespace FirebirdSql.Data.Isql
 			get { return this.token; }
 			set
 			{
+				if (value == null)
+					throw new ArgumentNullException();
 				if (string.IsNullOrEmpty(value))
-				{
-					throw new Exception("Token is empty!");
-				}
+					throw new ArgumentException();
 				this.token = value;
 				this.tokenLength = this.token.Length;
 			}
@@ -202,7 +202,7 @@ namespace FirebirdSql.Data.Isql
 
 			if (start >= this.sourceLength)
 			{
-				throw new Exception("Cannot start parsing after the end of the string.");
+				throw new ArgumentOutOfRangeException("Cannot start parsing after the end of the string.");
 			}
 
 			this.source = targetString;
