@@ -509,7 +509,7 @@ namespace FirebirdSql.Data.Isql
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CONNECT")
 			{
-				throw new Exception("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
+				throw new ArgumentException("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
 			}
 			parser.ParseNext();
 			this.connectionString.Database = parser.Result.Replace("'", string.Empty);
@@ -537,7 +537,7 @@ namespace FirebirdSql.Data.Isql
 						break;
 
 					default:
-						throw new Exception("Unexpected token '" + parser.Result.Trim() + "' on isql CONNECT statement.");
+						throw new ArgumentException("Unexpected token '" + parser.Result.Trim() + "' on isql CONNECT statement.");
 
 				}
 			}
@@ -563,7 +563,7 @@ namespace FirebirdSql.Data.Isql
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
 			{
-				throw new Exception("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
+				throw new ArgumentException("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
 			}
 			parser.ParseNext(); // {DATABASE | SCHEMA}
 			parser.ParseNext();
@@ -592,11 +592,11 @@ namespace FirebirdSql.Data.Isql
 					case "DEFAULT":
 						parser.ParseNext();
 						if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CHARACTER")
-							throw new Exception("Expected the keyword CHARACTER but something else was found.");
+							throw new ArgumentException("Expected the keyword CHARACTER but something else was found.");
 
 						parser.ParseNext();
 						if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
-							throw new Exception("Expected the keyword SET but something else was found.");
+							throw new ArgumentException("Expected the keyword SET but something else was found.");
 
 						parser.ParseNext();
 						this.connectionString.Charset = parser.Result;
@@ -620,7 +620,7 @@ namespace FirebirdSql.Data.Isql
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
 			{
-				throw new Exception("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
 			}
 			parser.ParseNext(); // NAMES
 			parser.ParseNext();
@@ -639,7 +639,7 @@ namespace FirebirdSql.Data.Isql
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
 			{
-				throw new Exception("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
 			}
 			parser.ParseNext(); // SQL
 			parser.ParseNext(); // DIALECT
@@ -1131,7 +1131,7 @@ namespace FirebirdSql.Data.Isql
 					}
 					break;
 			}
-			throw new Exception("The type of the SQL statement could not be determined.");
+			throw new ArgumentException("The type of the SQL statement could not be determined.");
 		}
 
 		#endregion
