@@ -419,7 +419,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.options.Add("user id", DefaultUserId);
 			this.options.Add("password", DefaultPassword);
 			this.options.Add("role name", DefaultRoleName);
-			this.options.Add("catalog", DefaultCatalog);
+			this.options.Add("initial catalog", DefaultCatalog);
 			this.options.Add("character set", DefaultCharacterSet);
 			this.options.Add("dialect", DefaultDialect);
 			this.options.Add("packet size", DefaultPacketSize);
