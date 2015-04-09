@@ -36,10 +36,6 @@ namespace FirebirdSql.Data.Isql
 	/// </summary>
 	public class FbBatchExecution
 	{
-		#region Constants
-		const string StatementToken = " ";
-		#endregion
-
 		#region Events
 
 		/// <summary>
@@ -504,8 +500,8 @@ namespace FirebirdSql.Data.Isql
 			// [PASSWORD 'password']
 			// [CACHE int]
 			// [ROLE 'rolename']
-			StringParser parser = new StringParser(FbScript.PutOnSingleLine(connectDbStatement, StatementToken), false);
-			parser.Token = StatementToken;
+			StringParser parser = new StringParser(connectDbStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CONNECT")
 			{
@@ -558,8 +554,8 @@ namespace FirebirdSql.Data.Isql
 			// [DEFAULT CHARACTER SET charset]
 			// [<secondary_file>];	
 			int pageSize = 0;
-			StringParser parser = new StringParser(FbScript.PutOnSingleLine(createDatabaseStatement, StatementToken), false);
-			parser.Token = StatementToken;
+			StringParser parser = new StringParser(createDatabaseStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
 			{
@@ -615,8 +611,8 @@ namespace FirebirdSql.Data.Isql
 		protected void SetNames(string setNamesStatement)
 		{
 			// SET NAMES charset
-			StringParser parser = new StringParser(FbScript.PutOnSingleLine(setNamesStatement, StatementToken), false);
-			parser.Token = StatementToken;
+			StringParser parser = new StringParser(setNamesStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
 			{
@@ -634,8 +630,8 @@ namespace FirebirdSql.Data.Isql
 		protected void SetSqlDialect(string setSqlDialectStatement)
 		{
 			// SET SQL DIALECT dialect
-			StringParser parser = new StringParser(FbScript.PutOnSingleLine(setSqlDialectStatement, StatementToken), false);
-			parser.Token = StatementToken;
+			StringParser parser = new StringParser(setSqlDialectStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
 			{

@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Isql
 		{
 			this.results = new FbStatementCollection();
 			this.parser = new StringParser(RemoveComments(script), false);
-			this.parser.Token = ";";
+			this.parser.Tokens = new[] { ";" };
 		}
 
 		#endregion
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Isql
 
 				if (this.IsSetTermStatement(atomicResult, out newParserToken))
 				{
-					this.parser.Token = newParserToken;
+					this.parser.Tokens = new[] { newParserToken };
 					continue;
 				}
 
@@ -184,14 +184,6 @@ namespace FirebirdSql.Data.Isql
 			}
 
 			return result.ToString();
-		}
-
-		internal static string PutOnSingleLine(string source, string separator)
-		{
-			return source
-				.Replace("\r\n", separator)
-				.Replace("\r", separator)
-				.Replace("\n", separator);
 		}
 
 		#endregion
