@@ -264,6 +264,21 @@ END
 			}
 		}
 
+		[Test]
+		public void DNET()
+		{
+			const string ConnectionString = @"data source=localhost;port number=20455;initial catalog=;user id=SYSDBA;password=masterkey;pooling=False;packet size=16384;character set=UTF8";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("localhost", cs.DataSource);
+			Assert.AreEqual(20455, cs.Port);
+			Assert.AreEqual(string.Empty, cs.Database);
+			Assert.AreEqual("SYSDBA", cs.UserID);
+			Assert.AreEqual("masterkey", cs.Password);
+			Assert.AreEqual(false, cs.Pooling);
+			Assert.AreEqual(16384, cs.PacketSize);
+			Assert.AreEqual("UTF8", cs.Charset);
+		}
+
 		#endregion
 	}
 }

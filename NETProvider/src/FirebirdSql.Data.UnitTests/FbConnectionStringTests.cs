@@ -135,5 +135,23 @@ namespace FirebirdSql.Data.UnitTests
 
 			Assert.AreEqual(s1, s2);
 		}
+
+		[Test]
+		public void ParsingWithEmptyKeyConnectionStringTest()
+		{
+			const string ConnectionString = "user=;password=testpwd";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("", cs.UserID);
+			Assert.AreEqual("testpwd", cs.Password);
+		}
+
+		[Test]
+		public void ParsingWithWhiteSpacesKeyConnectionStringTest()
+		{
+			const string ConnectionString = "user= \t;password=testpwd";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("", cs.UserID);
+			Assert.AreEqual("testpwd", cs.Password);
+		}
 	}
 }
