@@ -212,47 +212,39 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterTable:
 						case SqlStatementType.AlterTrigger:
 						case SqlStatementType.AlterView:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.Commit:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.sqlTransaction.Commit();
 							this.sqlTransaction = null;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.Connect:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.ConnectToDatabase(sqlStatement);
 
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.CreateDatabase:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.CreateDatabase(sqlStatement);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
@@ -274,13 +266,11 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.DeclareStatement:
 						case SqlStatementType.DeclareTable:
 						case SqlStatementType.Delete:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
@@ -288,25 +278,21 @@ namespace FirebirdSql.Data.Isql
 							break;
 
 						case SqlStatementType.Disconnect:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.sqlConnection.Close();
 							FbConnection.ClearPool(this.sqlConnection);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.DropDatabase:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							FbConnection.DropDatabase(this.connectionString.ToString());
 							this.requiresNewConnection = true;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
@@ -330,13 +316,11 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.ExecuteProcedure:
 							this.ProvideCommand().CommandText = sqlStatement;
 
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
@@ -349,13 +333,11 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Open:
 						case SqlStatementType.Prepare:
 						case SqlStatementType.Revoke:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
@@ -363,37 +345,31 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.RecreateTable:
 						case SqlStatementType.RecreateTrigger:
 						case SqlStatementType.RecreateView:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.Rollback:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.sqlTransaction.Rollback();
 							this.sqlTransaction = null;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.Select:
 							this.ProvideCommand().CommandText = sqlStatement;
 
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							dataReader = this.sqlCommand.ExecuteReader();
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, dataReader, -1);
 							if (!dataReader.IsClosed)
 							{
@@ -403,35 +379,29 @@ namespace FirebirdSql.Data.Isql
 
 						case SqlStatementType.SetGenerator:
 						case SqlStatementType.AlterSequence:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.SetNames:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.SetNames(sqlStatement);
 							this.requiresNewConnection = true;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.SetSQLDialect:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.SetSqlDialect(sqlStatement);
 							this.requiresNewConnection = true;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
@@ -443,13 +413,11 @@ namespace FirebirdSql.Data.Isql
 
 						case SqlStatementType.Update:
 						case SqlStatementType.Whenever:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 					}
