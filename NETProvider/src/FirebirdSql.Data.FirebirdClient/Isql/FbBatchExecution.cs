@@ -171,6 +171,7 @@ namespace FirebirdSql.Data.Isql
 					statementType == SqlStatementType.CreateDatabase ||
 					statementType == SqlStatementType.Disconnect ||
 					statementType == SqlStatementType.DropDatabase ||
+					statementType == SqlStatementType.SetAutoDDL ||
 					statementType == SqlStatementType.SetDatabase ||
 					statementType == SqlStatementType.SetNames ||
 					statementType == SqlStatementType.SetSQLDialect))
@@ -377,6 +378,15 @@ namespace FirebirdSql.Data.Isql
 							}
 							break;
 
+						case SqlStatementType.SetAutoDDL:
+							this.OnCommandExecuting(null);
+
+							this.SetAutoDdl(sqlStatement, ref autoCommit);
+							this.requiresNewConnection = false;
+
+							this.OnCommandExecuted(sqlStatement, null, -1);
+							break;
+
 						case SqlStatementType.SetGenerator:
 						case SqlStatementType.AlterSequence:
 							this.OnCommandExecuting(this.sqlCommand);
@@ -562,6 +572,43 @@ namespace FirebirdSql.Data.Isql
 			FbConnection.CreateDatabase(this.connectionString.ToString(), pageSize, true, false);
 			this.requiresNewConnection = true;
 			this.ProvideConnection();
+		}
+
+		/// <summary>
+		/// Parses the isql statement SET AUTODDL and sets the character set to current connection string.
+		/// </summary>
+		/// <param name="setAutoDdlStatement">The set names statement.</param>
+		protected void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
+		{
+			// SET AUTODDL [ON | OFF]
+			StringParser parser = new StringParser(setAutoDdlStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.ParseNext();
+			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			{
+				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+			}
+			parser.ParseNext(); // AUTO
+			if (parser.ParseNext() != -1)
+			{
+				string onOff = parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture);
+				if (onOff == "ON")
+				{
+					autoCommit = true;
+				}
+				else if (onOff == "OFF")
+				{
+					autoCommit = false;
+				}
+				else
+				{
+					throw new ArgumentException("Expected the ON or OFF but something else was found.");
+				}
+			}
+			else
+			{
+				autoCommit = !autoCommit;
+			}
 		}
 
 		/// <summary>
@@ -1042,6 +1089,10 @@ namespace FirebirdSql.Data.Isql
 					if (StringParser.StartsWith(sqlStatement, "SELECT", true))
 					{
 						return SqlStatementType.Select;
+					}
+					if (StringParser.StartsWith(sqlStatement, "SET AUTODDL", true))
+					{
+						return SqlStatementType.SetAutoDDL;
 					}
 					if (StringParser.StartsWith(sqlStatement, "SET DATABASE", true))
 					{

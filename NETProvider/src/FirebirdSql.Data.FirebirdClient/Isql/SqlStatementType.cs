@@ -361,6 +361,11 @@ namespace FirebirdSql.Data.Isql
 		Select,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>SET AUTODDL</b>
+		/// </summary>
+		SetAutoDDL,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>SET DATABASE</b>
 		/// </summary>
 		SetDatabase,
