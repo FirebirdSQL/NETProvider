@@ -240,9 +240,7 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>Returns <b>true</b> if the <b>token</b> precedes the <b>source</b>.</returns>
 		public static bool StartsWith(string source, string token, bool ignoreCase)
 		{
-			return source.Length < token.Length
-			?false
-			:string.Compare(token, source.Substring(0, token.Length), ignoreCase, CultureInfo.CurrentUICulture) == 0;
+			return source.StartsWith(token, ignoreCase, CultureInfo.CurrentUICulture);
 		}
 
 		#endregion
