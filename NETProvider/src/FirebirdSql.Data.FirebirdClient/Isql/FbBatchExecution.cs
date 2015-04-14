@@ -147,16 +147,8 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
 		/// </summary>
-		public void Execute()
-		{
-			this.Execute(true);
-		}
-
-		/// <summary>
-		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
-		/// </summary>
 		/// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
-		public void Execute(bool autoCommit)
+		public void Execute(bool autoCommit = true)
 		{
 			if (this.SqlStatements == null || this.SqlStatements.Count == 0)
 			{
