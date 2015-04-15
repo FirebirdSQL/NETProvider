@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>EntityFramework.Firebird</id>
-    <version>4.6.1.0</version>
+    <version>4.6.2.0</version>
     <title>Firebird Entity Framework Provider</title>         
     <description>The Entity Framework Provider for Firebird enables you to develop .NET applications that connect to the Firebird database using Entity Framework.</description>
     <authors>FirebirdSQL</authors>
