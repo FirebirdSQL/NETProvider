@@ -82,14 +82,13 @@ namespace FirebirdSql.Data.Isql
 	{
 		#region Fields
 
-		private int charsParsed;
 		private string source;
-		private string token;
-		private int currentIndex;
-		private bool caseSensitive;
 		private int sourceLength;
+		private bool caseSensitive;
+		private string[] tokens;
+		private int currentIndex;
+		private int charsParsed;
 		private string result;
-		private int tokenLength;
 
 		#endregion
 
@@ -114,17 +113,21 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// The string separator. The default value is a white space: 0x32 ASCII code.
 		/// </summary>
-		public string Token
+		public string[] Tokens
 		{
-			get { return this.token; }
+			get { return this.tokens; }
 			set
 			{
-				if (string.IsNullOrEmpty(value))
+				if (value == null)
+					throw new ArgumentNullException();
+				foreach (var item in value)
 				{
-					throw new Exception("Token is empty!");
+					if (value == null)
+						throw new ArgumentNullException();
+					if (string.IsNullOrEmpty(item))
+						throw new ArgumentException();
 				}
-				this.token = value;
-				this.tokenLength = this.token.Length;
+				this.tokens = value;
 			}
 		}
 
@@ -143,17 +146,6 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// Creates an instance of StringParser.
 		/// </summary>
-		/// <param name="caseSensitive">Indicates if parser system should be case-sensitive (true) or case-intensitive (false).</param>
-		public StringParser(bool caseSensitive)
-		{
-			this.caseSensitive = caseSensitive;
-			this.token = " ";
-			this.tokenLength = this.token.Length;
-		}
-
-		/// <summary>
-		/// Creates an instance of StringParser.
-		/// </summary>
 		/// <param name="targetString">Indicates if parser system should be case-sensitive (true) or case-intensitive (false).</param>
 		/// <param name="caseSensitive">The string to parse.</param>
 		/// <remarks>By defining the string (to parse) in constructor you can call directly the method <see cref="ParseNext"/>
@@ -162,8 +154,7 @@ namespace FirebirdSql.Data.Isql
 		public StringParser(string targetString, bool caseSensitive)
 		{
 			this.caseSensitive = caseSensitive;
-			this.token = " ";
-			this.tokenLength = this.token.Length;
+			this.tokens = new[] { " " };
 			this.source = targetString;
 			this.sourceLength = targetString.Length;
 		}
@@ -171,71 +162,6 @@ namespace FirebirdSql.Data.Isql
 		#endregion
 
 		#region Methods
-
-		/// <summary>
-		/// Parses target string attempting to determine the (sub)string between the beginning of this string and the <see cref="Token"/>.
-		/// After the parse is complete system will load into <see cref="CharsParsed"/> then number of chars scanned and into <see cref="Result"/>
-		/// the string that was found.
-		/// </summary>
-		/// <param name="targetString">The string to be parsed.</param>
-		/// <returns>The index of the char next char after the <see cref="Token"/> end.</returns>
-		/// <remarks>If nothing is parsed the method will return -1. Case the <see cref="Token"/> wasn't found until the end of the string the method retuns 
-		/// (in <see cref="Result"/>) the string found between the starting index and the end of the string. </remarks>
-		public int Parse(string targetString)
-		{
-			return Parse(targetString, 0);
-		}
-
-		/// <summary>
-		/// Parses target string attempting to determine the (sub)string between the index <b>start</b> of this string and the <see cref="Token"/>.
-		/// After the parse is complete system will load into <see cref="CharsParsed"/> then number of chars scanned and into <see cref="Result"/>
-		/// the string that was found.
-		/// </summary>
-		/// <param name="targetString">The string to be parsed.</param>
-		/// <param name="start">The start index for parsing purposes.</param>
-		/// <returns>The index of the char next char after the <c>Token</c> end.</returns>
-		/// <remarks>If nothing is parsed the method will return -1. Case the <see cref="Token"/> wasn't found until the end of the string the method returns 
-		/// (in <see cref="Result"/>) the string found between the starting index and the end of the string. </remarks>
-		public int Parse(string targetString, int start)
-		{
-			this.sourceLength = targetString.Length;
-
-			if (start >= this.sourceLength)
-			{
-				throw new Exception("Cannot start parsing after the end of the string.");
-			}
-
-			this.source = targetString;
-
-			int i = start;
-			while (i < this.sourceLength)
-			{
-				if (string.Compare(this.source[i].ToString(), this.token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
-				{
-					if (string.Compare(this.source.Substring(i, this.tokenLength), this.token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
-					{
-						i += this.tokenLength;
-						break;
-					}
-				}
-
-				i++;
-			}
-
-			this.currentIndex = i;
-			if (this.currentIndex != this.sourceLength)
-			{
-				this.charsParsed = this.currentIndex - start;
-				this.result = this.source.Substring(start, this.currentIndex - start - this.tokenLength);
-			}
-			else
-			{
-				this.charsParsed = this.currentIndex - start;
-				this.result = this.source.Substring(start);
-			}
-
-			return this.currentIndex;
-		}
 
 		/// <summary>
 		/// <para>
@@ -254,6 +180,7 @@ namespace FirebirdSql.Data.Isql
 
 			int i = this.currentIndex;
 			bool inLiteral = false;
+			string matchedToken = null;
 
 			while (i < this.sourceLength)
 			{
@@ -264,94 +191,31 @@ namespace FirebirdSql.Data.Isql
 
 				if (!inLiteral)
 				{
-					if (string.Compare(this.source[i].ToString(), this.token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
+					foreach (var token in this.Tokens)
 					{
-						if (string.Compare(this.source.Substring(i, this.tokenLength), this.token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
+						if (string.Compare(this.source[i].ToString(), token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
 						{
-							i += this.tokenLength;
-							break;
+							if (string.Compare(this.source.Substring(i, token.Length), token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
+							{
+								i += token.Length;
+								matchedToken = token;
+								goto Break;
+							}
 						}
 					}
 				}
 
 				i++;
 			}
+		// just to get out of the outer loop
+		Break:
+			{ }
 
 			this.charsParsed = i - this.currentIndex;
-			bool subtractToken = (i != this.sourceLength) || this.source.EndsWith(this.token, !this.caseSensitive, CultureInfo.CurrentUICulture);
-			this.result = this.source.Substring(this.currentIndex, i - this.currentIndex - (subtractToken ? this.tokenLength : 0));
+			bool subtractToken = (i != this.sourceLength) || (matchedToken != null && this.source.EndsWith(matchedToken, !this.caseSensitive, CultureInfo.CurrentUICulture));
+			this.result = this.source.Substring(this.currentIndex, i - this.currentIndex - (subtractToken ? matchedToken.Length : 0));
 
 			return this.currentIndex = i;
-		}
-
-		/// <summary>
-		/// Returns the index of the substring in the string. If the substring does not exists the method returns <b>-1</b>.
-		/// </summary>
-		/// <param name="substring">The string to be located.</param>
-		/// <returns>The index of the substring or -1 if the string does not exists within the source string.
-		/// If the the substring is empty method returns 0.</returns>
-		/// <remarks>The instance parses for the substring in a case sensitive or intensive way, as you specify at 
-		/// class construction.</remarks>
-		public int IndexOf(string substring)
-		{
-			return IndexOf(substring, 0);
-		}
-
-		/// <summary>
-		/// Returns the index of the substring in the string starting on index <b>startIndex</b>. 
-		/// If the substring does not exists the method returns <b>-1</b>.
-		/// </summary>
-		/// <param name="substring">The string to be located.</param>
-		/// <param name="startIndex">The start index of the source string where parser will start.</param>
-		/// <returns>The index of the substring or -1 if the string does not exists within the source string.
-		/// If the the substring is empty method returns <i>startIndex</i>.</returns>
-		/// <remarks>The instance parses for the substring in a case sensitive or intensive way, as you specify at 
-		/// class construction.</remarks>
-		public int IndexOf(string substring, int startIndex)
-		{
-			if (startIndex >= this.sourceLength)
-			{
-				throw new IndexOutOfRangeException("Start index out of bounds.");
-			}
-
-			if (substring == null || substring.Length == 0)
-			{
-				return startIndex;
-			}
-
-			int i = startIndex;
-			while (i < this.sourceLength)
-			{
-				if (string.Compare(this.source[i].ToString(), substring[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
-				{
-					if (substring != null && substring.Length == 1)
-					{
-						return i;
-					}
-
-					int j = i + 1;
-					while ((j < this.sourceLength) && ((j - i) < substring.Length))
-					{
-						if (string.Compare(this.source[j].ToString(), substring[j - i].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
-						{
-							j++;
-						}
-						else
-						{
-							break;
-						}
-					}
-
-					if ((j - i) == substring.Length)
-					{
-						return i;
-					}
-				}
-
-				i++;
-			}
-
-			return -1;
 		}
 
 		/// <summary>
@@ -376,12 +240,7 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>Returns <b>true</b> if the <b>token</b> precedes the <b>source</b>.</returns>
 		public static bool StartsWith(string source, string token, bool ignoreCase)
 		{
-			if (source.Length < token.Length)
-			{
-				return false;
-			}
-
-			return string.Compare(token, source.Substring(0, token.Length), ignoreCase, CultureInfo.CurrentUICulture) == 0;
+			return source.StartsWith(token, ignoreCase, CultureInfo.CurrentUICulture);
 		}
 
 		#endregion

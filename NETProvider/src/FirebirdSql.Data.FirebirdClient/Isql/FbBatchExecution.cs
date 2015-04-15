@@ -147,16 +147,8 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
 		/// </summary>
-		public void Execute()
-		{
-			this.Execute(true);
-		}
-
-		/// <summary>
-		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
-		/// </summary>
 		/// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
-		public void Execute(bool autoCommit)
+		public void Execute(bool autoCommit = true)
 		{
 			if (this.SqlStatements == null || this.SqlStatements.Count == 0)
 			{
@@ -179,6 +171,7 @@ namespace FirebirdSql.Data.Isql
 					statementType == SqlStatementType.CreateDatabase ||
 					statementType == SqlStatementType.Disconnect ||
 					statementType == SqlStatementType.DropDatabase ||
+					statementType == SqlStatementType.SetAutoDDL ||
 					statementType == SqlStatementType.SetDatabase ||
 					statementType == SqlStatementType.SetNames ||
 					statementType == SqlStatementType.SetSQLDialect))
@@ -220,48 +213,39 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterTable:
 						case SqlStatementType.AlterTrigger:
 						case SqlStatementType.AlterView:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.Commit:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.sqlTransaction.Commit();
 							this.sqlTransaction = null;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.Connect:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.ConnectToDatabase(sqlStatement);
 
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.CreateDatabase:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.CreateDatabase(sqlStatement);
-
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
@@ -283,13 +267,11 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.DeclareStatement:
 						case SqlStatementType.DeclareTable:
 						case SqlStatementType.Delete:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
@@ -297,26 +279,21 @@ namespace FirebirdSql.Data.Isql
 							break;
 
 						case SqlStatementType.Disconnect:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.sqlConnection.Close();
 							FbConnection.ClearPool(this.sqlConnection);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.DropDatabase:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							FbConnection.DropDatabase(this.connectionString.ToString());
-							//this.sqlConnection = null;
 							this.requiresNewConnection = true;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
@@ -340,13 +317,11 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.ExecuteProcedure:
 							this.ProvideCommand().CommandText = sqlStatement;
 
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
@@ -359,13 +334,11 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Open:
 						case SqlStatementType.Prepare:
 						case SqlStatementType.Revoke:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
@@ -373,37 +346,31 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.RecreateTable:
 						case SqlStatementType.RecreateTrigger:
 						case SqlStatementType.RecreateView:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.Rollback:
-							// raise the event
 							this.OnCommandExecuting(null);
 
 							this.sqlTransaction.Rollback();
 							this.sqlTransaction = null;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.Select:
 							this.ProvideCommand().CommandText = sqlStatement;
 
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							dataReader = this.sqlCommand.ExecuteReader();
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, dataReader, -1);
 							if (!dataReader.IsClosed)
 							{
@@ -411,21 +378,44 @@ namespace FirebirdSql.Data.Isql
 							}
 							break;
 
+						case SqlStatementType.SetAutoDDL:
+							this.OnCommandExecuting(null);
+
+							this.SetAutoDdl(sqlStatement, ref autoCommit);
+							this.requiresNewConnection = false;
+
+							this.OnCommandExecuted(sqlStatement, null, -1);
+							break;
+
 						case SqlStatementType.SetGenerator:
 						case SqlStatementType.AlterSequence:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
-						case SqlStatementType.SetDatabase:
 						case SqlStatementType.SetNames:
+							this.OnCommandExecuting(null);
+
+							this.SetNames(sqlStatement);
+							this.requiresNewConnection = true;
+
+							this.OnCommandExecuted(sqlStatement, null, -1);
+							break;
+
 						case SqlStatementType.SetSQLDialect:
+							this.OnCommandExecuting(null);
+
+							this.SetSqlDialect(sqlStatement);
+							this.requiresNewConnection = true;
+
+							this.OnCommandExecuted(sqlStatement, null, -1);
+							break;
+
+						case SqlStatementType.SetDatabase:
 						case SqlStatementType.SetStatistics:
 						case SqlStatementType.SetTransaction:
 						case SqlStatementType.ShowSQLDialect:
@@ -433,13 +423,11 @@ namespace FirebirdSql.Data.Isql
 
 						case SqlStatementType.Update:
 						case SqlStatementType.Whenever:
-							// raise the event
 							this.OnCommandExecuting(this.sqlCommand);
 
 							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
 							this.requiresNewConnection = false;
 
-							// raise the event
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 					}
@@ -468,7 +456,7 @@ namespace FirebirdSql.Data.Isql
 
 		#endregion
 
-		#region Protected Internal Methods
+		#region Protected Methods
 
 		/// <summary>
 		/// Updates the connection string with the data parsed from the parameter and opens a connection
@@ -477,13 +465,17 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="connectDbStatement"></param>
 		protected internal void ConnectToDatabase(string connectDbStatement)
 		{
-			// CONNECT 'filespec' [USER 'username'][PASSWORD 'password'] [CACHE int] [ROLE 'rolename']
+			// CONNECT 'filespec'
+			// [USER 'username']
+			// [PASSWORD 'password']
+			// [CACHE int]
+			// [ROLE 'rolename']
 			StringParser parser = new StringParser(connectDbStatement, false);
-			parser.Token = " ";
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CONNECT")
 			{
-				throw new Exception("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
+				throw new ArgumentException("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
 			}
 			parser.ParseNext();
 			this.connectionString.Database = parser.Result.Replace("'", string.Empty);
@@ -511,7 +503,7 @@ namespace FirebirdSql.Data.Isql
 						break;
 
 					default:
-						throw new Exception("Unexpected token '" + parser.Result.Trim() + "' on isql CONNECT statement.");
+						throw new ArgumentException("Unexpected token '" + parser.Result.Trim() + "' on isql CONNECT statement.");
 
 				}
 			}
@@ -522,8 +514,8 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// Parses the isql statement CREATE DATABASE and creates the database and opens a connection to the recently created database.
 		/// </summary>
-		/// <param name="createDbStatement">the create database statement.</param>
-		protected internal void CreateDatabase(string createDbStatement)
+		/// <param name="createDatabaseStatement">The create database statement.</param>
+		protected void CreateDatabase(string createDatabaseStatement)
 		{
 			// CREATE {DATABASE | SCHEMA} 'filespec'
 			// [USER 'username' [PASSWORD 'password']]
@@ -532,12 +524,12 @@ namespace FirebirdSql.Data.Isql
 			// [DEFAULT CHARACTER SET charset]
 			// [<secondary_file>];	
 			int pageSize = 0;
-			StringParser parser = new StringParser(createDbStatement, false);
-			parser.Token = " ";
+			StringParser parser = new StringParser(createDatabaseStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
 			{
-				throw new Exception("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
+				throw new ArgumentException("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
 			}
 			parser.ParseNext(); // {DATABASE | SCHEMA}
 			parser.ParseNext();
@@ -566,11 +558,11 @@ namespace FirebirdSql.Data.Isql
 					case "DEFAULT":
 						parser.ParseNext();
 						if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CHARACTER")
-							throw new Exception("Expected the keyword CHARACTER but something else was found.");
+							throw new ArgumentException("Expected the keyword CHARACTER but something else was found.");
 
 						parser.ParseNext();
 						if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
-							throw new Exception("Expected the keyword SET but something else was found.");
+							throw new ArgumentException("Expected the keyword SET but something else was found.");
 
 						parser.ParseNext();
 						this.connectionString.Charset = parser.Result;
@@ -583,19 +575,84 @@ namespace FirebirdSql.Data.Isql
 		}
 
 		/// <summary>
-		/// 
+		/// Parses the isql statement SET AUTODDL and sets the character set to current connection string.
 		/// </summary>
-		/// <returns></returns>
-		protected internal FbConnection SetDatabase(string setDbStatement)
+		/// <param name="setAutoDdlStatement">The set names statement.</param>
+		protected void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
 		{
-			throw new NotImplementedException();
+			// SET AUTODDL [ON | OFF]
+			StringParser parser = new StringParser(setAutoDdlStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.ParseNext();
+			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			{
+				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+			}
+			parser.ParseNext(); // AUTO
+			if (parser.ParseNext() != -1)
+			{
+				string onOff = parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture);
+				if (onOff == "ON")
+				{
+					autoCommit = true;
+				}
+				else if (onOff == "OFF")
+				{
+					autoCommit = false;
+				}
+				else
+				{
+					throw new ArgumentException("Expected the ON or OFF but something else was found.");
+				}
+			}
+			else
+			{
+				autoCommit = !autoCommit;
+			}
 		}
 
 		/// <summary>
-		/// 
+		/// Parses the isql statement SET NAMES and sets the character set to current connection string.
 		/// </summary>
-		/// <returns></returns>
-		protected internal FbCommand ProvideCommand()
+		/// <param name="setNamesStatement">The set names statement.</param>
+		protected void SetNames(string setNamesStatement)
+		{
+			// SET NAMES charset
+			StringParser parser = new StringParser(setNamesStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.ParseNext();
+			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			{
+				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+			}
+			parser.ParseNext(); // NAMES
+			parser.ParseNext();
+			this.connectionString.Charset = parser.Result;
+		}
+
+		/// <summary>
+		/// Parses the isql statement SET SQL DIALECT and sets the dialect set to current connection string.
+		/// </summary>
+		/// <param name="setSqlDialectStatement">The set sql dialect statement.</param>
+		protected void SetSqlDialect(string setSqlDialectStatement)
+		{
+			// SET SQL DIALECT dialect
+			StringParser parser = new StringParser(setSqlDialectStatement, false);
+			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.ParseNext();
+			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			{
+				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+			}
+			parser.ParseNext(); // SQL
+			parser.ParseNext(); // DIALECT
+			parser.ParseNext();
+			int dialect = 3;
+			int.TryParse(parser.Result, out dialect);
+			this.connectionString.Dialect = dialect;
+		}
+
+		protected FbCommand ProvideCommand()
 		{
 			if (this.sqlCommand == null)
 			{
@@ -607,11 +664,7 @@ namespace FirebirdSql.Data.Isql
 			return this.sqlCommand;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-		protected internal FbConnection ProvideConnection()
+		protected FbConnection ProvideConnection()
 		{
 			if (requiresNewConnection)
 			{
@@ -638,7 +691,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="command">Command to execute.</param>
 		/// <param name="autocommit">true to commit the transaction after execution; or false if not.</param>
 		/// <returns>The number of rows affected by the query execution.</returns>
-		protected internal int ExecuteCommand(FbCommand command, bool autocommit)
+		protected int ExecuteCommand(FbCommand command, bool autocommit)
 		{
 			int rowsAffected = command.ExecuteNonQuery();
 			if (autocommit && command.IsDDLCommand && command.Transaction != null)
@@ -648,60 +701,6 @@ namespace FirebirdSql.Data.Isql
 
 			return rowsAffected;
 		}
-
-		/*
-		/// <summary>
-		/// Changes the <see cref="FbConnection.ConnectionString"/> of the current (not open) Firebird connection.
-		/// </summary>
-		/// <param name="sqlDialectStatement">The SET SQL Dialect statement.</param>
-		/// <remarks>This method expects the FB Connection in Closed state.</remarks>
-		protected internal void SetSqlDialect(string sqlDialectStatement)
-		{
-			if (sqlConnection.State != ConnectionState.Closed)
-			{
-				throw new Exception("Attempting to set an SQL dialect for the database while the connection is not closed.");
-			}
-			if (connectionString == null)
-			{
-				throw new Exception("Cannot execute the statement SET SQL DIALECT because you already provied an instance of FbConnection");
-			}
-			try
-			{
-				connectionString.Load(sqlConnection.ConnectionString);
-			}
-			catch
-			{
-				sqlConnection.ConnectionString = string.Empty;
-			}
-
-			StringParser parser	= new StringParser(sqlDialectStatement, false);
-			parser.Token = " ";
-			parser.ParseNext();										    
-			if (parser.Result.ToUpper().CompareTo("SET") != 0)
-				throw new Exception("Expected the keyword SET but something else was found.");
-			parser.ParseNext();
-			if (parser.Result.ToUpper().CompareTo("SQL") != 0)
-				throw new Exception("Expected the keyword SQL but something else was found.");
-			parser.ParseNext();
-			if (parser.Result.ToUpper().CompareTo("DIALECT") != 0)
-				throw new Exception("Expected the keyword DIALECT but something else was found.");
-			parser.ParseNext();
-			int i = int.Parse(parser.Result);
-			if ((i < 0) || (i > 3))
-				throw new Exception("Invalid sql dialect. Available dialects are: 1, 2 and 3");
-			
-			this.attachParams.Dialect = i;
-		}
- 
-		protected internal FbTransaction ProvideTransaction()
-		{
-			if (this.requiresNewTransaction)
-			{
-				this.sqlTransaction = sqlConnection.BeginTransaction();
-			}
-			return this.sqlTransaction;
-		}
-		*/
 
 		#endregion
 
@@ -748,7 +747,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		/// <param name="sqlStatement">The string containing the SQL statement.</param>
 		/// <returns>The <see cref="SqlStatementType"/> of the <b>sqlStatement</b>.</returns>
-		/// <remarks>If the type of <b>sqlStatement</b> could not be determinated this 
+		/// <remarks>If the type of <b>sqlStatement</b> could not be determined this 
 		/// method will throw an exception.</remarks>
 		public static SqlStatementType GetStatementType(string sqlStatement)
 		{
@@ -793,7 +792,7 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.AlterView;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'C':
 					switch (char.ToUpper(sqlStatement[1], CultureInfo.CurrentUICulture))
@@ -803,7 +802,7 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.Close;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							break;
 
 						case 'O':
 							if (StringParser.StartsWith(sqlStatement, "COMMENT ON", true))
@@ -818,7 +817,7 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.Connect;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							break;
 
 						case 'R':
 							if (StringParser.StartsWith(sqlStatement, "CREATE DATABASE", true))
@@ -886,11 +885,9 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.CreateView;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
-
-						default:
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							break;
 					}
+					break;
 
 				case 'D':
 					switch (char.ToUpper(sqlStatement[1], CultureInfo.CurrentUICulture))
@@ -924,14 +921,14 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.Describe;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							break;
 
 						case 'I':
 							if (StringParser.StartsWith(sqlStatement, "DISCONNECT", true))
 							{
 								return SqlStatementType.Disconnect;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							break;
 
 						case 'R':
 							if (StringParser.StartsWith(sqlStatement, "DROP DATABASE", true))
@@ -990,11 +987,9 @@ namespace FirebirdSql.Data.Isql
 							{
 								return SqlStatementType.DropView;
 							}
-							throw new Exception("The type of the SQL statement could not be determinated.");
-
-						default:
-							throw new Exception("The type of the SQL statement could not be determinated.");
+							break;
 					}
+					break;
 
 				case 'E':
 					if (StringParser.StartsWith(sqlStatement, "EXECUTE PROCEDURE", true))
@@ -1021,21 +1016,21 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.EndDeclareSection;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'F':
 					if (StringParser.StartsWith(sqlStatement, "FETCH", true))
 					{
 						return SqlStatementType.Fetch;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'G':
 					if (StringParser.StartsWith(sqlStatement, "GRANT", true))
 					{
 						return SqlStatementType.Grant;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'I':
 					if (StringParser.StartsWith(sqlStatement, "INSERT CURSOR", true))
@@ -1046,21 +1041,21 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.Insert;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'O':
 					if (StringParser.StartsWith(sqlStatement, "OPEN", true))
 					{
 						return SqlStatementType.Open;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'P':
 					if (StringParser.StartsWith(sqlStatement, "PREPARE", true))
 					{
 						return SqlStatementType.Prepare;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'R':
 					if (StringParser.StartsWith(sqlStatement, "REVOKE", true))
@@ -1088,12 +1083,16 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.Rollback;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'S':
 					if (StringParser.StartsWith(sqlStatement, "SELECT", true))
 					{
 						return SqlStatementType.Select;
+					}
+					if (StringParser.StartsWith(sqlStatement, "SET AUTODDL", true))
+					{
+						return SqlStatementType.SetAutoDDL;
 					}
 					if (StringParser.StartsWith(sqlStatement, "SET DATABASE", true))
 					{
@@ -1123,25 +1122,23 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.ShowSQLDialect;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'U':
 					if (StringParser.StartsWith(sqlStatement, "UPDATE", true))
 					{
 						return SqlStatementType.Update;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 
 				case 'W':
 					if (StringParser.StartsWith(sqlStatement, "WHENEVER", true))
 					{
 						return SqlStatementType.Whenever;
 					}
-					throw new Exception("The type of the SQL statement could not be determinated.");
-
-				default:
-					throw new Exception("The type of the SQL statement could not be determinated.");
+					break;
 			}
+			throw new ArgumentException("The type of the SQL statement could not be determined.");
 		}
 
 		#endregion
