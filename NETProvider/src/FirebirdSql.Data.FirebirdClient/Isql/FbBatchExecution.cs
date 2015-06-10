@@ -1,20 +1,20 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2003-2007 Abel Eduardo Pereira
  *  All Rights Reserved.
- * 
+ *
  * Contributors:
  *   Jiri Cincura (jiri@cincura.net)
  *   Olivier Metod
@@ -440,7 +440,10 @@ namespace FirebirdSql.Data.Isql
 						this.sqlTransaction = null;
 					}
 
-					throw new FbException(string.Format(CultureInfo.CurrentUICulture, "An exception was thrown when executing command: {0}{2}Batch execution aborted{2}The returned message was: {1}", sqlStatement, ex.Message, Environment.NewLine));
+					throw new FbException(string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted{0}.The returned message was: {2}.",
+						Environment.NewLine,
+						sqlStatement,
+						ex.Message));
 				}
 			}
 
@@ -522,7 +525,7 @@ namespace FirebirdSql.Data.Isql
 			// [PAGE_SIZE [=] int]
 			// [LENGTH [=] int [PAGE[S]]]
 			// [DEFAULT CHARACTER SET charset]
-			// [<secondary_file>];	
+			// [<secondary_file>];
 			int pageSize = 0;
 			StringParser parser = new StringParser(createDatabaseStatement, false);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
@@ -723,11 +726,11 @@ namespace FirebirdSql.Data.Isql
 		/// The trigger function for <see cref="CommandExecuted"/> event.
 		/// </summary>
 		/// <param name="commandText">The <see cref="FbCommand.CommandText"/> of the executed SQL command.</param>
-		/// <param name="dataReader">The <see cref="FbDataReader"/> instance with the returned data. If the 
-		/// command executed is not meant to return data (ex: UPDATE, INSERT...) this parameter must be 
+		/// <param name="dataReader">The <see cref="FbDataReader"/> instance with the returned data. If the
+		/// command executed is not meant to return data (ex: UPDATE, INSERT...) this parameter must be
 		/// setled to <b>null</b>.</param>
-		/// <param name="rowsAffected">The rows that were affected by the executed SQL command. If the executed 
-		/// command is not meant to return this kind of information (ex: SELECT) this parameter must 
+		/// <param name="rowsAffected">The rows that were affected by the executed SQL command. If the executed
+		/// command is not meant to return this kind of information (ex: SELECT) this parameter must
 		/// be setled to <b>-1</b>.</param>
 		protected void OnCommandExecuted(string commandText, FbDataReader dataReader, int rowsAffected)
 		{
@@ -747,7 +750,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		/// <param name="sqlStatement">The string containing the SQL statement.</param>
 		/// <returns>The <see cref="SqlStatementType"/> of the <b>sqlStatement</b>.</returns>
-		/// <remarks>If the type of <b>sqlStatement</b> could not be determined this 
+		/// <remarks>If the type of <b>sqlStatement</b> could not be determined this
 		/// method will throw an exception.</remarks>
 		public static SqlStatementType GetStatementType(string sqlStatement)
 		{
@@ -1138,7 +1141,9 @@ namespace FirebirdSql.Data.Isql
 					}
 					break;
 			}
-			throw new ArgumentException("The type of the SQL statement could not be determined.");
+			throw new ArgumentException(string.Format("The type of the SQL statement could not be determined.{0}Statement: {1}.",
+				Environment.NewLine,
+				sqlStatement));
 		}
 
 		#endregion
