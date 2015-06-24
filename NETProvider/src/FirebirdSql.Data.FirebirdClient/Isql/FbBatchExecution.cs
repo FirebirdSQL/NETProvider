@@ -250,6 +250,7 @@ namespace FirebirdSql.Data.Isql
 							break;
 
 						case SqlStatementType.CommentOn:
+						case SqlStatementType.CreateCollation:
 						case SqlStatementType.CreateDomain:
 						case SqlStatementType.CreateException:
 						case SqlStatementType.CreateGenerator:
@@ -823,6 +824,10 @@ namespace FirebirdSql.Data.Isql
 							break;
 
 						case 'R':
+							if (StringParser.StartsWith(sqlStatement, "CREATE COLLATION", true))
+							{
+								return SqlStatementType.CreateCollation;
+							}
 							if (StringParser.StartsWith(sqlStatement, "CREATE DATABASE", true))
 							{
 								return SqlStatementType.CreateDatabase;
