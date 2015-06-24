@@ -298,6 +298,7 @@ namespace FirebirdSql.Data.Isql
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
+						case SqlStatementType.DropCollation:
 						case SqlStatementType.DropDomain:
 						case SqlStatementType.DropException:
 						case SqlStatementType.DropExternalFunction:
@@ -939,6 +940,10 @@ namespace FirebirdSql.Data.Isql
 							break;
 
 						case 'R':
+							if (StringParser.StartsWith(sqlStatement, "DROP COLLATION", true))
+							{
+								return SqlStatementType.DropCollation;
+							}
 							if (StringParser.StartsWith(sqlStatement, "DROP DATABASE", true))
 							{
 								return SqlStatementType.DropDatabase;

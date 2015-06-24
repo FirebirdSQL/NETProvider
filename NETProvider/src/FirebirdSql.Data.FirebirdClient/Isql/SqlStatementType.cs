@@ -201,6 +201,11 @@ namespace FirebirdSql.Data.Isql
 		Disconnect,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>DROP COLLATION</b>
+		/// </summary>
+		DropCollation,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>DROP DATABASE</b>
 		/// </summary>
 		DropDatabase,
