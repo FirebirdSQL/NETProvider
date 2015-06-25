@@ -70,14 +70,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public FbStatementCollection SqlStatements
 		{
-			get
-			{
-				if (this.sqlStatements == null)
-				{
-					this.sqlStatements = new FbStatementCollection();
-				}
-				return this.sqlStatements;
-			}
+			get { return this.sqlStatements; }
 		}
 
 		#endregion
@@ -85,21 +78,13 @@ namespace FirebirdSql.Data.Isql
 		#region Constructors
 
 		/// <summary>
-		/// Creates an instance of FbBatchExecution engine.
-		/// </summary>
-		public FbBatchExecution()
-		{
-			this.sqlConnection = new FbConnection(); // do not specify the connection string
-			this.connectionString = new FbConnectionStringBuilder();
-		}
-
-		/// <summary>
 		/// Creates an instance of FbBatchExecution engine with the given
 		/// connection.
 		/// </summary>
 		/// <param name="sqlConnection">A <see cref="FbConnection"/> object.</param>
-		public FbBatchExecution(FbConnection sqlConnection)
+		public FbBatchExecution(FbConnection sqlConnection = null)
 		{
+			this.sqlStatements = new FbStatementCollection();
 			if (sqlConnection == null)
 			{
 				this.sqlConnection = new FbConnection(); // do not specify the connection string
@@ -118,31 +103,25 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		/// <param name="sqlConnection">A <see cref="FbConnection"/> object.</param>
 		/// <param name="isqlScript">A <see cref="FbScript"/> object.</param>
+		[Obsolete("Use other ctor together with AppendSqlStatements mehod.")]
 		public FbBatchExecution(FbConnection sqlConnection, FbScript isqlScript)
+			: this(sqlConnection)
 		{
-			if (sqlConnection == null)
-			{
-				this.sqlConnection = new FbConnection(); // do	not	specify	the	connection string
-				this.connectionString = new FbConnectionStringBuilder();
-			}
-			else
-			{
-				this.sqlConnection = sqlConnection;
-				this.connectionString = new FbConnectionStringBuilder(sqlConnection.ConnectionString);
-			}
-
-			if (isqlScript != null)
-			{
-				foreach (string sql in isqlScript.Results)
-				{
-					this.SqlStatements.Add(sql);
-				}
-			}
+			AppendSqlStatements(isqlScript);
 		}
 
 		#endregion
 
 		#region Methods
+
+		/// <summary>
+		/// Appends SQL statements from <see cref="FbScript"/> instance. <see cref="FbScript.Parse"/> should be already called.
+		/// </summary>
+		/// <param name="isqlScript">A <see cref="FbScript"/> object.</param>
+		public void AppendSqlStatements(FbScript isqlScript)
+		{
+			this.sqlStatements.AddRange(isqlScript.Results);
+		}
 
 		/// <summary>
 		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
