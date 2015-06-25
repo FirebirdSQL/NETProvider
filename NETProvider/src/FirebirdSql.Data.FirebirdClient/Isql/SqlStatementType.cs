@@ -296,6 +296,11 @@ namespace FirebirdSql.Data.Isql
 		Execute,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>EXECUTE BLOCK</b>
+		/// </summary>
+		ExecuteBlock,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>EXECUTE IMMEDIATE</b>
 		/// </summary>
 		ExecuteImmediate,

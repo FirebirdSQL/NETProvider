@@ -327,6 +327,21 @@ namespace FirebirdSql.Data.Isql
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
+						case SqlStatementType.ExecuteBlock:
+							this.ProvideCommand().CommandText = sqlStatement;
+
+							this.OnCommandExecuting(this.sqlCommand);
+
+							dataReader = this.sqlCommand.ExecuteReader();
+							this.requiresNewConnection = false;
+
+							this.OnCommandExecuted(sqlStatement, dataReader, -1);
+							if (!dataReader.IsClosed)
+							{
+								dataReader.Close();
+							}
+							break;
+
 						case SqlStatementType.Fetch:
 							break;
 
@@ -1005,13 +1020,17 @@ namespace FirebirdSql.Data.Isql
 					break;
 
 				case 'E':
-					if (StringParser.StartsWith(sqlStatement, "EXECUTE PROCEDURE", true))
+					if (StringParser.StartsWith(sqlStatement, "EXECUTE BLOCK", true))
 					{
-						return SqlStatementType.ExecuteProcedure;
+						return SqlStatementType.ExecuteBlock;
 					}
 					if (StringParser.StartsWith(sqlStatement, "EXECUTE IMMEDIATE", true))
 					{
 						return SqlStatementType.ExecuteImmediate;
+					}
+					if (StringParser.StartsWith(sqlStatement, "EXECUTE PROCEDURE", true))
+					{
+						return SqlStatementType.ExecuteProcedure;
 					}
 					if (StringParser.StartsWith(sqlStatement, "EXECUTE", true))
 					{
