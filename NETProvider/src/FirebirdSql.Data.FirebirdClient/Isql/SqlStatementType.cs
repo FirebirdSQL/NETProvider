@@ -56,6 +56,11 @@ namespace FirebirdSql.Data.Isql
 		AlterProcedure,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>ALTER ROLE</b>
+		/// </summary>
+		AlterRole,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>ALTER SEQUENCE</b>
 		/// </summary>
 		AlterSequence,

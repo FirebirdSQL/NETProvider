@@ -189,6 +189,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterException:
 						case SqlStatementType.AlterIndex:
 						case SqlStatementType.AlterProcedure:
+						case SqlStatementType.AlterRole:
 						case SqlStatementType.AlterTable:
 						case SqlStatementType.AlterTrigger:
 						case SqlStatementType.AlterView:
@@ -774,6 +775,10 @@ namespace FirebirdSql.Data.Isql
 					if (StringParser.StartsWith(sqlStatement, "ALTER PROCEDURE", true))
 					{
 						return SqlStatementType.AlterProcedure;
+					}
+					if (StringParser.StartsWith(sqlStatement, "ALTER ROLE", true))
+					{
+						return SqlStatementType.AlterRole;
 					}
 					if (StringParser.StartsWith(sqlStatement, "ALTER SEQUENCE", true))
 					{
