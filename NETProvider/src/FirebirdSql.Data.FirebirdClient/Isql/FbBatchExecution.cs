@@ -691,10 +691,10 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="command">Command to execute.</param>
 		/// <param name="autocommit">true to commit the transaction after execution; or false if not.</param>
 		/// <returns>The number of rows affected by the query execution.</returns>
-		protected int ExecuteCommand(FbCommand command, bool autocommit)
+		protected int ExecuteCommand(FbCommand command, bool autoCommit)
 		{
 			int rowsAffected = command.ExecuteNonQuery();
-			if (autocommit && command.IsDDLCommand && command.Transaction != null)
+			if (autoCommit && command.IsDDLCommand && command.Transaction != null)
 			{
 				command.Transaction.CommitRetaining();
 			}
