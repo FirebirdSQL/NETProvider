@@ -1,20 +1,20 @@
 /*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
- * 
+ *
  *  Contributors:
  *    Jiri Cincura (jiri@cincura.net)
  */
@@ -1025,6 +1025,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			for (int i = 0; i < this.statement.Parameters.Count; i++)
 			{
+				var statementParameter = this.statement.Parameters[i];
 				index = i;
 
 				if (this.namedParameters.Count > 0)
@@ -1038,74 +1039,74 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (index != -1)
 				{
-					if (this.Parameters[index].InternalValue == DBNull.Value || this.Parameters[index].InternalValue == null)
+					var commandParameter = this.Parameters[index];
+					if (commandParameter.InternalValue == DBNull.Value || commandParameter.InternalValue == null)
 					{
-						this.statement.Parameters[i].NullFlag = -1;
-						this.statement.Parameters[i].Value = DBNull.Value;
+						statementParameter.NullFlag = -1;
+						statementParameter.Value = DBNull.Value;
 
-						if (!this.statement.Parameters[i].AllowDBNull())
+						if (!statementParameter.AllowDBNull())
 						{
-							this.statement.Parameters[i].DataType++;
+							statementParameter.DataType++;
 						}
 					}
 					else
 					{
 						// Parameter value is not null
-						this.statement.Parameters[i].NullFlag = 0;
+						statementParameter.NullFlag = 0;
 
-						switch (this.statement.Parameters[i].DbDataType)
+						switch (statementParameter.DbDataType)
 						{
 							case DbDataType.Binary:
 								{
 									BlobBase blob = this.statement.CreateBlob();
-									blob.Write((byte[])this.Parameters[index].InternalValue);
-									this.statement.Parameters[i].Value = blob.Id;
+									blob.Write((byte[])commandParameter.InternalValue);
+									statementParameter.Value = blob.Id;
 								}
 								break;
 
 							case DbDataType.Text:
 								{
 									BlobBase blob = this.statement.CreateBlob();
-									if (this.Parameters[index].InternalValue is byte[])
-										blob.Write((byte[])this.Parameters[index].InternalValue);
+									if (commandParameter.InternalValue is byte[])
+										blob.Write((byte[])commandParameter.InternalValue);
 									else
-										blob.Write((string)this.Parameters[index].InternalValue);
-									this.statement.Parameters[i].Value = blob.Id;
+										blob.Write((string)commandParameter.InternalValue);
+									statementParameter.Value = blob.Id;
 								}
 								break;
 
 							case DbDataType.Array:
 								{
-									if (this.statement.Parameters[i].ArrayHandle == null)
+									if (statementParameter.ArrayHandle == null)
 									{
-										this.statement.Parameters[i].ArrayHandle =
+										statementParameter.ArrayHandle =
 										this.statement.CreateArray(
-											this.statement.Parameters[i].Relation,
-											this.statement.Parameters[i].Name);
+											statementParameter.Relation,
+											statementParameter.Name);
 									}
 									else
 									{
-										this.statement.Parameters[i].ArrayHandle.DB = this.statement.Database;
-										this.statement.Parameters[i].ArrayHandle.Transaction = this.statement.Transaction;
+										statementParameter.ArrayHandle.DB = this.statement.Database;
+										statementParameter.ArrayHandle.Transaction = this.statement.Transaction;
 									}
 
-									this.statement.Parameters[i].ArrayHandle.Handle = 0;
-									this.statement.Parameters[i].ArrayHandle.Write((System.Array)this.Parameters[index].InternalValue);
-									this.statement.Parameters[i].Value = this.statement.Parameters[i].ArrayHandle.Handle;
+									statementParameter.ArrayHandle.Handle = 0;
+									statementParameter.ArrayHandle.Write((System.Array)commandParameter.InternalValue);
+									statementParameter.Value = statementParameter.ArrayHandle.Handle;
 								}
 								break;
 
 							case DbDataType.Guid:
-								if (!(this.Parameters[index].InternalValue is Guid) &&
-									!(this.Parameters[index].InternalValue is byte[]))
+								if (!(commandParameter.InternalValue is Guid) && !(commandParameter.InternalValue is byte[]))
 								{
 									throw new InvalidOperationException("Incorrect Guid value.");
 								}
-								this.statement.Parameters[i].Value = this.Parameters[index].InternalValue;
+								statementParameter.Value = commandParameter.InternalValue;
 								break;
 
 							default:
-								this.statement.Parameters[i].Value = this.Parameters[index].InternalValue;
+								statementParameter.Value = commandParameter.InternalValue;
 								break;
 						}
 					}
