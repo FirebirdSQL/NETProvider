@@ -1052,7 +1052,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 					else
 					{
-						// Parameter value is not null
 						statementParameter.NullFlag = 0;
 
 						switch (statementParameter.DbDataType)
