@@ -1,17 +1,17 @@
 /*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
  *
@@ -153,8 +153,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					throw new ArgumentException("The FbParameter specified in the value parameter is already added to this or another FbParameterCollection.");
 				}
-				if (value.ParameterName == null ||
-					value.ParameterName.Length == 0)
+				if (value.ParameterName == null || value.ParameterName.Length == 0)
 				{
 					value.ParameterName = this.GenerateParameterName();
 				}
@@ -194,7 +193,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override bool Contains(string parameterName)
 		{
-			return (-1 != this.IndexOf(parameterName));
+			return this.IndexOf(parameterName) != -1;
 		}
 
 		public int IndexOf(FbParameter value)
@@ -209,17 +208,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override int IndexOf(string parameterName)
 		{
-			int index = 0;
-			foreach (FbParameter item in this.parameters)
-			{
-				if (CultureAwareEqualityComparer.Instance.Equals(item.ParameterName, parameterName) ||
-					CultureAwareEqualityComparer.Instance.Equals(item.InternalParameterName, parameterName))
-				{
-					return index;
-				}
-				index++;
-			}
-			return -1;
+			var normalizedParameterName = FbParameter.NormalizeParameterName(parameterName);
+			return this.parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase));
 		}
 
 		public void Insert(int index, FbParameter value)

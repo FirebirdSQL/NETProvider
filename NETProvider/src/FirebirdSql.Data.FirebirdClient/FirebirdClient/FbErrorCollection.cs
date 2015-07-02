@@ -1,21 +1,21 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
- *  Copyright (c) 2012 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2012, 2015 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *  
+ *
  */
 
 using System;
@@ -63,17 +63,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal int IndexOf(string errorMessage)
 		{
-			int index = 0;
-			foreach (FbError item in this.errors)
-			{
-				if (CultureAwareEqualityComparer.Instance.Equals(item.Message, errorMessage))
-				{
-					return index;
-				}
-				index++;
-			}
-
-			return -1;
+			return this.errors.FindIndex(x => string.Equals(x.Message, errorMessage, StringComparison.CurrentCultureIgnoreCase));
 		}
 
 		internal FbError Add(FbError error)
