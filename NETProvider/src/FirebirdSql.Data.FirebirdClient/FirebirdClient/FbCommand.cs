@@ -294,23 +294,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal bool IsSelectCommand
 		{
-			get
-			{
-				if (this.statement != null)
-				{
-					if (this.statement.StatementType == DbStatementType.Select ||
-						this.statement.StatementType == DbStatementType.SelectForUpdate)
-					{
-						return true;
-					}
-				}
-				return false;
-			}
+			get { return this.statement != null && (this.statement.StatementType == DbStatementType.Select || this.statement.StatementType == DbStatementType.SelectForUpdate); }
 		}
 
 		internal bool IsDDLCommand
 		{
-			get { return (this.statement != null && this.statement.StatementType == DbStatementType.DDL); }
+			get { return this.statement != null && this.statement.StatementType == DbStatementType.DDL; }
 		}
 
 		internal Type[] ExpectedColumnTypes
