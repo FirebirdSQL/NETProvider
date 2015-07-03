@@ -155,29 +155,13 @@ namespace FirebirdSql.Data.Isql
 					statementType == SqlStatementType.SetNames ||
 					statementType == SqlStatementType.SetSQLDialect))
 				{
-					// Update command configuration
 					this.ProvideCommand();
 					this.sqlCommand.CommandText = sqlStatement;
-
-					// Check how transactions are going to be handled
-					if (statementType == SqlStatementType.Insert ||
-						statementType == SqlStatementType.Update ||
-						statementType == SqlStatementType.Delete)
+					if (this.sqlTransaction == null && !(statementType == SqlStatementType.Commit || statementType == SqlStatementType.Rollback))
 					{
-						// DML commands should be inside a transaction
-						if (this.sqlTransaction == null)
-						{
-							this.sqlTransaction = this.sqlConnection.BeginTransaction();
-						}
-						this.sqlCommand.Transaction = this.sqlTransaction;
+						this.sqlTransaction = this.sqlConnection.BeginTransaction();
 					}
-					else if (this.sqlTransaction != null && !(statementType == SqlStatementType.Commit || statementType == SqlStatementType.Rollback))
-					{
-						// Non DML Statements should be executed using
-						// implicit transaction support
-						this.sqlTransaction.Commit();
-						this.sqlTransaction = null;
-					}
+					this.sqlCommand.Transaction = this.sqlTransaction;
 				}
 
 				try
@@ -195,7 +179,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterView:
 							this.OnCommandExecuting(this.sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
+							rowsAffected = this.ExecuteCommand(autoCommit);
 							this.requiresNewConnection = false;
 
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
@@ -204,8 +188,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Commit:
 							this.OnCommandExecuting(null);
 
-							this.sqlTransaction.Commit();
-							this.sqlTransaction = null;
+							this.CommitTransaction();
 
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
@@ -250,7 +233,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Delete:
 							this.OnCommandExecuting(this.sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
+							rowsAffected = this.ExecuteCommand(autoCommit);
 							this.requiresNewConnection = false;
 
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
@@ -301,7 +284,7 @@ namespace FirebirdSql.Data.Isql
 
 							this.OnCommandExecuting(this.sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
+							rowsAffected = this.ExecuteCommand(autoCommit);
 							this.requiresNewConnection = false;
 
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
@@ -333,7 +316,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Revoke:
 							this.OnCommandExecuting(this.sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
+							rowsAffected = this.ExecuteCommand(autoCommit);
 							this.requiresNewConnection = false;
 
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
@@ -345,7 +328,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.RecreateView:
 							this.OnCommandExecuting(this.sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
+							rowsAffected = this.ExecuteCommand(autoCommit);
 							this.requiresNewConnection = false;
 
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
@@ -354,8 +337,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Rollback:
 							this.OnCommandExecuting(null);
 
-							this.sqlTransaction.Rollback();
-							this.sqlTransaction = null;
+							this.RollbackTransaction();
 
 							this.OnCommandExecuted(sqlStatement, null, -1);
 							break;
@@ -388,7 +370,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterSequence:
 							this.OnCommandExecuting(this.sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
+							rowsAffected = this.ExecuteCommand(autoCommit);
 							this.requiresNewConnection = false;
 
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
@@ -422,7 +404,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Whenever:
 							this.OnCommandExecuting(this.sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(this.sqlCommand, autoCommit);
+							rowsAffected = this.ExecuteCommand(autoCommit);
 							this.requiresNewConnection = false;
 
 							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
@@ -431,11 +413,7 @@ namespace FirebirdSql.Data.Isql
 				}
 				catch (Exception ex)
 				{
-					if (this.sqlTransaction != null)
-					{
-						this.sqlTransaction.Rollback();
-						this.sqlTransaction = null;
-					}
+					this.RollbackTransaction();
 
 					throw new FbException(string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
 						Environment.NewLine,
@@ -444,12 +422,7 @@ namespace FirebirdSql.Data.Isql
 				}
 			}
 
-			if (this.sqlTransaction != null)
-			{
-				// commit root transaction
-				this.sqlTransaction.Commit();
-				this.sqlTransaction = null;
-			}
+			this.CommitTransaction();
 
 			this.sqlConnection.Close();
 		}
@@ -691,15 +664,33 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="command">Command to execute.</param>
 		/// <param name="autocommit">true to commit the transaction after execution; or false if not.</param>
 		/// <returns>The number of rows affected by the query execution.</returns>
-		protected int ExecuteCommand(FbCommand command, bool autoCommit)
+		protected int ExecuteCommand(bool autoCommit)
 		{
-			int rowsAffected = command.ExecuteNonQuery();
-			if (autoCommit && command.IsDDLCommand && command.Transaction != null)
+			int rowsAffected = this.sqlCommand.ExecuteNonQuery();
+			if (autoCommit && this.sqlCommand.IsDDLCommand)
 			{
-				command.Transaction.CommitRetaining();
+				this.CommitTransaction();
 			}
 
 			return rowsAffected;
+		}
+
+		protected void CommitTransaction()
+		{
+			if (this.sqlTransaction != null)
+			{
+				this.sqlTransaction.Commit();
+				this.sqlTransaction = null;
+			}
+		}
+
+		protected void RollbackTransaction()
+		{
+			if (this.sqlTransaction != null)
+			{
+				this.sqlTransaction.Rollback();
+				this.sqlTransaction = null;
+			}
 		}
 
 		#endregion
