@@ -1,17 +1,17 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			{
 				FbParameter parameter;
 
-				// Use the corresponding function parameter TypeUsage where available (currently, the SSDL facets and 
+				// Use the corresponding function parameter TypeUsage where available (currently, the SSDL facets and
 				// type trump user-defined facets and type in the EntityCommand).
 				FunctionParameter functionParameter;
 				if (null != function && function.Parameters.TryGetValue(queryParameter.Key, false, out functionParameter))
@@ -273,7 +273,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 			else if (isOutParam)
 			{
-				// if the parameter is a return/out/inout parameter, ensure there 
+				// if the parameter is a return/out/inout parameter, ensure there
 				// is space for any value
 				return int.MaxValue;
 			}
@@ -367,7 +367,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				if (functionTree.ResultType != null)
 				{
 					Debug.Assert(MetadataHelpers.IsCollectionType(functionTree.ResultType.EdmType), "Result type of a function is expected to be a collection of RowType or PrimitiveType");
-					
+
 					var typeUsage = MetadataHelpers.GetElementTypeUsage(functionTree.ResultType);
 					var elementType = typeUsage.EdmType;
 					if (MetadataHelpers.IsRowType(elementType))
@@ -414,7 +414,8 @@ namespace FirebirdSql.Data.EntityFramework6
 			fbScript.Parse();
 			using (var fbConnection = new FbConnection(connection.ConnectionString))
 			{
-				var execution = new FbBatchExecution(fbConnection, fbScript);
+				var execution = new FbBatchExecution(fbConnection);
+				execution.AppendSqlStatements(fbScript);
 				execution.Execute();
 			}
 		}
@@ -460,7 +461,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 		}
 
-		protected override void DbDeleteDatabase(DbConnection connection, int? commandTimeout, 
+		protected override void DbDeleteDatabase(DbConnection connection, int? commandTimeout,
 #pragma warning disable 3001
 			StoreItemCollection storeItemCollection)
 #pragma warning restore 3001
