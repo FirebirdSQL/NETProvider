@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override void AddRange(Array values)
 		{
-			this.AddRange(values.Cast<FbParameter>());
+			this.AddRange(values.Cast<object>().Select(x => { EnsureFbParameterType(x); return (FbParameter)x; }));
 		}
 
 		public FbParameter AddWithValue(string parameterName, object value)
@@ -173,12 +173,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override int Add(object value)
 		{
-			if (!(value is FbParameter))
-			{
-				throw new InvalidCastException("The parameter passed was not a FbParameter.");
-			}
+			EnsureFbParameterType(value);
 
-			return this.IndexOf(this.Add(value as FbParameter));
+			return this.IndexOf(this.Add((FbParameter)value));
 		}
 
 		public bool Contains(FbParameter value)
@@ -188,7 +185,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override bool Contains(object value)
 		{
-			return this.parameters.Contains((FbParameter)value);
+			EnsureFbParameterType(value);
+
+			return this.Contains((FbParameter)value);
 		}
 
 		public override bool Contains(string parameterName)
@@ -203,7 +202,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override int IndexOf(object value)
 		{
-			return this.parameters.IndexOf((FbParameter)value);
+			EnsureFbParameterType(value);
+
+			return this.IndexOf((FbParameter)value);
 		}
 
 		public override int IndexOf(string parameterName)
@@ -219,39 +220,27 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override void Insert(int index, object value)
 		{
-			this.parameters.Insert(index, (FbParameter)value);
+			EnsureFbParameterType(value);
+
+			this.Insert(index, (FbParameter)value);
 		}
 
 		public void Remove(FbParameter value)
 		{
-			if (!(value is FbParameter))
-			{
-				throw new InvalidCastException("The parameter passed was not a FbParameter.");
-			}
 			if (!this.Contains(value))
 			{
 				throw new SystemException("The parameter does not exist in the collection.");
 			}
 
 			this.parameters.Remove(value);
-
-			((FbParameter)value).Parent = null;
+			value.Parent = null;
 		}
 
 		public override void Remove(object value)
 		{
-			if (!(value is FbParameter))
-			{
-				throw new InvalidCastException("The parameter passed was not a FbParameter.");
-			}
-			if (!this.Contains(value))
-			{
-				throw new SystemException("The parameter does not exist in the collection.");
-			}
+			EnsureFbParameterType(value);
 
-			this.parameters.Remove((FbParameter)value);
-
-			((FbParameter)value).Parent = null;
+			this.Remove((FbParameter)value);
 		}
 
 		public override void RemoveAt(int index)
@@ -339,6 +328,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 
 			return name;
+		}
+
+		private void EnsureFbParameterType(object value)
+		{
+			if (!(value is FbParameter))
+			{
+				throw new InvalidCastException("The parameter passed was not a FbParameter.");
+			}
 		}
 
 		#endregion
