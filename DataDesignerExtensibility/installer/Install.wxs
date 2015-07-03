@@ -14,7 +14,13 @@
 			<ComponentRef Id="FirebirdDDEXComponent" />
 			<ComponentRef Id="OtherFilesComponent" />
 		</Feature>
-		<Feature Id="VS2013Registry64Feature" Title="Visual Studio 2013 Support (64bit OS)" Level="1">
+		<Feature Id="VS2015Registry64Feature" Title="Visual Studio 2015 Support (64bit OS)" Level="1">
+			<ComponentRef Id="VS2015Registry64Component" />
+		</Feature>
+		<Feature Id="VS2015Registry32Feature" Title="Visual Studio 2015 Support (32bit OS)" Level="2">
+			<ComponentRef Id="VS2015Registry32Component" />
+		</Feature>
+		<Feature Id="VS2013Registry64Feature" Title="Visual Studio 2013 Support (64bit OS)" Level="2">
 			<ComponentRef Id="VS2013Registry64Component" />
 		</Feature>
 		<Feature Id="VS2013Registry32Feature" Title="Visual Studio 2013 Support (32bit OS)" Level="2">
@@ -61,6 +67,12 @@
 				</Directory>
 			</Directory>
 
+			<Component Id="VS2015Registry64Component" Guid="DA35A566-D451-4869-84EC-2991219728D1">
+				<?include $(var.BaseDir)\installer\VS2015Registry64.wsx ?>
+			</Component>
+			<Component Id="VS2015Registry32Component" Guid="D4654238-3DF3-4783-9D0E-5D3B9B5C53CA">
+				<?include $(var.BaseDir)\installer\VS2015Registry32.wsx ?>
+			</Component>
 			<Component Id="VS2013Registry64Component" Guid="60913AE0-759B-423E-862A-28570266BA16">
 				<?include $(var.BaseDir)\installer\VS2013Registry64.wsx ?>
 			</Component>
