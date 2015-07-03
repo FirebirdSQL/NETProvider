@@ -16,8 +16,6 @@
  *  All Rights Reserved.
  */
 
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
-
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -402,7 +400,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			return type;
 		}
 
-#if (!NET_35)
 		protected override void DbCreateDatabase(DbConnection connection, int? commandTimeout,
 #pragma warning disable 3001
 			StoreItemCollection storeItemCollection)
@@ -468,7 +465,5 @@ namespace FirebirdSql.Data.EntityFramework6
 		{
 			FbConnection.DropDatabase(connection.ConnectionString);
 		}
-#endif
 	}
 }
-#endif

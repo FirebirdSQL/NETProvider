@@ -1,21 +1,21 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  Copyright (c) 2008, 2013 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *  
+ *
  */
 
 using System;
@@ -425,7 +425,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override object GetValue(int i)
 		{
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
 			// type coercions for EF
 			if (this.command.ExpectedColumnTypes != null)
 			{
@@ -447,7 +446,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					return this.GetBoolean(i);
 				}
 			}
-#endif
 
 			this.CheckState();
 			this.CheckPosition();
@@ -820,7 +818,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				@"SELECT
 					fld.rdb$computed_blr AS computed_blr,
 					fld.rdb$computed_source AS computed_source,
-					(SELECT COUNT(*) FROM rdb$relation_constraints rel 
+					(SELECT COUNT(*) FROM rdb$relation_constraints rel
 					  INNER JOIN rdb$indices idx ON rel.rdb$index_name = idx.rdb$index_name
 					  INNER JOIN rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name
 					WHERE rel.rdb$constraint_type = 'PRIMARY KEY'

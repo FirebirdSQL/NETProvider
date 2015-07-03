@@ -1,22 +1,20 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
-
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
 
 using System;
 using System.Collections.Generic;
@@ -79,8 +77,8 @@ namespace FirebirdSql.Data.EntityFramework6
 		}
 
 		/// <summary>
-		/// Providers should override this to return information specific to their provider.  
-		/// 
+		/// Providers should override this to return information specific to their provider.
+		///
 		/// This method should never return null.
 		/// </summary>
 		/// <param name="informationType">The name of the information to be retrieved.</param>
@@ -134,7 +132,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		}
 
 		/// <summary>
-		/// This method takes a type and a set of facets and returns the best mapped equivalent type 
+		/// This method takes a type and a set of facets and returns the best mapped equivalent type
 		/// in EDM.
 		/// </summary>
 		/// <param name="storeType">A TypeUsage encapsulating a store type and a set of facets</param>
@@ -252,7 +250,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		}
 
 		/// <summary>
-		/// This method takes a type and a set of facets and returns the best mapped equivalent type 
+		/// This method takes a type and a set of facets and returns the best mapped equivalent type
 		/// in SQL Server, taking the store version into consideration.
 		/// </summary>
 		/// <param name="storeType">A TypeUsage encapsulating an EDM type and a set of facets</param>
@@ -454,7 +452,6 @@ namespace FirebirdSql.Data.EntityFramework6
 #endif
 		}
 
-#if (!NET_35)
 		public override bool SupportsEscapingLikeArgument(out char escapeCharacter)
 		{
 			escapeCharacter = LikeEscapeCharacter;
@@ -469,7 +466,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			sb.Replace("_", LikeEscapeCharacter + "_");
 			return sb.ToString();
 		}
-#endif
 
 #if (EF_6)
 		public override bool SupportsInExpression()
@@ -479,4 +475,3 @@ namespace FirebirdSql.Data.EntityFramework6
 #endif
 	}
 }
-#endif

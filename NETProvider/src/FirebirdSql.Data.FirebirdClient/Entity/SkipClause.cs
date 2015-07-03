@@ -1,22 +1,20 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
-
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
 
 using System;
 using System.Globalization;
@@ -28,7 +26,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 #endif
 {
 	/// <summary>
-	/// SkipClause represents the SKIP expression in a SqlSelectStatement. 
+	/// SkipClause represents the SKIP expression in a SqlSelectStatement.
 	/// It has a count property, which indicates how many rows should be skipped.
 	/// </summary>
 	internal class SkipClause : ISqlFragment
@@ -78,7 +76,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		#region ISqlFragment Members
 
 		/// <summary>
-		/// Write out the SKIP part of sql select statement 
+		/// Write out the SKIP part of sql select statement
 		/// It basically writes SKIP (X).
 		/// </summary>
 		/// <param name="writer"></param>
@@ -95,5 +93,3 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		#endregion
 	}
 }
-
-#endif
