@@ -53,9 +53,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private bool implicitTransaction;
 		private int commandTimeout;
 		private int fetchSize;
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
 		private Type[] expectedColumnTypes;
-#endif
 
 		#endregion
 
@@ -417,10 +415,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			command.FetchSize = this.FetchSize;
 			command.UpdatedRowSource = this.UpdatedRowSource;
 
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
 			if (this.expectedColumnTypes != null)
+			{
 				command.expectedColumnTypes = (Type[])this.expectedColumnTypes.Clone();
-#endif
+			}
 
 			for (int i = 0; i < this.Parameters.Count; i++)
 			{

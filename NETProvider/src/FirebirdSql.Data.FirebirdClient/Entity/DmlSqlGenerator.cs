@@ -1,22 +1,20 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
-
-#if (!(NET_35 && !ENTITY_FRAMEWORK))
 
 using System;
 using System.Collections.Generic;
@@ -68,7 +66,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			tree.Target.Expression.Accept(translator);
 			commandText.AppendLine();
 
-			// set c1 = ..., c2 = ..., ...            
+			// set c1 = ..., c2 = ..., ...
 			commandText.Append("SET ");
 
 			foreach (DbSetClause setClause in tree.SetClauses)
@@ -205,17 +203,17 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// how to construct the key predicate.
 		/// <code>
 		/// Sample SQL:
-		///     
+		///
 		///     select IdentityValue
 		///     from dbo.MyTable
 		///     where @@ROWCOUNT > 0 and IdentityValue = scope_identity()
-		/// 
+		///
 		/// or
-		/// 
+		///
 		///     select TimestamptValue
 		///     from dbo.MyTable
 		///     where @@ROWCOUNT > 0 and Id = 1
-		/// 
+		///
 		/// Note that we filter on rowcount to ensure no rows are returned if no rows were modified.
 		/// </code>
 		/// </summary>
@@ -325,4 +323,3 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		#endregion
 	}
 }
-#endif

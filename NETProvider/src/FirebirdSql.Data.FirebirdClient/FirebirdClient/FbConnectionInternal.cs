@@ -579,22 +579,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
 			if (assembly != null)
 			{
-#if (!NET_35)
 				if (assembly.IsFullyTrusted)
 					return Process.GetCurrentProcess().Id;
 				else
 					return -1;
-#else
-				// Think about better solution
-				try
-				{
-					return Process.GetCurrentProcess().Id;
-				}
-				catch
-				{
-					return -1;
-				}
-#endif
 			}
 			else // if we're not loaded from managed code
 			{
