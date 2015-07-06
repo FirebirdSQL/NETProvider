@@ -294,23 +294,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal bool IsSelectCommand
 		{
-			get
-			{
-				if (this.statement != null)
-				{
-					if (this.statement.StatementType == DbStatementType.Select ||
-						this.statement.StatementType == DbStatementType.SelectForUpdate)
-					{
-						return true;
-					}
-				}
-				return false;
-			}
+			get { return this.statement != null && (this.statement.StatementType == DbStatementType.Select || this.statement.StatementType == DbStatementType.SelectForUpdate); }
 		}
 
 		internal bool IsDDLCommand
 		{
-			get { return (this.statement != null && this.statement.StatementType == DbStatementType.DDL); }
+			get { return this.statement != null && this.statement.StatementType == DbStatementType.DDL; }
 		}
 
 		internal Type[] ExpectedColumnTypes
@@ -880,12 +869,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			for (int i = 0; i < this.namedParameters.Count; i++)
 			{
-				if (this.Parameters.IndexOf(this.namedParameters[i]) == -1)
+				var parametersIndex = this.Parameters.IndexOf(this.namedParameters[i]);
+				if (parametersIndex == -1)
 				{
 					throw new FbException(string.Format("Must declare the variable '{0}'", this.namedParameters[i]));
 				}
 
-				FbParameter parameter = this.Parameters[this.namedParameters[i]];
+				FbParameter parameter = this.Parameters[parametersIndex];
 
 				if (parameter.Direction == ParameterDirection.Input ||
 					parameter.Direction == ParameterDirection.InputOutput)
