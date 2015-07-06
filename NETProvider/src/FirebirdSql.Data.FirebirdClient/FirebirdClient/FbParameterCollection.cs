@@ -209,7 +209,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override int IndexOf(string parameterName)
 		{
+			return this.IndexOf(parameterName, -1);
+		}
+
+		internal int IndexOf(string parameterName, int luckyIndex)
+		{
 			var normalizedParameterName = FbParameter.NormalizeParameterName(parameterName);
+			if (luckyIndex != -1 && luckyIndex < this.parameters.Count)
+			{
+				if (this.parameters[luckyIndex].InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase))
+				{
+					return luckyIndex;
+				}
+			}
 			return this.parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase));
 		}
 

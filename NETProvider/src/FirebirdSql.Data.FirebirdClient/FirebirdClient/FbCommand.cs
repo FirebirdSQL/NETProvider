@@ -869,7 +869,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			for (int i = 0; i < this.namedParameters.Count; i++)
 			{
-				var parametersIndex = this.Parameters.IndexOf(this.namedParameters[i]);
+				var parametersIndex = this.Parameters.IndexOf(this.namedParameters[i], i);
 				if (parametersIndex == -1)
 				{
 					throw new FbException(string.Format("Must declare the variable '{0}'", this.namedParameters[i]));
@@ -1020,7 +1020,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (this.namedParameters.Count > 0)
 				{
-					index = this.Parameters.IndexOf(this.namedParameters[i]);
+					index = this.Parameters.IndexOf(this.namedParameters[i], i);
 					if (index == -1)
 					{
 						throw new FbException(string.Format("Must declare the variable '{0}'", this.namedParameters[i]));
