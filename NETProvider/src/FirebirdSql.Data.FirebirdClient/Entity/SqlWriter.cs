@@ -33,10 +33,6 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
 #endif
 {
-	/// <summary>
-	/// This extends StringWriter primarily to add the ability to add an indent
-	/// to each line that is written out.
-	/// </summary>
 	internal class SqlWriter : StringWriter
 	{
 		#region Fields

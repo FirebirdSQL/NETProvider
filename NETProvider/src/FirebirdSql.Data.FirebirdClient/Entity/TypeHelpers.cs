@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6
 #endif
 {
-	static class TypeHelpers
+	internal static class TypeHelpers
 	{
 		public static bool TryGetPrecision(TypeUsage tu, out byte precision)
 		{

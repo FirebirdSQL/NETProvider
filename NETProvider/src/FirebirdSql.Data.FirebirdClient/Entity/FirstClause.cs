@@ -25,11 +25,6 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
 #endif
 {
-	/// <summary>
-	/// FirstClause represents the FIRST expression in a SqlSelectStatement.
-	/// It has a count property, which indicates how many FIRST rows should be selected and a
-	/// boolen WithTies property.
-	/// </summary>
 	internal class FirstClause : ISqlFragment
 	{
 		#region Fields

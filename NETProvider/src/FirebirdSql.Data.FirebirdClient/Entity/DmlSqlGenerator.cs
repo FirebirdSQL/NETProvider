@@ -43,9 +43,6 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
 #endif
 {
-	/// <summary>
-	/// Class generating SQL for a DML command tree.
-	/// </summary>
 	internal static class DmlSqlGenerator
 	{
 		#region Static Fields

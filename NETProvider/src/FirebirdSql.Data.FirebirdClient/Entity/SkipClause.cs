@@ -25,10 +25,6 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
 #endif
 {
-	/// <summary>
-	/// SkipClause represents the SKIP expression in a SqlSelectStatement.
-	/// It has a count property, which indicates how many rows should be skipped.
-	/// </summary>
 	internal class SkipClause : ISqlFragment
 	{
 		#region Fields

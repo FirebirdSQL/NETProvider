@@ -34,24 +34,6 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
 #endif
 {
-	/// <summary>
-	/// <see cref="SymbolTable"/>
-	/// This class represents an extent/nested select statement,
-	/// or a column.
-	///
-	/// The important fields are Name, Type and NewName.
-	/// NewName starts off the same as Name, and is then modified as necessary.
-	///
-	///
-	/// The rest are used by special symbols.
-	/// e.g. NeedsRenaming is used by columns to indicate that a new name must
-	/// be picked for the column in the second phase of translation.
-	///
-	/// IsUnnest is used by symbols for a collection expression used as a from clause.
-	/// This allows <see cref="SqlGenerator.AddFromSymbol(SqlSelectStatement, string, Symbol, bool)"/> to add the column list
-	/// after the alias.
-	///
-	/// </summary>
 	internal class Symbol : ISqlFragment
 	{
 		#region Fields

@@ -35,12 +35,6 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
 #endif
 {
-	/// <summary>
-	/// This class is like StringBuilder.  While traversing the tree for the first time,
-	/// we do not know all the strings that need to be appended e.g. things that need to be
-	/// renamed, nested select statements etc.  So, we use a builder that can collect
-	/// all kinds of sql fragments.
-	/// </summary>
 	internal sealed class SqlBuilder : ISqlFragment
 	{
 		#region Fields

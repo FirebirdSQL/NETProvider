@@ -42,11 +42,7 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
 #endif
 {
-	/// <summary>
-	/// Lightweight expression translator for DML expression trees, which have constrained
-	/// scope and support.
-	/// </summary>
-	class ExpressionTranslator : DbExpressionVisitor
+	internal class ExpressionTranslator : DbExpressionVisitor
 	{
 		#region Fields
 

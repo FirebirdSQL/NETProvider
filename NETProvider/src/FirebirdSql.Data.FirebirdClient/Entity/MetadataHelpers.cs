@@ -33,10 +33,7 @@ namespace FirebirdSql.Data.Entity
 namespace FirebirdSql.Data.EntityFramework6
 #endif
 {
-	/// <summary>
-	/// A set of static helpers for type metadata
-	/// </summary>
-	static class MetadataHelpers
+	internal static class MetadataHelpers
 	{
 		#region Type Helpers
 
