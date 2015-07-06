@@ -1,17 +1,17 @@
 /*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2004-2005 Carlos Guzman Alvarez
  *	Copyright (c) 2014-2015 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal const int DefaultDialect = 3;
 		internal const int DefaultPacketSize = 8192;
 		internal const bool DefaultPooling = true;
-		internal const int DefautlConnectionLifetime = 0;
+		internal const int DefaultConnectionLifetime = 0;
 		internal const int DefaultMinPoolSize = 0;
 		internal const int DefaultMaxPoolSize = 100;
 		internal const int DefaultConnectionTimeout = 15;
@@ -60,7 +60,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Static Fields
 
-		public static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) 
+		public static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
 		{
 			{ "data source", "data source" },
 			{ "datasource", "data source" },
@@ -302,7 +302,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					if (keyPair.Groups.Count == 8)
 					{
-						string[] values = new string[] 
+						string[] values = new string[]
 						{
 							(keyPair.Groups[2].Success ? keyPair.Groups[2].Value
 								: keyPair.Groups[4].Success ? keyPair.Groups[4].Value
@@ -424,7 +424,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.options.Add("dialect", DefaultDialect);
 			this.options.Add("packet size", DefaultPacketSize);
 			this.options.Add("pooling", DefaultPooling);
-			this.options.Add("connection lifetime", DefautlConnectionLifetime);
+			this.options.Add("connection lifetime", DefaultConnectionLifetime);
 			this.options.Add("min pool size", DefaultMinPoolSize);
 			this.options.Add("max pool size", DefaultMaxPoolSize);
 			this.options.Add("connection timeout", DefaultConnectionTimeout);

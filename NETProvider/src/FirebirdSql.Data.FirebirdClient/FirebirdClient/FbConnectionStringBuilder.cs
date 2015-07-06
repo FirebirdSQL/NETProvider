@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Connection")]
 		[DisplayName("Connection LifeTime")]
 		[Description("When a connection is returned to the pool, its creation time is compared with the current time, and the connection is destroyed if that time span (in seconds) exceeds the value specified by connection lifetime.")]
-		[DefaultValue(FbConnectionString.DefautlConnectionLifetime)]
+		[DefaultValue(FbConnectionString.DefaultConnectionLifetime)]
 		public int ConnectionLifeTime
 		{
 			get { return this.GetInt32("Connection Lifetime"); }
