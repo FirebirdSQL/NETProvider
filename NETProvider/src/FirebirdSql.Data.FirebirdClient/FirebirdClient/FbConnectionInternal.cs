@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private IDatabase db;
 		private FbTransaction activeTransaction;
-		private List<WeakReference<FbCommand>> preparedCommands;
+		private List<WeakReference> preparedCommands;
 		private FbConnectionString options;
 		private FbConnection owningConnection;
 		private bool disposed;
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnectionInternal(FbConnectionString options)
 		{
-			this.preparedCommands = new List<WeakReference<FbCommand>>();
+			this.preparedCommands = new List<WeakReference>();
 			this.preparedCommandsCleanupSyncRoot = new object();
 
 			this.options = options;
@@ -293,7 +293,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			for (int i = 0; i < this.preparedCommands.Count; i++)
 			{
 				FbCommand command;
-				if (!this.preparedCommands[i].TryGetTarget(out command))
+				if (!this.preparedCommands[i].TryGetTarget<FbCommand>(out command))
 					continue;
 
 				if (command.Transaction != null)
@@ -381,7 +381,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			for (int i = 0; i < this.preparedCommands.Count; i++)
 			{
 				FbCommand current;
-				if (!this.preparedCommands[i].TryGetTarget(out current))
+				if (!this.preparedCommands[i].TryGetTarget<FbCommand>(out current))
 				{
 					position = i;
 					break;
@@ -394,7 +394,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 				}
 			}
-			this.preparedCommands.Insert(position, new WeakReference<FbCommand>(command));
+			this.preparedCommands.Insert(position, new WeakReference(command));
 		}
 
 		public void RemovePreparedCommand(FbCommand command)
@@ -416,7 +416,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void ReleasePreparedCommands()
 		{
-			WeakReference<FbCommand>[] toProcess = new WeakReference<FbCommand>[this.preparedCommands.Count];
+			WeakReference[] toProcess = new WeakReference[this.preparedCommands.Count];
 			this.preparedCommands.CopyTo(toProcess);
 			for (int i = 0; i < toProcess.Length; i++)
 			{
