@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(0)]
 		public override int Size
 		{
-			get 
+			get
 			{
 				return (this.HasSize ? this.size : this.RealValueSize ?? 0);
 			}
@@ -214,12 +214,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				if (!string.IsNullOrEmpty(this.parameterName) && !this.parameterName.StartsWith("@"))
-				{
-					return string.Format("@{0}", this.ParameterName);
-				}
-
-				return this.ParameterName;
+				return NormalizeParameterName(this.parameterName);
 			}
 		}
 
@@ -337,8 +332,10 @@ namespace FirebirdSql.Data.FirebirdClient
 				this.scale,
 				this.sourceColumn,
 				this.sourceVersion,
-				this.value) 
-				{ Charset = this.charset };
+				this.value)
+				{
+					Charset = this.charset
+				};
 		}
 
 		#endregion
@@ -454,6 +451,17 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				return null;
 			}
+		}
+
+		#endregion
+
+		#region Static Methods
+
+		internal static string NormalizeParameterName(string parameterName)
+		{
+			return !string.IsNullOrEmpty(parameterName) && !parameterName.StartsWith("@")
+				? string.Format("@{0}", parameterName)
+				: parameterName;
 		}
 
 		#endregion

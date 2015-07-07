@@ -1,17 +1,17 @@
 /*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
  *
@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override void AddRange(Array values)
 		{
-			this.AddRange(values.Cast<FbParameter>());
+			this.AddRange(values.Cast<object>().Select(x => { EnsureFbParameterType(x); return (FbParameter)x; }));
 		}
 
 		public FbParameter AddWithValue(string parameterName, object value)
@@ -153,8 +153,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					throw new ArgumentException("The FbParameter specified in the value parameter is already added to this or another FbParameterCollection.");
 				}
-				if (value.ParameterName == null ||
-					value.ParameterName.Length == 0)
+				if (value.ParameterName == null || value.ParameterName.Length == 0)
 				{
 					value.ParameterName = this.GenerateParameterName();
 				}
@@ -174,12 +173,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override int Add(object value)
 		{
-			if (!(value is FbParameter))
-			{
-				throw new InvalidCastException("The parameter passed was not a FbParameter.");
-			}
+			EnsureFbParameterType(value);
 
-			return this.IndexOf(this.Add(value as FbParameter));
+			return this.IndexOf(this.Add((FbParameter)value));
 		}
 
 		public bool Contains(FbParameter value)
@@ -189,12 +185,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override bool Contains(object value)
 		{
-			return this.parameters.Contains((FbParameter)value);
+			EnsureFbParameterType(value);
+
+			return this.Contains((FbParameter)value);
 		}
 
 		public override bool Contains(string parameterName)
 		{
-			return (-1 != this.IndexOf(parameterName));
+			return this.IndexOf(parameterName) != -1;
 		}
 
 		public int IndexOf(FbParameter value)
@@ -204,22 +202,27 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override int IndexOf(object value)
 		{
-			return this.parameters.IndexOf((FbParameter)value);
+			EnsureFbParameterType(value);
+
+			return this.IndexOf((FbParameter)value);
 		}
 
 		public override int IndexOf(string parameterName)
 		{
-			int index = 0;
-			foreach (FbParameter item in this.parameters)
+			return this.IndexOf(parameterName, -1);
+		}
+
+		internal int IndexOf(string parameterName, int luckyIndex)
+		{
+			var normalizedParameterName = FbParameter.NormalizeParameterName(parameterName);
+			if (luckyIndex != -1 && luckyIndex < this.parameters.Count)
 			{
-				if (CultureAwareEqualityComparer.Instance.Equals(item.ParameterName, parameterName) ||
-					CultureAwareEqualityComparer.Instance.Equals(item.InternalParameterName, parameterName))
+				if (this.parameters[luckyIndex].InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase))
 				{
-					return index;
+					return luckyIndex;
 				}
-				index++;
 			}
-			return -1;
+			return this.parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase));
 		}
 
 		public void Insert(int index, FbParameter value)
@@ -229,39 +232,27 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override void Insert(int index, object value)
 		{
-			this.parameters.Insert(index, (FbParameter)value);
+			EnsureFbParameterType(value);
+
+			this.Insert(index, (FbParameter)value);
 		}
 
 		public void Remove(FbParameter value)
 		{
-			if (!(value is FbParameter))
-			{
-				throw new InvalidCastException("The parameter passed was not a FbParameter.");
-			}
 			if (!this.Contains(value))
 			{
 				throw new SystemException("The parameter does not exist in the collection.");
 			}
 
 			this.parameters.Remove(value);
-
-			((FbParameter)value).Parent = null;
+			value.Parent = null;
 		}
 
 		public override void Remove(object value)
 		{
-			if (!(value is FbParameter))
-			{
-				throw new InvalidCastException("The parameter passed was not a FbParameter.");
-			}
-			if (!this.Contains(value))
-			{
-				throw new SystemException("The parameter does not exist in the collection.");
-			}
+			EnsureFbParameterType(value);
 
-			this.parameters.Remove((FbParameter)value);
-
-			((FbParameter)value).Parent = null;
+			this.Remove((FbParameter)value);
 		}
 
 		public override void RemoveAt(int index)
@@ -349,6 +340,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 
 			return name;
+		}
+
+		private void EnsureFbParameterType(object value)
+		{
+			if (!(value is FbParameter))
+			{
+				throw new InvalidCastException("The parameter passed was not a FbParameter.");
+			}
 		}
 
 		#endregion
