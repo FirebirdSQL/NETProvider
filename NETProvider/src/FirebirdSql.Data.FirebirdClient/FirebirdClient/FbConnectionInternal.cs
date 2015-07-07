@@ -292,10 +292,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			for (int i = 0; i < this.preparedCommands.Count; i++)
 			{
-				if (!this.preparedCommands[i].IsAlive)
+				FbCommand command;
+				if (!this.preparedCommands[i].TryGetTarget<FbCommand>(out command))
 					continue;
-
-				FbCommand command = this.preparedCommands[i].Target as FbCommand;
 
 				if (command.Transaction != null)
 				{
@@ -381,14 +380,18 @@ namespace FirebirdSql.Data.FirebirdClient
 			int position = this.preparedCommands.Count;
 			for (int i = 0; i < this.preparedCommands.Count; i++)
 			{
-				if (!this.preparedCommands[i].IsAlive)
+				FbCommand current;
+				if (!this.preparedCommands[i].TryGetTarget<FbCommand>(out current))
 				{
 					position = i;
 					break;
 				}
-				if (this.preparedCommands[i].Target == command)
+				else
 				{
-					return;
+					if (current == command)
+					{
+						return;
+					}
 				}
 			}
 			this.preparedCommands.Insert(position, new WeakReference(command));
@@ -400,10 +403,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				for (int i = this.preparedCommands.Count - 1; i >= 0; i--)
 				{
-					var cmd = this.preparedCommands[i];
-					if (cmd != null && cmd.Target == command)
+					var item = this.preparedCommands[i];
+					FbCommand current;
+					if (item.TryGetTarget(out current) && current == command)
 					{
-						cmd.Target = null;
 						this.preparedCommands.RemoveAt(i);
 						return;
 					}
@@ -417,15 +420,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			this.preparedCommands.CopyTo(toProcess);
 			for (int i = 0; i < toProcess.Length; i++)
 			{
-				WeakReference current = toProcess[i];
-
-				if (!current.IsAlive)
+				FbCommand current;
+				if (!toProcess[i].TryGetTarget(out current))
 					continue;
 
 				try
 				{
 					// Release statement handle
-					(current.Target as FbCommand).Release();
+					current.Release();
 				}
 				catch (System.IO.IOException)
 				{
