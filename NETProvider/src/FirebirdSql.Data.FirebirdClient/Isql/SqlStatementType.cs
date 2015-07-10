@@ -36,6 +36,11 @@ namespace FirebirdSql.Data.Isql
 		AlterDatabase = 0,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>ALTER CHARACTER SET</b>
+		/// </summary>
+		AlterCharacterSet,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>ALTER DOMAIN</b>
 		/// </summary>
 		AlterDomain,
