@@ -31,14 +31,14 @@ namespace FirebirdSql.Data.Isql
 	public enum SqlStatementType
 	{
 		/// <summary>
-		/// Represents the SQL statement: <b>ALTER DATABASE</b>
-		/// </summary>
-		AlterDatabase = 0,
-
-		/// <summary>
 		/// Represents the SQL statement: <b>ALTER CHARACTER SET</b>
 		/// </summary>
-		AlterCharacterSet,
+		AlterCharacterSet = 0,
+
+		/// <summary>
+		/// Represents the SQL statement: <b>ALTER DATABASE</b>
+		/// </summary>
+		AlterDatabase,
 
 		/// <summary>
 		/// Represents the SQL statement: <b>ALTER DOMAIN</b>
