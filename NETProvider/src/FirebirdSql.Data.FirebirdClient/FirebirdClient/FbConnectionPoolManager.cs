@@ -1,17 +1,17 @@
 ﻿/*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2013-2014 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			bool _disposed;
 			object _syncRoot;
 			FbConnectionString _connectionString;
-			Queue<Item> _available;
+			Stack<Item> _available;
 			List<FbConnectionInternal> _busy;
 
 			public Pool(FbConnectionString connectionString)
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_disposed = false;
 				_syncRoot = new object();
 				_connectionString = connectionString;
-				_available = new Queue<Item>();
+				_available = new Stack<Item>();
 				_busy = new List<FbConnectionInternal>();
 			}
 
@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					CheckDisposedImpl();
 
 					var connection = _available.Any()
-						? _available.Dequeue().Connection
+						? _available.Pop().Connection
 						: CreateNewConnectionIfPossibleImpl(_connectionString, owner);
 					connection.SetOwningConnection(owner);
 					_busy.Add(connection);
@@ -120,7 +120,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					var removed = _busy.Remove(connection);
 					if (removed)
-						_available.Enqueue(new Item(DateTimeOffset.UtcNow, connection));
+					{
+						_available.Push(new Item(DateTimeOffset.UtcNow, connection));
+					}
 				}
 			}
 
@@ -132,13 +134,17 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					var now = DateTimeOffset.UtcNow;
 					var available = _available.ToArray();
+					if (available.Count() <= _connectionString.MinPoolSize)
+						return;
 					var keep = available.Where(x => IsAlive(_connectionString.ConnectionLifeTime, x.Created, now)).ToArray();
 					var keepCount = keep.Count();
 					if (keepCount < _connectionString.MinPoolSize)
-						keep = available.Except(keep).Take(_connectionString.MinPoolSize - keepCount).ToArray();
+					{
+						keep = keep.Concat(available.Except(keep).OrderByDescending(x => x.Created).Take(_connectionString.MinPoolSize - keepCount)).ToArray();
+					}
 					var release = available.Except(keep).ToArray();
 					release.AsParallel().ForAll(x => x.Dispose());
-					_available = new Queue<Item>(keep);
+					_available = new Stack<Item>(keep);
 				}
 			}
 
