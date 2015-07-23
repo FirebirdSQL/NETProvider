@@ -1,22 +1,20 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2006 Carlos Guzman Alvarez
+ *  Copyright (c) 2014-2015 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *   
- *  Contributors:
- *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -28,6 +26,9 @@ using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
 using NUnit.Framework;
+using System.Threading;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace FirebirdSql.Data.UnitTests
 {
@@ -218,8 +219,8 @@ RETURNS (
   R94 FLOAT,
   R95 FLOAT )
 AS
-BEGIN 
-  SUSPEND; 
+BEGIN
+  SUSPEND;
 END
 ";
 				cmd.ExecuteNonQuery();
@@ -265,6 +266,46 @@ END
 		}
 
 		[Test]
+		public void DNET595()
+		{
+			const int NumberOfThreads = 15;
+
+			var threads = new List<Thread>();
+
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
+			csb.Pooling = true;
+			csb.ConnectionLifeTime = 5;
+			string cs = csb.ToString();
+
+			for (int i = 0; i < NumberOfThreads; i++)
+			{
+				var t = new Thread(o =>
+				{
+					for (int j = 0; j < 50; j++)
+					{
+						GetSomething(cs);
+					}
+				});
+				t.IsBackground = true;
+				t.Start();
+				threads.Add(t);
+			}
+			foreach (var thread in threads)
+			{
+				thread.Join();
+			}
+			Assert.AreEqual(NumberOfThreads + 1, FbConnectionTests.ActiveConnections());
+
+			var sw = new Stopwatch();
+			sw.Start();
+			while (sw.Elapsed.TotalSeconds < 60)
+			{
+				GetSomething(cs);
+			}
+			Assert.LessOrEqual(FbConnectionTests.ActiveConnections(), 2 + 1);
+		}
+
+		[Test]
 		public void DNET()
 		{
 			const string ConnectionString = @"data source=localhost;port number=20455;initial catalog=;user id=SYSDBA;password=masterkey;pooling=False;packet size=16384;character set=UTF8";
@@ -277,6 +318,25 @@ END
 			Assert.AreEqual(false, cs.Pooling);
 			Assert.AreEqual(16384, cs.PacketSize);
 			Assert.AreEqual("UTF8", cs.Charset);
+		}
+
+		#endregion
+
+		#region Methods
+
+		private static void GetSomething(string connectionString)
+		{
+			using (FbConnection conn = new FbConnection(connectionString))
+			{
+				conn.Open();
+				using (FbCommand command = new FbCommand("select current_timestamp from mon$database", conn))
+				{
+					FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
+					csb.Pooling = true;
+					csb.ConnectionLifeTime = 5;
+					string cs = csb.ToString(); command.ExecuteScalar();
+				}
+			}
 		}
 
 		#endregion

@@ -1,18 +1,19 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2014-2015 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -145,7 +146,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ConnectionPoolingTest()
 		{
-			// Using ActiveUsers as proxy for number of connections
 			FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
@@ -156,27 +156,20 @@ namespace FirebirdSql.Data.UnitTests
 
 			int active = ActiveConnections();
 
-			// Open two connections.
 			Console.WriteLine("Open two connections.");
 			myConnection1.Open();
 			myConnection2.Open();
 
-			// Now there are two connections in the pool that matches the connection string.
-			// Return the both connections to the pool. 
 			Console.WriteLine("Return both of the connections to the pool.");
 			myConnection1.Close();
 			myConnection2.Close();
 
 			Assert.AreEqual(active + 2, ActiveConnections());
-
-			// Clear pools
-			FbConnection.ClearAllPools();
 		}
 
 		[Test]
 		public void ConnectionPoolingTimeOutTest()
 		{
-			// Using ActiveUsers as proxy for number of connections
 			FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
@@ -200,8 +193,6 @@ namespace FirebirdSql.Data.UnitTests
 			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
 
 			Assert.AreEqual(active, ActiveConnections());
-
-			FbConnection.ClearAllPools();
 		}
 
 		[Test]
@@ -243,8 +234,6 @@ namespace FirebirdSql.Data.UnitTests
 				connections.ForEach(x => x.Dispose());
 			}
 
-			FbConnection.ClearAllPools();
-
 			Assert.IsTrue(thrown);
 		}
 
@@ -277,9 +266,6 @@ namespace FirebirdSql.Data.UnitTests
 			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
 
 			Assert.AreEqual(active + csb.MinPoolSize, ActiveConnections());
-
-			FbConnection.ClearAllPools();
-
 		}
 
 		[Test]
@@ -338,7 +324,7 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-		private int ActiveConnections()
+		public static int ActiveConnections()
 		{
 			using (FbConnection conn = new FbConnection(BuildConnectionString()))
 			{
