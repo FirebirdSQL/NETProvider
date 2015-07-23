@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	sealed class FbConnectionPoolManager : IDisposable
 	{
-		static Lazy<FbConnectionPoolManager> _instanceLazy = new Lazy<FbConnectionPoolManager>(() => new FbConnectionPoolManager(), LazyThreadSafetyMode.PublicationOnly);
+		static Lazy<FbConnectionPoolManager> _instanceLazy = new Lazy<FbConnectionPoolManager>(() => new FbConnectionPoolManager(), LazyThreadSafetyMode.ExecutionAndPublication);
 
 		internal static FbConnectionPoolManager Instance
 		{
