@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			bool _disposed;
 			object _syncRoot;
 			FbConnectionString _connectionString;
-			Queue<Item> _available;
+			Stack<Item> _available;
 			List<FbConnectionInternal> _busy;
 
 			public Pool(FbConnectionString connectionString)
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_disposed = false;
 				_syncRoot = new object();
 				_connectionString = connectionString;
-				_available = new Queue<Item>();
+				_available = new Stack<Item>();
 				_busy = new List<FbConnectionInternal>();
 			}
 
@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					CheckDisposedImpl();
 
 					var connection = _available.Any()
-						? _available.Dequeue().Connection
+						? _available.Pop().Connection
 						: CreateNewConnectionIfPossibleImpl(_connectionString, owner);
 					connection.SetOwningConnection(owner);
 					_busy.Add(connection);
@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					var removed = _busy.Remove(connection);
 					if (removed)
 					{
-						_available.Enqueue(new Item(DateTimeOffset.UtcNow, connection));
+						_available.Push(new Item(DateTimeOffset.UtcNow, connection));
 					}
 				}
 			}
@@ -144,7 +144,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 					var release = available.Except(keep).ToArray();
 					release.AsParallel().ForAll(x => x.Dispose());
-					_available = new Queue<Item>(keep);
+					_available = new Stack<Item>(keep);
 				}
 			}
 
