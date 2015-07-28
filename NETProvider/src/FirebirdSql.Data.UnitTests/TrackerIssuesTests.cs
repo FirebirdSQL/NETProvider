@@ -32,12 +32,14 @@ using System.Diagnostics;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture]
+	[TestFixture(FbServerType.Default)]
+	[TestFixture(FbServerType.Embedded)]
 	public class TrackerIssuesTests : TestsBase
 	{
 		#region Constructors
 
-		public TrackerIssuesTests()
+		public TrackerIssuesTests(FbServerType serverType)
+			: base(serverType, false)
 		{
 		}
 
@@ -268,41 +270,44 @@ END
 		[Test]
 		public void DNET595()
 		{
+			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
 
 			var threads = new List<Thread>();
 
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
-			csb.Pooling = true;
-			csb.ConnectionLifeTime = 5;
-			string cs = csb.ToString();
-
-			for (int i = 0; i < NumberOfThreads; i++)
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
 			{
-				var t = new Thread(o =>
+				csb.Pooling = true;
+				csb.ConnectionLifeTime = 5;
+				string cs = csb.ToString();
+
+				for (int i = 0; i < NumberOfThreads; i++)
 				{
-					for (int j = 0; j < 50; j++)
+					var t = new Thread(o =>
 					{
-						GetSomething(cs);
-					}
-				});
-				t.IsBackground = true;
-				t.Start();
-				threads.Add(t);
-			}
-			foreach (var thread in threads)
-			{
-				thread.Join();
-			}
-			Assert.AreEqual(NumberOfThreads + 1, FbConnectionTests.ActiveConnections());
+						for (int j = 0; j < 50; j++)
+						{
+							GetSomething(cs);
+						}
+					});
+					t.IsBackground = true;
+					t.Start();
+					threads.Add(t);
+				}
+				foreach (var thread in threads)
+				{
+					thread.Join();
+				}
+				Assert.That(FbConnectionTests.ActiveConnections(this.FbServerType), Is.InRange(NumberOfThreads - 1, NumberOfThreads + 1));
 
-			var sw = new Stopwatch();
-			sw.Start();
-			while (sw.Elapsed.TotalSeconds < 60)
-			{
-				GetSomething(cs);
+				var sw = new Stopwatch();
+				sw.Start();
+				while (sw.Elapsed.TotalSeconds < 60)
+				{
+					GetSomething(cs);
+				}
+				Assert.LessOrEqual(FbConnectionTests.ActiveConnections(this.FbServerType), 2 + 1);
 			}
-			Assert.LessOrEqual(FbConnectionTests.ActiveConnections(), 2 + 1);
 		}
 
 		[Test]
@@ -331,10 +336,11 @@ END
 				conn.Open();
 				using (FbCommand command = new FbCommand("select current_timestamp from mon$database", conn))
 				{
-					FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
+					FbConnectionStringBuilder csb = new FbConnectionStringBuilder(connectionString);
 					csb.Pooling = true;
 					csb.ConnectionLifeTime = 5;
-					string cs = csb.ToString(); command.ExecuteScalar();
+					string cs = csb.ToString();
+					command.ExecuteScalar();
 				}
 			}
 		}

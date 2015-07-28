@@ -29,13 +29,14 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture]
+	[TestFixture(FbServerType.Default)]
+	[TestFixture(FbServerType.Embedded)]
 	public class FbCommandTests : TestsBase
 	{
 		#region Constructors
 
-		public FbCommandTests()
-			: base(false)
+		public FbCommandTests(FbServerType serverType)
+			: base(serverType, false)
 		{
 		}
 
@@ -356,6 +357,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void UnicodeTest()
 		{
+			try
+			{
 			string createTable = "CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10));";
 
 			FbCommand ct = new FbCommand(createTable, this.Connection);
@@ -387,11 +390,23 @@ namespace FirebirdSql.Data.UnitTests
 			}
 
 			r.Close();
+			}
+			finally
+			{
+				string dropTable = "DROP TABLE VARCHARTEST;";
+
+				using (FbCommand ct = new FbCommand(dropTable, this.Connection))
+				{
+					ct.ExecuteNonQuery();
+				}
+			}
 		}
 
 		[Test]
 		public void SimplifiedChineseTest()
 		{
+			try
+			{
 			string createTable = "CREATE TABLE TABLE1 (FIELD1 varchar(20))";
 			FbCommand create = new FbCommand(createTable, this.Connection);
 			create.ExecuteNonQuery();
@@ -428,6 +443,14 @@ namespace FirebirdSql.Data.UnitTests
 			select.Dispose();
 
 			Assert.AreEqual("中文", result, "Incorrect results in	plain insert");
+			}
+			finally
+			{
+				string dropTable = "DROP TABLE TABLE1";
+				FbCommand drop = new FbCommand(dropTable, this.Connection);
+				drop.ExecuteNonQuery();
+				drop.Dispose();
+			}
 		}
 
 		[Test]
@@ -682,7 +705,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void CommandCancellationTest()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
+			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
 			{
 				Assert.Inconclusive("Not supported on this version.");
 				return;
@@ -722,6 +745,8 @@ end";
 		[Test]
 		public void NoCommandPlanTest()
 		{
+			try
+			{
 			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "recreate table NoCommandPlanTest (id int)";
@@ -729,6 +754,15 @@ end";
 				var plan = default(string);
 				Assert.DoesNotThrow(() => { plan=cmd.CommandPlan; });
 				Assert.IsEmpty(plan);
+			}
+			}
+			finally
+			{
+				using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = "drop table NoCommandPlanTest";
+					cmd.ExecuteNonQuery();
+				}
 			}
 		}
 

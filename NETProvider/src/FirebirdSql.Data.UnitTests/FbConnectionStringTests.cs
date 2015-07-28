@@ -27,8 +27,7 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture]
-	public class FbConnectionStringTests : TestsBase
+	public class FbConnectionStringTests
 	{
 		[Test]
 		public void ParsingNormalConnectionStringTest()

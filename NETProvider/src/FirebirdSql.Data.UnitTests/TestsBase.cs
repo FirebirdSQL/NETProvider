@@ -31,9 +31,45 @@ using System.Security.Cryptography;
 using NUnit.Framework;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Services;
+using System.Diagnostics;
 
 namespace FirebirdSql.Data.UnitTests
 {
+	[SetUpFixture]
+	public class FirstClass
+	{
+		[SetUp]
+		public void SetupDatabase()
+		{
+			Prepare(FbServerType.Default);
+			Prepare(FbServerType.Embedded);
+		}
+
+		private static void Prepare(FbServerType server)
+		{
+			string cs = TestsBase.BuildConnectionString(server);
+
+			TestsBase.CreateDatabase(cs);
+			TestsBase.CreateTables(cs);
+			TestsBase.CreateProcedures(cs);
+			TestsBase.CreateTriggers(cs);
+		}
+
+		[TearDown]
+		public void DropDatabase()
+		{
+			FbConnection.ClearAllPools();
+			Drop(FbServerType.Default);
+			Drop(FbServerType.Embedded);
+		}
+
+		private void Drop(FbServerType server)
+		{
+			string cs = TestsBase.BuildConnectionString(server);
+			TestsBase.DropDatabase(cs);
+		}
+	}
+
 	public class TestsBase
 	{
 		#region	Fields
@@ -41,6 +77,13 @@ namespace FirebirdSql.Data.UnitTests
 		private FbConnection connection;
 		private FbTransaction transaction;
 		private bool withTransaction;
+		private FbServerType fbServerType;
+		private string cs;
+
+		public FbServerType FbServerType
+		{
+			get { return fbServerType; }
+		}
 
 		#endregion
 
@@ -61,13 +104,14 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region	Constructors
 
-		public TestsBase()
+		public TestsBase(FbServerType serverType)
+			: this(serverType, false)
 		{
-			this.withTransaction = false;
 		}
 
-		public TestsBase(bool withTransaction)
+		public TestsBase(FbServerType fbServerType, bool withTransaction)
 		{
+			this.fbServerType = fbServerType;
 			this.withTransaction = withTransaction;
 		}
 
@@ -78,14 +122,8 @@ namespace FirebirdSql.Data.UnitTests
 		[SetUp]
 		public virtual void SetUp()
 		{
-			string cs = BuildConnectionString();
-
-			CreateDatabase(cs);
-			CreateTables(cs);
+			this.cs = BuildConnectionString(this.fbServerType);
 			InsertTestData(cs);
-			CreateProcedures(cs);
-			CreateTriggers(cs);
-
 			this.connection = new FbConnection(cs);
 			this.connection.Open();
 
@@ -102,24 +140,34 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				try
 				{
-					transaction.Commit();
+					if (!transaction.IsUpdated)
+					{
+						transaction.Commit();
+					}
+				}
+				catch
+				{
+				}
+				try
+				{
+					transaction.Dispose();
 				}
 				catch
 				{
 				}
 			}
-			connection.Close();
-
-			FbConnection.ClearAllPools();
-			string cs = BuildConnectionString();
-			DropDatabase(cs);
+			if (connection != null)
+			{
+				connection.Dispose();
+			}
+			DeleteAllData(this.cs);
 		}
 
 		#endregion
 
 		#region	Database Creation Methods
 
-		private static void CreateDatabase(string connectionString)
+		internal static void CreateDatabase(string connectionString)
 		{
 			FbConnection.CreateDatabase(
 				connectionString,
@@ -128,12 +176,12 @@ namespace FirebirdSql.Data.UnitTests
 				true);
 		}
 
-		private static void DropDatabase(string connectionString)
+		internal static void DropDatabase(string connectionString)
 		{
 			FbConnection.DropDatabase(connectionString);
 		}
 
-		private static void CreateTables(string connectionString)
+		internal static void CreateTables(string connectionString)
 		{
 			FbConnection connection = new FbConnection(connectionString);
 			connection.Open();
@@ -184,10 +232,14 @@ namespace FirebirdSql.Data.UnitTests
 			command.ExecuteNonQuery();
 			command.Dispose();
 
+			FbCommand createTable = new FbCommand("CREATE TABLE GUID_TEST (INT_FIELD INTEGER, GUID_FIELD CHAR(16) CHARACTER SET OCTETS)", connection);
+			createTable.ExecuteNonQuery();
+			createTable.Dispose();
+
 			connection.Close();
 		}
 
-		private static void CreateProcedures(string connectionString)
+		internal static void CreateProcedures(string connectionString)
 		{
 			FbConnection connection = new FbConnection(connectionString);
 			connection.Open();
@@ -285,7 +337,7 @@ namespace FirebirdSql.Data.UnitTests
 			connection.Close();
 		}
 
-		private static void CreateTriggers(string connectionString)
+		internal static void CreateTriggers(string connectionString)
 		{
 			FbConnection connection = new FbConnection(connectionString);
 			connection.Open();
@@ -350,7 +402,7 @@ namespace FirebirdSql.Data.UnitTests
 			connection.Close();
 		}
 
-		private static void InsertTestData(string connectionString)
+		internal static void InsertTestData(string connectionString)
 		{
 			FbConnection connection = new FbConnection(connectionString);
 			connection.Open();
@@ -412,6 +464,43 @@ namespace FirebirdSql.Data.UnitTests
 			finally
 			{
 				command.Dispose();
+				transaction.Dispose();
+				connection.Close();
+			}
+		}
+
+		internal static void DeleteAllData(string connectionString)
+		{
+			FbConnection connection = new FbConnection(connectionString);
+			connection.Open();			
+
+			string commandText1 ="delete from test";
+			string commandText2 = "delete from log";
+			string commandText3 = "delete from PrepareTest";
+
+			FbTransaction transaction = connection.BeginTransaction();
+
+			FbCommand command = new FbCommand(commandText1, connection, transaction);
+			FbCommand command2 = new FbCommand(commandText2, connection, transaction);
+			FbCommand command3 = new FbCommand(commandText3, connection, transaction);
+			try
+			{
+				command.ExecuteNonQuery();
+				command2.ExecuteNonQuery();
+				command3.ExecuteNonQuery();
+			
+				// Commit transaction
+				transaction.Commit();
+			}
+			catch (FbException)
+			{
+				transaction.Rollback();
+				throw;
+			}
+			finally
+			{
+				command.Dispose();
+				transaction.Dispose();
 				connection.Close();
 			}
 		}
@@ -420,28 +509,17 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region	ConnectionString Building methods
 
-		public static string BuildConnectionString()
+		public static string BuildConnectionString(FbServerType serverType)
 		{
-			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
-
-			cs.UserID = ConfigurationManager.AppSettings["User"];
-			cs.Password = ConfigurationManager.AppSettings["Password"];
-			cs.Database = ConfigurationManager.AppSettings["Database"];
-			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
-			cs.Port = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
-			cs.Charset = ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling = false;
-			cs.ServerType = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
-
-			return cs.ToString();
+			return BuildConnectionStringBuilder(serverType).ToString();
 		}
 
-		public static string BuildServicesConnectionString()
+		public static string BuildServicesConnectionString(FbServerType serverType)
 		{
-			return BuildServicesConnectionString(true);
+			return BuildServicesConnectionString(serverType, true);
 		}
 
-		public static string BuildServicesConnectionString(bool includeDatabase)
+		public static string BuildServicesConnectionString(FbServerType serverType, bool includeDatabase)
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
@@ -452,12 +530,12 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				cs.Database = ConfigurationManager.AppSettings["Database"];
 			}
-			cs.ServerType = (FbServerType)Convert.ToInt32(ConfigurationManager.AppSettings["ServerType"]);
+			cs.ServerType = serverType;
 
 			return cs.ToString();
 		}
 
-		public static FbConnectionStringBuilder BuildConnectionStringBuilder()
+		public static FbConnectionStringBuilder BuildConnectionStringBuilder(FbServerType serverType)
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
@@ -468,8 +546,7 @@ namespace FirebirdSql.Data.UnitTests
 			cs.Port = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
 			cs.Charset = ConfigurationManager.AppSettings["Charset"];
 			cs.Pooling = false;
-			cs.ServerType = (FbServerType)Int32.Parse(ConfigurationManager.AppSettings["ServerType"]);
-
+			cs.ServerType = serverType;
 			return cs;
 		}
 
@@ -514,10 +591,10 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-		public static Version GetServerVersion()
+		public static Version GetServerVersion(FbServerType serverType)
 		{
 			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString();
+			server.ConnectionString = BuildServicesConnectionString(serverType);
 			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
 		}
 

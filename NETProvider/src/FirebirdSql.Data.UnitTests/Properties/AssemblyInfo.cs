@@ -22,7 +22,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 [assembly: ComVisible(false)]
 [assembly: AssemblyTitle("NUnit Test Suite - Firebird ADO.NET Data Provider")]
 [assembly: AssemblyDescription("NUnit Test Suite - Firebird ADO.NET Data Provider")]

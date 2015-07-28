@@ -30,13 +30,14 @@ namespace FirebirdSql.Data.UnitTests
 	/// <summary>
 	/// All the test in this TestFixture are using implicit transaction support.
 	/// </summary>
-	[TestFixture]
+	[TestFixture(FbServerType.Default)]
+	[TestFixture(FbServerType.Embedded)]
 	public class GuidTests : TestsBase
 	{
 		#region Constructors
 
-		public GuidTests()
-			: base()
+		public GuidTests(FbServerType serverType)
+			: base(serverType, false)
 		{
 		}
 
@@ -47,10 +48,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void InsertGuidTest()
 		{
-			FbCommand createTable = new FbCommand("CREATE TABLE GUID_TEST (GUID_FIELD CHAR(16) CHARACTER SET OCTETS)", Connection);
-			createTable.ExecuteNonQuery();
-			createTable.Dispose();
-
 			Guid newGuid = Guid.Empty;
 			Guid guidValue = Guid.NewGuid();
 
@@ -61,12 +58,12 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			// Select the value
-			FbCommand select = new FbCommand("SELECT * FROM GUID_TEST", Connection);
+			using (FbCommand select = new FbCommand("SELECT * FROM GUID_TEST", Connection))
 			using (FbDataReader r = select.ExecuteReader())
 			{
 				if (r.Read())
 				{
-					newGuid = r.GetGuid(0);
+					newGuid = r.GetGuid(1);
 				}
 			}
 
@@ -76,26 +73,26 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void InsertNullGuidTest()
 		{
-			FbCommand createTable = new FbCommand("CREATE TABLE GUID_TEST (INT_FIELD INTEGER, GUID_FIELD CHAR(16) CHARACTER SET OCTETS)", Connection);
-			createTable.ExecuteNonQuery();
-			createTable.Dispose();
-
 			// Insert the Guid
-			FbCommand insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection);
-			insert.Parameters.Add("@IntField", FbDbType.Integer).Value = GetId();
+			var id = GetId();
+            FbCommand insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection);
+			insert.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
 			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = DBNull.Value;
 			insert.ExecuteNonQuery();
 			insert.Dispose();
 
 			// Select the value
-			FbCommand select = new FbCommand("SELECT * FROM GUID_TEST", Connection);
-			using (FbDataReader r = select.ExecuteReader())
+			using (FbCommand select = new FbCommand("SELECT * FROM GUID_TEST WHERE INT_FIELD = @IntField", Connection))
 			{
-				if (r.Read())
+				select.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
+				using (FbDataReader r = select.ExecuteReader())
 				{
-					if (!r.IsDBNull(1))
+					if (r.Read())
 					{
-						throw new Exception();
+						if (!r.IsDBNull(1))
+						{
+							throw new Exception();
+						}
 					}
 				}
 			}
