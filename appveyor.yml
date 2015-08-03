@@ -1,0 +1,17 @@
+version: 0.0.0.{build}
+os: Default Azure
+configuration:
+- Debug
+- Release_40
+- Release_45
+shallow_clone: true
+build:
+  project: NETProvider\src\NETProvider.sln
+  parallel: true
+  verbosity: minimal
+test: off
+artifacts:
+- path: NETProvider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.dll
+- path: NETProvider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.pdb
+- path: NETProvider\src\EntityFramework.Firebird\bin\$(Configuration)\EntityFramework.Firebird.dll
+- path: NETProvider\src\EntityFramework.Firebird\bin\$(Configuration)\EntityFramework.Firebird.pdb
