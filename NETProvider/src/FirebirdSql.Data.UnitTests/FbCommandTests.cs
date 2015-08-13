@@ -359,37 +359,38 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			try
 			{
-			string createTable = "CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10));";
+				string createTable = "CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10));";
 
-			FbCommand ct = new FbCommand(createTable, this.Connection);
-			ct.ExecuteNonQuery();
-			ct.Dispose();
+				FbCommand ct = new FbCommand(createTable, this.Connection);
+				ct.ExecuteNonQuery();
+				ct.Dispose();
 
-			ArrayList l = new ArrayList();
+				ArrayList l = new ArrayList();
 
-			l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1');");
-			l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11');");
-			l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111');");
-			l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111');");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1');");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11');");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111');");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111');");
 
-			foreach (string statement in l)
-			{
-				FbCommand insert = new FbCommand(statement, this.Connection);
-				insert.ExecuteNonQuery();
-				insert.Dispose();
-			}
+				foreach (string statement in l)
+				{
+					FbCommand insert = new FbCommand(statement, this.Connection);
+					insert.ExecuteNonQuery();
+					insert.Dispose();
+				}
 
-			string sql = "select * from	varchartest";
+				string sql = "select * from	varchartest";
 
-			FbCommand cmd = new FbCommand(sql, this.Connection);
-			FbDataReader r = cmd.ExecuteReader();
+				FbCommand cmd = new FbCommand(sql, this.Connection);
+				FbDataReader r = cmd.ExecuteReader();
 
-			while (r.Read())
-			{
-				Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
-			}
+				while (r.Read())
+				{
+					Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
+				}
 
-			r.Close();
+				r.Close();
+				cmd.Dispose();
 			}
 			finally
 			{
