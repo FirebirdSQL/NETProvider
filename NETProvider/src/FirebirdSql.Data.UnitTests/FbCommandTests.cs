@@ -746,24 +746,13 @@ end";
 		[Test]
 		public void NoCommandPlanTest()
 		{
-			try
-			{
 			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "recreate table NoCommandPlanTest (id int)";
-				cmd.ExecuteNonQuery();
+				cmd.Prepare();
 				var plan = default(string);
 				Assert.DoesNotThrow(() => { plan=cmd.CommandPlan; });
 				Assert.IsEmpty(plan);
-			}
-			}
-			finally
-			{
-				using (var cmd = Connection.CreateCommand())
-				{
-					cmd.CommandText = "drop table NoCommandPlanTest";
-					cmd.ExecuteNonQuery();
-				}
 			}
 		}
 
