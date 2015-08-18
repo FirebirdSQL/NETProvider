@@ -421,6 +421,7 @@ namespace FirebirdSql.Data.UnitTests
 			finally
 			{
 				command.Dispose();
+				transaction.Dispose();
 				connection.Close();
 			}
 		}
