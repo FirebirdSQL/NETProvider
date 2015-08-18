@@ -1,22 +1,22 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
- *  
+ *
  *  Contributors:
- *   Jiri Cincura (jiri@cincura.net)   
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -37,8 +37,8 @@ namespace FirebirdSql.Data.UnitTests
 	{
 		#region Constructors
 
-		public FbServicesTests()
-			: base(false)
+		public FbServicesTests(FbServerType serverType)
+			: base(serverType, false)
 		{
 		}
 
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbBackup backupSvc = new FbBackup();
 
-			backupSvc.ConnectionString = BuildServicesConnectionString();
+			backupSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
 			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 			backupSvc.BackupFiles.Add(new FbBackupFile(ConfigurationManager.AppSettings["BackupRestoreFile"], 2048));
 			backupSvc.Verbose = true;
@@ -103,7 +103,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BackupRestore_A_Backup02StreamingTest()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
+			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
 			{
 				Assert.Inconclusive("Not supported on this version.");
 				return;
@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			using (var ms = new MemoryStream())
 			{
-				backupSvc.ConnectionString = BuildServicesConnectionString();
+				backupSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
 				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 				backupSvc.OutputStream = ms;
 
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbRestore restoreSvc = new FbRestore();
 
-			restoreSvc.ConnectionString = BuildServicesConnectionString();
+			restoreSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
 			restoreSvc.PageSize = 4096;
 			restoreSvc.Verbose = true;
@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BackupRestore_B_Restore02StreamingTest()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
+			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
 			{
 				Assert.Inconclusive("Not supported on this version.");
 				return;
@@ -163,7 +163,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			using (var fs = File.OpenRead(GetBackupRestoreFullPath()))
 			{
-				restoreSvc.ConnectionString = BuildServicesConnectionString();
+				restoreSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
 				restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
 				restoreSvc.PageSize = 4096;
 				restoreSvc.Verbose = true;
@@ -264,7 +264,6 @@ namespace FirebirdSql.Data.UnitTests
 			FbLog logSvc = new FbLog();
 
 			logSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType, false);
-			logSvc.ConnectionString = BuildServicesConnectionString(false);
 
 			logSvc.ServiceOutput += ServiceOutput;
 
