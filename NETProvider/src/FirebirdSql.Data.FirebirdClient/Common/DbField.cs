@@ -347,15 +347,22 @@ namespace FirebirdSql.Data.Common
 						}
 						else
 						{
-							string s = this.Charset.GetString(buffer, 0, buffer.Length);
-
-							if ((this.Length % this.Charset.BytesPerCharacter) == 0 &&
-								s.Length > this.CharCount)
+							if (this.Charset.IsOctetsCharset)
 							{
-								s = s.Substring(0, this.CharCount);
+								this.Value = buffer;
 							}
+							else
+							{
+								string s = this.Charset.GetString(buffer, 0, buffer.Length);
 
-							this.Value = s;
+								if ((this.Length % this.Charset.BytesPerCharacter) == 0 &&
+									s.Length > this.CharCount)
+								{
+									s = s.Substring(0, this.CharCount);
+								}
+
+								this.Value = s;
+							}
 						}
 						break;
 
