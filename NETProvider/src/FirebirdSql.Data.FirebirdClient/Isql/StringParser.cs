@@ -1,20 +1,20 @@
 /*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
  *  All Rights Reserved.
- * 
+ *
  * Contributors:
  *   Jiri Cincura (jiri@cincura.net)
  */
@@ -34,12 +34,12 @@ namespace FirebirdSql.Data.Isql
 	/// static void Main(string[] args) {
 	///		int currentIndex = 0;
 	///		string s = ".NET Framework doesn't have a string parsing class?!";
-	///		StringParser parser = new StringParser(s, false);			
+	///		StringParser parser = new StringParser(s, false);
 	///		while (currentIndex &lt; s.Length) {
 	///			Console.WriteLine("Returned Index: {0}", currentIndex = parser.ParseNext());
 	///			Console.WriteLine("Chars scanned: {0}", parser.CharsParsed);
 	///			Console.WriteLine("Parsing result: {0}", parser.Result);
-	///			Console.WriteLine();     
+	///			Console.WriteLine();
 	///		}
 	/// }
 	/// </code>
@@ -166,10 +166,10 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// <para>
 		/// Repeats the parsing starting on the index returned by <see cref="Parse(System.String)"/> method.</para>
-		/// You can also call <b>ParseNext</b> directly (without calling <see cref="Parse(System.String)"/>) if you define the text to be parsed at instance construction.  
+		/// You can also call <b>ParseNext</b> directly (without calling <see cref="Parse(System.String)"/>) if you define the text to be parsed at instance construction.
 		/// </summary>
 		/// <returns>The index of the char next char after the <see cref="Token"/> end.</returns>
-		/// <remarks>If nothing is parsed the method will return -1. Case the <see cref="Token"/> wasn't found until the end of the string the method returns 
+		/// <remarks>If nothing is parsed the method will return -1. Case the <see cref="Token"/> wasn't found until the end of the string the method returns
 		/// (in <see cref="Result"/>) the string found between the starting index and the end of the string.</remarks>
 		public int ParseNext()
 		{
@@ -225,22 +225,6 @@ namespace FirebirdSql.Data.Isql
 		public override string ToString()
 		{
 			return this.source;
-		}
-
-		#endregion
-
-		#region Static Methods
-
-		/// <summary>
-		/// Indicates if the string specified as <b>source</b> starts with the <b>token</b> string.
-		/// </summary>
-		/// <param name="source">The source string.</param>
-		/// <param name="token">The token that is intended to find.</param>
-		/// <param name="ignoreCase">Indicated is char case should be ignored.</param>
-		/// <returns>Returns <b>true</b> if the <b>token</b> precedes the <b>source</b>.</returns>
-		public static bool StartsWith(string source, string token, bool ignoreCase)
-		{
-			return source.StartsWith(token, ignoreCase, CultureInfo.CurrentUICulture);
 		}
 
 		#endregion
