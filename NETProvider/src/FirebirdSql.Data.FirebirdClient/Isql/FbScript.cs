@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Isql
 		public FbScript(string script)
 		{
 			this.results = new FbStatementCollection();
-			this.parser = new StringParser(RemoveComments(script), false);
+			this.parser = new StringParser(RemoveComments(script));
 			this.parser.Tokens = new[] { ";" };
 		}
 

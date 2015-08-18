@@ -21,6 +21,7 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace FirebirdSql.Data.Isql
 {
@@ -84,7 +85,6 @@ namespace FirebirdSql.Data.Isql
 
 		private string source;
 		private int sourceLength;
-		private bool caseSensitive;
 		private string[] tokens;
 		private int currentIndex;
 		private int charsParsed;
@@ -151,9 +151,8 @@ namespace FirebirdSql.Data.Isql
 		/// <remarks>By defining the string (to parse) in constructor you can call directly the method <see cref="ParseNext"/>
 		/// without having to initializate the target string on <see cref="Parse(System.String)"/> method. See the example for further details.
 		/// </remarks>
-		public StringParser(string targetString, bool caseSensitive)
+		public StringParser(string targetString)
 		{
-			this.caseSensitive = caseSensitive;
 			this.tokens = new[] { " " };
 			this.source = targetString;
 			this.sourceLength = targetString.Length;
@@ -193,26 +192,23 @@ namespace FirebirdSql.Data.Isql
 				{
 					foreach (var token in this.Tokens)
 					{
-						if (string.Compare(this.source[i].ToString(), token[0].ToString(), !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
+						if (string.Compare(this.source, i, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
 						{
-							if (string.Compare(this.source.Substring(i, token.Length), token, !this.caseSensitive, CultureInfo.CurrentUICulture) == 0)
-							{
-								i += token.Length;
-								matchedToken = token;
-								goto Break;
-							}
+							i += token.Length;
+							matchedToken = token;
+							goto Break;
 						}
 					}
 				}
 
 				i++;
 			}
-		// just to get out of the outer loop
-		Break:
+			// just to get out of the outer loop
+			Break:
 			{ }
 
 			this.charsParsed = i - this.currentIndex;
-			bool subtractToken = (i != this.sourceLength) || (matchedToken != null && this.source.EndsWith(matchedToken, !this.caseSensitive, CultureInfo.CurrentUICulture));
+			bool subtractToken = (i != this.sourceLength) || (matchedToken != null && this.source.EndsWith(matchedToken, false, CultureInfo.CurrentUICulture));
 			this.result = this.source.Substring(this.currentIndex, i - this.currentIndex - (subtractToken ? matchedToken.Length : 0));
 
 			return this.currentIndex = i;
