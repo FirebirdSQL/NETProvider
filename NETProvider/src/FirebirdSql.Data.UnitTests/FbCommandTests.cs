@@ -1,20 +1,20 @@
 /*
- *	Firebird ADO.NET Data provider for .NET	and	Mono 
- * 
- *	   The contents	of this	file are subject to	the	Initial	
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this	file except	in compliance with the 
- *	   License.	You	may	obtain a copy of the License at	
+ *	Firebird ADO.NET Data provider for .NET	and	Mono
+ *
+ *	   The contents	of this	file are subject to	the	Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this	file except	in compliance with the
+ *	   License.	You	may	obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software	distributed	under the License is distributed on	
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied.	See	the	License	for	the	specific 
+ *	   Software	distributed	under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied.	See	the	License	for	the	specific
  *	   language	governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All	Rights Reserved.
- *   
+ *
  *  Contributors:
  *    Jiri Cincura (jiri@cincura.net)
  */
@@ -357,37 +357,50 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void UnicodeTest()
 		{
-			string createTable = "CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10));";
-
-			FbCommand ct = new FbCommand(createTable, this.Connection);
-			ct.ExecuteNonQuery();
-			ct.Dispose();
-
-			ArrayList l = new ArrayList();
-
-			l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1');");
-			l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11');");
-			l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111');");
-			l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111');");
-
-			foreach (string statement in l)
+			try
 			{
-				FbCommand insert = new FbCommand(statement, this.Connection);
-				insert.ExecuteNonQuery();
-				insert.Dispose();
+				string createTable = "CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10));";
+
+				FbCommand ct = new FbCommand(createTable, this.Connection);
+				ct.ExecuteNonQuery();
+				ct.Dispose();
+
+				ArrayList l = new ArrayList();
+
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1');");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11');");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111');");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111');");
+
+				foreach (string statement in l)
+				{
+					FbCommand insert = new FbCommand(statement, this.Connection);
+					insert.ExecuteNonQuery();
+					insert.Dispose();
+				}
+
+				string sql = "select * from	varchartest";
+
+				FbCommand cmd = new FbCommand(sql, this.Connection);
+				FbDataReader r = cmd.ExecuteReader();
+
+				while (r.Read())
+				{
+					Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
+				}
+
+				r.Close();
+				cmd.Dispose();
 			}
-
-			string sql = "select * from	varchartest";
-
-			FbCommand cmd = new FbCommand(sql, this.Connection);
-			FbDataReader r = cmd.ExecuteReader();
-
-			while (r.Read())
+			finally
 			{
-				Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
-			}
+				string dropTable = "DROP TABLE VARCHARTEST;";
 
-			r.Close();
+				using (FbCommand ct = new FbCommand(dropTable, this.Connection))
+				{
+					ct.ExecuteNonQuery();
+				}
+			}
 		}
 
 		[Test]
@@ -738,7 +751,7 @@ end";
 				cmd.CommandText = "recreate table NoCommandPlanTest (id int)";
 				cmd.Prepare();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan=cmd.CommandPlan; });
+				Assert.DoesNotThrow(() => { plan = cmd.CommandPlan; });
 				Assert.IsEmpty(plan);
 			}
 		}
