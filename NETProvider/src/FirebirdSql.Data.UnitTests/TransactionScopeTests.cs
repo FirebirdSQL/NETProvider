@@ -28,13 +28,14 @@ namespace FirebirdSql.Data.UnitTests
 	/// <summary>
 	/// All the test in this TestFixture are using implicit transaction support.
 	/// </summary>
-	[TestFixture]
+	[TestFixture(FbServerType.Default)]
+	[TestFixture(FbServerType.Embedded)]
 	public class TransactionScopeTests : TestsBase
 	{
 		#region Constructors
 
-		public TransactionScopeTests()
-			: base()
+		public TransactionScopeTests(FbServerType serverType)
+			: base(serverType)
 		{
 		}
 
@@ -45,7 +46,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void SimpleSelectTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
 
 			csb.Enlist = true;
 
@@ -73,7 +74,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void InsertTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder();
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
 
 			csb.Enlist = true;
 

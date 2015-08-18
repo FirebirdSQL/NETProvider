@@ -27,13 +27,14 @@ namespace FirebirdSql.Data.UnitTests
 	/// <summary>
 	/// All the test in this TestFixture are using implicit transaction support.
 	/// </summary>
-	[TestFixture]
+	[TestFixture(FbServerType.Default)]
+	[TestFixture(FbServerType.Embedded)]
 	public class FbStoredProcCallsTests : TestsBase
 	{
 		#region Constructors
 
-		public FbStoredProcCallsTests()
-			: base(false)
+		public FbStoredProcCallsTests(FbServerType serverType)
+			: base(serverType, false)
 		{
 		}
 
