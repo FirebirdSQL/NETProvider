@@ -8,9 +8,8 @@ shallow_clone: true
 matrix:
   fast_finish: true
 before_test:
-  - ps: $serverName = 'kent'
-  - ps: Start-FileDownload "http://$serverName.dl.sourceforge.net/project/firebird/firebird-win32/2.5.4-Release/Firebird-2.5.4.26856-0_Win32.zip" | Out-Null
-  - ps: Start-FileDownload "http://$serverName.dl.sourceforge.net/project/firebird/firebird-win64/2.5.4-Release/Firebird-2.5.4.26856-0_x64_embed.zip" | Out-Null
+  - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win32/2.5.4-Release/Firebird-2.5.4.26856-0_Win32.zip" | Out-Null
+  - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win64/2.5.4-Release/Firebird-2.5.4.26856-0_x64_embed.zip" | Out-Null
   - ps: $sourceDir = (Resolve-Path .).Path
   - ps: $targetDir = "$sourceDir\NETProvider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
   - ps: '[System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null'
