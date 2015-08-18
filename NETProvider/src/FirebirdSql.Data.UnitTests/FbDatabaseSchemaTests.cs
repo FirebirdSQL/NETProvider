@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Data;
 using System.Collections;
 
@@ -26,13 +27,14 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture]
+	[TestFixture(FbServerType.Default)]
+	[TestFixture(FbServerType.Embedded)]
 	public class FbDatabaseSchemaTests : TestsBase
 	{
 		#region Constructors
 
-		public FbDatabaseSchemaTests()
-			: base(false)
+		public FbDatabaseSchemaTests(FbServerType serverType)
+			: base(serverType, false)
 		{
 		}
 
@@ -200,7 +202,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			tables = Connection.GetSchema("Tables", new string[] { null, null, null, "TABLE" });
 
-			Assert.AreEqual(3, tables.Rows.Count);
+			Assert.AreEqual(4, tables.Rows.Count);
 		}
 
 		[Test]
