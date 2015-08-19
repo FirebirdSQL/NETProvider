@@ -217,32 +217,6 @@ end";
 			return BitConverter.ToInt32(buffer, 0);
 		}
 
-		public static IEnumerable<string> SearchFiles(string root, string searchPattern)
-		{
-			Stack<string> pending = new Stack<string>();
-			pending.Push(root);
-			while (pending.Count != 0)
-			{
-				var path = pending.Pop();
-				string[] next = null;
-				try
-				{
-					next = Directory.GetFiles(path, searchPattern).Where(x => !File.GetAttributes(x).HasFlag(FileAttributes.ReparsePoint)).ToArray();
-				}
-				catch { }
-				if (next != null && next.Length != 0)
-					foreach (var file in next)
-						yield return file;
-				try
-				{
-					next = Directory.GetDirectories(path).Where(x => !new DirectoryInfo(x).Attributes.HasFlag(FileAttributes.ReparsePoint)).ToArray();
-					foreach (var subdir in next)
-						pending.Push(subdir);
-				}
-				catch { }
-			}
-		}
-
 		public static Version GetServerVersion(FbServerType serverType)
 		{
 			var server = new FbServerProperties();

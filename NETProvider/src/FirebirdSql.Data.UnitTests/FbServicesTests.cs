@@ -68,21 +68,15 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region Static Helpers
-
-		string GetBackupRestoreFullPath()
-		{
-			var startLocation = Environment.GetEnvironmentVariable("HOMEDRIVE") + @"\";
-			var backupRestoreFile = SearchFiles(startLocation, TestsSetup.BackupRestoreFile).SingleOrDefault();
-			return backupRestoreFile;
-		}
-
-		#endregion
-
 		#region Unit Tests
 
 		[Test]
-		public void BackupRestore_A_Backup01Test()
+		public void BackupRestoreTest()
+		{
+			BackupRestoreTest_BackupPart();
+			BackupRestoreTest_RestorePart();
+		}
+		void BackupRestoreTest_BackupPart()
 		{
 			FbBackup backupSvc = new FbBackup();
 
@@ -94,46 +88,8 @@ namespace FirebirdSql.Data.UnitTests
 			backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
 
 			backupSvc.Execute();
-
-			var backup = GetBackupRestoreFullPath();
-			Assert.IsNotNull(backup);
-			Assert.Greater(new FileInfo(backup).Length, 0);
 		}
-
-		[Test]
-		public void BackupRestore_A_Backup02StreamingTest()
-		{
-			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
-				return;
-			}
-
-			FbStreamingBackup backupSvc = new FbStreamingBackup();
-			var backupLength = default(long);
-
-			using (var ms = new MemoryStream())
-			{
-				backupSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
-				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
-				backupSvc.OutputStream = ms;
-
-				backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
-
-				backupSvc.Execute();
-
-				backupLength = ms.Length;
-			}
-
-			Assert.Greater(backupLength, 0);
-			// suppose the "previous" test is done and the file is somewhere
-			var backup = GetBackupRestoreFullPath();
-			Assert.IsNotNull(backup);
-			Assert.AreEqual(new FileInfo(backup).Length, backupLength);
-		}
-
-		[Test]
-		public void BackupRestore_B_Restore01Test()
+		void BackupRestoreTest_RestorePart()
 		{
 			FbRestore restoreSvc = new FbRestore();
 
@@ -146,12 +102,10 @@ namespace FirebirdSql.Data.UnitTests
 			restoreSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
 
 			restoreSvc.Execute();
-
-			// some validation
 		}
 
 		[Test]
-		public void BackupRestore_B_Restore02StreamingTest()
+		public void StreamingBackupRestoreTest()
 		{
 			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
 			{
@@ -159,22 +113,38 @@ namespace FirebirdSql.Data.UnitTests
 				return;
 			}
 
+			using (var ms = new MemoryStream())
+			{
+				StreamingBackupRestoreTest_BackupPart(ms);
+				ms.Position = 0;
+				StreamingBackupRestoreTest_RestorePart(ms);
+			}
+		}
+		public void StreamingBackupRestoreTest_BackupPart(MemoryStream buffer)
+		{
+			FbStreamingBackup backupSvc = new FbStreamingBackup();
+
+			backupSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
+			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
+			backupSvc.OutputStream = buffer;
+
+			backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+
+			backupSvc.Execute();
+		}
+		public void StreamingBackupRestoreTest_RestorePart(MemoryStream buffer)
+		{
 			FbStreamingRestore restoreSvc = new FbStreamingRestore();
 
-			using (var fs = File.OpenRead(GetBackupRestoreFullPath()))
-			{
-				restoreSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
-				restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
-				restoreSvc.PageSize = 4096;
-				restoreSvc.Verbose = true;
-				restoreSvc.InputStream = fs;
+			restoreSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
+			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
+			restoreSvc.PageSize = 4096;
+			restoreSvc.Verbose = true;
+			restoreSvc.InputStream = buffer;
 
-				restoreSvc.ServiceOutput += ServiceOutput;
+			restoreSvc.ServiceOutput += ServiceOutput;
 
-				restoreSvc.Execute();
-			}
-
-			// some validation
+			restoreSvc.Execute();
 		}
 
 		[Test]
@@ -347,7 +317,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void NBackup_A_NBackupTest()
+		public void NBackupBackupRestoreTest()
 		{
 			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
 			{
@@ -355,34 +325,31 @@ namespace FirebirdSql.Data.UnitTests
 				return;
 			}
 
+			NBackupBackupRestoreTest_BackupPart();
+			NBackupBackupRestoreTest_RestorePart();
+		}
+		void NBackupBackupRestoreTest_BackupPart()
+		{
 			Action<int> doLevel = l =>
-				{
-					var nbak = new FbNBackup();
+			{
+				var nbak = new FbNBackup();
 
-					nbak.ConnectionString = BuildServicesConnectionString(this.FbServerType);
-					nbak.Level = l;
-					nbak.BackupFile = TestsSetup.BackupRestoreFile + l.ToString();
-					nbak.DirectIO = true;
+				nbak.ConnectionString = BuildServicesConnectionString(this.FbServerType);
+				nbak.Level = l;
+				nbak.BackupFile = TestsSetup.BackupRestoreFile + l.ToString();
+				nbak.DirectIO = true;
 
-					nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
+				nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
 
-					nbak.ServiceOutput += ServiceOutput;
+				nbak.ServiceOutput += ServiceOutput;
 
-					nbak.Execute();
-				};
+				nbak.Execute();
+			};
 			doLevel(0);
 			doLevel(1);
 		}
-
-		[Test]
-		public void NBackup_B_NRestoreTest()
+		void NBackupBackupRestoreTest_RestorePart()
 		{
-			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
-				return;
-			}
-
 			FbConnection.DropDatabase(BuildConnectionString(this.FbServerType));
 
 			var nrest = new FbNRestore();
