@@ -5,8 +5,6 @@ configuration:
   - Release_40
   - Release_45
 shallow_clone: true
-matrix:
-  fast_finish: true
 before_test:
   - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win32/2.5.4-Release/Firebird-2.5.4.26856-0_Win32.zip" | Out-Null
   - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win64/2.5.4-Release/Firebird-2.5.4.26856-0_x64_embed.zip" | Out-Null
