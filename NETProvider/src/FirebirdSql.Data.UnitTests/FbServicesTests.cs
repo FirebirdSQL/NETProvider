@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.UnitTests
 		string GetBackupRestoreFullPath()
 		{
 			var startLocation = Environment.GetEnvironmentVariable("HOMEDRIVE") + @"\";
-			var backupRestoreFile = SearchFiles(startLocation, ConfigurationManager.AppSettings["BackupRestoreFile"]).SingleOrDefault();
+			var backupRestoreFile = SearchFiles(startLocation, TestsSetup.BackupRestoreFile).SingleOrDefault();
 			return backupRestoreFile;
 		}
 
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			backupSvc.ConnectionString = BuildServicesConnectionString(this.FbServerType);
 			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
-			backupSvc.BackupFiles.Add(new FbBackupFile(ConfigurationManager.AppSettings["BackupRestoreFile"], 2048));
+			backupSvc.BackupFiles.Add(new FbBackupFile(TestsSetup.BackupRestoreFile, 2048));
 			backupSvc.Verbose = true;
 
 			backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
@@ -141,7 +141,7 @@ namespace FirebirdSql.Data.UnitTests
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
 			restoreSvc.PageSize = 4096;
 			restoreSvc.Verbose = true;
-			restoreSvc.BackupFiles.Add(new FbBackupFile(ConfigurationManager.AppSettings["BackupRestoreFile"], 2048));
+			restoreSvc.BackupFiles.Add(new FbBackupFile(TestsSetup.BackupRestoreFile, 2048));
 
 			restoreSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
 
@@ -361,7 +361,7 @@ namespace FirebirdSql.Data.UnitTests
 
 					nbak.ConnectionString = BuildServicesConnectionString(this.FbServerType);
 					nbak.Level = l;
-					nbak.BackupFile = ConfigurationManager.AppSettings["BackupRestoreFile"] + l.ToString();
+					nbak.BackupFile = TestsSetup.BackupRestoreFile + l.ToString();
 					nbak.DirectIO = true;
 
 					nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
@@ -388,7 +388,7 @@ namespace FirebirdSql.Data.UnitTests
 			var nrest = new FbNRestore();
 
 			nrest.ConnectionString = BuildServicesConnectionString(this.FbServerType);
-			nrest.BackupFiles = Enumerable.Range(0, 2).Select(l => ConfigurationManager.AppSettings["BackupRestoreFile"] + l.ToString());
+			nrest.BackupFiles = Enumerable.Range(0, 2).Select(l => TestsSetup.BackupRestoreFile + l.ToString());
 			nrest.DirectIO = true;
 
 			nrest.ServiceOutput += ServiceOutput;

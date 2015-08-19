@@ -175,12 +175,12 @@ end";
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
-			cs.UserID = ConfigurationManager.AppSettings["User"];
-			cs.Password = ConfigurationManager.AppSettings["Password"];
+			cs.UserID = TestsSetup.UserID;
+			cs.Password = TestsSetup.Password;
+			cs.DataSource = TestsSetup.DataSource;
 			if (includeDatabase)
 			{
-				cs.Database = ConfigurationManager.AppSettings["Database"];
+				cs.Database = TestsSetup.Database;
 			}
 			cs.ServerType = serverType;
 
@@ -191,13 +191,13 @@ end";
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.UserID = ConfigurationManager.AppSettings["User"];
-			cs.Password = ConfigurationManager.AppSettings["Password"];
-			cs.Database = ConfigurationManager.AppSettings["Database"];
-			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
-			cs.Port = Int32.Parse(ConfigurationManager.AppSettings["Port"]);
-			cs.Charset = ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling = false;
+			cs.UserID = TestsSetup.UserID;
+			cs.Password = TestsSetup.Password;
+			cs.DataSource = TestsSetup.DataSource;
+			cs.Database = TestsSetup.Database;
+			cs.Port = TestsSetup.Port;
+			cs.Charset = TestsSetup.Charset;
+			cs.Pooling = TestsSetup.Pooling;
 			cs.ServerType = serverType;
 			return cs;
 		}

@@ -30,6 +30,18 @@ namespace FirebirdSql.Data.UnitTests
 	[SetUpFixture]
 	public class TestsSetup
 	{
+		internal const string UserID = "SYSDBA";
+		internal const string Password = "masterkey";
+		internal const string Database = "netprovider_tests.fdb";
+		internal const string DataSource = "localhost";
+		internal const int Port = 3050;
+		internal const string Charset = "utf8";
+		internal const bool Pooling = false;
+		internal const int PageSize = 4096;
+		internal const bool ForcedWrite = false;
+		internal const string BackupRestoreFile = "netprovider_tests.fbk";
+		internal const string IsqlScript = "";
+
 		[SetUp]
 		public void SetUp()
 		{
@@ -63,11 +75,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		private static void CreateDatabase(string connectionString)
 		{
-			FbConnection.CreateDatabase(
-				connectionString,
-				Convert.ToInt32(ConfigurationManager.AppSettings["PageSize"]),
-				Boolean.Parse(ConfigurationManager.AppSettings["ForcedWrite"]),
-				true);
+			FbConnection.CreateDatabase(connectionString, TestsSetup.PageSize, TestsSetup.ForcedWrite, true);
 		}
 
 		private static void DropDatabase(string connectionString)

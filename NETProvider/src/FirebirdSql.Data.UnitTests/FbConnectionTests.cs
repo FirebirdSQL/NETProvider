@@ -130,19 +130,22 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 
-			cs.DataSource = ConfigurationManager.AppSettings["DataSource"];
-			cs.Database = ConfigurationManager.AppSettings["Database"];
-			cs.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
-			cs.UserID = ConfigurationManager.AppSettings["User"];
-			cs.Password = ConfigurationManager.AppSettings["Password"];
+			cs.DataSource = TestsSetup.DataSource;
+			cs.Database = TestsSetup.Database;
+			cs.Port = TestsSetup.Port;
+			cs.UserID = TestsSetup.UserID;
+			cs.Password = TestsSetup.Password;
 			cs.ServerType = this.FbServerType;
-			cs.Charset = ConfigurationManager.AppSettings["Charset"];
-			cs.Pooling = Convert.ToBoolean(ConfigurationManager.AppSettings["Pooling"]);
+			cs.Charset = TestsSetup.Charset;
+			cs.Pooling = TestsSetup.Pooling;
 
-			using (FbConnection c = new FbConnection(cs.ToString()))
+			Assert.DoesNotThrow(() =>
 			{
-				c.Open();
-			}
+				using (FbConnection c = new FbConnection(cs.ToString()))
+				{
+					c.Open();
+				}
+			});
 		}
 
 		[Test]
