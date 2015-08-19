@@ -91,7 +91,16 @@ namespace FirebirdSql.Data.Client.Native
 					case IscCodes.isc_arg_number:
 						exception.Errors.Add(new IscError(arg.AsInt(), statusVector[i++].AsInt()));
 						break;
+					case IscCodes.isc_arg_sql_state:
+						{
+							IntPtr ptr = statusVector[i++];
+							string s = Marshal.PtrToStringAnsi(ptr);
+							string arg_value = charset.GetString(
+								System.Text.Encoding.Default.GetBytes(s));
 
+							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
+						}
+						break;
 					default:
 						IntPtr e = statusVector[i++];
 						if (e != IntPtr.Zero)
