@@ -1,5 +1,5 @@
 version: 0.0.0.{build}
-os: Default Azure
+os: Windows Server 2012 R2
 configuration:
   - Debug
   - Release_40
