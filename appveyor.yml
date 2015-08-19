@@ -16,6 +16,7 @@ before_test:
   - ps: '[System.IO.Compression.ZipFile]::ExtractToDirectory("$sourceDir\Firebird-2.5.4.26856-0_x64_embed.zip", $targetDir) | Out-Null'
   - ps: '[System.IO.Compression.ZipFile]::ExtractToDirectory("$sourceDir\Firebird-2.5.4.26856-0_Win32.zip", "C:\firebird") | Out-Null'
   - ps: C:\firebird\bin\fb_inet_server.exe -m -a
+  - ps: sc -Value $null -Path C:\firebird\firebird.log -Encoding Ascii
 build:
   project: NETProvider\src\NETProvider.sln
   parallel: true
