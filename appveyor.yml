@@ -10,12 +10,12 @@ matrix:
 before_test:
   - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win32/2.5.4-Release/Firebird-2.5.4.26856-0_Win32.zip" | Out-Null
   - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win64/2.5.4-Release/Firebird-2.5.4.26856-0_x64_embed.zip" | Out-Null
-  - ps: $sourceDir = (Resolve-Path .).Path
+  - ps: $sourceDir = Resolve-Path .
   - ps: $targetDir = "$sourceDir\NETProvider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
   - ps: '[System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null'
   - ps: '[System.IO.Compression.ZipFile]::ExtractToDirectory("$sourceDir\Firebird-2.5.4.26856-0_x64_embed.zip", $targetDir) | Out-Null'
-  - ps: '[System.IO.Compression.ZipFile]::ExtractToDirectory("$sourceDir\Firebird-2.5.4.26856-0_Win32.zip", "c:\firebird") | Out-Null'
-  - ps: c:\firebird\bin\fb_inet_server.exe -m -a
+  - ps: '[System.IO.Compression.ZipFile]::ExtractToDirectory("$sourceDir\Firebird-2.5.4.26856-0_Win32.zip", "C:\firebird") | Out-Null'
+  - ps: C:\firebird\bin\fb_inet_server.exe -m -a
 build:
   project: NETProvider\src\NETProvider.sln
   parallel: true
