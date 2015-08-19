@@ -359,18 +359,17 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			try
 			{
-				string createTable = "CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10));";
-
-				FbCommand ct = new FbCommand(createTable, this.Connection);
-				ct.ExecuteNonQuery();
-				ct.Dispose();
+				using (FbCommand create = new FbCommand("CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10))", this.Connection))
+				{
+					create.ExecuteNonQuery();
+				}
 
 				ArrayList l = new ArrayList();
 
-				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1');");
-				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11');");
-				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111');");
-				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111');");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1')");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11')");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111')");
+				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111')");
 
 				foreach (string statement in l)
 				{
@@ -394,11 +393,9 @@ namespace FirebirdSql.Data.UnitTests
 			}
 			finally
 			{
-				string dropTable = "DROP TABLE VARCHARTEST;";
-
-				using (FbCommand ct = new FbCommand(dropTable, this.Connection))
+				using (FbCommand drop = new FbCommand("DROP TABLE VARCHARTEST", this.Connection))
 				{
-					ct.ExecuteNonQuery();
+					drop.ExecuteNonQuery();
 				}
 			}
 		}
