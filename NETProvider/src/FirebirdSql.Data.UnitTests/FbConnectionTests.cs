@@ -201,7 +201,7 @@ namespace FirebirdSql.Data.UnitTests
 				myConnection2.Close();
 			}
 
-			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime + 1));
+			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
 
 			Assert.AreEqual(active, GetActiveConnections());
 
@@ -276,7 +276,7 @@ namespace FirebirdSql.Data.UnitTests
 				connections.ForEach(x => x.Dispose());
 			}
 
-			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime + 1));
+			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
 
 			Assert.AreEqual(active + csb.MinPoolSize, GetActiveConnections());
 		}

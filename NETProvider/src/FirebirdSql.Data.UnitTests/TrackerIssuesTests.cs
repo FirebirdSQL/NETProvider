@@ -309,7 +309,7 @@ END
 				GetSomething(cs);
 			}
 
-			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime + 1));
+			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
 			Assert.AreEqual(active, GetActiveConnections());
 		}
 
