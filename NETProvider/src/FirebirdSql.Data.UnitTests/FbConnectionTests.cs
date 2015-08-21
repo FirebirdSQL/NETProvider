@@ -154,7 +154,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbConnection.ClearAllPools();
 			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
-
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
@@ -179,8 +178,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbConnection.ClearAllPools();
 			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
-
-			csb.Pooling = true;
+			csb.Pooling = false;
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
 
