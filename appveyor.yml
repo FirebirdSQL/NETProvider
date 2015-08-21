@@ -21,7 +21,8 @@ build:
   parallel: true
   verbosity: minimal
 test_script:
-  - nunit-console.exe ".\NETProvider\src\FirebirdSql.Data.UnitTests\bin\%Configuration%\FirebirdSql.Data.UnitTests.dll" /framework:net-4.0 /exclude=Local
+  - ps: cd $testsDir
+  - ps: nunit-console FirebirdSql.Data.UnitTests.dll /framework:net-4.0 /exclude=Local
 artifacts:
   - path: NETProvider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.dll
   - path: NETProvider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.pdb
