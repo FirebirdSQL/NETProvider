@@ -272,14 +272,16 @@ END
 		{
 			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
-
-			var threads = new List<Thread>();
+			const int ConnectionLifeTime = 5;
 
 			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
 			csb.Pooling = true;
-			csb.ConnectionLifeTime = 5;
+			csb.ConnectionLifeTime = ConnectionLifeTime;
 			string cs = csb.ToString();
 
+			var active = FbConnectionTests.ActiveConnections(this.FbServerType);
+
+			var threads = new List<Thread>();
 			for (int i = 0; i < NumberOfThreads; i++)
 			{
 				var t = new Thread(o =>
@@ -297,7 +299,8 @@ END
 			{
 				thread.Join();
 			}
-			Assert.That(FbConnectionTests.ActiveConnections(this.FbServerType), Is.InRange(NumberOfThreads - 1, NumberOfThreads + 1));
+
+			Assert.Greater(FbConnectionTests.ActiveConnections(this.FbServerType), active);
 
 			var sw = new Stopwatch();
 			sw.Start();
@@ -305,7 +308,9 @@ END
 			{
 				GetSomething(cs);
 			}
-			Assert.LessOrEqual(FbConnectionTests.ActiveConnections(this.FbServerType), 2 + 1);
+
+			Thread.Sleep(TimeSpan.FromSeconds(ConnectionLifeTime + 1));
+			Assert.AreEqual(FbConnectionTests.ActiveConnections(this.FbServerType), active);
 		}
 
 		[Test]
