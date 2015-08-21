@@ -150,6 +150,56 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
+		public void ConnectionPoolingOnTest()
+		{
+			FbConnection.ClearAllPools();
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+
+			csb.Pooling = true;
+			csb.ConnectionLifeTime = 5;
+			string cs = csb.ToString();
+
+			int active = GetActiveConnections();
+
+			using (FbConnection
+				myConnection1 = new FbConnection(cs),
+				myConnection2 = new FbConnection(cs))
+			{
+				myConnection1.Open();
+				myConnection2.Open();
+
+				Assert.AreEqual(active + 2, GetActiveConnections());
+			}
+
+			Assert.AreEqual(active + 2, GetActiveConnections());
+		}
+
+		[Test]
+		public void ConnectionPoolingOffTest()
+		{
+			FbConnection.ClearAllPools();
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+
+			csb.Pooling = true;
+			csb.ConnectionLifeTime = 5;
+			string cs = csb.ToString();
+
+			int active = GetActiveConnections();
+
+			using (FbConnection
+				myConnection1 = new FbConnection(cs),
+				myConnection2 = new FbConnection(cs))
+			{
+				myConnection1.Open();
+				myConnection2.Open();
+
+				Assert.AreEqual(active + 2, GetActiveConnections());
+			}
+
+			Assert.AreEqual(active, GetActiveConnections());
+		}
+
+		[Test]
 		public void ConnectionPoolingLifeTimeTest()
 		{
 			FbConnection.ClearAllPools();
@@ -169,13 +219,9 @@ namespace FirebirdSql.Data.UnitTests
 				myConnection2.Open();
 
 				Assert.AreEqual(active + 2, GetActiveConnections());
-
-				myConnection1.Close();
-				myConnection2.Close();
 			}
 
 			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
-
 			Assert.AreEqual(active, GetActiveConnections());
 
 		}
@@ -250,7 +296,6 @@ namespace FirebirdSql.Data.UnitTests
 			}
 
 			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
-
 			Assert.AreEqual(active + csb.MinPoolSize, GetActiveConnections());
 		}
 
