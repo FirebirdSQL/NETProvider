@@ -150,32 +150,6 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void ConnectionPoolingTest()
-		{
-			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
-
-			csb.Pooling = true;
-			csb.ConnectionLifeTime = 5;
-			string cs = csb.ToString();
-
-			FbConnection myConnection1 = new FbConnection(cs);
-			FbConnection myConnection2 = new FbConnection(cs);
-
-			int active = GetActiveConnections();
-
-			Console.WriteLine("Open two connections.");
-			myConnection1.Open();
-			myConnection2.Open();
-			Assert.AreEqual(active + 2, GetActiveConnections());
-
-			Console.WriteLine("Return both of the connections to the pool.");
-			myConnection1.Close();
-			myConnection2.Close();
-			Assert.AreEqual(active + 2, GetActiveConnections());
-		}
-
-		[Test]
 		public void ConnectionPoolingTimeOutTest()
 		{
 			FbConnection.ClearAllPools();
