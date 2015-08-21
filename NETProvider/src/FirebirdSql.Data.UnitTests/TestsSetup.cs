@@ -42,19 +42,26 @@ namespace FirebirdSql.Data.UnitTests
 		internal const string BackupRestoreFile = "netprovider_tests.fbk";
 		internal const string IsqlScript = "";
 
-		[SetUp]
-		public void SetUp()
+		private static HashSet<FbServerType> _initalized = new HashSet<FbServerType>();
+
+		public static void SetUp(FbServerType serverType)
 		{
-			Prepare(FbServerType.Default);
-			Prepare(FbServerType.Embedded);
+			if (!_initalized.Contains(serverType))
+			{
+				Prepare(serverType);
+				_initalized.Add(serverType);
+			}
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
 			FbConnection.ClearAllPools();
-			Drop(FbServerType.Default);
-			Drop(FbServerType.Embedded);
+			foreach (var item in _initalized)
+			{
+				Drop(item);
+			}
+			_initalized.Clear();
 		}
 
 		private static void Drop(FbServerType serverType)

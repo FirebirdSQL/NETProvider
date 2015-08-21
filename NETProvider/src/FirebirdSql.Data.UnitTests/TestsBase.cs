@@ -86,6 +86,8 @@ namespace FirebirdSql.Data.UnitTests
 		[SetUp]
 		public virtual void SetUp()
 		{
+			TestsSetup.SetUp(this.fbServerType);
+
 			string cs = BuildConnectionString(this.fbServerType);
 			InsertTestData(cs);
 			this.connection = new FbConnection(cs);
