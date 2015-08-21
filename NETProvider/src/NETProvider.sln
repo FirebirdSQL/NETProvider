@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj", "{326A24F9-6259-45DB-835C-18DB80728460}"
 EndProject
@@ -32,10 +32,10 @@ Global
 		{326A24F9-6259-45DB-835C-18DB80728460}.Release_Mono_w_Linux|Any CPU.Build.0 = Release_Mono_w_Linux|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_40|Any CPU.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.ActiveCfg = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.Build.0 = Release|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_Mono_w_Linux|Any CPU.ActiveCfg = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_40|Any CPU.ActiveCfg = Release_40|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.ActiveCfg = Release_45|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.Build.0 = Release_45|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_Mono_w_Linux|Any CPU.ActiveCfg = Release_40|Any CPU
 		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_40|Any CPU.ActiveCfg = Release_40|Any CPU
