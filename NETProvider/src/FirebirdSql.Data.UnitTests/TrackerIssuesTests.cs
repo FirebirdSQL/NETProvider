@@ -272,11 +272,11 @@ END
 		{
 			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
-			const int ConnectionLifeTime = 5;
 
 			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
 			csb.Pooling = true;
-			csb.ConnectionLifeTime = ConnectionLifeTime;
+			csb.ConnectionLifeTime = 5;
+			csb.MinPoolSize = 0;
 			string cs = csb.ToString();
 
 			var active = GetActiveConnections();
@@ -309,7 +309,7 @@ END
 				GetSomething(cs);
 			}
 
-			Thread.Sleep(TimeSpan.FromSeconds(ConnectionLifeTime + 1));
+			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime + 1));
 			Assert.AreEqual(GetActiveConnections(), active);
 		}
 

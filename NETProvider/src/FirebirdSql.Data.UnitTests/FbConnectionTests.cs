@@ -23,6 +23,7 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
@@ -200,7 +201,7 @@ namespace FirebirdSql.Data.UnitTests
 				myConnection2.Close();
 			}
 
-			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
+			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime + 1));
 
 			Assert.AreEqual(active, GetActiveConnections());
 
@@ -275,7 +276,7 @@ namespace FirebirdSql.Data.UnitTests
 				connections.ForEach(x => x.Dispose());
 			}
 
-			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
+			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime + 1));
 
 			Assert.AreEqual(active + csb.MinPoolSize, GetActiveConnections());
 		}
