@@ -339,10 +339,6 @@ END
 				conn.Open();
 				using (FbCommand command = new FbCommand("select current_timestamp from mon$database", conn))
 				{
-					FbConnectionStringBuilder csb = new FbConnectionStringBuilder(connectionString);
-					csb.Pooling = true;
-					csb.ConnectionLifeTime = 5;
-					string cs = csb.ToString();
 					command.ExecuteScalar();
 				}
 			}
