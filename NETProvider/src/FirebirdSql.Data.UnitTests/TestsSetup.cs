@@ -57,15 +57,15 @@ namespace FirebirdSql.Data.UnitTests
 			Drop(FbServerType.Embedded);
 		}
 
-		private static void Drop(FbServerType server)
+		private static void Drop(FbServerType serverType)
 		{
-			string cs = TestsBase.BuildConnectionString(server);
+			string cs = TestsBase.BuildConnectionString(serverType);
 			DropDatabase(cs);
 		}
 
-		private static void Prepare(FbServerType server)
+		private static void Prepare(FbServerType serverType)
 		{
-			string cs = TestsBase.BuildConnectionString(server);
+			string cs = TestsBase.BuildConnectionString(serverType);
 			CreateDatabase(cs);
 			CreateTables(cs);
 			CreateProcedures(cs);
