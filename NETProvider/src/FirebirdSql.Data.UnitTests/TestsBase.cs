@@ -286,10 +286,12 @@ end";
 
 		public int GetActiveConnections()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(fbServerType)))
+			var csb = BuildConnectionStringBuilder(fbServerType);
+			csb.Pooling = false;
+			using (var conn = new FbConnection(csb.ToString()))
 			{
 				conn.Open();
-				using (FbCommand cmd = conn.CreateCommand())
+				using (var cmd = conn.CreateCommand())
 				{
 					cmd.CommandText = "select count(*) from mon$attachments where mon$attachment_id <> current_connection";
 					return (int)cmd.ExecuteScalar();
