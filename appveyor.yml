@@ -12,7 +12,7 @@ before_test:
   - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win32/2.5.4-Release/Firebird-2.5.4.26856-0_Win32.zip" | Out-Null
   - ps: 7z x Firebird-2.5.4.26856-0_Win32.zip
   - ps: sc -Value $null -Path firebird.log -Encoding Ascii
-  - ps: .\bin\fbserver.exe -a
+  - ps: .\bin\fb_inet_server.exe -a -m
   - ps: cd $testsDir
   - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win64/2.5.4-Release/Firebird-2.5.4.26856-0_x64_embed.zip" | Out-Null
   - ps: 7z x Firebird-2.5.4.26856-0_x64_embed.zip
