@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
@@ -220,7 +221,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
 			Assert.AreEqual(active, GetActiveConnections());
-
 		}
 
 		[Test]
@@ -234,36 +234,26 @@ namespace FirebirdSql.Data.UnitTests
 			string cs = csb.ToString();
 
 			var connections = new List<FbConnection>();
-			var thrown = false;
 			try
 			{
 				for (int i = 0; i <= csb.MaxPoolSize; i++)
 				{
 					var connection = new FbConnection(cs);
+					connections.Add(connection);
 					if (i == csb.MaxPoolSize)
 					{
-						try
-						{
-							connection.Open();
-						}
-						catch (InvalidOperationException)
-						{
-							thrown = true;
-						}
+						Assert.Throws<InvalidOperationException>(() => connection.Open());
 					}
 					else
 					{
 						Assert.DoesNotThrow(() => connection.Open());
 					}
-					connections.Add(connection);
 				}
 			}
 			finally
 			{
 				connections.ForEach(x => x.Dispose());
 			}
-
-			Assert.IsTrue(thrown);
 		}
 
 		[Test]
@@ -283,8 +273,8 @@ namespace FirebirdSql.Data.UnitTests
 				for (int i = 0; i < csb.MinPoolSize * 2; i++)
 				{
 					var connection = new FbConnection(cs);
-					Assert.DoesNotThrow(() => connection.Open());
 					connections.Add(connection);
+					Assert.DoesNotThrow(() => connection.Open());
 				}
 			}
 			finally

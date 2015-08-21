@@ -92,7 +92,6 @@ namespace FirebirdSql.Data.UnitTests
 			InsertTestData(cs);
 			this.connection = new FbConnection(cs);
 			this.connection.Open();
-
 			if (this.withTransaction)
 			{
 				this.transaction = this.connection.BeginTransaction();
@@ -128,6 +127,7 @@ namespace FirebirdSql.Data.UnitTests
 				connection.Dispose();
 			}
 			DeleteAllData(cs);
+			FbConnection.ClearAllPools();
 		}
 
 		#endregion

@@ -524,10 +524,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				dpb.Append(IscCodes.isc_dpb_no_db_triggers, 1);
 			}
-            if (options.NoGarbageCollect)
-            {
-                dpb.Append(IscCodes.isc_dpb_no_garbage_collect, (byte)0);
-            }
+			if (options.NoGarbageCollect)
+			{
+				dpb.Append(IscCodes.isc_dpb_no_garbage_collect, (byte)0);
+			}
 
 			return dpb;
 		}

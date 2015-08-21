@@ -21,7 +21,7 @@ build:
   verbosity: minimal
 test_script:
   - ps: cd $testsDir
-  - ps: nunit-console FirebirdSql.Data.UnitTests.dll /framework:net-4.0 /exclude=Local /nodots /noshadow
+  - ps: nunit-console FirebirdSql.Data.UnitTests.dll /framework:net-4.0 /exclude:Local /nodots /noshadow
 artifacts:
   - path: NETProvider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.dll
   - path: NETProvider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.pdb
