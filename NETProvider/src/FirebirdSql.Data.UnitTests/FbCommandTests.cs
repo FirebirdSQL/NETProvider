@@ -23,7 +23,7 @@ using System;
 using System.Collections;
 using System.Data;
 using System.Text;
-
+using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
@@ -733,9 +733,9 @@ end";
 						cancelled = "HY008" == ex.SQLSTATE;
 					}
 				}, null);
-				System.Threading.Thread.Sleep(2000);
+				Thread.Sleep(2000);
 				cmd.Cancel();
-				System.Threading.Thread.Sleep(2000);
+				Thread.Sleep(2000);
 				Assert.IsTrue(cancelled);
 			}
 		}
