@@ -150,7 +150,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void ConnectionPoolingTimeOutTest()
+		public void ConnectionPoolingLifeTimeTest()
 		{
 			FbConnection.ClearAllPools();
 			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
