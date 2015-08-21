@@ -68,7 +68,7 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-	<ItemGroup>
+  <ItemGroup>
     <Reference Include="nunit.framework">
       <HintPath>..\..\lib\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -111,6 +111,11 @@
     <Compile Include="TransactionScopeTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EntityFramework.Firebird\EntityFramework.Firebird.csproj">
+      <Project>{5ff27ba8-4843-4207-a5ea-273bc5f7e8e4}</Project>
+      <Name>EntityFramework.Firebird</Name>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj">
       <Project>{326A24F9-6259-45DB-835C-18DB80728460}</Project>
       <Name>FirebirdSql.Data.FirebirdClient</Name>
