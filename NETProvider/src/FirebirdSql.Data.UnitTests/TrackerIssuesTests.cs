@@ -310,7 +310,7 @@ END
 			}
 
 			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime + 1));
-			Assert.AreEqual(GetActiveConnections(), active);
+			Assert.AreEqual(active, GetActiveConnections());
 		}
 
 		[Test]
