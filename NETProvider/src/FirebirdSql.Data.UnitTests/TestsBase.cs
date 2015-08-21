@@ -73,9 +73,9 @@ namespace FirebirdSql.Data.UnitTests
 		{
 		}
 
-		public TestsBase(FbServerType fbServerType, bool withTransaction)
+		public TestsBase(FbServerType serverType, bool withTransaction)
 		{
-			this.fbServerType = fbServerType;
+			this.fbServerType = serverType;
 			this.withTransaction = withTransaction;
 		}
 
@@ -277,6 +277,26 @@ end";
 
 		#region	Methods
 
+		public Version GetServerVersion()
+		{
+			var server = new FbServerProperties();
+			server.ConnectionString = BuildServicesConnectionString(fbServerType);
+			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
+		}
+
+		public int GetActiveConnections()
+		{
+			using (FbConnection conn = new FbConnection(BuildConnectionString(fbServerType)))
+			{
+				conn.Open();
+				using (FbCommand cmd = conn.CreateCommand())
+				{
+					cmd.CommandText = "select count(*) from mon$attachments where mon$attachment_id <> current_connection";
+					return (int)cmd.ExecuteScalar();
+				}
+			}
+		}
+
 		public static int GetId()
 		{
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
@@ -286,13 +306,6 @@ end";
 			rng.GetBytes(buffer);
 
 			return BitConverter.ToInt32(buffer, 0);
-		}
-
-		public static Version GetServerVersion(FbServerType serverType)
-		{
-			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(serverType);
-			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
 		}
 
 		#endregion

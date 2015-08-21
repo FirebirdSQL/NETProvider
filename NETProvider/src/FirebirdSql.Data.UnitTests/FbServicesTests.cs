@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void StreamingBackupRestoreTest()
 		{
-			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
+			if (GetServerVersion() < new Version("2.5.0.0"))
 			{
 				Assert.Inconclusive("Not supported on this version.");
 				return;
@@ -201,7 +201,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Category("Local")]
 		public void ShutdownOnline2Test()
 		{
-			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
+			if (GetServerVersion() < new Version("2.5.0.0"))
 			{
 				Assert.Inconclusive("Not supported on this version.");
 				return;
@@ -319,7 +319,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NBackupBackupRestoreTest()
 		{
-			if (GetServerVersion(this.FbServerType) < new Version("2.5.0.0"))
+			if (GetServerVersion() < new Version("2.5.0.0"))
 			{
 				Assert.Inconclusive("Not supported on this version.");
 				return;

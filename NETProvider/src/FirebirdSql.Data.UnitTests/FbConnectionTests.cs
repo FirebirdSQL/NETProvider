@@ -161,7 +161,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbConnection myConnection1 = new FbConnection(cs);
 			FbConnection myConnection2 = new FbConnection(cs);
 
-			int active = ActiveConnections(this.FbServerType);
+			int active = GetActiveConnections();
 
 			Console.WriteLine("Open two connections.");
 			myConnection1.Open();
@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.UnitTests
 			myConnection1.Close();
 			myConnection2.Close();
 
-			Assert.AreEqual(active + 2, ActiveConnections(this.FbServerType));
+			Assert.AreEqual(active + 2, GetActiveConnections());
 
 		}
 
@@ -185,7 +185,7 @@ namespace FirebirdSql.Data.UnitTests
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
 
-			int active = ActiveConnections(this.FbServerType);
+			int active = GetActiveConnections();
 
 			using (FbConnection
 				myConnection1 = new FbConnection(cs),
@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.UnitTests
 				myConnection1.Open();
 				myConnection2.Open();
 
-				Assert.AreEqual(active + 2, ActiveConnections(this.FbServerType));
+				Assert.AreEqual(active + 2, GetActiveConnections());
 
 				myConnection1.Close();
 				myConnection2.Close();
@@ -202,7 +202,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
 
-			Assert.AreEqual(active, ActiveConnections(this.FbServerType));
+			Assert.AreEqual(active, GetActiveConnections());
 
 		}
 
@@ -258,7 +258,7 @@ namespace FirebirdSql.Data.UnitTests
 			csb.MinPoolSize = 3;
 			string cs = csb.ToString();
 
-			int active = ActiveConnections(this.FbServerType);
+			int active = GetActiveConnections();
 
 			var connections = new List<FbConnection>();
 			try
@@ -277,7 +277,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			System.Threading.Thread.Sleep(csb.ConnectionLifeTime * 2 * 1000);
 
-			Assert.AreEqual(active + csb.MinPoolSize, ActiveConnections(this.FbServerType));
+			Assert.AreEqual(active + csb.MinPoolSize, GetActiveConnections());
 		}
 
 		[Test]
@@ -333,19 +333,6 @@ namespace FirebirdSql.Data.UnitTests
 
 				default:
 					return Connection.BeginTransaction(level);
-			}
-		}
-
-		public static int ActiveConnections(FbServerType serverType)
-		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(serverType)))
-			{
-				conn.Open();
-				using (FbCommand cmd = conn.CreateCommand())
-				{
-					cmd.CommandText = "select count(*) from mon$attachments where mon$attachment_id <> current_connection";
-					return (int)cmd.ExecuteScalar();
-				}
 			}
 		}
 

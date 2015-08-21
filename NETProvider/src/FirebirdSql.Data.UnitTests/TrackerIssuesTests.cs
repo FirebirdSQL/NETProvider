@@ -279,7 +279,7 @@ END
 			csb.ConnectionLifeTime = ConnectionLifeTime;
 			string cs = csb.ToString();
 
-			var active = FbConnectionTests.ActiveConnections(this.FbServerType);
+			var active = GetActiveConnections();
 
 			var threads = new List<Thread>();
 			for (int i = 0; i < NumberOfThreads; i++)
@@ -300,7 +300,7 @@ END
 				thread.Join();
 			}
 
-			Assert.Greater(FbConnectionTests.ActiveConnections(this.FbServerType), active);
+			Assert.Greater(GetActiveConnections(), active);
 
 			var sw = new Stopwatch();
 			sw.Start();
@@ -310,7 +310,7 @@ END
 			}
 
 			Thread.Sleep(TimeSpan.FromSeconds(ConnectionLifeTime + 1));
-			Assert.AreEqual(FbConnectionTests.ActiveConnections(this.FbServerType), active);
+			Assert.AreEqual(GetActiveConnections(), active);
 		}
 
 		[Test]
