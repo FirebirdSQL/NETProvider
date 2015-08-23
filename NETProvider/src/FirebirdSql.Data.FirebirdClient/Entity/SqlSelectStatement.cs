@@ -37,20 +37,20 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private bool isDistinct;
-		private List<Symbol> allJoinExtents;
-		private List<Symbol> fromExtents;
-		private Dictionary<Symbol, bool> outerExtents;
-		private FirstClause first;
-		private SkipClause skip;
-		private SqlBuilder select = new SqlBuilder();
-		private SqlBuilder from = new SqlBuilder();
-		private SqlBuilder where;
-		private SqlBuilder groupBy;
-		private SqlBuilder orderBy;
+		private bool _isDistinct;
+		private List<Symbol> _allJoinExtents;
+		private List<Symbol> _fromExtents;
+		private Dictionary<Symbol, bool> _outerExtents;
+		private FirstClause _first;
+		private SkipClause _skip;
+		private SqlBuilder _select = new SqlBuilder();
+		private SqlBuilder _from = new SqlBuilder();
+		private SqlBuilder _where;
+		private SqlBuilder _groupBy;
+		private SqlBuilder _orderBy;
 		//indicates whether it is the top most select statement,
 		// if not Order By should be omitted unless there is a corresponding TOP
-		private bool isTopMost;
+		private bool _isTopMost;
 
 		#endregion
 
@@ -60,11 +60,11 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			get
 			{
-				if (null == orderBy)
+				if (null == _orderBy)
 				{
-					this.orderBy = new SqlBuilder();
+					_orderBy = new SqlBuilder();
 				}
-				return this.orderBy;
+				return _orderBy;
 			}
 		}
 
@@ -77,27 +77,27 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// </summary>
 		internal bool IsDistinct
 		{
-			get { return this.isDistinct; }
-			set { this.isDistinct = value; }
+			get { return _isDistinct; }
+			set { _isDistinct = value; }
 		}
 
 		internal List<Symbol> AllJoinExtents
 		{
-			get { return this.allJoinExtents; }
+			get { return _allJoinExtents; }
 			// We have a setter as well, even though this is a list,
 			// since we use this field only in special cases.
-			set { this.allJoinExtents = value; }
+			set { _allJoinExtents = value; }
 		}
 
 		internal List<Symbol> FromExtents
 		{
 			get
 			{
-				if (null == this.fromExtents)
+				if (null == _fromExtents)
 				{
-					this.fromExtents = new List<Symbol>();
+					_fromExtents = new List<Symbol>();
 				}
-				return this.fromExtents;
+				return _fromExtents;
 			}
 		}
 
@@ -105,53 +105,53 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			get
 			{
-				if (null == outerExtents)
+				if (null == _outerExtents)
 				{
-					this.outerExtents = new Dictionary<Symbol, bool>();
+					_outerExtents = new Dictionary<Symbol, bool>();
 				}
-				return outerExtents;
+				return _outerExtents;
 			}
 		}
 
 		internal FirstClause First
 		{
-			get { return this.first; }
+			get { return _first; }
 			set
 			{
-				Debug.Assert(first == null, "SqlSelectStatement.Top has already been set");
-				this.first = value;
+				Debug.Assert(_first == null, "SqlSelectStatement.Top has already been set");
+				_first = value;
 			}
 		}
 
 		internal SkipClause Skip
 		{
-			get { return this.skip; }
+			get { return _skip; }
 			set
 			{
-				Debug.Assert(skip == null, "SqlSelectStatement.Skip has already been set");
-				this.skip = value;
+				Debug.Assert(_skip == null, "SqlSelectStatement.Skip has already been set");
+				_skip = value;
 			}
 		}
 
 		internal SqlBuilder Select
 		{
-			get { return this.select; }
+			get { return _select; }
 		}
 
 		internal SqlBuilder From
 		{
-			get { return this.from; }
+			get { return _from; }
 		}
 
 		internal SqlBuilder Where
 		{
 			get
 			{
-				if (null == this.where)
+				if (null == _where)
 				{
-					this.where = new SqlBuilder();
+					_where = new SqlBuilder();
 				}
-				return this.where;
+				return _where;
 			}
 		}
 
@@ -159,18 +159,18 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			get
 			{
-				if (null == this.groupBy)
+				if (null == _groupBy)
 				{
-					this.groupBy = new SqlBuilder();
+					_groupBy = new SqlBuilder();
 				}
-				return this.groupBy;
+				return _groupBy;
 			}
 		}
 
 		internal bool IsTopMost
 		{
-			get { return this.isTopMost; }
-			set { this.isTopMost = value; }
+			get { return _isTopMost; }
+			set { _isTopMost = value; }
 		}
 
 		#endregion
@@ -200,9 +200,9 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			// JoinSymbols have to be treated specially.
 			List<string> outerExtentAliases = null;
 
-			if ((null != outerExtents) && (0 < outerExtents.Count))
+			if ((null != _outerExtents) && (0 < _outerExtents.Count))
 			{
-				foreach (Symbol outerExtent in outerExtents.Keys)
+				foreach (Symbol outerExtent in _outerExtents.Keys)
 				{
 					JoinSymbol joinSymbol = outerExtent as JoinSymbol;
 					if (joinSymbol != null)
@@ -230,7 +230,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			// An then rename each of the FromExtents we have
 			// If AllJoinExtents is non-null - it has precedence.
 			// The new name is derived from the old name - we append an increasing int.
-			List<Symbol> extentList = this.AllJoinExtents ?? this.fromExtents;
+			List<Symbol> extentList = AllJoinExtents ?? _fromExtents;
 			if (null != extentList)
 			{
 				foreach (Symbol fromAlias in extentList)
@@ -271,54 +271,54 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			writer.Indent += 1; // ++ can be confusing in this context
 
 			writer.Write("SELECT ");
-			if (this.IsDistinct)
+			if (IsDistinct)
 			{
 				writer.Write("DISTINCT ");
 			}
 
-			if (this.First != null)
+			if (First != null)
 			{
-				this.First.WriteSql(writer, sqlGenerator);
+				First.WriteSql(writer, sqlGenerator);
 			}
 
-			if (this.Skip != null)
+			if (Skip != null)
 			{
-				this.Skip.WriteSql(writer, sqlGenerator);
+				Skip.WriteSql(writer, sqlGenerator);
 			}
 
-			if ((this.select == null) || this.Select.IsEmpty)
+			if ((_select == null) || Select.IsEmpty)
 			{
 				Debug.Assert(false);  // we have removed all possibilities of SELECT *.
 				writer.Write("*");
 			}
 			else
 			{
-				this.Select.WriteSql(writer, sqlGenerator);
+				Select.WriteSql(writer, sqlGenerator);
 			}
 
 			writer.WriteLine();
 			writer.Write("FROM ");
-			this.From.WriteSql(writer, sqlGenerator);
+			From.WriteSql(writer, sqlGenerator);
 
-			if ((this.where != null) && !this.Where.IsEmpty)
+			if ((_where != null) && !Where.IsEmpty)
 			{
 				writer.WriteLine();
 				writer.Write("WHERE ");
-				this.Where.WriteSql(writer, sqlGenerator);
+				Where.WriteSql(writer, sqlGenerator);
 			}
 
-			if ((this.groupBy != null) && !this.GroupBy.IsEmpty)
+			if ((_groupBy != null) && !GroupBy.IsEmpty)
 			{
 				writer.WriteLine();
 				writer.Write("GROUP BY ");
-				this.GroupBy.WriteSql(writer, sqlGenerator);
+				GroupBy.WriteSql(writer, sqlGenerator);
 			}
 
-			if ((this.orderBy != null) && !this.OrderBy.IsEmpty && (this.IsTopMost || this.First != null || this.Skip != null))
+			if ((_orderBy != null) && !OrderBy.IsEmpty && (IsTopMost || First != null || Skip != null))
 			{
 				writer.WriteLine();
 				writer.Write("ORDER BY ");
-				this.OrderBy.WriteSql(writer, sqlGenerator);
+				OrderBy.WriteSql(writer, sqlGenerator);
 			}
 
 			--writer.Indent;

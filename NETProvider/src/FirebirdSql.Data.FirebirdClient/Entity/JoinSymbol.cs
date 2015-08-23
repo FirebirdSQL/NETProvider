@@ -40,11 +40,11 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private List<Symbol> columnList;
-		private List<Symbol> extentList;
-		private List<Symbol> flattenedExtentList;
-		private Dictionary<string, Symbol> nameToExtent;
-		private bool isNestedJoin;
+		private List<Symbol> _columnList;
+		private List<Symbol> _extentList;
+		private List<Symbol> _flattenedExtentList;
+		private Dictionary<string, Symbol> _nameToExtent;
+		private bool _isNestedJoin;
 
 		#endregion
 
@@ -54,42 +54,42 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			get
 			{
-				if (null == columnList)
+				if (null == _columnList)
 				{
-					columnList = new List<Symbol>();
+					_columnList = new List<Symbol>();
 				}
-				return columnList;
+				return _columnList;
 			}
-			set { columnList = value; }
+			set { _columnList = value; }
 		}
 
 		internal List<Symbol> ExtentList
 		{
-			get { return extentList; }
+			get { return _extentList; }
 		}
 
 		internal List<Symbol> FlattenedExtentList
 		{
 			get
 			{
-				if (null == flattenedExtentList)
+				if (null == _flattenedExtentList)
 				{
-					flattenedExtentList = new List<Symbol>();
+					_flattenedExtentList = new List<Symbol>();
 				}
-				return flattenedExtentList;
+				return _flattenedExtentList;
 			}
-			set { flattenedExtentList = value; }
+			set { _flattenedExtentList = value; }
 		}
 
 		internal Dictionary<string, Symbol> NameToExtent
 		{
-			get { return nameToExtent; }
+			get { return _nameToExtent; }
 		}
 
 		internal bool IsNestedJoin
 		{
-			get { return isNestedJoin; }
-			set { isNestedJoin = value; }
+			get { return _isNestedJoin; }
+			set { _isNestedJoin = value; }
 		}
 
 		#endregion
@@ -99,13 +99,13 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		public JoinSymbol(string name, TypeUsage type, List<Symbol> extents)
 			: base(name, type)
 		{
-			extentList = new List<Symbol>(extents.Count);
-			nameToExtent = new Dictionary<string, Symbol>(extents.Count, StringComparer.OrdinalIgnoreCase);
+			_extentList = new List<Symbol>(extents.Count);
+			_nameToExtent = new Dictionary<string, Symbol>(extents.Count, StringComparer.OrdinalIgnoreCase);
 
 			foreach (Symbol symbol in extents)
 			{
-				this.nameToExtent[symbol.Name] = symbol;
-				this.ExtentList.Add(symbol);
+				_nameToExtent[symbol.Name] = symbol;
+				ExtentList.Add(symbol);
 			}
 		}
 

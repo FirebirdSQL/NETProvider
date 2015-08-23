@@ -46,11 +46,11 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private readonly StringBuilder commandText;
-		private readonly DbModificationCommandTree commandTree;
-		private readonly List<DbParameter> parameters;
-		private readonly Dictionary<EdmMember, List<DbParameter>> memberValues;
-		private int parameterNameCount = 0;
+		private readonly StringBuilder _commandText;
+		private readonly DbModificationCommandTree _commandTree;
+		private readonly List<DbParameter> _parameters;
+		private readonly Dictionary<EdmMember, List<DbParameter>> _memberValues;
+		private int _parameterNameCount = 0;
 
 		#endregion
 
@@ -58,12 +58,12 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		internal List<DbParameter> Parameters
 		{
-			get { return this.parameters; }
+			get { return _parameters; }
 		}
 
 		internal Dictionary<EdmMember, List<DbParameter>> MemberValues
 		{
-			get { return this.memberValues; }
+			get { return _memberValues; }
 		}
 
 		#endregion
@@ -257,35 +257,35 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		public override void Visit(DbIsNullExpression expression)
 		{
 			expression.Argument.Accept(this);
-			commandText.Append(" IS NULL");
+			_commandText.Append(" IS NULL");
 		}
 
 		public override void Visit(DbNotExpression expression)
 		{
-			commandText.Append("NOT (");
+			_commandText.Append("NOT (");
 			expression.Accept(this);
-			commandText.Append(")");
+			_commandText.Append(")");
 		}
 
 		public override void Visit(DbConstantExpression expression)
 		{
 			FbParameter parameter = CreateParameter(expression.Value, expression.ResultType);
-			commandText.Append(parameter.ParameterName);
+			_commandText.Append(parameter.ParameterName);
 		}
 
 		public override void Visit(DbScanExpression expression)
 		{
-			commandText.Append(SqlGenerator.GetTargetSql(expression.Target));
+			_commandText.Append(SqlGenerator.GetTargetSql(expression.Target));
 		}
 
 		public override void Visit(DbPropertyExpression expression)
 		{
-			commandText.Append(DmlSqlGenerator.GenerateMemberSql(expression.Property));
+			_commandText.Append(DmlSqlGenerator.GenerateMemberSql(expression.Property));
 		}
 
 		public override void Visit(DbNullExpression expression)
 		{
-			commandText.Append("NULL");
+			_commandText.Append("NULL");
 		}
 
 		public override void Visit(DbNewInstanceExpression expression)
@@ -302,7 +302,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				}
 				else
 				{
-					commandText.Append(", ");
+					_commandText.Append(", ");
 				}
 				argument.Accept(this);
 			}
@@ -328,21 +328,21 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			Debug.Assert(null != commandText);
 			Debug.Assert(null != commandTree);
 
-			this.commandText = commandText;
-			this.commandTree = commandTree;
-			this.parameters = new List<DbParameter>();
-			this.memberValues = preserveMemberValues ? new Dictionary<EdmMember, List<DbParameter>>() : null;
+			_commandText = commandText;
+			_commandTree = commandTree;
+			_parameters = new List<DbParameter>();
+			_memberValues = preserveMemberValues ? new Dictionary<EdmMember, List<DbParameter>>() : null;
 		}
 
 		// generate parameter (name based on parameter ordinal)
 		internal FbParameter CreateParameter(object value, TypeUsage type)
 		{
-			string parameterName = string.Concat("@p", parameterNameCount.ToString(CultureInfo.InvariantCulture));
-			parameterNameCount++;
+			string parameterName = string.Concat("@p", _parameterNameCount.ToString(CultureInfo.InvariantCulture));
+			_parameterNameCount++;
 
 			FbParameter parameter = FbProviderServices.CreateSqlParameter(parameterName, type, ParameterMode.In, value);
 
-			parameters.Add(parameter);
+			_parameters.Add(parameter);
 
 			return parameter;
 		}
@@ -356,7 +356,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <param name="value">Expression containing the value of the column.</param>
 		internal void RegisterMemberValue(DbExpression propertyExpression, DbExpression value)
 		{
-			if (null != memberValues)
+			if (null != _memberValues)
 			{
 				// register the value for this property
 				Debug.Assert(propertyExpression.ExpressionKind == DbExpressionKind.Property,
@@ -371,11 +371,11 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 					Debug.Assert(value.ExpressionKind == DbExpressionKind.Constant, "value must either constant or null");
 
 					// retrieve the last parameter added (which describes the parameter)
-					DbParameter p = parameters[parameters.Count - 1];
-					if (!memberValues.ContainsKey(property))
-						memberValues.Add(property, new List<DbParameter>(new[] { p }));
+					DbParameter p = _parameters[_parameters.Count - 1];
+					if (!_memberValues.ContainsKey(property))
+						_memberValues.Add(property, new List<DbParameter>(new[] { p }));
 					else
-						memberValues[property].Add(p);
+						_memberValues[property].Add(p);
 				}
 			}
 		}
@@ -386,11 +386,11 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		private void VisitBinary(DbBinaryExpression expression, string separator)
 		{
-			commandText.Append("(");
+			_commandText.Append("(");
 			expression.Left.Accept(this);
-			commandText.Append(separator);
+			_commandText.Append(separator);
 			expression.Right.Accept(this);
-			commandText.Append(")");
+			_commandText.Append(")");
 		}
 
 		#endregion

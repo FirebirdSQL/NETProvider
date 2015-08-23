@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private List<object> sqlFragments;
+		private List<object> _sqlFragments;
 
 		#endregion
 
@@ -49,11 +49,11 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			get
 			{
-				if (null == sqlFragments)
+				if (null == _sqlFragments)
 				{
-					sqlFragments = new List<object>();
+					_sqlFragments = new List<object>();
 				}
-				return sqlFragments;
+				return _sqlFragments;
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// </summary>
 		public bool IsEmpty
 		{
-			get { return ((null == sqlFragments) || (0 == sqlFragments.Count)); }
+			get { return ((null == _sqlFragments) || (0 == _sqlFragments.Count)); }
 		}
 
 		#endregion
@@ -102,9 +102,9 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <param name="sqlGenerator"></param>
 		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
 		{
-			if (null != sqlFragments)
+			if (null != _sqlFragments)
 			{
-				foreach (object o in sqlFragments)
+				foreach (object o in _sqlFragments)
 				{
 					string str = (o as string);
 					if (null != str)

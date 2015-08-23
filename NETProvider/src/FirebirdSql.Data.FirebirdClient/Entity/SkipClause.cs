@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private ISqlFragment skipCount;
+		private ISqlFragment _skipCount;
 
 		#endregion
 
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// </summary>
 		internal ISqlFragment SkipCount
 		{
-			get { return this.skipCount; }
+			get { return _skipCount; }
 		}
 
 		#endregion
@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <param name="topCount"></param>
 		internal SkipClause(ISqlFragment skipCount)
 		{
-			this.skipCount = skipCount;
+			_skipCount = skipCount;
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			SqlBuilder sqlBuilder = new SqlBuilder();
 			sqlBuilder.Append(skipCount.ToString(CultureInfo.InvariantCulture));
-			this.skipCount = sqlBuilder;
+			_skipCount = sqlBuilder;
 		}
 
 		#endregion
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
 		{
 			writer.Write("SKIP (");
-			this.SkipCount.WriteSql(writer, sqlGenerator);
+			SkipCount.WriteSql(writer, sqlGenerator);
 			writer.Write(")");
 
 			writer.Write(" ");

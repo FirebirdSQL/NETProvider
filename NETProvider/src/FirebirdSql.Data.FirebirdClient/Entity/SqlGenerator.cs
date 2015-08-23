@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// This allows them (DbVariableReferenceExpression eventually) to update the list of
 		/// outer extents (free variables) used by this select statement.
 		/// </summary>
-		Stack<SqlSelectStatement> selectStatementStack;
+		Stack<SqlSelectStatement> _selectStatementStack;
 
 		/// <summary>
 		/// The top of the stack
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		private SqlSelectStatement CurrentSelectStatement
 		{
 			// There is always something on the stack, so we can always Peek.
-			get { return selectStatementStack.Peek(); }
+			get { return _selectStatementStack.Peek(); }
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// a new Select statement, or reuse the parent's.  This flag
 		/// indicates whether the parent is a join or not.
 		/// </summary>
-		Stack<bool> isParentAJoinStack;
+		Stack<bool> _isParentAJoinStack;
 
 		/// <summary>
 		/// The top of the stack
@@ -73,40 +73,40 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			// There might be no entry on the stack if a Join node has never
 			// been seen, so we return false in that case.
-			get { return isParentAJoinStack.Count == 0 ? false : isParentAJoinStack.Peek(); }
+			get { return _isParentAJoinStack.Count == 0 ? false : _isParentAJoinStack.Peek(); }
 		}
 
 		#endregion
 
 		#region Global lists and state
-		Dictionary<string, int> allExtentNames;
+		Dictionary<string, int> _allExtentNames;
 		internal Dictionary<string, int> AllExtentNames
 		{
-			get { return allExtentNames; }
+			get { return _allExtentNames; }
 		}
 
 		// For each column name, we store the last integer suffix that
 		// was added to produce a unique column name.  This speeds up
 		// the creation of the next unique name for this column name.
-		Dictionary<string, int> allColumnNames;
+		Dictionary<string, int> _allColumnNames;
 		internal Dictionary<string, int> AllColumnNames
 		{
-			get { return allColumnNames; }
+			get { return _allColumnNames; }
 		}
 
-		SymbolTable symbolTable = new SymbolTable();
+		SymbolTable _symbolTable = new SymbolTable();
 
 		/// <summary>
 		/// VariableReferenceExpressions are allowed only as children of DbPropertyExpression
 		/// or MethodExpression.  The cheapest way to ensure this is to set the following
 		/// property in DbVariableReferenceExpression and reset it in the allowed parent expressions.
 		/// </summary>
-		bool isVarRefSingle = false;
+		bool _isVarRefSingle = false;
 
-		bool shouldHandleBoolComparison = true;
-		bool shouldCastParameter = true;
+		bool _shouldHandleBoolComparison = true;
+		bool _shouldCastParameter = true;
 
-		Dictionary<string, string> shortenedNames = new Dictionary<string, string>();
+		Dictionary<string, string> _shortenedNames = new Dictionary<string, string>();
 
 		#endregion
 
@@ -313,11 +313,11 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <returns>The string representing the SQL to be executed.</returns>
 		private string GenerateSql(DbQueryCommandTree tree)
 		{
-			selectStatementStack = new Stack<SqlSelectStatement>();
-			isParentAJoinStack = new Stack<bool>();
+			_selectStatementStack = new Stack<SqlSelectStatement>();
+			_isParentAJoinStack = new Stack<bool>();
 
-			allExtentNames = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-			allColumnNames = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+			_allExtentNames = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+			_allColumnNames = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
 			// Literals will not be converted to parameters.
 
@@ -339,15 +339,15 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				result = sqlBuilder;
 			}
 
-			if (isVarRefSingle)
+			if (_isVarRefSingle)
 			{
 				throw new NotSupportedException();
 				// A DbVariableReferenceExpression has to be a child of DbPropertyExpression or MethodExpression
 			}
 
 			// Check that the parameter stacks are not leaking.
-			Debug.Assert(selectStatementStack.Count == 0);
-			Debug.Assert(isParentAJoinStack.Count == 0);
+			Debug.Assert(_selectStatementStack.Count == 0);
+			Debug.Assert(_isParentAJoinStack.Count == 0);
 
 			return WriteSql(result);
 		}
@@ -990,12 +990,12 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				innerQuery = CreateNewSelectStatement(innerQuery, varName, e.Input.VariableType, out fromSymbol);
 			}
 
-			selectStatementStack.Push(innerQuery);
-			symbolTable.EnterScope();
+			_selectStatementStack.Push(innerQuery);
+			_symbolTable.EnterScope();
 
 			AddFromSymbol(innerQuery, varName, fromSymbol);
 			// This line is not present for other relational nodes.
-			symbolTable.Add(GetShortenedName(e.Input.GroupVariableName), fromSymbol);
+			_symbolTable.Add(GetShortenedName(e.Input.GroupVariableName), fromSymbol);
 
 
 			// The enumerator is shared by both the keys and the aggregates,
@@ -1116,8 +1116,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			}
 
 
-			symbolTable.ExitScope();
-			selectStatementStack.Pop();
+			_symbolTable.ExitScope();
+			_selectStatementStack.Pop();
 
 			return result;
 		}
@@ -1228,7 +1228,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 			if (!(e.Argument is DbParameterReferenceExpression && e.Pattern is DbParameterReferenceExpression))
 			{
-				shouldCastParameter = false;
+				_shouldCastParameter = false;
 			}
 
 			result.Append(e.Argument.Accept(this));
@@ -1243,7 +1243,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				result.Append(e.Escape.Accept(this));
 			}
 
-			shouldCastParameter = true;
+			_shouldCastParameter = true;
 
 			return result;
 		}
@@ -1386,7 +1386,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			SqlBuilder result = new SqlBuilder();
 
 			string sqlPrimitiveType = null;
-			if (shouldCastParameter)
+			if (_shouldCastParameter)
 			{
 				sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType);
 				result.Append("CAST(");
@@ -1394,7 +1394,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			// Do not quote this name.
 			// We are not checking that e.Name has no illegal characters. e.g. space
 			result.Append("@" + e.ParameterName);
-			if (shouldCastParameter)
+			if (_shouldCastParameter)
 			{
 				result.Append(" AS ");
 				result.Append(sqlPrimitiveType);
@@ -1423,8 +1423,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				result = CreateNewSelectStatement(result, varName, e.Input.VariableType, out fromSymbol);
 			}
 
-			selectStatementStack.Push(result);
-			symbolTable.EnterScope();
+			_selectStatementStack.Push(result);
+			_symbolTable.EnterScope();
 
 			AddFromSymbol(result, varName, fromSymbol);
 
@@ -1442,8 +1442,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				result.Select.Append(e.Projection.Accept(this));
 			}
 
-			symbolTable.ExitScope();
-			selectStatementStack.Pop();
+			_symbolTable.ExitScope();
+			_selectStatementStack.Pop();
 
 			return result;
 		}
@@ -1482,7 +1482,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			DbVariableReferenceExpression DbVariableReferenceExpression = e.Instance as DbVariableReferenceExpression;
 			if (DbVariableReferenceExpression != null)
 			{
-				isVarRefSingle = false;
+				_isVarRefSingle = false;
 			}
 
 			// We need to flatten, and have not yet seen the first nested SELECT statement.
@@ -1619,15 +1619,15 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 			result.Skip = new SkipClause(skipCount);
 
-			selectStatementStack.Push(result);
-			symbolTable.EnterScope();
+			_selectStatementStack.Push(result);
+			_symbolTable.EnterScope();
 
 			AddFromSymbol(result, varName, fromSymbol);
 
 			AddSortKeys(result.OrderBy, e.SortOrder);
 
-			symbolTable.ExitScope();
-			selectStatementStack.Pop();
+			_symbolTable.ExitScope();
+			_selectStatementStack.Pop();
 
 			return result;
 		}
@@ -1651,15 +1651,15 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				result = CreateNewSelectStatement(result, varName, e.Input.VariableType, out fromSymbol);
 			}
 
-			selectStatementStack.Push(result);
-			symbolTable.EnterScope();
+			_selectStatementStack.Push(result);
+			_symbolTable.EnterScope();
 
 			AddFromSymbol(result, varName, fromSymbol);
 
 			AddSortKeys(result.OrderBy, e.SortOrder);
 
-			symbolTable.ExitScope();
-			selectStatementStack.Pop();
+			_symbolTable.ExitScope();
+			_selectStatementStack.Pop();
 
 			return result;
 		}
@@ -1700,16 +1700,16 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <returns>A <see cref="Symbol"/>.</returns>
 		public override ISqlFragment Visit(DbVariableReferenceExpression e)
 		{
-			if (isVarRefSingle)
+			if (_isVarRefSingle)
 			{
 				throw new NotSupportedException();
 				// A DbVariableReferenceExpression has to be a child of DbPropertyExpression or MethodExpression
 				// This is also checked in GenerateSql(...) at the end of the visiting.
 			}
-			isVarRefSingle = true; // This will be reset by DbPropertyExpression or MethodExpression
+			_isVarRefSingle = true; // This will be reset by DbPropertyExpression or MethodExpression
 
 			string varName = GetShortenedName(e.VariableName);
-			Symbol result = symbolTable.Lookup(varName);
+			Symbol result = _symbolTable.Lookup(varName);
 			if (!CurrentSelectStatement.FromExtents.Contains(result))
 			{
 				CurrentSelectStatement.OuterExtents[result] = true;
@@ -1789,7 +1789,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 			if (!(left is DbParameterReferenceExpression && right is DbParameterReferenceExpression))
 			{
-				shouldCastParameter = false;
+				_shouldCastParameter = false;
 			}
 
 			if (IsComplexExpression(left))
@@ -1804,7 +1804,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				result.Append(")");
 			}
 
-			if (shouldHandleBoolComparison)
+			if (_shouldHandleBoolComparison)
 			{
 				result.Append(op);
 
@@ -1822,10 +1822,10 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			}
 			else
 			{
-				shouldHandleBoolComparison = true;
+				_shouldHandleBoolComparison = true;
 			}
 
-			shouldCastParameter = true;
+			_shouldCastParameter = true;
 
 			return result;
 		}
@@ -1978,7 +1978,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		SqlBuilder VisitIsNullExpression(DbIsNullExpression e, bool negate)
 		{
 			SqlBuilder result = new SqlBuilder();
-			shouldCastParameter = false;
+			_shouldCastParameter = false;
 			result.Append(e.Argument.Accept(this));
 			if (!negate)
 			{
@@ -1988,7 +1988,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			{
 				result.Append(" IS NOT NULL");
 			}
-			shouldCastParameter = true;
+			_shouldCastParameter = true;
 			return result;
 		}
 
@@ -2026,7 +2026,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			{
 				result = new SqlSelectStatement();
 				result.AllJoinExtents = new List<Symbol>();
-				selectStatementStack.Push(result);
+				_selectStatementStack.Push(result);
 			}
 			else
 			{
@@ -2037,7 +2037,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			// It would be nice if we could call VisitInputExpression - that would
 			// avoid some code duplication
 			// but the Join postprocessing is messy and prevents this reuse.
-			symbolTable.EnterScope();
+			_symbolTable.EnterScope();
 
 			string separator = string.Empty;
 			bool isLeftMostInput = true;
@@ -2059,7 +2059,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 											 || IsApplyExpression(input.Expression)))
 										;
 
-				isParentAJoinStack.Push(needsJoinContext ? true : false);
+				_isParentAJoinStack.Push(needsJoinContext ? true : false);
 				// if the child reuses our select statement, it will append the from
 				// symbols to our FromExtents list.  So, we need to remember the
 				// start of the child's entries.
@@ -2067,7 +2067,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 				ISqlFragment fromExtentFragment = input.Expression.Accept(this);
 
-				isParentAJoinStack.Pop();
+				_isParentAJoinStack.Pop();
 
 				ProcessJoinInputResult(fromExtentFragment, result, input, fromSymbolStart);
 				separator = joinString;
@@ -2082,17 +2082,17 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				case DbExpressionKind.InnerJoin:
 				case DbExpressionKind.LeftOuterJoin:
 					result.From.Append(" ON ");
-					isParentAJoinStack.Push(false);
+					_isParentAJoinStack.Push(false);
 					result.From.Append(joinCondition.Accept(this));
-					isParentAJoinStack.Pop();
+					_isParentAJoinStack.Pop();
 					break;
 			}
 
-			symbolTable.ExitScope();
+			_symbolTable.ExitScope();
 
 			if (!IsParentAJoin)
 			{
-				selectStatementStack.Pop();
+				_selectStatementStack.Pop();
 			}
 
 			return result;
@@ -2232,7 +2232,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 				// We do not call AddFromSymbol(), since we do not want to add
 				// "AS alias" to the FROM clause- it has been done when the extent was added earlier.
-				symbolTable.Add(varName, fromSymbol);
+				_symbolTable.Add(varName, fromSymbol);
 			}
 		}
 
@@ -2473,13 +2473,13 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		private static ISqlFragment HandleCanonicalContainsFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			sqlgen.shouldHandleBoolComparison = false;
+			sqlgen._shouldHandleBoolComparison = false;
 			return sqlgen.HandleSpecialFunctionToOperator(e, false);
 		}
 
 		private static ISqlFragment HandleCanonicalEndsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			sqlgen.shouldHandleBoolComparison = false;
+			sqlgen._shouldHandleBoolComparison = false;
 			SqlBuilder result = new SqlBuilder();
 			result.Append("REVERSE(");
 			result.Append(e.Arguments[0].Accept(sqlgen));
@@ -2556,7 +2556,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		private static ISqlFragment HandleCanonicalStartsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			sqlgen.shouldHandleBoolComparison = false;
+			sqlgen._shouldHandleBoolComparison = false;
 			return sqlgen.HandleSpecialFunctionToOperator(e, false);
 		}
 
@@ -2897,7 +2897,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 					// Since all renaming happens in the second phase
 					// we lose nothing by setting the next column name index to 0
 					// many times.
-					allColumnNames[recordMemberName] = 0;
+					_allColumnNames[recordMemberName] = 0;
 
 					// Create a new symbol/reuse existing symbol for the column
 					Symbol columnSymbol;
@@ -3040,12 +3040,12 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 				// We have this inside the if statement, since
 				// we only want to add extents that are actually used.
-				allExtentNames[fromSymbol.Name] = 0;
+				_allExtentNames[fromSymbol.Name] = 0;
 			}
 
 			if (addToSymbolTable)
 			{
-				symbolTable.Add(inputVarName, fromSymbol);
+				_symbolTable.Add(inputVarName, fromSymbol);
 			}
 		}
 
@@ -3484,7 +3484,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				default:
 					Symbol fromSymbol;
 					string inputVarName = "c";  // any name will do - this is my random choice.
-					symbolTable.EnterScope();
+					_symbolTable.EnterScope();
 
 					TypeUsage type = null;
 					switch (e.ExpressionKind)
@@ -3507,7 +3507,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 					result = VisitInputExpression(e, inputVarName, type, out fromSymbol);
 					AddFromSymbol(result, inputVarName, fromSymbol);
-					symbolTable.ExitScope();
+					_symbolTable.ExitScope();
 					break;
 			}
 
@@ -3543,8 +3543,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				result = CreateNewSelectStatement(result, varName, input.VariableType, out fromSymbol);
 			}
 
-			selectStatementStack.Push(result);
-			symbolTable.EnterScope();
+			_selectStatementStack.Push(result);
+			_symbolTable.EnterScope();
 
 			AddFromSymbol(result, varName, fromSymbol);
 
@@ -3558,8 +3558,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 				result.Where.Append(")");
 			}
 
-			symbolTable.ExitScope();
-			selectStatementStack.Pop();
+			_symbolTable.ExitScope();
+			_selectStatementStack.Pop();
 
 			return result;
 		}
@@ -3709,10 +3709,10 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		internal string GetShortenedName(string name)
 		{
 			string shortened;
-			if (!this.shortenedNames.TryGetValue(name, out shortened))
+			if (!_shortenedNames.TryGetValue(name, out shortened))
 			{
-				shortened = BuildName(this.shortenedNames.Count);
-				this.shortenedNames[name] = shortened;
+				shortened = BuildName(_shortenedNames.Count);
+				_shortenedNames[name] = shortened;
 			}
 			return shortened;
 		}
