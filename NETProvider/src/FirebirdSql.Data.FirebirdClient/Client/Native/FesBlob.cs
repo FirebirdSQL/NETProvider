@@ -30,8 +30,8 @@ namespace FirebirdSql.Data.Client.Native
 	{
 		#region Fields
 
-		private FesDatabase db;
-		private IntPtr[] statusVector;
+		private FesDatabase _db;
+		private IntPtr[] _statusVector;
 
 		#endregion
 
@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public override IDatabase Database
 		{
-			get { return this.db; }
+			get { return _db; }
 		}
 
 		#endregion
@@ -63,12 +63,12 @@ namespace FirebirdSql.Data.Client.Native
 				throw new ArgumentException("Specified argument is not of FesTransaction type.");
 			}
 
-			this.db = (FesDatabase)db;
-			this.transaction = (FesTransaction)transaction;
-			this.position = 0;
-			this.blobHandle = 0;
-			this.blobId = blobId;
-			this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+			_db = (FesDatabase)db;
+			_transaction = (FesTransaction)transaction;
+			_position = 0;
+			_blobHandle = 0;
+			_blobId = blobId;
+			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
 		#endregion
@@ -77,69 +77,69 @@ namespace FirebirdSql.Data.Client.Native
 
 		protected override void Create()
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				int dbHandle = this.db.Handle;
-				int trHandle = this.transaction.Handle;
+				int dbHandle = _db.Handle;
+				int trHandle = _transaction.Handle;
 
-				db.FbClient.isc_create_blob2(
-					this.statusVector,
+				_db.FbClient.isc_create_blob2(
+					_statusVector,
 					ref	dbHandle,
 					ref	trHandle,
-					ref	this.blobHandle,
-					ref	this.blobId,
+					ref _blobHandle,
+					ref _blobId,
 					0,
 					new byte[0]);
 
-				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
 
-				this.RblAddValue(IscCodes.RBL_create);
+				RblAddValue(IscCodes.RBL_create);
 			}
 		}
 
 		protected override void Open()
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				int dbHandle = this.db.Handle;
-				int trHandle = this.transaction.Handle;
+				int dbHandle = _db.Handle;
+				int trHandle = _transaction.Handle;
 
-				db.FbClient.isc_open_blob2(
-					this.statusVector,
+				_db.FbClient.isc_open_blob2(
+					_statusVector,
 					ref	dbHandle,
 					ref	trHandle,
-					ref	this.blobHandle,
-					ref	this.blobId,
+					ref _blobHandle,
+					ref _blobId,
 					0,
 					new byte[0]);
 
-				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
 			}
 		}
 
 		protected override byte[] GetSegment()
 		{
-			short requested = (short)this.SegmentSize;
+			short requested = (short)SegmentSize;
 			short segmentLength = 0;
 
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
 				using (MemoryStream segment = new MemoryStream())
 				{
 					byte[] tmp = new byte[requested];
 
-					IntPtr status = db.FbClient.isc_get_segment(
-						this.statusVector,
-						ref	this.blobHandle,
+					IntPtr status = _db.FbClient.isc_get_segment(
+						_statusVector,
+						ref _blobHandle,
 						ref	segmentLength,
 						requested,
 						tmp);
@@ -149,22 +149,22 @@ namespace FirebirdSql.Data.Client.Native
 						segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
 					}
 
-					this.RblRemoveValue(IscCodes.RBL_segment);
+					RblRemoveValue(IscCodes.RBL_segment);
 
-					if (this.statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
+					if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
 					{
 						segment.SetLength(0);
-						this.RblAddValue(IscCodes.RBL_eof_pending);
+						RblAddValue(IscCodes.RBL_eof_pending);
 					}
 					else
 					{
-						if (status == IntPtr.Zero || this.statusVector[1] == new IntPtr(IscCodes.isc_segment))
+						if (status == IntPtr.Zero || _statusVector[1] == new IntPtr(IscCodes.isc_segment))
 						{
-							this.RblAddValue(IscCodes.RBL_segment);
+							RblAddValue(IscCodes.RBL_segment);
 						}
 						else
 						{
-							this.db.ParseStatusVector(this.statusVector);
+							_db.ParseStatusVector(_statusVector);
 						}
 					}
 
@@ -175,18 +175,18 @@ namespace FirebirdSql.Data.Client.Native
 
 		protected override void PutSegment(byte[] buffer)
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				db.FbClient.isc_put_segment(
-					this.statusVector,
-					ref	this.blobHandle,
+				_db.FbClient.isc_put_segment(
+					_statusVector,
+					ref _blobHandle,
 					(short)buffer.Length,
 					buffer);
 
-				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
 			}
 		}
 
@@ -202,27 +202,27 @@ namespace FirebirdSql.Data.Client.Native
 
 		protected override void Close()
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				db.FbClient.isc_close_blob(this.statusVector, ref this.blobHandle);
+				_db.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
 
-				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
 			}
 		}
 
 		protected override void Cancel()
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				db.FbClient.isc_cancel_blob(this.statusVector, ref this.blobHandle);
+				_db.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
 
-				FesConnection.ParseStatusVector(this.statusVector, this.db.Charset);
+				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
 			}
 		}
 
@@ -232,7 +232,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void ClearStatusVector()
 		{
-			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+			Array.Clear(_statusVector, 0, _statusVector.Length);
 		}
 
 		#endregion

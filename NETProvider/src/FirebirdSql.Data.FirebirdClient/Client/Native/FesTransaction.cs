@@ -47,11 +47,11 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Fields
 
-		private int handle;
-		private FesDatabase db;
-		private TransactionState state;
-		private bool disposed;
-		private IntPtr[] statusVector;
+		private int _handle;
+		private FesDatabase _db;
+		private TransactionState _state;
+		private bool _disposed;
+		private IntPtr[] _statusVector;
 
 		#endregion
 
@@ -59,12 +59,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		public int Handle
 		{
-			get { return this.handle; }
+			get { return _handle; }
 		}
 
 		public TransactionState State
 		{
-			get { return this.state; }
+			get { return _state; }
 		}
 
 		#endregion
@@ -78,9 +78,9 @@ namespace FirebirdSql.Data.Client.Native
 				throw new ArgumentException("Specified argument is not of FesDatabase type.");
 			}
 
-			this.db = (FesDatabase)db;
-			this.state = TransactionState.NoTransaction;
-			this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+			_db = (FesDatabase)db;
+			_state = TransactionState.NoTransaction;
+			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
 			GC.SuppressFinalize(this);
 		}
@@ -91,7 +91,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		~FesTransaction()
 		{
-			this.Dispose(false);
+			Dispose(false);
 		}
 
 		#endregion
@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void Dispose()
 		{
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -108,12 +108,12 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			lock (this)
 			{
-				if (!this.disposed)
+				if (!_disposed)
 				{
 					try
 					{
 						// release any unmanaged resources
-						this.Rollback();
+						Rollback();
 					}
 					catch
 					{
@@ -123,13 +123,13 @@ namespace FirebirdSql.Data.Client.Native
 						// release any managed resources
 						if (disposing)
 						{
-							this.db = null;
-							this.handle = 0;
-							this.state = TransactionState.NoTransaction;
-							this.statusVector = null;
+							_db = null;
+							_handle = 0;
+							_state = TransactionState.NoTransaction;
+							_statusVector = null;
 						}
 
-						this.disposed = true;
+						_disposed = true;
 					}
 				}
 			}
@@ -141,12 +141,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void BeginTransaction(TransactionParameterBuffer tpb)
 		{
-			if (this.state != TransactionState.NoTransaction)
+			if (_state != TransactionState.NoTransaction)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
+				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
 			}
 
-			lock (this.db)
+			lock (_db)
 			{
 				IscTeb teb = new IscTeb();
 				IntPtr tebData = IntPtr.Zero;
@@ -154,11 +154,11 @@ namespace FirebirdSql.Data.Client.Native
 				try
 				{
 					// Clear the status vector
-					this.ClearStatusVector();
+					ClearStatusVector();
 
 					// Set db handle
 					teb.dbb_ptr = Marshal.AllocHGlobal(4);
-					Marshal.WriteInt32(teb.dbb_ptr, this.db.Handle);
+					Marshal.WriteInt32(teb.dbb_ptr, _db.Handle);
 
 					// Set tpb length
 					teb.tpb_len = tpb.Length;
@@ -173,24 +173,24 @@ namespace FirebirdSql.Data.Client.Native
 
 					Marshal.StructureToPtr(teb, tebData, true);
 
-					int trHandle = this.handle;
+					int trHandle = _handle;
 
-					db.FbClient.isc_start_multiple(
-						this.statusVector,
+					_db.FbClient.isc_start_multiple(
+						_statusVector,
 						ref	trHandle,
 						1,
 						tebData);
 
-					this.handle = trHandle;
+					_handle = trHandle;
 
 					// Parse status	vector
-					this.db.ParseStatusVector(this.statusVector);
+					_db.ParseStatusVector(_statusVector);
 
 					// Update transaction state
-					this.state = TransactionState.Active;
+					_state = TransactionState.Active;
 
 					// Update transaction count
-					this.db.TransactionCount++;
+					_db.TransactionCount++;
 				}
 				catch
 				{
@@ -218,95 +218,95 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void Commit()
 		{
-			this.CheckTransactionState();
+			CheckTransactionState();
 
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				int trHandle = this.handle;
+				int trHandle = _handle;
 
-				db.FbClient.isc_commit_transaction(this.statusVector, ref trHandle);
+				_db.FbClient.isc_commit_transaction(_statusVector, ref trHandle);
 
-				this.handle = trHandle;
+				_handle = trHandle;
 
-				this.db.ParseStatusVector(this.statusVector);
+				_db.ParseStatusVector(_statusVector);
 
-				this.db.TransactionCount--;
+				_db.TransactionCount--;
 
-				if (this.Update != null)
+				if (Update != null)
 				{
-					this.Update(this, new EventArgs());
+					Update(this, new EventArgs());
 				}
 
-				this.state = TransactionState.NoTransaction;
+				_state = TransactionState.NoTransaction;
 			}
 		}
 
 		public void Rollback()
 		{
-			this.CheckTransactionState();
+			CheckTransactionState();
 
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				int trHandle = this.handle;
+				int trHandle = _handle;
 
-				db.FbClient.isc_rollback_transaction(this.statusVector, ref trHandle);
+				_db.FbClient.isc_rollback_transaction(_statusVector, ref trHandle);
 
-				this.handle = trHandle;
+				_handle = trHandle;
 
-				this.db.ParseStatusVector(this.statusVector);
+				_db.ParseStatusVector(_statusVector);
 
-				this.db.TransactionCount--;
+				_db.TransactionCount--;
 
-				if (this.Update != null)
+				if (Update != null)
 				{
-					this.Update(this, new EventArgs());
+					Update(this, new EventArgs());
 				}
 
-				this.state = TransactionState.NoTransaction;
+				_state = TransactionState.NoTransaction;
 			}
 		}
 
 		public void CommitRetaining()
 		{
-			this.CheckTransactionState();
+			CheckTransactionState();
 
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				int trHandle = this.handle;
+				int trHandle = _handle;
 
-				db.FbClient.isc_commit_retaining(this.statusVector, ref trHandle);
+				_db.FbClient.isc_commit_retaining(_statusVector, ref trHandle);
 
-				this.db.ParseStatusVector(this.statusVector);
+				_db.ParseStatusVector(_statusVector);
 
-				this.state = TransactionState.Active;
+				_state = TransactionState.Active;
 			}
 		}
 
 		public void RollbackRetaining()
 		{
-			this.CheckTransactionState();
+			CheckTransactionState();
 
-			lock (this.db)
+			lock (_db)
 			{
 				// Clear the status vector
-				this.ClearStatusVector();
+				ClearStatusVector();
 
-				int trHandle = this.handle;
+				int trHandle = _handle;
 
-				db.FbClient.isc_rollback_retaining(this.statusVector, ref trHandle);
+				_db.FbClient.isc_rollback_retaining(_statusVector, ref trHandle);
 
-				this.db.ParseStatusVector(this.statusVector);
+				_db.ParseStatusVector(_statusVector);
 
-				this.state = TransactionState.Active;
+				_state = TransactionState.Active;
 			}
 		}
 
@@ -328,14 +328,14 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void ClearStatusVector()
 		{
-			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+			Array.Clear(_statusVector, 0, _statusVector.Length);
 		}
 
 		private void CheckTransactionState()
 		{
-			if (this.state != TransactionState.Active)
+			if (_state != TransactionState.Active)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, this.handle, "no valid");
+				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
 			}
 		}
 
