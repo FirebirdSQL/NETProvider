@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Server
 	{
 		#region Fields
 
-		private DbDataReader reader;
+		private DbDataReader _reader;
 
 		#endregion
 
@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Server
 
 		public FbResultSet(DbDataReader reader)
 		{
-			this.reader = reader;
+			_reader = reader;
 		}
 
 		#endregion
@@ -47,37 +47,37 @@ namespace FirebirdSql.Data.Server
 
 		public void Close()
 		{
-			if (this.reader != null)
+			if (_reader != null)
 			{
-				this.reader.Close();
-				this.reader = null;
+				_reader.Close();
+				_reader = null;
 			}
 		}
 
 		public bool Read()
 		{
-			if (this.reader == null)
+			if (_reader == null)
 			{
 				return false;
 			}
 
-			return this.reader.Read();
+			return _reader.Read();
 		}
 
 		public object GetValue(int i)
 		{
-			if (this.reader == null)
+			if (_reader == null)
 			{
 				return null;
 			}
 
 			// If the field is a blob or a clob we will be returning the Blob ID
-			if (this.reader.GetDataTypeName(i).ToLower().StartsWith("blob"))
+			if (_reader.GetDataTypeName(i).ToLower().StartsWith("blob"))
 			{
-				return this.reader.GetInt64(i);
+				return _reader.GetInt64(i);
 			}
 
-			return this.reader.GetValue(i);
+			return _reader.GetValue(i);
 		}
 
 		/*

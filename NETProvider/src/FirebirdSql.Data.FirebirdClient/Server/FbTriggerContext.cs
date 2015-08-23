@@ -27,27 +27,27 @@ namespace FirebirdSql.Data.Server
 
 		public string TableName
 		{
-			get 
+			get
 			{
-				if (this.connection == null || this.connection.State != System.Data.ConnectionState.Open)
+				if (_connection == null || _connection.State != System.Data.ConnectionState.Open)
 				{
 					throw new InvalidOperationException("The connection should bevalid an open.");
 				}
 
-				return this.connection.InnerConnection.Database.GetTriggerContext().GetTableName(); 
+				return _connection.InnerConnection.Database.GetTriggerContext().GetTableName();
 			}
 		}
 
 		public FbTriggerActionType Action
 		{
-			get 
+			get
 			{
-				if (this.connection == null || this.connection.State != System.Data.ConnectionState.Open)
+				if (_connection == null || _connection.State != System.Data.ConnectionState.Open)
 				{
 					throw new InvalidOperationException("The connection should bevalid an open.");
 				}
 
-				return (FbTriggerActionType)this.connection.InnerConnection.Database.GetTriggerContext().GetTriggerAction(); 
+				return (FbTriggerActionType)_connection.InnerConnection.Database.GetTriggerContext().GetTriggerAction();
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Server
 
 		#region Fields
 
-		private FbConnection connection;
+		private FbConnection _connection;
 
 		#endregion
 
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Server
 				throw new ArgumentNullException("connection cannot be null.");
 			}
 
-			this.connection = connection;
+			_connection = connection;
 		}
 
 		#endregion
@@ -77,32 +77,32 @@ namespace FirebirdSql.Data.Server
 
 		public object GetOldValue(string name)
 		{
-			if (this.connection == null || this.connection.State != System.Data.ConnectionState.Open)
+			if (_connection == null || _connection.State != System.Data.ConnectionState.Open)
 			{
 				throw new InvalidOperationException("The connection should bevalid an open.");
 			}
 
-			return this.connection.InnerConnection.Database.GetTriggerContext().GetOldValue(name);
+			return _connection.InnerConnection.Database.GetTriggerContext().GetOldValue(name);
 		}
 
 		public object GetNewValue(string name)
 		{
-			if (this.connection == null || this.connection.State != System.Data.ConnectionState.Open)
+			if (_connection == null || _connection.State != System.Data.ConnectionState.Open)
 			{
 				throw new InvalidOperationException("The connection should bevalid an open.");
 			}
 
-			return this.connection.InnerConnection.Database.GetTriggerContext().GetNewValue(name);
+			return _connection.InnerConnection.Database.GetTriggerContext().GetNewValue(name);
 		}
 
 		public void SetNewValue(string name, object value)
 		{
-			if (this.connection == null || this.connection.State != System.Data.ConnectionState.Open)
+			if (_connection == null || _connection.State != System.Data.ConnectionState.Open)
 			{
 				throw new InvalidOperationException("The connection should bevalid an open.");
 			}
 
-			this.connection.InnerConnection.Database.GetTriggerContext().SetNewValue(name, value);
+			_connection.InnerConnection.Database.GetTriggerContext().SetNewValue(name, value);
 		}
 
 		#endregion
