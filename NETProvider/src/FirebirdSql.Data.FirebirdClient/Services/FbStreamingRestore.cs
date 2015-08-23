@@ -32,16 +32,16 @@ namespace FirebirdSql.Data.Services
 {
 	public class FbStreamingRestore : FbService
 	{
-		private int? pageSize;
+		private int? _pageSize;
 		public int? PageSize
 		{
-			get { return pageSize; }
+			get { return _pageSize; }
 			set
 			{
 				if (value.HasValue && !PageSizeHelper.IsValidPageSize((int)value))
 					throw new InvalidOperationException("Invalid page size.");
 
-				pageSize = value;
+				_pageSize = value;
 			}
 		}
 
@@ -69,9 +69,9 @@ namespace FirebirdSql.Data.Services
 				}
 				if (PageBuffers.HasValue)
 					StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
-				if (pageSize.HasValue)
-					StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)pageSize);
-				this.StartSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(this.ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
+				if (_pageSize.HasValue)
+					StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
+				StartSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();

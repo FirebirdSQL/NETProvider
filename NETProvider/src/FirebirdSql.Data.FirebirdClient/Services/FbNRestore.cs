@@ -43,24 +43,24 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				// Configure Spb
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_nrest);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+				StartSpb.Append(IscCodes.isc_action_svc_nrest);
+				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
-				foreach (var file in this.BackupFiles)
+				foreach (var file in BackupFiles)
 				{
-					this.StartSpb.Append(IscCodes.isc_spb_nbk_file, file);
+					StartSpb.Append(IscCodes.isc_spb_nbk_file, file);
 				}
 
-				this.StartSpb.Append(IscCodes.isc_spb_nbk_direct, this.DirectIO ? "ON" : "OFF");
+				StartSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 
-				this.Open();
+				Open();
 
 				// Start execution
-				this.StartTask();
+				StartTask();
 
-				this.ProcessServiceOutput();
+				ProcessServiceOutput();
 			}
 			catch (Exception ex)
 			{
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Services
 			finally
 			{
 				// Close
-				this.Close();
+				Close();
 			}
 		}
 		#endregion

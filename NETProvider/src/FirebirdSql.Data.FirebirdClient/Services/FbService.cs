@@ -1,20 +1,20 @@
 /*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
- * 
+ *
  *  Contributors:
  *   Jiri Cincura (jiri@cincura.net)
  */
@@ -41,12 +41,12 @@ namespace FirebirdSql.Data.Services
 
 		#region Fields
 
-		private IServiceManager svc;
-		private FbServiceState state;
-		private FbConnectionString csManager;
-		private string connectionString;
-		private string serviceName;
-		private int queryBufferSize;
+		private IServiceManager _svc;
+		private FbServiceState _state;
+		private FbConnectionString _csManager;
+		private string _connectionString;
+		private string _serviceName;
+		private int _queryBufferSize;
 
 		#endregion
 
@@ -61,36 +61,36 @@ namespace FirebirdSql.Data.Services
 
 		public FbServiceState State
 		{
-			get { return state; }
+			get { return _state; }
 		}
 
 		public string ConnectionString
 		{
-			get { return this.connectionString; }
+			get { return _connectionString; }
 			set
 			{
-				if (this.svc != null && this.state == FbServiceState.Open)
+				if (_svc != null && _state == FbServiceState.Open)
 				{
 					throw new InvalidOperationException("ConnectionString cannot be modified on active service instances.");
 				}
 
-				this.csManager = new FbConnectionString(value);
+				_csManager = new FbConnectionString(value);
 
 				if (value == null)
 				{
-					this.connectionString = string.Empty;
+					_connectionString = string.Empty;
 				}
 				else
 				{
-					this.connectionString = value;
+					_connectionString = value;
 				}
 			}
 		}
 
 		public int QueryBufferSize
 		{
-			get { return this.queryBufferSize; }
-			set { this.queryBufferSize = value; }
+			get { return _queryBufferSize; }
+			set { _queryBufferSize = value; }
 		}
 
 		#endregion
@@ -99,7 +99,7 @@ namespace FirebirdSql.Data.Services
 
 		protected string Database
 		{
-			get { return this.csManager.Database; }
+			get { return _csManager.Database; }
 		}
 
 		#endregion
@@ -108,10 +108,10 @@ namespace FirebirdSql.Data.Services
 
 		protected FbService(string connectionString = null)
 		{
-			this.state = FbServiceState.Closed;
-			this.serviceName = "service_mgr";
-			this.queryBufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
-			this.ConnectionString = connectionString;
+			_state = FbServiceState.Closed;
+			_serviceName = "service_mgr";
+			_queryBufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
+			ConnectionString = connectionString;
 		}
 
 		#endregion
@@ -122,16 +122,16 @@ namespace FirebirdSql.Data.Services
 		{
 			ServiceParameterBuffer spb = new ServiceParameterBuffer();
 
-			// SPB configuration				
+			// SPB configuration
 			spb.Append(IscCodes.isc_spb_version);
 			spb.Append(IscCodes.isc_spb_current_version);
-			spb.Append((byte)IscCodes.isc_spb_user_name, this.csManager.UserID);
-			spb.Append((byte)IscCodes.isc_spb_password, this.csManager.Password);
+			spb.Append((byte)IscCodes.isc_spb_user_name, _csManager.UserID);
+			spb.Append((byte)IscCodes.isc_spb_password, _csManager.Password);
 			spb.Append((byte)IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 
-			if (this.csManager.Role != null && this.csManager.Role.Length > 0)
+			if (_csManager.Role != null && _csManager.Role.Length > 0)
 			{
-				spb.Append((byte)IscCodes.isc_spb_sql_role_name, this.csManager.Role);
+				spb.Append((byte)IscCodes.isc_spb_sql_role_name, _csManager.Role);
 			}
 
 			return spb;
@@ -143,33 +143,33 @@ namespace FirebirdSql.Data.Services
 
 		protected void Open()
 		{
-			if (this.state != FbServiceState.Closed)
+			if (_state != FbServiceState.Closed)
 			{
 				throw new InvalidOperationException("Service already Open.");
 			}
 
-			if (this.csManager.UserID == null || this.csManager.UserID.Length == 0)
+			if (_csManager.UserID == null || _csManager.UserID.Length == 0)
 			{
 				throw new InvalidOperationException("No user name was specified.");
 			}
 
-			if (this.csManager.Password == null || this.csManager.Password.Length == 0)
+			if (_csManager.Password == null || _csManager.Password.Length == 0)
 			{
 				throw new InvalidOperationException("No user password was specified.");
 			}
 
 			try
 			{
-				if (this.svc == null)
+				if (_svc == null)
 				{
 					// New instance	for	Service	handler
-					this.svc = ClientFactory.CreateServiceManager(this.csManager);
+					_svc = ClientFactory.CreateServiceManager(_csManager);
 				}
 
 				// Initialize Services API
-				this.svc.Attach(this.BuildSpb(), this.csManager.DataSource, this.csManager.Port, this.serviceName);
+				_svc.Attach(BuildSpb(), _csManager.DataSource, _csManager.Port, _serviceName);
 
-				this.state = FbServiceState.Open;
+				_state = FbServiceState.Open;
 			}
 			catch (Exception ex)
 			{
@@ -179,17 +179,17 @@ namespace FirebirdSql.Data.Services
 
 		protected void Close()
 		{
-			if (this.state != FbServiceState.Open)
+			if (_state != FbServiceState.Open)
 			{
 				return;
 			}
 
 			try
 			{
-				this.svc.Detach();
-				this.svc = null;
+				_svc.Detach();
+				_svc = null;
 
-				this.state = FbServiceState.Closed;
+				_state = FbServiceState.Closed;
 			}
 			catch (Exception ex)
 			{
@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.Services
 
 		protected void StartTask()
 		{
-			if (this.state == FbServiceState.Closed)
+			if (_state == FbServiceState.Closed)
 			{
 				throw new InvalidOperationException("Service is Closed.");
 			}
@@ -207,7 +207,7 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				// Start service operation
-				this.svc.Start(this.StartSpb);
+				_svc.Start(StartSpb);
 			}
 			catch (Exception ex)
 			{
@@ -218,7 +218,7 @@ namespace FirebirdSql.Data.Services
 		protected ArrayList Query(byte[] items)
 		{
 			var result = new ArrayList();
-			this.Query(items, (truncated, item) =>
+			Query(items, (truncated, item) =>
 			{
 				var stringItem = item as string;
 				if (stringItem != null)
@@ -259,14 +259,14 @@ namespace FirebirdSql.Data.Services
 
 		protected void Query(byte[] items, Action<bool, object> resultAction)
 		{
-			this.ProcessQuery(items, resultAction);
+			ProcessQuery(items, resultAction);
 		}
 
 		protected void ProcessServiceOutput()
 		{
 			string line;
 
-			while ((line = this.GetNextLine()) != null)
+			while ((line = GetNextLine()) != null)
 			{
 				WriteServiceOutputChecked(line);
 			}
@@ -274,7 +274,7 @@ namespace FirebirdSql.Data.Services
 
 		protected string GetNextLine()
 		{
-			var info = this.Query(new byte[] { IscCodes.isc_info_svc_line });
+			var info = Query(new byte[] { IscCodes.isc_info_svc_line });
 			if (info.Count == 0)
 				return null;
 			return info[0] as string;
@@ -282,9 +282,9 @@ namespace FirebirdSql.Data.Services
 
 		protected void WriteServiceOutputChecked(string s)
 		{
-			if (this.ServiceOutput != null)
+			if (ServiceOutput != null)
 			{
-				this.ServiceOutput(this, new ServiceOutputEventArgs(s));
+				ServiceOutput(this, new ServiceOutputEventArgs(s));
 			}
 		}
 
@@ -298,13 +298,13 @@ namespace FirebirdSql.Data.Services
 			var truncated = false;
 			var type = default(int);
 
-			var buffer = this.QueryService(items);
+			var buffer = QueryService(items);
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
 				if (type == IscCodes.isc_info_truncated)
 				{
-					buffer = this.QueryService(items);
+					buffer = QueryService(items);
 					pos = 0;
 					truncated = true;
 					continue;
@@ -398,30 +398,30 @@ namespace FirebirdSql.Data.Services
 		private byte[] QueryService(byte[] items)
 		{
 			bool shouldClose = false;
-			if (this.state == FbServiceState.Closed)
+			if (_state == FbServiceState.Closed)
 			{
 				// Attach to Service Manager
-				this.Open();
+				Open();
 				shouldClose = true;
 			}
 
-			if (this.QuerySpb == null)
+			if (QuerySpb == null)
 			{
-				this.QuerySpb = new ServiceParameterBuffer();
+				QuerySpb = new ServiceParameterBuffer();
 			}
 
 			try
 			{
 				// Response	buffer
-				byte[] buffer = new byte[this.queryBufferSize];
-				this.svc.Query(this.QuerySpb, items.Length, items, buffer.Length, buffer);
+				byte[] buffer = new byte[_queryBufferSize];
+				_svc.Query(QuerySpb, items.Length, items, buffer.Length, buffer);
 				return buffer;
 			}
 			finally
 			{
 				if (shouldClose)
 				{
-					this.Close();
+					Close();
 				}
 			}
 		}

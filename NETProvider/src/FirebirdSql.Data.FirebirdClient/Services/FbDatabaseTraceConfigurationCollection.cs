@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Services
 	{
 		public override string ToString()
 		{
-			return string.Join(Environment.NewLine, this.ConvertAll(x => x.ToString()).ToArray());
+			return string.Join(Environment.NewLine, ConvertAll(x => x.ToString()).ToArray());
 		}
 	}
 }

@@ -39,43 +39,43 @@ namespace FirebirdSql.Data.Services
 
 		public int GetVersion()
 		{
-			return this.GetInt32(IscCodes.isc_info_svc_version);
+			return GetInt32(IscCodes.isc_info_svc_version);
 		}
 
 		public string GetServerVersion()
 		{
-			return this.GetString(IscCodes.isc_info_svc_server_version);
+			return GetString(IscCodes.isc_info_svc_server_version);
 		}
 
 		public string GetImplementation()
 		{
-			return this.GetString(IscCodes.isc_info_svc_implementation);
+			return GetString(IscCodes.isc_info_svc_implementation);
 		}
 
 		public string GetRootDirectory()
 		{
-			return this.GetString(IscCodes.isc_info_svc_get_env);
+			return GetString(IscCodes.isc_info_svc_get_env);
 		}
 
 		public string GetLockManager()
 		{
-			return this.GetString(IscCodes.isc_info_svc_get_env_lock);
+			return GetString(IscCodes.isc_info_svc_get_env_lock);
 		}
 
 		public string GetMessageFile()
 		{
-			return this.GetString(IscCodes.isc_info_svc_get_env_msg);
+			return GetString(IscCodes.isc_info_svc_get_env_msg);
 		}
 
 		public FbDatabasesInfo GetDatabasesInfo()
 		{
-			ArrayList info = this.GetInfo(IscCodes.isc_info_svc_svr_db_info);
+			ArrayList info = GetInfo(IscCodes.isc_info_svc_svr_db_info);
 			return info.Count != 0 ? (FbDatabasesInfo)info[0] : new FbDatabasesInfo();
 		}
 
 		public FbServerConfig GetServerConfig()
 		{
-			ArrayList info = this.GetInfo(IscCodes.isc_info_svc_get_config);
+			ArrayList info = GetInfo(IscCodes.isc_info_svc_get_config);
 			return info.Count != 0 ? (FbServerConfig)info[0] : new FbServerConfig();
 		}
 
@@ -85,26 +85,26 @@ namespace FirebirdSql.Data.Services
 
 		private string GetString(int item)
 		{
-			ArrayList info = this.GetInfo(item);
+			ArrayList info = GetInfo(item);
 
 			return info.Count != 0 ? (string)info[0] : null;
 		}
 
 		private int GetInt32(int item)
 		{
-			ArrayList info = this.GetInfo(item);
+			ArrayList info = GetInfo(item);
 
 			return info.Count != 0 ? (int)info[0] : 0;
 		}
 
 		private ArrayList GetInfo(int item)
 		{
-			return this.GetInfo(new byte[] { (byte)item });
+			return GetInfo(new byte[] { (byte)item });
 		}
 
 		private ArrayList GetInfo(byte[] items)
 		{
-			return this.Query(items);
+			return Query(items);
 		}
 
 		#endregion

@@ -37,8 +37,8 @@ namespace FirebirdSql.Data.Services
 
 		public FbBackupFile(string fileName, int? fileLength = null)
 		{
-			this.BackupFile = fileName;
-			this.BackupLength = fileLength;
+			BackupFile = fileName;
+			BackupLength = fileLength;
 		}
 
 		#endregion

@@ -40,17 +40,17 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				// Configure Spb
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
+				StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
 
-				this.Open();
+				Open();
 
 				// Start execution
-				this.StartTask();
+				StartTask();
 
 				// Process service output
-				this.ProcessServiceOutput();
+				ProcessServiceOutput();
 			}
 			catch (Exception ex)
 			{
@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				this.Close();
+				Close();
 			}
 		}
 

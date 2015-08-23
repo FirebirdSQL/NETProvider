@@ -50,116 +50,116 @@ namespace FirebirdSql.Data.Services
 
 		public int LockMemSize
 		{
-			get { return this.lockMemSize; }
-			set { this.lockMemSize = value; }
+			get { return lockMemSize; }
+			set { lockMemSize = value; }
 		}
 
 		public int LockSemCount
 		{
-			get { return this.lockSemCount; }
-			set { this.lockSemCount = value; }
+			get { return lockSemCount; }
+			set { lockSemCount = value; }
 		}
 
 		public int LockSignal
 		{
-			get { return this.lockSignal; }
-			set { this.lockSignal = value; }
+			get { return lockSignal; }
+			set { lockSignal = value; }
 		}
 
 		public int EventMemorySize
 		{
-			get { return this.eventMemorySize; }
-			set { this.eventMemorySize = value; }
+			get { return eventMemorySize; }
+			set { eventMemorySize = value; }
 		}
 
 		public int PrioritySwitchDelay
 		{
-			get { return this.prioritySwitchDelay; }
-			set { this.prioritySwitchDelay = value; }
+			get { return prioritySwitchDelay; }
+			set { prioritySwitchDelay = value; }
 		}
 
 		public int MinMemory
 		{
-			get { return this.minMemory; }
-			set { this.minMemory = value; }
+			get { return minMemory; }
+			set { minMemory = value; }
 		}
 
 		public int MaxMemory
 		{
-			get { return this.maxMemory; }
-			set { this.maxMemory = value; }
+			get { return maxMemory; }
+			set { maxMemory = value; }
 		}
 
 		public int LockGrantOrder
 		{
-			get { return this.lockGrantOrder; }
-			set { this.lockGrantOrder = value; }
+			get { return lockGrantOrder; }
+			set { lockGrantOrder = value; }
 		}
 
 		public int AnyLockMemory
 		{
-			get { return this.anyLockMemory; }
-			set { this.anyLockMemory = value; }
+			get { return anyLockMemory; }
+			set { anyLockMemory = value; }
 		}
 
 		public int AnyLockSemaphore
 		{
-			get { return this.anyLockSemaphore; }
-			set { this.anyLockSemaphore = value; }
+			get { return anyLockSemaphore; }
+			set { anyLockSemaphore = value; }
 		}
 
 		public int AnyLockSignal
 		{
-			get { return this.anyLockSignal; }
-			set { this.anyLockSignal = value; }
+			get { return anyLockSignal; }
+			set { anyLockSignal = value; }
 		}
 
 		public int AnyEventMemory
 		{
-			get { return this.anyEventMemory; }
-			set { this.anyEventMemory = value; }
+			get { return anyEventMemory; }
+			set { anyEventMemory = value; }
 		}
 
 		public int LockHashSlots
 		{
-			get { return this.lockHashSlots; }
-			set { this.lockHashSlots = value; }
+			get { return lockHashSlots; }
+			set { lockHashSlots = value; }
 		}
 
 		public int DeadlockTimeout
 		{
-			get { return this.deadlockTimeout; }
-			set { this.deadlockTimeout = value; }
+			get { return deadlockTimeout; }
+			set { deadlockTimeout = value; }
 		}
 
 		public int LockRequireSpins
 		{
-			get { return this.lockRequireSpins; }
-			set { this.lockRequireSpins = value; }
+			get { return lockRequireSpins; }
+			set { lockRequireSpins = value; }
 		}
 
 		public int ConnectionTimeout
 		{
-			get { return this.connectionTimeout; }
-			set { this.connectionTimeout = value; }
+			get { return connectionTimeout; }
+			set { connectionTimeout = value; }
 		}
 
 		public int DummyPacketInterval
 		{
-			get { return this.dummyPacketInterval; }
-			set { this.dummyPacketInterval = value; }
+			get { return dummyPacketInterval; }
+			set { dummyPacketInterval = value; }
 		}
 
 		public int IpcMapSize
 		{
-			get { return this.ipcMapSize; }
-			set { this.ipcMapSize = value; }
+			get { return ipcMapSize; }
+			set { ipcMapSize = value; }
 		}
 
 		public int DefaultDbCachePages
 		{
-			get { return this.defaultDbCachePages; }
-			set { this.defaultDbCachePages = value; }
+			get { return defaultDbCachePages; }
+			set { defaultDbCachePages = value; }
 		}
 
 		#endregion

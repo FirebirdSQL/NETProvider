@@ -37,19 +37,19 @@ namespace FirebirdSql.Data.Services
 
 		public int ConnectionCount
 		{
-			get { return this.connectionCount; }
-			set { this.connectionCount = value; }
+			get { return connectionCount; }
+			set { connectionCount = value; }
 		}
 
 		public List<string> Databases
 		{
 			get
 			{
-				if (this.databases == null)
+				if (databases == null)
 				{
-					this.databases = new List<string>();
+					databases = new List<string>();
 				}
-				return this.databases;
+				return databases;
 			}
 		}
 

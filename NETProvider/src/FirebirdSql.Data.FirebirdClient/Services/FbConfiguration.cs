@@ -37,214 +37,214 @@ namespace FirebirdSql.Data.Services
 
 		public void SetSqlDialect(int sqlDialect)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-			this.StartSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			StartSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void SetSweepInterval(int sweepInterval)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-			this.StartSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			StartSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void SetPageBuffers(int pageBuffers)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-			this.StartSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			StartSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void DatabaseShutdown(FbShutdownMode mode, int seconds)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
 			switch (mode)
 			{
 				case FbShutdownMode.Forced:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_shutdown_db, seconds);
+					StartSpb.Append(IscCodes.isc_spb_prp_shutdown_db, seconds);
 					break;
 
 				case FbShutdownMode.DenyTransaction:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_deny_new_transactions, seconds);
+					StartSpb.Append(IscCodes.isc_spb_prp_deny_new_transactions, seconds);
 					break;
 
 				case FbShutdownMode.DenyConnection:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
+					StartSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
 					break;
 			}
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void DatabaseShutdown2(FbShutdownOnlineMode mode, FbShutdownType type, int seconds)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
-			this.StartSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
+			StartSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
 
 			switch (type)
 			{
 				case FbShutdownType.ForceShutdown:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_force_shutdown, seconds);
+					StartSpb.Append(IscCodes.isc_spb_prp_force_shutdown, seconds);
 					break;
 
 				case FbShutdownType.AttachmentsShutdown:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_attachments_shutdown, seconds);
+					StartSpb.Append(IscCodes.isc_spb_prp_attachments_shutdown, seconds);
 					break;
 
 				case FbShutdownType.TransactionsShutdown:
-					this.StartSpb.Append(IscCodes.isc_spb_prp_transactions_shutdown, seconds);
+					StartSpb.Append(IscCodes.isc_spb_prp_transactions_shutdown, seconds);
 					break;
 			}
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void DatabaseOnline()
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-			this.StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void DatabaseOnline2(FbShutdownOnlineMode mode)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
-			this.StartSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
+			StartSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void ActivateShadows()
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-			this.StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void SetForcedWrites(bool forcedWrites)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
 			if (forcedWrites)
 			{
-				this.StartSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
+				StartSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
 			}
 			else
 			{
-				this.StartSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_async);
+				StartSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_async);
 			}
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void SetReserveSpace(bool reserveSpace)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
 			if (reserveSpace)
 			{
-				this.StartSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
+				StartSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
 			}
 			else
 			{
-				this.StartSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res_use_full);
+				StartSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res_use_full);
 			}
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		public void SetAccessMode(bool readOnly)
 		{
-			this.StartSpb = new ServiceParameterBuffer();
+			StartSpb = new ServiceParameterBuffer();
 
-			this.StartSpb.Append(IscCodes.isc_action_svc_properties);
-			this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-			this.StartSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
+			StartSpb.Append(IscCodes.isc_action_svc_properties);
+			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			StartSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
 
-			this.Open();
+			Open();
 
-			this.StartTask();
+			StartTask();
 
-			this.Close();
+			Close();
 		}
 
 		#endregion
