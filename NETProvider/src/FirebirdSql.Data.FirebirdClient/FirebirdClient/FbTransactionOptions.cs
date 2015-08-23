@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	public struct FbTransactionOptions
+	public class FbTransactionOptions
 	{
 		private TimeSpan? _waitTimeout;
 		public TimeSpan? WaitTimeout
