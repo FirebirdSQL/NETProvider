@@ -30,22 +30,22 @@ namespace FirebirdSql.Data.Common
 
 		public RemoteEventCountsCallback EventCountsCallback
 		{
-			get { return this.eventCountsCallback; }
-			set { this.eventCountsCallback = value; }
+			get { return _eventCountsCallback; }
+			set { _eventCountsCallback = value; }
 		}
 
 		#endregion
 
 		#region Fields
 
-		private RemoteEventCountsCallback eventCountsCallback;
-		private List<string>	events;
-		private IDatabase	db;
-		private int			localId;
-		private int			remoteId;
-		private bool		initialCounts;
-		private int[]		previousCounts;
-		private int[]		actualCounts;
+		private RemoteEventCountsCallback _eventCountsCallback;
+		private List<string>	_events;
+		private IDatabase	_db;
+		private int			_localId;
+		private int			_remoteId;
+		private bool		_initialCounts;
+		private int[]		_previousCounts;
+		private int[]		_actualCounts;
 
 		#endregion
 
@@ -53,21 +53,21 @@ namespace FirebirdSql.Data.Common
 
 		public int LocalId
 		{
-			get { return this.localId; }
-			set { this.localId = value; }
+			get { return _localId; }
+			set { _localId = value; }
 		}
 
 		public int RemoteId
 		{
-			get { return this.remoteId; }
-			set { this.remoteId = value; }
+			get { return _remoteId; }
+			set { _remoteId = value; }
 		}
 
 		public List<string> Events
 		{
 			get
 			{
-				return this.events;
+				return _events;
 			}
 		}
 
@@ -75,22 +75,22 @@ namespace FirebirdSql.Data.Common
 		{
 			get
 			{
-				if (this.actualCounts == null && this.previousCounts == null)
+				if (_actualCounts == null && _previousCounts == null)
 				{
 					return false;
 				}
-				else if (this.actualCounts != null && this.previousCounts == null)
+				else if (_actualCounts != null && _previousCounts == null)
 				{
 					return true;
 				}
-				else if (this.actualCounts.Length != this.previousCounts.Length)
+				else if (_actualCounts.Length != _previousCounts.Length)
 				{
 					return true;
 				}
 
-				for (int i = 0; i < this.actualCounts.Length; i++)
+				for (int i = 0; i < _actualCounts.Length; i++)
 				{
-					if (this.actualCounts[i] != this.previousCounts[i])
+					if (_actualCounts[i] != _previousCounts[i])
 					{
 						return true;
 					}
@@ -102,12 +102,12 @@ namespace FirebirdSql.Data.Common
 
 		public int[] PreviousCounts
 		{
-			get { return this.previousCounts; }
+			get { return _previousCounts; }
 		}
 
 		public int[] ActualCounts
 		{
-			get { return this.actualCounts; }
+			get { return _actualCounts; }
 		}
 
 		#endregion
@@ -120,10 +120,10 @@ namespace FirebirdSql.Data.Common
 
 		public RemoteEvent(IDatabase db, int localId, int remoteId, List<string> events)
 		{
-			this.db = db;
-			this.localId = localId;
-			this.remoteId = remoteId;
-			this.events = events;
+			_db = db;
+			_localId = localId;
+			_remoteId = remoteId;
+			_events = events;
 		}
 
 		#endregion
@@ -132,41 +132,41 @@ namespace FirebirdSql.Data.Common
 
 		public void QueueEvents()
 		{
-			lock (this.db.SyncObject)
+			lock (_db.SyncObject)
 			{
-				this.db.QueueEvents(this);
+				_db.QueueEvents(this);
 			}
 		}
 
 		public void CancelEvents()
 		{
-			lock (this.db.SyncObject)
+			lock (_db.SyncObject)
 			{
-				this.db.CancelEvents(this);
-				this.ResetCounts();
+				_db.CancelEvents(this);
+				ResetCounts();
 			}
 		}
 
 		public void ResetCounts()
 		{
-			this.initialCounts	= false;
-			this.actualCounts	= null;
-			this.previousCounts = null;
+			_initialCounts = false;
+			_actualCounts = null;
+			_previousCounts = null;
 		}
 
 		public void EventCounts(byte[] buffer)
 		{
 			int pos = 1;
-			Charset charset = this.db.Charset;
+			Charset charset = _db.Charset;
 
 			if (buffer != null)
 			{
-				if (this.initialCounts)
+				if (_initialCounts)
 				{
-					this.previousCounts = this.actualCounts;
+					_previousCounts = _actualCounts;
 				}
 
-				this.actualCounts = new int[this.events.Count];
+				_actualCounts = new int[_events.Count];
 
 				while (pos < buffer.Length)
 				{
@@ -175,25 +175,25 @@ namespace FirebirdSql.Data.Common
 
 					pos += length;
 
-					int index = this.events.IndexOf(eventName);
+					int index = _events.IndexOf(eventName);
 					if (index != -1)
 					{
-						this.actualCounts[index] = BitConverter.ToInt32(buffer, pos) - 1;
+						_actualCounts[index] = BitConverter.ToInt32(buffer, pos) - 1;
 					}
 
 					pos += 4;
 				}
 
-				if (!this.initialCounts)
+				if (!_initialCounts)
 				{
-					this.QueueEvents();
-					this.initialCounts = true;
+					QueueEvents();
+					_initialCounts = true;
 				}
 				else
 				{
-					if (this.EventCountsCallback != null)
+					if (EventCountsCallback != null)
 					{
-						this.EventCountsCallback();
+						EventCountsCallback();
 					}
 				}
 			}
@@ -205,15 +205,15 @@ namespace FirebirdSql.Data.Common
 
 			epb.Append(IscCodes.EPB_version1);
 
-			for (int i = 0; i < this.events.Count; i++)
+			for (int i = 0; i < _events.Count; i++)
 			{
-				if (this.actualCounts != null)
+				if (_actualCounts != null)
 				{
-					epb.Append(this.events[i], this.actualCounts[i] + 1);
+					epb.Append(_events[i], _actualCounts[i] + 1);
 				}
 				else
 				{
-					epb.Append(this.events[i], 0);
+					epb.Append(_events[i], 0);
 				}
 			}
 

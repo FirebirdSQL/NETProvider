@@ -33,14 +33,14 @@ namespace FirebirdSql.Data.Common
 
 		public int LowerBound
 		{
-			get { return this.lowerBound; }
-			set { this.lowerBound = value; }
+			get { return lowerBound; }
+			set { lowerBound = value; }
 		}
 
 		public int UpperBound
 		{
-			get { return this.upperBound; }
-			set { this.upperBound = value; }
+			get { return upperBound; }
+			set { upperBound = value; }
 		}
 
 		#endregion

@@ -81,13 +81,13 @@ namespace FirebirdSql.Data.Common
 
 		#region Fields
 
-		private bool disposed;
+		private bool _disposed;
 
 		#endregion
 
 		#region Protected Fields
 
-		protected TransactionUpdateEventHandler TransactionUpdate;
+		protected TransactionUpdateEventHandler _TransactionUpdate;
 
 		#endregion
 
@@ -156,7 +156,7 @@ namespace FirebirdSql.Data.Common
 
 		protected bool IsDisposed
 		{
-			get { return this.disposed; }
+			get { return _disposed; }
 		}
 
 		#endregion
@@ -165,7 +165,7 @@ namespace FirebirdSql.Data.Common
 
 		~StatementBase()
 		{
-			this.Dispose(false);
+			Dispose(false);
 		}
 
 		#endregion
@@ -174,15 +174,15 @@ namespace FirebirdSql.Data.Common
 
 		public void Dispose()
 		{
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!this.disposed)
+			if (!_disposed)
 			{
-				this.disposed = true;
+				_disposed = true;
 			}
 		}
 
@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.Common
 		{
 			int		count		= 0;
 			int		bufferSize	= IscCodes.DEFAULT_MAX_BUFFER_SIZE;
-			byte[]	buffer		= this.GetSqlInfo(DescribePlanInfoItems, bufferSize);
+			byte[]	buffer		= GetSqlInfo(DescribePlanInfoItems, bufferSize);
 
 			if (buffer[0] == IscCodes.isc_info_end)
 			{
@@ -204,7 +204,7 @@ namespace FirebirdSql.Data.Common
 			while (buffer[0] == IscCodes.isc_info_truncated && count < 4)
 			{
 				bufferSize *= 2;
-				buffer = this.GetSqlInfo(DescribePlanInfoItems, bufferSize);
+				buffer = GetSqlInfo(DescribePlanInfoItems, bufferSize);
 				count++;
 			}
 			if (count > 3)
@@ -216,7 +216,7 @@ namespace FirebirdSql.Data.Common
 			len += buffer[2] << 8;
 			if (len > 0)
 			{
-				return this.Database.Charset.GetString(buffer, 4, --len);
+				return Database.Charset.GetString(buffer, 4, --len);
 			}
 			else
 			{
@@ -226,44 +226,44 @@ namespace FirebirdSql.Data.Common
 
 		public virtual void Close()
 		{
-			if (this.State == StatementState.Executed ||
-				this.State == StatementState.Error)
+			if (State == StatementState.Executed ||
+				State == StatementState.Error)
 			{
-				if (this.StatementType == DbStatementType.Select ||
-					this.StatementType == DbStatementType.SelectForUpdate ||
-					this.StatementType == DbStatementType.StoredProcedure)
+				if (StatementType == DbStatementType.Select ||
+					StatementType == DbStatementType.SelectForUpdate ||
+					StatementType == DbStatementType.StoredProcedure)
 				{
-					if (this.State == StatementState.Allocated ||
-						this.State == StatementState.Prepared ||
-						this.State == StatementState.Executed)
+					if (State == StatementState.Allocated ||
+						State == StatementState.Prepared ||
+						State == StatementState.Executed)
 					{
 						try
 						{
-							this.Free(IscCodes.DSQL_close);
+							Free(IscCodes.DSQL_close);
 						}
 						catch
 						{
 						}
 					}
-					this.ClearArrayHandles();
-					this.State = StatementState.Closed;
+					ClearArrayHandles();
+					State = StatementState.Closed;
 				}
 			}
 		}
 
 		public virtual void Release()
 		{
-			if (this.Transaction != null && this.TransactionUpdate != null)
+			if (Transaction != null && _TransactionUpdate != null)
 			{
-				this.Transaction.Update -= this.TransactionUpdate;
-				this.TransactionUpdate = null;
+				Transaction.Update -= _TransactionUpdate;
+				_TransactionUpdate = null;
 			}
 
-			this.Free(IscCodes.DSQL_drop);
+			Free(IscCodes.DSQL_drop);
 
-			this.ClearArrayHandles();
-			this.State          = StatementState.Deallocated;
-			this.StatementType  = DbStatementType.None;
+			ClearArrayHandles();
+			State = StatementState.Deallocated;
+			StatementType = DbStatementType.None;
 		}
 
 		#endregion
@@ -298,14 +298,14 @@ namespace FirebirdSql.Data.Common
 
 		protected byte[] GetSqlInfo(byte[] items)
 		{
-			return this.GetSqlInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+			return GetSqlInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
 		}
 
 		protected int GetRecordsAffected()
 		{
-			byte[] buffer = this.GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+			byte[] buffer = GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
-			return this.ProcessRecordsAffectedBuffer(buffer);
+			return ProcessRecordsAffectedBuffer(buffer);
 		}
 
 		protected int ProcessRecordsAffectedBuffer(byte[] buffer)
@@ -368,9 +368,9 @@ namespace FirebirdSql.Data.Common
 
 		protected DbStatementType GetStatementType()
 		{
-			byte[] buffer = this.GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+			byte[] buffer = GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 
-			return this.ProcessStatementTypeInfoBuffer(buffer);
+			return ProcessStatementTypeInfoBuffer(buffer);
 		}
 
 		protected DbStatementType ProcessStatementTypeInfoBuffer(byte[] buffer)
@@ -402,13 +402,13 @@ namespace FirebirdSql.Data.Common
 
 		protected void ClearArrayHandles()
 		{
-			if (this.Fields != null && this.Fields.Count > 0)
+			if (Fields != null && Fields.Count > 0)
 			{
-				for (int i = 0; i < this.Fields.Count; i++)
+				for (int i = 0; i < Fields.Count; i++)
 				{
-					if (this.Fields[i].IsArray())
+					if (Fields[i].IsArray())
 					{
-						this.Fields[i].ArrayHandle = null;
+						Fields[i].ArrayHandle = null;
 					}
 				}
 			}

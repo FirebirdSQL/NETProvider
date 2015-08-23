@@ -39,14 +39,14 @@ namespace FirebirdSql.Data.Common
 
 		public void Append(string content, int actualCount)
 		{
-			this.Append(Encoding.Default.GetBytes(content), actualCount);
+			Append(Encoding.Default.GetBytes(content), actualCount);
 		}
 
 		public void Append(byte[] content, int actualCount)
 		{
-			this.WriteByte(content.Length);
-			this.Write(content);
-			this.Write(actualCount);
+			WriteByte(content.Length);
+			Write(content);
+			Write(actualCount);
 		}
 
 		#endregion

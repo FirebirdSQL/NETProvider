@@ -35,10 +35,10 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private short version;
-		private short count;
-		private short actualCount;
-		private DbField[] fields;
+		private short _version;
+		private short _count;
+		private short _actualCount;
+		private DbField[] _fields;
 
 		#endregion
 
@@ -48,23 +48,23 @@ namespace FirebirdSql.Data.Common
 		{
 			get
 			{
-				return this.version;
+				return _version;
 			}
 			set
 			{
-				this.version = value;
+				_version = value;
 			}
 		}
 
 		public short Count
 		{
-			get { return this.count; }
+			get { return _count; }
 		}
 
 		public short ActualCount
 		{
-			get { return this.actualCount; }
-			set { this.actualCount = value; }
+			get { return _actualCount; }
+			set { _actualCount = value; }
 		}
 
 		#endregion
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Common
 
 		public DbField this[int index]
 		{
-			get { return this.fields[index]; }
+			get { return _fields[index]; }
 		}
 
 		#endregion
@@ -82,14 +82,14 @@ namespace FirebirdSql.Data.Common
 
 		public Descriptor(short n)
 		{
-			this.version		= IscCodes.SQLDA_VERSION1;
-			this.count			= n;
-			this.actualCount	= n;
-			this.fields			= new DbField[n];
+			_version = IscCodes.SQLDA_VERSION1;
+			_count = n;
+			_actualCount = n;
+			_fields = new DbField[n];
 
 			for (int i = 0; i < n; i++)
 			{
-				this.fields[i] = new DbField();
+				_fields[i] = new DbField();
 			}
 		}
 
@@ -99,21 +99,21 @@ namespace FirebirdSql.Data.Common
 
 		public object Clone()
 		{
-			Descriptor descriptor = new Descriptor(this.Count);
-			descriptor.Version = this.version;
+			Descriptor descriptor = new Descriptor(Count);
+			descriptor.Version = _version;
 
 			for (int i = 0; i < descriptor.Count; i++)
 			{
-				descriptor[i].DataType	= this.fields[i].DataType;
-				descriptor[i].NumericScale = this.fields[i].NumericScale;
-				descriptor[i].SubType	= this.fields[i].SubType;
-				descriptor[i].Length	= this.fields[i].Length;
-				descriptor[i].Value		= this.fields[i].Value;
-				descriptor[i].NullFlag	= this.fields[i].NullFlag;
-				descriptor[i].Name		= this.fields[i].Name;
-				descriptor[i].Relation	= this.fields[i].Relation;
-				descriptor[i].Owner		= this.fields[i].Owner;
-				descriptor[i].Alias		= this.fields[i].Alias;
+				descriptor[i].DataType	= _fields[i].DataType;
+				descriptor[i].NumericScale = _fields[i].NumericScale;
+				descriptor[i].SubType	= _fields[i].SubType;
+				descriptor[i].Length	= _fields[i].Length;
+				descriptor[i].Value		= _fields[i].Value;
+				descriptor[i].NullFlag	= _fields[i].NullFlag;
+				descriptor[i].Name		= _fields[i].Name;
+				descriptor[i].Relation	= _fields[i].Relation;
+				descriptor[i].Owner		= _fields[i].Owner;
+				descriptor[i].Alias		= _fields[i].Alias;
 			}
 
 			return descriptor;
@@ -125,9 +125,9 @@ namespace FirebirdSql.Data.Common
 
 		public void ResetValues()
 		{
-			for (int i = 0; i < this.fields.Length; i++)
+			for (int i = 0; i < _fields.Length; i++)
 			{
-				this.fields[i].Value = null;
+				_fields[i].Value = null;
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace FirebirdSql.Data.Common
 		{
 			using (MemoryStream blr = new MemoryStream())
 			{
-				int par_count = this.Count * 2;
+				int par_count = Count * 2;
 
 				blr.WriteByte(IscCodes.blr_version5);
 				blr.WriteByte(IscCodes.blr_begin);
@@ -144,10 +144,10 @@ namespace FirebirdSql.Data.Common
 				blr.WriteByte((byte)(par_count & 255));
 				blr.WriteByte((byte)(par_count >> 8));
 
-				for (int i = 0; i < this.fields.Length; i++)
+				for (int i = 0; i < _fields.Length; i++)
 				{
-					int dtype = this.fields[i].SqlType;
-					int len = this.fields[i].Length;
+					int dtype = _fields[i].SqlType;
+					int len = _fields[i].Length;
 
 					switch (dtype)
 					{
@@ -199,22 +199,22 @@ namespace FirebirdSql.Data.Common
 
 						case IscCodes.SQL_LONG:
 							blr.WriteByte(IscCodes.blr_long);
-							blr.WriteByte((byte)this.fields[i].NumericScale);
+							blr.WriteByte((byte)_fields[i].NumericScale);
 							break;
 
 						case IscCodes.SQL_SHORT:
 							blr.WriteByte(IscCodes.blr_short);
-							blr.WriteByte((byte)this.fields[i].NumericScale);
+							blr.WriteByte((byte)_fields[i].NumericScale);
 							break;
 
 						case IscCodes.SQL_INT64:
 							blr.WriteByte(IscCodes.blr_int64);
-							blr.WriteByte((byte)this.fields[i].NumericScale);
+							blr.WriteByte((byte)_fields[i].NumericScale);
 							break;
 
 						case IscCodes.SQL_QUAD:
 							blr.WriteByte(IscCodes.blr_quad);
-							blr.WriteByte((byte)this.fields[i].NumericScale);
+							blr.WriteByte((byte)_fields[i].NumericScale);
 							break;
 
 						case IscCodes.SQL_NULL:

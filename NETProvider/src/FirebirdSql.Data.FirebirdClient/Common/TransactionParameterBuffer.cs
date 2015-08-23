@@ -38,21 +38,21 @@ namespace FirebirdSql.Data.Common
 
 		public void Append(int type, short value)
 		{
-			this.WriteByte(type);
-			this.WriteByte(2);
-			this.Write(value);
+			WriteByte(type);
+			WriteByte(2);
+			Write(value);
 		}
 
 		public void Append(int type, string content)
 		{
-			this.Append(type, Encoding.Default.GetBytes(content));
+			Append(type, Encoding.Default.GetBytes(content));
 		}
 
 		public void Append(int type, byte[] buffer)
 		{
-			this.WriteByte(type);
-			this.WriteByte(buffer.Length);
-			this.Write(buffer);
+			WriteByte(type);
+			WriteByte(buffer.Length);
+			Write(buffer);
 		}
 
 		#endregion

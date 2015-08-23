@@ -56,9 +56,9 @@ namespace FirebirdSql.Data.Common
 		{
 			get
 			{
-				if (this.Errors.Count > 0)
+				if (Errors.Count > 0)
 				{
-					return this.Errors[0].IsWarning;
+					return Errors[0].IsWarning;
 				}
 				else
 				{
@@ -74,15 +74,15 @@ namespace FirebirdSql.Data.Common
 		public IscException()
 			: base()
 		{
-			this.Errors = new List<IscError>();
+			Errors = new List<IscError>();
 		}
 
 		public IscException(int errorCode)
 			: this()
 		{
-			this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+			Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 
-			this.BuildExceptionData();
+			BuildExceptionData();
 		}
 
 		public IscException(IEnumerable<int> errorCodes)
@@ -90,62 +90,62 @@ namespace FirebirdSql.Data.Common
 		{
 			foreach (int errorCode in errorCodes)
 			{
-				this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+				Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 			}
 
-			this.BuildExceptionData();
+			BuildExceptionData();
 		}
 
 		/// <param name="dummy">This parameter is here only to differentiate sqlState and strParam.</param>
 		public IscException(string sqlState, int dummy)
 			: this()
 		{
-			this.Errors.Add(new IscError(IscCodes.isc_arg_sql_state, sqlState));
+			Errors.Add(new IscError(IscCodes.isc_arg_sql_state, sqlState));
 
-			this.BuildExceptionData();
+			BuildExceptionData();
 		}
 
 		public IscException(string strParam)
 			: this()
 		{
-			this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
+			Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 
-			this.BuildExceptionData();
+			BuildExceptionData();
 		}
 
 		public IscException(int errorCode, int intParam)
 			: this()
 		{
-			this.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
-			this.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
+			Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+			Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
 
-			this.BuildExceptionData();
+			BuildExceptionData();
 		}
 
 		public IscException(int type, int errorCode, string strParam)
 			: this()
 		{
-			this.Errors.Add(new IscError(type, errorCode));
-			this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
+			Errors.Add(new IscError(type, errorCode));
+			Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 
-			this.BuildExceptionData();
+			BuildExceptionData();
 		}
 
 		public IscException(int type, int errorCode, int intParam, string strParam)
 			: this()
 		{
-			this.Errors.Add(new IscError(type, errorCode));
-			this.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
-			this.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
+			Errors.Add(new IscError(type, errorCode));
+			Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
+			Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 
-			this.BuildExceptionData();
+			BuildExceptionData();
 		}
 
 		internal IscException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
-			this.Errors = (List<IscError>)info.GetValue("errors", typeof(List<IscError>));
-			this.ErrorCode = info.GetInt32("errorCode");
+			Errors = (List<IscError>)info.GetValue("errors", typeof(List<IscError>));
+			ErrorCode = info.GetInt32("errorCode");
 		}
 
 		#endregion
@@ -154,9 +154,9 @@ namespace FirebirdSql.Data.Common
 
 		public void BuildExceptionData()
 		{
-			this.BuildErrorCode();
-			this.BuildSqlState();
-			this.BuildExceptionMessage();
+			BuildErrorCode();
+			BuildSqlState();
+			BuildExceptionMessage();
 		}
 
 		[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
@@ -165,8 +165,8 @@ namespace FirebirdSql.Data.Common
 		{
 			base.GetObjectData(info, context);
 
-			info.AddValue("errors", this.Errors);
-			info.AddValue("errorCode", this.ErrorCode);
+			info.AddValue("errors", Errors);
+			info.AddValue("errorCode", ErrorCode);
 		}
 
 		public override string ToString()
@@ -180,21 +180,21 @@ namespace FirebirdSql.Data.Common
 
 		private void BuildErrorCode()
 		{
-			this.ErrorCode = (this.Errors.Count != 0 ? this.Errors[0].ErrorCode : 0);
+			ErrorCode = (Errors.Count != 0 ? Errors[0].ErrorCode : 0);
 		}
 
 		private void BuildSqlState()
 		{
-			IscError error = this.Errors.Find(e => e.Type == IscCodes.isc_arg_sql_state);
+			IscError error = Errors.Find(e => e.Type == IscCodes.isc_arg_sql_state);
 			// step #1, maybe we already have a SQLSTATE stuffed in the status vector
 			if (error != null)
 			{
-				this.SQLSTATE = error.StrParam;
+				SQLSTATE = error.StrParam;
 			}
 			// step #2, see if we can find a mapping.
 			else
 			{
-				this.SQLSTATE = GetValueOrDefault(SqlStateMapping.Values, this.ErrorCode, _ => string.Empty);
+				SQLSTATE = GetValueOrDefault(SqlStateMapping.Values, ErrorCode, _ => string.Empty);
 			}
 		}
 
@@ -202,21 +202,21 @@ namespace FirebirdSql.Data.Common
 		{
 			StringBuilder builder = new StringBuilder();
 
-			for (int i = 0; i < this.Errors.Count; i++)
+			for (int i = 0; i < Errors.Count; i++)
 			{
-				if (this.Errors[i].Type == IscCodes.isc_arg_gds ||
-					this.Errors[i].Type == IscCodes.isc_arg_warning)
+				if (Errors[i].Type == IscCodes.isc_arg_gds ||
+					Errors[i].Type == IscCodes.isc_arg_warning)
 				{
-					int code = this.Errors[i].ErrorCode;
+					int code = Errors[i].ErrorCode;
 					string message = GetValueOrDefault(IscErrorMessages.Values, code, BuildDefaultErrorMessage);
 
 					ArrayList param = new ArrayList();
 
 					int index = i + 1;
 
-					while (index < this.Errors.Count && this.Errors[index].IsArgument)
+					while (index < Errors.Count && Errors[index].IsArgument)
 					{
-						param.Add(this.Errors[index++].StrParam);
+						param.Add(Errors[index++].StrParam);
 						i++;
 					}
 
@@ -227,7 +227,7 @@ namespace FirebirdSql.Data.Common
 						if (code == IscCodes.isc_except)
 						{
 							// Custom exception	add	the	first argument as error	code
-							this.ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
+							ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
 						}
 						else if (code == IscCodes.isc_except2)
 						{
@@ -263,10 +263,10 @@ namespace FirebirdSql.Data.Common
 			}
 
 			// Update error	collection only	with the main error
-			IscError mainError = new IscError(this.ErrorCode);
+			IscError mainError = new IscError(ErrorCode);
 			mainError.Message = builder.ToString();
 
-			this.Errors.Add(mainError);
+			Errors.Add(mainError);
 
 			// Update exception	message
 			_message = builder.ToString();
