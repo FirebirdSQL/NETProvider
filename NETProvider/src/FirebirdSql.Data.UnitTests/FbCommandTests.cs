@@ -222,7 +222,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "update test set char_field = 'carlos@firebird.org', bigint_field = @bigint, varchar_field	= 'carlos@ado.net' where int_field = @integer";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@bigint", FbDbType.BigInt).Value = 200;
 			command.Parameters.Add("@integer", FbDbType.Integer).Value = 1;
 
@@ -238,7 +238,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "select * from	test where int_field >=	@lang and int_field	<= @lang";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@lang", FbDbType.Integer).Value = 10;
 
 			FbDataReader reader = command.ExecuteReader();
@@ -286,7 +286,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "insert into test (int_field) values (100000)";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 
 			FbDataReader reader = command.ExecuteReader();
 
@@ -335,10 +335,10 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "update test set timestamp_field =	@timestamp where int_field = @integer";
 
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			try
 			{
-				FbCommand command = new FbCommand(sql, this.Connection, transaction);
+				FbCommand command = new FbCommand(sql, Connection, transaction);
 				command.Parameters.Add("@timestamp", FbDbType.TimeStamp).Value = 1;
 				command.Parameters.Add("@integer", FbDbType.Integer).Value = 1;
 
@@ -359,7 +359,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			try
 			{
-				using (FbCommand create = new FbCommand("CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10))", this.Connection))
+				using (FbCommand create = new FbCommand("CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10))", Connection))
 				{
 					create.ExecuteNonQuery();
 				}
@@ -373,14 +373,14 @@ namespace FirebirdSql.Data.UnitTests
 
 				foreach (string statement in l)
 				{
-					FbCommand insert = new FbCommand(statement, this.Connection);
+					FbCommand insert = new FbCommand(statement, Connection);
 					insert.ExecuteNonQuery();
 					insert.Dispose();
 				}
 
 				string sql = "select * from	varchartest";
 
-				FbCommand cmd = new FbCommand(sql, this.Connection);
+				FbCommand cmd = new FbCommand(sql, Connection);
 				FbDataReader r = cmd.ExecuteReader();
 
 				while (r.Read())
@@ -393,7 +393,7 @@ namespace FirebirdSql.Data.UnitTests
 			}
 			finally
 			{
-				using (FbCommand drop = new FbCommand("DROP TABLE VARCHARTEST", this.Connection))
+				using (FbCommand drop = new FbCommand("DROP TABLE VARCHARTEST", Connection))
 				{
 					drop.ExecuteNonQuery();
 				}
@@ -406,37 +406,37 @@ namespace FirebirdSql.Data.UnitTests
 			try
 			{
 				string createTable = "CREATE TABLE TABLE1 (FIELD1 varchar(20))";
-				FbCommand create = new FbCommand(createTable, this.Connection);
+				FbCommand create = new FbCommand(createTable, Connection);
 				create.ExecuteNonQuery();
 				create.Dispose();
 
 				// insert using	parametrized SQL
 				string sql = "INSERT INTO Table1 VALUES	(@value)";
-				FbCommand command = new FbCommand(sql, this.Connection);
+				FbCommand command = new FbCommand(sql, Connection);
 				command.Parameters.Add("@value", FbDbType.VarChar).Value = "中文";
 				command.ExecuteNonQuery();
 				command.Dispose();
 
 				sql = "SELECT *	FROM TABLE1";
-				FbCommand select = new FbCommand(sql, this.Connection);
+				FbCommand select = new FbCommand(sql, Connection);
 				string result = select.ExecuteScalar().ToString();
 				select.Dispose();
 
 				Assert.AreEqual("中文", result, "Incorrect results in parametrized insert");
 
 				sql = "DELETE FROM TABLE1";
-				FbCommand delete = new FbCommand(sql, this.Connection);
+				FbCommand delete = new FbCommand(sql, Connection);
 				delete.ExecuteNonQuery();
 				delete.Dispose();
 
 				// insert using	plain SQL
 				sql = "INSERT INTO Table1 VALUES ('中文')";
-				FbCommand plainCommand = new FbCommand(sql, this.Connection);
+				FbCommand plainCommand = new FbCommand(sql, Connection);
 				plainCommand.ExecuteNonQuery();
 				plainCommand.Dispose();
 
 				sql = "SELECT *	FROM TABLE1";
-				select = new FbCommand(sql, this.Connection);
+				select = new FbCommand(sql, Connection);
 				result = select.ExecuteScalar().ToString();
 				select.Dispose();
 
@@ -445,7 +445,7 @@ namespace FirebirdSql.Data.UnitTests
 			finally
 			{
 				string dropTable = "DROP TABLE TABLE1";
-				FbCommand drop = new FbCommand(dropTable, this.Connection);
+				FbCommand drop = new FbCommand(dropTable, Connection);
 				drop.ExecuteNonQuery();
 				drop.Dispose();
 			}
@@ -456,7 +456,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "insert into TEST (int_field, date_field) values (1002, @date)";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 
 			command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
 
@@ -470,7 +470,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "insert into TEST (int_field) values (@value)";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@value", FbDbType.Integer).Value = null;
 
 			try
@@ -595,7 +595,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "insert into TEST (int_field) values (@value)";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 			command.Prepare();
 			command.Parameters.Add("@value", FbDbType.Integer).Value = 100000;
 
@@ -607,9 +607,9 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ReadOnlyTransactionTest()
 		{
-			using (IDbCommand command = this.Connection.CreateCommand())
+			using (IDbCommand command = Connection.CreateCommand())
 			{
-				using (IDbTransaction transaction = this.Connection.BeginTransaction(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Read, WaitTimeout = null }))
+				using (IDbTransaction transaction = Connection.BeginTransaction(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Read, WaitTimeout = null }))
 				{
 					try
 					{
@@ -629,11 +629,11 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DisposeTest()
 		{
-			DataTable tables = this.Connection.GetSchema("Tables", new string[] { null, null, null, null });
+			DataTable tables = Connection.GetSchema("Tables", new string[] { null, null, null, null });
 
 			string selectSql = "SELECT * FROM TEST";
 
-			FbCommand c1 = new FbCommand(selectSql, this.Connection);
+			FbCommand c1 = new FbCommand(selectSql, Connection);
 			IDataReader r = c1.ExecuteReader();
 
 			while (r.Read())

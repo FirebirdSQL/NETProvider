@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void SimpleSelectTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 
 			csb.Enlist = true;
 
@@ -74,7 +74,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void InsertTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 
 			csb.Enlist = true;
 

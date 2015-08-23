@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.UnitTests
 	{
 		#region Fields
 
-		private FbDataAdapter adapter;
+		private FbDataAdapter _adapter;
 
 		#endregion
 
@@ -52,13 +52,13 @@ namespace FirebirdSql.Data.UnitTests
 		public override void SetUp()
 		{
 			base.SetUp();
-			adapter = new FbDataAdapter(new FbCommand("select *	from TEST where	VARCHAR_FIELD =	?", Connection));
+			_adapter = new FbDataAdapter(new FbCommand("select *	from TEST where	VARCHAR_FIELD =	?", Connection));
 		}
 
 		[TearDown]
 		public override void TearDown()
 		{
-			adapter.Dispose();
+			_adapter.Dispose();
 			base.TearDown();
 		}
 
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void GetInsertCommandTest()
 		{
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
 			Console.WriteLine();
 			Console.WriteLine("CommandBuilder -	GetInsertCommand Method	Test");
@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void GetUpdateCommandTest()
 		{
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
 			Console.WriteLine();
 			Console.WriteLine("CommandBuilder -	GetUpdateCommand Method	Test");
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void GetDeleteCommandTest()
 		{
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
 			Console.WriteLine();
 			Console.WriteLine("CommandBuilder -	GetDeleteCommand Method	Test");
@@ -108,7 +108,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void RefreshSchemaTest()
 		{
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
 			Console.WriteLine();
 			Console.WriteLine("CommandBuilder -	RefreshSchema Method Test -	Commands for original SQL statement: ");
@@ -117,7 +117,7 @@ namespace FirebirdSql.Data.UnitTests
 			Console.WriteLine(builder.GetUpdateCommand().CommandText);
 			Console.WriteLine(builder.GetDeleteCommand().CommandText);
 
-			adapter.SelectCommand.CommandText = "select	* from TEST	where BIGINT_FIELD = ?";
+			_adapter.SelectCommand.CommandText = "select	* from TEST	where BIGINT_FIELD = ?";
 
 			builder.RefreshSchema();
 
@@ -134,9 +134,9 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void CommandBuilderWithExpressionFieldTest()
 		{
-			adapter.SelectCommand.CommandText = "select	TEST.*,	0 AS VALOR from	TEST";
+			_adapter.SelectCommand.CommandText = "select	TEST.*,	0 AS VALOR from	TEST";
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
 			Console.WriteLine();
 			Console.WriteLine("CommandBuilder -	GetUpdateCommand Method	Test");
@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			Connection.Close();
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
 			Console.WriteLine();
 			Console.WriteLine("CommandBuilder -	RefreshSchema Method Test -	Commands for original SQL statement: ");
@@ -203,7 +203,7 @@ namespace FirebirdSql.Data.UnitTests
 			Console.WriteLine(builder.GetUpdateCommand().CommandText);
 			Console.WriteLine(builder.GetDeleteCommand().CommandText);
 
-			adapter.SelectCommand.CommandText = "select	* from TEST	where BIGINT_FIELD = ?";
+			_adapter.SelectCommand.CommandText = "select	* from TEST	where BIGINT_FIELD = ?";
 
 			builder.RefreshSchema();
 

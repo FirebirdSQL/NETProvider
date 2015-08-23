@@ -273,7 +273,7 @@ END
 			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
 
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			csb.MinPoolSize = 0;

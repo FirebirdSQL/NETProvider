@@ -39,10 +39,10 @@ namespace FirebirdSql.Data.UnitTests
 	{
 		#region	Fields
 
-		private FbConnection connection;
-		private FbTransaction transaction;
-		private bool withTransaction;
-		private FbServerType fbServerType;
+		private FbConnection _connection;
+		private FbTransaction _transaction;
+		private bool _withTransaction;
+		private FbServerType _fbServerType;
 
 		#endregion
 
@@ -50,18 +50,18 @@ namespace FirebirdSql.Data.UnitTests
 
 		public FbConnection Connection
 		{
-			get { return connection; }
+			get { return _connection; }
 		}
 
 		public FbServerType FbServerType
 		{
-			get { return fbServerType; }
+			get { return _fbServerType; }
 		}
 
 		public FbTransaction Transaction
 		{
-			get { return transaction; }
-			set { transaction = value; }
+			get { return _transaction; }
+			set { _transaction = value; }
 		}
 
 		#endregion
@@ -75,8 +75,8 @@ namespace FirebirdSql.Data.UnitTests
 
 		public TestsBase(FbServerType serverType, bool withTransaction)
 		{
-			this.fbServerType = serverType;
-			this.withTransaction = withTransaction;
+			_fbServerType = serverType;
+			_withTransaction = withTransaction;
 		}
 
 		#endregion
@@ -86,29 +86,29 @@ namespace FirebirdSql.Data.UnitTests
 		[SetUp]
 		public virtual void SetUp()
 		{
-			TestsSetup.SetUp(this.fbServerType);
+			TestsSetup.SetUp(_fbServerType);
 
-			string cs = BuildConnectionString(this.fbServerType);
+			string cs = BuildConnectionString(_fbServerType);
 			InsertTestData(cs);
-			this.connection = new FbConnection(cs);
-			this.connection.Open();
-			if (this.withTransaction)
+			_connection = new FbConnection(cs);
+			_connection.Open();
+			if (_withTransaction)
 			{
-				this.transaction = this.connection.BeginTransaction();
+				_transaction = _connection.BeginTransaction();
 			}
 		}
 
 		[TearDown]
 		public virtual void TearDown()
 		{
-			string cs = BuildConnectionString(this.fbServerType);
-			if (this.withTransaction)
+			string cs = BuildConnectionString(_fbServerType);
+			if (_withTransaction)
 			{
 				try
 				{
-					if (!transaction.IsUpdated)
+					if (!_transaction.IsUpdated)
 					{
-						transaction.Commit();
+						_transaction.Commit();
 					}
 				}
 				catch
@@ -116,15 +116,15 @@ namespace FirebirdSql.Data.UnitTests
 				}
 				try
 				{
-					transaction.Dispose();
+					_transaction.Dispose();
 				}
 				catch
 				{
 				}
 			}
-			if (connection != null)
+			if (_connection != null)
 			{
-				connection.Dispose();
+				_connection.Dispose();
 			}
 			DeleteAllData(cs);
 			FbConnection.ClearAllPools();
@@ -270,13 +270,13 @@ end";
 		public Version GetServerVersion()
 		{
 			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(fbServerType);
+			server.ConnectionString = BuildServicesConnectionString(_fbServerType);
 			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
 		}
 
 		public int GetActiveConnections()
 		{
-			var csb = BuildConnectionStringBuilder(fbServerType);
+			var csb = BuildConnectionStringBuilder(_fbServerType);
 			csb.Pooling = false;
 			using (var conn = new FbConnection(csb.ToString()))
 			{

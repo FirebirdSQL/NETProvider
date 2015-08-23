@@ -54,14 +54,14 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ProviderManifestTest()
 		{
-			DbProviderManifest manifest = this.GetProviderServices().GetProviderManifest("foobar");
+			DbProviderManifest manifest = GetProviderServices().GetProviderManifest("foobar");
 			Assert.IsNotNull(manifest);
 		}
 
 		[Test]
 		public void ProviderManifestTokenTest()
 		{
-			string token = this.GetProviderServices().GetProviderManifestToken(Connection);
+			string token = GetProviderServices().GetProviderManifestToken(Connection);
 			Assert.IsNotNullOrEmpty(token);
 			Console.WriteLine(token);
 			Version v = new Version(token);
