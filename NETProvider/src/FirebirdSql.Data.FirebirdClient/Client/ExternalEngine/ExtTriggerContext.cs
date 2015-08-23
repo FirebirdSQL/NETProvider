@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 	{
 		#region Fields
 
-		private IDatabase database;
+		private IDatabase _database;
 
 		#endregion
 
@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public ExtTriggerContext(IDatabase database)
 		{
-			this.database = database;
+			_database = database;
 		}
 
 		#endregion
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 			ExtConnection.ParseStatusVector(statusVector);
 
-			return this.database.Charset.GetString(tableName, 0, count);
+			return _database.Charset.GetString(tableName, 0, count);
 		}
 
 		public int GetTriggerAction()
@@ -66,17 +66,17 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public object GetOldValue(string name)
 		{
-			return this.GetValue(name, true);
+			return GetValue(name, true);
 		}
 
 		public object GetNewValue(string name)
 		{
-			return this.GetValue(name, false);
+			return GetValue(name, false);
 		}
 
 		public void SetNewValue(string name, object value)
 		{
-			this.SetValue(name, value, false);
+			SetValue(name, value, false);
 		}
 
 		#endregion
@@ -89,7 +89,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			byte[] fieldName = new byte[32];
 			object value = null;
 
-			this.database.Charset.GetBytes(name, 0, name.Length, fieldName, 0);
+			_database.Charset.GetBytes(name, 0, name.Length, fieldName, 0);
 
 			// Marshal structures to pointer
 			ParamDscMarshaler marshaler = ParamDscMarshaler.Instance;
@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				fieldName,
 				valuePtr);
 
-			value = marshaler.MarshalNativeToManaged(this.database.Charset, valuePtr);
+			value = marshaler.MarshalNativeToManaged(_database.Charset, valuePtr);
 			marshaler.CleanUpNativeData(ref valuePtr);
 
 			ExtConnection.ParseStatusVector(statusVector);
@@ -115,12 +115,12 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			int[] statusVector = ExtConnection.GetNewStatusVector();
 			byte[] fieldName = new byte[32];
 
-			this.database.Charset.GetBytes(name, 0, name.Length, fieldName, 0);
+			_database.Charset.GetBytes(name, 0, name.Length, fieldName, 0);
 
 			// Marshal structures to pointer
 			ParamDscMarshaler marshaler = ParamDscMarshaler.Instance;
 
-			IntPtr valuePtr = marshaler.MarshalManagedToNative(this.database.Charset, value);
+			IntPtr valuePtr = marshaler.MarshalManagedToNative(_database.Charset, value);
 
 			bool result = SafeNativeMethods.isc_set_trigger_field(
 				statusVector,

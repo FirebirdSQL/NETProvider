@@ -36,25 +36,25 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public WarningMessageCallback WarningMessage
 		{
-			get { return this.warningMessage; }
-			set { this.warningMessage = value; }
+			get { return _warningMessage; }
+			set { _warningMessage = value; }
 		}
 
 		#endregion
 
 		#region Fields
 
-		private WarningMessageCallback warningMessage;
+		private WarningMessageCallback _warningMessage;
 
-		private int handle;
-		private int transactionCount;
-		private string serverVersion;
-		private Charset charset;
-		private short packetSize;
-		private short dialect;
-		private bool disposed;
-		private int[] statusVector;
-		private object syncObject;
+		private int _handle;
+		private int _transactionCount;
+		private string _serverVersion;
+		private Charset _charset;
+		private short _packetSize;
+		private short _dialect;
+		private bool _disposed;
+		private int[] _statusVector;
+		private object _syncObject;
 
 		#endregion
 
@@ -62,36 +62,36 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public int Handle
 		{
-			get { return this.handle; }
+			get { return _handle; }
 		}
 
 		public int TransactionCount
 		{
-			get { return this.transactionCount; }
-			set { this.transactionCount = value; }
+			get { return _transactionCount; }
+			set { _transactionCount = value; }
 		}
 
 		public string ServerVersion
 		{
-			get { return this.serverVersion; }
+			get { return _serverVersion; }
 		}
 
 		public Charset Charset
 		{
-			get { return this.charset; }
-			set { this.charset = value; }
+			get { return _charset; }
+			set { _charset = value; }
 		}
 
 		public short PacketSize
 		{
-			get { return this.packetSize; }
-			set { this.packetSize = value; }
+			get { return _packetSize; }
+			set { _packetSize = value; }
 		}
 
 		public short Dialect
 		{
-			get { return this.dialect; }
-			set { this.dialect = value; }
+			get { return _dialect; }
+			set { _dialect = value; }
 		}
 
 		public bool HasRemoteEventSupport
@@ -103,12 +103,12 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		{
 			get
 			{
-				if (this.syncObject == null)
+				if (_syncObject == null)
 				{
-					Interlocked.CompareExchange(ref this.syncObject, new object(), null);
+					Interlocked.CompareExchange(ref _syncObject, new object(), null);
 				}
 
-				return this.syncObject;
+				return _syncObject;
 			}
 		}
 
@@ -118,10 +118,10 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public ExtDatabase()
 		{
-			this.charset = Charset.DefaultCharset;
-			this.dialect = 3;
-			this.packetSize = 8192;
-			this.statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
+			_charset = Charset.DefaultCharset;
+			_dialect = 3;
+			_packetSize = 8192;
+			_statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
 
 			GC.SuppressFinalize(this);
 		}
@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		~ExtDatabase()
 		{
-			this.Dispose(false);
+			Dispose(false);
 		}
 
 		#endregion
@@ -141,7 +141,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public void Dispose()
 		{
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -149,28 +149,28 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		{
 			lock (this)
 			{
-				if (!this.disposed)
+				if (!_disposed)
 				{
 					try
 					{
 						// release any unmanaged resources
-						this.Detach();
+						Detach();
 
 						// release any managed resources
 						if (disposing)
 						{
-							this.warningMessage = null;
-							this.charset = null;
-							this.serverVersion = null;
-							this.transactionCount = 0;
-							this.dialect = 0;
-							this.handle = 0;
-							this.packetSize = 0;
+							_warningMessage = null;
+							_charset = null;
+							_serverVersion = null;
+							_transactionCount = 0;
+							_dialect = 0;
+							_handle = 0;
+							_packetSize = 0;
 						}
 					}
 					finally
 					{
-						this.disposed = true;
+						_disposed = true;
 					}
 				}
 			}
@@ -221,13 +221,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			int dbHandle = 0;
 
 			// Clear status vector
-			this.ClearStatusVector();
+			ClearStatusVector();
 
 			lock (this)
 			{
-				SafeNativeMethods.isc_get_current_database(this.statusVector, ref dbHandle);
+				SafeNativeMethods.isc_get_current_database(_statusVector, ref dbHandle);
 
-				this.handle = dbHandle;
+				_handle = dbHandle;
 			}
 		}
 
@@ -287,19 +287,19 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				IscCodes.isc_info_end
 			};
 
-			return this.GetDatabaseInfo(items, 50)[0].ToString();
+			return GetDatabaseInfo(items, 50)[0].ToString();
 		}
 
 		public ArrayList GetDatabaseInfo(byte[] items)
 		{
-			return this.GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
 		}
 
 		public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
 		{
 			byte[] buffer = new byte[bufferLength];
 
-			this.DatabaseInfo(items, buffer, buffer.Length);
+			DatabaseInfo(items, buffer, buffer.Length);
 
 			return IscHelper.ParseDatabaseInfo(buffer);
 		}
@@ -325,7 +325,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			{
 				if (ex.IsWarning)
 				{
-					this.warningMessage(ex);
+					_warningMessage(ex);
 				}
 				else
 				{
@@ -340,7 +340,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		private void ClearStatusVector()
 		{
-			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+			Array.Clear(_statusVector, 0, _statusVector.Length);
 		}
 
 		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
@@ -348,7 +348,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			lock (this)
 			{
 				int[] statusVector = ExtConnection.GetNewStatusVector();
-				int dbHandle = this.Handle;
+				int dbHandle = Handle;
 
 				SafeNativeMethods.isc_database_info(
 					statusVector,
@@ -358,7 +358,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 					(short)bufferLength,
 					buffer);
 
-				this.ParseStatusVector(statusVector);
+				ParseStatusVector(statusVector);
 			}
 		}
 

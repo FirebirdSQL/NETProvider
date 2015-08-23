@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 	{
 		#region Fields
 
-		private ExtDatabase db;
+		private ExtDatabase _db;
 
 		#endregion
 
@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public override IDatabase Database
 		{
-			get { return this.db; }
+			get { return _db; }
 		}
 
 		#endregion
@@ -59,11 +59,11 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				throw new ArgumentException("Specified argument is not of FesTransaction type.");
 			}
 
-			this.db = (ExtDatabase)db;
-			this.transaction = (ExtTransaction)transaction;
-			this.position = 0;
-			this.blobHandle = 0;
-			this.blobId = blobId;
+			_db = (ExtDatabase)db;
+			_transaction = (ExtTransaction)transaction;
+			_position = 0;
+			_blobHandle = 0;
+			_blobId = blobId;
 		}
 
 		#endregion
@@ -72,43 +72,43 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		protected override void Create()
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				int[] statusVector = ExtConnection.GetNewStatusVector();
 
-				int dbHandle = this.db.Handle;
-				int trHandle = this.transaction.Handle;
+				int dbHandle = _db.Handle;
+				int trHandle = _transaction.Handle;
 
 				SafeNativeMethods.isc_create_blob2(
 					statusVector,
 					ref	dbHandle,
 					ref	trHandle,
-					ref	this.blobHandle,
-					ref	this.blobId,
+					ref _blobHandle,
+					ref _blobId,
 					0,
 					new byte[0]);
 
 				ExtConnection.ParseStatusVector(statusVector);
 
-				this.RblAddValue(IscCodes.RBL_create);
+				RblAddValue(IscCodes.RBL_create);
 			}
 		}
 
 		protected override void Open()
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				int[] statusVector = ExtConnection.GetNewStatusVector();
 
-				int dbHandle = this.db.Handle;
-				int trHandle = this.transaction.Handle;
+				int dbHandle = _db.Handle;
+				int trHandle = _transaction.Handle;
 
 				SafeNativeMethods.isc_open_blob2(
 					statusVector,
 					ref	dbHandle,
 					ref	trHandle,
-					ref	this.blobHandle,
-					ref	this.blobId,
+					ref _blobHandle,
+					ref _blobId,
 					0,
 					new byte[0]);
 
@@ -118,10 +118,10 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		protected override byte[] GetSegment()
 		{
-			short requested = (short)this.SegmentSize;
+			short requested = (short)SegmentSize;
 			short segmentLength = 0;
 
-			lock (this.db)
+			lock (_db)
 			{
 				int[] statusVector = ExtConnection.GetNewStatusVector();
 
@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 					int status = SafeNativeMethods.isc_get_segment(
 						statusVector,
-						ref	this.blobHandle,
+						ref _blobHandle,
 						ref	segmentLength,
 						requested,
 						tmp);
@@ -141,21 +141,21 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 						segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
 					}
 
-					this.RblRemoveValue(IscCodes.RBL_segment);
+					RblRemoveValue(IscCodes.RBL_segment);
 					if (statusVector[1] == IscCodes.isc_segstr_eof)
 					{
 						segment.SetLength(0);
-						this.RblAddValue(IscCodes.RBL_eof_pending);
+						RblAddValue(IscCodes.RBL_eof_pending);
 					}
 					else
 					{
 						if (status == 0 || statusVector[1] == IscCodes.isc_segment)
 						{
-							this.RblAddValue(IscCodes.RBL_segment);
+							RblAddValue(IscCodes.RBL_segment);
 						}
 						else
 						{
-							this.db.ParseStatusVector(statusVector);
+							_db.ParseStatusVector(statusVector);
 						}
 					}
 
@@ -166,13 +166,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		protected override void PutSegment(byte[] buffer)
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				int[] statusVector = ExtConnection.GetNewStatusVector();
 
 				SafeNativeMethods.isc_put_segment(
 					statusVector,
-					ref	this.blobHandle,
+					ref _blobHandle,
 					(short)buffer.Length,
 					buffer);
 
@@ -192,11 +192,11 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		protected override void Close()
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				int[] statusVector = ExtConnection.GetNewStatusVector();
 
-				SafeNativeMethods.isc_close_blob(statusVector, ref this.blobHandle);
+				SafeNativeMethods.isc_close_blob(statusVector, ref _blobHandle);
 
 				ExtConnection.ParseStatusVector(statusVector);
 			}
@@ -204,11 +204,11 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		protected override void Cancel()
 		{
-			lock (this.db)
+			lock (_db)
 			{
 				int[] statusVector = ExtConnection.GetNewStatusVector();
 
-				SafeNativeMethods.isc_cancel_blob(statusVector, ref this.blobHandle);
+				SafeNativeMethods.isc_cancel_blob(statusVector, ref _blobHandle);
 
 				ExtConnection.ParseStatusVector(statusVector);
 			}
