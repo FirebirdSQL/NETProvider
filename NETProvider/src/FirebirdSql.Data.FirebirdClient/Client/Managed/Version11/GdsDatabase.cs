@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		public GdsDatabase(Version10.GdsConnection connection)
 			: base(connection)
 		{
-			this.DeferredPackets = new Queue<Action<IResponse>>();
+			DeferredPackets = new Queue<Action<IResponse>>();
 		}
 
 		#endregion
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
 #if (!LINUX)
-			lock (this.SyncObject)
+			lock (SyncObject)
 			{
 				try
 				{
@@ -77,9 +77,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 						byte[] authData = sspiHelper.InitializeClientSecurity();
 						SendTrustedAuthToBuffer(dpb, authData);
 						SendAttachToBuffer(dpb, database);
-						this.Flush();
+						Flush();
 
-						IResponse response = this.ReadResponse();
+						IResponse response = ReadResponse();
 						ProcessTrustedAuthResponse(sspiHelper, ref response);
 						ProcessAttachResponse((GenericResponse)response);
 					}
@@ -113,10 +113,10 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			while (response is AuthResponse)
 			{
 				byte[] authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
-				this.Write(IscCodes.op_trusted_auth);
-				this.WriteBuffer(authData);
-				this.Flush();
-				response = this.ReadResponse();
+				Write(IscCodes.op_trusted_auth);
+				WriteBuffer(authData);
+				Flush();
+				response = ReadResponse();
 			}
 		}
 #endif
@@ -125,12 +125,12 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#region Public methods
 		public override void ReleaseObject(int op, int id)
 		{
-			lock (this.SyncObject)
+			lock (SyncObject)
 			{
 				try
 				{
 					DoReleaseObjectPacket(op, id);
-					this.DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
+					DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
 				}
 				catch (IOException)
 				{
@@ -158,7 +158,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			switch (operation)
 			{
 				case IscCodes.op_trusted_auth:
-					return new AuthResponse(this.ReadBuffer());
+					return new AuthResponse(ReadBuffer());
 
 				default:
 					return base.ProcessOperation(operation);

@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Client.Managed
 	{
 		#region Fields
 
-		private int count;
+		private int _count;
 
 		#endregion
 
@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public int Count
 		{
-			get { return this.count; }
+			get { return _count; }
 		}
 
 		#endregion
@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public SqlResponse(int count)
 		{
-			this.count = count;
+			_count = count;
 		}
 
 		#endregion

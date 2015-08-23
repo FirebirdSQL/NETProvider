@@ -30,18 +30,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region Fields
 
-		protected int			    handle;
-		protected GdsDatabase       database;
-		private GdsTransaction      transaction;
-		protected Descriptor	    parameters;
-		protected Descriptor	    fields;
-		protected StatementState	state;
-		protected DbStatementType   statementType;
-		protected bool			    allRowsFetched;
-		private Queue<DbValue[]>    rows;
-		private Queue<DbValue[]>    outputParams;
-		private int				    fetchSize;
-		private bool                returnRecordsAffected;
+		protected int			    _handle;
+		protected GdsDatabase       _database;
+		private GdsTransaction      _transaction;
+		protected Descriptor	    _parameters;
+		protected Descriptor	    _fields;
+		protected StatementState	_state;
+		protected DbStatementType   _statementType;
+		protected bool			    _allRowsFetched;
+		private Queue<DbValue[]>    _rows;
+		private Queue<DbValue[]>    _outputParams;
+		private int				    _fetchSize;
+		private bool                _returnRecordsAffected;
 
 		#endregion
 
@@ -49,31 +49,31 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override IDatabase Database
 		{
-			get { return this.database; }
+			get { return _database; }
 		}
 
 		public override ITransaction Transaction
 		{
-			get { return this.transaction; }
+			get { return _transaction; }
 			set
 			{
-				if (this.transaction != value)
+				if (_transaction != value)
 				{
-					if (this.TransactionUpdate != null && this.transaction != null)
+					if (_TransactionUpdate != null && _transaction != null)
 					{
-						this.transaction.Update -= this.TransactionUpdate;
-						this.TransactionUpdate	= null;
+						_transaction.Update -= _TransactionUpdate;
+						_TransactionUpdate = null;
 					}
 
 					if (value == null)
 					{
-						this.transaction = null;
+						_transaction = null;
 					}
 					else
 					{
-						this.transaction		= (GdsTransaction)value;
-						this.TransactionUpdate	= new TransactionUpdateEventHandler(this.TransactionUpdated);
-						this.transaction.Update += this.TransactionUpdate;
+						_transaction = (GdsTransaction)value;
+						_TransactionUpdate = new TransactionUpdateEventHandler(TransactionUpdated);
+						_transaction.Update += _TransactionUpdate;
 					}
 				}
 			}
@@ -81,13 +81,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override Descriptor Parameters
 		{
-			get { return this.parameters; }
-			set { this.parameters = value; }
+			get { return _parameters; }
+			set { _parameters = value; }
 		}
 
 		public override Descriptor Fields
 		{
-			get { return this.fields; }
+			get { return _fields; }
 		}
 
 		public override int RecordsAffected { get; protected set; }
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			get
 			{
-				if (this.state == StatementState.Deallocated || this.state == StatementState.Error)
+				if (_state == StatementState.Deallocated || _state == StatementState.Error)
 				{
 					return false;
 				}
@@ -109,26 +109,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override DbStatementType StatementType
 		{
-			get { return this.statementType; }
-			protected set { this.statementType = value; }
+			get { return _statementType; }
+			protected set { _statementType = value; }
 		}
 
 		public override StatementState State
 		{
-			get { return this.state; }
-			protected set { this.state = value; }
+			get { return _state; }
+			protected set { _state = value; }
 		}
 
 		public override int FetchSize
 		{
-			get { return this.fetchSize; }
-			set { this.fetchSize = value; }
+			get { return _fetchSize; }
+			set { _fetchSize = value; }
 		}
 
 		public override bool ReturnRecordsAffected
 		{
-			get { return this.returnRecordsAffected; }
-			set { this.returnRecordsAffected = value; }
+			get { return _returnRecordsAffected; }
+			set { _returnRecordsAffected = value; }
 		}
 
 		#endregion
@@ -151,17 +151,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
 			}
 
-			this.handle = IscCodes.INVALID_OBJECT;
-			this.RecordsAffected = -1;
-			this.fetchSize		= 200;
-			this.rows			= new Queue<DbValue[]>();
-			this.outputParams	= new Queue<DbValue[]>();
+			_handle = IscCodes.INVALID_OBJECT;
+			RecordsAffected = -1;
+			_fetchSize = 200;
+			_rows = new Queue<DbValue[]>();
+			_outputParams = new Queue<DbValue[]>();
 
-			this.database = (GdsDatabase)db;
+			_database = (GdsDatabase)db;
 
 			if (transaction != null)
 			{
-				this.Transaction = transaction;
+				Transaction = transaction;
 			}
 
 			GC.SuppressFinalize(this);
@@ -175,12 +175,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			lock (this)
 			{
-				if (!this.IsDisposed)
+				if (!IsDisposed)
 				{
 					try
 					{
 						// release any unmanaged resources
-						this.Release();
+						Release();
 					}
 					catch
 					{
@@ -190,20 +190,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						// release any managed resources
 						if (disposing)
 						{
-							this.Clear();
+							Clear();
 
-							this.rows               = null;
-							this.outputParams       = null;
-							this.database           = null;
-							this.fields             = null;
-							this.parameters         = null;
-							this.transaction        = null;
-							this.allRowsFetched     = false;
-							this.state              = StatementState.Deallocated;
-							this.statementType      = DbStatementType.None;
-							this.handle             = 0;
-							this.fetchSize          = 0;
-							this.RecordsAffected    = 0;
+							_rows = null;
+							_outputParams = null;
+							_database = null;
+							_fields = null;
+							_parameters = null;
+							_transaction = null;
+							_allRowsFetched = false;
+							_state = StatementState.Deallocated;
+							_statementType = DbStatementType.None;
+							_handle = 0;
+							_fetchSize = 0;
+							RecordsAffected = 0;
 						}
 						
 						base.Dispose(disposing);
@@ -218,12 +218,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override BlobBase CreateBlob()
 		{
-			return new GdsBlob(this.database, this.transaction);
+			return new GdsBlob(_database, _transaction);
 		}
 
 		public override BlobBase CreateBlob(long blobId)
 		{
-			return new GdsBlob(this.database, this.transaction, blobId);
+			return new GdsBlob(_database, _transaction, blobId);
 		}
 
 		#endregion
@@ -237,12 +237,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override ArrayBase CreateArray(string tableName, string fieldName)
 		{
-			return new GdsArray(this.database, this.transaction, tableName, fieldName);
+			return new GdsArray(_database, _transaction, tableName, fieldName);
 		}
 
 		public override ArrayBase CreateArray(long handle, string tableName, string fieldName)
 		{
-			return new GdsArray(this.database, this.transaction, handle, tableName, fieldName);
+			return new GdsArray(_database, _transaction, handle, tableName, fieldName);
 		}
 
 		#endregion
@@ -252,37 +252,37 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public override void Prepare(string commandText)
 		{
 			// Clear data
-			this.ClearAll();
+			ClearAll();
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					if (this.state == StatementState.Deallocated)
+					if (_state == StatementState.Deallocated)
 					{
 						// Allocate	statement
-						this.SendAllocateToBuffer();
-						this.database.Flush();
-						this.ProcessAllocateResponce(this.database.ReadGenericResponse());
+						SendAllocateToBuffer();
+						_database.Flush();
+						ProcessAllocateResponce(_database.ReadGenericResponse());
 					}
 
-					this.SendPrepareToBuffer(commandText);
-					this.database.Flush();
-					this.ProcessPrepareResponse(this.database.ReadGenericResponse());
+					SendPrepareToBuffer(commandText);
+					_database.Flush();
+					ProcessPrepareResponse(_database.ReadGenericResponse());
 
 					// Grab statement type
-					this.SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
-					this.database.Flush(); 
-					this.statementType = this.ProcessStatementTypeInfoBuffer(this.ProcessInfoSqlResponse(this.database.ReadGenericResponse()));
+					SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+					_database.Flush();
+					_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
 
 
-					this.state = StatementState.Prepared;
+					_state = StatementState.Prepared;
 				}
 				catch (IOException)
 				{
 					// if the statement has been already allocated, it's now in error
-					if (this.state == StatementState.Allocated)
-						this.state = StatementState.Error;
+					if (_state == StatementState.Allocated)
+						_state = StatementState.Error;
 					throw new IscException(IscCodes.isc_net_read_err);
 				}
 			}
@@ -290,49 +290,49 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void Execute()
 		{
-			if (this.state == StatementState.Deallocated)
+			if (_state == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
 
 			// Clear data
-			this.Clear();
+			Clear();
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					this.RecordsAffected = -1;
+					RecordsAffected = -1;
 
-					this.SendExecuteToBuffer();
+					SendExecuteToBuffer();
 
-					this.database.Flush();
+					_database.Flush();
 
-					if (this.statementType == DbStatementType.StoredProcedure)
+					if (_statementType == DbStatementType.StoredProcedure)
 					{
-						this.ProcessStoredProcedureExecuteResponse(this.database.ReadSqlResponse());
+						ProcessStoredProcedureExecuteResponse(_database.ReadSqlResponse());
 					}
 
-					GenericResponse executeResponse = this.database.ReadGenericResponse();
-					this.ProcessExecuteResponse(executeResponse);
+					GenericResponse executeResponse = _database.ReadGenericResponse();
+					ProcessExecuteResponse(executeResponse);
  
 					// Updated number of records affected by the statement execution			
-					if (this.ReturnRecordsAffected &&
-						(this.StatementType == DbStatementType.Insert ||
-						this.StatementType == DbStatementType.Delete ||
-						this.StatementType == DbStatementType.Update ||
-						this.StatementType == DbStatementType.StoredProcedure))
+					if (ReturnRecordsAffected &&
+						(StatementType == DbStatementType.Insert ||
+						StatementType == DbStatementType.Delete ||
+						StatementType == DbStatementType.Update ||
+						StatementType == DbStatementType.StoredProcedure))
 					{
-						this.SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
-						this.database.Flush();
-						this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(this.database.ReadGenericResponse()));
+						SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+						_database.Flush();
+						RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
 					}
 
-					this.state = StatementState.Executed;
+					_state = StatementState.Executed;
 				}
 				catch (IOException)
 				{
-					this.state = StatementState.Error;
+					_state = StatementState.Error;
 					throw new IscException(IscCodes.isc_net_read_err);
 				}
 			}
@@ -340,37 +340,37 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override DbValue[] Fetch()
 		{
-			if (this.state == StatementState.Deallocated)
+			if (_state == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
-			if (this.statementType != DbStatementType.Select &&
-				this.statementType != DbStatementType.SelectForUpdate)
+			if (_statementType != DbStatementType.Select &&
+				_statementType != DbStatementType.SelectForUpdate)
 			{
 				return null;
 			}
 
-			if (!this.allRowsFetched && this.rows.Count == 0)
+			if (!_allRowsFetched && _rows.Count == 0)
 			{
 				// Fetch next batch	of rows
-				lock (this.database.SyncObject)
+				lock (_database.SyncObject)
 				{
 					try
 					{
-						this.database.Write(IscCodes.op_fetch);
-						this.database.Write(this.handle);
-						this.database.WriteBuffer(this.fields.ToBlrArray());
-						this.database.Write(0);			// p_sqldata_message_number						
-						this.database.Write(fetchSize);	// p_sqldata_messages
-						this.database.Flush();
+						_database.Write(IscCodes.op_fetch);
+						_database.Write(_handle);
+						_database.WriteBuffer(_fields.ToBlrArray());
+						_database.Write(0);         // p_sqldata_message_number						
+						_database.Write(_fetchSize);    // p_sqldata_messages
+						_database.Flush();
 
-						if (this.database.NextOperation() == IscCodes.op_fetch_response)
+						if (_database.NextOperation() == IscCodes.op_fetch_response)
 						{
 							IResponse response = null;
 
-							while (!this.allRowsFetched)
+							while (!_allRowsFetched)
 							{
-								response = this.database.ReadResponse();
+								response = _database.ReadResponse();
 
 								if (response is FetchResponse)
 								{
@@ -378,11 +378,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 									if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 									{
-										this.rows.Enqueue(this.ReadDataRow());
+										_rows.Enqueue(ReadDataRow());
 									}
 									else if (fetchResponse.Status == 100)
 									{
-										this.allRowsFetched = true;
+										_allRowsFetched = true;
 									}
 									else
 									{
@@ -397,7 +397,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						}
 						else
 						{
-							this.database.ReadResponse();
+							_database.ReadResponse();
 						}
 					}
 					catch (IOException)
@@ -407,13 +407,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 			}
 
-			if (this.rows != null && this.rows.Count > 0)
+			if (_rows != null && _rows.Count > 0)
 			{
-				return this.rows.Dequeue();
+				return _rows.Dequeue();
 			}
 			else
 			{
-				this.rows.Clear();
+				_rows.Clear();
 
 				return null;
 			}
@@ -421,9 +421,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override DbValue[] GetOutputParameters()
 		{
-			if (this.outputParams.Count > 0)
+			if (_outputParams.Count > 0)
 			{
-				return this.outputParams.Dequeue();
+				return _outputParams.Dequeue();
 			}
 
 			return null;
@@ -447,32 +447,32 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region op_prepare methods
 		protected void SendPrepareToBuffer(string commandText)
 		{
-			this.database.Write(IscCodes.op_prepare_statement);
-			this.database.Write(this.transaction.Handle);
-			this.database.Write(this.handle);
-			this.database.Write((int)this.database.Dialect);
-			this.database.Write(commandText);
-			this.database.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
-			this.database.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE);
+			_database.Write(IscCodes.op_prepare_statement);
+			_database.Write(_transaction.Handle);
+			_database.Write(_handle);
+			_database.Write((int)_database.Dialect);
+			_database.Write(commandText);
+			_database.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
+			_database.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE);
 		}
 
 		protected void ProcessPrepareResponse(GenericResponse response)
 		{
 			Descriptor[] descriptors = new Descriptor[] { null, null };
-			this.ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref descriptors);
-			this.fields = descriptors[0];
-			this.parameters = descriptors[1];
+			ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref descriptors);
+			_fields = descriptors[0];
+			_parameters = descriptors[1];
 		}
 		#endregion
 
 		#region op_info_sql methods
 		protected override byte[] GetSqlInfo(byte[] items, int bufferLength)
 		{
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				DoInfoSqlPacket(items, bufferLength);
-				this.database.Flush();
-				return ProcessInfoSqlResponse(this.database.ReadGenericResponse());
+				_database.Flush();
+				return ProcessInfoSqlResponse(_database.ReadGenericResponse());
 			}
 		}
 
@@ -490,11 +490,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void SendInfoSqlToBuffer(byte[] items, int bufferLength)
 		{
-			this.database.Write(IscCodes.op_info_sql);
-			this.database.Write(this.handle);
-			this.database.Write(0);
-			this.database.WriteBuffer(items, items.Length);
-			this.database.Write(bufferLength);
+			_database.Write(IscCodes.op_info_sql);
+			_database.Write(_handle);
+			_database.Write(0);
+			_database.WriteBuffer(items, items.Length);
+			_database.Write(bufferLength);
 		}
 
 		protected byte[] ProcessInfoSqlResponse(GenericResponse respose)
@@ -510,11 +510,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			if (FreeNotNeeded(option))
 				return;
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				DoFreePacket(option);
-				this.database.Flush();
-				ProcessFreeResponse(this.database.ReadResponse());
+				_database.Flush();
+				ProcessFreeResponse(_database.ReadResponse());
 			}
 		}
 
@@ -522,7 +522,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			// Does	not	seem to	be possible	or necessary to	close
 			// an execute procedure	statement.
-			if (this.StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
+			if (StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
 			{
 				return true;
 			}
@@ -541,24 +541,24 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				// Reset statement information
 				if (option == IscCodes.DSQL_drop)
 				{
-					this.parameters = null;
-					this.fields = null;
+					_parameters = null;
+					_fields = null;
 				}
 
-				this.Clear();
+				Clear();
 			}
 			catch (IOException)
 			{
-				this.state = StatementState.Error;
+				_state = StatementState.Error;
 				throw new IscException(IscCodes.isc_net_read_err);
 			}
 		}
 
 		protected void SendFreeToBuffer(int option)
 		{
-			this.database.Write(IscCodes.op_free_statement);
-			this.database.Write(this.handle);
-			this.database.Write(option);
+			_database.Write(IscCodes.op_free_statement);
+			_database.Write(_handle);
+			_database.Write(option);
 		}
 
 		protected void ProcessFreeResponse(IResponse response)
@@ -570,16 +570,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region op_allocate_statement methods
 		protected void SendAllocateToBuffer()
 		{
-			this.database.Write(IscCodes.op_allocate_statement);
-			this.database.Write(this.database.Handle);
+			_database.Write(IscCodes.op_allocate_statement);
+			_database.Write(_database.Handle);
 		}
 
 		protected void ProcessAllocateResponce(GenericResponse response)
 		{
-			this.handle = response.ObjectHandle;
-			this.allRowsFetched = false;
-			this.state = StatementState.Allocated;
-			this.statementType = DbStatementType.None;
+			_handle = response.ObjectHandle;
+			_allRowsFetched = false;
+			_state = StatementState.Allocated;
+			_statementType = DbStatementType.None;
 		}
 		#endregion
 
@@ -588,46 +588,46 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			// this may throw error, so it needs to be before any writing
 			byte[] descriptor = null;
-			if (this.parameters != null)
+			if (_parameters != null)
 			{
-				using (XdrStream xdr = new XdrStream(this.database.Charset))
+				using (XdrStream xdr = new XdrStream(_database.Charset))
 				{
-					xdr.Write(this.parameters);
+					xdr.Write(_parameters);
 					descriptor = xdr.ToArray();
 				}
 			}
 
 			// Write the message
-			if (this.statementType == DbStatementType.StoredProcedure)
+			if (_statementType == DbStatementType.StoredProcedure)
 			{
-				this.database.Write(IscCodes.op_execute2);
+				_database.Write(IscCodes.op_execute2);
 			}
 			else
 			{
-				this.database.Write(IscCodes.op_execute);
+				_database.Write(IscCodes.op_execute);
 			}
 
-			this.database.Write(this.handle);
-			this.database.Write(this.transaction.Handle);
+			_database.Write(_handle);
+			_database.Write(_transaction.Handle);
 
-			if (this.parameters != null)
+			if (_parameters != null)
 			{
-				this.database.WriteBuffer(this.parameters.ToBlrArray());
-				this.database.Write(0);	// Message number
-				this.database.Write(1);	// Number of messages
-				this.database.Write(descriptor, 0, descriptor.Length);
+				_database.WriteBuffer(_parameters.ToBlrArray());
+				_database.Write(0); // Message number
+				_database.Write(1); // Number of messages
+				_database.Write(descriptor, 0, descriptor.Length);
 			}
 			else
 			{
-				this.database.WriteBuffer(null);
-				this.database.Write(0);
-				this.database.Write(0);
+				_database.WriteBuffer(null);
+				_database.Write(0);
+				_database.Write(0);
 			}
 
-			if (this.statementType == DbStatementType.StoredProcedure)
+			if (_statementType == DbStatementType.StoredProcedure)
 			{
-				this.database.WriteBuffer((this.fields == null) ? null : this.fields.ToBlrArray());
-				this.database.Write(0);	// Output message number
+				_database.WriteBuffer((_fields == null) ? null : _fields.ToBlrArray());
+				_database.Write(0);	// Output message number
 			}
 		}
 
@@ -642,7 +642,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (response.Count > 0)
 				{
-					this.outputParams.Enqueue(this.ReadDataRow());
+					_outputParams.Enqueue(ReadDataRow());
 				}
 			}
 			catch (IOException)
@@ -656,31 +656,31 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			lock (this)
 			{
-				if (this.Transaction != null && this.TransactionUpdate != null)
+				if (Transaction != null && _TransactionUpdate != null)
 				{
-					this.Transaction.Update -= this.TransactionUpdate;
+					Transaction.Update -= _TransactionUpdate;
 				}
 
-				this.state              = StatementState.Closed;
-				this.TransactionUpdate  = null;
-				this.allRowsFetched     = false;
+				_state = StatementState.Closed;
+				_TransactionUpdate = null;
+				_allRowsFetched = false;
 			}
 		}
 
 		protected DbValue[] ReadDataRow()
 		{
-			DbValue[] row = new DbValue[this.fields.Count];
+			DbValue[] row = new DbValue[_fields.Count];
 			object value = null;
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				// This	only works if not (port->port_flags	& PORT_symmetric)				
-				for (int i = 0; i < this.fields.Count; i++)
+				for (int i = 0; i < _fields.Count; i++)
 				{
 					try
 					{
-						value = this.database.ReadValue(this.fields[i]);
-						row[i] = new DbValue(this, this.fields[i], value);
+						value = _database.ReadValue(_fields[i]);
+						row[i] = new DbValue(this, _fields[i], value);
 					}
 					catch (IOException)
 					{
@@ -694,7 +694,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void ParseSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
 		{
-			this.ParseTruncSqlInfo(info, items, ref rowDescs);
+			ParseTruncSqlInfo(info, items, ref rowDescs);
 		}
 
 		protected void ParseTruncSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
@@ -733,7 +733,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								newItems.Add(items[i]);
 							}
 
-							info = this.GetSqlInfo(newItems.ToArray(), info.Length);
+							info = GetSqlInfo(newItems.ToArray(), info.Length);
 
 							currentPosition = 0;
 							currentDescriptorIndex = -1;
@@ -797,28 +797,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						case IscCodes.isc_info_sql_field:
 							len = IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
-							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Name = this.database.Charset.GetString(info, currentPosition, len);
+							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Name = _database.Charset.GetString(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_relation:
 							len = IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
-							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Relation = this.database.Charset.GetString(info, currentPosition, len);
+							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Relation = _database.Charset.GetString(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_owner:
 							len = IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
-							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Owner = this.database.Charset.GetString(info, currentPosition, len);
+							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Owner = _database.Charset.GetString(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_alias:
 							len = IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
-							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Alias = this.database.Charset.GetString(info, currentPosition, len);
+							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Alias = _database.Charset.GetString(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
@@ -833,24 +833,24 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void Clear()
 		{
-			if (this.rows != null && this.rows.Count > 0)
+			if (_rows != null && _rows.Count > 0)
 			{
-				this.rows.Clear();
+				_rows.Clear();
 			}
-			if (this.outputParams != null && this.outputParams.Count > 0)
+			if (_outputParams != null && _outputParams.Count > 0)
 			{
-				this.outputParams.Clear();
+				_outputParams.Clear();
 			}
 
-			this.allRowsFetched = false;
+			_allRowsFetched = false;
 		}
 
 		protected void ClearAll()
 		{
-			this.Clear();
+			Clear();
 
-			this.parameters = null;
-			this.fields = null;
+			_parameters = null;
+			_fields = null;
 		}
 
 		#endregion

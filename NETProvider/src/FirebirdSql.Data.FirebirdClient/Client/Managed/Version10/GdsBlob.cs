@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region Fields
 
-		private GdsDatabase database;
+		private GdsDatabase _database;
 
 		#endregion
 
@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override IDatabase Database
 		{
-			get { return this.database; }
+			get { return _database; }
 		}
 
 		#endregion
@@ -57,11 +57,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
 			}
 
-			this.database				= (GdsDatabase)db;
-			this.transaction	= transaction;
-			this.position		= 0;
-			this.blobHandle		= 0;
-			this.blobId			= blobId;
+			_database = (GdsDatabase)db;
+			_transaction = transaction;
+			_position = 0;
+			_blobHandle = 0;
+			_blobId = blobId;
 		}
 
 		#endregion
@@ -72,8 +72,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				this.CreateOrOpen(IscCodes.op_create_blob, null);
-				this.RblAddValue(IscCodes.RBL_create);
+				CreateOrOpen(IscCodes.op_create_blob, null);
+				RblAddValue(IscCodes.RBL_create);
 			}
 			catch (IscException)
 			{
@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				this.CreateOrOpen(IscCodes.op_open_blob, null);
+				CreateOrOpen(IscCodes.op_open_blob, null);
 			}
 			catch (IscException)
 			{
@@ -95,28 +95,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected override byte[] GetSegment()
 		{
-			int requested = this.SegmentSize;
+			int requested = SegmentSize;
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					this.database.Write(IscCodes.op_get_segment);
-					this.database.Write(this.blobHandle);
-					this.database.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
-					this.database.Write(0);	// Data	segment
-					this.database.Flush();
+					_database.Write(IscCodes.op_get_segment);
+					_database.Write(_blobHandle);
+					_database.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
+					_database.Write(0); // Data	segment
+					_database.Flush();
 
-					GenericResponse response = this.database.ReadGenericResponse();
+					GenericResponse response = _database.ReadGenericResponse();
 
-					this.RblRemoveValue(IscCodes.RBL_segment);
+					RblRemoveValue(IscCodes.RBL_segment);
 					if (response.ObjectHandle == 1)
 					{
-						this.RblAddValue(IscCodes.RBL_segment);
+						RblAddValue(IscCodes.RBL_segment);
 					}
 					else if (response.ObjectHandle == 2)
 					{
-						this.RblAddValue(IscCodes.RBL_eof_pending);
+						RblAddValue(IscCodes.RBL_eof_pending);
 					}
 
 					byte[] buffer = response.Data;
@@ -155,16 +155,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected override void PutSegment(byte[] buffer)
 		{
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					this.database.Write(IscCodes.op_batch_segments);
-					this.database.Write(this.blobHandle);
-					this.database.WriteBlobBuffer(buffer);
-					this.database.Flush();
+					_database.Write(IscCodes.op_batch_segments);
+					_database.Write(_blobHandle);
+					_database.WriteBlobBuffer(buffer);
+					_database.Flush();
 
-					this.database.ReadResponse();
+					_database.ReadResponse();
 				}
 				catch (IOException)
 				{
@@ -175,19 +175,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected override void Seek(int position)
 		{
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					this.database.Write(IscCodes.op_seek_blob);
-					this.database.Write(this.blobHandle);
-					this.database.Write(0);					// Seek	mode
-					this.database.Write(position);			// Seek	offset
-					this.database.Flush();
+					_database.Write(IscCodes.op_seek_blob);
+					_database.Write(_blobHandle);
+					_database.Write(0);                 // Seek	mode
+					_database.Write(position);          // Seek	offset
+					_database.Flush();
 
-					GenericResponse response = (GenericResponse)database.ReadResponse();
+					GenericResponse response = (GenericResponse)_database.ReadResponse();
 
-					this.position = response.ObjectHandle;
+					_position = response.ObjectHandle;
 				}
 				catch (IOException)
 				{
@@ -203,12 +203,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected override void Close()
 		{
-			this.database.ReleaseObject(IscCodes.op_close_blob, this.blobHandle);
+			_database.ReleaseObject(IscCodes.op_close_blob, _blobHandle);
 		}
 
 		protected override void Cancel()
 		{
-			this.database.ReleaseObject(IscCodes.op_cancel_blob, this.blobHandle);
+			_database.ReleaseObject(IscCodes.op_cancel_blob, _blobHandle);
 		}
 
 		#endregion
@@ -217,23 +217,23 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void CreateOrOpen(int op, BlobParameterBuffer bpb)
 		{
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					this.database.Write(op);
+					_database.Write(op);
 					if (bpb != null)
 					{
-						this.database.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
+						_database.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
 					}
-					this.database.Write(this.transaction.Handle);
-					this.database.Write(this.blobId);
-					this.database.Flush();
+					_database.Write(_transaction.Handle);
+					_database.Write(_blobId);
+					_database.Flush();
 
-					GenericResponse response = this.database.ReadGenericResponse();
+					GenericResponse response = _database.ReadGenericResponse();
 
-					this.blobId     = response.BlobId;
-					this.blobHandle = response.ObjectHandle;
+					_blobId = response.BlobId;
+					_blobHandle = response.ObjectHandle;
 				}
 				catch (IOException)
 				{

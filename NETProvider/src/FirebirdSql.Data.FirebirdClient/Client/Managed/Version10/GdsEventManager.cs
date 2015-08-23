@@ -29,10 +29,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region Fields
 
-		private GdsDatabase database;
-		private Thread eventsThread;
-		private ConcurrentDictionary<int, RemoteEvent> events;
-		private int handle;
+		private GdsDatabase _database;
+		private Thread _eventsThread;
+		private ConcurrentDictionary<int, RemoteEvent> _events;
+		private int _handle;
 
 		#endregion
 
@@ -40,17 +40,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public GdsEventManager(int handle, string ipAddress, int portNumber)
 		{
-			this.events = new ConcurrentDictionary<int, RemoteEvent>();
-			this.handle = handle;
+			_events = new ConcurrentDictionary<int, RemoteEvent>();
+			_handle = handle;
 
 			// Initialize the connection
-			if (this.database == null)
+			if (_database == null)
 			{
 				GdsConnection connection = new GdsConnection(ipAddress, portNumber);
 
 				connection.Connect();
 
-				this.database = new GdsDatabase(connection);
+				_database = new GdsDatabase(connection);
 			}
 		}
 
@@ -62,15 +62,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			lock (this)
 			{
-				this.events[remoteEvent.LocalId] = remoteEvent;
+				_events[remoteEvent.LocalId] = remoteEvent;
 
 				// Jiri Cincura: I'm pretty sure this is a race condition.
-				if (this.eventsThread == null || this.eventsThread.ThreadState.HasFlag(ThreadState.Stopped | ThreadState.Unstarted))
+				if (_eventsThread == null || _eventsThread.ThreadState.HasFlag(ThreadState.Stopped | ThreadState.Unstarted))
 				{
-					this.eventsThread = new Thread(ThreadHandler);
-					this.eventsThread.IsBackground = true;
-					this.eventsThread.Name = "FirebirdClient - Events Thread";
-					this.eventsThread.Start();
+					_eventsThread = new Thread(ThreadHandler);
+					_eventsThread.IsBackground = true;
+					_eventsThread.Name = "FirebirdClient - Events Thread";
+					_eventsThread.Start();
 				}
 			}
 		}
@@ -78,28 +78,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public void CancelEvents(RemoteEvent remoteEvent)
 		{
 			RemoteEvent dummy;
-			this.events.TryRemove(remoteEvent.LocalId, out dummy);
+			_events.TryRemove(remoteEvent.LocalId, out dummy);
 		}
 
 		public void Close()
 		{
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
-				if (this.database != null)
+				if (_database != null)
 				{
-					this.database.CloseConnection();
+					_database.CloseConnection();
 				}
 
-				if (this.eventsThread != null)
+				if (_eventsThread != null)
 				{
 					// we don't have here clue about disposing vs. finalizer
 					if (!Environment.HasShutdownStarted)
 					{
-						this.eventsThread.Abort();
-						this.eventsThread.Join();
+						_eventsThread.Abort();
+						_eventsThread.Join();
 					}
 
-					this.eventsThread = null;
+					_eventsThread = null;
 				}
 			}
 		}
@@ -114,27 +114,27 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				while (GetEventsCountLocked() > 0)
 				{
-					var operation = this.database.NextOperation();
+					var operation = _database.NextOperation();
 
 					switch (operation)
 					{
 						case IscCodes.op_response:
-							this.database.ReadResponse();
+							_database.ReadResponse();
 							continue;
 
 						case IscCodes.op_exit:
 						case IscCodes.op_disconnect:
-							this.Close();
+							Close();
 							return;
 
 						case IscCodes.op_event:
-							var dbHandle = this.database.ReadInt32();
-							var buffer = this.database.ReadBuffer();
-							var ast = this.database.ReadBytes(8);
-							var eventId = this.database.ReadInt32();
+							var dbHandle = _database.ReadInt32();
+							var buffer = _database.ReadBuffer();
+							var ast = _database.ReadBytes(8);
+							var eventId = _database.ReadInt32();
 
 							RemoteEvent currentEvent;
-							if (this.events.TryRemove(eventId, out currentEvent))
+							if (_events.TryRemove(eventId, out currentEvent))
 							{
 								// Notify new event counts
 								currentEvent.EventCounts(buffer);
@@ -156,7 +156,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private int GetEventsCountLocked()
 		{
-			return this.events.Count;
+			return _events.Count;
 		}
 
 		#endregion

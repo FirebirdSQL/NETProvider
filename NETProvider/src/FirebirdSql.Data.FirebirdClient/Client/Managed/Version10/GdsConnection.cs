@@ -35,15 +35,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Fields
 
-		private Socket socket;
-		private NetworkStream networkStream;
-		private string dataSource;
-		private int portNumber;
-		private int packetSize;
-		private Charset characterSet;
-		private int protocolVersion;
-		private int protocolArchitecture;
-		private int protocolMinimunType;
+		private Socket _socket;
+		private NetworkStream _networkStream;
+		private string _dataSource;
+		private int _portNumber;
+		private int _packetSize;
+		private Charset _characterSet;
+		private int _protocolVersion;
+		private int _protocolArchitecture;
+		private int _protocolMinimunType;
 
 		#endregion
 
@@ -51,27 +51,27 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public bool IsConnected
 		{
-			get { return (this.socket != null && this.socket.Connected); }
+			get { return (_socket != null && _socket.Connected); }
 		}
 
 		public int ProtocolVersion
 		{
-			get { return this.protocolVersion; }
+			get { return _protocolVersion; }
 		}
 
 		public int ProtocolArchitecture
 		{
-			get { return this.protocolArchitecture; }
+			get { return _protocolArchitecture; }
 		}
 
 		public int ProtocolMinimunType
 		{
-			get { return this.protocolMinimunType; }
+			get { return _protocolMinimunType; }
 		}
 
 		public bool DataAvailable
 		{
-			get { return this.networkStream.DataAvailable; }
+			get { return _networkStream.DataAvailable; }
 		}
 
 		internal IPAddress IPAddress { get; private set; }
@@ -87,10 +87,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public GdsConnection(string dataSource, int portNumber, int packetSize, Charset characterSet)
 		{
-			this.dataSource = dataSource;
-			this.portNumber = portNumber;
-			this.packetSize = packetSize;
-			this.characterSet = characterSet;
+			_dataSource = dataSource;
+			_portNumber = portNumber;
+			_packetSize = packetSize;
+			_characterSet = characterSet;
 
 			GC.SuppressFinalize(this);
 		}
@@ -103,38 +103,38 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				this.IPAddress = this.GetIPAddress(this.dataSource, AddressFamily.InterNetwork);
-				IPEndPoint endPoint = new IPEndPoint(this.IPAddress, this.portNumber);
+				IPAddress = GetIPAddress(_dataSource, AddressFamily.InterNetwork);
+				IPEndPoint endPoint = new IPEndPoint(IPAddress, _portNumber);
 
-				this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+				_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
 				// Set Receive Buffer size.
-				this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, packetSize);
+				_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, _packetSize);
 				// Set Send	Buffer size.
-				this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, packetSize);
+				_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, _packetSize);
 				// Disables	the	Nagle algorithm	for	send coalescing.
-				this.socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
+				_socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
 				// Start sending keepalive packets every 30min after 30min of idle connection
-				this.socket.SetKeepAlive(KeepAliveTime, KeepAliveInterval);
+				_socket.SetKeepAlive(KeepAliveTime, KeepAliveInterval);
 
 				// Make	the	socket to connect to the Server
-				this.socket.Connect(endPoint);
-				this.networkStream = new NetworkStream(this.socket, true);
+				_socket.Connect(endPoint);
+				_networkStream = new NetworkStream(_socket, true);
 
-				GC.SuppressFinalize(this.socket);
-				GC.SuppressFinalize(this.networkStream);
+				GC.SuppressFinalize(_socket);
+				GC.SuppressFinalize(_networkStream);
 			}
 			catch (SocketException)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_network_error, dataSource);
+				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_network_error, _dataSource);
 			}
 		}
 
 		public virtual void Identify(string database)
 		{
 			// handles this.networkStream
-			XdrStream inputStream = this.CreateXdrStream();
-			XdrStream outputStream = this.CreateXdrStream();
+			XdrStream inputStream = CreateXdrStream();
+			XdrStream outputStream = CreateXdrStream();
 
 			try
 			{
@@ -169,20 +169,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				if (inputStream.ReadOperation() == IscCodes.op_accept)
 				{
-					this.protocolVersion = inputStream.ReadInt32();	// Protocol	version
-					this.protocolArchitecture = inputStream.ReadInt32();	// Architecture	for	protocol
-					this.protocolMinimunType = inputStream.ReadInt32();	// Minimum type
+					_protocolVersion = inputStream.ReadInt32(); // Protocol	version
+					_protocolArchitecture = inputStream.ReadInt32();    // Architecture	for	protocol
+					_protocolMinimunType = inputStream.ReadInt32();	// Minimum type
 
-					if (this.protocolVersion < 0)
+					if (_protocolVersion < 0)
 					{
-						this.protocolVersion = (ushort)(this.protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
+						_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
 					}
 				}
 				else
 				{
 					try
 					{
-						this.Disconnect();
+						Disconnect();
 					}
 					catch
 					{
@@ -201,19 +201,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public XdrStream CreateXdrStream()
 		{
-			return new XdrStream(new BufferedStream(this.networkStream), this.characterSet);
+			return new XdrStream(new BufferedStream(_networkStream), _characterSet);
 		}
 
 		public virtual void Disconnect()
 		{
 			// socket is owned by network stream, so it'll be closed automatically
-			if (this.networkStream != null)
+			if (_networkStream != null)
 			{
-				this.networkStream.Close();
+				_networkStream.Close();
 			}
 
-			this.socket = null;
-			this.networkStream = null;
+			_socket = null;
+			_networkStream = null;
 		}
 
 		#endregion

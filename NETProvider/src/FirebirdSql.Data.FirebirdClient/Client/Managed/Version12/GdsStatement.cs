@@ -44,40 +44,40 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		public override void Execute()
 		{
-			if (this.state == StatementState.Deallocated)
+			if (_state == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
 
 			// Clear data
-			this.Clear();
+			Clear();
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					this.RecordsAffected = -1;
+					RecordsAffected = -1;
 
-					this.SendExecuteToBuffer();
+					SendExecuteToBuffer();
 
-					this.database.Flush();
+					_database.Flush();
 
 					// sql?, execute
 					int numberOfResponses =
-						(this.StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
+						(StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
 					try
 					{
 						SqlResponse sqlStoredProcedureResponse = null;
-						if (this.StatementType == DbStatementType.StoredProcedure)
+						if (StatementType == DbStatementType.StoredProcedure)
 						{
 							numberOfResponses--;
-							sqlStoredProcedureResponse = this.database.ReadSqlResponse();
-							this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
+							sqlStoredProcedureResponse = _database.ReadSqlResponse();
+							ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
 						}
 
 						numberOfResponses--;
-						GenericResponse executeResponse = this.database.ReadGenericResponse();
-						this.ProcessExecuteResponse(executeResponse);
+						GenericResponse executeResponse = _database.ReadGenericResponse();
+						ProcessExecuteResponse(executeResponse);
 					}
 					finally
 					{
@@ -87,25 +87,25 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					//we need to split this in two, to alloow server handle op_cancel properly
 
 					// Obtain records affected by query execution
-					if (this.ReturnRecordsAffected &&
-						(this.StatementType == DbStatementType.Insert ||
-						this.StatementType == DbStatementType.Delete ||
-						this.StatementType == DbStatementType.Update ||
-						this.StatementType == DbStatementType.StoredProcedure ||
-						this.StatementType == DbStatementType.Select))
+					if (ReturnRecordsAffected &&
+						(StatementType == DbStatementType.Insert ||
+						StatementType == DbStatementType.Delete ||
+						StatementType == DbStatementType.Update ||
+						StatementType == DbStatementType.StoredProcedure ||
+						StatementType == DbStatementType.Select))
 					{
 						// Grab rows affected
-						this.SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
-						
-						this.database.Flush();
+						SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+
+						_database.Flush();
 
 						//rows affected
 						numberOfResponses = 1;
 						try
 						{
 							numberOfResponses--;
-							GenericResponse rowsAffectedResponse = this.database.ReadGenericResponse();
-							this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
+							GenericResponse rowsAffectedResponse = _database.ReadGenericResponse();
+							RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(rowsAffectedResponse));
 						}
 						finally
 						{
@@ -113,11 +113,11 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 						}
 					}
 
-					this.state = StatementState.Executed;
+					_state = StatementState.Executed;
 				}
 				catch (IOException)
 				{
-					this.state = StatementState.Error;
+					_state = StatementState.Error;
 					throw new IscException(IscCodes.isc_net_read_err);
 				}
 			}

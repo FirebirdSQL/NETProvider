@@ -269,12 +269,12 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		#region Private members
 
-		private SecHandle clientCredentials = new SecHandle();
-		private SecHandle clientContext = new SecHandle();
-		private bool disposed = false;
+		private SecHandle _clientCredentials = new SecHandle();
+		private SecHandle _clientContext = new SecHandle();
+		private bool _disposed = false;
 
-		private string securPackage;
-		private string remotePrincipal;
+		private string _securPackage;
+		private string _remotePrincipal;
 
 		#endregion
 
@@ -304,12 +304,12 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// <param name="remotePrincipal">SPN of server (may be necessary for Kerberos</param>
 		public SSPIHelper(string securPackage, string remotePrincipal)
 		{
-			this.securPackage = securPackage;
-			this.remotePrincipal = remotePrincipal;
+			_securPackage = securPackage;
+			_remotePrincipal = remotePrincipal;
 			SecInteger expiry = new SecInteger();
 			if (AcquireCredentialsHandle(null, securPackage, SECPKG_CRED_OUTBOUND,
 																	IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero,
-																	out clientCredentials, out expiry) != SEC_E_OK)
+																	out _clientCredentials, out expiry) != SEC_E_OK)
 				throw new Exception("Acquiring client credentials failed");
 		}
 
@@ -323,7 +323,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// <returns>Client authentication data to be sent to server</returns>
 		public byte[] InitializeClientSecurity()
 		{
-			if (disposed)
+			if (_disposed)
 				throw new ObjectDisposedException("SSPIHelper");
 			CloseClientContext();
 			SecInteger expiry = new SecInteger(0);
@@ -332,15 +332,15 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			try
 			{
 				int resCode = InitializeSecurityContext(
-					ref clientCredentials,
+					ref _clientCredentials,
 					IntPtr.Zero,
-					remotePrincipal,// null string pszTargetName,
+					_remotePrincipal,// null string pszTargetName,
 					STANDARD_CONTEXT_ATTRIBUTES,
 					0,//int Reserved1,
 					SECURITY_NATIVE_DREP,//int TargetDataRep
 					IntPtr.Zero,    //Always zero first time around...
 					0, //int Reserved2,
-					out clientContext, //pHandle CtxtHandle = SecHandle
+					out _clientContext, //pHandle CtxtHandle = SecHandle
 					ref clientTokenBuf,//ref SecBufferDesc pOutput, //PSecBufferDesc
 					out contextAttributes,//ref int pfContextAttr,
 					out expiry); //ref IntPtr ptsExpiry ); //PTimeStamp
@@ -363,9 +363,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// <returns>Client authentication data to be sent to server</returns>
 		public byte[] GetClientSecurity(byte[] serverToken)
 		{
-			if (disposed)
+			if (_disposed)
 				throw new ObjectDisposedException("SSPIHelper");
-			if (clientContext.IsInvalid)
+			if (_clientContext.IsInvalid)
 				throw new InvalidOperationException("InitializeClientSecurity not called");
 			SecInteger expiry = new SecInteger();
 			uint contextAttributes;
@@ -376,15 +376,15 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				try
 				{
 					int resCode = InitializeSecurityContext(
-						ref clientCredentials,
-						ref clientContext,
-						remotePrincipal,// null string pszTargetName,
+						ref _clientCredentials,
+						ref _clientContext,
+						_remotePrincipal,// null string pszTargetName,
 						STANDARD_CONTEXT_ATTRIBUTES,
 						0,//int Reserved1,
 						SECURITY_NATIVE_DREP,//int TargetDataRep
 						ref serverTokenBuf, // server token must be ref because it is struct
 						0, //int Reserved2,
-						out clientContext, //pHandle CtxtHandle = SecHandle
+						out _clientContext, //pHandle CtxtHandle = SecHandle
 						ref clientTokenBuf,//ref SecBufferDesc pOutput, //PSecBufferDesc
 						out contextAttributes,//ref int pfContextAttr,
 						out expiry); //ref IntPtr ptsExpiry ); //PTimeStamp
@@ -409,7 +409,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		~SSPIHelper()
 		{
-			this.Dispose(false);
+			Dispose(false);
 		}
 
 		#endregion
@@ -418,7 +418,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		public void Dispose()
 		{
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -430,33 +430,33 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		{
 			lock (this)
 			{
-				if (!this.disposed)
+				if (!_disposed)
 				{
 					if (disposing)
 					{
 					}
 					CloseClientContext();
 					CloseClientCredentials();
-					this.disposed = true;
+					_disposed = true;
 				}
 			}
 		}
 
 		private void CloseClientContext()
 		{
-			if (!clientContext.IsInvalid)
+			if (!_clientContext.IsInvalid)
 			{
-				DeleteSecurityContext(ref clientContext);
-				clientContext = new SecHandle();
+				DeleteSecurityContext(ref _clientContext);
+				_clientContext = new SecHandle();
 			}
 		}
 
 		private void CloseClientCredentials()
 		{
-			if (!clientCredentials.IsInvalid)
+			if (!_clientCredentials.IsInvalid)
 			{
-				FreeCredentialsHandle(ref clientCredentials);
-				clientCredentials = new SecHandle();
+				FreeCredentialsHandle(ref _clientCredentials);
+				_clientCredentials = new SecHandle();
 			}
 		}
 

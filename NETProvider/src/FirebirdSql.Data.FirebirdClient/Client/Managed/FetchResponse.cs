@@ -25,8 +25,8 @@ namespace FirebirdSql.Data.Client.Managed
 	{
 		#region Fields
 
-		private int status;
-		private int count;
+		private int _status;
+		private int _count;
 
 		#endregion
 
@@ -34,12 +34,12 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public int Status
 		{
-			get { return this.status; }
+			get { return _status; }
 		}
 
 		public int Count
 		{
-			get { return this.count; }
+			get { return _count; }
 		}
 
 		#endregion
@@ -48,8 +48,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public FetchResponse(int status, int count)
 		{
-			this.status = status;
-			this.count  = count;
+			_status = status;
+			_count = count;
 		}
 
 		#endregion
