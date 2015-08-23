@@ -124,8 +124,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
-		private Dictionary<string, object> options;
-		private bool isServiceConnectionString;
+		private Dictionary<string, object> _options;
+		private bool _isServiceConnectionString;
 
 		#endregion
 
@@ -133,122 +133,122 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public string UserID
 		{
-			get { return this.GetString("user id"); }
+			get { return GetString("user id"); }
 		}
 
 		public string Password
 		{
-			get { return this.GetString("password"); }
+			get { return GetString("password"); }
 		}
 
 		public string DataSource
 		{
-			get { return this.GetString("data source"); }
+			get { return GetString("data source"); }
 		}
 
 		public int Port
 		{
-			get { return this.GetInt32("port number"); }
+			get { return GetInt32("port number"); }
 		}
 
 		public string Database
 		{
-			get { return ExpandDataDirectory(this.GetString("initial catalog")); }
+			get { return ExpandDataDirectory(GetString("initial catalog")); }
 		}
 
 		public short PacketSize
 		{
-			get { return this.GetInt16("packet size"); }
+			get { return GetInt16("packet size"); }
 		}
 
 		public string Role
 		{
-			get { return this.GetString("role name"); }
+			get { return GetString("role name"); }
 		}
 
 		public byte Dialect
 		{
-			get { return this.GetByte("dialect"); }
+			get { return GetByte("dialect"); }
 		}
 
 		public string Charset
 		{
-			get { return this.GetString("character set"); }
+			get { return GetString("character set"); }
 		}
 
 		public int ConnectionTimeout
 		{
-			get { return this.GetInt32("connection timeout"); }
+			get { return GetInt32("connection timeout"); }
 		}
 
 		public bool Pooling
 		{
-			get { return this.GetBoolean("pooling"); }
+			get { return GetBoolean("pooling"); }
 		}
 
 		public long ConnectionLifeTime
 		{
-			get { return this.GetInt64("connection lifetime"); }
+			get { return GetInt64("connection lifetime"); }
 		}
 
 		public int MinPoolSize
 		{
-			get { return this.GetInt32("min pool size"); }
+			get { return GetInt32("min pool size"); }
 		}
 
 		public int MaxPoolSize
 		{
-			get { return this.GetInt32("max pool size"); }
+			get { return GetInt32("max pool size"); }
 		}
 
 		public int FetchSize
 		{
-			get { return this.GetInt32("fetch size"); }
+			get { return GetInt32("fetch size"); }
 		}
 
 		public FbServerType ServerType
 		{
-			get { return (FbServerType)this.GetInt32("server type"); }
+			get { return (FbServerType)GetInt32("server type"); }
 		}
 
 		public IsolationLevel IsolationLevel
 		{
-			get { return this.GetIsolationLevel("isolation level"); }
+			get { return GetIsolationLevel("isolation level"); }
 		}
 
 		public bool ReturnRecordsAffected
 		{
-			get { return this.GetBoolean("records affected"); }
+			get { return GetBoolean("records affected"); }
 		}
 
 		public bool ContextConnection
 		{
-			get { return this.GetBoolean("context connection"); }
+			get { return GetBoolean("context connection"); }
 		}
 
 		public bool Enlist
 		{
-			get { return this.GetBoolean("enlist"); }
+			get { return GetBoolean("enlist"); }
 		}
 
 		public string ClientLibrary
 		{
-			get { return this.GetString("client library"); }
+			get { return GetString("client library"); }
 		}
 
 		public int DbCachePages
 		{
-			get { return this.GetInt32("cache pages"); }
+			get { return GetInt32("cache pages"); }
 		}
 
 		public bool NoDatabaseTriggers
 		{
-			get { return this.GetBoolean("no db triggers"); }
+			get { return GetBoolean("no db triggers"); }
 		}
 
 		public bool NoGarbageCollect
 		{
-			get { return this.GetBoolean("no garbage collect"); }
+			get { return GetBoolean("no garbage collect"); }
 		}
 
 		#endregion
@@ -257,12 +257,12 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal bool FallIntoTrustedAuth
 		{
 			// on non-Win the UserID/Password is checked in Validate method
-			get { return string.IsNullOrEmpty(this.UserID) && string.IsNullOrEmpty(this.Password); }
+			get { return string.IsNullOrEmpty(UserID) && string.IsNullOrEmpty(Password); }
 		}
 
 		internal string NormalizedConnectionString
 		{
-			get { return string.Join(";", this.options.Keys.OrderBy(x => x, StringComparer.InvariantCulture).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(this.options[key].ToString())))); }
+			get { return string.Join(";", _options.Keys.OrderBy(x => x, StringComparer.InvariantCulture).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(_options[key].ToString())))); }
 		}
 		#endregion
 
@@ -270,18 +270,18 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnectionString()
 		{
-			this.SetDefaultOptions();
+			SetDefaultOptions();
 		}
 
 		public FbConnectionString(string connectionString)
 		{
-			this.Load(connectionString);
+			Load(connectionString);
 		}
 
 		internal FbConnectionString(bool isServiceConnectionString)
 		{
-			this.isServiceConnectionString = isServiceConnectionString;
-			this.SetDefaultOptions();
+			_isServiceConnectionString = isServiceConnectionString;
+			SetDefaultOptions();
 		}
 
 		#endregion
@@ -292,7 +292,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			const string KeyPairsRegex = "(([\\w\\s\\d]*)\\s*?=\\s*?\"([^\"]*)\"|([\\w\\s\\d]*)\\s*?=\\s*?'([^']*)'|([\\w\\s\\d]*)\\s*?=\\s*?([^\"';][^;]*))";
 
-			this.SetDefaultOptions();
+			SetDefaultOptions();
 
 			if (connectionString != null && connectionString.Length > 0)
 			{
@@ -332,30 +332,30 @@ namespace FirebirdSql.Data.FirebirdClient
 									{
 										throw new NotSupportedException("Not supported 'server type'.");
 									}
-									this.options[key] = serverType;
+									_options[key] = serverType;
 								}
 								else
 								{
-									this.options[key] = values[1];
+									_options[key] = values[1];
 								}
 							}
 						}
 					}
 				}
 
-				if (this.ContextConnection || this.ServerType == FbServerType.Context)
+				if (ContextConnection || ServerType == FbServerType.Context)
 				{
 					// When Context connection is true we should get the currently active connection
 					// on the Firebird Server
-					this.options["server type"] = FbServerType.Context;
-					this.options["pooling"] = false;
-					this.options["context connection"] = true;
+					_options["server type"] = FbServerType.Context;
+					_options["pooling"] = false;
+					_options["context connection"] = true;
 				}
 				else
 				{
-					if (this.Database != null && this.Database.Length > 0)
+					if (Database != null && Database.Length > 0)
 					{
-						this.ParseConnectionInfo(this.Database);
+						ParseConnectionInfo(Database);
 					}
 				}
 			}
@@ -363,41 +363,41 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Validate()
 		{
-			if (!this.ContextConnection)
+			if (!ContextConnection)
 			{
 				if (
 #if (LINUX)  // on Linux Trusted Auth isn't available
 					(string.IsNullOrEmpty(this.UserID)) ||
 					(string.IsNullOrEmpty(this.Password)) ||
 #endif
-(string.IsNullOrEmpty(this.Database) && !this.isServiceConnectionString) ||
-					(string.IsNullOrEmpty(this.DataSource) && this.ServerType != FbServerType.Embedded) ||
-					(string.IsNullOrEmpty(this.Charset)) ||
-					(this.Port == 0) ||
-					(!Enum.IsDefined(typeof(FbServerType), this.ServerType)) ||
-					(this.MinPoolSize > this.MaxPoolSize)
+(string.IsNullOrEmpty(Database) && !_isServiceConnectionString) ||
+					(string.IsNullOrEmpty(DataSource) && ServerType != FbServerType.Embedded) ||
+					(string.IsNullOrEmpty(Charset)) ||
+					(Port == 0) ||
+					(!Enum.IsDefined(typeof(FbServerType), ServerType)) ||
+					(MinPoolSize > MaxPoolSize)
 				   )
 				{
 					throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
 				}
-				if (this.Dialect < 1 || this.Dialect > 3)
+				if (Dialect < 1 || Dialect > 3)
 				{
 					throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
 				}
-				if (this.PacketSize < 512 || this.PacketSize > 32767)
+				if (PacketSize < 512 || PacketSize > 32767)
 				{
-					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", this.PacketSize, Environment.NewLine));
+					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", PacketSize, Environment.NewLine));
 				}
-				if (this.DbCachePages < 0)
+				if (DbCachePages < 0)
 				{
-					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", this.DbCachePages, Environment.NewLine));
+					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", DbCachePages, Environment.NewLine));
 				}
-				if (this.Pooling && this.NoDatabaseTriggers)
+				if (Pooling && NoDatabaseTriggers)
 				{
 					throw new ArgumentException("Cannot use Pooling and NoDBTriggers together.");
 				}
 
-				this.CheckIsolationLevel();
+				CheckIsolationLevel();
 			}
 		}
 
@@ -407,37 +407,37 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void SetDefaultOptions()
 		{
-			if (this.options == null)
+			if (_options == null)
 			{
-				this.options = new Dictionary<string, object>();
+				_options = new Dictionary<string, object>();
 			}
 
-			this.options.Clear();
+			_options.Clear();
 
-			this.options.Add("data source", DefaultDataSource);
-			this.options.Add("port number", DefaultPortNumber);
-			this.options.Add("user id", DefaultUserId);
-			this.options.Add("password", DefaultPassword);
-			this.options.Add("role name", DefaultRoleName);
-			this.options.Add("initial catalog", DefaultCatalog);
-			this.options.Add("character set", DefaultCharacterSet);
-			this.options.Add("dialect", DefaultDialect);
-			this.options.Add("packet size", DefaultPacketSize);
-			this.options.Add("pooling", DefaultPooling);
-			this.options.Add("connection lifetime", DefaultConnectionLifetime);
-			this.options.Add("min pool size", DefaultMinPoolSize);
-			this.options.Add("max pool size", DefaultMaxPoolSize);
-			this.options.Add("connection timeout", DefaultConnectionTimeout);
-			this.options.Add("fetch size", DefaultFetchSize);
-			this.options.Add("server type", DefaultServerType);
-			this.options.Add("isolation level", DefaultIsolationLevel);
-			this.options.Add("records affected", DefaultRecordsAffected);
-			this.options.Add("context connection", DefaultContextConnection);
-			this.options.Add("enlist", DefaultEnlist);
-			this.options.Add("client library", DefaultClientLibrary);
-			this.options.Add("cache pages", DefaultCachePages);
-			this.options.Add("no db triggers", DefaultNoDbTriggers);
-			this.options.Add("no garbage collect", DefaultNoGarbageCollect);
+			_options.Add("data source", DefaultDataSource);
+			_options.Add("port number", DefaultPortNumber);
+			_options.Add("user id", DefaultUserId);
+			_options.Add("password", DefaultPassword);
+			_options.Add("role name", DefaultRoleName);
+			_options.Add("initial catalog", DefaultCatalog);
+			_options.Add("character set", DefaultCharacterSet);
+			_options.Add("dialect", DefaultDialect);
+			_options.Add("packet size", DefaultPacketSize);
+			_options.Add("pooling", DefaultPooling);
+			_options.Add("connection lifetime", DefaultConnectionLifetime);
+			_options.Add("min pool size", DefaultMinPoolSize);
+			_options.Add("max pool size", DefaultMaxPoolSize);
+			_options.Add("connection timeout", DefaultConnectionTimeout);
+			_options.Add("fetch size", DefaultFetchSize);
+			_options.Add("server type", DefaultServerType);
+			_options.Add("isolation level", DefaultIsolationLevel);
+			_options.Add("records affected", DefaultRecordsAffected);
+			_options.Add("context connection", DefaultContextConnection);
+			_options.Add("enlist", DefaultEnlist);
+			_options.Add("client library", DefaultClientLibrary);
+			_options.Add("cache pages", DefaultCachePages);
+			_options.Add("no db triggers", DefaultNoDbTriggers);
+			_options.Add("no garbage collect", DefaultNoGarbageCollect);
 		}
 
 		private void ParseConnectionInfo(string connectInfo)
@@ -486,7 +486,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else if (portSep < 0 && dataSource.Length == 1)
 				{
-					if (string.IsNullOrEmpty(this.DataSource))
+					if (string.IsNullOrEmpty(DataSource))
 					{
 						dataSource = "localhost";
 					}
@@ -503,14 +503,14 @@ namespace FirebirdSql.Data.FirebirdClient
 				database = connectInfo;
 			}
 
-			this.options["initial catalog"] = database;
+			_options["initial catalog"] = database;
 			if (dataSource != null)
 			{
-				this.options["data source"] = dataSource;
+				_options["data source"] = dataSource;
 			}
 			if (portNumber != -1)
 			{
-				this.options["port number"] = portNumber;
+				_options["port number"] = portNumber;
 			}
 		}
 
@@ -529,7 +529,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private string GetString(string key)
 		{
 			object value;
-			if (this.options.TryGetValue(key, out value))
+			if (_options.TryGetValue(key, out value))
 				return (string)value;
 			else
 				return null;
@@ -538,7 +538,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private bool GetBoolean(string key)
 		{
 			object value;
-			if (this.options.TryGetValue(key, out value))
+			if (_options.TryGetValue(key, out value))
 				return Boolean.Parse(value.ToString());
 			else
 				return false;
@@ -547,7 +547,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private byte GetByte(string key)
 		{
 			object value;
-			if (this.options.TryGetValue(key, out value))
+			if (_options.TryGetValue(key, out value))
 				return Convert.ToByte(value, CultureInfo.CurrentCulture);
 			else
 				return 0;
@@ -556,7 +556,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private short GetInt16(string key)
 		{
 			object value;
-			if (this.options.TryGetValue(key, out value))
+			if (_options.TryGetValue(key, out value))
 				return Convert.ToInt16(value, CultureInfo.InvariantCulture);
 			else
 				return 0;
@@ -565,7 +565,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private int GetInt32(string key)
 		{
 			object value;
-			if (this.options.TryGetValue(key, out value))
+			if (_options.TryGetValue(key, out value))
 				return Convert.ToInt32(value, CultureInfo.InvariantCulture);
 			else
 				return 0;
@@ -574,7 +574,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private long GetInt64(string key)
 		{
 			object value;
-			if (this.options.TryGetValue(key, out value))
+			if (_options.TryGetValue(key, out value))
 				return Convert.ToInt64(value, CultureInfo.InvariantCulture);
 			else
 				return 0;
@@ -583,7 +583,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private IsolationLevel GetIsolationLevel(string key)
 		{
 			object value;
-			if (this.options.TryGetValue(key, out value))
+			if (_options.TryGetValue(key, out value))
 			{
 				string il = value.ToString().ToLower(CultureInfo.InvariantCulture);
 
@@ -617,7 +617,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckIsolationLevel()
 		{
-			string il = this.options["isolation level"].ToString().ToLower(CultureInfo.InvariantCulture);
+			string il = _options["isolation level"].ToString().ToLower(CultureInfo.InvariantCulture);
 
 			switch (il)
 			{

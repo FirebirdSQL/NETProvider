@@ -33,19 +33,19 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Fields
 
-		private FbParameterCollection parent;
-		private FbDbType fbDbType;
-		private ParameterDirection direction;
-		private DataRowVersion sourceVersion;
-		private FbCharset charset;
-		private bool isNullable;
-		private bool sourceColumnNullMapping;
-		private byte precision;
-		private byte scale;
-		private int size;
-		private object value;
-		private string parameterName;
-		private string sourceColumn;
+		private FbParameterCollection _parent;
+		private FbDbType _fbDbType;
+		private ParameterDirection _direction;
+		private DataRowVersion _sourceVersion;
+		private FbCharset _charset;
+		private bool _isNullable;
+		private bool _sourceColumnNullMapping;
+		private byte _precision;
+		private byte _scale;
+		private int _size;
+		private object _value;
+		private string _parameterName;
+		private string _sourceColumn;
 
 		#endregion
 
@@ -54,8 +54,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue("")]
 		public override string ParameterName
 		{
-			get { return this.parameterName; }
-			set { this.parameterName = value; }
+			get { return _parameterName; }
+			set { _parameterName = value; }
 		}
 
 		[Category("Data")]
@@ -64,20 +64,20 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				return (this.HasSize ? this.size : this.RealValueSize ?? 0);
+				return (HasSize ? _size : RealValueSize ?? 0);
 			}
 			set
 			{
 				if (value < 0)
 					throw new ArgumentOutOfRangeException("Size");
 
-				this.size = value;
+				_size = value;
 
 				// Hack for Clob parameters
 				if (value == 2147483647 &&
-					(this.FbDbType == FbDbType.VarChar || this.FbDbType == FbDbType.Char))
+					(FbDbType == FbDbType.VarChar || FbDbType == FbDbType.Char))
 				{
-					this.FbDbType = FbDbType.Text;
+					FbDbType = FbDbType.Text;
 				}
 			}
 		}
@@ -86,8 +86,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(ParameterDirection.Input)]
 		public override ParameterDirection Direction
 		{
-			get { return this.direction; }
-			set { this.direction = value; }
+			get { return _direction; }
+			set { _direction = value; }
 		}
 
 		[Browsable(false)]
@@ -96,24 +96,24 @@ namespace FirebirdSql.Data.FirebirdClient
 		[EditorBrowsable(EditorBrowsableState.Advanced)]
 		public override bool IsNullable
 		{
-			get { return this.isNullable; }
-			set { this.isNullable = value; }
+			get { return _isNullable; }
+			set { _isNullable = value; }
 		}
 
 		[Category("Data")]
 		[DefaultValue("")]
 		public override string SourceColumn
 		{
-			get { return this.sourceColumn; }
-			set { this.sourceColumn = value; }
+			get { return _sourceColumn; }
+			set { _sourceColumn = value; }
 		}
 
 		[Category("Data")]
 		[DefaultValue(DataRowVersion.Current)]
 		public override DataRowVersion SourceVersion
 		{
-			get { return this.sourceVersion; }
-			set { this.sourceVersion = value; }
+			get { return _sourceVersion; }
+			set { _sourceVersion = value; }
 		}
 
 		[Browsable(false)]
@@ -122,8 +122,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public override DbType DbType
 		{
-			get { return TypeHelper.GetDbType((DbDataType)this.fbDbType); }
-			set { this.FbDbType = (FbDbType)TypeHelper.GetDbDataType(value); }
+			get { return TypeHelper.GetDbType((DbDataType)_fbDbType); }
+			set { FbDbType = (FbDbType)TypeHelper.GetDbDataType(value); }
 		}
 
 		[RefreshProperties(RefreshProperties.All)]
@@ -131,11 +131,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbDbType.VarChar)]
 		public FbDbType FbDbType
 		{
-			get { return this.fbDbType; }
+			get { return _fbDbType; }
 			set
 			{
-				this.fbDbType = value;
-				this.IsTypeSet = true;
+				_fbDbType = value;
+				IsTypeSet = true;
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[TypeConverter(typeof(StringConverter)), DefaultValue(null)]
 		public override object Value
 		{
-			get { return this.value; }
+			get { return _value; }
 			set
 			{
 				if (value == null)
@@ -151,17 +151,17 @@ namespace FirebirdSql.Data.FirebirdClient
 					value = System.DBNull.Value;
 				}
 
-				if (this.FbDbType == FbDbType.Guid && value != null &&
+				if (FbDbType == FbDbType.Guid && value != null &&
 					value != DBNull.Value && !(value is Guid) && !(value is byte[]))
 				{
 					throw new InvalidOperationException("Incorrect Guid value.");
 				}
 
-				this.value = value;
+				_value = value;
 
-				if (!this.IsTypeSet)
+				if (!IsTypeSet)
 				{
-					this.SetFbDbType(value);
+					SetFbDbType(value);
 				}
 			}
 		}
@@ -170,14 +170,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbCharset.Default)]
 		public FbCharset Charset
 		{
-			get { return this.charset; }
-			set { this.charset = value; }
+			get { return _charset; }
+			set { _charset = value; }
 		}
 
 		public override bool SourceColumnNullMapping
 		{
-			get { return this.sourceColumnNullMapping; }
-			set { this.sourceColumnNullMapping = value; }
+			get { return _sourceColumnNullMapping; }
+			set { _sourceColumnNullMapping = value; }
 		}
 
 		#endregion
@@ -188,16 +188,16 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue((byte)0)]
 		public byte Precision
 		{
-			get { return this.precision; }
-			set { this.precision = value; }
+			get { return _precision; }
+			set { _precision = value; }
 		}
 
 		[Category("Data")]
 		[DefaultValue((byte)0)]
 		public byte Scale
 		{
-			get { return this.scale; }
-			set { this.scale = value; }
+			get { return _scale; }
+			set { _scale = value; }
 		}
 
 		#endregion
@@ -206,15 +206,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal FbParameterCollection Parent
 		{
-			get { return this.parent; }
-			set { this.parent = value; }
+			get { return _parent; }
+			set { _parent = value; }
 		}
 
 		internal string InternalParameterName
 		{
 			get
 			{
-				return NormalizeParameterName(this.parameterName);
+				return NormalizeParameterName(_parameterName);
 			}
 		}
 
@@ -224,25 +224,25 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				string svalue = (this.value as string);
+				string svalue = (_value as string);
 				if (svalue != null)
 				{
-					return svalue.Substring(0, Math.Min(this.Size, svalue.Length));
+					return svalue.Substring(0, Math.Min(Size, svalue.Length));
 				}
-				byte[] bvalue = (this.value as byte[]);
+				byte[] bvalue = (_value as byte[]);
 				if (bvalue != null)
 				{
-					byte[] result = new byte[Math.Min(this.Size, bvalue.Length)];
+					byte[] result = new byte[Math.Min(Size, bvalue.Length)];
 					Array.Copy(bvalue, result, result.Length);
 					return result;
 				}
-				return this.value;
+				return _value;
 			}
 		}
 
 		internal bool HasSize
 		{
-			get { return this.size != default(int); }
+			get { return _size != default(int); }
 		}
 
 		#endregion
@@ -251,43 +251,43 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbParameter()
 		{
-			this.fbDbType = FbDbType.VarChar;
-			this.direction = ParameterDirection.Input;
-			this.sourceVersion = DataRowVersion.Current;
-			this.sourceColumn = string.Empty;
-			this.parameterName = string.Empty;
-			this.charset = FbCharset.Default;
+			_fbDbType = FbDbType.VarChar;
+			_direction = ParameterDirection.Input;
+			_sourceVersion = DataRowVersion.Current;
+			_sourceColumn = string.Empty;
+			_parameterName = string.Empty;
+			_charset = FbCharset.Default;
 		}
 
 		public FbParameter(string parameterName, object value)
 			: this()
 		{
-			this.parameterName = parameterName;
-			this.Value = value;
+			_parameterName = parameterName;
+			Value = value;
 		}
 
 		public FbParameter(string parameterName, FbDbType fbType)
 			: this()
 		{
-			this.parameterName = parameterName;
-			this.FbDbType = fbType;
+			_parameterName = parameterName;
+			FbDbType = fbType;
 		}
 
 		public FbParameter(string parameterName, FbDbType fbType, int size)
 			: this()
 		{
-			this.parameterName = parameterName;
-			this.FbDbType = fbType;
-			this.Size = size;
+			_parameterName = parameterName;
+			FbDbType = fbType;
+			Size = size;
 		}
 
 		public FbParameter(string parameterName, FbDbType fbType, int size, string sourceColumn)
 			: this()
 		{
-			this.parameterName = parameterName;
-			this.FbDbType = fbType;
-			this.Size = size;
-			this.sourceColumn = sourceColumn;
+			_parameterName = parameterName;
+			FbDbType = fbType;
+			Size = size;
+			_sourceColumn = sourceColumn;
 		}
 
 		[EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -303,17 +303,17 @@ namespace FirebirdSql.Data.FirebirdClient
 			DataRowVersion sourceVersion,
 			object value)
 		{
-			this.parameterName = parameterName;
-			this.FbDbType = dbType;
-			this.Size = size;
-			this.direction = direction;
-			this.isNullable = isNullable;
-			this.precision = precision;
-			this.scale = scale;
-			this.sourceColumn = sourceColumn;
-			this.sourceVersion = sourceVersion;
-			this.Value = value;
-			this.charset = FbCharset.Default;
+			_parameterName = parameterName;
+			FbDbType = dbType;
+			Size = size;
+			_direction = direction;
+			_isNullable = isNullable;
+			_precision = precision;
+			_scale = scale;
+			_sourceColumn = sourceColumn;
+			_sourceVersion = sourceVersion;
+			Value = value;
+			_charset = FbCharset.Default;
 		}
 
 		#endregion
@@ -323,19 +323,19 @@ namespace FirebirdSql.Data.FirebirdClient
 		object ICloneable.Clone()
 		{
 			return new FbParameter(
-				this.parameterName,
-				this.fbDbType,
-				this.size,
-				this.direction,
-				this.isNullable,
-				this.precision,
-				this.scale,
-				this.sourceColumn,
-				this.sourceVersion,
-				this.value)
+				_parameterName,
+				_fbDbType,
+				_size,
+				_direction,
+				_isNullable,
+				_precision,
+				_scale,
+				_sourceColumn,
+				_sourceVersion,
+				_value)
 				{
-					Charset = this.charset
-				};
+					Charset = _charset
+			};
 		}
 
 		#endregion
@@ -344,7 +344,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override string ToString()
 		{
-			return this.parameterName;
+			return _parameterName;
 		}
 
 		public override void ResetDbType()
@@ -368,60 +368,60 @@ namespace FirebirdSql.Data.FirebirdClient
 			switch (code)
 			{
 				case TypeCode.Char:
-					this.fbDbType = FbDbType.Char;
+					_fbDbType = FbDbType.Char;
 					break;
 
 				case TypeCode.DBNull:
 				case TypeCode.String:
-					this.fbDbType = FbDbType.VarChar;
+					_fbDbType = FbDbType.VarChar;
 					break;
 
 				case TypeCode.Boolean:
-					this.fbDbType = FbDbType.Boolean;
+					_fbDbType = FbDbType.Boolean;
 					break;
 
 				case TypeCode.Byte:
 				case TypeCode.SByte:
 				case TypeCode.Int16:
 				case TypeCode.UInt16:
-					this.fbDbType = FbDbType.SmallInt;
+					_fbDbType = FbDbType.SmallInt;
 					break;
 
 				case TypeCode.Int32:
 				case TypeCode.UInt32:
-					this.fbDbType = FbDbType.Integer;
+					_fbDbType = FbDbType.Integer;
 					break;
 
 				case TypeCode.Int64:
 				case TypeCode.UInt64:
-					this.fbDbType = FbDbType.BigInt;
+					_fbDbType = FbDbType.BigInt;
 					break;
 
 				case TypeCode.Single:
-					this.fbDbType = FbDbType.Float;
+					_fbDbType = FbDbType.Float;
 					break;
 
 				case TypeCode.Double:
-					this.fbDbType = FbDbType.Double;
+					_fbDbType = FbDbType.Double;
 					break;
 
 				case TypeCode.Decimal:
-					this.fbDbType = FbDbType.Decimal;
+					_fbDbType = FbDbType.Decimal;
 					break;
 
 				case TypeCode.DateTime:
-					this.fbDbType = FbDbType.TimeStamp;
+					_fbDbType = FbDbType.TimeStamp;
 					break;
 
 				case TypeCode.Empty:
 				default:
 					if (value is Guid)
 					{
-						this.fbDbType = FbDbType.Guid;
+						_fbDbType = FbDbType.Guid;
 					}
 					else if (code == TypeCode.Object)
 					{
-						this.fbDbType = FbDbType.Binary;
+						_fbDbType = FbDbType.Binary;
 					}
 					else
 					{
@@ -439,12 +439,12 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				string svalue = (value as string);
+				string svalue = (_value as string);
 				if (svalue != null)
 				{
 					return svalue.Length;
 				}
-				byte[] bvalue = (value as byte[]);
+				byte[] bvalue = (_value as byte[]);
 				if (bvalue != null)
 				{
 					return bvalue.Length;

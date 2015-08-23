@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Fields
 
-		private List<FbParameter> parameters;
+		private List<FbParameter> _parameters;
 
 		#endregion
 
@@ -47,16 +47,16 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public new FbParameter this[string parameterName]
 		{
-			get { return this[this.IndexOf(parameterName)]; }
-			set { this[this.IndexOf(parameterName)] = value; }
+			get { return this[IndexOf(parameterName)]; }
+			set { this[IndexOf(parameterName)] = value; }
 		}
 
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public new FbParameter this[int index]
 		{
-			get { return this.parameters[index]; }
-			set { this.parameters[index] = value; }
+			get { return _parameters[index]; }
+			set { _parameters[index] = value; }
 		}
 
 		#endregion
@@ -67,27 +67,27 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public override int Count
 		{
-			get { return this.parameters.Count; }
+			get { return _parameters.Count; }
 		}
 
 		public override bool IsFixedSize
 		{
-			get { return ((IList)this.parameters).IsFixedSize; }
+			get { return ((IList)_parameters).IsFixedSize; }
 		}
 
 		public override bool IsReadOnly
 		{
-			get { return ((IList)this.parameters).IsReadOnly; }
+			get { return ((IList)_parameters).IsReadOnly; }
 		}
 
 		public override bool IsSynchronized
 		{
-			get { return ((ICollection)this.parameters).IsSynchronized; }
+			get { return ((ICollection)_parameters).IsSynchronized; }
 		}
 
 		public override object SyncRoot
 		{
-			get { return ((ICollection)this.parameters).SyncRoot; }
+			get { return ((ICollection)_parameters).SyncRoot; }
 		}
 
 		#endregion
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal FbParameterCollection()
 		{
-			this.parameters = new List<FbParameter>();
+			_parameters = new List<FbParameter>();
 		}
 
 		#endregion
@@ -107,43 +107,43 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			foreach (var p in values)
 			{
-				this.Add(p);
+				Add(p);
 			}
 		}
 
 		public override void AddRange(Array values)
 		{
-			this.AddRange(values.Cast<object>().Select(x => { EnsureFbParameterType(x); return (FbParameter)x; }));
+			AddRange(values.Cast<object>().Select(x => { EnsureFbParameterType(x); return (FbParameter)x; }));
 		}
 
 		public FbParameter AddWithValue(string parameterName, object value)
 		{
-			return this.Add(new FbParameter(parameterName, value));
+			return Add(new FbParameter(parameterName, value));
 		}
 
 		public FbParameter Add(string parameterName, object value)
 		{
-			return this.Add(new FbParameter(parameterName, value));
+			return Add(new FbParameter(parameterName, value));
 		}
 
 		public FbParameter Add(string parameterName, FbDbType type)
 		{
-			return this.Add(new FbParameter(parameterName, type));
+			return Add(new FbParameter(parameterName, type));
 		}
 
 		public FbParameter Add(string parameterName, FbDbType fbType, int size)
 		{
-			return this.Add(new FbParameter(parameterName, fbType, size));
+			return Add(new FbParameter(parameterName, fbType, size));
 		}
 
 		public FbParameter Add(string parameterName, FbDbType fbType, int size, string sourceColumn)
 		{
-			return this.Add(new FbParameter(parameterName, fbType, size, sourceColumn));
+			return Add(new FbParameter(parameterName, fbType, size, sourceColumn));
 		}
 
 		public FbParameter Add(FbParameter value)
 		{
-			lock (this.SyncRoot)
+			lock (SyncRoot)
 			{
 				if (value == null)
 				{
@@ -155,17 +155,17 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				if (value.ParameterName == null || value.ParameterName.Length == 0)
 				{
-					value.ParameterName = this.GenerateParameterName();
+					value.ParameterName = GenerateParameterName();
 				}
 				else
 				{
-					if (this.IndexOf(value) != -1)
+					if (IndexOf(value) != -1)
 					{
 						throw new ArgumentException("FbParameterCollection already contains FbParameter with ParameterName '" + value.ParameterName + "'.");
 					}
 				}
 
-				this.parameters.Add(value);
+				_parameters.Add(value);
 
 				return value;
 			}
@@ -175,76 +175,76 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			EnsureFbParameterType(value);
 
-			return this.IndexOf(this.Add((FbParameter)value));
+			return IndexOf(Add((FbParameter)value));
 		}
 
 		public bool Contains(FbParameter value)
 		{
-			return this.parameters.Contains(value);
+			return _parameters.Contains(value);
 		}
 
 		public override bool Contains(object value)
 		{
 			EnsureFbParameterType(value);
 
-			return this.Contains((FbParameter)value);
+			return Contains((FbParameter)value);
 		}
 
 		public override bool Contains(string parameterName)
 		{
-			return this.IndexOf(parameterName) != -1;
+			return IndexOf(parameterName) != -1;
 		}
 
 		public int IndexOf(FbParameter value)
 		{
-			return this.parameters.IndexOf(value);
+			return _parameters.IndexOf(value);
 		}
 
 		public override int IndexOf(object value)
 		{
 			EnsureFbParameterType(value);
 
-			return this.IndexOf((FbParameter)value);
+			return IndexOf((FbParameter)value);
 		}
 
 		public override int IndexOf(string parameterName)
 		{
-			return this.IndexOf(parameterName, -1);
+			return IndexOf(parameterName, -1);
 		}
 
 		internal int IndexOf(string parameterName, int luckyIndex)
 		{
 			var normalizedParameterName = FbParameter.NormalizeParameterName(parameterName);
-			if (luckyIndex != -1 && luckyIndex < this.parameters.Count)
+			if (luckyIndex != -1 && luckyIndex < _parameters.Count)
 			{
-				if (this.parameters[luckyIndex].InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase))
+				if (_parameters[luckyIndex].InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase))
 				{
 					return luckyIndex;
 				}
 			}
-			return this.parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase));
+			return _parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase));
 		}
 
 		public void Insert(int index, FbParameter value)
 		{
-			this.parameters.Insert(index, value);
+			_parameters.Insert(index, value);
 		}
 
 		public override void Insert(int index, object value)
 		{
 			EnsureFbParameterType(value);
 
-			this.Insert(index, (FbParameter)value);
+			Insert(index, (FbParameter)value);
 		}
 
 		public void Remove(FbParameter value)
 		{
-			if (!this.Contains(value))
+			if (!Contains(value))
 			{
 				throw new SystemException("The parameter does not exist in the collection.");
 			}
 
-			this.parameters.Remove(value);
+			_parameters.Remove(value);
 			value.Parent = null;
 		}
 
@@ -252,44 +252,44 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			EnsureFbParameterType(value);
 
-			this.Remove((FbParameter)value);
+			Remove((FbParameter)value);
 		}
 
 		public override void RemoveAt(int index)
 		{
-			if (index < 0 || index > this.Count)
+			if (index < 0 || index > Count)
 			{
 				throw new IndexOutOfRangeException("The specified index does not exist.");
 			}
 
 			FbParameter parameter = this[index];
-			this.parameters.RemoveAt(index);
+			_parameters.RemoveAt(index);
 			parameter.Parent = null;
 		}
 
 		public override void RemoveAt(string parameterName)
 		{
-			this.RemoveAt(this.IndexOf(parameterName));
+			RemoveAt(IndexOf(parameterName));
 		}
 
 		public void CopyTo(FbParameter[] array, int index)
 		{
-			this.parameters.CopyTo(array, index);
+			_parameters.CopyTo(array, index);
 		}
 
 		public override void CopyTo(Array array, int index)
 		{
-			((IList)this.parameters).CopyTo(array, index);
+			((IList)_parameters).CopyTo(array, index);
 		}
 
 		public override void Clear()
 		{
-			this.parameters.Clear();
+			_parameters.Clear();
 		}
 
 		public override IEnumerator GetEnumerator()
 		{
-			return this.parameters.GetEnumerator();
+			return _parameters.GetEnumerator();
 		}
 
 		#endregion
@@ -322,14 +322,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GenerateParameterName()
 		{
-			int index = this.Count + 1;
+			int index = Count + 1;
 			string name = string.Empty;
 
 			while (index > 0)
 			{
 				name = "Parameter" + index.ToString(CultureInfo.InvariantCulture);
 
-				if (this.IndexOf(name) == -1)
+				if (IndexOf(name) == -1)
 				{
 					index = -1;
 				}

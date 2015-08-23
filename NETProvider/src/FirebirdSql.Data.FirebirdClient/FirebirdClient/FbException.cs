@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Fields
 
-		private FbErrorCollection errors;
+		private FbErrorCollection _errors;
 
 		#endregion
 
@@ -46,12 +46,12 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				if (this.errors == null)
+				if (_errors == null)
 				{
-					this.errors = new FbErrorCollection();
+					_errors = new FbErrorCollection();
 				}
 
-				return this.errors;
+				return _errors;
 			}
 		}
 
@@ -59,9 +59,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				if ((this.InnerException != null) && (this.InnerException is IscException))
+				if ((InnerException != null) && (InnerException is IscException))
 				{
-					return ((IscException)this.InnerException).ErrorCode;
+					return ((IscException)InnerException).ErrorCode;
 				}
 
 				return base.ErrorCode;
@@ -72,9 +72,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				if ((this.InnerException != null) && (this.InnerException is IscException))
+				if ((InnerException != null) && (InnerException is IscException))
 				{
-					return ((IscException)this.InnerException).SQLSTATE;
+					return ((IscException)InnerException).SQLSTATE;
 				}
 
 				return null;
@@ -100,14 +100,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (innerException is IscException)
 			{
-				this.ProcessIscExceptionErrors((IscException)innerException);
+				ProcessIscExceptionErrors((IscException)innerException);
 			}
 		}
 
 		internal FbException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
-			this.errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
+			_errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
 		}
 
 		#endregion
@@ -120,7 +120,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			base.GetObjectData(info, context);
 
-			info.AddValue("errors", this.errors);
+			info.AddValue("errors", _errors);
 		}
 
 		#endregion
@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			foreach (IscError error in innerException.Errors)
 			{
-				this.Errors.Add(error.Message, error.ErrorCode);
+				Errors.Add(error.Message, error.ErrorCode);
 			}
 		}
 

@@ -35,9 +35,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
-		private FbConnection connection;
-		private RemoteEvent revent;
-		private SynchronizationContext synchronizationContext;
+		private FbConnection _connection;
+		private RemoteEvent _revent;
+		private SynchronizationContext _synchronizationContext;
 
 		#endregion
 
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public string this[int index]
 		{
-			get { return this.revent.Events[index]; }
+			get { return _revent.Events[index]; }
 		}
 
 		#endregion
@@ -54,22 +54,22 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnection Connection
 		{
-			get { return this.connection; }
-			set { this.connection = value; }
+			get { return _connection; }
+			set { _connection = value; }
 		}
 
 		public bool HasChanges
 		{
-			get { return this.revent.HasChanges; }
+			get { return _revent.HasChanges; }
 		}
 
 		public int RemoteEventId
 		{
 			get
 			{
-				if (this.revent != null)
+				if (_revent != null)
 				{
-					return this.revent.RemoteId;
+					return _revent.RemoteId;
 				}
 
 				return -1;
@@ -92,14 +92,14 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("Connection must be valid and open");
 			}
 
-			this.connection = connection;
-			this.revent = connection.InnerConnection.Database.CreateEvent();
-			this.revent.EventCountsCallback = new RemoteEventCountsCallback(this.OnRemoteEventCounts);
-			this.synchronizationContext = SynchronizationContext.Current ?? new SynchronizationContext();
+			_connection = connection;
+			_revent = connection.InnerConnection.Database.CreateEvent();
+			_revent.EventCountsCallback = new RemoteEventCountsCallback(OnRemoteEventCounts);
+			_synchronizationContext = SynchronizationContext.Current ?? new SynchronizationContext();
 
 			if (events != null)
 			{
-				this.AddEvents(events);
+				AddEvents(events);
 			}
 		}
 
@@ -118,30 +118,30 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new ArgumentException("Max number of events for request interest is 15");
 			}
 
-			if (events.Length != this.revent.Events.Count)
+			if (events.Length != _revent.Events.Count)
 			{
-				this.revent.ResetCounts();
+				_revent.ResetCounts();
 			}
 			else
 			{
-				string[] actualEvents = new string[this.revent.Events.Count];
-				this.revent.Events.CopyTo(actualEvents, 0);
+				string[] actualEvents = new string[_revent.Events.Count];
+				_revent.Events.CopyTo(actualEvents, 0);
 
 				for (int i = 0; i < actualEvents.Length; i++)
 				{
 					if (events[i] != actualEvents[i])
 					{
-						this.revent.ResetCounts();
+						_revent.ResetCounts();
 						break;
 					}
 				}
 			}
 
-			this.revent.Events.Clear();
+			_revent.Events.Clear();
 
 			for (int i = 0; i < events.Length; i++)
 			{
-				this.revent.Events.Add(events[i]);
+				_revent.Events.Add(events[i]);
 			}
 		}
 
@@ -149,7 +149,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			try
 			{
-				this.revent.QueueEvents();
+				_revent.QueueEvents();
 			}
 			catch (IscException ex)
 			{
@@ -161,7 +161,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			try
 			{
-				this.revent.CancelEvents();
+				_revent.CancelEvents();
 			}
 			catch (IscException ex)
 			{
@@ -177,24 +177,24 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			bool canceled = false;
 
-			int[] actualCounts = (int[])this.revent.ActualCounts.Clone();
-			if (this.revent.PreviousCounts != null)
+			int[] actualCounts = (int[])_revent.ActualCounts.Clone();
+			if (_revent.PreviousCounts != null)
 			{
-				for (int i = 0; i < this.revent.ActualCounts.Length; i++)
+				for (int i = 0; i < _revent.ActualCounts.Length; i++)
 				{
-					actualCounts[i] -= this.revent.PreviousCounts[i];
+					actualCounts[i] -= _revent.PreviousCounts[i];
 				}
 			}
 
 			// Send individual event notifications
 			for (int i = 0; i < actualCounts.Length; i++)
 			{
-				FbRemoteEventEventArgs args = new FbRemoteEventEventArgs(this.revent.Events[i], actualCounts[i]);
-				if (this.RemoteEventCounts != null)
+				FbRemoteEventEventArgs args = new FbRemoteEventEventArgs(_revent.Events[i], actualCounts[i]);
+				if (RemoteEventCounts != null)
 				{
-					this.synchronizationContext.Send(_ =>
+					_synchronizationContext.Send(_ =>
 					{
-						this.RemoteEventCounts(this, args);
+						RemoteEventCounts(this, args);
 					}, null);
 				}
 
@@ -208,12 +208,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (canceled)
 			{
 				// Requeque
-				this.CancelEvents();
+				CancelEvents();
 			}
 			else
 			{
 				// Requeque
-				this.QueueEvents();
+				QueueEvents();
 			}
 		}
 

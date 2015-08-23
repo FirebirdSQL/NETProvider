@@ -70,8 +70,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
-		private bool disposed;
-		private bool shouldDisposeSelectCommand;
+		private bool _disposed;
+		private bool _shouldDisposeSelectCommand;
 
 		#endregion
 
@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbDataAdapter(FbCommand selectCommand)
 			: base()
 		{
-			this.SelectCommand = selectCommand;
+			SelectCommand = selectCommand;
 		}
 
 		public FbDataAdapter(string selectCommandText, string selectConnectionString)
@@ -132,8 +132,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbDataAdapter(string selectCommandText, FbConnection selectConnection)
 			: base()
 		{
-			this.SelectCommand = new FbCommand(selectCommandText, selectConnection);
-			this.shouldDisposeSelectCommand = true;
+			SelectCommand = new FbCommand(selectCommandText, selectConnection);
+			_shouldDisposeSelectCommand = true;
 		}
 
 		#endregion
@@ -144,26 +144,26 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (!this.disposed)
+				if (!_disposed)
 				{
 					try
 					{
 						// Release any managed resources
 						if (disposing)
 						{
-							if (this.shouldDisposeSelectCommand)
+							if (_shouldDisposeSelectCommand)
 							{
-								if (this.SelectCommand != null)
+								if (SelectCommand != null)
 								{
-									this.SelectCommand.Dispose();
-									this.SelectCommand = null;
+									SelectCommand.Dispose();
+									SelectCommand = null;
 								}
 							}
 						}
 
 						// release any unmanaged resources
 
-						this.disposed = true;
+						_disposed = true;
 					}
 					finally
 					{
@@ -256,17 +256,17 @@ namespace FirebirdSql.Data.FirebirdClient
 						continue;
 
 					case DataRowState.Added:
-						command = this.InsertCommand;
+						command = InsertCommand;
 						statementType = StatementType.Insert;
 						break;
 
 					case DataRowState.Modified:
-						command = this.UpdateCommand;
+						command = UpdateCommand;
 						statementType = StatementType.Update;
 						break;
 
 					case DataRowState.Deleted:
-						command = this.DeleteCommand;
+						command = DeleteCommand;
 						statementType = StatementType.Delete;
 						break;
 				}
@@ -284,7 +284,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
-					updatingArgs = this.CreateRowUpdatingEvent(row, command, statementType, tableMapping);
+					updatingArgs = CreateRowUpdatingEvent(row, command, statementType, tableMapping);
 
 					/* 1. Update Parameter values (It's	very similar to	what we	
 					 * are doing in	the	FbCommandBuilder class).
@@ -295,7 +295,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					{
 						try
 						{
-							this.UpdateParameterValues(command, statementType, row, tableMapping);
+							UpdateParameterValues(command, statementType, row, tableMapping);
 						}
 						catch (Exception ex)
 						{
@@ -305,7 +305,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 
 					// 2. Raise	RowUpdating	event
-					this.OnRowUpdating(updatingArgs);
+					OnRowUpdating(updatingArgs);
 
 					if (updatingArgs.Status == UpdateStatus.SkipAllRemainingRows)
 					{
@@ -338,7 +338,7 @@ namespace FirebirdSql.Data.FirebirdClient
 							 *	Update requires	a valid	UpdateCommand when passed DataRow collection with modified rows.
 							 *	Update requires	a valid	DeleteCommand when passed DataRow collection with deleted rows.
 							 */
-							throw new InvalidOperationException(this.CreateExceptionMessage(statementType));
+							throw new InvalidOperationException(CreateExceptionMessage(statementType));
 						}
 
 						// 3. Execute the command
@@ -390,14 +390,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 									DataColumnMapping columnMapping = tableMapping.GetColumnMappingBySchemaAction(
 										parameter.SourceColumn,
-										this.MissingMappingAction);
+										MissingMappingAction);
 
 									if (columnMapping != null)
 									{
 										column = columnMapping.GetDataColumnBySchemaAction(
 											row.Table,
 											null,
-											this.MissingSchemaAction);
+											MissingSchemaAction);
 
 										if (column != null)
 										{
@@ -418,8 +418,8 @@ namespace FirebirdSql.Data.FirebirdClient
 				if (updatingArgs != null && updatingArgs.Status == UpdateStatus.Continue)
 				{
 					// 6. Raise	RowUpdated event
-					RowUpdatedEventArgs updatedArgs = this.CreateRowUpdatedEvent(row, command, statementType, tableMapping);
-					this.OnRowUpdated(updatedArgs);
+					RowUpdatedEventArgs updatedArgs = CreateRowUpdatedEvent(row, command, statementType, tableMapping);
+					OnRowUpdated(updatedArgs);
 
 					if (updatedArgs.Status == UpdateStatus.SkipAllRemainingRows)
 					{
@@ -439,14 +439,14 @@ namespace FirebirdSql.Data.FirebirdClient
 					else if (updatingArgs.Status == UpdateStatus.Continue)
 					{
 						// If the update result is an exception throw it
-						if (!this.ContinueUpdateOnError && updateException != null)
+						if (!ContinueUpdateOnError && updateException != null)
 						{
-							this.CloseConnections(connections);
+							CloseConnections(connections);
 							throw updateException;
 						}
 
 						// 7. Call AcceptChanges
-						if (this.AcceptChangesDuringUpdate && !row.HasErrors)
+						if (AcceptChangesDuringUpdate && !row.HasErrors)
 						{
 							row.AcceptChanges();
 						}
@@ -455,15 +455,15 @@ namespace FirebirdSql.Data.FirebirdClient
 				else
 				{
 					// If the update result is an exception throw it
-					if (!this.ContinueUpdateOnError && updateException != null)
+					if (!ContinueUpdateOnError && updateException != null)
 					{
-						this.CloseConnections(connections);
+						CloseConnections(connections);
 						throw updateException;
 					}
 				}
 			}
 
-			this.CloseConnections(connections);
+			CloseConnections(connections);
 
 			return updated;
 		}
@@ -519,11 +519,11 @@ namespace FirebirdSql.Data.FirebirdClient
 					 */
 					DataColumnMapping columnMapping = tableMapping.GetColumnMappingBySchemaAction(
 						parameter.SourceColumn,
-						this.MissingMappingAction);
+						MissingMappingAction);
 
 					if (columnMapping != null)
 					{
-						column = columnMapping.GetDataColumnBySchemaAction(row.Table, null, this.MissingSchemaAction);
+						column = columnMapping.GetDataColumnBySchemaAction(row.Table, null, MissingSchemaAction);
 
 						if (column != null)
 						{
@@ -544,7 +544,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 							if (parameter.SourceColumnNullMapping)
 							{
-								parameter.Value = this.IsNull(row[column, dataRowVersion]) ? 1 : 0;
+								parameter.Value = IsNull(row[column, dataRowVersion]) ? 1 : 0;
 							}
 							else
 							{

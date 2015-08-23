@@ -39,8 +39,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultUserId)]
 		public string UserID
 		{
-			get { return this.GetString("User ID"); }
-			set { this.SetValue("User ID", value); }
+			get { return GetString("User ID"); }
+			set { SetValue("User ID", value); }
 		}
 
 		[Category("Security")]
@@ -50,8 +50,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultPassword)]
 		public string Password
 		{
-			get { return this.GetString("Password"); }
-			set { this.SetValue("Password", value); }
+			get { return GetString("Password"); }
+			set { SetValue("Password", value); }
 		}
 
 		[Category("Source")]
@@ -60,8 +60,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultDataSource)]
 		public string DataSource
 		{
-			get { return this.GetString("Data Source"); }
-			set { this.SetValue("Data Source", value); }
+			get { return GetString("Data Source"); }
+			set { SetValue("Data Source", value); }
 		}
 
 		[Category("Source")]
@@ -70,8 +70,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultCatalog)]
 		public string Database
 		{
-			get { return this.GetString("Initial Catalog"); }
-			set { this.SetValue("Initial Catalog", value); }
+			get { return GetString("Initial Catalog"); }
+			set { SetValue("Initial Catalog", value); }
 		}
 
 		[Category("Source")]
@@ -80,8 +80,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultPortNumber)]
 		public int Port
 		{
-			get { return this.GetInt32("Port Number"); }
-			set { this.SetValue("Port Number", value); }
+			get { return GetInt32("Port Number"); }
+			set { SetValue("Port Number", value); }
 		}
 
 		[Category("Advanced")]
@@ -90,8 +90,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultPacketSize)]
 		public int PacketSize
 		{
-			get { return this.GetInt32("Packet Size"); }
-			set { this.SetValue("Packet Size", value); }
+			get { return GetInt32("Packet Size"); }
+			set { SetValue("Packet Size", value); }
 		}
 
 		[Category("Security")]
@@ -100,8 +100,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultRoleName)]
 		public string Role
 		{
-			get { return this.GetString("Role Name"); }
-			set { this.SetValue("Role Name", value); }
+			get { return GetString("Role Name"); }
+			set { SetValue("Role Name", value); }
 		}
 
 		[Category("Advanced")]
@@ -110,8 +110,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultDialect)]
 		public int Dialect
 		{
-			get { return this.GetInt32("Dialect"); }
-			set { this.SetValue("Dialect", value); }
+			get { return GetInt32("Dialect"); }
+			set { SetValue("Dialect", value); }
 		}
 
 		[Category("Advanced")]
@@ -120,8 +120,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultCharacterSet)]
 		public string Charset
 		{
-			get { return this.GetString("Character Set"); }
-			set { this.SetValue("Character Set", value); }
+			get { return GetString("Character Set"); }
+			set { SetValue("Character Set", value); }
 		}
 
 		[Category("Connection")]
@@ -130,8 +130,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultConnectionTimeout)]
 		public int ConnectionTimeout
 		{
-			get { return this.GetInt32("Connection Timeout"); }
-			set { this.SetValue("Connection Timeout", value); }
+			get { return GetInt32("Connection Timeout"); }
+			set { SetValue("Connection Timeout", value); }
 		}
 
 		[Category("Pooling")]
@@ -140,8 +140,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultPooling)]
 		public bool Pooling
 		{
-			get { return this.GetBoolean("Pooling"); }
-			set { this.SetValue("Pooling", value); }
+			get { return GetBoolean("Pooling"); }
+			set { SetValue("Pooling", value); }
 		}
 
 		[Category("Connection")]
@@ -150,8 +150,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultConnectionLifetime)]
 		public int ConnectionLifeTime
 		{
-			get { return this.GetInt32("Connection Lifetime"); }
-			set { this.SetValue("Connection Lifetime", value); }
+			get { return GetInt32("Connection Lifetime"); }
+			set { SetValue("Connection Lifetime", value); }
 		}
 
 		[Category("Pooling")]
@@ -160,8 +160,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultMinPoolSize)]
 		public int MinPoolSize
 		{
-			get { return this.GetInt32("Min Pool Size"); }
-			set { this.SetValue("Min Pool Size", value); }
+			get { return GetInt32("Min Pool Size"); }
+			set { SetValue("Min Pool Size", value); }
 		}
 
 		[Category("Pooling")]
@@ -170,8 +170,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultMaxPoolSize)]
 		public int MaxPoolSize
 		{
-			get { return this.GetInt32("Max Pool Size"); }
-			set { this.SetValue("Max Pool Size", value); }
+			get { return GetInt32("Max Pool Size"); }
+			set { SetValue("Max Pool Size", value); }
 		}
 
 		[Category("Advanced")]
@@ -180,8 +180,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultFetchSize)]
 		public int FetchSize
 		{
-			get { return this.GetInt32("Fetch Size"); }
-			set { this.SetValue("Fetch Size", value); }
+			get { return GetInt32("Fetch Size"); }
+			set { SetValue("Fetch Size", value); }
 		}
 
 		[Category("Source")]
@@ -190,8 +190,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultServerType)]
 		public FbServerType ServerType
 		{
-			get { return this.GetServerType("Server Type"); }
-			set { this.SetValue("Server Type", value); }
+			get { return GetServerType("Server Type"); }
+			set { SetValue("Server Type", value); }
 		}
 
 		[Category("Advanced")]
@@ -200,8 +200,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultIsolationLevel)]
 		public IsolationLevel IsolationLevel
 		{
-			get { return (IsolationLevel)this.GetInt32("Isolation Level"); }
-			set { this.SetValue("Isolation Level", value); }
+			get { return (IsolationLevel)GetInt32("Isolation Level"); }
+			set { SetValue("Isolation Level", value); }
 		}
 
 		[Category("Advanced")]
@@ -210,8 +210,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultRecordsAffected)]
 		public bool ReturnRecordsAffected
 		{
-			get { return this.GetBoolean("Records Affected"); }
-			set { this.SetValue("Records Affected", value); }
+			get { return GetBoolean("Records Affected"); }
+			set { SetValue("Records Affected", value); }
 		}
 
 		[Category("Advanced")]
@@ -220,8 +220,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultContextConnection)]
 		public bool ContextConnection
 		{
-			get { return this.GetBoolean("Context Connection"); }
-			set { this.SetValue("Context Connection", value); }
+			get { return GetBoolean("Context Connection"); }
+			set { SetValue("Context Connection", value); }
 		}
 
 		[Category("Pooling")]
@@ -230,8 +230,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultPooling)]
 		public bool Enlist
 		{            
-			get { return this.GetBoolean("Enlist"); }
-			set { this.SetValue("Enlist", value); }
+			get { return GetBoolean("Enlist"); }
+			set { SetValue("Enlist", value); }
 		}
 
 		[Category("Advanced")]
@@ -240,8 +240,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultClientLibrary)]
 		public string ClientLibrary
 		{
-			get { return this.GetString("Client Library"); }
-			set { this.SetValue("Client Library", value); }
+			get { return GetString("Client Library"); }
+			set { SetValue("Client Library", value); }
 		}
 
 		[Category("Advanced")]
@@ -250,8 +250,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultCachePages)]
 		public int DbCachePages
 		{
-			get { return this.GetInt32("Cache Pages"); }
-			set { this.SetValue("Cache Pages", value); }
+			get { return GetInt32("Cache Pages"); }
+			set { SetValue("Cache Pages", value); }
 		}
 
 		[Category("Advanced")]
@@ -260,8 +260,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultNoDbTriggers)]
 		public bool NoDatabaseTriggers
 		{
-			get { return this.GetBoolean("No DB Triggers"); }
-			set { this.SetValue("No DB Triggers", value); }
+			get { return GetBoolean("No DB Triggers"); }
+			set { SetValue("No DB Triggers", value); }
 		}
 
         [Category("Advanced")]
@@ -270,8 +270,8 @@ namespace FirebirdSql.Data.FirebirdClient
         [DefaultValue(FbConnectionString.DefaultNoGarbageCollect)]
         public bool NoGarbageCollect
         {
-            get { return this.GetBoolean("No Garbage Collect"); }
-            set { this.SetValue("No Garbage Collect", value); }
+            get { return GetBoolean("No Garbage Collect"); }
+            set { SetValue("No Garbage Collect", value); }
         }
 
 		#endregion
@@ -284,7 +284,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnectionStringBuilder(string connectionString)
 		{
-			this.ConnectionString = connectionString;
+			ConnectionString = connectionString;
 		}
 
 		#endregion
@@ -293,12 +293,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private int GetInt32(string keyword)
 		{
-			return Convert.ToInt32(this[this.GetKey(keyword)]);
+			return Convert.ToInt32(this[GetKey(keyword)]);
 		}
 
 		private FbServerType GetServerType(string keyword)
 		{
-			object value = this[this.GetKey(keyword)];
+			object value = this[GetKey(keyword)];
 
 			if (value is FbServerType)
 			{
@@ -319,22 +319,22 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
-			return (FbServerType)this.GetInt32(keyword);
+			return (FbServerType)GetInt32(keyword);
 		}
 
 		private string GetString(string keyword)
 		{           
-			return Convert.ToString(this[this.GetKey(keyword)]);
+			return Convert.ToString(this[GetKey(keyword)]);
 		}
 
 		private bool GetBoolean(string keyword)
 		{
-			return Convert.ToBoolean(this[this.GetKey(keyword)]);
+			return Convert.ToBoolean(this[GetKey(keyword)]);
 		}
 
 		private void SetValue<T>(string keyword, T value)
 		{
-			this[this.GetKey(keyword)] = value;
+			this[GetKey(keyword)] = value;
 		}
 
 		private string GetKey(string keyword)
@@ -342,7 +342,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			string synonymKey = (string)FbConnectionString.Synonyms[keyword];
 
 			// First check if there are yet a property for the requested keyword
-			foreach (string key in this.Keys)
+			foreach (string key in Keys)
 			{
 				if (FbConnectionString.Synonyms.ContainsKey(key) && (string)FbConnectionString.Synonyms[key] == synonymKey)
 				{
