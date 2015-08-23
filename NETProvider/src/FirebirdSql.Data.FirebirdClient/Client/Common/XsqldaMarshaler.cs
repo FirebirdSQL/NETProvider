@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Client.Common
 				// Destroy XSQLVAR structures
 				for (int i = 0; i < xsqlda.sqln; i++)
 				{
-					IntPtr ptr1 = this.GetIntPtr(pNativeData, this.ComputeLength(i));
+					IntPtr ptr1 = GetIntPtr(pNativeData, ComputeLength(i));
 
 					// Free	sqldata	and	sqlind pointers	if needed
 					XSQLVAR sqlvar = (XSQLVAR)Marshal.PtrToStructure(ptr1, typeof(XSQLVAR));
@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Client.Common
 						sqlvar.sqlind = IntPtr.Zero;
 					}
 
-					IntPtr ptr2 = this.GetIntPtr(pNativeData, this.ComputeLength(i));
+					IntPtr ptr2 = GetIntPtr(pNativeData, ComputeLength(i));
 					Marshal.DestroyStructure(ptr2, typeof(XSQLVAR));
 				}
 
@@ -134,36 +134,36 @@ namespace FirebirdSql.Data.Client.Common
 				Marshal.WriteInt16(xsqlvar[i].sqlind, descriptor[i].NullFlag);
 
 				// Name
-				xsqlvar[i].sqlname = this.GetStringBuffer(charset, descriptor[i].Name);
+				xsqlvar[i].sqlname = GetStringBuffer(charset, descriptor[i].Name);
 				xsqlvar[i].sqlname_length = (short)descriptor[i].Name.Length;
 
 				// Relation	Name
-				xsqlvar[i].relname = this.GetStringBuffer(charset, descriptor[i].Relation);
+				xsqlvar[i].relname = GetStringBuffer(charset, descriptor[i].Relation);
 				xsqlvar[i].relname_length = (short)descriptor[i].Relation.Length;
 
 				// Owner name
-				xsqlvar[i].ownername = this.GetStringBuffer(charset, descriptor[i].Owner);
+				xsqlvar[i].ownername = GetStringBuffer(charset, descriptor[i].Owner);
 				xsqlvar[i].ownername_length = (short)descriptor[i].Owner.Length;
 
 				// Alias name
-				xsqlvar[i].aliasname = this.GetStringBuffer(charset, descriptor[i].Alias);
+				xsqlvar[i].aliasname = GetStringBuffer(charset, descriptor[i].Alias);
 				xsqlvar[i].aliasname_length = (short)descriptor[i].Alias.Length;
 			}
 
-			return this.MarshalManagedToNative(xsqlda, xsqlvar);
+			return MarshalManagedToNative(xsqlda, xsqlvar);
 		}
 
 		public IntPtr MarshalManagedToNative(XSQLDA xsqlda, XSQLVAR[] xsqlvar)
 		{
-			int size = this.ComputeLength(xsqlda.sqln);
+			int size = ComputeLength(xsqlda.sqln);
 			IntPtr ptr = Marshal.AllocHGlobal(size);
 
 			Marshal.StructureToPtr(xsqlda, ptr, true);
 
 			for (int i = 0; i < xsqlvar.Length; i++)
 			{
-				int offset = this.ComputeLength(i);
-				Marshal.StructureToPtr(xsqlvar[i], this.GetIntPtr(ptr, offset), true);
+				int offset = ComputeLength(i);
+				Marshal.StructureToPtr(xsqlvar[i], GetIntPtr(ptr, offset), true);
 			}
 
 			return ptr;
@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.Client.Common
 
 		public Descriptor MarshalNativeToManaged(Charset charset, IntPtr pNativeData)
 		{
-			return this.MarshalNativeToManaged(charset, pNativeData, false);
+			return MarshalNativeToManaged(charset, pNativeData, false);
 		}
 
 		public Descriptor MarshalNativeToManaged(Charset charset, IntPtr pNativeData, bool fetching)
@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.Client.Common
 
 			for (int i = 0; i < xsqlvar.Length; i++)
 			{
-				IntPtr ptr = this.GetIntPtr(pNativeData, this.ComputeLength(i));
+				IntPtr ptr = GetIntPtr(pNativeData, ComputeLength(i));
 				xsqlvar[i] = (XSQLVAR)Marshal.PtrToStructure(ptr, typeof(XSQLVAR));
 
 				// Map XSQLVAR information to Descriptor
@@ -214,14 +214,14 @@ namespace FirebirdSql.Data.Client.Common
 				{
 					if (descriptor[i].NullFlag != -1)
 					{
-						descriptor[i].SetValue(this.GetBytes(xsqlvar[i]));
+						descriptor[i].SetValue(GetBytes(xsqlvar[i]));
 					}
 				}
 
-				descriptor[i].Name      = this.GetString(charset, xsqlvar[i].sqlname);
-				descriptor[i].Relation  = this.GetString(charset, xsqlvar[i].relname);
-				descriptor[i].Owner     = this.GetString(charset, xsqlvar[i].ownername);
-				descriptor[i].Alias     = this.GetString(charset, xsqlvar[i].aliasname);
+				descriptor[i].Name      = GetString(charset, xsqlvar[i].sqlname);
+				descriptor[i].Relation  = GetString(charset, xsqlvar[i].relname);
+				descriptor[i].Owner     = GetString(charset, xsqlvar[i].ownername);
+				descriptor[i].Alias     = GetString(charset, xsqlvar[i].aliasname);
 			}
 
 			return descriptor;
@@ -258,7 +258,7 @@ namespace FirebirdSql.Data.Client.Common
 			{
 				case IscCodes.SQL_VARYING:
 					buffer  = new byte[Marshal.ReadInt16(xsqlvar.sqldata)];
-					tmp     = this.GetIntPtr(xsqlvar.sqldata, 2);
+					tmp     = GetIntPtr(xsqlvar.sqldata, 2);
 
 					Marshal.Copy(tmp, buffer, 0, buffer.Length);
 

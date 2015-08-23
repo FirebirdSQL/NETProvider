@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.Client.Common
 				arrayBounds[i].UpperBound = (short)descriptor.Bounds[i].UpperBound;
 			}
 
-			return this.MarshalManagedToNative(arrayDesc, arrayBounds);
+			return MarshalManagedToNative(arrayDesc, arrayBounds);
 		}
 
 		public IntPtr MarshalManagedToNative(ArrayDescMarshal arrayDesc, ArrayBoundMarshal[] arrayBounds)
