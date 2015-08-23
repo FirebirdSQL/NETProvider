@@ -50,14 +50,14 @@ namespace FirebirdSql.Data.Isql
 
 		#region Fields
 
-		private FbStatementCollection sqlStatements;
-		private FbConnection sqlConnection;
-		private FbTransaction sqlTransaction;
-		private FbConnectionStringBuilder connectionString;
-		private FbCommand sqlCommand;
+		private FbStatementCollection _sqlStatements;
+		private FbConnection _sqlConnection;
+		private FbTransaction _sqlTransaction;
+		private FbConnectionStringBuilder _connectionString;
+		private FbCommand _sqlCommand;
 
 		// control fields
-		private bool requiresNewConnection;
+		private bool _requiresNewConnection;
 
 		#endregion
 
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public FbStatementCollection SqlStatements
 		{
-			get { return this.sqlStatements; }
+			get { return _sqlStatements; }
 		}
 
 		#endregion
@@ -82,16 +82,16 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="sqlConnection">A <see cref="FbConnection"/> object.</param>
 		public FbBatchExecution(FbConnection sqlConnection = null)
 		{
-			this.sqlStatements = new FbStatementCollection();
+			_sqlStatements = new FbStatementCollection();
 			if (sqlConnection == null)
 			{
-				this.sqlConnection = new FbConnection(); // do not specify the connection string
-				this.connectionString = new FbConnectionStringBuilder();
+				_sqlConnection = new FbConnection(); // do not specify the connection string
+				_connectionString = new FbConnectionStringBuilder();
 			}
 			else
 			{
-				this.sqlConnection = sqlConnection;
-				this.connectionString = new FbConnectionStringBuilder(sqlConnection.ConnectionString);
+				_sqlConnection = sqlConnection;
+				_connectionString = new FbConnectionStringBuilder(sqlConnection.ConnectionString);
 			}
 		}
 
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="isqlScript">A <see cref="FbScript"/> object.</param>
 		public void AppendSqlStatements(FbScript isqlScript)
 		{
-			this.sqlStatements.AddRange(isqlScript.Results);
+			_sqlStatements.AddRange(isqlScript.Results);
 		}
 
 		/// <summary>
@@ -127,12 +127,12 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
 		public void Execute(bool autoCommit = true)
 		{
-			if (this.SqlStatements == null || this.SqlStatements.Count == 0)
+			if (SqlStatements == null || SqlStatements.Count == 0)
 			{
 				throw new InvalidOperationException("There are no commands for execution.");
 			}
 
-			foreach (string sqlStatement in this.SqlStatements)
+			foreach (string sqlStatement in SqlStatements)
 			{
 				if (string.IsNullOrEmpty(sqlStatement))
 				{
@@ -153,13 +153,13 @@ namespace FirebirdSql.Data.Isql
 					statementType == SqlStatementType.SetNames ||
 					statementType == SqlStatementType.SetSQLDialect))
 				{
-					this.ProvideCommand();
-					this.sqlCommand.CommandText = sqlStatement;
-					if (this.sqlTransaction == null && !(statementType == SqlStatementType.Commit || statementType == SqlStatementType.Rollback))
+					ProvideCommand();
+					_sqlCommand.CommandText = sqlStatement;
+					if (_sqlTransaction == null && !(statementType == SqlStatementType.Commit || statementType == SqlStatementType.Rollback))
 					{
-						this.sqlTransaction = this.sqlConnection.BeginTransaction();
+						_sqlTransaction = _sqlConnection.BeginTransaction();
 					}
-					this.sqlCommand.Transaction = this.sqlTransaction;
+					_sqlCommand.Transaction = _sqlTransaction;
 				}
 
 				try
@@ -175,39 +175,39 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterTable:
 						case SqlStatementType.AlterTrigger:
 						case SqlStatementType.AlterView:
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(autoCommit);
-							this.requiresNewConnection = false;
+							rowsAffected = ExecuteCommand(autoCommit);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.Commit:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							this.CommitTransaction();
+							CommitTransaction();
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.Connect:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							this.ConnectToDatabase(sqlStatement);
+							ConnectToDatabase(sqlStatement);
 
-							this.requiresNewConnection = false;
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.CreateDatabase:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							this.CreateDatabase(sqlStatement);
-							this.requiresNewConnection = false;
+							CreateDatabase(sqlStatement);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.CommentOn:
@@ -229,34 +229,34 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.DeclareStatement:
 						case SqlStatementType.DeclareTable:
 						case SqlStatementType.Delete:
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(autoCommit);
-							this.requiresNewConnection = false;
+							rowsAffected = ExecuteCommand(autoCommit);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.Describe:
 							break;
 
 						case SqlStatementType.Disconnect:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							this.sqlConnection.Close();
-							FbConnection.ClearPool(this.sqlConnection);
-							this.requiresNewConnection = false;
+							_sqlConnection.Close();
+							FbConnection.ClearPool(_sqlConnection);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.DropDatabase:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							FbConnection.DropDatabase(this.connectionString.ToString());
-							this.requiresNewConnection = true;
+							FbConnection.DropDatabase(_connectionString.ToString());
+							_requiresNewConnection = true;
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.DropCollation:
@@ -278,25 +278,25 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Execute:
 						case SqlStatementType.ExecuteImmediate:
 						case SqlStatementType.ExecuteProcedure:
-							this.ProvideCommand().CommandText = sqlStatement;
+							ProvideCommand().CommandText = sqlStatement;
 
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(autoCommit);
-							this.requiresNewConnection = false;
+							rowsAffected = ExecuteCommand(autoCommit);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.ExecuteBlock:
-							this.ProvideCommand().CommandText = sqlStatement;
+							ProvideCommand().CommandText = sqlStatement;
 
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							dataReader = this.sqlCommand.ExecuteReader();
-							this.requiresNewConnection = false;
+							dataReader = _sqlCommand.ExecuteReader();
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, dataReader, -1);
+							OnCommandExecuted(sqlStatement, dataReader, -1);
 							if (!dataReader.IsClosed)
 							{
 								dataReader.Close();
@@ -312,43 +312,43 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Open:
 						case SqlStatementType.Prepare:
 						case SqlStatementType.Revoke:
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(autoCommit);
-							this.requiresNewConnection = false;
+							rowsAffected = ExecuteCommand(autoCommit);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.RecreateProcedure:
 						case SqlStatementType.RecreateTable:
 						case SqlStatementType.RecreateTrigger:
 						case SqlStatementType.RecreateView:
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(autoCommit);
-							this.requiresNewConnection = false;
+							rowsAffected = ExecuteCommand(autoCommit);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.Rollback:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							this.RollbackTransaction();
+							RollbackTransaction();
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.Select:
-							this.ProvideCommand().CommandText = sqlStatement;
+							ProvideCommand().CommandText = sqlStatement;
 
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							dataReader = this.sqlCommand.ExecuteReader();
-							this.requiresNewConnection = false;
+							dataReader = _sqlCommand.ExecuteReader();
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, dataReader, -1);
+							OnCommandExecuted(sqlStatement, dataReader, -1);
 							if (!dataReader.IsClosed)
 							{
 								dataReader.Close();
@@ -356,40 +356,40 @@ namespace FirebirdSql.Data.Isql
 							break;
 
 						case SqlStatementType.SetAutoDDL:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							this.SetAutoDdl(sqlStatement, ref autoCommit);
-							this.requiresNewConnection = false;
+							SetAutoDdl(sqlStatement, ref autoCommit);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.SetGenerator:
 						case SqlStatementType.AlterSequence:
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(autoCommit);
-							this.requiresNewConnection = false;
+							rowsAffected = ExecuteCommand(autoCommit);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 
 						case SqlStatementType.SetNames:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							this.SetNames(sqlStatement);
-							this.requiresNewConnection = true;
+							SetNames(sqlStatement);
+							_requiresNewConnection = true;
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.SetSQLDialect:
-							this.OnCommandExecuting(null);
+							OnCommandExecuting(null);
 
-							this.SetSqlDialect(sqlStatement);
-							this.requiresNewConnection = true;
+							SetSqlDialect(sqlStatement);
+							_requiresNewConnection = true;
 
-							this.OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
 						case SqlStatementType.SetDatabase:
@@ -400,18 +400,18 @@ namespace FirebirdSql.Data.Isql
 
 						case SqlStatementType.Update:
 						case SqlStatementType.Whenever:
-							this.OnCommandExecuting(this.sqlCommand);
+							OnCommandExecuting(_sqlCommand);
 
-							rowsAffected = this.ExecuteCommand(autoCommit);
-							this.requiresNewConnection = false;
+							rowsAffected = ExecuteCommand(autoCommit);
+							_requiresNewConnection = false;
 
-							this.OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(sqlStatement, null, rowsAffected);
 							break;
 					}
 				}
 				catch (Exception ex)
 				{
-					this.RollbackTransaction();
+					RollbackTransaction();
 
 					throw new FbException(string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
 						Environment.NewLine,
@@ -420,9 +420,9 @@ namespace FirebirdSql.Data.Isql
 				}
 			}
 
-			this.CommitTransaction();
+			CommitTransaction();
 
-			this.sqlConnection.Close();
+			_sqlConnection.Close();
 		}
 
 		#endregion
@@ -449,19 +449,19 @@ namespace FirebirdSql.Data.Isql
 				throw new ArgumentException("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
 			}
 			parser.ParseNext();
-			this.connectionString.Database = parser.Result.Replace("'", string.Empty);
+			_connectionString.Database = parser.Result.Replace("'", string.Empty);
 			while (parser.ParseNext() != -1)
 			{
 				switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
 				{
 					case "USER":
 						parser.ParseNext();
-						this.connectionString.UserID = parser.Result.Replace("'", string.Empty);
+						_connectionString.UserID = parser.Result.Replace("'", string.Empty);
 						break;
 
 					case "PASSWORD":
 						parser.ParseNext();
-						this.connectionString.Password = parser.Result.Replace("'", string.Empty);
+						_connectionString.Password = parser.Result.Replace("'", string.Empty);
 						break;
 
 					case "CACHE":
@@ -470,7 +470,7 @@ namespace FirebirdSql.Data.Isql
 
 					case "ROLE":
 						parser.ParseNext();
-						this.connectionString.Role = parser.Result.Replace("'", string.Empty);
+						_connectionString.Role = parser.Result.Replace("'", string.Empty);
 						break;
 
 					default:
@@ -478,8 +478,8 @@ namespace FirebirdSql.Data.Isql
 
 				}
 			}
-			this.requiresNewConnection = true;
-			this.ProvideConnection();
+			_requiresNewConnection = true;
+			ProvideConnection();
 		}
 
 		/// <summary>
@@ -504,19 +504,19 @@ namespace FirebirdSql.Data.Isql
 			}
 			parser.ParseNext(); // {DATABASE | SCHEMA}
 			parser.ParseNext();
-			this.connectionString.Database = parser.Result.Replace("'", string.Empty);
+			_connectionString.Database = parser.Result.Replace("'", string.Empty);
 			while (parser.ParseNext() != -1)
 			{
 				switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
 				{
 					case "USER":
 						parser.ParseNext();
-						this.connectionString.UserID = parser.Result.Replace("'", string.Empty);
+						_connectionString.UserID = parser.Result.Replace("'", string.Empty);
 						break;
 
 					case "PASSWORD":
 						parser.ParseNext();
-						this.connectionString.Password = parser.Result.Replace("'", string.Empty);
+						_connectionString.Password = parser.Result.Replace("'", string.Empty);
 						break;
 
 					case "PAGE_SIZE":
@@ -536,13 +536,13 @@ namespace FirebirdSql.Data.Isql
 							throw new ArgumentException("Expected the keyword SET but something else was found.");
 
 						parser.ParseNext();
-						this.connectionString.Charset = parser.Result;
+						_connectionString.Charset = parser.Result;
 						break;
 				}
 			}
-			FbConnection.CreateDatabase(this.connectionString.ToString(), pageSize, true, false);
-			this.requiresNewConnection = true;
-			this.ProvideConnection();
+			FbConnection.CreateDatabase(_connectionString.ToString(), pageSize, true, false);
+			_requiresNewConnection = true;
+			ProvideConnection();
 		}
 
 		/// <summary>
@@ -598,7 +598,7 @@ namespace FirebirdSql.Data.Isql
 			}
 			parser.ParseNext(); // NAMES
 			parser.ParseNext();
-			this.connectionString.Charset = parser.Result;
+			_connectionString.Charset = parser.Result;
 		}
 
 		/// <summary>
@@ -620,40 +620,40 @@ namespace FirebirdSql.Data.Isql
 			parser.ParseNext();
 			int dialect = 3;
 			int.TryParse(parser.Result, out dialect);
-			this.connectionString.Dialect = dialect;
+			_connectionString.Dialect = dialect;
 		}
 
 		protected FbCommand ProvideCommand()
 		{
-			if (this.sqlCommand == null)
+			if (_sqlCommand == null)
 			{
-				this.sqlCommand = new FbCommand();
+				_sqlCommand = new FbCommand();
 			}
 
-			this.sqlCommand.Connection = this.ProvideConnection();
+			_sqlCommand.Connection = ProvideConnection();
 
-			return this.sqlCommand;
+			return _sqlCommand;
 		}
 
 		protected FbConnection ProvideConnection()
 		{
-			if (requiresNewConnection)
+			if (_requiresNewConnection)
 			{
-				if ((this.sqlConnection != null) &&
-					((this.sqlConnection.State != ConnectionState.Closed) ||
-					(this.sqlConnection.State != ConnectionState.Broken)))
+				if ((_sqlConnection != null) &&
+					((_sqlConnection.State != ConnectionState.Closed) ||
+					(_sqlConnection.State != ConnectionState.Broken)))
 				{
-					this.sqlConnection.Close();
+					_sqlConnection.Close();
 				}
-				this.sqlConnection = new FbConnection(this.connectionString.ToString());
+				_sqlConnection = new FbConnection(_connectionString.ToString());
 			}
 
-			if (this.sqlConnection.State == ConnectionState.Closed)
+			if (_sqlConnection.State == ConnectionState.Closed)
 			{
-				this.sqlConnection.Open();
+				_sqlConnection.Open();
 			}
 
-			return this.sqlConnection;
+			return _sqlConnection;
 		}
 
 		/// <summary>
@@ -664,10 +664,10 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>The number of rows affected by the query execution.</returns>
 		protected int ExecuteCommand(bool autoCommit)
 		{
-			int rowsAffected = this.sqlCommand.ExecuteNonQuery();
-			if (autoCommit && this.sqlCommand.IsDDLCommand)
+			int rowsAffected = _sqlCommand.ExecuteNonQuery();
+			if (autoCommit && _sqlCommand.IsDDLCommand)
 			{
-				this.CommitTransaction();
+				CommitTransaction();
 			}
 
 			return rowsAffected;
@@ -675,19 +675,19 @@ namespace FirebirdSql.Data.Isql
 
 		protected void CommitTransaction()
 		{
-			if (this.sqlTransaction != null)
+			if (_sqlTransaction != null)
 			{
-				this.sqlTransaction.Commit();
-				this.sqlTransaction = null;
+				_sqlTransaction.Commit();
+				_sqlTransaction = null;
 			}
 		}
 
 		protected void RollbackTransaction()
 		{
-			if (this.sqlTransaction != null)
+			if (_sqlTransaction != null)
 			{
-				this.sqlTransaction.Rollback();
-				this.sqlTransaction = null;
+				_sqlTransaction.Rollback();
+				_sqlTransaction = null;
 			}
 		}
 

@@ -83,12 +83,12 @@ namespace FirebirdSql.Data.Isql
 	{
 		#region Fields
 
-		private string source;
-		private int sourceLength;
-		private string[] tokens;
-		private int currentIndex;
-		private int charsParsed;
-		private string result;
+		private string _source;
+		private int _sourceLength;
+		private string[] _tokens;
+		private int _currentIndex;
+		private int _charsParsed;
+		private string _result;
 
 		#endregion
 
@@ -99,7 +99,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public int CharsParsed
 		{
-			get { return this.charsParsed; }
+			get { return _charsParsed; }
 		}
 
 		/// <summary>
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public string Result
 		{
-			get { return this.result; }
+			get { return _result; }
 		}
 
 		/// <summary>
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public string[] Tokens
 		{
-			get { return this.tokens; }
+			get { return _tokens; }
 			set
 			{
 				if (value == null)
@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.Isql
 					if (string.IsNullOrEmpty(item))
 						throw new ArgumentException();
 				}
-				this.tokens = value;
+				_tokens = value;
 			}
 		}
 
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public int Length
 		{
-			get { return this.sourceLength; }
+			get { return _sourceLength; }
 		}
 
 		#endregion
@@ -153,9 +153,9 @@ namespace FirebirdSql.Data.Isql
 		/// </remarks>
 		public StringParser(string targetString)
 		{
-			this.tokens = new[] { " " };
-			this.source = targetString;
-			this.sourceLength = targetString.Length;
+			_tokens = new[] { " " };
+			_source = targetString;
+			_sourceLength = targetString.Length;
 		}
 
 		#endregion
@@ -172,27 +172,27 @@ namespace FirebirdSql.Data.Isql
 		/// (in <see cref="Result"/>) the string found between the starting index and the end of the string.</remarks>
 		public int ParseNext()
 		{
-			if (this.currentIndex >= this.sourceLength)
+			if (_currentIndex >= _sourceLength)
 			{
 				return -1;
 			}
 
-			int i = this.currentIndex;
+			int i = _currentIndex;
 			bool inLiteral = false;
 			string matchedToken = null;
 
-			while (i < this.sourceLength)
+			while (i < _sourceLength)
 			{
-				if (this.source[i] == '\'')
+				if (_source[i] == '\'')
 				{
 					inLiteral = !inLiteral;
 				}
 
 				if (!inLiteral)
 				{
-					foreach (var token in this.Tokens)
+					foreach (var token in Tokens)
 					{
-						if (string.Compare(this.source, i, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
+						if (string.Compare(_source, i, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
 						{
 							i += token.Length;
 							matchedToken = token;
@@ -207,11 +207,11 @@ namespace FirebirdSql.Data.Isql
 			Break:
 			{ }
 
-			this.charsParsed = i - this.currentIndex;
-			bool subtractToken = (i != this.sourceLength) || (matchedToken != null && this.source.EndsWith(matchedToken, false, CultureInfo.CurrentUICulture));
-			this.result = this.source.Substring(this.currentIndex, i - this.currentIndex - (subtractToken ? matchedToken.Length : 0));
+			_charsParsed = i - _currentIndex;
+			bool subtractToken = (i != _sourceLength) || (matchedToken != null && _source.EndsWith(matchedToken, false, CultureInfo.CurrentUICulture));
+			_result = _source.Substring(_currentIndex, i - _currentIndex - (subtractToken ? matchedToken.Length : 0));
 
-			return this.currentIndex = i;
+			return _currentIndex = i;
 		}
 
 		/// <summary>
@@ -220,7 +220,7 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>The string to be parsed.</returns>
 		public override string ToString()
 		{
-			return this.source;
+			return _source;
 		}
 
 		#endregion

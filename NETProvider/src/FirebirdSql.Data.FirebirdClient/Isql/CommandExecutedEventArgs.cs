@@ -28,9 +28,9 @@ namespace FirebirdSql.Data.Isql
 	{
 		#region Fields
 
-		private string commandText;
-		private FbDataReader dataReader;
-		private int rowsAffected;
+		private string _commandText;
+		private FbDataReader _dataReader;
+		private int _rowsAffected;
 
 		#endregion
 
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public SqlStatementType StatementType
 		{
-			get { return FbBatchExecution.GetStatementType(this.commandText); }
+			get { return FbBatchExecution.GetStatementType(_commandText); }
 		}
 
 		/// <summary>
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public string CommandText
 		{
-			get { return this.commandText; }
+			get { return _commandText; }
 		}
 
 		/// <summary>
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public FbDataReader DataReader
 		{
-			get { return this.dataReader; }
+			get { return _dataReader; }
 		}
 
 		#endregion
@@ -77,9 +77,9 @@ namespace FirebirdSql.Data.Isql
 			string commandText,
 			int rowsAffected)
 		{
-			this.dataReader = dataReader;
-			this.commandText = commandText;
-			this.rowsAffected = rowsAffected;
+			_dataReader = dataReader;
+			_commandText = commandText;
+			_rowsAffected = rowsAffected;
 		}
 
 		#endregion
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>The SQL statement that will be executed.</returns>
 		public override string ToString()
 		{
-			return this.commandText;
+			return _commandText;
 		}
 
 		#endregion
