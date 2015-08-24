@@ -166,6 +166,7 @@ namespace FirebirdSql.Data.Isql
 				{
 					switch (statementType)
 					{
+						case SqlStatementType.AlterCharacterSet:
 						case SqlStatementType.AlterDatabase:
 						case SqlStatementType.AlterDomain:
 						case SqlStatementType.AlterException:
@@ -745,6 +746,10 @@ namespace FirebirdSql.Data.Isql
 			{
 				case 'A':
 				case 'a':
+					if (sqlStatement.StartsWith("ALTER CHARACTER SET", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterCharacterSet;
+					}
 					if (sqlStatement.StartsWith("ALTER DATABASE", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.AlterDatabase;
