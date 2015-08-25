@@ -2,9 +2,9 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Id="7D65E5D3-A191-4208-875A-43F149F9C36F"
 					 UpgradeCode="8A1FACD4-F003-4720-AD50-4161CA58E84B"
-					 Name="FirebirdClient !(bind.fileVersion.FirebirdSql.Data.FirebirdClient.dll)"
+					 Name="FirebirdClient $(var.Version)"
 					 Language="1033"
-					 Version="!(bind.fileVersion.FirebirdSql.Data.FirebirdClient.dll)"
+					 Version="$(var.Version)"
 					 Manufacturer="FirebirdSQL">
 		<Package InstallerVersion="200" Compressed="yes" Description="ADO.NET Data Provider for Firebird" />
 
@@ -44,10 +44,10 @@
 									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb" />
 						<File Id="FirebirdSql.Data.UnitTests.dll"
 									Name="FirebirdSql.Data.UnitTests.dll"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release\FirebirdSql.Data.UnitTests.dll" />
+									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release_45\FirebirdSql.Data.UnitTests.dll" />
 						<File Id="FirebirdSql.Data.UnitTests.config"
 									Name="FirebirdSql.Data.UnitTests.dll.config"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release\FirebirdSql.Data.UnitTests.dll.config" />
+									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release_45\FirebirdSql.Data.UnitTests.dll.config" />
 					</Component>
 				</Directory>
 			</Directory>
