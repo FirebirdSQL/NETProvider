@@ -46,6 +46,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private object _value;
 		private string _parameterName;
 		private string _sourceColumn;
+		private string _normalizedParameterName;
 
 		#endregion
 
@@ -55,7 +56,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		public override string ParameterName
 		{
 			get { return _parameterName; }
-			set { _parameterName = value; }
+			set
+			{
+				_parameterName = value;
+				_normalizedParameterName = NormalizeParameterName(value);
+			}
 		}
 
 		[Category("Data")]
@@ -214,7 +219,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				return NormalizeParameterName(_parameterName);
+				return _normalizedParameterName;
 			}
 		}
 
@@ -257,6 +262,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_sourceColumn = string.Empty;
 			_parameterName = string.Empty;
 			_charset = FbCharset.Default;
+			_normalizedParameterName = string.Empty;
 		}
 
 		public FbParameter(string parameterName, object value)
@@ -264,6 +270,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_parameterName = parameterName;
 			Value = value;
+			_normalizedParameterName = NormalizeParameterName(parameterName);
 		}
 
 		public FbParameter(string parameterName, FbDbType fbType)
@@ -271,6 +278,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_parameterName = parameterName;
 			FbDbType = fbType;
+			_normalizedParameterName = NormalizeParameterName(parameterName);
 		}
 
 		public FbParameter(string parameterName, FbDbType fbType, int size)
@@ -279,6 +287,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_parameterName = parameterName;
 			FbDbType = fbType;
 			Size = size;
+			_normalizedParameterName = NormalizeParameterName(parameterName);
 		}
 
 		public FbParameter(string parameterName, FbDbType fbType, int size, string sourceColumn)
@@ -288,6 +297,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			FbDbType = fbType;
 			Size = size;
 			_sourceColumn = sourceColumn;
+			_normalizedParameterName = NormalizeParameterName(parameterName);
 		}
 
 		[EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -314,6 +324,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_sourceVersion = sourceVersion;
 			Value = value;
 			_charset = FbCharset.Default;
+			_normalizedParameterName = NormalizeParameterName(parameterName);
 		}
 
 		#endregion
@@ -459,9 +470,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal static string NormalizeParameterName(string parameterName)
 		{
-			return !string.IsNullOrEmpty(parameterName) && !parameterName.StartsWith("@")
-				? string.Format("@{0}", parameterName)
-				: parameterName;
+			if (string.IsNullOrEmpty(parameterName) || parameterName[0] == '@')
+			{
+				return parameterName;
+			}
+
+			return parameterName.PadLeft(parameterName.Length + 1, '@');
 		}
 
 		#endregion

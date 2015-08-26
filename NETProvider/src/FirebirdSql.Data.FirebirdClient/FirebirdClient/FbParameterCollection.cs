@@ -217,12 +217,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			var normalizedParameterName = FbParameter.NormalizeParameterName(parameterName);
 			if (luckyIndex != -1 && luckyIndex < _parameters.Count)
 			{
-				if (_parameters[luckyIndex].InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase))
+				if (_parameters[luckyIndex].InternalParameterName.Equals(normalizedParameterName, StringComparison.OrdinalIgnoreCase))
 				{
 					return luckyIndex;
 				}
 			}
-			return _parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase));
+			return _parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, StringComparison.OrdinalIgnoreCase));
 		}
 
 		public void Insert(int index, FbParameter value)
