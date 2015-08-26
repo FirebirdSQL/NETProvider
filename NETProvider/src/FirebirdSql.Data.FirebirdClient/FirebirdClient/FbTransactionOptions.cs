@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				return (_lockTables ?? (_lockTables = new Dictionary<string, FbTransactionBehavior>()));
+				return _lockTables ?? (_lockTables = new Dictionary<string, FbTransactionBehavior>());
 			}
 			set
 			{
