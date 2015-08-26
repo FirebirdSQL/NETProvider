@@ -29,6 +29,8 @@ using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Services;
 using NUnit.Framework;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace FirebirdSql.Data.UnitTests
 {
@@ -338,7 +340,6 @@ namespace FirebirdSql.Data.UnitTests
 				nbak.Level = l;
 				nbak.BackupFile = TestsSetup.BackupRestoreFile + l.ToString();
 				nbak.DirectIO = true;
-
 				nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
 
 				nbak.ServiceOutput += ServiceOutput;
@@ -361,6 +362,40 @@ namespace FirebirdSql.Data.UnitTests
 			nrest.ServiceOutput += ServiceOutput;
 
 			nrest.Execute();
+		}
+
+		[Test]
+		public void TraceTest()
+		{
+			var trace = new FbTrace();
+			trace.ConnectionString = BuildServicesConnectionString(FbServerType, false);
+			trace.DatabasesConfigurations.Add(new FbDatabaseTraceConfiguration()
+			{
+				Enabled = true,
+				Events = FbDatabaseTraceEvents.Connections | FbDatabaseTraceEvents.Errors,
+				TimeThreshold = TimeSpan.FromMilliseconds(1),
+			});
+
+			var sessionId = -1;
+			trace.ServiceOutput += (sender, e) =>
+			{
+				if (sessionId == -1)
+				{
+					var match = Regex.Match(e.Message, @"Trace session ID (\d+) started");
+					if (match.Success)
+					{
+						sessionId = int.Parse(match.Groups[1].Value);
+					}
+				}
+				ServiceOutput(sender, e);
+			};
+
+			ThreadPool.QueueUserWorkItem(_ =>
+			{
+				Thread.Sleep(2000);
+				new FbTrace(BuildServicesConnectionString(FbServerType, false)).Stop(sessionId);
+			});
+			trace.Start("test");
 		}
 
 		#endregion
