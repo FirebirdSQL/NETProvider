@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Services
 		{
 			get
 			{
-				return _databases ?? (_databases = new List<string>());
+				return (_databases ?? (_databases = new List<string>())).AsReadOnly();
 			}
 		}
 
