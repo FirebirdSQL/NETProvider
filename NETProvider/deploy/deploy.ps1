@@ -6,12 +6,12 @@ $baseDir = Split-Path -Parent (Split-Path -parent $MyInvocation.MyCommand.Defini
 
 rm -Recurse -Force $baseDir\deploy\out\*
 
-7za a -mx=9 $baseDir\deploy\out\FirebirdSql.Data.FirebirdClient-$Version-NET45.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb
-7za a -mx=9 $baseDir\deploy\out\FirebirdSql.Data.FirebirdClient-$Version-NET40.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb
-7za a -mx=9 $baseDir\deploy\out\FirebirdSql.Data.FirebirdClient-$Version-MONO_LINUX.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_Mono_w_Linux\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_Mono_w_Linux\FirebirdSql.Data.FirebirdClient.pdb 
+7z a -mx=9 $baseDir\deploy\out\FirebirdSql.Data.FirebirdClient-$Version-NET45.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb
+7z a -mx=9 $baseDir\deploy\out\FirebirdSql.Data.FirebirdClient-$Version-NET40.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb
+7z a -mx=9 $baseDir\deploy\out\FirebirdSql.Data.FirebirdClient-$Version-MONO_LINUX.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_Mono_w_Linux\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_Mono_w_Linux\FirebirdSql.Data.FirebirdClient.pdb 
 
-7za a -mx=9 $baseDir\deploy\out\EntityFramework.Firebird-$Version-NET45.7z $baseDir\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.pdb
-7za a -mx=9 $baseDir\deploy\out\EntityFramework.Firebird-$Version-NET40.7z $baseDir\src\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.pdb
+7z a -mx=9 $baseDir\deploy\out\EntityFramework.Firebird-$Version-NET45.7z $baseDir\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.pdb
+7z a -mx=9 $baseDir\deploy\out\EntityFramework.Firebird-$Version-NET40.7z $baseDir\src\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.pdb
 
 & $nuget pack $baseDir\nuget\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.nuspec -Version $Version
 & $nuget pack $baseDir\nuget\EntityFramework.Firebird\EntityFramework.Firebird.nuspec -Version $Version
