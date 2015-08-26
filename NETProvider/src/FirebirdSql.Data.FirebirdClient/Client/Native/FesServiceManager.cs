@@ -29,10 +29,10 @@ namespace FirebirdSql.Data.Client.Native
 	{
 		#region Fields
 
-		private IFbClient fbClient;
-		private int handle;
-		private IntPtr[] statusVector;
-		private Charset charset;
+		private IFbClient _fbClient;
+		private int _handle;
+		private IntPtr[] _statusVector;
+		private Charset _charset;
 
 		#endregion
 
@@ -40,13 +40,13 @@ namespace FirebirdSql.Data.Client.Native
 
 		public int Handle
 		{
-			get { return this.handle; }
+			get { return _handle; }
 		}
 
 		public Charset Charset
 		{
-			get { return this.charset; }
-			set { this.charset = value; }
+			get { return _charset; }
+			set { _charset = value; }
 		}
 
 		#endregion
@@ -60,9 +60,9 @@ namespace FirebirdSql.Data.Client.Native
 
 		public FesServiceManager(string dllName, Charset charset)
 		{
-			this.fbClient = FbClientFactory.GetFbClient(dllName);
-			this.charset = (charset != null ? charset : Charset.DefaultCharset);
-			this.statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+			_fbClient = FbClientFactory.GetFbClient(dllName);
+			_charset = (charset != null ? charset : Charset.DefaultCharset);
+			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
 		#endregion
@@ -72,12 +72,12 @@ namespace FirebirdSql.Data.Client.Native
 		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
 		{
 			// Clear the status vector
-			this.ClearStatusVector();
+			ClearStatusVector();
 
-			int svcHandle = this.Handle;
+			int svcHandle = Handle;
 
-			fbClient.isc_service_attach(
-				this.statusVector,
+			_fbClient.isc_service_attach(
+				_statusVector,
 				(short)service.Length,
 				service,
 				ref	svcHandle,
@@ -85,45 +85,45 @@ namespace FirebirdSql.Data.Client.Native
 				spb.ToArray());
 
 			// Parse status	vector
-			this.ParseStatusVector(this.statusVector);
+			ParseStatusVector(_statusVector);
 
 			// Update status vector
-			this.handle = svcHandle;
+			_handle = svcHandle;
 		}
 
 		public void Detach()
 		{
 			// Clear the status vector
-			this.ClearStatusVector();
+			ClearStatusVector();
 
-			int svcHandle = this.Handle;
+			int svcHandle = Handle;
 
-			fbClient.isc_service_detach(this.statusVector, ref svcHandle);
+			_fbClient.isc_service_detach(_statusVector, ref svcHandle);
 
 			// Parse status	vector
-			this.ParseStatusVector(this.statusVector);
+			ParseStatusVector(_statusVector);
 
 			// Update status vector
-			this.handle = svcHandle;
+			_handle = svcHandle;
 		}
 
 		public void Start(ServiceParameterBuffer spb)
 		{
 			// Clear the status vector
-			this.ClearStatusVector();
+			ClearStatusVector();
 
-			int svcHandle = this.Handle;
+			int svcHandle = Handle;
 			int reserved = 0;
 
-			fbClient.isc_service_start(
-				this.statusVector,
+			_fbClient.isc_service_start(
+				_statusVector,
 				ref	svcHandle,
 				ref	reserved,
 				(short)spb.Length,
 				spb.ToArray());
 
 			// Parse status	vector
-			this.ParseStatusVector(this.statusVector);
+			ParseStatusVector(_statusVector);
 		}
 
 		public void Query(
@@ -134,13 +134,13 @@ namespace FirebirdSql.Data.Client.Native
 			byte[] buffer)
 		{
 			// Clear the status vector
-			this.ClearStatusVector();
+			ClearStatusVector();
 
-			int svcHandle = this.Handle;
+			int svcHandle = Handle;
 			int reserved = 0;
 
-			fbClient.isc_service_query(
-				this.statusVector,
+			_fbClient.isc_service_query(
+				_statusVector,
 				ref	svcHandle,
 				ref	reserved,
 				(short)spb.Length,
@@ -151,7 +151,7 @@ namespace FirebirdSql.Data.Client.Native
 				buffer);
 
 			// Parse status	vector
-			this.ParseStatusVector(this.statusVector);
+			ParseStatusVector(_statusVector);
 		}
 
 		#endregion
@@ -160,12 +160,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void ClearStatusVector()
 		{
-			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+			Array.Clear(_statusVector, 0, _statusVector.Length);
 		}
 
 		private void ParseStatusVector(IntPtr[] statusVector)
 		{
-			IscException ex = FesConnection.ParseStatusVector(statusVector, this.charset);
+			IscException ex = FesConnection.ParseStatusVector(statusVector, _charset);
 
 			if (ex != null && !ex.IsWarning)
 			{

@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private List<Dictionary<string, Symbol>> symbols = new List<Dictionary<string, Symbol>>();
+		private List<Dictionary<string, Symbol>> _symbols = new List<Dictionary<string, Symbol>>();
 
 		#endregion
 
@@ -47,26 +47,26 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		internal void EnterScope()
 		{
-			symbols.Add(new Dictionary<string, Symbol>(StringComparer.OrdinalIgnoreCase));
+			_symbols.Add(new Dictionary<string, Symbol>(StringComparer.OrdinalIgnoreCase));
 		}
 
 		internal void ExitScope()
 		{
-			symbols.RemoveAt(symbols.Count - 1);
+			_symbols.RemoveAt(_symbols.Count - 1);
 		}
 
 		internal void Add(string name, Symbol value)
 		{
-			symbols[symbols.Count - 1][name] = value;
+			_symbols[_symbols.Count - 1][name] = value;
 		}
 
 		internal Symbol Lookup(string name)
 		{
-			for (int i = symbols.Count - 1; i >= 0; --i)
+			for (int i = _symbols.Count - 1; i >= 0; --i)
 			{
-				if (symbols[i].ContainsKey(name))
+				if (_symbols[i].ContainsKey(name))
 				{
-					return symbols[i][name];
+					return _symbols[i][name];
 				}
 			}
 

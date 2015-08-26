@@ -28,9 +28,9 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private int		rblFlags;
-		private Charset charset;
-		private int		segmentSize;
+		private int		_rblFlags;
+		private Charset _charset;
+		private int		_segmentSize;
 
 		#endregion
 
@@ -38,27 +38,27 @@ namespace FirebirdSql.Data.Common
 
 		public int Handle
 		{
-			get { return this.blobHandle; }
+			get { return _blobHandle; }
 		}
 
 		public long Id
 		{
-			get { return this.blobId; }
+			get { return _blobId; }
 		}
 
 		public bool EOF
 		{
-			get { return (this.rblFlags & IscCodes.RBL_eof_pending) != 0; }
+			get { return (_rblFlags & IscCodes.RBL_eof_pending) != 0; }
 		}
 
 		#endregion
 
 		#region Protected Fields
 
-		protected long          blobId;
-		protected int           blobHandle;
-		protected int           position;
-		protected ITransaction  transaction;
+		protected long          _blobId;
+		protected int           _blobHandle;
+		protected int           _position;
+		protected ITransaction  _transaction;
 
 		#endregion
 
@@ -66,7 +66,7 @@ namespace FirebirdSql.Data.Common
 
 		protected int SegmentSize
 		{
-			get { return this.segmentSize; }
+			get { return _segmentSize; }
 		}
 
 		#endregion
@@ -84,8 +84,8 @@ namespace FirebirdSql.Data.Common
 
 		protected BlobBase(IDatabase db)
 		{
-			this.segmentSize = db.PacketSize;
-			this.charset = db.Charset;
+			_segmentSize = db.PacketSize;
+			_charset = db.Charset;
 		}
 
 		#endregion
@@ -94,8 +94,8 @@ namespace FirebirdSql.Data.Common
 
 		public string ReadString()
 		{
-			byte[] buffer = this.Read();
-			return this.charset.GetString(buffer, 0, buffer.Length);
+			byte[] buffer = Read();
+			return _charset.GetString(buffer, 0, buffer.Length);
 		}
 
 		public byte[] Read()
@@ -104,20 +104,20 @@ namespace FirebirdSql.Data.Common
 
 			try
 			{
-				this.Open();
+				Open();
 
 				while (!EOF)
 				{
-					byte[] segment = this.GetSegment();
+					byte[] segment = GetSegment();
 					ms.Write(segment, 0, segment.Length);
 				}
 
-				this.Close();
+				Close();
 			}
 			catch
 			{
 				// Cancel the blob and rethrow the exception
-				this.Cancel();
+				Cancel();
 
 				throw;
 			}
@@ -127,25 +127,25 @@ namespace FirebirdSql.Data.Common
 
 		public void Write(string data)
 		{
-			this.Write(this.charset.GetBytes(data));
+			Write(_charset.GetBytes(data));
 		}
 
 		public void Write(byte[] buffer)
 		{
-			this.Write(buffer, 0, buffer.Length);
+			Write(buffer, 0, buffer.Length);
 		}
 
 		public void Write(byte[] buffer, int index, int count)
 		{
 			try
 			{
-				this.Create();
+				Create();
 
 				byte[] tmpBuffer = null;
 
 				int length	= count;
 				int offset	= index;
-				int chunk	= length >= this.segmentSize ? this.segmentSize : length;
+				int chunk	= length >= _segmentSize ? _segmentSize : length;
 
 				tmpBuffer = new byte[chunk];
 
@@ -158,18 +158,18 @@ namespace FirebirdSql.Data.Common
 					}
 
 					Array.Copy(buffer, offset, tmpBuffer, 0, chunk);
-					this.PutSegment(tmpBuffer);
+					PutSegment(tmpBuffer);
 
 					offset += chunk;
 					length -= chunk;
 				}
 
-				this.Close();
+				Close();
 			}
 			catch
 			{
 				// Cancel the blob and rethrow the exception
-				this.Cancel();
+				Cancel();
 
 				throw;
 			}
@@ -194,12 +194,12 @@ namespace FirebirdSql.Data.Common
 
 		protected void RblAddValue(int rblValue)
 		{
-			this.rblFlags |= rblValue;
+			_rblFlags |= rblValue;
 		}
 
 		protected void RblRemoveValue(int rblValue)
 		{
-			this.rblFlags &= ~rblValue;
+			_rblFlags &= ~rblValue;
 		}
 
 		#endregion

@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private ISqlFragment firstCount;
+		private ISqlFragment _firstCount;
 
 		#endregion
 
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// </summary>
 		internal ISqlFragment FirstCount
 		{
-			get { return this.firstCount; }
+			get { return _firstCount; }
 		}
 
 		#endregion
@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <param name="topCount"></param>
 		internal FirstClause(ISqlFragment firstCount)
 		{
-			this.firstCount = firstCount;
+			_firstCount = firstCount;
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			SqlBuilder sqlBuilder = new SqlBuilder();
 			sqlBuilder.Append(firstCount.ToString(CultureInfo.InvariantCulture));
-			this.firstCount = sqlBuilder;
+			_firstCount = sqlBuilder;
 		}
 
 		#endregion
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
 		{
 			writer.Write("FIRST (");
-			this.FirstCount.WriteSql(writer, sqlGenerator);
+			FirstCount.WriteSql(writer, sqlGenerator);
 			writer.Write(")");
 
 			writer.Write(" ");

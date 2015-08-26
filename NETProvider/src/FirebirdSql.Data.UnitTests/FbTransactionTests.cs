@@ -89,9 +89,9 @@ namespace FirebirdSql.Data.UnitTests
 
 			try
 			{
-				transaction = this.Connection.BeginTransaction();
+				transaction = Connection.BeginTransaction();
 
-				command = new FbCommand("ALTER TABLE \"TEST\" drop \"INT_FIELD\"", this.Connection, transaction);
+				command = new FbCommand("ALTER TABLE \"TEST\" drop \"INT_FIELD\"", Connection, transaction);
 				command.ExecuteNonQuery();
 
 				transaction.Commit();

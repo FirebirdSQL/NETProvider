@@ -113,22 +113,22 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		public override System.Collections.ObjectModel.ReadOnlyCollection<PrimitiveType> GetStoreTypes()
 		{
-			if (this._primitiveTypes == null)
+			if (_primitiveTypes == null)
 			{
-				this._primitiveTypes = base.GetStoreTypes();
+				_primitiveTypes = base.GetStoreTypes();
 			}
 
-			return this._primitiveTypes;
+			return _primitiveTypes;
 		}
 
 		public override System.Collections.ObjectModel.ReadOnlyCollection<EdmFunction> GetStoreFunctions()
 		{
-			if (this._functions == null)
+			if (_functions == null)
 			{
-				this._functions = base.GetStoreFunctions();
+				_functions = base.GetStoreFunctions();
 			}
 
-			return this._functions;
+			return _functions;
 		}
 
 		/// <summary>

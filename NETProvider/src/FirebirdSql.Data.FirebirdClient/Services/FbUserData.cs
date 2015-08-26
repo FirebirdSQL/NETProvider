@@ -24,15 +24,15 @@ namespace FirebirdSql.Data.Services
 	{
 		#region Fields
 
-		private string userName;
-		private string firstName;
-		private string lastName;
-		private string middleName;
-		private string userPassword;
-		private string groupName;
-		private string roleName;
-		private int userID;
-		private int groupID;
+		private string _userName;
+		private string _firstName;
+		private string _lastName;
+		private string _middleName;
+		private string _userPassword;
+		private string _groupName;
+		private string _roleName;
+		private int _userID;
+		private int _groupID;
 
 		#endregion
 
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Services
 
 		public string UserName
 		{
-			get { return this.userName; }
+			get { return _userName; }
 			set
 			{
 				if (value == null)
@@ -52,13 +52,13 @@ namespace FirebirdSql.Data.Services
 					throw new InvalidOperationException("The user name cannot have more than 31 characters.");
 				}
 
-				this.userName = value;
+				_userName = value;
 			}
 		}
 
 		public string UserPassword
 		{
-			get { return this.userPassword; }
+			get { return _userPassword; }
 			set
 			{
 				if (value == null)
@@ -70,50 +70,50 @@ namespace FirebirdSql.Data.Services
 					throw new InvalidOperationException("The user password cannot have more than 31 characters.");
 				}
 
-				this.userPassword = value;
+				_userPassword = value;
 			}
 		}
 
 		public string FirstName
 		{
-			get { return this.firstName; }
-			set { this.firstName = value; }
+			get { return _firstName; }
+			set { _firstName = value; }
 		}
 
 		public string LastName
 		{
-			get { return this.lastName; }
-			set { this.lastName = value; }
+			get { return _lastName; }
+			set { _lastName = value; }
 		}
 
 		public string MiddleName
 		{
-			get { return this.middleName; }
-			set { this.middleName = value; }
+			get { return _middleName; }
+			set { _middleName = value; }
 		}
 
 		public int UserID
 		{
-			get { return this.userID; }
-			set { this.userID = value; }
+			get { return _userID; }
+			set { _userID = value; }
 		}
 
 		public int GroupID
 		{
-			get { return this.groupID; }
-			set { this.groupID = value; }
+			get { return _groupID; }
+			set { _groupID = value; }
 		}
 
 		public string GroupName
 		{
-			get { return this.groupName; }
-			set { this.groupName = value; }
+			get { return _groupName; }
+			set { _groupName = value; }
 		}
 
 		public string RoleName
 		{
-			get { return this.roleName; }
-			set { this.roleName = value; }
+			get { return _roleName; }
+			set { _roleName = value; }
 		}
 
 		#endregion
@@ -122,12 +122,12 @@ namespace FirebirdSql.Data.Services
 
 		public FbUserData()
 		{
-			this.userName = string.Empty;
-			this.firstName = string.Empty;
-			this.lastName = string.Empty;
-			this.middleName = string.Empty;
-			this.userPassword = string.Empty;
-			this.roleName = string.Empty;
+			_userName = string.Empty;
+			_firstName = string.Empty;
+			_lastName = string.Empty;
+			_middleName = string.Empty;
+			_userPassword = string.Empty;
+			_roleName = string.Empty;
 		}
 
 		#endregion

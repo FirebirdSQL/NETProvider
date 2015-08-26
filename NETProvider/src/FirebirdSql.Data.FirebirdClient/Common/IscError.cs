@@ -29,10 +29,10 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private string	message;
-		private int		type;
-		private int		errorCode;
-		private string	strParam;
+		private string	_message;
+		private int		_type;
+		private int		_errorCode;
+		private string	_strParam;
 
 		#endregion
 
@@ -40,29 +40,29 @@ namespace FirebirdSql.Data.Common
 
 		public string Message
 		{
-			get { return this.message; }
-			set { this.message = value; }
+			get { return _message; }
+			set { _message = value; }
 		}
 
 		public int ErrorCode
 		{
-			get { return this.errorCode; }
+			get { return _errorCode; }
 		}
 
 		public string StrParam
 		{
 			get
 			{
-				switch (this.type)
+				switch (_type)
 				{
 					case IscCodes.isc_arg_interpreted:
 					case IscCodes.isc_arg_string:
 					case IscCodes.isc_arg_cstring:
 					case IscCodes.isc_arg_sql_state:
-						return this.strParam;
+						return _strParam;
 
 					case IscCodes.isc_arg_number:
-						return this.errorCode.ToString(CultureInfo.InvariantCulture);
+						return _errorCode.ToString(CultureInfo.InvariantCulture);
 
 					default:
 						return string.Empty;
@@ -72,14 +72,14 @@ namespace FirebirdSql.Data.Common
 
 		public int Type
 		{
-			get { return this.type; }
+			get { return _type; }
 		}
 
 		public bool IsArgument
 		{
 			get
 			{
-				switch (this.type)
+				switch (_type)
 				{
 					case IscCodes.isc_arg_interpreted:
 					case IscCodes.isc_arg_string:
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsWarning
 		{
-			get { return this.type == IscCodes.isc_arg_warning; }
+			get { return _type == IscCodes.isc_arg_warning; }
 		}
 
 		#endregion
@@ -104,19 +104,19 @@ namespace FirebirdSql.Data.Common
 
 		internal IscError(int errorCode)
 		{
-			this.errorCode = errorCode;
+			_errorCode = errorCode;
 		}
 
 		internal IscError(int type, string strParam)
 		{
-			this.type		= type;
-			this.strParam	= strParam;
+			_type = type;
+			_strParam = strParam;
 		}
 
 		internal IscError(int type, int errorCode)
 		{
-			this.type		= type;
-			this.errorCode	= errorCode;
+			_type = type;
+			_errorCode = errorCode;
 		}
 
 		#endregion

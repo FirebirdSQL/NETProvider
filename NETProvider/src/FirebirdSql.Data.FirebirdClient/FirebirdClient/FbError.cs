@@ -25,10 +25,10 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Fields
 
-		private byte classError;
-		private int lineNumber;
-		private string message;
-		private int number;
+		private byte _classError;
+		private int _lineNumber;
+		private string _message;
+		private int _number;
 
 		#endregion
 
@@ -36,22 +36,22 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public byte Class
 		{
-			get { return this.classError; }
+			get { return _classError; }
 		}
 
 		public int LineNumber
 		{
-			get { return this.lineNumber; }
+			get { return _lineNumber; }
 		}
 
 		public string Message
 		{
-			get { return this.message; }
+			get { return _message; }
 		}
 
 		public int Number
 		{
-			get { return this.number; }
+			get { return _number; }
 		}
 
 		#endregion
@@ -70,10 +70,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal FbError(byte classError, int line, string message, int number)
 		{
-			this.classError = classError;
-			this.lineNumber = line;
-			this.number = number;
-			this.message = message;
+			_classError = classError;
+			_lineNumber = line;
+			_number = number;
+			_message = message;
 		}
 
 		#endregion

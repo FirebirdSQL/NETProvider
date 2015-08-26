@@ -31,10 +31,10 @@ namespace FirebirdSql.Data.Services
 	{
 		#region Properties
 
-		private FbBackupFileCollection backupFiles;
+		private FbBackupFileCollection _backupFiles;
 		public FbBackupFileCollection BackupFiles
 		{
-			get { return this.backupFiles; }
+			get { return _backupFiles; }
 		}
 
 		public bool Verbose { get; set; }
@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Services
 		public FbBackup(string connectionString = null)
 			: base(connectionString)
 		{
-			this.backupFiles = new FbBackupFileCollection();
+			_backupFiles = new FbBackupFileCollection();
 		}
 
 		#endregion
@@ -60,33 +60,33 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				// Configure Spb
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_backup);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+				StartSpb.Append(IscCodes.isc_action_svc_backup);
+				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
-				foreach (FbBackupFile file in backupFiles)
+				foreach (FbBackupFile file in _backupFiles)
 				{
-					this.StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
+					StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
 					if (file.BackupLength.HasValue)
-						this.StartSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
+						StartSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
 				}
 
-				if (this.Verbose)
+				if (Verbose)
 				{
-					this.StartSpb.Append(IscCodes.isc_spb_verbose);
+					StartSpb.Append(IscCodes.isc_spb_verbose);
 				}
 
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.Options);
+				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
-				this.Open();
+				Open();
 
 				// Start execution
-				this.StartTask();
+				StartTask();
 
-				if (this.Verbose)
+				if (Verbose)
 				{
-					this.ProcessServiceOutput();
+					ProcessServiceOutput();
 				}
 			}
 			catch (Exception ex)
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.Services
 			finally
 			{
 				// Close
-				this.Close();
+				Close();
 			}
 		}
 

@@ -29,9 +29,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region Fields
 
-		private int             handle;
-		private GdsDatabase     database;
-		private GdsConnection   connection;
+		private int             _handle;
+		private GdsDatabase     _database;
+		private GdsConnection   _connection;
 
 		#endregion
 
@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public int Handle
 		{
-			get { return this.handle; }
+			get { return _handle; }
 		}
 
 		#endregion
@@ -48,8 +48,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public GdsServiceManager(GdsConnection connection)
 		{
-			this.connection = connection;
-			this.database   = new GdsDatabase(this.connection);
+			_connection = connection;
+			_database = new GdsDatabase(_connection);
 		}
 
 		#endregion
@@ -64,19 +64,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					this.database.Write(IscCodes.op_service_attach);
-					this.database.Write(0);
-					this.database.Write(service);
-					this.database.WriteBuffer(spb.ToArray());
-					this.database.Flush();
+					_database.Write(IscCodes.op_service_attach);
+					_database.Write(0);
+					_database.Write(service);
+					_database.WriteBuffer(spb.ToArray());
+					_database.Flush();
 
-					response = this.database.ReadGenericResponse();
+					response = _database.ReadGenericResponse();
 
-					this.handle = response.ObjectHandle;
+					_handle = response.ObjectHandle;
 				}
 				catch (IOException)
 				{
-					this.database.Detach();
+					_database.Detach();
 
 					throw new IscException(IscCodes.isc_net_write_err);
 				}
@@ -89,12 +89,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					this.database.Write(IscCodes.op_service_detach);
-					this.database.Write(this.Handle);
-					this.database.Write(IscCodes.op_disconnect);
-					this.database.Flush();
+					_database.Write(IscCodes.op_service_detach);
+					_database.Write(Handle);
+					_database.Write(IscCodes.op_disconnect);
+					_database.Flush();
 
-					this.handle = 0;
+					_handle = 0;
 				}
 				catch (IOException)
 				{
@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					try
 					{
-						this.connection.Disconnect();
+						_connection.Disconnect();
 					}
 					catch (IOException)
 					{
@@ -112,8 +112,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					finally
 					{
-						this.database   = null;
-						this.connection = null;
+						_database = null;
+						_connection = null;
 					}
 				}
 			}
@@ -125,15 +125,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					this.database.Write(IscCodes.op_service_start);
-					this.database.Write(this.Handle);
-					this.database.Write(0);
-					this.database.WriteBuffer(spb.ToArray(), spb.Length);
-					this.database.Flush();
+					_database.Write(IscCodes.op_service_start);
+					_database.Write(Handle);
+					_database.Write(0);
+					_database.WriteBuffer(spb.ToArray(), spb.Length);
+					_database.Flush();
 
 					try
 					{
-						this.database.ReadResponse();
+						_database.ReadResponse();
 					}
 					catch (IscException)
 					{
@@ -158,16 +158,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					this.database.Write(IscCodes.op_service_info);	//	operation
-					this.database.Write(this.Handle);				//	db_handle
-					this.database.Write(0);										//	incarnation
-					this.database.WriteBuffer(spb.ToArray(), spb.Length);		//	Service parameter buffer
-					this.database.WriteBuffer(requestBuffer, requestLength);	//	request	buffer
-					this.database.Write(bufferLength);				//	result buffer length
+					_database.Write(IscCodes.op_service_info);  //	operation
+					_database.Write(Handle);                //	db_handle
+					_database.Write(0);                                     //	incarnation
+					_database.WriteBuffer(spb.ToArray(), spb.Length);       //	Service parameter buffer
+					_database.WriteBuffer(requestBuffer, requestLength);    //	request	buffer
+					_database.Write(bufferLength);              //	result buffer length
 
-					this.database.Flush();
+					_database.Flush();
 
-					GenericResponse response = this.database.ReadGenericResponse();
+					GenericResponse response = _database.ReadGenericResponse();
 
 					int responseLength = bufferLength;
 

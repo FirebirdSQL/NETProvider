@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Fields
 
-		private FbConnection connection;
+		private FbConnection _connection;
 
 		#endregion
 
@@ -37,188 +37,188 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnection Connection
 		{
-			get { return this.connection; }
-			set { this.connection = value; }
+			get { return _connection; }
+			set { _connection = value; }
 		}
 
 		public string IscVersion
 		{
-			get { return this.GetString(IscCodes.isc_info_isc_version); }
+			get { return GetString(IscCodes.isc_info_isc_version); }
 		}
 
 		public string ServerVersion
 		{
-			get { return this.GetString(IscCodes.isc_info_firebird_version); }
+			get { return GetString(IscCodes.isc_info_firebird_version); }
 		}
 
 		public string ServerClass
 		{
-			get { return this.GetString(IscCodes.isc_info_db_class); }
+			get { return GetString(IscCodes.isc_info_db_class); }
 		}
 
 		public int PageSize
 		{
-			get { return this.GetInt32(IscCodes.isc_info_page_size); }
+			get { return GetInt32(IscCodes.isc_info_page_size); }
 		}
 
 		public int AllocationPages
 		{
-			get { return this.GetInt32(IscCodes.isc_info_allocation); }
+			get { return GetInt32(IscCodes.isc_info_allocation); }
 		}
 
 		public string BaseLevel
 		{
-			get { return this.GetString(IscCodes.isc_info_base_level); }
+			get { return GetString(IscCodes.isc_info_base_level); }
 		}
 
 		public string DbId
 		{
-			get { return this.GetString(IscCodes.isc_info_db_id); }
+			get { return GetString(IscCodes.isc_info_db_id); }
 		}
 
 		public string Implementation
 		{
-			get { return this.GetString(IscCodes.isc_info_implementation); }
+			get { return GetString(IscCodes.isc_info_implementation); }
 		}
 
 		public bool NoReserve
 		{
-			get { return this.GetBoolean(IscCodes.isc_info_no_reserve); }
+			get { return GetBoolean(IscCodes.isc_info_no_reserve); }
 		}
 
 		public int OdsVersion
 		{
-			get { return this.GetInt32(IscCodes.isc_info_ods_version); }
+			get { return GetInt32(IscCodes.isc_info_ods_version); }
 		}
 
 		public int OdsMinorVersion
 		{
-			get { return this.GetInt32(IscCodes.isc_info_ods_minor_version); }
+			get { return GetInt32(IscCodes.isc_info_ods_minor_version); }
 		}
 
 		public int MaxMemory
 		{
-			get { return this.GetInt32(IscCodes.isc_info_max_memory); }
+			get { return GetInt32(IscCodes.isc_info_max_memory); }
 		}
 
 		public int CurrentMemory
 		{
-			get { return this.GetInt32(IscCodes.isc_info_current_memory); }
+			get { return GetInt32(IscCodes.isc_info_current_memory); }
 		}
 
 		public bool ForcedWrites
 		{
-			get { return this.GetBoolean(IscCodes.isc_info_forced_writes); }
+			get { return GetBoolean(IscCodes.isc_info_forced_writes); }
 		}
 
 		public int NumBuffers
 		{
-			get { return this.GetInt32(IscCodes.isc_info_num_buffers); }
+			get { return GetInt32(IscCodes.isc_info_num_buffers); }
 		}
 
 		public int SweepInterval
 		{
-			get { return this.GetInt32(IscCodes.isc_info_sweep_interval); }
+			get { return GetInt32(IscCodes.isc_info_sweep_interval); }
 		}
 
 		public bool ReadOnly
 		{
-			get { return this.GetBoolean(IscCodes.isc_info_db_read_only); }
+			get { return GetBoolean(IscCodes.isc_info_db_read_only); }
 		}
 
 		public int Fetches
 		{
-			get { return this.GetInt32(IscCodes.isc_info_fetches); }
+			get { return GetInt32(IscCodes.isc_info_fetches); }
 		}
 
 		public int Marks
 		{
-			get { return this.GetInt32(IscCodes.isc_info_marks); }
+			get { return GetInt32(IscCodes.isc_info_marks); }
 		}
 
 		public int Reads
 		{
-			get { return this.GetInt32(IscCodes.isc_info_reads); }
+			get { return GetInt32(IscCodes.isc_info_reads); }
 		}
 
 		public int Writes
 		{
-			get { return this.GetInt32(IscCodes.isc_info_writes); }
+			get { return GetInt32(IscCodes.isc_info_writes); }
 		}
 
 		public int BackoutCount
 		{
-			get { return this.GetInt32(IscCodes.isc_info_backout_count); }
+			get { return GetInt32(IscCodes.isc_info_backout_count); }
 		}
 
 		public int DeleteCount
 		{
-			get { return this.GetInt32(IscCodes.isc_info_delete_count); }
+			get { return GetInt32(IscCodes.isc_info_delete_count); }
 		}
 
 		public int ExpungeCount
 		{
-			get { return this.GetInt32(IscCodes.isc_info_expunge_count); }
+			get { return GetInt32(IscCodes.isc_info_expunge_count); }
 		}
 
 		public int InsertCount
 		{
-			get { return this.GetInt32(IscCodes.isc_info_insert_count); }
+			get { return GetInt32(IscCodes.isc_info_insert_count); }
 		}
 
 		public int PurgeCount
 		{
-			get { return this.GetInt32(IscCodes.isc_info_purge_count); }
+			get { return GetInt32(IscCodes.isc_info_purge_count); }
 		}
 
 		public int ReadIdxCount
 		{
-			get { return this.GetInt32(IscCodes.isc_info_read_idx_count); }
+			get { return GetInt32(IscCodes.isc_info_read_idx_count); }
 		}
 
 		public int ReadSeqCount
 		{
-			get { return this.GetInt32(IscCodes.isc_info_read_seq_count); }
+			get { return GetInt32(IscCodes.isc_info_read_seq_count); }
 		}
 
 		public int UpdateCount
 		{
-			get { return this.GetInt32(IscCodes.isc_info_update_count); }
+			get { return GetInt32(IscCodes.isc_info_update_count); }
 		}
 
 		public int DatabaseSizeInPages
 		{
-			get { return this.GetInt32(IscCodes.isc_info_db_size_in_pages); }
+			get { return GetInt32(IscCodes.isc_info_db_size_in_pages); }
 		}
 
 		public int OldestTransaction
 		{
-			get { return this.GetInt32(IscCodes.isc_info_oldest_transaction); }
+			get { return GetInt32(IscCodes.isc_info_oldest_transaction); }
 		}
 
 		public int OldestActiveTransaction
 		{
-			get { return this.GetInt32(IscCodes.isc_info_oldest_active); }
+			get { return GetInt32(IscCodes.isc_info_oldest_active); }
 		}
 
 		public int OldestActiveSnapshot
 		{
-			get { return this.GetInt32(IscCodes.isc_info_oldest_snapshot); }
+			get { return GetInt32(IscCodes.isc_info_oldest_snapshot); }
 		}
 
 		public int NextTransaction
 		{
-			get { return this.GetInt32(IscCodes.isc_info_next_transaction); }
+			get { return GetInt32(IscCodes.isc_info_next_transaction); }
 		}
 
 		public int ActiveTransactions
 		{
-			get { return this.GetInt32(IscCodes.isc_info_active_transactions); }
+			get { return GetInt32(IscCodes.isc_info_active_transactions); }
 		}
 
 		public ArrayList ActiveUsers
 		{
-			get { return this.GetArrayList(IscCodes.isc_info_user_names); }
+			get { return GetArrayList(IscCodes.isc_info_user_names); }
 		}
 
 		#endregion
@@ -231,7 +231,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbDatabaseInfo(FbConnection connection)
 		{
-			this.connection = connection;
+			_connection = connection;
 		}
 
 		#endregion
@@ -240,9 +240,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetString(byte item)
 		{
-			this.CheckConnection();
+			CheckConnection();
 
-			IDatabase db = this.Connection.InnerConnection.Database;
+			IDatabase db = Connection.InnerConnection.Database;
 			byte[] items = new byte[]
 				{
 					item,
@@ -254,9 +254,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private int GetInt32(byte item)
 		{
-			this.CheckConnection();
+			CheckConnection();
 
-			IDatabase db = this.Connection.InnerConnection.Database;
+			IDatabase db = Connection.InnerConnection.Database;
 			byte[] items = new byte[]
 				{
 					item,
@@ -270,9 +270,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private bool GetBoolean(byte item)
 		{
-			this.CheckConnection();
+			CheckConnection();
 
-			IDatabase db = this.Connection.InnerConnection.Database;
+			IDatabase db = Connection.InnerConnection.Database;
 			byte[] items = new byte[]
 				{
 					item,
@@ -286,9 +286,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private ArrayList GetArrayList(byte item)
 		{
-			this.CheckConnection();
+			CheckConnection();
 
-			IDatabase db = this.Connection.InnerConnection.Database;
+			IDatabase db = Connection.InnerConnection.Database;
 			byte[] items = new byte[]
 				{
 					item,
@@ -300,8 +300,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckConnection()
 		{
-			if (this.connection == null ||
-				this.connection.State == ConnectionState.Closed)
+			if (_connection == null ||
+				_connection.State == ConnectionState.Closed)
 			{
 				throw new InvalidOperationException("Connection must be valid and open");
 			}

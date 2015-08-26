@@ -30,8 +30,8 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private MemoryStream stream;
-		private bool isLittleEndian;
+		private MemoryStream _stream;
+		private bool _isLittleEndian;
 
 		#endregion
 
@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Common
 
 		public short Length
 		{
-			get { return (short)this.ToArray().Length; }
+			get { return (short)ToArray().Length; }
 		}
 
 		#endregion
@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Common
 
 		protected bool IsLittleEndian
 		{
-			get { return this.isLittleEndian; }
+			get { return _isLittleEndian; }
 		}
 
 		#endregion
@@ -57,8 +57,8 @@ namespace FirebirdSql.Data.Common
 
 		protected ParameterBuffer(bool isLittleEndian)
 		{
-			this.stream = new MemoryStream();
-			this.isLittleEndian = isLittleEndian;
+			_stream = new MemoryStream();
+			_isLittleEndian = isLittleEndian;
 		}
 
 		#endregion
@@ -67,12 +67,12 @@ namespace FirebirdSql.Data.Common
 
 		public virtual void Append(int type)
 		{
-			this.WriteByte(type);
+			WriteByte(type);
 		}
 
 		public byte[] ToArray()
 		{
-			return stream.ToArray();
+			return _stream.ToArray();
 		}
 
 		#endregion
@@ -81,51 +81,51 @@ namespace FirebirdSql.Data.Common
 
 		protected void WriteByte(int value)
 		{
-			this.WriteByte((byte)value);
+			WriteByte((byte)value);
 		}
 
 		protected void WriteByte(byte value)
 		{
-			this.stream.WriteByte(value);
+			_stream.WriteByte(value);
 		}
 
 		protected void Write(byte value)
 		{
-			this.WriteByte(value);
+			WriteByte(value);
 		}
 
 		protected void Write(short value)
 		{
-			if (!this.IsLittleEndian)
+			if (!IsLittleEndian)
 			{
 				value = (short)IPAddress.NetworkToHostOrder(value);
 			}
 
 			byte[] buffer = BitConverter.GetBytes(value);
 
-			this.stream.Write(buffer, 0, buffer.Length);
+			_stream.Write(buffer, 0, buffer.Length);
 		}
 
 		protected void Write(int value)
 		{
-			if (!this.IsLittleEndian)
+			if (!IsLittleEndian)
 			{
 				value = (int)IPAddress.NetworkToHostOrder(value);
 			}
 
 			byte[] buffer = BitConverter.GetBytes(value);
 
-			this.stream.Write(buffer, 0, buffer.Length);
+			_stream.Write(buffer, 0, buffer.Length);
 		}
 
 		protected void Write(byte[] buffer)
 		{
-			this.Write(buffer, 0, buffer.Length);
+			Write(buffer, 0, buffer.Length);
 		}
 
 		protected void Write(byte[] buffer, int offset, int count)
 		{
-			this.stream.Write(buffer, offset, count);
+			_stream.Write(buffer, offset, count);
 		}
 
 		#endregion

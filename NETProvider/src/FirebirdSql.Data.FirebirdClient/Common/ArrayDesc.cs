@@ -40,58 +40,58 @@ namespace FirebirdSql.Data.Common
 
 		public byte DataType
 		{
-			get { return this.dataType; }
-			set { this.dataType = value; }
+			get { return dataType; }
+			set { dataType = value; }
 		}
 
 		// Scale for numeric datatypes
 		public short Scale
 		{
-			get { return this.scale; }
-			set { this.scale = value; }
+			get { return scale; }
+			set { scale = value; }
 		}
 
 		// Legth in bytes of each array element
 		public short Length
 		{
-			get { return this.length; }
-			set { this.length = value; }
+			get { return length; }
+			set { length = value; }
 		}
 
 		// Column name - 32
 		public string FieldName
 		{
-			get { return this.fieldName; }
-			set { this.fieldName = value; }
+			get { return fieldName; }
+			set { fieldName = value; }
 		}
 
 		// Table name -32
 		public string RelationName
 		{
-			get { return this.relationName; }
-			set { this.relationName = value; }
+			get { return relationName; }
+			set { relationName = value; }
 		}
 
 		// Number of array dimensions 
 		public short Dimensions
 		{
-			get { return this.dimensions; }
-			set { this.dimensions = value; }
+			get { return dimensions; }
+			set { dimensions = value; }
 		}
 
 		// Specifies wheter array is to be accesed in
 		// row mayor or column-mayor order
 		public short Flags
 		{
-			get { return this.flags; }
-			set { this.flags = value; }
+			get { return flags; }
+			set { flags = value; }
 		}
 
 		// Lower and upper bounds for each dimension - 16
 		public ArrayBound[] Bounds
 		{
-			get { return this.bounds; }
-			set { this.bounds = value; }
+			get { return bounds; }
+			set { bounds = value; }
 		}
 
 		#endregion

@@ -75,9 +75,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Fields
 
-		private Charset charset;
-		private Stream innerStream;
-		private int operation;
+		private Charset _charset;
+		private Stream _innerStream;
+		private int _operation;
 
 		#endregion
 
@@ -85,28 +85,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override bool CanWrite
 		{
-			get { return this.innerStream.CanWrite; }
+			get { return _innerStream.CanWrite; }
 		}
 
 		public override bool CanRead
 		{
-			get { return this.innerStream.CanRead; }
+			get { return _innerStream.CanRead; }
 		}
 
 		public override bool CanSeek
 		{
-			get { return this.innerStream.CanSeek; }
+			get { return _innerStream.CanSeek; }
 		}
 
 		public override long Position
 		{
-			get { return this.innerStream.Position; }
-			set { this.innerStream.Position = value; }
+			get { return _innerStream.Position; }
+			set { _innerStream.Position = value; }
 		}
 
 		public override long Length
 		{
-			get { return this.innerStream.Length; }
+			get { return _innerStream.Length; }
 		}
 
 		#endregion
@@ -128,9 +128,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public XdrStream(Stream innerStream, Charset charset)
 			: base()
 		{
-			this.innerStream = innerStream;
-			this.charset = charset;
-			this.ResetOperation();
+			_innerStream = innerStream;
+			_charset = charset;
+			ResetOperation();
 
 			GC.SuppressFinalize(innerStream);
 		}
@@ -143,9 +143,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				if (this.innerStream != null)
+				if (_innerStream != null)
 				{
-					this.innerStream.Close();
+					_innerStream.Close();
 				}
 			}
 			catch
@@ -153,39 +153,39 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			finally
 			{
-				this.charset = null;
-				this.innerStream = null;
+				_charset = null;
+				_innerStream = null;
 			}
 		}
 
 		public override void Flush()
 		{
-			this.CheckDisposed();
+			CheckDisposed();
 
-			this.innerStream.Flush();
+			_innerStream.Flush();
 		}
 
 		public override void SetLength(long length)
 		{
-			this.CheckDisposed();
+			CheckDisposed();
 
-			this.innerStream.SetLength(length);
+			_innerStream.SetLength(length);
 		}
 
 		public override long Seek(long offset, System.IO.SeekOrigin loc)
 		{
-			this.CheckDisposed();
+			CheckDisposed();
 
-			return this.innerStream.Seek(offset, loc);
+			return _innerStream.Seek(offset, loc);
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			this.CheckDisposed();
+			CheckDisposed();
 
-			if (this.CanRead)
+			if (CanRead)
 			{
-				return this.innerStream.Read(buffer, offset, count);
+				return _innerStream.Read(buffer, offset, count);
 			}
 
 			throw new InvalidOperationException("Read operations are not allowed by this stream");
@@ -193,18 +193,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void WriteByte(byte value)
 		{
-			this.CheckDisposed();
+			CheckDisposed();
 
-			this.innerStream.WriteByte(value);
+			_innerStream.WriteByte(value);
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
 		{
-			this.CheckDisposed();
+			CheckDisposed();
 
-			if (this.CanWrite)
+			if (CanWrite)
 			{
-				this.innerStream.Write(buffer, offset, count);
+				_innerStream.Write(buffer, offset, count);
 			}
 			else
 			{
@@ -214,11 +214,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] ToArray()
 		{
-			this.CheckDisposed();
+			CheckDisposed();
 
-			if (this.innerStream is MemoryStream)
+			if (_innerStream is MemoryStream)
 			{
-				return ((MemoryStream)this.innerStream).ToArray();
+				return ((MemoryStream)_innerStream).ToArray();
 			}
 
 			throw new InvalidOperationException();
@@ -230,8 +230,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual int ReadOperation()
 		{
-			int op = this.ValidOperationAvailable ? this.operation : this.ReadNextOperation();
-			this.ResetOperation();
+			int op = ValidOperationAvailable ? _operation : ReadNextOperation();
+			ResetOperation();
 			return op;
 		}
 
@@ -245,10 +245,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				 * this	level rather than try to catch them	in all places where
 				 * this	routine	is called 
 				 */
-				this.operation = this.ReadInt32();
-			} while (this.operation == IscCodes.op_dummy);
+				_operation = ReadInt32();
+			} while (_operation == IscCodes.op_dummy);
 
-			return this.operation;
+			return _operation;
 		}
 
 		#endregion
@@ -265,7 +265,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				int currentlyRead = -1;
 				while (toRead > 0 && currentlyRead != 0)
 				{
-					toRead -= (currentlyRead = this.Read(buffer, count - toRead, toRead));
+					toRead -= (currentlyRead = Read(buffer, count - toRead, toRead));
 				}
 				if (toRead == count)
 				{
@@ -278,12 +278,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] ReadOpaque(int length)
 		{
-			byte[] buffer = this.ReadBytes(length);
+			byte[] buffer = ReadBytes(length);
 
 			int padLength = ((4 - length) & 3);
 			if (padLength > 0)
 			{
-				this.Read(Pad, 0, padLength);
+				Read(Pad, 0, padLength);
 			}
 
 			return buffer;
@@ -291,77 +291,77 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] ReadBuffer()
 		{
-			return this.ReadOpaque((ushort)this.ReadInt32());
+			return ReadOpaque((ushort)ReadInt32());
 		}
 
 		public string ReadString()
 		{
-			return this.ReadString(this.charset);
+			return ReadString(_charset);
 		}
 
 		public string ReadString(int length)
 		{
-			return this.ReadString(this.charset, length);
+			return ReadString(_charset, length);
 		}
 
 		public string ReadString(Charset charset)
 		{
-			return this.ReadString(charset, this.ReadInt32());
+			return ReadString(charset, ReadInt32());
 		}
 
 		public string ReadString(Charset charset, int length)
 		{
-			byte[] buffer = this.ReadOpaque(length);
+			byte[] buffer = ReadOpaque(length);
 
 			return charset.GetString(buffer, 0, buffer.Length);
 		}
 
 		public short ReadInt16()
 		{
-			return Convert.ToInt16(this.ReadInt32());
+			return Convert.ToInt16(ReadInt32());
 		}
 
 		public int ReadInt32()
 		{
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(this.ReadBytes(4), 0));
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(ReadBytes(4), 0));
 		}
 
 		public long ReadInt64()
 		{
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(this.ReadBytes(8), 0));
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(ReadBytes(8), 0));
 		}
 
 		public Guid ReadGuid(int length)
 		{
-			return new Guid(this.ReadOpaque(length));
+			return new Guid(ReadOpaque(length));
 		}
 
 		public float ReadSingle()
 		{
-			return BitConverter.ToSingle(BitConverter.GetBytes(this.ReadInt32()), 0);
+			return BitConverter.ToSingle(BitConverter.GetBytes(ReadInt32()), 0);
 		}
 
 		public double ReadDouble()
 		{
-			return BitConverter.ToDouble(BitConverter.GetBytes(this.ReadInt64()), 0);
+			return BitConverter.ToDouble(BitConverter.GetBytes(ReadInt64()), 0);
 		}
 
 		public DateTime ReadDateTime()
 		{
-			DateTime date = this.ReadDate();
-			TimeSpan time = this.ReadTime();
+			DateTime date = ReadDate();
+			TimeSpan time = ReadTime();
 
 			return new DateTime(date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
 		}
 
 		public DateTime ReadDate()
 		{
-			return TypeDecoder.DecodeDate(this.ReadInt32());
+			return TypeDecoder.DecodeDate(ReadInt32());
 		}
 
 		public TimeSpan ReadTime()
 		{
-			return TypeDecoder.DecodeTime(this.ReadInt32());
+			return TypeDecoder.DecodeTime(ReadInt32());
 		}
 
 		public decimal ReadDecimal(int type, int scale)
@@ -371,21 +371,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			switch (type & ~1)
 			{
 				case IscCodes.SQL_SHORT:
-					value = TypeDecoder.DecodeDecimal(this.ReadInt16(), scale, type);
+					value = TypeDecoder.DecodeDecimal(ReadInt16(), scale, type);
 					break;
 
 				case IscCodes.SQL_LONG:
-					value = TypeDecoder.DecodeDecimal(this.ReadInt32(), scale, type);
+					value = TypeDecoder.DecodeDecimal(ReadInt32(), scale, type);
 					break;
 
 				case IscCodes.SQL_QUAD:
 				case IscCodes.SQL_INT64:
-					value = TypeDecoder.DecodeDecimal(this.ReadInt64(), scale, type);
+					value = TypeDecoder.DecodeDecimal(ReadInt64(), scale, type);
 					break;
 
 				case IscCodes.SQL_DOUBLE:
 				case IscCodes.SQL_D_FLOAT:
-					value = Convert.ToDecimal(this.ReadDouble());
+					value = Convert.ToDecimal(ReadDouble());
 					break;
 			}
 
@@ -395,18 +395,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public object ReadValue(DbField field)
 		{
 			object fieldValue = null;
-			Charset innerCharset = (this.charset.Name != "NONE") ? this.charset : field.Charset;
+			Charset innerCharset = (_charset.Name != "NONE") ? _charset : field.Charset;
 
 			switch (field.DbDataType)
 			{
 				case DbDataType.Char:
 					if (field.Charset.IsOctetsCharset)
 					{
-						fieldValue = this.ReadOpaque(field.Length);
+						fieldValue = ReadOpaque(field.Length);
 					}
 					else
 					{
-						string s = this.ReadString(innerCharset, field.Length);
+						string s = ReadString(innerCharset, field.Length);
 
 						if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
 							s.Length > field.CharCount)
@@ -423,60 +423,60 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				case DbDataType.VarChar:
 					if (field.Charset.IsOctetsCharset)
 					{
-						fieldValue = this.ReadBuffer();
+						fieldValue = ReadBuffer();
 					}
 					else
 					{
-						fieldValue = this.ReadString(innerCharset);
+						fieldValue = ReadString(innerCharset);
 					}
 					break;
 
 				case DbDataType.SmallInt:
-					fieldValue = this.ReadInt16();
+					fieldValue = ReadInt16();
 					break;
 
 				case DbDataType.Integer:
-					fieldValue = this.ReadInt32();
+					fieldValue = ReadInt32();
 					break;
 
 				case DbDataType.Array:
 				case DbDataType.Binary:
 				case DbDataType.Text:
 				case DbDataType.BigInt:
-					fieldValue = this.ReadInt64();
+					fieldValue = ReadInt64();
 					break;
 
 				case DbDataType.Decimal:
 				case DbDataType.Numeric:
-					fieldValue = this.ReadDecimal(field.DataType, field.NumericScale);
+					fieldValue = ReadDecimal(field.DataType, field.NumericScale);
 					break;
 
 				case DbDataType.Float:
-					fieldValue = this.ReadSingle();
+					fieldValue = ReadSingle();
 					break;
 
 				case DbDataType.Guid:
-					fieldValue = this.ReadGuid(field.Length);
+					fieldValue = ReadGuid(field.Length);
 					break;
 
 				case DbDataType.Double:
-					fieldValue = this.ReadDouble();
+					fieldValue = ReadDouble();
 					break;
 
 				case DbDataType.Date:
-					fieldValue = this.ReadDate();
+					fieldValue = ReadDate();
 					break;
 
 				case DbDataType.Time:
-					fieldValue = this.ReadTime();
+					fieldValue = ReadTime();
 					break;
 
 				case DbDataType.TimeStamp:
-					fieldValue = this.ReadDateTime();
+					fieldValue = ReadDateTime();
 					break;
 			}
 
-			int sqlInd = this.ReadInt32();
+			int sqlInd = ReadInt32();
 
 			if (sqlInd == 0)
 			{
@@ -498,32 +498,32 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void WriteOpaque(byte[] buffer)
 		{
-			this.WriteOpaque(buffer, buffer.Length);
+			WriteOpaque(buffer, buffer.Length);
 		}
 
 		public void WriteOpaque(byte[] buffer, int length)
 		{
 			if (buffer != null && length > 0)
 			{
-				this.Write(buffer, 0, buffer.Length);
-				this.Write(Fill, 0, length - buffer.Length);
-				this.Write(Pad, 0, ((4 - length) & 3));
+				Write(buffer, 0, buffer.Length);
+				Write(Fill, 0, length - buffer.Length);
+				Write(Pad, 0, ((4 - length) & 3));
 			}
 		}
 
 		public void WriteBuffer(byte[] buffer)
 		{
-			this.WriteBuffer(buffer, buffer == null ? 0 : buffer.Length);
+			WriteBuffer(buffer, buffer == null ? 0 : buffer.Length);
 		}
 
 		public void WriteBuffer(byte[] buffer, int length)
 		{
-			this.Write(length);
+			Write(length);
 
 			if (buffer != null && length > 0)
 			{
-				this.Write(buffer, 0, length);
-				this.Write(Pad, 0, ((4 - length) & 3));
+				Write(buffer, 0, length);
+				Write(Pad, 0, ((4 - length) & 3));
 			}
 		}
 
@@ -536,13 +536,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw (new IOException()); //Need a	value???
 			}
 
-			this.Write(length + 2);
-			this.Write(length + 2);	//bizarre but true!	three copies of	the	length
-			this.WriteByte((byte)((length >> 0) & 0xff));
-			this.WriteByte((byte)((length >> 8) & 0xff));
-			this.Write(buffer, 0, length);
+			Write(length + 2);
+			Write(length + 2);  //bizarre but true!	three copies of	the	length
+			WriteByte((byte)((length >> 0) & 0xff));
+			WriteByte((byte)((length >> 8) & 0xff));
+			Write(buffer, 0, length);
 
-			this.Write(Pad, 0, ((4 - length + 2) & 3));
+			Write(Pad, 0, ((4 - length + 2) & 3));
 		}
 
 		public void WriteTyped(int type, byte[] buffer)
@@ -551,54 +551,54 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (buffer == null)
 			{
-				this.Write(1);
-				this.WriteByte((byte)type);
+				Write(1);
+				WriteByte((byte)type);
 				length = 1;
 			}
 			else
 			{
 				length = buffer.Length + 1;
-				this.Write(length);
-				this.WriteByte((byte)type);
-				this.Write(buffer, 0, buffer.Length);
+				Write(length);
+				WriteByte((byte)type);
+				Write(buffer, 0, buffer.Length);
 			}
-			this.Write(Pad, 0, ((4 - length) & 3));
+			Write(Pad, 0, ((4 - length) & 3));
 		}
 
 		public void Write(string value)
 		{
-			byte[] buffer = this.charset.GetBytes(value);
+			byte[] buffer = _charset.GetBytes(value);
 
-			this.WriteBuffer(buffer, buffer.Length);
+			WriteBuffer(buffer, buffer.Length);
 		}
 
 		public void Write(short value)
 		{
-			this.Write((int)value);
+			Write((int)value);
 		}
 
 		public void Write(int value)
 		{
-			this.Write(BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value)), 0, 4);
+			Write(BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value)), 0, 4);
 		}
 
 		public void Write(long value)
 		{
-			this.Write(BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value)), 0, 8);
+			Write(BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value)), 0, 8);
 		}
 
 		public void Write(float value)
 		{
 			byte[] buffer = BitConverter.GetBytes(value);
 
-			this.Write(BitConverter.ToInt32(buffer, 0));
+			Write(BitConverter.ToInt32(buffer, 0));
 		}
 
 		public void Write(double value)
 		{
 			byte[] buffer = BitConverter.GetBytes(value);
 
-			this.Write(BitConverter.ToInt64(buffer, 0));
+			Write(BitConverter.ToInt64(buffer, 0));
 		}
 
 		public void Write(decimal value, int type, int scale)
@@ -608,51 +608,51 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			switch (type & ~1)
 			{
 				case IscCodes.SQL_SHORT:
-					this.Write((short)numeric);
+					Write((short)numeric);
 					break;
 
 				case IscCodes.SQL_LONG:
-					this.Write((int)numeric);
+					Write((int)numeric);
 					break;
 
 				case IscCodes.SQL_QUAD:
 				case IscCodes.SQL_INT64:
-					this.Write((long)numeric);
+					Write((long)numeric);
 					break;
 
 				case IscCodes.SQL_DOUBLE:
 				case IscCodes.SQL_D_FLOAT:
-					this.Write((double)value);
+					Write((double)value);
 					break;
 			}
 		}
 
 		public void Write(bool value)
 		{
-			this.Write((short)(value ? 1 : 0));
+			Write((short)(value ? 1 : 0));
 		}
 
 		public void Write(DateTime value)
 		{
-			this.WriteDate(value);
-			this.WriteTime(TypeHelper.DateTimeToTimeSpan(value));
+			WriteDate(value);
+			WriteTime(TypeHelper.DateTimeToTimeSpan(value));
 		}
 
 		public void WriteDate(DateTime value)
 		{
-			this.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(value)));
+			Write(TypeEncoder.EncodeDate(Convert.ToDateTime(value)));
 		}
 
 		public void WriteTime(TimeSpan value)
 		{
-			this.Write(TypeEncoder.EncodeTime(value));
+			Write(TypeEncoder.EncodeTime(value));
 		}
 
 		public void Write(Descriptor descriptor)
 		{
 			for (int i = 0; i < descriptor.Count; i++)
 			{
-				this.Write(descriptor[i]);
+				Write(descriptor[i]);
 			}
 		}
 
@@ -669,7 +669,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						case DbDataType.Char:
 							if (param.Charset.IsOctetsCharset)
 							{
-								this.WriteOpaque(param.DbValue.GetBinary(), param.Length);
+								WriteOpaque(param.DbValue.GetBinary(), param.Length);
 							}
 							else
 							{
@@ -681,14 +681,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 									throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 								}
 
-								this.WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
+								WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
 							}
 							break;
 
 						case DbDataType.VarChar:
 							if (param.Charset.IsOctetsCharset)
 							{
-								this.WriteOpaque(param.DbValue.GetBinary(), param.Length);
+								WriteOpaque(param.DbValue.GetBinary(), param.Length);
 							}
 							else
 							{
@@ -702,60 +702,60 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 								byte[] data = param.Charset.GetBytes(svalue);
 
-								this.WriteBuffer(data, data.Length);
+								WriteBuffer(data, data.Length);
 							}
 							break;
 
 						case DbDataType.SmallInt:
-							this.Write(param.DbValue.GetInt16());
+							Write(param.DbValue.GetInt16());
 							break;
 
 						case DbDataType.Integer:
-							this.Write(param.DbValue.GetInt32());
+							Write(param.DbValue.GetInt32());
 							break;
 
 						case DbDataType.BigInt:
 						case DbDataType.Array:
 						case DbDataType.Binary:
 						case DbDataType.Text:
-							this.Write(param.DbValue.GetInt64());
+							Write(param.DbValue.GetInt64());
 							break;
 
 						case DbDataType.Decimal:
 						case DbDataType.Numeric:
-							this.Write(
+							Write(
 								param.DbValue.GetDecimal(),
 								param.DataType,
 								param.NumericScale);
 							break;
 
 						case DbDataType.Float:
-							this.Write(param.DbValue.GetFloat());
+							Write(param.DbValue.GetFloat());
 							break;
 
 						case DbDataType.Guid:
-							this.WriteOpaque(param.DbValue.GetGuid().ToByteArray());
+							WriteOpaque(param.DbValue.GetGuid().ToByteArray());
 							break;
 
 						case DbDataType.Double:
-							this.Write(param.DbValue.GetDouble());
+							Write(param.DbValue.GetDouble());
 							break;
 
 						case DbDataType.Date:
-							this.Write(param.DbValue.GetDate());
+							Write(param.DbValue.GetDate());
 							break;
 
 						case DbDataType.Time:
-							this.Write(param.DbValue.GetTime());
+							Write(param.DbValue.GetTime());
 							break;
 
 						case DbDataType.TimeStamp:
-							this.Write(param.DbValue.GetDate());
-							this.Write(param.DbValue.GetTime());
+							Write(param.DbValue.GetDate());
+							Write(param.DbValue.GetTime());
 							break;
 
 						case DbDataType.Boolean:
-							this.Write(Convert.ToBoolean(param.Value));
+							Write(Convert.ToBoolean(param.Value));
 							break;
 
 						default:
@@ -763,7 +763,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 				}
 
-				this.Write(param.NullFlag);
+				Write(param.NullFlag);
 			}
 			catch (IOException)
 			{
@@ -777,7 +777,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void CheckDisposed()
 		{
-			if (this.innerStream == null)
+			if (_innerStream == null)
 			{
 				throw new ObjectDisposedException("The XdrStream is closed.");
 			}
@@ -785,7 +785,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void ResetOperation()
 		{
-			this.operation = -1;
+			_operation = -1;
 		}
 
 		#endregion
@@ -794,7 +794,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private bool ValidOperationAvailable
 		{
-			get { return this.operation >= 0; }
+			get { return _operation >= 0; }
 		}
 
 		#endregion

@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Services
 	{
 		#region Fields
 
-		private FbStatisticalFlags options;
+		private FbStatisticalFlags _options;
 
 		#endregion
 
@@ -35,8 +35,8 @@ namespace FirebirdSql.Data.Services
 
 		public FbStatisticalFlags Options
 		{
-			get { return this.options; }
-			set { this.options = value; }
+			get { return _options; }
+			set { _options = value; }
 		}
 
 		#endregion
@@ -55,20 +55,20 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
 				// Configure Spb
-				this.StartSpb.Append(IscCodes.isc_action_svc_db_stats);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+				StartSpb.Append(IscCodes.isc_action_svc_db_stats);
+				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+				StartSpb.Append(IscCodes.isc_spb_options, (int)_options);
 
-				this.Open();
+				Open();
 
 				// Start execution
-				this.StartTask();
+				StartTask();
 
 				// Process service output
-				this.ProcessServiceOutput();
+				ProcessServiceOutput();
 			}
 			catch (Exception ex)
 			{
@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				this.Close();
+				Close();
 			}
 		}
 

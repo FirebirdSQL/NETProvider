@@ -35,8 +35,8 @@ namespace FirebirdSql.Data.Isql
 	{
 		#region Fields
 
-		private StringParser parser;
-		private FbStatementCollection results;
+		private StringParser _parser;
+		private FbStatementCollection _results;
 
 		#endregion
 
@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public FbStatementCollection Results
 		{
-			get { return this.results; }
+			get { return _results; }
 		}
 
 		#endregion
@@ -67,9 +67,9 @@ namespace FirebirdSql.Data.Isql
 
 		public FbScript(string script)
 		{
-			this.results = new FbStatementCollection();
-			this.parser = new StringParser(RemoveComments(script));
-			this.parser.Tokens = new[] { ";" };
+			_results = new FbStatementCollection();
+			_parser = new StringParser(RemoveComments(script));
+			_parser.Tokens = new[] { ";" };
 		}
 
 		#endregion
@@ -86,26 +86,26 @@ namespace FirebirdSql.Data.Isql
 			string atomicResult;
 			string newParserToken;
 
-			this.results.Clear();
+			_results.Clear();
 
-			while (index < this.parser.Length)
+			while (index < _parser.Length)
 			{
-				index = this.parser.ParseNext();
-				atomicResult = this.parser.Result.Trim();
+				index = _parser.ParseNext();
+				atomicResult = _parser.Result.Trim();
 
-				if (this.IsSetTermStatement(atomicResult, out newParserToken))
+				if (IsSetTermStatement(atomicResult, out newParserToken))
 				{
-					this.parser.Tokens = new[] { newParserToken };
+					_parser.Tokens = new[] { newParserToken };
 					continue;
 				}
 
 				if (atomicResult != null && atomicResult.Length > 0)
 				{
-					this.results.Add(atomicResult);
+					_results.Add(atomicResult);
 				}
 			}
 
-			return this.results.Count;
+			return _results.Count;
 		}
 
 		/// <summary>
@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>The SQL code to be parsed (without comments).</returns>
 		public override string ToString()
 		{
-			return this.parser.ToString();
+			return _parser.ToString();
 		}
 
 		#endregion

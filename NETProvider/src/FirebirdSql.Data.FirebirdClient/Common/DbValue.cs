@@ -28,9 +28,9 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private StatementBase	statement;
-		private DbField			field;
-		private object			value;
+		private StatementBase	_statement;
+		private DbField			_field;
+		private object			_value;
 
 		#endregion
 
@@ -38,13 +38,13 @@ namespace FirebirdSql.Data.Common
 
 		public DbField Field
 		{
-			get { return this.field; }
+			get { return _field; }
 		}
 
 		public object Value
 		{
-			get { return this.GetValue(); }
-			set { this.value = value; }
+			get { return GetValue(); }
+			set { _value = value; }
 		}
 
 		#endregion
@@ -53,22 +53,22 @@ namespace FirebirdSql.Data.Common
 
 		public DbValue(DbField field, object value)
 		{
-			this.field = field;
-			this.value = value ?? DBNull.Value;
+			_field = field;
+			_value = value ?? DBNull.Value;
 		}
 
 		public DbValue(StatementBase statement, DbField field)
 		{
-			this.statement	= statement;
-			this.field		= field;
-			this.value		= field.Value;
+			_statement = statement;
+			_field = field;
+			_value = field.Value;
 		}
 
 		public DbValue(StatementBase statement, DbField field, object value)
 		{
-			this.statement	= statement;
-			this.field		= field;
-			this.value		= value ?? DBNull.Value;
+			_statement = statement;
+			_field = field;
+			_value = value ?? DBNull.Value;
 		}
 
 		#endregion
@@ -77,72 +77,72 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsDBNull()
 		{
-			return TypeHelper.IsDBNull(this.value);
+			return TypeHelper.IsDBNull(_value);
 		}
 
 		public string GetString()
 		{
-			if (this.Field.DbDataType == DbDataType.Text && this.value is long)
+			if (Field.DbDataType == DbDataType.Text && _value is long)
 			{
-				this.value = this.GetClobData((long)this.value);
+				_value = GetClobData((long)_value);
 			}
-			if (this.value is byte[])
+			if (_value is byte[])
 			{
-				return this.Field.Charset.GetString((byte[])this.value);
+				return Field.Charset.GetString((byte[])_value);
 			}
 
-			return this.value.ToString();
+			return _value.ToString();
 		}
 
 		public char GetChar()
 		{
-			return Convert.ToChar(this.value, CultureInfo.CurrentCulture);
+			return Convert.ToChar(_value, CultureInfo.CurrentCulture);
 		}
 
 		public bool GetBoolean()
 		{
-			return Convert.ToBoolean(this.value, CultureInfo.InvariantCulture);
+			return Convert.ToBoolean(_value, CultureInfo.InvariantCulture);
 		}
 
 		public byte GetByte()
 		{
-			return Convert.ToByte(this.value, CultureInfo.InvariantCulture);
+			return Convert.ToByte(_value, CultureInfo.InvariantCulture);
 		}
 
 		public short GetInt16()
 		{
-			return Convert.ToInt16(this.value, CultureInfo.InvariantCulture);
+			return Convert.ToInt16(_value, CultureInfo.InvariantCulture);
 		}
 
 		public int GetInt32()
 		{
-			return Convert.ToInt32(this.value, CultureInfo.InvariantCulture);
+			return Convert.ToInt32(_value, CultureInfo.InvariantCulture);
 		}
 
 		public long GetInt64()
 		{
-			return Convert.ToInt64(this.value, CultureInfo.InvariantCulture);
+			return Convert.ToInt64(_value, CultureInfo.InvariantCulture);
 		}
 
 		public decimal GetDecimal()
 		{
-			return Convert.ToDecimal(this.value, CultureInfo.InvariantCulture);
+			return Convert.ToDecimal(_value, CultureInfo.InvariantCulture);
 		}
 
 		public float GetFloat()
 		{
-			return Convert.ToSingle(this.value, CultureInfo.InvariantCulture);
+			return Convert.ToSingle(_value, CultureInfo.InvariantCulture);
 		}
 
 		public Guid GetGuid()
 		{
-			if (this.Value is Guid)
+			if (Value is Guid)
 			{
-				return (Guid)this.Value;
+				return (Guid)Value;
 			}
-			else if (this.Value is byte[])
+			else if (Value is byte[])
 			{
-				return new Guid((byte[])this.value);
+				return new Guid((byte[])_value);
 			}
 
 			throw new InvalidOperationException("Incorrect Guid value");
@@ -150,59 +150,59 @@ namespace FirebirdSql.Data.Common
 
 		public double GetDouble()
 		{
-			return Convert.ToDouble(this.value, CultureInfo.InvariantCulture);
+			return Convert.ToDouble(_value, CultureInfo.InvariantCulture);
 		}
 
 		public DateTime GetDateTime()
 		{
-			if (this.value is TimeSpan)
-				return new DateTime(0 * 10000L + 621355968000000000 + ((TimeSpan)this.value).Ticks);
-			else if (this.value is DateTimeOffset)
-				return Convert.ToDateTime(((DateTimeOffset)this.value).DateTime, CultureInfo.CurrentCulture.DateTimeFormat);
+			if (_value is TimeSpan)
+				return new DateTime(0 * 10000L + 621355968000000000 + ((TimeSpan)_value).Ticks);
+			else if (_value is DateTimeOffset)
+				return Convert.ToDateTime(((DateTimeOffset)_value).DateTime, CultureInfo.CurrentCulture.DateTimeFormat);
 			else
-				return Convert.ToDateTime(this.value, CultureInfo.CurrentCulture.DateTimeFormat);
+				return Convert.ToDateTime(_value, CultureInfo.CurrentCulture.DateTimeFormat);
 		}
 
 		public Array GetArray()
 		{
-			if (this.value is long)
+			if (_value is long)
 			{
-				this.value = this.GetArrayData((long)this.value);
+				_value = GetArrayData((long)_value);
 			}
 
-			return (Array)this.value;
+			return (Array)_value;
 		}
 
 		public byte[] GetBinary()
 		{
-			if (this.value is long)
+			if (_value is long)
 			{
-				this.value = this.GetBlobData((long)this.value);
+				_value = GetBlobData((long)_value);
 			}
 
-			return (byte[])this.value;
+			return (byte[])_value;
 		}
 
 		public int GetDate()
 		{
-			return TypeEncoder.EncodeDate(this.GetDateTime());
+			return TypeEncoder.EncodeDate(GetDateTime());
 		}
 
 		public int GetTime()
 		{
-			if (this.value is TimeSpan)
-				return TypeEncoder.EncodeTime((TimeSpan)this.value);
+			if (_value is TimeSpan)
+				return TypeEncoder.EncodeTime((TimeSpan)_value);
 			else
-				return TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(this.GetDateTime()));
+				return TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(GetDateTime()));
 		}
 
 		public byte[] GetBytes()
 		{
-			if (this.IsDBNull())
+			if (IsDBNull())
 			{
-				int length = field.Length;
+				int length = _field.Length;
 
-				if (this.Field.SqlType == IscCodes.SQL_VARYING)
+				if (Field.SqlType == IscCodes.SQL_VARYING)
 				{
 					// Add two bytes more for store	value length
 					length += 2;
@@ -212,30 +212,30 @@ namespace FirebirdSql.Data.Common
 			}
 
 
-			switch (this.Field.DbDataType)
+			switch (Field.DbDataType)
 			{
 				case DbDataType.Char:
-					if (this.Field.Charset.IsOctetsCharset)
+					if (Field.Charset.IsOctetsCharset)
 					{
-						return (byte[])this.value;
+						return (byte[])_value;
 					}
 					else
 					{
-						string svalue = this.GetString();
+						string svalue = GetString();
 
-						if ((this.Field.Length % this.Field.Charset.BytesPerCharacter) == 0 &&
-							svalue.Length > this.Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
+							svalue.Length > Field.CharCount)
 						{
 							throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
 
-						byte[] buffer = new byte[this.Field.Length];
+						byte[] buffer = new byte[Field.Length];
 						for (int i = 0; i < buffer.Length; i++)
 						{
 							buffer[i] = 32;
 						}
 
-						byte[] bytes = this.Field.Charset.GetBytes(svalue);
+						byte[] bytes = Field.Charset.GetBytes(svalue);
 
 						Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
 
@@ -243,22 +243,22 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case DbDataType.VarChar:
-					if (this.Field.Charset.IsOctetsCharset)
+					if (Field.Charset.IsOctetsCharset)
 					{
-						return (byte[])this.value;
+						return (byte[])_value;
 					}
 					else
 					{
-						string svalue = this.GetString();
+						string svalue = GetString();
 
-						if ((this.Field.Length % this.Field.Charset.BytesPerCharacter) == 0 &&
-							svalue.Length > this.Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
+							svalue.Length > Field.CharCount)
 						{
 							throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
 
-						byte[] sbuffer = this.Field.Charset.GetBytes(svalue);
-						byte[] buffer = new byte[this.Field.Length + 2];
+						byte[] sbuffer = Field.Charset.GetBytes(svalue);
+						byte[] buffer = new byte[Field.Length + 2];
 
 						// Copy	length
 						Buffer.BlockCopy(BitConverter.GetBytes((short)sbuffer.Length), 0, buffer, 0, 2);
@@ -271,34 +271,34 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.Numeric:
 				case DbDataType.Decimal:
-					return this.GetNumericBytes();
+					return GetNumericBytes();
 
 				case DbDataType.SmallInt:
-					return BitConverter.GetBytes(this.GetInt16());
+					return BitConverter.GetBytes(GetInt16());
 
 				case DbDataType.Integer:
-					return BitConverter.GetBytes(this.GetInt32());
+					return BitConverter.GetBytes(GetInt32());
 
 				case DbDataType.Array:
 				case DbDataType.Binary:
 				case DbDataType.Text:
 				case DbDataType.BigInt:
-					return BitConverter.GetBytes(this.GetInt64());
+					return BitConverter.GetBytes(GetInt64());
 
 				case DbDataType.Float:
-					return BitConverter.GetBytes(this.GetFloat());
+					return BitConverter.GetBytes(GetFloat());
 
 				case DbDataType.Double:
-					return BitConverter.GetBytes(this.GetDouble());
+					return BitConverter.GetBytes(GetDouble());
 
 				case DbDataType.Date:
-					return BitConverter.GetBytes(TypeEncoder.EncodeDate(this.GetDateTime()));
+					return BitConverter.GetBytes(TypeEncoder.EncodeDate(GetDateTime()));
 
 				case DbDataType.Time:
-					return BitConverter.GetBytes(this.GetTime());
+					return BitConverter.GetBytes(GetTime());
 
 				case DbDataType.TimeStamp:
-					var dt = this.GetDateTime();
+					var dt = GetDateTime();
 					byte[] date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
 					byte[] time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
 
@@ -310,7 +310,7 @@ namespace FirebirdSql.Data.Common
 					return result;
 
 				case DbDataType.Guid:
-					return this.GetGuid().ToByteArray();
+					return GetGuid().ToByteArray();
 
 				default:
 					throw new NotSupportedException("Unknown data type");
@@ -319,10 +319,10 @@ namespace FirebirdSql.Data.Common
 
 		private byte[] GetNumericBytes()
 		{
-			decimal value = this.GetDecimal();
-			object numeric = TypeEncoder.EncodeDecimal(value, this.Field.NumericScale, this.Field.DataType);
+			decimal value = GetDecimal();
+			object numeric = TypeEncoder.EncodeDecimal(value, Field.NumericScale, Field.DataType);
 
-			switch (field.SqlType)
+			switch (_field.SqlType)
 			{
 				case IscCodes.SQL_SHORT:
 					return BitConverter.GetBytes((short)numeric);
@@ -335,7 +335,7 @@ namespace FirebirdSql.Data.Common
 					return BitConverter.GetBytes((long)numeric);
 
 				case IscCodes.SQL_DOUBLE:
-					return BitConverter.GetBytes(this.GetDouble());
+					return BitConverter.GetBytes(GetDouble());
 
 				default:
 					return null;
@@ -348,74 +348,74 @@ namespace FirebirdSql.Data.Common
 
 		private object GetValue()
 		{
-			if (this.IsDBNull())
+			if (IsDBNull())
 			{
 				return System.DBNull.Value;
 			}
 
-			switch (this.field.DbDataType)
+			switch (_field.DbDataType)
 			{
 				case DbDataType.Text:
-					if (this.statement == null)
+					if (_statement == null)
 					{
-						return this.GetInt64();
+						return GetInt64();
 					}
 					else
 					{
-						return this.GetString();
+						return GetString();
 					}
 
 				case DbDataType.Binary:
-					if (this.statement == null)
+					if (_statement == null)
 					{
-						return this.GetInt64();
+						return GetInt64();
 					}
 					else
 					{
-						return this.GetBinary();
+						return GetBinary();
 					}
 
 				case DbDataType.Array:
-					if (this.statement == null)
+					if (_statement == null)
 					{
-						return this.GetInt64();
+						return GetInt64();
 					}
 					else
 					{
-						return this.GetArray();
+						return GetArray();
 					}
 
 				default:
-					return this.value;
+					return _value;
 			}
 		}
 
 		private string GetClobData(long blobId)
 		{
-			BlobBase clob = this.statement.CreateBlob(blobId);
+			BlobBase clob = _statement.CreateBlob(blobId);
 
 			return clob.ReadString();
 		}
 
 		private byte[] GetBlobData(long blobId)
 		{
-			BlobBase blob = this.statement.CreateBlob(blobId);
+			BlobBase blob = _statement.CreateBlob(blobId);
 
 			return blob.Read();
 		}
 
 		private Array GetArrayData(long handle)
 		{
-			if (this.field.ArrayHandle == null)
+			if (_field.ArrayHandle == null)
 			{
-				this.field.ArrayHandle = this.statement.CreateArray(handle, this.Field.Relation, this.Field.Name);
+				_field.ArrayHandle = _statement.CreateArray(handle, Field.Relation, Field.Name);
 			}
 
-			ArrayBase gdsArray = this.statement.CreateArray(this.field.ArrayHandle.Descriptor);
+			ArrayBase gdsArray = _statement.CreateArray(_field.ArrayHandle.Descriptor);
 			
 			gdsArray.Handle			= handle;
-			gdsArray.DB				= this.statement.Database;
-			gdsArray.Transaction	= this.statement.Transaction;
+			gdsArray.DB				= _statement.Database;
+			gdsArray.Transaction	= _statement.Transaction;
 
 			return gdsArray.Read();
 		}

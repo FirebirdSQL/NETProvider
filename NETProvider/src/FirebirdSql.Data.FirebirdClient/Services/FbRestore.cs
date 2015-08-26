@@ -31,22 +31,22 @@ namespace FirebirdSql.Data.Services
 	{
 		#region Properties
 
-		private FbBackupFileCollection backupFiles;
+		private FbBackupFileCollection _backupFiles;
 		public FbBackupFileCollection BackupFiles
 		{
-			get { return this.backupFiles; }
+			get { return _backupFiles; }
 		}
 
-		private int? pageSize;
+		private int? _pageSize;
 		public int? PageSize
 		{
-			get { return this.pageSize; }
+			get { return _pageSize; }
 			set
 			{
 				if (value.HasValue && !PageSizeHelper.IsValidPageSize((int)value))
 					throw new InvalidOperationException("Invalid page size.");
 
-				this.pageSize = value;
+				_pageSize = value;
 			}
 		}
 
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Services
 		public FbRestore(string connectionString = null)
 			: base(connectionString)
 		{
-			this.backupFiles = new FbBackupFileCollection();
+			_backupFiles = new FbBackupFileCollection();
 		}
 
 		#endregion
@@ -73,36 +73,36 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_restore);
+				StartSpb.Append(IscCodes.isc_action_svc_restore);
 
-				foreach (FbBackupFile bkpFile in this.backupFiles)
+				foreach (FbBackupFile bkpFile in _backupFiles)
 				{
-					this.StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
+					StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
 				}
 
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
-				if (this.Verbose)
+				if (Verbose)
 				{
-					this.StartSpb.Append(IscCodes.isc_spb_verbose);
+					StartSpb.Append(IscCodes.isc_spb_verbose);
 				}
 
-				if (this.PageBuffers.HasValue)
-					this.StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)this.PageBuffers);
-				if (this.pageSize.HasValue)
-					this.StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)this.pageSize);
-				this.StartSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(this.ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.Options);
+				if (PageBuffers.HasValue)
+					StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
+				if (_pageSize.HasValue)
+					StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
+				StartSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
+				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
-				this.Open();
+				Open();
 
-				this.StartTask();
+				StartTask();
 
-				if (this.Verbose)
+				if (Verbose)
 				{
-					this.ProcessServiceOutput();
+					ProcessServiceOutput();
 				}
 			}
 			catch (Exception ex)
@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				this.Close();
+				Close();
 			}
 		}
 

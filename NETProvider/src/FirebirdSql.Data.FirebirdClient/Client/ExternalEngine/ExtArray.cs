@@ -36,9 +36,9 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 	{
 		#region Fields
 
-		private long handle;
-		private ExtDatabase db;
-		private ExtTransaction transaction;
+		private long _handle;
+		private ExtDatabase _db;
+		private ExtTransaction _transaction;
 
 		#endregion
 
@@ -46,20 +46,20 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public override long Handle
 		{
-			get { return this.handle; }
-			set { this.handle = value; }
+			get { return _handle; }
+			set { _handle = value; }
 		}
 
 		public override IDatabase DB
 		{
-			get { return this.db; }
-			set { this.db = (ExtDatabase)value; }
+			get { return _db; }
+			set { _db = (ExtDatabase)value; }
 		}
 
 		public override ITransaction Transaction
 		{
-			get { return this.transaction; }
-			set { this.transaction = (ExtTransaction)value; }
+			get { return _transaction; }
+			set { _transaction = (ExtTransaction)value; }
 		}
 
 		#endregion
@@ -96,11 +96,11 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			{
 				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
 			}
-			this.db = (ExtDatabase)db;
-			this.transaction = (ExtTransaction)transaction;
-			this.handle = handle;
+			_db = (ExtDatabase)db;
+			_transaction = (ExtTransaction)transaction;
+			_handle = handle;
 
-			this.LookupBounds();
+			LookupBounds();
 		}
 
 		#endregion
@@ -111,12 +111,12 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		{
 			int[] statusVector = ExtConnection.GetNewStatusVector();
 
-			int dbHandle = this.db.Handle;
-			int trHandle = this.transaction.Handle;
+			int dbHandle = _db.Handle;
+			int trHandle = _transaction.Handle;
 
 			ArrayDescMarshaler marshaler = ArrayDescMarshaler.Instance;
 
-			IntPtr arrayDesc = marshaler.MarshalManagedToNative(this.Descriptor);
+			IntPtr arrayDesc = marshaler.MarshalManagedToNative(Descriptor);
 
 			byte[] buffer = new byte[sliceLength];
 
@@ -124,7 +124,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				statusVector,
 				ref	dbHandle,
 				ref	trHandle,
-				ref	this.handle,
+				ref _handle,
 				arrayDesc,
 				buffer,
 				ref	sliceLength);
@@ -141,16 +141,16 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		{
 			int[] statusVector = ExtConnection.GetNewStatusVector();
 
-			int dbHandle = this.db.Handle;
-			int trHandle = this.transaction.Handle;
+			int dbHandle = _db.Handle;
+			int trHandle = _transaction.Handle;
 
 			ArrayDescMarshaler marshaler = ArrayDescMarshaler.Instance;
 
-			IntPtr arrayDesc = marshaler.MarshalManagedToNative(this.Descriptor);
+			IntPtr arrayDesc = marshaler.MarshalManagedToNative(Descriptor);
 
 			// Obtain the System of	type of	Array elements and
 			// Fill	buffer
-			Type systemType = this.GetSystemType();
+			Type systemType = GetSystemType();
 
 			byte[] buffer = new byte[sliceLength];
 			if (systemType.IsPrimitive)
@@ -159,14 +159,14 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			}
 			else
 			{
-				buffer = this.EncodeSlice(this.Descriptor, sourceArray, sliceLength);
+				buffer = EncodeSlice(Descriptor, sourceArray, sliceLength);
 			}
 
 			SafeNativeMethods.isc_array_put_slice(
 				statusVector,
 				ref	dbHandle,
 				ref	trHandle,
-				ref	this.handle,
+				ref _handle,
 				arrayDesc,
 				buffer,
 				ref	sliceLength);
@@ -187,16 +187,16 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			int slicePosition = 0;
 			int type = 0;
 			DbDataType dbType = DbDataType.Array;
-			Type systemType = this.GetSystemType();
-			Charset charset = this.db.Charset;
-			int[] lengths = new int[this.Descriptor.Dimensions];
-			int[] lowerBounds = new int[this.Descriptor.Dimensions];
+			Type systemType = GetSystemType();
+			Charset charset = _db.Charset;
+			int[] lengths = new int[Descriptor.Dimensions];
+			int[] lowerBounds = new int[Descriptor.Dimensions];
 
 			// Get upper and lower bounds of each dimension
-			for (int i = 0; i < this.Descriptor.Dimensions; i++)
+			for (int i = 0; i < Descriptor.Dimensions; i++)
 			{
-				lowerBounds[i] = this.Descriptor.Bounds[i].LowerBound;
-				lengths[i] = this.Descriptor.Bounds[i].UpperBound;
+				lowerBounds[i] = Descriptor.Bounds[i].LowerBound;
+				lengths[i] = Descriptor.Bounds[i].UpperBound;
 
 				if (lowerBounds[i] == 0)
 				{
@@ -210,10 +210,10 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			Array tempData = Array.CreateInstance(systemType, sliceData.Length);
 
 			// Infer data types
-			type = TypeHelper.GetFbType(this.Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, 0, this.Descriptor.Scale);
+			type = TypeHelper.GetFbType(Descriptor.DataType);
+			dbType = TypeHelper.GetDbDataType(Descriptor.DataType, 0, Descriptor.Scale);
 
-			int itemLength = this.Descriptor.Length;
+			int itemLength = Descriptor.Length;
 
 			for (int i = 0; i < tempData.Length; i++)
 			{
@@ -275,7 +275,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 									break;
 							}
 
-							decimal dvalue = TypeDecoder.DecodeDecimal(evalue, this.Descriptor.Scale, type);
+							decimal dvalue = TypeDecoder.DecodeDecimal(evalue, Descriptor.Scale, type);
 
 							tempData.SetValue(dvalue, i);
 						}
@@ -349,14 +349,14 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		private byte[] EncodeSlice(ArrayDesc desc, Array sourceArray, int length)
 		{
 			BinaryWriter writer = new BinaryWriter(new MemoryStream());
-			Charset charset = this.db.Charset;
+			Charset charset = _db.Charset;
 			DbDataType dbType = DbDataType.Array;
-			int subType = (this.Descriptor.Scale < 0) ? 2 : 0;
+			int subType = (Descriptor.Scale < 0) ? 2 : 0;
 			int type = 0;
 
 			// Infer data types
-			type = TypeHelper.GetFbType(this.Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, subType, this.Descriptor.Scale);
+			type = TypeHelper.GetFbType(Descriptor.DataType);
+			dbType = TypeHelper.GetDbDataType(Descriptor.DataType, subType, Descriptor.Scale);
 
 			foreach (object source in sourceArray)
 			{

@@ -147,12 +147,12 @@ namespace FirebirdSql.Data.Common
 
 		#region Fields
 
-		private int		    id;
-		private int		    bytesPerCharacter;
-		private string	    name;
-		private string	    systemName;
-		private Encoding    encoding;
-		private object      syncObject;
+		private int		    _id;
+		private int		    _bytesPerCharacter;
+		private string	    _name;
+		private string	    _systemName;
+		private Encoding    _encoding;
+		private object      _syncObject;
 
 		#endregion
 
@@ -160,22 +160,22 @@ namespace FirebirdSql.Data.Common
 
 		public int Identifier
 		{
-			get { return this.id; }
+			get { return _id; }
 		}
 
 		public string Name
 		{
-			get { return this.name; }
+			get { return _name; }
 		}
 
 		public int BytesPerCharacter
 		{
-			get { return this.bytesPerCharacter; }
+			get { return _bytesPerCharacter; }
 		}
 
 		public bool IsOctetsCharset
 		{
-			get { return (this.id == Charset.GetCharset("OCTETS").Identifier); }
+			get { return (_id == Charset.GetCharset("OCTETS").Identifier); }
 		}
 
 		#endregion
@@ -184,13 +184,13 @@ namespace FirebirdSql.Data.Common
 
 		public Charset(int id, string name, int bytesPerCharacter, string systemName)
 		{
-			this.id					= id;
-			this.name				= name;
-			this.bytesPerCharacter	= bytesPerCharacter;
-			this.systemName			= systemName;
-			this.syncObject         = new object();
+			_id = id;
+			_name = name;
+			_bytesPerCharacter = bytesPerCharacter;
+			_systemName = systemName;
+			_syncObject = new object();
 
-			this.SetEncoding();
+			SetEncoding();
 		}
 
 		#endregion
@@ -199,22 +199,22 @@ namespace FirebirdSql.Data.Common
 
 		public byte[] GetBytes(string s)
 		{
-			return this.encoding.GetBytes(s);
+			return _encoding.GetBytes(s);
 		}
 
 		public int GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex)
 		{
-			return this.encoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
+			return _encoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
 		}
 
 		public string GetString(byte[] buffer)
 		{
-			return this.GetString(buffer, 0, buffer.Length);
+			return GetString(buffer, 0, buffer.Length);
 		}
 
 		public string GetString(byte[] buffer, int index, int count)
 		{
-			return this.encoding.GetString(buffer, index, count);
+			return _encoding.GetString(buffer, index, count);
 		}
 
 		#endregion
@@ -223,22 +223,22 @@ namespace FirebirdSql.Data.Common
 
 		private void SetEncoding()
 		{
-			lock (this.syncObject)
+			lock (_syncObject)
 			{
-				if (this.encoding == null)
+				if (_encoding == null)
 				{
-					switch (this.systemName)
+					switch (_systemName)
 					{
 						case "NONE":
-							this.encoding = Encoding.Default;
+							_encoding = Encoding.Default;
 							break;
 
 						case "OCTETS":
-							this.encoding = new BinaryEncoding();
+							_encoding = new BinaryEncoding();
 							break;
 
 						default:
-							this.encoding = Encoding.GetEncoding(this.systemName);
+							_encoding = Encoding.GetEncoding(_systemName);
 							break;
 					}
 				}

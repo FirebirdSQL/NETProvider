@@ -77,13 +77,13 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public IntPtr MarshalManagedToNative()
 		{
-			return this.MarshalManagedToNative(new ParamDsc());
+			return MarshalManagedToNative(new ParamDsc());
 		}
 
 		public IntPtr MarshalManagedToNative(Charset charset, object value)
 		{
 			DbField field = new DbField();
-			ParamDsc descriptor = this.BuildDescriptor(charset, value);
+			ParamDsc descriptor = BuildDescriptor(charset, value);
 			DbDataType type = TypeHelper.GetTypeFromDsc(descriptor.Type, descriptor.Scale, descriptor.SubType);
 
 			field.DataType          = (short)TypeHelper.GetFbType(type, true);
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			descriptor.Data = Marshal.AllocHGlobal(buffer.Length);
 			Marshal.Copy(buffer, 0, descriptor.Data, buffer.Length);
 
-			return this.MarshalManagedToNative(descriptor);
+			return MarshalManagedToNative(descriptor);
 		}
 
 		public IntPtr MarshalManagedToNative(ParamDsc descriptor)
@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			// Obtain ParamDsc information
 			ParamDsc descriptor = (ParamDsc)Marshal.PtrToStructure(pNativeData, typeof(ParamDsc));
 
-			return this.GetValue(descriptor, charset);
+			return GetValue(descriptor, charset);
 		}
 
 		#endregion
@@ -140,7 +140,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			field.NumericScale  = descriptor.Scale;
 			field.SubType       = descriptor.SubType;
 
-			byte[] data = this.GetBytes(descriptor, field.DataType);
+			byte[] data = GetBytes(descriptor, field.DataType);
 
 			field.SetValue(data);
 
@@ -160,7 +160,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			{
 				case IscCodes.SQL_VARYING:
 					buffer = new byte[Marshal.ReadInt16(descriptor.Data)];
-					IntPtr tmp = this.GetIntPtr(descriptor.Data, 2);
+					IntPtr tmp = GetIntPtr(descriptor.Data, 2);
 					Marshal.Copy(tmp, buffer, 0, buffer.Length);
 					return buffer;
 
@@ -200,7 +200,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			}
 			else
 			{
-				this.SetDscType(ref descriptor, value);
+				SetDscType(ref descriptor, value);
 			}
 
 			if (descriptor.Type == IscCodes.dtype_cstring || descriptor.Type == IscCodes.dtype_varying)

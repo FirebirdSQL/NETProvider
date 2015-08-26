@@ -39,8 +39,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private Symbol source;
-		private Symbol column;
+		private Symbol _source;
+		private Symbol _column;
 
 		#endregion
 
@@ -48,14 +48,14 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		public Symbol Source
 		{
-			get { return this.source; }
-			set { this.source = value; }
+			get { return _source; }
+			set { _source = value; }
 		}
 
 		public Symbol Column
 		{
-			get { return this.column; }
-			set { this.column = value; }
+			get { return _column; }
+			set { _column = value; }
 		}
 
 		#endregion
@@ -64,8 +64,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		public SymbolPair(Symbol source, Symbol column)
 		{
-			this.Source = source;
-			this.Column = column;
+			Source = source;
+			Column = column;
 		}
 
 		#endregion

@@ -24,7 +24,7 @@ namespace FirebirdSql.Data.Services
 	{
 		#region Fields
 
-		private string message;
+		private string _message;
 
 		#endregion
 
@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Services
 
 		public string Message
 		{
-			get { return this.message; }
+			get { return _message; }
 		}
 
 		#endregion
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Services
 
 		public ServiceOutputEventArgs(string message)
 		{
-			this.message = message;
+			_message = message;
 		}
 
 		#endregion

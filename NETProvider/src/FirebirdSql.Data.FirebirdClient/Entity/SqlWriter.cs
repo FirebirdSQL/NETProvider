@@ -38,8 +38,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		#region Fields
 
 		// We start at -1, since the first select statement will increment it to 0.
-		private int     indent              = -1;
-		private bool    atBeginningOfLine   = true;
+		private int     _indent              = -1;
+		private bool    _atBeginningOfLine   = true;
 
 		#endregion
 
@@ -50,8 +50,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// </summary>
 		internal int Indent
 		{
-			get { return this.indent; }
-			set { this.indent = value; }
+			get { return _indent; }
+			set { _indent = value; }
 		}
 
 		#endregion
@@ -83,17 +83,17 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			if (value == Environment.NewLine)
 			{
 				base.WriteLine();
-				this.atBeginningOfLine = true;
+				_atBeginningOfLine = true;
 			}
 			else
 			{
-				if (this.atBeginningOfLine)
+				if (_atBeginningOfLine)
 				{
-					if (indent > 0)
+					if (_indent > 0)
 					{
-						base.Write(new string('\t', indent));
+						base.Write(new string('\t', _indent));
 					}
-					this.atBeginningOfLine = false;
+					_atBeginningOfLine = false;
 				}
 				base.Write(value);
 			}
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		public override void WriteLine()
 		{
 			base.WriteLine();
-			this.atBeginningOfLine = true;
+			_atBeginningOfLine = true;
 		}
 
 		#endregion

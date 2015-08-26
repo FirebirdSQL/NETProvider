@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Services
 	{
 		#region Fields
 
-		private FbValidationFlags options;
+		private FbValidationFlags _options;
 
 		#endregion
 
@@ -35,8 +35,8 @@ namespace FirebirdSql.Data.Services
 
 		public FbValidationFlags Options
 		{
-			get { return this.options; }
-			set { this.options = value; }
+			get { return _options; }
+			set { _options = value; }
 		}
 
 		#endregion
@@ -53,27 +53,27 @@ namespace FirebirdSql.Data.Services
 
 		public void Execute()
 		{
-			if (string.IsNullOrEmpty(this.Database))
+			if (string.IsNullOrEmpty(Database))
 			{
 				throw new FbException("Validation should be used against a specific database");
 			}
 
 			try
 			{
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
 				// Configure Spb
-				this.StartSpb.Append(IscCodes.isc_action_svc_repair);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.options);
+				StartSpb.Append(IscCodes.isc_action_svc_repair);
+				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+				StartSpb.Append(IscCodes.isc_spb_options, (int)_options);
 
-				this.Open();
+				Open();
 
 				// Start execution
-				this.StartTask();
+				StartTask();
 
 				// Process service output
-				this.ProcessServiceOutput();
+				ProcessServiceOutput();
 			}
 			catch (Exception ex)
 			{
@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				this.Close();
+				Close();
 			}
 		}
 

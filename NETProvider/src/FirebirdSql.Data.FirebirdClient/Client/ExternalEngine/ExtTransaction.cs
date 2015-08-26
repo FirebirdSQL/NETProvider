@@ -47,11 +47,11 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#region Fields
 
-		private int handle;
-		private ExtDatabase db;
-		private TransactionState state;
-		private bool disposed;
-		private int[] statusVector;
+		private int _handle;
+		private ExtDatabase _db;
+		private TransactionState _state;
+		private bool _disposed;
+		private int[] _statusVector;
 
 		#endregion
 
@@ -59,12 +59,12 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public int Handle
 		{
-			get { return this.handle; }
+			get { return _handle; }
 		}
 
 		public TransactionState State
 		{
-			get { return this.state; }
+			get { return _state; }
 		}
 
 		#endregion
@@ -78,9 +78,9 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				throw new ArgumentException("Specified argument is not of FesDatabase type.");
 			}
 
-			this.db = (ExtDatabase)db;
-			this.state = TransactionState.NoTransaction;
-			this.statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
+			_db = (ExtDatabase)db;
+			_state = TransactionState.NoTransaction;
+			_statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
 
 			GC.SuppressFinalize(this);
 		}
@@ -91,7 +91,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		~ExtTransaction()
 		{
-			this.Dispose(false);
+			Dispose(false);
 		}
 
 		#endregion
@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public void Dispose()
 		{
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -108,25 +108,25 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		{
 			lock (this)
 			{
-				if (!this.disposed)
+				if (!_disposed)
 				{
 					try
 					{
 						// release any unmanaged resources
-						this.Rollback();
+						Rollback();
 
 						// release any managed resources
 						if (disposing)
 						{
-							this.db = null;
-							this.handle = 0;
-							this.state = TransactionState.NoTransaction;
-							this.statusVector = null;
+							_db = null;
+							_handle = 0;
+							_state = TransactionState.NoTransaction;
+							_statusVector = null;
 						}
 					}
 					finally
 					{
-						this.disposed = true;
+						_disposed = true;
 					}
 				}
 			}
@@ -139,32 +139,32 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public void BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			// Clear the status vector
-			this.ClearStatusVector();
+			ClearStatusVector();
 
 			int trHandle = 0;
 
-			lock (this.db)
+			lock (_db)
 			{
-				SafeNativeMethods.isc_get_current_transaction(this.statusVector, ref trHandle);
+				SafeNativeMethods.isc_get_current_transaction(_statusVector, ref trHandle);
 
-				this.handle = trHandle;
-				this.state = TransactionState.Active;
+				_handle = trHandle;
+				_state = TransactionState.Active;
 			}
 		}
 
 		public void Commit()
 		{
-			if (this.Update != null)
+			if (Update != null)
 			{
-				this.Update(this, new EventArgs());
+				Update(this, new EventArgs());
 			}
 		}
 
 		public void Rollback()
 		{
-			if (this.Update != null)
+			if (Update != null)
 			{
-				this.Update(this, new EventArgs());
+				Update(this, new EventArgs());
 			}
 		}
 
@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		private void ClearStatusVector()
 		{
-			Array.Clear(this.statusVector, 0, this.statusVector.Length);
+			Array.Clear(_statusVector, 0, _statusVector.Length);
 		}
 
 		#endregion

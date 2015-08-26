@@ -38,12 +38,12 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 	{
 		#region Fields
 
-		private Dictionary<string, Symbol> columns = new Dictionary<string, Symbol>(StringComparer.CurrentCultureIgnoreCase);
-		private bool needsRenaming = false;
-		private bool isUnnest = false;
-		private string name;
-		private string newName;
-		private TypeUsage type;
+		private Dictionary<string, Symbol> _columns = new Dictionary<string, Symbol>(StringComparer.CurrentCultureIgnoreCase);
+		private bool _needsRenaming = false;
+		private bool _isUnnest = false;
+		private string _name;
+		private string _newName;
+		private TypeUsage _type;
 
 		#endregion
 
@@ -51,13 +51,13 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		public string Name
 		{
-			get { return this.name; }
+			get { return _name; }
 		}
 
 		public string NewName
 		{
-			get { return this.newName; }
-			set { this.newName = value; }
+			get { return _newName; }
+			set { _newName = value; }
 		}
 
 		#endregion
@@ -66,25 +66,25 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		internal Dictionary<string, Symbol> Columns
 		{
-			get { return this.columns; }
+			get { return _columns; }
 		}
 
 		internal bool NeedsRenaming
 		{
-			get { return this.needsRenaming; }
-			set { this.needsRenaming = value; }
+			get { return _needsRenaming; }
+			set { _needsRenaming = value; }
 		}
 
 		internal bool IsUnnest
 		{
-			get { return this.isUnnest; }
-			set { this.isUnnest = value; }
+			get { return _isUnnest; }
+			set { _isUnnest = value; }
 		}
 
 		internal TypeUsage Type
 		{
-			get { return this.type; }
-			set { this.type = value; }
+			get { return _type; }
+			set { _type = value; }
 		}
 
 		#endregion
@@ -93,9 +93,9 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		public Symbol(string name, TypeUsage type)
 		{
-			this.name = name;
-			this.newName = name;
-			this.Type = type;
+			_name = name;
+			_newName = name;
+			Type = type;
 		}
 
 		#endregion
@@ -112,27 +112,27 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <param name="sqlGenerator"></param>
 		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
 		{
-			if (this.NeedsRenaming)
+			if (NeedsRenaming)
 			{
 				string newName;
-				int i = sqlGenerator.AllColumnNames[this.NewName];
+				int i = sqlGenerator.AllColumnNames[NewName];
 				do
 				{
 					++i;
-					newName = this.Name + i.ToString(System.Globalization.CultureInfo.InvariantCulture);
+					newName = Name + i.ToString(System.Globalization.CultureInfo.InvariantCulture);
 				} while (sqlGenerator.AllColumnNames.ContainsKey(newName));
-				sqlGenerator.AllColumnNames[this.NewName] = i;
+				sqlGenerator.AllColumnNames[NewName] = i;
 
 				// Prevent it from being renamed repeatedly.
-				this.NeedsRenaming = false;
-				this.NewName = newName;
+				NeedsRenaming = false;
+				NewName = newName;
 
 				// Add this column name to list of known names so that there are no subsequent
 				// collisions
 				sqlGenerator.AllColumnNames[newName] = 0;
 			}
 
-			writer.Write(SqlGenerator.QuoteIdentifier(this.NewName));
+			writer.Write(SqlGenerator.QuoteIdentifier(NewName));
 		}
 
 		#endregion

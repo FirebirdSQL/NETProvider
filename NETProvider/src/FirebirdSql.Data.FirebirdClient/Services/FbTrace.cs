@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.Services
 		public FbTrace(string connectionString = null)
 			: base(connectionString)
 		{
-			this.DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
+			DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
 		}
 		#endregion
 
@@ -44,18 +44,18 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				string config = this.DatabasesConfigurations.ToString() + (this.ServiceConfiguration != null ? this.ServiceConfiguration.ToString() : string.Empty);
+				string config = DatabasesConfigurations.ToString() + (ServiceConfiguration != null ? ServiceConfiguration.ToString() : string.Empty);
 
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_trace_start);
+				StartSpb.Append(IscCodes.isc_action_svc_trace_start);
 				if (!string.IsNullOrEmpty(sessionName))
-					this.StartSpb.Append(IscCodes.isc_spb_trc_name, sessionName);
-				this.StartSpb.Append(IscCodes.isc_spb_trc_cfg, config);
+					StartSpb.Append(IscCodes.isc_spb_trc_name, sessionName);
+				StartSpb.Append(IscCodes.isc_spb_trc_cfg, config);
 
-				this.Open();
-				this.StartTask();
-				this.ProcessServiceOutput();
+				Open();
+				StartTask();
+				ProcessServiceOutput();
 			}
 			catch (Exception ex)
 			{
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				this.Close();
+				Close();
 			}
 		}
 
@@ -92,15 +92,15 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
-				this.StartSpb.Append(action);
+				StartSpb.Append(action);
 				if (sessionID.HasValue)
-					this.StartSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
+					StartSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
 
-				this.Open();
-				this.StartTask();
-				this.ProcessServiceOutput();
+				Open();
+				StartTask();
+				ProcessServiceOutput();
 			}
 			catch (Exception ex)
 			{
@@ -108,7 +108,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				this.Close();
+				Close();
 			}
 		}
 	}

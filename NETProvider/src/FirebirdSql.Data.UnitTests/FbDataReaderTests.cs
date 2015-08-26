@@ -283,7 +283,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "insert into test (int_field) values (100000)";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 
 			FbDataReader reader = command.ExecuteReader();
 
@@ -308,7 +308,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "select blob_field from TEST where int_field = @int_field";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 2;
 
 			FbDataReader reader = command.ExecuteReader();
@@ -327,7 +327,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "select clob_field from TEST where int_field = @int_field";
 
-			FbCommand command = new FbCommand(sql, this.Connection);
+			FbCommand command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 50;
 
 			FbDataReader reader = command.ExecuteReader();
@@ -346,7 +346,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			string sql = "select decimal_field from test";
 
-			FbCommand test = new FbCommand(sql, this.Connection);
+			FbCommand test = new FbCommand(sql, Connection);
 			FbDataReader r = test.ExecuteReader(CommandBehavior.SchemaOnly);
 
 			DataTable schema = r.GetSchemaTable();

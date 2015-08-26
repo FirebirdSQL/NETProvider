@@ -34,9 +34,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region Fields
 
-		private long			handle;
-		private GdsDatabase		database;
-		private GdsTransaction	transaction;
+		private long			_handle;
+		private GdsDatabase		_database;
+		private GdsTransaction	_transaction;
 
 		#endregion
 
@@ -44,20 +44,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override long Handle
 		{
-			get { return this.handle; }
-			set { this.handle = value; }
+			get { return _handle; }
+			set { _handle = value; }
 		}
 
 		public override IDatabase DB
 		{
-			get { return this.database; }
-			set { this.database = (GdsDatabase)value; }
+			get { return _database; }
+			set { _database = (GdsDatabase)value; }
 		}
 
 		public override ITransaction Transaction
 		{
-			get { return this.transaction; }
-			set { this.transaction = (GdsTransaction)value; }
+			get { return _transaction; }
+			set { _transaction = (GdsTransaction)value; }
 		}
 
 		#endregion
@@ -86,11 +86,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
 			}
 
-			this.database				= (GdsDatabase)db;
-			this.transaction	= (GdsTransaction)transaction;
-			this.handle			= handle;
+			_database = (GdsDatabase)db;
+			_transaction = (GdsTransaction)transaction;
+			_handle = handle;
 
-			this.LookupBounds();
+			LookupBounds();
 		}
 
 		#endregion
@@ -99,22 +99,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override byte[] GetSlice(int sliceLength)
 		{
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					byte[] sdl = this.GenerateSDL(this.Descriptor);
+					byte[] sdl = GenerateSDL(Descriptor);
 
-					this.database.Write(IscCodes.op_get_slice);	// Op code
-					this.database.Write(this.transaction.Handle);// Transaction
-					this.database.Write(this.handle);			// Array id
-					this.database.Write(sliceLength);			// Slice length
-					this.database.WriteBuffer(sdl);				// Slice descriptor	language
-					this.database.Write(string.Empty);			// Slice parameters					
-					this.database.Write(0);						// Slice proper
-					this.database.Flush();
+					_database.Write(IscCodes.op_get_slice); // Op code
+					_database.Write(_transaction.Handle);// Transaction
+					_database.Write(_handle);           // Array id
+					_database.Write(sliceLength);           // Slice length
+					_database.WriteBuffer(sdl);             // Slice descriptor	language
+					_database.Write(string.Empty);          // Slice parameters					
+					_database.Write(0);                     // Slice proper
+					_database.Flush();
 
-					return this.ReceiveSliceResponse(this.Descriptor);
+					return ReceiveSliceResponse(Descriptor);
 				}
 				catch (IOException)
 				{
@@ -125,26 +125,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void PutSlice(System.Array sourceArray, int sliceLength)
 		{
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					byte[] sdl = this.GenerateSDL(this.Descriptor);
-					byte[] slice = this.EncodeSliceArray(sourceArray);
+					byte[] sdl = GenerateSDL(Descriptor);
+					byte[] slice = EncodeSliceArray(sourceArray);
 
-					this.database.Write(IscCodes.op_put_slice);	    // Op code
-					this.database.Write(this.transaction.Handle);   // Transaction
-					this.database.Write((long)0);				    // Array Handle
-					this.database.Write(sliceLength);			    // Slice length
-					this.database.WriteBuffer(sdl);				    // Slice descriptor	language
-					this.database.Write(string.Empty);			    // Slice parameters
-					this.database.Write(sliceLength);			    // Slice length
-					this.database.Write(slice, 0, slice.Length);    // Slice proper
-					this.database.Flush();
+					_database.Write(IscCodes.op_put_slice);     // Op code
+					_database.Write(_transaction.Handle);   // Transaction
+					_database.Write((long)0);                   // Array Handle
+					_database.Write(sliceLength);               // Slice length
+					_database.WriteBuffer(sdl);                 // Slice descriptor	language
+					_database.Write(string.Empty);              // Slice parameters
+					_database.Write(sliceLength);               // Slice length
+					_database.Write(slice, 0, slice.Length);    // Slice proper
+					_database.Flush();
 
-					GenericResponse response = this.database.ReadGenericResponse();
+					GenericResponse response = _database.ReadGenericResponse();
 
-					this.handle = response.BlobId;
+					_handle = response.BlobId;
 				}
 				catch (IOException)
 				{
@@ -162,17 +162,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			DbDataType	dbType		= DbDataType.Array;
 			Array		sliceData	= null;
 			Array		tempData	= null;
-			Type		systemType	= this.GetSystemType();
-			int[]		lengths		= new int[this.Descriptor.Dimensions];
-			int[]		lowerBounds = new int[this.Descriptor.Dimensions];
+			Type		systemType	= GetSystemType();
+			int[]		lengths		= new int[Descriptor.Dimensions];
+			int[]		lowerBounds = new int[Descriptor.Dimensions];
 			int			type		= 0;
 			int			index		= 0;
 
 			// Get upper and lower bounds of each dimension
-			for (int i = 0; i < this.Descriptor.Dimensions; i++)
+			for (int i = 0; i < Descriptor.Dimensions; i++)
 			{
-				lowerBounds[i]	= this.Descriptor.Bounds[i].LowerBound;
-				lengths[i]		= this.Descriptor.Bounds[i].UpperBound;
+				lowerBounds[i]	= Descriptor.Bounds[i].LowerBound;
+				lengths[i]		= Descriptor.Bounds[i].UpperBound;
 
 				if (lowerBounds[i] == 0)
 				{
@@ -185,18 +185,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			tempData = Array.CreateInstance(systemType, sliceData.Length);
 
 			// Infer Firebird and Db datatypes
-			type	= TypeHelper.GetFbType(this.Descriptor.DataType);
-			dbType	= TypeHelper.GetDbDataType(this.Descriptor.DataType, 0, this.Descriptor.Scale);
+			type	= TypeHelper.GetFbType(Descriptor.DataType);
+			dbType	= TypeHelper.GetDbDataType(Descriptor.DataType, 0, Descriptor.Scale);
 
 			// Decode slice	data
-			XdrStream xdr = new XdrStream(slice, this.database.Charset);
+			XdrStream xdr = new XdrStream(slice, _database.Charset);
 
 			while (xdr.Position < xdr.Length)
 			{
 				switch (dbType)
 				{
 					case DbDataType.Char:
-						tempData.SetValue(xdr.ReadString(this.Descriptor.Length), index);
+						tempData.SetValue(xdr.ReadString(Descriptor.Length), index);
 						break;
 
 					case DbDataType.VarChar:
@@ -217,7 +217,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					case DbDataType.Numeric:
 					case DbDataType.Decimal:
-						tempData.SetValue(xdr.ReadDecimal(type, this.Descriptor.Scale), index);
+						tempData.SetValue(xdr.ReadDecimal(type, Descriptor.Scale), index);
 						break;
 
 					case DbDataType.Float:
@@ -268,16 +268,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				int operation = this.database.ReadOperation();
+				int operation = _database.ReadOperation();
 
 				if (operation == IscCodes.op_slice)
 				{
 					// Read	slice length
 					bool	isVariying = false;
 					int		elements = 0;
-					int		length = this.database.ReadInt32();
+					int		length = _database.ReadInt32();
 
-					length = this.database.ReadInt32();
+					length = _database.ReadInt32();
 
 					switch (desc.DataType)
 					{
@@ -306,7 +306,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 						for (int i = 0; i < elements; i++)
 						{
-							byte[] buffer = this.database.ReadOpaque(this.database.ReadInt32());
+							byte[] buffer = _database.ReadOpaque(_database.ReadInt32());
 
 							xdr.WriteBuffer(buffer, buffer.Length);
 						}
@@ -315,13 +315,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					else
 					{
-						return this.database.ReadOpaque(length);
+						return _database.ReadOpaque(length);
 					}
 				}
 				else
 				{
-					this.database.SetOperation(operation);
-					this.database.ReadResponse();
+					_database.SetOperation(operation);
+					_database.ReadResponse();
 
 					return null;
 				}
@@ -335,13 +335,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private byte[] EncodeSliceArray(Array sourceArray)
 		{
 			DbDataType	dbType	= DbDataType.Array;
-			Charset		charset = this.database.Charset;
-			XdrStream	xdr		= new XdrStream(this.database.Charset);
-			int         subType = (this.Descriptor.Scale < 0) ? 2 : 0;
+			Charset		charset = _database.Charset;
+			XdrStream	xdr		= new XdrStream(_database.Charset);
+			int         subType = (Descriptor.Scale < 0) ? 2 : 0;
 			int			type	= 0;
 
-			type = TypeHelper.GetFbType(this.Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(this.Descriptor.DataType, subType, this.Descriptor.Scale);
+			type = TypeHelper.GetFbType(Descriptor.DataType);
+			dbType = TypeHelper.GetDbDataType(Descriptor.DataType, subType, Descriptor.Scale);
 
 			foreach (object source in sourceArray)
 			{
@@ -349,7 +349,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					case DbDataType.Char:
 						byte[] buffer = charset.GetBytes(source.ToString());
-						xdr.WriteOpaque(buffer, this.Descriptor.Length);
+						xdr.WriteOpaque(buffer, Descriptor.Length);
 						break;
 
 					case DbDataType.VarChar:
@@ -370,7 +370,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					case DbDataType.Decimal:
 					case DbDataType.Numeric:
-						xdr.Write((decimal)source, type, this.Descriptor.Scale);
+						xdr.Write((decimal)source, type, Descriptor.Scale);
 						break;
 
 					case DbDataType.Float:
@@ -419,7 +419,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
 			sdl = new BinaryWriter(new MemoryStream());
-			this.Stuff(
+			Stuff(
 				sdl, 4, IscCodes.isc_sdl_version1,
 				IscCodes.isc_sdl_struct, 1, desc.DataType);
 
@@ -429,21 +429,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				case IscCodes.blr_long:
 				case IscCodes.blr_int64:
 				case IscCodes.blr_quad:
-					this.StuffSdl(sdl, (byte)desc.Scale);
+					StuffSdl(sdl, (byte)desc.Scale);
 					break;
 
 				case IscCodes.blr_text:
 				case IscCodes.blr_cstring:
 				case IscCodes.blr_varying:
-					this.StuffWord(sdl, desc.Length);
+					StuffWord(sdl, desc.Length);
 					break;
 
 				default:
 					break;
 			}
 
-			this.StuffString(sdl, IscCodes.isc_sdl_relation, desc.RelationName);
-			this.StuffString(sdl, IscCodes.isc_sdl_field, desc.FieldName);
+			StuffString(sdl, IscCodes.isc_sdl_relation, desc.RelationName);
+			StuffString(sdl, IscCodes.isc_sdl_field, desc.FieldName);
 
 			if ((desc.Flags & IscCodes.ARRAY_DESC_COLUMN_MAJOR) == IscCodes.ARRAY_DESC_COLUMN_MAJOR)
 			{
@@ -463,28 +463,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				tail = desc.Bounds[n];
 				if (tail.LowerBound == 1)
 				{
-					this.Stuff(sdl, 2, IscCodes.isc_sdl_do1, n);
+					Stuff(sdl, 2, IscCodes.isc_sdl_do1, n);
 				}
 				else
 				{
-					this.Stuff(sdl, 2, IscCodes.isc_sdl_do2, n);
+					Stuff(sdl, 2, IscCodes.isc_sdl_do2, n);
 
-					this.StuffLiteral(sdl, tail.LowerBound);
+					StuffLiteral(sdl, tail.LowerBound);
 				}
 
-				this.StuffLiteral(sdl, tail.UpperBound);
+				StuffLiteral(sdl, tail.UpperBound);
 			}
 
-			this.Stuff(
+			Stuff(
 				sdl, 5, IscCodes.isc_sdl_element,
 				1, IscCodes.isc_sdl_scalar, 0, dimensions);
 
 			for (n = 0; n < dimensions; n++)
 			{
-				this.Stuff(sdl, 2, IscCodes.isc_sdl_variable, n);
+				Stuff(sdl, 2, IscCodes.isc_sdl_variable, n);
 			}
 
-			this.StuffSdl(sdl, IscCodes.isc_sdl_eoc);
+			StuffSdl(sdl, IscCodes.isc_sdl_eoc);
 
 			return ((MemoryStream)sdl.BaseStream).ToArray();
 		}
@@ -504,48 +504,48 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void StuffSdl(BinaryWriter sdl, byte sdl_byte)
 		{
-			this.Stuff(sdl, 1, sdl_byte);
+			Stuff(sdl, 1, sdl_byte);
 		}
 
 		private void StuffWord(BinaryWriter sdl, short word)
 		{
-			this.Stuff(sdl, BitConverter.GetBytes(word));
+			Stuff(sdl, BitConverter.GetBytes(word));
 		}
 
 		private void StuffLong(BinaryWriter sdl, int word)
 		{
-			this.Stuff(sdl, BitConverter.GetBytes(word));
+			Stuff(sdl, BitConverter.GetBytes(word));
 		}
 
 		private void StuffLiteral(BinaryWriter sdl, int literal)
 		{
 			if (literal >= -128 && literal <= 127)
 			{
-				this.Stuff(sdl, 2, IscCodes.isc_sdl_tiny_integer, literal);
+				Stuff(sdl, 2, IscCodes.isc_sdl_tiny_integer, literal);
 
 				return;
 			}
 
 			if (literal >= -32768 && literal <= 32767)
 			{
-				this.StuffSdl(sdl, IscCodes.isc_sdl_short_integer);
-				this.StuffWord(sdl, (short)literal);
+				StuffSdl(sdl, IscCodes.isc_sdl_short_integer);
+				StuffWord(sdl, (short)literal);
 
 				return;
 			}
 
-			this.StuffSdl(sdl, IscCodes.isc_sdl_long_integer);
-			this.StuffLong(sdl, literal);
+			StuffSdl(sdl, IscCodes.isc_sdl_long_integer);
+			StuffLong(sdl, literal);
 		}
 
 		private void StuffString(BinaryWriter sdl, int constant, string value)
 		{
-			this.StuffSdl(sdl, (byte)constant);
-			this.StuffSdl(sdl, (byte)value.Length);
+			StuffSdl(sdl, (byte)constant);
+			StuffSdl(sdl, (byte)value.Length);
 
 			for (int i = 0; i < value.Length; i++)
 			{
-				this.StuffSdl(sdl, (byte)value[i]);
+				StuffSdl(sdl, (byte)value[i]);
 			}
 		}
 

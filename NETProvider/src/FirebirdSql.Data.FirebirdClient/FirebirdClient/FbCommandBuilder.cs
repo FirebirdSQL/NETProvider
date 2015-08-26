@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
-		private FbRowUpdatingEventHandler rowUpdatingHandler;
+		private FbRowUpdatingEventHandler _rowUpdatingHandler;
 
 		#endregion
 
@@ -170,10 +170,10 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbCommandBuilder(FbDataAdapter adapter)
 			: base()
 		{
-			this.DataAdapter = adapter;
-			this.QuotePrefix = "\"";
-			this.QuoteSuffix = "\"";
-			this.ConflictOption = ConflictOption.OverwriteChanges;
+			DataAdapter = adapter;
+			QuotePrefix = "\"";
+			QuoteSuffix = "\"";
+			ConflictOption = ConflictOption.OverwriteChanges;
 		}
 
 		#endregion
@@ -217,7 +217,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new ArgumentNullException("Unquoted identifier parameter cannot be null");
 			}
 
-			return String.Format("{0}{1}{2}", this.QuotePrefix, unquotedIdentifier, this.QuoteSuffix);
+			return String.Format("{0}{1}{2}", QuotePrefix, unquotedIdentifier, QuoteSuffix);
 		}
 
 		public override string UnquoteIdentifier(string quotedIdentifier)
@@ -229,11 +229,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			string unquotedIdentifier = quotedIdentifier.Trim();
 
-			if (unquotedIdentifier.StartsWith(this.QuotePrefix))
+			if (unquotedIdentifier.StartsWith(QuotePrefix))
 			{
 				unquotedIdentifier = unquotedIdentifier.Remove(0, 1);
 			}
-			if (unquotedIdentifier.EndsWith(this.QuoteSuffix))
+			if (unquotedIdentifier.EndsWith(QuoteSuffix))
 			{
 				unquotedIdentifier = unquotedIdentifier.Remove(unquotedIdentifier.Length - 1, 1);
 			}
@@ -273,7 +273,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override string GetParameterPlaceholder(int parameterOrdinal)
 		{
-			return this.GetParameterName(parameterOrdinal);
+			return GetParameterName(parameterOrdinal);
 		}
 
 		protected override void SetRowUpdatingHandler(DbDataAdapter adapter)
@@ -283,8 +283,8 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("adapter needs to be a FbDataAdapter");
 			}
 
-			this.rowUpdatingHandler = new FbRowUpdatingEventHandler(this.RowUpdatingHandler);
-			((FbDataAdapter)adapter).RowUpdating += this.rowUpdatingHandler;
+			_rowUpdatingHandler = new FbRowUpdatingEventHandler(RowUpdatingHandler);
+			((FbDataAdapter)adapter).RowUpdating += _rowUpdatingHandler;
 		}
 
 		#endregion

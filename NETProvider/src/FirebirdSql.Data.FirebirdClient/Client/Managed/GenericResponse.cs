@@ -25,10 +25,10 @@ namespace FirebirdSql.Data.Client.Managed
 	{
 		#region Fields
 
-		private int			    objectHandle;
-		private long		    blobId;
-		private byte[]		    data;
-		private IscException    exception;
+		private int			    _objectHandle;
+		private long		    _blobId;
+		private byte[]		    _data;
+		private IscException    _exception;
 
 		#endregion
 
@@ -36,22 +36,22 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public int ObjectHandle
 		{
-			get { return objectHandle; }
+			get { return _objectHandle; }
 		}
 
 		public long BlobId
 		{
-			get { return blobId; }
+			get { return _blobId; }
 		}
 
 		public byte[] Data
 		{
-			get { return data; }
+			get { return _data; }
 		}
 
 		public IscException Exception
 		{
-			get { return this.exception; }
+			get { return _exception; }
 		}
 
 		#endregion
@@ -60,10 +60,10 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public GenericResponse(int objectHandle, long blobId, byte[] data, IscException exception)
 		{
-			this.objectHandle	= objectHandle;
-			this.blobId			= blobId;
-			this.data			= data;
-			this.exception      = exception;
+			_objectHandle = objectHandle;
+			_blobId = blobId;
+			_data = data;
+			_exception = exception;
 		}
 
 		#endregion

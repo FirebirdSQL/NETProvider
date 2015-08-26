@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void FillTest()
 		{
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void FillMultipleTest()
 		{
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void InsertTest()
 		{
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -175,7 +175,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateCharTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -216,7 +216,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateVarCharTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -257,7 +257,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateSmallIntTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -298,7 +298,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateBigIntTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -339,7 +339,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateDoubleTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -380,7 +380,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateFloatTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -421,7 +421,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateNumericTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -462,7 +462,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateDecimalTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -503,7 +503,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateDateTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -548,7 +548,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateTimeTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -593,7 +593,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateTimeStampTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -641,7 +641,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void UpdateClobTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -669,7 +669,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void DeleteTest()
 		{
 			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = this.Connection.BeginTransaction();
+			FbTransaction transaction = Connection.BeginTransaction();
 			FbCommand command = new FbCommand(sql, Connection, transaction);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -700,7 +700,7 @@ namespace FirebirdSql.Data.UnitTests
 			string deleteSql = "DELETE FROM test WHERE int_field = @id";
 
 			// Set up conenction and select/delete commands
-			FbConnection connection = new FbConnection(this.Connection.ConnectionString);
+			FbConnection connection = new FbConnection(Connection.ConnectionString);
 			FbCommand select = new FbCommand(selectSql, connection);
 			FbCommand delete = new FbCommand(deleteSql, connection);
 			delete.Parameters.Add("@id", FbDbType.Integer);
@@ -732,7 +732,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Ignore("Not supported")]
 		public void MultipleResultsetTest()
 		{
-			FbCommand command = new FbCommand("", this.Connection);
+			FbCommand command = new FbCommand("", Connection);
 
 			command.CommandText = "select * from test;";
 			command.CommandText += "select int_field from test;";

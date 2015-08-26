@@ -37,9 +37,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
-		private FbConnectionInternal    connection;
-		private FbTransaction           transaction;
-		private Transaction             systemTransaction;
+		private FbConnectionInternal    _connection;
+		private FbTransaction           _transaction;
+		private Transaction             _systemTransaction;
 
 		#endregion
 
@@ -47,12 +47,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public bool IsCompleted
 		{
-			get { return (this.transaction == null); }
+			get { return (_transaction == null); }
 		}
 
 		public Transaction SystemTransaction
 		{
-			get { return this.systemTransaction; }
+			get { return _systemTransaction; }
 		}
 
 		#endregion
@@ -60,12 +60,12 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Constructors
 
 		public FbEnlistmentNotification(FbConnectionInternal connection, Transaction systemTransaction)
-		{            
-			this.connection         = connection;
-			this.transaction        = connection.BeginTransaction(systemTransaction.IsolationLevel);
-			this.systemTransaction  = systemTransaction;
+		{
+			_connection = connection;
+			_transaction = connection.BeginTransaction(systemTransaction.IsolationLevel);
+			_systemTransaction = systemTransaction;
 
-			this.systemTransaction.EnlistVolatile(this, System.Transactions.EnlistmentOptions.None);
+			_systemTransaction.EnlistVolatile(this, System.Transactions.EnlistmentOptions.None);
 		}
 
 		#endregion
@@ -74,25 +74,25 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Commit(Enlistment enlistment)
 		{
-			if (this.transaction != null && !this.transaction.IsUpdated)
+			if (_transaction != null && !_transaction.IsUpdated)
 			{
-				this.transaction.Commit();
-				this.transaction = null;
+				_transaction.Commit();
+				_transaction = null;
 
-				if (this.Completed != null)
+				if (Completed != null)
 				{
-					this.Completed(this, new EventArgs());
+					Completed(this, new EventArgs());
 				}
 
-				if (this.connection != null)
+				if (_connection != null)
 				{
-					if (!this.connection.Options.Pooling && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
+					if (!_connection.Options.Pooling && (_connection.OwningConnection == null || _connection.OwningConnection.IsClosed))
 					{
-						this.connection.Disconnect();
+						_connection.Disconnect();
 					}
 				}
-				this.connection         = null;
-				this.systemTransaction  = null;
+				_connection = null;
+				_systemTransaction = null;
 
 				// Declare done on the enlistment
 				enlistment.Done();
@@ -111,25 +111,25 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Rollback(Enlistment enlistment)
 		{
-			if (this.transaction != null && !this.transaction.IsUpdated)
+			if (_transaction != null && !_transaction.IsUpdated)
 			{
-				this.transaction.Rollback();
-				this.transaction        = null;
+				_transaction.Rollback();
+				_transaction = null;
 
-				if (this.Completed != null)
+				if (Completed != null)
 				{
-					this.Completed(this, new EventArgs());
+					Completed(this, new EventArgs());
 				}
 
-				if (this.connection != null)
+				if (_connection != null)
 				{
-					if (!this.connection.Options.Pooling && (this.connection.OwningConnection == null || this.connection.OwningConnection.IsClosed))
+					if (!_connection.Options.Pooling && (_connection.OwningConnection == null || _connection.OwningConnection.IsClosed))
 					{
-						this.connection.Disconnect();
+						_connection.Disconnect();
 					}
 				}
-				this.connection = null;
-				this.systemTransaction  = null;
+				_connection = null;
+				_systemTransaction = null;
 
 				// Declare done on the enlistment
 				enlistment.Done();

@@ -24,8 +24,8 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Fields
 
-		private string name;
-		private int counts;
+		private string _name;
+		private int _counts;
 
 		#endregion
 
@@ -33,12 +33,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public string Name
 		{
-			get { return this.name; }
+			get { return _name; }
 		}
 
 		public int Counts
 		{
-			get { return this.counts; }
+			get { return _counts; }
 		}
 
 		#endregion
@@ -52,8 +52,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbRemoteEventEventArgs(string name, int counts, bool cancel)
 			: base(cancel)
 		{
-			this.name = name;
-			this.counts = counts;
+			_name = name;
+			_counts = counts;
 		}
 
 		#endregion

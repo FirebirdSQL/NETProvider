@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		public AuthResponse(byte[] data)
 		{
-			this.Data = data;
+			Data = data;
 		}
 
 		#endregion

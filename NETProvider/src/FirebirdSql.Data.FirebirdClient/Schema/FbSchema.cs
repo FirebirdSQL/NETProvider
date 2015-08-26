@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.Schema
 		public DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
 			DataTable dataTable = new DataTable(collectionName);
-			FbCommand command = this.BuildCommand(connection, collectionName, this.ParseRestrictions(restrictions));
+			FbCommand command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions));
 			FbDataAdapter adapter = new FbDataAdapter(command);
 
 			try
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Schema
 
 			TrimStringFields(dataTable);
 
-			return this.ProcessResult(dataTable);
+			return ProcessResult(dataTable);
 		}
 
 		#endregion
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Schema
 		protected FbCommand BuildCommand(FbConnection connection, string collectionName, string[] restrictions)
 		{
 			string          filter = String.Format("CollectionName='{0}'", collectionName);
-			StringBuilder	builder = this.GetCommandText(restrictions);
+			StringBuilder	builder = GetCommandText(restrictions);
 			DataRow[]       restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
 			FbTransaction	transaction = connection.InnerConnection.ActiveTransaction;
 			FbCommand		command	= new FbCommand(builder.ToString(), connection, transaction);

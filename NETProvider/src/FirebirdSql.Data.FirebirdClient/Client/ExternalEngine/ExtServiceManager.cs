@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 	{
 		#region Fields
 
-		private int handle;
+		private int _handle;
 
 		#endregion
 
@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public int Handle
 		{
-			get { return this.handle; }
+			get { return _handle; }
 		}
 
 		#endregion
@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
 		{
 			int[] statusVector = ExtConnection.GetNewStatusVector();
-			int svcHandle = this.Handle;
+			int svcHandle = Handle;
 
 			SafeNativeMethods.isc_service_attach(
 				statusVector,
@@ -66,30 +66,30 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				spb.ToArray());
 
 			// Parse status	vector
-			this.ParseStatusVector(statusVector);
+			ParseStatusVector(statusVector);
 
 			// Update status vector
-			this.handle = svcHandle;
+			_handle = svcHandle;
 		}
 
 		public void Detach()
 		{
 			int[] statusVector = ExtConnection.GetNewStatusVector();
-			int svcHandle = this.Handle;
+			int svcHandle = Handle;
 
 			SafeNativeMethods.isc_service_detach(statusVector, ref svcHandle);
 
 			// Parse status	vector
-			this.ParseStatusVector(statusVector);
+			ParseStatusVector(statusVector);
 
 			// Update status vector
-			this.handle = svcHandle;
+			_handle = svcHandle;
 		}
 
 		public void Start(ServiceParameterBuffer spb)
 		{
 			int[] statusVector = ExtConnection.GetNewStatusVector();
-			int svcHandle = this.Handle;
+			int svcHandle = Handle;
 			int reserved = 0;
 
 			SafeNativeMethods.isc_service_start(
@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				spb.ToArray());
 
 			// Parse status	vector
-			this.ParseStatusVector(statusVector);
+			ParseStatusVector(statusVector);
 		}
 
 		public void Query(
@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			byte[] buffer)
 		{
 			int[] statusVector = ExtConnection.GetNewStatusVector();
-			int svcHandle = this.Handle;
+			int svcHandle = Handle;
 			int reserved = 0;
 
 			SafeNativeMethods.isc_service_query(
@@ -126,7 +126,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				buffer);
 
 			// Parse status	vector
-			this.ParseStatusVector(statusVector);
+			ParseStatusVector(statusVector);
 		}
 
 		#endregion

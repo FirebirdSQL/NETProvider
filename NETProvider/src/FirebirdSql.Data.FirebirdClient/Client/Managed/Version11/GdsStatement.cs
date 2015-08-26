@@ -46,66 +46,66 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		public override void Prepare(string commandText)
 		{
 			// Clear data
-			this.ClearAll();
+			ClearAll();
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
 					int numberOfResponses = 0;
-					if (this.state == StatementState.Deallocated)
+					if (_state == StatementState.Deallocated)
 					{
 						// Allocate statement
-						this.SendAllocateToBuffer();
+						SendAllocateToBuffer();
 						numberOfResponses++;
 					}
 
 					// Prepare the statement
-					this.SendPrepareToBuffer(commandText);
+					SendPrepareToBuffer(commandText);
 					numberOfResponses++;
 
 					// Grab statement type
-					this.SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+					SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 					numberOfResponses++;
 
-					this.database.Flush();
+					_database.Flush();
 
 					// allocate, prepare, statement type
 					try
 					{
 						GenericResponse allocateResponse = null;
-						if (this.state == StatementState.Deallocated)
+						if (_state == StatementState.Deallocated)
 						{
 							numberOfResponses--;
-							allocateResponse = this.database.ReadGenericResponse();
+							allocateResponse = _database.ReadGenericResponse();
 						}
 
 						numberOfResponses--;
-						GenericResponse prepareResponse = this.database.ReadGenericResponse();
+						GenericResponse prepareResponse = _database.ReadGenericResponse();
 						bool deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
 
 						numberOfResponses--;
-						GenericResponse statementTypeResponse = this.database.ReadGenericResponse();
+						GenericResponse statementTypeResponse = _database.ReadGenericResponse();
 
 						if (allocateResponse != null)
 						{
-							this.ProcessAllocateResponce(allocateResponse);
+							ProcessAllocateResponce(allocateResponse);
 						}
-						this.ProcessPrepareResponse(prepareResponse);
-						this.statementType = this.ProcessStatementTypeInfoBuffer(this.ProcessInfoSqlResponse(statementTypeResponse));
+						ProcessPrepareResponse(prepareResponse);
+						_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(statementTypeResponse));
 					}
 					finally
 					{
 						SafeFinishFetching(ref numberOfResponses);
 					}
 
-					this.state = StatementState.Prepared;
+					_state = StatementState.Prepared;
 				}
 				catch (IOException)
 				{
 					// if the statement has been already allocated, it's now in error
-					if (this.state == StatementState.Allocated)
-						this.state = StatementState.Error;
+					if (_state == StatementState.Allocated)
+						_state = StatementState.Error;
 					throw new IscException(IscCodes.isc_net_read_err);
 				}
 			}
@@ -113,76 +113,76 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		public override void Execute()
 		{
-			if (this.state == StatementState.Deallocated)
+			if (_state == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
 
 			// Clear data
-			this.Clear();
+			Clear();
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				try
 				{
-					this.RecordsAffected = -1;
+					RecordsAffected = -1;
 
-					this.SendExecuteToBuffer();
+					SendExecuteToBuffer();
 
 					bool readRowsAffectedResponse = false;
 					// Obtain records affected by query execution
-					if (this.ReturnRecordsAffected &&
-						(this.StatementType == DbStatementType.Insert ||
-						this.StatementType == DbStatementType.Delete ||
-						this.StatementType == DbStatementType.Update ||
-						this.StatementType == DbStatementType.StoredProcedure ||
-						this.StatementType == DbStatementType.Select))
+					if (ReturnRecordsAffected &&
+						(StatementType == DbStatementType.Insert ||
+						StatementType == DbStatementType.Delete ||
+						StatementType == DbStatementType.Update ||
+						StatementType == DbStatementType.StoredProcedure ||
+						StatementType == DbStatementType.Select))
 					{
 						// Grab rows affected
-						this.SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+						SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
 						readRowsAffectedResponse = true;
 					}
 
-					this.database.Flush();
+					_database.Flush();
 
 					// sql?, execute, rows affected?
 					int numberOfResponses =
-						(this.StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
+						(StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
 					try
 					{
 						SqlResponse sqlStoredProcedureResponse = null;
-						if (this.StatementType == DbStatementType.StoredProcedure)
+						if (StatementType == DbStatementType.StoredProcedure)
 						{
 							numberOfResponses--;
-							sqlStoredProcedureResponse = this.database.ReadSqlResponse();
-							this.ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
+							sqlStoredProcedureResponse = _database.ReadSqlResponse();
+							ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
 						}
 
 						numberOfResponses--;
-						GenericResponse executeResponse = this.database.ReadGenericResponse();
+						GenericResponse executeResponse = _database.ReadGenericResponse();
 
 						GenericResponse rowsAffectedResponse = null;
 						if (readRowsAffectedResponse)
 						{
 							numberOfResponses--;
-							rowsAffectedResponse = this.database.ReadGenericResponse();
+							rowsAffectedResponse = _database.ReadGenericResponse();
 						}
 
-						this.ProcessExecuteResponse(executeResponse);
+						ProcessExecuteResponse(executeResponse);
 						if (readRowsAffectedResponse)
-							this.RecordsAffected = this.ProcessRecordsAffectedBuffer(this.ProcessInfoSqlResponse(rowsAffectedResponse));
+							RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(rowsAffectedResponse));
 					}
 					finally
 					{
 						SafeFinishFetching(ref numberOfResponses);
 					}
 
-					this.state = StatementState.Executed;
+					_state = StatementState.Executed;
 				}
 				catch (IOException)
 				{
-					this.state = StatementState.Error;
+					_state = StatementState.Error;
 					throw new IscException(IscCodes.isc_net_read_err);
 				}
 			}
@@ -198,7 +198,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				numberOfResponses--;
 				try
 				{
-					this.database.ReadResponse();
+					_database.ReadResponse();
 				}
 				catch (IscException)
 				{ }
@@ -210,10 +210,10 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			if (FreeNotNeeded(option))
 				return;
 
-			lock (this.database.SyncObject)
+			lock (_database.SyncObject)
 			{
 				DoFreePacket(option);
-				(this.Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponse);
+				(Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponse);
 			}
 		}
 		#endregion

@@ -28,19 +28,19 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private short dataType;
-		private short numericScale;
-		private short subType;
-		private short length;
-		private short nullFlag;
-		private string name;
-		private string relation;
-		private string owner;
-		private string alias;
-		private int charCount;
-		private DbValue dbValue;
-		private Charset charset;
-		private ArrayBase arrayHandle;
+		private short _dataType;
+		private short _numericScale;
+		private short _subType;
+		private short _length;
+		private short _nullFlag;
+		private string _name;
+		private string _relation;
+		private string _owner;
+		private string _alias;
+		private int _charCount;
+		private DbValue _dbValue;
+		private Charset _charset;
+		private ArrayBase _arrayHandle;
 
 		#endregion
 
@@ -48,44 +48,44 @@ namespace FirebirdSql.Data.Common
 
 		public DbDataType DbDataType
 		{
-			get { return this.GetDbDataType(); }
+			get { return GetDbDataType(); }
 		}
 
 		public int SqlType
 		{
-			get { return this.dataType & ~1; }
+			get { return _dataType & ~1; }
 		}
 
 		public short DataType
 		{
-			get { return this.dataType; }
-			set { this.dataType = value; }
+			get { return _dataType; }
+			set { _dataType = value; }
 		}
 
 		public short NumericScale
 		{
-			get { return this.numericScale; }
-			set { this.numericScale = value; }
+			get { return _numericScale; }
+			set { _numericScale = value; }
 		}
 
 		public short SubType
 		{
-			get { return this.subType; }
+			get { return _subType; }
 			set
 			{
-				this.subType = value;
-				if (this.IsCharacter())
+				_subType = value;
+				if (IsCharacter())
 				{
 					// Bits 0-7 of sqlsubtype is charset_id (127 is a special value -
 					// current attachment charset).
 					// Bits 8-17 hold collation_id for this value.
 					byte[] cs = BitConverter.GetBytes(value);
 
-					this.charset = Charset.GetCharset(cs[0]);
+					_charset = Charset.GetCharset(cs[0]);
 
-					if (this.charset == null)
+					if (_charset == null)
 					{
-						this.charset = Charset.DefaultCharset;
+						_charset = Charset.DefaultCharset;
 					}
 				}
 			}
@@ -93,64 +93,64 @@ namespace FirebirdSql.Data.Common
 
 		public short Length
 		{
-			get { return this.length; }
+			get { return _length; }
 			set
 			{
-				this.length = value;
-				if (this.IsCharacter())
+				_length = value;
+				if (IsCharacter())
 				{
-					this.charCount = this.length / this.charset.BytesPerCharacter;
+					_charCount = _length / _charset.BytesPerCharacter;
 				}
 			}
 		}
 
 		public short NullFlag
 		{
-			get { return this.nullFlag; }
-			set { this.nullFlag = value; }
+			get { return _nullFlag; }
+			set { _nullFlag = value; }
 		}
 
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value.Trim(); }
+			get { return _name; }
+			set { _name = value.Trim(); }
 		}
 
 		public string Relation
 		{
-			get { return this.relation; }
-			set { this.relation = value.Trim(); }
+			get { return _relation; }
+			set { _relation = value.Trim(); }
 		}
 
 		public string Owner
 		{
-			get { return this.owner; }
-			set { this.owner = value.Trim(); }
+			get { return _owner; }
+			set { _owner = value.Trim(); }
 		}
 
 		public string Alias
 		{
-			get { return this.alias; }
-			set { this.alias = value.Trim(); }
+			get { return _alias; }
+			set { _alias = value.Trim(); }
 		}
 
 		public Charset Charset
 		{
-			get { return this.charset; }
+			get { return _charset; }
 		}
 
 		public int CharCount
 		{
-			get { return this.charCount; }
+			get { return _charCount; }
 		}
 
 		public ArrayBase ArrayHandle
 		{
 			get
 			{
-				if (this.IsArray())
+				if (IsArray())
 				{
-					return this.arrayHandle;
+					return _arrayHandle;
 				}
 				else
 				{
@@ -160,9 +160,9 @@ namespace FirebirdSql.Data.Common
 
 			set
 			{
-				if (this.IsArray())
+				if (IsArray())
 				{
-					this.arrayHandle = value;
+					_arrayHandle = value;
 				}
 				else
 				{
@@ -173,13 +173,13 @@ namespace FirebirdSql.Data.Common
 
 		public DbValue DbValue
 		{
-			get { return this.dbValue; }
+			get { return _dbValue; }
 		}
 
 		public object Value
 		{
-			get { return this.dbValue.Value; }
-			set { this.dbValue.Value = value; }
+			get { return _dbValue.Value; }
+			set { _dbValue.Value = value; }
 		}
 
 		#endregion
@@ -188,12 +188,12 @@ namespace FirebirdSql.Data.Common
 
 		public DbField()
 		{
-			this.charCount = -1;
-			this.name = string.Empty;
-			this.relation = string.Empty;
-			this.owner = string.Empty;
-			this.alias = string.Empty;
-			this.dbValue = new DbValue(this, DBNull.Value);
+			_charCount = -1;
+			_name = string.Empty;
+			_relation = string.Empty;
+			_owner = string.Empty;
+			_alias = string.Empty;
+			_dbValue = new DbValue(this, DBNull.Value);
 		}
 
 		#endregion
@@ -202,12 +202,12 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsNumeric()
 		{
-			if (this.dataType == 0)
+			if (_dataType == 0)
 			{
 				return false;
 			}
 
-			switch (this.DbDataType)
+			switch (DbDataType)
 			{
 				case DbDataType.SmallInt:
 				case DbDataType.Integer:
@@ -225,12 +225,12 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsDecimal()
 		{
-			if (this.dataType == 0)
+			if (_dataType == 0)
 			{
 				return false;
 			}
 
-			switch (this.DbDataType)
+			switch (DbDataType)
 			{
 				case DbDataType.Numeric:
 				case DbDataType.Decimal:
@@ -243,12 +243,12 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsLong()
 		{
-			if (this.dataType == 0)
+			if (_dataType == 0)
 			{
 				return false;
 			}
 
-			switch (this.DbDataType)
+			switch (DbDataType)
 			{
 				case DbDataType.Binary:
 				case DbDataType.Text:
@@ -261,12 +261,12 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsCharacter()
 		{
-			if (this.dataType == 0)
+			if (_dataType == 0)
 			{
 				return false;
 			}
 
-			switch (this.DbDataType)
+			switch (DbDataType)
 			{
 				case DbDataType.Char:
 				case DbDataType.VarChar:
@@ -280,12 +280,12 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsArray()
 		{
-			if (this.dataType == 0)
+			if (_dataType == 0)
 			{
 				return false;
 			}
 
-			switch (this.DbDataType)
+			switch (DbDataType)
 			{
 				case DbDataType.Array:
 					return true;
@@ -297,7 +297,7 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsAliased()
 		{
-			return (this.Name != this.Alias) ? true : false;
+			return (Name != Alias) ? true : false;
 		}
 
 		//public bool IsExpression()
@@ -307,116 +307,116 @@ namespace FirebirdSql.Data.Common
 
 		public int GetSize()
 		{
-			if (this.IsLong())
+			if (IsLong())
 			{
 				return System.Int32.MaxValue;
 			}
 			else
 			{
-				if (this.IsCharacter())
+				if (IsCharacter())
 				{
-					return this.CharCount;
+					return CharCount;
 				}
 				else
 				{
-					return this.Length;
+					return Length;
 				}
 			}
 		}
 
 		public bool AllowDBNull()
 		{
-			return ((this.DataType & 1) == 1);
+			return ((DataType & 1) == 1);
 		}
 
 		public void SetValue(byte[] buffer)
 		{
-			if (buffer == null || this.NullFlag == -1)
+			if (buffer == null || NullFlag == -1)
 			{
-				this.Value = System.DBNull.Value;
+				Value = System.DBNull.Value;
 			}
 			else
 			{
-				switch (this.SqlType)
+				switch (SqlType)
 				{
 					case IscCodes.SQL_TEXT:
 					case IscCodes.SQL_VARYING:
-						if (this.DbDataType == DbDataType.Guid)
+						if (DbDataType == DbDataType.Guid)
 						{
-							this.Value = new Guid(buffer);
+							Value = new Guid(buffer);
 						}
 						else
 						{
-							if (this.Charset.IsOctetsCharset)
+							if (Charset.IsOctetsCharset)
 							{
-								this.Value = buffer;
+								Value = buffer;
 							}
 							else
 							{
-								string s = this.Charset.GetString(buffer, 0, buffer.Length);
+								string s = Charset.GetString(buffer, 0, buffer.Length);
 
-								if ((this.Length % this.Charset.BytesPerCharacter) == 0 &&
-									s.Length > this.CharCount)
+								if ((Length % Charset.BytesPerCharacter) == 0 &&
+									s.Length > CharCount)
 								{
-									s = s.Substring(0, this.CharCount);
+									s = s.Substring(0, CharCount);
 								}
 
-								this.Value = s;
+								Value = s;
 							}
 						}
 						break;
 
 					case IscCodes.SQL_SHORT:
-						if (this.numericScale < 0)
+						if (_numericScale < 0)
 						{
-							this.Value = TypeDecoder.DecodeDecimal(
+							Value = TypeDecoder.DecodeDecimal(
 								BitConverter.ToInt16(buffer, 0),
-								this.numericScale,
-								this.dataType);
+								_numericScale,
+								_dataType);
 						}
 						else
 						{
-							this.Value = BitConverter.ToInt16(buffer, 0);
+							Value = BitConverter.ToInt16(buffer, 0);
 						}
 						break;
 
 					case IscCodes.SQL_LONG:
-						if (this.NumericScale < 0)
+						if (NumericScale < 0)
 						{
-							this.Value = TypeDecoder.DecodeDecimal(
+							Value = TypeDecoder.DecodeDecimal(
 								BitConverter.ToInt32(buffer, 0),
-								this.numericScale,
-								this.dataType);
+								_numericScale,
+								_dataType);
 						}
 						else
 						{
-							this.Value = BitConverter.ToInt32(buffer, 0);
+							Value = BitConverter.ToInt32(buffer, 0);
 						}
 						break;
 
 					case IscCodes.SQL_FLOAT:
-						this.Value = BitConverter.ToSingle(buffer, 0);
+						Value = BitConverter.ToSingle(buffer, 0);
 						break;
 
 					case IscCodes.SQL_DOUBLE:
 					case IscCodes.SQL_D_FLOAT:
-						this.Value = BitConverter.ToDouble(buffer, 0);
+						Value = BitConverter.ToDouble(buffer, 0);
 						break;
 
 					case IscCodes.SQL_QUAD:
 					case IscCodes.SQL_INT64:
 					case IscCodes.SQL_BLOB:
 					case IscCodes.SQL_ARRAY:
-						if (this.NumericScale < 0)
+						if (NumericScale < 0)
 						{
-							this.Value = TypeDecoder.DecodeDecimal(
+							Value = TypeDecoder.DecodeDecimal(
 								BitConverter.ToInt64(buffer, 0),
-								this.numericScale,
-								this.dataType);
+								_numericScale,
+								_dataType);
 						}
 						else
 						{
-							this.Value = BitConverter.ToInt64(buffer, 0);
+							Value = BitConverter.ToInt64(buffer, 0);
 						}
 						break;
 
@@ -424,17 +424,17 @@ namespace FirebirdSql.Data.Common
 						DateTime date = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
 						TimeSpan time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 4));
 
-						this.Value = new System.DateTime(
+						Value = new System.DateTime(
 							date.Year, date.Month, date.Day,
 							time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
 						break;
 
 					case IscCodes.SQL_TYPE_TIME:
-						this.Value = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 0));
+						Value = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 0));
 						break;
 
 					case IscCodes.SQL_TYPE_DATE:
-						this.Value = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
+						Value = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
 						break;
 
 					default:
@@ -445,70 +445,70 @@ namespace FirebirdSql.Data.Common
 
 		public void FixNull()
 		{
-			if (this.NullFlag == -1 && this.dbValue.IsDBNull())
+			if (NullFlag == -1 && _dbValue.IsDBNull())
 			{
-				switch (this.DbDataType)
+				switch (DbDataType)
 				{
 					case DbDataType.Char:
 					case DbDataType.VarChar:
-						this.Value = string.Empty;
+						Value = string.Empty;
 						break;
 
 					case DbDataType.Guid:
-						this.Value = Guid.Empty;
+						Value = Guid.Empty;
 						break;
 
 					case DbDataType.SmallInt:
-						this.Value = (short)0;
+						Value = (short)0;
 						break;
 
 					case DbDataType.Integer:
-						this.Value = (int)0;
+						Value = (int)0;
 						break;
 
 					case DbDataType.BigInt:
 					case DbDataType.Binary:
 					case DbDataType.Array:
 					case DbDataType.Text:
-						this.Value = (long)0;
+						Value = (long)0;
 						break;
 
 					case DbDataType.Numeric:
 					case DbDataType.Decimal:
-						this.Value = (decimal)0;
+						Value = (decimal)0;
 						break;
 
 					case DbDataType.Float:
-						this.Value = (float)0;
+						Value = (float)0;
 						break;
 
 					case DbDataType.Double:
-						this.Value = (double)0;
+						Value = (double)0;
 						break;
 
 					case DbDataType.Date:
 					case DbDataType.TimeStamp:
-						this.Value = new DateTime(0 * 10000L + 621355968000000000);
+						Value = new DateTime(0 * 10000L + 621355968000000000);
 						break;
 
 					case DbDataType.Time:
-						this.Value = TimeSpan.Zero;
+						Value = TimeSpan.Zero;
 						break;
 
 					default:
-						throw new IscException("Unknown sql data type: " + this.DataType);
+						throw new IscException("Unknown sql data type: " + DataType);
 				}
 			}
 		}
 
 		public Type GetSystemType()
 		{
-			return Type.GetType(TypeHelper.GetSystemDataTypeName(this.DbDataType), true);
+			return Type.GetType(TypeHelper.GetSystemDataTypeName(DbDataType), true);
 		}
 
 		public bool HasDataType()
 		{
-			return this.dataType != 0;
+			return _dataType != 0;
 		}
 
 		#endregion
@@ -518,13 +518,13 @@ namespace FirebirdSql.Data.Common
 		private DbDataType GetDbDataType()
 		{
 			// Special case for Guid handling
-			if (this.SqlType == IscCodes.SQL_TEXT && this.Length == 16 &&
-				(this.Charset != null && this.Charset.Name.Equals("OCTETS", StringComparison.InvariantCultureIgnoreCase)))
+			if (SqlType == IscCodes.SQL_TEXT && Length == 16 &&
+				(Charset != null && Charset.Name.Equals("OCTETS", StringComparison.InvariantCultureIgnoreCase)))
 			{
 				return DbDataType.Guid;
 			}
 
-			switch (this.SqlType)
+			switch (SqlType)
 			{
 				case IscCodes.SQL_TEXT:
 					return DbDataType.Char;
@@ -533,15 +533,15 @@ namespace FirebirdSql.Data.Common
 					return DbDataType.VarChar;
 
 				case IscCodes.SQL_SHORT:
-					if (this.SubType == 2)
+					if (SubType == 2)
 					{
 						return DbDataType.Decimal;
 					}
-					else if (this.SubType == 1)
+					else if (SubType == 1)
 					{
 						return DbDataType.Numeric;
 					}
-					else if (this.NumericScale < 0)
+					else if (NumericScale < 0)
 					{
 						return DbDataType.Decimal;
 					}
@@ -551,15 +551,15 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case IscCodes.SQL_LONG:
-					if (this.SubType == 2)
+					if (SubType == 2)
 					{
 						return DbDataType.Decimal;
 					}
-					else if (this.SubType == 1)
+					else if (SubType == 1)
 					{
 						return DbDataType.Numeric;
 					}
-					else if (this.NumericScale < 0)
+					else if (NumericScale < 0)
 					{
 						return DbDataType.Decimal;
 					}
@@ -570,15 +570,15 @@ namespace FirebirdSql.Data.Common
 
 				case IscCodes.SQL_QUAD:
 				case IscCodes.SQL_INT64:
-					if (this.SubType == 2)
+					if (SubType == 2)
 					{
 						return DbDataType.Decimal;
 					}
-					else if (this.SubType == 1)
+					else if (SubType == 1)
 					{
 						return DbDataType.Numeric;
 					}
-					else if (this.NumericScale < 0)
+					else if (NumericScale < 0)
 					{
 						return DbDataType.Decimal;
 					}
@@ -592,15 +592,15 @@ namespace FirebirdSql.Data.Common
 
 				case IscCodes.SQL_DOUBLE:
 				case IscCodes.SQL_D_FLOAT:
-					if (this.SubType == 2)
+					if (SubType == 2)
 					{
 						return DbDataType.Decimal;
 					}
-					else if (this.SubType == 1)
+					else if (SubType == 1)
 					{
 						return DbDataType.Numeric;
 					}
-					else if (this.NumericScale < 0)
+					else if (NumericScale < 0)
 					{
 						return DbDataType.Decimal;
 					}
@@ -610,7 +610,7 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case IscCodes.SQL_BLOB:
-					if (this.subType == 1)
+					if (_subType == 1)
 					{
 						return DbDataType.Text;
 					}

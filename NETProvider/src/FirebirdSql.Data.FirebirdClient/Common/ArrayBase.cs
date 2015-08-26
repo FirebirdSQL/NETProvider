@@ -29,10 +29,10 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private ArrayDesc	descriptor;
-		private string		tableName;
-		private string		fieldName;
-		private string		rdbFieldName;
+		private ArrayDesc	_descriptor;
+		private string		_tableName;
+		private string		_fieldName;
+		private string		_rdbFieldName;
 
 		#endregion
 
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Common
 
 		public ArrayDesc Descriptor
 		{
-			get { return this.descriptor; }
+			get { return _descriptor; }
 		}
 
 		#endregion
@@ -71,16 +71,16 @@ namespace FirebirdSql.Data.Common
 
 		protected ArrayBase(ArrayDesc descriptor)
 		{
-			this.tableName	= descriptor.RelationName;
-			this.fieldName	= descriptor.FieldName;
-			this.descriptor = descriptor;
+			_tableName = descriptor.RelationName;
+			_fieldName = descriptor.FieldName;
+			_descriptor = descriptor;
 		}
 
 		protected ArrayBase(string tableName, string fieldName)
 		{
-			this.tableName		= tableName;
-			this.fieldName		= fieldName;
-			this.rdbFieldName	= string.Empty;
+			_tableName = tableName;
+			_fieldName = fieldName;
+			_rdbFieldName = string.Empty;
 		}
 
 		#endregion
@@ -89,47 +89,47 @@ namespace FirebirdSql.Data.Common
 
 		public Array Read()
 		{
-			byte[] slice = this.GetSlice(this.GetSliceLength(true));
+			byte[] slice = GetSlice(GetSliceLength(true));
 
-			return this.DecodeSlice(slice);
+			return DecodeSlice(slice);
 		}
 
 		public void Write(System.Array sourceArray)
 		{
-			this.SetDesc(sourceArray);
-			this.PutSlice(sourceArray, this.GetSliceLength(false));
+			SetDesc(sourceArray);
+			PutSlice(sourceArray, GetSliceLength(false));
 		}
 
 		public void SetDesc(System.Array sourceArray)
 		{
-			this.descriptor.Dimensions = (short)sourceArray.Rank;
+			_descriptor.Dimensions = (short)sourceArray.Rank;
 
 			for (int i = 0; i < sourceArray.Rank; i++)
 			{
-				int lb = this.descriptor.Bounds[i].LowerBound;
+				int lb = _descriptor.Bounds[i].LowerBound;
 				int ub = sourceArray.GetLength(i) - 1 + lb;
 
-				this.descriptor.Bounds[i].UpperBound = ub;
+				_descriptor.Bounds[i].UpperBound = ub;
 			}
 		}
 
 		public void LookupBounds()
 		{
-			this.LookupDesc();
+			LookupDesc();
 
-			StatementBase lookup = this.DB.CreateStatement(this.Transaction);
+			StatementBase lookup = DB.CreateStatement(Transaction);
 
-			lookup.Prepare(this.GetArrayBounds());
+			lookup.Prepare(GetArrayBounds());
 			lookup.Execute();
 
 			int i = 0;
-			this.descriptor.Bounds = new ArrayBound[16];
+			_descriptor.Bounds = new ArrayBound[16];
 			DbValue[] values;
 
 			while ((values = lookup.Fetch()) != null)
 			{
-				this.descriptor.Bounds[i].LowerBound = values[0].GetInt32();
-				this.descriptor.Bounds[i].UpperBound = values[1].GetInt32();
+				_descriptor.Bounds[i].LowerBound = values[0].GetInt32();
+				_descriptor.Bounds[i].UpperBound = values[1].GetInt32();
 
 				i++;
 			}
@@ -141,26 +141,26 @@ namespace FirebirdSql.Data.Common
 		public void LookupDesc()
 		{
 			// Initializa array descriptor information
-			this.descriptor = new ArrayDesc();
+			_descriptor = new ArrayDesc();
 
 			// Create statement for retrieve information
-			StatementBase lookup = this.DB.CreateStatement(this.Transaction);
+			StatementBase lookup = DB.CreateStatement(Transaction);
 
-			lookup.Prepare(this.GetArrayDesc());
+			lookup.Prepare(GetArrayDesc());
 			lookup.Execute();
 
 			DbValue[] values = lookup.Fetch();
 			if (values != null && values.Length > 0)
 			{
-				this.descriptor.RelationName	= tableName;
-				this.descriptor.FieldName		= fieldName;
-				this.descriptor.DataType		= values[0].GetByte();
-				this.descriptor.Scale			= values[1].GetInt16();
-				this.descriptor.Length			= values[2].GetInt16();
-				this.descriptor.Dimensions		= values[3].GetInt16();
-				this.descriptor.Flags			= 0;
+				_descriptor.RelationName	= _tableName;
+				_descriptor.FieldName		= _fieldName;
+				_descriptor.DataType		= values[0].GetByte();
+				_descriptor.Scale			= values[1].GetInt16();
+				_descriptor.Length			= values[2].GetInt16();
+				_descriptor.Dimensions		= values[3].GetInt16();
+				_descriptor.Flags			= 0;
 
-				this.rdbFieldName = values[4].GetString().Trim();
+				_rdbFieldName = values[4].GetString().Trim();
 			}
 			else
 			{
@@ -180,16 +180,16 @@ namespace FirebirdSql.Data.Common
 			int length = 0;
 			int elements = 0;
 
-			for (int i = 0; i < this.descriptor.Dimensions; i++)
+			for (int i = 0; i < _descriptor.Dimensions; i++)
 			{
-				ArrayBound bound = this.descriptor.Bounds[i];
+				ArrayBound bound = _descriptor.Bounds[i];
 
 				elements += (bound.UpperBound - bound.LowerBound) + 1;
 			}
 
-			length = elements * this.descriptor.Length;
+			length = elements * _descriptor.Length;
 
-			switch (this.descriptor.DataType)
+			switch (_descriptor.DataType)
 			{
 				case IscCodes.blr_varying:
 				case IscCodes.blr_varying2:
@@ -204,7 +204,7 @@ namespace FirebirdSql.Data.Common
 		{
 			Type systemType;
 
-			switch (this.descriptor.DataType)
+			switch (_descriptor.DataType)
 			{
 				case IscCodes.blr_text:
 				case IscCodes.blr_text2:
@@ -222,7 +222,7 @@ namespace FirebirdSql.Data.Common
 
 				case IscCodes.blr_short:
 					// Short/Smallint
-					if (this.descriptor.Scale < 0)
+					if (_descriptor.Scale < 0)
 					{
 						systemType = typeof(System.Decimal);
 					}
@@ -234,7 +234,7 @@ namespace FirebirdSql.Data.Common
 
 				case IscCodes.blr_long:
 					// Integer
-					if (this.descriptor.Scale < 0)
+					if (_descriptor.Scale < 0)
 					{
 						systemType = typeof(System.Decimal);
 					}
@@ -258,7 +258,7 @@ namespace FirebirdSql.Data.Common
 				case IscCodes.blr_quad:
 				case IscCodes.blr_int64:
 					// Long/Quad
-					if (this.descriptor.Scale < 0)
+					if (_descriptor.Scale < 0)
 					{
 						systemType = typeof(System.Decimal);
 					}
@@ -316,14 +316,14 @@ namespace FirebirdSql.Data.Common
 				"FROM RDB$RELATION_FIELDS X, RDB$FIELDS Y " +
 				"WHERE X.RDB$FIELD_SOURCE = Y.RDB$FIELD_NAME ");
 
-			if (this.tableName != null && this.tableName.Length != 0)
+			if (_tableName != null && _tableName.Length != 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, " AND X.RDB$RELATION_NAME = '{0}'", tableName);
+				sql.AppendFormat(CultureInfo.CurrentCulture, " AND X.RDB$RELATION_NAME = '{0}'", _tableName);
 			}
 
-			if (this.fieldName != null && this.fieldName.Length != 0)
+			if (_fieldName != null && _fieldName.Length != 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, " AND X.RDB$FIELD_NAME = '{0}'", fieldName);
+				sql.AppendFormat(CultureInfo.CurrentCulture, " AND X.RDB$FIELD_NAME = '{0}'", _fieldName);
 			}
 
 			return sql.ToString();
@@ -335,9 +335,9 @@ namespace FirebirdSql.Data.Common
 
 			sql.Append("SELECT X.RDB$LOWER_BOUND, X.RDB$UPPER_BOUND FROM RDB$FIELD_DIMENSIONS X ");
 
-			if (this.fieldName != null && this.fieldName.Length != 0)
+			if (_fieldName != null && _fieldName.Length != 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, "WHERE X.RDB$FIELD_NAME = '{0}'", rdbFieldName);
+				sql.AppendFormat(CultureInfo.CurrentCulture, "WHERE X.RDB$FIELD_NAME = '{0}'", _rdbFieldName);
 			}
 
 			sql.Append(" ORDER BY X.RDB$DIMENSION");

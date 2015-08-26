@@ -26,15 +26,15 @@ namespace FirebirdSql.Data.Services
 	public sealed class FbNBackup : FbService
 	{
 		#region Properties
-		private int level;
+		private int _level;
 		public int Level
 		{
-			get { return this.level; }
+			get { return _level; }
 			set
 			{
 				if (value < 0)
 					throw new ArgumentOutOfRangeException();
-				this.level = value;
+				_level = value;
 			}
 		}
 		public string BackupFile { get; set; }
@@ -54,24 +54,24 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				// Configure Spb
-				this.StartSpb = new ServiceParameterBuffer();
+				StartSpb = new ServiceParameterBuffer();
 
-				this.StartSpb.Append(IscCodes.isc_action_svc_nbak);
-				this.StartSpb.Append(IscCodes.isc_spb_dbname, this.Database);
+				StartSpb.Append(IscCodes.isc_action_svc_nbak);
+				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 
-				this.StartSpb.Append(IscCodes.isc_spb_nbk_level, this.level);
-				this.StartSpb.Append(IscCodes.isc_spb_nbk_file, this.BackupFile);
+				StartSpb.Append(IscCodes.isc_spb_nbk_level, _level);
+				StartSpb.Append(IscCodes.isc_spb_nbk_file, BackupFile);
 
-				this.StartSpb.Append(IscCodes.isc_spb_nbk_direct, this.DirectIO ? "ON" : "OFF");
+				StartSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 
-				this.StartSpb.Append(IscCodes.isc_spb_options, (int)this.Options);
+				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
-				this.Open();
+				Open();
 
 				// Start execution
-				this.StartTask();
+				StartTask();
 
-				this.ProcessServiceOutput();
+				ProcessServiceOutput();
 			}
 			catch (Exception ex)
 			{
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Services
 			finally
 			{
 				// Close
-				this.Close();
+				Close();
 			}
 		}
 		#endregion

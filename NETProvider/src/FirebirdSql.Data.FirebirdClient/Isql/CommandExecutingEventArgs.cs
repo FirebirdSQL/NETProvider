@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Isql
 	{
 		#region Fields
 
-		private FbCommand sqlCommand;
+		private FbCommand _sqlCommand;
 
 		#endregion
 
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public FbCommand SqlCommand
 		{
-			get { return this.sqlCommand; }
+			get { return _sqlCommand; }
 		}
 
 		/// <summary>
@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.Isql
 		/// </summary>
 		public SqlStatementType StatementType
 		{
-			get { return FbBatchExecution.GetStatementType(this.SqlCommand.CommandText); }
+			get { return FbBatchExecution.GetStatementType(SqlCommand.CommandText); }
 		}
 
 		#endregion
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Isql
 		/// </remarks>
 		public CommandExecutingEventArgs(FbCommand sqlCommand)
 		{
-			this.sqlCommand = sqlCommand;
+			_sqlCommand = sqlCommand;
 		}
 
 		#endregion
@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>The SQL statement that will be executed.</returns>
 		public override string ToString()
 		{
-			return this.sqlCommand.CommandText;
+			return _sqlCommand.CommandText;
 		}
 
 		#endregion

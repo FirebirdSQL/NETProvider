@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		protected override DbCommandDefinition CreateDbCommandDefinition(DbProviderManifest manifest, DbCommandTree commandTree)
 		{
 			DbCommand prototype = CreateCommand(manifest, commandTree);
-			DbCommandDefinition result = this.CreateCommandDefinition(prototype);
+			DbCommandDefinition result = CreateCommandDefinition(prototype);
 			return result;
 		}
 

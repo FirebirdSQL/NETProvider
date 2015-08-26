@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BeginTransactionNoWaitTimeoutTest()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(this.FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
 			{
 				conn.Open();
 				FbTransaction tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = null });
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutTest()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(this.FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
 			{
 				conn.Open();
 				FbTransaction tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromSeconds(10) });
@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutInvalidValue1Test()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(this.FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
 			{
 				conn.Open();
 				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromDays(9999) }));
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutInvalidValue2Test()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(this.FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
 			{
 				conn.Open();
 				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromMilliseconds(1) }));
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.UnitTests
 			cs.Port = TestsSetup.Port;
 			cs.UserID = TestsSetup.UserID;
 			cs.Password = TestsSetup.Password;
-			cs.ServerType = this.FbServerType;
+			cs.ServerType = FbServerType;
 			cs.Charset = TestsSetup.Charset;
 			cs.Pooling = TestsSetup.Pooling;
 
@@ -154,7 +154,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void ConnectionPoolingOnTest()
 		{
 			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void ConnectionPoolingOffTest()
 		{
 			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Pooling = false;
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
@@ -202,7 +202,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void ConnectionPoolingLifeTimeTest()
 		{
 			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
@@ -227,7 +227,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void ConnectionPoolingMaxPoolSizeTest()
 		{
 			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 120;
 			csb.MaxPoolSize = 10;
@@ -259,7 +259,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ConnectionPoolingMinPoolSizeTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			csb.MinPoolSize = 3;
@@ -289,7 +289,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NoDatabaseTriggersWrongConnectionStringTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Pooling = true;
 			csb.NoDatabaseTriggers = true;
 			Assert.Throws<ArgumentException>(() => new FbConnection(csb.ToString()));
@@ -298,7 +298,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DatabaseTriggersTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(this.FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Pooling = false;
 
 			int rows;
@@ -344,7 +344,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		private void BeginTransactionILTestsHelper(IsolationLevel level)
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(this.FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
 			{
 				conn.Open();
 				FbTransaction tx = conn.BeginTransaction(level);

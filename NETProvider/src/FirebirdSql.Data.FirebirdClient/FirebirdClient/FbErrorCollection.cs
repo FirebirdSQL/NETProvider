@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Fields
 
-		private List<FbError> errors;
+		private List<FbError> _errors;
 
 		#endregion
 
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal FbErrorCollection()
 		{
-			this.errors = new List<FbError>();
+			_errors = new List<FbError>();
 		}
 
 		#endregion
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public int Count
 		{
-			get { return this.errors.Count; }
+			get { return _errors.Count; }
 		}
 
 		public bool IsReadOnly
@@ -63,19 +63,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal int IndexOf(string errorMessage)
 		{
-			return this.errors.FindIndex(x => string.Equals(x.Message, errorMessage, StringComparison.CurrentCultureIgnoreCase));
+			return _errors.FindIndex(x => string.Equals(x.Message, errorMessage, StringComparison.CurrentCultureIgnoreCase));
 		}
 
 		internal FbError Add(FbError error)
 		{
-			this.errors.Add(error);
+			_errors.Add(error);
 
 			return error;
 		}
 
 		internal FbError Add(string errorMessage, int number)
 		{
-			return this.Add(new FbError(errorMessage, number));
+			return Add(new FbError(errorMessage, number));
 		}
 
 		void ICollection<FbError>.Add(FbError item)
@@ -90,12 +90,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public bool Contains(FbError item)
 		{
-			return this.errors.Contains(item);
+			return _errors.Contains(item);
 		}
 
 		public void CopyTo(FbError[] array, int arrayIndex)
 		{
-			this.errors.CopyTo(array, arrayIndex);
+			_errors.CopyTo(array, arrayIndex);
 		}
 
 		bool ICollection<FbError>.Remove(FbError item)
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public IEnumerator<FbError> GetEnumerator()
 		{
-			return this.errors.GetEnumerator();
+			return _errors.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
