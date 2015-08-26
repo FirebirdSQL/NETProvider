@@ -13,10 +13,8 @@
  *	   language governing rights and limitations under the License.
  *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *
- *  Contributors:
- *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -26,33 +24,18 @@ namespace FirebirdSql.Data.Services
 {
 	public class FbDatabasesInfo
 	{
-		#region Fields
+		public int ConnectionCount { get; internal set; }
 
-		private int connectionCount;
-		private List<string> databases;
-
-		#endregion
-
-		#region Properties
-
-		public int ConnectionCount
-		{
-			get { return this.connectionCount; }
-			set { this.connectionCount = value; }
-		}
-
-		public List<string> Databases
+		private IList<string> _databases;
+		public IList<string> Databases
 		{
 			get
 			{
-				if (this.databases == null)
-				{
-					this.databases = new List<string>();
-				}
-				return this.databases;
+				return _databases ?? (_databases = new List<string>());
 			}
 		}
 
-		#endregion
+		internal FbDatabasesInfo()
+		{ }
 	}
 }

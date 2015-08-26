@@ -13,10 +13,8 @@
  *	   language governing rights and limitations under the License.
  *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *
- *  Contributors:
- *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -25,146 +23,27 @@ namespace FirebirdSql.Data.Services
 {
 	public class FbServerConfig
 	{
-		#region Fields
+		public int LockMemSize { get; internal set; }
+		public int LockSemCount { get; internal set; }
+		public int LockSignal { get; internal set; }
+		public int EventMemorySize { get; internal set; }
+		public int PrioritySwitchDelay { get; internal set; }
+		public int MinMemory { get; internal set; }
+		public int MaxMemory { get; internal set; }
+		public int LockGrantOrder { get; internal set; }
+		public int AnyLockMemory { get; internal set; }
+		public int AnyLockSemaphore { get; internal set; }
+		public int AnyLockSignal { get; internal set; }
+		public int AnyEventMemory { get; internal set; }
+		public int LockHashSlots { get; internal set; }
+		public int DeadlockTimeout { get; internal set; }
+		public int LockRequireSpins { get; internal set; }
+		public int ConnectionTimeout { get; internal set; }
+		public int DummyPacketInterval { get; internal set; }
+		public int IpcMapSize { get; internal set; }
+		public int DefaultDbCachePages { get; internal set; }
 
-		private int lockMemSize;
-		private int lockSemCount;
-		private int lockSignal;
-		private int eventMemorySize;
-		private int prioritySwitchDelay;
-		private int minMemory;
-		private int maxMemory;
-		private int lockGrantOrder;
-		private int anyLockMemory;
-		private int anyLockSemaphore;
-		private int anyLockSignal;
-		private int anyEventMemory;
-		private int lockHashSlots;
-		private int deadlockTimeout;
-		private int lockRequireSpins;
-		private int connectionTimeout;
-		private int dummyPacketInterval;
-		private int ipcMapSize;
-		private int defaultDbCachePages;
-
-		#endregion
-
-		#region Properties
-
-		public int LockMemSize
-		{
-			get { return this.lockMemSize; }
-			set { this.lockMemSize = value; }
-		}
-
-		public int LockSemCount
-		{
-			get { return this.lockSemCount; }
-			set { this.lockSemCount = value; }
-		}
-
-		public int LockSignal
-		{
-			get { return this.lockSignal; }
-			set { this.lockSignal = value; }
-		}
-
-		public int EventMemorySize
-		{
-			get { return this.eventMemorySize; }
-			set { this.eventMemorySize = value; }
-		}
-
-		public int PrioritySwitchDelay
-		{
-			get { return this.prioritySwitchDelay; }
-			set { this.prioritySwitchDelay = value; }
-		}
-
-		public int MinMemory
-		{
-			get { return this.minMemory; }
-			set { this.minMemory = value; }
-		}
-
-		public int MaxMemory
-		{
-			get { return this.maxMemory; }
-			set { this.maxMemory = value; }
-		}
-
-		public int LockGrantOrder
-		{
-			get { return this.lockGrantOrder; }
-			set { this.lockGrantOrder = value; }
-		}
-
-		public int AnyLockMemory
-		{
-			get { return this.anyLockMemory; }
-			set { this.anyLockMemory = value; }
-		}
-
-		public int AnyLockSemaphore
-		{
-			get { return this.anyLockSemaphore; }
-			set { this.anyLockSemaphore = value; }
-		}
-
-		public int AnyLockSignal
-		{
-			get { return this.anyLockSignal; }
-			set { this.anyLockSignal = value; }
-		}
-
-		public int AnyEventMemory
-		{
-			get { return this.anyEventMemory; }
-			set { this.anyEventMemory = value; }
-		}
-
-		public int LockHashSlots
-		{
-			get { return this.lockHashSlots; }
-			set { this.lockHashSlots = value; }
-		}
-
-		public int DeadlockTimeout
-		{
-			get { return this.deadlockTimeout; }
-			set { this.deadlockTimeout = value; }
-		}
-
-		public int LockRequireSpins
-		{
-			get { return this.lockRequireSpins; }
-			set { this.lockRequireSpins = value; }
-		}
-
-		public int ConnectionTimeout
-		{
-			get { return this.connectionTimeout; }
-			set { this.connectionTimeout = value; }
-		}
-
-		public int DummyPacketInterval
-		{
-			get { return this.dummyPacketInterval; }
-			set { this.dummyPacketInterval = value; }
-		}
-
-		public int IpcMapSize
-		{
-			get { return this.ipcMapSize; }
-			set { this.ipcMapSize = value; }
-		}
-
-		public int DefaultDbCachePages
-		{
-			get { return this.defaultDbCachePages; }
-			set { this.defaultDbCachePages = value; }
-		}
-
-		#endregion
+		internal FbServerConfig()
+		{ }
 	}
 }
