@@ -26,8 +26,8 @@ namespace FirebirdSql.Data.Services
 	{
 		public int ConnectionCount { get; internal set; }
 
-		private IList<string> _databases;
-		public IList<string> Databases
+		private List<string> _databases;
+		public IReadOnlyList<string> Databases
 		{
 			get
 			{
@@ -37,5 +37,10 @@ namespace FirebirdSql.Data.Services
 
 		internal FbDatabasesInfo()
 		{ }
+
+		internal void AddDatabase(string database)
+		{
+			_databases.Add(database);
+		}
 	}
 }

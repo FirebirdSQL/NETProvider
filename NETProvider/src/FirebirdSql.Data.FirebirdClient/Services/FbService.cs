@@ -553,7 +553,7 @@ namespace FirebirdSql.Data.Services
 					case IscCodes.isc_spb_dbname:
 						length = IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
-						dbInfo.Databases.Add(Encoding.Default.GetString(buffer, pos, length));
+						dbInfo.AddDatabase(Encoding.Default.GetString(buffer, pos, length));
 						pos += length;
 						break;
 				}
