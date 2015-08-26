@@ -4,6 +4,10 @@ configuration:
   - Release_40
   - Release_45
 shallow_clone: true
+build:
+  project: NETProvider\src\NETProvider.sln
+  parallel: true
+  verbosity: minimal
 before_test:
   - ps: $sourceDir = Resolve-Path .
   - ps: $testsDir = "$sourceDir\NETProvider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
@@ -15,10 +19,6 @@ before_test:
   - ps: cd $testsDir
   - ps: Start-FileDownload "http://downloads.sourceforge.net/project/firebird/firebird-win64/2.5.4-Release/Firebird-2.5.4.26856-0_x64_embed.zip" | Out-Null
   - ps: 7z x Firebird-2.5.4.26856-0_x64_embed.zip
-build:
-  project: NETProvider\src\NETProvider.sln
-  parallel: true
-  verbosity: minimal
 test_script:
   - ps: cd $testsDir
   - ps: nunit-console FirebirdSql.Data.UnitTests.dll /framework:net-4.0 /exclude:Local /nodots /noshadow
