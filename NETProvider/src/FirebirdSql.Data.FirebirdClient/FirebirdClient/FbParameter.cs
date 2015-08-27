@@ -46,6 +46,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private object _value;
 		private string _parameterName;
 		private string _sourceColumn;
+		private string _internalParameterName;
 
 		#endregion
 
@@ -55,7 +56,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		public override string ParameterName
 		{
 			get { return _parameterName; }
-			set { _parameterName = value; }
+			set
+			{
+				_parameterName = value;
+				_internalParameterName = NormalizeParameterName(value);
+		}
 		}
 
 		[Category("Data")]
@@ -214,7 +219,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				return NormalizeParameterName(_parameterName);
+				return _internalParameterName;
 			}
 		}
 
@@ -257,26 +262,27 @@ namespace FirebirdSql.Data.FirebirdClient
 			_sourceColumn = string.Empty;
 			_parameterName = string.Empty;
 			_charset = FbCharset.Default;
+			_internalParameterName = string.Empty;
 		}
 
 		public FbParameter(string parameterName, object value)
 			: this()
 		{
-			_parameterName = parameterName;
+			ParameterName = parameterName;
 			Value = value;
 		}
 
 		public FbParameter(string parameterName, FbDbType fbType)
 			: this()
 		{
-			_parameterName = parameterName;
+			ParameterName = parameterName;
 			FbDbType = fbType;
 		}
 
 		public FbParameter(string parameterName, FbDbType fbType, int size)
 			: this()
 		{
-			_parameterName = parameterName;
+			ParameterName = parameterName;
 			FbDbType = fbType;
 			Size = size;
 		}
@@ -284,7 +290,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbParameter(string parameterName, FbDbType fbType, int size, string sourceColumn)
 			: this()
 		{
-			_parameterName = parameterName;
+			ParameterName = parameterName;
 			FbDbType = fbType;
 			Size = size;
 			_sourceColumn = sourceColumn;
@@ -303,7 +309,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			DataRowVersion sourceVersion,
 			object value)
 		{
-			_parameterName = parameterName;
+			ParameterName = parameterName;
 			FbDbType = dbType;
 			Size = size;
 			_direction = direction;
