@@ -6,12 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdCl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests", "FirebirdSql.Data.UnitTests\FirebirdSql.Data.UnitTests.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "installer", "installer", "{D5D2A0BC-7109-4039-8861-7917D0F0E7A2}"
-	ProjectSection(SolutionItems) = preProject
-		..\installer\build.bat = ..\installer\build.bat
-		..\installer\Install.wxs = ..\installer\Install.wxs
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Firebird", "EntityFramework.Firebird\EntityFramework.Firebird.csproj", "{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}"
 EndProject
 Global
