@@ -225,9 +225,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			// Attach to the database
 			Write(IscCodes.op_attach);
-			Write(0);                       // Database	object ID
-			WriteBuffer(Encoding.Default.GetBytes(database));               // Database	PATH
-			WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+			Write(0);                                           // Database object ID
+			WriteBuffer(Encoding.Default.GetBytes(database));   // Database PATH
+			WriteBuffer(dpb.ToArray());                         // DPB Parameter buffer
 		}
 
 		protected virtual void ProcessAttachResponse(GenericResponse response)
@@ -415,7 +415,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					Write(IscCodes.op_connect_request);
 					Write(IscCodes.P_REQ_async);    // Connection type
-					Write(_handle);         // Related object
+					Write(_handle);                 // Related object
 					Write(0);                       // Partner identification
 
 					Flush();
@@ -454,7 +454,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					// garbage
 					ReadBytes(respLen);
 
-					// Read	Status Vector
+					// Read Status Vector
 					ReadStatusVector();
 				}
 				catch (IOException)
@@ -516,12 +516,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					EventParameterBuffer epb = events.ToEpb();
 
-					Write(IscCodes.op_que_events); // Op codes
-					Write(_handle);         // Database	object id
-					WriteBuffer(epb.ToArray()); // Event description block
+					Write(IscCodes.op_que_events);
+					Write(_handle);                 // Database object id
+					WriteBuffer(epb.ToArray());     // Event description block
 					Write(0);                       // Address of ast routine
-					Write(0);                       // Argument	to ast routine
-					Write(events.LocalId);          // Client side id of remote	event
+					Write(0);                       // Argument to ast routine
+					Write(events.LocalId);          // Client side id of remote event
 
 					Flush();
 
@@ -543,9 +543,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					Write(IscCodes.op_cancel_events);   // Op code
-					Write(_handle);             // Database	object id
-					Write(events.LocalId);              // Event ID
+					Write(IscCodes.op_cancel_events);
+					Write(_handle);             // Database object id
+					Write(events.LocalId);      // Event ID
 
 					Flush();
 
