@@ -48,11 +48,11 @@ namespace FirebirdSql.Data.UnitTests
 		#region Unit Tests
 
 		[Test]
-		public void DNET60()
+		public void DNET60_EmptyFieldReadingError()
 		{
 			using (FbCommand command = Connection.CreateCommand())
 			{
-				command.CommandText = "select ' ' AS EmptyColumn from rdb$database";
+				command.CommandText = "select '' AS EmptyColumn from rdb$database";
 
 				using (FbDataReader r = command.ExecuteReader())
 				{
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void DNET183()
+		public void DNET183_VarcharSpacesShouldNotBeTrimmed()
 		{
 			const string value = "foo  ";
 
@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void DNET217()
+		public void DNET217_ReadingALotOfFields()
 		{
 			StringBuilder cols = new StringBuilder();
 			string separator = string.Empty;
@@ -110,7 +110,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void DNET260()
+		public void DNET260_ProcedureWithALotOfParamters()
 		{
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
@@ -247,7 +247,7 @@ END
 		}
 
 		[Test]
-		public void DNET273()
+		public void DNET273_WritingClobAsBinary()
 		{
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
@@ -259,7 +259,7 @@ END
 		}
 
 		[Test]
-		public void DNET274()
+		public void DNET274_EFCommandsHandlingShouldNotBlockGC()
 		{
 			for (int i = 1000; i < 21000; i++)
 			{
@@ -268,7 +268,7 @@ END
 		}
 
 		[Test]
-		public void DNET595()
+		public void DNET595_ProperConnectionPoolConnectionsClosing()
 		{
 			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
