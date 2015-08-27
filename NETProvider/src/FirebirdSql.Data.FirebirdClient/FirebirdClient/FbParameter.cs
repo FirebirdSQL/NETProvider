@@ -459,9 +459,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal static string NormalizeParameterName(string parameterName)
 		{
-			return !string.IsNullOrEmpty(parameterName) && !parameterName.StartsWith("@")
-				? string.Format("@{0}", parameterName)
-				: parameterName;
+			return string.IsNullOrEmpty(parameterName) || parameterName[0] == '@'
+				? parameterName
+				: "@" + parameterName;
 		}
 
 		#endregion
