@@ -1,20 +1,20 @@
-/*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+﻿/*
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
- * 
+ *
  *  Contributors:
  *   Jiri Cincura (jiri@cincura.net)
  */
@@ -273,20 +273,20 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				/* The order of	execution can be reviewed in the .NET 1.1 documentation
 				 *
-				 * 1. The values in	the	DataRow	are	moved to the parameter values. 
-				 * 2. The OnRowUpdating	event is raised. 
-				 * 3. The command executes.	
-				 * 4. If the command is	set	to FirstReturnedRecord,	then the first returned	result is placed in	the	DataRow. 
-				 * 5. If there are output parameters, they are placed in the DataRow. 
-				 * 6. The OnRowUpdated event is	raised.	
-				 * 7 AcceptChanges is called. 
+				 * 1. The values in	the	DataRow	are	moved to the parameter values.
+				 * 2. The OnRowUpdating	event is raised.
+				 * 3. The command executes.
+				 * 4. If the command is	set	to FirstReturnedRecord,	then the first returned	result is placed in	the	DataRow.
+				 * 5. If there are output parameters, they are placed in the DataRow.
+				 * 6. The OnRowUpdated event is	raised.
+				 * 7 AcceptChanges is called.
 				 */
 
 				try
 				{
 					updatingArgs = CreateRowUpdatingEvent(row, command, statementType, tableMapping);
 
-					/* 1. Update Parameter values (It's	very similar to	what we	
+					/* 1. Update Parameter values (It's	very similar to	what we
 					 * are doing in	the	FbCommandBuilder class).
 					 *
 					 * Only	input parameters should	be updated.
@@ -363,14 +363,14 @@ namespace FirebirdSql.Data.FirebirdClient
 							row.AcceptChanges();
 						}
 
-						/* 4. If the command is	set	to FirstReturnedRecord,	then the 
-						 * first returned result is	placed in the DataRow. 
-						 * 
-						 * We have nothing to do in	this case as there are no 
+						/* 4. If the command is	set	to FirstReturnedRecord,	then the
+						 * first returned result is	placed in the DataRow.
+						 *
+						 * We have nothing to do in	this case as there are no
 						 * support for batch commands.
 						 */
 
-						/* 5. Check	if we have output parameters and they should 
+						/* 5. Check	if we have output parameters and they should
 						 * be updated.
 						 *
 						 * Only	output parameters should be	updated

@@ -1,20 +1,20 @@
-/*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+﻿/*
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *  All Rights Reserved.
- *	
+ *
  *  Contributors:
  *      Jiri Cincura (jiri@cincura.net)
  */
@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Common
 	/// Descriptor of query input and output parameters.
 	/// </summary>
 	/// <remarks>
-	/// This is similar to the XSQLDA structure described 
+	/// This is similar to the XSQLDA structure described
 	/// in the Interbase 6.0 API docs.
 	/// </remarks>
 	internal sealed class Descriptor : ICloneable
@@ -223,7 +223,7 @@ namespace FirebirdSql.Data.Common
 							blr.WriteByte((byte)(len >> 8));
 							break;
 					}
-			
+
 					blr.WriteByte(IscCodes.blr_short);
 					blr.WriteByte(0);
 				}

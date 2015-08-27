@@ -1,17 +1,17 @@
-/*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+﻿/*
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
  *  All Rights Reserved.
  */
@@ -22,11 +22,11 @@ using FirebirdSql.Data.FirebirdClient;
 namespace FirebirdSql.Data.Isql
 {
 	/// <summary>
-	///	CommandExecutingEventArgs encapsulates the events arguments for the event trigged 
-	///	from the <see cref="FbBatchExecution"/> during the execution. 
+	///	CommandExecutingEventArgs encapsulates the events arguments for the event trigged
+	///	from the <see cref="FbBatchExecution"/> during the execution.
 	/// </summary>
 	/// <remarks>
-	/// 
+	///
 	/// </remarks>
 	public class CommandExecutingEventArgs : EventArgs
 	{
@@ -39,8 +39,8 @@ namespace FirebirdSql.Data.Isql
 		#region Properties
 
 		/// <summary>
-		/// Returns the <see cref="FbCommand"/> instance that created for the SQL statement that goes 
-		/// for execution. 
+		/// Returns the <see cref="FbCommand"/> instance that created for the SQL statement that goes
+		/// for execution.
 		/// </summary>
 		public FbCommand SqlCommand
 		{
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Isql
 		/// Creates an instance of CommandExecutingEventArgs class.
 		/// </summary>
 		/// <param name="sqlCommand">The FbCommand properly instanciated.</param>
-		/// <remarks>The <b>sqlCommand</b> should be proper instanciated with a valid 
+		/// <remarks>The <b>sqlCommand</b> should be proper instanciated with a valid
 		/// <see cref="FbCommand"/> and with the SQL statement loaded in <see cref="FbCommand.CommandText"/>.
 		/// </remarks>
 		public CommandExecutingEventArgs(FbCommand sqlCommand)

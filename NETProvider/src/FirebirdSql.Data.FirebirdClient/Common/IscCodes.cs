@@ -1,21 +1,21 @@
-/*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+﻿/*
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- * 
+ *
  *	This file was originally ported	from Jaybird
  */
 
@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Common
 		#region Protocol Codes
 
 		/* The protocol	is defined blocks, rather than messages, to
-		 * separate	the	protocol from the transport	layer.	
+		 * separate	the	protocol from the transport	layer.
 		 */
 		public const int CONNECT_VERSION2 = 2;
 
@@ -66,7 +66,7 @@ namespace FirebirdSql.Data.Common
 		public const int PROTOCOL_VERSION5 = 5;
 
 		/* Protocol	6 includes support for cancel remote events, blob seek,
-		 * and unknown message type	
+		 * and unknown message type
 		 */
 		public const int PROTOCOL_VERSION6 = 6;
 
@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.Common
 		/* Protocol	9 includes support for SPX32
 		 * SPX32 uses WINSOCK instead of Novell	SDK
 		 * In order	to differentiate between the old implementation
-		 * of SPX and this one,	different PROTOCOL VERSIONS	are	used 
+		 * of SPX and this one,	different PROTOCOL VERSIONS	are	used
 		 */
 		public const int PROTOCOL_VERSION9 = 9;
 
@@ -231,7 +231,7 @@ namespace FirebirdSql.Data.Common
 		public const int op_rollback_retaining = 86;
 
 		// Two following opcode are used in vulcan.
-		// No plans to implement them completely for a while, but to 
+		// No plans to implement them completely for a while, but to
 		// support protocol 11, where they are used, have them here.
 		public const int op_update_account_info = 87;
 		public const int op_authenticate_user = 88;
@@ -454,7 +454,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_prp_am_readonly = 39;
 		public const int isc_spb_prp_am_readwrite = 40;
 
-		// Option Flags		
+		// Option Flags
 		public const int isc_spb_prp_activate = 0x0100;
 		public const int isc_spb_prp_db_online = 0x0200;
 

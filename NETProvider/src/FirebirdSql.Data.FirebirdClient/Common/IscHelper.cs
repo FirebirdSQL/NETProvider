@@ -1,17 +1,17 @@
-/*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+ï»¿/*
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
  */
@@ -61,11 +61,11 @@ namespace FirebirdSql.Data.Common
 
 					case IscCodes.isc_info_db_id:
 						/* Database	file name and site name:
-						 *		• 1	byte containing	the	number 2
-						 *		• 1	byte containing	the	length,	d, of the database file	name in	bytes
-						 *		• A	string of d	bytes, containing the database file	name
-						 *		• 1	byte containing	the	length,	l, of the site name	in bytes
-						 *		• A	string of l	bytes, containing the site name
+						 *		ï¿½ 1	byte containing	the	number 2
+						 *		ï¿½ 1	byte containing	the	length,	d, of the database file	name in	bytes
+						 *		ï¿½ A	string of d	bytes, containing the database file	name
+						 *		ï¿½ 1	byte containing	the	length,	l, of the site name	in bytes
+						 *		ï¿½ A	string of l	bytes, containing the site name
 						 */
 						string dbFile = Encoding.Default.GetString(buffer, pos + 2, buffer[pos + 1]);
 						int sitePos = pos + 2 + buffer[pos + 1];
@@ -81,28 +81,28 @@ namespace FirebirdSql.Data.Common
 
 					case IscCodes.isc_info_implementation:
 						/* Database	implementation number:
-						 *		• 1	byte containing	a 1
-						 *		• 1	byte containing	the	implementation number
-						 *		• 1	byte containing	a “class” number, either 1 or 12
+						 *		ï¿½ 1	byte containing	a 1
+						 *		ï¿½ 1	byte containing	the	implementation number
+						 *		ï¿½ 1	byte containing	a ï¿½classï¿½ number, either 1 or 12
 						 */
 						info.Add(String.Format(CultureInfo.CurrentCulture, "{0}.{1}.{2}", buffer[pos], buffer[pos + 1], buffer[pos + 2]));
 						break;
 
 					case IscCodes.isc_info_no_reserve:
 						/* 0 or	1
-						 *		• 0	indicates space	is reserved	on each	database page for holding
+						 *		ï¿½ 0	indicates space	is reserved	on each	database page for holding
 						 *			backup versions	of modified	records	[Default]
-						 *		• 1	indicates no space is reserved for such	records
+						 *		ï¿½ 1	indicates no space is reserved for such	records
 						 */
 						info.Add(buffer[pos] == 1 ? true : false);
 						break;
 
 					case IscCodes.isc_info_ods_version:
 						/* ODS major version number
-						 *		• Databases	with different major version numbers have different
+						 *		ï¿½ Databases	with different major version numbers have different
 						 *			physical layouts; a	database engine	can	only access	databases
 						 *			with a particular ODS major	version	number
-						 *		• Trying to	attach to a	database with a	different ODS number
+						 *		ï¿½ Trying to	attach to a	database with a	different ODS number
 						 *			results	in an error
 						 */
 						info.Add(VaxInteger(buffer, pos, length));
@@ -128,9 +128,9 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.isc_info_isc_version:
 					case IscCodes.isc_info_firebird_version:
 						/* Version identification string of	the	database implementation:
-						 *		• 1	byte containing	the	number 1
-						 *		• 1	byte specifying	the	length,	n, of the following	string
-						 *		• n	bytes containing the version identification	string
+						 *		ï¿½ 1	byte containing	the	number 1
+						 *		ï¿½ 1	byte specifying	the	length,	n, of the following	string
+						 *		ï¿½ n	bytes containing the version identification	string
 						 */
 						info.Add(Encoding.Default.GetString(buffer, pos + 2, buffer[pos + 1]));
 						break;
@@ -164,7 +164,7 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					case IscCodes.isc_info_sweep_interval:
-						/* Number of transactions that are committed between “sweeps” to
+						/* Number of transactions that are committed between ï¿½sweepsï¿½ to
 						 * remove database record versions that	are	no longer needed
 						 */
 						info.Add(VaxInteger(buffer, pos, length));
@@ -216,7 +216,7 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					case IscCodes.isc_info_insert_count:
-						// Number of inserts into the database since the database was last attached	
+						// Number of inserts into the database since the database was last attached
 						info.Add(VaxInteger(buffer, pos, length));
 						break;
 
@@ -231,7 +231,7 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					case IscCodes.isc_info_read_seq_count:
-						/* Number of sequential	sequential table scans (row	reads) done	on each	
+						/* Number of sequential	sequential table scans (row	reads) done	on each
 						 * table since the database	was	last attached
 						 */
 						info.Add(VaxInteger(buffer, pos, length));

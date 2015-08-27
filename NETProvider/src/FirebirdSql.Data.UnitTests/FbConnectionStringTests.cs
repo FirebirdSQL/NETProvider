@@ -1,17 +1,17 @@
 ﻿/*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied.  See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2012 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
@@ -106,17 +106,17 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ParsingMultilineConnectionStringTest()
 		{
-			const string ConnectionString = @"DataSource=S05-04; 
- User= SYSDBA; 
- Password= masterkey; 
- Role= ; 
- Database=Termine; 
- Port=3050; 
- Dialect=3; 
- Charset=ISO8859_1; 
- Connection lifetime=0; 
- Connection timeout=15; 
- Pooling=True; 
+			const string ConnectionString = @"DataSource=S05-04;
+ User= SYSDBA;
+ Password= masterkey;
+ Role= ;
+ Database=Termine;
+ Port=3050;
+ Dialect=3;
+ Charset=ISO8859_1;
+ Connection lifetime=0;
+ Connection timeout=15;
+ Pooling=True;
  Packet Size=8192;";
 			var cs = new FbConnectionString(ConnectionString);
 			Assert.AreEqual("Termine", cs.Database);

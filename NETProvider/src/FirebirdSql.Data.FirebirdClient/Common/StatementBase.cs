@@ -1,20 +1,20 @@
-/*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+﻿/*
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
- *	All Rights Reserved. 
- * 
+ *	All Rights Reserved.
+ *
  *  Contributors:
  *    Jiri Cincura (jiri@cincura.net)
  */
@@ -31,8 +31,8 @@ namespace FirebirdSql.Data.Common
 		#region Protected Static Fields
 
 		// Plan	information	items
-		protected static readonly byte[] DescribePlanInfoItems = new byte[] 
-		{ 
+		protected static readonly byte[] DescribePlanInfoItems = new byte[]
+		{
 			IscCodes.isc_info_sql_get_plan
 		};
 
@@ -43,8 +43,8 @@ namespace FirebirdSql.Data.Common
 		};
 
 		// Describe	information	items
-		protected static readonly byte[] DescribeInfoAndBindInfoItems = new byte[] 
-		{ 
+		protected static readonly byte[] DescribeInfoAndBindInfoItems = new byte[]
+		{
 			IscCodes.isc_info_sql_select,
 			IscCodes.isc_info_sql_describe_vars,
 			IscCodes.isc_info_sql_sqlda_seq,
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.Common
 			// IscCodes.isc_info_sql_owner,
 			IscCodes.isc_info_sql_alias,
 			IscCodes.isc_info_sql_describe_end,
-			
+
 			IscCodes.isc_info_sql_bind,
 			IscCodes.isc_info_sql_describe_vars,
 			IscCodes.isc_info_sql_sqlda_seq,
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Common
 			IscCodes.isc_info_sql_relation,
 			// IscCodes.isc_info_sql_owner,
 			IscCodes.isc_info_sql_alias,
-			IscCodes.isc_info_sql_describe_end 
+			IscCodes.isc_info_sql_describe_end
 		};
 
 		protected static readonly byte[] StatementTypeInfoItems = new byte[]
@@ -333,7 +333,7 @@ namespace FirebirdSql.Data.Common
 						{
 							l = IscHelper.VaxInteger(buffer, pos, 2);
 							pos += 2;
-							
+
 							switch (t)
 							{
 								case IscCodes.isc_info_req_insert_count:

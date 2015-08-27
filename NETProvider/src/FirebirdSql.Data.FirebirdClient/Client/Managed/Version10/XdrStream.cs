@@ -1,20 +1,20 @@
-/*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+﻿/*
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
- *   
+ *
  *  Contributors:
  *    Jiri Cincura (jiri@cincura.net)
  */
@@ -243,7 +243,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				 * throwing	them away--note	that if	we are a server	we won't
 				 * be receiving	them, but it is	better to check	for	them at
 				 * this	level rather than try to catch them	in all places where
-				 * this	routine	is called 
+				 * this	routine	is called
 				 */
 				_operation = ReadInt32();
 			} while (_operation == IscCodes.op_dummy);

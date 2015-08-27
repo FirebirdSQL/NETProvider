@@ -1,20 +1,20 @@
-/*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+﻿/*
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
- *   
+ *
  *  Contributors:
  *    Jiri Cincura (jiri@cincura.net)
  */
@@ -365,7 +365,7 @@ namespace FirebirdSql.Data.Common
 					return "System.String";
 
 				case DbDataType.Guid:
-					return "System.Guid";                    
+					return "System.Guid";
 
 				case DbDataType.SmallInt:
 					return "System.Int16";
@@ -389,7 +389,7 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.Date:
 				case DbDataType.TimeStamp:
 					return "System.DateTime";
-				
+
 				case DbDataType.Time:
 					return "System.TimeSpan";
 
@@ -572,7 +572,7 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case IscCodes.dtype_d_float:	// Double
-				case IscCodes.dtype_double:	    
+				case IscCodes.dtype_double:
 					return DbDataType.Double;
 
 				case IscCodes.dtype_real:	    // Float

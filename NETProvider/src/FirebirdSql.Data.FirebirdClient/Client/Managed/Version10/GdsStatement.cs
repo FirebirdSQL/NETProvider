@@ -1,17 +1,17 @@
-/*
- *	Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *	   The contents of this file are subject to the Initial 
- *	   Developer's Public License Version 1.0 (the "License"); 
- *	   you may not use this file except in compliance with the 
- *	   License. You may obtain a copy of the License at 
+﻿/*
+ *	Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *	   The contents of this file are subject to the Initial
+ *	   Developer's Public License Version 1.0 (the "License");
+ *	   you may not use this file except in compliance with the
+ *	   License. You may obtain a copy of the License at
  *	   http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *	   Software distributed under the License is distributed on 
- *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *	   express or implied. See the License for the specific 
+ *	   Software distributed under the License is distributed on
+ *	   an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
- * 
+ *
  *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
  *	Copyright (c) 2007 - 2009 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
@@ -205,7 +205,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							_fetchSize = 0;
 							RecordsAffected = 0;
 						}
-						
+
 						base.Dispose(disposing);
 					}
 				}
@@ -315,8 +315,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					GenericResponse executeResponse = _database.ReadGenericResponse();
 					ProcessExecuteResponse(executeResponse);
- 
-					// Updated number of records affected by the statement execution			
+
+					// Updated number of records affected by the statement execution
 					if (ReturnRecordsAffected &&
 						(StatementType == DbStatementType.Insert ||
 						StatementType == DbStatementType.Delete ||
@@ -360,7 +360,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						_database.Write(IscCodes.op_fetch);
 						_database.Write(_handle);
 						_database.WriteBuffer(_fields.ToBlrArray());
-						_database.Write(0);         // p_sqldata_message_number						
+						_database.Write(0);         // p_sqldata_message_number
 						_database.Write(_fetchSize);    // p_sqldata_messages
 						_database.Flush();
 
@@ -632,7 +632,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		}
 
 		protected void ProcessExecuteResponse(GenericResponse response)
-		{ 
+		{
 			// nothing to do here
 		}
 
@@ -674,7 +674,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			lock (_database.SyncObject)
 			{
-				// This	only works if not (port->port_flags	& PORT_symmetric)				
+				// This	only works if not (port->port_flags	& PORT_symmetric)
 				for (int i = 0; i < _fields.Count; i++)
 				{
 					try
