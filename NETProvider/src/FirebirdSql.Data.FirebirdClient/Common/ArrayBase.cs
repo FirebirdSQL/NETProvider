@@ -177,17 +177,14 @@ namespace FirebirdSql.Data.Common
 
 		protected int GetSliceLength(bool read)
 		{
-			int length = 0;
-			int elements = 0;
-
+			int elements = 1;
 			for (int i = 0; i < _descriptor.Dimensions; i++)
 			{
 				ArrayBound bound = _descriptor.Bounds[i];
-
-				elements += (bound.UpperBound - bound.LowerBound) + 1;
+				elements *= bound.UpperBound - bound.LowerBound + 1;
 			}
 
-			length = elements * _descriptor.Length;
+			int length = elements * _descriptor.Length;
 
 			switch (_descriptor.DataType)
 			{
