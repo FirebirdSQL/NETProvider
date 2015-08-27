@@ -260,7 +260,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					if (_state == StatementState.Deallocated)
 					{
-						// Allocate	statement
+						// Allocate statement
 						SendAllocateToBuffer();
 						_database.Flush();
 						ProcessAllocateResponce(_database.ReadGenericResponse());
@@ -352,7 +352,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (!_allRowsFetched && _rows.Count == 0)
 			{
-				// Fetch next batch	of rows
+				// Fetch next batch of rows
 				lock (_database.SyncObject)
 				{
 					try
@@ -360,7 +360,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						_database.Write(IscCodes.op_fetch);
 						_database.Write(_handle);
 						_database.WriteBuffer(_fields.ToBlrArray());
-						_database.Write(0);         // p_sqldata_message_number
+						_database.Write(0);             // p_sqldata_message_number
 						_database.Write(_fetchSize);    // p_sqldata_messages
 						_database.Flush();
 
@@ -520,8 +520,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected bool FreeNotNeeded(int option)
 		{
-			// Does	not	seem to	be possible	or necessary to	close
-			// an execute procedure	statement.
+			// Does not seem to be possible or necessary to close
+			// an execute procedure statement.
 			if (StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
 			{
 				return true;
@@ -627,7 +627,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			if (_statementType == DbStatementType.StoredProcedure)
 			{
 				_database.WriteBuffer((_fields == null) ? null : _fields.ToBlrArray());
-				_database.Write(0);	// Output message number
+				_database.Write(0); // Output message number
 			}
 		}
 
@@ -674,7 +674,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			lock (_database.SyncObject)
 			{
-				// This	only works if not (port->port_flags	& PORT_symmetric)
+				// This only works if not (port->port_flags & PORT_symmetric)
 				for (int i = 0; i < _fields.Count; i++)
 				{
 					try
