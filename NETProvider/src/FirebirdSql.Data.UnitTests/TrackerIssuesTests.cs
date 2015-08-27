@@ -361,6 +361,7 @@ CREATE TABLE TABMAT (
 				using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "drop table tabmat";
+					cmd.ExecuteNonQuery();
 				}
 			}
 		}
