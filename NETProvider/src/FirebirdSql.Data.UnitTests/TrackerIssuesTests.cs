@@ -314,6 +314,58 @@ END
 		}
 
 		[Test]
+		public void DNET313_MultiDimensionalArray()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = @"
+CREATE TABLE TABMAT (
+    ID INTEGER NOT NULL,
+	MATRIX INTEGER[1:3, 1:4]
+)";
+				cmd.ExecuteNonQuery();
+			}
+			try
+			{
+				string sql = "INSERT INTO TabMat (Id,Matrix) Values(@ValId,@ValMat)";
+				int[,] mat = { { 1, 2, 3, 4 }, { 10, 20, 30, 40 }, { 101, 102, 103, 104 } };
+				Random random = new Random();
+				using (FbTransaction tx = Connection.BeginTransaction())
+				{
+					using (FbCommand cmd = new FbCommand(sql, Connection, tx))
+					{
+						cmd.Parameters.Add("@ValId", FbDbType.Integer).Value = random.Next();
+						cmd.Parameters.Add("@ValMat", FbDbType.Array).Value = mat;
+						cmd.ExecuteNonQuery();
+					}
+					tx.Commit();
+				}
+				using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = @"select matrix from tabmat";
+					using (var reader = cmd.ExecuteReader())
+					{
+						if (reader.Read())
+						{
+							Assert.AreEqual(mat, reader[0]);
+						}
+						else
+						{
+							Assert.Fail();
+						}
+					}
+				}
+			}
+			finally
+			{
+				using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = "drop table tabmat";
+				}
+			}
+		}
+
+		[Test]
 		public void DNET()
 		{
 			const string ConnectionString = @"data source=localhost;port number=20455;initial catalog=;user id=SYSDBA;password=masterkey;pooling=False;packet size=16384;character set=UTF8";
