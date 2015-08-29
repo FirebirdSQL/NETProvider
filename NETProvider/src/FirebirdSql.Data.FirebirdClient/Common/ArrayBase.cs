@@ -29,10 +29,10 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private ArrayDesc	_descriptor;
-		private string		_tableName;
-		private string		_fieldName;
-		private string		_rdbFieldName;
+		private ArrayDesc _descriptor;
+		private string _tableName;
+		private string _fieldName;
+		private string _rdbFieldName;
 
 		#endregion
 
@@ -152,13 +152,13 @@ namespace FirebirdSql.Data.Common
 			DbValue[] values = lookup.Fetch();
 			if (values != null && values.Length > 0)
 			{
-				_descriptor.RelationName	= _tableName;
-				_descriptor.FieldName		= _fieldName;
-				_descriptor.DataType		= values[0].GetByte();
-				_descriptor.Scale			= values[1].GetInt16();
-				_descriptor.Length			= values[2].GetInt16();
-				_descriptor.Dimensions		= values[3].GetInt16();
-				_descriptor.Flags			= 0;
+				_descriptor.RelationName = _tableName;
+				_descriptor.FieldName = _fieldName;
+				_descriptor.DataType = values[0].GetByte();
+				_descriptor.Scale = values[1].GetInt16();
+				_descriptor.Length = values[2].GetInt16();
+				_descriptor.Dimensions = values[3].GetInt16();
+				_descriptor.Flags = 0;
 
 				_rdbFieldName = values[4].GetString().Trim();
 			}
