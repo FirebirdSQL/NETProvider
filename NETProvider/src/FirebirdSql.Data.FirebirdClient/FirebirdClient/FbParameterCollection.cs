@@ -39,6 +39,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Fields
 
 		private List<FbParameter> _parameters;
+		private bool _collectionHasUnicodeParameterNames;
 
 		#endregion
 
@@ -90,14 +91,22 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get { return ((ICollection)_parameters).SyncRoot; }
 		}
-		
+
 		internal bool CollectionHasParameterWithUnicodeName
 		{
 			get
 			{
-				return _parameters.Any(x => x.IsUnicodeParameterName);
-            }
+				if (!ParameterNameFlagEvaluated)
+				{
+					_collectionHasUnicodeParameterNames = _parameters.Any(x => x.IsUnicodeParameterName);
+					ParameterNameFlagEvaluated = true;
+				}
+
+				return _collectionHasUnicodeParameterNames;
+			}
 		}
+
+		internal bool ParameterNameFlagEvaluated { get; set; }
 
 		#endregion
 
@@ -155,9 +164,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			EnsureFbParameterAddOrInsert(value);
 
 			value.Parent = this;
-				_parameters.Add(value);
-				return value;
-			}
+			_parameters.Add(value);
+			ParameterNameFlagEvaluated = false;
+			return value;
+		}
 
 		public override int Add(object value)
 		{
@@ -239,7 +249,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Remove(FbParameter value)
 		{
-			if (!_parameters.Remove(value))
+			if(!_parameters.Remove(value))
 			{
 				throw new ArgumentException("The parameter does not exist in the collection.");
 			}

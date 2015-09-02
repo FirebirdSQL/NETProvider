@@ -63,6 +63,10 @@ namespace FirebirdSql.Data.FirebirdClient
 				_parameterName = value;
 				_internalParameterName = NormalizeParameterName(value);
 				_isUnicodeParameterName = Encoding.UTF8.GetByteCount(value) != value.Length;
+				if (_parent != null)
+				{
+					_parent.ParameterNameFlagEvaluated = false;
+				}
 			}
 		}
 
@@ -215,7 +219,19 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal FbParameterCollection Parent
 		{
 			get { return _parent; }
-			set { _parent = value; }
+			set
+			{
+				if (_parent != null)
+				{
+					_parent.ParameterNameFlagEvaluated = false;
+				}
+
+				_parent = value;
+				if (value != null)
+				{
+					value.ParameterNameFlagEvaluated = false;
+				}
+			}
 		}
 
 		internal string InternalParameterName

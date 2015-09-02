@@ -103,6 +103,25 @@ namespace FirebirdSql.Data.UnitTests
 			Assert.IsTrue(collection.CollectionHasParameterWithUnicodeName);
 		}
 
+		[Test]
+		public void CheckFbParameterParentPropertyInvariant()
+		{
+			var collection = new FbParameterCollection();
+			var parameter = collection.Add("Name", FbDbType.Array);
+			Assert.AreSame(collection, parameter.Parent);
+			Assert.Throws<ArgumentException>(() => collection.Add(parameter));
+			Assert.Throws<ArgumentException>(() => collection.AddRange(new FbParameter[] { parameter }));
+
+			collection.Remove(parameter);
+			Assert.IsNull(parameter.Parent);
+
+			Assert.Throws<ArgumentException>(() => collection.Remove(parameter));
+
+			collection.Insert(0, parameter);
+			Assert.AreSame(collection, parameter.Parent);
+			Assert.Throws<ArgumentException>(() => collection.Insert(0, parameter));
+		}
+
 		#endregion
 	}
 }
