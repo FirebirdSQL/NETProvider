@@ -145,25 +145,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (SyncRoot)
 			{
-				if (value == null)
-				{
-					throw new ArgumentException("The value parameter is null.");
-				}
-				if (value.Parent != null)
-				{
-					throw new ArgumentException("The FbParameter specified in the value parameter is already added to this or another FbParameterCollection.");
-				}
-				if (value.ParameterName == null || value.ParameterName.Length == 0)
-				{
-					value.ParameterName = GenerateParameterName();
-				}
-				else
-				{
-					if (IndexOf(value) != -1)
-					{
-						throw new ArgumentException("FbParameterCollection already contains FbParameter with ParameterName '" + value.ParameterName + "'.");
-					}
-				}
+				EnsureFbParameterAddOrInsert(value);
 
 				value.Parent = this;
 				_parameters.Add(value);
@@ -227,6 +209,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Insert(int index, FbParameter value)
 		{
+			EnsureFbParameterAddOrInsert(value);
+
 			value.Parent = this;
 			_parameters.Insert(index, value);
 		}
@@ -347,6 +331,29 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (!(value is FbParameter))
 			{
 				throw new InvalidCastException("The parameter passed was not a FbParameter.");
+			}
+		}
+
+		private void EnsureFbParameterAddOrInsert(FbParameter value)
+		{
+			if (value == null)
+			{
+				throw new ArgumentException("The value parameter is null.");
+			}
+			if (value.Parent != null)
+			{
+				throw new ArgumentException("The FbParameter specified in the value parameter is already added to this or another FbParameterCollection.");
+			}
+			if (value.ParameterName == null || value.ParameterName.Length == 0)
+			{
+				value.ParameterName = GenerateParameterName();
+			}
+			else
+			{
+				if (IndexOf(value) != -1)
+				{
+					throw new ArgumentException("FbParameterCollection already contains FbParameter with ParameterName '" + value.ParameterName + "'.");
+				}
 			}
 		}
 
