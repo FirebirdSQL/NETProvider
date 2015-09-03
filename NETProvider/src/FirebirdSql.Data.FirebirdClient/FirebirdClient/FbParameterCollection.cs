@@ -143,14 +143,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbParameter Add(FbParameter value)
 		{
-			lock (SyncRoot)
-			{
-				EnsureFbParameterAddOrInsert(value);
+			EnsureFbParameterAddOrInsert(value);
 
-				value.Parent = this;
-				_parameters.Add(value);
-				return value;
-			}
+			value.Parent = this;
+			_parameters.Add(value);
+			return value;
 		}
 
 		public override int Add(object value)
