@@ -165,8 +165,8 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 				}
 
+				value.Parent = this;
 				_parameters.Add(value);
-
 				return value;
 			}
 		}
@@ -227,6 +227,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Insert(int index, FbParameter value)
 		{
+			value.Parent = this;
 			_parameters.Insert(index, value);
 		}
 
