@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono
  *
  *	   The contents of this file are subject to the Initial
@@ -17,14 +17,12 @@
  */
 
 using System;
-using System.IO;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Client.Common
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct XSQLVAR
+	internal class XSQLVAREmpty
 	{
 		public short sqltype;
 		public short sqlscale;
@@ -32,6 +30,11 @@ namespace FirebirdSql.Data.Client.Common
 		public short sqllen;
 		public IntPtr sqldata;
 		public IntPtr sqlind;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	internal class XSQLVAR : XSQLVAREmpty
+	{
 		public short sqlname_length;
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
 		public byte[] sqlname;
