@@ -120,6 +120,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Data.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -136,6 +137,8 @@
     <Compile Include="Client\Managed\Version11\SSPIHelper.cs" />
     <Compile Include="Client\Managed\Version12\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version12\GdsStatement.cs" />
+    <Compile Include="Client\Managed\Version13\GdsDatabase.cs" />
+    <Compile Include="Client\Managed\Version13\GdsStatement.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\IscErrorMessages.cs" />
     <Compile Include="Common\PageSizeHelper.cs" />
@@ -170,6 +173,7 @@
     <Compile Include="Client\Managed\GenericResponse.cs" />
     <Compile Include="Client\Managed\IResponse.cs" />
     <Compile Include="Client\Managed\SqlResponse.cs" />
+    <Compile Include="Client\Managed\Version10\SrpClient.cs" />
     <Compile Include="Client\Managed\Version10\GdsArray.cs" />
     <Compile Include="Client\Managed\Version10\GdsBlob.cs" />
     <Compile Include="Client\Managed\Version10\GdsConnection.cs" />

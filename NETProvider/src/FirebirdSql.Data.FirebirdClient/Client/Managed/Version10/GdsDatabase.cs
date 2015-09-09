@@ -120,6 +120,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
+		public string UserID
+		{
+			get { return _connection.UserID; }
+		}
+
+		public string Password
+		{
+			get { return _connection.Password; }
+		}
+
+		public byte[] AuthData
+		{
+			get { return _connection.AuthData; }
+		}
+
+
 		#endregion
 
 		#region Constructors
@@ -227,6 +243,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			Write(IscCodes.op_attach);
 			Write(0);                                           // Database object ID
 			WriteBuffer(Encoding.Default.GetBytes(database));   // Database PATH
+			if (!string.IsNullOrEmpty(UserID)) {
+				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
+				if (!string.IsNullOrEmpty(Password)) {
+					dpb.Append(IscCodes.isc_dpb_password, Password);
+				}
+			}
 			WriteBuffer(dpb.ToArray());                         // DPB Parameter buffer
 		}
 

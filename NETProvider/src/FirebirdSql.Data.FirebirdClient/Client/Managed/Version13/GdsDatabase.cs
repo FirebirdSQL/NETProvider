@@ -28,9 +28,9 @@ using System.Collections.Generic;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version12
+namespace FirebirdSql.Data.Client.Managed.Version13
 {
-	internal class GdsDatabase : Version11.GdsDatabase
+	internal class GdsDatabase : Version12.GdsDatabase
 	{
 		public GdsDatabase(Version10.GdsConnection connection)
 			: base(connection)
@@ -40,15 +40,15 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		{
 			// Attach to the database
 			Write(IscCodes.op_attach);
-			Write(0);				    // Database	object ID
+			Write(0);					// Database	object ID
 			if (!string.IsNullOrEmpty(UserID)) {
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
-				if (!string.IsNullOrEmpty(Password)) {
-					dpb.Append(IscCodes.isc_dpb_password, Password);
+				if (AuthData != null) {
+					dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(BitConverter.ToString(AuthData).Replace("-", string.Empty)));
 				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			WriteBuffer(Encoding.UTF8.GetBytes(database));              // Database	PATH
+			WriteBuffer(Encoding.UTF8.GetBytes(database));				// Database	PATH
 			WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
 		}
 
@@ -58,12 +58,13 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			Write(0);
 			if (!string.IsNullOrEmpty(UserID)) {
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
-				if (!string.IsNullOrEmpty(Password)) {
-					dpb.Append(IscCodes.isc_dpb_password, Password);
+				if (AuthData != null) {
+					dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(BitConverter.ToString(AuthData).Replace("-", string.Empty)));
 				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			WriteBuffer(Encoding.UTF8.GetBytes(database));
+
 			WriteBuffer(dpb.ToArray());
 		}
 

@@ -67,13 +67,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static IDatabase CreateManagedDatabase(FbConnectionString options)
 		{
-			FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
+			FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
 
 			connection.Connect();
 			connection.Identify(options.Database);
 
 			switch (connection.ProtocolVersion)
 			{
+				case IscCodes.PROTOCOL_VERSION13:
+					return new FirebirdSql.Data.Client.Managed.Version13.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION12:
 					return new FirebirdSql.Data.Client.Managed.Version12.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION11:
@@ -87,13 +89,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static IServiceManager CreateManagedServiceManager(FbConnectionString options)
 		{
-			FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
+			FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
 
 			connection.Connect();
 			connection.Identify(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty);
 
 			switch (connection.ProtocolVersion)
 			{
+				case IscCodes.PROTOCOL_VERSION13:
 				case IscCodes.PROTOCOL_VERSION12:
 				case IscCodes.PROTOCOL_VERSION11:
 				case IscCodes.PROTOCOL_VERSION10:
