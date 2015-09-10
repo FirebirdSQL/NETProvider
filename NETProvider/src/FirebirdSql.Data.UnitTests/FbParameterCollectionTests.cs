@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void DNET_532_CheckCultureAwareIndexOf()
+		public void DNET532_CheckCultureAwareIndexOf()
 		{
 			var curCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
             try
@@ -61,8 +61,8 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void DNET_532_CheckFlagForUsingOrdinalIgnoreCase()
-		{			
+		public void DNET532_CheckFlagForUsingOrdinalIgnoreCase()
+		{
 			FbCommand command = new FbCommand();
 			command.Parameters.IndexOf("SomeField");
 
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void DNET_532_CheckFlagForUsingOrdinalIgnoreCaseWithOuterChanges()
+		public void DNET532_CheckFlagForUsingOrdinalIgnoreCaseWithOuterChanges()
 		{
 			var collection = new FbParameterCollection();
 			var parameter = new FbParameter() { ParameterName = "test" };
