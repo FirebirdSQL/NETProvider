@@ -29,6 +29,7 @@ using System.Globalization;
 using System.Linq;
 
 using FirebirdSql.Data.Common;
+using System.Text;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -38,6 +39,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Fields
 
 		private List<FbParameter> _parameters;
+		private bool _collectionHasUnicodeParameterNames;
 
 		#endregion
 
@@ -89,6 +91,22 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get { return ((ICollection)_parameters).SyncRoot; }
 		}
+
+		internal bool CollectionHasParameterWithUnicodeName
+		{
+			get
+			{
+				if (!ParameterNameFlagEvaluated)
+				{
+					_collectionHasUnicodeParameterNames = _parameters.Any(x => x.IsUnicodeParameterName);
+					ParameterNameFlagEvaluated = true;
+				}
+
+				return _collectionHasUnicodeParameterNames;
+			}
+		}
+
+		internal bool ParameterNameFlagEvaluated { get; set; }
 
 		#endregion
 
@@ -147,6 +165,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			value.Parent = this;
 			_parameters.Add(value);
+			ParameterNameFlagEvaluated = false;
 			return value;
 		}
 
@@ -193,15 +212,24 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal int IndexOf(string parameterName, int luckyIndex)
 		{
+			bool parameterUnicodeName = Encoding.UTF8.GetByteCount(parameterName) != parameterName.Length;
+			bool collectionHasParameterWithUnicodeName = CollectionHasParameterWithUnicodeName;
+			StringComparison usedComparison = StringComparison.OrdinalIgnoreCase;
+			if (parameterUnicodeName || collectionHasParameterWithUnicodeName)
+			{
+				usedComparison = StringComparison.CurrentCultureIgnoreCase;
+			}
+
 			var normalizedParameterName = FbParameter.NormalizeParameterName(parameterName);
 			if (luckyIndex != -1 && luckyIndex < _parameters.Count)
 			{
-				if (_parameters[luckyIndex].InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase))
+				if (_parameters[luckyIndex].InternalParameterName.Equals(normalizedParameterName, usedComparison))
 				{
 					return luckyIndex;
 				}
 			}
-			return _parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, StringComparison.CurrentCultureIgnoreCase));
+
+			return _parameters.FindIndex(x => x.InternalParameterName.Equals(normalizedParameterName, usedComparison));
 		}
 
 		public void Insert(int index, FbParameter value)
@@ -221,7 +249,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Remove(FbParameter value)
 		{
-			if (!_parameters.Remove(value))
+			if(!_parameters.Remove(value))
 			{
 				throw new ArgumentException("The parameter does not exist in the collection.");
 			}

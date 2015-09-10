@@ -25,6 +25,7 @@ using System.Data.Common;
 using System.ComponentModel;
 
 using FirebirdSql.Data.Common;
+using System.Text;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -47,6 +48,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private string _parameterName;
 		private string _sourceColumn;
 		private string _internalParameterName;
+		private bool _isUnicodeParameterName;
 
 		#endregion
 
@@ -60,7 +62,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				_parameterName = value;
 				_internalParameterName = NormalizeParameterName(value);
-		}
+				_isUnicodeParameterName = Encoding.UTF8.GetByteCount(value) != value.Length;
+				if (_parent != null)
+				{
+					_parent.ParameterNameFlagEvaluated = false;
+				}
+			}
 		}
 
 		[Category("Data")]
@@ -212,7 +219,19 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal FbParameterCollection Parent
 		{
 			get { return _parent; }
-			set { _parent = value; }
+			set
+			{
+				if (_parent != null)
+				{
+					_parent.ParameterNameFlagEvaluated = false;
+				}
+
+				_parent = value;
+				if (value != null)
+				{
+					value.ParameterNameFlagEvaluated = false;
+				}
+			}
 		}
 
 		internal string InternalParameterName
@@ -456,6 +475,14 @@ namespace FirebirdSql.Data.FirebirdClient
 					return bvalue.Length;
 				}
 				return null;
+			}
+		}
+
+		internal bool IsUnicodeParameterName
+		{
+			get
+			{
+				return _isUnicodeParameterName;
 			}
 		}
 

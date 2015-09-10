@@ -23,19 +23,9 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture(FbServerType.Default)]
-	[TestFixture(FbServerType.Embedded)]
-	public class FbParameterCollectionTests : TestsBase
+	[TestFixture]
+	public class FbParameterCollectionTests
 	{
-		#region Constructors
-
-		public FbParameterCollectionTests(FbServerType serverType)
-			: base(serverType)
-		{
-		}
-
-		#endregion
-
 		#region Unit Tests
 
 		[Test]
@@ -47,6 +37,89 @@ namespace FirebirdSql.Data.UnitTests
 			command.Parameters.Add("@p01", FbDbType.Integer);
 			command.Parameters.Add("@p02", 289273);
 			command.Parameters.Add("#p3", FbDbType.SmallInt, 2, "sourceColumn");
+		}
+
+		[Test]
+		public void DNET_532_CheckCultureAwareIndexOf()
+		{
+			var curCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            try
+			{
+				System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("tr-TR");
+				FbCommand command = new FbCommand();
+
+				// \u0131 is turkish symbol "i without dot" that uppercases to "I" symbol.
+				// see https://msdn.microsoft.com/en-us/library/ms973919.aspx#stringsinnet20_topic5 for more information
+				var parameterName = "Turkish\u0131Parameter";
+				command.Parameters.Add(parameterName, FbDbType.Char);
+				Assert.AreNotEqual(-1, command.Parameters.IndexOf("turkishIParameter"));
+			}
+			finally
+			{
+				System.Threading.Thread.CurrentThread.CurrentCulture = curCulture;
+            }
+		}
+
+		[Test]
+		public void DNET_532_CheckFlagForUsingOrdinalIgnoreCase()
+		{			
+			FbCommand command = new FbCommand();
+			command.Parameters.IndexOf("SomeField");
+
+			for (int i = 0; i < 100; ++i)
+			{
+				command.Parameters.Add("FIELD" + i.ToString(), FbDbType.Integer);
+			}
+
+			const string probeParameterName = "FIELD0";
+			const int noMatterValue = 12345;
+			const int deleteIndex = 12;
+			command.Parameters[probeParameterName].Value = noMatterValue;
+			Assert.IsFalse(command.Parameters.CollectionHasParameterWithUnicodeName);
+
+			command.Parameters.Remove(command.Parameters[deleteIndex]);
+			command.Parameters[probeParameterName].Value = noMatterValue;
+
+			command.Parameters.RemoveAt(deleteIndex);
+			command.Parameters[probeParameterName].Value = noMatterValue;
+
+			command.Parameters.Insert(deleteIndex, new FbParameter("FIELD101", FbDbType.Integer));
+			command.Parameters[probeParameterName].Value = noMatterValue;
+
+			command.Parameters.Clear();
+		}
+
+		[Test]
+		public void DNET_532_CheckFlagForUsingOrdinalIgnoreCaseWithOuterChanges()
+		{
+			var collection = new FbParameterCollection();
+			var parameter = new FbParameter() { ParameterName = "test" };
+			collection.Add(parameter);
+			var dummy1 = collection.IndexOf("dummy");
+			Assert.IsFalse(collection.CollectionHasParameterWithUnicodeName);
+			parameter.ParameterName = "řčšřčšřčš";
+			var dummy2 = collection.IndexOf("dummy");
+			Assert.IsTrue(parameter.IsUnicodeParameterName);
+			Assert.IsTrue(collection.CollectionHasParameterWithUnicodeName);
+		}
+
+		[Test]
+		public void CheckFbParameterParentPropertyInvariant()
+		{
+			var collection = new FbParameterCollection();
+			var parameter = collection.Add("Name", FbDbType.Array);
+			Assert.AreSame(collection, parameter.Parent);
+			Assert.Throws<ArgumentException>(() => collection.Add(parameter));
+			Assert.Throws<ArgumentException>(() => collection.AddRange(new FbParameter[] { parameter }));
+
+			collection.Remove(parameter);
+			Assert.IsNull(parameter.Parent);
+
+			Assert.Throws<ArgumentException>(() => collection.Remove(parameter));
+
+			collection.Insert(0, parameter);
+			Assert.AreSame(collection, parameter.Parent);
+			Assert.Throws<ArgumentException>(() => collection.Insert(0, parameter));
 		}
 
 		#endregion
