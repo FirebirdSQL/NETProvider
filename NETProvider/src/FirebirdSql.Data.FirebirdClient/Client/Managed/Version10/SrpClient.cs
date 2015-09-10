@@ -207,7 +207,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			byte[] hexServerPublicKey = new byte[serverKeyLength];
 			Array.Copy(authData, serverKeyStart, hexServerPublicKey, 0, serverKeyLength);
 			String hexServerPublicKeyString = System.Text.Encoding.UTF8.GetString(hexServerPublicKey);
-			BigInteger serverPublicKey = BigInteger.Parse(hexServerPublicKeyString, NumberStyles.HexNumber);
+			BigInteger serverPublicKey = BigInteger.Parse("00" + hexServerPublicKeyString, NumberStyles.HexNumber);
 			return clientProof(user.ToUpper(), password, salt, serverPublicKey);
 		}
 
