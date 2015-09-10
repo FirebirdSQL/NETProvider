@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Fields
 
 		private List<FbParameter> _parameters;
-		private bool _collectionHasUnicodeParameterNames;
+		private bool? _hasParameterWithNonAsciiName;
 
 		#endregion
 
@@ -92,21 +92,17 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return ((ICollection)_parameters).SyncRoot; }
 		}
 
-		internal bool CollectionHasParameterWithUnicodeName
+		#endregion
+
+		#region Internal properties
+
+		internal bool HasParameterWithNonAsciiName
 		{
 			get
 			{
-				if (!ParameterNameFlagEvaluated)
-				{
-					_collectionHasUnicodeParameterNames = _parameters.Any(x => x.IsUnicodeParameterName);
-					ParameterNameFlagEvaluated = true;
-				}
-
-				return _collectionHasUnicodeParameterNames;
+				return _hasParameterWithNonAsciiName ?? (bool)(_hasParameterWithNonAsciiName = _parameters.Any(x => x.IsUnicodeParameterName));
 			}
 		}
-
-		internal bool ParameterNameFlagEvaluated { get; set; }
 
 		#endregion
 
@@ -115,6 +111,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal FbParameterCollection()
 		{
 			_parameters = new List<FbParameter>();
+			_hasParameterWithNonAsciiName = null;
 		}
 
 		#endregion
@@ -165,7 +162,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			value.Parent = this;
 			_parameters.Add(value);
-			ParameterNameFlagEvaluated = false;
 			return value;
 		}
 
@@ -212,14 +208,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal int IndexOf(string parameterName, int luckyIndex)
 		{
-			bool parameterUnicodeName = Encoding.UTF8.GetByteCount(parameterName) != parameterName.Length;
-			bool collectionHasParameterWithUnicodeName = CollectionHasParameterWithUnicodeName;
-			StringComparison usedComparison = StringComparison.OrdinalIgnoreCase;
-			if (parameterUnicodeName || collectionHasParameterWithUnicodeName)
-			{
-				usedComparison = StringComparison.CurrentCultureIgnoreCase;
-			}
-
+			bool isNonAsciiParameterName = FbParameter.IsNonAsciiParameterName(parameterName);
+			StringComparison usedComparison = isNonAsciiParameterName || HasParameterWithNonAsciiName
+				? StringComparison.CurrentCultureIgnoreCase
+				: StringComparison.OrdinalIgnoreCase;
 			var normalizedParameterName = FbParameter.NormalizeParameterName(parameterName);
 			if (luckyIndex != -1 && luckyIndex < _parameters.Count)
 			{
@@ -323,6 +315,15 @@ namespace FirebirdSql.Data.FirebirdClient
 		protected override void SetParameter(string parameterName, DbParameter value)
 		{
 			this[parameterName] = (FbParameter)value;
+		}
+
+		#endregion
+
+		#region Internal Methods
+
+		internal void ParameterNameChanged()
+		{
+			_hasParameterWithNonAsciiName = null;
 		}
 
 		#endregion

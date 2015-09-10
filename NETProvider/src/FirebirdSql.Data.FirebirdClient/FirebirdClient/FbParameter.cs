@@ -61,12 +61,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			set
 			{
 				_parameterName = value;
-				_internalParameterName = NormalizeParameterName(value);
-				_isUnicodeParameterName = Encoding.UTF8.GetByteCount(value) != value.Length;
-				if (_parent != null)
-				{
-					_parent.ParameterNameFlagEvaluated = false;
-				}
+				_internalParameterName = NormalizeParameterName(_parameterName);
+				_isUnicodeParameterName = IsNonAsciiParameterName(_parameterName);
+				_parent?.ParameterNameChanged();
 			}
 		}
 
@@ -221,16 +218,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _parent; }
 			set
 			{
-				if (_parent != null)
-				{
-					_parent.ParameterNameFlagEvaluated = false;
-				}
-
+				_parent?.ParameterNameChanged();
 				_parent = value;
-				if (value != null)
-				{
-					value.ParameterNameFlagEvaluated = false;
-				}
+				_parent?.ParameterNameChanged();
 			}
 		}
 
@@ -495,6 +485,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			return string.IsNullOrEmpty(parameterName) || parameterName[0] == '@'
 				? parameterName
 				: "@" + parameterName;
+		}
+
+		internal static bool IsNonAsciiParameterName(string parameterName)
+		{
+			return Encoding.UTF8.GetByteCount(parameterName) != parameterName.Length;
 		}
 
 		#endregion

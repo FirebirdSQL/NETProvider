@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.UnitTests
 			const int noMatterValue = 12345;
 			const int deleteIndex = 12;
 			command.Parameters[probeParameterName].Value = noMatterValue;
-			Assert.IsFalse(command.Parameters.CollectionHasParameterWithUnicodeName);
+			Assert.IsFalse(command.Parameters.HasParameterWithNonAsciiName);
 
 			command.Parameters.Remove(command.Parameters[deleteIndex]);
 			command.Parameters[probeParameterName].Value = noMatterValue;
@@ -96,11 +96,11 @@ namespace FirebirdSql.Data.UnitTests
 			var parameter = new FbParameter() { ParameterName = "test" };
 			collection.Add(parameter);
 			var dummy1 = collection.IndexOf("dummy");
-			Assert.IsFalse(collection.CollectionHasParameterWithUnicodeName);
+			Assert.IsFalse(collection.HasParameterWithNonAsciiName);
 			parameter.ParameterName = "řčšřčšřčš";
 			var dummy2 = collection.IndexOf("dummy");
 			Assert.IsTrue(parameter.IsUnicodeParameterName);
-			Assert.IsTrue(collection.CollectionHasParameterWithUnicodeName);
+			Assert.IsTrue(collection.HasParameterWithNonAsciiName);
 		}
 
 		[Test]
