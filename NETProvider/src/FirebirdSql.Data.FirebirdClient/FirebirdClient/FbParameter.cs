@@ -358,8 +358,8 @@ namespace FirebirdSql.Data.FirebirdClient
 				_sourceColumn,
 				_sourceVersion,
 				_value)
-				{
-					Charset = _charset
+			{
+				Charset = _charset
 			};
 		}
 

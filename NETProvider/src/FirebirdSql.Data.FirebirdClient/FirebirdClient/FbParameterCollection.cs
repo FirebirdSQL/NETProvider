@@ -249,7 +249,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Remove(FbParameter value)
 		{
-			if(!_parameters.Remove(value))
+			if (!_parameters.Remove(value))
 			{
 				throw new ArgumentException("The parameter does not exist in the collection.");
 			}
