@@ -17,6 +17,7 @@
  *
  *  Contributors:
  *    Jiri Cincura (jiri@cincura.net)
+ *    Hennadii Zabula
  */
 
 using System;
