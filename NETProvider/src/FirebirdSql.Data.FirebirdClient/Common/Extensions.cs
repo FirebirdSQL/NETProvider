@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
@@ -34,8 +35,8 @@ namespace FirebirdSql.Data.Common
 
 			bool turnOn = time != 0 && interval != 0;
 			ulong[] input = new[]
-            	{
-            		turnOn ? (ulong)1 : (ulong)0,
+				{
+					turnOn ? (ulong)1 : (ulong)0,
 					time,
 					interval
 				};
@@ -73,6 +74,22 @@ namespace FirebirdSql.Data.Common
 		{
 			target = (T)weakReference.Target;
 			return target != null;
+		}
+
+		public static IntPtr ReadIntPtr(this BinaryReader self)
+		{
+			if (IntPtr.Size == sizeof(int))
+			{
+				return new IntPtr(self.ReadInt32());
+			}
+			else if (IntPtr.Size == sizeof(long))
+			{
+				return new IntPtr(self.ReadInt64());
+			}
+			else
+			{
+				throw new NotSupportedException();
+			}
 		}
 	}
 }

@@ -28,8 +28,8 @@ namespace FirebirdSql.Data.Client.Common
 {
 	internal static class XsqldaMarshaler
 	{
-		static int sizeofXSQLDA = Marshal.SizeOf(typeof(XSQLDA));
-		static int sizeofXSQLVAR = Marshal.SizeOf(typeof(XSQLVAR));
+		private static int sizeofXSQLDA = Marshal.SizeOf(typeof(XSQLDA));
+		private static int sizeofXSQLVAR = Marshal.SizeOf(typeof(XSQLVAR));
 
 		#region · Methods ·
 
@@ -38,19 +38,18 @@ namespace FirebirdSql.Data.Client.Common
 			if (pNativeData != IntPtr.Zero)
 			{
 				// Obtain XSQLDA information
-
 				XSQLDA xsqlda = (XSQLDA)Marshal.PtrToStructure(pNativeData, typeof(XSQLDA));
 
 				// Destroy XSQLDA structure
 				Marshal.DestroyStructure(pNativeData, typeof(XSQLDA));
 
 				// Destroy XSQLVAR structures
-				for (int i = 0; i < xsqlda.sqln; i++)
+				for (var i = 0; i < xsqlda.sqln; i++)
 				{
 					IntPtr ptr1 = GetIntPtr(pNativeData, ComputeLength(i));
 
 					// Free	sqldata	and	sqlind pointers	if needed
-					XSQLVAREmpty sqlvar = (XSQLVAREmpty)Marshal.PtrToStructure(ptr1, typeof(XSQLVAREmpty));
+					var sqlvar = (XSQLVAREmpty)Marshal.PtrToStructure(ptr1, typeof(XSQLVAREmpty));
 
 					if (sqlvar.sqldata != IntPtr.Zero)
 					{
@@ -78,14 +77,14 @@ namespace FirebirdSql.Data.Client.Common
 		public static IntPtr MarshalManagedToNative(Charset charset, Descriptor descriptor)
 		{
 			// Set up XSQLDA structure
-			XSQLDA xsqlda = new XSQLDA
+			var xsqlda = new XSQLDA
 			{
 				version = descriptor.Version,
 				sqln = descriptor.Count,
 				sqld = descriptor.ActualCount
 			};
 
-			XSQLVAR[] xsqlvar = new XSQLVAR[descriptor.Count];
+			var xsqlvar = new XSQLVAR[descriptor.Count];
 
 			for (var i = 0; i < xsqlvar.Length; i++)
 			{
@@ -137,14 +136,14 @@ namespace FirebirdSql.Data.Client.Common
 
 		public static IntPtr MarshalManagedToNative(XSQLDA xsqlda, XSQLVAR[] xsqlvar)
 		{
-			int size = ComputeLength(xsqlda.sqln);
-			IntPtr ptr = Marshal.AllocHGlobal(size);
+			var size = ComputeLength(xsqlda.sqln);
+			var ptr = Marshal.AllocHGlobal(size);
 
 			Marshal.StructureToPtr(xsqlda, ptr, true);
 
 			for (var i = 0; i < xsqlvar.Length; i++)
 			{
-				int offset = ComputeLength(i);
+				var offset = ComputeLength(i);
 				Marshal.StructureToPtr(xsqlvar[i], GetIntPtr(ptr, offset), true);
 			}
 
@@ -183,13 +182,13 @@ namespace FirebirdSql.Data.Client.Common
 		public static Descriptor MarshalNativeToManaged(Charset charset, IntPtr pNativeData, bool fetching)
 		{
 			// Obtain XSQLDA information
-			XSQLDA xsqlda = (XSQLDA)Marshal.PtrToStructure(pNativeData, typeof(XSQLDA));
+			var xsqlda = (XSQLDA)Marshal.PtrToStructure(pNativeData, typeof(XSQLDA));
 
 			// Create a	new	Descriptor
-			Descriptor descriptor = new Descriptor(xsqlda.sqln) { ActualCount = xsqlda.sqld };
+			var descriptor = new Descriptor(xsqlda.sqln) { ActualCount = xsqlda.sqld };
 
 			// Obtain XSQLVAR members information
-			XSQLVAR xsqlvar = new XSQLVAR();
+			var xsqlvar = new XSQLVAR();
 			for (var i = 0; i < xsqlda.sqln; i++)
 			{
 				var ptr = GetIntPtr(pNativeData, ComputeLength(i));
@@ -240,14 +239,11 @@ namespace FirebirdSql.Data.Client.Common
 			{
 				length += 4;
 			}
-
 			return length;
 		}
 
 		private static byte[] GetBytes(XSQLVAR xsqlvar)
 		{
-			byte[] buffer;
-
 			if (xsqlvar.sqllen == 0 || xsqlvar.sqldata == IntPtr.Zero)
 			{
 				return null;
@@ -256,13 +252,12 @@ namespace FirebirdSql.Data.Client.Common
 			switch (xsqlvar.sqltype & ~1)
 			{
 				case IscCodes.SQL_VARYING:
-					buffer = new byte[Marshal.ReadInt16(xsqlvar.sqldata)];
-					var tmp = GetIntPtr(xsqlvar.sqldata, 2);
-
-					Marshal.Copy(tmp, buffer, 0, buffer.Length);
-
-					return buffer;
-
+					{
+						var buffer = new byte[Marshal.ReadInt16(xsqlvar.sqldata)];
+						var tmp = GetIntPtr(xsqlvar.sqldata, 2);
+						Marshal.Copy(tmp, buffer, 0, buffer.Length);
+						return buffer;
+					}
 				case IscCodes.SQL_TEXT:
 				case IscCodes.SQL_SHORT:
 				case IscCodes.SQL_LONG:
@@ -276,11 +271,11 @@ namespace FirebirdSql.Data.Client.Common
 				case IscCodes.SQL_TIMESTAMP:
 				case IscCodes.SQL_TYPE_TIME:
 				case IscCodes.SQL_TYPE_DATE:
-					buffer = new byte[xsqlvar.sqllen];
-					Marshal.Copy(xsqlvar.sqldata, buffer, 0, buffer.Length);
-
-					return buffer;
-
+					{
+						var buffer = new byte[xsqlvar.sqllen];
+						Marshal.Copy(xsqlvar.sqldata, buffer, 0, buffer.Length);
+						return buffer;
+					}
 				default:
 					throw new NotSupportedException("Unknown data type");
 			}
@@ -289,16 +284,13 @@ namespace FirebirdSql.Data.Client.Common
 		private static byte[] GetStringBuffer(Charset charset, string value)
 		{
 			var buffer = new byte[32];
-
 			charset.GetBytes(value, 0, value.Length, buffer, 0);
-
 			return buffer;
 		}
 
 		private static string GetString(Charset charset, byte[] buffer)
 		{
 			var value = charset.GetString(buffer);
-
 			return value.TrimEnd('\0', ' ');
 		}
 
