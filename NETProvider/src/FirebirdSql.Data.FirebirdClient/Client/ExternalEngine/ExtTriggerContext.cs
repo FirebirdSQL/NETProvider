@@ -92,9 +92,9 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			_database.Charset.GetBytes(name, 0, name.Length, fieldName, 0);
 
 			// Marshal structures to pointer
-			ParamDscMarshaler marshaler = ParamDscMarshaler.Instance;
+			ParamDscMarshaler XsqldaMarshaler = ParamDscMarshaler.Instance;
 
-			IntPtr valuePtr = marshaler.MarshalManagedToNative();
+			IntPtr valuePtr = XsqldaMarshaler.MarshalManagedToNative();
 
 			bool result = SafeNativeMethods.isc_get_trigger_field(
 				statusVector,
@@ -102,8 +102,8 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				fieldName,
 				valuePtr);
 
-			value = marshaler.MarshalNativeToManaged(_database.Charset, valuePtr);
-			marshaler.CleanUpNativeData(ref valuePtr);
+			value = XsqldaMarshaler.MarshalNativeToManaged(_database.Charset, valuePtr);
+			XsqldaMarshaler.CleanUpNativeData(ref valuePtr);
 
 			ExtConnection.ParseStatusVector(statusVector);
 
@@ -118,9 +118,9 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			_database.Charset.GetBytes(name, 0, name.Length, fieldName, 0);
 
 			// Marshal structures to pointer
-			ParamDscMarshaler marshaler = ParamDscMarshaler.Instance;
+			ParamDscMarshaler XsqldaMarshaler = ParamDscMarshaler.Instance;
 
-			IntPtr valuePtr = marshaler.MarshalManagedToNative(_database.Charset, value);
+			IntPtr valuePtr = XsqldaMarshaler.MarshalManagedToNative(_database.Charset, value);
 
 			bool result = SafeNativeMethods.isc_set_trigger_field(
 				statusVector,
@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				fieldName,
 				valuePtr);
 
-			marshaler.CleanUpNativeData(ref valuePtr);
+			XsqldaMarshaler.CleanUpNativeData(ref valuePtr);
 
 			ExtConnection.ParseStatusVector(statusVector);
 		}
