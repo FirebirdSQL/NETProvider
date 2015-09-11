@@ -47,10 +47,11 @@ namespace FirebirdSql.Data.Client.Common
 				// Destroy XSQLVAR structures
 				for (var i = 0; i < xsqlda.sqln; i++)
 				{
-					IntPtr ptr1 = GetIntPtr(pNativeData, ComputeLength(i));
+					IntPtr ptr = GetIntPtr(pNativeData, ComputeLength(i));
 
 					// Free	sqldata	and	sqlind pointers	if needed
-					var sqlvar = (XSQLVAREmpty)Marshal.PtrToStructure(ptr1, typeof(XSQLVAREmpty));
+					var sqlvar = new XSQLVAR();
+					MarshalXSQLVAR(ptr, sqlvar, true);
 
 					if (sqlvar.sqldata != IntPtr.Zero)
 					{
@@ -64,8 +65,7 @@ namespace FirebirdSql.Data.Client.Common
 						sqlvar.sqlind = IntPtr.Zero;
 					}
 
-					Marshal.DestroyStructure(ptr1, typeof(XSQLVAREmpty));
-					Marshal.DestroyStructure(ptr1, typeof(XSQLVAR));
+					Marshal.DestroyStructure(ptr, typeof(XSQLVAR));
 				}
 
 				// Free	pointer	memory
@@ -156,30 +156,6 @@ namespace FirebirdSql.Data.Client.Common
 			return MarshalNativeToManaged(charset, pNativeData, false);
 		}
 
-		static void MarshalXSQLVAR(IntPtr ptr, XSQLVAR var)
-		{
-			unsafe
-			{
-				using (BinaryReader reader = new BinaryReader(new UnmanagedMemoryStream((byte*)ptr.ToPointer(), sizeofXSQLVAR)))
-				{
-					var.sqltype = reader.ReadInt16();
-					var.sqlscale = reader.ReadInt16();
-					var.sqlsubtype = reader.ReadInt16();
-					var.sqllen = reader.ReadInt16();
-					var.sqldata = reader.ReadIntPtr();
-					var.sqlind = reader.ReadIntPtr();
-					var.sqlname_length = reader.ReadInt16();
-					var.sqlname = reader.ReadBytes(32);
-					var.relname_length = reader.ReadInt16();
-					var.relname = reader.ReadBytes(32);
-					var.ownername_length = reader.ReadInt16();
-					var.ownername = reader.ReadBytes(32);
-					var.aliasname_length = reader.ReadInt16();
-					var.aliasname = reader.ReadBytes(32);
-				}
-			}
-		}
-
 		public static Descriptor MarshalNativeToManaged(Charset charset, IntPtr pNativeData, bool fetching)
 		{
 			// Obtain XSQLDA information
@@ -227,6 +203,30 @@ namespace FirebirdSql.Data.Client.Common
 		#endregion
 
 		#region · Private Methods ·
+
+		private static void MarshalXSQLVAR(IntPtr ptr, XSQLVAR var, bool onlyPointers = false)
+		{
+			unsafe
+			{
+				using (BinaryReader reader = new BinaryReader(new UnmanagedMemoryStream((byte*)ptr.ToPointer(), sizeofXSQLVAR)))
+				{
+					if (!onlyPointers) var.sqltype = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) var.sqlscale = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) var.sqlsubtype = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) var.sqllen = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					var.sqldata = reader.ReadIntPtr();
+					var.sqlind = reader.ReadIntPtr();
+					if (!onlyPointers) var.sqlname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) var.sqlname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
+					if (!onlyPointers) var.relname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) var.relname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
+					if (!onlyPointers) var.ownername_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) var.ownername = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
+					if (!onlyPointers) var.aliasname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) var.aliasname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
+				}
+			}
+		}
 
 		private static IntPtr GetIntPtr(IntPtr ptr, int offset)
 		{
