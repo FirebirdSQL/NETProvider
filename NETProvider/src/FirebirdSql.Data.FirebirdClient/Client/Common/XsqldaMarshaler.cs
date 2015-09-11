@@ -204,26 +204,26 @@ namespace FirebirdSql.Data.Client.Common
 
 		#region · Private Methods ·
 
-		private static void MarshalXSQLVARNativeToManaged(IntPtr ptr, XSQLVAR var, bool onlyPointers = false)
+		private static void MarshalXSQLVARNativeToManaged(IntPtr ptr, XSQLVAR xsqlvar, bool onlyPointers = false)
 		{
 			unsafe
 			{
 				using (BinaryReader reader = new BinaryReader(new UnmanagedMemoryStream((byte*)ptr.ToPointer(), sizeofXSQLVAR)))
 				{
-					if (!onlyPointers) var.sqltype = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
-					if (!onlyPointers) var.sqlscale = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
-					if (!onlyPointers) var.sqlsubtype = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
-					if (!onlyPointers) var.sqllen = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
-					var.sqldata = reader.ReadIntPtr();
-					var.sqlind = reader.ReadIntPtr();
-					if (!onlyPointers) var.sqlname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
-					if (!onlyPointers) var.sqlname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
-					if (!onlyPointers) var.relname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
-					if (!onlyPointers) var.relname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
-					if (!onlyPointers) var.ownername_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
-					if (!onlyPointers) var.ownername = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
-					if (!onlyPointers) var.aliasname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
-					if (!onlyPointers) var.aliasname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
+					if (!onlyPointers) xsqlvar.sqltype = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) xsqlvar.sqlscale = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) xsqlvar.sqlsubtype = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) xsqlvar.sqllen = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					xsqlvar.sqldata = reader.ReadIntPtr();
+					xsqlvar.sqlind = reader.ReadIntPtr();
+					if (!onlyPointers) xsqlvar.sqlname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) xsqlvar.sqlname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
+					if (!onlyPointers) xsqlvar.relname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) xsqlvar.relname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
+					if (!onlyPointers) xsqlvar.ownername_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) xsqlvar.ownername = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
+					if (!onlyPointers) xsqlvar.aliasname_length = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
+					if (!onlyPointers) xsqlvar.aliasname = reader.ReadBytes(32); else reader.BaseStream.Position += 32;
 				}
 			}
 		}
