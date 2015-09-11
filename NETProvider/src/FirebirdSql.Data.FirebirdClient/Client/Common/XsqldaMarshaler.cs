@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Client.Common
 
 					// Free	sqldata	and	sqlind pointers	if needed
 					var sqlvar = new XSQLVAR();
-					MarshalXSQLVAR(ptr, sqlvar, true);
+					MarshalXSQLVARNativeToManaged(ptr, sqlvar, true);
 
 					if (sqlvar.sqldata != IntPtr.Zero)
 					{
@@ -169,7 +169,7 @@ namespace FirebirdSql.Data.Client.Common
 			for (var i = 0; i < xsqlda.sqln; i++)
 			{
 				var ptr = GetIntPtr(pNativeData, ComputeLength(i));
-				MarshalXSQLVAR(ptr, xsqlvar);
+				MarshalXSQLVARNativeToManaged(ptr, xsqlvar);
 
 				// Map XSQLVAR information to Descriptor
 				descriptor[i].DataType = xsqlvar.sqltype;
@@ -204,7 +204,7 @@ namespace FirebirdSql.Data.Client.Common
 
 		#region · Private Methods ·
 
-		private static void MarshalXSQLVAR(IntPtr ptr, XSQLVAR var, bool onlyPointers = false)
+		private static void MarshalXSQLVARNativeToManaged(IntPtr ptr, XSQLVAR var, bool onlyPointers = false)
 		{
 			unsafe
 			{
