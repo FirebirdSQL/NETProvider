@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
 		}
 
-		private byte[] getSalt() {
+		public byte[] GetSalt() {
 			byte[] b = new byte[SRP_SALT_SIZE];
 			random.GetBytes(b);
 			b = fromHexString("FB12C0444CEF82EB62E80DFA2085DC5F9CB515B3FB462F2898F108D544E32319");
@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return rc;
 		}
 
-		private Tuple<BigInteger, BigInteger> serverSeed(String user, String password, byte[] salt) {
+		public Tuple<BigInteger, BigInteger> ServerSeed(String user, String password, byte[] salt) {
 			BigInteger v = BigInteger.ModPow(g, getUserHash(user, password, salt), N);
 			BigInteger b = getSecret();
 			BigInteger gb = BigInteger.ModPow(g, b, N);
@@ -133,7 +133,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return new Tuple<BigInteger, BigInteger>(B, b);
 		}
 
-		private byte[] getServerSessionKey(String user, String password, byte[] salt, BigInteger A, BigInteger B, BigInteger b) {
+		public byte[] GetServerSessionKey(String user, String password, byte[] salt, BigInteger A, BigInteger B, BigInteger b) {
 			BigInteger u = getScramble(A, B);
 			BigInteger v = BigInteger.ModPow(g, getUserHash(user, password, salt), N);
 			BigInteger vu = BigInteger.ModPow(v, u, N);
@@ -215,25 +215,5 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return sessionKey;
 		}
 
-		public static void Main(string[] args) {
-			String user = "SYSDBA";
-			String password = "masterkey";
-
-			for (int i = 0; i < 1000; i++) {
-				SrpClient srpClient = new SrpClient();
-				byte[] salt = srpClient.getSalt();
-
-				Tuple<BigInteger, BigInteger> serverKeyPair = srpClient.serverSeed(user, password, salt);
-				byte[] serverSessionKey = srpClient.getServerSessionKey(
-					user, password, salt, srpClient.getPublicKey(),
-					serverKeyPair.Item1, serverKeyPair.Item2);
-				byte[] proof = srpClient.clientProof(user, password, salt, serverKeyPair.Item1);
-
-				if (!serverSessionKey.SequenceEqual(srpClient.getSessionKey())) {
-					Console.WriteLine("Fail");
-					break;
-				}
-			}
-		}
 	}
 }
