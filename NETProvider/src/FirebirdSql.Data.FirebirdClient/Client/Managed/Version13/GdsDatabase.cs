@@ -67,43 +67,5 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 			WriteBuffer(dpb.ToArray());
 		}
-
-		#region Override Statement Creation Methods
-
-		public override StatementBase CreateStatement()
-		{
-			return new GdsStatement(this);
-		}
-
-		public override StatementBase CreateStatement(ITransaction transaction)
-		{
-			return new GdsStatement(this, transaction);
-		}
-
-		#endregion
-
-		#region Cancel Methods
-
-		public override void CancelOperation(int kind)
-		{
-			try
-			{
-				SendCancelOperationToBuffer(kind);
-				Flush();
-				// no response, this is async
-			}
-			catch (IOException)
-			{
-				throw new IscException(IscCodes.isc_network_error);
-			}
-		}
-
-		protected void SendCancelOperationToBuffer(int kind)
-		{
-			Write(IscCodes.op_cancel);
-			Write(kind);
-		}
-
-		#endregion
 	}
 }

@@ -138,7 +138,6 @@
     <Compile Include="Client\Managed\Version12\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version12\GdsStatement.cs" />
     <Compile Include="Client\Managed\Version13\GdsDatabase.cs" />
-    <Compile Include="Client\Managed\Version13\GdsStatement.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\IscErrorMessages.cs" />
     <Compile Include="Common\PageSizeHelper.cs" />
