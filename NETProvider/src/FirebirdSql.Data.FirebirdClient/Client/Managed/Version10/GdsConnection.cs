@@ -172,13 +172,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				outputStream.Write(1);							// Architecture	of client -	Generic
 				outputStream.Write(2);							// Minimum type (ptype_rpc)
 				outputStream.Write(3);							// Maximum type (ptype_batch_send)
-				outputStream.Write(1);							// Preference weight
+				outputStream.Write(0);							// Preference weight
 
 				outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
 				outputStream.Write(1);							// Architecture	of client -	Generic
 				outputStream.Write(2);							// Minumum type (ptype_rpc)
 				outputStream.Write(5);							// Maximum type (ptype_lazy_send)
-				outputStream.Write(2);							// Preference weight
+				outputStream.Write(1);							// Preference weight
 
 				outputStream.Write(IscCodes.PROTOCOL_VERSION12);//	Protocol version
 				outputStream.Write(1);							// Architecture	of client -	Generic
@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				outputStream.Write(1);							// Architecture	of client -	Generic
 				outputStream.Write(2);							// Minumum type (ptype_rpc)
 				outputStream.Write(5);							// Maximum type (ptype_lazy_send)
-				outputStream.Write(2);							// Preference weight
+				outputStream.Write(3);							// Preference weight
 
 				outputStream.Flush();
 
