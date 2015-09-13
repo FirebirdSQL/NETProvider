@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private int _protocolVersion;
 		private int _protocolArchitecture;
 		private int _protocolMinimunType;
-		private SrpClient _srpClient = new SrpClient();
+		private SrpClient _srpClient;
 		private byte[] _authData;
 
 		#endregion
@@ -112,6 +112,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_portNumber = portNumber;
 			_packetSize = packetSize;
 			_characterSet = characterSet;
+			_srpClient = new SrpClient();
 
 			GC.SuppressFinalize(this);
 		}
