@@ -27,8 +27,7 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture(FbServerType.Default)]
-	[TestFixture(FbServerType.Embedded)]
+	[TestFixture]
 	public class SrpTests
 	{
 		#region Unit Tests
@@ -46,7 +45,7 @@ namespace FirebirdSql.Data.UnitTests
 			byte[] serverSessionKey = srpClient.GetServerSessionKey(
 					user, password, salt, srpClient.getPublicKey(),
 					serverKeyPair.Item1, serverKeyPair.Item2);
-			byte[] proof = srpClient.clientProof(user, password, salt, serverKeyPair.Item1);
+			srpClient.clientProof(user, password, salt, serverKeyPair.Item1);
 
 			Assert.AreEqual(serverSessionKey.ToString(), srpClient.getSessionKey().ToString());
 		}
