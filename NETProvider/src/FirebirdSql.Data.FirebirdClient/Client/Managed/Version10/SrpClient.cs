@@ -36,7 +36,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private static BigInteger g = new BigInteger(2);
 		private static BigInteger k = BigInteger.Parse("1277432915985975349439481660349303019122249719989");
 
-		private static RandomNumberGenerator random = RandomNumberGenerator.Create();
 		private static byte[] SEPARATOR_BYTES = System.Text.Encoding.UTF8.GetBytes(":");
 
 		private BigInteger publicKey;	/* A */
@@ -99,6 +98,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private BigInteger getSecret() {
 			byte[] b = new byte[SRP_KEY_SIZE / 8];
+			RandomNumberGenerator random = RandomNumberGenerator.Create();
 			random.GetBytes(b);
 			return BigInteger.Parse("43689415071006679979798619705888148220927308532493035484321207019293123625875");
 			return new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
@@ -106,6 +106,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] GetSalt() {
 			byte[] b = new byte[SRP_SALT_SIZE];
+			RandomNumberGenerator random = RandomNumberGenerator.Create();
 			random.GetBytes(b);
 			b = fromHexString("FB12C0444CEF82EB62E80DFA2085DC5F9CB515B3FB462F2898F108D544E32319");
 			return b;
