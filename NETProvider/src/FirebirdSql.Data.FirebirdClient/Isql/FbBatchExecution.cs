@@ -29,9 +29,6 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Isql
 {
-	/// <summary>
-	/// Summary description for BatchExecution.
-	/// </summary>
 	public class FbBatchExecution
 	{
 		#region Events
