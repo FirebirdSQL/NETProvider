@@ -132,13 +132,8 @@ namespace FirebirdSql.Data.Isql
 				throw new InvalidOperationException("There are no commands for execution.");
 			}
 
-			foreach (string sqlStatement in SqlStatements)
+			foreach (string sqlStatement in SqlStatements.Where(x => !string.IsNullOrEmpty(x)))
 			{
-				if (string.IsNullOrEmpty(sqlStatement))
-				{
-					continue;
-				}
-
 				// initializate outputs to default
 				int rowsAffected = -1;
 				FbDataReader dataReader = null;
