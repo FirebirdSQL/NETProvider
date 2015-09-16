@@ -411,9 +411,10 @@ namespace FirebirdSql.Data.Isql
 					CloseConnection();
 
 					throw new FbException(string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
-						Environment.NewLine,
-						sqlStatement,
-						ex.Message));
+							Environment.NewLine,
+							sqlStatement,
+							ex.Message),
+						ex);
 				}
 			}
 
