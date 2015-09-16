@@ -55,6 +55,7 @@ namespace FirebirdSql.Data.Isql
 
 		// control fields
 		private bool _requiresNewConnection;
+		private bool _shouldClose;
 
 		#endregion
 
@@ -128,6 +129,8 @@ namespace FirebirdSql.Data.Isql
 			{
 				throw new InvalidOperationException("There are no commands for execution.");
 			}
+
+			_shouldClose = false;
 
 			foreach (string sqlStatement in SqlStatements.Where(x => !string.IsNullOrEmpty(x)))
 			{
@@ -405,6 +408,7 @@ namespace FirebirdSql.Data.Isql
 				catch (Exception ex)
 				{
 					RollbackTransaction();
+					CloseConnection();
 
 					throw new FbException(string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
 						Environment.NewLine,
@@ -414,8 +418,7 @@ namespace FirebirdSql.Data.Isql
 			}
 
 			CommitTransaction();
-
-			_sqlConnection.Close();
+			CloseConnection();
 		}
 
 		#endregion
@@ -632,11 +635,9 @@ namespace FirebirdSql.Data.Isql
 		{
 			if (_requiresNewConnection)
 			{
-				if ((_sqlConnection != null) &&
-					((_sqlConnection.State != ConnectionState.Closed) ||
-					(_sqlConnection.State != ConnectionState.Broken)))
+				if (_sqlConnection != null && _sqlConnection.State != ConnectionState.Closed)
 				{
-					_sqlConnection.Close();
+					CloseConnection();
 				}
 				_sqlConnection = new FbConnection(_connectionString.ToString());
 			}
@@ -644,6 +645,7 @@ namespace FirebirdSql.Data.Isql
 			if (_sqlConnection.State == ConnectionState.Closed)
 			{
 				_sqlConnection.Open();
+				_shouldClose = true;
 			}
 
 			return _sqlConnection;
@@ -681,6 +683,14 @@ namespace FirebirdSql.Data.Isql
 			{
 				_sqlTransaction.Rollback();
 				_sqlTransaction = null;
+			}
+		}
+
+		protected void CloseConnection()
+		{
+			if (_shouldClose)
+			{
+				_sqlConnection.Close();
 			}
 		}
 
