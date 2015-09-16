@@ -702,11 +702,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="sqlCommand">The SQL command that is going for execution.</param>
 		protected void OnCommandExecuting(FbCommand sqlCommand)
 		{
-			if (CommandExecuting != null)
-			{
-				CommandExecutingEventArgs e = new CommandExecutingEventArgs(sqlCommand);
-				CommandExecuting(this, e);
-			}
+			CommandExecuting?.Invoke(this, new CommandExecutingEventArgs(sqlCommand));
 		}
 
 		/// <summary>
@@ -721,11 +717,7 @@ namespace FirebirdSql.Data.Isql
 		/// be setled to <b>-1</b>.</param>
 		protected void OnCommandExecuted(string commandText, FbDataReader dataReader, int rowsAffected)
 		{
-			if (CommandExecuted != null)
-			{
-				CommandExecutedEventArgs e = new CommandExecutedEventArgs(dataReader, commandText, rowsAffected);
-				CommandExecuted(this, e);
-			}
+			CommandExecuted?.Invoke(this, new CommandExecutedEventArgs(dataReader, commandText, rowsAffected));
 		}
 
 		#endregion
