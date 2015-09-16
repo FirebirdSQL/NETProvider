@@ -2,6 +2,7 @@
 *.user
 bin
 obj
-*/installer/out/
+DataDesignerExtensibility/installer/out/
 DataDesignerExtensibility/installer/in/
+NETProvider/deploy/out
 *.nupkg
