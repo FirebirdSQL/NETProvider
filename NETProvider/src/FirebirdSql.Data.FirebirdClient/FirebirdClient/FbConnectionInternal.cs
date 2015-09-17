@@ -94,8 +94,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			_preparedCommandsCleanupSyncRoot = new object();
 
 			_options = options;
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -104,9 +102,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		~FbConnectionInternal()
 		{
-			// Do not re-create Dispose clean-up code here.
-			// Calling Dispose(false) is optimal in terms of
-			// readability and maintainability.
 			Dispose(false);
 		}
 
@@ -117,12 +112,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		public void Dispose()
 		{
 			Dispose(true);
-
-			// This object will be cleaned up by the Dispose method.
-			// Therefore, you should call GC.SupressFinalize to
-			// take this object off the finalization queue
-			// and prevent finalization code for this object
-			// from executing a second time.
 			GC.SuppressFinalize(this);
 		}
 
@@ -132,13 +121,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (!_disposed)
 				{
-					// release any unmanaged resources
 					Disconnect();
 
 					if (disposing)
-					{
-						// release managed resources here
-					}
+					{ }
 
 					_disposed = true;
 				}
@@ -204,9 +190,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				try
 				{
 					_db.Dispose();
-				}
-				catch
-				{
 				}
 				finally
 				{
