@@ -60,15 +60,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private static byte[] Pad
 		{
-			get
-			{
-				if (pad == null)
-				{
-					pad = new byte[] { 0, 0, 0, 0 };
-				}
-
-				return pad;
-			}
+			get { return pad ?? (pad = new byte[] { 0, 0, 0, 0 }); }
 		}
 
 		#endregion
