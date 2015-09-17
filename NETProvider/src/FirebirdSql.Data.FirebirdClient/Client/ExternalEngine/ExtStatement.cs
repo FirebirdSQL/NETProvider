@@ -124,7 +124,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public override int FetchSize
 		{
 			get { return 200; }
-			set { ;	}
+			set { }
 		}
 
 		public override bool ReturnRecordsAffected
