@@ -161,8 +161,6 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				Transaction = transaction;
 			}
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -175,35 +173,30 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				try
 				{
-					// release any unmanaged resources
 					Release();
 				}
 				catch
-				{
-				}
-				finally
-				{
-					// release any managed resources
-					if (disposing)
-					{
-						Clear();
+				{ }
 
-						_db = null;
-						_fields = null;
-						_parameters = null;
-						_transaction = null;
-						_outputParams = null;
-						_statusVector = null;
-						_allRowsFetched = false;
-						_state = StatementState.Deallocated;
-						_statementType = DbStatementType.None;
-						_recordsAffected = 0;
-						_handle = 0;
-						FetchSize = 0;
-					}
+				if (disposing)
+				{
+					Clear();
 
-					base.Dispose(disposing);
+					_db = null;
+					_fields = null;
+					_parameters = null;
+					_transaction = null;
+					_outputParams = null;
+					_statusVector = null;
+					_allRowsFetched = false;
+					_state = StatementState.Deallocated;
+					_statementType = DbStatementType.None;
+					_recordsAffected = 0;
+					_handle = 0;
+					FetchSize = 0;
 				}
+
+				base.Dispose(disposing);
 			}
 		}
 
@@ -288,8 +281,8 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_dsql_prepare(
 					_statusVector,
-					ref	trHandle,
-					ref	stmtHandle,
+					ref trHandle,
+					ref stmtHandle,
 					(short)buffer.Length,
 					buffer,
 					_db.Dialect,
@@ -299,7 +292,7 @@ namespace FirebirdSql.Data.Client.Native
 				Descriptor descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
 
 				// Free	memory
-				XsqldaMarshaler.CleanUpNativeData(ref	sqlda);
+				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 
 				// Parse status	vector
 				_db.ParseStatusVector(_statusVector);
@@ -363,8 +356,8 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_dsql_execute2(
 					_statusVector,
-					ref	trHandle,
-					ref	stmtHandle,
+					ref trHandle,
+					ref stmtHandle,
 					IscCodes.SQLDA_VERSION1,
 					inSqlda,
 					outSqlda);
@@ -385,8 +378,8 @@ namespace FirebirdSql.Data.Client.Native
 				}
 
 				// Free	memory
-				XsqldaMarshaler.CleanUpNativeData(ref	inSqlda);
-				XsqldaMarshaler.CleanUpNativeData(ref	outSqlda);
+				XsqldaMarshaler.CleanUpNativeData(ref inSqlda);
+				XsqldaMarshaler.CleanUpNativeData(ref outSqlda);
 
 				_db.ParseStatusVector(_statusVector);
 
@@ -504,7 +497,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_dsql_describe(
 					_statusVector,
-					ref	stmtHandle,
+					ref stmtHandle,
 					IscCodes.SQLDA_VERSION1,
 					sqlda);
 
@@ -512,7 +505,7 @@ namespace FirebirdSql.Data.Client.Native
 				Descriptor descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
 
 				// Free	memory
-				XsqldaMarshaler.CleanUpNativeData(ref	sqlda);
+				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 
 				// Parse status	vector
 				_db.ParseStatusVector(_statusVector);
@@ -539,7 +532,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_dsql_describe_bind(
 					_statusVector,
-					ref	stmtHandle,
+					ref stmtHandle,
 					IscCodes.SQLDA_VERSION1,
 					sqlda);
 
@@ -554,21 +547,21 @@ namespace FirebirdSql.Data.Client.Native
 					descriptor = new Descriptor(n);
 
 					// Fre memory
-					XsqldaMarshaler.CleanUpNativeData(ref	sqlda);
+					XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 
 					// Marshal new structure
 					sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, descriptor);
 
 					_db.FbClient.isc_dsql_describe_bind(
 						_statusVector,
-						ref	stmtHandle,
+						ref stmtHandle,
 						IscCodes.SQLDA_VERSION1,
 						sqlda);
 
 					descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
 
 					// Free	memory
-					XsqldaMarshaler.CleanUpNativeData(ref	sqlda);
+					XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 
 					// Parse status	vector
 					_db.ParseStatusVector(_statusVector);
@@ -584,7 +577,7 @@ namespace FirebirdSql.Data.Client.Native
 				// Free	memory
 				if (sqlda != IntPtr.Zero)
 				{
-					XsqldaMarshaler.CleanUpNativeData(ref	sqlda);
+					XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 				}
 
 				// Update parameter	descriptor
@@ -614,7 +607,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_dsql_free_statement(
 					_statusVector,
-					ref	stmtHandle,
+					ref stmtHandle,
 					(short)option);
 
 				_handle = stmtHandle;
@@ -660,7 +653,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_dsql_sql_info(
 					_statusVector,
-					ref	stmtHandle,
+					ref stmtHandle,
 					(short)items.Length,
 					items,
 					(short)bufferLength,
@@ -709,8 +702,8 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_dsql_allocate_statement(
 					_statusVector,
-					ref	dbHandle,
-					ref	stmtHandle);
+					ref dbHandle,
+					ref stmtHandle);
 
 				_db.ParseStatusVector(_statusVector);
 

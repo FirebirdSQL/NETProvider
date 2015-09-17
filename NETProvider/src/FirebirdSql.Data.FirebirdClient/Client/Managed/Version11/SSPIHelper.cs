@@ -432,11 +432,12 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				if (!_disposed)
 				{
-					if (disposing)
-					{
-					}
 					CloseClientContext();
 					CloseClientCredentials();
+
+					if (disposing)
+					{ }
+
 					_disposed = true;
 				}
 			}

@@ -132,8 +132,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_packetSize = 8192;
 			_inputStream = _connection.CreateXdrStream();
 			_outputStream = _connection.CreateXdrStream();
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -163,31 +161,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					try
 					{
-						// release any unmanaged resources
 						Detach();
 					}
 					catch
-					{
-					}
-					finally
-					{
-						// release any managed resources
-						if (disposing)
-						{
-							_connection = null;
-							_charset = null;
-							_eventManager = null;
-							_serverVersion = null;
-							_dialect = 0;
-							_eventsId = 0;
-							_handle = 0;
-							_packetSize = 0;
-							_warningMessage = null;
-							_transactionCount = 0;
-						}
+					{ }
 
-						_disposed = true;
+					if (disposing)
+					{
+						_connection = null;
+						_charset = null;
+						_eventManager = null;
+						_serverVersion = null;
+						_dialect = 0;
+						_eventsId = 0;
+						_handle = 0;
+						_packetSize = 0;
+						_warningMessage = null;
+						_transactionCount = 0;
 					}
+
+					_disposed = true;
 				}
 			}
 		}

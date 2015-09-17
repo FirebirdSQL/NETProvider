@@ -133,8 +133,6 @@ namespace FirebirdSql.Data.Client.Native
 			_dialect = 3;
 			_packetSize = 8192;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -164,29 +162,24 @@ namespace FirebirdSql.Data.Client.Native
 				{
 					try
 					{
-						// release any unmanaged resources
 						Detach();
 					}
 					catch
-					{
-					}
-					finally
-					{
-						// release any managed resources
-						if (disposing)
-						{
-							_warningMessage = null;
-							_charset = null;
-							_serverVersion = null;
-							_statusVector = null;
-							_transactionCount = 0;
-							_dialect = 0;
-							_handle = 0;
-							_packetSize = 0;
-						}
+					{ }
 
-						_disposed = true;
+					if (disposing)
+					{
+						_warningMessage = null;
+						_charset = null;
+						_serverVersion = null;
+						_statusVector = null;
+						_transactionCount = 0;
+						_dialect = 0;
+						_handle = 0;
+						_packetSize = 0;
 					}
+
+					_disposed = true;
 				}
 			}
 		}

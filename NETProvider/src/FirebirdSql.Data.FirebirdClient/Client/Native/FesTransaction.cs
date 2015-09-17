@@ -81,8 +81,6 @@ namespace FirebirdSql.Data.Client.Native
 			_db = (FesDatabase)db;
 			_state = TransactionState.NoTransaction;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -112,25 +110,20 @@ namespace FirebirdSql.Data.Client.Native
 				{
 					try
 					{
-						// release any unmanaged resources
 						Rollback();
 					}
 					catch
-					{
-					}
-					finally
-					{
-						// release any managed resources
-						if (disposing)
-						{
-							_db = null;
-							_handle = 0;
-							_state = TransactionState.NoTransaction;
-							_statusVector = null;
-						}
+					{ }
 
-						_disposed = true;
+					if (disposing)
+					{
+						_db = null;
+						_handle = 0;
+						_state = TransactionState.NoTransaction;
+						_statusVector = null;
 					}
+
+					_disposed = true;
 				}
 			}
 		}
@@ -177,7 +170,7 @@ namespace FirebirdSql.Data.Client.Native
 
 					_db.FbClient.isc_start_multiple(
 						_statusVector,
-						ref	trHandle,
+						ref trHandle,
 						1,
 						tebData);
 

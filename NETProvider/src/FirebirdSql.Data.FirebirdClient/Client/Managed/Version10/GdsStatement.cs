@@ -30,18 +30,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region Fields
 
-		protected int			    _handle;
-		protected GdsDatabase       _database;
-		private GdsTransaction      _transaction;
-		protected Descriptor	    _parameters;
-		protected Descriptor	    _fields;
-		protected StatementState	_state;
-		protected DbStatementType   _statementType;
-		protected bool			    _allRowsFetched;
-		private Queue<DbValue[]>    _rows;
-		private Queue<DbValue[]>    _outputParams;
-		private int				    _fetchSize;
-		private bool                _returnRecordsAffected;
+		protected int _handle;
+		protected GdsDatabase _database;
+		private GdsTransaction _transaction;
+		protected Descriptor _parameters;
+		protected Descriptor _fields;
+		protected StatementState _state;
+		protected DbStatementType _statementType;
+		protected bool _allRowsFetched;
+		private Queue<DbValue[]> _rows;
+		private Queue<DbValue[]> _outputParams;
+		private int _fetchSize;
+		private bool _returnRecordsAffected;
 
 		#endregion
 
@@ -163,8 +163,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				Transaction = transaction;
 			}
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -179,35 +177,30 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					try
 					{
-						// release any unmanaged resources
 						Release();
 					}
 					catch
-					{
-					}
-					finally
-					{
-						// release any managed resources
-						if (disposing)
-						{
-							Clear();
+					{ }
 
-							_rows = null;
-							_outputParams = null;
-							_database = null;
-							_fields = null;
-							_parameters = null;
-							_transaction = null;
-							_allRowsFetched = false;
-							_state = StatementState.Deallocated;
-							_statementType = DbStatementType.None;
-							_handle = 0;
-							_fetchSize = 0;
-							RecordsAffected = 0;
-						}
+					if (disposing)
+					{
+						Clear();
 
-						base.Dispose(disposing);
+						_rows = null;
+						_outputParams = null;
+						_database = null;
+						_fields = null;
+						_parameters = null;
+						_transaction = null;
+						_allRowsFetched = false;
+						_state = StatementState.Deallocated;
+						_statementType = DbStatementType.None;
+						_handle = 0;
+						_fetchSize = 0;
+						RecordsAffected = 0;
 					}
+
+					base.Dispose(disposing);
 				}
 			}
 		}

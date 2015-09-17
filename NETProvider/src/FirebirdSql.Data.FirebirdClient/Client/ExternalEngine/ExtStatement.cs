@@ -157,8 +157,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			{
 				Transaction = transaction;
 			}
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -171,10 +169,11 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			{
 				try
 				{
-					// release any unmanaged resources
 					Release();
+				}
+				catch
+				{ }
 
-					// release any managed resources
 					if (disposing)
 					{
 						Clear();
@@ -189,13 +188,10 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 						_state = StatementState.Deallocated;
 						_handle = 0;
 					}
-				}
-				finally
-				{
+
 					base.Dispose(disposing);
 				}
 			}
-		}
 
 		#endregion
 

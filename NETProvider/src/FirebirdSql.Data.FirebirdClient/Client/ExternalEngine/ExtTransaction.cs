@@ -81,8 +81,6 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			_db = (ExtDatabase)db;
 			_state = TransactionState.NoTransaction;
 			_statusVector = new int[IscCodes.ISC_STATUS_LENGTH];
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -112,22 +110,20 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 				{
 					try
 					{
-						// release any unmanaged resources
 						Rollback();
+					}
+					catch
+					{ }
 
-						// release any managed resources
-						if (disposing)
-						{
-							_db = null;
-							_handle = 0;
-							_state = TransactionState.NoTransaction;
-							_statusVector = null;
-						}
-					}
-					finally
+					if (disposing)
 					{
-						_disposed = true;
+						_db = null;
+						_handle = 0;
+						_state = TransactionState.NoTransaction;
+						_statusVector = null;
 					}
+
+					_disposed = true;
 				}
 			}
 		}
