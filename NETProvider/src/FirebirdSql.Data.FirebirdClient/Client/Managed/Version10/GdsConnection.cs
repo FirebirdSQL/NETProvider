@@ -118,9 +118,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				// Make	the	socket to connect to the Server
 				_socket.Connect(endPoint);
 				_networkStream = new NetworkStream(_socket, true);
-
-				GC.SuppressFinalize(_socket);
-				GC.SuppressFinalize(_networkStream);
 			}
 			catch (SocketException)
 			{
