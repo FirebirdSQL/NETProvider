@@ -91,8 +91,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_portNumber = portNumber;
 			_packetSize = packetSize;
 			_characterSet = characterSet;
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
