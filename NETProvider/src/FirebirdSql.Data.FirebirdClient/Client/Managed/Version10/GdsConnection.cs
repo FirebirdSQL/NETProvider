@@ -195,7 +195,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public XdrStream CreateXdrStream()
 		{
-			return new XdrStream(new BufferedStream(_networkStream), _characterSet, false);
+			return new XdrStream(new BufferedStream(_networkStream, 32 * 1024), _characterSet, false);
 		}
 
 		public virtual void Disconnect()
