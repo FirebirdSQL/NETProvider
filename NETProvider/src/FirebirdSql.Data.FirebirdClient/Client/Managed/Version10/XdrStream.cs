@@ -782,7 +782,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region Private Methods
+		#region Private Properties
 
 		private bool ValidOperationAvailable
 		{
