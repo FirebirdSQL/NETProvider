@@ -135,19 +135,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				if (_innerStream != null)
-				{
-					_innerStream.Close();
-				}
+				_innerStream?.Close();
 			}
 			catch
-			{
-			}
-			finally
-			{
-				_charset = null;
-				_innerStream = null;
-			}
+			{ }
+
+			_innerStream = null;
+			_charset = null;
 		}
 
 		public override void Flush()
