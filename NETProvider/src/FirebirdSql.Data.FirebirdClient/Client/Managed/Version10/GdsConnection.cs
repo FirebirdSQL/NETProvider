@@ -210,8 +210,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_networkStream.Close();
 			}
 
-			_socket = null;
 			_networkStream = null;
+			_socket = null;
 		}
 
 		#endregion
