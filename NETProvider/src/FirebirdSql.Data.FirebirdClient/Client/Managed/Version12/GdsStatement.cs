@@ -60,7 +60,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 					SendExecuteToBuffer();
 
-					_database.Flush();
+					_database.XdrStream.Flush();
 
 					// sql?, execute
 					int numberOfResponses =
@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 						// Grab rows affected
 						SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
-						_database.Flush();
+						_database.XdrStream.Flush();
 
 						//rows affected
 						numberOfResponses = 1;

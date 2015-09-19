@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 					numberOfResponses++;
 
-					_database.Flush();
+					_database.XdrStream.Flush();
 
 					// allocate, prepare, statement type
 					try
@@ -144,7 +144,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 						readRowsAffectedResponse = true;
 					}
 
-					_database.Flush();
+					_database.XdrStream.Flush();
 
 					// sql?, execute, rows affected?
 					int numberOfResponses =

@@ -64,11 +64,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Write(IscCodes.op_service_attach);
-					_database.Write(0);
-					_database.Write(service);
-					_database.WriteBuffer(spb.ToArray());
-					_database.Flush();
+					_database.XdrStream.Write(IscCodes.op_service_attach);
+					_database.XdrStream.Write(0);
+					_database.XdrStream.Write(service);
+					_database.XdrStream.WriteBuffer(spb.ToArray());
+					_database.XdrStream.Flush();
 
 					response = _database.ReadGenericResponse();
 
@@ -89,10 +89,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Write(IscCodes.op_service_detach);
-					_database.Write(Handle);
-					_database.Write(IscCodes.op_disconnect);
-					_database.Flush();
+					_database.XdrStream.Write(IscCodes.op_service_detach);
+					_database.XdrStream.Write(Handle);
+					_database.XdrStream.Write(IscCodes.op_disconnect);
+					_database.XdrStream.Flush();
 
 					_handle = 0;
 				}
@@ -125,11 +125,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Write(IscCodes.op_service_start);
-					_database.Write(Handle);
-					_database.Write(0);
-					_database.WriteBuffer(spb.ToArray(), spb.Length);
-					_database.Flush();
+					_database.XdrStream.Write(IscCodes.op_service_start);
+					_database.XdrStream.Write(Handle);
+					_database.XdrStream.Write(0);
+					_database.XdrStream.WriteBuffer(spb.ToArray(), spb.Length);
+					_database.XdrStream.Flush();
 
 					try
 					{
@@ -158,14 +158,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Write(IscCodes.op_service_info);  //	operation
-					_database.Write(Handle);                //	db_handle
-					_database.Write(0);                                     //	incarnation
-					_database.WriteBuffer(spb.ToArray(), spb.Length);       //	Service parameter buffer
-					_database.WriteBuffer(requestBuffer, requestLength);    //	request	buffer
-					_database.Write(bufferLength);              //	result buffer length
+					_database.XdrStream.Write(IscCodes.op_service_info);  //	operation
+					_database.XdrStream.Write(Handle);                //	db_handle
+					_database.XdrStream.Write(0);                                     //	incarnation
+					_database.XdrStream.WriteBuffer(spb.ToArray(), spb.Length);       //	Service parameter buffer
+					_database.XdrStream.WriteBuffer(requestBuffer, requestLength);    //	request	buffer
+					_database.XdrStream.Write(bufferLength);              //	result buffer length
 
-					_database.Flush();
+					_database.XdrStream.Flush();
 
 					GenericResponse response = _database.ReadGenericResponse();
 

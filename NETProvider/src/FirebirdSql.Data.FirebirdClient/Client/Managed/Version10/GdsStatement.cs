@@ -256,17 +256,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					{
 						// Allocate statement
 						SendAllocateToBuffer();
-						_database.Flush();
+						_database.XdrStream.Flush();
 						ProcessAllocateResponce(_database.ReadGenericResponse());
 					}
 
 					SendPrepareToBuffer(commandText);
-					_database.Flush();
+					_database.XdrStream.Flush();
 					ProcessPrepareResponse(_database.ReadGenericResponse());
 
 					// Grab statement type
 					SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
-					_database.Flush();
+					_database.XdrStream.Flush();
 					_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
 
 
@@ -300,7 +300,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					SendExecuteToBuffer();
 
-					_database.Flush();
+					_database.XdrStream.Flush();
 
 					if (_statementType == DbStatementType.StoredProcedure)
 					{
@@ -318,7 +318,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						StatementType == DbStatementType.StoredProcedure))
 					{
 						SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
-						_database.Flush();
+						_database.XdrStream.Flush();
 						RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
 					}
 
@@ -351,12 +351,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					try
 					{
-						_database.Write(IscCodes.op_fetch);
-						_database.Write(_handle);
-						_database.WriteBuffer(_fields.ToBlrArray());
-						_database.Write(0);             // p_sqldata_message_number
-						_database.Write(_fetchSize);    // p_sqldata_messages
-						_database.Flush();
+						_database.XdrStream.Write(IscCodes.op_fetch);
+						_database.XdrStream.Write(_handle);
+						_database.XdrStream.WriteBuffer(_fields.ToBlrArray());
+						_database.XdrStream.Write(0);             // p_sqldata_message_number
+						_database.XdrStream.Write(_fetchSize);    // p_sqldata_messages
+						_database.XdrStream.Flush();
 
 						if (_database.NextOperation() == IscCodes.op_fetch_response)
 						{
@@ -441,13 +441,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region op_prepare methods
 		protected void SendPrepareToBuffer(string commandText)
 		{
-			_database.Write(IscCodes.op_prepare_statement);
-			_database.Write(_transaction.Handle);
-			_database.Write(_handle);
-			_database.Write((int)_database.Dialect);
-			_database.Write(commandText);
-			_database.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
-			_database.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE);
+			_database.XdrStream.Write(IscCodes.op_prepare_statement);
+			_database.XdrStream.Write(_transaction.Handle);
+			_database.XdrStream.Write(_handle);
+			_database.XdrStream.Write((int)_database.Dialect);
+			_database.XdrStream.Write(commandText);
+			_database.XdrStream.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
+			_database.XdrStream.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE);
 		}
 
 		protected void ProcessPrepareResponse(GenericResponse response)
@@ -465,7 +465,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			lock (_database.SyncObject)
 			{
 				DoInfoSqlPacket(items, bufferLength);
-				_database.Flush();
+				_database.XdrStream.Flush();
 				return ProcessInfoSqlResponse(_database.ReadGenericResponse());
 			}
 		}
@@ -484,11 +484,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void SendInfoSqlToBuffer(byte[] items, int bufferLength)
 		{
-			_database.Write(IscCodes.op_info_sql);
-			_database.Write(_handle);
-			_database.Write(0);
-			_database.WriteBuffer(items, items.Length);
-			_database.Write(bufferLength);
+			_database.XdrStream.Write(IscCodes.op_info_sql);
+			_database.XdrStream.Write(_handle);
+			_database.XdrStream.Write(0);
+			_database.XdrStream.WriteBuffer(items, items.Length);
+			_database.XdrStream.Write(bufferLength);
 		}
 
 		protected byte[] ProcessInfoSqlResponse(GenericResponse respose)
@@ -507,7 +507,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			lock (_database.SyncObject)
 			{
 				DoFreePacket(option);
-				_database.Flush();
+				_database.XdrStream.Flush();
 				ProcessFreeResponse(_database.ReadResponse());
 			}
 		}
@@ -550,9 +550,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void SendFreeToBuffer(int option)
 		{
-			_database.Write(IscCodes.op_free_statement);
-			_database.Write(_handle);
-			_database.Write(option);
+			_database.XdrStream.Write(IscCodes.op_free_statement);
+			_database.XdrStream.Write(_handle);
+			_database.XdrStream.Write(option);
 		}
 
 		protected void ProcessFreeResponse(IResponse response)
@@ -564,8 +564,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region op_allocate_statement methods
 		protected void SendAllocateToBuffer()
 		{
-			_database.Write(IscCodes.op_allocate_statement);
-			_database.Write(_database.Handle);
+			_database.XdrStream.Write(IscCodes.op_allocate_statement);
+			_database.XdrStream.Write(_database.Handle);
 		}
 
 		protected void ProcessAllocateResponce(GenericResponse response)
@@ -594,34 +594,34 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			// Write the message
 			if (_statementType == DbStatementType.StoredProcedure)
 			{
-				_database.Write(IscCodes.op_execute2);
+				_database.XdrStream.Write(IscCodes.op_execute2);
 			}
 			else
 			{
-				_database.Write(IscCodes.op_execute);
+				_database.XdrStream.Write(IscCodes.op_execute);
 			}
 
-			_database.Write(_handle);
-			_database.Write(_transaction.Handle);
+			_database.XdrStream.Write(_handle);
+			_database.XdrStream.Write(_transaction.Handle);
 
 			if (_parameters != null)
 			{
-				_database.WriteBuffer(_parameters.ToBlrArray());
-				_database.Write(0); // Message number
-				_database.Write(1); // Number of messages
-				_database.Write(descriptor, 0, descriptor.Length);
+				_database.XdrStream.WriteBuffer(_parameters.ToBlrArray());
+				_database.XdrStream.Write(0); // Message number
+				_database.XdrStream.Write(1); // Number of messages
+				_database.XdrStream.Write(descriptor, 0, descriptor.Length);
 			}
 			else
 			{
-				_database.WriteBuffer(null);
-				_database.Write(0);
-				_database.Write(0);
+				_database.XdrStream.WriteBuffer(null);
+				_database.XdrStream.Write(0);
+				_database.XdrStream.Write(0);
 			}
 
 			if (_statementType == DbStatementType.StoredProcedure)
 			{
-				_database.WriteBuffer((_fields == null) ? null : _fields.ToBlrArray());
-				_database.Write(0); // Output message number
+				_database.XdrStream.WriteBuffer((_fields == null) ? null : _fields.ToBlrArray());
+				_database.XdrStream.Write(0); // Output message number
 			}
 		}
 
@@ -673,7 +673,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					try
 					{
-						value = _database.ReadValue(_fields[i]);
+						value = _database.XdrStream.ReadValue(_fields[i]);
 						row[i] = new DbValue(this, _fields[i], value);
 					}
 					catch (IOException)

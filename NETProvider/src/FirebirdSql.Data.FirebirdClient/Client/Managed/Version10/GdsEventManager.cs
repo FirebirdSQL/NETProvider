@@ -128,10 +128,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							return;
 
 						case IscCodes.op_event:
-							var dbHandle = _database.ReadInt32();
-							var buffer = _database.ReadBuffer();
-							var ast = _database.ReadBytes(8);
-							var eventId = _database.ReadInt32();
+							var dbHandle = _database.XdrStream.ReadInt32();
+							var buffer = _database.XdrStream.ReadBuffer();
+							var ast = _database.XdrStream.ReadBytes(8);
+							var eventId = _database.XdrStream.ReadInt32();
 
 							RemoteEvent currentEvent;
 							if (_events.TryRemove(eventId, out currentEvent))

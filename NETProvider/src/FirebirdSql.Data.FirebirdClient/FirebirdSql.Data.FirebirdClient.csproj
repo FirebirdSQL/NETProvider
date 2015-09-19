@@ -181,7 +181,6 @@
     <Compile Include="Client\Managed\Version10\GdsServiceManager.cs" />
     <Compile Include="Client\Managed\Version10\GdsStatement.cs" />
     <Compile Include="Client\Managed\Version10\GdsTransaction.cs" />
-    <Compile Include="Client\Managed\Version10\IDatabaseStream.cs" />
     <Compile Include="Client\Managed\Version10\XdrStream.cs" />
     <Compile Include="Client\Managed\Version11\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version11\GdsStatement.cs" />

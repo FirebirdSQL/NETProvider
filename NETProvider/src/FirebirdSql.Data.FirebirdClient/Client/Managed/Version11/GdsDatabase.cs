@@ -77,7 +77,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 						byte[] authData = sspiHelper.InitializeClientSecurity();
 						SendTrustedAuthToBuffer(dpb, authData);
 						SendAttachToBuffer(dpb, database);
-						Flush();
+						XdrStream.Flush();
 
 						IResponse response = ReadResponse();
 						ProcessTrustedAuthResponse(sspiHelper, ref response);
@@ -113,9 +113,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			while (response is AuthResponse)
 			{
 				byte[] authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
-				Write(IscCodes.op_trusted_auth);
-				WriteBuffer(authData);
-				Flush();
+				XdrStream.Write(IscCodes.op_trusted_auth);
+				XdrStream.WriteBuffer(authData);
+				XdrStream.Flush();
 				response = ReadResponse();
 			}
 		}
@@ -158,7 +158,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			switch (operation)
 			{
 				case IscCodes.op_trusted_auth:
-					return new AuthResponse(ReadBuffer());
+					return new AuthResponse(XdrStream.ReadBuffer());
 
 				default:
 					return base.ProcessOperation(operation);

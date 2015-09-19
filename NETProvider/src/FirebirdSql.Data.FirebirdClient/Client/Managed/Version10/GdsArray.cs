@@ -105,14 +105,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					byte[] sdl = GenerateSDL(Descriptor);
 
-					_database.Write(IscCodes.op_get_slice); // Op code
-					_database.Write(_transaction.Handle);// Transaction
-					_database.Write(_handle);           // Array id
-					_database.Write(sliceLength);           // Slice length
-					_database.WriteBuffer(sdl);             // Slice descriptor	language
-					_database.Write(string.Empty);          // Slice parameters
-					_database.Write(0);                     // Slice proper
-					_database.Flush();
+					_database.XdrStream.Write(IscCodes.op_get_slice); // Op code
+					_database.XdrStream.Write(_transaction.Handle);// Transaction
+					_database.XdrStream.Write(_handle);           // Array id
+					_database.XdrStream.Write(sliceLength);           // Slice length
+					_database.XdrStream.WriteBuffer(sdl);             // Slice descriptor	language
+					_database.XdrStream.Write(string.Empty);          // Slice parameters
+					_database.XdrStream.Write(0);                     // Slice proper
+					_database.XdrStream.Flush();
 
 					return ReceiveSliceResponse(Descriptor);
 				}
@@ -132,15 +132,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					byte[] sdl = GenerateSDL(Descriptor);
 					byte[] slice = EncodeSliceArray(sourceArray);
 
-					_database.Write(IscCodes.op_put_slice);     // Op code
-					_database.Write(_transaction.Handle);   // Transaction
-					_database.Write((long)0);                   // Array Handle
-					_database.Write(sliceLength);               // Slice length
-					_database.WriteBuffer(sdl);                 // Slice descriptor	language
-					_database.Write(string.Empty);              // Slice parameters
-					_database.Write(sliceLength);               // Slice length
-					_database.Write(slice, 0, slice.Length);    // Slice proper
-					_database.Flush();
+					_database.XdrStream.Write(IscCodes.op_put_slice);     // Op code
+					_database.XdrStream.Write(_transaction.Handle);   // Transaction
+					_database.XdrStream.Write((long)0);                   // Array Handle
+					_database.XdrStream.Write(sliceLength);               // Slice length
+					_database.XdrStream.WriteBuffer(sdl);                 // Slice descriptor	language
+					_database.XdrStream.Write(string.Empty);              // Slice parameters
+					_database.XdrStream.Write(sliceLength);               // Slice length
+					_database.XdrStream.Write(slice, 0, slice.Length);    // Slice proper
+					_database.XdrStream.Flush();
 
 					GenericResponse response = _database.ReadGenericResponse();
 
@@ -275,9 +275,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					// Read	slice length
 					bool	isVariying = false;
 					int		elements = 0;
-					int		length = _database.ReadInt32();
+					int		length = _database.XdrStream.ReadInt32();
 
-					length = _database.ReadInt32();
+					length = _database.XdrStream.ReadInt32();
 
 					switch (desc.DataType)
 					{
@@ -306,7 +306,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 						for (int i = 0; i < elements; i++)
 						{
-							byte[] buffer = _database.ReadOpaque(_database.ReadInt32());
+							byte[] buffer = _database.XdrStream.ReadOpaque(_database.XdrStream.ReadInt32());
 
 							xdr.WriteBuffer(buffer, buffer.Length);
 						}
@@ -315,7 +315,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					else
 					{
-						return _database.ReadOpaque(length);
+						return _database.XdrStream.ReadOpaque(length);
 					}
 				}
 				else

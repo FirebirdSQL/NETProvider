@@ -42,11 +42,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Constructors
 
-		public GdsBlob(IDatabase db, ITransaction transaction) : this(db, transaction, 0)
+		public GdsBlob(IDatabase db, ITransaction transaction)
+			: this(db, transaction, 0)
 		{
 		}
 
-		public GdsBlob(IDatabase db, ITransaction transaction, long blobId) : base(db)
+		public GdsBlob(IDatabase db, ITransaction transaction, long blobId)
+			: base(db)
 		{
 			if (!(db is GdsDatabase))
 			{
@@ -101,11 +103,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Write(IscCodes.op_get_segment);
-					_database.Write(_blobHandle);
-					_database.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
-					_database.Write(0); // Data	segment
-					_database.Flush();
+					_database.XdrStream.Write(IscCodes.op_get_segment);
+					_database.XdrStream.Write(_blobHandle);
+					_database.XdrStream.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
+					_database.XdrStream.Write(0); // Data	segment
+					_database.XdrStream.Flush();
 
 					GenericResponse response = _database.ReadGenericResponse();
 
@@ -127,8 +129,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						return buffer;
 					}
 
-					int len     = 0;
-					int srcpos  = 0;
+					int len = 0;
+					int srcpos = 0;
 					int destpos = 0;
 
 					while (srcpos < buffer.Length)
@@ -137,7 +139,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						srcpos += 2;
 
 						Buffer.BlockCopy(buffer, srcpos, buffer, destpos, len);
-						srcpos	+= len;
+						srcpos += len;
 						destpos += len;
 					}
 
@@ -159,10 +161,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Write(IscCodes.op_batch_segments);
-					_database.Write(_blobHandle);
-					_database.WriteBlobBuffer(buffer);
-					_database.Flush();
+					_database.XdrStream.Write(IscCodes.op_batch_segments);
+					_database.XdrStream.Write(_blobHandle);
+					_database.XdrStream.WriteBlobBuffer(buffer);
+					_database.XdrStream.Flush();
 
 					_database.ReadResponse();
 				}
@@ -179,11 +181,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Write(IscCodes.op_seek_blob);
-					_database.Write(_blobHandle);
-					_database.Write(0);                 // Seek	mode
-					_database.Write(position);          // Seek	offset
-					_database.Flush();
+					_database.XdrStream.Write(IscCodes.op_seek_blob);
+					_database.XdrStream.Write(_blobHandle);
+					_database.XdrStream.Write(0);                 // Seek mode
+					_database.XdrStream.Write(position);          // Seek offset
+					_database.XdrStream.Flush();
 
 					GenericResponse response = (GenericResponse)_database.ReadResponse();
 
@@ -221,14 +223,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Write(op);
+					_database.XdrStream.Write(op);
 					if (bpb != null)
 					{
-						_database.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
+						_database.XdrStream.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
 					}
-					_database.Write(_transaction.Handle);
-					_database.Write(_blobId);
-					_database.Flush();
+					_database.XdrStream.Write(_transaction.Handle);
+					_database.XdrStream.Write(_blobId);
+					_database.XdrStream.Flush();
 
 					GenericResponse response = _database.ReadGenericResponse();
 

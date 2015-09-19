@@ -39,20 +39,20 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			// Attach to the database
-			Write(IscCodes.op_attach);
-			Write(0);				    // Database	object ID
+			XdrStream.Write(IscCodes.op_attach);
+			XdrStream.Write(0);				    // Database	object ID
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			WriteBuffer(Encoding.UTF8.GetBytes(database));              // Database	PATH
-			WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));              // Database	PATH
+			XdrStream.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
 		}
 
 		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			Write(IscCodes.op_create);
-			Write(0);
+			XdrStream.Write(IscCodes.op_create);
+			XdrStream.Write(0);
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			WriteBuffer(Encoding.UTF8.GetBytes(database));
-			WriteBuffer(dpb.ToArray());
+			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 
 		#region Override Statement Creation Methods
@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			try
 			{
 				SendCancelOperationToBuffer(kind);
-				Flush();
+				XdrStream.Flush();
 				// no response, this is async
 			}
 			catch (IOException)
@@ -87,8 +87,8 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		protected void SendCancelOperationToBuffer(int kind)
 		{
-			Write(IscCodes.op_cancel);
-			Write(kind);
+			XdrStream.Write(IscCodes.op_cancel);
+			XdrStream.Write(kind);
 		}
 
 		#endregion
