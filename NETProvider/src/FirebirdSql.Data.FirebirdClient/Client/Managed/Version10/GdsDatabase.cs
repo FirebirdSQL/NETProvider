@@ -58,8 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private int _eventsId;
 		private int _operation;
 		private bool _disposed;
-		private XdrStream _outputStream;
-		private XdrStream _inputStream;
+		private XdrStream _xdrStream;
 		private object _syncObject;
 
 		#endregion
@@ -130,8 +129,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_charset = Charset.DefaultCharset;
 			_dialect = 3;
 			_packetSize = 8192;
-			_inputStream = _connection.CreateXdrStream();
-			_outputStream = _connection.CreateXdrStream();
+			_xdrStream = _connection.CreateXdrStream();
 		}
 
 		#endregion
@@ -265,15 +263,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					// Disconnect
 					CloseConnection();
 
+#warning Here
 					// Close Input and Output streams
-					if (_inputStream != null)
-					{
-						_inputStream.Close();
-					}
-					if (_outputStream != null)
-					{
-						_outputStream.Close();
-					}
+					_xdrStream?.Close();
 
 					// Clear members
 					_transactionCount = 0;
@@ -281,8 +273,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					_dialect = 0;
 					_packetSize = 0;
 					_operation = 0;
-					_outputStream = null;
-					_inputStream = null;
+					_xdrStream = null;
 					_charset = null;
 					_connection = null;
 					_serverVersion = null;
@@ -657,12 +648,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual int ReadOperation()
 		{
-			return _inputStream.ReadOperation();
+			return _xdrStream.ReadOperation();
 		}
 
 		public virtual int NextOperation()
 		{
-			return _inputStream.ReadNextOperation();
+			return _xdrStream.ReadNextOperation();
 		}
 
 		public virtual IResponse ReadResponse()
@@ -858,92 +849,92 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] ReadBytes(int count)
 		{
-			return _inputStream.ReadBytes(count);
+			return _xdrStream.ReadBytes(count);
 		}
 
 		public byte[] ReadOpaque(int length)
 		{
-			return _inputStream.ReadOpaque(length);
+			return _xdrStream.ReadOpaque(length);
 		}
 
 		public byte[] ReadBuffer()
 		{
-			return _inputStream.ReadBuffer();
+			return _xdrStream.ReadBuffer();
 		}
 
 		public string ReadString()
 		{
-			return _inputStream.ReadString();
+			return _xdrStream.ReadString();
 		}
 
 		public string ReadString(int length)
 		{
-			return _inputStream.ReadString(length);
+			return _xdrStream.ReadString(length);
 		}
 
 		public string ReadString(Charset charset)
 		{
-			return _inputStream.ReadString(charset);
+			return _xdrStream.ReadString(charset);
 		}
 
 		public string ReadString(Charset charset, int length)
 		{
-			return _inputStream.ReadString(charset, length);
+			return _xdrStream.ReadString(charset, length);
 		}
 
 		public short ReadInt16()
 		{
-			return _inputStream.ReadInt16();
+			return _xdrStream.ReadInt16();
 		}
 
 		public int ReadInt32()
 		{
-			return _inputStream.ReadInt32();
+			return _xdrStream.ReadInt32();
 		}
 
 		public long ReadInt64()
 		{
-			return _inputStream.ReadInt64();
+			return _xdrStream.ReadInt64();
 		}
 
 		public Guid ReadGuid(int length)
 		{
-			return _inputStream.ReadGuid(length);
+			return _xdrStream.ReadGuid(length);
 		}
 
 		public float ReadSingle()
 		{
-			return _inputStream.ReadSingle();
+			return _xdrStream.ReadSingle();
 		}
 
 		public double ReadDouble()
 		{
-			return _inputStream.ReadDouble();
+			return _xdrStream.ReadDouble();
 		}
 
 		public DateTime ReadDateTime()
 		{
-			return _inputStream.ReadDateTime();
+			return _xdrStream.ReadDateTime();
 		}
 
 		public DateTime ReadDate()
 		{
-			return _inputStream.ReadDate();
+			return _xdrStream.ReadDate();
 		}
 
 		public TimeSpan ReadTime()
 		{
-			return _inputStream.ReadTime();
+			return _xdrStream.ReadTime();
 		}
 
 		public decimal ReadDecimal(int type, int scale)
 		{
-			return _inputStream.ReadDecimal(type, scale);
+			return _xdrStream.ReadDecimal(type, scale);
 		}
 
 		public object ReadValue(DbField field)
 		{
-			return _inputStream.ReadValue(field);
+			return _xdrStream.ReadValue(field);
 		}
 
 		#endregion
@@ -952,107 +943,107 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void WriteOpaque(byte[] buffer)
 		{
-			_outputStream.WriteOpaque(buffer);
+			_xdrStream.WriteOpaque(buffer);
 		}
 
 		public void WriteOpaque(byte[] buffer, int length)
 		{
-			_outputStream.WriteOpaque(buffer, length);
+			_xdrStream.WriteOpaque(buffer, length);
 		}
 
 		public void WriteBuffer(byte[] buffer)
 		{
-			_outputStream.WriteBuffer(buffer);
+			_xdrStream.WriteBuffer(buffer);
 		}
 
 		public void WriteBuffer(byte[] buffer, int length)
 		{
-			_outputStream.WriteBuffer(buffer, length);
+			_xdrStream.WriteBuffer(buffer, length);
 		}
 
 		public void WriteBlobBuffer(byte[] buffer)
 		{
-			_outputStream.WriteBlobBuffer(buffer);
+			_xdrStream.WriteBlobBuffer(buffer);
 		}
 
 		public void WriteTyped(int type, byte[] buffer)
 		{
-			_outputStream.WriteTyped(type, buffer);
+			_xdrStream.WriteTyped(type, buffer);
 		}
 
 		public void Write(string value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(short value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(int value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(long value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(float value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(double value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(decimal value, int type, int scale)
 		{
-			_outputStream.Write(value, type, scale);
+			_xdrStream.Write(value, type, scale);
 		}
 
 		public void Write(bool value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(DateTime value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void WriteDate(DateTime value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void WriteTime(DateTime value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(Descriptor value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(DbField value)
 		{
-			_outputStream.Write(value);
+			_xdrStream.Write(value);
 		}
 
 		public void Write(byte[] buffer, int offset, int count)
 		{
-			_outputStream.Write(buffer, offset, count);
+			_xdrStream.Write(buffer, offset, count);
 		}
 
 		public void Flush()
 		{
-			_outputStream.Flush();
+			_xdrStream.Flush();
 		}
 
 		#endregion

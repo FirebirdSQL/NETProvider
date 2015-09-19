@@ -128,85 +128,81 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public virtual void Identify(string database)
 		{
 			// handles this.networkStream
-			XdrStream inputStream = CreateXdrStream();
-			XdrStream outputStream = CreateXdrStream();
-
-			try
+			using (var xdrStream = CreateXdrStream())
 			{
-				outputStream.Write(IscCodes.op_connect);
-				outputStream.Write(IscCodes.op_attach);
-				outputStream.Write(IscCodes.CONNECT_VERSION2);	// CONNECT_VERSION2
-				outputStream.Write(1);							// Architecture	of client -	Generic
-
-				outputStream.Write(database);					// Database	path
-				outputStream.Write(3);							// Protocol	versions understood
-				outputStream.WriteBuffer(UserIdentificationStuff());	// User	identification Stuff
-
-				outputStream.Write(IscCodes.PROTOCOL_VERSION10);//	Protocol version
-				outputStream.Write(1);							// Architecture	of client -	Generic
-				outputStream.Write(2);							// Minimum type (ptype_rpc)
-				outputStream.Write(3);							// Maximum type (ptype_batch_send)
-				outputStream.Write(0);							// Preference weight
-
-				outputStream.Write(IscCodes.PROTOCOL_VERSION11);//	Protocol version
-				outputStream.Write(1);							// Architecture	of client -	Generic
-				outputStream.Write(2);							// Minumum type (ptype_rpc)
-				outputStream.Write(5);							// Maximum type (ptype_lazy_send)
-				outputStream.Write(1);							// Preference weight
-
-				outputStream.Write(IscCodes.PROTOCOL_VERSION12);//	Protocol version
-				outputStream.Write(1);							// Architecture	of client -	Generic
-				outputStream.Write(2);							// Minumum type (ptype_rpc)
-				outputStream.Write(5);							// Maximum type (ptype_lazy_send)
-				outputStream.Write(2);							// Preference weight
-
-				outputStream.Flush();
-
-				if (inputStream.ReadOperation() == IscCodes.op_accept)
+				try
 				{
-					_protocolVersion = inputStream.ReadInt32(); // Protocol	version
-					_protocolArchitecture = inputStream.ReadInt32();    // Architecture	for	protocol
-					_protocolMinimunType = inputStream.ReadInt32();	// Minimum type
+					xdrStream.Write(IscCodes.op_connect);
+					xdrStream.Write(IscCodes.op_attach);
+					xdrStream.Write(IscCodes.CONNECT_VERSION2);          // CONNECT_VERSION2
+					xdrStream.Write(1);                                  // Architecture of client - Generic
 
-					if (_protocolVersion < 0)
+					xdrStream.Write(database);                           // Database path
+					xdrStream.Write(3);                                  // Protocol versions understood
+					xdrStream.WriteBuffer(UserIdentificationStuff());    // User identification Stuff
+
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION10);    // Protocol version
+					xdrStream.Write(1);                              // Architecture of client - Generic
+					xdrStream.Write(2);                              // Minimum type (ptype_rpc)
+					xdrStream.Write(3);                              // Maximum type (ptype_batch_send)
+					xdrStream.Write(0);                              // Preference weight
+
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION11);    // Protocol version
+					xdrStream.Write(1);                              // Architecture of client - Generic
+					xdrStream.Write(2);                              // Minumum type (ptype_rpc)
+					xdrStream.Write(5);                              // Maximum type (ptype_lazy_send)
+					xdrStream.Write(1);                              // Preference weight
+
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION12);    // Protocol version
+					xdrStream.Write(1);                              // Architecture of client - Generic
+					xdrStream.Write(2);                              // Minumum type (ptype_rpc)
+					xdrStream.Write(5);                              // Maximum type (ptype_lazy_send)
+					xdrStream.Write(2);                              // Preference weight
+
+					xdrStream.Flush();
+
+					if (xdrStream.ReadOperation() == IscCodes.op_accept)
 					{
-						_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
+						_protocolVersion = xdrStream.ReadInt32(); // Protocol version
+						_protocolArchitecture = xdrStream.ReadInt32(); // Architecture for protocol
+						_protocolMinimunType = xdrStream.ReadInt32(); // Minimum type
+
+						if (_protocolVersion < 0)
+						{
+							_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
+						}
+					}
+					else
+					{
+						try
+						{
+							Disconnect();
+						}
+						catch
+						{
+						}
+						finally
+						{
+							throw new IscException(IscCodes.isc_connect_reject);
+						}
 					}
 				}
-				else
+				catch (IOException)
 				{
-					try
-					{
-						Disconnect();
-					}
-					catch
-					{
-					}
-					finally
-					{
-						throw new IscException(IscCodes.isc_connect_reject);
-					}
+					throw new IscException(IscCodes.isc_network_error);
 				}
-			}
-			catch (IOException)
-			{
-				throw new IscException(IscCodes.isc_network_error);
 			}
 		}
 
 		public XdrStream CreateXdrStream()
 		{
-			return new XdrStream(new BufferedStream(_networkStream), _characterSet);
+			return new XdrStream(new BufferedStream(_networkStream), _characterSet, false);
 		}
 
 		public virtual void Disconnect()
 		{
 			// socket is owned by network stream, so it'll be closed automatically
-			if (_networkStream != null)
-			{
-				_networkStream.Close();
-			}
-
+			_networkStream?.Close();
 			_networkStream = null;
 			_socket = null;
 		}

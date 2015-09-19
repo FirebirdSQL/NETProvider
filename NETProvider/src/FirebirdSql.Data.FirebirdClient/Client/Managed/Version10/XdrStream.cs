@@ -67,8 +67,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Fields
 
-		private Charset _charset;
 		private Stream _innerStream;
+		private Charset _charset;
+		private bool _ownsStream;
 		private int _operation;
 
 		#endregion
@@ -110,21 +111,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{ }
 
 		public XdrStream(Charset charset)
-			: this(new MemoryStream(), charset)
+			: this(new MemoryStream(), charset, true)
 		{ }
 
 		public XdrStream(byte[] buffer, Charset charset)
-			: this(new MemoryStream(buffer), charset)
+			: this(new MemoryStream(buffer), charset, true)
 		{ }
 
-		public XdrStream(Stream innerStream, Charset charset)
+		public XdrStream(Stream innerStream, Charset charset, bool ownsStream)
 			: base()
 		{
 			_innerStream = innerStream;
 			_charset = charset;
+			_ownsStream = ownsStream;
 			ResetOperation();
-
-			GC.SuppressFinalize(innerStream);
 		}
 
 		#endregion
@@ -135,7 +135,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				_innerStream?.Close();
+				if (_ownsStream)
+				{
+					_innerStream?.Close();
+				}
 			}
 			catch
 			{ }
