@@ -50,6 +50,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		private readonly DbModificationCommandTree _commandTree;
 		private readonly List<DbParameter> _parameters;
 		private readonly Dictionary<EdmMember, List<DbParameter>> _memberValues;
+		private readonly bool generateParameters;
 		private int _parameterNameCount = 0;
 
 		#endregion
@@ -272,11 +273,11 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			if (generateParameters)
 			{
 				var parameter = CreateParameter(expression.Value, expression.ResultType);
-			_commandText.Append(parameter.ParameterName);
-		}
+				_commandText.Append(parameter.ParameterName);
+			}
 			else
 			{
-				using (var writer = new SqlWriter(commandText))
+				using (var writer = new SqlWriter(_commandText))
 				{
 					var sqlGenerator = new SqlGenerator();
 					sqlGenerator.WriteSql(writer, expression.Accept(sqlGenerator));
