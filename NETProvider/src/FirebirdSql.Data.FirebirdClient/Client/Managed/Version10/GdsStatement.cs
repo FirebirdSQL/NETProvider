@@ -747,7 +747,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								int n = IscHelper.VaxInteger(info, currentPosition, len);
 								rowDescs[currentDescriptorIndex] = new Descriptor((short)n);
 								if (n == 0)
+								{
+									currentPosition += len;
 									goto Break;
+								}
 							}
 							currentPosition += len;
 							break;
