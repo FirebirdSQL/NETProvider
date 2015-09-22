@@ -148,26 +148,16 @@ namespace FirebirdSql.Data.Common
 		{
 			get
 			{
-				if (IsArray())
-				{
-					return _arrayHandle;
-				}
-				else
-				{
-					throw new IscException("Field is not an array type");
-				}
+				EnsureArray();
+
+				return _arrayHandle;
 			}
 
 			set
 			{
-				if (IsArray())
-				{
-					_arrayHandle = value;
-				}
-				else
-				{
-					throw new IscException("Field is not an array type");
-				}
+				EnsureArray();
+
+				_arrayHandle = value;
 			}
 		}
 
@@ -496,7 +486,7 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					default:
-						throw new IscException("Unknown sql data type: " + DataType);
+						throw new IscException($"Unknown sql data type: {DataType}.");
 				}
 			}
 		}
@@ -637,6 +627,12 @@ namespace FirebirdSql.Data.Common
 				default:
 					throw new SystemException("Invalid data type");
 			}
+		}
+
+		private void EnsureArray()
+		{
+			if (!IsArray())
+				throw new IscException("Field is not an array type.");
 		}
 
 		#endregion
