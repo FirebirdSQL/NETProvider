@@ -119,9 +119,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_socket.Connect(endPoint);
 				_networkStream = new NetworkStream(_socket, true);
 			}
-			catch (SocketException)
+			catch (SocketException ex)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_network_error, _dataSource);
+				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_network_error, _dataSource, ex);
 			}
 		}
 
@@ -186,9 +186,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						}
 					}
 				}
-				catch (IOException)
+			catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_network_error);
+				throw new IscException(IscCodes.isc_network_error, ex);
 				}
 			}
 		}

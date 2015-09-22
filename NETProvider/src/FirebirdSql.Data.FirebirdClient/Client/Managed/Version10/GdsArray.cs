@@ -116,9 +116,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					return ReceiveSliceResponse(Descriptor);
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err);
+					throw new IscException(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -146,9 +146,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					_handle = response.BlobId;
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err);
+					throw new IscException(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -326,9 +326,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					return null;
 				}
 			}
-			catch (IOException)
+			catch (IOException ex)
 			{
-				throw new IscException(IscCodes.isc_net_read_err);
+				throw new IscException(IscCodes.isc_net_read_err, ex);
 			}
 		}
 

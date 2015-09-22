@@ -89,10 +89,10 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					SafelyDetach();
 					throw;
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
 					SafelyDetach();
-					throw new IscException(IscCodes.isc_net_write_err);
+					throw new IscException(IscCodes.isc_net_write_err, ex);
 				}
 
 				AfterAttachActions();
@@ -132,9 +132,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					DoReleaseObjectPacket(op, id);
 					DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err);
+					throw new IscException(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}

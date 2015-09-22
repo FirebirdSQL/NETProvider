@@ -79,9 +79,9 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				XdrStream.Flush();
 				// no response, this is async
 			}
-			catch (IOException)
+			catch (IOException ex)
 			{
-				throw new IscException(IscCodes.isc_network_error);
+				throw new IscException(IscCodes.isc_network_error, ex);
 			}
 		}
 

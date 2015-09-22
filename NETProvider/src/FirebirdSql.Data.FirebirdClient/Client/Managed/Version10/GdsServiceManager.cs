@@ -74,11 +74,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					_handle = response.ObjectHandle;
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
 					_database.Detach();
 
-					throw new IscException(IscCodes.isc_net_write_err);
+					throw new IscException(IscCodes.isc_net_write_err, ex);
 				}
 			}
 		}
@@ -96,9 +96,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					_handle = 0;
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_network_error);
+					throw new IscException(IscCodes.isc_network_error, ex);
 				}
 				finally
 				{
@@ -106,9 +106,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					{
 						_connection.Disconnect();
 					}
-					catch (IOException)
+					catch (IOException ex)
 					{
-						throw new IscException(IscCodes.isc_network_error);
+						throw new IscException(IscCodes.isc_network_error, ex);
 					}
 					finally
 					{
@@ -140,9 +140,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						throw;
 					}
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_write_err);
+					throw new IscException(IscCodes.isc_net_write_err, ex);
 				}
 			}
 		}
@@ -178,9 +178,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_network_error);
+					throw new IscException(IscCodes.isc_network_error, ex);
 				}
 			}
 		}

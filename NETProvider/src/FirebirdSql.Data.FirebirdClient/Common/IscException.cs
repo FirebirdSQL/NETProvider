@@ -71,22 +71,22 @@ namespace FirebirdSql.Data.Common
 
 		#region Constructors
 
-		public IscException()
-			: base()
+		public IscException(Exception innerException = null)
+			: base(innerException?.Message, innerException)
 		{
 			Errors = new List<IscError>();
 		}
 
-		public IscException(int errorCode)
-			: this()
+		public IscException(int errorCode, Exception innerException = null)
+			: this(innerException)
 		{
 			Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 
 			BuildExceptionData();
 		}
 
-		public IscException(IEnumerable<int> errorCodes)
-			: this()
+		public IscException(IEnumerable<int> errorCodes, Exception innerException = null)
+			: this(innerException)
 		{
 			foreach (int errorCode in errorCodes)
 			{
@@ -96,25 +96,16 @@ namespace FirebirdSql.Data.Common
 			BuildExceptionData();
 		}
 
-		/// <param name="dummy">This parameter is here only to differentiate sqlState and strParam.</param>
-		public IscException(string sqlState, int dummy)
-			: this()
-		{
-			Errors.Add(new IscError(IscCodes.isc_arg_sql_state, sqlState));
-
-			BuildExceptionData();
-		}
-
-		public IscException(string strParam)
-			: this()
+		public IscException(string strParam, Exception innerException = null)
+			: this(innerException)
 		{
 			Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 
 			BuildExceptionData();
 		}
 
-		public IscException(int errorCode, int intParam)
-			: this()
+		public IscException(int errorCode, int intParam, Exception innerException = null)
+			: this(innerException)
 		{
 			Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 			Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
@@ -122,8 +113,8 @@ namespace FirebirdSql.Data.Common
 			BuildExceptionData();
 		}
 
-		public IscException(int type, int errorCode, string strParam)
-			: this()
+		public IscException(int type, int errorCode, string strParam, Exception innerException = null)
+			: this(innerException)
 		{
 			Errors.Add(new IscError(type, errorCode));
 			Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
@@ -131,8 +122,8 @@ namespace FirebirdSql.Data.Common
 			BuildExceptionData();
 		}
 
-		public IscException(int type, int errorCode, int intParam, string strParam)
-			: this()
+		public IscException(int type, int errorCode, int intParam, string strParam, Exception innerException = null)
+			: this(innerException)
 		{
 			Errors.Add(new IscError(type, errorCode));
 			Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));

@@ -148,9 +148,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					return result;
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err);
+					throw new IscException(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -168,9 +168,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					_database.ReadResponse();
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err);
+					throw new IscException(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -191,9 +191,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					_position = response.ObjectHandle;
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_network_error);
+					throw new IscException(IscCodes.isc_network_error, ex);
 				}
 			}
 		}
@@ -237,9 +237,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					_blobId = response.BlobId;
 					_blobHandle = response.ObjectHandle;
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err);
+					throw new IscException(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}

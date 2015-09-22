@@ -728,9 +728,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				Write(param.NullFlag);
 			}
-			catch (IOException)
+			catch (IOException ex)
 			{
-				throw new IscException(IscCodes.isc_net_write_err);
+				throw new IscException(IscCodes.isc_net_write_err, ex);
 			}
 		}
 
