@@ -205,8 +205,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 				}
 				catch
-				{
-				}
+				{ }
 				finally
 				{
 					if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))

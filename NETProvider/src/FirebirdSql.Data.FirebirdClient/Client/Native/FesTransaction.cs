@@ -114,7 +114,8 @@ namespace FirebirdSql.Data.Client.Native
 					}
 					catch
 					{ }
-
+					finally
+					{
 					if (disposing)
 					{
 						_db = null;

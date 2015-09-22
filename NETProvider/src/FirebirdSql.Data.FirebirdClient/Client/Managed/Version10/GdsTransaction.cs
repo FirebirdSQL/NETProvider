@@ -106,7 +106,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					catch
 					{ }
-
+					finally
+					{
 					if (disposing)
 					{
 						_database = null;

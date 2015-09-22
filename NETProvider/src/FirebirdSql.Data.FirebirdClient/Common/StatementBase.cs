@@ -192,9 +192,9 @@ namespace FirebirdSql.Data.Common
 
 		public string GetExecutionPlan()
 		{
-			int		count		= 0;
-			int		bufferSize	= IscCodes.DEFAULT_MAX_BUFFER_SIZE;
-			byte[]	buffer		= GetSqlInfo(DescribePlanInfoItems, bufferSize);
+			int count = 0;
+			int bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
+			byte[] buffer = GetSqlInfo(DescribePlanInfoItems, bufferSize);
 
 			if (buffer[0] == IscCodes.isc_info_end)
 			{
@@ -242,8 +242,7 @@ namespace FirebirdSql.Data.Common
 							Free(IscCodes.DSQL_close);
 						}
 						catch
-						{
-						}
+						{ }
 					}
 					ClearArrayHandles();
 					State = StatementState.Closed;
@@ -314,9 +313,9 @@ namespace FirebirdSql.Data.Common
 			int updateCount = 0;
 			int deleteCount = 0;
 			int selectCount = 0;
-			int pos			= 0;
-			int length		= 0;
-			int type		= 0;
+			int pos = 0;
+			int length = 0;
+			int type = 0;
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{

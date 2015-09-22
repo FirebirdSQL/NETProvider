@@ -139,8 +139,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						}
 					}
 					catch
-					{
-					}
+					{ }
 					finally
 					{
 						_isolationLevel = IsolationLevel.ReadCommitted;

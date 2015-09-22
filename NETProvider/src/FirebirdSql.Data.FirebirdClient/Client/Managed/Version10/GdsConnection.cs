@@ -179,8 +179,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							Disconnect();
 						}
 						catch
-						{
-						}
+					{ }
 						finally
 						{
 							throw new IscException(IscCodes.isc_connect_reject);

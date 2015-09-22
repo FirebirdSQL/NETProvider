@@ -112,15 +112,13 @@ namespace FirebirdSql.Data.UnitTests
 					}
 				}
 				catch
-				{
-				}
+				{ }
 				try
 				{
 					_transaction.Dispose();
 				}
 				catch
-				{
-				}
+				{ }
 			}
 			if (_connection != null)
 			{

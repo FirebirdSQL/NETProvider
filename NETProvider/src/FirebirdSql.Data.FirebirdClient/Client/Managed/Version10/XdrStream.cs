@@ -142,7 +142,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch
 			{ }
-
+			finally
+			{
 			_innerStream = null;
 			_charset = null;
 		}

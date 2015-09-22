@@ -480,8 +480,7 @@ namespace FirebirdSql.Data.UnitTests
 				throw new Exception("The command was executed without throw	an exception");
 			}
 			catch
-			{
-			}
+			{ }
 		}
 
 		[Test]

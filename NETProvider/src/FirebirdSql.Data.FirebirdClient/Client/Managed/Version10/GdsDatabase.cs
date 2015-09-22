@@ -163,7 +163,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					catch
 					{ }
-
+					finally
+					{
 					if (disposing)
 					{
 						_connection = null;
@@ -330,9 +331,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							CloseConnection();
 						}
 						catch
-						{
-						}
-
+						{ }
 						throw;
 					}
 				}
@@ -381,11 +380,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						CloseConnection();
 					}
 					catch
-					{
+					{ }
 					}
 				}
 			}
-		}
 
 		#endregion
 

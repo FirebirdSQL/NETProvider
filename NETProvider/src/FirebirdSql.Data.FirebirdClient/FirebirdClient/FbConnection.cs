@@ -320,8 +320,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						_disposed = true;
 					}
 					catch
-					{
-					}
+					{ }
 					finally
 					{
 						base.Dispose(disposing);
@@ -592,8 +591,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						}
 					}
 					catch
-					{
-					}
+					{ }
 					finally
 					{
 						// Update connection state
