@@ -697,7 +697,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			int currentItemIndex = 0;
 			while (info[currentPosition] != IscCodes.isc_info_end)
 			{
-				bool jumpOutOfInnerLoop = false;
 				byte item;
 				while ((item = info[currentPosition++]) != IscCodes.isc_info_sql_describe_end)
 				{
@@ -730,8 +729,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 							currentPosition = 0;
 							currentDescriptorIndex = -1;
-							jumpOutOfInnerLoop = true;
-							break;
+							goto Break;
 
 						case IscCodes.isc_info_sql_select:
 						case IscCodes.isc_info_sql_bind:
@@ -747,7 +745,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							{
 								int n = IscHelper.VaxInteger(info, currentPosition, len);
 								rowDescs[currentDescriptorIndex] = new Descriptor((short)n);
-								jumpOutOfInnerLoop = (n == 0);
+								if (n == 0)
+									goto Break;
 							}
 							currentPosition += len;
 							break;
@@ -818,9 +817,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						default:
 							throw new IscException(IscCodes.isc_dsql_sqlda_err);
 					}
-					if (jumpOutOfInnerLoop)
-						break;
 				}
+				// just to get out of the loop
+				Break:
+				{ }
 			}
 		}
 
