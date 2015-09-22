@@ -462,7 +462,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			else
 			{
-				throw new IscException("invalid sqlind value: " + sqlInd);
+				throw new IscException($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
 			}
 		}
 
@@ -722,7 +722,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							break;
 
 						default:
-							throw new IscException("Unknown sql data type: " + param.DataType);
+							throw new IscException($"Unknown sql data type: {param.DataType}.");
 					}
 				}
 
@@ -741,7 +741,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private void CheckDisposed()
 		{
 			if (_innerStream == null)
-				throw new ObjectDisposedException("The XdrStream is closed.");
+				throw new ObjectDisposedException($"The {nameof(XdrStream)} is closed.");
 		}
 
 		private void ResetOperation()
