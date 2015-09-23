@@ -300,7 +300,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				if (TransactionCount > 0)
 				{
-					throw new IscException(IscCodes.isc_open_trans, TransactionCount);
+					throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
 				}
 
 				int dbHandle = Handle;

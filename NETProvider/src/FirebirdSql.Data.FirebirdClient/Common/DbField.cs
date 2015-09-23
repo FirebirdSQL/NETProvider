@@ -486,7 +486,7 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					default:
-						throw new IscException($"Unknown sql data type: {DataType}.");
+						throw IscException.ForStrParam($"Unknown sql data type: {DataType}.");
 				}
 			}
 		}
@@ -632,7 +632,7 @@ namespace FirebirdSql.Data.Common
 		private void EnsureArray()
 		{
 			if (!IsArray())
-				throw new IscException("Field is not an array type.");
+				throw IscException.ForStrParam("Field is not an array type.");
 		}
 
 		#endregion

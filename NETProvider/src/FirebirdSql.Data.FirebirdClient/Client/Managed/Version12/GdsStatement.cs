@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				catch (IOException ex)
 				{
 					_state = StatementState.Error;
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}

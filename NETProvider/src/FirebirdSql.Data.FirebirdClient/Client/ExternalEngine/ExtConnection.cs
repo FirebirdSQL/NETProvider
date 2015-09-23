@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 						{
 							if (exception == null)
 							{
-								exception = new IscException();
+								exception = IscException.ForBuilding();
 							}
 							exception.Errors.Add(new IscError(arg, er));
 						}
@@ -98,7 +98,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 						{
 							if (exception == null)
 							{
-								exception = new IscException();
+								exception = IscException.ForBuilding();
 							}
 							exception.Errors.Add(new IscError(arg, e));
 						}

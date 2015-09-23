@@ -462,7 +462,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			else
 			{
-				throw new IscException($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
+				throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
 			}
 		}
 
@@ -641,7 +641,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
 									svalue.Length > param.CharCount)
 								{
-									throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+									throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 								}
 
 								WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
@@ -660,7 +660,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
 									svalue.Length > param.CharCount)
 								{
-									throw new IscException(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+									throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 								}
 
 								byte[] data = param.Charset.GetBytes(svalue);
@@ -722,7 +722,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							break;
 
 						default:
-							throw new IscException($"Unknown sql data type: {param.DataType}.");
+							throw IscException.ForStrParam($"Unknown sql data type: {param.DataType}.");
 					}
 				}
 
@@ -730,7 +730,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw new IscException(IscCodes.isc_net_write_err, ex);
+				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
 			}
 		}
 

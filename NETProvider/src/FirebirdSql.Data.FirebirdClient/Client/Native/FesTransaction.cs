@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			if (_state != TransactionState.NoTransaction)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
+				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
 			}
 
 			lock (_db)
@@ -329,7 +329,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			if (_state != TransactionState.Active)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
+				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
 			}
 		}
 

@@ -71,69 +71,82 @@ namespace FirebirdSql.Data.Common
 
 		#region Constructors
 
-		public IscException(Exception innerException = null)
+		private IscException(Exception innerException = null)
 			: base(innerException?.Message, innerException)
 		{
 			Errors = new List<IscError>();
 		}
 
-		public IscException(int errorCode, Exception innerException = null)
-			: this(innerException)
+		public static IscException ForBuilding()
 		{
-			Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
-
-			BuildExceptionData();
+			return new IscException();
 		}
 
-		public IscException(IEnumerable<int> errorCodes, Exception innerException = null)
-			: this(innerException)
+		public static IscException ForErrorCode(int errorCode, Exception innerException = null)
 		{
+			var result = new IscException(innerException);
+			result.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+			result.BuildExceptionData();
+			return result;
+		}
+
+		public static IscException ForErrorCodes(IEnumerable<int> errorCodes, Exception innerException = null)
+		{
+			var result = new IscException(innerException);
 			foreach (int errorCode in errorCodes)
 			{
-				Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+				result.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 			}
-
-			BuildExceptionData();
+			result.BuildExceptionData();
+			return result;
 		}
 
-		public IscException(string strParam, Exception innerException = null)
-			: this(innerException)
+		public static IscException ForSQLSTATE(string sqlState, Exception innerException = null)
 		{
-			Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
-
-			BuildExceptionData();
+			var result = new IscException(innerException);
+			result.Errors.Add(new IscError(IscCodes.isc_arg_sql_state, sqlState));
+			result.BuildExceptionData();
+			return result;
 		}
 
-		public IscException(int errorCode, int intParam, Exception innerException = null)
-			: this(innerException)
+		public static IscException ForStrParam(string strParam, Exception innerException = null)
 		{
-			Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
-			Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
-
-			BuildExceptionData();
+			var result = new IscException(innerException);
+			result.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
+			result.BuildExceptionData();
+			return result;
 		}
 
-		public IscException(int type, int errorCode, string strParam, Exception innerException = null)
-			: this(innerException)
+		public static IscException ForErrorCodeIntParam(int errorCode, int intParam, Exception innerException = null)
 		{
-			Errors.Add(new IscError(type, errorCode));
-			Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
-
-			BuildExceptionData();
+			var result = new IscException(innerException);
+			result.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
+			result.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
+			result.BuildExceptionData();
+			return result;
 		}
 
-		public IscException(int type, int errorCode, int intParam, string strParam, Exception innerException = null)
-			: this(innerException)
+		public static IscException ForTypeErrorCodeStrParam(int type, int errorCode, string strParam, Exception innerException = null)
 		{
-			Errors.Add(new IscError(type, errorCode));
-			Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
-			Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
-
-			BuildExceptionData();
+			var result = new IscException(innerException);
+			result.Errors.Add(new IscError(type, errorCode));
+			result.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
+			result.BuildExceptionData();
+			return result;
 		}
 
-		internal IscException(SerializationInfo info, StreamingContext context)
-			: base(info, context)
+		public static IscException ForTypeErrorCodeIntParamStrParam(int type, int errorCode, int intParam, string strParam, Exception innerException = null)
+		{
+			var result = new IscException(innerException);
+			result.Errors.Add(new IscError(type, errorCode));
+			result.Errors.Add(new IscError(IscCodes.isc_arg_number, intParam));
+			result.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
+			result.BuildExceptionData();
+			return result;
+		}
+
+		private IscException(SerializationInfo info, StreamingContext context)
+				: base(info, context)
 		{
 			Errors = (List<IscError>)info.GetValue("errors", typeof(List<IscError>));
 			ErrorCode = info.GetInt32("errorCode");

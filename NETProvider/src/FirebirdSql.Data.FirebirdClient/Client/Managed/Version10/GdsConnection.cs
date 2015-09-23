@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (SocketException ex)
 			{
-				throw new IscException(IscCodes.isc_arg_gds, IscCodes.isc_network_error, _dataSource, ex);
+				throw IscException.ForTypeErrorCodeStrParam(IscCodes.isc_arg_gds, IscCodes.isc_network_error, _dataSource, ex);
 			}
 		}
 
@@ -182,13 +182,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					{ }
 						finally
 						{
-							throw new IscException(IscCodes.isc_connect_reject);
+						throw IscException.ForErrorCode(IscCodes.isc_connect_reject);
 						}
 					}
 				}
 			catch (IOException ex)
 				{
-				throw new IscException(IscCodes.isc_network_error, ex);
+				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 				}
 			}
 		}

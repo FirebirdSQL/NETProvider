@@ -106,7 +106,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					// if the statement has been already allocated, it's now in error
 					if (_state == StatementState.Allocated)
 						_state = StatementState.Error;
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -183,7 +183,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				catch (IOException ex)
 				{
 					_state = StatementState.Error;
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}

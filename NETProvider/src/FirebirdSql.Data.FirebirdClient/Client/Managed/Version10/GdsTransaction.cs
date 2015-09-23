@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -186,7 +186,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -219,7 +219,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -245,7 +245,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -271,7 +271,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -303,7 +303,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -332,7 +332,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				catch (IOException ex)
 				{
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -351,7 +351,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private IscException GetNoValidTransactionException()
 		{
-			return new IscException(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
+			return IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
 		}
 
 		#endregion

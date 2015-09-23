@@ -277,7 +277,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					// if the statement has been already allocated, it's now in error
 					if (_state == StatementState.Allocated)
 						_state = StatementState.Error;
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -327,7 +327,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				catch (IOException ex)
 				{
 					_state = StatementState.Error;
-					throw new IscException(IscCodes.isc_net_read_err, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 		}
@@ -396,7 +396,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					catch (IOException ex)
 					{
-						throw new IscException(IscCodes.isc_net_read_err, ex);
+						throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 					}
 				}
 			}
@@ -478,7 +478,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw new IscException(IscCodes.isc_net_read_err, ex);
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
@@ -544,7 +544,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			catch (IOException ex)
 			{
 				_state = StatementState.Error;
-				throw new IscException(IscCodes.isc_net_read_err, ex);
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
@@ -641,7 +641,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw new IscException(IscCodes.isc_net_read_err, ex);
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 		#endregion
@@ -678,7 +678,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					catch (IOException ex)
 					{
-						throw new IscException(IscCodes.isc_net_read_err, ex);
+						throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 					}
 				}
 			}
@@ -819,7 +819,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							break;
 
 						default:
-							throw new IscException(IscCodes.isc_dsql_sqlda_err);
+							throw IscException.ForErrorCode(IscCodes.isc_dsql_sqlda_err);
 					}
 				}
 				// just to get out of the loop

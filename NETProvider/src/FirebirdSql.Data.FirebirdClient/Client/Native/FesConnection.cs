@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Client.Native
 						{
 							if (exception == null)
 							{
-								exception = new IscException();
+								exception = IscException.ForBuilding();
 							}
 							exception.Errors.Add(new IscError(arg.AsInt(), er.AsInt()));
 						}
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.Client.Native
 						{
 							if (exception == null)
 							{
-								exception = new IscException();
+								exception = IscException.ForBuilding();
 							}
 							exception.Errors.Add(new IscError(arg.AsInt(), e.AsInt()));
 						}
