@@ -25,6 +25,5 @@
     <file src="..\..\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.dll" target="lib\net45" />
     <file src="..\..\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.pdb" target="lib\net45" />
     <file src="tools\install.ps1" target="tools" />
-    <file src="..\..\readme.txt" target="" />
   </files>
 </package>
