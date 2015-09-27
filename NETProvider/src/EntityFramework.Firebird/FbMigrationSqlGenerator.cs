@@ -231,6 +231,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 			if (column.IsIdentity)
 			{
+				// possible identity drop was dropped with statement above
 				foreach (var item in _behavior.CreateIdentityForColumn(column.Name, tableName))
 					yield return Statement(item);
 			}
