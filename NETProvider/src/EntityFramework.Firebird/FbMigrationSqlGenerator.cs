@@ -1,21 +1,21 @@
 ﻿/*
- *  Firebird ADO.NET Data provider for .NET and Mono 
- * 
- *     The contents of this file are subject to the Initial 
- *     Developer's Public License Version 1.0 (the "License"); 
- *     you may not use this file except in compliance with the 
- *     License. You may obtain a copy of the License at 
+ *  Firebird ADO.NET Data provider for .NET and Mono
+ *
+ *     The contents of this file are subject to the Initial
+ *     Developer's Public License Version 1.0 (the "License");
+ *     you may not use this file except in compliance with the
+ *     License. You may obtain a copy of the License at
  *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
  *
- *     Software distributed under the License is distributed on 
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
- *     express or implied. See the License for the specific 
+ *     Software distributed under the License is distributed on
+ *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *     express or implied. See the License for the specific
  *     language governing rights and limitations under the License.
- * 
+ *
  *  Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
  *		Based on my work on NuoDbMigrationSqlGenerator for NuoDB.
  *  All Rights Reserved.
- *  
+ *
  */
 
 using System;
@@ -501,12 +501,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			builder.Append(" ");
 			builder.Append(columnType);
 
-			if ((column.IsNullable != null)
-				&& !column.IsNullable.Value)
-			{
-				builder.Append(" NOT NULL");
-			}
-
 			if (column.DefaultValue != null)
 			{
 				builder.Append(" DEFAULT ");
@@ -517,7 +511,14 @@ namespace FirebirdSql.Data.EntityFramework6
 				builder.Append(" DEFAULT ");
 				builder.Append(column.DefaultValueSql);
 			}
-			else if (column.IsIdentity)
+
+			if ((column.IsNullable != null)
+				&& !column.IsNullable.Value)
+			{
+				builder.Append(" NOT NULL");
+			}
+
+			if (column.IsIdentity)
 			{
 				var identity = _behavior.CreateIdentityForColumn(column.Name, tableName);
 				additionalCommands.AddRange(identity.Where(x => !string.IsNullOrWhiteSpace(x)));
