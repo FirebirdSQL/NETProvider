@@ -90,24 +90,23 @@ namespace FirebirdSql.Data.EntityFramework6
 		protected virtual IEnumerable<MigrationStatement> Generate(AddColumnOperation operation)
 		{
 			var tableName = ExtractName(operation.Table);
-			using (var writer = SqlWriter())
-			{
-				writer.Write("ALTER TABLE ");
-				writer.Write(Quote(tableName));
-				writer.Write(" ADD ");
-				var column = operation.Column;
-				var columnData = Generate(column, tableName);
-				writer.Write(columnData.Item1);
-				if (column.IsNullable != null
+			var column = operation.Column;
+			if (column.IsNullable != null
 					&& !column.IsNullable.Value
 					&& column.DefaultValue == null
 					&& string.IsNullOrWhiteSpace(column.DefaultValueSql)
 					&& !column.IsIdentity
 					&& !column.IsTimestamp)
-				{
-					writer.Write(" DEFAULT ");
-					writer.Write(WriteValue((dynamic)column.ClrDefaultValue));
-				}
+			{
+				column.DefaultValue = column.ClrDefaultValue;
+			}
+			var columnData = Generate(column, tableName);
+			using (var writer = SqlWriter())
+			{
+				writer.Write("ALTER TABLE ");
+				writer.Write(Quote(tableName));
+				writer.Write(" ADD ");
+				writer.Write(columnData.Item1);
 				yield return Statement(writer);
 			}
 		}
