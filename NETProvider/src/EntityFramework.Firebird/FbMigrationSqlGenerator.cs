@@ -109,6 +109,8 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write(columnData.Item1);
 				yield return Statement(writer);
 			}
+			foreach (var item in columnData.Item2.Select(x => Statement(x)))
+				yield return item;
 		}
 
 		protected virtual IEnumerable<MigrationStatement> Generate(AddForeignKeyOperation operation)
