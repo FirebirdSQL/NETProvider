@@ -208,8 +208,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal int IndexOf(string parameterName, int luckyIndex)
 		{
-			bool isNonAsciiParameterName = FbParameter.IsNonAsciiParameterName(parameterName);
-			StringComparison usedComparison = isNonAsciiParameterName || HasParameterWithNonAsciiName
+			var isNonAsciiParameterName = FbParameter.IsNonAsciiParameterName(parameterName);
+			var usedComparison = isNonAsciiParameterName || HasParameterWithNonAsciiName
 				? StringComparison.CurrentCultureIgnoreCase
 				: StringComparison.OrdinalIgnoreCase;
 			var normalizedParameterName = FbParameter.NormalizeParameterName(parameterName);
