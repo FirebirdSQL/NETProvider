@@ -116,15 +116,16 @@ namespace FirebirdSql.Data.Client.Native
 					{ }
 					finally
 					{
-					if (disposing)
-					{
-						_db = null;
-						_handle = 0;
-						_state = TransactionState.NoTransaction;
-						_statusVector = null;
-					}
+						if (disposing)
+						{
+							_db = null;
+							_handle = 0;
+							_state = TransactionState.NoTransaction;
+							_statusVector = null;
+						}
 
-					_disposed = true;
+						_disposed = true;
+					}
 				}
 			}
 		}

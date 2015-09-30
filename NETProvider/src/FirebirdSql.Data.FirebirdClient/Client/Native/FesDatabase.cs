@@ -168,19 +168,20 @@ namespace FirebirdSql.Data.Client.Native
 					{ }
 					finally
 					{
-					if (disposing)
-					{
-						_warningMessage = null;
-						_charset = null;
-						_serverVersion = null;
-						_statusVector = null;
-						_transactionCount = 0;
-						_dialect = 0;
-						_handle = 0;
-						_packetSize = 0;
-					}
+						if (disposing)
+						{
+							_warningMessage = null;
+							_charset = null;
+							_serverVersion = null;
+							_statusVector = null;
+							_transactionCount = 0;
+							_dialect = 0;
+							_handle = 0;
+							_packetSize = 0;
+						}
 
-					_disposed = true;
+						_disposed = true;
+					}
 				}
 			}
 		}

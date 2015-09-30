@@ -144,8 +144,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{ }
 			finally
 			{
-			_innerStream = null;
-			_charset = null;
+				_innerStream = null;
+				_charset = null;
+			}
 		}
 
 		public override void Flush()

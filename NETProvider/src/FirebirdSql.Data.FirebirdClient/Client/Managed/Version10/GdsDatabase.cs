@@ -170,21 +170,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					{ }
 					finally
 					{
-					if (disposing)
-					{
-						_connection = null;
-						_charset = null;
-						_eventManager = null;
-						_serverVersion = null;
-						_dialect = 0;
-						_eventsId = 0;
-						_handle = 0;
-						_packetSize = 0;
-						_warningMessage = null;
-						_transactionCount = 0;
-					}
+						if (disposing)
+						{
+							_connection = null;
+							_charset = null;
+							_eventManager = null;
+							_serverVersion = null;
+							_dialect = 0;
+							_eventsId = 0;
+							_handle = 0;
+							_packetSize = 0;
+							_warningMessage = null;
+							_transactionCount = 0;
+						}
 
-					_disposed = true;
+						_disposed = true;
+					}
 				}
 			}
 		}

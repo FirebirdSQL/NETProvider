@@ -179,25 +179,26 @@ namespace FirebirdSql.Data.Client.Native
 				{ }
 				finally
 				{
-				if (disposing)
-				{
-					Clear();
+					if (disposing)
+					{
+						Clear();
 
-					_db = null;
-					_fields = null;
-					_parameters = null;
-					_transaction = null;
-					_outputParams = null;
-					_statusVector = null;
-					_allRowsFetched = false;
-					_state = StatementState.Deallocated;
-					_statementType = DbStatementType.None;
-					_recordsAffected = 0;
-					_handle = 0;
-					FetchSize = 0;
+						_db = null;
+						_fields = null;
+						_parameters = null;
+						_transaction = null;
+						_outputParams = null;
+						_statusVector = null;
+						_allRowsFetched = false;
+						_state = StatementState.Deallocated;
+						_statementType = DbStatementType.None;
+						_recordsAffected = 0;
+						_handle = 0;
+						FetchSize = 0;
+					}
+
+					base.Dispose(disposing);
 				}
-
-				base.Dispose(disposing);
 			}
 		}
 

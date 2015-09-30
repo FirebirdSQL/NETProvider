@@ -108,14 +108,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					{ }
 					finally
 					{
-					if (disposing)
-					{
-						_database = null;
-						_handle = 0;
-						_state = TransactionState.NoTransaction;
-					}
+						if (disposing)
+						{
+							_database = null;
+							_handle = 0;
+							_state = TransactionState.NoTransaction;
+						}
 
-					_disposed = true;
+						_disposed = true;
+					}
 				}
 			}
 		}
