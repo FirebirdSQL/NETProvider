@@ -24,6 +24,6 @@ namespace FirebirdSql.Data.FirebirdClient.Properties
 {
 	static class VersionInfo
 	{
-		internal const string Version = "4.8.0.0";
+		internal const string Version = "4.8.1.0";
 	}
 }
