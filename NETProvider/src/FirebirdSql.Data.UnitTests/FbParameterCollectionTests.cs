@@ -108,7 +108,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			var collection = new FbParameterCollection();
 			var parameter = collection.Add("Name", FbDbType.Array);
-			Assert.AreSame(collection, parameter.Parent);
+			Assert.AreEqual(collection, parameter.Parent);
 			Assert.Throws<ArgumentException>(() => collection.Add(parameter));
 			Assert.Throws<ArgumentException>(() => collection.AddRange(new FbParameter[] { parameter }));
 
@@ -118,8 +118,18 @@ namespace FirebirdSql.Data.UnitTests
 			Assert.Throws<ArgumentException>(() => collection.Remove(parameter));
 
 			collection.Insert(0, parameter);
-			Assert.AreSame(collection, parameter.Parent);
+			Assert.AreEqual(collection, parameter.Parent);
 			Assert.Throws<ArgumentException>(() => collection.Insert(0, parameter));
+		}
+
+		[Test]
+		public void DNET635_ResetsParentOnClear()
+		{
+			var collection = new FbParameterCollection();
+			var parameter = collection.Add("test", 0);
+			Assert.IsNotNull(parameter.Parent);
+			collection.Clear();
+			Assert.IsNull(parameter.Parent);
 		}
 
 		#endregion

@@ -160,7 +160,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			EnsureFbParameterAddOrInsert(value);
 
-			value.Parent = this;
+			AttachParameter(value);
 			_parameters.Add(value);
 			return value;
 		}
@@ -228,7 +228,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			EnsureFbParameterAddOrInsert(value);
 
-			value.Parent = this;
+			AttachParameter(value);
 			_parameters.Insert(index, value);
 		}
 
@@ -246,7 +246,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new ArgumentException("The parameter does not exist in the collection.");
 			}
 
-			value.Parent = null;
+			ReleaseParameter(value);
 		}
 
 		public override void Remove(object value)
@@ -265,7 +265,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			FbParameter parameter = this[index];
 			_parameters.RemoveAt(index);
-			parameter.Parent = null;
+			ReleaseParameter(parameter);
 		}
 
 		public override void RemoveAt(string parameterName)
@@ -285,7 +285,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override void Clear()
 		{
+			var parameters = _parameters.ToArray();
 			_parameters.Clear();
+			foreach (var parameter in parameters)
+			{
+				ReleaseParameter(parameter);
+			}
 		}
 
 		public override IEnumerator GetEnumerator()
@@ -381,6 +386,16 @@ namespace FirebirdSql.Data.FirebirdClient
 					throw new ArgumentException("FbParameterCollection already contains FbParameter with ParameterName '" + value.ParameterName + "'.");
 				}
 			}
+		}
+
+		private void AttachParameter(FbParameter parameter)
+		{
+			parameter.Parent = this;
+		}
+
+		private void ReleaseParameter(FbParameter parameter)
+		{
+			parameter.Parent = null;
 		}
 
 		#endregion
