@@ -381,7 +381,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			else
 			{
-				if (IndexOf(value) != -1)
+				if (Contains(value.ParameterName))
 				{
 					throw new ArgumentException("FbParameterCollection already contains FbParameter with ParameterName '" + value.ParameterName + "'.");
 				}
