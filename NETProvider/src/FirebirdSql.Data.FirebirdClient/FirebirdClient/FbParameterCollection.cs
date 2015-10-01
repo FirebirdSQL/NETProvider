@@ -337,24 +337,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GenerateParameterName()
 		{
-			int index = Count + 1;
-			string name = string.Empty;
-
-			while (index > 0)
+			var index = Count + 1;
+			while (true)
 			{
-				name = "Parameter" + index.ToString(CultureInfo.InvariantCulture);
-
-				if (IndexOf(name) == -1)
+				var name = "Parameter" + index.ToString(CultureInfo.InvariantCulture);
+				if (!Contains(name))
 				{
-					index = -1;
+					return name;
 				}
-				else
-				{
-					index++;
-				}
+				index++;
 			}
-
-			return name;
 		}
 
 		private void EnsureFbParameterType(object value)
