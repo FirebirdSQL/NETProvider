@@ -361,7 +361,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (!(value is FbParameter))
 			{
-				throw new InvalidCastException("The parameter passed was not a FbParameter.");
+				throw new InvalidCastException($"The parameter passed was not a {nameof(FbParameter)}.");
 			}
 		}
 
@@ -369,11 +369,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (value == null)
 			{
-				throw new ArgumentException("The value parameter is null.");
+				throw new ArgumentNullException();
 			}
 			if (value.Parent != null)
 			{
-				throw new ArgumentException("The FbParameter specified in the value parameter is already added to this or another FbParameterCollection.");
+				throw new ArgumentException($"The {nameof(FbParameter)} specified in the value parameter is already added to this or another {nameof(FbParameterCollection)}.");
 			}
 			if (value.ParameterName == null || value.ParameterName.Length == 0)
 			{
@@ -383,7 +383,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (Contains(value.ParameterName))
 				{
-					throw new ArgumentException("FbParameterCollection already contains FbParameter with ParameterName '" + value.ParameterName + "'.");
+					throw new ArgumentException($"{nameof(FbParameterCollection)} already contains {nameof(FbParameter)} with {nameof(FbParameter.ParameterName)} '{value.ParameterName}'.");
 				}
 			}
 		}
