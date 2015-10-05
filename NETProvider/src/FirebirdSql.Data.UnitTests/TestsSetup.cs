@@ -40,7 +40,6 @@ namespace FirebirdSql.Data.UnitTests
 		internal const int PageSize = 4096;
 		internal const bool ForcedWrite = false;
 		internal const string BackupRestoreFile = "netprovider_tests.fbk";
-		internal const string IsqlScript = "";
 
 		private static HashSet<FbServerType> _initalized = new HashSet<FbServerType>();
 

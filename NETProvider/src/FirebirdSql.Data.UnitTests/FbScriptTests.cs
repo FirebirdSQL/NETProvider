@@ -31,20 +31,6 @@ namespace FirebirdSql.Data.UnitTests
 		#region Unit Tests
 
 		[Test]
-		public void IsqlScriptTest()
-		{
-			string fileName = TestsSetup.IsqlScript;
-			if (System.IO.File.Exists(fileName))
-			{
-				FbScript isql = new FbScript(fileName);
-				foreach (string command in isql.Results)
-				{
-					Console.WriteLine(command);
-				}
-			}
-		}
-
-		[Test]
 		public void SimpleStatementNoSemicolonWithLiteral()
 		{
 			const string text =
@@ -152,6 +138,17 @@ namespace FirebirdSql.Data.UnitTests
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text, script.Results[0]);
+		}
+
+		[Test]
+		public void OneStatementWithMultilineCommentWithSemicolonWithSemicolonAtTheEnd()
+		{
+			const string text =
+@"select * from foo /* ;foo */;";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0]);
 		}
 
 		#endregion
