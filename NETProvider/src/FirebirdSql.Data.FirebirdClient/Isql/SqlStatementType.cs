@@ -30,6 +30,15 @@ namespace FirebirdSql.Data.Isql
 	[Serializable]
 	public enum SqlStatementType
 	{
+		#region Special cases
+
+		/// <summary>
+		/// Represents the SQL comment</b>
+		/// </summary>
+		_Comment,
+
+		#endregion
+
 		/// <summary>
 		/// Represents the SQL statement: <b>ALTER CHARACTER SET</b>
 		/// </summary>
@@ -433,6 +442,6 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// Represents the SQL statement: <b>WHENEVER</b>
 		/// </summary>
-		Whenever
+		Whenever,
 	}
 }

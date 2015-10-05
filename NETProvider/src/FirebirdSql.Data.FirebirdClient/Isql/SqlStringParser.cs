@@ -106,15 +106,15 @@ namespace FirebirdSql.Data.Isql
 					{
 						if (GetChar(i) == '\'' && GetNextChar(i) != '\'')
 						{
+							i++;
 							break;
 						}
 						i++;
 					}
-					i--;
+					//i--;
 				}
-
 				// single-line comment
-				if (GetChar(i) == '-' && GetNextChar(i) == '-')
+				else if (GetChar(i) == '-' && GetNextChar(i) == '-')
 				{
 					i++;
 					while (i < _sourceLength)
@@ -133,11 +133,10 @@ namespace FirebirdSql.Data.Isql
 						}
 						i++;
 					}
-					i--;
+					//i--;
 				}
-
 				// multi-line comment
-				if (GetChar(i) == '/' && GetNextChar(i) == '*')
+				else if (GetChar(i) == '/' && GetNextChar(i) == '*')
 				{
 					i++;
 					while (i < _sourceLength)
@@ -149,7 +148,7 @@ namespace FirebirdSql.Data.Isql
 						}
 						i++;
 					}
-					i--;
+					//i--;
 				}
 
 				foreach (var token in Tokens)
@@ -167,8 +166,16 @@ namespace FirebirdSql.Data.Isql
 				i++;
 			}
 
-			_result = _source.Substring(_currentIndex, i - _currentIndex);
-			return _currentIndex = i;
+			if (i > _sourceLength)
+			{
+				_result = _source.Substring(_currentIndex);
+				return _currentIndex = _sourceLength;
+			}
+			else
+			{
+				_result = _source.Substring(_currentIndex, i - _currentIndex);
+				return _currentIndex = i;
+			}
 		}
 
 		public override string ToString()

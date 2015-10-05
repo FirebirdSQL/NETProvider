@@ -125,7 +125,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
 		public void Execute(bool autoCommit = true)
 		{
-			if (SqlStatements == null || SqlStatements.Count == 0)
+			if ((SqlStatements?.Count ?? 0) == 0)
 			{
 				throw new InvalidOperationException("There are no commands for execution.");
 			}
@@ -139,7 +139,8 @@ namespace FirebirdSql.Data.Isql
 				FbDataReader dataReader = null;
 				SqlStatementType statementType = FbBatchExecution.GetStatementType(sqlStatement);
 
-				if (!(statementType == SqlStatementType.Connect ||
+				if (!(statementType == SqlStatementType._Comment ||
+					statementType == SqlStatementType.Connect ||
 					statementType == SqlStatementType.CreateDatabase ||
 					statementType == SqlStatementType.Disconnect ||
 					statementType == SqlStatementType.DropDatabase ||
@@ -168,9 +169,61 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterIndex:
 						case SqlStatementType.AlterProcedure:
 						case SqlStatementType.AlterRole:
+						case SqlStatementType.AlterSequence:
 						case SqlStatementType.AlterTable:
 						case SqlStatementType.AlterTrigger:
 						case SqlStatementType.AlterView:
+						case SqlStatementType.CommentOn:
+						case SqlStatementType.CreateCollation:
+						case SqlStatementType.CreateDomain:
+						case SqlStatementType.CreateException:
+						case SqlStatementType.CreateGenerator:
+						case SqlStatementType.CreateIndex:
+						case SqlStatementType.CreateProcedure:
+						case SqlStatementType.CreateRole:
+						case SqlStatementType.CreateSequence:
+						case SqlStatementType.CreateShadow:
+						case SqlStatementType.CreateTable:
+						case SqlStatementType.CreateTrigger:
+						case SqlStatementType.CreateView:
+						case SqlStatementType.DeclareCursor:
+						case SqlStatementType.DeclareExternalFunction:
+						case SqlStatementType.DeclareFilter:
+						case SqlStatementType.DeclareStatement:
+						case SqlStatementType.DeclareTable:
+						case SqlStatementType.Delete:
+						case SqlStatementType.DropCollation:
+						case SqlStatementType.DropDomain:
+						case SqlStatementType.DropException:
+						case SqlStatementType.DropExternalFunction:
+						case SqlStatementType.DropFilter:
+						case SqlStatementType.DropGenerator:
+						case SqlStatementType.DropIndex:
+						case SqlStatementType.DropProcedure:
+						case SqlStatementType.DropSequence:
+						case SqlStatementType.DropRole:
+						case SqlStatementType.DropShadow:
+						case SqlStatementType.DropTable:
+						case SqlStatementType.DropTrigger:
+						case SqlStatementType.DropView:
+						case SqlStatementType.EventInit:
+						case SqlStatementType.EventWait:
+						case SqlStatementType.Execute:
+						case SqlStatementType.ExecuteImmediate:
+						case SqlStatementType.ExecuteProcedure:
+						case SqlStatementType.Grant:
+						case SqlStatementType.Insert:
+						case SqlStatementType.InsertCursor:
+						case SqlStatementType.Open:
+						case SqlStatementType.Prepare:
+						case SqlStatementType.Revoke:
+						case SqlStatementType.RecreateProcedure:
+						case SqlStatementType.RecreateTable:
+						case SqlStatementType.RecreateTrigger:
+						case SqlStatementType.RecreateView:
+						case SqlStatementType.SetGenerator:
+						case SqlStatementType.Update:
+						case SqlStatementType.Whenever:
 							OnCommandExecuting(_sqlCommand);
 
 							rowsAffected = ExecuteCommand(autoCommit);
@@ -183,6 +236,14 @@ namespace FirebirdSql.Data.Isql
 							OnCommandExecuting(null);
 
 							CommitTransaction();
+
+							OnCommandExecuted(sqlStatement, null, -1);
+							break;
+
+						case SqlStatementType.Rollback:
+							OnCommandExecuting(null);
+
+							RollbackTransaction();
 
 							OnCommandExecuted(sqlStatement, null, -1);
 							break;
@@ -206,36 +267,6 @@ namespace FirebirdSql.Data.Isql
 							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
-						case SqlStatementType.CommentOn:
-						case SqlStatementType.CreateCollation:
-						case SqlStatementType.CreateDomain:
-						case SqlStatementType.CreateException:
-						case SqlStatementType.CreateGenerator:
-						case SqlStatementType.CreateIndex:
-						case SqlStatementType.CreateProcedure:
-						case SqlStatementType.CreateRole:
-						case SqlStatementType.CreateSequence:
-						case SqlStatementType.CreateShadow:
-						case SqlStatementType.CreateTable:
-						case SqlStatementType.CreateTrigger:
-						case SqlStatementType.CreateView:
-						case SqlStatementType.DeclareCursor:
-						case SqlStatementType.DeclareExternalFunction:
-						case SqlStatementType.DeclareFilter:
-						case SqlStatementType.DeclareStatement:
-						case SqlStatementType.DeclareTable:
-						case SqlStatementType.Delete:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
-						case SqlStatementType.Describe:
-							break;
-
 						case SqlStatementType.Disconnect:
 							OnCommandExecuting(null);
 
@@ -255,87 +286,7 @@ namespace FirebirdSql.Data.Isql
 							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
-						case SqlStatementType.DropCollation:
-						case SqlStatementType.DropDomain:
-						case SqlStatementType.DropException:
-						case SqlStatementType.DropExternalFunction:
-						case SqlStatementType.DropFilter:
-						case SqlStatementType.DropGenerator:
-						case SqlStatementType.DropIndex:
-						case SqlStatementType.DropProcedure:
-						case SqlStatementType.DropSequence:
-						case SqlStatementType.DropRole:
-						case SqlStatementType.DropShadow:
-						case SqlStatementType.DropTable:
-						case SqlStatementType.DropTrigger:
-						case SqlStatementType.DropView:
-						case SqlStatementType.EventInit:
-						case SqlStatementType.EventWait:
-						case SqlStatementType.Execute:
-						case SqlStatementType.ExecuteImmediate:
-						case SqlStatementType.ExecuteProcedure:
-							ProvideCommand().CommandText = sqlStatement;
-
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
 						case SqlStatementType.ExecuteBlock:
-							ProvideCommand().CommandText = sqlStatement;
-
-							OnCommandExecuting(_sqlCommand);
-
-							dataReader = _sqlCommand.ExecuteReader();
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, dataReader, -1);
-							if (!dataReader.IsClosed)
-							{
-								dataReader.Close();
-							}
-							break;
-
-						case SqlStatementType.Fetch:
-							break;
-
-						case SqlStatementType.Grant:
-						case SqlStatementType.Insert:
-						case SqlStatementType.InsertCursor:
-						case SqlStatementType.Open:
-						case SqlStatementType.Prepare:
-						case SqlStatementType.Revoke:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
-						case SqlStatementType.RecreateProcedure:
-						case SqlStatementType.RecreateTable:
-						case SqlStatementType.RecreateTrigger:
-						case SqlStatementType.RecreateView:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
-						case SqlStatementType.Rollback:
-							OnCommandExecuting(null);
-
-							RollbackTransaction();
-
-							OnCommandExecuted(sqlStatement, null, -1);
-							break;
-
 						case SqlStatementType.Select:
 							ProvideCommand().CommandText = sqlStatement;
 
@@ -360,16 +311,6 @@ namespace FirebirdSql.Data.Isql
 							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
-						case SqlStatementType.SetGenerator:
-						case SqlStatementType.AlterSequence:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
 						case SqlStatementType.SetNames:
 							OnCommandExecuting(null);
 
@@ -388,21 +329,16 @@ namespace FirebirdSql.Data.Isql
 							OnCommandExecuted(sqlStatement, null, -1);
 							break;
 
+						case SqlStatementType.Fetch:
+						case SqlStatementType.Describe:
+						case SqlStatementType._Comment:
+							break;
+
 						case SqlStatementType.SetDatabase:
 						case SqlStatementType.SetStatistics:
 						case SqlStatementType.SetTransaction:
 						case SqlStatementType.ShowSQLDialect:
 							throw new NotImplementedException();
-
-						case SqlStatementType.Update:
-						case SqlStatementType.Whenever:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
 					}
 				}
 				catch (Exception ex)
@@ -1130,6 +1066,20 @@ namespace FirebirdSql.Data.Isql
 					if (sqlStatement.StartsWith("WHENEVER", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.Whenever;
+					}
+					break;
+
+				case '-':
+					if (sqlStatement.StartsWith("--", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType._Comment;
+					}
+					break;
+
+				case '/':
+					if (sqlStatement.StartsWith("/*", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType._Comment;
 					}
 					break;
 			}
