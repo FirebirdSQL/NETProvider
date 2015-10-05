@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Isql
 	{
 		#region Fields
 
-		private StringParser _parser;
+		private SqlStringParser _parser;
 		private FbStatementCollection _results;
 
 		#endregion
@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Isql
 		public FbScript(string script)
 		{
 			_results = new FbStatementCollection();
-			_parser = new StringParser(RemoveComments(script));
+			_parser = new SqlStringParser(script);
 			_parser.Tokens = new[] { ";" };
 		}
 
@@ -115,75 +115,6 @@ namespace FirebirdSql.Data.Isql
 		public override string ToString()
 		{
 			return _parser.ToString();
-		}
-
-		#endregion
-
-		#region Internal Static Methods
-
-		/// <summary>
-		/// Removes from the SQL code all comments of the type: /*...*/ or --
-		/// </summary>
-		/// <param name="source">The string containing the original SQL code.</param>
-		/// <returns>A string containing the SQL code without comments.</returns>
-		internal static string RemoveComments(string source)
-		{
-			int i = 0;
-			int length = source.Length;
-			StringBuilder result = new StringBuilder();
-			bool insideComment = false;
-			bool insideLiteral = false;
-
-			while (i < length)
-			{
-				if (insideLiteral)
-				{
-					result.Append(source[i]);
-
-					if (source[i] == '\'')
-					{
-						insideLiteral = false;
-					}
-				}
-				else if (insideComment)
-				{
-					if (source[i] == '*')
-					{
-						if ((i < length - 1) && (source[i + 1] == '/'))
-						{
-							i++;
-							insideComment = false;
-						}
-					}
-				}
-				else if ((source[i] == '\'') && (i < length - 1))
-				{
-					result.Append(source[i]);
-					insideLiteral = true;
-				}
-				else if ((source[i] == '/') && (i < length - 1) && (source[i + 1] == '*'))
-				{
-					i++;
-					insideComment = true;
-				}
-				else if ((source[i] == '-' && (i < length - 1) && source[i + 1] == '-'))
-				{
-					i++;
-					while (i < length && source[i] != '\n')
-					{
-						i++;
-					}
-					i--;
-				}
-				else
-				{
-					result.Append(source[i]);
-				}
-
-				i++;
-			}
-
-			return result.ToString();
 		}
 
 		#endregion

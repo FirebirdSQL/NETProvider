@@ -292,7 +292,7 @@
     <Compile Include="Isql\FbBatchExecution.cs" />
     <Compile Include="Isql\FbScript.cs" />
     <Compile Include="Isql\SqlStatementType.cs" />
-    <Compile Include="Isql\StringParser.cs" />
+    <Compile Include="Isql\SqlStringParser.cs" />
     <Compile Include="Isql\FbStatementCollection.cs" />
     <Compile Include="Schema\FbCharacterSets.cs" />
     <Compile Include="Schema\FbCheckConstraints.cs" />

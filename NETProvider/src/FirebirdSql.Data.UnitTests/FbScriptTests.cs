@@ -17,9 +17,7 @@
  */
 
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections.Specialized;
+using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
@@ -27,19 +25,9 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture(FbServerType.Default)]
-	[TestFixture(FbServerType.Embedded)]
-	public class FbScriptTests : TestsBase
+	[TestFixture]
+	public class FbScriptTests
 	{
-		#region Constructors
-
-		public FbScriptTests(FbServerType serverType)
- 			: base(serverType)
-		{
-		}
-
-		#endregion
-
 		#region Unit Tests
 
 		[Test]
@@ -57,13 +45,113 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void OneLineCommentOnLastLineTest()
+		public void SimpleStatementNoSemicolonWithLiteral()
 		{
-			const string script =
-@"select * from foo
--- comment";
-			FbScript isql = new FbScript(script);
-			Assert.DoesNotThrow(() => isql.Parse());
+			const string text =
+@"select * from foo where x = 'foobar'";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text, script.Results[0]);
+		}
+
+		[Test]
+		public void SimpleStatementWithSemicolonWithLiteral()
+		{
+			const string text =
+@"select * from foo where x = 'foobar';";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0]);
+		}
+
+		[Test]
+		public void SimpleStatementNoSemicolonWithSemicolonInLiteral()
+		{
+			const string text =
+@"select * from foo where x = 'foo;bar'";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text, script.Results[0]);
+		}
+
+		[Test]
+		public void SimpleStatementNoSemicolonWithEscapedSingleQuoteInLiteral()
+		{
+			const string text =
+@"select * from foo where x = 'foo''bar'";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text, script.Results[0]);
+		}
+
+		[Test]
+		public void TwoStatements()
+		{
+			const string text =
+@"select * from foo;select * from bar";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(2, script.Results.Count());
+		}
+
+		[Test]
+		public void OneStatementNoSemicolonOneAfterSingleLineComment()
+		{
+			const string text =
+@"select * from foo--;select * from bar";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text, script.Results[0]);
+		}
+
+		[Test]
+		public void OneStatementWithSemicolonOneAfterSingleLineComment()
+		{
+			const string text =
+@"select * from foo;--select * from bar";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(2, script.Results.Count());
+			Assert.AreEqual("select * from foo", script.Results[0]);
+			Assert.AreEqual("--select * from bar", script.Results[1]);
+		}
+
+		[Test]
+		public void OneStatementWithMultilineCommentNoSemicolon()
+		{
+			const string text =
+@"select * from foo /* foo */";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text, script.Results[0]);
+		}
+
+		[Test]
+		public void OneStatementWithMultilineCommentSeparatedBySemicolon()
+		{
+			const string text =
+@"select * from foo /* foo */;";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0]);
+		}
+
+		[Test]
+		public void OneStatementWithMultilineCommentWithSemicolon()
+		{
+			const string text =
+@"select * from foo /* ;foo */";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text, script.Results[0]);
 		}
 
 		#endregion

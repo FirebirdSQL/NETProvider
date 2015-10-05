@@ -438,7 +438,7 @@ namespace FirebirdSql.Data.Isql
 			// [PASSWORD 'password']
 			// [CACHE int]
 			// [ROLE 'rolename']
-			StringParser parser = new StringParser(connectDbStatement);
+			SqlStringParser parser = new SqlStringParser(connectDbStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CONNECT")
@@ -492,7 +492,7 @@ namespace FirebirdSql.Data.Isql
 			// [DEFAULT CHARACTER SET charset]
 			// [<secondary_file>];
 			int pageSize = 0;
-			StringParser parser = new StringParser(createDatabaseStatement);
+			SqlStringParser parser = new SqlStringParser(createDatabaseStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
@@ -549,7 +549,7 @@ namespace FirebirdSql.Data.Isql
 		protected void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
 		{
 			// SET AUTODDL [ON | OFF]
-			StringParser parser = new StringParser(setAutoDdlStatement);
+			SqlStringParser parser = new SqlStringParser(setAutoDdlStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
@@ -586,7 +586,7 @@ namespace FirebirdSql.Data.Isql
 		protected void SetNames(string setNamesStatement)
 		{
 			// SET NAMES charset
-			StringParser parser = new StringParser(setNamesStatement);
+			SqlStringParser parser = new SqlStringParser(setNamesStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
@@ -605,7 +605,7 @@ namespace FirebirdSql.Data.Isql
 		protected void SetSqlDialect(string setSqlDialectStatement)
 		{
 			// SET SQL DIALECT dialect
-			StringParser parser = new StringParser(setSqlDialectStatement);
+			SqlStringParser parser = new SqlStringParser(setSqlDialectStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			parser.ParseNext();
 			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")

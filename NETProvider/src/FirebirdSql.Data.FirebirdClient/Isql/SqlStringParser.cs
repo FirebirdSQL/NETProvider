@@ -25,90 +25,23 @@ using System.Linq;
 
 namespace FirebirdSql.Data.Isql
 {
-	/// <summary>
-	/// StringParser parses a string returnning the (sub)strings between tokens.
-	/// </summary>
-	/// <example>
-	/// An example of how to use this class.
-	/// <code>
-	/// [STAThread]
-	/// static void Main(string[] args) {
-	///		int currentIndex = 0;
-	///		string s = ".NET Framework doesn't have a string parsing class?!";
-	///		StringParser parser = new StringParser(s, false);
-	///		while (currentIndex &lt; s.Length) {
-	///			Console.WriteLine("Returned Index: {0}", currentIndex = parser.ParseNext());
-	///			Console.WriteLine("Chars scanned: {0}", parser.CharsParsed);
-	///			Console.WriteLine("Parsing result: {0}", parser.Result);
-	///			Console.WriteLine();
-	///		}
-	/// }
-	/// </code>
-	/// <para>The output:</para>
-	/// <code>
-	/// Returned Index: 5
-	///	Chars scanned: 5
-	///	Parsing	result:	.NET
-	///
-	///	Returned Index:	15
-	///	Chars scanned: 10
-	///	Parsing	result:	Framework
-	///
-	///	Returned Index:	23
-	///	Chars scanned: 8
-	///	Parsing	result:	doesn't
-	///
-	///	Returned Index:	28
-	///	Chars scanned: 5
-	///	Parsing	result:	have
-	///
-	///	Returned Index:	30
-	///	Chars scanned: 2
-	///	Parsing	result:	a
-	///
-	///	Returned Index:	37
-	///	Chars scanned: 7
-	///	Parsing	result:	string
-	///
-	///	Returned Index:	45
-	///	Chars scanned: 8
-	///	Parsing	result:	parsing
-	///
-	///	Returned Index:	52
-	///	Chars scanned: 7
-	///	Parsing	result:	class?!
-	/// </code>
-	/// </example>
-	class StringParser
+	class SqlStringParser
 	{
-		#region Fields
-
-		private string _source;
-		private int _sourceLength;
-		private string[] _tokens;
-		private int _currentIndex;
-		private int _charsParsed;
-		private string _result;
-
-		#endregion
-
-		#region Properties
-
-		/// <summary>
-		/// Loaded after a parsing operation with the number of chars parsed.
-		/// </summary>
-		public int CharsParsed
-		{
-			get { return _charsParsed; }
-		}
+		string _source;
+		int _sourceLength;
+		string[] _tokens;
+		int _currentIndex;
+		string _result;
 
 		/// <summary>
 		/// Loaded after a parsing operation with the string that was found between tokens.
 		/// </summary>
-		public string Result
-		{
-			get { return _result; }
-		}
+		public string Result => _result;
+
+		/// <summary>
+		/// Returns the length of the string that is being parsed.
+		/// </summary>
+		public int Length => _sourceLength;
 
 		/// <summary>
 		/// The string separator. The default value is a white space: 0x32 ASCII code.
@@ -132,18 +65,6 @@ namespace FirebirdSql.Data.Isql
 		}
 
 		/// <summary>
-		/// Returns the length of the string that is being parsed.
-		/// </summary>
-		public int Length
-		{
-			get { return _sourceLength; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		/// <summary>
 		/// Creates an instance of StringParser.
 		/// </summary>
 		/// <param name="targetString">Indicates if parser system should be case-sensitive (true) or case-intensitive (false).</param>
@@ -151,16 +72,12 @@ namespace FirebirdSql.Data.Isql
 		/// <remarks>By defining the string (to parse) in constructor you can call directly the method <see cref="ParseNext"/>
 		/// without having to initializate the target string on <see cref="Parse(System.String)"/> method. See the example for further details.
 		/// </remarks>
-		public StringParser(string targetString)
+		public SqlStringParser(string targetString)
 		{
 			_tokens = new[] { " " };
 			_source = targetString;
 			_sourceLength = targetString.Length;
 		}
-
-		#endregion
-
-		#region Methods
 
 		/// <summary>
 		/// <para>
@@ -177,52 +94,98 @@ namespace FirebirdSql.Data.Isql
 				return -1;
 			}
 
-			int i = _currentIndex;
-			bool inLiteral = false;
+			var i = _currentIndex;
 			string matchedToken = null;
-
 			while (i < _sourceLength)
 			{
-				if (_source[i] == '\'')
+				// literal
+				if (GetChar(i) == '\'')
 				{
-					inLiteral = !inLiteral;
+					i++;
+					while (i < _sourceLength)
+					{
+						if (GetChar(i) == '\'' && GetNextChar(i) != '\'')
+						{
+							break;
+						}
+						i++;
+					}
+					i--;
 				}
 
-				if (!inLiteral)
+				// single/line comment
+				if (GetChar(i) == '-' && GetNextChar(i) == '-')
 				{
-					foreach (var token in Tokens)
+					i++;
+					while (i < _sourceLength)
 					{
-						if (string.Compare(_source, i, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
+						if (GetChar(i) == '\n')
 						{
-							i += token.Length;
-							matchedToken = token;
-							goto Break;
+							break;
 						}
+						if (GetChar(i) == '\r')
+						{
+							if (GetNextChar(i) == '\n')
+							{
+								i++;
+							}
+							break;
+						}
+						i++;
+					}
+					i--;
+				}
+
+				// multi-line comment
+				if (GetChar(i) == '/' && GetNextChar(i) == '*')
+				{
+					i++;
+					while (i < _sourceLength)
+					{
+						if (GetChar(i) == '*' && GetNextChar(i) == '/')
+						{
+							i++;
+							break;
+						}
+						i++;
+					}
+					i--;
+				}
+
+				foreach (var token in Tokens)
+				{
+					if (string.Compare(_source, i, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
+					{
+						i += token.Length;
+						matchedToken = token;
+						_result = _source.Substring(_currentIndex, i - _currentIndex - token.Length);
+						_currentIndex = i;
+						return _currentIndex;
 					}
 				}
 
 				i++;
 			}
-			// just to get out of the outer loop
-			Break:
-			{ }
 
-			_charsParsed = i - _currentIndex;
-			bool subtractToken = (i != _sourceLength) || (matchedToken != null && _source.EndsWith(matchedToken, false, CultureInfo.CurrentUICulture));
-			_result = _source.Substring(_currentIndex, i - _currentIndex - (subtractToken ? matchedToken.Length : 0));
-
+			_result = _source.Substring(_currentIndex, i - _currentIndex);
 			return _currentIndex = i;
 		}
 
-		/// <summary>
-		/// Overrided method that returns the string to be parsed.
-		/// </summary>
-		/// <returns>The string to be parsed.</returns>
 		public override string ToString()
 		{
 			return _source;
 		}
 
-		#endregion
+		char GetChar(int index)
+		{
+			return _source[index];
+		}
+
+		char? GetNextChar(int index)
+		{
+			return index + 1 < _sourceLength
+				? _source[index + 1]
+				: (char?)null;
+		}
 	}
 }
