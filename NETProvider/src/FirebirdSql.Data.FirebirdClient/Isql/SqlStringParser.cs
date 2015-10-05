@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.Isql
 					i--;
 				}
 
-				// single/line comment
+				// single-line comment
 				if (GetChar(i) == '-' && GetNextChar(i) == '-')
 				{
 					i++;
