@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0]);
+			Assert.AreEqual(text, script.Results[0].Text);
 		}
 
 		[Test]
@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0]);
+			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
 		}
 
 		[Test]
@@ -60,7 +60,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0]);
+			Assert.AreEqual(text, script.Results[0].Text);
 		}
 
 		[Test]
@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0]);
+			Assert.AreEqual(text, script.Results[0].Text);
 		}
 
 		[Test]
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0]);
+			Assert.AreEqual(text, script.Results[0].Text);
 		}
 
 		[Test]
@@ -103,8 +103,8 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(2, script.Results.Count());
-			Assert.AreEqual("select * from foo", script.Results[0]);
-			Assert.AreEqual("--select * from bar", script.Results[1]);
+			Assert.AreEqual("select * from foo", script.Results[0].Text);
+			Assert.AreEqual("--select * from bar", script.Results[1].Text);
 		}
 
 		[Test]
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0]);
+			Assert.AreEqual(text, script.Results[0].Text);
 		}
 
 		[Test]
@@ -126,7 +126,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0]);
+			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
 		}
 
 		[Test]
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0]);
+			Assert.AreEqual(text, script.Results[0].Text);
 		}
 
 		[Test]
@@ -148,7 +148,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbScript script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0]);
+			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
 		}
 
 		#endregion
