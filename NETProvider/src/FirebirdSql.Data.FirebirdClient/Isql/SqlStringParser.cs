@@ -94,93 +94,111 @@ namespace FirebirdSql.Data.Isql
 				return -1;
 			}
 
-			var i = _currentIndex;
-			string matchedToken = null;
-			while (i < _sourceLength)
+			var index = _currentIndex;
+			while (index < _sourceLength)
 			{
-				// literal
-				if (GetChar(i) == '\'')
+				if (GetChar(index) == '\'')
 				{
-					i++;
-					while (i < _sourceLength)
-					{
-						if (GetChar(i) == '\'' && GetNextChar(i) != '\'')
-						{
-							i++;
-							break;
-						}
-						i++;
-					}
-					//i--;
+					index++;
+					ProcessLiteral(ref index);
+					index++;
 				}
-				// single-line comment
-				else if (GetChar(i) == '-' && GetNextChar(i) == '-')
+				else if (GetChar(index) == '-' && GetNextChar(index) == '-')
 				{
-					i++;
-					while (i < _sourceLength)
-					{
-						if (GetChar(i) == '\n')
-						{
-							break;
-						}
-						if (GetChar(i) == '\r')
-						{
-							if (GetNextChar(i) == '\n')
-							{
-								i++;
-							}
-							break;
-						}
-						i++;
-					}
-					//i--;
+					index++;
+					ProcessSinglelineComment(ref index);
+					index++;
 				}
-				// multi-line comment
-				else if (GetChar(i) == '/' && GetNextChar(i) == '*')
+				else if (GetChar(index) == '/' && GetNextChar(index) == '*')
 				{
-					i++;
-					while (i < _sourceLength)
-					{
-						if (GetChar(i) == '*' && GetNextChar(i) == '/')
-						{
-							i++;
-							break;
-						}
-						i++;
-					}
-					//i--;
+					index++;
+					ProcessMultilineComment(ref index);
+					index++;
 				}
-
-				foreach (var token in Tokens)
+				else
 				{
-					if (string.Compare(_source, i, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
+					foreach (var token in Tokens)
 					{
-						i += token.Length;
-						matchedToken = token;
-						_result = _source.Substring(_currentIndex, i - _currentIndex - token.Length);
-						_currentIndex = i;
-						return _currentIndex;
+						if (string.Compare(_source, index, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
+						{
+							index += token.Length;
+							var matchedToken = token;
+							_result = _source.Substring(_currentIndex, index - _currentIndex - token.Length);
+							_currentIndex = index;
+							return _currentIndex;
+						}
 					}
+					index++;
 				}
-
-				i++;
 			}
 
-			if (i > _sourceLength)
+			if (index > _sourceLength)
 			{
 				_result = _source.Substring(_currentIndex);
 				return _currentIndex = _sourceLength;
 			}
 			else
 			{
-				_result = _source.Substring(_currentIndex, i - _currentIndex);
-				return _currentIndex = i;
+				_result = _source.Substring(_currentIndex, index - _currentIndex);
+				return _currentIndex = index;
 			}
 		}
 
 		public override string ToString()
 		{
 			return _source;
+		}
+
+		void ProcessLiteral(ref int index)
+		{
+			while (index < _sourceLength)
+			{
+				if (GetChar(index) == '\'')
+				{
+					if (GetNextChar(index) == '\'')
+					{
+						index++;
+					}
+					else
+					{
+						break;
+					}
+				}
+				index++;
+			}
+		}
+
+		void ProcessMultilineComment(ref int index)
+		{
+			while (index < _sourceLength)
+			{
+				if (GetChar(index) == '*' && GetNextChar(index) == '/')
+				{
+					index++;
+					break;
+				}
+				index++;
+			}
+		}
+
+		void ProcessSinglelineComment(ref int index)
+		{
+			while (index < _sourceLength)
+			{
+				if (GetChar(index) == '\n')
+				{
+					break;
+				}
+				if (GetChar(index) == '\r')
+				{
+					if (GetNextChar(index) == '\n')
+					{
+						index++;
+					}
+					break;
+				}
+				index++;
+			}
 		}
 
 		char GetChar(int index)
