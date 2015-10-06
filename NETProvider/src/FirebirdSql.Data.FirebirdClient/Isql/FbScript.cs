@@ -124,17 +124,15 @@ namespace FirebirdSql.Data.Isql
 		// method assumes that statement is trimmed
 		private bool IsSetTermStatement(string statement, out string newTerm)
 		{
-			bool result = false;
-
-			newTerm = string.Empty;
-
+			statement = SqlStringParser.RemoveComments(statement).TrimStart();
 			if (statement.StartsWith("SET TERM", StringComparison.OrdinalIgnoreCase))
 			{
 				newTerm = statement.Substring(8).Trim();
-				result = true;
+				return true;
 			}
 
-			return result;
+			newTerm = default(string);
+			return false;
 		}
 
 		#endregion
