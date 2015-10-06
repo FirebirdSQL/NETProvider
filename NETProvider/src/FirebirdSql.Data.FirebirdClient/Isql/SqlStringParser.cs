@@ -61,10 +61,14 @@ namespace FirebirdSql.Data.Isql
 			var lastYield = 0;
 			var index = 0;
 			var rawResult = new StringBuilder();
-			while (index < _sourceLength)
+			while (true)
 			{
 				Continue:
 				{ }
+				if (index >= _sourceLength)
+				{
+					break;
+				}
 				if (GetChar(index) == '\'')
 				{
 					rawResult.Append(GetChar(index));
@@ -106,9 +110,14 @@ namespace FirebirdSql.Data.Isql
 				}
 			}
 
-			if (index > _sourceLength)
+			if (index >= _sourceLength)
 			{
-				yield return new FbStatement(_source.Substring(lastYield), rawResult.ToString());
+				var parsed = _source.Substring(lastYield);
+				if (parsed.Trim() == string.Empty)
+				{
+					yield break;
+				}
+                yield return new FbStatement(parsed, rawResult.ToString());
 				lastYield = _sourceLength;
 				rawResult.Clear();
 			}

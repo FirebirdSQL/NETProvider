@@ -85,20 +85,19 @@ namespace FirebirdSql.Data.Isql
 			_results.Clear();
 			foreach (var statement in _parser.ParseNext())
 			{
-				if (!string.IsNullOrEmpty(statement.CleanText))
+				string newParserToken;
+				if (IsSetTermStatement(statement.CleanText, out newParserToken))
 				{
-					string newParserToken;
-					if (IsSetTermStatement(statement.CleanText, out newParserToken))
-					{
-						_parser.Tokens = new[] { newParserToken };
-						continue;
-					}
+					_parser.Tokens = new[] { newParserToken };
+					continue;
+				}
 
+				if (statement.CleanText != string.Empty)
+				{
 					var type = GetStatementType(statement.CleanText);
-                    if (type != null)
+					if (type != null)
 					{
 						statement.SetStatementType((SqlStatementType)type);
-						_results.Add(statement);
 					}
 					else
 					{
@@ -107,6 +106,8 @@ namespace FirebirdSql.Data.Isql
 							statement.Text));
 					}
 				}
+#warning Handle comments
+				_results.Add(statement);
 			}
 			return _results.Count;
 		}
