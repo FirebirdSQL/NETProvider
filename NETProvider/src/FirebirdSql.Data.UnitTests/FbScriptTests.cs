@@ -151,6 +151,17 @@ namespace FirebirdSql.Data.UnitTests
 			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
 		}
 
+		[Test]
+		public void SemicolonOnly()
+		{
+			const string text =
+@";";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
+		}
+
 		#endregion
 	}
 }
