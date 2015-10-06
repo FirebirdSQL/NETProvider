@@ -13,10 +13,8 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
+ *  Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *
- * Contributors:
- *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -58,7 +56,7 @@ namespace FirebirdSql.Data.Isql
 			_sourceLength = targetString.Length;
 		}
 
-		public IEnumerable<Tuple<string, string>> ParseNext()
+		public IEnumerable<FbStatement> ParseNext()
 		{
 			var lastYield = 0;
 			var index = 0;
@@ -94,9 +92,7 @@ namespace FirebirdSql.Data.Isql
 						if (string.Compare(_source, index, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
 						{
 							index += token.Length;
-							yield return Tuple.Create(
-								_source.Substring(lastYield, index - lastYield - token.Length),
-								rawResult.ToString());
+							yield return new FbStatement(_source.Substring(lastYield, index - lastYield - token.Length), rawResult.ToString());
 							lastYield = index;
 							rawResult.Clear();
 							goto Continue;
@@ -112,17 +108,13 @@ namespace FirebirdSql.Data.Isql
 
 			if (index > _sourceLength)
 			{
-				yield return Tuple.Create(
-					_source.Substring(lastYield),
-					rawResult.ToString());
+				yield return new FbStatement(_source.Substring(lastYield), rawResult.ToString());
 				lastYield = _sourceLength;
 				rawResult.Clear();
 			}
 			else
 			{
-				yield return Tuple.Create(
-					_source.Substring(lastYield, index - lastYield),
-					rawResult.ToString());
+				yield return new FbStatement(_source.Substring(lastYield, index - lastYield), rawResult.ToString());
 				lastYield = index;
 				rawResult.Clear();
 			}

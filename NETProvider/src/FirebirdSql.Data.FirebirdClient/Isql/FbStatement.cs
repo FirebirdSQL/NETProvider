@@ -12,19 +12,30 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2007, 2015 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace FirebirdSql.Data.Isql
 {
 	[Serializable]
-	public class FbStatementCollection : List<FbStatement>
+	public class FbStatement
 	{
-		internal FbStatementCollection()
-		{ }
+		public string Text { get; private set; }
+		internal string CleanText { get; private set; }
+		public SqlStatementType StatementType { get; private set; }
+
+		internal FbStatement(string text, string cleanText)
+		{
+			Text = text;
+			CleanText = cleanText;
+		}
+
+		internal void SetStatementType(SqlStatementType statementType)
+		{
+			StatementType = statementType;
+		}
 	}
 }

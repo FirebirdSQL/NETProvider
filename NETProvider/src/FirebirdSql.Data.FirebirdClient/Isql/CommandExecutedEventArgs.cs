@@ -14,6 +14,9 @@
  *
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
  *  All Rights Reserved.
+ *
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -21,80 +24,23 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Isql
 {
-	/// <summary>
-	/// Summary description for CommandExecutedEventArgs.
-	/// </summary>
 	public class CommandExecutedEventArgs
 	{
-		#region Fields
+		public FbDataReader DataReader { get; private set; }
+		public string CommandText { get; private set; }
+		public SqlStatementType StatementType { get; private set; }
+		public int RowsAffected { get; private set; }
 
-		private string _commandText;
-		private FbDataReader _dataReader;
-		private int _rowsAffected;
-
-		#endregion
-
-		#region Properties
-
-		/// <summary>
-		/// Returns the <see cref="SqlStatementType"/> of the current <see cref="CommandText"/>.
-		/// </summary>
-		public SqlStatementType StatementType
-		{
-			get { return FbBatchExecution.GetStatementType(_commandText); }
-		}
-
-		/// <summary>
-		/// Returns the SQL statement that was executed.
-		/// </summary>
-		public string CommandText
-		{
-			get { return _commandText; }
-		}
-
-		/// <summary>
-		/// Returns a <see cref="FbDataReader"/> instance case the executed SQL command returns data. If
-		/// the executed SQL command does not returns data, (for instance: the case of an UPDATE statement),
-		/// the <b>DataReader</b> is setled to <b>null</b>.
-		/// </summary>
-		public FbDataReader DataReader
-		{
-			get { return _dataReader; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		/// <summary>
-		/// Creates an instance of CommandExecutedEventArgs class.
-		/// </summary>
-		/// <param name="dataReader"></param>
-		/// <param name="commandText">The CommandText of the <see cref="FbCommand"/> that was executed.</param>
-		/// <param name="rowsAffected"></param>
 		public CommandExecutedEventArgs(
 			FbDataReader dataReader,
 			string commandText,
+			SqlStatementType statementType,
 			int rowsAffected)
 		{
-			_dataReader = dataReader;
-			_commandText = commandText;
-			_rowsAffected = rowsAffected;
+			DataReader = dataReader;
+			CommandText = commandText;
+			StatementType = statementType;
+			RowsAffected = rowsAffected;
 		}
-
-		#endregion
-
-		#region Methods
-
-		/// <summary>
-		/// Overrided. Returns the SQL statement that was executed.
-		/// </summary>
-		/// <returns>The SQL statement that will be executed.</returns>
-		public override string ToString()
-		{
-			return _commandText;
-		}
-
-		#endregion
 	}
 }
