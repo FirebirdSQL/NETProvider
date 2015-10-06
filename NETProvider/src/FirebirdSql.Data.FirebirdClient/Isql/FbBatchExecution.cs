@@ -369,6 +369,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="connectDbStatement"></param>
 		protected internal void ConnectToDatabase(string connectDbStatement)
 		{
+			connectDbStatement = SqlStringParser.RemoveComments(connectDbStatement).TrimStart();
 			// CONNECT 'filespec'
 			// [USER 'username']
 			// [PASSWORD 'password']
@@ -421,6 +422,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="createDatabaseStatement">The create database statement.</param>
 		protected void CreateDatabase(string createDatabaseStatement)
 		{
+			createDatabaseStatement = SqlStringParser.RemoveComments(createDatabaseStatement).TrimStart();
 			// CREATE {DATABASE | SCHEMA} 'filespec'
 			// [USER 'username' [PASSWORD 'password']]
 			// [PAGE_SIZE [=] int]
@@ -484,6 +486,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="setAutoDdlStatement">The set names statement.</param>
 		protected void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
 		{
+			setAutoDdlStatement = SqlStringParser.RemoveComments(setAutoDdlStatement).TrimStart();
 			// SET AUTODDL [ON | OFF]
 			SqlStringParser parser = new SqlStringParser(setAutoDdlStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
@@ -521,6 +524,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="setNamesStatement">The set names statement.</param>
 		protected void SetNames(string setNamesStatement)
 		{
+			setNamesStatement = SqlStringParser.RemoveComments(setNamesStatement).TrimStart();
 			// SET NAMES charset
 			SqlStringParser parser = new SqlStringParser(setNamesStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
@@ -540,6 +544,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="setSqlDialectStatement">The set sql dialect statement.</param>
 		protected void SetSqlDialect(string setSqlDialectStatement)
 		{
+			setSqlDialectStatement = SqlStringParser.RemoveComments(setSqlDialectStatement).TrimStart();
 			// SET SQL DIALECT dialect
 			SqlStringParser parser = new SqlStringParser(setSqlDialectStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
@@ -672,7 +677,7 @@ namespace FirebirdSql.Data.Isql
 		/// method will throw an exception.</remarks>
 		public static SqlStatementType GetStatementType(string sqlStatement)
 		{
-			sqlStatement = sqlStatement.TrimStart();
+			sqlStatement = SqlStringParser.RemoveComments(sqlStatement).TrimStart();
 			switch (sqlStatement.FirstOrDefault())
 			{
 				case 'A':

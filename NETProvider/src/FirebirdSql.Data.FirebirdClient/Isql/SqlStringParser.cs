@@ -22,6 +22,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace FirebirdSql.Data.Isql
 {
@@ -211,6 +212,66 @@ namespace FirebirdSql.Data.Isql
 			return index + 1 < _sourceLength
 				? _source[index + 1]
 				: (char?)null;
+		}
+
+		internal static string RemoveComments(string source)
+		{
+			var index = 0;
+			var length = source.Length;
+			var result = new StringBuilder();
+			var insideComment = false;
+			var insideLiteral = false;
+
+			while (index < length)
+			{
+				if (insideLiteral)
+				{
+					result.Append(source[index]);
+
+					if (source[index] == '\'')
+					{
+						insideLiteral = false;
+					}
+				}
+				else if (insideComment)
+				{
+					if (source[index] == '*')
+					{
+						if ((index < length - 1) && (source[index + 1] == '/'))
+						{
+							index++;
+							insideComment = false;
+						}
+					}
+				}
+				else if ((source[index] == '\'') && (index < length - 1))
+				{
+					result.Append(source[index]);
+					insideLiteral = true;
+				}
+				else if ((source[index] == '/') && (index < length - 1) && (source[index + 1] == '*'))
+				{
+					index++;
+					insideComment = true;
+				}
+				else if ((source[index] == '-' && (index < length - 1) && source[index + 1] == '-'))
+				{
+					index++;
+					while (index < length && source[index] != '\n')
+					{
+						index++;
+					}
+					index--;
+				}
+				else
+				{
+					result.Append(source[index]);
+				}
+
+				index++;
+			}
+
+			return result.ToString();
 		}
 	}
 }
