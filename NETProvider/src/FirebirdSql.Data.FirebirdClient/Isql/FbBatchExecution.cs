@@ -48,6 +48,7 @@ namespace FirebirdSql.Data.Isql
 		#region Fields
 
 		private FbStatementCollection _sqlStatements;
+		private FbStatementCollection _sqlStatements2;
 		private FbConnection _sqlConnection;
 		private FbTransaction _sqlTransaction;
 		private FbConnectionStringBuilder _connectionString;
@@ -81,6 +82,7 @@ namespace FirebirdSql.Data.Isql
 		public FbBatchExecution(FbConnection sqlConnection = null)
 		{
 			_sqlStatements = new FbStatementCollection();
+			_sqlStatements2 = new FbStatementCollection();
 			if (sqlConnection == null)
 			{
 				_sqlConnection = new FbConnection(); // do not specify the connection string
@@ -91,19 +93,6 @@ namespace FirebirdSql.Data.Isql
 				_sqlConnection = sqlConnection;
 				_connectionString = new FbConnectionStringBuilder(sqlConnection.ConnectionString);
 			}
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <b>FbBatchExecution</b> class with the given
-		/// <see cref="FbConnection" /> and <see cref="FbScript"/> instances.
-		/// </summary>
-		/// <param name="sqlConnection">A <see cref="FbConnection"/> object.</param>
-		/// <param name="isqlScript">A <see cref="FbScript"/> object.</param>
-		[Obsolete("Use other ctor together with AppendSqlStatements mehod.")]
-		public FbBatchExecution(FbConnection sqlConnection, FbScript isqlScript)
-			: this(sqlConnection)
-		{
-			AppendSqlStatements(isqlScript);
 		}
 
 		#endregion
@@ -117,6 +106,7 @@ namespace FirebirdSql.Data.Isql
 		public void AppendSqlStatements(FbScript isqlScript)
 		{
 			_sqlStatements.AddRange(isqlScript.Results);
+			_sqlStatements2.AddRange(isqlScript.Results2);
 		}
 
 		/// <summary>
@@ -132,15 +122,20 @@ namespace FirebirdSql.Data.Isql
 
 			_shouldClose = false;
 
-			foreach (string sqlStatement in SqlStatements.Where(x => !string.IsNullOrEmpty(x)))
+			for (int i = 0; i < SqlStatements.Count; i++)
 			{
+				var sqlStatement = SqlStatements[i];
+				var sqlStatement2 = _sqlStatements2[i];
+
+				if (string.IsNullOrEmpty(sqlStatement))
+					continue;
+
 				// initializate outputs to default
 				int rowsAffected = -1;
 				FbDataReader dataReader = null;
-				SqlStatementType statementType = FbBatchExecution.GetStatementType(sqlStatement);
+				SqlStatementType statementType = FbBatchExecution.GetStatementType(sqlStatement2);
 
-				if (!(statementType == SqlStatementType._Comment ||
-					statementType == SqlStatementType.Connect ||
+				if (!(statementType == SqlStatementType.Connect ||
 					statementType == SqlStatementType.CreateDatabase ||
 					statementType == SqlStatementType.Disconnect ||
 					statementType == SqlStatementType.DropDatabase ||
@@ -251,7 +246,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Connect:
 							OnCommandExecuting(null);
 
-							ConnectToDatabase(sqlStatement);
+							ConnectToDatabase(sqlStatement2);
 
 							_requiresNewConnection = false;
 
@@ -261,7 +256,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.CreateDatabase:
 							OnCommandExecuting(null);
 
-							CreateDatabase(sqlStatement);
+							CreateDatabase(sqlStatement2);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(sqlStatement, null, -1);
@@ -305,7 +300,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.SetAutoDDL:
 							OnCommandExecuting(null);
 
-							SetAutoDdl(sqlStatement, ref autoCommit);
+							SetAutoDdl(sqlStatement2, ref autoCommit);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(sqlStatement, null, -1);
@@ -314,7 +309,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.SetNames:
 							OnCommandExecuting(null);
 
-							SetNames(sqlStatement);
+							SetNames(sqlStatement2);
 							_requiresNewConnection = true;
 
 							OnCommandExecuted(sqlStatement, null, -1);
@@ -323,7 +318,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.SetSQLDialect:
 							OnCommandExecuting(null);
 
-							SetSqlDialect(sqlStatement);
+							SetSqlDialect(sqlStatement2);
 							_requiresNewConnection = true;
 
 							OnCommandExecuted(sqlStatement, null, -1);
@@ -331,7 +326,6 @@ namespace FirebirdSql.Data.Isql
 
 						case SqlStatementType.Fetch:
 						case SqlStatementType.Describe:
-						case SqlStatementType._Comment:
 							break;
 
 						case SqlStatementType.SetDatabase:
@@ -369,7 +363,6 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="connectDbStatement"></param>
 		protected internal void ConnectToDatabase(string connectDbStatement)
 		{
-			connectDbStatement = SqlStringParser.RemoveComments(connectDbStatement).TrimStart();
 			// CONNECT 'filespec'
 			// [USER 'username']
 			// [PASSWORD 'password']
@@ -422,7 +415,6 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="createDatabaseStatement">The create database statement.</param>
 		protected void CreateDatabase(string createDatabaseStatement)
 		{
-			createDatabaseStatement = SqlStringParser.RemoveComments(createDatabaseStatement).TrimStart();
 			// CREATE {DATABASE | SCHEMA} 'filespec'
 			// [USER 'username' [PASSWORD 'password']]
 			// [PAGE_SIZE [=] int]
@@ -486,7 +478,6 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="setAutoDdlStatement">The set names statement.</param>
 		protected void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
 		{
-			setAutoDdlStatement = SqlStringParser.RemoveComments(setAutoDdlStatement).TrimStart();
 			// SET AUTODDL [ON | OFF]
 			SqlStringParser parser = new SqlStringParser(setAutoDdlStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
@@ -524,7 +515,6 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="setNamesStatement">The set names statement.</param>
 		protected void SetNames(string setNamesStatement)
 		{
-			setNamesStatement = SqlStringParser.RemoveComments(setNamesStatement).TrimStart();
 			// SET NAMES charset
 			SqlStringParser parser = new SqlStringParser(setNamesStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
@@ -544,7 +534,6 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="setSqlDialectStatement">The set sql dialect statement.</param>
 		protected void SetSqlDialect(string setSqlDialectStatement)
 		{
-			setSqlDialectStatement = SqlStringParser.RemoveComments(setSqlDialectStatement).TrimStart();
 			// SET SQL DIALECT dialect
 			SqlStringParser parser = new SqlStringParser(setSqlDialectStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
@@ -677,7 +666,6 @@ namespace FirebirdSql.Data.Isql
 		/// method will throw an exception.</remarks>
 		public static SqlStatementType GetStatementType(string sqlStatement)
 		{
-			sqlStatement = SqlStringParser.RemoveComments(sqlStatement).TrimStart();
 			switch (sqlStatement.FirstOrDefault())
 			{
 				case 'A':
@@ -1071,20 +1059,6 @@ namespace FirebirdSql.Data.Isql
 					if (sqlStatement.StartsWith("WHENEVER", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.Whenever;
-					}
-					break;
-
-				case '-':
-					if (sqlStatement.StartsWith("--", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType._Comment;
-					}
-					break;
-
-				case '/':
-					if (sqlStatement.StartsWith("/*", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType._Comment;
 					}
 					break;
 			}

@@ -33,20 +33,12 @@ namespace FirebirdSql.Data.Isql
 		string[] _tokens;
 		int _currentIndex;
 		string _result;
+		string _resultClean;
 
-		/// <summary>
-		/// Loaded after a parsing operation with the string that was found between tokens.
-		/// </summary>
 		public string Result => _result;
 
-		/// <summary>
-		/// Returns the length of the string that is being parsed.
-		/// </summary>
-		public int Length => _sourceLength;
+		public string ResultClean => _resultClean;
 
-		/// <summary>
-		/// The string separator. The default value is a white space: 0x32 ASCII code.
-		/// </summary>
 		public string[] Tokens
 		{
 			get { return _tokens; }
@@ -65,14 +57,6 @@ namespace FirebirdSql.Data.Isql
 			}
 		}
 
-		/// <summary>
-		/// Creates an instance of StringParser.
-		/// </summary>
-		/// <param name="targetString">Indicates if parser system should be case-sensitive (true) or case-intensitive (false).</param>
-		/// <param name="caseSensitive">The string to parse.</param>
-		/// <remarks>By defining the string (to parse) in constructor you can call directly the method <see cref="ParseNext"/>
-		/// without having to initializate the target string on <see cref="Parse(System.String)"/> method. See the example for further details.
-		/// </remarks>
 		public SqlStringParser(string targetString)
 		{
 			_tokens = new[] { " " };
@@ -80,14 +64,6 @@ namespace FirebirdSql.Data.Isql
 			_sourceLength = targetString.Length;
 		}
 
-		/// <summary>
-		/// <para>
-		/// Repeats the parsing starting on the index returned by <see cref="Parse(System.String)"/> method.</para>
-		/// You can also call <b>ParseNext</b> directly (without calling <see cref="Parse(System.String)"/>) if you define the text to be parsed at instance construction.
-		/// </summary>
-		/// <returns>The index of the char next char after the <see cref="Token"/> end.</returns>
-		/// <remarks>If nothing is parsed the method will return -1. Case the <see cref="Token"/> wasn't found until the end of the string the method returns
-		/// (in <see cref="Result"/>) the string found between the starting index and the end of the string.</remarks>
 		public int ParseNext()
 		{
 			if (_currentIndex >= _sourceLength)
@@ -95,13 +71,16 @@ namespace FirebirdSql.Data.Isql
 				return -1;
 			}
 
+			var rawResult = new StringBuilder();
 			var index = _currentIndex;
 			while (index < _sourceLength)
 			{
-				if (GetChar(index) == '\'')
+                if (GetChar(index) == '\'')
 				{
+					rawResult.Append(GetChar(index));
 					index++;
-					ProcessLiteral(ref index);
+					rawResult.Append(ProcessLiteral(ref index));
+					rawResult.Append(GetChar(index));
 					index++;
 				}
 				else if (GetChar(index) == '-' && GetNextChar(index) == '-')
@@ -125,9 +104,13 @@ namespace FirebirdSql.Data.Isql
 							index += token.Length;
 							var matchedToken = token;
 							_result = _source.Substring(_currentIndex, index - _currentIndex - token.Length);
-							_currentIndex = index;
-							return _currentIndex;
+							_resultClean = rawResult.ToString();
+							return _currentIndex = index;
 						}
+					}
+					if (!(rawResult.Length == 0 && char.IsWhiteSpace(GetChar(index))))
+					{
+						rawResult.Append(GetChar(index));
 					}
 					index++;
 				}
@@ -136,28 +119,27 @@ namespace FirebirdSql.Data.Isql
 			if (index > _sourceLength)
 			{
 				_result = _source.Substring(_currentIndex);
+				_resultClean = rawResult.ToString();
 				return _currentIndex = _sourceLength;
 			}
 			else
 			{
 				_result = _source.Substring(_currentIndex, index - _currentIndex);
+				_resultClean = rawResult.ToString();
 				return _currentIndex = index;
 			}
 		}
 
-		public override string ToString()
+		string ProcessLiteral(ref int index)
 		{
-			return _source;
-		}
-
-		void ProcessLiteral(ref int index)
-		{
+			var sb = new StringBuilder();
 			while (index < _sourceLength)
 			{
 				if (GetChar(index) == '\'')
 				{
 					if (GetNextChar(index) == '\'')
 					{
+						sb.Append(GetChar(index));
 						index++;
 					}
 					else
@@ -165,8 +147,10 @@ namespace FirebirdSql.Data.Isql
 						break;
 					}
 				}
+				sb.Append(GetChar(index));
 				index++;
 			}
+			return sb.ToString();
 		}
 
 		void ProcessMultilineComment(ref int index)
@@ -212,66 +196,6 @@ namespace FirebirdSql.Data.Isql
 			return index + 1 < _sourceLength
 				? _source[index + 1]
 				: (char?)null;
-		}
-
-		internal static string RemoveComments(string source)
-		{
-			var index = 0;
-			var length = source.Length;
-			var result = new StringBuilder();
-			var insideComment = false;
-			var insideLiteral = false;
-
-			while (index < length)
-			{
-				if (insideLiteral)
-				{
-					result.Append(source[index]);
-
-					if (source[index] == '\'')
-					{
-						insideLiteral = false;
-					}
-				}
-				else if (insideComment)
-				{
-					if (source[index] == '*')
-					{
-						if ((index < length - 1) && (source[index + 1] == '/'))
-						{
-							index++;
-							insideComment = false;
-						}
-					}
-				}
-				else if ((source[index] == '\'') && (index < length - 1))
-				{
-					result.Append(source[index]);
-					insideLiteral = true;
-				}
-				else if ((source[index] == '/') && (index < length - 1) && (source[index + 1] == '*'))
-				{
-					index++;
-					insideComment = true;
-				}
-				else if ((source[index] == '-' && (index < length - 1) && source[index + 1] == '-'))
-				{
-					index++;
-					while (index < length && source[index] != '\n')
-					{
-						index++;
-					}
-					index--;
-				}
-				else
-				{
-					result.Append(source[index]);
-				}
-
-				index++;
-			}
-
-			return result.ToString();
 		}
 	}
 }

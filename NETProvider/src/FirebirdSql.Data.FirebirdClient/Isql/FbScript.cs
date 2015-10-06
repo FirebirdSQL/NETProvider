@@ -37,6 +37,7 @@ namespace FirebirdSql.Data.Isql
 
 		private SqlStringParser _parser;
 		private FbStatementCollection _results;
+		private FbStatementCollection _results2;
 
 		#endregion
 
@@ -49,6 +50,11 @@ namespace FirebirdSql.Data.Isql
 		public FbStatementCollection Results
 		{
 			get { return _results; }
+		}
+
+		internal FbStatementCollection Results2
+		{
+			get { return _results2; }
 		}
 
 		#endregion
@@ -68,6 +74,7 @@ namespace FirebirdSql.Data.Isql
 		public FbScript(string script)
 		{
 			_results = new FbStatementCollection();
+			_results2 = new FbStatementCollection();
 			_parser = new SqlStringParser(script);
 			_parser.Tokens = new[] { ";" };
 		}
@@ -82,49 +89,34 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>The number of statements found.</returns>
 		public int Parse()
 		{
-			int index = 0;
-			string atomicResult;
-			string newParserToken;
-
 			_results.Clear();
 
-			while (index < _parser.Length)
+			while (_parser.ParseNext() != -1)
 			{
-				index = _parser.ParseNext();
-				atomicResult = _parser.Result.Trim();
-
-				if (IsSetTermStatement(atomicResult, out newParserToken))
+				var resultClean = _parser.ResultClean;
+				if (!string.IsNullOrEmpty(resultClean))
 				{
-					_parser.Tokens = new[] { newParserToken };
-					continue;
-				}
+					string newParserToken;
+					if (IsSetTermStatement(resultClean, out newParserToken))
+					{
+						_parser.Tokens = new[] { newParserToken };
+						continue;
+					}
 
-				if (atomicResult != null && atomicResult.Length > 0)
-				{
-					_results.Add(atomicResult);
+					_results2.Add(resultClean);
+					_results.Add(_parser.Result);
 				}
 			}
 
 			return _results.Count;
 		}
 
-		/// <summary>
-		/// Overrided method, returns the the SQL code to be parsed (with comments removed).
-		/// </summary>
-		/// <returns>The SQL code to be parsed (without comments).</returns>
-		public override string ToString()
-		{
-			return _parser.ToString();
-		}
-
 		#endregion
 
 		#region Private Methods
 
-		// method assumes that statement is trimmed
 		private bool IsSetTermStatement(string statement, out string newTerm)
 		{
-			statement = SqlStringParser.RemoveComments(statement).TrimStart();
 			if (statement.StartsWith("SET TERM", StringComparison.OrdinalIgnoreCase))
 			{
 				newTerm = statement.Substring(8).Trim();
