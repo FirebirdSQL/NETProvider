@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.Isql
 				var sqlStatement = SqlStatements[i];
 				var sqlStatement2 = _sqlStatements2[i];
 
-				if (string.IsNullOrEmpty(sqlStatement))
+				if (string.IsNullOrEmpty(sqlStatement2))
 					continue;
 
 				// initializate outputs to default
