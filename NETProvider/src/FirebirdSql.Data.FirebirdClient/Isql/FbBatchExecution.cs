@@ -120,14 +120,8 @@ namespace FirebirdSql.Data.Isql
 
 			_shouldClose = false;
 
-			for (int i = 0; i < _statements.Count; i++)
+			foreach (var statement in Statements)
 			{
-				var statement = _statements[i];
-
-				// initializate outputs to default
-				int rowsAffected = -1;
-				FbDataReader dataReader = null;
-
 				if (!(statement.StatementType == SqlStatementType.Connect ||
 					statement.StatementType == SqlStatementType.CreateDatabase ||
 					statement.StatementType == SqlStatementType.Disconnect ||
@@ -214,7 +208,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Whenever:
 							OnCommandExecuting(_sqlCommand, statement.StatementType);
 
-							rowsAffected = ExecuteCommand(autoCommit);
+							var rowsAffected = ExecuteCommand(autoCommit);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, rowsAffected);
@@ -280,13 +274,11 @@ namespace FirebirdSql.Data.Isql
 
 							OnCommandExecuting(_sqlCommand, statement.StatementType);
 
-							dataReader = _sqlCommand.ExecuteReader();
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(dataReader, statement.Text, statement.StatementType, -1);
-							if (!dataReader.IsClosed)
+							using (var dataReader = _sqlCommand.ExecuteReader())
 							{
-								dataReader.Close();
+								_requiresNewConnection = false;
+
+								OnCommandExecuted(dataReader, statement.Text, statement.StatementType, -1);
 							}
 							break;
 
