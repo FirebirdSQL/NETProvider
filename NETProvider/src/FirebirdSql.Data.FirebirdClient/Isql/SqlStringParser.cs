@@ -20,6 +20,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -31,13 +32,6 @@ namespace FirebirdSql.Data.Isql
 		string _source;
 		int _sourceLength;
 		string[] _tokens;
-		int _currentIndex;
-		string _result;
-		string _resultClean;
-
-		public string Result => _result;
-
-		public string ResultClean => _resultClean;
 
 		public string[] Tokens
 		{
@@ -64,18 +58,16 @@ namespace FirebirdSql.Data.Isql
 			_sourceLength = targetString.Length;
 		}
 
-		public int ParseNext()
+		public IEnumerable<Tuple<string, string>> ParseNext()
 		{
-			if (_currentIndex >= _sourceLength)
-			{
-				return -1;
-			}
-
+			var lastYield = 0;
+			var index = 0;
 			var rawResult = new StringBuilder();
-			var index = _currentIndex;
 			while (index < _sourceLength)
 			{
-                if (GetChar(index) == '\'')
+				Continue:
+				{ }
+				if (GetChar(index) == '\'')
 				{
 					rawResult.Append(GetChar(index));
 					index++;
@@ -102,10 +94,12 @@ namespace FirebirdSql.Data.Isql
 						if (string.Compare(_source, index, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
 						{
 							index += token.Length;
-							var matchedToken = token;
-							_result = _source.Substring(_currentIndex, index - _currentIndex - token.Length);
-							_resultClean = rawResult.ToString();
-							return _currentIndex = index;
+							yield return Tuple.Create(
+								_source.Substring(lastYield, index - lastYield - token.Length),
+								rawResult.ToString());
+							lastYield = index;
+							rawResult.Clear();
+							goto Continue;
 						}
 					}
 					if (!(rawResult.Length == 0 && char.IsWhiteSpace(GetChar(index))))
@@ -118,15 +112,19 @@ namespace FirebirdSql.Data.Isql
 
 			if (index > _sourceLength)
 			{
-				_result = _source.Substring(_currentIndex);
-				_resultClean = rawResult.ToString();
-				return _currentIndex = _sourceLength;
+				yield return Tuple.Create(
+					_source.Substring(lastYield),
+					rawResult.ToString());
+				lastYield = _sourceLength;
+				rawResult.Clear();
 			}
 			else
 			{
-				_result = _source.Substring(_currentIndex, index - _currentIndex);
-				_resultClean = rawResult.ToString();
-				return _currentIndex = index;
+				yield return Tuple.Create(
+					_source.Substring(lastYield, index - lastYield),
+					rawResult.ToString());
+				lastYield = index;
+				rawResult.Clear();
 			}
 		}
 

@@ -90,10 +90,9 @@ namespace FirebirdSql.Data.Isql
 		public int Parse()
 		{
 			_results.Clear();
-
-			while (_parser.ParseNext() != -1)
+			foreach (var item in _parser.ParseNext())
 			{
-				var resultClean = _parser.ResultClean;
+				var resultClean = item.Item2;
 				if (!string.IsNullOrEmpty(resultClean))
 				{
 					string newParserToken;
@@ -102,12 +101,10 @@ namespace FirebirdSql.Data.Isql
 						_parser.Tokens = new[] { newParserToken };
 						continue;
 					}
-
 					_results2.Add(resultClean);
-					_results.Add(_parser.Result);
+					_results.Add(item.Item1);
 				}
 			}
-
 			return _results.Count;
 		}
 

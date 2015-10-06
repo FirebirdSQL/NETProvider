@@ -370,39 +370,42 @@ namespace FirebirdSql.Data.Isql
 			// [ROLE 'rolename']
 			SqlStringParser parser = new SqlStringParser(connectDbStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CONNECT")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
-			}
-			parser.ParseNext();
-			_connectionString.Database = parser.Result.Replace("'", string.Empty);
-			while (parser.ParseNext() != -1)
-			{
-				switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
+				enumerator.MoveNext();
+				if (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture) != "CONNECT")
 				{
-					case "USER":
-						parser.ParseNext();
-						_connectionString.UserID = parser.Result.Replace("'", string.Empty);
-						break;
+					throw new ArgumentException("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
+				}
+				enumerator.MoveNext();
+				_connectionString.Database = enumerator.Current.Item1.Replace("'", string.Empty);
+				while (enumerator.MoveNext())
+				{
+					switch (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture))
+					{
+						case "USER":
+							enumerator.MoveNext();
+							_connectionString.UserID = enumerator.Current.Item1.Replace("'", string.Empty);
+							break;
 
-					case "PASSWORD":
-						parser.ParseNext();
-						_connectionString.Password = parser.Result.Replace("'", string.Empty);
-						break;
+						case "PASSWORD":
+							enumerator.MoveNext();
+							_connectionString.Password = enumerator.Current.Item1.Replace("'", string.Empty);
+							break;
 
-					case "CACHE":
-						parser.ParseNext();
-						break;
+						case "CACHE":
+							enumerator.MoveNext();
+							break;
 
-					case "ROLE":
-						parser.ParseNext();
-						_connectionString.Role = parser.Result.Replace("'", string.Empty);
-						break;
+						case "ROLE":
+							enumerator.MoveNext();
+							_connectionString.Role = enumerator.Current.Item1.Replace("'", string.Empty);
+							break;
 
-					default:
-						throw new ArgumentException("Unexpected token '" + parser.Result.Trim() + "' on isql CONNECT statement.");
+						default:
+							throw new ArgumentException("Unexpected token '" + enumerator.Current.Item1 + "' on isql CONNECT statement.");
 
+					}
 				}
 			}
 			_requiresNewConnection = true;
@@ -424,47 +427,50 @@ namespace FirebirdSql.Data.Isql
 			int pageSize = 0;
 			SqlStringParser parser = new SqlStringParser(createDatabaseStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
-			}
-			parser.ParseNext(); // {DATABASE | SCHEMA}
-			parser.ParseNext();
-			_connectionString.Database = parser.Result.Replace("'", string.Empty);
-			while (parser.ParseNext() != -1)
-			{
-				switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
+				enumerator.MoveNext();
+				if (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture) != "CREATE")
 				{
-					case "USER":
-						parser.ParseNext();
-						_connectionString.UserID = parser.Result.Replace("'", string.Empty);
-						break;
+					throw new ArgumentException("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
+				}
+				enumerator.MoveNext(); // {DATABASE | SCHEMA}
+				enumerator.MoveNext();
+				_connectionString.Database = enumerator.Current.Item1.Replace("'", string.Empty);
+				while (enumerator.MoveNext())
+				{
+					switch (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture))
+					{
+						case "USER":
+							enumerator.MoveNext();
+							_connectionString.UserID = enumerator.Current.Item1.Replace("'", string.Empty);
+							break;
 
-					case "PASSWORD":
-						parser.ParseNext();
-						_connectionString.Password = parser.Result.Replace("'", string.Empty);
-						break;
+						case "PASSWORD":
+							enumerator.MoveNext();
+							_connectionString.Password = enumerator.Current.Item1.Replace("'", string.Empty);
+							break;
 
-					case "PAGE_SIZE":
-						parser.ParseNext();
-						if (parser.Result.Trim() == "=")
-							parser.ParseNext();
-						int.TryParse(parser.Result, out pageSize);
-						break;
+						case "PAGE_SIZE":
+							enumerator.MoveNext();
+							if (enumerator.Current.Item1 == "=")
+								enumerator.MoveNext();
+							int.TryParse(enumerator.Current.Item1, out pageSize);
+							break;
 
-					case "DEFAULT":
-						parser.ParseNext();
-						if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CHARACTER")
-							throw new ArgumentException("Expected the keyword CHARACTER but something else was found.");
+						case "DEFAULT":
+							enumerator.MoveNext();
+							if (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture) != "CHARACTER")
+								throw new ArgumentException("Expected the keyword CHARACTER but something else was found.");
 
-						parser.ParseNext();
-						if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
-							throw new ArgumentException("Expected the keyword SET but something else was found.");
+							enumerator.MoveNext();
+							if (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture) != "SET")
+								throw new ArgumentException("Expected the keyword SET but something else was found.");
 
-						parser.ParseNext();
-						_connectionString.Charset = parser.Result;
-						break;
+							enumerator.MoveNext();
+							_connectionString.Charset = enumerator.Current.Item1;
+							break;
+					}
 				}
 			}
 			FbConnection.CreateDatabase(_connectionString.ToString(), pageSize, true, false);
@@ -481,31 +487,34 @@ namespace FirebirdSql.Data.Isql
 			// SET AUTODDL [ON | OFF]
 			SqlStringParser parser = new SqlStringParser(setAutoDdlStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
-			}
-			parser.ParseNext(); // AUTO
-			if (parser.ParseNext() != -1)
-			{
-				string onOff = parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture);
-				if (onOff == "ON")
+				enumerator.MoveNext();
+				if (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture) != "SET")
 				{
-					autoCommit = true;
+					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
 				}
-				else if (onOff == "OFF")
+				enumerator.MoveNext(); // AUTO
+				if (enumerator.MoveNext())
 				{
-					autoCommit = false;
+					string onOff = enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture);
+					if (onOff == "ON")
+					{
+						autoCommit = true;
+					}
+					else if (onOff == "OFF")
+					{
+						autoCommit = false;
+					}
+					else
+					{
+						throw new ArgumentException("Expected the ON or OFF but something else was found.");
+					}
 				}
 				else
 				{
-					throw new ArgumentException("Expected the ON or OFF but something else was found.");
+					autoCommit = !autoCommit;
 				}
-			}
-			else
-			{
-				autoCommit = !autoCommit;
 			}
 		}
 
@@ -518,14 +527,17 @@ namespace FirebirdSql.Data.Isql
 			// SET NAMES charset
 			SqlStringParser parser = new SqlStringParser(setNamesStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				enumerator.MoveNext();
+				if (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture) != "SET")
+				{
+					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				}
+				enumerator.MoveNext(); // NAMES
+				enumerator.MoveNext();
+				_connectionString.Charset = enumerator.Current.Item1;
 			}
-			parser.ParseNext(); // NAMES
-			parser.ParseNext();
-			_connectionString.Charset = parser.Result;
 		}
 
 		/// <summary>
@@ -537,17 +549,20 @@ namespace FirebirdSql.Data.Isql
 			// SET SQL DIALECT dialect
 			SqlStringParser parser = new SqlStringParser(setSqlDialectStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				enumerator.MoveNext();
+				if (enumerator.Current.Item1.ToUpper(CultureInfo.InvariantCulture) != "SET")
+				{
+					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				}
+				enumerator.MoveNext(); // SQL
+				enumerator.MoveNext(); // DIALECT
+				enumerator.MoveNext();
+				int dialect = 3;
+				int.TryParse(enumerator.Current.Item1, out dialect);
+				_connectionString.Dialect = dialect;
 			}
-			parser.ParseNext(); // SQL
-			parser.ParseNext(); // DIALECT
-			parser.ParseNext();
-			int dialect = 3;
-			int.TryParse(parser.Result, out dialect);
-			_connectionString.Dialect = dialect;
 		}
 
 		protected FbCommand ProvideCommand()
