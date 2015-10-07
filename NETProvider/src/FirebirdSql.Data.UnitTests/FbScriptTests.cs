@@ -96,18 +96,6 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void OneStatementWithSemicolonOneAfterSingleLineComment()
-		{
-			const string text =
-@"select * from foo;--select * from bar";
-			FbScript script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(2, script.Results.Count());
-			Assert.AreEqual("select * from foo", script.Results[0].Text);
-			Assert.AreEqual("--select * from bar", script.Results[1].Text);
-		}
-
-		[Test]
 		public void OneStatementWithMultilineCommentNoSemicolon()
 		{
 			const string text =
@@ -158,19 +146,40 @@ namespace FirebirdSql.Data.UnitTests
 @";";
 			FbScript script = new FbScript(text);
 			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
+			Assert.AreEqual(0, script.Results.Count());
 		}
 
 		[Test]
 		public void MultilineCommentSeparatedBySemicolon()
 		{
 			const string text =
-@"/**/;";
+@"/*
+foo
+*/;";
 			FbScript script = new FbScript(text);
+			script.UnknownStatement += (sender, e) =>
+			{
+				if (e.Statement.Text == text.Substring(0, text.Length - 1))
+					e.Ignore = true;
+			};
+			script.Parse();
+			Assert.AreEqual(0, script.Results.Count());
+		}
+
+		[Test]
+		public void OneStatementWithSemicolonOneAfterSingleLineComment()
+		{
+			const string text =
+@"select * from foo;--select * from bar";
+			FbScript script = new FbScript(text);
+			script.UnknownStatement += (sender, e) =>
+			{
+				if (e.Statement.Text == "--select * from bar")
+					e.Ignore = true;
+			};
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
+			Assert.AreEqual("select * from foo", script.Results[0].Text);
 		}
 
 		#endregion

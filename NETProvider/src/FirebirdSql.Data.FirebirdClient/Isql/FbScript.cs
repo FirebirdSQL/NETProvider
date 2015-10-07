@@ -87,27 +87,30 @@ namespace FirebirdSql.Data.Isql
 					}
 				}
 
-				var unknownStatementEventArgs = new UnknownStatementEventArgs(statement);
-				UnknownStatement?.Invoke(this, unknownStatementEventArgs);
-				if (unknownStatementEventArgs.Handled && !unknownStatementEventArgs.Ignore)
+				if (statement.Text.Trim() != string.Empty)
 				{
-					statement.SetStatementType(unknownStatementEventArgs.Type);
-					_results.Add(statement);
-					continue;
-				}
-				else if (!unknownStatementEventArgs.Handled && unknownStatementEventArgs.Ignore)
-				{
-					continue;
-				}
-				else if (unknownStatementEventArgs.Handled && unknownStatementEventArgs.Ignore)
-				{
-					throw new InvalidOperationException($"Both {nameof(UnknownStatementEventArgs.Handled)} and {nameof(UnknownStatementEventArgs.Ignore)} should not be set.");
-				}
-				else
-				{
-					throw new ArgumentException(string.Format("The type of the SQL statement could not be determined.{0}Statement: {1}.",
-						Environment.NewLine,
-						statement.Text));
+					var unknownStatementEventArgs = new UnknownStatementEventArgs(statement);
+					UnknownStatement?.Invoke(this, unknownStatementEventArgs);
+					if (unknownStatementEventArgs.Handled && !unknownStatementEventArgs.Ignore)
+					{
+						statement.SetStatementType(unknownStatementEventArgs.Type);
+						_results.Add(statement);
+						continue;
+					}
+					else if (!unknownStatementEventArgs.Handled && unknownStatementEventArgs.Ignore)
+					{
+						continue;
+					}
+					else if (unknownStatementEventArgs.Handled && unknownStatementEventArgs.Ignore)
+					{
+						throw new InvalidOperationException($"Both {nameof(UnknownStatementEventArgs.Handled)} and {nameof(UnknownStatementEventArgs.Ignore)} should not be set.");
+					}
+					else
+					{
+						throw new ArgumentException(string.Format("The type of the SQL statement could not be determined.{0}Statement: {1}.",
+							Environment.NewLine,
+							statement.Text));
+					}
 				}
 			}
 			return _results.Count;
