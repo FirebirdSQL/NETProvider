@@ -160,7 +160,9 @@ foo
 			script.UnknownStatement += (sender, e) =>
 			{
 				if (e.Statement.Text == text.Substring(0, text.Length - 1))
+				{
 					e.Ignore = true;
+				}
 			};
 			script.Parse();
 			Assert.AreEqual(0, script.Results.Count());
@@ -175,11 +177,32 @@ foo
 			script.UnknownStatement += (sender, e) =>
 			{
 				if (e.Statement.Text == "--select * from bar")
+				{
 					e.Ignore = true;
+				}
 			};
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual("select * from foo", script.Results[0].Text);
+		}
+
+		[Test]
+		public void ManuallySettingStatementType()
+		{
+			const string text =
+@"create db 'foobar'";
+			FbScript script = new FbScript(text);
+			script.UnknownStatement += (sender, e) =>
+			{
+				if (e.Statement.Text == text)
+				{
+					e.NewStatementType = SqlStatementType.CreateDatabase;
+					e.Handled = true;
+				}
+			};
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(SqlStatementType.CreateDatabase, script.Results[0].StatementType);
 		}
 
 		#endregion

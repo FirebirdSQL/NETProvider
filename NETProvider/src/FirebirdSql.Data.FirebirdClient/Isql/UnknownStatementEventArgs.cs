@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Isql
 		public FbStatement Statement { get; private set; }
 		public bool Handled { get; set; }
 		public bool Ignore { get; set; }
-		public SqlStatementType Type { get; set; }
+		public SqlStatementType NewStatementType { get; set; }
 
 		public UnknownStatementEventArgs(FbStatement statement)
 		{

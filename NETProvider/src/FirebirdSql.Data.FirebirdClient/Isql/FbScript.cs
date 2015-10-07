@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.Isql
 					UnknownStatement?.Invoke(this, unknownStatementEventArgs);
 					if (unknownStatementEventArgs.Handled && !unknownStatementEventArgs.Ignore)
 					{
-						statement.SetStatementType(unknownStatementEventArgs.Type);
+						statement.SetStatementType(unknownStatementEventArgs.NewStatementType);
 						_results.Add(statement);
 						continue;
 					}
