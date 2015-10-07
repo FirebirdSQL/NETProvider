@@ -13,10 +13,8 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
+ *  Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *
- * Contributors:
- *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -33,14 +31,10 @@ namespace FirebirdSql.Data.Isql
 	/// </summary>
 	public class FbScript
 	{
-		#region Fields
+		public event EventHandler<UnknownStatementEventArgs> UnknownStatement;
 
 		SqlStringParser _parser;
 		FbStatementCollection _results;
-
-		#endregion
-
-		#region Properties
 
 		/// <summary>
 		/// Returns a FbStatementCollection containing all the SQL statements (without comments) present on the file.
@@ -51,9 +45,6 @@ namespace FirebirdSql.Data.Isql
 			get { return _results; }
 		}
 
-		#endregion
-
-		#region Static
 		/// <summary>
 		/// Creates FbScript reading content from file.
 		/// </summary>
@@ -61,9 +52,6 @@ namespace FirebirdSql.Data.Isql
 		{
 			return new FbScript(File.ReadAllText(fileName));
 		}
-		#endregion
-
-		#region Constructors
 
 		public FbScript(string script)
 		{
@@ -71,10 +59,6 @@ namespace FirebirdSql.Data.Isql
 			_parser = new SqlStringParser(script);
 			_parser.Tokens = new[] { ";" };
 		}
-
-		#endregion
-
-		#region Methods
 
 		/// <summary>
 		/// Parses the SQL code and loads the SQL statements into the StringCollection <see cref="Results"/>.
@@ -98,23 +82,36 @@ namespace FirebirdSql.Data.Isql
 					if (type != null)
 					{
 						statement.SetStatementType((SqlStatementType)type);
-					}
-					else
-					{
-						throw new ArgumentException(string.Format("The type of the SQL statement could not be determined.{0}Statement: {1}.",
-							Environment.NewLine,
-							statement.Text));
+						_results.Add(statement);
+						continue;
 					}
 				}
-#warning Handle comments
-				_results.Add(statement);
+
+				var unknownStatementEventArgs = new UnknownStatementEventArgs(statement);
+				UnknownStatement?.Invoke(this, unknownStatementEventArgs);
+				if (unknownStatementEventArgs.Handled && !unknownStatementEventArgs.Ignore)
+				{
+					statement.SetStatementType(unknownStatementEventArgs.Type);
+					_results.Add(statement);
+					continue;
+				}
+				else if (!unknownStatementEventArgs.Handled && unknownStatementEventArgs.Ignore)
+				{
+					continue;
+				}
+				else if (unknownStatementEventArgs.Handled && unknownStatementEventArgs.Ignore)
+				{
+					throw new InvalidOperationException($"Both {nameof(UnknownStatementEventArgs.Handled)} and {nameof(UnknownStatementEventArgs.Ignore)} should not be set.");
+				}
+				else
+				{
+					throw new ArgumentException(string.Format("The type of the SQL statement could not be determined.{0}Statement: {1}.",
+						Environment.NewLine,
+						statement.Text));
+				}
 			}
 			return _results.Count;
 		}
-
-		#endregion
-
-		#region Static Methods
 
 		static bool IsSetTermStatement(string statement, out string newTerm)
 		{
@@ -528,7 +525,5 @@ namespace FirebirdSql.Data.Isql
 			}
 			return null;
 		}
-
-		#endregion
 	}
 }

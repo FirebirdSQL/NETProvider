@@ -17,7 +17,6 @@
  *  All Rights Reserved.
  *
  * Contributors:
- *   Jiri Cincura (jiri@cincura.net)
  *   Olivier Metod
  */
 
@@ -32,35 +31,25 @@ namespace FirebirdSql.Data.Isql
 {
 	public class FbBatchExecution
 	{
-		#region Events
-
 		/// <summary>
 		/// The event trigged before a SQL statement goes for execution.
 		/// </summary>
-		public event CommandExecutingEventHandler CommandExecuting;
+		public event EventHandler<CommandExecutingEventArgs> CommandExecuting;
 
 		/// <summary>
 		/// The event trigged after a SQL statement execution.
 		/// </summary>
-		public event CommandExecutedEventHandler CommandExecuted;
+		public event EventHandler<CommandExecutedEventArgs> CommandExecuted;
 
-		#endregion
-
-		#region Fields
-
-		private FbStatementCollection _statements;
-		private FbConnection _sqlConnection;
-		private FbTransaction _sqlTransaction;
-		private FbConnectionStringBuilder _connectionString;
-		private FbCommand _sqlCommand;
+		FbStatementCollection _statements;
+		FbConnection _sqlConnection;
+		FbTransaction _sqlTransaction;
+		FbConnectionStringBuilder _connectionString;
+		FbCommand _sqlCommand;
 
 		// control fields
-		private bool _requiresNewConnection;
-		private bool _shouldClose;
-
-		#endregion
-
-		#region Properties
+		bool _requiresNewConnection;
+		bool _shouldClose;
 
 		/// <summary>
 		/// Represents the list of SQL statements for batch execution.
@@ -69,10 +58,6 @@ namespace FirebirdSql.Data.Isql
 		{
 			get { return _statements; }
 		}
-
-		#endregion
-
-		#region Constructors
 
 		/// <summary>
 		/// Creates an instance of FbBatchExecution engine with the given
@@ -93,10 +78,6 @@ namespace FirebirdSql.Data.Isql
 				_connectionString = new FbConnectionStringBuilder(sqlConnection.ConnectionString);
 			}
 		}
-
-		#endregion
-
-		#region Methods
 
 		/// <summary>
 		/// Appends SQL statements from <see cref="FbScript"/> instance. <see cref="FbScript.Parse"/> should be already called.
@@ -214,6 +195,21 @@ namespace FirebirdSql.Data.Isql
 							OnCommandExecuted(null, statement.Text, statement.StatementType, rowsAffected);
 							break;
 
+						case SqlStatementType.ExecuteBlock:
+						case SqlStatementType.Select:
+#warning Who's disposing this?
+							ProvideCommand().CommandText = statement.Text;
+
+							OnCommandExecuting(_sqlCommand, statement.StatementType);
+
+							using (var dataReader = _sqlCommand.ExecuteReader())
+							{
+								_requiresNewConnection = false;
+
+								OnCommandExecuted(dataReader, statement.Text, statement.StatementType, -1);
+							}
+							break;
+
 						case SqlStatementType.Commit:
 							OnCommandExecuting(null, statement.StatementType);
 
@@ -230,29 +226,10 @@ namespace FirebirdSql.Data.Isql
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
 
-						case SqlStatementType.Connect:
-							OnCommandExecuting(null, statement.StatementType);
-
-							ConnectToDatabase(statement.CleanText);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
-							break;
-
 						case SqlStatementType.CreateDatabase:
 							OnCommandExecuting(null, statement.StatementType);
 
 							CreateDatabase(statement.CleanText);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
-							break;
-
-						case SqlStatementType.Disconnect:
-							OnCommandExecuting(null, statement.StatementType);
-
-							_sqlConnection.Close();
-							FbConnection.ClearPool(_sqlConnection);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
@@ -267,19 +244,23 @@ namespace FirebirdSql.Data.Isql
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
 
-						case SqlStatementType.ExecuteBlock:
-						case SqlStatementType.Select:
-#warning Who's disposing this?
-							ProvideCommand().CommandText = statement.Text;
+						case SqlStatementType.Connect:
+							OnCommandExecuting(null, statement.StatementType);
 
-							OnCommandExecuting(_sqlCommand, statement.StatementType);
+							ConnectToDatabase(statement.CleanText);
+							_requiresNewConnection = false;
 
-							using (var dataReader = _sqlCommand.ExecuteReader())
-							{
-								_requiresNewConnection = false;
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
+							break;
 
-								OnCommandExecuted(dataReader, statement.Text, statement.StatementType, -1);
-							}
+						case SqlStatementType.Disconnect:
+							OnCommandExecuting(null, statement.StatementType);
+
+							_sqlConnection.Close();
+							FbConnection.ClearPool(_sqlConnection);
+							_requiresNewConnection = false;
+
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
 
 						case SqlStatementType.SetAutoDDL:
@@ -337,16 +318,12 @@ namespace FirebirdSql.Data.Isql
 			CloseConnection();
 		}
 
-		#endregion
-
-		#region Protected Methods
-
 		/// <summary>
 		/// Updates the connection string with the data parsed from the parameter and opens a connection
 		/// to the database.
 		/// </summary>
 		/// <param name="connectDbStatement"></param>
-		protected internal void ConnectToDatabase(string connectDbStatement)
+		protected void ConnectToDatabase(string connectDbStatement)
 		{
 			// CONNECT 'filespec'
 			// [USER 'username']
@@ -625,10 +602,6 @@ namespace FirebirdSql.Data.Isql
 			}
 		}
 
-		#endregion
-
-		#region Event Handlers
-
 		/// <summary>
 		/// The trigger function for <see cref="CommandExecuting"/>	event.
 		/// </summary>
@@ -652,7 +625,5 @@ namespace FirebirdSql.Data.Isql
 		{
 			CommandExecuted?.Invoke(this, new CommandExecutedEventArgs(dataReader, commandText, statementType, rowsAffected));
 		}
-
-		#endregion
 	}
 }

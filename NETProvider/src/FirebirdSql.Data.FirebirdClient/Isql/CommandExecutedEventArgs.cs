@@ -31,11 +31,7 @@ namespace FirebirdSql.Data.Isql
 		public SqlStatementType StatementType { get; private set; }
 		public int RowsAffected { get; private set; }
 
-		public CommandExecutedEventArgs(
-			FbDataReader dataReader,
-			string commandText,
-			SqlStatementType statementType,
-			int rowsAffected)
+		public CommandExecutedEventArgs(FbDataReader dataReader, string commandText, SqlStatementType statementType, int rowsAffected)
 		{
 			DataReader = dataReader;
 			CommandText = commandText;

@@ -166,6 +166,7 @@
     <Compile Include="FirebirdClient\FbProviderServices.cs" />
     <Compile Include="FirebirdClient\FbTransactionOptions.cs" />
     <Compile Include="Isql\FbStatement.cs" />
+    <Compile Include="Isql\UnknownStatementEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Client\Common\ArrayBoundMarshal.cs" />
     <Compile Include="Client\Common\ArrayDescMarshal.cs" />
@@ -287,9 +288,7 @@
     <Compile Include="FirebirdClient\FbTransactionBehavior.cs" />
     <Compile Include="FirebirdClient\FirebirdClientFactory.cs" />
     <Compile Include="Isql\CommandExecutedEventArgs.cs" />
-    <Compile Include="Isql\CommandExecutedEventHandler.cs" />
     <Compile Include="Isql\CommandExecutingEventArgs.cs" />
-    <Compile Include="Isql\CommandExecutingEventHandler.cs" />
     <Compile Include="Isql\FbBatchExecution.cs" />
     <Compile Include="Isql\FbScript.cs" />
     <Compile Include="Isql\SqlStatementType.cs" />
