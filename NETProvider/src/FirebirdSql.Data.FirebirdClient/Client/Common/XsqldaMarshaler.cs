@@ -32,8 +32,6 @@ namespace FirebirdSql.Data.Client.Common
 		private static int sizeofXSQLDA = Marshal.SizeOf(typeof(XSQLDA));
 		private static int sizeofXSQLVAR = Marshal.SizeOf(typeof(XSQLVAR));
 
-		#region · Methods ·
-
 		public static void CleanUpNativeData(ref IntPtr pNativeData)
 		{
 			if (pNativeData != IntPtr.Zero)
@@ -200,10 +198,6 @@ namespace FirebirdSql.Data.Client.Common
 			return descriptor;
 		}
 
-		#endregion
-
-		#region · Private Methods ·
-
 		private static void MarshalXSQLVARNativeToManaged(IntPtr ptr, XSQLVAR xsqlvar, bool onlyPointers = false)
 		{
 			unsafe
@@ -299,7 +293,5 @@ namespace FirebirdSql.Data.Client.Common
 		{
 			return charset.GetString(buffer, 0, bufferLength);
 		}
-
-		#endregion
 	}
 }
