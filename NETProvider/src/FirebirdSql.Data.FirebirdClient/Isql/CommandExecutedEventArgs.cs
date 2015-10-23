@@ -24,7 +24,7 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Isql
 {
-	public class CommandExecutedEventArgs
+	public class CommandExecutedEventArgs : EventArgs
 	{
 		public FbDataReader DataReader { get; private set; }
 		public string CommandText { get; private set; }
