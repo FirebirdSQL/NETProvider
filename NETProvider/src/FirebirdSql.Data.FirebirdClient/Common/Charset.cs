@@ -147,12 +147,11 @@ namespace FirebirdSql.Data.Common
 
 		#region Fields
 
-		private int		    _id;
-		private int		    _bytesPerCharacter;
-		private string	    _name;
-		private string	    _systemName;
-		private Encoding    _encoding;
-		private object      _syncObject;
+		private int _id;
+		private int _bytesPerCharacter;
+		private string _name;
+		private string _systemName;
+		private Encoding _encoding;
 
 		#endregion
 
@@ -188,9 +187,18 @@ namespace FirebirdSql.Data.Common
 			_name = name;
 			_bytesPerCharacter = bytesPerCharacter;
 			_systemName = systemName;
-			_syncObject = new object();
-
-			SetEncoding();
+			switch (_systemName)
+			{
+				case "NONE":
+					_encoding = Encoding.Default;
+					break;
+				case "OCTETS":
+					_encoding = new BinaryEncoding();
+					break;
+				default:
+					_encoding = Encoding.GetEncoding(_systemName);
+					break;
+			}
 		}
 
 		#endregion
@@ -215,34 +223,6 @@ namespace FirebirdSql.Data.Common
 		public string GetString(byte[] buffer, int index, int count)
 		{
 			return _encoding.GetString(buffer, index, count);
-		}
-
-		#endregion
-
-		#region Private Methods
-
-		private void SetEncoding()
-		{
-			lock (_syncObject)
-			{
-				if (_encoding == null)
-				{
-					switch (_systemName)
-					{
-						case "NONE":
-							_encoding = Encoding.Default;
-							break;
-
-						case "OCTETS":
-							_encoding = new BinaryEncoding();
-							break;
-
-						default:
-							_encoding = Encoding.GetEncoding(_systemName);
-							break;
-					}
-				}
-			}
 		}
 
 		#endregion
