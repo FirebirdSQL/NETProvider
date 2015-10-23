@@ -151,7 +151,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override event StateChangeEventHandler StateChange;
 
-		public event FbInfoMessageEventHandler InfoMessage;
+		public event EventHandler<FbInfoMessageEventArgs> InfoMessage;
 
 		#endregion
 

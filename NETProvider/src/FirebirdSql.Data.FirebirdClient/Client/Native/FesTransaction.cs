@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Events
 
-		public event TransactionUpdateEventHandler Update;
+		public event EventHandler Update;
 
 		#endregion
 

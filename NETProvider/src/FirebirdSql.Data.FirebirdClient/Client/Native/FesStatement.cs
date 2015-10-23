@@ -72,7 +72,7 @@ namespace FirebirdSql.Data.Client.Native
 					else
 					{
 						_transaction = (FesTransaction)value;
-						_TransactionUpdate = new TransactionUpdateEventHandler(TransactionUpdated);
+						_TransactionUpdate = new EventHandler(TransactionUpdated);
 						_transaction.Update += _TransactionUpdate;
 					}
 				}

@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.UnitTests
 			backupSvc.BackupFiles.Add(new FbBackupFile(TestsSetup.BackupRestoreFile, 2048));
 			backupSvc.Verbose = true;
 
-			backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+			backupSvc.ServiceOutput += new EventHandler<ServiceOutputEventArgs>(ServiceOutput);
 
 			backupSvc.Execute();
 		}
@@ -101,7 +101,7 @@ namespace FirebirdSql.Data.UnitTests
 			restoreSvc.Verbose = true;
 			restoreSvc.BackupFiles.Add(new FbBackupFile(TestsSetup.BackupRestoreFile, 2048));
 
-			restoreSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+			restoreSvc.ServiceOutput += new EventHandler<ServiceOutputEventArgs>(ServiceOutput);
 
 			restoreSvc.Execute();
 		}
@@ -130,7 +130,7 @@ namespace FirebirdSql.Data.UnitTests
 			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 			backupSvc.OutputStream = buffer;
 
-			backupSvc.ServiceOutput += new ServiceOutputEventHandler(ServiceOutput);
+			backupSvc.ServiceOutput += new EventHandler<ServiceOutputEventArgs>(ServiceOutput);
 
 			backupSvc.Execute();
 		}

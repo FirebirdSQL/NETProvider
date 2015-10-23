@@ -72,7 +72,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					else
 					{
 						_transaction = (GdsTransaction)value;
-						_TransactionUpdate = new TransactionUpdateEventHandler(TransactionUpdated);
+						_TransactionUpdate = new EventHandler(TransactionUpdated);
 						_transaction.Update += _TransactionUpdate;
 					}
 				}

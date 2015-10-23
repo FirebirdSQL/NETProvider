@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Events
 
-		public event FbRowUpdatedEventHandler RowUpdated
+		public event EventHandler<FbRowUpdatedEventArgs>   RowUpdated
 		{
 			add
 			{
@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public event FbRowUpdatingEventHandler RowUpdating
+		public event EventHandler<FbRowUpdatingEventArgs> RowUpdating
 		{
 			add
 			{
@@ -197,9 +197,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override void OnRowUpdating(RowUpdatingEventArgs value)
 		{
-			FbRowUpdatingEventHandler handler = null;
+			EventHandler<FbRowUpdatingEventArgs> handler = null;
 
-			handler = (FbRowUpdatingEventHandler)base.Events[EventRowUpdating];
+			handler = (EventHandler<FbRowUpdatingEventArgs>)base.Events[EventRowUpdating];
 
 			if ((null != handler) &&
 				(value is FbRowUpdatingEventArgs) &&
@@ -211,9 +211,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override void OnRowUpdated(RowUpdatedEventArgs value)
 		{
-			FbRowUpdatedEventHandler handler = null;
+			EventHandler<FbRowUpdatedEventArgs> handler = null;
 
-			handler = (FbRowUpdatedEventHandler)base.Events[EventRowUpdated];
+			handler = (EventHandler<FbRowUpdatedEventArgs>)base.Events[EventRowUpdated];
 
 			if ((handler != null) &&
 				(value is FbRowUpdatedEventArgs) &&

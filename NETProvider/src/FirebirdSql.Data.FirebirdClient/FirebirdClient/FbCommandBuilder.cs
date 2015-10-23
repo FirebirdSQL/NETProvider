@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
-		private FbRowUpdatingEventHandler _rowUpdatingHandler;
+		private EventHandler<FbRowUpdatingEventArgs> _rowUpdatingHandler;
 
 		#endregion
 
@@ -283,7 +283,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("adapter needs to be a FbDataAdapter");
 			}
 
-			_rowUpdatingHandler = new FbRowUpdatingEventHandler(RowUpdatingHandler);
+			_rowUpdatingHandler = new EventHandler<FbRowUpdatingEventArgs>(RowUpdatingHandler);
 			((FbDataAdapter)adapter).RowUpdating += _rowUpdatingHandler;
 		}
 

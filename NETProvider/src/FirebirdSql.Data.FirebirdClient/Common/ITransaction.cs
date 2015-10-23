@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Events
 
-		event TransactionUpdateEventHandler Update;
+		event EventHandler Update;
 
 		#endregion
 

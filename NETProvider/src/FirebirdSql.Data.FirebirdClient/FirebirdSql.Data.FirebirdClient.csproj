@@ -238,7 +238,6 @@
     <Compile Include="Common\StatementState.cs" />
     <Compile Include="Common\TransactionParameterBuffer.cs" />
     <Compile Include="Common\TransactionState.cs" />
-    <Compile Include="Common\TransactionUpdateEventHandler.cs" />
     <Compile Include="Common\TypeDecoder.cs" />
     <Compile Include="Common\TypeEncoder.cs" />
     <Compile Include="Common\TypeHelper.cs" />
@@ -268,7 +267,6 @@
     <Compile Include="FirebirdClient\FbErrorCollection.cs" />
     <Compile Include="FirebirdClient\FbException.cs" />
     <Compile Include="FirebirdClient\FbInfoMessageEventArgs.cs" />
-    <Compile Include="FirebirdClient\FbInfoMessageEventHandler.cs" />
     <Compile Include="FirebirdClient\FbParameter.cs" />
     <Compile Include="FirebirdClient\FbParameterCollection.cs" />
     <Compile Include="Server\FbResultSet.cs" />
@@ -277,11 +275,8 @@
     <Compile Include="FirebirdClient\FirebirdClientPermissionAtrribute.cs" />
     <Compile Include="FirebirdClient\FbRemoteEvent.cs" />
     <Compile Include="FirebirdClient\FbRemoteEventEventArgs.cs" />
-    <Compile Include="FirebirdClient\FbRemoteEventEventHandler.cs" />
     <Compile Include="FirebirdClient\FbRowUpdatedEventArgs.cs" />
-    <Compile Include="FirebirdClient\FbRowUpdatedEventHandler.cs" />
     <Compile Include="FirebirdClient\FbRowUpdatingEventArgs.cs" />
-    <Compile Include="FirebirdClient\FbRowUpdatingEventHandler.cs" />
     <Compile Include="FirebirdClient\FbTransaction.cs" />
     <Compile Include="FirebirdClient\FbTransactionBehavior.cs" />
     <Compile Include="FirebirdClient\FirebirdClientFactory.cs" />
@@ -357,7 +352,6 @@
     <Compile Include="Services\FbValidation.cs" />
     <Compile Include="Services\FbValidationFlags.cs" />
     <Compile Include="Services\ServiceOutputEventArgs.cs" />
-    <Compile Include="Services\ServiceOutputEventHandler.cs" />
     <Compile Include="Server\FbTriggerActionType.cs" />
     <Compile Include="Server\FbTriggerContext.cs" />
     <Compile Include="Server\IResultSet.cs" />

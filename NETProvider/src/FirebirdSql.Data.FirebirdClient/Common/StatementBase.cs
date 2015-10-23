@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.Common
 
 		#region Protected Fields
 
-		protected TransactionUpdateEventHandler _TransactionUpdate;
+		protected EventHandler _TransactionUpdate;
 
 		#endregion
 

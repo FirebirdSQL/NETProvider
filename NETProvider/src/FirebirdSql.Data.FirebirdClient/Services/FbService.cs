@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Services
 	{
 		#region Events
 
-		public event ServiceOutputEventHandler ServiceOutput;
+		public event EventHandler<ServiceOutputEventArgs> ServiceOutput;
 
 		#endregion
 

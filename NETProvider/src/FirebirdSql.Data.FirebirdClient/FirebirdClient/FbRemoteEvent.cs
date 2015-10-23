@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Events
 
-		public event FbRemoteEventEventHandler RemoteEventCounts;
+		public event EventHandler<FbRemoteEventEventArgs> RemoteEventCounts;
 
 		#endregion
 

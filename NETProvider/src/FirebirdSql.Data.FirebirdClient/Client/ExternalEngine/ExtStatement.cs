@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 					else
 					{
 						_transaction = (ExtTransaction)value;
-						_TransactionUpdate = new TransactionUpdateEventHandler(TransactionUpdated);
+						_TransactionUpdate = new EventHandler(TransactionUpdated);
 						_transaction.Update += _TransactionUpdate;
 					}
 				}
