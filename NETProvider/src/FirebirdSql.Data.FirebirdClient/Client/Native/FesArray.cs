@@ -118,23 +118,21 @@ namespace FirebirdSql.Data.Client.Native
 			int dbHandle = _db.Handle;
 			int trHandle = _transaction.Handle;
 
-			ArrayDescMarshaler marshaler = ArrayDescMarshaler.Instance;
-
-			IntPtr arrayDesc = marshaler.MarshalManagedToNative(Descriptor);
+			IntPtr arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 
 			byte[] buffer = new byte[sliceLength];
 
 			_db.FbClient.isc_array_get_slice(
 				_statusVector,
-				ref	dbHandle,
-				ref	trHandle,
+				ref dbHandle,
+				ref trHandle,
 				ref _handle,
 				arrayDesc,
 				buffer,
-				ref	sliceLength);
+				ref sliceLength);
 
 			// Free	memory
-			marshaler.CleanUpNativeData(ref	arrayDesc);
+			ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
 			FesConnection.ParseStatusVector(_statusVector, _db.Charset);
 
@@ -149,9 +147,7 @@ namespace FirebirdSql.Data.Client.Native
 			int dbHandle = _db.Handle;
 			int trHandle = _transaction.Handle;
 
-			ArrayDescMarshaler marshaler = ArrayDescMarshaler.Instance;
-
-			IntPtr arrayDesc = marshaler.MarshalManagedToNative(Descriptor);
+			IntPtr arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 
 			// Obtain the System of	type of	Array elements and
 			// Fill	buffer
@@ -169,15 +165,15 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.FbClient.isc_array_put_slice(
 				_statusVector,
-				ref	dbHandle,
-				ref	trHandle,
+				ref dbHandle,
+				ref trHandle,
 				ref _handle,
 				arrayDesc,
 				buffer,
-				ref	sliceLength);
+				ref sliceLength);
 
 			// Free	memory
-			marshaler.CleanUpNativeData(ref	arrayDesc);
+			ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
 			FesConnection.ParseStatusVector(_statusVector, _db.Charset);
 		}

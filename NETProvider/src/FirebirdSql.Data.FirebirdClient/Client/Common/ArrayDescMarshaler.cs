@@ -26,34 +26,9 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Common
 {
-	internal class ArrayDescMarshaler
+	internal static class ArrayDescMarshaler
 	{
-		#region Static Fields
-
-		private static readonly ArrayDescMarshaler instance = new ArrayDescMarshaler();
-
-		#endregion
-
-		#region Static Properties
-
-		public static ArrayDescMarshaler Instance
-		{
-			get { return ArrayDescMarshaler.instance; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		private ArrayDescMarshaler()
-		{
-		}
-
-		#endregion
-
-		#region Methods
-
-		public void CleanUpNativeData(ref IntPtr pNativeData)
+		public static void CleanUpNativeData(ref IntPtr pNativeData)
 		{
 			if (pNativeData != IntPtr.Zero)
 			{
@@ -73,17 +48,17 @@ namespace FirebirdSql.Data.Client.Common
 			}
 		}
 
-		public IntPtr MarshalManagedToNative(ArrayDesc descriptor)
+		public static IntPtr MarshalManagedToNative(ArrayDesc descriptor)
 		{
 			ArrayDescMarshal arrayDesc = new ArrayDescMarshal();
 
-			arrayDesc.DataType		= descriptor.DataType;
-			arrayDesc.Scale			= (byte)descriptor.Scale;
-			arrayDesc.Length		= descriptor.Length;
-			arrayDesc.FieldName		= descriptor.FieldName;
-			arrayDesc.RelationName	= descriptor.RelationName;
-			arrayDesc.Dimensions	= descriptor.Dimensions;
-			arrayDesc.Flags			= descriptor.Flags;
+			arrayDesc.DataType = descriptor.DataType;
+			arrayDesc.Scale = (byte)descriptor.Scale;
+			arrayDesc.Length = descriptor.Length;
+			arrayDesc.FieldName = descriptor.FieldName;
+			arrayDesc.RelationName = descriptor.RelationName;
+			arrayDesc.Dimensions = descriptor.Dimensions;
+			arrayDesc.Flags = descriptor.Flags;
 
 			ArrayBoundMarshal[] arrayBounds = new ArrayBoundMarshal[descriptor.Bounds.Length];
 
@@ -96,10 +71,10 @@ namespace FirebirdSql.Data.Client.Common
 			return MarshalManagedToNative(arrayDesc, arrayBounds);
 		}
 
-		public IntPtr MarshalManagedToNative(ArrayDescMarshal arrayDesc, ArrayBoundMarshal[] arrayBounds)
+		public static IntPtr MarshalManagedToNative(ArrayDescMarshal arrayDesc, ArrayBoundMarshal[] arrayBounds)
 		{
-			int		size = ArrayDescMarshal.ComputeLength(arrayBounds.Length);
-			IntPtr	ptr	 = Marshal.AllocHGlobal(size);
+			int size = ArrayDescMarshal.ComputeLength(arrayBounds.Length);
+			IntPtr ptr = Marshal.AllocHGlobal(size);
 
 			Marshal.StructureToPtr(arrayDesc, ptr, true);
 			for (int i = 0; i < arrayBounds.Length; i++)
@@ -109,7 +84,5 @@ namespace FirebirdSql.Data.Client.Common
 
 			return ptr;
 		}
-
-		#endregion
 	}
 }
