@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono
  *
  *     The contents of this file are subject to the Initial
@@ -37,6 +37,9 @@ using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Infrastructure.DependencyResolution;
+using System.Data.Entity.Migrations.Sql;
+using System.Data.Entity.Migrations.History;
+using System.Data.Entity.Infrastructure.Interception;
 
 using FirebirdSql.Data.EntityFramework6.SqlGen;
 #endif
@@ -56,12 +59,15 @@ namespace FirebirdSql.Data.EntityFramework6
 	public class FbProviderServices : DbProviderServices
 #pragma warning restore 3009
 	{
+		public const string ProviderInvariantName = "FirebirdSql.Data.FirebirdClient";
 		public static readonly FbProviderServices Instance = new FbProviderServices();
 
 		public FbProviderServices()
 		{
 #if (EF_6)
 			AddDependencyResolver(new SingletonDependencyResolver<IDbConnectionFactory>(new FbConnectionFactory()));
+			AddDependencyResolver(new SingletonDependencyResolver<Func<MigrationSqlGenerator>>(() => new FbMigrationSqlGenerator(), ProviderInvariantName));
+			DbInterception.Add(new FbMigrationsTransactionsInterceptor());
 #endif
 		}
 
@@ -405,16 +411,19 @@ namespace FirebirdSql.Data.EntityFramework6
 			StoreItemCollection storeItemCollection)
 #pragma warning restore 3001
 		{
-			FbConnection.CreateDatabase(connection.ConnectionString, 16384, true, false);
+			FbConnection.CreateDatabase(connection.ConnectionString, pageSize: 16384);
 			string script = DbCreateDatabaseScript(GetDbProviderManifestToken(connection), storeItemCollection);
 			FbScript fbScript = new FbScript(script);
 			fbScript.Parse();
+			if (fbScript.Results.Any())
+			{
 			using (var fbConnection = new FbConnection(connection.ConnectionString))
 			{
 				var execution = new FbBatchExecution(fbConnection);
 				execution.AppendSqlStatements(fbScript);
 				execution.Execute();
 			}
+		}
 		}
 
 		protected override string DbCreateDatabaseScript(string providerManifestToken,

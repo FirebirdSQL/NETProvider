@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono
  *
  *     The contents of this file are subject to the Initial
@@ -99,15 +99,16 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			}
 		}
 
-		/// <summary>
-		/// Writes a line terminator to the text stream.
-		/// </summary>
-		/// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter"/> is closed. </exception>
-		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
 		public override void WriteLine()
 		{
 			base.WriteLine();
 			_atBeginningOfLine = true;
+		}
+
+		public override void WriteLine(string value)
+		{
+			Write(value);
+			WriteLine();
 		}
 
 		#endregion

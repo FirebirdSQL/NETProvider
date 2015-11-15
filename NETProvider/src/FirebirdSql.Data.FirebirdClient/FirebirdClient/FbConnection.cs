@@ -55,17 +55,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Static Database Creation/Drop methods
 
-		public static void CreateDatabase(string connectionString)
-		{
-			FbConnection.CreateDatabase(connectionString, 4096, true, false);
-		}
-
 		public static void CreateDatabase(string connectionString, bool overwrite)
 		{
-			FbConnection.CreateDatabase(connectionString, 4096, true, overwrite);
+			FbConnection.CreateDatabase(connectionString, overwrite: overwrite);
 		}
 
-		public static void CreateDatabase(string connectionString, int pageSize, bool forcedWrites, bool overwrite)
+		public static void CreateDatabase(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false)
 		{
 			FbConnectionString options = new FbConnectionString(connectionString);
 			options.Validate();
