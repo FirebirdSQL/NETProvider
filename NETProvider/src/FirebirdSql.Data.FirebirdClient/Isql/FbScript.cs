@@ -13,15 +13,13 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
+ *  Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *
- * Contributors:
- *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
 using System.IO;
-using System.Text;
+using System.Linq;
 
 namespace FirebirdSql.Data.Isql
 {
@@ -33,14 +31,10 @@ namespace FirebirdSql.Data.Isql
 	/// </summary>
 	public class FbScript
 	{
-		#region Fields
+		public event EventHandler<UnknownStatementEventArgs> UnknownStatement;
 
-		private StringParser _parser;
-		private FbStatementCollection _results;
-
-		#endregion
-
-		#region Properties
+		SqlStringParser _parser;
+		FbStatementCollection _results;
 
 		/// <summary>
 		/// Returns a FbStatementCollection containing all the SQL statements (without comments) present on the file.
@@ -51,9 +45,6 @@ namespace FirebirdSql.Data.Isql
 			get { return _results; }
 		}
 
-		#endregion
-
-		#region Static
 		/// <summary>
 		/// Creates FbScript reading content from file.
 		/// </summary>
@@ -61,20 +52,13 @@ namespace FirebirdSql.Data.Isql
 		{
 			return new FbScript(File.ReadAllText(fileName));
 		}
-		#endregion
-
-		#region Constructors
 
 		public FbScript(string script)
 		{
 			_results = new FbStatementCollection();
-			_parser = new StringParser(RemoveComments(script));
+			_parser = new SqlStringParser(script);
 			_parser.Tokens = new[] { ";" };
 		}
-
-		#endregion
-
-		#region Methods
 
 		/// <summary>
 		/// Parses the SQL code and loads the SQL statements into the StringCollection <see cref="Results"/>.
@@ -82,130 +66,467 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>The number of statements found.</returns>
 		public int Parse()
 		{
-			int index = 0;
-			string atomicResult;
-			string newParserToken;
-
 			_results.Clear();
-
-			while (index < _parser.Length)
+			foreach (var statement in _parser.ParseNext())
 			{
-				index = _parser.ParseNext();
-				atomicResult = _parser.Result.Trim();
-
-				if (IsSetTermStatement(atomicResult, out newParserToken))
+				string newParserToken;
+				if (IsSetTermStatement(statement.CleanText, out newParserToken))
 				{
 					_parser.Tokens = new[] { newParserToken };
 					continue;
 				}
 
-				if (atomicResult != null && atomicResult.Length > 0)
+				if (statement.CleanText != string.Empty)
 				{
-					_results.Add(atomicResult);
+					var type = GetStatementType(statement.CleanText);
+					if (type != null)
+					{
+						statement.SetStatementType((SqlStatementType)type);
+						_results.Add(statement);
+						continue;
+					}
+				}
+
+				if (statement.Text.Trim() != string.Empty)
+				{
+					var unknownStatementEventArgs = new UnknownStatementEventArgs(statement);
+					UnknownStatement?.Invoke(this, unknownStatementEventArgs);
+					if (unknownStatementEventArgs.Handled && !unknownStatementEventArgs.Ignore)
+					{
+						statement.SetStatementType(unknownStatementEventArgs.NewStatementType);
+						_results.Add(statement);
+						continue;
+					}
+					else if (!unknownStatementEventArgs.Handled && unknownStatementEventArgs.Ignore)
+					{
+						continue;
+					}
+					else if (unknownStatementEventArgs.Handled && unknownStatementEventArgs.Ignore)
+					{
+						throw new InvalidOperationException($"Both {nameof(UnknownStatementEventArgs.Handled)} and {nameof(UnknownStatementEventArgs.Ignore)} should not be set.");
+					}
+					else
+					{
+						throw new ArgumentException(string.Format("The type of the SQL statement could not be determined.{0}Statement: {1}.",
+							Environment.NewLine,
+							statement.Text));
+					}
 				}
 			}
-
 			return _results.Count;
 		}
 
-		/// <summary>
-		/// Overrided method, returns the the SQL code to be parsed (with comments removed).
-		/// </summary>
-		/// <returns>The SQL code to be parsed (without comments).</returns>
-		public override string ToString()
+		static bool IsSetTermStatement(string statement, out string newTerm)
 		{
-			return _parser.ToString();
-		}
-
-		#endregion
-
-		#region Internal Static Methods
-
-		/// <summary>
-		/// Removes from the SQL code all comments of the type: /*...*/ or --
-		/// </summary>
-		/// <param name="source">The string containing the original SQL code.</param>
-		/// <returns>A string containing the SQL code without comments.</returns>
-		internal static string RemoveComments(string source)
-		{
-			int i = 0;
-			int length = source.Length;
-			StringBuilder result = new StringBuilder();
-			bool insideComment = false;
-			bool insideLiteral = false;
-
-			while (i < length)
-			{
-				if (insideLiteral)
-				{
-					result.Append(source[i]);
-
-					if (source[i] == '\'')
-					{
-						insideLiteral = false;
-					}
-				}
-				else if (insideComment)
-				{
-					if (source[i] == '*')
-					{
-						if ((i < length - 1) && (source[i + 1] == '/'))
-						{
-							i++;
-							insideComment = false;
-						}
-					}
-				}
-				else if ((source[i] == '\'') && (i < length - 1))
-				{
-					result.Append(source[i]);
-					insideLiteral = true;
-				}
-				else if ((source[i] == '/') && (i < length - 1) && (source[i + 1] == '*'))
-				{
-					i++;
-					insideComment = true;
-				}
-				else if ((source[i] == '-' && (i < length - 1) && source[i + 1] == '-'))
-				{
-					i++;
-					while (i < length && source[i] != '\n')
-					{
-						i++;
-					}
-					i--;
-				}
-				else
-				{
-					result.Append(source[i]);
-				}
-
-				i++;
-			}
-
-			return result.ToString();
-		}
-
-		#endregion
-
-		#region Private Methods
-
-		// method assumes that statement is trimmed
-		private bool IsSetTermStatement(string statement, out string newTerm)
-		{
-			bool result = false;
-
-			newTerm = string.Empty;
-
 			if (statement.StartsWith("SET TERM", StringComparison.OrdinalIgnoreCase))
 			{
 				newTerm = statement.Substring(8).Trim();
-				result = true;
+				return true;
 			}
 
-			return result;
+			newTerm = default(string);
+			return false;
 		}
 
-		#endregion
+		static SqlStatementType? GetStatementType(string sqlStatement)
+		{
+			switch (sqlStatement.FirstOrDefault())
+			{
+				case 'A':
+				case 'a':
+					if (sqlStatement.StartsWith("ALTER CHARACTER SET", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterCharacterSet;
+					}
+					if (sqlStatement.StartsWith("ALTER DATABASE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterDatabase;
+					}
+					if (sqlStatement.StartsWith("ALTER DOMAIN", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterDomain;
+					}
+					if (sqlStatement.StartsWith("ALTER EXCEPTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterException;
+					}
+					if (sqlStatement.StartsWith("ALTER INDEX", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterIndex;
+					}
+					if (sqlStatement.StartsWith("ALTER PROCEDURE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterProcedure;
+					}
+					if (sqlStatement.StartsWith("ALTER ROLE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterRole;
+					}
+					if (sqlStatement.StartsWith("ALTER SEQUENCE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterSequence;
+					}
+					if (sqlStatement.StartsWith("ALTER TABLE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterTable;
+					}
+					if (sqlStatement.StartsWith("ALTER TRIGGER", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterTrigger;
+					}
+					if (sqlStatement.StartsWith("ALTER VIEW", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterView;
+					}
+					break;
+
+				case 'C':
+				case 'c':
+					if (sqlStatement.StartsWith("CLOSE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Close;
+					}
+					if (sqlStatement.StartsWith("COMMENT ON", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CommentOn;
+					}
+					if (sqlStatement.StartsWith("COMMIT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Commit;
+					}
+					if (sqlStatement.StartsWith("CONNECT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Connect;
+					}
+					if (sqlStatement.StartsWith("CREATE COLLATION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateCollation;
+					}
+					if (sqlStatement.StartsWith("CREATE DATABASE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateDatabase;
+					}
+					if (sqlStatement.StartsWith("CREATE DOMAIN", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateDomain;
+					}
+					if (sqlStatement.StartsWith("CREATE EXCEPTION", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE OR ALTER EXCEPTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateException;
+					}
+					if (sqlStatement.StartsWith("CREATE GENERATOR", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateGenerator;
+					}
+					if (sqlStatement.StartsWith("CREATE INDEX", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE ASC INDEX", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE ASCENDING INDEX", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE DESC INDEX", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE DESCENDING INDEX", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateIndex;
+					}
+					if (sqlStatement.StartsWith("CREATE PROCEDURE", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE OR ALTER PROCEDURE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateProcedure;
+					}
+					if (sqlStatement.StartsWith("CREATE ROLE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateRole;
+					}
+					if (sqlStatement.StartsWith("CREATE SEQUENCE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateSequence;
+					}
+					if (sqlStatement.StartsWith("CREATE SHADOW", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateShadow;
+					}
+					if (sqlStatement.StartsWith("CREATE TABLE", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE GLOBAL TEMPORARY TABLE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateTable;
+					}
+					if (sqlStatement.StartsWith("CREATE TRIGGER", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE OR ALTER TRIGGER", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateTrigger;
+					}
+					if (sqlStatement.StartsWith("CREATE UNIQUE INDEX", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE UNIQUE ASC INDEX", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE UNIQUE ASCENDING INDEX", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE UNIQUE DESC INDEX", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE UNIQUE DESCENDING INDEX", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateIndex;
+					}
+					if (sqlStatement.StartsWith("CREATE VIEW", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE OR ALTER VIEW", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateView;
+					}
+					break;
+
+				case 'D':
+				case 'd':
+					if (sqlStatement.StartsWith("DECLARE CURSOR", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DeclareCursor;
+					}
+					if (sqlStatement.StartsWith("DECLARE EXTERNAL FUNCTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DeclareExternalFunction;
+					}
+					if (sqlStatement.StartsWith("DECLARE FILTER", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DeclareFilter;
+					}
+					if (sqlStatement.StartsWith("DECLARE STATEMENT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DeclareStatement;
+					}
+					if (sqlStatement.StartsWith("DECLARE TABLE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DeclareTable;
+					}
+					if (sqlStatement.StartsWith("DELETE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Delete;
+					}
+					if (sqlStatement.StartsWith("DESCRIBE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Describe;
+					}
+					if (sqlStatement.StartsWith("DISCONNECT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Disconnect;
+					}
+					if (sqlStatement.StartsWith("DROP COLLATION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropCollation;
+					}
+					if (sqlStatement.StartsWith("DROP DATABASE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropDatabase;
+					}
+					if (sqlStatement.StartsWith("DROP DOMAIN", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropDomain;
+					}
+					if (sqlStatement.StartsWith("DROP EXCEPTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropException;
+					}
+					if (sqlStatement.StartsWith("DROP EXTERNAL FUNCTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropExternalFunction;
+					}
+					if (sqlStatement.StartsWith("DROP FILTER", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropFilter;
+					}
+					if (sqlStatement.StartsWith("DROP GENERATOR", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropGenerator;
+					}
+					if (sqlStatement.StartsWith("DROP INDEX", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropIndex;
+					}
+					if (sqlStatement.StartsWith("DROP PROCEDURE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropProcedure;
+					}
+					if (sqlStatement.StartsWith("DROP SEQUENCE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropSequence;
+					}
+					if (sqlStatement.StartsWith("DROP ROLE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropRole;
+					}
+					if (sqlStatement.StartsWith("DROP SHADOW", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropShadow;
+					}
+					if (sqlStatement.StartsWith("DROP TABLE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropTable;
+					}
+					if (sqlStatement.StartsWith("DROP TRIGGER", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropTrigger;
+					}
+					if (sqlStatement.StartsWith("DROP VIEW", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropView;
+					}
+					break;
+
+				case 'E':
+				case 'e':
+					if (sqlStatement.StartsWith("EXECUTE BLOCK", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.ExecuteBlock;
+					}
+					if (sqlStatement.StartsWith("EXECUTE IMMEDIATE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.ExecuteImmediate;
+					}
+					if (sqlStatement.StartsWith("EXECUTE PROCEDURE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.ExecuteProcedure;
+					}
+					if (sqlStatement.StartsWith("EXECUTE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Execute;
+					}
+					if (sqlStatement.StartsWith("EVENT WAIT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.EventWait;
+					}
+					if (sqlStatement.StartsWith("EVENT INIT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.EventInit;
+					}
+					if (sqlStatement.StartsWith("END DECLARE SECTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.EndDeclareSection;
+					}
+					break;
+
+				case 'F':
+				case 'f':
+					if (sqlStatement.StartsWith("FETCH", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Fetch;
+					}
+					break;
+
+				case 'G':
+				case 'g':
+					if (sqlStatement.StartsWith("GRANT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Grant;
+					}
+					break;
+
+				case 'I':
+				case 'i':
+					if (sqlStatement.StartsWith("INSERT CURSOR", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.InsertCursor;
+					}
+					if (sqlStatement.StartsWith("INSERT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Insert;
+					}
+					break;
+
+				case 'O':
+				case 'o':
+					if (sqlStatement.StartsWith("OPEN", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Open;
+					}
+					break;
+
+				case 'P':
+				case 'p':
+					if (sqlStatement.StartsWith("PREPARE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Prepare;
+					}
+					break;
+
+				case 'R':
+				case 'r':
+					if (sqlStatement.StartsWith("REVOKE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Revoke;
+					}
+					if (sqlStatement.StartsWith("RECREATE PROCEDURE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.RecreateProcedure;
+					}
+					if (sqlStatement.StartsWith("RECREATE TABLE", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("RECREATE GLOBAL TEMPORARY TABLE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.RecreateTable;
+					}
+					if (sqlStatement.StartsWith("RECREATE TRIGGER", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.RecreateTrigger;
+					}
+					if (sqlStatement.StartsWith("RECREATE VIEW", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.RecreateView;
+					}
+					if (sqlStatement.StartsWith("ROLLBACK", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Rollback;
+					}
+					break;
+
+				case 'S':
+				case 's':
+					if (sqlStatement.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Select;
+					}
+					if (sqlStatement.StartsWith("SET AUTODDL", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.SetAutoDDL;
+					}
+					if (sqlStatement.StartsWith("SET DATABASE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.SetDatabase;
+					}
+					if (sqlStatement.StartsWith("SET GENERATOR", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.SetGenerator;
+					}
+					if (sqlStatement.StartsWith("SET NAMES", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.SetNames;
+					}
+					if (sqlStatement.StartsWith("SET SQL DIALECT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.SetSQLDialect;
+					}
+					if (sqlStatement.StartsWith("SET STATISTICS", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.SetStatistics;
+					}
+					if (sqlStatement.StartsWith("SET TRANSACTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.SetTransaction;
+					}
+					if (sqlStatement.StartsWith("SHOW SQL DIALECT", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.ShowSQLDialect;
+					}
+					break;
+
+				case 'U':
+				case 'u':
+					if (sqlStatement.StartsWith("UPDATE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Update;
+					}
+					break;
+
+				case 'W':
+				case 'w':
+					if (sqlStatement.StartsWith("WHENEVER", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Whenever;
+					}
+					break;
+			}
+			return null;
+		}
 	}
 }

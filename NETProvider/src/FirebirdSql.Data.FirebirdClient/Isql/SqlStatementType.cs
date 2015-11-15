@@ -433,6 +433,6 @@ namespace FirebirdSql.Data.Isql
 		/// <summary>
 		/// Represents the SQL statement: <b>WHENEVER</b>
 		/// </summary>
-		Whenever
+		Whenever,
 	}
 }

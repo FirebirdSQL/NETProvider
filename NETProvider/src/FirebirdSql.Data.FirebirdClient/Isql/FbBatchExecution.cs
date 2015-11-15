@@ -13,10 +13,10 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2003-2007 Abel Eduardo Pereira
+ *  Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *
  * Contributors:
- *   Jiri Cincura (jiri@cincura.net)
  *   Olivier Metod
  */
 
@@ -31,47 +31,33 @@ namespace FirebirdSql.Data.Isql
 {
 	public class FbBatchExecution
 	{
-		#region Events
-
 		/// <summary>
 		/// The event trigged before a SQL statement goes for execution.
 		/// </summary>
-		public event CommandExecutingEventHandler CommandExecuting;
+		public event EventHandler<CommandExecutingEventArgs> CommandExecuting;
 
 		/// <summary>
 		/// The event trigged after a SQL statement execution.
 		/// </summary>
-		public event CommandExecutedEventHandler CommandExecuted;
+		public event EventHandler<CommandExecutedEventArgs> CommandExecuted;
 
-		#endregion
-
-		#region Fields
-
-		private FbStatementCollection _sqlStatements;
-		private FbConnection _sqlConnection;
-		private FbTransaction _sqlTransaction;
-		private FbConnectionStringBuilder _connectionString;
-		private FbCommand _sqlCommand;
+		FbStatementCollection _statements;
+		FbConnection _sqlConnection;
+		FbTransaction _sqlTransaction;
+		FbConnectionStringBuilder _connectionString;
+		FbCommand _sqlCommand;
 
 		// control fields
-		private bool _requiresNewConnection;
-		private bool _shouldClose;
-
-		#endregion
-
-		#region Properties
+		bool _requiresNewConnection;
+		bool _shouldClose;
 
 		/// <summary>
 		/// Represents the list of SQL statements for batch execution.
 		/// </summary>
-		public FbStatementCollection SqlStatements
+		public FbStatementCollection Statements
 		{
-			get { return _sqlStatements; }
+			get { return _statements; }
 		}
-
-		#endregion
-
-		#region Constructors
 
 		/// <summary>
 		/// Creates an instance of FbBatchExecution engine with the given
@@ -80,7 +66,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="sqlConnection">A <see cref="FbConnection"/> object.</param>
 		public FbBatchExecution(FbConnection sqlConnection = null)
 		{
-			_sqlStatements = new FbStatementCollection();
+			_statements = new FbStatementCollection();
 			if (sqlConnection == null)
 			{
 				_sqlConnection = new FbConnection(); // do not specify the connection string
@@ -94,29 +80,12 @@ namespace FirebirdSql.Data.Isql
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <b>FbBatchExecution</b> class with the given
-		/// <see cref="FbConnection" /> and <see cref="FbScript"/> instances.
-		/// </summary>
-		/// <param name="sqlConnection">A <see cref="FbConnection"/> object.</param>
-		/// <param name="isqlScript">A <see cref="FbScript"/> object.</param>
-		[Obsolete("Use other ctor together with AppendSqlStatements mehod.")]
-		public FbBatchExecution(FbConnection sqlConnection, FbScript isqlScript)
-			: this(sqlConnection)
-		{
-			AppendSqlStatements(isqlScript);
-		}
-
-		#endregion
-
-		#region Methods
-
-		/// <summary>
 		/// Appends SQL statements from <see cref="FbScript"/> instance. <see cref="FbScript.Parse"/> should be already called.
 		/// </summary>
 		/// <param name="isqlScript">A <see cref="FbScript"/> object.</param>
 		public void AppendSqlStatements(FbScript isqlScript)
 		{
-			_sqlStatements.AddRange(isqlScript.Results);
+			_statements.AddRange(isqlScript.Results);
 		}
 
 		/// <summary>
@@ -125,32 +94,27 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
 		public void Execute(bool autoCommit = true)
 		{
-			if (SqlStatements == null || SqlStatements.Count == 0)
+			if ((_statements?.Count ?? 0) == 0)
 			{
 				throw new InvalidOperationException("There are no commands for execution.");
 			}
 
 			_shouldClose = false;
 
-			foreach (string sqlStatement in SqlStatements.Where(x => !string.IsNullOrEmpty(x)))
+			foreach (var statement in Statements)
 			{
-				// initializate outputs to default
-				int rowsAffected = -1;
-				FbDataReader dataReader = null;
-				SqlStatementType statementType = FbBatchExecution.GetStatementType(sqlStatement);
-
-				if (!(statementType == SqlStatementType.Connect ||
-					statementType == SqlStatementType.CreateDatabase ||
-					statementType == SqlStatementType.Disconnect ||
-					statementType == SqlStatementType.DropDatabase ||
-					statementType == SqlStatementType.SetAutoDDL ||
-					statementType == SqlStatementType.SetDatabase ||
-					statementType == SqlStatementType.SetNames ||
-					statementType == SqlStatementType.SetSQLDialect))
+				if (!(statement.StatementType == SqlStatementType.Connect ||
+					statement.StatementType == SqlStatementType.CreateDatabase ||
+					statement.StatementType == SqlStatementType.Disconnect ||
+					statement.StatementType == SqlStatementType.DropDatabase ||
+					statement.StatementType == SqlStatementType.SetAutoDDL ||
+					statement.StatementType == SqlStatementType.SetDatabase ||
+					statement.StatementType == SqlStatementType.SetNames ||
+					statement.StatementType == SqlStatementType.SetSQLDialect))
 				{
 					ProvideCommand();
-					_sqlCommand.CommandText = sqlStatement;
-					if (_sqlTransaction == null && !(statementType == SqlStatementType.Commit || statementType == SqlStatementType.Rollback))
+					_sqlCommand.CommandText = statement.Text;
+					if (_sqlTransaction == null && !(statement.StatementType == SqlStatementType.Commit || statement.StatementType == SqlStatementType.Rollback))
 					{
 						_sqlTransaction = _sqlConnection.BeginTransaction();
 					}
@@ -159,7 +123,7 @@ namespace FirebirdSql.Data.Isql
 
 				try
 				{
-					switch (statementType)
+					switch (statement.StatementType)
 					{
 						case SqlStatementType.AlterCharacterSet:
 						case SqlStatementType.AlterDatabase:
@@ -168,44 +132,10 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterIndex:
 						case SqlStatementType.AlterProcedure:
 						case SqlStatementType.AlterRole:
+						case SqlStatementType.AlterSequence:
 						case SqlStatementType.AlterTable:
 						case SqlStatementType.AlterTrigger:
 						case SqlStatementType.AlterView:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
-						case SqlStatementType.Commit:
-							OnCommandExecuting(null);
-
-							CommitTransaction();
-
-							OnCommandExecuted(sqlStatement, null, -1);
-							break;
-
-						case SqlStatementType.Connect:
-							OnCommandExecuting(null);
-
-							ConnectToDatabase(sqlStatement);
-
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, -1);
-							break;
-
-						case SqlStatementType.CreateDatabase:
-							OnCommandExecuting(null);
-
-							CreateDatabase(sqlStatement);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, -1);
-							break;
-
 						case SqlStatementType.CommentOn:
 						case SqlStatementType.CreateCollation:
 						case SqlStatementType.CreateDomain:
@@ -225,36 +155,6 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.DeclareStatement:
 						case SqlStatementType.DeclareTable:
 						case SqlStatementType.Delete:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
-						case SqlStatementType.Describe:
-							break;
-
-						case SqlStatementType.Disconnect:
-							OnCommandExecuting(null);
-
-							_sqlConnection.Close();
-							FbConnection.ClearPool(_sqlConnection);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, -1);
-							break;
-
-						case SqlStatementType.DropDatabase:
-							OnCommandExecuting(null);
-
-							FbConnection.DropDatabase(_connectionString.ToString());
-							_requiresNewConnection = true;
-
-							OnCommandExecuted(sqlStatement, null, -1);
-							break;
-
 						case SqlStatementType.DropCollation:
 						case SqlStatementType.DropDomain:
 						case SqlStatementType.DropException:
@@ -274,118 +174,124 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Execute:
 						case SqlStatementType.ExecuteImmediate:
 						case SqlStatementType.ExecuteProcedure:
-							ProvideCommand().CommandText = sqlStatement;
-
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
-						case SqlStatementType.ExecuteBlock:
-							ProvideCommand().CommandText = sqlStatement;
-
-							OnCommandExecuting(_sqlCommand);
-
-							dataReader = _sqlCommand.ExecuteReader();
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, dataReader, -1);
-							if (!dataReader.IsClosed)
-							{
-								dataReader.Close();
-							}
-							break;
-
-						case SqlStatementType.Fetch:
-							break;
-
 						case SqlStatementType.Grant:
 						case SqlStatementType.Insert:
 						case SqlStatementType.InsertCursor:
 						case SqlStatementType.Open:
 						case SqlStatementType.Prepare:
 						case SqlStatementType.Revoke:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
-
 						case SqlStatementType.RecreateProcedure:
 						case SqlStatementType.RecreateTable:
 						case SqlStatementType.RecreateTrigger:
 						case SqlStatementType.RecreateView:
-							OnCommandExecuting(_sqlCommand);
+						case SqlStatementType.SetGenerator:
+						case SqlStatementType.Update:
+						case SqlStatementType.Whenever:
+							OnCommandExecuting(_sqlCommand, statement.StatementType);
 
-							rowsAffected = ExecuteCommand(autoCommit);
+							var rowsAffected = ExecuteCommand(autoCommit);
 							_requiresNewConnection = false;
 
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(null, statement.Text, statement.StatementType, rowsAffected);
 							break;
 
-						case SqlStatementType.Rollback:
-							OnCommandExecuting(null);
-
-							RollbackTransaction();
-
-							OnCommandExecuted(sqlStatement, null, -1);
-							break;
-
+						case SqlStatementType.ExecuteBlock:
 						case SqlStatementType.Select:
-							ProvideCommand().CommandText = sqlStatement;
+#warning Who's disposing this?
+							ProvideCommand().CommandText = statement.Text;
 
-							OnCommandExecuting(_sqlCommand);
+							OnCommandExecuting(_sqlCommand, statement.StatementType);
 
-							dataReader = _sqlCommand.ExecuteReader();
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, dataReader, -1);
-							if (!dataReader.IsClosed)
+							using (var dataReader = _sqlCommand.ExecuteReader())
 							{
-								dataReader.Close();
+								_requiresNewConnection = false;
+
+								OnCommandExecuted(dataReader, statement.Text, statement.StatementType, -1);
 							}
 							break;
 
-						case SqlStatementType.SetAutoDDL:
-							OnCommandExecuting(null);
+						case SqlStatementType.Commit:
+							OnCommandExecuting(null, statement.StatementType);
 
-							SetAutoDdl(sqlStatement, ref autoCommit);
-							_requiresNewConnection = false;
+							CommitTransaction();
 
-							OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
 
-						case SqlStatementType.SetGenerator:
-						case SqlStatementType.AlterSequence:
-							OnCommandExecuting(_sqlCommand);
+						case SqlStatementType.Rollback:
+							OnCommandExecuting(null, statement.StatementType);
 
-							rowsAffected = ExecuteCommand(autoCommit);
+							RollbackTransaction();
+
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
+							break;
+
+						case SqlStatementType.CreateDatabase:
+							OnCommandExecuting(null, statement.StatementType);
+
+							CreateDatabase(statement.CleanText);
 							_requiresNewConnection = false;
 
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
+							break;
+
+						case SqlStatementType.DropDatabase:
+							OnCommandExecuting(null, statement.StatementType);
+
+							FbConnection.DropDatabase(_connectionString.ToString());
+							_requiresNewConnection = true;
+
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
+							break;
+
+						case SqlStatementType.Connect:
+							OnCommandExecuting(null, statement.StatementType);
+
+							ConnectToDatabase(statement.CleanText);
+							_requiresNewConnection = false;
+
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
+							break;
+
+						case SqlStatementType.Disconnect:
+							OnCommandExecuting(null, statement.StatementType);
+
+							_sqlConnection.Close();
+							FbConnection.ClearPool(_sqlConnection);
+							_requiresNewConnection = false;
+
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
+							break;
+
+						case SqlStatementType.SetAutoDDL:
+							OnCommandExecuting(null, statement.StatementType);
+
+							SetAutoDdl(statement.CleanText, ref autoCommit);
+							_requiresNewConnection = false;
+
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
 
 						case SqlStatementType.SetNames:
-							OnCommandExecuting(null);
+							OnCommandExecuting(null, statement.StatementType);
 
-							SetNames(sqlStatement);
+							SetNames(statement.CleanText);
 							_requiresNewConnection = true;
 
-							OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
 
 						case SqlStatementType.SetSQLDialect:
-							OnCommandExecuting(null);
+							OnCommandExecuting(null, statement.StatementType);
 
-							SetSqlDialect(sqlStatement);
+							SetSqlDialect(statement.CleanText);
 							_requiresNewConnection = true;
 
-							OnCommandExecuted(sqlStatement, null, -1);
+							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
+							break;
+
+						case SqlStatementType.Fetch:
+						case SqlStatementType.Describe:
 							break;
 
 						case SqlStatementType.SetDatabase:
@@ -393,16 +299,6 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.SetTransaction:
 						case SqlStatementType.ShowSQLDialect:
 							throw new NotImplementedException();
-
-						case SqlStatementType.Update:
-						case SqlStatementType.Whenever:
-							OnCommandExecuting(_sqlCommand);
-
-							rowsAffected = ExecuteCommand(autoCommit);
-							_requiresNewConnection = false;
-
-							OnCommandExecuted(sqlStatement, null, rowsAffected);
-							break;
 					}
 				}
 				catch (Exception ex)
@@ -412,7 +308,7 @@ namespace FirebirdSql.Data.Isql
 
 					throw new FbException(string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
 							Environment.NewLine,
-							sqlStatement,
+							statement.Text,
 							ex.Message),
 						ex);
 				}
@@ -422,57 +318,56 @@ namespace FirebirdSql.Data.Isql
 			CloseConnection();
 		}
 
-		#endregion
-
-		#region Protected Methods
-
 		/// <summary>
 		/// Updates the connection string with the data parsed from the parameter and opens a connection
 		/// to the database.
 		/// </summary>
 		/// <param name="connectDbStatement"></param>
-		protected internal void ConnectToDatabase(string connectDbStatement)
+		protected void ConnectToDatabase(string connectDbStatement)
 		{
 			// CONNECT 'filespec'
 			// [USER 'username']
 			// [PASSWORD 'password']
 			// [CACHE int]
 			// [ROLE 'rolename']
-			StringParser parser = new StringParser(connectDbStatement);
+			SqlStringParser parser = new SqlStringParser(connectDbStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CONNECT")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
-			}
-			parser.ParseNext();
-			_connectionString.Database = parser.Result.Replace("'", string.Empty);
-			while (parser.ParseNext() != -1)
-			{
-				switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
+				enumerator.MoveNext();
+				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "CONNECT")
 				{
-					case "USER":
-						parser.ParseNext();
-						_connectionString.UserID = parser.Result.Replace("'", string.Empty);
-						break;
+					throw new ArgumentException("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
+				}
+				enumerator.MoveNext();
+				_connectionString.Database = enumerator.Current.Text.Replace("'", string.Empty);
+				while (enumerator.MoveNext())
+				{
+					switch (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture))
+					{
+						case "USER":
+							enumerator.MoveNext();
+							_connectionString.UserID = enumerator.Current.Text.Replace("'", string.Empty);
+							break;
 
-					case "PASSWORD":
-						parser.ParseNext();
-						_connectionString.Password = parser.Result.Replace("'", string.Empty);
-						break;
+						case "PASSWORD":
+							enumerator.MoveNext();
+							_connectionString.Password = enumerator.Current.Text.Replace("'", string.Empty);
+							break;
 
-					case "CACHE":
-						parser.ParseNext();
-						break;
+						case "CACHE":
+							enumerator.MoveNext();
+							break;
 
-					case "ROLE":
-						parser.ParseNext();
-						_connectionString.Role = parser.Result.Replace("'", string.Empty);
-						break;
+						case "ROLE":
+							enumerator.MoveNext();
+							_connectionString.Role = enumerator.Current.Text.Replace("'", string.Empty);
+							break;
 
-					default:
-						throw new ArgumentException("Unexpected token '" + parser.Result.Trim() + "' on isql CONNECT statement.");
+						default:
+							throw new ArgumentException("Unexpected token '" + enumerator.Current.Text + "' on isql CONNECT statement.");
 
+					}
 				}
 			}
 			_requiresNewConnection = true;
@@ -492,49 +387,52 @@ namespace FirebirdSql.Data.Isql
 			// [DEFAULT CHARACTER SET charset]
 			// [<secondary_file>];
 			int pageSize = 0;
-			StringParser parser = new StringParser(createDatabaseStatement);
+			SqlStringParser parser = new SqlStringParser(createDatabaseStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CREATE")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
-			}
-			parser.ParseNext(); // {DATABASE | SCHEMA}
-			parser.ParseNext();
-			_connectionString.Database = parser.Result.Replace("'", string.Empty);
-			while (parser.ParseNext() != -1)
-			{
-				switch (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture))
+				enumerator.MoveNext();
+				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "CREATE")
 				{
-					case "USER":
-						parser.ParseNext();
-						_connectionString.UserID = parser.Result.Replace("'", string.Empty);
-						break;
+					throw new ArgumentException("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
+				}
+				enumerator.MoveNext(); // {DATABASE | SCHEMA}
+				enumerator.MoveNext();
+				_connectionString.Database = enumerator.Current.Text.Replace("'", string.Empty);
+				while (enumerator.MoveNext())
+				{
+					switch (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture))
+					{
+						case "USER":
+							enumerator.MoveNext();
+							_connectionString.UserID = enumerator.Current.Text.Replace("'", string.Empty);
+							break;
 
-					case "PASSWORD":
-						parser.ParseNext();
-						_connectionString.Password = parser.Result.Replace("'", string.Empty);
-						break;
+						case "PASSWORD":
+							enumerator.MoveNext();
+							_connectionString.Password = enumerator.Current.Text.Replace("'", string.Empty);
+							break;
 
-					case "PAGE_SIZE":
-						parser.ParseNext();
-						if (parser.Result.Trim() == "=")
-							parser.ParseNext();
-						int.TryParse(parser.Result, out pageSize);
-						break;
+						case "PAGE_SIZE":
+							enumerator.MoveNext();
+							if (enumerator.Current.Text == "=")
+								enumerator.MoveNext();
+							int.TryParse(enumerator.Current.Text, out pageSize);
+							break;
 
-					case "DEFAULT":
-						parser.ParseNext();
-						if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "CHARACTER")
-							throw new ArgumentException("Expected the keyword CHARACTER but something else was found.");
+						case "DEFAULT":
+							enumerator.MoveNext();
+							if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "CHARACTER")
+								throw new ArgumentException("Expected the keyword CHARACTER but something else was found.");
 
-						parser.ParseNext();
-						if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
-							throw new ArgumentException("Expected the keyword SET but something else was found.");
+							enumerator.MoveNext();
+							if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
+								throw new ArgumentException("Expected the keyword SET but something else was found.");
 
-						parser.ParseNext();
-						_connectionString.Charset = parser.Result;
-						break;
+							enumerator.MoveNext();
+							_connectionString.Charset = enumerator.Current.Text;
+							break;
+					}
 				}
 			}
 			FbConnection.CreateDatabase(_connectionString.ToString(), pageSize, true, false);
@@ -549,33 +447,36 @@ namespace FirebirdSql.Data.Isql
 		protected void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
 		{
 			// SET AUTODDL [ON | OFF]
-			StringParser parser = new StringParser(setAutoDdlStatement);
+			SqlStringParser parser = new SqlStringParser(setAutoDdlStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
-			}
-			parser.ParseNext(); // AUTO
-			if (parser.ParseNext() != -1)
-			{
-				string onOff = parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture);
-				if (onOff == "ON")
+				enumerator.MoveNext();
+				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
 				{
-					autoCommit = true;
+					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
 				}
-				else if (onOff == "OFF")
+				enumerator.MoveNext(); // AUTO
+				if (enumerator.MoveNext())
 				{
-					autoCommit = false;
+					string onOff = enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture);
+					if (onOff == "ON")
+					{
+						autoCommit = true;
+					}
+					else if (onOff == "OFF")
+					{
+						autoCommit = false;
+					}
+					else
+					{
+						throw new ArgumentException("Expected the ON or OFF but something else was found.");
+					}
 				}
 				else
 				{
-					throw new ArgumentException("Expected the ON or OFF but something else was found.");
+					autoCommit = !autoCommit;
 				}
-			}
-			else
-			{
-				autoCommit = !autoCommit;
 			}
 		}
 
@@ -586,16 +487,19 @@ namespace FirebirdSql.Data.Isql
 		protected void SetNames(string setNamesStatement)
 		{
 			// SET NAMES charset
-			StringParser parser = new StringParser(setNamesStatement);
+			SqlStringParser parser = new SqlStringParser(setNamesStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				enumerator.MoveNext();
+				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
+				{
+					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				}
+				enumerator.MoveNext(); // NAMES
+				enumerator.MoveNext();
+				_connectionString.Charset = enumerator.Current.Text;
 			}
-			parser.ParseNext(); // NAMES
-			parser.ParseNext();
-			_connectionString.Charset = parser.Result;
 		}
 
 		/// <summary>
@@ -605,19 +509,22 @@ namespace FirebirdSql.Data.Isql
 		protected void SetSqlDialect(string setSqlDialectStatement)
 		{
 			// SET SQL DIALECT dialect
-			StringParser parser = new StringParser(setSqlDialectStatement);
+			SqlStringParser parser = new SqlStringParser(setSqlDialectStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			parser.ParseNext();
-			if (parser.Result.Trim().ToUpper(CultureInfo.CurrentUICulture) != "SET")
+			using (var enumerator = parser.ParseNext().GetEnumerator())
 			{
-				throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				enumerator.MoveNext();
+				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
+				{
+					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
+				}
+				enumerator.MoveNext(); // SQL
+				enumerator.MoveNext(); // DIALECT
+				enumerator.MoveNext();
+				int dialect = 3;
+				int.TryParse(enumerator.Current.Text, out dialect);
+				_connectionString.Dialect = dialect;
 			}
-			parser.ParseNext(); // SQL
-			parser.ParseNext(); // DIALECT
-			parser.ParseNext();
-			int dialect = 3;
-			int.TryParse(parser.Result, out dialect);
-			_connectionString.Dialect = dialect;
 		}
 
 		protected FbCommand ProvideCommand()
@@ -695,17 +602,13 @@ namespace FirebirdSql.Data.Isql
 			}
 		}
 
-		#endregion
-
-		#region Event Handlers
-
 		/// <summary>
 		/// The trigger function for <see cref="CommandExecuting"/>	event.
 		/// </summary>
 		/// <param name="sqlCommand">The SQL command that is going for execution.</param>
-		protected void OnCommandExecuting(FbCommand sqlCommand)
+		protected void OnCommandExecuting(FbCommand sqlCommand, SqlStatementType statementType)
 		{
-			CommandExecuting?.Invoke(this, new CommandExecutingEventArgs(sqlCommand));
+			CommandExecuting?.Invoke(this, new CommandExecutingEventArgs(sqlCommand, statementType));
 		}
 
 		/// <summary>
@@ -718,426 +621,9 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="rowsAffected">The rows that were affected by the executed SQL command. If the executed
 		/// command is not meant to return this kind of information (ex: SELECT) this parameter must
 		/// be setled to <b>-1</b>.</param>
-		protected void OnCommandExecuted(string commandText, FbDataReader dataReader, int rowsAffected)
+		protected void OnCommandExecuted(FbDataReader dataReader, string commandText, SqlStatementType statementType, int rowsAffected)
 		{
-			CommandExecuted?.Invoke(this, new CommandExecutedEventArgs(dataReader, commandText, rowsAffected));
+			CommandExecuted?.Invoke(this, new CommandExecutedEventArgs(dataReader, commandText, statementType, rowsAffected));
 		}
-
-		#endregion
-
-		#region Static Methods
-
-		/// <summary>
-		/// Determines the <see cref="SqlStatementType"/> of the provided SQL statement.
-		/// </summary>
-		/// <param name="sqlStatement">The string containing the SQL statement.</param>
-		/// <returns>The <see cref="SqlStatementType"/> of the <b>sqlStatement</b>.</returns>
-		/// <remarks>If the type of <b>sqlStatement</b> could not be determined this
-		/// method will throw an exception.</remarks>
-		public static SqlStatementType GetStatementType(string sqlStatement)
-		{
-			sqlStatement = sqlStatement.TrimStart();
-			switch (sqlStatement.FirstOrDefault())
-			{
-				case 'A':
-				case 'a':
-					if (sqlStatement.StartsWith("ALTER CHARACTER SET", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterCharacterSet;
-					}
-					if (sqlStatement.StartsWith("ALTER DATABASE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterDatabase;
-					}
-					if (sqlStatement.StartsWith("ALTER DOMAIN", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterDomain;
-					}
-					if (sqlStatement.StartsWith("ALTER EXCEPTION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterException;
-					}
-					if (sqlStatement.StartsWith("ALTER INDEX", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterIndex;
-					}
-					if (sqlStatement.StartsWith("ALTER PROCEDURE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterProcedure;
-					}
-					if (sqlStatement.StartsWith("ALTER ROLE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterRole;
-					}
-					if (sqlStatement.StartsWith("ALTER SEQUENCE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterSequence;
-					}
-					if (sqlStatement.StartsWith("ALTER TABLE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterTable;
-					}
-					if (sqlStatement.StartsWith("ALTER TRIGGER", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterTrigger;
-					}
-					if (sqlStatement.StartsWith("ALTER VIEW", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.AlterView;
-					}
-					break;
-
-				case 'C':
-				case 'c':
-					if (sqlStatement.StartsWith("CLOSE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Close;
-					}
-					if (sqlStatement.StartsWith("COMMENT ON", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CommentOn;
-					}
-					if (sqlStatement.StartsWith("COMMIT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Commit;
-					}
-					if (sqlStatement.StartsWith("CONNECT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Connect;
-					}
-					if (sqlStatement.StartsWith("CREATE COLLATION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateCollation;
-					}
-					if (sqlStatement.StartsWith("CREATE DATABASE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateDatabase;
-					}
-					if (sqlStatement.StartsWith("CREATE DOMAIN", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateDomain;
-					}
-					if (sqlStatement.StartsWith("CREATE EXCEPTION", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE OR ALTER EXCEPTION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateException;
-					}
-					if (sqlStatement.StartsWith("CREATE GENERATOR", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateGenerator;
-					}
-					if (sqlStatement.StartsWith("CREATE INDEX", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE ASC INDEX", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE ASCENDING INDEX", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE DESC INDEX", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE DESCENDING INDEX", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateIndex;
-					}
-					if (sqlStatement.StartsWith("CREATE PROCEDURE", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE OR ALTER PROCEDURE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateProcedure;
-					}
-					if (sqlStatement.StartsWith("CREATE ROLE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateRole;
-					}
-					if (sqlStatement.StartsWith("CREATE SEQUENCE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateSequence;
-					}
-					if (sqlStatement.StartsWith("CREATE SHADOW", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateShadow;
-					}
-					if (sqlStatement.StartsWith("CREATE TABLE", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE GLOBAL TEMPORARY TABLE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateTable;
-					}
-					if (sqlStatement.StartsWith("CREATE TRIGGER", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE OR ALTER TRIGGER", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateTrigger;
-					}
-					if (sqlStatement.StartsWith("CREATE UNIQUE INDEX", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE UNIQUE ASC INDEX", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE UNIQUE ASCENDING INDEX", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE UNIQUE DESC INDEX", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE UNIQUE DESCENDING INDEX", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateIndex;
-					}
-					if (sqlStatement.StartsWith("CREATE VIEW", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("CREATE OR ALTER VIEW", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.CreateView;
-					}
-					break;
-
-				case 'D':
-				case 'd':
-					if (sqlStatement.StartsWith("DECLARE CURSOR", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DeclareCursor;
-					}
-					if (sqlStatement.StartsWith("DECLARE EXTERNAL FUNCTION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DeclareExternalFunction;
-					}
-					if (sqlStatement.StartsWith("DECLARE FILTER", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DeclareFilter;
-					}
-					if (sqlStatement.StartsWith("DECLARE STATEMENT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DeclareStatement;
-					}
-					if (sqlStatement.StartsWith("DECLARE TABLE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DeclareTable;
-					}
-					if (sqlStatement.StartsWith("DELETE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Delete;
-					}
-					if (sqlStatement.StartsWith("DESCRIBE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Describe;
-					}
-					if (sqlStatement.StartsWith("DISCONNECT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Disconnect;
-					}
-					if (sqlStatement.StartsWith("DROP COLLATION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropCollation;
-					}
-					if (sqlStatement.StartsWith("DROP DATABASE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropDatabase;
-					}
-					if (sqlStatement.StartsWith("DROP DOMAIN", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropDomain;
-					}
-					if (sqlStatement.StartsWith("DROP EXCEPTION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropException;
-					}
-					if (sqlStatement.StartsWith("DROP EXTERNAL FUNCTION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropExternalFunction;
-					}
-					if (sqlStatement.StartsWith("DROP FILTER", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropFilter;
-					}
-					if (sqlStatement.StartsWith("DROP GENERATOR", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropGenerator;
-					}
-					if (sqlStatement.StartsWith("DROP INDEX", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropIndex;
-					}
-					if (sqlStatement.StartsWith("DROP PROCEDURE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropProcedure;
-					}
-					if (sqlStatement.StartsWith("DROP SEQUENCE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropSequence;
-					}
-					if (sqlStatement.StartsWith("DROP ROLE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropRole;
-					}
-					if (sqlStatement.StartsWith("DROP SHADOW", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropShadow;
-					}
-					if (sqlStatement.StartsWith("DROP TABLE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropTable;
-					}
-					if (sqlStatement.StartsWith("DROP TRIGGER", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropTrigger;
-					}
-					if (sqlStatement.StartsWith("DROP VIEW", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.DropView;
-					}
-					break;
-
-				case 'E':
-				case 'e':
-					if (sqlStatement.StartsWith("EXECUTE BLOCK", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.ExecuteBlock;
-					}
-					if (sqlStatement.StartsWith("EXECUTE IMMEDIATE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.ExecuteImmediate;
-					}
-					if (sqlStatement.StartsWith("EXECUTE PROCEDURE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.ExecuteProcedure;
-					}
-					if (sqlStatement.StartsWith("EXECUTE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Execute;
-					}
-					if (sqlStatement.StartsWith("EVENT WAIT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.EventWait;
-					}
-					if (sqlStatement.StartsWith("EVENT INIT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.EventInit;
-					}
-					if (sqlStatement.StartsWith("END DECLARE SECTION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.EndDeclareSection;
-					}
-					break;
-
-				case 'F':
-				case 'f':
-					if (sqlStatement.StartsWith("FETCH", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Fetch;
-					}
-					break;
-
-				case 'G':
-				case 'g':
-					if (sqlStatement.StartsWith("GRANT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Grant;
-					}
-					break;
-
-				case 'I':
-				case 'i':
-					if (sqlStatement.StartsWith("INSERT CURSOR", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.InsertCursor;
-					}
-					if (sqlStatement.StartsWith("INSERT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Insert;
-					}
-					break;
-
-				case 'O':
-				case 'o':
-					if (sqlStatement.StartsWith("OPEN", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Open;
-					}
-					break;
-
-				case 'P':
-				case 'p':
-					if (sqlStatement.StartsWith("PREPARE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Prepare;
-					}
-					break;
-
-				case 'R':
-				case 'r':
-					if (sqlStatement.StartsWith("REVOKE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Revoke;
-					}
-					if (sqlStatement.StartsWith("RECREATE PROCEDURE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.RecreateProcedure;
-					}
-					if (sqlStatement.StartsWith("RECREATE TABLE", StringComparison.OrdinalIgnoreCase) ||
-						sqlStatement.StartsWith("RECREATE GLOBAL TEMPORARY TABLE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.RecreateTable;
-					}
-					if (sqlStatement.StartsWith("RECREATE TRIGGER", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.RecreateTrigger;
-					}
-					if (sqlStatement.StartsWith("RECREATE VIEW", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.RecreateView;
-					}
-					if (sqlStatement.StartsWith("ROLLBACK", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Rollback;
-					}
-					break;
-
-				case 'S':
-				case 's':
-					if (sqlStatement.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Select;
-					}
-					if (sqlStatement.StartsWith("SET AUTODDL", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.SetAutoDDL;
-					}
-					if (sqlStatement.StartsWith("SET DATABASE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.SetDatabase;
-					}
-					if (sqlStatement.StartsWith("SET GENERATOR", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.SetGenerator;
-					}
-					if (sqlStatement.StartsWith("SET NAMES", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.SetNames;
-					}
-					if (sqlStatement.StartsWith("SET SQL DIALECT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.SetSQLDialect;
-					}
-					if (sqlStatement.StartsWith("SET STATISTICS", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.SetStatistics;
-					}
-					if (sqlStatement.StartsWith("SET TRANSACTION", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.SetTransaction;
-					}
-					if (sqlStatement.StartsWith("SHOW SQL DIALECT", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.ShowSQLDialect;
-					}
-					break;
-
-				case 'U':
-				case 'u':
-					if (sqlStatement.StartsWith("UPDATE", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Update;
-					}
-					break;
-
-				case 'W':
-				case 'w':
-					if (sqlStatement.StartsWith("WHENEVER", StringComparison.OrdinalIgnoreCase))
-					{
-						return SqlStatementType.Whenever;
-					}
-					break;
-			}
-			throw new ArgumentException(string.Format("The type of the SQL statement could not be determined.{0}Statement: {1}.",
-				Environment.NewLine,
-				sqlStatement));
-		}
-
-		#endregion
 	}
 }

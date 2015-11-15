@@ -14,6 +14,9 @@
  *
  *  Copyright (c) 2003, 2005 Abel Eduardo Pereira
  *  All Rights Reserved.
+ *
+ * Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -21,69 +24,15 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Isql
 {
-	/// <summary>
-	///	CommandExecutingEventArgs encapsulates the events arguments for the event trigged
-	///	from the <see cref="FbBatchExecution"/> during the execution.
-	/// </summary>
-	/// <remarks>
-	///
-	/// </remarks>
 	public class CommandExecutingEventArgs : EventArgs
 	{
-		#region Fields
+		public FbCommand SqlCommand { get; private set; }
+		public SqlStatementType StatementType { get; private set; }
 
-		private FbCommand _sqlCommand;
-
-		#endregion
-
-		#region Properties
-
-		/// <summary>
-		/// Returns the <see cref="FbCommand"/> instance that created for the SQL statement that goes
-		/// for execution.
-		/// </summary>
-		public FbCommand SqlCommand
+		public CommandExecutingEventArgs(FbCommand sqlCommand, SqlStatementType statementType)
 		{
-			get { return _sqlCommand; }
+			SqlCommand = sqlCommand;
+			StatementType = statementType;
 		}
-
-		/// <summary>
-		/// Returns the <see cref="SqlStatementType"/> of the current <see cref="SqlCommand"/>.
-		/// </summary>
-		public SqlStatementType StatementType
-		{
-			get { return FbBatchExecution.GetStatementType(SqlCommand.CommandText); }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		/// <summary>
-		/// Creates an instance of CommandExecutingEventArgs class.
-		/// </summary>
-		/// <param name="sqlCommand">The FbCommand properly instanciated.</param>
-		/// <remarks>The <b>sqlCommand</b> should be proper instanciated with a valid
-		/// <see cref="FbCommand"/> and with the SQL statement loaded in <see cref="FbCommand.CommandText"/>.
-		/// </remarks>
-		public CommandExecutingEventArgs(FbCommand sqlCommand)
-		{
-			_sqlCommand = sqlCommand;
-		}
-
-		#endregion
-
-		#region Methods
-
-		/// <summary>
-		/// Overrided. Returns the SQL statement that goes for execution.
-		/// </summary>
-		/// <returns>The SQL statement that will be executed.</returns>
-		public override string ToString()
-		{
-			return _sqlCommand.CommandText;
-		}
-
-		#endregion
 	}
 }
