@@ -752,6 +752,30 @@ end";
 			}
 		}
 
+		[Test]
+		public void ReadsTimeWithProperPrecision()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast('00:00:01.4321' as time) from rdb$database";
+				var result = (TimeSpan)cmd.ExecuteScalar();
+				Assert.AreEqual(TimeSpan.FromTicks(14321000), result);
+			}
+		}
+
+		[Test]
+		public void PassesTimeSpanWithProperPrecision()
+		{
+			var ts = TimeSpan.FromTicks(14321000);
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast(@value as time) from rdb$database";
+				cmd.Parameters.Add("value", ts);
+				var result = (TimeSpan)cmd.ExecuteScalar();
+				Assert.AreEqual(ts, result);
+			}
+		}
+
 		#endregion
 	}
 }
