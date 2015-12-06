@@ -1,8 +1,8 @@
 *.suo
 *.user
+*.vs
 bin
 obj
 DataDesignerExtensibility/installer/out/
 DataDesignerExtensibility/installer/in/
 NETProvider/deploy/out
-*.nupkg
