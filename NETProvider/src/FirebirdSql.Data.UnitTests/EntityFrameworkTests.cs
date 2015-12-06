@@ -62,7 +62,8 @@ namespace FirebirdSql.Data.UnitTests
 		public void ProviderManifestTokenTest()
 		{
 			string token = GetProviderServices().GetProviderManifestToken(Connection);
-			Assert.IsNotNullOrEmpty(token);
+			Assert.IsNotNull(token);
+			Assert.IsNotEmpty(token);
 			Console.WriteLine(token);
 			Version v = new Version(token);
 			Assert.Greater(v.Major, 0);
