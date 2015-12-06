@@ -51,13 +51,7 @@ namespace FirebirdSql.Data.Common
 
 		public static TimeSpan DecodeTime(int sql_time)
 		{
-			int millisInDay = sql_time / 10;
-			int hour = millisInDay / 3600000;
-			int minute = (millisInDay - hour * 3600000) / 60000;
-			int second = (millisInDay - hour * 3600000 - minute * 60000) / 1000;
-			int millisecond = millisInDay - hour * 3600000 - minute * 60000 - second * 1000;
-
-			return new TimeSpan(0, hour, minute, second, millisecond);
+			return TimeSpan.FromTicks(sql_time * 1000L);
 		}
 
 		public static DateTime DecodeDate(int sql_date)

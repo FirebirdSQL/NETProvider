@@ -55,11 +55,7 @@ namespace FirebirdSql.Data.Common
 
 		public static int EncodeTime(TimeSpan t)
 		{
-			return
-				(t.Hours * 3600000 +
-				t.Minutes * 60000 +
-				t.Seconds * 1000 +
-				t.Milliseconds) * 10;
+			return (int)(t.Ticks / 1000L);
 		}
 
 		public static int EncodeDate(DateTime d)
