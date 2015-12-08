@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-		[TearDown]
+		[OneTimeTearDown]
 		public void TearDown()
 		{
 			FbConnection.ClearAllPools();
