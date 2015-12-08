@@ -12,7 +12,7 @@
  *     express or implied. See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2014-2015 Jiri Cincura (jiri@cincura.net)
  *		Based on my work on NuoDbMigrationSqlGenerator for NuoDB.
  *  All Rights Reserved.
  *
@@ -203,6 +203,12 @@ namespace FirebirdSql.Data.EntityFramework6
 				if (column.IsNullable != null && !column.IsNullable.Value)
 				{
 					writer.Write(" NOT NULL");
+				}
+				if (column.Type == PrimitiveTypeKind.Boolean)
+				{
+					writer.Write(" CHECK(");
+					writer.Write(Quote(column.Name));
+					writer.Write(" IN (0,1))");
 				}
 				yield return Statement(writer);
 			}
@@ -521,6 +527,13 @@ namespace FirebirdSql.Data.EntityFramework6
 				&& !column.IsNullable.Value)
 			{
 				builder.Append(" NOT NULL");
+			}
+
+			if (column.Type == PrimitiveTypeKind.Boolean)
+			{
+				builder.Append(" CHECK(");
+				builder.Append(Quote(column.Name));
+				builder.Append(" IN (0,1))");
 			}
 
 			if (column.IsIdentity)
