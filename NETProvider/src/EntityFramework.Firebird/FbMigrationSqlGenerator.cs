@@ -636,9 +636,9 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		static string CheckName(string name)
 		{
-			if (name.Length > 31)
-#warning What exception?
-				throw new ArgumentException();
+			const int LengthLimit = 31;
+			if (name.Length > LengthLimit)
+				throw new ArgumentOutOfRangeException($"The name '{name}' is longer than Firebird's {LengthLimit} characters limit.");
 			return name;
 		}
 
