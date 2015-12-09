@@ -328,7 +328,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			DateTime date = ReadDate();
 			TimeSpan time = ReadTime();
-			return new DateTime(date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+			return date.Add(time);
 		}
 
 		public DateTime ReadDate()
