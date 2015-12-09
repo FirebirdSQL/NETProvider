@@ -414,9 +414,7 @@ namespace FirebirdSql.Data.Common
 						DateTime date = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
 						TimeSpan time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 4));
 
-						Value = new System.DateTime(
-							date.Year, date.Month, date.Day,
-							time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+						Value = date.Add(time);
 						break;
 
 					case IscCodes.SQL_TYPE_TIME:
