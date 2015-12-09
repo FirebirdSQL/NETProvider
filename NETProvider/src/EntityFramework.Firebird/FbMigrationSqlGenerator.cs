@@ -207,7 +207,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				if (column.Type == PrimitiveTypeKind.Boolean)
 				{
 					writer.Write(" CHECK(");
-					writer.Write(Quote(column.Name));
+					writer.Write(Quote(columnName));
 					writer.Write(" IN (0,1))");
 				}
 				yield return Statement(writer);
@@ -532,7 +532,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			if (column.Type == PrimitiveTypeKind.Boolean)
 			{
 				builder.Append(" CHECK(");
-				builder.Append(Quote(column.Name));
+				builder.Append(Quote(columnName));
 				builder.Append(" IN (0,1))");
 			}
 
