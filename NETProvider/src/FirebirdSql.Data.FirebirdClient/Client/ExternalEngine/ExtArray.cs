@@ -313,9 +313,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 							DateTime date = TypeDecoder.DecodeDate(idate);
 							TimeSpan time = TypeDecoder.DecodeTime(itime);
 
-							DateTime timestamp = new System.DateTime(
-								date.Year, date.Month, date.Day,
-								time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+							DateTime timestamp = date.Add(time);
 
 							tempData.SetValue(timestamp, i);
 						}
