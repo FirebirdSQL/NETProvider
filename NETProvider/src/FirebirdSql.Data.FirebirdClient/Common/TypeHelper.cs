@@ -600,8 +600,7 @@ namespace FirebirdSql.Data.Common
 
 		public static TimeSpan DateTimeToTimeSpan(DateTime d)
 		{
-			GregorianCalendar calendar = new GregorianCalendar();
-			return new TimeSpan(0, calendar.GetHour(d), calendar.GetMinute(d), calendar.GetSecond(d), (int)calendar.GetMilliseconds(d));
+			return TimeSpan.FromTicks(d.Subtract(d.Date).Ticks);
 		}
 
 		#endregion
