@@ -638,7 +638,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		{
 			const int LengthLimit = 31;
 			if (name.Length > LengthLimit)
-				throw new ArgumentOutOfRangeException($"The name '{name}' is longer than Firebird's {LengthLimit} characters limit.");
+				throw new ArgumentOutOfRangeException($"The name '{name}' is longer than Firebird's {LengthLimit} characters limit for objects names.");
 			return name;
 		}
 
