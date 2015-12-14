@@ -36,9 +36,9 @@ namespace FirebirdSql.Data.Common
 
 		#region Properties
 
-		public int Handle
+		public abstract int Handle
 		{
-			get { return _blobHandle; }
+			get;
 		}
 
 		public long Id
@@ -56,7 +56,6 @@ namespace FirebirdSql.Data.Common
 		#region Protected Fields
 
 		protected long          _blobId;
-		protected int           _blobHandle;
 		protected int           _position;
 		protected ITransaction  _transaction;
 

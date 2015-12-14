@@ -23,6 +23,7 @@ using System;
 using System.IO;
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Client.Native.Handle;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -32,6 +33,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		private FesDatabase _db;
 		private IntPtr[] _statusVector;
+		private BlobHandle _blobHandle;
 
 		#endregion
 
@@ -40,6 +42,11 @@ namespace FirebirdSql.Data.Client.Native
 		public override IDatabase Database
 		{
 			get { return _db; }
+		}
+
+		public override int Handle
+		{
+			get { return _blobHandle.DangerousGetHandle().AsInt(); }
 		}
 
 		#endregion
@@ -66,7 +73,7 @@ namespace FirebirdSql.Data.Client.Native
 			_db = (FesDatabase)db;
 			_transaction = (FesTransaction)transaction;
 			_position = 0;
-			_blobHandle = 0;
+			_blobHandle = new BlobHandle();
 			_blobId = blobId;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
@@ -82,8 +89,8 @@ namespace FirebirdSql.Data.Client.Native
 				// Clear the status vector
 				ClearStatusVector();
 
-				int dbHandle = _db.Handle;
-				int trHandle = _transaction.Handle;
+				DatabaseHandle dbHandle = _db.HandlePtr;
+				TransactionHandle trHandle = ((FesTransaction)_transaction).HandlePtr;
 
 				_db.FbClient.isc_create_blob2(
 					_statusVector,
@@ -107,8 +114,8 @@ namespace FirebirdSql.Data.Client.Native
 				// Clear the status vector
 				ClearStatusVector();
 
-				int dbHandle = _db.Handle;
-				int trHandle = _transaction.Handle;
+				DatabaseHandle dbHandle = _db.HandlePtr;
+				TransactionHandle trHandle = ((FesTransaction)_transaction).HandlePtr;
 
 				_db.FbClient.isc_open_blob2(
 					_statusVector,

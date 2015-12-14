@@ -22,6 +22,7 @@ using System.Data;
 using System.Runtime.InteropServices;
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Client.Native.Handle;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -47,7 +48,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Fields
 
-		private int _handle;
+		private TransactionHandle _handle;
 		private FesDatabase _db;
 		private TransactionState _state;
 		private bool _disposed;
@@ -58,6 +59,11 @@ namespace FirebirdSql.Data.Client.Native
 		#region Properties
 
 		public int Handle
+		{
+			get { return _handle.DangerousGetHandle().AsInt(); }
+		}
+
+		public TransactionHandle HandlePtr
 		{
 			get { return _handle; }
 		}
@@ -79,6 +85,7 @@ namespace FirebirdSql.Data.Client.Native
 			}
 
 			_db = (FesDatabase)db;
+			_handle = new TransactionHandle();
 			_state = TransactionState.NoTransaction;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
@@ -104,29 +111,18 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void Dispose(bool disposing)
 		{
-			lock (this)
+			if (!_disposed)
 			{
-				if (!_disposed)
+				if (disposing)
 				{
-					try
-					{
-						Rollback();
-					}
-					catch
-					{ }
-					finally
-					{
-						if (disposing)
-						{
-							_db = null;
-							_handle = 0;
-							_state = TransactionState.NoTransaction;
-							_statusVector = null;
-						}
-
-						_disposed = true;
-					}
+					Rollback();
+					_db = null;
+					_handle.Dispose();
+					_state = TransactionState.NoTransaction;
+					_statusVector = null;
 				}
+
+				_disposed = true;
 			}
 		}
 
@@ -138,7 +134,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			if (_state != TransactionState.NoTransaction)
 			{
-				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
+				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, Handle, "no valid");
 			}
 
 			lock (_db)
@@ -167,16 +163,12 @@ namespace FirebirdSql.Data.Client.Native
 					tebData = Marshal.AllocHGlobal(size);
 
 					Marshal.StructureToPtr(teb, tebData, true);
-
-					int trHandle = _handle;
-
+					
 					_db.FbClient.isc_start_multiple(
 						_statusVector,
-						ref trHandle,
+						ref _handle,
 						1,
 						tebData);
-
-					_handle = trHandle;
 
 					// Parse status	vector
 					_db.ParseStatusVector(_statusVector);
@@ -219,13 +211,9 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				// Clear the status vector
 				ClearStatusVector();
-
-				int trHandle = _handle;
-
-				_db.FbClient.isc_commit_transaction(_statusVector, ref trHandle);
-
-				_handle = trHandle;
-
+				
+				_db.FbClient.isc_commit_transaction(_statusVector, ref _handle);
+				
 				_db.ParseStatusVector(_statusVector);
 
 				_db.TransactionCount--;
@@ -247,13 +235,9 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				// Clear the status vector
 				ClearStatusVector();
-
-				int trHandle = _handle;
-
-				_db.FbClient.isc_rollback_transaction(_statusVector, ref trHandle);
-
-				_handle = trHandle;
-
+				
+				_db.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
+				
 				_db.ParseStatusVector(_statusVector);
 
 				_db.TransactionCount--;
@@ -275,10 +259,8 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				// Clear the status vector
 				ClearStatusVector();
-
-				int trHandle = _handle;
-
-				_db.FbClient.isc_commit_retaining(_statusVector, ref trHandle);
+				
+				_db.FbClient.isc_commit_retaining(_statusVector, ref _handle);
 
 				_db.ParseStatusVector(_statusVector);
 
@@ -294,10 +276,8 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				// Clear the status vector
 				ClearStatusVector();
-
-				int trHandle = _handle;
-
-				_db.FbClient.isc_rollback_retaining(_statusVector, ref trHandle);
+				
+				_db.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
 
 				_db.ParseStatusVector(_statusVector);
 
@@ -330,7 +310,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			if (_state != TransactionState.Active)
 			{
-				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
+				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, Handle, "no valid");
 			}
 		}
 
