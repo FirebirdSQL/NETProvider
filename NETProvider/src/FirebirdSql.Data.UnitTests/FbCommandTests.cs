@@ -776,6 +776,30 @@ end";
 			}
 		}
 
+		[Test]
+		public void ReadsDateTimeWithProperPrecision()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast('1.2.2015 05:06:01.4321' as timestamp) from rdb$database";
+				var result = (DateTime)cmd.ExecuteScalar();
+				Assert.AreEqual(new DateTime(635583639614321000), result);
+			}
+		}
+
+		[Test]
+		public void PassesDateTimeWithProperPrecision()
+		{
+			var dt = new DateTime(635583639614321000);
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast(@value as timestamp) from rdb$database";
+				cmd.Parameters.Add("value", dt);
+				var result = (DateTime)cmd.ExecuteScalar();
+				Assert.AreEqual(dt, result);
+			}
+		}
+
 		#endregion
 	}
 }
