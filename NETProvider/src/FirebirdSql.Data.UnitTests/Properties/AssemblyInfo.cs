@@ -17,19 +17,16 @@
  */
 
 using System;
-using System.Resources;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: CLSCompliant(false)]
+[assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
-[assembly: AssemblyTitle("NUnit Test Suite - Firebird ADO.NET Data Provider")]
-[assembly: AssemblyDescription("NUnit Test Suite - Firebird ADO.NET Data Provider")]
-[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FirebirdSQL")]
 [assembly: AssemblyProduct("FirebirdClient")]
+[assembly: AssemblyDelaySign(false)]
 [assembly: AssemblyCopyright("(c) 2002-2015")]
+[assembly: AssemblyTitle("FirebirdClient - Test Suite")]
+[assembly: AssemblyDescription("FirebirdClient - Test Suite")]
 [assembly: AssemblyVersion("0.0.0.0")]
 [assembly: AssemblyFileVersion("0.0.0.0")]
-[assembly: AssemblyDelaySign(false)]
