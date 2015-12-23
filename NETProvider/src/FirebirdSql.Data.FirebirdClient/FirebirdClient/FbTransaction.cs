@@ -194,12 +194,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Save(string savePointName)
 		{
+			EnsureSavePointName(savePointName);
 			lock (this)
 			{
-				if (string.IsNullOrWhiteSpace(savePointName))
-				{
-					throw new ArgumentException("No transaction name was be specified.");
-				}
 				if (_isUpdated)
 				{
 					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
@@ -224,12 +221,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Commit(string savePointName)
 		{
+			EnsureSavePointName(savePointName);
 			lock (this)
 			{
-				if (string.IsNullOrWhiteSpace(savePointName))
-				{
-					throw new ArgumentException("No transaction name was be specified.");
-				}
 				if (_isUpdated)
 				{
 					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
@@ -254,12 +248,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Rollback(string savePointName)
 		{
+			EnsureSavePointName(savePointName);
 			lock (this)
 			{
-				if (string.IsNullOrWhiteSpace(savePointName))
-				{
-					throw new ArgumentException("No transaction name was be specified.");
-				}
 				if (_isUpdated)
 				{
 					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
@@ -491,6 +482,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 
 			return tpb;
+		}
+
+		private static void EnsureSavePointName(string savePointName)
+		{
+			if (string.IsNullOrWhiteSpace(savePointName))
+			{
+				throw new ArgumentException("No transaction name was be specified.");
+			}
 		}
 
 		#endregion
