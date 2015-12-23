@@ -215,12 +215,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
-					FbCommand command = new FbCommand(
+					using (var command = new FbCommand(
 						"SAVEPOINT " + savePointName,
 						_connection,
-						this);
-					command.ExecuteNonQuery();
-					command.Dispose();
+						this))
+					{
+						command.ExecuteNonQuery();
+					}
 				}
 				catch (IscException ex)
 				{
@@ -244,12 +245,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
-					FbCommand command = new FbCommand(
+					using (var command = new FbCommand(
 						"RELEASE SAVEPOINT " + savePointName,
 						_connection,
-						this);
-					command.ExecuteNonQuery();
-					command.Dispose();
+						this))
+					{
+						command.ExecuteNonQuery();
+					}
 				}
 				catch (IscException ex)
 				{
@@ -273,12 +275,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
-					FbCommand command = new FbCommand(
+					using (var command = new FbCommand(
 						"ROLLBACK WORK TO SAVEPOINT " + savePointName,
 						_connection,
-						this);
-					command.ExecuteNonQuery();
-					command.Dispose();
+						this))
+					{
+						command.ExecuteNonQuery();
+					}
 				}
 				catch (IscException ex)
 				{
