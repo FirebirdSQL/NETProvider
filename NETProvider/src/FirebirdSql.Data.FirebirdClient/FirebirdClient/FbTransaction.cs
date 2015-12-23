@@ -370,11 +370,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void UpdateTransaction()
 		{
-			if (_connection != null && _connection.InnerConnection != null)
-			{
-				_connection.InnerConnection.TransactionUpdated();
-			}
-
+			_connection?.InnerConnection?.TransactionUpdated();
 			_isUpdated = true;
 			_connection = null;
 			_transaction = null;
