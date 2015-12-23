@@ -337,8 +337,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				try
 				{
-					IDatabase database = _connection.InnerConnection.Database;
-					_transaction = database.BeginTransaction(BuildTpb());
+					_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb());
 				}
 				catch (IscException ex)
 				{
@@ -353,8 +352,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				try
 				{
-					IDatabase database = _connection.InnerConnection.Database;
-					_transaction = database.BeginTransaction(BuildTpb(options));
+					_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb(options));
 				}
 				catch (IscException ex)
 				{
