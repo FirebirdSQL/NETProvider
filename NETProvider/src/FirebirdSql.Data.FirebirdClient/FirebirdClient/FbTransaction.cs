@@ -430,7 +430,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return BuildTpb(options);
 		}
 
-		private TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
+		private static TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
 		{
 			TransactionParameterBuffer tpb = new TransactionParameterBuffer();
 
