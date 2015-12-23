@@ -44,17 +44,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public new FbConnection Connection
 		{
-			get
-			{
-				if (!_isUpdated)
-				{
-					return _connection;
-				}
-				else
-				{
-					return null;
-				}
-			}
+			get { return !_isUpdated ? _connection : null; }
 		}
 
 		public override IsolationLevel IsolationLevel
