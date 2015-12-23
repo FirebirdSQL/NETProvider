@@ -204,16 +204,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (savePointName == null)
+				if (string.IsNullOrWhiteSpace(savePointName))
 				{
 					throw new ArgumentException("No transaction name was be specified.");
-				}
-				else
-				{
-					if (savePointName.Length == 0)
-					{
-						throw new ArgumentException("No transaction name was be specified.");
-					}
 				}
 				if (_isUpdated)
 				{
@@ -240,16 +233,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (savePointName == null)
+				if (string.IsNullOrWhiteSpace(savePointName))
 				{
 					throw new ArgumentException("No transaction name was be specified.");
-				}
-				else
-				{
-					if (savePointName.Length == 0)
-					{
-						throw new ArgumentException("No transaction name was be specified.");
-					}
 				}
 				if (_isUpdated)
 				{
@@ -276,16 +262,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (savePointName == null)
+				if (string.IsNullOrWhiteSpace(savePointName))
 				{
 					throw new ArgumentException("No transaction name was be specified.");
-				}
-				else
-				{
-					if (savePointName.Length == 0)
-					{
-						throw new ArgumentException("No transaction name was be specified.");
-					}
 				}
 				if (_isUpdated)
 				{
