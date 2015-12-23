@@ -91,8 +91,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal FbTransaction(FbConnection connection)
 			: this(connection, IsolationLevel.ReadCommitted)
-		{
-		}
+		{ }
 
 		internal FbTransaction(FbConnection connection, IsolationLevel il)
 		{
