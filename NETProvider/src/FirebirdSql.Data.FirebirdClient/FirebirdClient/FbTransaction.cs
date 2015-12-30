@@ -204,10 +204,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
-					using (var command = new FbCommand(
-						"SAVEPOINT " + savePointName,
-						_connection,
-						this))
+					using (var command = new FbCommand($"SAVEPOINT {savePointName}", _connection, this))
 					{
 						command.ExecuteNonQuery();
 					}
@@ -231,10 +228,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
-					using (var command = new FbCommand(
-						"RELEASE SAVEPOINT " + savePointName,
-						_connection,
-						this))
+					using (var command = new FbCommand($"RELEASE SAVEPOINT {savePointName}", _connection, this))
 					{
 						command.ExecuteNonQuery();
 					}
@@ -258,10 +252,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
-					using (var command = new FbCommand(
-						"ROLLBACK WORK TO SAVEPOINT " + savePointName,
-						_connection,
-						this))
+					using (var command = new FbCommand($"ROLLBACK WORK TO SAVEPOINT {savePointName}", _connection, this))
 					{
 						command.ExecuteNonQuery();
 					}
