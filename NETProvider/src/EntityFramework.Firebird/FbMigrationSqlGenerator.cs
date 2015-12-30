@@ -266,7 +266,7 @@ namespace FirebirdSql.Data.EntityFramework6
 					writer.Write("UNIQUE ");
 				}
 				writer.Write("INDEX ");
-				writer.Write(Quote(CheckName(CreateItemName(operation.Name))));
+				writer.Write(Quote(CheckName(CreateItemName(BuildIndexName(operation)))));
 				writer.Write(" ON ");
 				writer.Write(Quote(CheckName(ExtractName(operation.Table))));
 				writer.Write("(");
@@ -355,7 +355,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			using (var writer = SqlWriter())
 			{
 				writer.Write("DROP INDEX ");
-				writer.Write(Quote(CheckName(CreateItemName(operation.Name))));
+				writer.Write(Quote(CheckName(CreateItemName(BuildIndexName(operation)))));
 				yield return Statement(writer);
 			}
 		}
@@ -628,6 +628,13 @@ namespace FirebirdSql.Data.EntityFramework6
 				typeUsage = BuildStoreTypeUsage(storeTypeName, propertyModel) ?? typeUsage;
 			}
 			return SqlGenerator.GetSqlPrimitiveType(typeUsage);
+		}
+
+		static string BuildIndexName(IndexOperation indexOperation)
+		{
+			return !indexOperation.HasDefaultName
+				? indexOperation.Name
+				: IndexOperation.BuildDefaultName(new[] { ExtractName(indexOperation.Table) }.Concat(indexOperation.Columns));
 		}
 
 		static string ExtractName(string name)
