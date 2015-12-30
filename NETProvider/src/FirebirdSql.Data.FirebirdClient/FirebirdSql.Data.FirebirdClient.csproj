@@ -145,6 +145,7 @@
     <Compile Include="Common\SqlStateMapping.cs" />
     <Compile Include="Common\TimeoutHelper.cs" />
     <Compile Include="Common\TraceHelper.cs" />
+    <Compile Include="Common\TransactionBase.cs" />
     <Compile Include="Entity\DmlSqlGenerator.cs" />
     <Compile Include="Entity\ExpressionTranslator.cs" />
     <Compile Include="Entity\FirstClause.cs" />

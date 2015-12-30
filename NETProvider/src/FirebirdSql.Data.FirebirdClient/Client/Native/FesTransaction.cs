@@ -25,7 +25,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-	internal sealed class FesTransaction : ITransaction, IDisposable
+	internal sealed class FesTransaction : TransactionBase
 	{
 		#region Inner Structs
 
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Events
 
-		public event EventHandler Update;
+		public override event EventHandler Update;
 
 		#endregion
 
@@ -57,12 +57,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Properties
 
-		public int Handle
+		public override int Handle
 		{
 			get { return _handle; }
 		}
 
-		public TransactionState State
+		public override TransactionState State
 		{
 			get { return _state; }
 		}
@@ -85,24 +85,9 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region Finalizer
-
-		~FesTransaction()
-		{
-			Dispose(false);
-		}
-
-		#endregion
-
 		#region IDisposable methods
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		private void Dispose(bool disposing)
+		protected override void Dispose(bool disposing)
 		{
 			lock (this)
 			{
@@ -110,7 +95,10 @@ namespace FirebirdSql.Data.Client.Native
 				{
 					try
 					{
-						Rollback();
+						if (_state != TransactionState.NoTransaction)
+						{
+							Rollback();
+						}
 					}
 					catch
 					{ }
@@ -125,6 +113,7 @@ namespace FirebirdSql.Data.Client.Native
 						}
 
 						_disposed = true;
+						base.Dispose(disposing);
 					}
 				}
 			}
@@ -134,11 +123,11 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public void BeginTransaction(TransactionParameterBuffer tpb)
+		public override void BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			if (_state != TransactionState.NoTransaction)
 			{
-				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
+				throw new InvalidOperationException();
 			}
 
 			lock (_db)
@@ -211,9 +200,9 @@ namespace FirebirdSql.Data.Client.Native
 			}
 		}
 
-		public void Commit()
+		public override void Commit()
 		{
-			CheckTransactionState();
+			EnsureActiveTransactionState();
 
 			lock (_db)
 			{
@@ -239,9 +228,9 @@ namespace FirebirdSql.Data.Client.Native
 			}
 		}
 
-		public void Rollback()
+		public override void Rollback()
 		{
-			CheckTransactionState();
+			EnsureActiveTransactionState();
 
 			lock (_db)
 			{
@@ -267,9 +256,9 @@ namespace FirebirdSql.Data.Client.Native
 			}
 		}
 
-		public void CommitRetaining()
+		public override void CommitRetaining()
 		{
-			CheckTransactionState();
+			EnsureActiveTransactionState();
 
 			lock (_db)
 			{
@@ -286,9 +275,9 @@ namespace FirebirdSql.Data.Client.Native
 			}
 		}
 
-		public void RollbackRetaining()
+		public override void RollbackRetaining()
 		{
-			CheckTransactionState();
+			EnsureActiveTransactionState();
 
 			lock (_db)
 			{
@@ -309,13 +298,11 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Two Phase Commit Methods
 
-		void ITransaction.Prepare()
-		{
-		}
+		public override void Prepare()
+		{ }
 
-		void ITransaction.Prepare(byte[] buffer)
-		{
-		}
+		public override void Prepare(byte[] buffer)
+		{ }
 
 		#endregion
 
@@ -324,14 +311,6 @@ namespace FirebirdSql.Data.Client.Native
 		private void ClearStatusVector()
 		{
 			Array.Clear(_statusVector, 0, _statusVector.Length);
-		}
-
-		private void CheckTransactionState()
-		{
-			if (_state != TransactionState.Active)
-			{
-				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
-			}
 		}
 
 		#endregion

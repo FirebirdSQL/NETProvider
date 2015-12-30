@@ -25,7 +25,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.ExternalEngine
 {
-	internal sealed class ExtTransaction : ITransaction, IDisposable
+	internal sealed class ExtTransaction : TransactionBase
 	{
 		#region Inner Structs
 
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#region Events
 
-		public event EventHandler Update;
+		public override event EventHandler Update;
 
 		#endregion
 
@@ -57,12 +57,12 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#region Properties
 
-		public int Handle
+		public override int Handle
 		{
 			get { return _handle; }
 		}
 
-		public TransactionState State
+		public override TransactionState State
 		{
 			get { return _state; }
 		}
@@ -85,24 +85,9 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#endregion
 
-		#region Finalizer
-
-		~ExtTransaction()
-		{
-			Dispose(false);
-		}
-
-		#endregion
-
 		#region IDisposable methods
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		private void Dispose(bool disposing)
+		protected override void Dispose(bool disposing)
 		{
 			lock (this)
 			{
@@ -124,6 +109,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 					}
 
 					_disposed = true;
+					base.Dispose(disposing);
 				}
 			}
 		}
@@ -132,7 +118,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#region Methods
 
-		public void BeginTransaction(TransactionParameterBuffer tpb)
+		public override void BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			// Clear the status vector
 			ClearStatusVector();
@@ -148,7 +134,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			}
 		}
 
-		public void Commit()
+		public override void Commit()
 		{
 			if (Update != null)
 			{
@@ -156,7 +142,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			}
 		}
 
-		public void Rollback()
+		public override void Rollback()
 		{
 			if (Update != null)
 			{
@@ -164,25 +150,21 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			}
 		}
 
-		public void CommitRetaining()
-		{
-		}
+		public override void CommitRetaining()
+		{ }
 
-		public void RollbackRetaining()
-		{
-		}
+		public override void RollbackRetaining()
+		{ }
 
 		#endregion
 
 		#region Two Phase Commit Methods
 
-		void ITransaction.Prepare()
-		{
-		}
+		public override void Prepare()
+		{ }
 
-		void ITransaction.Prepare(byte[] buffer)
-		{
-		}
+		public override void Prepare(byte[] buffer)
+		{ }
 
 		#endregion
 

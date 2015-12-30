@@ -24,11 +24,11 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-	internal sealed class GdsTransaction : ITransaction, IDisposable
+	internal sealed class GdsTransaction : TransactionBase
 	{
 		#region Events
 
-		public event EventHandler Update;
+		public override event EventHandler Update;
 
 		#endregion
 
@@ -44,12 +44,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Properties
 
-		public int Handle
+		public override int Handle
 		{
 			get { return _handle; }
 		}
 
-		public TransactionState State
+		public override TransactionState State
 		{
 			get { return _state; }
 		}
@@ -77,24 +77,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region Finalizer
-
-		~GdsTransaction()
-		{
-			Dispose(false);
-		}
-
-		#endregion
-
 		#region IDisposable methods
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		private void Dispose(bool disposing)
+		protected override void Dispose(bool disposing)
 		{
 			lock (_stateSyncRoot)
 			{
@@ -102,7 +87,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					try
 					{
-						Rollback();
+						if (_state != TransactionState.NoTransaction)
+						{
+							Rollback();
+						}
 					}
 					catch
 					{ }
@@ -116,6 +104,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						}
 
 						_disposed = true;
+						base.Dispose(disposing);
 					}
 				}
 			}
@@ -125,13 +114,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public void BeginTransaction(TransactionParameterBuffer tpb)
+		public override void BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			lock (_stateSyncRoot)
 			{
 				if (_state != TransactionState.NoTransaction)
 				{
-					throw GetNoValidTransactionException();
+					throw new InvalidOperationException();
 				}
 
 				try
@@ -159,11 +148,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void Commit()
+		public override void Commit()
 		{
 			lock (_stateSyncRoot)
 			{
-				CheckTransactionState();
+				EnsureActiveTransactionState();
 
 				try
 				{
@@ -192,11 +181,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void Rollback()
+		public override void Rollback()
 		{
 			lock (_stateSyncRoot)
 			{
-				CheckTransactionState();
+				EnsureActiveTransactionState();
 
 				try
 				{
@@ -225,11 +214,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void CommitRetaining()
+		public override void CommitRetaining()
 		{
 			lock (_stateSyncRoot)
 			{
-				CheckTransactionState();
+				EnsureActiveTransactionState();
 
 				try
 				{
@@ -251,11 +240,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void RollbackRetaining()
+		public override void RollbackRetaining()
 		{
 			lock (_stateSyncRoot)
 			{
-				CheckTransactionState();
+				EnsureActiveTransactionState();
 
 				try
 				{
@@ -281,11 +270,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Two Phase Commit Methods
 
-		public void Prepare()
+		public override void Prepare()
 		{
 			lock (_stateSyncRoot)
 			{
-				CheckTransactionState();
+				EnsureActiveTransactionState();
 
 				try
 				{
@@ -309,11 +298,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void Prepare(byte[] buffer)
+		public override void Prepare(byte[] buffer)
 		{
 			lock (_stateSyncRoot)
 			{
-				CheckTransactionState();
+				EnsureActiveTransactionState();
 
 				try
 				{
@@ -336,23 +325,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
-		}
-
-		#endregion
-
-		#region Private Methods
-
-		private void CheckTransactionState()
-		{
-			if (_state != TransactionState.Active)
-			{
-				throw GetNoValidTransactionException();
-			}
-		}
-
-		private IscException GetNoValidTransactionException()
-		{
-			return IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, _handle, "no valid");
 		}
 
 		#endregion
