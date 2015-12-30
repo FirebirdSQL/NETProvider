@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private ITransaction _transaction;
 		private IsolationLevel _isolationLevel;
 		private bool _disposed;
-		private bool _isUpdated;
+		private bool _isCompleted;
 
 		#endregion
 
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public new FbConnection Connection
 		{
-			get { return !_isUpdated ? _connection : null; }
+			get { return !_isCompleted ? _connection : null; }
 		}
 
 		public override IsolationLevel IsolationLevel
@@ -61,9 +61,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _transaction; }
 		}
 
-		internal bool IsUpdated
+		internal bool IsCompleted
 		{
-			get { return _isUpdated; }
+			get { return _isCompleted; }
 		}
 
 		#endregion
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal FbTransaction(FbConnection connection, IsolationLevel il)
 		{
 			_disposed = false;
-			_isUpdated = false;
+			_isCompleted = false;
 
 			_connection = connection;
 			_isolationLevel = il;
@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						// release any unmanaged resources
 						if (_transaction != null)
 						{
-							if (_transaction.State == TransactionState.Active && !_isUpdated)
+							if (_transaction.State == TransactionState.Active && !_isCompleted)
 							{
 								_transaction.Dispose();
 								_transaction = null;
@@ -134,8 +134,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					{ }
 					finally
 					{
-						_isolationLevel = IsolationLevel.ReadCommitted;
-						_isUpdated = true;
+						_isCompleted = true;
 						_disposed = true;
 					}
 				}
@@ -150,15 +149,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (_isUpdated)
-				{
-					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
-				}
-
+				EnsureCompleted();
 				try
 				{
 					_transaction.Commit();
-					UpdateTransaction();
+					CompleteTransaction();
 				}
 				catch (IscException ex)
 				{
@@ -171,15 +166,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (_isUpdated)
-				{
-					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
-				}
-
+				EnsureCompleted();
 				try
 				{
 					_transaction.Rollback();
-					UpdateTransaction();
+					CompleteTransaction();
 				}
 				catch (IscException ex)
 				{
@@ -197,11 +188,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			EnsureSavePointName(savePointName);
 			lock (this)
 			{
-				if (_isUpdated)
-				{
-					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
-				}
-
+				EnsureCompleted();
 				try
 				{
 					using (var command = new FbCommand($"SAVEPOINT {savePointName}", _connection, this))
@@ -221,11 +208,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			EnsureSavePointName(savePointName);
 			lock (this)
 			{
-				if (_isUpdated)
-				{
-					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
-				}
-
+				EnsureCompleted();
 				try
 				{
 					using (var command = new FbCommand($"RELEASE SAVEPOINT {savePointName}", _connection, this))
@@ -245,11 +228,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			EnsureSavePointName(savePointName);
 			lock (this)
 			{
-				if (_isUpdated)
-				{
-					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
-				}
-
+				EnsureCompleted();
 				try
 				{
 					using (var command = new FbCommand($"ROLLBACK WORK TO SAVEPOINT {savePointName}", _connection, this))
@@ -268,11 +247,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (_isUpdated)
-				{
-					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
-				}
-
+				EnsureCompleted();
 				try
 				{
 					_transaction.CommitRetaining();
@@ -288,11 +263,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (_isUpdated)
-				{
-					throw new InvalidOperationException("This Transaction has completed; it is no longer usable.");
-				}
-
+				EnsureCompleted();
 				try
 				{
 					_transaction.RollbackRetaining();
@@ -342,10 +313,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Private Methods
 
-		private void UpdateTransaction()
+		private void CompleteTransaction()
 		{
-			_connection?.InnerConnection?.TransactionUpdated();
-			_isUpdated = true;
+			_connection?.InnerConnection?.TransactionCompleted();
+			_isCompleted = true;
 			_connection = null;
 			_transaction = null;
 		}
@@ -378,6 +349,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 
 			return BuildTpb(options);
+		}
+
+		private void EnsureCompleted()
+		{
+			if (_isCompleted)
+			{
+				throw new InvalidOperationException("This transaction has completed and it is no longer usable.");
+			}
 		}
 
 		private static TransactionParameterBuffer BuildTpb(FbTransactionOptions options)

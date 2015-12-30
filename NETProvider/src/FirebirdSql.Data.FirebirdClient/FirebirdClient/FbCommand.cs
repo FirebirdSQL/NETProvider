@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
 					}
 
-					if (_transaction != null && _transaction.IsUpdated)
+					if (_transaction != null && _transaction.IsCompleted)
 					{
 						_transaction = null;
 					}
@@ -1331,7 +1331,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckCommand()
 		{
-			if (_transaction != null && _transaction.IsUpdated)
+			if (_transaction != null && _transaction.IsCompleted)
 			{
 				_transaction = null;
 			}
@@ -1354,7 +1354,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("Execute requires the Command object to have a Transaction object when the Connection object assigned to the command is in a pending local transaction. The Transaction property of the Command has not been initialized.");
 			}
 
-			if (_transaction != null && !_transaction.IsUpdated &&
+			if (_transaction != null && !_transaction.IsCompleted &&
 				!_connection.Equals(_transaction.Connection))
 			{
 				throw new InvalidOperationException("Command Connection is not equal to Transaction Connection.");

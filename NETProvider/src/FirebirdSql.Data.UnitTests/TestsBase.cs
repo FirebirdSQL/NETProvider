@@ -106,7 +106,7 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				try
 				{
-					if (!_transaction.IsUpdated)
+					if (!_transaction.IsCompleted)
 					{
 						_transaction.Commit();
 					}

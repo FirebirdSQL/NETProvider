@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				return _activeTransaction != null && !_activeTransaction.IsUpdated;
+				return _activeTransaction != null && !_activeTransaction.IsCompleted;
 			}
 		}
 
@@ -273,7 +273,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public void TransactionUpdated()
+		public void TransactionCompleted()
 		{
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{

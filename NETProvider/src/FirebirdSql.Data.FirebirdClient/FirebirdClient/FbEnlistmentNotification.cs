@@ -74,7 +74,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Commit(Enlistment enlistment)
 		{
-			if (_transaction != null && !_transaction.IsUpdated)
+			if (_transaction != null && !_transaction.IsCompleted)
 			{
 				_transaction.Commit();
 				_transaction = null;
@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Rollback(Enlistment enlistment)
 		{
-			if (_transaction != null && !_transaction.IsUpdated)
+			if (_transaction != null && !_transaction.IsCompleted)
 			{
 				_transaction.Rollback();
 				_transaction = null;
