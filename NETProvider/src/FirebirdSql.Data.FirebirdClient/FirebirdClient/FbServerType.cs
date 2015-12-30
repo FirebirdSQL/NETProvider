@@ -24,6 +24,5 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		Default		= 0,
 		Embedded    = 1,
-		Context     = 2
 	}
 }

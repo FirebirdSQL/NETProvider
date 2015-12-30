@@ -189,7 +189,6 @@
     <Compile Include="Client\Managed\Version11\GdsStatement.cs" />
     <Compile Include="Client\Native\FbClientFactory.cs" />
     <Compile Include="Client\Native\IFbClient.cs" />
-    <Compile Include="Client\ExternalEngine\ParamDsc.cs" />
     <Compile Include="Client\Common\XSQLDA.cs" />
     <Compile Include="Client\Common\XsqldaMarshaler.cs" />
     <Compile Include="Client\Common\XSQLVAR.cs" />
@@ -201,16 +200,6 @@
     <Compile Include="Client\Native\FesServiceManager.cs" />
     <Compile Include="Client\Native\FesStatement.cs" />
     <Compile Include="Client\Native\FesTransaction.cs" />
-    <Compile Include="Client\ExternalEngine\ExtArray.cs" />
-    <Compile Include="Client\ExternalEngine\ExtBlob.cs" />
-    <Compile Include="Client\ExternalEngine\ExtConnection.cs" />
-    <Compile Include="Client\ExternalEngine\ExtDatabase.cs" />
-    <Compile Include="Client\ExternalEngine\ExtServiceManager.cs" />
-    <Compile Include="Client\ExternalEngine\ExtStatement.cs" />
-    <Compile Include="Client\ExternalEngine\ExtTransaction.cs" />
-    <Compile Include="Client\ExternalEngine\ExtTriggerContext.cs" />
-    <Compile Include="Client\ExternalEngine\ParamDscMarshaler.cs" />
-    <Compile Include="Client\ExternalEngine\SafeNativeMethods.cs" />
     <Compile Include="Common\ArrayBase.cs" />
     <Compile Include="Common\ArrayBound.cs" />
     <Compile Include="Common\ArrayDesc.cs" />

@@ -214,16 +214,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { SetValue("Records Affected", value); }
 		}
 
-		[Category("Advanced")]
-		[DisplayName("ContextConnection")]
-		[Description("Use ContextConnection or not.")]
-		[DefaultValue(FbConnectionString.DefaultContextConnection)]
-		public bool ContextConnection
-		{
-			get { return GetBoolean("Context Connection"); }
-			set { SetValue("Context Connection", value); }
-		}
-
 		[Category("Pooling")]
 		[DisplayName("Enlist")]
 		[Description("If true, enlists the connections in the current transaction.")]
@@ -313,9 +303,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					case "Embedded":
 						return FbServerType.Embedded;
-
-					case "Context":
-						return FbServerType.Context;
 				}
 			}
 
