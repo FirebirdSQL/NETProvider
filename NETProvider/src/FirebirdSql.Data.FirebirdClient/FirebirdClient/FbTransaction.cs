@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						// release any unmanaged resources
 						if (_transaction != null)
 						{
-							if (_transaction.State == TransactionState.Active && !_isCompleted)
+							if (!_isCompleted)
 							{
 								_transaction.Dispose();
 								_transaction = null;
@@ -304,9 +304,10 @@ namespace FirebirdSql.Data.FirebirdClient
 		private void CompleteTransaction()
 		{
 			_connection?.InnerConnection?.TransactionCompleted();
-			_isCompleted = true;
 			_connection = null;
+			_transaction.Dispose();
 			_transaction = null;
+			_isCompleted = true;
 		}
 
 		private TransactionParameterBuffer BuildTpb()
