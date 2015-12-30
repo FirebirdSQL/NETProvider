@@ -31,6 +31,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region Fields
 
 		protected int _handle;
+		private bool _disposed;
 		protected GdsDatabase _database;
 		private GdsTransaction _transaction;
 		protected Descriptor _parameters;
@@ -173,7 +174,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			lock (this)
 			{
-				if (!IsDisposed)
+				if (!_disposed)
 				{
 					try
 					{
@@ -201,6 +202,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							RecordsAffected = 0;
 						}
 
+						_disposed = true;
 						base.Dispose(disposing);
 					}
 				}

@@ -79,12 +79,6 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region Fields
-
-		private bool _disposed;
-
-		#endregion
-
 		#region Protected Fields
 
 		protected EventHandler _TransactionUpdate;
@@ -152,15 +146,6 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region Protected Properties
-
-		protected bool IsDisposed
-		{
-			get { return _disposed; }
-		}
-
-		#endregion
-
 		#region Finalizer
 
 		~StatementBase()
@@ -179,12 +164,7 @@ namespace FirebirdSql.Data.Common
 		}
 
 		protected virtual void Dispose(bool disposing)
-		{
-			if (!_disposed)
-			{
-				_disposed = true;
-			}
-		}
+		{ }
 
 		#endregion
 

@@ -30,6 +30,7 @@ namespace FirebirdSql.Data.Client.Native
 		#region Fields
 
 		private int _handle;
+		private bool _disposed;
 		private FesDatabase _db;
 		private FesTransaction _transaction;
 		private Descriptor _parameters;
@@ -169,7 +170,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		protected override void Dispose(bool disposing)
 		{
-			if (!IsDisposed)
+			if (!_disposed)
 			{
 				try
 				{
@@ -197,6 +198,7 @@ namespace FirebirdSql.Data.Client.Native
 						FetchSize = 0;
 					}
 
+					_disposed = true;
 					base.Dispose(disposing);
 				}
 			}
