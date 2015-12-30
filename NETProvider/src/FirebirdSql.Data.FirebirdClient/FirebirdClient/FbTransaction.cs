@@ -34,7 +34,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private FbConnection _connection;
 		private ITransaction _transaction;
-		private IsolationLevel _isolationLevel;
 		private bool _disposed;
 		private bool _isCompleted;
 
@@ -47,14 +46,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return !_isCompleted ? _connection : null; }
 		}
 
-		public override IsolationLevel IsolationLevel
-		{
-			get { return _isolationLevel; }
-		}
-
-		#endregion
-
-		#region Internal Properties
+		public override IsolationLevel IsolationLevel { get; }
 
 		internal ITransaction Transaction
 		{
@@ -65,10 +57,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get { return _isCompleted; }
 		}
-
-		#endregion
-
-		#region DbTransaction Protected properties
 
 		protected override DbConnection DbConnection
 		{
@@ -89,7 +77,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_isCompleted = false;
 
 			_connection = connection;
-			_isolationLevel = il;
+			IsolationLevel = il;
 		}
 
 		#endregion
@@ -329,7 +317,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			options.TransactionBehavior |= FbTransactionBehavior.NoWait;
 
-			switch (_isolationLevel)
+			switch (IsolationLevel)
 			{
 				case IsolationLevel.Serializable:
 					options.TransactionBehavior |= FbTransactionBehavior.Consistency;
