@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return _database; }
 		}
 
-		public override ITransaction Transaction
+		public override TransactionBase Transaction
 		{
 			get { return _transaction; }
 			set
@@ -141,7 +141,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 		}
 
-		public GdsStatement(IDatabase db, ITransaction transaction)
+		public GdsStatement(IDatabase db, TransactionBase transaction)
 		{
 			if (!(db is GdsDatabase))
 			{

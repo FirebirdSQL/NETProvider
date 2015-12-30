@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Common
 		protected long          _blobId;
 		protected int           _blobHandle;
 		protected int           _position;
-		protected ITransaction  _transaction;
+		protected TransactionBase  _transaction;
 
 		#endregion
 

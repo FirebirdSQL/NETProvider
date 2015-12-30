@@ -42,12 +42,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Constructors
 
-		public GdsBlob(IDatabase db, ITransaction transaction)
+		public GdsBlob(IDatabase db, TransactionBase transaction)
 			: this(db, transaction, 0)
 		{
 		}
 
-		public GdsBlob(IDatabase db, ITransaction transaction, long blobId)
+		public GdsBlob(IDatabase db, TransactionBase transaction, long blobId)
 			: base(db)
 		{
 			if (!(db is GdsDatabase))

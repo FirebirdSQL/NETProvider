@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Client.Native
 			get { return _db; }
 		}
 
-		public override ITransaction Transaction
+		public override TransactionBase Transaction
 		{
 			get { return _transaction; }
 			set
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 		}
 
-		public FesStatement(IDatabase db, ITransaction transaction)
+		public FesStatement(IDatabase db, TransactionBase transaction)
 		{
 			if (!(db is FesDatabase))
 			{

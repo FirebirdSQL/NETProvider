@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			get { return _db; }
 		}
 
-		public override ITransaction Transaction
+		public override TransactionBase Transaction
 		{
 			get { return _transaction; }
 			set
@@ -143,7 +143,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		{
 		}
 
-		public ExtStatement(IDatabase db, ITransaction transaction)
+		public ExtStatement(IDatabase db, TransactionBase transaction)
 		{
 			if (!(db is ExtDatabase))
 			{

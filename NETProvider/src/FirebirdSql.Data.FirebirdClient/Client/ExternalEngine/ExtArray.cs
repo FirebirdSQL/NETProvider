@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			set { _db = (ExtDatabase)value; }
 		}
 
-		public override ITransaction Transaction
+		public override TransactionBase Transaction
 		{
 			get { return _transaction; }
 			set { _transaction = (ExtTransaction)value; }
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public ExtArray(
 			IDatabase db,
-			ITransaction transaction,
+			TransactionBase transaction,
 			string tableName,
 			string fieldName)
 			: this(db, transaction, -1, tableName, fieldName)
@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		public ExtArray(
 			IDatabase db,
-			ITransaction transaction,
+			TransactionBase transaction,
 			long handle,
 			string tableName,
 			string fieldName)

@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			: base(db)
 		{ }
 
-		public GdsStatement(IDatabase db, ITransaction transaction)
+		public GdsStatement(IDatabase db, TransactionBase transaction)
 			: base(db, transaction)
 		{ }
 

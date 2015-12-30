@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Common
 			set;
 		}
 
-		public abstract ITransaction Transaction
+		public abstract TransactionBase Transaction
 		{
 			get;
 			set;

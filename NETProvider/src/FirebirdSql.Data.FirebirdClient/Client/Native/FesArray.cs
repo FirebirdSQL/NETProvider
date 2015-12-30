@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.Client.Native
 			set { _db = (FesDatabase)value; }
 		}
 
-		public override ITransaction Transaction
+		public override TransactionBase Transaction
 		{
 			get { return _transaction; }
 			set { _transaction = (FesTransaction)value; }
@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public FesArray(
 			IDatabase db,
-			ITransaction transaction,
+			TransactionBase transaction,
 			string tableName,
 			string fieldName)
 			: this(db, transaction, -1, tableName, fieldName)
@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public FesArray(
 			IDatabase db,
-			ITransaction transaction,
+			TransactionBase transaction,
 			long handle,
 			string tableName,
 			string fieldName)

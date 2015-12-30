@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return new GdsStatement(this);
 		}
 
-		public override StatementBase CreateStatement(ITransaction transaction)
+		public override StatementBase CreateStatement(TransactionBase transaction)
 		{
 			return new GdsStatement(this, transaction);
 		}

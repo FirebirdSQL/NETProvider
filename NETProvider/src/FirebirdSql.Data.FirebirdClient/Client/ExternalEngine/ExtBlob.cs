@@ -42,12 +42,12 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#region Constructors
 
-		public ExtBlob(IDatabase db, ITransaction transaction)
+		public ExtBlob(IDatabase db, TransactionBase transaction)
 			: this(db, transaction, 0)
 		{
 		}
 
-		public ExtBlob(IDatabase db, ITransaction transaction, long blobId)
+		public ExtBlob(IDatabase db, TransactionBase transaction, long blobId)
 			: base(db)
 		{
 			if (!(db is ExtDatabase))

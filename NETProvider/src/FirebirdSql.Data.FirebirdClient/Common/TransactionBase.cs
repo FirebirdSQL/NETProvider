@@ -21,7 +21,7 @@ using FirebirdSql.Data.Client.Managed;
 
 namespace FirebirdSql.Data.Common
 {
-	internal abstract class TransactionBase : ITransaction
+	internal abstract class TransactionBase : IDisposable
 	{
 		protected void EnsureActiveTransactionState()
 		{

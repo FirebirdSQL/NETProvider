@@ -94,10 +94,10 @@ namespace FirebirdSql.Data.Common
 		void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database);
 		void DropDatabase();
 
-		ITransaction BeginTransaction(TransactionParameterBuffer tpb);
+		TransactionBase BeginTransaction(TransactionParameterBuffer tpb);
 
 		StatementBase CreateStatement();
-		StatementBase CreateStatement(ITransaction transaction);
+		StatementBase CreateStatement(TransactionBase transaction);
 
 		ArrayList GetDatabaseInfo(byte[] items);
 		ArrayList GetDatabaseInfo(byte[] items, int bufferLength);

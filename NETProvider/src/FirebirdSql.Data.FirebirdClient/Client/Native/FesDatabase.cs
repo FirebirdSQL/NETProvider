@@ -321,7 +321,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Transaction Methods
 
-		public ITransaction BeginTransaction(TransactionParameterBuffer tpb)
+		public TransactionBase BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			FesTransaction transaction = new FesTransaction(this);
 			transaction.BeginTransaction(tpb);
@@ -353,7 +353,7 @@ namespace FirebirdSql.Data.Client.Native
 			return new FesStatement(this);
 		}
 
-		public StatementBase CreateStatement(ITransaction transaction)
+		public StatementBase CreateStatement(TransactionBase transaction)
 		{
 			return new FesStatement(this, transaction as FesTransaction);
 		}

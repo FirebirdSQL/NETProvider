@@ -232,7 +232,6 @@
     <Compile Include="Common\IscException.cs" />
     <Compile Include="Common\IscHelper.cs" />
     <Compile Include="Common\IServiceManager.cs" />
-    <Compile Include="Common\ITransaction.cs" />
     <Compile Include="Common\ParameterBuffer.cs" />
     <Compile Include="Common\RemoteEvent.cs" />
     <Compile Include="Common\RemoteEventCountsCallback.cs" />

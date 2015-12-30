@@ -240,7 +240,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 
 		#region Transaction Methods
 
-		public ITransaction BeginTransaction(TransactionParameterBuffer tpb)
+		public TransactionBase BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			ExtTransaction transaction = new ExtTransaction(this);
 			transaction.BeginTransaction(tpb);
@@ -266,7 +266,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 			return new ExtStatement(this);
 		}
 
-		public StatementBase CreateStatement(ITransaction transaction)
+		public StatementBase CreateStatement(TransactionBase transaction)
 		{
 			return new ExtStatement(this, transaction as ExtTransaction);
 		}

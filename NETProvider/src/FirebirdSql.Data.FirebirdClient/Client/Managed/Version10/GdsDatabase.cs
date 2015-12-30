@@ -552,7 +552,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Transaction Methods
 
-		public virtual ITransaction BeginTransaction(TransactionParameterBuffer tpb)
+		public virtual TransactionBase BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			GdsTransaction transaction = new GdsTransaction(this);
 
@@ -579,7 +579,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return new GdsStatement(this);
 		}
 
-		public virtual StatementBase CreateStatement(ITransaction transaction)
+		public virtual StatementBase CreateStatement(TransactionBase transaction)
 		{
 			return new GdsStatement(this, transaction);
 		}

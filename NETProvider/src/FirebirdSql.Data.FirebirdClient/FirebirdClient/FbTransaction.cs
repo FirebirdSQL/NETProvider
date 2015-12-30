@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Fields
 
 		private FbConnection _connection;
-		private ITransaction _transaction;
+		private TransactionBase _transaction;
 		private bool _disposed;
 		private bool _isCompleted;
 
@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override IsolationLevel IsolationLevel { get; }
 
-		internal ITransaction Transaction
+		internal TransactionBase Transaction
 		{
 			get { return _transaction; }
 		}

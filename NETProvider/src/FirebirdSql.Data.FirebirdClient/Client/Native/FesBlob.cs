@@ -46,12 +46,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Constructors
 
-		public FesBlob(IDatabase db, ITransaction transaction)
+		public FesBlob(IDatabase db, TransactionBase transaction)
 			: this(db, transaction, 0)
 		{
 		}
 
-		public FesBlob(IDatabase db, ITransaction transaction, long blobId)
+		public FesBlob(IDatabase db, TransactionBase transaction, long blobId)
 			: base(db)
 		{
 			if (!(db is FesDatabase))
