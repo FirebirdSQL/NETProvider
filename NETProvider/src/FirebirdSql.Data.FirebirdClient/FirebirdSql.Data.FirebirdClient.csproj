@@ -207,7 +207,6 @@
     <Compile Include="Common\BlobBase.cs" />
     <Compile Include="Common\BlobParameterBuffer.cs" />
     <Compile Include="Common\Charset.cs" />
-    <Compile Include="Common\ITriggerContext.cs" />
     <Compile Include="Common\DatabaseParameterBuffer.cs" />
     <Compile Include="Common\DbDataType.cs" />
     <Compile Include="Common\DbField.cs" />
@@ -261,7 +260,6 @@
     <Compile Include="FirebirdClient\FbInfoMessageEventArgs.cs" />
     <Compile Include="FirebirdClient\FbParameter.cs" />
     <Compile Include="FirebirdClient\FbParameterCollection.cs" />
-    <Compile Include="Server\FbResultSet.cs" />
     <Compile Include="FirebirdClient\FbServerType.cs" />
     <Compile Include="FirebirdClient\FirebirdClientPermission.cs" />
     <Compile Include="FirebirdClient\FirebirdClientPermissionAtrribute.cs" />
@@ -342,9 +340,6 @@
     <Compile Include="Services\FbValidation.cs" />
     <Compile Include="Services\FbValidationFlags.cs" />
     <Compile Include="Services\ServiceOutputEventArgs.cs" />
-    <Compile Include="Server\FbTriggerActionType.cs" />
-    <Compile Include="Server\FbTriggerContext.cs" />
-    <Compile Include="Server\IResultSet.cs" />
     <Compile Include="Properties\VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>

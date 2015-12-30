@@ -107,8 +107,6 @@ namespace FirebirdSql.Data.Common
 		void QueueEvents(RemoteEvent events);
 		void CancelEvents(RemoteEvent events);
 
-		ITriggerContext GetTriggerContext();
-
 		void CancelOperation(int kind);
 
 		#endregion

@@ -615,15 +615,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region Trigger Context Methods
-
-		public virtual ITriggerContext GetTriggerContext()
-		{
-			throw new NotSupportedException();
-		}
-
-		#endregion
-
 		#region Response Methods
 
 		protected void ProcessResponse(IResponse response)
