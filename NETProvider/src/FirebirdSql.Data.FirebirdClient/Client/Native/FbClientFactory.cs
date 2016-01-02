@@ -16,8 +16,10 @@
  *	All Rights Reserved.
  */
 
+using FirebirdSql.Data.Client.Native.Handle;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
@@ -37,6 +39,7 @@ namespace FirebirdSql.Data.Client.Native
 		/// specified.
 		/// </summary>
 		private static IDictionary<string, IFbClient> cache;
+		private static List<Type> injectionTypes;
 
 		/// <summary>
 		/// Static constructor sets up member variables.
@@ -44,6 +47,12 @@ namespace FirebirdSql.Data.Client.Native
 		static FbClientFactory()
 		{
 			cache = new SortedDictionary<string, IFbClient>();
+			injectionTypes = typeof(FbClientFactory).Assembly.GetTypes()
+				.Where(x => !x.IsAbstract)
+				.Where(x => !x.IsInterface)
+				.Where(x => typeof(IFirebirdHandle).IsAssignableFrom(x))
+				.Select(x => x.MakeByRefType())
+				.ToList();
 		}
 
 		/// <summary>
@@ -187,29 +196,63 @@ namespace FirebirdSql.Data.Client.Native
 			ILGenerator il = mb.GetILGenerator();
 			for (int i = 1; i <= pis.Count; i++)
 			{
-				if (i == 1)
-				{
-					il.Emit(OpCodes.Ldarg_1);
-				}
-				else if (i == 2)
-				{
-					il.Emit(OpCodes.Ldarg_2);
-				}
-				else if (i == 3)
-				{
-					il.Emit(OpCodes.Ldarg_3);
-				}
-				else
-				{
-					il.Emit(OpCodes.Ldarg_S, (short)i);
-				}
+				EmitLdarg(il, i);
 			}
 
 			il.EmitCall(OpCodes.Call, smb, null);
+
+			EmitClientInjectionToFirebirdHandleOjects(mi.ReturnType, pis, il);
+
 			il.Emit(OpCodes.Ret);
 
 			// Define the fact that our IFbClient.Method is the explicit interface implementation of that method
 			tb.DefineMethodOverride(mb, mi);
+		}
+
+		private static void EmitClientInjectionToFirebirdHandleOjects(
+			Type returnType,
+			List<ParameterInfo> pis,
+			ILGenerator il)
+		{
+			bool injectProperties = pis.Select(x => x.ParameterType).Intersect(injectionTypes).Any();
+			if (injectProperties)
+			{
+				il.DeclareLocal(returnType);
+				il.Emit(OpCodes.Stloc_0);
+				for (int i = 0; i < pis.Count; i++)
+				{
+					if (injectionTypes.Contains(pis[i].ParameterType))
+					{
+						EmitLdarg(il, i + 1);
+						il.Emit(OpCodes.Ldind_Ref);
+						il.Emit(OpCodes.Ldarg_0);
+						il.Emit(OpCodes.Callvirt, typeof(IFirebirdHandle).GetMethod("SetClient"));
+						il.Emit(OpCodes.Nop);
+					}
+				}
+
+				il.Emit(OpCodes.Ldloc_0);
+			}
+		}
+
+		private static void EmitLdarg(ILGenerator il, int i)
+		{
+			if (i == 1)
+			{
+				il.Emit(OpCodes.Ldarg_1);
+			}
+			else if (i == 2)
+			{
+				il.Emit(OpCodes.Ldarg_2);
+			}
+			else if (i == 3)
+			{
+				il.Emit(OpCodes.Ldarg_3);
+			}
+			else
+			{
+				il.Emit(OpCodes.Ldarg_S, (short)i);
+			}
 		}
 
 		/// <summary>

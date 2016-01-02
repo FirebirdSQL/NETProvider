@@ -25,6 +25,7 @@ using System.Threading;
 using System.Text;
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Client.Native.Handle;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -44,7 +45,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		private WarningMessageCallback _warningMessage;
 
-		private int _handle;
+		private DatabaseHandle _handle;
 		private int _transactionCount;
 		private string _serverVersion;
 		private Charset _charset;
@@ -61,6 +62,11 @@ namespace FirebirdSql.Data.Client.Native
 		#region Properties
 
 		public int Handle
+		{
+			get { return _handle.DangerousGetHandle().AsInt(); }
+		}
+
+		public DatabaseHandle HandlePtr
 		{
 			get { return _handle; }
 		}
@@ -129,6 +135,7 @@ namespace FirebirdSql.Data.Client.Native
 		public FesDatabase(string dllName, Charset charset)
 		{
 			_fbClient = FbClientFactory.GetFbClient(dllName);
+			_handle = new DatabaseHandle();
 			_charset = (charset != null ? charset : Charset.DefaultCharset);
 			_dialect = 3;
 			_packetSize = 8192;
@@ -156,33 +163,23 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void Dispose(bool disposing)
 		{
-			lock (this)
+			if (!_disposed)
 			{
-				if (!_disposed)
+				if (disposing)
 				{
-					try
-					{
-						Detach();
-					}
-					catch
-					{ }
-					finally
-					{
-						if (disposing)
-						{
-							_warningMessage = null;
-							_charset = null;
-							_serverVersion = null;
-							_statusVector = null;
-							_transactionCount = 0;
-							_dialect = 0;
-							_handle = 0;
-							_packetSize = 0;
-						}
-
-						_disposed = true;
-					}
+					Detach();
+					_warningMessage = null;
+					_charset = null;
+					_serverVersion = null;
+					_statusVector = null;
+					_transactionCount = 0;
+					_dialect = 0;
+					_handle.Dispose();
+					_packetSize = 0;
 				}
+
+				_disposed = true;
+
 			}
 		}
 
@@ -192,46 +189,35 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
-			lock (this)
-			{
-				byte[] databaseBuffer = Encoding.Default.GetBytes(database);
-				int dbHandle = Handle;
+			byte[] databaseBuffer = Encoding.Default.GetBytes(database);
 
-				// Clear status vector
-				ClearStatusVector();
+			// Clear status vector
+			ClearStatusVector();
 
-				_fbClient.isc_create_database(
-					_statusVector,
-					(short)databaseBuffer.Length,
-					databaseBuffer,
-					ref dbHandle,
-					(short)dpb.Length,
-					dpb.ToArray(),
-					0);
+			_fbClient.isc_create_database(
+				_statusVector,
+				(short)databaseBuffer.Length,
+				databaseBuffer,
+				ref _handle,
+				dpb.Length,
+				dpb.ToArray(),
+				0);
 
-				ParseStatusVector(_statusVector);
+			ParseStatusVector(_statusVector);
 
-				_handle = dbHandle;
-
-				Detach();
-			}
+			Detach();
 		}
 
 		public void DropDatabase()
 		{
-			lock (this)
-			{
-				int dbHandle = Handle;
+			// Clear status vector
+			ClearStatusVector();
 
-				// Clear status vector
-				ClearStatusVector();
+			_fbClient.isc_drop_database(_statusVector, ref _handle);
 
-				_fbClient.isc_drop_database(_statusVector, ref dbHandle);
+			_handle.Close();
 
-				ParseStatusVector(_statusVector);
-
-				_handle = 0;
-			}
+			ParseStatusVector(_statusVector);
 		}
 
 		#endregion
@@ -264,30 +250,23 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
-			lock (this)
-			{
-				byte[] databaseBuffer = Encoding.Default.GetBytes(database);
-				int dbHandle = 0;
+			byte[] databaseBuffer = Encoding.Default.GetBytes(database);
 
-				// Clear status vector
-				ClearStatusVector();
+			// Clear status vector
+			ClearStatusVector();
 
-				_fbClient.isc_attach_database(
-					_statusVector,
-					(short)databaseBuffer.Length,
-					databaseBuffer,
-					ref dbHandle,
-					(short)dpb.Length,
-					dpb.ToArray());
+			_fbClient.isc_attach_database(
+				_statusVector,
+				(short)databaseBuffer.Length,
+				databaseBuffer,
+				ref _handle,
+				(short)dpb.Length,
+				dpb.ToArray());
 
-				ParseStatusVector(_statusVector);
+			ParseStatusVector(_statusVector);
 
-				// Update the database handle
-				_handle = dbHandle;
-
-				// Get server version
-				_serverVersion = GetServerVersion();
-			}
+			// Get server version
+			_serverVersion = GetServerVersion();
 		}
 
 		public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
@@ -297,24 +276,17 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void Detach()
 		{
-			lock (this)
+			if (TransactionCount > 0)
 			{
-				if (TransactionCount > 0)
-				{
-					throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
-				}
-
-				int dbHandle = Handle;
-
-				// Clear status vector
-				ClearStatusVector();
-
-				_fbClient.isc_detach_database(_statusVector, ref dbHandle);
-
-				_handle = dbHandle;
-
-				FesConnection.ParseStatusVector(_statusVector, _charset);
+				throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
 			}
+
+			// Clear status vector
+			ClearStatusVector();
+
+			_fbClient.isc_detach_database(_statusVector, ref _handle);
+
+			FesConnection.ParseStatusVector(_statusVector, _charset);
 		}
 
 		#endregion
@@ -335,11 +307,9 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void CancelOperation(int kind)
 		{
-			int dbHandle = Handle;
-
 			IntPtr[] localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
-			_fbClient.fb_cancel_operation(localStatusVector, ref dbHandle, kind);
+			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, kind);
 
 			FesConnection.ParseStatusVector(localStatusVector, _charset);
 		}
@@ -428,23 +398,18 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
 		{
-			lock (this)
-			{
-				int dbHandle = Handle;
+			// Clear status vector
+			ClearStatusVector();
 
-				// Clear status vector
-				ClearStatusVector();
+			_fbClient.isc_database_info(
+				_statusVector,
+				ref _handle,
+				(short)items.Length,
+				items,
+				(short)bufferLength,
+				buffer);
 
-				_fbClient.isc_database_info(
-					_statusVector,
-					ref dbHandle,
-					(short)items.Length,
-					items,
-					(short)bufferLength,
-					buffer);
-
-				ParseStatusVector(_statusVector);
-			}
+			ParseStatusVector(_statusVector);
 		}
 
 		#endregion

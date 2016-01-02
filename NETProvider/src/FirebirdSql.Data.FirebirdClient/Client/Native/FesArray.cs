@@ -29,6 +29,7 @@ using System.Text;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Client.Common;
+using FirebirdSql.Data.Client.Native.Handle;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -115,8 +116,8 @@ namespace FirebirdSql.Data.Client.Native
 			// Clear the status vector
 			ClearStatusVector();
 
-			int dbHandle = _db.Handle;
-			int trHandle = _transaction.Handle;
+			DatabaseHandle dbHandle = _db.HandlePtr;
+			TransactionHandle trHandle = _transaction.HandlePtr;
 
 			IntPtr arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 
@@ -144,8 +145,8 @@ namespace FirebirdSql.Data.Client.Native
 			// Clear the status vector
 			ClearStatusVector();
 
-			int dbHandle = _db.Handle;
-			int trHandle = _transaction.Handle;
+			DatabaseHandle dbHandle = _db.HandlePtr;
+			TransactionHandle trHandle = _transaction.HandlePtr;
 
 			IntPtr arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 

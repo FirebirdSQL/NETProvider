@@ -28,6 +28,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region Fields
 
 		private GdsDatabase _database;
+		private int _blobHandle;
 
 		#endregion
 
@@ -36,6 +37,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public override IDatabase Database
 		{
 			get { return _database; }
+		}
+
+		public override int Handle
+		{
+			get { return _blobHandle; }
 		}
 
 		#endregion

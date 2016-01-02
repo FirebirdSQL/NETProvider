@@ -139,6 +139,12 @@
     <Compile Include="Client\Managed\Version11\SSPIHelper.cs" />
     <Compile Include="Client\Managed\Version12\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version12\GdsStatement.cs" />
+    <Compile Include="Client\Native\Handle\BlobHandle.cs" />
+    <Compile Include="Client\Native\Handle\DatabaseHandle.cs" />
+    <Compile Include="Client\Native\Handle\FirebirdHandle.cs" />
+    <Compile Include="Client\Native\Handle\IFirebirdHandle.cs" />
+    <Compile Include="Client\Native\Handle\StatementHandle.cs" />
+    <Compile Include="Client\Native\Handle\TransactionHandle.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\IscErrorMessages.cs" />
     <Compile Include="Common\PageSizeHelper.cs" />
