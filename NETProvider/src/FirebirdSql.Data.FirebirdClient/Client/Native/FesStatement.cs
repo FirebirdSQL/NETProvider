@@ -22,6 +22,7 @@ using System.Text;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Client.Common;
+using FirebirdSql.Data.Client.Native.Handle;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -29,7 +30,7 @@ namespace FirebirdSql.Data.Client.Native
 	{
 		#region Fields
 
-		private int _handle;
+		private StatementHandle _handle;
 		private bool _disposed;
 		private FesDatabase _db;
 		private FesTransaction _transaction;
@@ -154,6 +155,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_recordsAffected = -1;
 			_db = (FesDatabase)db;
+			_handle = new StatementHandle();
 			_outputParams = new Queue();
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 			_fetchSqlDa = IntPtr.Zero;
@@ -174,16 +176,10 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				try
 				{
-					Release();
-				}
-				catch
-				{ }
-				finally
-				{
 					if (disposing)
 					{
+						Release();
 						Clear();
-
 						_db = null;
 						_fields = null;
 						_parameters = null;
@@ -194,10 +190,12 @@ namespace FirebirdSql.Data.Client.Native
 						_state = StatementState.Deallocated;
 						_statementType = DbStatementType.None;
 						_recordsAffected = 0;
-						_handle = 0;
+						_handle.Close();
 						FetchSize = 0;
 					}
-
+				}
+				finally
+				{
 					_disposed = true;
 					base.Dispose(disposing);
 				}
@@ -278,15 +276,14 @@ namespace FirebirdSql.Data.Client.Native
 				_fields = new Descriptor(1);
 
 				IntPtr sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
-				int trHandle = _transaction.Handle;
-				int stmtHandle = _handle;
+				TransactionHandle trHandle = _transaction.HandlePtr;
 
 				byte[] buffer = _db.Charset.GetBytes(commandText);
 
 				_db.FbClient.isc_dsql_prepare(
 					_statusVector,
 					ref trHandle,
-					ref stmtHandle,
+					ref _handle,
 					(short)buffer.Length,
 					buffer,
 					_db.Dialect,
@@ -355,13 +352,12 @@ namespace FirebirdSql.Data.Client.Native
 					outSqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
 				}
 
-				int trHandle = _transaction.Handle;
-				int stmtHandle = _handle;
-
+				TransactionHandle trHandle = _transaction.HandlePtr;
+				
 				_db.FbClient.isc_dsql_execute2(
 					_statusVector,
 					ref trHandle,
-					ref stmtHandle,
+					ref _handle,
 					IscCodes.SQLDA_VERSION1,
 					inSqlda,
 					outSqlda);
@@ -427,10 +423,10 @@ namespace FirebirdSql.Data.Client.Native
 					ClearStatusVector();
 
 					// Statement handle to be passed to the fetch method
-					int stmtHandle = _handle;
+
 
 					// Fetch data
-					IntPtr status = _db.FbClient.isc_dsql_fetch(_statusVector, ref stmtHandle, IscCodes.SQLDA_VERSION1, _fetchSqlDa);
+					IntPtr status = _db.FbClient.isc_dsql_fetch(_statusVector, ref _handle, IscCodes.SQLDA_VERSION1, _fetchSqlDa);
 
 					// Obtain values
 					Descriptor rowDesc = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, _fetchSqlDa, true);
@@ -497,11 +493,11 @@ namespace FirebirdSql.Data.Client.Native
 
 
 				IntPtr sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
-				int stmtHandle = _handle;
+
 
 				_db.FbClient.isc_dsql_describe(
 					_statusVector,
-					ref stmtHandle,
+					ref _handle,
 					IscCodes.SQLDA_VERSION1,
 					sqlda);
 
@@ -532,11 +528,11 @@ namespace FirebirdSql.Data.Client.Native
 				_parameters = new Descriptor(1);
 
 				IntPtr sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _parameters);
-				int stmtHandle = _handle;
+
 
 				_db.FbClient.isc_dsql_describe_bind(
 					_statusVector,
-					ref stmtHandle,
+					ref _handle,
 					IscCodes.SQLDA_VERSION1,
 					sqlda);
 
@@ -558,7 +554,7 @@ namespace FirebirdSql.Data.Client.Native
 
 					_db.FbClient.isc_dsql_describe_bind(
 						_statusVector,
-						ref stmtHandle,
+						ref _handle,
 						IscCodes.SQLDA_VERSION1,
 						sqlda);
 
@@ -607,15 +603,11 @@ namespace FirebirdSql.Data.Client.Native
 				// Clear the status vector
 				ClearStatusVector();
 
-				int stmtHandle = _handle;
-
 				_db.FbClient.isc_dsql_free_statement(
 					_statusVector,
-					ref stmtHandle,
+					ref _handle,
 					(short)option);
-
-				_handle = stmtHandle;
-
+				
 				// Reset statement information
 				if (option == IscCodes.DSQL_drop)
 				{
@@ -653,11 +645,11 @@ namespace FirebirdSql.Data.Client.Native
 				ClearStatusVector();
 
 				byte[] buffer = new byte[bufferLength];
-				int stmtHandle = _handle;
+
 
 				_db.FbClient.isc_dsql_sql_info(
 					_statusVector,
-					ref stmtHandle,
+					ref _handle,
 					(short)items.Length,
 					items,
 					(short)bufferLength,
@@ -701,17 +693,15 @@ namespace FirebirdSql.Data.Client.Native
 				// Clear the status vector
 				ClearStatusVector();
 
-				int dbHandle = _db.Handle;
-				int stmtHandle = _handle;
+				DatabaseHandle dbHandle = _db.HandlePtr;
 
 				_db.FbClient.isc_dsql_allocate_statement(
 					_statusVector,
 					ref dbHandle,
-					ref stmtHandle);
+					ref _handle);				
 
 				_db.ParseStatusVector(_statusVector);
-
-				_handle = stmtHandle;
+				
 				_allRowsFetched = false;
 				_state = StatementState.Allocated;
 				_statementType = DbStatementType.None;

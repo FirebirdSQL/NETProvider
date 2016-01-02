@@ -28,6 +28,7 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		#region Fields
 
 		private ExtDatabase _db;
+		private int _blobHandle;
 
 		#endregion
 
@@ -36,6 +37,11 @@ namespace FirebirdSql.Data.Client.ExternalEngine
 		public override IDatabase Database
 		{
 			get { return _db; }
+		}
+
+		public override int Handle
+		{
+			get { return _blobHandle; }
 		}
 
 		#endregion

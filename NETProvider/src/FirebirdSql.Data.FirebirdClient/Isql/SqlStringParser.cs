@@ -112,12 +112,16 @@ namespace FirebirdSql.Data.Isql
 
 			if (index >= _sourceLength)
 			{
-				var parsed = _source.Substring(lastYield);
-				if (parsed.Trim() == string.Empty)
+				if (lastYield != 0)
 				{
-					yield break;
+					var parsed = _source.Substring(lastYield);
+					if (parsed.Trim() == string.Empty)
+					{
+						yield break;
+					}
+					yield return new FbStatement(parsed, rawResult.ToString());
 				}
-                yield return new FbStatement(parsed, rawResult.ToString());
+
 				lastYield = _sourceLength;
 				rawResult.Clear();
 			}
