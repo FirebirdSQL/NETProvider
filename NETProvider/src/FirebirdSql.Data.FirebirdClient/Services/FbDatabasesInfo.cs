@@ -35,12 +35,14 @@ namespace FirebirdSql.Data.Services
 		{
 			get
 			{
-				return (_databases ?? (_databases = new List<string>())).AsReadOnly();
+				return _databases.AsReadOnly();
 			}
 		}
 
 		internal FbDatabasesInfo()
-		{ }
+		{
+			_databases = new List<string>();
+		}
 
 		internal void AddDatabase(string database)
 		{
