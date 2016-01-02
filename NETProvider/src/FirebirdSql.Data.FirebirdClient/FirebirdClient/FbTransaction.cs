@@ -107,7 +107,6 @@ namespace FirebirdSql.Data.FirebirdClient
 							if (!_isCompleted)
 							{
 								_transaction.Dispose();
-								_transaction = null;
 							}
 						}
 
