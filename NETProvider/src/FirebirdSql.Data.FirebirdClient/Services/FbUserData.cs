@@ -22,8 +22,6 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbUserData
 	{
-		#region Fields
-
 		private string _userName;
 		private string _firstName;
 		private string _lastName;
@@ -33,10 +31,6 @@ namespace FirebirdSql.Data.Services
 		private string _roleName;
 		private int _userID;
 		private int _groupID;
-
-		#endregion
-
-		#region Properties
 
 		public string UserName
 		{
@@ -116,10 +110,6 @@ namespace FirebirdSql.Data.Services
 			set { _roleName = value; }
 		}
 
-		#endregion
-
-		#region Constructors
-
 		public FbUserData()
 		{
 			_userName = string.Empty;
@@ -129,7 +119,5 @@ namespace FirebirdSql.Data.Services
 			_userPassword = string.Empty;
 			_roleName = string.Empty;
 		}
-
-		#endregion
 	}
 }
