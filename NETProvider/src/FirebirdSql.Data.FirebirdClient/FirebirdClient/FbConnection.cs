@@ -311,13 +311,12 @@ namespace FirebirdSql.Data.FirebirdClient
 							_options = null;
 							_connectionString = null;
 						}
-
-						_disposed = true;
 					}
 					catch
 					{ }
 					finally
 					{
+						_disposed = true;
 						base.Dispose(disposing);
 					}
 				}

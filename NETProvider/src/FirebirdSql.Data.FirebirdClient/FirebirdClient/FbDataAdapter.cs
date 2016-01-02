@@ -148,6 +148,8 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					try
 					{
+						// Release any unmanaged resources
+
 						// Release any managed resources
 						if (disposing)
 						{
@@ -160,13 +162,10 @@ namespace FirebirdSql.Data.FirebirdClient
 								}
 							}
 						}
-
-						// release any unmanaged resources
-
-						_disposed = true;
 					}
 					finally
 					{
+						_disposed = true;
 						base.Dispose(disposing);
 					}
 				}
