@@ -390,11 +390,10 @@ namespace FirebirdSql.Data.FirebirdClient
 								_namedParameters = null;
 							}
 						}
-
-						_disposed = true;
 					}
 					finally
 					{
+						_disposed = true;
 						base.Dispose(disposing);
 					}
 				}
