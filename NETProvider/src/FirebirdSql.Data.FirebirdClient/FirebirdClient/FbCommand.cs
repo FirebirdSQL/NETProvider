@@ -364,7 +364,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (!_disposed && disposing)
+				if (!_disposed)
 				{
 					try
 					{
