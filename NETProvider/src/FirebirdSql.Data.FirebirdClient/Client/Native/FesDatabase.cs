@@ -179,7 +179,6 @@ namespace FirebirdSql.Data.Client.Native
 				}
 
 				_disposed = true;
-
 			}
 		}
 
