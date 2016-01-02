@@ -364,28 +364,31 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			lock (this)
 			{
-				if (!_disposed && disposing)
+				if (!_disposed)
 				{
 					try
 					{
 						// Release any unmanaged resources
 						Release();
 
-						// release any managed resources
-						_commandTimeout = 0;
-						_fetchSize = 0;
-						_implicitTransaction = false;
-						_commandText = null;
-						_connection = null;
-						_transaction = null;
-						_parameters = null;
-						_statement = null;
-						_activeReader = null;
-
-						if (_namedParameters != null)
+						if (disposing)
 						{
-							_namedParameters.Clear();
-							_namedParameters = null;
+							// release any managed resources
+							_commandTimeout = 0;
+							_fetchSize = 0;
+							_implicitTransaction = false;
+							_commandText = null;
+							_connection = null;
+							_transaction = null;
+							_parameters = null;
+							_statement = null;
+							_activeReader = null;
+
+							if (_namedParameters != null)
+							{
+								_namedParameters.Clear();
+								_namedParameters = null;
+							}
 						}
 
 						_disposed = true;
