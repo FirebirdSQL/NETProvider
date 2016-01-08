@@ -73,8 +73,8 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		protected override DbCommandDefinition CreateDbCommandDefinition(DbProviderManifest manifest, DbCommandTree commandTree)
 		{
-			DbCommand prototype = CreateCommand(manifest, commandTree);
-			DbCommandDefinition result = CreateCommandDefinition(prototype);
+			var prototype = CreateCommand(manifest, commandTree);
+			var result = CreateCommandDefinition(prototype);
 			return result;
 		}
 
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 			var expectedTypes = PrepareTypeCoercions(commandTree);
 
-			FbCommand command = FbCommand.CreateWithTypeCoercions(expectedTypes);
+			var command = FbCommand.CreateWithTypeCoercions(expectedTypes);
 
 			List<DbParameter> parameters;
 			CommandType commandType;
@@ -171,7 +171,6 @@ namespace FirebirdSql.Data.EntityFramework6
 			{
 				throw new ArgumentException("Could not determine store version; a valid store connection or a version hint is required.");
 			}
-
 			return new FbProviderManifest(versionHint);
 		}
 
@@ -189,7 +188,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 			// output parameters are handled differently (we need to ensure there is space for return
 			// values where the user has not given a specific Size/MaxLength)
-			bool isOutParam = mode != ParameterMode.In;
+			var isOutParam = mode != ParameterMode.In;
 			FbDbType sqlDbType = GetSqlDbType(type, isOutParam, out size);
 
 			if (result.FbDbType != sqlDbType)
@@ -204,7 +203,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				result.Size = size.Value;
 			}
 
-			bool isNullable = MetadataHelpers.IsNullable(type);
+			var isNullable = MetadataHelpers.IsNullable(type);
 			if (isOutParam || isNullable != result.IsNullable)
 			{
 				result.IsNullable = isNullable;
@@ -412,8 +411,8 @@ namespace FirebirdSql.Data.EntityFramework6
 #pragma warning restore 3001
 		{
 			FbConnection.CreateDatabase(connection.ConnectionString, pageSize: 16384);
-			string script = DbCreateDatabaseScript(GetDbProviderManifestToken(connection), storeItemCollection);
-			FbScript fbScript = new FbScript(script);
+			var script = DbCreateDatabaseScript(GetDbProviderManifestToken(connection), storeItemCollection);
+			var fbScript = new FbScript(script);
 			fbScript.Parse();
 			if (fbScript.Results.Any())
 			{
