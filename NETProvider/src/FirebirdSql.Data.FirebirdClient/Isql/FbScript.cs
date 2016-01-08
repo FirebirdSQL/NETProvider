@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.Isql
 		public int Parse()
 		{
 			_results.Clear();
-			foreach (var statement in _parser.ParseNext())
+			foreach (var statement in _parser.Parse())
 			{
 				string newParserToken;
 				if (IsSetTermStatement(statement.CleanText, out newParserToken))

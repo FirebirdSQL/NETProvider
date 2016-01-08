@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Isql
 			_sourceLength = targetString.Length;
 		}
 
-		public IEnumerable<FbStatement> ParseNext()
+		public IEnumerable<FbStatement> Parse()
 		{
 			var lastYield = 0;
 			var index = 0;

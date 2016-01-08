@@ -332,7 +332,7 @@ namespace FirebirdSql.Data.Isql
 			// [ROLE 'rolename']
 			SqlStringParser parser = new SqlStringParser(connectDbStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			using (var enumerator = parser.ParseNext().GetEnumerator())
+			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
 				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "CONNECT")
@@ -389,7 +389,7 @@ namespace FirebirdSql.Data.Isql
 			int pageSize = 0;
 			SqlStringParser parser = new SqlStringParser(createDatabaseStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			using (var enumerator = parser.ParseNext().GetEnumerator())
+			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
 				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "CREATE")
@@ -449,7 +449,7 @@ namespace FirebirdSql.Data.Isql
 			// SET AUTODDL [ON | OFF]
 			SqlStringParser parser = new SqlStringParser(setAutoDdlStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			using (var enumerator = parser.ParseNext().GetEnumerator())
+			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
 				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
@@ -489,7 +489,7 @@ namespace FirebirdSql.Data.Isql
 			// SET NAMES charset
 			SqlStringParser parser = new SqlStringParser(setNamesStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			using (var enumerator = parser.ParseNext().GetEnumerator())
+			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
 				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
@@ -511,7 +511,7 @@ namespace FirebirdSql.Data.Isql
 			// SET SQL DIALECT dialect
 			SqlStringParser parser = new SqlStringParser(setSqlDialectStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
-			using (var enumerator = parser.ParseNext().GetEnumerator())
+			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
 				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
