@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2013-2014 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2013-2016 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -42,22 +42,13 @@ namespace FirebirdSql.Data.EntityFramework6
 		{
 			var result = new StringBuilder();
 
-			if (storeItems == null)
+			if (storeItems != null)
 			{
-				result.Append("-- No input.");
-				return result.ToString();
+				result.Append(string.Join(Environment.NewLine, Tables(storeItems)));
+				result.AppendLine();
+				result.Append(string.Join(Environment.NewLine, ForeignKeyConstraints(storeItems)));
+				result.AppendLine();
 			}
-
-			result.Append("-- Tables");
-			result.AppendLine();
-			result.Append(string.Join(Environment.NewLine, Tables(storeItems)));
-			result.AppendLine();
-			result.Append("-- Foreign Key Constraints");
-			result.AppendLine();
-			result.Append(string.Join(Environment.NewLine, ForeignKeyConstraints(storeItems)));
-			result.AppendLine();
-			result.AppendLine();
-			result.Append("-- EOF");
 
 			return result.ToString();
 		}
