@@ -417,13 +417,13 @@ namespace FirebirdSql.Data.EntityFramework6
 			fbScript.Parse();
 			if (fbScript.Results.Any())
 			{
-			using (var fbConnection = new FbConnection(connection.ConnectionString))
-			{
-				var execution = new FbBatchExecution(fbConnection);
-				execution.AppendSqlStatements(fbScript);
-				execution.Execute();
+				using (var fbConnection = new FbConnection(connection.ConnectionString))
+				{
+					var execution = new FbBatchExecution(fbConnection);
+					execution.AppendSqlStatements(fbScript);
+					execution.Execute();
+				}
 			}
-		}
 		}
 
 		protected override string DbCreateDatabaseScript(string providerManifestToken,

@@ -33,8 +33,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NullScript()
 		{
-			FbScript script = new FbScript(null);
-			Assert.Throws<ArgumentNullException>(() => script.Parse());
+			Assert.Throws<ArgumentNullException>(() => new FbScript(null));
 		}
 
 		[Test]
