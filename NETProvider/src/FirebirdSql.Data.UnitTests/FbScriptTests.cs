@@ -31,6 +31,29 @@ namespace FirebirdSql.Data.UnitTests
 		#region Unit Tests
 
 		[Test]
+		public void NullScript()
+		{
+			FbScript script = new FbScript(null);
+			Assert.Throws<ArgumentNullException>(() => script.Parse());
+		}
+
+		[Test]
+		public void EmptyScript()
+		{
+			FbScript script = new FbScript(string.Empty);
+			script.Parse();
+			Assert.AreEqual(0, script.Results.Count());
+		}
+
+		[Test]
+		public void WhiteSpacesScript()
+		{
+			FbScript script = new FbScript("\t    \t ");
+			script.Parse();
+			Assert.AreEqual(0, script.Results.Count());
+		}
+
+		[Test]
 		public void SimpleStatementNoSemicolonWithLiteral()
 		{
 			const string text =

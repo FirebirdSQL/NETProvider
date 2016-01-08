@@ -55,6 +55,9 @@ namespace FirebirdSql.Data.Isql
 
 		public FbScript(string script)
 		{
+			if (script == null)
+				throw new ArgumentNullException();
+
 			_results = new FbStatementCollection();
 			_parser = new SqlStringParser(script);
 			_parser.Tokens = new[] { ";" };
