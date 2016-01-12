@@ -685,6 +685,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				switch (arg)
 				{
 					case IscCodes.isc_arg_gds:
+					default:
 						int er = XdrStream.ReadInt32();
 						if (er != 0)
 						{
@@ -715,18 +716,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					case IscCodes.isc_arg_sql_state:
 						exception.Errors.Add(new IscError(arg, XdrStream.ReadString()));
-						break;
-
-					default:
-						int e = XdrStream.ReadInt32();
-						if (e != 0)
-						{
-							if (exception == null)
-							{
-								exception = IscException.ForBuilding();
-							}
-							exception.Errors.Add(new IscError(arg, e));
-						}
 						break;
 				}
 			}
