@@ -387,9 +387,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					catch
 					{ }
-					}
 				}
 			}
+		}
 
 		#endregion
 
@@ -698,10 +698,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						break;
 
 					case IscCodes.isc_arg_end:
-						if (exception != null && exception.Errors.Count != 0)
-						{
-							exception.BuildExceptionData();
-						}
+						exception?.BuildExceptionData();
 						eof = true;
 						break;
 

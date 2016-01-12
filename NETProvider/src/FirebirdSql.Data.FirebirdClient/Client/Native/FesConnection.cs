@@ -22,7 +22,7 @@
 
 using System;
 using System.Runtime.InteropServices;
-
+using System.Text;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Client.Native
 			IscException exception = null;
 			bool eof = false;
 
-			for (int i = 0; i < statusVector.Length; )
+			for (int i = 0; i < statusVector.Length;)
 			{
 				IntPtr arg = statusVector[i++];
 
@@ -56,10 +56,7 @@ namespace FirebirdSql.Data.Client.Native
 						break;
 
 					case IscCodes.isc_arg_end:
-						if (exception != null && exception.Errors.Count != 0)
-						{
-							exception.BuildExceptionData();
-						}
+						exception?.BuildExceptionData();
 						eof = true;
 						break;
 
@@ -68,9 +65,7 @@ namespace FirebirdSql.Data.Client.Native
 						{
 							IntPtr ptr = statusVector[i++];
 							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(
-								System.Text.Encoding.Default.GetBytes(s));
-
+							string arg_value = charset.GetString(Encoding.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
@@ -81,9 +76,7 @@ namespace FirebirdSql.Data.Client.Native
 
 							IntPtr ptr = statusVector[i++];
 							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(
-								System.Text.Encoding.Default.GetBytes(s));
-
+							string arg_value = charset.GetString(Encoding.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
@@ -96,9 +89,7 @@ namespace FirebirdSql.Data.Client.Native
 						{
 							IntPtr ptr = statusVector[i++];
 							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(
-								System.Text.Encoding.Default.GetBytes(s));
-
+							string arg_value = charset.GetString(Encoding.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
