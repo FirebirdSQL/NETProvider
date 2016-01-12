@@ -46,12 +46,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				if (_errors == null)
-				{
-					_errors = new FbErrorCollection();
-				}
-
-				return _errors;
+				return _errors ?? (_errors = new FbErrorCollection());
 			}
 		}
 
@@ -59,12 +54,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				if ((InnerException != null) && (InnerException is IscException))
-				{
-					return ((IscException)InnerException).ErrorCode;
-				}
-
-				return base.ErrorCode;
+				return (InnerException as IscException)?.ErrorCode ?? base.ErrorCode;
 			}
 		}
 
@@ -72,12 +62,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				if ((InnerException != null) && (InnerException is IscException))
-				{
-					return ((IscException)InnerException).SQLSTATE;
-				}
-
-				return null;
+				return (InnerException as IscException)?.SQLSTATE;
 			}
 		}
 
