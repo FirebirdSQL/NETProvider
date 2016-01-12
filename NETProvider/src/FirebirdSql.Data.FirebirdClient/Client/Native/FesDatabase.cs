@@ -358,15 +358,6 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region Trigger Context Methods
-
-		public ITriggerContext GetTriggerContext()
-		{
-			throw new NotSupportedException();
-		}
-
-		#endregion
-
 		#region Internal Methods
 
 		internal void ParseStatusVector(IntPtr[] statusVector)

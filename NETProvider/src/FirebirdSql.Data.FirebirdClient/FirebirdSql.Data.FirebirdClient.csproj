@@ -195,7 +195,6 @@
     <Compile Include="Client\Managed\Version11\GdsStatement.cs" />
     <Compile Include="Client\Native\FbClientFactory.cs" />
     <Compile Include="Client\Native\IFbClient.cs" />
-    <Compile Include="Client\ExternalEngine\ParamDsc.cs" />
     <Compile Include="Client\Common\XSQLDA.cs" />
     <Compile Include="Client\Common\XsqldaMarshaler.cs" />
     <Compile Include="Client\Common\XSQLVAR.cs" />
@@ -207,16 +206,6 @@
     <Compile Include="Client\Native\FesServiceManager.cs" />
     <Compile Include="Client\Native\FesStatement.cs" />
     <Compile Include="Client\Native\FesTransaction.cs" />
-    <Compile Include="Client\ExternalEngine\ExtArray.cs" />
-    <Compile Include="Client\ExternalEngine\ExtBlob.cs" />
-    <Compile Include="Client\ExternalEngine\ExtConnection.cs" />
-    <Compile Include="Client\ExternalEngine\ExtDatabase.cs" />
-    <Compile Include="Client\ExternalEngine\ExtServiceManager.cs" />
-    <Compile Include="Client\ExternalEngine\ExtStatement.cs" />
-    <Compile Include="Client\ExternalEngine\ExtTransaction.cs" />
-    <Compile Include="Client\ExternalEngine\ExtTriggerContext.cs" />
-    <Compile Include="Client\ExternalEngine\ParamDscMarshaler.cs" />
-    <Compile Include="Client\ExternalEngine\SafeNativeMethods.cs" />
     <Compile Include="Common\ArrayBase.cs" />
     <Compile Include="Common\ArrayBound.cs" />
     <Compile Include="Common\ArrayDesc.cs" />
@@ -224,7 +213,6 @@
     <Compile Include="Common\BlobBase.cs" />
     <Compile Include="Common\BlobParameterBuffer.cs" />
     <Compile Include="Common\Charset.cs" />
-    <Compile Include="Common\ITriggerContext.cs" />
     <Compile Include="Common\DatabaseParameterBuffer.cs" />
     <Compile Include="Common\DbDataType.cs" />
     <Compile Include="Common\DbField.cs" />
@@ -277,7 +265,6 @@
     <Compile Include="FirebirdClient\FbInfoMessageEventArgs.cs" />
     <Compile Include="FirebirdClient\FbParameter.cs" />
     <Compile Include="FirebirdClient\FbParameterCollection.cs" />
-    <Compile Include="Server\FbResultSet.cs" />
     <Compile Include="FirebirdClient\FbServerType.cs" />
     <Compile Include="FirebirdClient\FirebirdClientPermission.cs" />
     <Compile Include="FirebirdClient\FirebirdClientPermissionAtrribute.cs" />
@@ -358,9 +345,6 @@
     <Compile Include="Services\FbValidation.cs" />
     <Compile Include="Services\FbValidationFlags.cs" />
     <Compile Include="Services\ServiceOutputEventArgs.cs" />
-    <Compile Include="Server\FbTriggerActionType.cs" />
-    <Compile Include="Server\FbTriggerContext.cs" />
-    <Compile Include="Server\IResultSet.cs" />
     <Compile Include="Properties\VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>

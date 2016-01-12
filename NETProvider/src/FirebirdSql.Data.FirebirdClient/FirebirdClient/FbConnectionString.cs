@@ -50,7 +50,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal const FbServerType DefaultServerType = FbServerType.Default;
 		internal const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 		internal const bool DefaultRecordsAffected = true;
-		internal const bool DefaultContextConnection = false;
 		internal const bool DefaultEnlist = false;
 		internal const string DefaultClientLibrary = "fbembed";
 		internal const int DefaultCachePages = 0;
@@ -103,7 +102,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			{ "isolation level", "isolation level" },
 			{ "isolationlevel", "isolation level" },
 			{ "records affected", "records affected" },
-			{ "context connection", "context connection" },
 			{ "enlist", "enlist" },
 			{ "clientlibrary", "client library" },
 			{ "client library", "client library" },
@@ -219,11 +217,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		public bool ReturnRecordsAffected
 		{
 			get { return GetBoolean("records affected"); }
-		}
-
-		public bool ContextConnection
-		{
-			get { return GetBoolean("context connection"); }
 		}
 
 		public bool Enlist
@@ -343,62 +336,48 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 				}
 
-				if (ContextConnection || ServerType == FbServerType.Context)
+				if (Database != null && Database.Length > 0)
 				{
-					// When Context connection is true we should get the currently active connection
-					// on the Firebird Server
-					_options["server type"] = FbServerType.Context;
-					_options["pooling"] = false;
-					_options["context connection"] = true;
-				}
-				else
-				{
-					if (Database != null && Database.Length > 0)
-					{
-						ParseConnectionInfo(Database);
-					}
+					ParseConnectionInfo(Database);
 				}
 			}
 		}
 
 		public void Validate()
 		{
-			if (!ContextConnection)
-			{
-				if (
+			if (
 #if (LINUX)  // on Linux Trusted Auth isn't available
-					(string.IsNullOrEmpty(this.UserID)) ||
-					(string.IsNullOrEmpty(this.Password)) ||
+				(string.IsNullOrEmpty(this.UserID)) ||
+				(string.IsNullOrEmpty(this.Password)) ||
 #endif
-(string.IsNullOrEmpty(Database) && !_isServiceConnectionString) ||
-					(string.IsNullOrEmpty(DataSource) && ServerType != FbServerType.Embedded) ||
-					(string.IsNullOrEmpty(Charset)) ||
-					(Port == 0) ||
-					(!Enum.IsDefined(typeof(FbServerType), ServerType)) ||
-					(MinPoolSize > MaxPoolSize)
-				   )
-				{
-					throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
-				}
-				if (Dialect < 1 || Dialect > 3)
-				{
-					throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
-				}
-				if (PacketSize < 512 || PacketSize > 32767)
-				{
-					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", PacketSize, Environment.NewLine));
-				}
-				if (DbCachePages < 0)
-				{
-					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", DbCachePages, Environment.NewLine));
-				}
-				if (Pooling && NoDatabaseTriggers)
-				{
-					throw new ArgumentException("Cannot use Pooling and NoDBTriggers together.");
-				}
-
-				CheckIsolationLevel();
+				(string.IsNullOrEmpty(Database) && !_isServiceConnectionString) ||
+				(string.IsNullOrEmpty(DataSource) && ServerType != FbServerType.Embedded) ||
+				(string.IsNullOrEmpty(Charset)) ||
+				(Port == 0) ||
+				(!Enum.IsDefined(typeof(FbServerType), ServerType)) ||
+				(MinPoolSize > MaxPoolSize)
+			   )
+			{
+				throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
 			}
+			if (Dialect < 1 || Dialect > 3)
+			{
+				throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
+			}
+			if (PacketSize < 512 || PacketSize > 32767)
+			{
+				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", PacketSize, Environment.NewLine));
+			}
+			if (DbCachePages < 0)
+			{
+				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", DbCachePages, Environment.NewLine));
+			}
+			if (Pooling && NoDatabaseTriggers)
+			{
+				throw new ArgumentException("Cannot use Pooling and NoDBTriggers together.");
+			}
+
+			CheckIsolationLevel();
 		}
 
 		#endregion
@@ -432,7 +411,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			_options.Add("server type", DefaultServerType);
 			_options.Add("isolation level", DefaultIsolationLevel);
 			_options.Add("records affected", DefaultRecordsAffected);
-			_options.Add("context connection", DefaultContextConnection);
 			_options.Add("enlist", DefaultEnlist);
 			_options.Add("client library", DefaultClientLibrary);
 			_options.Add("cache pages", DefaultCachePages);

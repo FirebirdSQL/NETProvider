@@ -40,10 +40,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					// Native (PInvoke) Client
 					return new FirebirdSql.Data.Client.Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
 
-				case FbServerType.Context:
-					// External Engine (PInvoke) Client
-					return new FirebirdSql.Data.Client.ExternalEngine.ExtDatabase();
-
 				default:
 					throw new NotSupportedException("Specified server type is not correct.");
 			}
