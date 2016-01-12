@@ -43,6 +43,7 @@ namespace FirebirdSql.Data.Client.Native
 				switch (arg.AsInt())
 				{
 					case IscCodes.isc_arg_gds:
+					default:
 						IntPtr er = statusVector[i++];
 						if (er != IntPtr.Zero)
 						{
@@ -99,17 +100,6 @@ namespace FirebirdSql.Data.Client.Native
 								System.Text.Encoding.Default.GetBytes(s));
 
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
-						}
-						break;
-					default:
-						IntPtr e = statusVector[i++];
-						if (e != IntPtr.Zero)
-						{
-							if (exception == null)
-							{
-								exception = IscException.ForBuilding();
-							}
-							exception.Errors.Add(new IscError(arg.AsInt(), e.AsInt()));
 						}
 						break;
 				}
