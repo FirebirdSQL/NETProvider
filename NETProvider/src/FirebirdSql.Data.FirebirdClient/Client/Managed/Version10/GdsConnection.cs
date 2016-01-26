@@ -21,10 +21,9 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Permissions;
+using System.Text;
 
 using FirebirdSql.Data.Common;
-using System.Text;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
@@ -126,7 +125,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			try
 			{
 				IPAddress = GetIPAddress(_dataSource, AddressFamily.InterNetwork);
-				IPEndPoint endPoint = new IPEndPoint(IPAddress, _portNumber);
+				var endPoint = new IPEndPoint(IPAddress, _portNumber);
 
 				_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -272,17 +271,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private byte[] UserIdentificationStuff()
 		{
-			// Here	we identify	the	user to	the	engine.
-			// This	may	or may not be used as login	info to	a database.
-			var user = Encoding.Default.GetBytes(System.Environment.UserName);
-			var host = Encoding.Default.GetBytes(System.Net.Dns.GetHostName());
-
 			using (var user_id = new MemoryStream())
 			{
+				// Here	we identify	the	user to	the	engine.
+				// This	may	or may not be used as login	info to	a database.
+				var user = Encoding.Default.GetBytes(Environment.UserName);
+				var host = Encoding.Default.GetBytes(Dns.GetHostName());
+
 				if (_userID != null)
 				{
 					var login = Encoding.Default.GetBytes(_userID);
 					var plugin_name = Encoding.Default.GetBytes("Srp");
+
 					// Login
 					user_id.WriteByte(9);
 					user_id.WriteByte((byte)login.Length);
@@ -299,10 +299,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					user_id.Write(plugin_name, 0, plugin_name.Length);
 
 					// Specific Data
-					byte[] specific_data = Encoding.Default.GetBytes(_srpClient.getPublicKeyHex());
-					int remaining = specific_data.Length;
-					int position = 0;
-					int step = 0;
+					var specific_data = Encoding.Default.GetBytes(_srpClient.getPublicKeyHex());
+					var remaining = specific_data.Length;
+					var position = 0;
+					var step = 0;
 					while (remaining > 0)
 					{
 						user_id.WriteByte(7);
