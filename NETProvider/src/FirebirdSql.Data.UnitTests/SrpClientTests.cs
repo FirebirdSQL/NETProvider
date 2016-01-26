@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2016 Hajime Nakagami
+ *  Copyright (c) 2015 Hajime Nakagami (nakagami@gmail.com)
  *	Copyright (c) 2016 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
