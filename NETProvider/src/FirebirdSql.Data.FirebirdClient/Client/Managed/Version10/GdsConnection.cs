@@ -151,17 +151,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual void Identify(string database)
 		{
-			// handles this.networkStream
 			using (var xdrStream = CreateXdrStream())
 			{
-				outputStream.Write(IscCodes.op_connect);
-				outputStream.Write(IscCodes.op_attach);
-				outputStream.Write(IscCodes.CONNECT_VERSION3);	// CONNECT_VERSION2
-				outputStream.Write(1);							// Architecture	of client -	Generic
+				try
+				{
+					xdrStream.Write(IscCodes.op_connect);
+					xdrStream.Write(IscCodes.op_attach);
+					xdrStream.Write(IscCodes.CONNECT_VERSION3); // CONNECT_VERSION2
+					xdrStream.Write(1);                         // Architecture	of client -	Generic
 
-				outputStream.Write(database);					// Database	path
-				outputStream.Write(4);							// Protocol	versions understood
-				outputStream.WriteBuffer(UserIdentificationStuff());	// User	identification Stuff
+					xdrStream.Write(database);                  // Database	path
+					xdrStream.Write(4);                         // Protocol	versions understood
+					xdrStream.WriteBuffer(UserIdentificationStuff());   // User	identification Stuff
 
 					xdrStream.Write(IscCodes.PROTOCOL_VERSION10);    // Protocol version
 					xdrStream.Write(1);                              // Architecture of client - Generic
@@ -181,20 +182,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					xdrStream.Write(5);                              // Maximum type (ptype_lazy_send)
 					xdrStream.Write(2);                              // Preference weight
 
-				outputStream.Write(IscCodes.PROTOCOL_VERSION13);//	Protocol version
-				outputStream.Write(1);							// Architecture	of client -	Generic
-				outputStream.Write(2);							// Minumum type (ptype_rpc)
-				outputStream.Write(5);							// Maximum type (ptype_lazy_send)
-				outputStream.Write(3);							// Preference weight
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION13);//	Protocol version
+					xdrStream.Write(1);                         // Architecture	of client -	Generic
+					xdrStream.Write(2);                         // Minumum type (ptype_rpc)
+					xdrStream.Write(5);                         // Maximum type (ptype_lazy_send)
+					xdrStream.Write(3);                         // Preference weight
 
-				outputStream.Flush();
+					xdrStream.Flush();
 
-				var operation = inputStream.ReadOperation();
-				if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
-				{
-					_protocolVersion = inputStream.ReadInt32(); // Protocol	version
-					_protocolArchitecture = inputStream.ReadInt32();    // Architecture	for	protocol
-					_protocolMinimunType = inputStream.ReadInt32();	// Minimum type
+					var operation = xdrStream.ReadOperation();
+					if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
+					{
+						_protocolVersion = xdrStream.ReadInt32(); // Protocol	version
+						_protocolArchitecture = xdrStream.ReadInt32();    // Architecture	for	protocol
+						_protocolMinimunType = xdrStream.ReadInt32();   // Minimum type
 
 						if (_protocolVersion < 0)
 						{
@@ -208,27 +209,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							Disconnect();
 						}
 						catch
-					{ }
+						{ }
 						finally
 						{
-						throw IscException.ForErrorCode(IscCodes.isc_connect_reject);
+							throw IscException.ForErrorCode(IscCodes.isc_connect_reject);
 						}
 					}
 
-					if (op_code ==	IscCodes.op_cond_accept || op_code == IscCodes.op_accept_data)
+					if (operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
 					{
-						byte[] data = inputStream.ReadBuffer();
-						string acceptPluginName = inputStream.ReadString();
-						int is_authenticated = inputStream.ReadInt32();
-						string keys = inputStream.ReadString();
-						if (is_authenticated == 0) {
+						var data = xdrStream.ReadBuffer();
+						var acceptPluginName = xdrStream.ReadString();
+						var isAuthenticated = xdrStream.ReadInt32();
+						var keys = xdrStream.ReadString();
+						if (isAuthenticated == 0)
+						{
 							_authData = _srpClient.clientProof(_userID, _password, data);
 						}
 					}
 				}
-			catch (IOException ex)
+				catch (IOException ex)
 				{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 				}
 			}
 		}
@@ -282,7 +284,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			using (var user_id = new MemoryStream())
 			{
-				if (_userID != null) {
+				if (_userID != null)
+				{
 					var login = Encoding.Default.GetBytes(_userID);
 					var plugin_name = Encoding.Default.GetBytes("Srp");
 					// Login
@@ -305,7 +308,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					int remaining = specific_data.Length;
 					int position = 0;
 					int step = 0;
-					while (remaining > 0) {
+					while (remaining > 0)
+					{
 						user_id.WriteByte(7);
 						int toWrite = Math.Min(remaining, 254);
 						user_id.WriteByte((byte)(toWrite + 1));
