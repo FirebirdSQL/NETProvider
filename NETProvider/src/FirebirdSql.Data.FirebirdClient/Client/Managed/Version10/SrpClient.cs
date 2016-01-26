@@ -217,13 +217,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private static byte[] Sha1(params byte[][] ba)
 		{
-			List<byte> mergedList = new List<byte>(ba.Sum(b => b.Length));
-			SHA1 hash = SHA1.Create();
-			foreach (byte[] b in ba)
+			using (SHA1 hash = SHA1.Create())
 			{
-				mergedList.AddRange(b);
+				return hash.ComputeHash(ba.SelectMany(x => x).ToArray());
 			}
-			return hash.ComputeHash(mergedList.ToArray());
 		}
 
 		private static byte[] Pad(BigInteger n)
