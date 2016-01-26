@@ -216,7 +216,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						var keys = xdrStream.ReadString();
 						if (isAuthenticated == 0)
 						{
-							_authData = _srpClient.clientProof(_userID, _password, data);
+							_authData = _srpClient.ClientProof(_userID, _password, data);
 						}
 					}
 				}
@@ -297,7 +297,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					user_id.Write(plugin_name, 0, plugin_name.Length);
 
 					// Specific Data
-					var specific_data = Encoding.Default.GetBytes(_srpClient.getPublicKeyHex());
+					var specific_data = Encoding.Default.GetBytes(_srpClient.GetPublicKeyHex());
 					var remaining = specific_data.Length;
 					var position = 0;
 					var step = 0;

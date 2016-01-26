@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public SrpClient()
 		{
-			_privateKey = getSecret();
+			_privateKey = GetSecret();
 			_publicKey = BigInteger.ModPow(g, _privateKey, N);
 		}
 
@@ -56,25 +56,25 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			byte[] b = new byte[SRP_SALT_SIZE];
 			RandomNumberGenerator random = RandomNumberGenerator.Create();
 			random.GetBytes(b);
-			b = fromHexString("FB12C0444CEF82EB62E80DFA2085DC5F9CB515B3FB462F2898F108D544E32319");
+			b = FromHexString("FB12C0444CEF82EB62E80DFA2085DC5F9CB515B3FB462F2898F108D544E32319");
 			return b;
 		}
 
-		public string getPublicKeyHex()
+		public string GetPublicKeyHex()
 		{
-			return toHexString(pad(_publicKey));
+			return ToHexString(Pad(_publicKey));
 		}
 
-		public byte[] clientProof(string user, string password, byte[] salt, BigInteger serverPublicKey)
+		public byte[] ClientProof(string user, string password, byte[] salt, BigInteger serverPublicKey)
 		{
-			byte[] K = getClientSessionKey(user, password, salt, serverPublicKey);
+			byte[] K = GetClientSessionKey(user, password, salt, serverPublicKey);
 
-			BigInteger n1 = fromBigByteArray(sha1(toBigByteArray(N)));
-			BigInteger n2 = fromBigByteArray(sha1(toBigByteArray(g)));
+			BigInteger n1 = FromBigByteArray(Sha1(ToBigByteArray(N)));
+			BigInteger n2 = FromBigByteArray(Sha1(ToBigByteArray(g)));
 
 			n1 = BigInteger.ModPow(n1, n2, N);
-			n2 = fromBigByteArray(sha1(Encoding.UTF8.GetBytes(user.ToUpper())));
-			byte[] M = sha1(toBigByteArray(n1), toBigByteArray(n2), salt, toBigByteArray(_publicKey), toBigByteArray(serverPublicKey), K);
+			n2 = FromBigByteArray(Sha1(Encoding.UTF8.GetBytes(user.ToUpper())));
+			byte[] M = Sha1(ToBigByteArray(n1), ToBigByteArray(n2), salt, ToBigByteArray(_publicKey), ToBigByteArray(serverPublicKey), K);
 
 			_sessionKey = K;
 			_proof = M;
@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return _proof;
 		}
 
-		public byte[] clientProof(string user, string password, byte[] authData)
+		public byte[] ClientProof(string user, string password, byte[] authData)
 		{
 			int saltLength = authData[0] + authData[1] * 256;
 			byte[] salt = new byte[saltLength];
@@ -94,18 +94,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			Array.Copy(authData, serverKeyStart, hexServerPublicKey, 0, serverKeyLength);
 			string hexServerPublicKeyString = Encoding.UTF8.GetString(hexServerPublicKey);
 			BigInteger serverPublicKey = BigInteger.Parse("00" + hexServerPublicKeyString, NumberStyles.HexNumber);
-			return clientProof(user.ToUpper(), password, salt, serverPublicKey);
+			return ClientProof(user.ToUpper(), password, salt, serverPublicKey);
 		}
 
-		public byte[] getSessionKey()
+		public byte[] GetSessionKey()
 		{
 			return _sessionKey;
 		}
 
 		public Tuple<BigInteger, BigInteger> ServerSeed(string user, string password, byte[] salt)
 		{
-			BigInteger v = BigInteger.ModPow(g, getUserHash(user, password, salt), N);
-			BigInteger b = getSecret();
+			BigInteger v = BigInteger.ModPow(g, GetUserHash(user, password, salt), N);
+			BigInteger b = GetSecret();
 			BigInteger gb = BigInteger.ModPow(g, b, N);
 			BigInteger kv;
 			BigInteger.DivRem(BigInteger.Multiply(k, v), N, out kv);
@@ -117,26 +117,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] GetServerSessionKey(string user, string password, byte[] salt, BigInteger A, BigInteger B, BigInteger b)
 		{
-			BigInteger u = getScramble(A, B);
-			BigInteger v = BigInteger.ModPow(g, getUserHash(user, password, salt), N);
+			BigInteger u = GetScramble(A, B);
+			BigInteger v = BigInteger.ModPow(g, GetUserHash(user, password, salt), N);
 			BigInteger vu = BigInteger.ModPow(v, u, N);
 			BigInteger Avu;
 			BigInteger.DivRem(BigInteger.Multiply(A, vu), N, out Avu);
 			BigInteger sessionSecret = BigInteger.ModPow(Avu, b, N);
-			return sha1(toBigByteArray(sessionSecret));
+			return Sha1(ToBigByteArray(sessionSecret));
 		}
 
-		public BigInteger getPublicKey()
+		public BigInteger GetPublicKey()
 		{
 			return _publicKey;
 		}
 
-		public BigInteger getPrivateKey()
+		public BigInteger GetPrivateKey()
 		{
 			return _privateKey;
 		}
 
-		private BigInteger getSecret()
+		private BigInteger GetSecret()
 		{
 			byte[] b = new byte[SRP_KEY_SIZE / 8];
 			RandomNumberGenerator random = RandomNumberGenerator.Create();
@@ -145,10 +145,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
 		}
 
-		private byte[] getClientSessionKey(string user, string password, byte[] salt, BigInteger serverPublicKey)
+		private byte[] GetClientSessionKey(string user, string password, byte[] salt, BigInteger serverPublicKey)
 		{
-			BigInteger u = getScramble(_publicKey, serverPublicKey);
-			BigInteger x = getUserHash(user, password, salt);
+			BigInteger u = GetScramble(_publicKey, serverPublicKey);
+			BigInteger x = GetUserHash(user, password, salt);
 			BigInteger gx = BigInteger.ModPow(g, x, N);
 			BigInteger kgx;
 			BigInteger.DivRem(BigInteger.Multiply(k, gx), N, out kgx);
@@ -165,27 +165,27 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			BigInteger.DivRem(BigInteger.Add(_privateKey, ux), N, out aux);
 			BigInteger sessionSecret = BigInteger.ModPow(diff, aux, N);
 
-			return sha1(toBigByteArray(sessionSecret));
+			return Sha1(ToBigByteArray(sessionSecret));
 		}
 
-		private static BigInteger getUserHash(string user, string password, byte[] salt)
+		private static BigInteger GetUserHash(string user, string password, byte[] salt)
 		{
 			byte[] userBytes = Encoding.UTF8.GetBytes(user.ToUpper());
 			byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-			byte[] hash1 = sha1(userBytes, SEPARATOR_BYTES, passwordBytes);
-			byte[] hash2 = sha1(salt, hash1);
+			byte[] hash1 = Sha1(userBytes, SEPARATOR_BYTES, passwordBytes);
+			byte[] hash2 = Sha1(salt, hash1);
 
-			BigInteger rc = fromBigByteArray(hash2);
+			BigInteger rc = FromBigByteArray(hash2);
 			return rc;
 		}
 
-		private static BigInteger fromBigByteArray(byte[] b)
+		private static BigInteger FromBigByteArray(byte[] b)
 		{
 			Array.Reverse(b);
 			return new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
 		}
 
-		private static byte[] toBigByteArray(BigInteger n)
+		private static byte[] ToBigByteArray(BigInteger n)
 		{
 			byte[] b = n.ToByteArray();
 			int length = b.Length;
@@ -199,12 +199,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return b2;
 		}
 
-		private static string toHexString(byte[] b)
+		private static string ToHexString(byte[] b)
 		{
 			return BitConverter.ToString(b).Replace("-", string.Empty);
 		}
 
-		private static byte[] fromHexString(string s)
+		private static byte[] FromHexString(string s)
 		{
 			byte[] b = new byte[s.Length / 2];
 			for (int i = 0; i < b.Length; i++)
@@ -215,7 +215,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return b;
 		}
 
-		private static byte[] sha1(params byte[][] ba)
+		private static byte[] Sha1(params byte[][] ba)
 		{
 			List<byte> mergedList = new List<byte>(ba.Sum(b => b.Length));
 			SHA1 hash = SHA1.Create();
@@ -226,9 +226,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return hash.ComputeHash(mergedList.ToArray());
 		}
 
-		private static byte[] pad(BigInteger n)
+		private static byte[] Pad(BigInteger n)
 		{
-			byte[] bn = toBigByteArray(n);
+			byte[] bn = ToBigByteArray(n);
 			if (bn.Length > SRP_KEY_SIZE)
 			{
 				byte[] buf = new byte[SRP_KEY_SIZE];
@@ -238,9 +238,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return bn;
 		}
 
-		private static BigInteger getScramble(BigInteger x, BigInteger y)
+		private static BigInteger GetScramble(BigInteger x, BigInteger y)
 		{
-			return fromBigByteArray(sha1(pad(x), pad(y)));
+			return FromBigByteArray(Sha1(Pad(x), Pad(y)));
 		}
 	}
 }
