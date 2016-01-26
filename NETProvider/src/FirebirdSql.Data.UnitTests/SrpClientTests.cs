@@ -12,44 +12,31 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2016 Hajime Nakagami
+ *	Copyright (c) 2016 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
 using System;
-using System.Data;
-using System.Numerics;
-using System.Data.Common;
-
-using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Client.Managed.Version10;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
 	[TestFixture]
-	public class SrpTests
+	public class SrpClientTests
 	{
-		#region Unit Tests
-
 		[Test]
 		public void KeyMatchTest()
 		{
-            String user = "SYSDBA";
-            String password = "masterkey";
-
-            SrpClient srpClient = new SrpClient();
-            byte[] salt = srpClient.GetSalt();
-
-			Tuple<BigInteger, BigInteger> serverKeyPair = srpClient.ServerSeed(user, password, salt);
-			byte[] serverSessionKey = srpClient.GetServerSessionKey(
-					user, password, salt, srpClient.getPublicKey(),
-					serverKeyPair.Item1, serverKeyPair.Item2);
-			srpClient.clientProof(user, password, salt, serverKeyPair.Item1);
-
-			Assert.AreEqual(serverSessionKey.ToString(), srpClient.getSessionKey().ToString());
+			var user = "SYSDBA";
+			var password = "masterkey";
+			var client = new SrpClient();
+			var salt = client.GetSalt();
+			var serverKeyPair = client.ServerSeed(user, password, salt);
+			var serverSessionKey = client.GetServerSessionKey(user, password, salt, client.getPublicKey(), serverKeyPair.Item1, serverKeyPair.Item2);
+			client.clientProof(user, password, salt, serverKeyPair.Item1);
+			Assert.AreEqual(serverSessionKey.ToString(), client.getSessionKey().ToString());
 		}
-
-		#endregion
 	}
 }
