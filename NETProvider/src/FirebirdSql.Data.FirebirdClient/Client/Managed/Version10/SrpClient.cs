@@ -173,7 +173,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var passwordBytes = Encoding.UTF8.GetBytes(password);
 			var hash1 = Sha1(userBytes, SEPARATOR_BYTES, passwordBytes);
 			var hash2 = Sha1(salt, hash1);
-			BigInteger rc = FromBigByteArray(hash2);
+			var rc = FromBigByteArray(hash2);
 			return rc;
 		}
 
