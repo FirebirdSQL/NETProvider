@@ -112,8 +112,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_packetSize = packetSize;
 			_characterSet = characterSet;
 			_srpClient = new SrpClient();
-
-			GC.SuppressFinalize(this);
 		}
 
 		#endregion
