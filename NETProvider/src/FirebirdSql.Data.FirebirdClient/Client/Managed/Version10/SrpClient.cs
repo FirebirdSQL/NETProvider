@@ -54,8 +54,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public byte[] GetSalt()
 		{
 			byte[] b = new byte[SRP_SALT_SIZE];
-			RandomNumberGenerator random = RandomNumberGenerator.Create();
-			random.GetBytes(b);
+			using (RandomNumberGenerator random = RandomNumberGenerator.Create())
+			{
+				random.GetBytes(b);
+			}
 			return b;
 		}
 
