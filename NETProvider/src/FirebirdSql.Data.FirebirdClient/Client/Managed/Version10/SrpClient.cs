@@ -65,12 +65,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			var K = GetClientSessionKey(user, password, salt, serverPublicKey);
 
-			var n1 = FromBigByteArray(Sha1(ToBigByteArray(N)));
-			var n2 = FromBigByteArray(Sha1(ToBigByteArray(g)));
+			var n1 = BigIntegerFromByteArray(Sha1(BigIntegerToByteArray(N)));
+			var n2 = BigIntegerFromByteArray(Sha1(BigIntegerToByteArray(g)));
 
 			n1 = BigInteger.ModPow(n1, n2, N);
-			n2 = FromBigByteArray(Sha1(Encoding.UTF8.GetBytes(user.ToUpper())));
-			var M = Sha1(ToBigByteArray(n1), ToBigByteArray(n2), salt, ToBigByteArray(PublicKey), ToBigByteArray(serverPublicKey), K);
+			n2 = BigIntegerFromByteArray(Sha1(Encoding.UTF8.GetBytes(user.ToUpper())));
+			var M = Sha1(BigIntegerToByteArray(n1), BigIntegerToByteArray(n2), salt, BigIntegerToByteArray(PublicKey), BigIntegerToByteArray(serverPublicKey), K);
 
 			SessionKey = K;
 			Proof = M;
@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var Avu = default(BigInteger);
 			BigInteger.DivRem(A * vu, N, out Avu);
 			var sessionSecret = BigInteger.ModPow(Avu, b, N);
-			return Sha1(ToBigByteArray(sessionSecret));
+			return Sha1(BigIntegerToByteArray(sessionSecret));
 		}
 
 		private BigInteger GetSecret()
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var aux = default(BigInteger);
 			BigInteger.DivRem(PrivateKey + ux, N, out aux);
 			var sessionSecret = BigInteger.ModPow(diff, aux, N);
-			return Sha1(ToBigByteArray(sessionSecret));
+			return Sha1(BigIntegerToByteArray(sessionSecret));
 		}
 
 		private static BigInteger GetUserHash(string user, string password, byte[] salt)
@@ -154,16 +154,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var passwordBytes = Encoding.UTF8.GetBytes(password);
 			var hash1 = Sha1(userBytes, SEPARATOR_BYTES, passwordBytes);
 			var hash2 = Sha1(salt, hash1);
-			var rc = FromBigByteArray(hash2);
+			var rc = BigIntegerFromByteArray(hash2);
 			return rc;
 		}
 
-		private static BigInteger FromBigByteArray(byte[] b)
+		private static BigInteger BigIntegerFromByteArray(byte[] b)
 		{
 			return new BigInteger(b.Reverse().Concat(new byte[] { 0 }).ToArray());
 		}
 
-		private static byte[] ToBigByteArray(BigInteger n)
+		private static byte[] BigIntegerToByteArray(BigInteger n)
 		{
 			var b = n.ToByteArray();
 			var length = b.Length;
@@ -192,7 +192,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private static byte[] Pad(BigInteger n)
 		{
-			var bn = ToBigByteArray(n);
+			var bn = BigIntegerToByteArray(n);
 			if (bn.Length > SRP_KEY_SIZE)
 			{
 				var buf = new byte[SRP_KEY_SIZE];
@@ -204,7 +204,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private static BigInteger GetScramble(BigInteger x, BigInteger y)
 		{
-			return FromBigByteArray(Sha1(Pad(x), Pad(y)));
+			return BigIntegerFromByteArray(Sha1(Pad(x), Pad(y)));
 		}
 	}
 }
