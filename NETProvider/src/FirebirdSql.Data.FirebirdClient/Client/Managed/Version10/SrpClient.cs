@@ -40,6 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private static readonly byte[] SEPARATOR_BYTES = Encoding.UTF8.GetBytes(":");
 
 		public BigInteger PublicKey { get; } // A
+		public string PublicKeyHex => Pad(PublicKey).ToHexString();
 		public BigInteger PrivateKey { get; } // a
 		public byte[] Proof { get; private set; } // M
 		public byte[] SessionKey { get; private set; } // K
@@ -58,11 +59,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				random.GetBytes(b);
 			}
 			return b;
-		}
-
-		public string GetPublicKeyHex()
-		{
-			return Pad(PublicKey).ToHexString();
 		}
 
 		public byte[] ClientProof(string user, string password, byte[] salt, BigInteger serverPublicKey)

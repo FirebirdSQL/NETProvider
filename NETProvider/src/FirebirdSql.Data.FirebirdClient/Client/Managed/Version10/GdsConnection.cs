@@ -297,7 +297,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					user_id.Write(plugin_name, 0, plugin_name.Length);
 
 					// Specific Data
-					var specific_data = Encoding.Default.GetBytes(_srpClient.GetPublicKeyHex());
+					var specific_data = Encoding.Default.GetBytes(_srpClient.PublicKeyHex);
 					var remaining = specific_data.Length;
 					var position = 0;
 					var step = 0;
