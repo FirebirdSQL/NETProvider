@@ -56,7 +56,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			byte[] b = new byte[SRP_SALT_SIZE];
 			RandomNumberGenerator random = RandomNumberGenerator.Create();
 			random.GetBytes(b);
-			b = FromHexString("FB12C0444CEF82EB62E80DFA2085DC5F9CB515B3FB462F2898F108D544E32319");
 			return b;
 		}
 
@@ -131,7 +130,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return _publicKey;
 		}
 
-		public BigInteger GetPrivateKey()
+		private BigInteger GetPrivateKey()
 		{
 			return _privateKey;
 		}
@@ -141,7 +140,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			byte[] b = new byte[SRP_KEY_SIZE / 8];
 			RandomNumberGenerator random = RandomNumberGenerator.Create();
 			random.GetBytes(b);
-			return BigInteger.Parse("43689415071006679979798619705888148220927308532493035484321207019293123625875");
 			return new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
 		}
 
@@ -206,13 +204,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private static byte[] FromHexString(string s)
 		{
-			byte[] b = new byte[s.Length / 2];
-			for (int i = 0; i < b.Length; i++)
-			{
-				b[i] = Convert.ToByte(s.Substring(i * 2, 2), 16);
-			}
-
-			return b;
+			return Enumerable.Range(0, s.Length / 2).Select(i => Convert.ToByte(s.Substring(i * 2, 2), 16)).ToArray();
 		}
 
 		private static byte[] Sha1(params byte[][] ba)
