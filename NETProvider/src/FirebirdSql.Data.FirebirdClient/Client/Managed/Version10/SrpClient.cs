@@ -37,8 +37,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private static readonly BigInteger N = BigInteger.Parse("00E67D2E994B2F900C3F41F08F5BB2627ED0D49EE1FE767A52EFCD565CD6E768812C3E1E9CE8F0A8BEA6CB13CD29DDEBF7A96D4A93B55D488DF099A15C89DCB0640738EB2CBDD9A8F7BAB561AB1B0DC1C6CDABF303264A08D1BCA932D1F1EE428B619D970F342ABA9A65793B8B2F041AE5364350C16F735F56ECBCA87BD57B29E7", NumberStyles.HexNumber);
 		private static readonly BigInteger g = new BigInteger(2);
 		private static readonly BigInteger k = BigInteger.Parse("1277432915985975349439481660349303019122249719989");
-
-		private static byte[] SEPARATOR_BYTES = Encoding.UTF8.GetBytes(":");
+		private static readonly byte[] SEPARATOR_BYTES = Encoding.UTF8.GetBytes(":");
 
 		private BigInteger _publicKey;   /* A */
 		private BigInteger _privateKey;  /* a */
