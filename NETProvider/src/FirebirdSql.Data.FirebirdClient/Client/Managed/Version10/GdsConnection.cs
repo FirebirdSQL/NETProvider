@@ -130,16 +130,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-				// Set Receive Buffer size.
 				_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, _packetSize);
-				// Set Send	Buffer size.
 				_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, _packetSize);
-				// Disables	the	Nagle algorithm	for	send coalescing.
 				_socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
-				// Start sending keepalive packets every 30min after 30min of idle connection
 				_socket.SetKeepAlive(KeepAliveTime, KeepAliveInterval);
 
-				// Make	the	socket to connect to the Server
 				_socket.Connect(endPoint);
 				_networkStream = new NetworkStream(_socket, true);
 			}
