@@ -108,7 +108,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var b = GetSecret();
 			var gb = BigInteger.ModPow(g, b, N);
 			var kv = default(BigInteger);
-			BigInteger.DivRem(BigInteger.Multiply(k, v), N, out kv);
+			BigInteger.DivRem(k * v, N, out kv);
 			var B = default(BigInteger);
 			BigInteger.DivRem(BigInteger.Add(kv, gb), N, out B);
 			return Tuple.Create(B, b);
@@ -119,8 +119,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var u = GetScramble(A, B);
 			var v = BigInteger.ModPow(g, GetUserHash(user, password, salt), N);
 			var vu = BigInteger.ModPow(v, u, N);
-			var Avu = default(BigInteger); ;
-			BigInteger.DivRem(BigInteger.Multiply(A, vu), N, out Avu);
+			var Avu = default(BigInteger);
+			BigInteger.DivRem(A * vu, N, out Avu);
 			var sessionSecret = BigInteger.ModPow(Avu, b, N);
 			return Sha1(ToBigByteArray(sessionSecret));
 		}
@@ -151,18 +151,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var x = GetUserHash(user, password, salt);
 			var gx = BigInteger.ModPow(g, x, N);
 			var kgx = default(BigInteger);
-			BigInteger.DivRem(BigInteger.Multiply(k, gx), N, out kgx);
-			var Bkgx = BigInteger.Subtract(serverPublicKey, kgx);    // B-kgx
-			if (BigInteger.Compare(Bkgx, 0) < 0)
+			BigInteger.DivRem(k * gx, N, out kgx);
+			var Bkgx = serverPublicKey - kgx;
+			if (Bkgx < 0)
 			{
-				Bkgx = BigInteger.Add(Bkgx, N);
+				Bkgx = Bkgx + N;
 			}
 			var diff = default(BigInteger);
 			BigInteger.DivRem(Bkgx, N, out diff);
 			var ux = default(BigInteger);
-			BigInteger.DivRem(BigInteger.Multiply(u, x), N, out ux);
+			BigInteger.DivRem(u * x, N, out ux);
 			var aux = default(BigInteger);
-			BigInteger.DivRem(BigInteger.Add(_privateKey, ux), N, out aux);
+			BigInteger.DivRem(_privateKey + ux, N, out aux);
 			var sessionSecret = BigInteger.ModPow(diff, aux, N);
 			return Sha1(ToBigByteArray(sessionSecret));
 		}
