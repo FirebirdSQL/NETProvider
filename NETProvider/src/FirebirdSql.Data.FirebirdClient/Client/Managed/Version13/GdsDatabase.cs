@@ -28,9 +28,9 @@ using System.Collections.Generic;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version12
+namespace FirebirdSql.Data.Client.Managed.Version13
 {
-	internal class GdsDatabase : Version11.GdsDatabase
+	internal class GdsDatabase : Version12.GdsDatabase
 	{
 		public GdsDatabase(Version10.GdsConnection connection)
 			: base(connection)
@@ -39,70 +39,33 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			// Attach to the database
-			XdrStream.Write(IscCodes.op_attach);
-			XdrStream.Write(0);				    // Database	object ID
+			Write(IscCodes.op_attach);
+			Write(0);					// Database	object ID
 			if (!string.IsNullOrEmpty(UserID)) {
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
-				if (!string.IsNullOrEmpty(Password)) {
-					dpb.Append(IscCodes.isc_dpb_password, Password);
+				if (AuthData != null) {
+					dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(BitConverter.ToString(AuthData).Replace("-", string.Empty)));
 				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));              // Database	PATH
-			XdrStream.WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
+			WriteBuffer(Encoding.UTF8.GetBytes(database));				// Database	PATH
+			WriteBuffer(dpb.ToArray());	// DPB Parameter buffer
 		}
 
 		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			XdrStream.Write(IscCodes.op_create);
-			XdrStream.Write(0);
+			Write(IscCodes.op_create);
+			Write(0);
 			if (!string.IsNullOrEmpty(UserID)) {
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
-				if (!string.IsNullOrEmpty(Password)) {
-					dpb.Append(IscCodes.isc_dpb_password, Password);
+				if (AuthData != null) {
+					dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(BitConverter.ToString(AuthData).Replace("-", string.Empty)));
 				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			XdrStream.WriteBuffer(dpb.ToArray());
+			WriteBuffer(Encoding.UTF8.GetBytes(database));
+
+			WriteBuffer(dpb.ToArray());
 		}
-
-		#region Override Statement Creation Methods
-
-		public override StatementBase CreateStatement()
-		{
-			return new GdsStatement(this);
-		}
-
-		public override StatementBase CreateStatement(TransactionBase transaction)
-		{
-			return new GdsStatement(this, transaction);
-		}
-
-		#endregion
-
-		#region Cancel Methods
-
-		public override void CancelOperation(int kind)
-		{
-			try
-			{
-				SendCancelOperationToBuffer(kind);
-				XdrStream.Flush();
-				// no response, this is async
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
-			}
-		}
-
-		protected void SendCancelOperationToBuffer(int kind)
-		{
-			XdrStream.Write(IscCodes.op_cancel);
-			XdrStream.Write(kind);
-		}
-
-		#endregion
 	}
 }

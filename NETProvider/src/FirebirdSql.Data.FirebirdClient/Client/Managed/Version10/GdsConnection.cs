@@ -37,6 +37,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private Socket _socket;
 		private NetworkStream _networkStream;
+		private string _userID;
+		private string _password;
 		private string _dataSource;
 		private int _portNumber;
 		private int _packetSize;
@@ -44,6 +46,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private int _protocolVersion;
 		private int _protocolArchitecture;
 		private int _protocolMinimunType;
+		private SrpClient _srpClient;
+		private byte[] _authData;
 
 		#endregion
 
@@ -74,6 +78,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return _networkStream.DataAvailable; }
 		}
 
+		public string UserID
+		{
+			get { return _userID; }
+		}
+
+		public string Password
+		{
+			get { return _password; }
+		}
+
+		public byte[] AuthData
+		{
+			get { return _authData; }
+		}
+
 		internal IPAddress IPAddress { get; private set; }
 
 		#endregion
@@ -81,16 +100,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region Constructors
 
 		public GdsConnection(string dataSource, int port)
-			: this(dataSource, port, 8192, Charset.DefaultCharset)
+			: this(null, null, dataSource, port, 8192, Charset.DefaultCharset)
 		{
 		}
 
-		public GdsConnection(string dataSource, int portNumber, int packetSize, Charset characterSet)
+		public GdsConnection(string userID, string password, string dataSource, int portNumber, int packetSize, Charset characterSet)
 		{
+			_userID = userID;
+			_password = password;
 			_dataSource = dataSource;
 			_portNumber = portNumber;
 			_packetSize = packetSize;
 			_characterSet = characterSet;
+			_srpClient = new SrpClient();
+
+			GC.SuppressFinalize(this);
 		}
 
 		#endregion
@@ -130,16 +154,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			// handles this.networkStream
 			using (var xdrStream = CreateXdrStream())
 			{
-				try
-				{
-					xdrStream.Write(IscCodes.op_connect);
-					xdrStream.Write(IscCodes.op_attach);
-					xdrStream.Write(IscCodes.CONNECT_VERSION2);          // CONNECT_VERSION2
-					xdrStream.Write(1);                                  // Architecture of client - Generic
+				outputStream.Write(IscCodes.op_connect);
+				outputStream.Write(IscCodes.op_attach);
+				outputStream.Write(IscCodes.CONNECT_VERSION3);	// CONNECT_VERSION2
+				outputStream.Write(1);							// Architecture	of client -	Generic
 
-					xdrStream.Write(database);                           // Database path
-					xdrStream.Write(3);                                  // Protocol versions understood
-					xdrStream.WriteBuffer(UserIdentificationStuff());    // User identification Stuff
+				outputStream.Write(database);					// Database	path
+				outputStream.Write(4);							// Protocol	versions understood
+				outputStream.WriteBuffer(UserIdentificationStuff());	// User	identification Stuff
 
 					xdrStream.Write(IscCodes.PROTOCOL_VERSION10);    // Protocol version
 					xdrStream.Write(1);                              // Architecture of client - Generic
@@ -159,13 +181,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					xdrStream.Write(5);                              // Maximum type (ptype_lazy_send)
 					xdrStream.Write(2);                              // Preference weight
 
-					xdrStream.Flush();
+				outputStream.Write(IscCodes.PROTOCOL_VERSION13);//	Protocol version
+				outputStream.Write(1);							// Architecture	of client -	Generic
+				outputStream.Write(2);							// Minumum type (ptype_rpc)
+				outputStream.Write(5);							// Maximum type (ptype_lazy_send)
+				outputStream.Write(3);							// Preference weight
 
-					if (xdrStream.ReadOperation() == IscCodes.op_accept)
-					{
-						_protocolVersion = xdrStream.ReadInt32(); // Protocol version
-						_protocolArchitecture = xdrStream.ReadInt32(); // Architecture for protocol
-						_protocolMinimunType = xdrStream.ReadInt32(); // Minimum type
+				outputStream.Flush();
+
+				var operation = inputStream.ReadOperation();
+				if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
+				{
+					_protocolVersion = inputStream.ReadInt32(); // Protocol	version
+					_protocolArchitecture = inputStream.ReadInt32();    // Architecture	for	protocol
+					_protocolMinimunType = inputStream.ReadInt32();	// Minimum type
 
 						if (_protocolVersion < 0)
 						{
@@ -183,6 +212,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						finally
 						{
 						throw IscException.ForErrorCode(IscCodes.isc_connect_reject);
+						}
+					}
+
+					if (op_code ==	IscCodes.op_cond_accept || op_code == IscCodes.op_accept_data)
+					{
+						byte[] data = inputStream.ReadBuffer();
+						string acceptPluginName = inputStream.ReadString();
+						int is_authenticated = inputStream.ReadInt32();
+						string keys = inputStream.ReadString();
+						if (is_authenticated == 0) {
+							_authData = _srpClient.clientProof(_userID, _password, data);
 						}
 					}
 				}
@@ -242,6 +282,48 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			using (var user_id = new MemoryStream())
 			{
+				if (_userID != null) {
+					var login = Encoding.Default.GetBytes(_userID);
+					var plugin_name = Encoding.Default.GetBytes("Srp");
+					// Login
+					user_id.WriteByte(9);
+					user_id.WriteByte((byte)login.Length);
+					user_id.Write(login, 0, login.Length);
+
+					// Plugin Name
+					user_id.WriteByte(8);
+					user_id.WriteByte((byte)plugin_name.Length);
+					user_id.Write(plugin_name, 0, plugin_name.Length);
+
+					// Plugin List
+					user_id.WriteByte(10);
+					user_id.WriteByte((byte)plugin_name.Length);
+					user_id.Write(plugin_name, 0, plugin_name.Length);
+
+					// Specific Data
+					byte[] specific_data = Encoding.Default.GetBytes(_srpClient.getPublicKeyHex());
+					int remaining = specific_data.Length;
+					int position = 0;
+					int step = 0;
+					while (remaining > 0) {
+						user_id.WriteByte(7);
+						int toWrite = Math.Min(remaining, 254);
+						user_id.WriteByte((byte)(toWrite + 1));
+						user_id.WriteByte((byte)step++);
+						user_id.Write(specific_data, position, toWrite);
+						remaining -= toWrite;
+						position += toWrite;
+					}
+
+					// Client Crypt (Not Encrypt)
+					user_id.WriteByte(11);
+					user_id.WriteByte(4);
+					user_id.WriteByte(0);
+					user_id.WriteByte(0);
+					user_id.WriteByte(0);
+					user_id.WriteByte(0);
+				}
+
 				// User	Name
 				user_id.WriteByte(1);
 				user_id.WriteByte((byte)user.Length);

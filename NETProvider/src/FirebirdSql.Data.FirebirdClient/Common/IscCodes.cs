@@ -57,6 +57,7 @@ namespace FirebirdSql.Data.Common
 		 * separate	the	protocol from the transport	layer.
 		 */
 		public const int CONNECT_VERSION2 = 2;
+		public const int CONNECT_VERSION3 = 3;
 
 		/* Protocol	4 is protocol 3	plus server	management functions */
 		public const int PROTOCOL_VERSION3 = 3;
@@ -110,6 +111,11 @@ namespace FirebirdSql.Data.Common
 		// on superserver and superclassic.
 
 		public const int PROTOCOL_VERSION12 = (FB_PROTOCOL_FLAG | 12);
+
+		// Protocol 13 has support for SRP authentication
+		// and Wire encryption
+
+		public const int PROTOCOL_VERSION13 = (FB_PROTOCOL_FLAG | 13);
 
 		#endregion
 
@@ -239,6 +245,13 @@ namespace FirebirdSql.Data.Common
 		public const int op_partial = 89;	// packet is not complete - delay processing
 		public const int op_trusted_auth = 90;
 		public const int op_cancel = 91;
+		public const int op_cont_auth = 92;
+		public const int op_ping = 93;
+		public const int op_accept_data = 94;
+		public const int op_abort_aux_connection = 95;
+		public const int op_crypt = 96;
+		public const int op_crypt_key_callback = 97;
+		public const int op_cond_accept = 98;
 
 		#endregion
 
@@ -312,6 +325,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_dpb_trusted_auth = 73;
 		public const int isc_dpb_process_name = 74;
 		public const int isc_dpb_utf8_filename = 77;
+		public const int isc_dpb_specific_auth_data = 84;
 
 		#endregion
 

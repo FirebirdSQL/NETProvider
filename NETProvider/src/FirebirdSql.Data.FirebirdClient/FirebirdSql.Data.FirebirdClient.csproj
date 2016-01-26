@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -123,6 +123,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Data.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -139,6 +140,7 @@
     <Compile Include="Client\Managed\Version11\SSPIHelper.cs" />
     <Compile Include="Client\Managed\Version12\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version12\GdsStatement.cs" />
+    <Compile Include="Client\Managed\Version13\GdsDatabase.cs" />
     <Compile Include="Client\Native\Handle\BlobHandle.cs" />
     <Compile Include="Client\Native\Handle\DatabaseHandle.cs" />
     <Compile Include="Client\Native\Handle\FirebirdHandle.cs" />
@@ -182,6 +184,7 @@
     <Compile Include="Client\Managed\GenericResponse.cs" />
     <Compile Include="Client\Managed\IResponse.cs" />
     <Compile Include="Client\Managed\SqlResponse.cs" />
+    <Compile Include="Client\Managed\Version10\SrpClient.cs" />
     <Compile Include="Client\Managed\Version10\GdsArray.cs" />
     <Compile Include="Client\Managed\Version10\GdsBlob.cs" />
     <Compile Include="Client\Managed\Version10\GdsConnection.cs" />
