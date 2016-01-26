@@ -140,8 +140,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private BigInteger GetSecret()
 		{
 			byte[] b = new byte[SRP_KEY_SIZE / 8];
-			RandomNumberGenerator random = RandomNumberGenerator.Create();
-			random.GetBytes(b);
+			using (RandomNumberGenerator random = RandomNumberGenerator.Create())
+			{
+				random.GetBytes(b);
+			}
 			return new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
 		}
 
