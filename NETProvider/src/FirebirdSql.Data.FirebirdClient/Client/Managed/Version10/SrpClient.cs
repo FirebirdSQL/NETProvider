@@ -160,8 +160,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private static BigInteger FromBigByteArray(byte[] b)
 		{
-			Array.Reverse(b);
-			return new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
+			return new BigInteger(b.Reverse().Concat(new byte[] { 0 }).ToArray());
 		}
 
 		private static byte[] ToBigByteArray(BigInteger n)
