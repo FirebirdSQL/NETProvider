@@ -53,69 +53,30 @@ namespace FirebirdSql.Data.Common
 
 		#region Protocol Codes
 
-		/* The protocol	is defined blocks, rather than messages, to
-		 * separate	the	protocol from the transport	layer.
-		 */
+		public const int GenericAchitectureClient = 1;
+
 		public const int CONNECT_VERSION2 = 2;
 		public const int CONNECT_VERSION3 = 3;
-
-		/* Protocol	4 is protocol 3	plus server	management functions */
 		public const int PROTOCOL_VERSION3 = 3;
 		public const int PROTOCOL_VERSION4 = 4;
-
-		/* Protocol	5 includes support for a d_float data type */
 		public const int PROTOCOL_VERSION5 = 5;
-
-		/* Protocol	6 includes support for cancel remote events, blob seek,
-		 * and unknown message type
-		 */
 		public const int PROTOCOL_VERSION6 = 6;
-
-		/* Protocol	7 includes DSQL	support	*/
 		public const int PROTOCOL_VERSION7 = 7;
-
-		/* Protocol	8 includes collapsing first	receive	into a send, drop database,
-		 * DSQL	execute	2, DSQL	execute	immediate 2, DSQL insert, services,	and
-		 * transact	request.
-		 */
 		public const int PROTOCOL_VERSION8 = 8;
-
-		/* Protocol	9 includes support for SPX32
-		 * SPX32 uses WINSOCK instead of Novell	SDK
-		 * In order	to differentiate between the old implementation
-		 * of SPX and this one,	different PROTOCOL VERSIONS	are	used
-		 */
 		public const int PROTOCOL_VERSION9 = 9;
-
-		/* Protocol	10 includes	support	for	warnings and removes the requirement for
-		 * encoding	and	decoding status	codes.
-		 */
 		public const int PROTOCOL_VERSION10 = 10;
-
-		// Since protocol 11 we must be separated from Borland Interbase.
-		// Therefore always set highmost bit in protocol version to 1.
-		// For unsigned protocol version this does not break version's compare.
 
 		public const int FB_PROTOCOL_FLAG = 0x8000;
 		public const int FB_PROTOCOL_MASK = ~FB_PROTOCOL_FLAG;
 
-		// Protocol 11 has support for user authentication related
-		// operations (op_update_account_info, op_authenticate_user and
-		// op_trusted_auth). When specific operation is not supported,
-		// we say "sorry".
-
 		public const int PROTOCOL_VERSION11 = (FB_PROTOCOL_FLAG | 11);
-
-		// Protocol 12 has support for asynchronous call op_cancel.
-		// Currently implemented asynchronously only for TCP/IP
-		// on superserver and superclassic.
-
 		public const int PROTOCOL_VERSION12 = (FB_PROTOCOL_FLAG | 12);
-
-		// Protocol 13 has support for SRP authentication
-		// and Wire encryption
-
 		public const int PROTOCOL_VERSION13 = (FB_PROTOCOL_FLAG | 13);
+
+		public const int ptype_rpc = 2;
+		public const int ptype_batch_send = 3;
+		public const int ptype_out_of_band = 4;
+		public const int ptype_lazy_send = 5;
 
 		#endregion
 

@@ -152,35 +152,35 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					xdrStream.Write(IscCodes.op_connect);
 					xdrStream.Write(IscCodes.op_attach);
-					xdrStream.Write(IscCodes.CONNECT_VERSION3); // CONNECT_VERSION2
-					xdrStream.Write(1);                         // Architecture	of client -	Generic
+					xdrStream.Write(IscCodes.CONNECT_VERSION3);
+					xdrStream.Write(IscCodes.GenericAchitectureClient);
 
-					xdrStream.Write(database);                  // Database	path
+					xdrStream.Write(database);
 					xdrStream.Write(4);                         // Protocol	versions understood
 					xdrStream.WriteBuffer(UserIdentificationStuff());   // User	identification Stuff
 
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION10);    // Protocol version
-					xdrStream.Write(1);                              // Architecture of client - Generic
-					xdrStream.Write(2);                              // Minimum type (ptype_rpc)
-					xdrStream.Write(3);                              // Maximum type (ptype_batch_send)
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION10);
+					xdrStream.Write(IscCodes.GenericAchitectureClient);
+					xdrStream.Write(IscCodes.ptype_rpc);
+					xdrStream.Write(IscCodes.ptype_batch_send);
 					xdrStream.Write(0);                              // Preference weight
 
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION11);    // Protocol version
-					xdrStream.Write(1);                              // Architecture of client - Generic
-					xdrStream.Write(2);                              // Minumum type (ptype_rpc)
-					xdrStream.Write(5);                              // Maximum type (ptype_lazy_send)
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION11);
+					xdrStream.Write(IscCodes.GenericAchitectureClient);
+					xdrStream.Write(IscCodes.ptype_rpc);
+					xdrStream.Write(IscCodes.ptype_lazy_send);
 					xdrStream.Write(1);                              // Preference weight
 
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION12);    // Protocol version
-					xdrStream.Write(1);                              // Architecture of client - Generic
-					xdrStream.Write(2);                              // Minumum type (ptype_rpc)
-					xdrStream.Write(5);                              // Maximum type (ptype_lazy_send)
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION12);
+					xdrStream.Write(IscCodes.GenericAchitectureClient);
+					xdrStream.Write(IscCodes.ptype_rpc);
+					xdrStream.Write(IscCodes.ptype_lazy_send);
 					xdrStream.Write(2);                              // Preference weight
 
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION13);//	Protocol version
-					xdrStream.Write(1);                         // Architecture	of client -	Generic
-					xdrStream.Write(2);                         // Minumum type (ptype_rpc)
-					xdrStream.Write(5);                         // Maximum type (ptype_lazy_send)
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION13);
+					xdrStream.Write(IscCodes.GenericAchitectureClient);
+					xdrStream.Write(IscCodes.ptype_rpc);
+					xdrStream.Write(IscCodes.ptype_lazy_send);
 					xdrStream.Write(3);                         // Preference weight
 
 					xdrStream.Flush();
