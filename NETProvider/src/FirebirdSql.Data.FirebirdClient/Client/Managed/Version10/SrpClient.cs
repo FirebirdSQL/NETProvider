@@ -40,10 +40,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private static byte[] SEPARATOR_BYTES = Encoding.UTF8.GetBytes(":");
 
-		private BigInteger publicKey;   /* A */
-		private BigInteger privateKey;  /* a */
-		private byte[] proof;           /* M */
-		private byte[] sessionKey;      /* K */
+		private BigInteger _publicKey;   /* A */
+		private BigInteger _privateKey;  /* a */
+		private byte[] _proof;           /* M */
+		private byte[] _sessionKey;      /* K */
 
 		private static BigInteger fromBigByteArray(byte[] b)
 		{
@@ -164,23 +164,23 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public SrpClient()
 		{
-			privateKey = getSecret();
-			publicKey = BigInteger.ModPow(g, privateKey, N);
+			_privateKey = getSecret();
+			_publicKey = BigInteger.ModPow(g, _privateKey, N);
 		}
 
 		public BigInteger getPublicKey()
 		{
-			return publicKey;
+			return _publicKey;
 		}
 
 		public BigInteger getPrivateKey()
 		{
-			return privateKey;
+			return _privateKey;
 		}
 
 		private byte[] getClientSessionKey(String user, String password, byte[] salt, BigInteger serverPublicKey)
 		{
-			BigInteger u = getScramble(publicKey, serverPublicKey);
+			BigInteger u = getScramble(_publicKey, serverPublicKey);
 			BigInteger x = getUserHash(user, password, salt);
 			BigInteger gx = BigInteger.ModPow(g, x, N);
 			BigInteger kgx;
@@ -195,7 +195,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			BigInteger ux;
 			BigInteger.DivRem(BigInteger.Multiply(u, x), N, out ux);
 			BigInteger aux;
-			BigInteger.DivRem(BigInteger.Add(privateKey, ux), N, out aux);
+			BigInteger.DivRem(BigInteger.Add(_privateKey, ux), N, out aux);
 			BigInteger sessionSecret = BigInteger.ModPow(diff, aux, N);
 
 			return sha1(toBigByteArray(sessionSecret));
@@ -203,7 +203,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public String getPublicKeyHex()
 		{
-			return toHexString(pad(publicKey));
+			return toHexString(pad(_publicKey));
 		}
 
 		public byte[] clientProof(String user, String password, byte[] salt, BigInteger serverPublicKey)
@@ -215,12 +215,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			n1 = BigInteger.ModPow(n1, n2, N);
 			n2 = fromBigByteArray(sha1(Encoding.UTF8.GetBytes(user.ToUpper())));
-			byte[] M = sha1(toBigByteArray(n1), toBigByteArray(n2), salt, toBigByteArray(publicKey), toBigByteArray(serverPublicKey), K);
+			byte[] M = sha1(toBigByteArray(n1), toBigByteArray(n2), salt, toBigByteArray(_publicKey), toBigByteArray(serverPublicKey), K);
 
-			sessionKey = K;
-			proof = M;
+			_sessionKey = K;
+			_proof = M;
 
-			return proof;
+			return _proof;
 		}
 
 		public byte[] clientProof(String user, String password, byte[] authData)
@@ -240,7 +240,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public byte[] getSessionKey()
 		{
-			return sessionKey;
+			return _sessionKey;
 		}
 
 	}
