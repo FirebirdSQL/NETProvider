@@ -34,9 +34,9 @@ namespace FirebirdSql.Data.UnitTests
 			var client = new SrpClient();
 			var salt = client.GetSalt();
 			var serverKeyPair = client.ServerSeed(user, password, salt);
-			var serverSessionKey = client.GetServerSessionKey(user, password, salt, client.GetPublicKey(), serverKeyPair.Item1, serverKeyPair.Item2);
+			var serverSessionKey = client.GetServerSessionKey(user, password, salt, client.PublicKey, serverKeyPair.Item1, serverKeyPair.Item2);
 			client.ClientProof(user, password, salt, serverKeyPair.Item1);
-			Assert.AreEqual(serverSessionKey.ToString(), client.GetSessionKey().ToString());
+			Assert.AreEqual(serverSessionKey.ToString(), client.SessionKey.ToString());
 		}
 	}
 }
