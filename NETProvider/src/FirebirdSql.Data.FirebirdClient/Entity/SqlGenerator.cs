@@ -32,6 +32,7 @@ using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data;
 using System.Linq;
 
+using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
 #if (!EF_6)
@@ -3168,7 +3169,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		internal static string FormatBinary(byte[] value)
 		{
-			return string.Format("x'{0}'", BitConverter.ToString(value).Replace("-", string.Empty));
+			return string.Format("x'{0}'", value.ToHexString());
 		}
 
 		internal static string FormatString(string value, bool isUnicode, int? explicitLength = null)

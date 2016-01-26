@@ -19,11 +19,11 @@
 
 using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Globalization;
 using System.Text;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public string GetPublicKeyHex()
 		{
-			return ToHexString(Pad(_publicKey));
+			return Pad(_publicKey).ToHexString();
 		}
 
 		public byte[] ClientProof(string user, string password, byte[] salt, BigInteger serverPublicKey)
@@ -195,11 +195,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			Array.Copy(b, 0, b2, 0, length);
 			Array.Reverse(b2);
 			return b2;
-		}
-
-		private static string ToHexString(byte[] b)
-		{
-			return BitConverter.ToString(b).Replace("-", string.Empty);
 		}
 
 		private static byte[] FromHexString(string s)

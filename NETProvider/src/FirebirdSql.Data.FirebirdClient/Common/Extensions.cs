@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2011-2013,2015 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2011-2013,2015-2016 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -26,7 +26,7 @@ using System.Text.RegularExpressions;
 
 namespace FirebirdSql.Data.Common
 {
-	static class Extensions
+	internal static class Extensions
 	{
 		public static bool SetKeepAlive(this Socket socket, ulong time, ulong interval)
 		{
@@ -90,6 +90,11 @@ namespace FirebirdSql.Data.Common
 			{
 				throw new NotSupportedException();
 			}
+		}
+
+		public static string ToHexString(this byte[] b)
+		{
+			return BitConverter.ToString(b).Replace("-", string.Empty);
 		}
 	}
 }

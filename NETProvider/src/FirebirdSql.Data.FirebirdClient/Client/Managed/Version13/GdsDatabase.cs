@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
 				if (AuthData != null)
 				{
-					dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(BitConverter.ToString(AuthData).Replace("-", string.Empty)));
+					dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(AuthData.ToHexString()));
 				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
 				if (AuthData != null)
 				{
-					dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(BitConverter.ToString(AuthData).Replace("-", string.Empty)));
+					dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(AuthData.ToHexString()));
 				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
