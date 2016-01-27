@@ -17,34 +17,20 @@
  */
 
 using System;
+using System.IO;
+using System.Text;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Common
+namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct ArrayDescMarshal
+	internal struct	XSQLDA
 	{
-		#region Fields
-
-		public byte DataType;
-		public byte Scale;
-		public short Length;
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-		public string FieldName;
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-		public string RelationName;
-		public short Dimensions;
-		public short Flags;
-
-		#endregion
-
-		#region Static Methods
-
-		public static int ComputeLength(int n)
-		{
-			return (Marshal.SizeOf(typeof(ArrayDescMarshal)) + n * Marshal.SizeOf(typeof(ArrayBoundMarshal)));
-		}
-
-		#endregion
+		public short	version;
+		[MarshalAs(UnmanagedType.ByValTStr,	SizeConst=8)]
+		public string	sqldaid;
+		public int		sqldabc;
+		public short	sqln;
+		public short	sqld;
 	}
 }

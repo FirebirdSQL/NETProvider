@@ -25,7 +25,7 @@ using System.Globalization;
 using System.Text;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version10
+namespace FirebirdSql.Data.Client.Managed
 {
 	/// <remarks>
 	/// http://srp.stanford.edu/design.html

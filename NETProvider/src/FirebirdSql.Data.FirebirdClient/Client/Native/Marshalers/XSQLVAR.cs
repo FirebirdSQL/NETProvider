@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono
  *
  *	   The contents of this file are subject to the Initial
@@ -17,20 +17,35 @@
  */
 
 using System;
-using System.IO;
-using System.Text;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Common
+namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct	XSQLDA
+	internal class XSQLVAREmpty
 	{
-		public short	version;
-		[MarshalAs(UnmanagedType.ByValTStr,	SizeConst=8)]
-		public string	sqldaid;
-		public int		sqldabc;
-		public short	sqln;
-		public short	sqld;
+		public short sqltype;
+		public short sqlscale;
+		public short sqlsubtype;
+		public short sqllen;
+		public IntPtr sqldata;
+		public IntPtr sqlind;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	internal class XSQLVAR : XSQLVAREmpty
+	{
+		public short sqlname_length;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+		public byte[] sqlname;
+		public short relname_length;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+		public byte[] relname;
+		public short ownername_length;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+		public byte[] ownername;
+		public short aliasname_length;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+		public byte[] aliasname;
 	}
 }

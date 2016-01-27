@@ -18,7 +18,7 @@
  */
 
 using System;
-using FirebirdSql.Data.Client.Managed.Version10;
+using FirebirdSql.Data.Client.Managed;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
