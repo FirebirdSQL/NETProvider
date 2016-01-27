@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal class XSQLVAREmpty
+	internal class XSQLVAR
 	{
 		public short sqltype;
 		public short sqlscale;
@@ -30,11 +30,6 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 		public short sqllen;
 		public IntPtr sqldata;
 		public IntPtr sqlind;
-	}
-
-	[StructLayout(LayoutKind.Sequential)]
-	internal class XSQLVAR : XSQLVAREmpty
-	{
 		public short sqlname_length;
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
 		public byte[] sqlname;
