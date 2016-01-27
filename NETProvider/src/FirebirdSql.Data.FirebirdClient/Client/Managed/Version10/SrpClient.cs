@@ -165,16 +165,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private static byte[] BigIntegerToByteArray(BigInteger n)
 		{
-			var b = n.ToByteArray();
-			var length = b.Length;
-			if (b[length - 1] == 0)
-			{
-				length -= 1;
-			}
-			var b2 = new byte[length];
-			Array.Copy(b, 0, b2, 0, length);
-			Array.Reverse(b2);
-			return b2;
+			return n.ToByteArray().Reverse().SkipWhile((e, i) => i == 0 && e == 0).ToArray();
 		}
 
 		private static byte[] FromHexString(string s)
