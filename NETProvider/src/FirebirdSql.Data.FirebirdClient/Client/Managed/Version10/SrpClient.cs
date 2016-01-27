@@ -51,16 +51,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			PublicKey = BigInteger.ModPow(g, PrivateKey, N);
 		}
 
-		public byte[] GetSalt()
-		{
-			var b = new byte[SRP_SALT_SIZE];
-			using (RandomNumberGenerator random = RandomNumberGenerator.Create())
-			{
-				random.GetBytes(b);
-			}
-			return b;
-		}
-
 		public byte[] ClientProof(string user, string password, byte[] salt, BigInteger serverPublicKey)
 		{
 			var K = GetClientSessionKey(user, password, salt, serverPublicKey);
@@ -116,14 +106,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return ComputeHash(BigIntegerToByteArray(sessionSecret));
 		}
 
+		public byte[] GetSalt()
+		{
+			return GetRandomBytes(SRP_SALT_SIZE);
+		}
+
 		private BigInteger GetSecret()
 		{
-			var b = new byte[SRP_KEY_SIZE / 8];
-			using (RandomNumberGenerator random = RandomNumberGenerator.Create())
-			{
-				random.GetBytes(b);
-			}
-			return new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
+			return new BigInteger(GetRandomBytes(SRP_KEY_SIZE / 8).Concat(new byte[] { 0 }).ToArray());
 		}
 
 		private byte[] GetClientSessionKey(string user, string password, byte[] salt, BigInteger serverPublicKey)
@@ -189,6 +179,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private static BigInteger GetScramble(BigInteger x, BigInteger y)
 		{
 			return BigIntegerFromByteArray(ComputeHash(Pad(x), Pad(y)));
+		}
+
+		private static byte[] GetRandomBytes(int count)
+		{
+			var result = new byte[count];
+			using (RandomNumberGenerator random = RandomNumberGenerator.Create())
+			{
+				random.GetBytes(result);
+			}
+			return result;
 		}
 	}
 }
