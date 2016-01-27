@@ -154,8 +154,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var passwordBytes = Encoding.UTF8.GetBytes(password);
 			var hash1 = ComputeHash(userBytes, SEPARATOR_BYTES, passwordBytes);
 			var hash2 = ComputeHash(salt, hash1);
-			var rc = BigIntegerFromByteArray(hash2);
-			return rc;
+			return BigIntegerFromByteArray(hash2);
 		}
 
 		private static BigInteger BigIntegerFromByteArray(byte[] b)
