@@ -168,7 +168,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				DatabaseParameterBuffer dpb = BuildDpb(_db, _options);
 
-				if (_options.FallIntoTrustedAuth)
+				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
 					_db.AttachWithTrustedAuth(dpb, _options.DataSource, _options.Port, _options.Database);
 				}
