@@ -272,11 +272,6 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			using (var result = new MemoryStream())
 			{
-				// Here	we identify	the	user to	the	engine.
-				// This	may	or may not be used as login	info to	a database.
-				var user = Encoding.Default.GetBytes(Environment.UserName);
-				var host = Encoding.Default.GetBytes(Dns.GetHostName());
-
 				if (_userID != null)
 				{
 #warning Charset
@@ -326,11 +321,13 @@ namespace FirebirdSql.Data.Client.Managed
 				}
 
 				// User	Name
+				var user = Encoding.Default.GetBytes(Environment.UserName);
 				result.WriteByte(1);
 				result.WriteByte((byte)user.Length);
 				result.Write(user, 0, user.Length);
 
 				// Host	name
+				var host = Encoding.Default.GetBytes(Dns.GetHostName());
 				result.WriteByte(4);
 				result.WriteByte((byte)host.Length);
 				result.Write(host, 0, host.Length);
