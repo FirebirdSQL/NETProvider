@@ -237,7 +237,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			// Attach to the database
 			XdrStream.Write(IscCodes.op_attach);
 			XdrStream.Write(0);                                           // Database object ID
 			if (!string.IsNullOrEmpty(UserID))
