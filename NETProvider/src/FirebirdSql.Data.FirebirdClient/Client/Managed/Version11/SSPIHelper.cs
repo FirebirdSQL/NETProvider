@@ -291,23 +291,23 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// <summary>
 		/// Creates SSPIHelper with given security package and no remote principal and gets client credentials
 		/// </summary>
-		/// <param name="securPackage">Name of security package (e.g. NTLM, Kerberos, ...)</param>
-		public SSPIHelper(string securPackage)
-			: this(securPackage, null)
+		/// <param name="securityPackage">Name of security package (e.g. NTLM, Kerberos, ...)</param>
+		public SSPIHelper(string securityPackage)
+			: this(securityPackage, null)
 		{
 		}
 
 		/// <summary>
 		/// Creates SSPIHelper with given security package and remote principal and gets client credentials
 		/// </summary>
-		/// <param name="securPackage">Name of security package (e.g. NTLM, Kerberos, ...)</param>
+		/// <param name="securityPackage">Name of security package (e.g. NTLM, Kerberos, ...)</param>
 		/// <param name="remotePrincipal">SPN of server (may be necessary for Kerberos</param>
-		public SSPIHelper(string securPackage, string remotePrincipal)
+		public SSPIHelper(string securityPackage, string remotePrincipal)
 		{
-			_securPackage = securPackage;
+			_securPackage = securityPackage;
 			_remotePrincipal = remotePrincipal;
 			SecInteger expiry = new SecInteger();
-			if (AcquireCredentialsHandle(null, securPackage, SECPKG_CRED_OUTBOUND,
+			if (AcquireCredentialsHandle(null, securityPackage, SECPKG_CRED_OUTBOUND,
 																	IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero,
 																	out _clientCredentials, out expiry) != SEC_E_OK)
 				throw new Exception("Acquiring client credentials failed");
