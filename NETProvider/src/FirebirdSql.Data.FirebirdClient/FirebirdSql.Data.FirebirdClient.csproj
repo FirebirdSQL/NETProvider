@@ -187,7 +187,7 @@
     <Compile Include="Client\Managed\SrpClient.cs" />
     <Compile Include="Client\Managed\Version10\GdsArray.cs" />
     <Compile Include="Client\Managed\Version10\GdsBlob.cs" />
-    <Compile Include="Client\Managed\Version10\GdsConnection.cs" />
+    <Compile Include="Client\Managed\GdsConnection.cs" />
     <Compile Include="Client\Managed\Version10\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version10\GdsEventManager.cs" />
     <Compile Include="Client\Managed\Version10\GdsServiceManager.cs" />

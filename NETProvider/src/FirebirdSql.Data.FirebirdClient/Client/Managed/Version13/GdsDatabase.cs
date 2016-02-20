@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 {
 	internal class GdsDatabase : Version12.GdsDatabase
 	{
-		public GdsDatabase(Version10.GdsConnection connection)
+		public GdsDatabase(GdsConnection connection)
 			: base(connection)
 		{ }
 

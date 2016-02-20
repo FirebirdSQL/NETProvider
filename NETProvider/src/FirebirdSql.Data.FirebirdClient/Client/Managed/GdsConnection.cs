@@ -25,7 +25,7 @@ using System.Text;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version10
+namespace FirebirdSql.Data.Client.Managed
 {
 	internal class GdsConnection
 	{
@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public bool IsConnected
 		{
-			get { return (_socket != null && _socket.Connected); }
+			get { return _socket?.Connected ?? false; }
 		}
 
 		public int ProtocolVersion
@@ -154,8 +154,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					xdrStream.Write(database);
 					xdrStream.Write(4);                         // Protocol	versions understood
-					xdrStream.WriteBuffer(UserIdentificationStuff());   // User	identification Stuff
+					xdrStream.WriteBuffer(UserIdentificationStuff());
 
+#warning Refactoring? Wrapping?
 					xdrStream.Write(IscCodes.PROTOCOL_VERSION10);
 					xdrStream.Write(IscCodes.GenericAchitectureClient);
 					xdrStream.Write(IscCodes.ptype_rpc);
@@ -269,7 +270,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private byte[] UserIdentificationStuff()
 		{
-			using (var user_id = new MemoryStream())
+			using (var result = new MemoryStream())
 			{
 				// Here	we identify	the	user to	the	engine.
 				// This	may	or may not be used as login	info to	a database.
@@ -278,23 +279,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				if (_userID != null)
 				{
+#warning Charset
 					var login = Encoding.Default.GetBytes(_userID);
+#warning Plugin name constant
 					var plugin_name = Encoding.Default.GetBytes("Srp");
 
+#warning Magic constants
 					// Login
-					user_id.WriteByte(9);
-					user_id.WriteByte((byte)login.Length);
-					user_id.Write(login, 0, login.Length);
+					result.WriteByte(9);
+					result.WriteByte((byte)login.Length);
+					result.Write(login, 0, login.Length);
 
 					// Plugin Name
-					user_id.WriteByte(8);
-					user_id.WriteByte((byte)plugin_name.Length);
-					user_id.Write(plugin_name, 0, plugin_name.Length);
+					result.WriteByte(8);
+					result.WriteByte((byte)plugin_name.Length);
+					result.Write(plugin_name, 0, plugin_name.Length);
 
 					// Plugin List
-					user_id.WriteByte(10);
-					user_id.WriteByte((byte)plugin_name.Length);
-					user_id.Write(plugin_name, 0, plugin_name.Length);
+					result.WriteByte(10);
+					result.WriteByte((byte)plugin_name.Length);
+					result.Write(plugin_name, 0, plugin_name.Length);
 
 					// Specific Data
 					var specific_data = Encoding.Default.GetBytes(_srpClient.PublicKeyHex);
@@ -303,39 +307,39 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					var step = 0;
 					while (remaining > 0)
 					{
-						user_id.WriteByte(7);
+						result.WriteByte(7);
 						int toWrite = Math.Min(remaining, 254);
-						user_id.WriteByte((byte)(toWrite + 1));
-						user_id.WriteByte((byte)step++);
-						user_id.Write(specific_data, position, toWrite);
+						result.WriteByte((byte)(toWrite + 1));
+						result.WriteByte((byte)step++);
+						result.Write(specific_data, position, toWrite);
 						remaining -= toWrite;
 						position += toWrite;
 					}
 
 					// Client Crypt (Not Encrypt)
-					user_id.WriteByte(11);
-					user_id.WriteByte(4);
-					user_id.WriteByte(0);
-					user_id.WriteByte(0);
-					user_id.WriteByte(0);
-					user_id.WriteByte(0);
+					result.WriteByte(11);
+					result.WriteByte(4);
+					result.WriteByte(0);
+					result.WriteByte(0);
+					result.WriteByte(0);
+					result.WriteByte(0);
 				}
 
 				// User	Name
-				user_id.WriteByte(1);
-				user_id.WriteByte((byte)user.Length);
-				user_id.Write(user, 0, user.Length);
+				result.WriteByte(1);
+				result.WriteByte((byte)user.Length);
+				result.Write(user, 0, user.Length);
 
 				// Host	name
-				user_id.WriteByte(4);
-				user_id.WriteByte((byte)host.Length);
-				user_id.Write(host, 0, host.Length);
+				result.WriteByte(4);
+				result.WriteByte((byte)host.Length);
+				result.Write(host, 0, host.Length);
 
 				// Attach/create using this connection will use user verification
-				user_id.WriteByte(6);
-				user_id.WriteByte(0);
+				result.WriteByte(6);
+				result.WriteByte(0);
 
-				return user_id.ToArray();
+				return result.ToArray();
 			}
 		}
 
