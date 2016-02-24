@@ -32,90 +32,141 @@ namespace FirebirdSql.Data.FirebirdClient
 	internal sealed class FbConnectionString
 	{
 		#region Constants
-		internal const string DefaultDataSource = "";
-		internal const int DefaultPortNumber = 3050;
-		internal const string DefaultUserId = "";
-		internal const string DefaultPassword = "";
-		internal const string DefaultRoleName = "";
-		internal const string DefaultCatalog = "";
-		internal const string DefaultCharacterSet = "NONE";
-		internal const int DefaultDialect = 3;
-		internal const int DefaultPacketSize = 8192;
-		internal const bool DefaultPooling = true;
-		internal const int DefaultConnectionLifetime = 0;
-		internal const int DefaultMinPoolSize = 0;
-		internal const int DefaultMaxPoolSize = 100;
-		internal const int DefaultConnectionTimeout = 15;
-		internal const int DefaultFetchSize = 200;
-		internal const FbServerType DefaultServerType = FbServerType.Default;
-		internal const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
-		internal const bool DefaultRecordsAffected = true;
-		internal const bool DefaultEnlist = false;
-		internal const string DefaultClientLibrary = "fbembed";
-		internal const int DefaultCachePages = 0;
-		internal const bool DefaultNoDbTriggers = false;
-		internal const bool DefaultNoGarbageCollect = false;
+		internal const string DefaultValueDataSource = "";
+		internal const int DefaultValuePortNumber = 3050;
+		internal const string DefaultValueUserId = "";
+		internal const string DefaultValuePassword = "";
+		internal const string DefaultValueRoleName = "";
+		internal const string DefaultValueCatalog = "";
+		internal const string DefaultValueCharacterSet = "NONE";
+		internal const int DefaultValueDialect = 3;
+		internal const int DefaultValuePacketSize = 8192;
+		internal const bool DefaultValuePooling = true;
+		internal const int DefaultValueConnectionLifetime = 0;
+		internal const int DefaultValueMinPoolSize = 0;
+		internal const int DefaultValueMaxPoolSize = 100;
+		internal const int DefaultValueConnectionTimeout = 15;
+		internal const int DefaultValueFetchSize = 200;
+		internal const FbServerType DefaultValueServerType = FbServerType.Default;
+		internal const IsolationLevel DefaultValueIsolationLevel = IsolationLevel.ReadCommitted;
+		internal const bool DefaultValueRecordsAffected = true;
+		internal const bool DefaultValueEnlist = false;
+		internal const string DefaultValueClientLibrary = "fbembed";
+		internal const int DefaultValueCachePages = 0;
+		internal const bool DefaultValueNoDbTriggers = false;
+		internal const bool DefaultValueNoGarbageCollect = false;
+
+		internal const string DefaultKeyUserId = "user id";
+		internal const string DefaultKeyPortNumber = "port number";
+		internal const string DefaultKeyDataSource = "data source";
+		internal const string DefaultKeyPassword = "password";
+		internal const string DefaultKeyRoleName = "role name";
+		internal const string DefaultKeyCatalog = "initial catalog";
+		internal const string DefaultKeyCharacterSet = "character set";
+		internal const string DefaultKeyDialect = "dialect";
+		internal const string DefaultKeyPacketSize = "packet size";
+		internal const string DefaultKeyPooling = "pooling";
+		internal const string DefaultKeyConnectionLifetime = "connection lifetime";
+		internal const string DefaultKeyMinPoolSize = "min pool size";
+		internal const string DefaultKeyMaxPoolSize = "max pool size";
+		internal const string DefaultKeyConnectionTimeout = "connection timeout";
+		internal const string DefaultKeyFetchSize = "fetch size";
+		internal const string DefaultKeyServerType = "server type";
+		internal const string DefaultKeyIsolationLevel = "isolation level";
+		internal const string DefaultKeyRecordsAffected = "records affected";
+		internal const string DefaultKeyEnlist = "enlist";
+		internal const string DefaultKeyClientLibrary = "client library";
+		internal const string DefaultKeyCachePages = "cache pages";
+		internal const string DefaultKeyNoDbTriggers = "no db triggers";
+		internal const string DefaultKeyNoGarbageCollect = "no garbage collect";
 		#endregion
 
 		#region Static Fields
 
-		public static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+		internal static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
 		{
-			{ "data source", "data source" },
-			{ "datasource", "data source" },
-			{ "server", "data source" },
-			{ "host", "data source" },
-			{ "port", "port number" },
-			{ "port number", "port number" },
-			{ "database", "initial catalog" },
-			{ "initial catalog", "initial catalog" },
-			{ "user id", "user id" },
-			{ "userid", "user id" },
-			{ "uid", "user id" },
-			{ "user", "user id" },
-			{ "user name", "user id" },
-			{ "username", "user id" },
-			{ "password", "password" },
-			{ "user password", "password" },
-			{ "userpassword", "password" },
-			{ "dialect", "dialect" },
-			{ "pooling", "pooling" },
-			{ "max pool size", "max pool size" },
-			{ "maxpoolsize", "max pool size" },
-			{ "min pool size", "min pool size" },
-			{ "minpoolsize", "min pool size" },
-			{ "character set", "character set" },
-			{ "charset", "character set" },
-			{ "connection lifetime", "connection lifetime" },
-			{ "connectionlifetime", "connection lifetime" },
-			{ "timeout", "connection timeout" },
-			{ "connection timeout", "connection timeout" },
-			{ "connectiontimeout", "connection timeout" },
-			{ "packet size", "packet size" },
-			{ "packetsize", "packet size" },
-			{ "role", "role name" },
-			{ "role name", "role name" },
-			{ "fetch size", "fetch size" },
-			{ "fetchsize", "fetch size" },
-			{ "server type", "server type" },
-			{ "servertype", "server type" },
-			{ "isolation level", "isolation level" },
-			{ "isolationlevel", "isolation level" },
-			{ "records affected", "records affected" },
-			{ "enlist", "enlist" },
-			{ "clientlibrary", "client library" },
-			{ "client library", "client library" },
-			{ "cache pages", "cache pages" },
-			{ "cachepages", "cache pages" },
-			{ "pagebuffers", "cache pages" },
-			{ "page buffers", "cache pages" },
-			{ "no db triggers", "no db triggers" },
-			{ "nodbtriggers", "no db triggers" },
-			{ "no dbtriggers", "no db triggers" },
-			{ "no database triggers", "no db triggers" },
-			{ "nodatabasetriggers", "no db triggers" },
-			{ "no garbage collect", "no garbage collect"},
-			{ "nogarbagecollect", "no garbage collect"}
+			{ DefaultKeyDataSource, DefaultKeyDataSource },
+			{ "datasource", DefaultKeyDataSource },
+			{ "server", DefaultKeyDataSource },
+			{ "host", DefaultKeyDataSource },
+			{ "port", DefaultKeyPortNumber },
+			{ DefaultKeyPortNumber, DefaultKeyPortNumber },
+			{ "database", DefaultKeyCatalog },
+			{ DefaultKeyCatalog, DefaultKeyCatalog },
+			{ DefaultKeyUserId, DefaultKeyUserId },
+			{ "userid", DefaultKeyUserId },
+			{ "uid", DefaultKeyUserId },
+			{ "user", DefaultKeyUserId },
+			{ "user name", DefaultKeyUserId },
+			{ "username", DefaultKeyUserId },
+			{ DefaultKeyPassword, DefaultKeyPassword },
+			{ "user password", DefaultKeyPassword },
+			{ "userpassword", DefaultKeyPassword },
+			{ DefaultKeyDialect, DefaultKeyDialect },
+			{ DefaultKeyPooling, DefaultKeyPooling },
+			{ DefaultKeyMaxPoolSize, DefaultKeyMaxPoolSize },
+			{ "maxpoolsize", DefaultKeyMaxPoolSize },
+			{ DefaultKeyMinPoolSize, DefaultKeyMinPoolSize },
+			{ "minpoolsize", DefaultKeyMinPoolSize },
+			{ DefaultKeyCharacterSet, DefaultKeyCharacterSet },
+			{ "charset", DefaultKeyCharacterSet },
+			{ DefaultKeyConnectionLifetime, DefaultKeyConnectionLifetime },
+			{ "connectionlifetime", DefaultKeyConnectionLifetime },
+			{ "timeout", DefaultKeyConnectionTimeout },
+			{ DefaultKeyConnectionTimeout, DefaultKeyConnectionTimeout },
+			{ "connectiontimeout", DefaultKeyConnectionTimeout },
+			{ DefaultKeyPacketSize, DefaultKeyPacketSize },
+			{ "packetsize", DefaultKeyPacketSize },
+			{ "role", DefaultKeyRoleName },
+			{ DefaultKeyRoleName, DefaultKeyRoleName },
+			{ DefaultKeyFetchSize, DefaultKeyFetchSize },
+			{ "fetchsize", DefaultKeyFetchSize },
+			{ DefaultKeyServerType, DefaultKeyServerType },
+			{ "servertype", DefaultKeyServerType },
+			{ DefaultKeyIsolationLevel, DefaultKeyIsolationLevel },
+			{ "isolationlevel", DefaultKeyIsolationLevel },
+			{ DefaultKeyRecordsAffected, DefaultKeyRecordsAffected },
+			{ DefaultKeyEnlist, DefaultKeyEnlist },
+			{ "clientlibrary", DefaultKeyClientLibrary },
+			{ DefaultKeyClientLibrary, DefaultKeyClientLibrary },
+			{ DefaultKeyCachePages, DefaultKeyCachePages },
+			{ "cachepages", DefaultKeyCachePages },
+			{ "pagebuffers", DefaultKeyCachePages },
+			{ "page buffers", DefaultKeyCachePages },
+			{ DefaultKeyNoDbTriggers, DefaultKeyNoDbTriggers },
+			{ "nodbtriggers", DefaultKeyNoDbTriggers },
+			{ "no dbtriggers", DefaultKeyNoDbTriggers },
+			{ "no database triggers", DefaultKeyNoDbTriggers },
+			{ "nodatabasetriggers", DefaultKeyNoDbTriggers },
+			{ DefaultKeyNoGarbageCollect, DefaultKeyNoGarbageCollect},
+			{ "nogarbagecollect", DefaultKeyNoGarbageCollect}
+		};
+
+		internal static readonly IDictionary<string, object> DefaultValues = new Dictionary<string, object>(StringComparer.Ordinal)
+		{
+			{ DefaultKeyDataSource, DefaultValueDataSource },
+			{ DefaultKeyPortNumber, DefaultValuePortNumber },
+			{ DefaultKeyUserId, DefaultValueUserId },
+			{ DefaultKeyPassword, DefaultValuePassword },
+			{ DefaultKeyRoleName, DefaultValueRoleName },
+			{ DefaultKeyCatalog, DefaultValueCatalog },
+			{ DefaultKeyCharacterSet, DefaultValueCharacterSet },
+			{ DefaultKeyDialect, DefaultValueDialect },
+			{ DefaultKeyPacketSize, DefaultValuePacketSize },
+			{ DefaultKeyPooling, DefaultValuePooling },
+			{ DefaultKeyConnectionLifetime, DefaultValueConnectionLifetime },
+			{ DefaultKeyMinPoolSize, DefaultValueMinPoolSize },
+			{ DefaultKeyMaxPoolSize, DefaultValueMaxPoolSize },
+			{ DefaultKeyConnectionTimeout, DefaultValueConnectionTimeout },
+			{ DefaultKeyFetchSize, DefaultValueFetchSize },
+			{ DefaultKeyServerType, DefaultValueServerType },
+			{ DefaultKeyIsolationLevel, DefaultValueIsolationLevel },
+			{ DefaultKeyRecordsAffected, DefaultValueRecordsAffected },
+			{ DefaultKeyEnlist, DefaultValueEnlist },
+			{ DefaultKeyClientLibrary, DefaultValueClientLibrary },
+			{ DefaultKeyCachePages, DefaultValueCachePages },
+			{ DefaultKeyNoDbTriggers, DefaultValueNoDbTriggers },
+			{ DefaultKeyNoGarbageCollect, DefaultValueNoGarbageCollect },
 		};
 
 		#endregion
@@ -131,117 +182,117 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public string UserID
 		{
-			get { return GetString("user id"); }
+			get { return GetString(DefaultKeyUserId); }
 		}
 
 		public string Password
 		{
-			get { return GetString("password"); }
+			get { return GetString(DefaultKeyPassword); }
 		}
 
 		public string DataSource
 		{
-			get { return GetString("data source"); }
+			get { return GetString(DefaultKeyDataSource); }
 		}
 
 		public int Port
 		{
-			get { return GetInt32("port number"); }
+			get { return GetInt32(DefaultKeyPortNumber); }
 		}
 
 		public string Database
 		{
-			get { return ExpandDataDirectory(GetString("initial catalog")); }
+			get { return ExpandDataDirectory(GetString(DefaultKeyCatalog)); }
 		}
 
 		public short PacketSize
 		{
-			get { return GetInt16("packet size"); }
+			get { return GetInt16(DefaultKeyPacketSize); }
 		}
 
 		public string Role
 		{
-			get { return GetString("role name"); }
+			get { return GetString(DefaultKeyRoleName); }
 		}
 
 		public byte Dialect
 		{
-			get { return GetByte("dialect"); }
+			get { return GetByte(DefaultKeyDialect); }
 		}
 
 		public string Charset
 		{
-			get { return GetString("character set"); }
+			get { return GetString(DefaultKeyCharacterSet); }
 		}
 
 		public int ConnectionTimeout
 		{
-			get { return GetInt32("connection timeout"); }
+			get { return GetInt32(DefaultKeyConnectionTimeout); }
 		}
 
 		public bool Pooling
 		{
-			get { return GetBoolean("pooling"); }
+			get { return GetBoolean(DefaultKeyPooling); }
 		}
 
 		public long ConnectionLifeTime
 		{
-			get { return GetInt64("connection lifetime"); }
+			get { return GetInt64(DefaultKeyConnectionLifetime); }
 		}
 
 		public int MinPoolSize
 		{
-			get { return GetInt32("min pool size"); }
+			get { return GetInt32(DefaultKeyMinPoolSize); }
 		}
 
 		public int MaxPoolSize
 		{
-			get { return GetInt32("max pool size"); }
+			get { return GetInt32(DefaultKeyMaxPoolSize); }
 		}
 
 		public int FetchSize
 		{
-			get { return GetInt32("fetch size"); }
+			get { return GetInt32(DefaultKeyFetchSize); }
 		}
 
 		public FbServerType ServerType
 		{
-			get { return (FbServerType)GetInt32("server type"); }
+			get { return (FbServerType)GetInt32(DefaultKeyServerType); }
 		}
 
 		public IsolationLevel IsolationLevel
 		{
-			get { return GetIsolationLevel("isolation level"); }
+			get { return GetIsolationLevel(DefaultKeyIsolationLevel); }
 		}
 
 		public bool ReturnRecordsAffected
 		{
-			get { return GetBoolean("records affected"); }
+			get { return GetBoolean(DefaultKeyRecordsAffected); }
 		}
 
 		public bool Enlist
 		{
-			get { return GetBoolean("enlist"); }
+			get { return GetBoolean(DefaultKeyEnlist); }
 		}
 
 		public string ClientLibrary
 		{
-			get { return GetString("client library"); }
+			get { return GetString(DefaultKeyClientLibrary); }
 		}
 
 		public int DbCachePages
 		{
-			get { return GetInt32("cache pages"); }
+			get { return GetInt32(DefaultKeyCachePages); }
 		}
 
 		public bool NoDatabaseTriggers
 		{
-			get { return GetBoolean("no db triggers"); }
+			get { return GetBoolean(DefaultKeyNoDbTriggers); }
 		}
 
 		public bool NoGarbageCollect
 		{
-			get { return GetBoolean("no garbage collect"); }
+			get { return GetBoolean(DefaultKeyNoGarbageCollect); }
 		}
 
 		#endregion
@@ -314,7 +365,7 @@ namespace FirebirdSql.Data.FirebirdClient
 							string key;
 							if (Synonyms.TryGetValue(values[0], out key))
 							{
-								if (key == "server type")
+								if (key == DefaultKeyServerType)
 								{
 									FbServerType serverType = default(FbServerType);
 									try
@@ -370,7 +421,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			if (DbCachePages < 0)
 			{
-				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Db Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", DbCachePages, Environment.NewLine));
+				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", DbCachePages, Environment.NewLine));
 			}
 			if (Pooling && NoDatabaseTriggers)
 			{
@@ -386,36 +437,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void SetDefaultOptions()
 		{
-			if (_options == null)
-			{
-				_options = new Dictionary<string, object>();
-			}
-
-			_options.Clear();
-
-			_options.Add("data source", DefaultDataSource);
-			_options.Add("port number", DefaultPortNumber);
-			_options.Add("user id", DefaultUserId);
-			_options.Add("password", DefaultPassword);
-			_options.Add("role name", DefaultRoleName);
-			_options.Add("initial catalog", DefaultCatalog);
-			_options.Add("character set", DefaultCharacterSet);
-			_options.Add("dialect", DefaultDialect);
-			_options.Add("packet size", DefaultPacketSize);
-			_options.Add("pooling", DefaultPooling);
-			_options.Add("connection lifetime", DefaultConnectionLifetime);
-			_options.Add("min pool size", DefaultMinPoolSize);
-			_options.Add("max pool size", DefaultMaxPoolSize);
-			_options.Add("connection timeout", DefaultConnectionTimeout);
-			_options.Add("fetch size", DefaultFetchSize);
-			_options.Add("server type", DefaultServerType);
-			_options.Add("isolation level", DefaultIsolationLevel);
-			_options.Add("records affected", DefaultRecordsAffected);
-			_options.Add("enlist", DefaultEnlist);
-			_options.Add("client library", DefaultClientLibrary);
-			_options.Add("cache pages", DefaultCachePages);
-			_options.Add("no db triggers", DefaultNoDbTriggers);
-			_options.Add("no garbage collect", DefaultNoGarbageCollect);
+			_options = new Dictionary<string, object>(DefaultValues);
 		}
 
 		private void ParseConnectionInfo(string connectInfo)
@@ -481,14 +503,14 @@ namespace FirebirdSql.Data.FirebirdClient
 				database = connectInfo;
 			}
 
-			_options["initial catalog"] = database;
+			_options[DefaultKeyCatalog] = database;
 			if (dataSource != null)
 			{
-				_options["data source"] = dataSource;
+				_options[DefaultKeyDataSource] = dataSource;
 			}
 			if (portNumber != -1)
 			{
-				_options["port number"] = portNumber;
+				_options[DefaultKeyPortNumber] = portNumber;
 			}
 		}
 
@@ -595,7 +617,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckIsolationLevel()
 		{
-			string il = _options["isolation level"].ToString().ToLower(CultureInfo.InvariantCulture);
+			string il = _options[DefaultKeyIsolationLevel].ToString().ToLower(CultureInfo.InvariantCulture);
 
 			switch (il)
 			{

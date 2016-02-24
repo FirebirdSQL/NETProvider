@@ -36,233 +36,233 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Security")]
 		[DisplayName("User ID")]
 		[Description("Indicates the User ID to be used when connecting to the data source.")]
-		[DefaultValue(FbConnectionString.DefaultUserId)]
+		[DefaultValue(FbConnectionString.DefaultValueUserId)]
 		public string UserID
 		{
-			get { return GetString("User ID"); }
-			set { SetValue("User ID", value); }
+			get { return GetString(FbConnectionString.DefaultKeyUserId, FbConnectionString.DefaultValueUserId); }
+			set { SetValue(FbConnectionString.DefaultKeyUserId, value); }
 		}
 
 		[Category("Security")]
 		[DisplayName("Password")]
 		[Description("Indicates the password to be used when connecting to the data source.")]
 		[PasswordPropertyText(true)]
-		[DefaultValue(FbConnectionString.DefaultPassword)]
+		[DefaultValue(FbConnectionString.DefaultValuePassword)]
 		public string Password
 		{
-			get { return GetString("Password"); }
-			set { SetValue("Password", value); }
+			get { return GetString(FbConnectionString.DefaultKeyPassword, FbConnectionString.DefaultValuePassword); }
+			set { SetValue(FbConnectionString.DefaultKeyPassword, value); }
 		}
 
 		[Category("Source")]
 		[DisplayName("DataSource")]
 		[Description("The name of the Firebird server to which to connect.")]
-		[DefaultValue(FbConnectionString.DefaultDataSource)]
+		[DefaultValue(FbConnectionString.DefaultValueDataSource)]
 		public string DataSource
 		{
-			get { return GetString("Data Source"); }
-			set { SetValue("Data Source", value); }
+			get { return GetString(FbConnectionString.DefaultKeyDataSource, FbConnectionString.DefaultValueDataSource); }
+			set { SetValue(FbConnectionString.DefaultKeyDataSource, value); }
 		}
 
 		[Category("Source")]
 		[DisplayName("Database")]
 		[Description("The name of the actual database or the database to be used when a connection is open. It is normally the path to an .FDB file or an alias.")]
-		[DefaultValue(FbConnectionString.DefaultCatalog)]
+		[DefaultValue(FbConnectionString.DefaultValueCatalog)]
 		public string Database
 		{
-			get { return GetString("Initial Catalog"); }
-			set { SetValue("Initial Catalog", value); }
+			get { return GetString(FbConnectionString.DefaultKeyCatalog, FbConnectionString.DefaultValueCatalog); }
+			set { SetValue(FbConnectionString.DefaultKeyCatalog, value); }
 		}
 
 		[Category("Source")]
 		[DisplayName("Port")]
 		[Description("Port to use for TCP/IP connections")]
-		[DefaultValue(FbConnectionString.DefaultPortNumber)]
+		[DefaultValue(FbConnectionString.DefaultValuePortNumber)]
 		public int Port
 		{
-			get { return GetInt32("Port Number"); }
-			set { SetValue("Port Number", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyPortNumber, FbConnectionString.DefaultValuePortNumber); }
+			set { SetValue(FbConnectionString.DefaultKeyPortNumber, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("PacketSize")]
 		[Description("The size (in bytes) of network packets. PacketSize may be in the range 512-32767 bytes.")]
-		[DefaultValue(FbConnectionString.DefaultPacketSize)]
+		[DefaultValue(FbConnectionString.DefaultValuePacketSize)]
 		public int PacketSize
 		{
-			get { return GetInt32("Packet Size"); }
-			set { SetValue("Packet Size", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyPacketSize, FbConnectionString.DefaultValuePacketSize); }
+			set { SetValue(FbConnectionString.DefaultKeyPacketSize, value); }
 		}
 
 		[Category("Security")]
 		[DisplayName("Role")]
 		[Description("The user role.")]
-		[DefaultValue(FbConnectionString.DefaultRoleName)]
+		[DefaultValue(FbConnectionString.DefaultValueRoleName)]
 		public string Role
 		{
-			get { return GetString("Role Name"); }
-			set { SetValue("Role Name", value); }
+			get { return GetString(FbConnectionString.DefaultKeyRoleName, FbConnectionString.DefaultValueRoleName); }
+			set { SetValue(FbConnectionString.DefaultKeyRoleName, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("Dialect")]
 		[Description("The database SQL dialect.")]
-		[DefaultValue(FbConnectionString.DefaultDialect)]
+		[DefaultValue(FbConnectionString.DefaultValueDialect)]
 		public int Dialect
 		{
-			get { return GetInt32("Dialect"); }
-			set { SetValue("Dialect", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyDialect, FbConnectionString.DefaultValueDialect); }
+			set { SetValue(FbConnectionString.DefaultKeyDialect, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("Character Set")]
 		[Description("The connection character set encoding.")]
-		[DefaultValue(FbConnectionString.DefaultCharacterSet)]
+		[DefaultValue(FbConnectionString.DefaultValueCharacterSet)]
 		public string Charset
 		{
-			get { return GetString("Character Set"); }
-			set { SetValue("Character Set", value); }
+			get { return GetString(FbConnectionString.DefaultKeyCharacterSet, FbConnectionString.DefaultValueCharacterSet); }
+			set { SetValue(FbConnectionString.DefaultKeyCharacterSet, value); }
 		}
 
 		[Category("Connection")]
 		[DisplayName("Connection Timeout")]
 		[Description("The time (in seconds) to wait for a connection to open.")]
-		[DefaultValue(FbConnectionString.DefaultConnectionTimeout)]
+		[DefaultValue(FbConnectionString.DefaultValueConnectionTimeout)]
 		public int ConnectionTimeout
 		{
-			get { return GetInt32("Connection Timeout"); }
-			set { SetValue("Connection Timeout", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyConnectionTimeout, FbConnectionString.DefaultValueConnectionTimeout); }
+			set { SetValue(FbConnectionString.DefaultKeyConnectionTimeout, value); }
 		}
 
 		[Category("Pooling")]
 		[DisplayName("Pooling")]
 		[Description("When true the connection is grabbed from a pool or, if necessary, created and added to the appropriate pool.")]
-		[DefaultValue(FbConnectionString.DefaultPooling)]
+		[DefaultValue(FbConnectionString.DefaultValuePooling)]
 		public bool Pooling
 		{
-			get { return GetBoolean("Pooling"); }
-			set { SetValue("Pooling", value); }
+			get { return GetBoolean(FbConnectionString.DefaultKeyPooling, FbConnectionString.DefaultValuePooling); }
+			set { SetValue(FbConnectionString.DefaultKeyPooling, value); }
 		}
 
 		[Category("Connection")]
 		[DisplayName("Connection LifeTime")]
 		[Description("When a connection is returned to the pool, its creation time is compared with the current time, and the connection is destroyed if that time span (in seconds) exceeds the value specified by connection lifetime.")]
-		[DefaultValue(FbConnectionString.DefaultConnectionLifetime)]
+		[DefaultValue(FbConnectionString.DefaultValueConnectionLifetime)]
 		public int ConnectionLifeTime
 		{
-			get { return GetInt32("Connection Lifetime"); }
-			set { SetValue("Connection Lifetime", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyConnectionLifetime, FbConnectionString.DefaultValueConnectionLifetime); }
+			set { SetValue(FbConnectionString.DefaultKeyConnectionLifetime, value); }
 		}
 
 		[Category("Pooling")]
 		[DisplayName("MinPoolSize")]
 		[Description("The minimun number of connections allowed in the pool.")]
-		[DefaultValue(FbConnectionString.DefaultMinPoolSize)]
+		[DefaultValue(FbConnectionString.DefaultValueMinPoolSize)]
 		public int MinPoolSize
 		{
-			get { return GetInt32("Min Pool Size"); }
-			set { SetValue("Min Pool Size", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyMinPoolSize, FbConnectionString.DefaultValueMinPoolSize); }
+			set { SetValue(FbConnectionString.DefaultKeyMinPoolSize, value); }
 		}
 
 		[Category("Pooling")]
 		[DisplayName("MaxPoolSize")]
 		[Description("The maximum number of connections allowed in the pool.")]
-		[DefaultValue(FbConnectionString.DefaultMaxPoolSize)]
+		[DefaultValue(FbConnectionString.DefaultValueMaxPoolSize)]
 		public int MaxPoolSize
 		{
-			get { return GetInt32("Max Pool Size"); }
-			set { SetValue("Max Pool Size", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyMaxPoolSize, FbConnectionString.DefaultValueMaxPoolSize); }
+			set { SetValue(FbConnectionString.DefaultKeyMaxPoolSize, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("FetchSize")]
 		[Description("The maximum number of rows to be fetched in a single call to read into the internal row buffer.")]
-		[DefaultValue(FbConnectionString.DefaultFetchSize)]
+		[DefaultValue(FbConnectionString.DefaultValueFetchSize)]
 		public int FetchSize
 		{
-			get { return GetInt32("Fetch Size"); }
-			set { SetValue("Fetch Size", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyFetchSize, FbConnectionString.DefaultValueFetchSize); }
+			set { SetValue(FbConnectionString.DefaultKeyFetchSize, value); }
 		}
 
 		[Category("Source")]
 		[DisplayName("ServerType")]
 		[Description("The type of server used.")]
-		[DefaultValue(FbConnectionString.DefaultServerType)]
+		[DefaultValue(FbConnectionString.DefaultValueServerType)]
 		public FbServerType ServerType
 		{
-			get { return GetServerType("Server Type"); }
-			set { SetValue("Server Type", value); }
+			get { return GetServerType(FbConnectionString.DefaultKeyServerType, FbConnectionString.DefaultValueServerType); }
+			set { SetValue(FbConnectionString.DefaultKeyServerType, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("IsolationLevel")]
 		[Description("The default Isolation Level for implicit transactions.")]
-		[DefaultValue(FbConnectionString.DefaultIsolationLevel)]
+		[DefaultValue(FbConnectionString.DefaultValueIsolationLevel)]
 		public IsolationLevel IsolationLevel
 		{
-			get { return (IsolationLevel)GetInt32("Isolation Level"); }
-			set { SetValue("Isolation Level", value); }
+			get { return GetIsolationLevel(FbConnectionString.DefaultKeyIsolationLevel, FbConnectionString.DefaultValueIsolationLevel); }
+			set { SetValue(FbConnectionString.DefaultKeyIsolationLevel, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("Records Affected")]
 		[Description("Get the number of rows affected by a command when true.")]
-		[DefaultValue(FbConnectionString.DefaultRecordsAffected)]
+		[DefaultValue(FbConnectionString.DefaultValueRecordsAffected)]
 		public bool ReturnRecordsAffected
 		{
-			get { return GetBoolean("Records Affected"); }
-			set { SetValue("Records Affected", value); }
+			get { return GetBoolean(FbConnectionString.DefaultKeyRecordsAffected, FbConnectionString.DefaultValueRecordsAffected); }
+			set { SetValue(FbConnectionString.DefaultKeyRecordsAffected, value); }
 		}
 
 		[Category("Pooling")]
 		[DisplayName("Enlist")]
 		[Description("If true, enlists the connections in the current transaction.")]
-		[DefaultValue(FbConnectionString.DefaultPooling)]
+		[DefaultValue(FbConnectionString.DefaultValuePooling)]
 		public bool Enlist
 		{
-			get { return GetBoolean("Enlist"); }
-			set { SetValue("Enlist", value); }
+			get { return GetBoolean(FbConnectionString.DefaultKeyEnlist, FbConnectionString.DefaultValueEnlist); }
+			set { SetValue(FbConnectionString.DefaultKeyEnlist, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("Client Library")]
 		[Description("Client library for Firebird Embedded Server.")]
-		[DefaultValue(FbConnectionString.DefaultClientLibrary)]
+		[DefaultValue(FbConnectionString.DefaultValueClientLibrary)]
 		public string ClientLibrary
 		{
-			get { return GetString("Client Library"); }
-			set { SetValue("Client Library", value); }
+			get { return GetString(FbConnectionString.DefaultKeyClientLibrary, FbConnectionString.DefaultValueClientLibrary); }
+			set { SetValue(FbConnectionString.DefaultKeyClientLibrary, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("Cache Pages")]
 		[Description("How many cache buffers to use for this session.")]
-		[DefaultValue(FbConnectionString.DefaultCachePages)]
+		[DefaultValue(FbConnectionString.DefaultValueCachePages)]
 		public int DbCachePages
 		{
-			get { return GetInt32("Cache Pages"); }
-			set { SetValue("Cache Pages", value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyCachePages, FbConnectionString.DefaultValueCachePages); }
+			set { SetValue(FbConnectionString.DefaultKeyCachePages, value); }
 		}
 
 		[Category("Advanced")]
 		[DisplayName("No Triggers")]
 		[Description("Disables database triggers for this connection.")]
-		[DefaultValue(FbConnectionString.DefaultNoDbTriggers)]
+		[DefaultValue(FbConnectionString.DefaultValueNoDbTriggers)]
 		public bool NoDatabaseTriggers
 		{
-			get { return GetBoolean("No DB Triggers"); }
-			set { SetValue("No DB Triggers", value); }
+			get { return GetBoolean(FbConnectionString.DefaultKeyNoDbTriggers, FbConnectionString.DefaultValueNoDbTriggers); }
+			set { SetValue(FbConnectionString.DefaultKeyNoDbTriggers, value); }
 		}
 
-        [Category("Advanced")]
-        [DisplayName("NoGarbageCollect")]
-        [Description("If true, disables sweeping the database upon attachment.")]
-        [DefaultValue(FbConnectionString.DefaultNoGarbageCollect)]
-        public bool NoGarbageCollect
-        {
-            get { return GetBoolean("No Garbage Collect"); }
-            set { SetValue("No Garbage Collect", value); }
-        }
+		[Category("Advanced")]
+		[DisplayName("NoGarbageCollect")]
+		[Description("If true, disables sweeping the database upon attachment.")]
+		[DefaultValue(FbConnectionString.DefaultValueNoGarbageCollect)]
+		public bool NoGarbageCollect
+		{
+			get { return GetBoolean(FbConnectionString.DefaultKeyNoGarbageCollect, FbConnectionString.DefaultValueNoGarbageCollect); }
+			set { SetValue(FbConnectionString.DefaultKeyNoGarbageCollect, value); }
+		}
 
 		#endregion
 
@@ -273,6 +273,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		public FbConnectionStringBuilder(string connectionString)
+			: this()
 		{
 			ConnectionString = connectionString;
 		}
@@ -281,14 +282,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Private methods
 
-		private int GetInt32(string keyword)
+		private int GetInt32(string keyword, int defaultValue)
 		{
-			return Convert.ToInt32(this[GetKey(keyword)]);
+			object value;
+			return TryGetValue(GetKey(keyword), out value)
+				? Convert.ToInt32(value)
+				: defaultValue;
 		}
 
-		private FbServerType GetServerType(string keyword)
+		private FbServerType GetServerType(string keyword, FbServerType defaultValue)
 		{
-			object value = this[GetKey(keyword)];
+			object value;
+			if (!TryGetValue(GetKey(keyword), out value))
+				return defaultValue;
 
 			if (value is FbServerType)
 			{
@@ -296,7 +302,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			else if (value is string)
 			{
-				switch (value.ToString())
+				switch ((string)value)
 				{
 					case "Default":
 						return FbServerType.Default;
@@ -306,17 +312,32 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
-			return (FbServerType)GetInt32(keyword);
+			return (FbServerType)GetInt32(keyword, (int)defaultValue);
 		}
 
-		private string GetString(string keyword)
+		private IsolationLevel GetIsolationLevel(string keyword, IsolationLevel defaultValue)
 		{
-			return Convert.ToString(this[GetKey(keyword)]);
+			object value;
+			if (!TryGetValue(GetKey(keyword), out value))
+				return defaultValue;
+
+			return (IsolationLevel)GetInt32(keyword, (int)defaultValue);
 		}
 
-		private bool GetBoolean(string keyword)
+		private string GetString(string keyword, string defaultValue)
 		{
-			return Convert.ToBoolean(this[GetKey(keyword)]);
+			object value;
+			return TryGetValue(GetKey(keyword), out value)
+				? Convert.ToString(value)
+				: defaultValue;
+		}
+
+		private bool GetBoolean(string keyword, bool defaultValue)
+		{
+			object value;
+			return TryGetValue(GetKey(keyword), out value)
+				? Convert.ToBoolean(value)
+				: defaultValue;
 		}
 
 		private void SetValue<T>(string keyword, T value)
@@ -326,9 +347,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetKey(string keyword)
 		{
-			string synonymKey = FbConnectionString.Synonyms[keyword];
-
-			// First check if there are yet a property for the requested keyword
+			var synonymKey = FbConnectionString.Synonyms[keyword];
 			foreach (string key in Keys)
 			{
 				if (FbConnectionString.Synonyms.ContainsKey(key) && FbConnectionString.Synonyms[key] == synonymKey)
@@ -337,7 +356,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					break;
 				}
 			}
-
 			return synonymKey;
 		}
 
