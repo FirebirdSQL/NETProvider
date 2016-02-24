@@ -43,12 +43,5 @@ namespace FirebirdSql.Data.UnitTests
 			var b = new FbConnectionStringBuilder();
 			Assert.Equals(b.MaxPoolSize, FbConnectionString.DefaultValueMaxPoolSize);
 		}
-
-		[Test]
-		public void ContainsDefaultKeys()
-		{
-			var b = new FbConnectionStringBuilder();
-			Assert.IsNotEmpty(b.Keys);
-		}
 	}
 }
