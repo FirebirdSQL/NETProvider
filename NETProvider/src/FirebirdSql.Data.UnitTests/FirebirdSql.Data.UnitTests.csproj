@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FbConnectionStringTests.cs" />
+    <Compile Include="FbConnectionStringBuilderTests.cs" />
     <Compile Include="FbExceptionTests.cs" />
     <Compile Include="TestsSetup.cs" />
     <Compile Include="TrackerIssuesTests.cs" />
