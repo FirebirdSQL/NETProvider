@@ -529,55 +529,49 @@ namespace FirebirdSql.Data.FirebirdClient
 		private string GetString(string key)
 		{
 			object value;
-			if (_options.TryGetValue(key, out value))
-				return (string)value;
-			else
-				return null;
+			return _options.TryGetValue(key, out value)
+				? (string)value
+				: null;
 		}
 
 		private bool GetBoolean(string key)
 		{
 			object value;
-			if (_options.TryGetValue(key, out value))
-				return Boolean.Parse(value.ToString());
-			else
-				return false;
+			return _options.TryGetValue(key, out value)
+				? bool.Parse(value.ToString())
+				: false;
 		}
 
 		private byte GetByte(string key)
 		{
 			object value;
-			if (_options.TryGetValue(key, out value))
-				return Convert.ToByte(value, CultureInfo.CurrentCulture);
-			else
-				return 0;
+			return _options.TryGetValue(key, out value)
+				? Convert.ToByte(value, CultureInfo.CurrentCulture)
+				: (byte)0;
 		}
 
 		private short GetInt16(string key)
 		{
 			object value;
-			if (_options.TryGetValue(key, out value))
-				return Convert.ToInt16(value, CultureInfo.InvariantCulture);
-			else
-				return 0;
+			return _options.TryGetValue(key, out value)
+				? Convert.ToInt16(value, CultureInfo.InvariantCulture)
+				: (short)0;
 		}
 
 		private int GetInt32(string key)
 		{
 			object value;
-			if (_options.TryGetValue(key, out value))
-				return Convert.ToInt32(value, CultureInfo.InvariantCulture);
-			else
-				return 0;
+			return _options.TryGetValue(key, out value)
+				? Convert.ToInt32(value, CultureInfo.InvariantCulture)
+				: 0;
 		}
 
 		private long GetInt64(string key)
 		{
 			object value;
-			if (_options.TryGetValue(key, out value))
-				return Convert.ToInt64(value, CultureInfo.InvariantCulture);
-			else
-				return 0;
+			return _options.TryGetValue(key, out value)
+				? Convert.ToInt64(value, CultureInfo.InvariantCulture)
+				: 0;
 		}
 
 		private IsolationLevel GetIsolationLevel(string key)
