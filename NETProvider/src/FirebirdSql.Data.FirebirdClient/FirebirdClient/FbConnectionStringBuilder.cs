@@ -326,12 +326,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetKey(string keyword)
 		{
-			string synonymKey = (string)FbConnectionString.Synonyms[keyword];
+			string synonymKey = FbConnectionString.Synonyms[keyword];
 
 			// First check if there are yet a property for the requested keyword
 			foreach (string key in Keys)
 			{
-				if (FbConnectionString.Synonyms.ContainsKey(key) && (string)FbConnectionString.Synonyms[key] == synonymKey)
+				if (FbConnectionString.Synonyms.ContainsKey(key) && FbConnectionString.Synonyms[key] == synonymKey)
 				{
 					synonymKey = key;
 					break;
