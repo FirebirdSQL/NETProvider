@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void NoValueProvidedReturnsDefault()
 		{
 			var b = new FbConnectionStringBuilder();
-			Assert.Equals(b.MaxPoolSize, FbConnectionString.DefaultValueMaxPoolSize);
+			Assert.AreEqual(b.MaxPoolSize, FbConnectionString.DefaultValueMaxPoolSize);
 		}
 	}
 }
