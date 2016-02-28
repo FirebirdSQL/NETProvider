@@ -20,8 +20,9 @@ before_test:
   - ps: $testsDir = "$sourceDir\NETProvider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
   - ps: mkdir C:\firebird | Out-Null ; cd C:\firebird
   - ps: Start-FileDownload "$env:fb_download" | Out-Null
-  - ps: 7z x server.7z
+  - ps: 7z x ($env:fb_download -replace '.+/([^/]+)\?dl=1','$1')
   - ps: $env:fb_start
+
   - ps: cd $testsDir
   - ps: Start-FileDownload "https://www.dropbox.com/s/qcgkjk14bn9h8p7/embedded.7z?dl=1" | Out-Null
   - ps: 7z x embedded.7z
