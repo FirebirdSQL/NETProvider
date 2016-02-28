@@ -641,7 +641,7 @@ namespace FirebirdSql.Data.UnitTests
 			const int ColumnValue = 1234;
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
-				cmd.CommandText = string.Format("update TEST set int_field = '{0}' returning int_field", ColumnValue);
+				cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
 				cmd.ExecuteNonQuery();
 				Assert.AreEqual(ColumnValue, cmd.Parameters[0].Value);
