@@ -3,6 +3,13 @@ configuration:
   - Debug
   - Release_40
   - Release_45
+environment:
+  matrix:
+  - fb_download: https://www.dropbox.com/s/y5j3k15gngs8zm1/server.7z?dl=1
+    fb_start: .\bin\fb_inet_server.exe -a -m
+
+  - fb_download: https://www.dropbox.com/s/y5j3k15gngs8zm1/server.7z?dl=1
+    fb_start: .\bin\fb_inet_server.exe -a
 shallow_clone: true
 build:
   project: NETProvider\src\NETProvider.sln
@@ -12,9 +19,9 @@ before_test:
   - ps: $sourceDir = Resolve-Path .
   - ps: $testsDir = "$sourceDir\NETProvider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
   - ps: mkdir C:\firebird | Out-Null ; cd C:\firebird
-  - ps: Start-FileDownload "https://www.dropbox.com/s/y5j3k15gngs8zm1/server.7z?dl=1" | Out-Null
+  - ps: Start-FileDownload "$env:fb_download" | Out-Null
   - ps: 7z x server.7z
-  - ps: .\bin\fb_inet_server.exe -a -m
+  - ps: $env:fb_start
   - ps: cd $testsDir
   - ps: Start-FileDownload "https://www.dropbox.com/s/qcgkjk14bn9h8p7/embedded.7z?dl=1" | Out-Null
   - ps: 7z x embedded.7z
