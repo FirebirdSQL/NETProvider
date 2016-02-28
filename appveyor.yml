@@ -18,6 +18,7 @@ build:
 before_test:
   - ps: $sourceDir = Resolve-Path .
   - ps: $testsDir = "$sourceDir\NETProvider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
+
   - ps: mkdir C:\firebird | Out-Null
   - ps: cd C:\firebird
   - ps: Start-FileDownload "$env:fb_download" | Out-Null
@@ -26,6 +27,7 @@ before_test:
   - ps: mv .\server\* .
   - ps: rmdir .\embedded
   - ps: rmdir .\server
+
   - ps: iex $env:fb_start
   - ps: ni firebird.log -ItemType File | Out-Null
 test_script:
