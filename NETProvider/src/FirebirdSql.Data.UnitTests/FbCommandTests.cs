@@ -643,14 +643,13 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ReturningClauseTest()
 		{
+			const int ColumnValue = 1234;
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
-				const string columnValue = "foobar";
-
-				cmd.CommandText = string.Format("update rdb$database set rdb$description = '{0}' returning rdb$description", columnValue);
+				cmd.CommandText = string.Format("update TEST set int_field = '{0}' returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
 				cmd.ExecuteNonQuery();
-				Assert.AreEqual(columnValue, cmd.Parameters[0].Value);
+				Assert.AreEqual(ColumnValue, cmd.Parameters[0].Value);
 			}
 		}
 
