@@ -5,10 +5,10 @@ configuration:
   - Release_45
 environment:
   matrix:
-  - fb_download: https://www.dropbox.com/s/y5j3k15gngs8zm1/server.7z?dl=1
+  - fb_download: https://www.dropbox.com/s/i9h93c813nrvt26/fb25.7z?dl=1
     fb_start: .\bin\fb_inet_server.exe -a -m
 
-  - fb_download: https://www.dropbox.com/s/y5j3k15gngs8zm1/server.7z?dl=1
+  - fb_download: https://www.dropbox.com/s/i9h93c813nrvt26/fb25.7z?dl=1
     fb_start: .\bin\fb_inet_server.exe -a
 shallow_clone: true
 build:
@@ -18,14 +18,15 @@ build:
 before_test:
   - ps: $sourceDir = Resolve-Path .
   - ps: $testsDir = "$sourceDir\NETProvider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
-  - ps: mkdir C:\firebird | Out-Null ; cd C:\firebird
+  - ps: mkdir C:\firebird | Out-Null
+  - ps: cd C:\firebird
   - ps: Start-FileDownload "$env:fb_download" | Out-Null
   - ps: 7z x ($env:fb_download -replace '.+/([^/]+)\?dl=1','$1')
+  - ps: mv .\embedded\* $testsDir
+  - ps: mv .\server\* .
+  - ps: rmdir .\embedded
+  - ps: rmdir .\server
   - ps: $env:fb_start
-
-  - ps: cd $testsDir
-  - ps: Start-FileDownload "https://www.dropbox.com/s/qcgkjk14bn9h8p7/embedded.7z?dl=1" | Out-Null
-  - ps: 7z x embedded.7z
 test_script:
   - ps: cd $testsDir
   - ps: nunit3-console FirebirdSql.Data.UnitTests.dll --framework=net-4.0 --where="cat != Local" --result="myresults.xml;format=AppVeyor"
