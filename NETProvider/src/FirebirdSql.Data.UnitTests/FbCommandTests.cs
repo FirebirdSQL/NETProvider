@@ -403,51 +403,46 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void SimplifiedChineseTest()
 		{
+			const string Value = "中文";
 			try
 			{
-				string createTable = "CREATE TABLE TABLE1 (FIELD1 varchar(20))";
-				FbCommand create = new FbCommand(createTable, Connection);
-				create.ExecuteNonQuery();
-				create.Dispose();
+				using (var cmd = new FbCommand("CREATE TABLE TABLE1 (FIELD1 varchar(20))", Connection))
+				{
+					cmd.ExecuteNonQuery();
+				}
 
-				// insert using	parametrized SQL
-				string sql = "INSERT INTO Table1 VALUES	(@value)";
-				FbCommand command = new FbCommand(sql, Connection);
-				command.Parameters.Add("@value", FbDbType.VarChar).Value = "中文";
-				command.ExecuteNonQuery();
-				command.Dispose();
+				using (var cmd = new FbCommand("INSERT INTO TABLE1 VALUES (@value)", Connection))
+				{
+					cmd.Parameters.Add("@value", FbDbType.VarChar).Value = Value;
+					cmd.ExecuteNonQuery();
+				}
+				using (var cmd = new FbCommand("SELECT * FROM TABLE1", Connection))
+				{
+					var result = cmd.ExecuteScalar().ToString();
+					Assert.AreEqual(Value, result, "Incorrect results in parametrized insert");
+				}
 
-				sql = "SELECT *	FROM TABLE1";
-				FbCommand select = new FbCommand(sql, Connection);
-				string result = select.ExecuteScalar().ToString();
-				select.Dispose();
+				using (var cmd = new FbCommand("DELETE FROM TABLE1", Connection))
+				{
+					cmd.ExecuteNonQuery();
+				}
 
-				Assert.AreEqual("中文", result, "Incorrect results in parametrized insert");
-
-				sql = "DELETE FROM TABLE1";
-				FbCommand delete = new FbCommand(sql, Connection);
-				delete.ExecuteNonQuery();
-				delete.Dispose();
-
-				// insert using	plain SQL
-				sql = "INSERT INTO Table1 VALUES ('中文')";
-				FbCommand plainCommand = new FbCommand(sql, Connection);
-				plainCommand.ExecuteNonQuery();
-				plainCommand.Dispose();
-
-				sql = "SELECT *	FROM TABLE1";
-				select = new FbCommand(sql, Connection);
-				result = select.ExecuteScalar().ToString();
-				select.Dispose();
-
-				Assert.AreEqual("中文", result, "Incorrect results in plain insert");
+				using (var cmd = new FbCommand($"INSERT INTO TABLE1 VALUES ('{Value}')", Connection))
+				{
+					cmd.ExecuteNonQuery();
+				}
+				using (var cmd = new FbCommand("SELECT * FROM TABLE1", Connection))
+				{
+					var result = cmd.ExecuteScalar().ToString();
+					Assert.AreEqual(Value, result, "Incorrect results in plain insert");
+				}
 			}
 			finally
 			{
-				string dropTable = "DROP TABLE TABLE1";
-				FbCommand drop = new FbCommand(dropTable, Connection);
-				drop.ExecuteNonQuery();
-				drop.Dispose();
+				using (var cmd = new FbCommand("DROP TABLE TABLE1", Connection))
+				{
+					cmd.ExecuteNonQuery();
+				}
 			}
 		}
 
