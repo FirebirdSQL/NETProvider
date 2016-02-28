@@ -54,29 +54,6 @@ namespace FirebirdSql.Data.UnitTests
 
 			Assert.AreEqual(100, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			Console.WriteLine();
-			Console.WriteLine("DataAdapter - Fill Method - Test");
-
-			foreach (DataTable table in ds.Tables)
-			{
-				foreach (DataColumn col in table.Columns)
-				{
-					Console.Write(col.ColumnName + "\t\t");
-				}
-
-				Console.WriteLine();
-
-				foreach (DataRow row in table.Rows)
-				{
-					for (int i = 0; i < table.Columns.Count; i++)
-					{
-						Console.Write(row[i] + "\t\t");
-					}
-
-					Console.WriteLine("");
-				}
-			}
-
 			adapter.Dispose();
 			builder.Dispose();
 			command.Dispose();
