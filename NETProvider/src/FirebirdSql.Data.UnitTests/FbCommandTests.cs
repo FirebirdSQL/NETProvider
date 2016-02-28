@@ -373,23 +373,24 @@ namespace FirebirdSql.Data.UnitTests
 
 				foreach (string statement in l)
 				{
-					FbCommand insert = new FbCommand(statement, Connection);
-					insert.ExecuteNonQuery();
-					insert.Dispose();
+					using (FbCommand insert = new FbCommand(statement, Connection))
+					{
+						insert.ExecuteNonQuery();
+					}
 				}
 
 				string sql = "select * from	varchartest";
 
-				FbCommand cmd = new FbCommand(sql, Connection);
-				FbDataReader r = cmd.ExecuteReader();
-
-				while (r.Read())
+				using (FbCommand cmd = new FbCommand(sql, Connection))
 				{
-					Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
+					using (FbDataReader r = cmd.ExecuteReader())
+					{
+						while (r.Read())
+						{
+							Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
+						}
+					}
 				}
-
-				r.Close();
-				cmd.Dispose();
 			}
 			finally
 			{
