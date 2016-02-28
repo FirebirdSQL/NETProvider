@@ -57,10 +57,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public static void CreateDatabase(string connectionString, bool overwrite)
 		{
-			FbConnection.CreateDatabase(connectionString, overwrite: overwrite);
+			CreateDatabaseImpl(connectionString, overwrite: overwrite);
 		}
 
 		public static void CreateDatabase(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false)
+		{
+			CreateDatabaseImpl(connectionString, pageSize, forcedWrites, overwrite);
+		}
+
+		private static void CreateDatabaseImpl(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false)
 		{
 			FbConnectionString options = new FbConnectionString(connectionString);
 			options.Validate();
