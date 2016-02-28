@@ -26,7 +26,7 @@ before_test:
   - ps: mv .\server\* .
   - ps: rmdir .\embedded
   - ps: rmdir .\server
-  - ps: $env:fb_start
+  - ps: '& $env:fb_start'
 test_script:
   - ps: cd $testsDir
   - ps: nunit3-console FirebirdSql.Data.UnitTests.dll --framework=net-4.0 --where="cat != Local" --result="myresults.xml;format=AppVeyor"
