@@ -242,12 +242,6 @@ end";
 				cs.Database = TestsSetup.Database;
 			}
 			cs.ServerType = serverType;
-			var libEmbedded = Environment.GetEnvironmentVariable("lib_embedded");
-			if (!string.IsNullOrEmpty(libEmbedded))
-			{
-				cs.ClientLibrary = libEmbedded;
-			}
-
 			return cs.ToString();
 		}
 
@@ -263,11 +257,6 @@ end";
 			cs.Charset = TestsSetup.Charset;
 			cs.Pooling = TestsSetup.Pooling;
 			cs.ServerType = serverType;
-			var libEmbedded = Environment.GetEnvironmentVariable("lib_embedded");
-			if (!string.IsNullOrEmpty(libEmbedded))
-			{
-				cs.ClientLibrary = libEmbedded;
-			}
 			return cs;
 		}
 
