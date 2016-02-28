@@ -358,7 +358,7 @@ namespace FirebirdSql.Data.UnitTests
 			using (FbCommand cmd = conn.CreateCommand())
 			{
 				cmd.CommandText = "select count(*) from log where text = 'on connect'";
-				return (int)cmd.ExecuteScalar();
+				return Convert.ToInt32(cmd.ExecuteScalar());
 			}
 		}
 
