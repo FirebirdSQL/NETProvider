@@ -71,9 +71,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			DataTable columns = Connection.GetSchema("Columns");
 
-			columns = Connection.GetSchema(
-							"Columns",
-							new string[] { null, null, "TEST", "INT_FIELD" });
+			columns = Connection.GetSchema("Columns", new string[] { null, null, "TEST", "INT_FIELD" });
 
 			Assert.AreEqual(1, columns.Rows.Count);
 		}
