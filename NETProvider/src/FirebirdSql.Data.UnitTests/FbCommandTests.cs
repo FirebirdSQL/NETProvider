@@ -417,25 +417,20 @@ namespace FirebirdSql.Data.UnitTests
 					cmd.Parameters.Add("@value", FbDbType.VarChar).Value = Value;
 					cmd.ExecuteNonQuery();
 				}
-				using (var cmd = new FbCommand("SELECT * FROM TABLE1", Connection))
-				{
-					var result = cmd.ExecuteScalar().ToString();
-					Assert.AreEqual(Value, result, "Incorrect results in parametrized insert");
-				}
-
-				using (var cmd = new FbCommand("DELETE FROM TABLE1", Connection))
-				{
-					cmd.ExecuteNonQuery();
-				}
-
 				using (var cmd = new FbCommand($"INSERT INTO TABLE1 VALUES ('{Value}')", Connection))
 				{
 					cmd.ExecuteNonQuery();
 				}
+
 				using (var cmd = new FbCommand("SELECT * FROM TABLE1", Connection))
 				{
-					var result = cmd.ExecuteScalar().ToString();
-					Assert.AreEqual(Value, result, "Incorrect results in plain insert");
+					using (var reader = cmd.ExecuteReader())
+					{
+						while (reader.Read())
+						{
+							Assert.AreEqual(Value, reader[0]);
+						}
+					}
 				}
 			}
 			finally
