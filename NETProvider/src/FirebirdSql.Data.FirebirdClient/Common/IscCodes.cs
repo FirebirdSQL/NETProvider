@@ -900,30 +900,6 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region DSC Types
-
-		public const int DSC_null = 1;
-		public const int dtype_text = 1;
-		public const int dtype_cstring = 2;
-		public const int dtype_varying = 3;
-		public const int dtype_packed = 6;
-		public const int dtype_byte = 7;
-		public const int dtype_short = 8;
-		public const int dtype_long = 9;
-		public const int dtype_quad = 10;
-		public const int dtype_real = 11;
-		public const int dtype_double = 12;
-		public const int dtype_d_float = 13;
-		public const int dtype_sql_date = 14;
-		public const int dtype_sql_time = 15;
-		public const int dtype_timestamp = 16;
-		public const int dtype_blob = 17;
-		public const int dtype_array = 18;
-		public const int dtype_int64 = 19;
-		public const int DTYPE_TYPE_MAX = 20;
-
-		#endregion
-
 		#region Cancel types
 		public const int fb_cancel_disable = 1;
 		public const int fb_cancel_enable = 2;
