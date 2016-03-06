@@ -21,7 +21,6 @@
 
 using System;
 using System.Data;
-using System.Globalization;
 
 namespace FirebirdSql.Data.Common
 {
@@ -345,7 +344,7 @@ namespace FirebirdSql.Data.Common
 					return "TIMESTAMP";
 
 				default:
-					return null;
+					throw new ArgumentException("Invalid data type");
 			}
 		}
 
@@ -394,7 +393,7 @@ namespace FirebirdSql.Data.Common
 					return "System.TimeSpan";
 
 				default:
-					return null;
+					throw new ArgumentException("Invalid data type");
 			}
 		}
 
