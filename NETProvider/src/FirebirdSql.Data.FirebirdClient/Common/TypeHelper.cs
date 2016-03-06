@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Common
 
 		public static bool IsDBNull(object value)
 		{
-			return (value == null || value == System.DBNull.Value);
+			return (value == null || value == DBNull.Value);
 		}
 
 		public static short GetSize(DbDataType dataType)
