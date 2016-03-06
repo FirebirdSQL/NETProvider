@@ -870,6 +870,7 @@ namespace FirebirdSql.Data.Common
 		public const int blr_blob_id = 45;
 		public const int blr_sql_date = 12;
 		public const int blr_sql_time = 13;
+		public const int blr_bool = 23;
 
 		public const int blr_null = 45;
 
@@ -891,6 +892,7 @@ namespace FirebirdSql.Data.Common
 		public const int SQL_TYPE_TIME = 560;
 		public const int SQL_TYPE_DATE = 570;
 		public const int SQL_INT64 = 580;
+		public const int SQL_BOOLEAN = 32764;
 		public const int SQL_NULL = 32766;
 
 		// Historical alias	for	pre	V6 applications
