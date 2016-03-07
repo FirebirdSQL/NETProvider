@@ -42,7 +42,6 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.Text:
 					return 8;
 
-				case DbDataType.Boolean:
 				case DbDataType.SmallInt:
 					return 2;
 
@@ -59,6 +58,9 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.Guid:
 					return 16;
+
+				case DbDataType.Boolean:
+					return 1;
 
 				default:
 					throw new ArgumentException("Invalid data type");
@@ -88,7 +90,6 @@ namespace FirebirdSql.Data.Common
 					sqltype = IscCodes.SQL_VARYING;
 					break;
 
-				case DbDataType.Boolean:
 				case DbDataType.SmallInt:
 					sqltype = IscCodes.SQL_SHORT;
 					break;
@@ -123,6 +124,10 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.TimeStamp:
 					sqltype = IscCodes.SQL_TIMESTAMP;
+					break;
+
+				case DbDataType.Boolean:
+					sqltype = IscCodes.SQL_BOOLEAN;
 					break;
 
 				default:
@@ -184,6 +189,9 @@ namespace FirebirdSql.Data.Common
 
 				case IscCodes.blr_blob:
 					return IscCodes.SQL_BLOB;
+
+				case IscCodes.blr_bool:
+					return IscCodes.SQL_BOOLEAN;
 
 				default:
 					throw new ArgumentException("Invalid data type");
@@ -288,6 +296,9 @@ namespace FirebirdSql.Data.Common
 						return DbDataType.Binary;
 					}
 
+				case IscCodes.blr_bool:
+					return DbDataType.Boolean;
+
 				default:
 					throw new ArgumentException("Invalid data type");
 			}
@@ -343,6 +354,9 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.TimeStamp:
 					return "TIMESTAMP";
 
+				case DbDataType.Boolean:
+					return "BOOLEAN";
+
 				default:
 					throw new ArgumentException("Invalid data type");
 			}
@@ -391,6 +405,9 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.Time:
 					return "System.TimeSpan";
+
+				case DbDataType.Boolean:
+					return "System.Boolean";
 
 				default:
 					throw new ArgumentException("Invalid data type");
@@ -461,7 +478,6 @@ namespace FirebirdSql.Data.Common
 				case DbType.AnsiStringFixedLength:
 					return DbDataType.Char;
 
-				case DbType.Boolean:
 				case DbType.Byte:
 				case DbType.SByte:
 				case DbType.Int16:
@@ -500,6 +516,9 @@ namespace FirebirdSql.Data.Common
 
 				case DbType.Guid:
 					return DbDataType.Guid;
+
+				case DbType.Boolean:
+					return DbDataType.Boolean;
 
 				default:
 					throw new ArgumentException("Invalid data type");
