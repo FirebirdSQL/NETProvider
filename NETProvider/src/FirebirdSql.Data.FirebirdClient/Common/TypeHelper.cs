@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.Common
 					return 16;
 
 				default:
-					return 0;
+					throw new ArgumentException("Invalid data type");
 			}
 		}
 
