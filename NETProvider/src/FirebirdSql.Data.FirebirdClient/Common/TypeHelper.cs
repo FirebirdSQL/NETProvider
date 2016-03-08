@@ -21,6 +21,7 @@
 
 using System;
 using System.Data;
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Common
 {
@@ -31,9 +32,9 @@ namespace FirebirdSql.Data.Common
 			return value == null || value == DBNull.Value;
 		}
 
-		public static short GetSize(DbDataType dataType)
+		public static short GetSize(DbDataType type)
 		{
-			switch (dataType)
+			switch (type)
 			{
 				case DbDataType.Array:
 				case DbDataType.Binary:
@@ -61,15 +62,15 @@ namespace FirebirdSql.Data.Common
 					return 1;
 
 				default:
-					throw InvalidDataType((int)dataType);
+					throw InvalidDataType((int)type);
 			}
 		}
 
-		public static int GetFbType(DbDataType dataType, bool isNullable)
+		public static int GetSqlTypeFromDbDataType(DbDataType type, bool isNullable)
 		{
 			int sqltype = 0;
 
-			switch (dataType)
+			switch (type)
 			{
 				case DbDataType.Array:
 					sqltype = IscCodes.SQL_ARRAY;
@@ -129,7 +130,7 @@ namespace FirebirdSql.Data.Common
 					break;
 
 				default:
-					throw InvalidDataType((int)dataType);
+					throw InvalidDataType((int)type);
 			}
 
 			if (isNullable)
@@ -140,9 +141,9 @@ namespace FirebirdSql.Data.Common
 			return sqltype;
 		}
 
-		public static int GetFbType(int blrType)
+		public static int GetSqlTypeFromBlrType(int type)
 		{
-			switch (blrType)
+			switch (type)
 			{
 				case IscCodes.blr_varying:
 				case IscCodes.blr_varying2:
@@ -192,13 +193,13 @@ namespace FirebirdSql.Data.Common
 					return IscCodes.SQL_BOOLEAN;
 
 				default:
-					throw InvalidDataType(blrType);
+					throw InvalidDataType(type);
 			}
 		}
 
-		public static string GetDataTypeName(DbDataType dataType)
+		public static string GetDataTypeName(DbDataType type)
 		{
-			switch (dataType)
+			switch (type)
 			{
 				case DbDataType.Array:
 					return "ARRAY";
@@ -250,13 +251,13 @@ namespace FirebirdSql.Data.Common
 					return "BOOLEAN";
 
 				default:
-					throw InvalidDataType((int)dataType);
+					throw InvalidDataType((int)type);
 			}
 		}
 
-		public static Type GetTypeFromDbDataType(DbDataType dataType)
+		public static Type GetTypeFromDbDataType(DbDataType type)
 		{
-			switch (dataType)
+			switch (type)
 			{
 				case DbDataType.Array:
 					return typeof(System.Array);
@@ -302,13 +303,13 @@ namespace FirebirdSql.Data.Common
 					return typeof(System.Boolean);
 
 				default:
-					throw InvalidDataType((int)dataType);
+					throw InvalidDataType((int)type);
 			}
 		}
 
-		public static Type GetTypeFromBlrType(int blrType, int subType, int scale)
+		public static Type GetTypeFromBlrType(int type, int subType, int scale)
 		{
-			return GetTypeFromDbDataType(GetDbDataTypeFromBlrType(blrType, subType, scale));
+			return GetTypeFromDbDataType(GetDbDataTypeFromBlrType(type, subType, scale));
 		}
 
 		public static DbType GetDbTypeFromDbDataType(DbDataType type)
@@ -363,9 +364,9 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public static DbDataType GetDbDataTypeFromDbType(DbType dbType)
+		public static DbDataType GetDbDataTypeFromDbType(DbType type)
 		{
-			switch (dbType)
+			switch (type)
 			{
 				case DbType.String:
 				case DbType.AnsiString:
@@ -418,24 +419,24 @@ namespace FirebirdSql.Data.Common
 					return DbDataType.Boolean;
 
 				default:
-					throw InvalidDataType((int)dbType);
+					throw InvalidDataType((int)type);
 			}
 		}
 
-		public static DbDataType GetDbDataTypeFromBlrType(int blrType, int subType, int scale)
+		public static DbDataType GetDbDataTypeFromBlrType(int type, int subType, int scale)
 		{
-			return GetDbDataTypeFromSqlType(GetFbType(blrType), subType, scale);
+			return GetDbDataTypeFromSqlType(GetSqlTypeFromBlrType(type), subType, scale);
 		}
 
-		public static DbDataType GetDbDataTypeFromSqlType(int sqlType, int subType, int scale, int? length = null, Charset charset = null)
+		public static DbDataType GetDbDataTypeFromSqlType(int type, int subType, int scale, int? length = null, Charset charset = null)
 		{
 			// Special case for Guid handling
-			if (sqlType == IscCodes.SQL_TEXT && length == 16 && (charset?.Name.Equals("OCTETS", StringComparison.InvariantCultureIgnoreCase) ?? false))
+			if (type == IscCodes.SQL_TEXT && length == 16 && (charset?.Name.Equals("OCTETS", StringComparison.InvariantCultureIgnoreCase) ?? false))
 			{
 				return DbDataType.Guid;
 			}
 
-			switch (sqlType)
+			switch (type)
 			{
 				case IscCodes.SQL_TEXT:
 					return DbDataType.Char;
@@ -549,8 +550,14 @@ namespace FirebirdSql.Data.Common
 					return DbDataType.Boolean;
 
 				default:
-					throw InvalidDataType(sqlType);
+					throw InvalidDataType(type);
 			}
+		}
+
+		public static DbDataType GetDbDataTypeFromFbDbType(FbDbType type)
+		{
+			// these are aligned for this conversion
+			return (DbDataType)type;
 		}
 
 		public static TimeSpan DateTimeToTimeSpan(DateTime d)

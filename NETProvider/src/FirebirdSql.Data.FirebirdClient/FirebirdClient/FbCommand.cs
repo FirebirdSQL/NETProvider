@@ -937,7 +937,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 
 			// Set parameter Data Type
-			descriptor[index].DataType = (short)TypeHelper.GetFbType((DbDataType)type, parameter.IsNullable);
+			descriptor[index].DataType = (short)TypeHelper.GetSqlTypeFromDbDataType(TypeHelper.GetDbDataTypeFromFbDbType(type), parameter.IsNullable);
 
 			// Set parameter Sub Type
 			switch (type)

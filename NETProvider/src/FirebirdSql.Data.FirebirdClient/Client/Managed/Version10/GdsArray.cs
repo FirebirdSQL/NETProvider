@@ -185,7 +185,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			tempData = Array.CreateInstance(systemType, sliceData.Length);
 
 			// Infer Firebird and Db datatypes
-			type	= TypeHelper.GetFbType(Descriptor.DataType);
+			type	= TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType	= TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
 			// Decode slice	data
@@ -340,7 +340,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			int         subType = (Descriptor.Scale < 0) ? 2 : 0;
 			int			type	= 0;
 
-			type = TypeHelper.GetFbType(Descriptor.DataType);
+			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
 			foreach (object source in sourceArray)
