@@ -367,6 +367,11 @@ namespace FirebirdSql.Data.Client.Managed
 			return value;
 		}
 
+		public bool ReadBoolean()
+		{
+			return BitConverter.ToBoolean(ReadBytes(4), 0);
+		}
+
 		public object ReadValue(DbField field)
 		{
 			object fieldValue = null;
@@ -448,6 +453,10 @@ namespace FirebirdSql.Data.Client.Managed
 
 				case DbDataType.TimeStamp:
 					fieldValue = ReadDateTime();
+					break;
+
+				case DbDataType.Boolean:
+					fieldValue = ReadBoolean();
 					break;
 			}
 
