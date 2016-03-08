@@ -266,6 +266,8 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 				case IscCodes.SQL_TIMESTAMP:
 				case IscCodes.SQL_TYPE_TIME:
 				case IscCodes.SQL_TYPE_DATE:
+#warning Test it later
+				case IscCodes.SQL_BOOLEAN:
 					{
 						var buffer = new byte[xsqlvar.sqllen];
 						Marshal.Copy(xsqlvar.sqldata, buffer, 0, buffer.Length);
