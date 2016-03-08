@@ -157,7 +157,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (value == null)
 				{
-					value = System.DBNull.Value;
+					value = DBNull.Value;
 				}
 
 				if (FbDbType == FbDbType.Guid && value != null &&
@@ -375,7 +375,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (value == null)
 			{
-				value = System.DBNull.Value;
+				value = DBNull.Value;
 			}
 
 			TypeCode code = Type.GetTypeCode(value.GetType());

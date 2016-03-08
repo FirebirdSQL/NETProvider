@@ -323,7 +323,7 @@ namespace FirebirdSql.Data.Common
 		{
 			if (buffer == null || NullFlag == -1)
 			{
-				Value = System.DBNull.Value;
+				Value = DBNull.Value;
 			}
 			else
 			{

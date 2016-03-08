@@ -127,13 +127,13 @@ namespace FirebirdSql.Data.Schema
 				int blrType = Convert.ToInt32(row["FIELD_TYPE"], CultureInfo.InvariantCulture);
 
 				int subType = 0;
-				if (row["COLUMN_SUB_TYPE"] != System.DBNull.Value)
+				if (row["COLUMN_SUB_TYPE"] != DBNull.Value)
 				{
 					subType = Convert.ToInt32(row["COLUMN_SUB_TYPE"], CultureInfo.InvariantCulture);
 				}
 
 				int scale = 0;
-				if (row["NUMERIC_SCALE"] != System.DBNull.Value)
+				if (row["NUMERIC_SCALE"] != DBNull.Value)
 				{
 					scale = Convert.ToInt32(row["NUMERIC_SCALE"], CultureInfo.InvariantCulture);
 				}
@@ -158,13 +158,13 @@ namespace FirebirdSql.Data.Schema
 					row["CHARACTER_OCTET_LENGTH"] = 0;
 				}
 
-				if (row["NUMERIC_PRECISION"] == System.DBNull.Value)
+				if (row["NUMERIC_PRECISION"] == DBNull.Value)
 				{
 					row["NUMERIC_PRECISION"] = 0;
 				}
 
 				if ((dbType == FbDbType.Decimal || dbType == FbDbType.Numeric) &&
-					(row["NUMERIC_PRECISION"] == System.DBNull.Value || Convert.ToInt32(row["NUMERIC_PRECISION"]) == 0))
+					(row["NUMERIC_PRECISION"] == DBNull.Value || Convert.ToInt32(row["NUMERIC_PRECISION"]) == 0))
 				{
 					row["NUMERIC_PRECISION"] = row["COLUMN_SIZE"];
 				}

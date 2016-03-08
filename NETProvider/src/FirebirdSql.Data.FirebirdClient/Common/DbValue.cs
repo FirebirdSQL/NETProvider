@@ -350,7 +350,7 @@ namespace FirebirdSql.Data.Common
 		{
 			if (IsDBNull())
 			{
-				return System.DBNull.Value;
+				return DBNull.Value;
 			}
 
 			switch (_field.DbDataType)
