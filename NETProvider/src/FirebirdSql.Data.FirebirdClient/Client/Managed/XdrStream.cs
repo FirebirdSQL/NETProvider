@@ -369,7 +369,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public bool ReadBoolean()
 		{
-			return BitConverter.ToBoolean(ReadBytes(4), 0);
+			return TypeDecoder.DecodeBoolean(ReadOpaque(1)[0]);
 		}
 
 		public object ReadValue(DbField field)
@@ -602,7 +602,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void Write(bool value)
 		{
-			Write((short)(value ? 1 : 0));
+			WriteOpaque(new[] { TypeEncoder.EncodeBoolean(value) });
 		}
 
 		public void Write(DateTime value)
