@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.Client.Managed
 					xdrStream.Write(IscCodes.GenericAchitectureClient);
 
 					xdrStream.Write(database);
-					xdrStream.Write(4);                         // Protocol	versions understood
+					xdrStream.Write(4);                         // Protocol versions understood
 					xdrStream.WriteBuffer(UserIdentificationStuff());
 
 #warning Refactoring? Wrapping?
@@ -186,8 +186,8 @@ namespace FirebirdSql.Data.Client.Managed
 					var operation = xdrStream.ReadOperation();
 					if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
 					{
-						_protocolVersion = xdrStream.ReadInt32(); // Protocol	version
-						_protocolArchitecture = xdrStream.ReadInt32();    // Architecture	for	protocol
+						_protocolVersion = xdrStream.ReadInt32(); // Protocol version
+						_protocolArchitecture = xdrStream.ReadInt32();    // Architecture for protocol
 						_protocolMinimunType = xdrStream.ReadInt32();   // Minimum type
 
 						if (_protocolVersion < 0)
