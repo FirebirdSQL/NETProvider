@@ -107,25 +107,21 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-		[TestCase(true)]
-		[TestCase(false)]
-		[TestCase(null)]
-		public void SimpleSelectWithBoolConditionTest(bool? value)
+		[TestCase(false, 0)]
+		[TestCase(true, 1)]
+		[TestCase(null, 2)]
+		public void SimpleSelectWithBoolConditionTest(bool? value, int id)
 		{
 			using (var cmd = Connection.CreateCommand())
 			{
-				cmd.CommandText = $"SELECT * FROM withboolean WHERE bool = @bool";
+				cmd.CommandText = $"SELECT id FROM withboolean WHERE bool IS NOT DISTINCT FROM @bool";
 				cmd.Parameters.Add(new FbParameter("bool", value));
-				using (var reader = cmd.ExecuteReader())
-				{
-					Assert.IsTrue(reader.Read(), $"Expected a row for value {value}.");
-					Assert.IsFalse(reader.Read(), "Did not expect a second row.");
-				}
+				Assert.AreEqual(id, cmd.ExecuteScalar());
 			}
 		}
 
-		[TestCase(3, true)]
-		[TestCase(4, false)]
+		[TestCase(3, false)]
+		[TestCase(4, true)]
 		[TestCase(5, null)]
 		public void ParametrizedInsertTest(int id, bool? value)
 		{
@@ -140,7 +136,7 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				cmd.CommandText = $"SELECT bool FROM withboolean WHERE id = @id";
 				cmd.Parameters.Add("id", id);
-				Assert.AreEqual(value, cmd.ExecuteScalar());
+				Assert.AreEqual(value ?? (object)DBNull.Value, cmd.ExecuteScalar());
 			}
 		}
 	}
