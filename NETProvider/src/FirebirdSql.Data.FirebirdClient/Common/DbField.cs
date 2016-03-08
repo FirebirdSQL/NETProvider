@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Common
 
 		public DbDataType DbDataType
 		{
-			get { return GetDbDataType(); }
+			get { return TypeHelper.GetDbDataTypeFromSqlType(SqlType, SubType, NumericScale, Length, Charset); }
 		}
 
 		public int SqlType
@@ -149,14 +149,12 @@ namespace FirebirdSql.Data.Common
 			get
 			{
 				EnsureArray();
-
 				return _arrayHandle;
 			}
 
 			set
 			{
 				EnsureArray();
-
 				_arrayHandle = value;
 			}
 		}
@@ -289,11 +287,6 @@ namespace FirebirdSql.Data.Common
 		{
 			return (Name != Alias) ? true : false;
 		}
-
-		//public bool IsExpression()
-		//{
-		//    return this.Name.Length == 0 ? true : false;
-		//}
 
 		public int GetSize()
 		{
@@ -491,7 +484,7 @@ namespace FirebirdSql.Data.Common
 
 		public Type GetSystemType()
 		{
-			return Type.GetType(TypeHelper.GetSystemDataTypeName(DbDataType), true);
+			return TypeHelper.GetSystemDataType(DbDataType);
 		}
 
 		public bool HasDataType()
@@ -502,130 +495,6 @@ namespace FirebirdSql.Data.Common
 		#endregion
 
 		#region Private Methods
-
-		private DbDataType GetDbDataType()
-		{
-			// Special case for Guid handling
-			if (SqlType == IscCodes.SQL_TEXT && Length == 16 &&
-				(Charset != null && Charset.Name.Equals("OCTETS", StringComparison.InvariantCultureIgnoreCase)))
-			{
-				return DbDataType.Guid;
-			}
-
-			switch (SqlType)
-			{
-				case IscCodes.SQL_TEXT:
-					return DbDataType.Char;
-
-				case IscCodes.SQL_VARYING:
-					return DbDataType.VarChar;
-
-				case IscCodes.SQL_SHORT:
-					if (SubType == 2)
-					{
-						return DbDataType.Decimal;
-					}
-					else if (SubType == 1)
-					{
-						return DbDataType.Numeric;
-					}
-					else if (NumericScale < 0)
-					{
-						return DbDataType.Decimal;
-					}
-					else
-					{
-						return DbDataType.SmallInt;
-					}
-
-				case IscCodes.SQL_LONG:
-					if (SubType == 2)
-					{
-						return DbDataType.Decimal;
-					}
-					else if (SubType == 1)
-					{
-						return DbDataType.Numeric;
-					}
-					else if (NumericScale < 0)
-					{
-						return DbDataType.Decimal;
-					}
-					else
-					{
-						return DbDataType.Integer;
-					}
-
-				case IscCodes.SQL_QUAD:
-				case IscCodes.SQL_INT64:
-					if (SubType == 2)
-					{
-						return DbDataType.Decimal;
-					}
-					else if (SubType == 1)
-					{
-						return DbDataType.Numeric;
-					}
-					else if (NumericScale < 0)
-					{
-						return DbDataType.Decimal;
-					}
-					else
-					{
-						return DbDataType.BigInt;
-					}
-
-				case IscCodes.SQL_FLOAT:
-					return DbDataType.Float;
-
-				case IscCodes.SQL_DOUBLE:
-				case IscCodes.SQL_D_FLOAT:
-					if (SubType == 2)
-					{
-						return DbDataType.Decimal;
-					}
-					else if (SubType == 1)
-					{
-						return DbDataType.Numeric;
-					}
-					else if (NumericScale < 0)
-					{
-						return DbDataType.Decimal;
-					}
-					else
-					{
-						return DbDataType.Double;
-					}
-
-				case IscCodes.SQL_BLOB:
-					if (_subType == 1)
-					{
-						return DbDataType.Text;
-					}
-					else
-					{
-						return DbDataType.Binary;
-					}
-
-				case IscCodes.SQL_TIMESTAMP:
-					return DbDataType.TimeStamp;
-
-				case IscCodes.SQL_TYPE_TIME:
-					return DbDataType.Time;
-
-				case IscCodes.SQL_TYPE_DATE:
-					return DbDataType.Date;
-
-				case IscCodes.SQL_ARRAY:
-					return DbDataType.Array;
-
-				case IscCodes.SQL_NULL:
-					return DbDataType.Null;
-
-				default:
-					throw new SystemException("Invalid data type");
-			}
-		}
 
 		private void EnsureArray()
 		{

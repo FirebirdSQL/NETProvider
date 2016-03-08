@@ -213,7 +213,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			// Infer data types
 			type = TypeHelper.GetFbType(Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(Descriptor.DataType, 0, Descriptor.Scale);
+			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
 			int itemLength = Descriptor.Length;
 
@@ -361,7 +361,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			// Infer data types
 			type = TypeHelper.GetFbType(Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(Descriptor.DataType, subType, Descriptor.Scale);
+			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
 			foreach (object source in sourceArray)
 			{

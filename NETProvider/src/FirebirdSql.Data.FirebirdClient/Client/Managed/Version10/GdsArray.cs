@@ -186,7 +186,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			// Infer Firebird and Db datatypes
 			type	= TypeHelper.GetFbType(Descriptor.DataType);
-			dbType	= TypeHelper.GetDbDataType(Descriptor.DataType, 0, Descriptor.Scale);
+			dbType	= TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
 			// Decode slice	data
 			XdrStream xdr = new XdrStream(slice, _database.Charset);
@@ -341,7 +341,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			int			type	= 0;
 
 			type = TypeHelper.GetFbType(Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(Descriptor.DataType, subType, Descriptor.Scale);
+			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
 			foreach (object source in sourceArray)
 			{
