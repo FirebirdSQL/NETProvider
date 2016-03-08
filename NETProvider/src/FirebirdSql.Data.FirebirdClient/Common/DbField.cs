@@ -418,6 +418,10 @@ namespace FirebirdSql.Data.Common
 						Value = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
 						break;
 
+					case IscCodes.SQL_BOOLEAN:
+						Value = BitConverter.ToBoolean(buffer, 0);
+						break;
+
 					default:
 						throw new NotSupportedException("Unknown data type");
 				}
@@ -474,6 +478,10 @@ namespace FirebirdSql.Data.Common
 
 					case DbDataType.Time:
 						Value = TimeSpan.Zero;
+						break;
+
+					case DbDataType.Boolean:
+						Value = false;
 						break;
 
 					default:
