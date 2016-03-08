@@ -460,7 +460,7 @@ namespace FirebirdSql.Data.Client.Native
 						break;
 
 					default:
-						throw new NotSupportedException("Unknown data type");
+						throw TypeHelper.InvalidDataType((int)dbType);
 				}
 			}
 

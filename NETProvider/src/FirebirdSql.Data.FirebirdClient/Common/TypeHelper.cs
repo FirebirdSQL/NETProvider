@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.Common
 					return 1;
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)dataType);
 			}
 		}
 
@@ -129,7 +129,7 @@ namespace FirebirdSql.Data.Common
 					break;
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)dataType);
 			}
 
 			if (isNullable)
@@ -192,7 +192,7 @@ namespace FirebirdSql.Data.Common
 					return IscCodes.SQL_BOOLEAN;
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType(blrType);
 			}
 		}
 
@@ -250,7 +250,7 @@ namespace FirebirdSql.Data.Common
 					return "BOOLEAN";
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)dataType);
 			}
 		}
 
@@ -302,7 +302,7 @@ namespace FirebirdSql.Data.Common
 					return typeof(System.Boolean);
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)dataType);
 			}
 		}
 
@@ -354,7 +354,7 @@ namespace FirebirdSql.Data.Common
 					return DbType.Boolean;
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)type);
 			}
 		}
 
@@ -413,7 +413,7 @@ namespace FirebirdSql.Data.Common
 					return DbDataType.Boolean;
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)dbType);
 			}
 		}
 
@@ -544,13 +544,18 @@ namespace FirebirdSql.Data.Common
 					return DbDataType.Boolean;
 
 				default:
-					throw new SystemException("Invalid data type");
+					throw InvalidDataType(sqlType);
 			}
 		}
 
 		public static TimeSpan DateTimeToTimeSpan(DateTime d)
 		{
 			return TimeSpan.FromTicks(d.Subtract(d.Date).Ticks);
+		}
+
+		public static Exception InvalidDataType(int type)
+		{
+			return new ArgumentException($"Invalid data type: {type}.");
 		}
 	}
 }

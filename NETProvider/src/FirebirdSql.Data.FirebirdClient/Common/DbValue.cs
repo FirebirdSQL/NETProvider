@@ -316,7 +316,7 @@ namespace FirebirdSql.Data.Common
 					return BitConverter.GetBytes(GetBoolean());
 
 				default:
-					throw new NotSupportedException("Unknown data type");
+					throw TypeHelper.InvalidDataType((int)Field.DbDataType);
 			}
 		}
 

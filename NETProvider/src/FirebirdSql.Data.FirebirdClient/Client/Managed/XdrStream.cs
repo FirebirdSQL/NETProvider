@@ -732,7 +732,7 @@ namespace FirebirdSql.Data.Client.Managed
 							break;
 
 						default:
-							throw IscException.ForStrParam($"Unknown sql data type: {param.DataType}.");
+							throw IscException.ForStrParam($"Unknown SQL data type: {param.DataType}.");
 					}
 				}
 

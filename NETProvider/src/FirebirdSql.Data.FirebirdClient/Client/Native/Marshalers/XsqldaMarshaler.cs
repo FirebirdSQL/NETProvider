@@ -244,7 +244,8 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 				return null;
 			}
 
-			switch (xsqlvar.sqltype & ~1)
+			var type = xsqlvar.sqltype & ~1;
+			switch (type)
 			{
 				case IscCodes.SQL_VARYING:
 					{
@@ -274,7 +275,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 						return buffer;
 					}
 				default:
-					throw new NotSupportedException("Unknown data type");
+					throw TypeHelper.InvalidDataType(type);
 			}
 		}
 

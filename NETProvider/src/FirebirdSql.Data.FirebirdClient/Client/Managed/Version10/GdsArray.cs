@@ -394,7 +394,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						break;
 
 					default:
-						throw new NotSupportedException("Unknown data type");
+						throw TypeHelper.InvalidDataType((int)dbType);
 				}
 			}
 

@@ -199,6 +199,7 @@ namespace FirebirdSql.Data.Common
 
 		protected Type GetSystemType()
 		{
+#warning HERE
 			Type systemType;
 
 			switch (_descriptor.DataType)
@@ -207,18 +208,15 @@ namespace FirebirdSql.Data.Common
 				case IscCodes.blr_text2:
 				case IscCodes.blr_cstring:
 				case IscCodes.blr_cstring2:
-					// Char
 					systemType = typeof(System.String);
 					break;
 
 				case IscCodes.blr_varying:
 				case IscCodes.blr_varying2:
-					// VarChar
 					systemType = typeof(System.String);
 					break;
 
 				case IscCodes.blr_short:
-					// Short/Smallint
 					if (_descriptor.Scale < 0)
 					{
 						systemType = typeof(System.Decimal);
@@ -230,7 +228,6 @@ namespace FirebirdSql.Data.Common
 					break;
 
 				case IscCodes.blr_long:
-					// Integer
 					if (_descriptor.Scale < 0)
 					{
 						systemType = typeof(System.Decimal);
@@ -242,19 +239,16 @@ namespace FirebirdSql.Data.Common
 					break;
 
 				case IscCodes.blr_float:
-					// Float
 					systemType = typeof(System.Single);
 					break;
 
 				case IscCodes.blr_double:
 				case IscCodes.blr_d_float:
-					// Double
 					systemType = typeof(System.Double);
 					break;
 
 				case IscCodes.blr_quad:
 				case IscCodes.blr_int64:
-					// Long/Quad
 					if (_descriptor.Scale < 0)
 					{
 						systemType = typeof(System.Decimal);
@@ -266,22 +260,19 @@ namespace FirebirdSql.Data.Common
 					break;
 
 				case IscCodes.blr_timestamp:
-					// Timestamp
 					systemType = typeof(System.DateTime);
 					break;
 
 				case IscCodes.blr_sql_time:
-					// Time
 					systemType = typeof(System.TimeSpan);
 					break;
 
 				case IscCodes.blr_sql_date:
-					// Date
 					systemType = typeof(System.DateTime);
 					break;
 
 				default:
-					throw new NotSupportedException("Unknown data type");
+					throw TypeHelper.InvalidDataType(_descriptor.DataType);
 			}
 
 			return systemType;

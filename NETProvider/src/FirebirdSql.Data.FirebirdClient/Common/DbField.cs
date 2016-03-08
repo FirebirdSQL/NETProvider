@@ -423,7 +423,7 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					default:
-						throw new NotSupportedException("Unknown data type");
+						throw TypeHelper.InvalidDataType(SqlType);
 				}
 			}
 		}
