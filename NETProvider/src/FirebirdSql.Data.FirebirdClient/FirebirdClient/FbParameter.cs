@@ -440,7 +440,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 					else
 					{
-						throw new SystemException("Value is of unknown data type");
+						throw new ArgumentException("Parameter type is unknown.");
 					}
 					break;
 			}
