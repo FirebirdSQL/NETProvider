@@ -492,7 +492,7 @@ namespace FirebirdSql.Data.Common
 
 		public Type GetSystemType()
 		{
-			return TypeHelper.GetSystemDataType(DbDataType);
+			return TypeHelper.GetTypeFromDbDataType(DbDataType);
 		}
 
 		public bool HasDataType()

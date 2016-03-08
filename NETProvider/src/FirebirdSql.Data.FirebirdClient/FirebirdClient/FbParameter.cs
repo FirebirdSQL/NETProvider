@@ -131,8 +131,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public override DbType DbType
 		{
-			get { return TypeHelper.GetDbType((DbDataType)_fbDbType); }
-			set { FbDbType = (FbDbType)TypeHelper.GetDbDataType(value); }
+			get { return TypeHelper.GetDbTypeFromDbDataType((DbDataType)_fbDbType); }
+			set { FbDbType = (FbDbType)TypeHelper.GetDbDataTypeFromDbType(value); }
 		}
 
 		[RefreshProperties(RefreshProperties.All)]

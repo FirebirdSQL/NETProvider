@@ -254,7 +254,7 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public static Type GetSystemDataType(DbDataType dataType)
+		public static Type GetTypeFromDbDataType(DbDataType dataType)
 		{
 			switch (dataType)
 			{
@@ -306,7 +306,12 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public static DbType GetDbType(DbDataType type)
+		public static Type GetTypeFromBlrType(int blrType, int subType, int scale)
+		{
+			return GetTypeFromDbDataType(GetDbDataTypeFromBlrType(blrType, subType, scale));
+		}
+
+		public static DbType GetDbTypeFromDbDataType(DbDataType type)
 		{
 			switch (type)
 			{
@@ -358,7 +363,7 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public static DbDataType GetDbDataType(DbType dbType)
+		public static DbDataType GetDbDataTypeFromDbType(DbType dbType)
 		{
 			switch (dbType)
 			{
