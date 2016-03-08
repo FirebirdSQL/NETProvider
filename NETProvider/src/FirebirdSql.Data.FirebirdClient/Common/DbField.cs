@@ -419,7 +419,7 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					case IscCodes.SQL_BOOLEAN:
-						Value = BitConverter.ToBoolean(buffer, 0);
+						Value = TypeDecoder.DecodeBoolean(buffer);
 						break;
 
 					default:

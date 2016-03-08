@@ -85,9 +85,9 @@ namespace FirebirdSql.Data.Common
 			return ((146097 * c) / 4 + (1461 * ya) / 4 + (153 * month + 2) / 5 + day + 1721119 - 2400001);
 		}
 
-		public static byte EncodeBoolean(bool value)
+		public static byte[] EncodeBoolean(bool value)
 		{
-			return (byte)(value ? 1 : 0);
+			return new[] { (byte)(value ? 1 : 0) };
 		}
 	}
 }

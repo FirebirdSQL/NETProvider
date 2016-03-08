@@ -88,9 +88,9 @@ namespace FirebirdSql.Data.Common
 			return date.Date;
 		}
 
-		public static bool DecodeBoolean(byte value)
+		public static bool DecodeBoolean(byte[] value)
 		{
-			return value != 0;
+			return value[0] != 0;
 		}
 	}
 }
