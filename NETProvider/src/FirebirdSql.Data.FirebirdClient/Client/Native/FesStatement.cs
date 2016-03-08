@@ -21,7 +21,7 @@ using System.Collections;
 using System.Text;
 
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Client.Common;
+using FirebirdSql.Data.Client.Native.Marshalers;
 using FirebirdSql.Data.Client.Native.Handle;
 
 namespace FirebirdSql.Data.Client.Native
@@ -353,7 +353,7 @@ namespace FirebirdSql.Data.Client.Native
 				}
 
 				TransactionHandle trHandle = _transaction.HandlePtr;
-				
+
 				_db.FbClient.isc_dsql_execute2(
 					_statusVector,
 					ref trHandle,
@@ -607,7 +607,7 @@ namespace FirebirdSql.Data.Client.Native
 					_statusVector,
 					ref _handle,
 					(short)option);
-				
+
 				// Reset statement information
 				if (option == IscCodes.DSQL_drop)
 				{
@@ -698,10 +698,10 @@ namespace FirebirdSql.Data.Client.Native
 				_db.FbClient.isc_dsql_allocate_statement(
 					_statusVector,
 					ref dbHandle,
-					ref _handle);				
+					ref _handle);
 
 				_db.ParseStatusVector(_statusVector);
-				
+
 				_allRowsFetched = false;
 				_state = StatementState.Allocated;
 				_statementType = DbStatementType.None;

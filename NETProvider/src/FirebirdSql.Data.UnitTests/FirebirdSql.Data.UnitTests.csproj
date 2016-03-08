@@ -89,6 +89,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Data.Entity">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -122,6 +123,7 @@
     <Compile Include="GuidTests.cs" />
     <Compile Include="EntityFrameworkTests.cs" />
     <Compile Include="TransactionScopeTests.cs" />
+    <Compile Include="SrpClientTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EntityFramework.Firebird\EntityFramework.Firebird.csproj">

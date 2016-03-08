@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Common
 		public const int SQL_DIALECT_CURRENT = SQL_DIALECT_V6;
 		public const int DSQL_close = 1;
 		public const int DSQL_drop = 2;
-		public const int ARRAY_DESC_COLUMN_MAJOR = 1;	/* Set for FORTRAN */
+		public const int ARRAY_DESC_COLUMN_MAJOR = 1;   /* Set for FORTRAN */
 		public const int ISC_STATUS_LENGTH = 20;
 		public const ushort INVALID_OBJECT = 0xFFFF;
 
@@ -53,63 +53,30 @@ namespace FirebirdSql.Data.Common
 
 		#region Protocol Codes
 
-		/* The protocol	is defined blocks, rather than messages, to
-		 * separate	the	protocol from the transport	layer.
-		 */
-		public const int CONNECT_VERSION2 = 2;
+		public const int GenericAchitectureClient = 1;
 
-		/* Protocol	4 is protocol 3	plus server	management functions */
+		public const int CONNECT_VERSION2 = 2;
+		public const int CONNECT_VERSION3 = 3;
 		public const int PROTOCOL_VERSION3 = 3;
 		public const int PROTOCOL_VERSION4 = 4;
-
-		/* Protocol	5 includes support for a d_float data type */
 		public const int PROTOCOL_VERSION5 = 5;
-
-		/* Protocol	6 includes support for cancel remote events, blob seek,
-		 * and unknown message type
-		 */
 		public const int PROTOCOL_VERSION6 = 6;
-
-		/* Protocol	7 includes DSQL	support	*/
 		public const int PROTOCOL_VERSION7 = 7;
-
-		/* Protocol	8 includes collapsing first	receive	into a send, drop database,
-		 * DSQL	execute	2, DSQL	execute	immediate 2, DSQL insert, services,	and
-		 * transact	request.
-		 */
 		public const int PROTOCOL_VERSION8 = 8;
-
-		/* Protocol	9 includes support for SPX32
-		 * SPX32 uses WINSOCK instead of Novell	SDK
-		 * In order	to differentiate between the old implementation
-		 * of SPX and this one,	different PROTOCOL VERSIONS	are	used
-		 */
 		public const int PROTOCOL_VERSION9 = 9;
-
-		/* Protocol	10 includes	support	for	warnings and removes the requirement for
-		 * encoding	and	decoding status	codes.
-		 */
 		public const int PROTOCOL_VERSION10 = 10;
-
-		// Since protocol 11 we must be separated from Borland Interbase.
-		// Therefore always set highmost bit in protocol version to 1.
-		// For unsigned protocol version this does not break version's compare.
 
 		public const int FB_PROTOCOL_FLAG = 0x8000;
 		public const int FB_PROTOCOL_MASK = ~FB_PROTOCOL_FLAG;
 
-		// Protocol 11 has support for user authentication related
-		// operations (op_update_account_info, op_authenticate_user and
-		// op_trusted_auth). When specific operation is not supported,
-		// we say "sorry".
-
 		public const int PROTOCOL_VERSION11 = (FB_PROTOCOL_FLAG | 11);
-
-		// Protocol 12 has support for asynchronous call op_cancel.
-		// Currently implemented asynchronously only for TCP/IP
-		// on superserver and superclassic.
-
 		public const int PROTOCOL_VERSION12 = (FB_PROTOCOL_FLAG | 12);
+		public const int PROTOCOL_VERSION13 = (FB_PROTOCOL_FLAG | 13);
+
+		public const int ptype_rpc = 2;
+		public const int ptype_batch_send = 3;
+		public const int ptype_out_of_band = 4;
+		public const int ptype_lazy_send = 5;
 
 		#endregion
 
@@ -129,33 +96,33 @@ namespace FirebirdSql.Data.Common
 		#region Operation Codes
 
 		// Operation (packet) types
-		public const int op_void = 0;	// Packet has been voided
-		public const int op_connect = 1;	// Connect to remote server
-		public const int op_exit = 2;	// Remote end has exitted
-		public const int op_accept = 3;	// Server accepts connection
-		public const int op_reject = 4;	// Server rejects connection
-		public const int op_protocol = 5;	// Protocol	selection
-		public const int op_disconnect = 6;	// Connect is going	away
-		public const int op_credit = 7;	// Grant (buffer) credits
-		public const int op_continuation = 8;	// Continuation	packet
-		public const int op_response = 9;	// Generic response	block
+		public const int op_void = 0;   // Packet has been voided
+		public const int op_connect = 1;    // Connect to remote server
+		public const int op_exit = 2;   // Remote end has exitted
+		public const int op_accept = 3; // Server accepts connection
+		public const int op_reject = 4; // Server rejects connection
+		public const int op_protocol = 5;   // Protocol	selection
+		public const int op_disconnect = 6; // Connect is going	away
+		public const int op_credit = 7; // Grant (buffer) credits
+		public const int op_continuation = 8;   // Continuation	packet
+		public const int op_response = 9;   // Generic response	block
 
 		// Page	server operations
-		public const int op_open_file = 10;	// Open	file for page service
-		public const int op_create_file = 11;	// Create file for page	service
-		public const int op_close_file = 12;	// Close file for page service
-		public const int op_read_page = 13;	// optionally lock and read	page
-		public const int op_write_page = 14;	// write page and optionally release lock
-		public const int op_lock = 15;	// sieze lock
-		public const int op_convert_lock = 16;	// convert existing	lock
-		public const int op_release_lock = 17;	// release existing	lock
-		public const int op_blocking = 18;	// blocking	lock message
+		public const int op_open_file = 10; // Open	file for page service
+		public const int op_create_file = 11;   // Create file for page	service
+		public const int op_close_file = 12;    // Close file for page service
+		public const int op_read_page = 13; // optionally lock and read	page
+		public const int op_write_page = 14;    // write page and optionally release lock
+		public const int op_lock = 15;  // sieze lock
+		public const int op_convert_lock = 16;  // convert existing	lock
+		public const int op_release_lock = 17;  // release existing	lock
+		public const int op_blocking = 18;  // blocking	lock message
 
 		// Full	context	server operations
-		public const int op_attach = 19;	// Attach database
-		public const int op_create = 20;	// Create database
-		public const int op_detach = 21;	// Detach database
-		public const int op_compile = 22;	// Request based operations
+		public const int op_attach = 19;    // Attach database
+		public const int op_create = 20;    // Create database
+		public const int op_detach = 21;    // Detach database
+		public const int op_compile = 22;   // Request based operations
 		public const int op_start = 23;
 		public const int op_start_and_send = 24;
 		public const int op_send = 25;
@@ -163,64 +130,64 @@ namespace FirebirdSql.Data.Common
 		public const int op_unwind = 27;
 		public const int op_release = 28;
 
-		public const int op_transaction = 29;	// Transaction operations
+		public const int op_transaction = 29;   // Transaction operations
 		public const int op_commit = 30;
 		public const int op_rollback = 31;
 		public const int op_prepare = 32;
 		public const int op_reconnect = 33;
 
-		public const int op_create_blob = 34;	// Blob	operations //
+		public const int op_create_blob = 34;   // Blob	operations //
 		public const int op_open_blob = 35;
 		public const int op_get_segment = 36;
 		public const int op_put_segment = 37;
 		public const int op_cancel_blob = 38;
 		public const int op_close_blob = 39;
 
-		public const int op_info_database = 40;	// Information services
+		public const int op_info_database = 40; // Information services
 		public const int op_info_request = 41;
 		public const int op_info_transaction = 42;
 		public const int op_info_blob = 43;
 
-		public const int op_batch_segments = 44;	// Put a bunch of blob segments
+		public const int op_batch_segments = 44;    // Put a bunch of blob segments
 
-		public const int op_mgr_set_affinity = 45;	// Establish server	affinity
-		public const int op_mgr_clear_affinity = 46;	// Break server	affinity
-		public const int op_mgr_report = 47;	// Report on server
+		public const int op_mgr_set_affinity = 45;  // Establish server	affinity
+		public const int op_mgr_clear_affinity = 46;    // Break server	affinity
+		public const int op_mgr_report = 47;    // Report on server
 
-		public const int op_que_events = 48;	// Que event notification request
-		public const int op_cancel_events = 49;	// Cancel event	notification request
-		public const int op_commit_retaining = 50;	// Commit retaining	(what else)
-		public const int op_prepare2 = 51;	// Message form	of prepare
-		public const int op_event = 52;	// Completed event request (asynchronous)
-		public const int op_connect_request = 53;	// Request to establish	connection
-		public const int op_aux_connect = 54;	// Establish auxiliary connection
-		public const int op_ddl = 55;	// DDL call
+		public const int op_que_events = 48;    // Que event notification request
+		public const int op_cancel_events = 49; // Cancel event	notification request
+		public const int op_commit_retaining = 50;  // Commit retaining	(what else)
+		public const int op_prepare2 = 51;  // Message form	of prepare
+		public const int op_event = 52; // Completed event request (asynchronous)
+		public const int op_connect_request = 53;   // Request to establish	connection
+		public const int op_aux_connect = 54;   // Establish auxiliary connection
+		public const int op_ddl = 55;   // DDL call
 		public const int op_open_blob2 = 56;
 		public const int op_create_blob2 = 57;
 		public const int op_get_slice = 58;
 		public const int op_put_slice = 59;
-		public const int op_slice = 60;	// Successful response to public const int op_get_slice
-		public const int op_seek_blob = 61;	// Blob	seek operation
+		public const int op_slice = 60; // Successful response to public const int op_get_slice
+		public const int op_seek_blob = 61; // Blob	seek operation
 
 		// DSQL	operations //
-		public const int op_allocate_statement = 62;	// allocate	a statment handle
-		public const int op_execute = 63;	// execute a prepared statement
-		public const int op_exec_immediate = 64;	// execute a statement
-		public const int op_fetch = 65;	// fetch a record
-		public const int op_fetch_response = 66;	// response	for	record fetch
-		public const int op_free_statement = 67;	// free	a statement
-		public const int op_prepare_statement = 68;	// prepare a statement
-		public const int op_set_cursor = 69;	// set a cursor	name
+		public const int op_allocate_statement = 62;    // allocate	a statment handle
+		public const int op_execute = 63;   // execute a prepared statement
+		public const int op_exec_immediate = 64;    // execute a statement
+		public const int op_fetch = 65; // fetch a record
+		public const int op_fetch_response = 66;    // response	for	record fetch
+		public const int op_free_statement = 67;    // free	a statement
+		public const int op_prepare_statement = 68; // prepare a statement
+		public const int op_set_cursor = 69;    // set a cursor	name
 		public const int op_info_sql = 70;
-		public const int op_dummy = 71;	// dummy packet	to detect loss of client
-		public const int op_response_piggyback = 72;	// response	block for piggybacked messages
+		public const int op_dummy = 71; // dummy packet	to detect loss of client
+		public const int op_response_piggyback = 72;    // response	block for piggybacked messages
 		public const int op_start_and_receive = 73;
 		public const int op_start_send_and_receive = 74;
 
-		public const int op_exec_immediate2 = 75;	// execute an immediate	statement with msgs
-		public const int op_execute2 = 76;	// execute a statement with	msgs
+		public const int op_exec_immediate2 = 75;   // execute an immediate	statement with msgs
+		public const int op_execute2 = 76;  // execute a statement with	msgs
 		public const int op_insert = 77;
-		public const int op_sql_response = 78;	// response	from execute; exec immed; insert
+		public const int op_sql_response = 78;  // response	from execute; exec immed; insert
 		public const int op_transact = 79;
 		public const int op_transact_response = 80;
 		public const int op_drop_database = 81;
@@ -236,9 +203,16 @@ namespace FirebirdSql.Data.Common
 		public const int op_update_account_info = 87;
 		public const int op_authenticate_user = 88;
 
-		public const int op_partial = 89;	// packet is not complete - delay processing
+		public const int op_partial = 89;   // packet is not complete - delay processing
 		public const int op_trusted_auth = 90;
 		public const int op_cancel = 91;
+		public const int op_cont_auth = 92;
+		public const int op_ping = 93;
+		public const int op_accept_data = 94;
+		public const int op_abort_aux_connection = 95;
+		public const int op_crypt = 96;
+		public const int op_crypt_key_callback = 97;
+		public const int op_cond_accept = 98;
 
 		#endregion
 
@@ -312,6 +286,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_dpb_trusted_auth = 73;
 		public const int isc_dpb_process_name = 74;
 		public const int isc_dpb_utf8_filename = 77;
+		public const int isc_dpb_specific_auth_data = 84;
 
 		#endregion
 
@@ -369,53 +344,53 @@ namespace FirebirdSql.Data.Common
 
 		#region Services Actions
 
-		public const int isc_action_svc_backup = 1;	/* Starts database backup process on the server	*/
-		public const int isc_action_svc_restore = 2;	/* Starts database restore process on the server */
-		public const int isc_action_svc_repair = 3;	/* Starts database repair process on the server	*/
-		public const int isc_action_svc_add_user = 4;	/* Adds	a new user to the security database	*/
-		public const int isc_action_svc_delete_user = 5;	/* Deletes a user record from the security database	*/
-		public const int isc_action_svc_modify_user = 6;	/* Modifies	a user record in the security database */
-		public const int isc_action_svc_display_user = 7;	/* Displays	a user record from the security	database */
-		public const int isc_action_svc_properties = 8;	/* Sets	database properties	*/
-		public const int isc_action_svc_add_license = 9;	/* Adds	a license to the license file */
-		public const int isc_action_svc_remove_license = 10;	/* Removes a license from the license file */
-		public const int isc_action_svc_db_stats = 11;	/* Retrieves database statistics */
-		public const int isc_action_svc_get_ib_log = 12;	/* Retrieves the InterBase log file	from the server	*/
-		public const int isc_action_svc_nbak = 20;	/* Incremental nbackup */
-		public const int isc_action_svc_nrest = 21;	/* Incremental database restore */
-		public const int isc_action_svc_trace_start = 22;	// Start trace session
-		public const int isc_action_svc_trace_stop = 23;	// Stop trace session
-		public const int isc_action_svc_trace_suspend = 24;	// Suspend trace session
-		public const int isc_action_svc_trace_resume = 25;	// Resume trace session
-		public const int isc_action_svc_trace_list = 26;	// List existing sessions
-		public const int isc_action_svc_set_mapping = 27;	// Set auto admins mapping in security database
-		public const int isc_action_svc_drop_mapping = 28;	// Drop auto admins mapping in security database
-		public const int isc_action_svc_display_user_adm = 29;	// Displays user(s) from security database with admin info
+		public const int isc_action_svc_backup = 1; /* Starts database backup process on the server	*/
+		public const int isc_action_svc_restore = 2;    /* Starts database restore process on the server */
+		public const int isc_action_svc_repair = 3; /* Starts database repair process on the server	*/
+		public const int isc_action_svc_add_user = 4;   /* Adds	a new user to the security database	*/
+		public const int isc_action_svc_delete_user = 5;    /* Deletes a user record from the security database	*/
+		public const int isc_action_svc_modify_user = 6;    /* Modifies	a user record in the security database */
+		public const int isc_action_svc_display_user = 7;   /* Displays	a user record from the security	database */
+		public const int isc_action_svc_properties = 8; /* Sets	database properties	*/
+		public const int isc_action_svc_add_license = 9;    /* Adds	a license to the license file */
+		public const int isc_action_svc_remove_license = 10;    /* Removes a license from the license file */
+		public const int isc_action_svc_db_stats = 11;  /* Retrieves database statistics */
+		public const int isc_action_svc_get_ib_log = 12;    /* Retrieves the InterBase log file	from the server	*/
+		public const int isc_action_svc_nbak = 20;  /* Incremental nbackup */
+		public const int isc_action_svc_nrest = 21; /* Incremental database restore */
+		public const int isc_action_svc_trace_start = 22;   // Start trace session
+		public const int isc_action_svc_trace_stop = 23;    // Stop trace session
+		public const int isc_action_svc_trace_suspend = 24; // Suspend trace session
+		public const int isc_action_svc_trace_resume = 25;  // Resume trace session
+		public const int isc_action_svc_trace_list = 26;    // List existing sessions
+		public const int isc_action_svc_set_mapping = 27;   // Set auto admins mapping in security database
+		public const int isc_action_svc_drop_mapping = 28;  // Drop auto admins mapping in security database
+		public const int isc_action_svc_display_user_adm = 29;  // Displays user(s) from security database with admin info
 
 		#endregion
 
 		#region Services Information
 
-		public const int isc_info_svc_svr_db_info = 50;	/* Retrieves the number	of attachments and databases */
-		public const int isc_info_svc_get_license = 51;	/* Retrieves all license keys and IDs from the license file	*/
-		public const int isc_info_svc_get_license_mask = 52;	/* Retrieves a bitmask representing	licensed options on	the	server */
-		public const int isc_info_svc_get_config = 53;	/* Retrieves the parameters	and	values for IB_CONFIG */
-		public const int isc_info_svc_version = 54;	/* Retrieves the version of	the	services manager */
-		public const int isc_info_svc_server_version = 55;	/* Retrieves the version of	the	InterBase server */
-		public const int isc_info_svc_implementation = 56;	/* Retrieves the implementation	of the InterBase server	*/
-		public const int isc_info_svc_capabilities = 57;	/* Retrieves a bitmask representing	the	server's capabilities */
-		public const int isc_info_svc_user_dbpath = 58;	/* Retrieves the path to the security database in use by the server	*/
-		public const int isc_info_svc_get_env = 59;	/* Retrieves the setting of	$INTERBASE */
-		public const int isc_info_svc_get_env_lock = 60;	/* Retrieves the setting of	$INTERBASE_LCK */
-		public const int isc_info_svc_get_env_msg = 61;	/* Retrieves the setting of	$INTERBASE_MSG */
-		public const int isc_info_svc_line = 62;	/* Retrieves 1 line	of service output per call */
-		public const int isc_info_svc_to_eof = 63;	/* Retrieves as much of	the	server output as will fit in the supplied buffer */
-		public const int isc_info_svc_timeout = 64;	/* Sets	/ signifies	a timeout value	for	reading	service	information	*/
-		public const int isc_info_svc_get_licensed_users = 65;	/* Retrieves the number	of users licensed for accessing	the	server */
-		public const int isc_info_svc_limbo_trans = 66;	/* Retrieve	the	limbo transactions */
-		public const int isc_info_svc_running = 67;	/* Checks to see if	a service is running on	an attachment */
-		public const int isc_info_svc_get_users = 68;	/* Returns the user	information	from isc_action_svc_display_users */
-		public const int isc_info_svc_stdin = 78;	/* Returns size of data, needed as stdin for service */
+		public const int isc_info_svc_svr_db_info = 50; /* Retrieves the number	of attachments and databases */
+		public const int isc_info_svc_get_license = 51; /* Retrieves all license keys and IDs from the license file	*/
+		public const int isc_info_svc_get_license_mask = 52;    /* Retrieves a bitmask representing	licensed options on	the	server */
+		public const int isc_info_svc_get_config = 53;  /* Retrieves the parameters	and	values for IB_CONFIG */
+		public const int isc_info_svc_version = 54; /* Retrieves the version of	the	services manager */
+		public const int isc_info_svc_server_version = 55;  /* Retrieves the version of	the	InterBase server */
+		public const int isc_info_svc_implementation = 56;  /* Retrieves the implementation	of the InterBase server	*/
+		public const int isc_info_svc_capabilities = 57;    /* Retrieves a bitmask representing	the	server's capabilities */
+		public const int isc_info_svc_user_dbpath = 58; /* Retrieves the path to the security database in use by the server	*/
+		public const int isc_info_svc_get_env = 59; /* Retrieves the setting of	$INTERBASE */
+		public const int isc_info_svc_get_env_lock = 60;    /* Retrieves the setting of	$INTERBASE_LCK */
+		public const int isc_info_svc_get_env_msg = 61; /* Retrieves the setting of	$INTERBASE_MSG */
+		public const int isc_info_svc_line = 62;    /* Retrieves 1 line	of service output per call */
+		public const int isc_info_svc_to_eof = 63;  /* Retrieves as much of	the	server output as will fit in the supplied buffer */
+		public const int isc_info_svc_timeout = 64; /* Sets	/ signifies	a timeout value	for	reading	service	information	*/
+		public const int isc_info_svc_get_licensed_users = 65;  /* Retrieves the number	of users licensed for accessing	the	server */
+		public const int isc_info_svc_limbo_trans = 66; /* Retrieve	the	limbo transactions */
+		public const int isc_info_svc_running = 67; /* Checks to see if	a service is running on	an attachment */
+		public const int isc_info_svc_get_users = 68;   /* Returns the user	information	from isc_action_svc_display_users */
+		public const int isc_info_svc_stdin = 78;   /* Returns size of data, needed as stdin for service */
 
 		#endregion
 
@@ -804,7 +779,7 @@ namespace FirebirdSql.Data.Common
 
 		#region Event Codes
 
-		public const int P_REQ_async = 1;	// Auxiliary asynchronous port
+		public const int P_REQ_async = 1;   // Auxiliary asynchronous port
 		public const int EPB_version1 = 1;
 
 		#endregion
@@ -824,7 +799,7 @@ namespace FirebirdSql.Data.Common
 
 		#region Error code generation
 
-		public const int ISC_MASK = 0x14000000;	// Defines the code	as a valid ISC code
+		public const int ISC_MASK = 0x14000000; // Defines the code	as a valid ISC code
 
 		#endregion
 
@@ -835,21 +810,21 @@ namespace FirebirdSql.Data.Common
 		public const int isc_err_factor = 1;
 		public const int isc_arg_end = 0;    // end of argument list
 		public const int isc_arg_gds = 1;    // generic DSRI	status value
-		public const int isc_arg_string = 2;	// string argument
-		public const int isc_arg_cstring = 3;	// count & string argument
-		public const int isc_arg_number = 4;	// numeric argument	(long)
-		public const int isc_arg_interpreted = 5;	// interpreted status code (string)
-		public const int isc_arg_vms = 6;	// VAX/VMS status code (long)
-		public const int isc_arg_unix = 7;	// UNIX	error code
-		public const int isc_arg_domain = 8;	// Apollo/Domain error code
-		public const int isc_arg_dos = 9;	// MSDOS/OS2 error code
-		public const int isc_arg_mpexl = 10;	// HP MPE/XL error code
-		public const int isc_arg_mpexl_ipc = 11;	// HP MPE/XL IPC error code
-		public const int isc_arg_next_mach = 15;	// NeXT/Mach error code
-		public const int isc_arg_netware = 16;	// NetWare error code
-		public const int isc_arg_win32 = 17;	// Win32 error code
-		public const int isc_arg_warning = 18;	// warning argument
-		public const int isc_arg_sql_state = 19;	// SQLSTATE
+		public const int isc_arg_string = 2;    // string argument
+		public const int isc_arg_cstring = 3;   // count & string argument
+		public const int isc_arg_number = 4;    // numeric argument	(long)
+		public const int isc_arg_interpreted = 5;   // interpreted status code (string)
+		public const int isc_arg_vms = 6;   // VAX/VMS status code (long)
+		public const int isc_arg_unix = 7;  // UNIX	error code
+		public const int isc_arg_domain = 8;    // Apollo/Domain error code
+		public const int isc_arg_dos = 9;   // MSDOS/OS2 error code
+		public const int isc_arg_mpexl = 10;    // HP MPE/XL error code
+		public const int isc_arg_mpexl_ipc = 11;    // HP MPE/XL IPC error code
+		public const int isc_arg_next_mach = 15;    // NeXT/Mach error code
+		public const int isc_arg_netware = 16;  // NetWare error code
+		public const int isc_arg_win32 = 17;    // Win32 error code
+		public const int isc_arg_warning = 18;  // warning argument
+		public const int isc_arg_sql_state = 19;    // SQLSTATE
 
 		public const int isc_open_trans = 335544357;
 		public const int isc_segment = 335544366;

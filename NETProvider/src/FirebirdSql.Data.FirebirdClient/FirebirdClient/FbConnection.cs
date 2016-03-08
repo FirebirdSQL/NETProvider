@@ -81,12 +81,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				// Dummy packet	interval
 				dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 
-				// User	name
-				dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
-
-				// User	password
-				dpb.Append(IscCodes.isc_dpb_password, options.Password);
-
 				// Database	dialect
 				dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { options.Dialect, 0, 0, 0 });
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono
  *
  *	   The contents of this file are subject to the Initial
@@ -19,32 +19,28 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Common
+namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct ArrayDescMarshal
+	internal class XSQLVAR
 	{
-		#region Fields
-
-		public byte DataType;
-		public byte Scale;
-		public short Length;
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-		public string FieldName;
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-		public string RelationName;
-		public short Dimensions;
-		public short Flags;
-
-		#endregion
-
-		#region Static Methods
-
-		public static int ComputeLength(int n)
-		{
-			return (Marshal.SizeOf(typeof(ArrayDescMarshal)) + n * Marshal.SizeOf(typeof(ArrayBoundMarshal)));
-		}
-
-		#endregion
+		public short sqltype;
+		public short sqlscale;
+		public short sqlsubtype;
+		public short sqllen;
+		public IntPtr sqldata;
+		public IntPtr sqlind;
+		public short sqlname_length;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+		public byte[] sqlname;
+		public short relname_length;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+		public byte[] relname;
+		public short ownername_length;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+		public byte[] ownername;
+		public short aliasname_length;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+		public byte[] aliasname;
 	}
 }

@@ -270,7 +270,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
-			throw new NotImplementedException("Trusted Auth isn't supported on Embedded Firebird.");
+			throw new NotSupportedException("Trusted Auth isn't supported on Embedded Firebird.");
 		}
 
 		public void Detach()

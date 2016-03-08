@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 	{
 		#region Constructors
 
-		public GdsDatabase(Version10.GdsConnection connection)
+		public GdsDatabase(GdsConnection connection)
 			: base(connection)
 		{
 			DeferredPackets = new Queue<Action<IResponse>>();

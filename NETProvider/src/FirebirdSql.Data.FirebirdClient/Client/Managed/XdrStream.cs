@@ -28,7 +28,7 @@ using System.Globalization;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version10
+namespace FirebirdSql.Data.Client.Managed
 {
 	internal class XdrStream : Stream
 	{

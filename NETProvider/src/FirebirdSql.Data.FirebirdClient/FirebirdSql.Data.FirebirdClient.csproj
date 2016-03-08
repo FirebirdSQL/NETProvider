@@ -123,6 +123,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Data.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -139,6 +140,7 @@
     <Compile Include="Client\Managed\Version11\SSPIHelper.cs" />
     <Compile Include="Client\Managed\Version12\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version12\GdsStatement.cs" />
+    <Compile Include="Client\Managed\Version13\GdsDatabase.cs" />
     <Compile Include="Client\Native\Handle\BlobHandle.cs" />
     <Compile Include="Client\Native\Handle\DatabaseHandle.cs" />
     <Compile Include="Client\Native\Handle\FirebirdHandle.cs" />
@@ -175,29 +177,30 @@
     <Compile Include="Isql\FbStatement.cs" />
     <Compile Include="Isql\UnknownStatementEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Client\Common\ArrayBoundMarshal.cs" />
-    <Compile Include="Client\Common\ArrayDescMarshal.cs" />
-    <Compile Include="Client\Common\ArrayDescMarshaler.cs" />
+    <Compile Include="Client\Native\Marshalers\ArrayBoundMarshal.cs" />
+    <Compile Include="Client\Native\Marshalers\ArrayDescMarshal.cs" />
+    <Compile Include="Client\Native\Marshalers\ArrayDescMarshaler.cs" />
     <Compile Include="Client\Managed\FetchResponse.cs" />
     <Compile Include="Client\Managed\GenericResponse.cs" />
     <Compile Include="Client\Managed\IResponse.cs" />
     <Compile Include="Client\Managed\SqlResponse.cs" />
+    <Compile Include="Client\Managed\SrpClient.cs" />
     <Compile Include="Client\Managed\Version10\GdsArray.cs" />
     <Compile Include="Client\Managed\Version10\GdsBlob.cs" />
-    <Compile Include="Client\Managed\Version10\GdsConnection.cs" />
+    <Compile Include="Client\Managed\GdsConnection.cs" />
     <Compile Include="Client\Managed\Version10\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version10\GdsEventManager.cs" />
     <Compile Include="Client\Managed\Version10\GdsServiceManager.cs" />
     <Compile Include="Client\Managed\Version10\GdsStatement.cs" />
     <Compile Include="Client\Managed\Version10\GdsTransaction.cs" />
-    <Compile Include="Client\Managed\Version10\XdrStream.cs" />
+    <Compile Include="Client\Managed\XdrStream.cs" />
     <Compile Include="Client\Managed\Version11\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version11\GdsStatement.cs" />
     <Compile Include="Client\Native\FbClientFactory.cs" />
     <Compile Include="Client\Native\IFbClient.cs" />
-    <Compile Include="Client\Common\XSQLDA.cs" />
-    <Compile Include="Client\Common\XsqldaMarshaler.cs" />
-    <Compile Include="Client\Common\XSQLVAR.cs" />
+    <Compile Include="Client\Native\Marshalers\XSQLDA.cs" />
+    <Compile Include="Client\Native\Marshalers\XsqldaMarshaler.cs" />
+    <Compile Include="Client\Native\Marshalers\XSQLVAR.cs" />
     <Compile Include="Client\Native\FbClient.cs" />
     <Compile Include="Client\Native\FesArray.cs" />
     <Compile Include="Client\Native\FesBlob.cs" />

@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Common
+namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	internal static class ArrayDescMarshaler
 	{

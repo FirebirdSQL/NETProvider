@@ -124,6 +124,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
+		public string UserID
+		{
+			get { return _connection.UserID; }
+		}
+
+		public string Password
+		{
+			get { return _connection.Password; }
+		}
+
+		public byte[] AuthData
+		{
+			get { return _connection.AuthData; }
+		}
+
+
 		#endregion
 
 		#region Constructors
@@ -221,9 +237,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			// Attach to the database
 			XdrStream.Write(IscCodes.op_attach);
 			XdrStream.Write(0);                                           // Database object ID
+			if (!string.IsNullOrEmpty(UserID))
+			{
+				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
+				if (!string.IsNullOrEmpty(Password))
+				{
+					dpb.Append(IscCodes.isc_dpb_password, Password);
+				}
+			}
 			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));   // Database PATH
 			XdrStream.WriteBuffer(dpb.ToArray());                         // DPB Parameter buffer
 		}
@@ -352,6 +375,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			XdrStream.Write(IscCodes.op_create);
 			XdrStream.Write(0);
+			if (!string.IsNullOrEmpty(UserID))
+			{
+				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
+				if (!string.IsNullOrEmpty(Password))
+				{
+					dpb.Append(IscCodes.isc_dpb_password, Password);
+				}
+			}
 			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}

@@ -21,7 +21,7 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Common
+namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct	XSQLDA

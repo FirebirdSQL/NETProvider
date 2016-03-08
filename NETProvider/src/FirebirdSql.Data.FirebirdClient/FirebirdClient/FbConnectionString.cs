@@ -298,12 +298,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 
 		#region Internal Properties
-		internal bool FallIntoTrustedAuth
-		{
-			// on non-Win the UserID/Password is checked in Validate method
-			get { return string.IsNullOrEmpty(UserID) && string.IsNullOrEmpty(Password); }
-		}
-
 		internal string NormalizedConnectionString
 		{
 			get { return string.Join(";", _options.Keys.OrderBy(x => x, StringComparer.InvariantCulture).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(_options[key].ToString())))); }

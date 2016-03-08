@@ -13,32 +13,27 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2016 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
- *
- *  Contributors:
- *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
+using FirebirdSql.Data.Client.Managed;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	internal sealed class ClientFactory
+	internal static class ClientFactory
 	{
-		#region Static Methods
-
 		public static IDatabase CreateDatabase(FbConnectionString options)
 		{
 			switch (options.ServerType)
 			{
 				case FbServerType.Default:
-					// Managed Client
 					return CreateManagedDatabase(options);
 
 				case FbServerType.Embedded:
-					// Native (PInvoke) Client
-					return new FirebirdSql.Data.Client.Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
+					return new Client.Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
 
 				default:
 					throw new NotSupportedException("Specified server type is not correct.");
@@ -53,8 +48,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					return CreateManagedServiceManager(options);
 
 				case FbServerType.Embedded:
-					// PInvoke Client
-					return new FirebirdSql.Data.Client.Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset));
+					return new Client.Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset));
 
 				default:
 					throw new NotSupportedException("Specified server type is not correct.");
@@ -63,19 +57,21 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static IDatabase CreateManagedDatabase(FbConnectionString options)
 		{
-			FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
 
 			connection.Connect();
 			connection.Identify(options.Database);
 
 			switch (connection.ProtocolVersion)
 			{
+				case IscCodes.PROTOCOL_VERSION13:
+					return new Client.Managed.Version13.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION12:
-					return new FirebirdSql.Data.Client.Managed.Version12.GdsDatabase(connection);
+					return new Client.Managed.Version12.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION11:
-					return new FirebirdSql.Data.Client.Managed.Version11.GdsDatabase(connection);
+					return new Client.Managed.Version11.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION10:
-					return new FirebirdSql.Data.Client.Managed.Version10.GdsDatabase(connection);
+					return new Client.Managed.Version10.GdsDatabase(connection);
 				default:
 					throw new NotSupportedException("Protocol not supported.");
 			}
@@ -83,28 +79,21 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static IServiceManager CreateManagedServiceManager(FbConnectionString options)
 		{
-			FirebirdSql.Data.Client.Managed.Version10.GdsConnection connection = new FirebirdSql.Data.Client.Managed.Version10.GdsConnection(options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
 
 			connection.Connect();
 			connection.Identify(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty);
 
 			switch (connection.ProtocolVersion)
 			{
+				case IscCodes.PROTOCOL_VERSION13:
 				case IscCodes.PROTOCOL_VERSION12:
 				case IscCodes.PROTOCOL_VERSION11:
 				case IscCodes.PROTOCOL_VERSION10:
-					return new FirebirdSql.Data.Client.Managed.Version10.GdsServiceManager(connection);
+					return new Client.Managed.Version10.GdsServiceManager(connection);
 				default:
 					throw new NotSupportedException("Protocol not supported.");
 			}
 		}
-		#endregion
-
-		#region Constructors
-
-		private ClientFactory()
-		{ }
-
-		#endregion
 	}
 }

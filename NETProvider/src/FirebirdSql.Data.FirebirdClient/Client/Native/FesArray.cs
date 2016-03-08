@@ -28,8 +28,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Client.Common;
 using FirebirdSql.Data.Client.Native.Handle;
+using FirebirdSql.Data.Client.Native.Marshalers;
 
 namespace FirebirdSql.Data.Client.Native
 {
