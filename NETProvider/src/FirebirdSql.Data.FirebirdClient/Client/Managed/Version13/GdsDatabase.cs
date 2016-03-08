@@ -32,6 +32,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 {
 	internal class GdsDatabase : Version12.GdsDatabase
 	{
+#warning Refactoring op_attach and op_create.
 		public GdsDatabase(GdsConnection connection)
 			: base(connection)
 		{ }
