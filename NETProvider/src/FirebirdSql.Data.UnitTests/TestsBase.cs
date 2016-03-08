@@ -242,7 +242,6 @@ end";
 				cs.Database = TestsSetup.Database;
 			}
 			cs.ServerType = serverType;
-
 			return cs.ToString();
 		}
 
@@ -282,7 +281,7 @@ end";
 				using (var cmd = conn.CreateCommand())
 				{
 					cmd.CommandText = "select count(*) from mon$attachments where mon$attachment_id <> current_connection";
-					return (int)cmd.ExecuteScalar();
+					return Convert.ToInt32(cmd.ExecuteScalar());
 				}
 			}
 		}

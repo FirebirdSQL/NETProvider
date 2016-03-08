@@ -128,29 +128,6 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void FbConnectionStringBuilderTest()
-		{
-			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
-
-			cs.DataSource = TestsSetup.DataSource;
-			cs.Database = TestsSetup.Database;
-			cs.Port = TestsSetup.Port;
-			cs.UserID = TestsSetup.UserID;
-			cs.Password = TestsSetup.Password;
-			cs.ServerType = FbServerType;
-			cs.Charset = TestsSetup.Charset;
-			cs.Pooling = TestsSetup.Pooling;
-
-			Assert.DoesNotThrow(() =>
-			{
-				using (FbConnection c = new FbConnection(cs.ToString()))
-				{
-					c.Open();
-				}
-			});
-		}
-
-		[Test]
 		public void ConnectionPoolingOnTest()
 		{
 			FbConnection.ClearAllPools();
@@ -358,7 +335,7 @@ namespace FirebirdSql.Data.UnitTests
 			using (FbCommand cmd = conn.CreateCommand())
 			{
 				cmd.CommandText = "select count(*) from log where text = 'on connect'";
-				return (int)cmd.ExecuteScalar();
+				return Convert.ToInt32(cmd.ExecuteScalar());
 			}
 		}
 

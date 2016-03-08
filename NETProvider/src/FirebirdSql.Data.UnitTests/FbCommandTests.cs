@@ -373,23 +373,24 @@ namespace FirebirdSql.Data.UnitTests
 
 				foreach (string statement in l)
 				{
-					FbCommand insert = new FbCommand(statement, Connection);
-					insert.ExecuteNonQuery();
-					insert.Dispose();
+					using (FbCommand insert = new FbCommand(statement, Connection))
+					{
+						insert.ExecuteNonQuery();
+					}
 				}
 
 				string sql = "select * from	varchartest";
 
-				FbCommand cmd = new FbCommand(sql, Connection);
-				FbDataReader r = cmd.ExecuteReader();
-
-				while (r.Read())
+				using (FbCommand cmd = new FbCommand(sql, Connection))
 				{
-					Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
+					using (FbDataReader r = cmd.ExecuteReader())
+					{
+						while (r.Read())
+						{
+							Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
+						}
+					}
 				}
-
-				r.Close();
-				cmd.Dispose();
 			}
 			finally
 			{
@@ -403,51 +404,41 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void SimplifiedChineseTest()
 		{
+			const string Value = "中文";
 			try
 			{
-				string createTable = "CREATE TABLE TABLE1 (FIELD1 varchar(20))";
-				FbCommand create = new FbCommand(createTable, Connection);
-				create.ExecuteNonQuery();
-				create.Dispose();
+				using (var cmd = new FbCommand("CREATE TABLE TABLE1 (FIELD1 varchar(20))", Connection))
+				{
+					cmd.ExecuteNonQuery();
+				}
 
-				// insert using	parametrized SQL
-				string sql = "INSERT INTO Table1 VALUES	(@value)";
-				FbCommand command = new FbCommand(sql, Connection);
-				command.Parameters.Add("@value", FbDbType.VarChar).Value = "中文";
-				command.ExecuteNonQuery();
-				command.Dispose();
+				using (var cmd = new FbCommand("INSERT INTO TABLE1 VALUES (@value)", Connection))
+				{
+					cmd.Parameters.Add("@value", FbDbType.VarChar).Value = Value;
+					cmd.ExecuteNonQuery();
+				}
+				using (var cmd = new FbCommand($"INSERT INTO TABLE1 VALUES ('{Value}')", Connection))
+				{
+					cmd.ExecuteNonQuery();
+				}
 
-				sql = "SELECT *	FROM TABLE1";
-				FbCommand select = new FbCommand(sql, Connection);
-				string result = select.ExecuteScalar().ToString();
-				select.Dispose();
-
-				Assert.AreEqual("中文", result, "Incorrect results in parametrized insert");
-
-				sql = "DELETE FROM TABLE1";
-				FbCommand delete = new FbCommand(sql, Connection);
-				delete.ExecuteNonQuery();
-				delete.Dispose();
-
-				// insert using	plain SQL
-				sql = "INSERT INTO Table1 VALUES ('中文')";
-				FbCommand plainCommand = new FbCommand(sql, Connection);
-				plainCommand.ExecuteNonQuery();
-				plainCommand.Dispose();
-
-				sql = "SELECT *	FROM TABLE1";
-				select = new FbCommand(sql, Connection);
-				result = select.ExecuteScalar().ToString();
-				select.Dispose();
-
-				Assert.AreEqual("中文", result, "Incorrect results in plain insert");
+				using (var cmd = new FbCommand("SELECT * FROM TABLE1", Connection))
+				{
+					using (var reader = cmd.ExecuteReader())
+					{
+						while (reader.Read())
+						{
+							Assert.AreEqual(Value, reader[0]);
+						}
+					}
+				}
 			}
 			finally
 			{
-				string dropTable = "DROP TABLE TABLE1";
-				FbCommand drop = new FbCommand(dropTable, Connection);
-				drop.ExecuteNonQuery();
-				drop.Dispose();
+				using (var cmd = new FbCommand("DROP TABLE TABLE1", Connection))
+				{
+					cmd.ExecuteNonQuery();
+				}
 			}
 		}
 
@@ -643,14 +634,13 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ReturningClauseTest()
 		{
+			const int ColumnValue = 1234;
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
-				const string columnValue = "foobar";
-
-				cmd.CommandText = string.Format("update rdb$database set rdb$description = '{0}' returning rdb$description", columnValue);
+				cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
 				cmd.ExecuteNonQuery();
-				Assert.AreEqual(columnValue, cmd.Parameters[0].Value);
+				Assert.AreEqual(ColumnValue, cmd.Parameters[0].Value);
 			}
 		}
 
