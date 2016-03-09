@@ -141,6 +141,7 @@
     <Compile Include="Client\Managed\Version12\GdsDatabase.cs" />
     <Compile Include="Client\Managed\Version12\GdsStatement.cs" />
     <Compile Include="Client\Managed\Version13\GdsDatabase.cs" />
+    <Compile Include="Client\Managed\Version13\GdsStatement.cs" />
     <Compile Include="Client\Native\Handle\BlobHandle.cs" />
     <Compile Include="Client\Native\Handle\DatabaseHandle.cs" />
     <Compile Include="Client\Native\Handle\FirebirdHandle.cs" />

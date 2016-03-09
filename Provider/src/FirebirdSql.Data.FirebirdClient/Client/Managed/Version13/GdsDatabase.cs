@@ -70,5 +70,19 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}
+
+		#region Override Statement Creation Methods
+
+		public override StatementBase CreateStatement()
+		{
+			return new GdsStatement(this);
+		}
+
+		public override StatementBase CreateStatement(TransactionBase transaction)
+		{
+			return new GdsStatement(this, transaction);
+		}
+
+		#endregion
 	}
 }
