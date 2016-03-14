@@ -972,7 +972,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			// Set parameter length
 			if (descriptor[index].Length == 0)
 			{
-				descriptor[index].Length = TypeHelper.GetSize((DbDataType)type);
+				descriptor[index].Length = TypeHelper.GetSize((DbDataType)type) ?? 0;
 			}
 
 			// Verify parameter

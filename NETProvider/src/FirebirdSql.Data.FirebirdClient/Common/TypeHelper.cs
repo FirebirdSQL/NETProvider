@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Common
 			return value == null || value == DBNull.Value;
 		}
 
-		public static short GetSize(DbDataType type)
+		public static short? GetSize(DbDataType type)
 		{
 			switch (type)
 			{
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Common
 					return 1;
 
 				default:
-					throw InvalidDataType((int)type);
+					return null;
 			}
 		}
 
