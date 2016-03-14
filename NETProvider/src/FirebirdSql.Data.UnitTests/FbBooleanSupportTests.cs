@@ -12,9 +12,12 @@ namespace FirebirdSql.Data.UnitTests
 	[TestFixture(FbServerType.Embedded)]
 	public class FbBooleanSupportTests : TestsBase
 	{
+		private bool _shouldTearDown;
+
 		public FbBooleanSupportTests(FbServerType serverType)
 			: base(serverType, false)
 		{
+			_shouldTearDown = false;
 		}
 
 		[SetUp]
@@ -25,6 +28,7 @@ namespace FirebirdSql.Data.UnitTests
 			if (!EnsureVersion(new Version("3.0.0.0")))
 				return;
 
+			_shouldTearDown = true;
 			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "CREATE TABLE withboolean (id INTEGER, bool BOOLEAN)";
@@ -49,13 +53,13 @@ namespace FirebirdSql.Data.UnitTests
 		[TearDown]
 		public override void TearDown()
 		{
-			if (!EnsureVersion(new Version("3.0.0.0")))
-				return;
-
-			using (var cmd = Connection.CreateCommand())
+			if (_shouldTearDown)
 			{
-				cmd.CommandText = "DROP TABLE withboolean";
-				cmd.ExecuteNonQuery();
+				using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = "DROP TABLE withboolean";
+					cmd.ExecuteNonQuery();
+				}
 			}
 			base.TearDown();
 		}
