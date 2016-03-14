@@ -8,15 +8,15 @@ This project is supported by:
 	SMS-Timing
 
 
-Developement list
------------------
+Development list
+----------------
 
 You can subscribe to the developement list at:
 
 	http://lists.sourceforge.net/lists/listinfo/firebird-net-provider
 
 
-You can access to the lastest developement sources through Git, see:
+You can access the lastest developement sources through Git, see:
 
 	https://sourceforge.net/p/firebird/NETProvider/ci/master/tree/
 
@@ -24,10 +24,10 @@ You can access to the lastest developement sources through Git, see:
 Reporting Bugs
 --------------
 
-Yo can report bugs using two ways:
+There are two ways you can report bugs:
 
 1. Sending it to the developement list.
-2. Thru the Firebird Project tracker (category DNET):
+2. Through the Firebird Project tracker (category DNET):
 
 
 	http://tracker.firebirdsql.org/DNET
