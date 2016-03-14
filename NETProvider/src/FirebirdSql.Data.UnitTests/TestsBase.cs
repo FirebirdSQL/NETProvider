@@ -264,13 +264,6 @@ end";
 
 		#region	Methods
 
-		public Version GetServerVersion()
-		{
-			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(_fbServerType);
-			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
-		}
-
 		public int GetActiveConnections()
 		{
 			var csb = BuildConnectionStringBuilder(_fbServerType);
@@ -288,12 +281,14 @@ end";
 
 		public bool EnsureVersion(Version version)
 		{
-			if (GetServerVersion() < version)
-			{
-				Assert.Inconclusive("Not supported on this version.");
-				return false;
-			}
-			return true;
+			var server = new FbServerProperties();
+			server.ConnectionString = BuildServicesConnectionString(_fbServerType);
+			var serverVersion = FbServerProperties.ParseServerVersion(server.GetServerVersion());
+			if (serverVersion >= version)
+				return true;
+
+			Assert.Inconclusive("Not supported on this version.");
+			return false;
 		}
 
 		public static int GetId()
