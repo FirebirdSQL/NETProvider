@@ -49,6 +49,9 @@ namespace FirebirdSql.Data.UnitTests
 		[TearDown]
 		public override void TearDown()
 		{
+			if (!EnsureVersion(new Version("3.0.0.0")))
+				return;
+
 			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "DROP TABLE withboolean";
