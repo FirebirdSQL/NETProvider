@@ -286,6 +286,16 @@ end";
 			}
 		}
 
+		public bool EnsureVersion(Version version)
+		{
+			if (GetServerVersion() < version)
+			{
+				Assert.Inconclusive("Not supported on this version.");
+				return false;
+			}
+			return true;
+		}
+
 		public static int GetId()
 		{
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();

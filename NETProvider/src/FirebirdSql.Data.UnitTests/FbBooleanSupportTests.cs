@@ -22,11 +22,8 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			base.SetUp();
 
-			if (GetServerVersion() < new Version("3.0.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
+			if (!EnsureVersion(new Version("3.0.0.0")))
 				return;
-			}
 
 			using (var cmd = Connection.CreateCommand())
 			{

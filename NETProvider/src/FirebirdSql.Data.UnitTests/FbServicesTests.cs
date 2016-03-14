@@ -109,11 +109,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void StreamingBackupRestoreTest()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
+			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
-			}
 
 			using (var ms = new MemoryStream())
 			{
@@ -203,11 +200,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Category("Local")]
 		public void ShutdownOnline2Test()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
+			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
-			}
 
 			FbConfiguration configurationSvc = new FbConfiguration();
 
@@ -321,11 +315,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NBackupBackupRestoreTest()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
+			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
-			}
 
 			NBackupBackupRestoreTest_BackupPart();
 			NBackupBackupRestoreTest_RestorePart();
