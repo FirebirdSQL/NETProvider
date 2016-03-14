@@ -264,7 +264,7 @@ end";
 
 		#region	Methods
 
-		public int GetActiveConnections()
+		protected int GetActiveConnections()
 		{
 			var csb = BuildConnectionStringBuilder(_fbServerType);
 			csb.Pooling = false;
@@ -279,19 +279,23 @@ end";
 			}
 		}
 
-		public bool EnsureVersion(Version version)
+		protected Version GetServerVersion()
 		{
 			var server = new FbServerProperties();
 			server.ConnectionString = BuildServicesConnectionString(_fbServerType);
-			var serverVersion = FbServerProperties.ParseServerVersion(server.GetServerVersion());
-			if (serverVersion >= version)
+			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
+		}
+
+		protected bool EnsureVersion(Version version)
+		{
+			if (GetServerVersion() >= version)
 				return true;
 
 			Assert.Inconclusive("Not supported on this version.");
 			return false;
 		}
 
-		public static int GetId()
+		protected static int GetId()
 		{
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
 
