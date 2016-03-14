@@ -692,11 +692,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void CommandCancellationTest()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
+			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
-			}
 
 			bool cancelled = false;
 

@@ -131,8 +131,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public override DbType DbType
 		{
-			get { return TypeHelper.GetDbType((DbDataType)_fbDbType); }
-			set { FbDbType = (FbDbType)TypeHelper.GetDbDataType(value); }
+			get { return TypeHelper.GetDbTypeFromDbDataType((DbDataType)_fbDbType); }
+			set { FbDbType = (FbDbType)TypeHelper.GetDbDataTypeFromDbType(value); }
 		}
 
 		[RefreshProperties(RefreshProperties.All)]
@@ -440,7 +440,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 					else
 					{
-						throw new SystemException("Value is of unknown data type");
+						throw new ArgumentException("Parameter type is unknown.");
 					}
 					break;
 			}

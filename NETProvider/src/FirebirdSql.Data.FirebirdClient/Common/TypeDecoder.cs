@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Common
 
 			if (scale < 0)
 			{
-				divisor = (long)System.Math.Pow(10, scale * (-1));
+				divisor = (long)Math.Pow(10, scale * (-1));
 			}
 
 			switch (sqltype & ~1)
@@ -83,9 +83,14 @@ namespace FirebirdSql.Data.Common
 				year += 1;
 			}
 
-			DateTime date = new System.DateTime(year, month, day);
+			DateTime date = new DateTime(year, month, day);
 
 			return date.Date;
+		}
+
+		public static bool DecodeBoolean(byte[] value)
+		{
+			return value[0] != 0;
 		}
 	}
 }

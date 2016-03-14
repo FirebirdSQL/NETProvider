@@ -367,6 +367,11 @@ namespace FirebirdSql.Data.Client.Managed
 			return value;
 		}
 
+		public bool ReadBoolean()
+		{
+			return TypeDecoder.DecodeBoolean(ReadOpaque(1));
+		}
+
 		public object ReadValue(DbField field)
 		{
 			object fieldValue = null;
@@ -448,6 +453,10 @@ namespace FirebirdSql.Data.Client.Managed
 
 				case DbDataType.TimeStamp:
 					fieldValue = ReadDateTime();
+					break;
+
+				case DbDataType.Boolean:
+					fieldValue = ReadBoolean();
 					break;
 			}
 
@@ -593,7 +602,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void Write(bool value)
 		{
-			Write((short)(value ? 1 : 0));
+			WriteOpaque(TypeEncoder.EncodeBoolean(value));
 		}
 
 		public void Write(DateTime value)
@@ -723,7 +732,7 @@ namespace FirebirdSql.Data.Client.Managed
 							break;
 
 						default:
-							throw IscException.ForStrParam($"Unknown sql data type: {param.DataType}.");
+							throw IscException.ForStrParam($"Unknown SQL data type: {param.DataType}.");
 					}
 				}
 

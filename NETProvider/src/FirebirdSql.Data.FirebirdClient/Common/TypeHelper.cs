@@ -21,29 +21,26 @@
 
 using System;
 using System.Data;
-using System.Globalization;
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Common
 {
 	internal static class TypeHelper
 	{
-		#region Static Methods
-
 		public static bool IsDBNull(object value)
 		{
-			return (value == null || value == System.DBNull.Value);
+			return value == null || value == DBNull.Value;
 		}
 
-		public static short GetSize(DbDataType dataType)
+		public static short? GetSize(DbDataType type)
 		{
-			switch (dataType)
+			switch (type)
 			{
 				case DbDataType.Array:
 				case DbDataType.Binary:
 				case DbDataType.Text:
 					return 8;
 
-				case DbDataType.Boolean:
 				case DbDataType.SmallInt:
 					return 2;
 
@@ -61,16 +58,19 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.Guid:
 					return 16;
 
+				case DbDataType.Boolean:
+					return 1;
+
 				default:
-					return 0;
+					return null;
 			}
 		}
 
-		public static int GetFbType(DbDataType dataType, bool isNullable)
+		public static int GetSqlTypeFromDbDataType(DbDataType type, bool isNullable)
 		{
 			int sqltype = 0;
 
-			switch (dataType)
+			switch (type)
 			{
 				case DbDataType.Array:
 					sqltype = IscCodes.SQL_ARRAY;
@@ -89,7 +89,6 @@ namespace FirebirdSql.Data.Common
 					sqltype = IscCodes.SQL_VARYING;
 					break;
 
-				case DbDataType.Boolean:
 				case DbDataType.SmallInt:
 					sqltype = IscCodes.SQL_SHORT;
 					break;
@@ -126,8 +125,12 @@ namespace FirebirdSql.Data.Common
 					sqltype = IscCodes.SQL_TIMESTAMP;
 					break;
 
+				case DbDataType.Boolean:
+					sqltype = IscCodes.SQL_BOOLEAN;
+					break;
+
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)type);
 			}
 
 			if (isNullable)
@@ -138,9 +141,9 @@ namespace FirebirdSql.Data.Common
 			return sqltype;
 		}
 
-		public static int GetFbType(int blrType)
+		public static int GetSqlTypeFromBlrType(int type)
 		{
-			switch (blrType)
+			switch (type)
 			{
 				case IscCodes.blr_varying:
 				case IscCodes.blr_varying2:
@@ -186,117 +189,17 @@ namespace FirebirdSql.Data.Common
 				case IscCodes.blr_blob:
 					return IscCodes.SQL_BLOB;
 
+				case IscCodes.blr_bool:
+					return IscCodes.SQL_BOOLEAN;
+
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType(type);
 			}
 		}
 
-		public static DbDataType GetDbDataType(int blrType, int subType, int scale)
+		public static string GetDataTypeName(DbDataType type)
 		{
-			switch (blrType)
-			{
-				case IscCodes.blr_varying:
-				case IscCodes.blr_varying2:
-					return DbDataType.VarChar;
-
-				case IscCodes.blr_text:
-				case IscCodes.blr_text2:
-					return DbDataType.Char;
-
-				case IscCodes.blr_cstring:
-				case IscCodes.blr_cstring2:
-					return DbDataType.Text;
-
-				case IscCodes.blr_short:
-					if (subType == 2)
-					{
-						return DbDataType.Decimal;
-					}
-					else if (subType == 1)
-					{
-						return DbDataType.Numeric;
-					}
-					else if (scale < 0)
-					{
-						return DbDataType.Decimal;
-					}
-					else
-					{
-						return DbDataType.SmallInt;
-					}
-
-				case IscCodes.blr_long:
-					if (subType == 2)
-					{
-						return DbDataType.Decimal;
-					}
-					else if (subType == 1)
-					{
-						return DbDataType.Numeric;
-					}
-					else if (scale < 0)
-					{
-						return DbDataType.Decimal;
-					}
-					else
-					{
-						return DbDataType.Integer;
-					}
-
-				case IscCodes.blr_quad:
-				case IscCodes.blr_int64:
-				case IscCodes.blr_blob_id:
-					if (subType == 2)
-					{
-						return DbDataType.Decimal;
-					}
-					else if (subType == 1)
-					{
-						return DbDataType.Numeric;
-					}
-					else if (scale < 0)
-					{
-						return DbDataType.Decimal;
-					}
-					else
-					{
-						return DbDataType.BigInt;
-					}
-
-				case IscCodes.blr_double:
-				case IscCodes.blr_d_float:
-					return DbDataType.Double;
-
-				case IscCodes.blr_float:
-					return DbDataType.Float;
-
-				case IscCodes.blr_sql_date:
-					return DbDataType.Date;
-
-				case IscCodes.blr_sql_time:
-					return DbDataType.Time;
-
-				case IscCodes.blr_timestamp:
-					return DbDataType.TimeStamp;
-
-				case IscCodes.blr_blob:
-					if (subType == 1)
-					{
-						return DbDataType.Text;
-					}
-					else
-					{
-						return DbDataType.Binary;
-					}
-
-				default:
-					throw new ArgumentException("Invalid data type");
-			}
-		}
-
-		public static string GetDataTypeName(DbDataType dataType)
-		{
-			switch (dataType)
+			switch (type)
 			{
 				case DbDataType.Array:
 					return "ARRAY";
@@ -344,61 +247,72 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.TimeStamp:
 					return "TIMESTAMP";
 
+				case DbDataType.Boolean:
+					return "BOOLEAN";
+
 				default:
-					return null;
+					throw InvalidDataType((int)type);
 			}
 		}
 
-		public static string GetSystemDataTypeName(DbDataType dataType)
+		public static Type GetTypeFromDbDataType(DbDataType type)
 		{
-			switch (dataType)
+			switch (type)
 			{
 				case DbDataType.Array:
-					return "System.Array";
+					return typeof(System.Array);
 
 				case DbDataType.Binary:
-					return "System.Byte[]";
+					return typeof(System.Byte[]);
 
 				case DbDataType.Text:
 				case DbDataType.Char:
 				case DbDataType.VarChar:
-					return "System.String";
+					return typeof(System.String);
 
 				case DbDataType.Guid:
-					return "System.Guid";
+					return typeof(System.Guid);
 
 				case DbDataType.SmallInt:
-					return "System.Int16";
+					return typeof(System.Int16);
 
 				case DbDataType.Integer:
-					return "System.Int32";
+					return typeof(System.Int32);
 
 				case DbDataType.BigInt:
-					return "System.Int64";
+					return typeof(System.Int64);
 
 				case DbDataType.Float:
-					return "System.Single";
+					return typeof(System.Single);
 
 				case DbDataType.Double:
-					return "System.Double";
+					return typeof(System.Double);
 
 				case DbDataType.Numeric:
 				case DbDataType.Decimal:
-					return "System.Decimal";
+					return typeof(System.Decimal);
 
 				case DbDataType.Date:
 				case DbDataType.TimeStamp:
-					return "System.DateTime";
+					return typeof(System.DateTime);
 
 				case DbDataType.Time:
-					return "System.TimeSpan";
+					return typeof(System.TimeSpan);
+
+				case DbDataType.Boolean:
+					return typeof(System.Boolean);
 
 				default:
-					return null;
+					throw InvalidDataType((int)type);
 			}
 		}
 
-		public static DbType GetDbType(DbDataType type)
+		public static Type GetTypeFromBlrType(int type, int subType, int scale)
+		{
+			return GetTypeFromDbDataType(GetDbDataTypeFromBlrType(type, subType, scale));
+		}
+
+		public static DbType GetDbTypeFromDbDataType(DbDataType type)
 		{
 			switch (type)
 			{
@@ -446,13 +360,13 @@ namespace FirebirdSql.Data.Common
 					return DbType.Boolean;
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)type);
 			}
 		}
 
-		public static DbDataType GetDbDataType(DbType dbType)
+		public static DbDataType GetDbDataTypeFromDbType(DbType type)
 		{
-			switch (dbType)
+			switch (type)
 			{
 				case DbType.String:
 				case DbType.AnsiString:
@@ -462,7 +376,6 @@ namespace FirebirdSql.Data.Common
 				case DbType.AnsiStringFixedLength:
 					return DbDataType.Char;
 
-				case DbType.Boolean:
 				case DbType.Byte:
 				case DbType.SByte:
 				case DbType.Int16:
@@ -502,31 +415,45 @@ namespace FirebirdSql.Data.Common
 				case DbType.Guid:
 					return DbDataType.Guid;
 
+				case DbType.Boolean:
+					return DbDataType.Boolean;
+
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType((int)type);
 			}
 		}
 
-		public static DbDataType GetTypeFromDsc(int dsc_type, int dsc_scale, int dsc_subType)
+		public static DbDataType GetDbDataTypeFromBlrType(int type, int subType, int scale)
 		{
-			switch (dsc_type)
+			return GetDbDataTypeFromSqlType(GetSqlTypeFromBlrType(type), subType, scale);
+		}
+
+		public static DbDataType GetDbDataTypeFromSqlType(int type, int subType, int scale, int? length = null, Charset charset = null)
+		{
+			// Special case for Guid handling
+			if (type == IscCodes.SQL_TEXT && length == 16 && (charset?.Name.Equals("OCTETS", StringComparison.InvariantCultureIgnoreCase) ?? false))
 			{
-				case IscCodes.dtype_cstring:	// char
+				return DbDataType.Guid;
+			}
+
+			switch (type)
+			{
+				case IscCodes.SQL_TEXT:
 					return DbDataType.Char;
 
-				case IscCodes.dtype_varying:	// varchar
+				case IscCodes.SQL_VARYING:
 					return DbDataType.VarChar;
 
-				case IscCodes.dtype_short:	    // Int16
-					if (dsc_subType == 2)
+				case IscCodes.SQL_SHORT:
+					if (subType == 2)
 					{
 						return DbDataType.Decimal;
 					}
-					else if (dsc_subType == 1)
+					else if (subType == 1)
 					{
 						return DbDataType.Numeric;
 					}
-					else if (dsc_scale < 0)
+					else if (scale < 0)
 					{
 						return DbDataType.Decimal;
 					}
@@ -535,16 +462,16 @@ namespace FirebirdSql.Data.Common
 						return DbDataType.SmallInt;
 					}
 
-				case IscCodes.dtype_long:	    // Int32
-					if (dsc_subType == 2)
+				case IscCodes.SQL_LONG:
+					if (subType == 2)
 					{
 						return DbDataType.Decimal;
 					}
-					else if (dsc_subType == 1)
+					else if (subType == 1)
 					{
 						return DbDataType.Numeric;
 					}
-					else if (dsc_scale < 0)
+					else if (scale < 0)
 					{
 						return DbDataType.Decimal;
 					}
@@ -553,16 +480,17 @@ namespace FirebirdSql.Data.Common
 						return DbDataType.Integer;
 					}
 
-				case IscCodes.dtype_int64:	    // Int64
-					if (dsc_subType == 2)
+				case IscCodes.SQL_QUAD:
+				case IscCodes.SQL_INT64:
+					if (subType == 2)
 					{
 						return DbDataType.Decimal;
 					}
-					else if (dsc_subType == 1)
+					else if (subType == 1)
 					{
 						return DbDataType.Numeric;
 					}
-					else if (dsc_scale < 0)
+					else if (scale < 0)
 					{
 						return DbDataType.Decimal;
 					}
@@ -571,31 +499,65 @@ namespace FirebirdSql.Data.Common
 						return DbDataType.BigInt;
 					}
 
-				case IscCodes.dtype_d_float:	// Double
-				case IscCodes.dtype_double:
-					return DbDataType.Double;
-
-				case IscCodes.dtype_real:	    // Float
+				case IscCodes.SQL_FLOAT:
 					return DbDataType.Float;
 
-				case IscCodes.dtype_sql_date:   // Date
-					return DbDataType.Date;
+				case IscCodes.SQL_DOUBLE:
+				case IscCodes.SQL_D_FLOAT:
+					if (subType == 2)
+					{
+						return DbDataType.Decimal;
+					}
+					else if (subType == 1)
+					{
+						return DbDataType.Numeric;
+					}
+					else if (scale < 0)
+					{
+						return DbDataType.Decimal;
+					}
+					else
+					{
+						return DbDataType.Double;
+					}
 
-				case IscCodes.dtype_sql_time:   // Time
-					return DbDataType.Time;
+				case IscCodes.SQL_BLOB:
+					if (subType == 1)
+					{
+						return DbDataType.Text;
+					}
+					else
+					{
+						return DbDataType.Binary;
+					}
 
-				case IscCodes.dtype_timestamp:	// Timestamp
+				case IscCodes.SQL_TIMESTAMP:
 					return DbDataType.TimeStamp;
 
-				case IscCodes.dtype_blob:       // Blob
-					return DbDataType.Binary;
+				case IscCodes.SQL_TYPE_TIME:
+					return DbDataType.Time;
 
-				case IscCodes.dtype_text:       // Clob
-					return DbDataType.Text;
+				case IscCodes.SQL_TYPE_DATE:
+					return DbDataType.Date;
+
+				case IscCodes.SQL_ARRAY:
+					return DbDataType.Array;
+
+				case IscCodes.SQL_NULL:
+					return DbDataType.Null;
+
+				case IscCodes.SQL_BOOLEAN:
+					return DbDataType.Boolean;
 
 				default:
-					throw new ArgumentException("Invalid data type");
+					throw InvalidDataType(type);
 			}
+		}
+
+		public static DbDataType GetDbDataTypeFromFbDbType(FbDbType type)
+		{
+			// these are aligned for this conversion
+			return (DbDataType)type;
 		}
 
 		public static TimeSpan DateTimeToTimeSpan(DateTime d)
@@ -603,6 +565,9 @@ namespace FirebirdSql.Data.Common
 			return TimeSpan.FromTicks(d.Subtract(d.Date).Ticks);
 		}
 
-		#endregion
+		public static Exception InvalidDataType(int type)
+		{
+			return new ArgumentException($"Invalid data type: {type}.");
+		}
 	}
 }

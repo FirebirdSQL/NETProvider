@@ -109,9 +109,12 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void StreamingBackupRestoreTest()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
+			if (!EnsureVersion(new Version("2.5.0.0")))
+				return;
+
+			if (GetServerVersion() >= new Version("3.0.0.0") && GetServerVersion() <= new Version("3.1.0.0"))
 			{
-				Assert.Inconclusive("Not supported on this version.");
+				Assert.Ignore("devel: FB 3 RC2 never asks last byte byte for isc_info_svc_stdin");
 				return;
 			}
 
@@ -122,7 +125,7 @@ namespace FirebirdSql.Data.UnitTests
 				StreamingBackupRestoreTest_RestorePart(ms);
 			}
 		}
-		public void StreamingBackupRestoreTest_BackupPart(MemoryStream buffer)
+		private void StreamingBackupRestoreTest_BackupPart(MemoryStream buffer)
 		{
 			FbStreamingBackup backupSvc = new FbStreamingBackup();
 
@@ -134,7 +137,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			backupSvc.Execute();
 		}
-		public void StreamingBackupRestoreTest_RestorePart(MemoryStream buffer)
+		private void StreamingBackupRestoreTest_RestorePart(MemoryStream buffer)
 		{
 			FbStreamingRestore restoreSvc = new FbStreamingRestore();
 
@@ -203,11 +206,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Category("Local")]
 		public void ShutdownOnline2Test()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
+			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
-			}
 
 			FbConfiguration configurationSvc = new FbConfiguration();
 
@@ -321,11 +321,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NBackupBackupRestoreTest()
 		{
-			if (GetServerVersion() < new Version("2.5.0.0"))
-			{
-				Assert.Inconclusive("Not supported on this version.");
+			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
-			}
 
 			NBackupBackupRestoreTest_BackupPart();
 			NBackupBackupRestoreTest_RestorePart();

@@ -217,6 +217,10 @@ namespace FirebirdSql.Data.Common
 							blr.WriteByte((byte)_fields[i].NumericScale);
 							break;
 
+						case IscCodes.SQL_BOOLEAN:
+							blr.WriteByte(IscCodes.blr_bool);
+							break;
+
 						case IscCodes.SQL_NULL:
 							blr.WriteByte(IscCodes.blr_text);
 							blr.WriteByte((byte)(len & 255));

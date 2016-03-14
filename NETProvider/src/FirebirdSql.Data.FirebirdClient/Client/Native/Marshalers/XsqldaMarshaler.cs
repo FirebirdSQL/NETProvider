@@ -244,7 +244,8 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 				return null;
 			}
 
-			switch (xsqlvar.sqltype & ~1)
+			var type = xsqlvar.sqltype & ~1;
+			switch (type)
 			{
 				case IscCodes.SQL_VARYING:
 					{
@@ -266,13 +267,15 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 				case IscCodes.SQL_TIMESTAMP:
 				case IscCodes.SQL_TYPE_TIME:
 				case IscCodes.SQL_TYPE_DATE:
+#warning Test it later
+				case IscCodes.SQL_BOOLEAN:
 					{
 						var buffer = new byte[xsqlvar.sqllen];
 						Marshal.Copy(xsqlvar.sqldata, buffer, 0, buffer.Length);
 						return buffer;
 					}
 				default:
-					throw new NotSupportedException("Unknown data type");
+					throw TypeHelper.InvalidDataType(type);
 			}
 		}
 

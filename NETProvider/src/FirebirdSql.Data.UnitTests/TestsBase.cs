@@ -264,14 +264,7 @@ end";
 
 		#region	Methods
 
-		public Version GetServerVersion()
-		{
-			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(_fbServerType);
-			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
-		}
-
-		public int GetActiveConnections()
+		protected int GetActiveConnections()
 		{
 			var csb = BuildConnectionStringBuilder(_fbServerType);
 			csb.Pooling = false;
@@ -286,7 +279,23 @@ end";
 			}
 		}
 
-		public static int GetId()
+		protected Version GetServerVersion()
+		{
+			var server = new FbServerProperties();
+			server.ConnectionString = BuildServicesConnectionString(_fbServerType);
+			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
+		}
+
+		protected bool EnsureVersion(Version version)
+		{
+			if (GetServerVersion() >= version)
+				return true;
+
+			Assert.Inconclusive("Not supported on this version.");
+			return false;
+		}
+
+		protected static int GetId()
 		{
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
 

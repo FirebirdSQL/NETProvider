@@ -95,6 +95,7 @@ namespace FirebirdSql.Data.Services
 			var items = Verbose
 				? new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line }
 				: new byte[] { IscCodes.isc_info_svc_stdin };
+#warning 32k constant
 			var readAheadBuffer = new List<byte>((32 * 1024) + 1);
 			ReadAheadBuffering(readAheadBuffer, InputStream, 0);
 			var response = Query(items);
@@ -133,6 +134,7 @@ namespace FirebirdSql.Data.Services
 
 		static int GetLength(ArrayList items)
 		{
+#warning 32k constant
 			const int maxLength = (32 * 1024) - 4;
 			return Math.Min(items[0] is int ? (int)items[0] : 0, maxLength);
 		}

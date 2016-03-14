@@ -212,8 +212,8 @@ namespace FirebirdSql.Data.Client.Native
 			Array tempData = Array.CreateInstance(systemType, sliceData.Length);
 
 			// Infer data types
-			type = TypeHelper.GetFbType(Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(Descriptor.DataType, 0, Descriptor.Scale);
+			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
+			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
 			int itemLength = Descriptor.Length;
 
@@ -360,8 +360,8 @@ namespace FirebirdSql.Data.Client.Native
 			int type = 0;
 
 			// Infer data types
-			type = TypeHelper.GetFbType(Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataType(Descriptor.DataType, subType, Descriptor.Scale);
+			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
+			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
 			foreach (object source in sourceArray)
 			{
@@ -460,7 +460,7 @@ namespace FirebirdSql.Data.Client.Native
 						break;
 
 					default:
-						throw new NotSupportedException("Unknown data type");
+						throw TypeHelper.InvalidDataType((int)dbType);
 				}
 			}
 
