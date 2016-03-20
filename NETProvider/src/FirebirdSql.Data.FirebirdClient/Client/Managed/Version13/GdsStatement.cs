@@ -39,5 +39,14 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 		{ }
 
 		#endregion
+
+		#region Overriden Methods
+
+		protected override byte[] WriteDescriptor(Descriptor descriptor, Charset charset)
+		{
+			return base.WriteDescriptor(descriptor, charset);
+		}
+
+		#endregion
 	}
 }
