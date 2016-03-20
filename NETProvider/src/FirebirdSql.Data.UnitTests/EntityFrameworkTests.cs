@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DbProviderServicesTest()
 		{
-			object dbproviderservices = (FirebirdClientFactory.Instance as IServiceProvider).GetService(typeof(DbProviderServices));
+			object dbproviderservices = GetProviderServices();
 			Assert.IsNotNull(dbproviderservices);
 			Assert.IsInstanceOf<FbProviderServices>(dbproviderservices);
 		}
