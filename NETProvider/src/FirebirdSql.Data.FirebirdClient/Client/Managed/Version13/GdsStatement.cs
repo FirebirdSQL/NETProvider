@@ -178,128 +178,35 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 		}
 
-		protected override DbValue[] ReadRows()
+		protected override DbValue[] ReadRow()
 		{
 			DbValue[] row = new DbValue[_fields.Count];
-			object value = null;
-
 			lock (_database.SyncObject)
 			{
 				var nullBytes = _database.XdrStream.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
 				var nullBits = new BitArray(nullBytes);
 
-				// This only works if not (port->port_flags & PORT_symmetric)
 				for (int i = 0; i < _fields.Count; i++)
 				{
 					if (nullBits.Get(i))
 					{
-						continue;
+						row[i] = new DbValue(this, _fields[i], null);
 					}
-
-					try
+					else
 					{
-						value = ReadValue(_fields[i]);
-						row[i] = new DbValue(this, _fields[i], value);
-					}
-					catch (IOException ex)
-					{
-						throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
+						try
+						{
+							var value = ReadRawValue(_fields[i]);
+							row[i] = new DbValue(this, _fields[i], value);
+						}
+						catch (IOException ex)
+						{
+							throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
+						}
 					}
 				}
 			}
-
 			return row;
-		}
-
-		protected override object ReadValue(DbField field)
-		{
-			object fieldValue = null;
-			Charset innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
-
-			switch (field.DbDataType)
-			{
-				case DbDataType.Char:
-					if (field.Charset.IsOctetsCharset)
-					{
-						fieldValue = _database.XdrStream.ReadOpaque(field.Length);
-					}
-					else
-					{
-						string s = _database.XdrStream.ReadString(innerCharset, field.Length);
-
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-							s.Length > field.CharCount)
-						{
-							fieldValue = s.Substring(0, field.CharCount);
-						}
-						else
-						{
-							fieldValue = s;
-						}
-					}
-					break;
-
-				case DbDataType.VarChar:
-					if (field.Charset.IsOctetsCharset)
-					{
-						fieldValue = _database.XdrStream.ReadBuffer();
-					}
-					else
-					{
-						fieldValue = _database.XdrStream.ReadString(innerCharset);
-					}
-					break;
-
-				case DbDataType.SmallInt:
-					fieldValue = _database.XdrStream.ReadInt16();
-					break;
-
-				case DbDataType.Integer:
-					fieldValue = _database.XdrStream.ReadInt32();
-					break;
-
-				case DbDataType.Array:
-				case DbDataType.Binary:
-				case DbDataType.Text:
-				case DbDataType.BigInt:
-					fieldValue = _database.XdrStream.ReadInt64();
-					break;
-
-				case DbDataType.Decimal:
-				case DbDataType.Numeric:
-					fieldValue = _database.XdrStream.ReadDecimal(field.DataType, field.NumericScale);
-					break;
-
-				case DbDataType.Float:
-					fieldValue = _database.XdrStream.ReadSingle();
-					break;
-
-				case DbDataType.Guid:
-					fieldValue = _database.XdrStream.ReadGuid(field.Length);
-					break;
-
-				case DbDataType.Double:
-					fieldValue = _database.XdrStream.ReadDouble();
-					break;
-
-				case DbDataType.Date:
-					fieldValue = _database.XdrStream.ReadDate();
-					break;
-
-				case DbDataType.Time:
-					fieldValue = _database.XdrStream.ReadTime();
-					break;
-
-				case DbDataType.TimeStamp:
-					fieldValue = _database.XdrStream.ReadDateTime();
-					break;
-
-				case DbDataType.Boolean:
-					fieldValue = _database.XdrStream.ReadBoolean();
-					break;
-			}
-
-			return fieldValue;
 		}
 
 		#endregion

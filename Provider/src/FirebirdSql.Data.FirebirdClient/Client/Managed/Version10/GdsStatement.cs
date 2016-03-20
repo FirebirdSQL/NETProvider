@@ -375,7 +375,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 									if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 									{
-										_rows.Enqueue(ReadRows());
+										_rows.Enqueue(ReadRow());
 									}
 									else if (fetchResponse.Status == 100)
 									{
@@ -631,7 +631,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (response.Count > 0)
 				{
-					_outputParams.Enqueue(ReadRows());
+					_outputParams.Enqueue(ReadRow());
 				}
 			}
 			catch (IOException ex)
@@ -798,6 +798,83 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
+		protected object ReadRawValue(DbField field)
+		{
+			var innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
+
+			switch (field.DbDataType)
+			{
+				case DbDataType.Char:
+					if (field.Charset.IsOctetsCharset)
+					{
+						return _database.XdrStream.ReadOpaque(field.Length);
+					}
+					else
+					{
+						var s = _database.XdrStream.ReadString(innerCharset, field.Length);
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
+							s.Length > field.CharCount)
+						{
+							return s.Substring(0, field.CharCount);
+						}
+						else
+						{
+							return s;
+						}
+					}
+
+				case DbDataType.VarChar:
+					if (field.Charset.IsOctetsCharset)
+					{
+						return _database.XdrStream.ReadBuffer();
+					}
+					else
+					{
+						return _database.XdrStream.ReadString(innerCharset);
+					}
+
+				case DbDataType.SmallInt:
+					return _database.XdrStream.ReadInt16();
+
+				case DbDataType.Integer:
+					return _database.XdrStream.ReadInt32();
+
+				case DbDataType.Array:
+				case DbDataType.Binary:
+				case DbDataType.Text:
+				case DbDataType.BigInt:
+					return _database.XdrStream.ReadInt64();
+
+				case DbDataType.Decimal:
+				case DbDataType.Numeric:
+					return _database.XdrStream.ReadDecimal(field.DataType, field.NumericScale);
+
+				case DbDataType.Float:
+					return _database.XdrStream.ReadSingle();
+
+				case DbDataType.Guid:
+					return _database.XdrStream.ReadGuid(field.Length);
+
+				case DbDataType.Double:
+					return _database.XdrStream.ReadDouble();
+
+				case DbDataType.Date:
+					return _database.XdrStream.ReadDate();
+
+				case DbDataType.Time:
+					return _database.XdrStream.ReadTime();
+
+				case DbDataType.TimeStamp:
+					return _database.XdrStream.ReadDateTime();
+
+				case DbDataType.Boolean:
+					return _database.XdrStream.ReadBoolean();
+
+				default:
+					throw TypeHelper.InvalidDataType((int)field.DbDataType);
+			}
+		}
+
 		protected void Clear()
 		{
 			if (_rows != null && _rows.Count > 0)
@@ -943,20 +1020,29 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected virtual DbValue[] ReadRows()
+		protected virtual DbValue[] ReadRow()
 		{
 			DbValue[] row = new DbValue[_fields.Count];
-			object value = null;
-
 			lock (_database.SyncObject)
 			{
-				// This only works if not (port->port_flags & PORT_symmetric)
 				for (int i = 0; i < _fields.Count; i++)
 				{
 					try
 					{
-						value = ReadValue(_fields[i]);
-						row[i] = new DbValue(this, _fields[i], value);
+						var value = ReadRawValue(_fields[i]);
+						var sqlInd = _database.XdrStream.ReadInt32();
+						if (sqlInd == -1)
+						{
+							row[i] = new DbValue(this, _fields[i], null);
+						}
+						else if (sqlInd == 0)
+						{
+							row[i] = new DbValue(this, _fields[i], value);
+						}
+						else
+						{
+							throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
+						}
 					}
 					catch (IOException ex)
 					{
@@ -964,112 +1050,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 				}
 			}
-
 			return row;
-		}
-
-		protected virtual object ReadValue(DbField field)
-		{
-			object fieldValue = null;
-			Charset innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
-
-			switch (field.DbDataType)
-			{
-				case DbDataType.Char:
-					if (field.Charset.IsOctetsCharset)
-					{
-						fieldValue = _database.XdrStream.ReadOpaque(field.Length);
-					}
-					else
-					{
-						string s = _database.XdrStream.ReadString(innerCharset, field.Length);
-
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-							s.Length > field.CharCount)
-						{
-							fieldValue = s.Substring(0, field.CharCount);
-						}
-						else
-						{
-							fieldValue = s;
-						}
-					}
-					break;
-
-				case DbDataType.VarChar:
-					if (field.Charset.IsOctetsCharset)
-					{
-						fieldValue = _database.XdrStream.ReadBuffer();
-					}
-					else
-					{
-						fieldValue = _database.XdrStream.ReadString(innerCharset);
-					}
-					break;
-
-				case DbDataType.SmallInt:
-					fieldValue = _database.XdrStream.ReadInt16();
-					break;
-
-				case DbDataType.Integer:
-					fieldValue = _database.XdrStream.ReadInt32();
-					break;
-
-				case DbDataType.Array:
-				case DbDataType.Binary:
-				case DbDataType.Text:
-				case DbDataType.BigInt:
-					fieldValue = _database.XdrStream.ReadInt64();
-					break;
-
-				case DbDataType.Decimal:
-				case DbDataType.Numeric:
-					fieldValue = _database.XdrStream.ReadDecimal(field.DataType, field.NumericScale);
-					break;
-
-				case DbDataType.Float:
-					fieldValue = _database.XdrStream.ReadSingle();
-					break;
-
-				case DbDataType.Guid:
-					fieldValue = _database.XdrStream.ReadGuid(field.Length);
-					break;
-
-				case DbDataType.Double:
-					fieldValue = _database.XdrStream.ReadDouble();
-					break;
-
-				case DbDataType.Date:
-					fieldValue = _database.XdrStream.ReadDate();
-					break;
-
-				case DbDataType.Time:
-					fieldValue = _database.XdrStream.ReadTime();
-					break;
-
-				case DbDataType.TimeStamp:
-					fieldValue = _database.XdrStream.ReadDateTime();
-					break;
-
-				case DbDataType.Boolean:
-					fieldValue = _database.XdrStream.ReadBoolean();
-					break;
-			}
-
-			int sqlInd = _database.XdrStream.ReadInt32();
-
-			if (sqlInd == 0)
-			{
-				return fieldValue;
-			}
-			else if (sqlInd == -1)
-			{
-				return null;
-			}
-			else
-			{
-				throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
-			}
 		}
 
 		#endregion
