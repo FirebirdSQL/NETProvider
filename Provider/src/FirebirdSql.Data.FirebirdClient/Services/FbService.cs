@@ -122,11 +122,18 @@ namespace FirebirdSql.Data.Services
 		{
 			ServiceParameterBuffer spb = new ServiceParameterBuffer();
 
-			// SPB configuration
 			spb.Append(IscCodes.isc_spb_version);
 			spb.Append(IscCodes.isc_spb_current_version);
-			spb.Append((byte)IscCodes.isc_spb_user_name, _csManager.UserID);
-			spb.Append((byte)IscCodes.isc_spb_password, _csManager.Password);
+			var gdsSvc = (Client.Managed.Version10.GdsServiceManager)_svc;
+			if (gdsSvc.AuthData != null)
+			{
+				spb.Append((byte)IscCodes.isc_spb_specific_auth_data, Encoding.UTF8.GetBytes(gdsSvc.AuthData.ToHexString()));
+			}
+			else
+			{
+				spb.Append((byte)IscCodes.isc_spb_user_name, _csManager.UserID);
+				spb.Append((byte)IscCodes.isc_spb_password, _csManager.Password);
+			}
 			spb.Append((byte)IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 
 			if (_csManager.Role != null && _csManager.Role.Length > 0)

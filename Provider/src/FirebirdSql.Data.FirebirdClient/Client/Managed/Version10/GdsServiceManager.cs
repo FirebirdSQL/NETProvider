@@ -42,6 +42,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return _handle; }
 		}
 
+		public byte[] AuthData
+		{
+			get { return _connection.AuthData; }
+		}
+
 		#endregion
 
 		#region Constructors
@@ -64,6 +69,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
+#warning Separate method for op_service_attach as for i.e. op_attach
 					_database.XdrStream.Write(IscCodes.op_service_attach);
 					_database.XdrStream.Write(0);
 					_database.XdrStream.Write(service);
