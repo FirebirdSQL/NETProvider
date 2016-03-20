@@ -183,27 +183,26 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			DbValue[] row = new DbValue[_fields.Count];
 			lock (_database.SyncObject)
 			{
-				var nullBytes = _database.XdrStream.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
-				var nullBits = new BitArray(nullBytes);
-
-				for (int i = 0; i < _fields.Count; i++)
+				try
 				{
-					if (nullBits.Get(i))
+					var nullBytes = _database.XdrStream.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
+					var nullBits = new BitArray(nullBytes);
+					for (int i = 0; i < _fields.Count; i++)
 					{
-						row[i] = new DbValue(this, _fields[i], null);
-					}
-					else
-					{
-						try
+						if (nullBits.Get(i))
+						{
+							row[i] = new DbValue(this, _fields[i], null);
+						}
+						else
 						{
 							var value = ReadRawValue(_fields[i]);
 							row[i] = new DbValue(this, _fields[i], value);
 						}
-						catch (IOException ex)
-						{
-							throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-						}
 					}
+				}
+				catch (IOException ex)
+				{
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 			return row;

@@ -1025,9 +1025,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			DbValue[] row = new DbValue[_fields.Count];
 			lock (_database.SyncObject)
 			{
-				for (int i = 0; i < _fields.Count; i++)
+				try
 				{
-					try
+					for (int i = 0; i < _fields.Count; i++)
 					{
 						var value = ReadRawValue(_fields[i]);
 						var sqlInd = _database.XdrStream.ReadInt32();
@@ -1044,10 +1044,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
 						}
 					}
-					catch (IOException ex)
-					{
-						throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-					}
+				}
+				catch (IOException ex)
+				{
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 			return row;
