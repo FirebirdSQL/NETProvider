@@ -42,14 +42,17 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		#region Overriden Methods
 
-		protected override byte[] WriteDescriptor(Descriptor descriptor, Charset charset)
+		protected override byte[] WriteParameters()
 		{
-			using (var xdr = new XdrStream(charset))
+			if (_parameters == null)
+				return null;
+
+			using (var xdr = new XdrStream(_database.Charset))
 			{
-				var bits = new BitArray(descriptor.Count);
-				for (int i = 0; i < descriptor.Count; i++)
+				var bits = new BitArray(_parameters.Count);
+				for (int i = 0; i < _parameters.Count; i++)
 				{
-					var field = descriptor[i];
+					var field = _parameters[i];
 					bits.Set(i, field.DbValue.IsDBNull());
 					bits.Set(i, field.DbDataType == DbDataType.Null);
 				}
@@ -57,9 +60,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				bits.CopyTo(buffer, 0);
 				xdr.WriteOpaque(buffer);
 
-				for (var i = 0; i < descriptor.Count; i++)
+				for (var i = 0; i < _parameters.Count; i++)
 				{
-					var field = descriptor[i];
+					var field = _parameters[i];
 					if (field.DbValue.IsDBNull())
 					{
 						continue;

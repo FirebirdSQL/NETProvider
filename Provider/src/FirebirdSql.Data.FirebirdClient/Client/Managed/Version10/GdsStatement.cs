@@ -584,7 +584,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected void SendExecuteToBuffer()
 		{
 			// this may throw error, so it needs to be before any writing
-			var descriptor = _parameters == null ? null : WriteDescriptor(_parameters, _database.Charset);
+			var descriptor = WriteParameters();
 
 			// Write the message
 			if (_statementType == DbStatementType.StoredProcedure)
@@ -656,6 +656,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
+#warning HERE
 		protected DbValue[] ReadDataRow()
 		{
 			DbValue[] row = new DbValue[_fields.Count];
@@ -845,13 +846,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_fields = null;
 		}
 
-		protected virtual byte[] WriteDescriptor(Descriptor descriptor, Charset charset)
+		protected virtual byte[] WriteParameters()
 		{
-			using (var xdr = new XdrStream(charset))
+			if (_parameters == null)
+				return null;
+
+			using (var xdr = new XdrStream(_database.Charset))
 			{
-				for (var i = 0; i < descriptor.Count; i++)
+				for (var i = 0; i < _parameters.Count; i++)
 				{
-					var field = descriptor[i];
+					var field = _parameters[i];
 					try
 					{
 						if (field.DbDataType != DbDataType.Null)
