@@ -49,34 +49,35 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 			using (var xdr = new XdrStream(_database.Charset))
 			{
-				var bits = new BitArray(_parameters.Count);
-				for (int i = 0; i < _parameters.Count; i++)
+				try
 				{
-					var field = _parameters[i];
-					bits.Set(i, field.DbValue.IsDBNull());
-				}
-				var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
-				bits.CopyTo(buffer, 0);
-				xdr.WriteOpaque(buffer);
-
-				for (var i = 0; i < _parameters.Count; i++)
-				{
-					var field = _parameters[i];
-					if (field.DbValue.IsDBNull())
+					var bits = new BitArray(_parameters.Count);
+					for (int i = 0; i < _parameters.Count; i++)
 					{
-						continue;
+						var field = _parameters[i];
+						bits.Set(i, field.DbValue.IsDBNull());
 					}
-					try
+					var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
+					bits.CopyTo(buffer, 0);
+					xdr.WriteOpaque(buffer);
+
+					for (var i = 0; i < _parameters.Count; i++)
 					{
+						var field = _parameters[i];
+						if (field.DbValue.IsDBNull())
+						{
+							continue;
+						}
 						WriteRawParameter(xdr, field);
 					}
-					catch (IOException ex)
-					{
-						throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
-					}
+
+					return xdr.ToArray();
+				}
+				catch (IOException ex)
+				{
+					throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
 				}
 
-				return xdr.ToArray();
 			}
 		}
 
@@ -101,13 +102,14 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 							row[i] = new DbValue(this, _fields[i], value);
 						}
 					}
+
+					return row;
 				}
 				catch (IOException ex)
 				{
 					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
-			return row;
 		}
 
 		#endregion
