@@ -798,6 +798,109 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
+		protected void WriteRawParameter(XdrStream xdr, DbField field)
+		{
+			if (field.DbDataType != DbDataType.Null)
+			{
+				field.FixNull();
+
+				switch (field.DbDataType)
+				{
+					case DbDataType.Char:
+						if (field.Charset.IsOctetsCharset)
+						{
+							xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
+						}
+						else
+						{
+							var svalue = field.DbValue.GetString();
+
+							if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
+								svalue.Length > field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+
+							xdr.WriteOpaque(field.Charset.GetBytes(svalue), field.Length);
+						}
+						break;
+
+					case DbDataType.VarChar:
+						if (field.Charset.IsOctetsCharset)
+						{
+							xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
+						}
+						else
+						{
+							var svalue = field.DbValue.GetString();
+
+							if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
+								svalue.Length > field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+
+							var data = field.Charset.GetBytes(svalue);
+
+							xdr.WriteBuffer(data, data.Length);
+						}
+						break;
+
+					case DbDataType.SmallInt:
+						xdr.Write(field.DbValue.GetInt16());
+						break;
+
+					case DbDataType.Integer:
+						xdr.Write(field.DbValue.GetInt32());
+						break;
+
+					case DbDataType.BigInt:
+					case DbDataType.Array:
+					case DbDataType.Binary:
+					case DbDataType.Text:
+						xdr.Write(field.DbValue.GetInt64());
+						break;
+
+					case DbDataType.Decimal:
+					case DbDataType.Numeric:
+						xdr.Write(field.DbValue.GetDecimal(), field.DataType, field.NumericScale);
+						break;
+
+					case DbDataType.Float:
+						xdr.Write(field.DbValue.GetFloat());
+						break;
+
+					case DbDataType.Guid:
+						xdr.WriteOpaque(field.DbValue.GetGuid().ToByteArray());
+						break;
+
+					case DbDataType.Double:
+						xdr.Write(field.DbValue.GetDouble());
+						break;
+
+					case DbDataType.Date:
+						xdr.Write(field.DbValue.GetDate());
+						break;
+
+					case DbDataType.Time:
+						xdr.Write(field.DbValue.GetTime());
+						break;
+
+					case DbDataType.TimeStamp:
+						xdr.Write(field.DbValue.GetDate());
+						xdr.Write(field.DbValue.GetTime());
+						break;
+
+					case DbDataType.Boolean:
+						xdr.Write(Convert.ToBoolean(field.Value));
+						break;
+
+					default:
+						throw IscException.ForStrParam($"Unknown SQL data type: {field.DataType}.");
+				}
+			}
+		}
+
 		protected object ReadRawValue(DbField field)
 		{
 			var innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
@@ -909,106 +1012,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					var field = _parameters[i];
 					try
 					{
-						if (field.DbDataType != DbDataType.Null)
-						{
-							field.FixNull();
-
-							switch (field.DbDataType)
-							{
-								case DbDataType.Char:
-									if (field.Charset.IsOctetsCharset)
-									{
-										xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
-									}
-									else
-									{
-										string svalue = field.DbValue.GetString();
-
-										if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-											svalue.Length > field.CharCount)
-										{
-											throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-										}
-
-										xdr.WriteOpaque(field.Charset.GetBytes(svalue), field.Length);
-									}
-									break;
-
-								case DbDataType.VarChar:
-									if (field.Charset.IsOctetsCharset)
-									{
-										xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
-									}
-									else
-									{
-										string svalue = field.DbValue.GetString();
-
-										if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-											svalue.Length > field.CharCount)
-										{
-											throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-										}
-
-										byte[] data = field.Charset.GetBytes(svalue);
-
-										xdr.WriteBuffer(data, data.Length);
-									}
-									break;
-
-								case DbDataType.SmallInt:
-									xdr.Write(field.DbValue.GetInt16());
-									break;
-
-								case DbDataType.Integer:
-									xdr.Write(field.DbValue.GetInt32());
-									break;
-
-								case DbDataType.BigInt:
-								case DbDataType.Array:
-								case DbDataType.Binary:
-								case DbDataType.Text:
-									xdr.Write(field.DbValue.GetInt64());
-									break;
-
-								case DbDataType.Decimal:
-								case DbDataType.Numeric:
-									xdr.Write(field.DbValue.GetDecimal(), field.DataType, field.NumericScale);
-									break;
-
-								case DbDataType.Float:
-									xdr.Write(field.DbValue.GetFloat());
-									break;
-
-								case DbDataType.Guid:
-									xdr.WriteOpaque(field.DbValue.GetGuid().ToByteArray());
-									break;
-
-								case DbDataType.Double:
-									xdr.Write(field.DbValue.GetDouble());
-									break;
-
-								case DbDataType.Date:
-									xdr.Write(field.DbValue.GetDate());
-									break;
-
-								case DbDataType.Time:
-									xdr.Write(field.DbValue.GetTime());
-									break;
-
-								case DbDataType.TimeStamp:
-									xdr.Write(field.DbValue.GetDate());
-									xdr.Write(field.DbValue.GetTime());
-									break;
-
-								case DbDataType.Boolean:
-									xdr.Write(Convert.ToBoolean(field.Value));
-									break;
-
-								default:
-									throw IscException.ForStrParam($"Unknown SQL data type: {field.DataType}.");
-							}
-						}
-
+						WriteRawParameter(xdr, field);
 						xdr.Write(field.NullFlag);
 					}
 					catch (IOException ex)
@@ -1016,6 +1020,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
 					}
 				}
+
 				return xdr.ToArray();
 			}
 		}
