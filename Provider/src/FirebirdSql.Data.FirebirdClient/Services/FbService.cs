@@ -124,8 +124,8 @@ namespace FirebirdSql.Data.Services
 
 			spb.Append(IscCodes.isc_spb_version);
 			spb.Append(IscCodes.isc_spb_current_version);
-			var gdsSvc = (Client.Managed.Version10.GdsServiceManager)_svc;
-			if (gdsSvc.AuthData != null)
+			var gdsSvc = _svc as Client.Managed.Version10.GdsServiceManager;
+			if (gdsSvc?.AuthData != null)
 			{
 				spb.Append((byte)IscCodes.isc_spb_specific_auth_data, Encoding.UTF8.GetBytes(gdsSvc.AuthData.ToHexString()));
 			}
