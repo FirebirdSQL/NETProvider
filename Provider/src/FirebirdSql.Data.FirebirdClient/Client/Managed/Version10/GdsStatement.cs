@@ -589,7 +589,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				using (XdrStream xdr = new XdrStream(_database.Charset))
 				{
-					xdr.Write(_parameters);
+					WriteDescriptor(_parameters, xdr);
 					descriptor = xdr.ToArray();
 				}
 			}
@@ -851,6 +851,126 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			_parameters = null;
 			_fields = null;
+		}
+
+		protected void WriteDescriptor(Descriptor descriptor, XdrStream xdr)
+		{
+			for (var i = 0; i < descriptor.Count; i++)
+			{
+				WriteField(descriptor[i], xdr);
+			}
+		}
+
+		public void WriteField(DbField param, XdrStream xdr)
+		{
+			try
+			{
+				if (param.DbDataType != DbDataType.Null)
+				{
+					param.FixNull();
+
+					switch (param.DbDataType)
+					{
+						case DbDataType.Char:
+							if (param.Charset.IsOctetsCharset)
+							{
+								xdr.WriteOpaque(param.DbValue.GetBinary(), param.Length);
+							}
+							else
+							{
+								string svalue = param.DbValue.GetString();
+
+								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
+									svalue.Length > param.CharCount)
+								{
+									throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+								}
+
+								xdr.WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
+							}
+							break;
+
+						case DbDataType.VarChar:
+							if (param.Charset.IsOctetsCharset)
+							{
+								xdr.WriteOpaque(param.DbValue.GetBinary(), param.Length);
+							}
+							else
+							{
+								string svalue = param.DbValue.GetString();
+
+								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
+									svalue.Length > param.CharCount)
+								{
+									throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+								}
+
+								byte[] data = param.Charset.GetBytes(svalue);
+
+								xdr.WriteBuffer(data, data.Length);
+							}
+							break;
+
+						case DbDataType.SmallInt:
+							xdr.Write(param.DbValue.GetInt16());
+							break;
+
+						case DbDataType.Integer:
+							xdr.Write(param.DbValue.GetInt32());
+							break;
+
+						case DbDataType.BigInt:
+						case DbDataType.Array:
+						case DbDataType.Binary:
+						case DbDataType.Text:
+							xdr.Write(param.DbValue.GetInt64());
+							break;
+
+						case DbDataType.Decimal:
+						case DbDataType.Numeric:
+							xdr.Write(param.DbValue.GetDecimal(), param.DataType, param.NumericScale);
+							break;
+
+						case DbDataType.Float:
+							xdr.Write(param.DbValue.GetFloat());
+							break;
+
+						case DbDataType.Guid:
+							xdr.WriteOpaque(param.DbValue.GetGuid().ToByteArray());
+							break;
+
+						case DbDataType.Double:
+							xdr.Write(param.DbValue.GetDouble());
+							break;
+
+						case DbDataType.Date:
+							xdr.Write(param.DbValue.GetDate());
+							break;
+
+						case DbDataType.Time:
+							xdr.Write(param.DbValue.GetTime());
+							break;
+
+						case DbDataType.TimeStamp:
+							xdr.Write(param.DbValue.GetDate());
+							xdr.Write(param.DbValue.GetTime());
+							break;
+
+						case DbDataType.Boolean:
+							xdr.Write(Convert.ToBoolean(param.Value));
+							break;
+
+						default:
+							throw IscException.ForStrParam($"Unknown SQL data type: {param.DataType}.");
+					}
+				}
+
+				xdr.Write(param.NullFlag);
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
+			}
 		}
 
 		#endregion
