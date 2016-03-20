@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					bits.Set(i, field.DbValue.IsDBNull());
 					bits.Set(i, field.DbDataType == DbDataType.Null);
 				}
-				var buffer = new byte[(int)Math.Ceiling(bits.Length / 8d)];
+				var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
 				bits.CopyTo(buffer, 0);
 				xdr.WriteOpaque(buffer);
 
