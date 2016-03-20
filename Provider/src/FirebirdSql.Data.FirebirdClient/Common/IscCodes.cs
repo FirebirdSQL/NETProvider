@@ -332,10 +332,13 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_dbname = 106;
 		public const int isc_spb_verbose = 107;
 		public const int isc_spb_options = 108;
+		public const int isc_spb_trusted_auth = 111;
 
 		public const int isc_spb_connect_timeout = isc_dpb_connect_timeout;
 		public const int isc_spb_dummy_packet_interval = isc_dpb_dummy_packet_interval;
 		public const int isc_spb_sql_role_name = isc_dpb_sql_role_name;
+
+		public const int isc_spb_specific_auth_data = isc_spb_trusted_auth;
 
 		public const int isc_spb_num_att = 5;
 		public const int isc_spb_num_db = 6;
