@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.Client.Managed
 					xdrStream.Write(IscCodes.GenericAchitectureClient);
 
 					xdrStream.Write(database);
-					xdrStream.Write(3);                         // Protocol versions understood
+					xdrStream.Write(4);                         // Protocol versions understood
 					xdrStream.WriteBuffer(UserIdentificationStuff());
 
 #warning Refactoring? Wrapping?
@@ -170,6 +170,12 @@ namespace FirebirdSql.Data.Client.Managed
 					xdrStream.Write(1);                              // Preference weight
 
 					xdrStream.Write(IscCodes.PROTOCOL_VERSION12);
+					xdrStream.Write(IscCodes.GenericAchitectureClient);
+					xdrStream.Write(IscCodes.ptype_rpc);
+					xdrStream.Write(IscCodes.ptype_lazy_send);
+					xdrStream.Write(2);
+
+					xdrStream.Write(IscCodes.PROTOCOL_VERSION13);
 					xdrStream.Write(IscCodes.GenericAchitectureClient);
 					xdrStream.Write(IscCodes.ptype_rpc);
 					xdrStream.Write(IscCodes.ptype_lazy_send);
