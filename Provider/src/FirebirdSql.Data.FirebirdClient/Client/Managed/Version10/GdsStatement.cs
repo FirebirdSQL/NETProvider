@@ -968,7 +968,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return row;
 		}
 
-
 		protected virtual object ReadValue(DbField field)
 		{
 			object fieldValue = null;
