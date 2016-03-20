@@ -929,6 +929,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			else if (type == FbDbType.Guid)
 			{
+#warning Encapsulate
 				charset = Charset.GetCharset("OCTETS");
 			}
 			else if (parameter.Charset != FbCharset.Default)
