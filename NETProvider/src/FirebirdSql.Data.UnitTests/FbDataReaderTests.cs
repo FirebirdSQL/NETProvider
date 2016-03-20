@@ -46,18 +46,15 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
 
-			Console.WriteLine();
-			Console.WriteLine("DataReader - Read Method - Test");
-
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
-					Console.Write(reader.GetValue(i) + "\t");
+					TestContext.Write(reader.GetValue(i) + "\t");
 				}
 
-				Console.WriteLine();
+				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -94,8 +91,7 @@ namespace FirebirdSql.Data.UnitTests
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
-				Console.Write(reader.GetString(reader.GetOrdinal("bigint_field")) + "\t");
-				Console.WriteLine();
+				TestContext.WriteLine(reader.GetString(reader.GetOrdinal("bigint_field")) + "\t");
 			}
 
 			reader.Close();
@@ -118,9 +114,9 @@ namespace FirebirdSql.Data.UnitTests
 
 				for (int i = 0; i < values.Length; i++)
 				{
-					Console.Write(values[i] + "\t");
+					TestContext.Write(values[i] + "\t");
 				}
-				Console.WriteLine();
+				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -140,9 +136,9 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
-					Console.Write(reader[i] + "\t");
+					TestContext.Write(reader[i] + "\t");
 				}
-				Console.WriteLine();
+				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -162,9 +158,9 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
-					Console.Write(reader[reader.GetName(i)] + "\t");
+					TestContext.Write(reader[reader.GetName(i)] + "\t");
 				}
-				Console.WriteLine();
+				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -186,18 +182,18 @@ namespace FirebirdSql.Data.UnitTests
 
 			foreach (DataColumn myCol in schema.Columns)
 			{
-				Console.Write("{0}\t\t", myCol.ColumnName);
+				TestContext.Write("{0}\t\t", myCol.ColumnName);
 			}
 
-			Console.WriteLine();
+			TestContext.WriteLine();
 
 			foreach (DataRow myRow in currRows)
 			{
 				foreach (DataColumn myCol in schema.Columns)
 				{
-					Console.Write("{0}\t\t", myRow[myCol]);
+					TestContext.Write("{0}\t\t", myRow[myCol]);
 				}
-				Console.WriteLine();
+				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -219,18 +215,18 @@ namespace FirebirdSql.Data.UnitTests
 
 			foreach (DataColumn myCol in schema.Columns)
 			{
-				Console.Write("{0}\t\t", myCol.ColumnName);
+				TestContext.Write("{0}\t\t", myCol.ColumnName);
 			}
 
-			Console.WriteLine();
+			TestContext.WriteLine();
 
 			foreach (DataRow myRow in currRows)
 			{
 				foreach (DataColumn myCol in schema.Columns)
 				{
-					Console.Write("{0}\t\t", myRow[myCol]);
+					TestContext.Write("{0}\t\t", myRow[myCol]);
 				}
-				Console.WriteLine();
+				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -254,12 +250,12 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
-					Console.Write(reader.GetValue(i) + "\t");
+					TestContext.Write(reader.GetValue(i) + "\t");
 				}
-				Console.WriteLine();
+				TestContext.WriteLine();
 			}
 
-			Console.WriteLine("===");
+			TestContext.WriteLine("===");
 
 			if (reader.NextResult())
 			{
@@ -267,9 +263,9 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					for (int i = 0; i < reader.FieldCount; i++)
 					{
-						Console.Write(reader.GetValue(i) + "\t");
+						TestContext.Write(reader.GetValue(i) + "\t");
 					}
-					Console.WriteLine();
+					TestContext.WriteLine();
 				}
 			}
 

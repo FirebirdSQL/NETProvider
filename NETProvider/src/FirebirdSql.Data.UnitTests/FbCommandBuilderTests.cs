@@ -71,10 +71,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			Console.WriteLine();
-			Console.WriteLine("CommandBuilder -	GetInsertCommand Method	Test");
-
-			Console.WriteLine(builder.GetInsertCommand().CommandText);
+			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -84,10 +81,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			Console.WriteLine();
-			Console.WriteLine("CommandBuilder -	GetUpdateCommand Method	Test");
-
-			Console.WriteLine(builder.GetUpdateCommand().CommandText);
+			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -97,10 +91,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			Console.WriteLine();
-			Console.WriteLine("CommandBuilder -	GetDeleteCommand Method	Test");
-
-			Console.WriteLine(builder.GetDeleteCommand().CommandText);
+			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -110,23 +101,17 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			Console.WriteLine();
-			Console.WriteLine("CommandBuilder -	RefreshSchema Method Test -	Commands for original SQL statement: ");
-
-			Console.WriteLine(builder.GetInsertCommand().CommandText);
-			Console.WriteLine(builder.GetUpdateCommand().CommandText);
-			Console.WriteLine(builder.GetDeleteCommand().CommandText);
+			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
+			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
+			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
 
 			_adapter.SelectCommand.CommandText = "select	* from TEST	where BIGINT_FIELD = ?";
 
 			builder.RefreshSchema();
 
-			Console.WriteLine();
-			Console.WriteLine("CommandBuilder -	RefreshSchema Method Test -	Commands for new SQL statement:	");
-
-			Console.WriteLine(builder.GetInsertCommand().CommandText);
-			Console.WriteLine(builder.GetUpdateCommand().CommandText);
-			Console.WriteLine(builder.GetDeleteCommand().CommandText);
+			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
+			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
+			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -138,10 +123,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			Console.WriteLine();
-			Console.WriteLine("CommandBuilder -	GetUpdateCommand Method	Test");
-
-			Console.WriteLine(builder.GetUpdateCommand().CommandText);
+			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -198,23 +180,17 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			Console.WriteLine();
-			Console.WriteLine("CommandBuilder -	RefreshSchema Method Test -	Commands for original SQL statement: ");
-
-			Console.WriteLine(builder.GetInsertCommand().CommandText);
-			Console.WriteLine(builder.GetUpdateCommand().CommandText);
-			Console.WriteLine(builder.GetDeleteCommand().CommandText);
+			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
+			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
+			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
 
 			_adapter.SelectCommand.CommandText = "select	* from TEST	where BIGINT_FIELD = ?";
 
 			builder.RefreshSchema();
 
-			Console.WriteLine();
-			Console.WriteLine("CommandBuilder -	RefreshSchema Method Test -	Commands for new SQL statement:	");
-
-			Console.WriteLine(builder.GetInsertCommand().CommandText);
-			Console.WriteLine(builder.GetUpdateCommand().CommandText);
-			Console.WriteLine(builder.GetDeleteCommand().CommandText);
+			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
+			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
+			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
 
 			builder.Dispose();
 		}
