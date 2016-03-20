@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		private static void CreateDatabase(string connectionString)
 		{
-			FbConnection.CreateDatabase(connectionString, TestsSetup.PageSize, TestsSetup.ForcedWrite, true);
+			FbConnection.CreateDatabase(connectionString, PageSize, ForcedWrite, true);
 		}
 
 		private static void DropDatabase(string connectionString)
