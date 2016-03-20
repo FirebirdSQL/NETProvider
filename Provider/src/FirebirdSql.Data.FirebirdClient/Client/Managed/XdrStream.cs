@@ -13,10 +13,8 @@
  *	   language governing rights and limitations under the License.
  *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2014-2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *
- *  Contributors:
- *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
