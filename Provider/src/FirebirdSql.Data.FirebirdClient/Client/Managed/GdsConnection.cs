@@ -179,7 +179,7 @@ namespace FirebirdSql.Data.Client.Managed
 					xdrStream.Write(IscCodes.GenericAchitectureClient);
 					xdrStream.Write(IscCodes.ptype_rpc);
 					xdrStream.Write(IscCodes.ptype_lazy_send);
-					xdrStream.Write(2);                              // Preference weight
+					xdrStream.Write(3);                              // Preference weight
 
 					xdrStream.Flush();
 
