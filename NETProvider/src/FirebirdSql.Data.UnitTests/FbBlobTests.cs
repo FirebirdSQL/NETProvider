@@ -51,15 +51,10 @@ namespace FirebirdSql.Data.UnitTests
 			string selectText = "SELECT blob_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)";
 
-			Console.WriteLine("\r\n\r\nBinary Blob Test");
-
-			Console.WriteLine("Generating an array of temp data");
 			// Generate an array of temp data
 			byte[] insert_values = new byte[100000 * 4];
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
 			rng.GetBytes(insert_values);
-
-			Console.WriteLine("Executing insert command");
 
 			// Execute insert command
 			FbTransaction transaction = Connection.BeginTransaction();
@@ -70,8 +65,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.ExecuteNonQuery();
 
 			transaction.Commit();
-
-			Console.WriteLine("Checking inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -84,8 +77,6 @@ namespace FirebirdSql.Data.UnitTests
 					throw new Exception("differences at index " + i.ToString());
 				}
 			}
-
-			Console.WriteLine("Finishing test");
 		}
 
 		[Test]
@@ -96,15 +87,10 @@ namespace FirebirdSql.Data.UnitTests
 			string selectText = "SELECT blob_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)";
 
-			Console.WriteLine("\r\n\r\nFbDataReader.GetBytes with Binary Blob Test");
-
-			Console.WriteLine("Generating an array of temp data");
 			// Generate an array of temp data
 			byte[] insert_values = new byte[100000 * 4];
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
 			rng.GetBytes(insert_values);
-
-			Console.WriteLine("Executing insert command");
 
 			// Execute insert command
 			FbTransaction transaction = Connection.BeginTransaction();
@@ -115,8 +101,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.ExecuteNonQuery();
 
 			transaction.Commit();
-
-			Console.WriteLine("Checking inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);

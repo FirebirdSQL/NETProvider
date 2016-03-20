@@ -78,8 +78,8 @@ namespace FirebirdSql.Data.UnitTests
 			reader.Read();
 
 			// Print output value
-			Console.WriteLine("Output Parameters - Result of SELECT command");
-			Console.WriteLine(reader[0]);
+			TestContext.WriteLine("Output Parameters - Result of SELECT command");
+			TestContext.WriteLine(reader[0]);
 
 			reader.Close();
 
@@ -103,8 +103,8 @@ namespace FirebirdSql.Data.UnitTests
 			command.ExecuteNonQuery();
 
 			// Print output value
-			Console.WriteLine("Output Parameters");
-			Console.WriteLine(command.Parameters[1].Value);
+			TestContext.WriteLine("Output Parameters");
+			TestContext.WriteLine(command.Parameters[1].Value);
 
 			// Dispose command - this will do a transaction commit
 			command.Dispose();
@@ -122,8 +122,8 @@ namespace FirebirdSql.Data.UnitTests
 			command.ExecuteNonQuery();
 
 			// Print output value
-			Console.WriteLine("Output Parameters - Record Count");
-			Console.WriteLine(command.Parameters[0].Value);
+			TestContext.WriteLine("Output Parameters - Record Count");
+			TestContext.WriteLine(command.Parameters[0].Value);
 
 			// Dispose command - this will do a transaction commit
 			command.Dispose();

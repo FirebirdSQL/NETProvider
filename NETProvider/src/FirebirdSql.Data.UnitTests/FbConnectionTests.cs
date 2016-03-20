@@ -285,7 +285,7 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				conn.Open();
 				rows = LogRowsCount(conn);
-				Console.WriteLine(rows);
+				TestContext.WriteLine(rows);
 			}
 
 			csb.NoDatabaseTriggers = true;
@@ -337,18 +337,6 @@ namespace FirebirdSql.Data.UnitTests
 				cmd.CommandText = "select count(*) from log where text = 'on connect'";
 				return Convert.ToInt32(cmd.ExecuteScalar());
 			}
-		}
-
-		#endregion
-
-		#region Event Handlers
-
-		public void OnStateChange(object sender, StateChangeEventArgs e)
-		{
-			Console.WriteLine("OnStateChange");
-			Console.WriteLine("  event args: (" +
-				   "originalState=" + e.OriginalState +
-				   " currentState=" + e.CurrentState + ")");
 		}
 
 		#endregion

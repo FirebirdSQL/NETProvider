@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.UnitTests
 			string token = GetProviderServices().GetProviderManifestToken(Connection);
 			Assert.IsNotNull(token);
 			Assert.IsNotEmpty(token);
-			Console.WriteLine(token);
+			TestContext.WriteLine(token);
 			Version v = new Version(token);
 			Assert.Greater(v.Major, 0);
 			Assert.GreaterOrEqual(v.Minor, 0);
@@ -125,7 +125,7 @@ namespace FirebirdSql.Data.UnitTests
 					});
 				Assert.DoesNotThrow(() =>
 				{
-					Console.WriteLine(q.ToString());
+					q.ToString();
 				});
 			}
 		}
@@ -161,7 +161,7 @@ namespace FirebirdSql.Data.UnitTests
 					 .SelectMany(m => m.Bars);
 				Assert.DoesNotThrow(() =>
 				{
-					Console.WriteLine(q.ToString());
+					q.ToString();
 				});
 			}
 		}

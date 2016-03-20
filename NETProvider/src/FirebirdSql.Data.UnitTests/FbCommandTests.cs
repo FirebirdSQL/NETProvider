@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			string charFieldValue = command.ExecuteScalar().ToString();
 
-			Console.WriteLine("Scalar value: {0}", charFieldValue);
+			TestContext.WriteLine("Scalar value: {0}", charFieldValue);
 
 			command.Dispose();
 		}
@@ -277,8 +277,8 @@ namespace FirebirdSql.Data.UnitTests
 			// This	will fill output parameters	values
 			command.ExecuteNonQuery();
 
-			Console.WriteLine("Output Parameters");
-			Console.WriteLine(command.Parameters[1].Value);
+			TestContext.WriteLine("Output Parameters");
+			TestContext.WriteLine(command.Parameters[1].Value);
 		}
 
 		[Test]
@@ -387,7 +387,7 @@ namespace FirebirdSql.Data.UnitTests
 					{
 						while (r.Read())
 						{
-							Console.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
+							TestContext.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
 						}
 					}
 				}

@@ -65,7 +65,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		void ServiceOutput(object sender, ServiceOutputEventArgs e)
 		{
-			Console.WriteLine(e.Message);
+			TestContext.WriteLine(e.Message);
 		}
 
 		#endregion
@@ -280,7 +280,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbUserData user = securitySvc.DisplayUser("SYSDBA");
 
-			Console.WriteLine("User name {0}", user.UserName);
+			TestContext.WriteLine("User name {0}", user.UserName);
 		}
 
 		[Test]
@@ -292,11 +292,11 @@ namespace FirebirdSql.Data.UnitTests
 
 			FbUserData[] users = securitySvc.DisplayUsers();
 
-			Console.WriteLine("User List");
+			TestContext.WriteLine("User List");
 
 			for (int i = 0; i < users.Length; i++)
 			{
-				Console.WriteLine("User {0} name {1}", i, users[i].UserName);
+				TestContext.WriteLine("User {0} name {1}", i, users[i].UserName);
 			}
 		}
 
@@ -310,12 +310,12 @@ namespace FirebirdSql.Data.UnitTests
 			FbServerConfig serverConfig = serverProp.GetServerConfig();
 			FbDatabasesInfo databasesInfo = serverProp.GetDatabasesInfo();
 
-			Console.WriteLine(serverProp.GetMessageFile());
-			Console.WriteLine(serverProp.GetLockManager());
-			Console.WriteLine(serverProp.GetRootDirectory());
-			Console.WriteLine(serverProp.GetImplementation());
-			Console.WriteLine(serverProp.GetServerVersion());
-			Console.WriteLine(serverProp.GetVersion());
+			TestContext.WriteLine(serverProp.GetMessageFile());
+			TestContext.WriteLine(serverProp.GetLockManager());
+			TestContext.WriteLine(serverProp.GetRootDirectory());
+			TestContext.WriteLine(serverProp.GetImplementation());
+			TestContext.WriteLine(serverProp.GetServerVersion());
+			TestContext.WriteLine(serverProp.GetVersion());
 		}
 
 		[Test]

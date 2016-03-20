@@ -45,9 +45,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Integer Array Test");
-
 			string selectText = "SELECT	iarray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, iarray_field)	values(@int_field, @array_field)";
 
@@ -59,7 +56,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = 30;
 			insert_values[3] = 40;
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -67,8 +63,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -98,9 +92,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Short Array Test");
-
 			string selectText = "SELECT	sarray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, sarray_field)	values(@int_field, @array_field)";
 
@@ -112,7 +103,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = 70;
 			insert_values[3] = 80;
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -120,8 +110,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -151,9 +139,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("BigInt Array	Test");
-
 			string selectText = "SELECT	larray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, larray_field)	values(@int_field, @array_field)";
 
@@ -165,7 +150,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = 70;
 			insert_values[3] = 80;
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -173,8 +157,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -204,9 +186,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Float Array Test");
-
 			string selectText = "SELECT	farray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, farray_field)	values(@int_field, @array_field)";
 
@@ -218,7 +197,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = 150.30F;
 			insert_values[3] = 160.40F;
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -226,8 +204,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -257,9 +233,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Double Array	Test");
-
 			string selectText = "SELECT	barray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, barray_field)	values(@int_field, @array_field)";
 
@@ -271,7 +244,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = 190.30;
 			insert_values[3] = 200.40;
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -279,8 +251,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -310,9 +280,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Numeric/Decimal Array Test");
-
 			string selectText = "SELECT	narray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, narray_field)	values(@int_field, @array_field)";
 
@@ -324,7 +291,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = 230.30M;
 			insert_values[3] = 240.40M;
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -332,8 +298,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -363,9 +327,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Date	Array Test");
-
 			string selectText = "SELECT	darray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, darray_field)	values(@int_field, @array_field)";
 
@@ -377,7 +338,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = DateTime.Now.AddDays(30);
 			insert_values[3] = DateTime.Now.AddDays(40);
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -385,8 +345,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -416,9 +374,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Time	Array Test");
-
 			string selectText = "SELECT	tarray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, tarray_field)	values(@int_field, @array_field)";
 
@@ -430,7 +385,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = new TimeSpan(6, 13, 14);
 			insert_values[3] = new TimeSpan(8, 15, 16);
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -438,8 +392,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -469,9 +421,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("TimeStamp Array Test");
-
 			string selectText = "SELECT	tsarray_field FROM TEST	WHERE int_field	= " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, tsarray_field) values(@int_field,	@array_field)";
 
@@ -483,7 +432,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = DateTime.Now.AddSeconds(30);
 			insert_values[3] = DateTime.Now.AddSeconds(40);
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -491,8 +439,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -522,9 +468,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Char	Array Test");
-
 			string selectText = "SELECT	carray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, carray_field)	values(@int_field, @array_field)";
 
@@ -536,7 +479,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = "abcdefghi";
 			insert_values[3] = "abcdefghijkl";
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -544,8 +486,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -575,9 +515,6 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			int id_value = GetId();
 
-			Console.WriteLine("\r\n");
-			Console.WriteLine("VarChar Array Test");
-
 			string selectText = "SELECT	varray_field FROM TEST WHERE int_field = " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, varray_field)	values(@int_field, @array_field)";
 
@@ -589,7 +526,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert_values[2] = "abcdefghi";
 			insert_values[3] = "abcdefghijkl";
 
-			Console.WriteLine("Executing insert	command");
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
@@ -597,8 +533,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -626,10 +560,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void IntegerArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Integer Array Test");
-			Console.WriteLine("------- ----- ----");
-
 			string updateText = "update	TEST set iarray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -651,10 +581,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ShortArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Short Array Test");
-			Console.WriteLine("----- ----- ----");
-
 			string updateText = "update	TEST set sarray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -676,10 +602,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BigIntArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("BigInt Array	Test");
-			Console.WriteLine("------ -----	----");
-
 			string updateText = "update	TEST set larray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -703,10 +625,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void FloatArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Float Array Test");
-			Console.WriteLine("----- ----- ----");
-
 			string updateText = "update	TEST set farray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -728,10 +646,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DoubleArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Double Array	Test");
-			Console.WriteLine("------ -----	----");
-
 			string updateText = "update	TEST set barray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -753,10 +667,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NumericArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Numeric/Decimal Array Test");
-			Console.WriteLine("--------------- ----- ----");
-
 			string updateText = "update	TEST set narray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -778,10 +688,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DateArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Date	Array Test");
-			Console.WriteLine("----	----- ----");
-
 			string updateText = "update	TEST set darray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -803,16 +709,12 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void TimeArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Time	Array Test");
-			Console.WriteLine("----	----- ----");
-
 			string updateText = "update	TEST set tarray_field =	@array_field " +
 								"WHERE int_field = 1";
 
 			TimeSpan[] new_values = new TimeSpan[2];
 
-			new_values[0] = new TimeSpan(11, 13,14);
+			new_values[0] = new TimeSpan(11, 13, 14);
 			new_values[1] = new TimeSpan(12, 15, 16);
 
 			FbCommand update = new FbCommand(updateText, Connection, Transaction);
@@ -828,10 +730,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void TimeStampArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("TimeStamp Array Test");
-			Console.WriteLine("--------- ----- ----");
-
 			string updateText = "update	TEST set tsarray_field = @array_field " +
 								"WHERE int_field = 1";
 
@@ -853,10 +751,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void CharArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("Char	Array Test");
-			Console.WriteLine("----	----- ----");
-
 			string updateText = "update	TEST set carray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -878,10 +772,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void VarCharArrayPartialUpdateTest()
 		{
-			Console.WriteLine("\r\n");
-			Console.WriteLine("VarChar Array Test");
-			Console.WriteLine("------- ----- ----");
-
 			string updateText = "update	TEST set varray_field =	@array_field " +
 								"WHERE int_field = 1";
 
@@ -909,8 +799,6 @@ namespace FirebirdSql.Data.UnitTests
 			string selectText = "SELECT	big_array FROM TEST	WHERE int_field	= " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, big_array) values(@int_field,	@array_field)";
 
-			Console.WriteLine("\r\n\r\nBigArrayTest");
-			Console.WriteLine("Generating an array of temp data");
 			// Generate	an array of	temp data
 			byte[] bytes = new byte[elements * 4];
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
@@ -919,7 +807,6 @@ namespace FirebirdSql.Data.UnitTests
 			int[] insert_values = new int[elements];
 			Buffer.BlockCopy(bytes, 0, insert_values, 0, bytes.Length);
 
-			Console.WriteLine("Executing insert	command");
 			// Execute insert command
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
@@ -928,8 +815,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -951,7 +836,6 @@ namespace FirebirdSql.Data.UnitTests
 				}
 			}
 
-			Console.WriteLine("Finishing test");
 			reader.Close();
 			select.Dispose();
 
@@ -968,8 +852,6 @@ namespace FirebirdSql.Data.UnitTests
 			string selectText = "SELECT	big_array FROM TEST	WHERE int_field	= " + id_value.ToString();
 			string insertText = "INSERT	INTO TEST (int_field, big_array) values(@int_field,	@array_field)";
 
-			Console.WriteLine("\r\n\r\nPartialUpdatesTest");
-			Console.WriteLine("Generating an array of temp data");
 			// Generate	an array of	temp data
 			byte[] bytes = new byte[elements * 4];
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
@@ -978,7 +860,6 @@ namespace FirebirdSql.Data.UnitTests
 			int[] insert_values = new int[elements];
 			Buffer.BlockCopy(bytes, 0, insert_values, 0, bytes.Length);
 
-			Console.WriteLine("Executing insert	command");
 			// Execute insert command
 			FbCommand insert = new FbCommand(insertText, Connection, Transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
@@ -987,8 +868,6 @@ namespace FirebirdSql.Data.UnitTests
 			insert.Dispose();
 
 			Transaction.Commit();
-
-			Console.WriteLine("Checking	inserted values");
 
 			// Check that inserted values are correct
 			FbCommand select = new FbCommand(selectText, Connection);
@@ -1010,7 +889,6 @@ namespace FirebirdSql.Data.UnitTests
 				}
 			}
 
-			Console.WriteLine("Finishing test");
 			reader.Close();
 			select.Dispose();
 
@@ -1022,22 +900,13 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region Private Methods
 
-		private void PrintArrayValues(System.Array array, bool original)
+		private void PrintArrayValues(Array array, bool original)
 		{
 			IEnumerator i = array.GetEnumerator();
-
-			if (original)
+			TestContext.WriteLine($"{(original ? "Original" : "New")} field values:");
+			foreach (var item in array)
 			{
-				Console.WriteLine("Original field values:");
-			}
-			else
-			{
-				Console.WriteLine("New field values:");
-			}
-
-			while (i.MoveNext())
-			{
-				Console.WriteLine(i.Current.ToString());
+				TestContext.WriteLine(item);
 			}
 		}
 

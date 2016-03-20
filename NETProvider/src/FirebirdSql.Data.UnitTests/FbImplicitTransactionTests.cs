@@ -53,26 +53,26 @@ namespace FirebirdSql.Data.UnitTests
 			DataSet ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
-			Console.WriteLine();
-			Console.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
+			TestContext.WriteLine();
+			TestContext.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
 
 			foreach (DataTable table in ds.Tables)
 			{
 				foreach (DataColumn col in table.Columns)
 				{
-					Console.Write(col.ColumnName + "\t\t");
+					TestContext.Write(col.ColumnName + "\t\t");
 				}
 
-				Console.WriteLine();
+				TestContext.WriteLine();
 
 				foreach (DataRow row in table.Rows)
 				{
 					for (int i = 0; i < table.Columns.Count; i++)
 					{
-						Console.Write(row[i] + "\t\t");
+						TestContext.Write(row[i] + "\t\t");
 					}
 
-					Console.WriteLine("");
+					TestContext.WriteLine("");
 				}
 			}
 
@@ -94,26 +94,26 @@ namespace FirebirdSql.Data.UnitTests
 			DataSet ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
-			Console.WriteLine();
-			Console.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
+			TestContext.WriteLine();
+			TestContext.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
 
 			foreach (DataTable table in ds.Tables)
 			{
 				foreach (DataColumn col in table.Columns)
 				{
-					Console.Write(col.ColumnName + "\t\t");
+					TestContext.Write(col.ColumnName + "\t\t");
 				}
 
-				Console.WriteLine();
+				TestContext.WriteLine();
 
 				foreach (DataRow row in table.Rows)
 				{
 					for (int i = 0; i < table.Columns.Count; i++)
 					{
-						Console.Write(row[i] + "\t\t");
+						TestContext.Write(row[i] + "\t\t");
 					}
 
-					Console.WriteLine("");
+					TestContext.WriteLine("");
 				}
 			}
 
@@ -122,26 +122,26 @@ namespace FirebirdSql.Data.UnitTests
 			ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
-			Console.WriteLine();
-			Console.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
+			TestContext.WriteLine();
+			TestContext.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
 
 			foreach (DataTable table in ds.Tables)
 			{
 				foreach (DataColumn col in table.Columns)
 				{
-					Console.Write(col.ColumnName + "\t\t");
+					TestContext.Write(col.ColumnName + "\t\t");
 				}
 
-				Console.WriteLine();
+				TestContext.WriteLine();
 
 				foreach (DataRow row in table.Rows)
 				{
 					for (int i = 0; i < table.Columns.Count; i++)
 					{
-						Console.Write(row[i] + "\t\t");
+						TestContext.Write(row[i] + "\t\t");
 					}
 
-					Console.WriteLine("");
+					TestContext.WriteLine("");
 				}
 			}
 
@@ -156,7 +156,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbCommand command = new FbCommand("select sum(int_field) from TEST", Connection);
 
-			Console.WriteLine("\r\nExecuteScalar with implicit transaction: {0}", command.ExecuteScalar());
+			Assert.DoesNotThrow(() => command.ExecuteScalar());
 
 			command.Dispose();
 		}
@@ -164,8 +164,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void UpdatedClobFieldTest()
 		{
-			Console.WriteLine("\r\nUpdate CLOB field with implicit transaction.");
-
 			FbCommand command = new FbCommand("update TEST set clob_field = @clob_field where int_field = @int_field", Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 			command.Parameters.Add("@clob_field", FbDbType.Text).Value = "Clob field update with implicit transaction";
@@ -181,8 +179,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void UpdatedBlobFieldTest()
 		{
-			Console.WriteLine("\r\nUpdate BLOB field with implicit transaction.");
-
 			FbCommand command = new FbCommand("update TEST set blob_field = @blob_field where int_field = @int_field", Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 			command.Parameters.Add("@blob_field", FbDbType.Binary).Value =
@@ -199,8 +195,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void UpdatedArrayFieldTest()
 		{
-			Console.WriteLine("\r\nUpdate CLOB field with implicit transaction.");
-
 			int[] values = new int[4];
 
 			values[0] = 10;
