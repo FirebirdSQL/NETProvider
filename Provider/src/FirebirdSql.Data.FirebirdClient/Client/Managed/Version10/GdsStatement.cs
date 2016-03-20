@@ -375,7 +375,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 									if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 									{
-										_rows.Enqueue(ReadDataRow());
+										_rows.Enqueue(ReadRows());
 									}
 									else if (fetchResponse.Status == 100)
 									{
@@ -631,7 +631,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (response.Count > 0)
 				{
-					_outputParams.Enqueue(ReadDataRow());
+					_outputParams.Enqueue(ReadRows());
 				}
 			}
 			catch (IOException ex)
@@ -654,32 +654,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_TransactionUpdate = null;
 				_allRowsFetched = false;
 			}
-		}
-
-#warning HERE
-		protected DbValue[] ReadDataRow()
-		{
-			DbValue[] row = new DbValue[_fields.Count];
-			object value = null;
-
-			lock (_database.SyncObject)
-			{
-				// This only works if not (port->port_flags & PORT_symmetric)
-				for (int i = 0; i < _fields.Count; i++)
-				{
-					try
-					{
-						value = _database.XdrStream.ReadValue(_fields[i]);
-						row[i] = new DbValue(this, _fields[i], value);
-					}
-					catch (IOException ex)
-					{
-						throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-					}
-				}
-			}
-
-			return row;
 		}
 
 		protected void ParseSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
@@ -967,6 +941,31 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				return xdr.ToArray();
 			}
+		}
+
+		protected virtual DbValue[] ReadRows()
+		{
+			DbValue[] row = new DbValue[_fields.Count];
+			object value = null;
+
+			lock (_database.SyncObject)
+			{
+				// This only works if not (port->port_flags & PORT_symmetric)
+				for (int i = 0; i < _fields.Count; i++)
+				{
+					try
+					{
+						value = _database.XdrStream.ReadValue(_fields[i]);
+						row[i] = new DbValue(this, _fields[i], value);
+					}
+					catch (IOException ex)
+					{
+						throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
+					}
+				}
+			}
+
+			return row;
 		}
 
 		#endregion
