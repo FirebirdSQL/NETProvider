@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					return new Client.Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
 
 				default:
-					throw new NotSupportedException("Specified server type is not correct.");
+					throw IncorrectServerTypeException();
 			}
 		}
 
@@ -51,8 +51,13 @@ namespace FirebirdSql.Data.FirebirdClient
 					return new Client.Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset));
 
 				default:
-					throw new NotSupportedException("Specified server type is not correct.");
+					throw IncorrectServerTypeException();
 			}
+		}
+
+		private static Exception IncorrectServerTypeException()
+		{
+			return new NotSupportedException("Specified server type is not correct.");
 		}
 
 		private static IDatabase CreateManagedDatabase(FbConnectionString options)
@@ -73,7 +78,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				case IscCodes.PROTOCOL_VERSION10:
 					return new Client.Managed.Version10.GdsDatabase(connection);
 				default:
-					throw new NotSupportedException("Protocol not supported.");
+					throw UnsupportedProtocolException();
 			}
 		}
 
@@ -94,6 +99,11 @@ namespace FirebirdSql.Data.FirebirdClient
 				default:
 					throw new NotSupportedException("Protocol not supported.");
 			}
+		}
+
+		private static NotSupportedException UnsupportedProtocolException()
+		{
+			return new NotSupportedException("Protocol not supported.");
 		}
 	}
 }
