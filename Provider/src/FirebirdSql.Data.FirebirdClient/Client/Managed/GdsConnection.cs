@@ -195,6 +195,14 @@ namespace FirebirdSql.Data.Client.Managed
 							_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
 						}
 					}
+					else if (operation == IscCodes.op_response)
+					{
+						var response = new GenericResponse(
+							xdrStream.ReadInt32(),
+							xdrStream.ReadInt64(),
+							xdrStream.ReadBuffer(),
+							ReadStatusVector(xdrStream));
+					}
 					else
 					{
 						try
@@ -338,6 +346,57 @@ namespace FirebirdSql.Data.Client.Managed
 
 				return result.ToArray();
 			}
+		}
+
+		#endregion
+
+		#region Static Methods
+
+		public static IscException ReadStatusVector(XdrStream xdr)
+		{
+			IscException exception = null;
+			bool eof = false;
+
+			while (!eof)
+			{
+				int arg = xdr.ReadInt32();
+
+				switch (arg)
+				{
+					case IscCodes.isc_arg_gds:
+					default:
+						int er = xdr.ReadInt32();
+						if (er != 0)
+						{
+							if (exception == null)
+							{
+								exception = IscException.ForBuilding();
+							}
+							exception.Errors.Add(new IscError(arg, er));
+						}
+						break;
+
+					case IscCodes.isc_arg_end:
+						exception?.BuildExceptionData();
+						eof = true;
+						break;
+
+					case IscCodes.isc_arg_interpreted:
+					case IscCodes.isc_arg_string:
+						exception.Errors.Add(new IscError(arg, xdr.ReadString()));
+						break;
+
+					case IscCodes.isc_arg_number:
+						exception.Errors.Add(new IscError(arg, xdr.ReadInt32()));
+						break;
+
+					case IscCodes.isc_arg_sql_state:
+						exception.Errors.Add(new IscError(arg, xdr.ReadString()));
+						break;
+				}
+			}
+
+			return exception;
 		}
 
 		#endregion
