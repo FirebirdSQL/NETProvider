@@ -368,7 +368,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				if (ex.IsWarning)
 				{
-					_warningMessage(ex);
+					_warningMessage?.Invoke(ex);
 				}
 				else
 				{
