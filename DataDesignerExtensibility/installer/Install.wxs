@@ -57,9 +57,9 @@
 									Source="$(var.BaseDir)\installer\in\FirebirdSql.VisualStudio.DataToolsUI.dll" />
 					</Component>
 					<Component Id="OtherFilesComponent" Guid="348EA22F-390E-4BA6-9C93-3879581E9297">
-						<File Id="ReadMe.txt"
-									Name="ReadMe.txt"
-									Source="$(var.BaseDir)\ReadMe.txt" />
+						<File Id="readme.txt"
+									Name="readme.txt"
+									Source="$(var.BaseDir)\readme.txt" />
 						<File Id="license.txt"
 									Name="license.txt"
 									Source="$(var.BaseDir)\license.txt" />
