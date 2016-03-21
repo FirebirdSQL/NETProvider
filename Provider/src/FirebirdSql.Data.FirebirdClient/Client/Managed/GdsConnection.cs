@@ -279,10 +279,8 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				if (_userID != null)
 				{
-#warning Charset
-					var login = Encoding.Default.GetBytes(_userID);
-#warning Plugin name constant
-					var plugin_name = Encoding.Default.GetBytes("Srp");
+					var login = Encoding.UTF8.GetBytes(_userID);
+					var plugin_name = Encoding.ASCII.GetBytes(SrpClient.PluginName);
 
 #warning Magic constants
 					// Login
@@ -301,7 +299,7 @@ namespace FirebirdSql.Data.Client.Managed
 					result.Write(plugin_name, 0, plugin_name.Length);
 
 					// Specific Data
-					var specific_data = Encoding.Default.GetBytes(_srpClient.PublicKeyHex);
+					var specific_data = Encoding.ASCII.GetBytes(_srpClient.PublicKeyHex);
 					var remaining = specific_data.Length;
 					var position = 0;
 					var step = 0;
@@ -316,6 +314,7 @@ namespace FirebirdSql.Data.Client.Managed
 						position += toWrite;
 					}
 
+#warning Magic
 					// Client Crypt (Not Encrypt)
 					result.WriteByte(11);
 					result.WriteByte(4);
@@ -326,13 +325,13 @@ namespace FirebirdSql.Data.Client.Managed
 				}
 
 				// User	Name
-				var user = Encoding.Default.GetBytes(Environment.UserName);
+				var user = Encoding.UTF8.GetBytes(Environment.UserName);
 				result.WriteByte(1);
 				result.WriteByte((byte)user.Length);
 				result.Write(user, 0, user.Length);
 
 				// Host	name
-				var host = Encoding.Default.GetBytes(Dns.GetHostName());
+				var host = Encoding.UTF8.GetBytes(Dns.GetHostName());
 				result.WriteByte(4);
 				result.WriteByte((byte)host.Length);
 				result.Write(host, 0, host.Length);
