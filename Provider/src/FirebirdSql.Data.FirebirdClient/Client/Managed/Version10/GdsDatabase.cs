@@ -474,7 +474,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					XdrStream.ReadBytes(respLen);
 
 					// Read Status Vector
-					ReadStatusVector();
+					XdrStream.ReadStatusVector();
 				}
 				catch (IOException ex)
 				{
@@ -704,53 +704,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return (SqlResponse)ReadResponse();
 		}
 
-		public virtual IscException ReadStatusVector()
-		{
-			IscException exception = null;
-			bool eof = false;
-
-			while (!eof)
-			{
-				int arg = XdrStream.ReadInt32();
-
-				switch (arg)
-				{
-					case IscCodes.isc_arg_gds:
-					default:
-						int er = XdrStream.ReadInt32();
-						if (er != 0)
-						{
-							if (exception == null)
-							{
-								exception = IscException.ForBuilding();
-							}
-							exception.Errors.Add(new IscError(arg, er));
-						}
-						break;
-
-					case IscCodes.isc_arg_end:
-						exception?.BuildExceptionData();
-						eof = true;
-						break;
-
-					case IscCodes.isc_arg_interpreted:
-					case IscCodes.isc_arg_string:
-						exception.Errors.Add(new IscError(arg, XdrStream.ReadString()));
-						break;
-
-					case IscCodes.isc_arg_number:
-						exception.Errors.Add(new IscError(arg, XdrStream.ReadInt32()));
-						break;
-
-					case IscCodes.isc_arg_sql_state:
-						exception.Errors.Add(new IscError(arg, XdrStream.ReadString()));
-						break;
-				}
-			}
-
-			return exception;
-		}
-
 		public virtual void SetOperation(int operation)
 		{
 			_operation = operation;
@@ -797,7 +750,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						XdrStream.ReadInt32(),
 						XdrStream.ReadInt64(),
 						XdrStream.ReadBuffer(),
-						ReadStatusVector());
+						XdrStream.ReadStatusVector());
 
 				case IscCodes.op_fetch_response:
 					return new FetchResponse(XdrStream.ReadInt32(), XdrStream.ReadInt32());

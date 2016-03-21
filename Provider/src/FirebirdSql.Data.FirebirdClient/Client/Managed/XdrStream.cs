@@ -370,6 +370,53 @@ namespace FirebirdSql.Data.Client.Managed
 			return TypeDecoder.DecodeBoolean(ReadOpaque(1));
 		}
 
+		public IscException ReadStatusVector()
+		{
+			IscException exception = null;
+			bool eof = false;
+
+			while (!eof)
+			{
+				int arg = ReadInt32();
+
+				switch (arg)
+				{
+					case IscCodes.isc_arg_gds:
+					default:
+						int er = ReadInt32();
+						if (er != 0)
+						{
+							if (exception == null)
+							{
+								exception = IscException.ForBuilding();
+							}
+							exception.Errors.Add(new IscError(arg, er));
+						}
+						break;
+
+					case IscCodes.isc_arg_end:
+						exception?.BuildExceptionData();
+						eof = true;
+						break;
+
+					case IscCodes.isc_arg_interpreted:
+					case IscCodes.isc_arg_string:
+						exception.Errors.Add(new IscError(arg, ReadString()));
+						break;
+
+					case IscCodes.isc_arg_number:
+						exception.Errors.Add(new IscError(arg, ReadInt32()));
+						break;
+
+					case IscCodes.isc_arg_sql_state:
+						exception.Errors.Add(new IscError(arg, ReadString()));
+						break;
+				}
+			}
+
+			return exception;
+		}
+
 		#endregion
 
 		#region XDR Write Methods
