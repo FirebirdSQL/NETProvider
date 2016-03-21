@@ -663,11 +663,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (response is GenericResponse)
 			{
-				if (((GenericResponse)response).Exception != null &&
-					((GenericResponse)response).Exception.IsWarning &&
-					_warningMessage != null)
+				if (((GenericResponse)response).Exception != null && ((GenericResponse)response).Exception.IsWarning)
 				{
-					_warningMessage(((GenericResponse)response).Exception);
+					_warningMessage?.Invoke(((GenericResponse)response).Exception);
 				}
 			}
 		}
