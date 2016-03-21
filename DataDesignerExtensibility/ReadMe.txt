@@ -1,8 +1,8 @@
-Visual Studio 2005/2008/2010/2012 DDEX Provider for Firebird
-=======================================================
+Visual Studio 2005/2008/2010/2012/2013/2015 DDEX Provider for Firebird
+======================================================================
 
 This project is supported by:
-=============================
+-----------------------------
 
   Sean Leyne (Broadview Software)
 
@@ -43,3 +43,4 @@ There's a couple of *.reg files in installation. There are files for 32bit and f
 IMPORTANT: The DDEX provider didn't work with Express editions of Visual Studio.
 
 (If you want to build the sources you will need to have C# and C++ installed and VS SDK.)
+
