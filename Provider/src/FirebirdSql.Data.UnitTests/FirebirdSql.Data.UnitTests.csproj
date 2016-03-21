@@ -97,7 +97,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DebugTests.cs" />
     <Compile Include="FbBooleanSupportTests.cs" />
     <Compile Include="FbConnectionStringTests.cs" />
     <Compile Include="FbConnectionStringBuilderTests.cs" />
