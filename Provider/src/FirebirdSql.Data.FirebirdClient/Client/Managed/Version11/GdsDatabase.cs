@@ -152,20 +152,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		}
 		#endregion
 
-		#region Protected methods
-		protected override IResponse ProcessOperation(int operation)
-		{
-			switch (operation)
-			{
-				case IscCodes.op_trusted_auth:
-					return new AuthResponse(XdrStream.ReadBuffer());
-
-				default:
-					return base.ProcessOperation(operation);
-			}
-		}
-		#endregion
-
 		#region Private methods
 		private void ProcessDeferredPackets()
 		{

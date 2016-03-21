@@ -732,33 +732,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			int operation = ReadOperation();
 
-			IResponse response = ProcessOperation(operation);
+			IResponse response = GdsConnection.ProcessOperation(operation, XdrStream);
 
 			ProcessResponseWarnings(response);
 
 			return response;
-		}
-
-		protected virtual IResponse ProcessOperation(int operation)
-		{
-			switch (operation)
-			{
-				case IscCodes.op_response:
-					return new GenericResponse(
-						XdrStream.ReadInt32(),
-						XdrStream.ReadInt64(),
-						XdrStream.ReadBuffer(),
-						XdrStream.ReadStatusVector());
-
-				case IscCodes.op_fetch_response:
-					return new FetchResponse(XdrStream.ReadInt32(), XdrStream.ReadInt32());
-
-				case IscCodes.op_sql_response:
-					return new SqlResponse(XdrStream.ReadInt32());
-
-				default:
-					return null;
-			}
 		}
 
 		/// <summary>

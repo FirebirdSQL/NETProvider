@@ -22,7 +22,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-
+using FirebirdSql.Data.Client.Managed.Version11;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
@@ -197,11 +197,8 @@ namespace FirebirdSql.Data.Client.Managed
 					}
 					else if (operation == IscCodes.op_response)
 					{
-						var response = new GenericResponse(
-							xdrStream.ReadInt32(),
-							xdrStream.ReadInt64(),
-							xdrStream.ReadBuffer(),
-							xdrStream.ReadStatusVector());
+						var response = (GenericResponse)ProcessOperation(operation, xdrStream);
+						throw response.Exception;
 					}
 					else
 					{
@@ -345,6 +342,35 @@ namespace FirebirdSql.Data.Client.Managed
 				result.WriteByte(0);
 
 				return result.ToArray();
+			}
+		}
+
+		#endregion
+
+		#region Static Methods
+
+		public static IResponse ProcessOperation(int operation, XdrStream xdr)
+		{
+			switch (operation)
+			{
+				case IscCodes.op_response:
+					return new GenericResponse(
+						xdr.ReadInt32(),
+						xdr.ReadInt64(),
+						xdr.ReadBuffer(),
+						xdr.ReadStatusVector());
+
+				case IscCodes.op_fetch_response:
+					return new FetchResponse(xdr.ReadInt32(), xdr.ReadInt32());
+
+				case IscCodes.op_sql_response:
+					return new SqlResponse(xdr.ReadInt32());
+
+				case IscCodes.op_trusted_auth:
+					return new AuthResponse(xdr.ReadBuffer());
+
+				default:
+					return null;
 			}
 		}
 
