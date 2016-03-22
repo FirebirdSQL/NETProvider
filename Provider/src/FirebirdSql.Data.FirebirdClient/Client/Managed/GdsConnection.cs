@@ -266,7 +266,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 #warning Magic constants
 					// Login
-					result.WriteByte(9);
+					result.WriteByte(9/*CNCT_login*/);
 					result.WriteByte((byte)login.Length);
 					result.Write(login, 0, login.Length);
 
