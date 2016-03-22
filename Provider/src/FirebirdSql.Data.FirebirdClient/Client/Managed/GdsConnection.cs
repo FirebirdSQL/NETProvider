@@ -72,11 +72,6 @@ namespace FirebirdSql.Data.Client.Managed
 			get { return _protocolMinimunType; }
 		}
 
-		public bool DataAvailable
-		{
-			get { return _networkStream.DataAvailable; }
-		}
-
 		public string UserID
 		{
 			get { return _userID; }
