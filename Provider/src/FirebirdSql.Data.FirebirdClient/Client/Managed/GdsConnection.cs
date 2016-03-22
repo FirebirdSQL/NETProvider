@@ -153,42 +153,29 @@ namespace FirebirdSql.Data.Client.Managed
 					xdrStream.Write(IscCodes.GenericAchitectureClient);
 
 					xdrStream.Write(database);
-					xdrStream.Write(4);                         // Protocol versions understood
+					xdrStream.Write(ProtocolsSupported.Protocols.Count);
 					xdrStream.WriteBuffer(UserIdentificationStuff());
 
-#warning Refactoring? Wrapping?
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION10);
-					xdrStream.Write(IscCodes.GenericAchitectureClient);
-					xdrStream.Write(IscCodes.ptype_rpc);
-					xdrStream.Write(IscCodes.ptype_batch_send);
-					xdrStream.Write(0);                              // Preference weight
+					var priority = 0;
+					foreach (var protocol in ProtocolsSupported.Protocols)
+					{
+						xdrStream.Write(protocol.Version);
+						xdrStream.Write(IscCodes.GenericAchitectureClient);
+						xdrStream.Write(protocol.MinPType);
+						xdrStream.Write(protocol.MaxPType);
+						xdrStream.Write(priority);
 
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION11);
-					xdrStream.Write(IscCodes.GenericAchitectureClient);
-					xdrStream.Write(IscCodes.ptype_rpc);
-					xdrStream.Write(IscCodes.ptype_lazy_send);
-					xdrStream.Write(1);                              // Preference weight
-
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION12);
-					xdrStream.Write(IscCodes.GenericAchitectureClient);
-					xdrStream.Write(IscCodes.ptype_rpc);
-					xdrStream.Write(IscCodes.ptype_lazy_send);
-					xdrStream.Write(2);
-
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION13);
-					xdrStream.Write(IscCodes.GenericAchitectureClient);
-					xdrStream.Write(IscCodes.ptype_rpc);
-					xdrStream.Write(IscCodes.ptype_lazy_send);
-					xdrStream.Write(3);                              // Preference weight
+						priority++;
+					}
 
 					xdrStream.Flush();
 
 					var operation = xdrStream.ReadOperation();
 					if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
 					{
-						_protocolVersion = xdrStream.ReadInt32(); // Protocol version
-						_protocolArchitecture = xdrStream.ReadInt32();    // Architecture for protocol
-						_protocolMinimunType = xdrStream.ReadInt32();   // Minimum type
+						_protocolVersion = xdrStream.ReadInt32();
+						_protocolArchitecture = xdrStream.ReadInt32();
+						_protocolMinimunType = xdrStream.ReadInt32();
 
 						if (_protocolVersion < 0)
 						{
