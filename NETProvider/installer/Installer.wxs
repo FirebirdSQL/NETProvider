@@ -38,7 +38,7 @@
 									Source="$(var.BaseDir)\readme.txt" />
 						<File Id="license.txt"
 									Name="license.txt"
-									Source="$(var.BaseDir)\license.txt" />
+									Source="$(var.BaseDir)\..\license.txt" />
 						<File Id="FirebirdSql.Data.FirebirdClient.pdb"
 									Name="FirebirdSql.Data.FirebirdClient.pdb"
 									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb" />
@@ -149,6 +149,6 @@
 		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
 		<WixVariable Id="WixUISupportPerUser" Value="0" />
 		<Property Id='ALLUSERS' Value='1' />
-		<WixVariable Id="WixUILicenseRtf" Value="$(var.BaseDir)\license.rtf" />
+		<WixVariable Id="WixUILicenseRtf" Value="$(var.BaseDir)\..\license.rtf" />
 	</Product>
 </Wix>

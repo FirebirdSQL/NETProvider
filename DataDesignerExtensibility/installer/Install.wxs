@@ -62,7 +62,7 @@
 									Source="$(var.BaseDir)\readme.txt" />
 						<File Id="license.txt"
 									Name="license.txt"
-									Source="$(var.BaseDir)\license.txt" />
+									Source="$(var.BaseDir)\..\license.txt" />
 					</Component>
 				</Directory>
 			</Directory>
@@ -104,6 +104,6 @@
 		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
 		<WixVariable Id="WixUISupportPerUser" Value="0" />
 		<Property Id='ALLUSERS' Value='1' />
-		<WixVariable Id="WixUILicenseRtf" Value="$(var.BaseDir)\license.rtf" />
+		<WixVariable Id="WixUILicenseRtf" Value="$(var.BaseDir)\..\license.rtf" />
 	</Product>
 </Wix>
