@@ -3,6 +3,6 @@
 *.vs
 bin
 obj
-DataDesignerExtensibility/installer/out/
-DataDesignerExtensibility/installer/in/
-NETProvider/deploy/out
+DDEX/installer/out/
+DDEX/installer/in/
+Provider/deploy/out

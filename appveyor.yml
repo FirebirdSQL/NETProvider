@@ -16,12 +16,12 @@ environment:
 shallow_clone: true
 test: off
 build:
-  project: NETProvider\src\NETProvider.sln
+  project: Provider\src\NETProvider.sln
   parallel: true
   verbosity: minimal
 before_test:
   - ps: $sourceDir = Resolve-Path .
-  - ps: $testsDir = "$sourceDir\NETProvider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
+  - ps: $testsDir = "$sourceDir\Provider\src\FirebirdSql.Data.UnitTests\bin\$env:Configuration"
 
   - ps: mkdir C:\firebird | Out-Null
   - ps: cd C:\firebird
@@ -38,7 +38,7 @@ test_script:
   - ps: cd $testsDir
   - ps: nunit3-console FirebirdSql.Data.UnitTests.dll --framework=net-4.0 --where='cat != Local' --stoponerror --result='myresults.xml;format=AppVeyor'
 artifacts:
-  - path: NETProvider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.dll
-  - path: NETProvider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.pdb
-  - path: NETProvider\src\EntityFramework.Firebird\bin\$(Configuration)\EntityFramework.Firebird.dll
-  - path: NETProvider\src\EntityFramework.Firebird\bin\$(Configuration)\EntityFramework.Firebird.pdb
+  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.dll
+  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.pdb
+  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\EntityFramework.Firebird.dll
+  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\EntityFramework.Firebird.pdb

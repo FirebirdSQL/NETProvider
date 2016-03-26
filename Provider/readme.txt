@@ -1,5 +1,5 @@
-README - FirebirdClient ADO.NET 2.0+ Data provider for Firebird
-===============================================================
+ADO.NET 2.0+ Data Provider for Firebird
+=======================================
 
 This project is supported by:
 -----------------------------
