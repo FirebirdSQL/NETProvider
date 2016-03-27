@@ -275,18 +275,7 @@ namespace FirebirdSql.Data.Client.Managed
 					result.Write(pluginName, 0, pluginName.Length);
 
 					var specificData = Encoding.ASCII.GetBytes(_srpClient.PublicKeyHex);
-					const int MultipartMaxLength = 255 - 1;
-					var part = 0;
-					var pieces = Math.Ceiling(specificData.Length / (double)MultipartMaxLength);
-					for (int i = 0; i < specificData.Length; i += MultipartMaxLength)
-					{
-						result.WriteByte(IscCodes.CNCT_specific_data);
-						var length = Math.Min(specificData.Length - i, MultipartMaxLength);
-						result.WriteByte((byte)(length + 1));
-						result.WriteByte((byte)part);
-						result.Write(specificData, i, length);
-						part++;
-					}
+					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 
 					result.WriteByte(IscCodes.CNCT_client_crypt);
 					result.WriteByte(4);
@@ -336,6 +325,22 @@ namespace FirebirdSql.Data.Client.Managed
 
 				default:
 					return null;
+			}
+		}
+
+		private static void WriteMultiPartHelper(Stream stream, byte code, byte[] data)
+		{
+			const int MaxLength = 255 - 1;
+			var part = 0;
+			var pieces = Math.Ceiling(data.Length / (double)MaxLength);
+			for (int i = 0; i < data.Length; i += MaxLength)
+			{
+				stream.WriteByte(code);
+				var length = Math.Min(data.Length - i, MaxLength);
+				stream.WriteByte((byte)(length + 1));
+				stream.WriteByte((byte)part);
+				stream.Write(data, i, length);
+				part++;
 			}
 		}
 
