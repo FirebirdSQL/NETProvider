@@ -266,27 +266,26 @@ namespace FirebirdSql.Data.Client.Managed
 					result.WriteByte((byte)login.Length);
 					result.Write(login, 0, login.Length);
 
-					var plugin_name = Encoding.ASCII.GetBytes(SrpClient.PluginName);
+					var pluginName = Encoding.ASCII.GetBytes(SrpClient.PluginName);
 					result.WriteByte(IscCodes.CNCT_plugin_name);
-					result.WriteByte((byte)plugin_name.Length);
-					result.Write(plugin_name, 0, plugin_name.Length);
+					result.WriteByte((byte)pluginName.Length);
+					result.Write(pluginName, 0, pluginName.Length);
 					result.WriteByte(IscCodes.CNCT_plugin_list);
-					result.WriteByte((byte)plugin_name.Length);
-					result.Write(plugin_name, 0, plugin_name.Length);
+					result.WriteByte((byte)pluginName.Length);
+					result.Write(pluginName, 0, pluginName.Length);
 
-					var specific_data = Encoding.ASCII.GetBytes(_srpClient.PublicKeyHex);
-					var remaining = specific_data.Length;
-					var position = 0;
-					var step = 0;
-					while (remaining > 0)
+					var specificData = Encoding.ASCII.GetBytes(_srpClient.PublicKeyHex);
+					const int MultipartMaxLength = 255 - 1;
+					var part = 0;
+					var pieces = Math.Ceiling(specificData.Length / (double)MultipartMaxLength);
+					for (int i = 0; i < specificData.Length; i += MultipartMaxLength)
 					{
 						result.WriteByte(IscCodes.CNCT_specific_data);
-						var toWrite = Math.Min(remaining, 254);
-						result.WriteByte((byte)(toWrite + 1));
-						result.WriteByte((byte)step++);
-						result.Write(specific_data, position, toWrite);
-						remaining -= toWrite;
-						position += toWrite;
+						var length = Math.Min(specificData.Length - i, MultipartMaxLength);
+						result.WriteByte((byte)(length + 1));
+						result.WriteByte((byte)part);
+						result.Write(specificData, i, length);
+						part++;
 					}
 
 					result.WriteByte(IscCodes.CNCT_client_crypt);
