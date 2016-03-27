@@ -34,7 +34,7 @@ using System.Threading;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture(FbServerType.Default)]
+	[FbServerTypeTestFixture(FbServerType.Default)]
 	public class FbServicesTests : TestsBase
 	{
 		#region Constructors
