@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			XdrStream.Write(IscCodes.op_attach);
-			XdrStream.Write(0);                 // Database	object ID
+			XdrStream.Write(0);
 			if (!string.IsNullOrEmpty(UserID))
 			{
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
@@ -49,8 +49,8 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));              // Database	PATH
-			XdrStream.WriteBuffer(dpb.ToArray());   // DPB Parameter buffer
+			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 
 		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
