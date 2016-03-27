@@ -149,7 +149,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 					xdrStream.Write(database);
 					xdrStream.Write(ProtocolsSupported.Protocols.Count);
-					xdrStream.WriteBuffer(UserIdentificationStuff());
+					xdrStream.WriteBuffer(UserIdentificationData());
 
 					var priority = 0;
 					foreach (var protocol in ProtocolsSupported.Protocols)
@@ -255,7 +255,7 @@ namespace FirebirdSql.Data.Client.Managed
 			return addresses[0];
 		}
 
-		private byte[] UserIdentificationStuff()
+		private byte[] UserIdentificationData()
 		{
 			using (var result = new MemoryStream())
 			{
@@ -264,30 +264,25 @@ namespace FirebirdSql.Data.Client.Managed
 					var login = Encoding.UTF8.GetBytes(_userID);
 					var plugin_name = Encoding.ASCII.GetBytes(SrpClient.PluginName);
 
-#warning Magic constants
-					// Login
-					result.WriteByte(9/*CNCT_login*/);
+					result.WriteByte(IscCodes.CNCT_login);
 					result.WriteByte((byte)login.Length);
 					result.Write(login, 0, login.Length);
 
-					// Plugin Name
-					result.WriteByte(8);
+					result.WriteByte(IscCodes.CNCT_plugin_name);
 					result.WriteByte((byte)plugin_name.Length);
 					result.Write(plugin_name, 0, plugin_name.Length);
 
-					// Plugin List
-					result.WriteByte(10);
+					result.WriteByte(IscCodes.CNCT_plugin_list);
 					result.WriteByte((byte)plugin_name.Length);
 					result.Write(plugin_name, 0, plugin_name.Length);
 
-					// Specific Data
 					var specific_data = Encoding.ASCII.GetBytes(_srpClient.PublicKeyHex);
 					var remaining = specific_data.Length;
 					var position = 0;
 					var step = 0;
 					while (remaining > 0)
 					{
-						result.WriteByte(7);
+						result.WriteByte(IscCodes.CNCT_specific_data);
 						int toWrite = Math.Min(remaining, 254);
 						result.WriteByte((byte)(toWrite + 1));
 						result.WriteByte((byte)step++);
@@ -296,14 +291,9 @@ namespace FirebirdSql.Data.Client.Managed
 						position += toWrite;
 					}
 
-#warning Magic
-					// Client Crypt (Not Encrypt)
-					result.WriteByte(11);
+					result.WriteByte(IscCodes.CNCT_client_crypt);
 					result.WriteByte(4);
-					result.WriteByte(0);
-					result.WriteByte(0);
-					result.WriteByte(0);
-					result.WriteByte(0);
+					result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 				}
 
 				// User	Name
