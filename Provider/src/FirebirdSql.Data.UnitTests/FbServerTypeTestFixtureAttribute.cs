@@ -12,51 +12,20 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2009 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2016 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using FirebirdSql.Data.FirebirdClient;
-using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
-	[FbServerTypeTestFixture(FbServerType.Embedded)]
-	class FbExceptionTests : TestsBase
+	// prevents CLS warning because of `params` in `TestFixtureAttribute`
+	class FbServerTypeTestFixtureAttribute : NUnit.Framework.TestFixtureAttribute
 	{
-		#region Constructors
-
-		public FbExceptionTests(FbServerType serverType)
+		public FbServerTypeTestFixtureAttribute(FbServerType serverType)
 			: base(serverType)
 		{ }
-
-		#endregion
-
-		#region Unit Tests
-
-		[Test]
-		public void SQLSTATETest()
-		{
-			using (FbCommand cmd = Connection.CreateCommand())
-			{
-				cmd.CommandText = "drop exception nonexisting";
-				try
-				{
-					cmd.ExecuteNonQuery();
-				}
-				catch (FbException ex)
-				{
-					Assert.AreEqual("42000", ex.SQLSTATE);
-				}
-			}
-		}
-
-		#endregion
 	}
 }

@@ -32,8 +32,8 @@ using System.Diagnostics;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[TestFixture(FbServerType.Default)]
-	[TestFixture(FbServerType.Embedded)]
+	[FbServerTypeTestFixture(FbServerType.Default)]
+	[FbServerTypeTestFixture(FbServerType.Embedded)]
 	public class TrackerIssuesTests : TestsBase
 	{
 		#region Constructors
