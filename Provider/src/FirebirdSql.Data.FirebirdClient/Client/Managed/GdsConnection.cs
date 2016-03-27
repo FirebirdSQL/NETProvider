@@ -332,7 +332,6 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			const int MaxLength = 255 - 1;
 			var part = 0;
-			var pieces = Math.Ceiling(data.Length / (double)MaxLength);
 			for (int i = 0; i < data.Length; i += MaxLength)
 			{
 				stream.WriteByte(code);
