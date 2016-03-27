@@ -262,16 +262,14 @@ namespace FirebirdSql.Data.Client.Managed
 				if (_userID != null)
 				{
 					var login = Encoding.UTF8.GetBytes(_userID);
-					var plugin_name = Encoding.ASCII.GetBytes(SrpClient.PluginName);
-
 					result.WriteByte(IscCodes.CNCT_login);
 					result.WriteByte((byte)login.Length);
 					result.Write(login, 0, login.Length);
 
+					var plugin_name = Encoding.ASCII.GetBytes(SrpClient.PluginName);
 					result.WriteByte(IscCodes.CNCT_plugin_name);
 					result.WriteByte((byte)plugin_name.Length);
 					result.Write(plugin_name, 0, plugin_name.Length);
-
 					result.WriteByte(IscCodes.CNCT_plugin_list);
 					result.WriteByte((byte)plugin_name.Length);
 					result.Write(plugin_name, 0, plugin_name.Length);
@@ -283,7 +281,7 @@ namespace FirebirdSql.Data.Client.Managed
 					while (remaining > 0)
 					{
 						result.WriteByte(IscCodes.CNCT_specific_data);
-						int toWrite = Math.Min(remaining, 254);
+						var toWrite = Math.Min(remaining, 254);
 						result.WriteByte((byte)(toWrite + 1));
 						result.WriteByte((byte)step++);
 						result.Write(specific_data, position, toWrite);
@@ -296,20 +294,17 @@ namespace FirebirdSql.Data.Client.Managed
 					result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 				}
 
-				// User	Name
 				var user = Encoding.UTF8.GetBytes(Environment.UserName);
-				result.WriteByte(1);
+				result.WriteByte(IscCodes.CNCT_user);
 				result.WriteByte((byte)user.Length);
 				result.Write(user, 0, user.Length);
 
-				// Host	name
 				var host = Encoding.UTF8.GetBytes(Dns.GetHostName());
-				result.WriteByte(4);
+				result.WriteByte(IscCodes.CNCT_host);
 				result.WriteByte((byte)host.Length);
 				result.Write(host, 0, host.Length);
 
-				// Attach/create using this connection will use user verification
-				result.WriteByte(6);
+				result.WriteByte(IscCodes.CNCT_user_verification);
 				result.WriteByte(0);
 
 				return result.ToArray();
