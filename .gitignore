@@ -1,6 +1,6 @@
 *.suo
 *.user
-*.vs
+.vs
 bin
 obj
 DDEX/installer/out/
