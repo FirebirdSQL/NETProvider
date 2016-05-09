@@ -92,81 +92,43 @@ namespace FirebirdSql.Data.Services
 
 		void ReadInput()
 		{
-			var items = Verbose
-				? new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line }
-				: new byte[] { IscCodes.isc_info_svc_stdin };
-			var readAheadBuffer = new List<byte>(IscCodes.BUFFER_SIZE_32K + 1);
+			var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
 			var response = Query(items);
-			var length = GetLength(response);
+			var requestedLength = GetLength(response);
 			while (true)
 			{
-				if (length > 0)
+				if (requestedLength > 0)
 				{
-					var data = ReadAheadBuffering(readAheadBuffer, InputStream, length);
-					var spb = new ServiceParameterBuffer();
-					spb.Append(IscCodes.isc_info_svc_line, data);
-					QuerySpb = spb;
+					var data = new byte[requestedLength];
+					var read = InputStream.Read(data, 0, requestedLength);
+					if (read > 0)
+					{
+						Array.Resize(ref data, read);
+						var spb = new ServiceParameterBuffer();
+						spb.Append(IscCodes.isc_info_svc_line, data);
+						QuerySpb = spb;
+					}
 				}
 				response = Query(items);
-				QuerySpb = null;
-				length = GetLength(response);
-				var messages = ProcessMessages(response);
-				if (!readAheadBuffer.Any() && !messages)
+				if (response.Count == 1)
 				{
 					break;
 				}
+				var message = response[1] as string;
+				if (message != null)
+				{
+					WriteServiceOutputChecked(message);
+				}
+				requestedLength = GetLength(response);
+				QuerySpb = null;
 			}
-			while (Query(new byte[] { IscCodes.isc_info_svc_line }).Count != 0)
-			{ }
-
-		}
-
-		bool ProcessMessages(ArrayList items)
-		{
-			var message = GetMessage(items);
-			if (message == null)
-				return false;
-			WriteServiceOutputChecked(message);
-			return true;
 		}
 
 		static int GetLength(ArrayList items)
 		{
 			// minus the size of isc code
 			const int maxLength = IscCodes.BUFFER_SIZE_32K - 4;
-			return Math.Min(items[0] is int ? (int)items[0] : 0, maxLength);
-		}
-
-		static string GetMessage(ArrayList items)
-		{
-			if (items[0] is string)
-				return (string)items[0];
-			if (items.Count > 1)
-				return (string)items[1];
-			return null;
-		}
-
-		static byte[] ReadAheadBuffering(List<byte> readAheadBuffer, Stream stream, int length)
-		{
-			var giveLast = false;
-			if (readAheadBuffer.Count < readAheadBuffer.Capacity)
-			{
-				var buffer = new byte[readAheadBuffer.Capacity - readAheadBuffer.Count];
-				var read = stream.Read(buffer, 0, buffer.Length);
-				if (read != 0)
-				{
-					Array.Resize(ref buffer, read);
-					readAheadBuffer.AddRange(buffer);
-				}
-				else
-				{
-					giveLast = true;
-				}
-			}
-			var result = new byte[Math.Min(length, readAheadBuffer.Count - (giveLast ? 0 : 1))];
-			readAheadBuffer.CopyTo(0, result, 0, result.Length);
-			readAheadBuffer.RemoveRange(0, result.Length);
-			return result;
+			return Math.Min((int)items[0], maxLength);
 		}
 	}
 }

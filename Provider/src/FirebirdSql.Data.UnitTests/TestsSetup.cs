@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.UnitTests
 		internal const int Port = 3050;
 		internal const string Charset = "utf8";
 		internal const bool Pooling = false;
-		internal const int PageSize = 4096;
+		internal const int PageSize = 16384;
 		internal const bool ForcedWrite = false;
 		internal const string BackupRestoreFile = "netprovider_tests.fbk";
 

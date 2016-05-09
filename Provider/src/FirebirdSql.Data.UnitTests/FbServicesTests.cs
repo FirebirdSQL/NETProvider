@@ -77,6 +77,9 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			BackupRestoreTest_BackupPart();
 			BackupRestoreTest_RestorePart();
+			// test the database was actually restored fine
+			Connection.Open();
+			Connection.Close();
 		}
 		void BackupRestoreTest_BackupPart()
 		{
@@ -97,7 +100,7 @@ namespace FirebirdSql.Data.UnitTests
 
 			restoreSvc.ConnectionString = BuildServicesConnectionString(FbServerType);
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
-			restoreSvc.PageSize = 4096;
+			restoreSvc.PageSize = TestsSetup.PageSize;
 			restoreSvc.Verbose = true;
 			restoreSvc.BackupFiles.Add(new FbBackupFile(TestsSetup.BackupRestoreFile, 2048));
 
@@ -107,23 +110,53 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void StreamingBackupRestoreTest()
+		[TestCase(true)]
+		[TestCase(false)]
+		public void StreamingBackupRestoreTest(bool verbose)
 		{
 			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
 
-			if (GetServerVersion() >= new Version("3.0.0.0") && GetServerVersion() <= new Version("3.1.0.0"))
+			Connection.Open();
+			using (var cmd = Connection.CreateCommand())
 			{
-				Assert.Ignore("devel: FB 3 RC2 never asks last byte byte for isc_info_svc_stdin");
-				return;
+				cmd.CommandText = "create table dummy_data (foo varchar(1000) primary key)";
+				cmd.ExecuteNonQuery();
 			}
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = @"execute block
+as
+declare cnt int;
+begin
+	cnt = 999999;
+	while (cnt > 0) do
+	begin
+		insert into dummy_data values (uuid_to_char(gen_uuid()));
+		cnt = cnt - 1;
+	end
+end";
+				cmd.ExecuteNonQuery();
+			}
+			Connection.Close();
 
 			using (var ms = new MemoryStream())
 			{
 				StreamingBackupRestoreTest_BackupPart(ms);
 				ms.Position = 0;
-				StreamingBackupRestoreTest_RestorePart(ms);
+				StreamingBackupRestoreTest_RestorePart(ms, verbose);
+				// test the database was actually restored fine
+				Connection.Open();
+				Connection.Close();
 			}
+
+			Connection.Open();
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "drop table dummy_data";
+				cmd.ExecuteNonQuery();
+			}
+			Connection.Close();
 		}
 		private void StreamingBackupRestoreTest_BackupPart(MemoryStream buffer)
 		{
@@ -137,14 +170,14 @@ namespace FirebirdSql.Data.UnitTests
 
 			backupSvc.Execute();
 		}
-		private void StreamingBackupRestoreTest_RestorePart(MemoryStream buffer)
+		private void StreamingBackupRestoreTest_RestorePart(MemoryStream buffer, bool verbose)
 		{
 			FbStreamingRestore restoreSvc = new FbStreamingRestore();
 
 			restoreSvc.ConnectionString = BuildServicesConnectionString(FbServerType);
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
-			restoreSvc.PageSize = 4096;
-			restoreSvc.Verbose = true;
+			restoreSvc.PageSize = TestsSetup.PageSize;
+			restoreSvc.Verbose = verbose;
 			restoreSvc.InputStream = buffer;
 
 			restoreSvc.ServiceOutput += ServiceOutput;

@@ -396,6 +396,14 @@ namespace FirebirdSql.Data.Services
 						{
 							var length = GetLength(buffer, 4, ref pos);
 							queryResponseAction(truncated, length);
+							truncated = false;
+							break;
+						}
+
+					case IscCodes.isc_info_data_not_ready:
+						{
+							queryResponseAction(truncated, -1);
+							truncated = false;
 							break;
 						}
 				}
