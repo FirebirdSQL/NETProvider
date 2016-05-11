@@ -402,7 +402,7 @@ namespace FirebirdSql.Data.Services
 
 					case IscCodes.isc_info_data_not_ready:
 						{
-							queryResponseAction(truncated, -1);
+							queryResponseAction(truncated, typeof(void));
 							truncated = false;
 							break;
 						}
