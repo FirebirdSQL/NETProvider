@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.Services
 			var message = GetMessage(items);
 			if (message == null)
 				return false;
-			WriteServiceOutputChecked(message);
+			OnServiceOutput(message);
 			return true;
 		}
 
