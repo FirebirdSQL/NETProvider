@@ -618,19 +618,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void OnWarningMessage(IscException warning)
 		{
-			if (InfoMessage != null)
-			{
-				InfoMessage(this, new FbInfoMessageEventArgs(warning));
-			}
+			InfoMessage?.Invoke(this, new FbInfoMessageEventArgs(warning));
 		}
 
 		private void OnStateChange(ConnectionState originalState, ConnectionState currentState)
 		{
 			_state = currentState;
-			if (StateChange != null)
-			{
-				StateChange(this, new StateChangeEventArgs(originalState, currentState));
-			}
+			StateChange?.Invoke(this, new StateChangeEventArgs(originalState, currentState));
 		}
 
 		#endregion

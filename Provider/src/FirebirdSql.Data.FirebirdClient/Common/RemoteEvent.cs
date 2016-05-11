@@ -191,10 +191,7 @@ namespace FirebirdSql.Data.Common
 				}
 				else
 				{
-					if (EventCountsCallback != null)
-					{
-						EventCountsCallback();
-					}
+					EventCountsCallback?.Invoke();
 				}
 			}
 		}

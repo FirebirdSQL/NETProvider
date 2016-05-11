@@ -79,10 +79,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_transaction.Commit();
 				_transaction = null;
 
-				if (Completed != null)
-				{
-					Completed(this, new EventArgs());
-				}
+				Completed?.Invoke(this, new EventArgs());
 
 				if (_connection != null)
 				{
@@ -116,10 +113,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_transaction.Rollback();
 				_transaction = null;
 
-				if (Completed != null)
-				{
-					Completed(this, new EventArgs());
-				}
+				Completed?.Invoke(this, new EventArgs());
 
 				if (_connection != null)
 				{

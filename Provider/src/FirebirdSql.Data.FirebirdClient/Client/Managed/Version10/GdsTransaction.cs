@@ -167,10 +167,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						_database.TransactionCount--;
 					}
 
-					if (Update != null)
-					{
-						Update(this, new EventArgs());
-					}
+					Update?.Invoke(this, new EventArgs());
 
 					_state = TransactionState.NoTransaction;
 				}
@@ -200,10 +197,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						_database.TransactionCount--;
 					}
 
-					if (Update != null)
-					{
-						Update(this, new EventArgs());
-					}
+					Update?.Invoke(this, new EventArgs());
 
 					_state = TransactionState.NoTransaction;
 				}

@@ -282,10 +282,7 @@ namespace FirebirdSql.Data.Services
 
 		protected void WriteServiceOutputChecked(string s)
 		{
-			if (ServiceOutput != null)
-			{
-				ServiceOutput(this, new ServiceOutputEventArgs(s));
-			}
+			ServiceOutput?.Invoke(this, new ServiceOutputEventArgs(s));
 		}
 
 		#endregion
