@@ -13,7 +13,7 @@
  *	   language governing rights and limitations under the License.
  *
  *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
- *	Copyright (c) 2007 - 2009 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2007 - 2009, 2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -375,7 +375,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 									if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 									{
-										_rows.Enqueue(ReadDataRow());
+										_rows.Enqueue(ReadRow());
 									}
 									else if (fetchResponse.Status == 100)
 									{
@@ -584,15 +584,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected void SendExecuteToBuffer()
 		{
 			// this may throw error, so it needs to be before any writing
-			byte[] descriptor = null;
-			if (_parameters != null)
-			{
-				using (XdrStream xdr = new XdrStream(_database.Charset))
-				{
-					xdr.Write(_parameters);
-					descriptor = xdr.ToArray();
-				}
-			}
+			var descriptor = WriteParameters();
 
 			// Write the message
 			if (_statementType == DbStatementType.StoredProcedure)
@@ -623,7 +615,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (_statementType == DbStatementType.StoredProcedure)
 			{
-				_database.XdrStream.WriteBuffer((_fields == null) ? null : _fields.ToBlrArray());
+				_database.XdrStream.WriteBuffer(_fields == null ? null : _fields.ToBlrArray());
 				_database.XdrStream.Write(0); // Output message number
 			}
 		}
@@ -639,7 +631,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (response.Count > 0)
 				{
-					_outputParams.Enqueue(ReadDataRow());
+					_outputParams.Enqueue(ReadRow());
 				}
 			}
 			catch (IOException ex)
@@ -662,31 +654,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_TransactionUpdate = null;
 				_allRowsFetched = false;
 			}
-		}
-
-		protected DbValue[] ReadDataRow()
-		{
-			DbValue[] row = new DbValue[_fields.Count];
-			object value = null;
-
-			lock (_database.SyncObject)
-			{
-				// This only works if not (port->port_flags & PORT_symmetric)
-				for (int i = 0; i < _fields.Count; i++)
-				{
-					try
-					{
-						value = _database.XdrStream.ReadValue(_fields[i]);
-						row[i] = new DbValue(this, _fields[i], value);
-					}
-					catch (IOException ex)
-					{
-						throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-					}
-				}
-			}
-
-			return row;
 		}
 
 		protected void ParseSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
@@ -831,6 +798,186 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
+		protected void WriteRawParameter(XdrStream xdr, DbField field)
+		{
+			if (field.DbDataType != DbDataType.Null)
+			{
+				field.FixNull();
+
+				switch (field.DbDataType)
+				{
+					case DbDataType.Char:
+						if (field.Charset.IsOctetsCharset)
+						{
+							xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
+						}
+						else
+						{
+							var svalue = field.DbValue.GetString();
+
+							if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
+								svalue.Length > field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+
+							xdr.WriteOpaque(field.Charset.GetBytes(svalue), field.Length);
+						}
+						break;
+
+					case DbDataType.VarChar:
+						if (field.Charset.IsOctetsCharset)
+						{
+							xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
+						}
+						else
+						{
+							var svalue = field.DbValue.GetString();
+
+							if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
+								svalue.Length > field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+
+							var data = field.Charset.GetBytes(svalue);
+
+							xdr.WriteBuffer(data, data.Length);
+						}
+						break;
+
+					case DbDataType.SmallInt:
+						xdr.Write(field.DbValue.GetInt16());
+						break;
+
+					case DbDataType.Integer:
+						xdr.Write(field.DbValue.GetInt32());
+						break;
+
+					case DbDataType.BigInt:
+					case DbDataType.Array:
+					case DbDataType.Binary:
+					case DbDataType.Text:
+						xdr.Write(field.DbValue.GetInt64());
+						break;
+
+					case DbDataType.Decimal:
+					case DbDataType.Numeric:
+						xdr.Write(field.DbValue.GetDecimal(), field.DataType, field.NumericScale);
+						break;
+
+					case DbDataType.Float:
+						xdr.Write(field.DbValue.GetFloat());
+						break;
+
+					case DbDataType.Guid:
+						xdr.WriteOpaque(field.DbValue.GetGuid().ToByteArray());
+						break;
+
+					case DbDataType.Double:
+						xdr.Write(field.DbValue.GetDouble());
+						break;
+
+					case DbDataType.Date:
+						xdr.Write(field.DbValue.GetDate());
+						break;
+
+					case DbDataType.Time:
+						xdr.Write(field.DbValue.GetTime());
+						break;
+
+					case DbDataType.TimeStamp:
+						xdr.Write(field.DbValue.GetDate());
+						xdr.Write(field.DbValue.GetTime());
+						break;
+
+					case DbDataType.Boolean:
+						xdr.Write(Convert.ToBoolean(field.Value));
+						break;
+
+					default:
+						throw IscException.ForStrParam($"Unknown SQL data type: {field.DataType}.");
+				}
+			}
+		}
+
+		protected object ReadRawValue(DbField field)
+		{
+			var innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
+
+			switch (field.DbDataType)
+			{
+				case DbDataType.Char:
+					if (field.Charset.IsOctetsCharset)
+					{
+						return _database.XdrStream.ReadOpaque(field.Length);
+					}
+					else
+					{
+						var s = _database.XdrStream.ReadString(innerCharset, field.Length);
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
+							s.Length > field.CharCount)
+						{
+							return s.Substring(0, field.CharCount);
+						}
+						else
+						{
+							return s;
+						}
+					}
+
+				case DbDataType.VarChar:
+					if (field.Charset.IsOctetsCharset)
+					{
+						return _database.XdrStream.ReadBuffer();
+					}
+					else
+					{
+						return _database.XdrStream.ReadString(innerCharset);
+					}
+
+				case DbDataType.SmallInt:
+					return _database.XdrStream.ReadInt16();
+
+				case DbDataType.Integer:
+					return _database.XdrStream.ReadInt32();
+
+				case DbDataType.Array:
+				case DbDataType.Binary:
+				case DbDataType.Text:
+				case DbDataType.BigInt:
+					return _database.XdrStream.ReadInt64();
+
+				case DbDataType.Decimal:
+				case DbDataType.Numeric:
+					return _database.XdrStream.ReadDecimal(field.DataType, field.NumericScale);
+
+				case DbDataType.Float:
+					return _database.XdrStream.ReadSingle();
+
+				case DbDataType.Guid:
+					return _database.XdrStream.ReadGuid(field.Length);
+
+				case DbDataType.Double:
+					return _database.XdrStream.ReadDouble();
+
+				case DbDataType.Date:
+					return _database.XdrStream.ReadDate();
+
+				case DbDataType.Time:
+					return _database.XdrStream.ReadTime();
+
+				case DbDataType.TimeStamp:
+					return _database.XdrStream.ReadDateTime();
+
+				case DbDataType.Boolean:
+					return _database.XdrStream.ReadBoolean();
+
+				default:
+					throw TypeHelper.InvalidDataType((int)field.DbDataType);
+			}
+		}
+
 		protected void Clear()
 		{
 			if (_rows != null && _rows.Count > 0)
@@ -851,6 +998,64 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			_parameters = null;
 			_fields = null;
+		}
+
+		protected virtual byte[] WriteParameters()
+		{
+			if (_parameters == null)
+				return null;
+
+			using (var xdr = new XdrStream(_database.Charset))
+			{
+				for (var i = 0; i < _parameters.Count; i++)
+				{
+					var field = _parameters[i];
+					try
+					{
+						WriteRawParameter(xdr, field);
+						xdr.Write(field.NullFlag);
+					}
+					catch (IOException ex)
+					{
+						throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
+					}
+				}
+
+				return xdr.ToArray();
+			}
+		}
+
+		protected virtual DbValue[] ReadRow()
+		{
+			DbValue[] row = new DbValue[_fields.Count];
+			lock (_database.SyncObject)
+			{
+				try
+				{
+					for (int i = 0; i < _fields.Count; i++)
+					{
+						var value = ReadRawValue(_fields[i]);
+						var sqlInd = _database.XdrStream.ReadInt32();
+						if (sqlInd == -1)
+						{
+							row[i] = new DbValue(this, _fields[i], null);
+						}
+						else if (sqlInd == 0)
+						{
+							row[i] = new DbValue(this, _fields[i], value);
+						}
+						else
+						{
+							throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
+						}
+					}
+				}
+				catch (IOException ex)
+				{
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
+				}
+			}
+			return row;
 		}
 
 		#endregion

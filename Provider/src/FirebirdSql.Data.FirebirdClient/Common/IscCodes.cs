@@ -44,6 +44,7 @@ namespace FirebirdSql.Data.Common
 
 		public const int BUFFER_SIZE_128 = 128;
 		public const int BUFFER_SIZE_256 = 256;
+		public const int BUFFER_SIZE_32K = 32768;
 		public const int DEFAULT_MAX_BUFFER_SIZE = 8192;
 		public const int ROWS_AFFECTED_BUFFER_SIZE = 34;
 		public const int STATEMENT_TYPE_BUFFER_SIZE = 8;
@@ -332,10 +333,13 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_dbname = 106;
 		public const int isc_spb_verbose = 107;
 		public const int isc_spb_options = 108;
+		public const int isc_spb_trusted_auth = 111;
 
 		public const int isc_spb_connect_timeout = isc_dpb_connect_timeout;
 		public const int isc_spb_dummy_packet_interval = isc_dpb_dummy_packet_interval;
 		public const int isc_spb_sql_role_name = isc_dpb_sql_role_name;
+
+		public const int isc_spb_specific_auth_data = isc_spb_trusted_auth;
 
 		public const int isc_spb_num_att = 5;
 		public const int isc_spb_num_db = 6;
@@ -905,6 +909,19 @@ namespace FirebirdSql.Data.Common
 		public const int fb_cancel_enable = 2;
 		public const int fb_cancel_raise = 3;
 		public const int fb_cancel_abort = 4;
+		#endregion
+
+		#region User identification data
+		public const int CNCT_user = 1;
+		public const int CNCT_passwd = 2;
+		public const int CNCT_host = 4;
+		public const int CNCT_group = 5;
+		public const int CNCT_user_verification = 6;
+		public const int CNCT_specific_data = 7;
+		public const int CNCT_plugin_name = 8;
+		public const int CNCT_login = 9;
+		public const int CNCT_plugin_list = 10;
+		public const int CNCT_client_crypt = 11;
 		#endregion
 	}
 }

@@ -101,6 +101,7 @@
     <Compile Include="FbConnectionStringTests.cs" />
     <Compile Include="FbConnectionStringBuilderTests.cs" />
     <Compile Include="FbExceptionTests.cs" />
+    <Compile Include="FbServerTypeTestFixtureAttribute.cs" />
     <Compile Include="TestsSetup.cs" />
     <Compile Include="TrackerIssuesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

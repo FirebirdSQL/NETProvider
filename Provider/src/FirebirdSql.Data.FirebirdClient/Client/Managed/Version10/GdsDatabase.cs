@@ -238,7 +238,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected virtual void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			XdrStream.Write(IscCodes.op_attach);
-			XdrStream.Write(0);                                           // Database object ID
+			XdrStream.Write(0);
 			if (!string.IsNullOrEmpty(UserID))
 			{
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
@@ -247,19 +247,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					dpb.Append(IscCodes.isc_dpb_password, Password);
 				}
 			}
-			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));   // Database PATH
-			XdrStream.WriteBuffer(dpb.ToArray());                         // DPB Parameter buffer
+			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));
+			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 
 		protected virtual void ProcessAttachResponse(GenericResponse response)
 		{
-			// Save the database connection handle
 			_handle = response.ObjectHandle;
 		}
 
 		protected void AfterAttachActions()
 		{
-			// Get server version
 			_serverVersion = GetServerVersion();
 		}
 
@@ -374,6 +372,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected virtual void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			XdrStream.Write(IscCodes.op_create);
+#warning Some constant for default database object ID
 			XdrStream.Write(0);
 			if (!string.IsNullOrEmpty(UserID))
 			{
@@ -474,7 +473,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					XdrStream.ReadBytes(respLen);
 
 					// Read Status Vector
-					ReadStatusVector();
+					XdrStream.ReadStatusVector();
 				}
 				catch (IOException ex)
 				{
@@ -663,11 +662,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (response is GenericResponse)
 			{
-				if (((GenericResponse)response).Exception != null &&
-					((GenericResponse)response).Exception.IsWarning &&
-					_warningMessage != null)
+				if (((GenericResponse)response).Exception != null && ((GenericResponse)response).Exception.IsWarning)
 				{
-					_warningMessage(((GenericResponse)response).Exception);
+					_warningMessage?.Invoke(((GenericResponse)response).Exception);
 				}
 			}
 		}
@@ -704,53 +701,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return (SqlResponse)ReadResponse();
 		}
 
-		public virtual IscException ReadStatusVector()
-		{
-			IscException exception = null;
-			bool eof = false;
-
-			while (!eof)
-			{
-				int arg = XdrStream.ReadInt32();
-
-				switch (arg)
-				{
-					case IscCodes.isc_arg_gds:
-					default:
-						int er = XdrStream.ReadInt32();
-						if (er != 0)
-						{
-							if (exception == null)
-							{
-								exception = IscException.ForBuilding();
-							}
-							exception.Errors.Add(new IscError(arg, er));
-						}
-						break;
-
-					case IscCodes.isc_arg_end:
-						exception?.BuildExceptionData();
-						eof = true;
-						break;
-
-					case IscCodes.isc_arg_interpreted:
-					case IscCodes.isc_arg_string:
-						exception.Errors.Add(new IscError(arg, XdrStream.ReadString()));
-						break;
-
-					case IscCodes.isc_arg_number:
-						exception.Errors.Add(new IscError(arg, XdrStream.ReadInt32()));
-						break;
-
-					case IscCodes.isc_arg_sql_state:
-						exception.Errors.Add(new IscError(arg, XdrStream.ReadString()));
-						break;
-				}
-			}
-
-			return exception;
-		}
-
 		public virtual void SetOperation(int operation)
 		{
 			_operation = operation;
@@ -781,33 +731,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			int operation = ReadOperation();
 
-			IResponse response = ProcessOperation(operation);
+			IResponse response = GdsConnection.ProcessOperation(operation, XdrStream);
 
 			ProcessResponseWarnings(response);
 
 			return response;
-		}
-
-		protected virtual IResponse ProcessOperation(int operation)
-		{
-			switch (operation)
-			{
-				case IscCodes.op_response:
-					return new GenericResponse(
-						XdrStream.ReadInt32(),
-						XdrStream.ReadInt64(),
-						XdrStream.ReadBuffer(),
-						ReadStatusVector());
-
-				case IscCodes.op_fetch_response:
-					return new FetchResponse(XdrStream.ReadInt32(), XdrStream.ReadInt32());
-
-				case IscCodes.op_sql_response:
-					return new SqlResponse(XdrStream.ReadInt32());
-
-				default:
-					return null;
-			}
 		}
 
 		/// <summary>

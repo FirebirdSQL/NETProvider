@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			XdrStream.Write(IscCodes.op_attach);
-			XdrStream.Write(0);                 // Database	object ID
+			XdrStream.Write(0);
 			if (!string.IsNullOrEmpty(UserID))
 			{
 				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
@@ -50,8 +50,8 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));                // Database	PATH
-			XdrStream.WriteBuffer(dpb.ToArray());   // DPB Parameter buffer
+			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 
 		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
@@ -70,5 +70,19 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}
+
+		#region Override Statement Creation Methods
+
+		public override StatementBase CreateStatement()
+		{
+			return new GdsStatement(this);
+		}
+
+		public override StatementBase CreateStatement(TransactionBase transaction)
+		{
+			return new GdsStatement(this, transaction);
+		}
+
+		#endregion
 	}
 }

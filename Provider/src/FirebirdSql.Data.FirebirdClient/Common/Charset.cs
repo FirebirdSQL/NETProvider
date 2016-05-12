@@ -28,7 +28,14 @@ namespace FirebirdSql.Data.Common
 {
 	internal sealed class Charset
 	{
-		#region Static
+		#region Constants
+
+		const string Octets = "OCTETS";
+		const string None = "NONE";
+
+		#endregion
+
+		#region Statics
 
 		private readonly static Dictionary<int, Charset> charsetsById;
 		private readonly static Dictionary<string, Charset> charsetsByName;
@@ -66,9 +73,9 @@ namespace FirebirdSql.Data.Common
 			List<Charset> charsets = new List<Charset>();
 
 			// NONE
-			charsets.Add(new Charset(0, "NONE", 1, "NONE"));
+			charsets.Add(new Charset(0, None, 1, None));
 			// OCTETS
-			charsets.Add(new Charset(1, "OCTETS", 1, "OCTETS"));
+			charsets.Add(new Charset(1, Octets, 1, Octets));
 			// American Standard Code for Information Interchange
 			charsets.Add(new Charset(2, "ASCII", 1, "ascii"));
 			// Eight-bit Unicode Transformation Format
@@ -174,7 +181,12 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsOctetsCharset
 		{
-			get { return (_id == Charset.GetCharset("OCTETS").Identifier); }
+			get { return (_id == GetCharset(Octets).Identifier); }
+		}
+
+		public bool IsNoneCharset
+		{
+			get { return (_id == GetCharset(None).Identifier); }
 		}
 
 		#endregion
@@ -189,10 +201,10 @@ namespace FirebirdSql.Data.Common
 			_systemName = systemName;
 			switch (_systemName)
 			{
-				case "NONE":
+				case None:
 					_encoding = Encoding.Default;
 					break;
-				case "OCTETS":
+				case Octets:
 					_encoding = new BinaryEncoding();
 					break;
 				default:

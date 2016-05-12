@@ -22,7 +22,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-
+using FirebirdSql.Data.Client.Managed.Version11;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
@@ -70,11 +70,6 @@ namespace FirebirdSql.Data.Client.Managed
 		public int ProtocolMinimunType
 		{
 			get { return _protocolMinimunType; }
-		}
-
-		public bool DataAvailable
-		{
-			get { return _networkStream.DataAvailable; }
 		}
 
 		public string UserID
@@ -153,41 +148,39 @@ namespace FirebirdSql.Data.Client.Managed
 					xdrStream.Write(IscCodes.GenericAchitectureClient);
 
 					xdrStream.Write(database);
-					xdrStream.Write(3);                         // Protocol versions understood
-					xdrStream.WriteBuffer(UserIdentificationStuff());
+					xdrStream.Write(ProtocolsSupported.Protocols.Count);
+					xdrStream.WriteBuffer(UserIdentificationData());
 
-#warning Refactoring? Wrapping?
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION10);
-					xdrStream.Write(IscCodes.GenericAchitectureClient);
-					xdrStream.Write(IscCodes.ptype_rpc);
-					xdrStream.Write(IscCodes.ptype_batch_send);
-					xdrStream.Write(0);                              // Preference weight
+					var priority = 0;
+					foreach (var protocol in ProtocolsSupported.Protocols)
+					{
+						xdrStream.Write(protocol.Version);
+						xdrStream.Write(IscCodes.GenericAchitectureClient);
+						xdrStream.Write(protocol.MinPType);
+						xdrStream.Write(protocol.MaxPType);
+						xdrStream.Write(priority);
 
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION11);
-					xdrStream.Write(IscCodes.GenericAchitectureClient);
-					xdrStream.Write(IscCodes.ptype_rpc);
-					xdrStream.Write(IscCodes.ptype_lazy_send);
-					xdrStream.Write(1);                              // Preference weight
-
-					xdrStream.Write(IscCodes.PROTOCOL_VERSION12);
-					xdrStream.Write(IscCodes.GenericAchitectureClient);
-					xdrStream.Write(IscCodes.ptype_rpc);
-					xdrStream.Write(IscCodes.ptype_lazy_send);
-					xdrStream.Write(2);                              // Preference weight
+						priority++;
+					}
 
 					xdrStream.Flush();
 
 					var operation = xdrStream.ReadOperation();
 					if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
 					{
-						_protocolVersion = xdrStream.ReadInt32(); // Protocol version
-						_protocolArchitecture = xdrStream.ReadInt32();    // Architecture for protocol
-						_protocolMinimunType = xdrStream.ReadInt32();   // Minimum type
+						_protocolVersion = xdrStream.ReadInt32();
+						_protocolArchitecture = xdrStream.ReadInt32();
+						_protocolMinimunType = xdrStream.ReadInt32();
 
 						if (_protocolVersion < 0)
 						{
 							_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
 						}
+					}
+					else if (operation == IscCodes.op_response)
+					{
+						var response = (GenericResponse)ProcessOperation(operation, xdrStream);
+						throw response.Exception;
 					}
 					else
 					{
@@ -262,75 +255,91 @@ namespace FirebirdSql.Data.Client.Managed
 			return addresses[0];
 		}
 
-		private byte[] UserIdentificationStuff()
+		private byte[] UserIdentificationData()
 		{
 			using (var result = new MemoryStream())
 			{
 				if (_userID != null)
 				{
-#warning Charset
-					var login = Encoding.Default.GetBytes(_userID);
-#warning Plugin name constant
-					var plugin_name = Encoding.Default.GetBytes("Srp");
-
-#warning Magic constants
-					// Login
-					result.WriteByte(9);
+					var login = Encoding.UTF8.GetBytes(_userID);
+					result.WriteByte(IscCodes.CNCT_login);
 					result.WriteByte((byte)login.Length);
 					result.Write(login, 0, login.Length);
 
-					// Plugin Name
-					result.WriteByte(8);
-					result.WriteByte((byte)plugin_name.Length);
-					result.Write(plugin_name, 0, plugin_name.Length);
+					var pluginName = Encoding.ASCII.GetBytes(SrpClient.PluginName);
+					result.WriteByte(IscCodes.CNCT_plugin_name);
+					result.WriteByte((byte)pluginName.Length);
+					result.Write(pluginName, 0, pluginName.Length);
+					result.WriteByte(IscCodes.CNCT_plugin_list);
+					result.WriteByte((byte)pluginName.Length);
+					result.Write(pluginName, 0, pluginName.Length);
 
-					// Plugin List
-					result.WriteByte(10);
-					result.WriteByte((byte)plugin_name.Length);
-					result.Write(plugin_name, 0, plugin_name.Length);
+					var specificData = Encoding.ASCII.GetBytes(_srpClient.PublicKeyHex);
+					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 
-					// Specific Data
-					var specific_data = Encoding.Default.GetBytes(_srpClient.PublicKeyHex);
-					var remaining = specific_data.Length;
-					var position = 0;
-					var step = 0;
-					while (remaining > 0)
-					{
-						result.WriteByte(7);
-						int toWrite = Math.Min(remaining, 254);
-						result.WriteByte((byte)(toWrite + 1));
-						result.WriteByte((byte)step++);
-						result.Write(specific_data, position, toWrite);
-						remaining -= toWrite;
-						position += toWrite;
-					}
-
-					// Client Crypt (Not Encrypt)
-					result.WriteByte(11);
+					result.WriteByte(IscCodes.CNCT_client_crypt);
 					result.WriteByte(4);
-					result.WriteByte(0);
-					result.WriteByte(0);
-					result.WriteByte(0);
-					result.WriteByte(0);
+					result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 				}
 
-				// User	Name
-				var user = Encoding.Default.GetBytes(Environment.UserName);
-				result.WriteByte(1);
+				var user = Encoding.UTF8.GetBytes(Environment.UserName);
+				result.WriteByte(IscCodes.CNCT_user);
 				result.WriteByte((byte)user.Length);
 				result.Write(user, 0, user.Length);
 
-				// Host	name
-				var host = Encoding.Default.GetBytes(Dns.GetHostName());
-				result.WriteByte(4);
+				var host = Encoding.UTF8.GetBytes(Dns.GetHostName());
+				result.WriteByte(IscCodes.CNCT_host);
 				result.WriteByte((byte)host.Length);
 				result.Write(host, 0, host.Length);
 
-				// Attach/create using this connection will use user verification
-				result.WriteByte(6);
+				result.WriteByte(IscCodes.CNCT_user_verification);
 				result.WriteByte(0);
 
 				return result.ToArray();
+			}
+		}
+
+		#endregion
+
+		#region Static Methods
+
+		public static IResponse ProcessOperation(int operation, XdrStream xdr)
+		{
+			switch (operation)
+			{
+				case IscCodes.op_response:
+					return new GenericResponse(
+						xdr.ReadInt32(),
+						xdr.ReadInt64(),
+						xdr.ReadBuffer(),
+						xdr.ReadStatusVector());
+
+				case IscCodes.op_fetch_response:
+					return new FetchResponse(xdr.ReadInt32(), xdr.ReadInt32());
+
+				case IscCodes.op_sql_response:
+					return new SqlResponse(xdr.ReadInt32());
+
+				case IscCodes.op_trusted_auth:
+					return new AuthResponse(xdr.ReadBuffer());
+
+				default:
+					return null;
+			}
+		}
+
+		private static void WriteMultiPartHelper(Stream stream, byte code, byte[] data)
+		{
+			const int MaxLength = 255 - 1;
+			var part = 0;
+			for (int i = 0; i < data.Length; i += MaxLength)
+			{
+				stream.WriteByte(code);
+				var length = Math.Min(data.Length - i, MaxLength);
+				stream.WriteByte((byte)(length + 1));
+				stream.WriteByte((byte)part);
+				stream.Write(data, i, length);
+				part++;
 			}
 		}
 

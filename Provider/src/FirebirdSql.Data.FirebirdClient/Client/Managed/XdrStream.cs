@@ -13,10 +13,8 @@
  *	   language governing rights and limitations under the License.
  *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2014-2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
- *
- *  Contributors:
- *    Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -372,108 +370,51 @@ namespace FirebirdSql.Data.Client.Managed
 			return TypeDecoder.DecodeBoolean(ReadOpaque(1));
 		}
 
-		public object ReadValue(DbField field)
+		public IscException ReadStatusVector()
 		{
-			object fieldValue = null;
-			Charset innerCharset = _charset.Name != "NONE" ? _charset : field.Charset;
+			IscException exception = null;
+			bool eof = false;
 
-			switch (field.DbDataType)
+			while (!eof)
 			{
-				case DbDataType.Char:
-					if (field.Charset.IsOctetsCharset)
-					{
-						fieldValue = ReadOpaque(field.Length);
-					}
-					else
-					{
-						string s = ReadString(innerCharset, field.Length);
+				int arg = ReadInt32();
 
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-							s.Length > field.CharCount)
+				switch (arg)
+				{
+					case IscCodes.isc_arg_gds:
+					default:
+						int er = ReadInt32();
+						if (er != 0)
 						{
-							fieldValue = s.Substring(0, field.CharCount);
+							if (exception == null)
+							{
+								exception = IscException.ForBuilding();
+							}
+							exception.Errors.Add(new IscError(arg, er));
 						}
-						else
-						{
-							fieldValue = s;
-						}
-					}
-					break;
+						break;
 
-				case DbDataType.VarChar:
-					if (field.Charset.IsOctetsCharset)
-					{
-						fieldValue = ReadBuffer();
-					}
-					else
-					{
-						fieldValue = ReadString(innerCharset);
-					}
-					break;
+					case IscCodes.isc_arg_end:
+						exception?.BuildExceptionData();
+						eof = true;
+						break;
 
-				case DbDataType.SmallInt:
-					fieldValue = ReadInt16();
-					break;
+					case IscCodes.isc_arg_interpreted:
+					case IscCodes.isc_arg_string:
+						exception.Errors.Add(new IscError(arg, ReadString()));
+						break;
 
-				case DbDataType.Integer:
-					fieldValue = ReadInt32();
-					break;
+					case IscCodes.isc_arg_number:
+						exception.Errors.Add(new IscError(arg, ReadInt32()));
+						break;
 
-				case DbDataType.Array:
-				case DbDataType.Binary:
-				case DbDataType.Text:
-				case DbDataType.BigInt:
-					fieldValue = ReadInt64();
-					break;
-
-				case DbDataType.Decimal:
-				case DbDataType.Numeric:
-					fieldValue = ReadDecimal(field.DataType, field.NumericScale);
-					break;
-
-				case DbDataType.Float:
-					fieldValue = ReadSingle();
-					break;
-
-				case DbDataType.Guid:
-					fieldValue = ReadGuid(field.Length);
-					break;
-
-				case DbDataType.Double:
-					fieldValue = ReadDouble();
-					break;
-
-				case DbDataType.Date:
-					fieldValue = ReadDate();
-					break;
-
-				case DbDataType.Time:
-					fieldValue = ReadTime();
-					break;
-
-				case DbDataType.TimeStamp:
-					fieldValue = ReadDateTime();
-					break;
-
-				case DbDataType.Boolean:
-					fieldValue = ReadBoolean();
-					break;
+					case IscCodes.isc_arg_sql_state:
+						exception.Errors.Add(new IscError(arg, ReadString()));
+						break;
+				}
 			}
 
-			int sqlInd = ReadInt32();
-
-			if (sqlInd == 0)
-			{
-				return fieldValue;
-			}
-			else if (sqlInd == -1)
-			{
-				return null;
-			}
-			else
-			{
-				throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
-			}
+			return exception;
 		}
 
 		#endregion
@@ -619,129 +560,6 @@ namespace FirebirdSql.Data.Client.Managed
 		public void WriteTime(TimeSpan value)
 		{
 			Write(TypeEncoder.EncodeTime(value));
-		}
-
-		public void Write(Descriptor descriptor)
-		{
-			for (var i = 0; i < descriptor.Count; i++)
-			{
-				Write(descriptor[i]);
-			}
-		}
-
-		public void Write(DbField param)
-		{
-			try
-			{
-				if (param.DbDataType != DbDataType.Null)
-				{
-					param.FixNull();
-
-					switch (param.DbDataType)
-					{
-						case DbDataType.Char:
-							if (param.Charset.IsOctetsCharset)
-							{
-								WriteOpaque(param.DbValue.GetBinary(), param.Length);
-							}
-							else
-							{
-								string svalue = param.DbValue.GetString();
-
-								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
-									svalue.Length > param.CharCount)
-								{
-									throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-								}
-
-								WriteOpaque(param.Charset.GetBytes(svalue), param.Length);
-							}
-							break;
-
-						case DbDataType.VarChar:
-							if (param.Charset.IsOctetsCharset)
-							{
-								WriteOpaque(param.DbValue.GetBinary(), param.Length);
-							}
-							else
-							{
-								string svalue = param.DbValue.GetString();
-
-								if ((param.Length % param.Charset.BytesPerCharacter) == 0 &&
-									svalue.Length > param.CharCount)
-								{
-									throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-								}
-
-								byte[] data = param.Charset.GetBytes(svalue);
-
-								WriteBuffer(data, data.Length);
-							}
-							break;
-
-						case DbDataType.SmallInt:
-							Write(param.DbValue.GetInt16());
-							break;
-
-						case DbDataType.Integer:
-							Write(param.DbValue.GetInt32());
-							break;
-
-						case DbDataType.BigInt:
-						case DbDataType.Array:
-						case DbDataType.Binary:
-						case DbDataType.Text:
-							Write(param.DbValue.GetInt64());
-							break;
-
-						case DbDataType.Decimal:
-						case DbDataType.Numeric:
-							Write(
-								param.DbValue.GetDecimal(),
-								param.DataType,
-								param.NumericScale);
-							break;
-
-						case DbDataType.Float:
-							Write(param.DbValue.GetFloat());
-							break;
-
-						case DbDataType.Guid:
-							WriteOpaque(param.DbValue.GetGuid().ToByteArray());
-							break;
-
-						case DbDataType.Double:
-							Write(param.DbValue.GetDouble());
-							break;
-
-						case DbDataType.Date:
-							Write(param.DbValue.GetDate());
-							break;
-
-						case DbDataType.Time:
-							Write(param.DbValue.GetTime());
-							break;
-
-						case DbDataType.TimeStamp:
-							Write(param.DbValue.GetDate());
-							Write(param.DbValue.GetTime());
-							break;
-
-						case DbDataType.Boolean:
-							Write(Convert.ToBoolean(param.Value));
-							break;
-
-						default:
-							throw IscException.ForStrParam($"Unknown SQL data type: {param.DataType}.");
-					}
-				}
-
-				Write(param.NullFlag);
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
-			}
 		}
 
 		#endregion
