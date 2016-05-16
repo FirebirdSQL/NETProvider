@@ -127,8 +127,8 @@ namespace FirebirdSql.Data.Services
 		static int GetLength(ArrayList items)
 		{
 			// minus the size of isc code
-			const int maxLength = IscCodes.BUFFER_SIZE_32K - 4;
-			return Math.Min((int)items[0], maxLength);
+			const int MaxLength = IscCodes.BUFFER_SIZE_32K - 4;
+			return Math.Min((int)items[0], MaxLength);
 		}
 	}
 }
