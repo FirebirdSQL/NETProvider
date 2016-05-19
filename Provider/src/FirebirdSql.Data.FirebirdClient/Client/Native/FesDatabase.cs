@@ -259,7 +259,7 @@ namespace FirebirdSql.Data.Client.Native
 				(short)databaseBuffer.Length,
 				databaseBuffer,
 				ref _handle,
-				(short)dpb.Length,
+				dpb.Length,
 				dpb.ToArray());
 
 			ParseStatusVector(_statusVector);

@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Client.Native
 				(short)service.Length,
 				service,
 				ref	svcHandle,
-				(short)spb.Length,
+				spb.Length,
 				spb.ToArray());
 
 			// Parse status	vector
@@ -119,7 +119,7 @@ namespace FirebirdSql.Data.Client.Native
 				_statusVector,
 				ref	svcHandle,
 				ref	reserved,
-				(short)spb.Length,
+				spb.Length,
 				spb.ToArray());
 
 			// Parse status	vector
@@ -143,7 +143,7 @@ namespace FirebirdSql.Data.Client.Native
 				_statusVector,
 				ref	svcHandle,
 				ref	reserved,
-				(short)spb.Length,
+				spb.Length,
 				spb.ToArray(),
 				(short)requestLength,
 				requestBuffer,

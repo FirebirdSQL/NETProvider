@@ -695,7 +695,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					DbValue[] values = outputParameterValues;
 					if (outputParameterValues == null)
 					{
-						values = (DbValue[])_statement.GetOutputParameters();
+						values = _statement.GetOutputParameters();
 					}
 
 					if (values != null && values.Length > 0)

@@ -3748,8 +3748,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		internal static string BuildName(int index)
 		{
-			const int offset = (int)'A';
-			const int length = (int)'Z' - offset;
+			const int offset = 'A';
+			const int length = 'Z' - offset;
 			if (index <= length)
 			{
 				return ((char)(offset + index)).ToString();

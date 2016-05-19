@@ -503,12 +503,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return CheckedGetValue(() => (byte[])_row[i].GetBinary()).Length;
+					return CheckedGetValue(() => _row[i].GetBinary()).Length;
 				}
 			}
 			else
 			{
-				byte[] byteArray = CheckedGetValue(() => (byte[])_row[i].GetBinary());
+				byte[] byteArray = CheckedGetValue(() => _row[i].GetBinary());
 
 				if (length > (byteArray.Length - dataIndex))
 				{

@@ -152,7 +152,7 @@ namespace FirebirdSql.Data.Common
 				{
 					if (chunk > length)
 					{
-						chunk = (int)length;
+						chunk = length;
 						tmpBuffer = new byte[chunk];
 					}
 
