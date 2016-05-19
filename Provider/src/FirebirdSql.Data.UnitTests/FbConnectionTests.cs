@@ -303,11 +303,32 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-		#endregion
+        [Test]
+        public void LogonUsernameTest()
+        {
+            string loggedUser = string.Empty;
+            using (var conn = new FbConnection(BuildConnectionString(FbServerType)))
+            {
+                conn.Open();
+                using (var transaction = conn.BeginTransaction())
+                {
+                    using (var command = conn.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+                        command.CommandText = "select CURRENT_USER from RDB$DATABASE";
+                        loggedUser = (string)command.ExecuteScalar();
+                    }
+                    transaction.Commit();
+                }
+            }
+            Assert.AreEqual(TestsSetup.UserID, loggedUser);
+        }
 
-		#region Methods
+        #endregion
 
-		public FbTransaction BeginTransaction(IsolationLevel level)
+        #region Methods
+
+        public FbTransaction BeginTransaction(IsolationLevel level)
 		{
 			switch (level)
 			{
