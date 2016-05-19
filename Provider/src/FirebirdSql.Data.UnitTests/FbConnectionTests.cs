@@ -304,24 +304,19 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
         [Test]
-        public void LogonUsernameTest()
+        public void UsedIDCorrectlyPassedToServer()
         {
-            string loggedUser = string.Empty;
             using (var conn = new FbConnection(BuildConnectionString(FbServerType)))
             {
                 conn.Open();
-                using (var transaction = conn.BeginTransaction())
+                using (var command = conn.CreateCommand())
                 {
-                    using (var command = conn.CreateCommand())
-                    {
-                        command.Transaction = transaction;
-                        command.CommandText = "select CURRENT_USER from RDB$DATABASE";
-                        loggedUser = (string)command.ExecuteScalar();
-                    }
-                    transaction.Commit();
+                    command.CommandText = "select CURRENT_USER from RDB$DATABASE";
+                    var loggedUser = (string)command.ExecuteScalar();
+                    Assert.AreEqual(TestsSetup.UserID, loggedUser);
                 }
             }
-            Assert.AreEqual(TestsSetup.UserID, loggedUser);
+            
         }
 
         #endregion
