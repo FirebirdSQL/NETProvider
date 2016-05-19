@@ -391,10 +391,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		public void Validate()
 		{
 			if (
-#if (LINUX)  // on Linux Trusted Auth isn't available
-				(string.IsNullOrEmpty(this.UserID)) ||
-				(string.IsNullOrEmpty(this.Password)) ||
-#endif
 				(string.IsNullOrEmpty(Database) && !_isServiceConnectionString) ||
 				(string.IsNullOrEmpty(DataSource) && ServerType != FbServerType.Embedded) ||
 				(string.IsNullOrEmpty(Charset)) ||

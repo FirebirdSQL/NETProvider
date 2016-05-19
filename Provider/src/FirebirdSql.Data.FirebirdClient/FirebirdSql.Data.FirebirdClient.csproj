@@ -203,7 +203,6 @@
     <Compile Include="Client\Native\Marshalers\XSQLDA.cs" />
     <Compile Include="Client\Native\Marshalers\XsqldaMarshaler.cs" />
     <Compile Include="Client\Native\Marshalers\XSQLVAR.cs" />
-    <Compile Include="Client\Native\FbClient.cs" />
     <Compile Include="Client\Native\FesArray.cs" />
     <Compile Include="Client\Native\FesBlob.cs" />
     <Compile Include="Client\Native\FesConnection.cs" />
