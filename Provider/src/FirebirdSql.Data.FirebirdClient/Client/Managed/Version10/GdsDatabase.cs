@@ -56,7 +56,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private short _packetSize;
 		private short _dialect;
 		private int _eventsId;
-		private int _operation;
 		private bool _disposed;
 		private XdrStream _xdrStream;
 		private object _syncObject;
@@ -291,7 +290,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					_handle = 0;
 					_dialect = 0;
 					_packetSize = 0;
-					_operation = 0;
 					_xdrStream = null;
 					_charset = null;
 					_connection = null;
@@ -690,7 +688,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual void SetOperation(int operation)
 		{
-			_operation = operation;
+			_xdrStream.SetOperation(operation);
 		}
 
 		public virtual void ReleaseObject(int op, int id)

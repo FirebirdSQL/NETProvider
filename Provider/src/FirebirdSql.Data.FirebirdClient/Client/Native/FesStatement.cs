@@ -296,7 +296,7 @@ namespace FirebirdSql.Data.Client.Native
 				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 
 				// Parse status	vector
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				// Describe	fields
 				_fields = descriptor;
@@ -381,7 +381,7 @@ namespace FirebirdSql.Data.Client.Native
 				XsqldaMarshaler.CleanUpNativeData(ref inSqlda);
 				XsqldaMarshaler.CleanUpNativeData(ref outSqlda);
 
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				UpdateRecordsAffected();
 
@@ -446,7 +446,7 @@ namespace FirebirdSql.Data.Client.Native
 					_fields = rowDesc;
 
 					// Parse status	vector
-					_db.ParseStatusVector(_statusVector);
+					_db.ProcessStatusVector(_statusVector);
 
 					if (status == new IntPtr(100))
 					{
@@ -508,7 +508,7 @@ namespace FirebirdSql.Data.Client.Native
 				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 
 				// Parse status	vector
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				// Update field	descriptor
 				_fields = descriptor;
@@ -539,7 +539,7 @@ namespace FirebirdSql.Data.Client.Native
 				Descriptor descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
 
 				// Parse status	vector
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				if (descriptor.ActualCount != 0 && descriptor.Count != descriptor.ActualCount)
 				{
@@ -564,7 +564,7 @@ namespace FirebirdSql.Data.Client.Native
 					XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 
 					// Parse status	vector
-					_db.ParseStatusVector(_statusVector);
+					_db.ProcessStatusVector(_statusVector);
 				}
 				else
 				{
@@ -618,7 +618,7 @@ namespace FirebirdSql.Data.Client.Native
 				Clear();
 				_allRowsFetched = false;
 
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 			}
 		}
 
@@ -655,7 +655,7 @@ namespace FirebirdSql.Data.Client.Native
 					(short)bufferLength,
 					buffer);
 
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				return buffer;
 			}
@@ -700,7 +700,7 @@ namespace FirebirdSql.Data.Client.Native
 					ref dbHandle,
 					ref _handle);
 
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				_allRowsFetched = false;
 				_state = StatementState.Allocated;
