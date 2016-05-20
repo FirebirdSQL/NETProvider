@@ -101,7 +101,7 @@ namespace FirebirdSql.Data.Client.Native
 					0,
 					new byte[0]);
 
-				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
+				_db.ProcessStatusVector(_statusVector);
 
 				RblAddValue(IscCodes.RBL_create);
 			}
@@ -126,7 +126,7 @@ namespace FirebirdSql.Data.Client.Native
 					0,
 					new byte[0]);
 
-				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
+				_db.ProcessStatusVector(_statusVector);
 			}
 		}
 
@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.Client.Native
 						}
 						else
 						{
-							_db.ParseStatusVector(_statusVector);
+							_db.ProcessStatusVector(_statusVector);
 						}
 					}
 
@@ -193,7 +193,7 @@ namespace FirebirdSql.Data.Client.Native
 					(short)buffer.Length,
 					buffer);
 
-				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
+				_db.ProcessStatusVector(_statusVector);
 			}
 		}
 
@@ -216,7 +216,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
 
-				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
+				_db.ProcessStatusVector(_statusVector);
 			}
 		}
 
@@ -229,7 +229,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
 
-				FesConnection.ParseStatusVector(_statusVector, _db.Charset);
+				_db.ProcessStatusVector(_statusVector);
 			}
 		}
 

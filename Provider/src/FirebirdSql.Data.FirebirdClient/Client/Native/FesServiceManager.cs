@@ -53,11 +53,6 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Constructors
 
-		public FesServiceManager()
-			: this(null, null)
-		{
-		}
-
 		public FesServiceManager(string dllName, Charset charset)
 		{
 			_fbClient = FbClientFactory.GetFbClient(dllName);
@@ -71,7 +66,6 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
 		{
-			// Clear the status vector
 			ClearStatusVector();
 
 			int svcHandle = Handle;
@@ -84,32 +78,26 @@ namespace FirebirdSql.Data.Client.Native
 				spb.Length,
 				spb.ToArray());
 
-			// Parse status	vector
-			ParseStatusVector(_statusVector);
+			ProcessStatusVector(_statusVector);
 
-			// Update status vector
 			_handle = svcHandle;
 		}
 
 		public void Detach()
 		{
-			// Clear the status vector
 			ClearStatusVector();
 
 			int svcHandle = Handle;
 
 			_fbClient.isc_service_detach(_statusVector, ref svcHandle);
 
-			// Parse status	vector
-			ParseStatusVector(_statusVector);
+			ProcessStatusVector(_statusVector);
 
-			// Update status vector
 			_handle = svcHandle;
 		}
 
 		public void Start(ServiceParameterBuffer spb)
 		{
-			// Clear the status vector
 			ClearStatusVector();
 
 			int svcHandle = Handle;
@@ -122,8 +110,7 @@ namespace FirebirdSql.Data.Client.Native
 				spb.Length,
 				spb.ToArray());
 
-			// Parse status	vector
-			ParseStatusVector(_statusVector);
+			ProcessStatusVector(_statusVector);
 		}
 
 		public void Query(
@@ -133,7 +120,6 @@ namespace FirebirdSql.Data.Client.Native
 			int bufferLength,
 			byte[] buffer)
 		{
-			// Clear the status vector
 			ClearStatusVector();
 
 			int svcHandle = Handle;
@@ -150,27 +136,34 @@ namespace FirebirdSql.Data.Client.Native
 				(short)buffer.Length,
 				buffer);
 
-			// Parse status	vector
-			ParseStatusVector(_statusVector);
+			ProcessStatusVector(_statusVector);
 		}
 
 		#endregion
 
 		#region Private Methods
 
-		private void ClearStatusVector()
-		{
-			Array.Clear(_statusVector, 0, _statusVector.Length);
-		}
-
-		private void ParseStatusVector(IntPtr[] statusVector)
+		private void ProcessStatusVector(IntPtr[] statusVector)
 		{
 			IscException ex = FesConnection.ParseStatusVector(statusVector, _charset);
 
-			if (ex != null && !ex.IsWarning)
+			if (ex != null)
 			{
-				throw ex;
+				if (ex.IsWarning)
+				{
+#warning This is not propagated to FesDatabase's callback as with GdsDatabase
+					//_warningMessage?.Invoke(ex);
+				}
+				else
+				{
+					throw ex;
+				}
 			}
+		}
+
+		private void ClearStatusVector()
+		{
+			Array.Clear(_statusVector, 0, _statusVector.Length);
 		}
 
 		#endregion
