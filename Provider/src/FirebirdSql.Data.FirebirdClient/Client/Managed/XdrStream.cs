@@ -209,14 +209,14 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Operation Identification Methods
 
-		public virtual int ReadOperation()
+		public int ReadOperation()
 		{
 			var op = ValidOperationAvailable ? _operation : ReadNextOperation();
 			ResetOperation();
 			return op;
 		}
 
-		public virtual int ReadNextOperation()
+		public int ReadNextOperation()
 		{
 			do
 			{
@@ -230,6 +230,16 @@ namespace FirebirdSql.Data.Client.Managed
 			} while (_operation == IscCodes.op_dummy);
 
 			return _operation;
+		}
+
+		public void SetOperation(int operation)
+		{
+			_operation = operation;
+		}
+
+		private void ResetOperation()
+		{
+			_operation = -1;
 		}
 
 		#endregion
@@ -570,11 +580,6 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			if (_innerStream == null)
 				throw new ObjectDisposedException($"The {nameof(XdrStream)} is closed.");
-		}
-
-		private void ResetOperation()
-		{
-			_operation = -1;
 		}
 
 		#endregion
