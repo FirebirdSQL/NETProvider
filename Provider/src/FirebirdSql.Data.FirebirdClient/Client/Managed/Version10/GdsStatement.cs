@@ -840,9 +840,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
 
-							var data = field.Charset.GetBytes(svalue);
-
-							xdr.WriteBuffer(data, data.Length);
+							xdr.WriteBuffer(field.Charset.GetBytes(svalue));
 						}
 						break;
 
