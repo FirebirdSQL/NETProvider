@@ -501,7 +501,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				dpb.Append(IscCodes.isc_dpb_sql_role_name, options.Role);
 			}
 			dpb.Append(IscCodes.isc_dpb_connect_timeout, options.ConnectionTimeout);
-
 			dpb.Append(IscCodes.isc_dpb_process_id, GetProcessId());
 			dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
 			if (options.NoDatabaseTriggers)
