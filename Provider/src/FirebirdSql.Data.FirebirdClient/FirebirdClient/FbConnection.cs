@@ -72,19 +72,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			try
 			{
-				// DPB configuration
 				DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
 
-				// Dpb version
 				dpb.Append(IscCodes.isc_dpb_version1);
 
-				// Dummy packet	interval
 				dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 
-				// Database	dialect
 				dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { options.Dialect, 0, 0, 0 });
 
-				// Character set
 				if (options.Charset.Length > 0)
 				{
 					Charset charset = Charset.GetCharset(options.Charset);
@@ -99,19 +94,15 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 				}
 
-				// Forced writes
 				dpb.Append(IscCodes.isc_dpb_force_write, (short)(forcedWrites ? 1 : 0));
 
-				// Database overwrite
 				dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
 
-				// Page	Size
 				if (pageSize > 0)
 				{
 					dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
 				}
 
-				// Create the new database
 				FbConnectionInternal db = new FbConnectionInternal(options);
 				db.CreateDatabase(dpb);
 			}
@@ -123,13 +114,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public static void DropDatabase(string connectionString)
 		{
-			// Configure Attachment
 			FbConnectionString options = new FbConnectionString(connectionString);
 			options.Validate();
 
 			try
 			{
-				// Drop	the	database
 				FbConnectionInternal db = new FbConnectionInternal(options);
 				db.DropDatabase();
 			}
