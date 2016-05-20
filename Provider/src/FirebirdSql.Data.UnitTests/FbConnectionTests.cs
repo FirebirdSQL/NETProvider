@@ -304,7 +304,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
         [Test]
-        public void UsedIDCorrectlyPassedToServer()
+        public void UserIDCorrectlyPassedToServer()
         {
             using (var conn = new FbConnection(BuildConnectionString(FbServerType)))
             {
@@ -316,7 +316,7 @@ namespace FirebirdSql.Data.UnitTests
                     Assert.AreEqual(TestsSetup.UserID, loggedUser);
                 }
             }
-            
+
         }
 
         #endregion
