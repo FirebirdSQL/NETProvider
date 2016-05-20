@@ -366,6 +366,24 @@ CREATE TABLE TABMAT (
 			}
 		}
 
+		[Test]
+		public void DNET304_VarcharOctetsParameterRoundtrip()
+		{
+			var data = new byte[] { 10, 20 };
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
+				cmd.CommandText = "select cast(@x as varchar(10) character set octets) from rdb$database";
+				using (FbDataReader reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						Assert.AreEqual(data, reader[0]);
+					}
+				}
+			}
+		}
+
 		#endregion
 
 		#region Methods
