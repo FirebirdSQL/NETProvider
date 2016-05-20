@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.Client.Native
 						tebData);
 
 					// Parse status	vector
-					_db.ParseStatusVector(_statusVector);
+					_db.ProcessStatusVector(_statusVector);
 
 					// Update transaction state
 					_state = TransactionState.Active;
@@ -214,7 +214,7 @@ namespace FirebirdSql.Data.Client.Native
 				
 				_db.FbClient.isc_commit_transaction(_statusVector, ref _handle);
 				
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				_db.TransactionCount--;
 
@@ -235,7 +235,7 @@ namespace FirebirdSql.Data.Client.Native
 				
 				_db.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
 				
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				_db.TransactionCount--;
 
@@ -256,7 +256,7 @@ namespace FirebirdSql.Data.Client.Native
 				
 				_db.FbClient.isc_commit_retaining(_statusVector, ref _handle);
 
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				_state = TransactionState.Active;
 			}
@@ -273,7 +273,7 @@ namespace FirebirdSql.Data.Client.Native
 				
 				_db.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
 
-				_db.ParseStatusVector(_statusVector);
+				_db.ProcessStatusVector(_statusVector);
 
 				_state = TransactionState.Active;
 			}

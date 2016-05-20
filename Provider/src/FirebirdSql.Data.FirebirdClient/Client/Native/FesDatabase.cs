@@ -127,11 +127,6 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Constructors
 
-		public FesDatabase()
-			: this(null, null)
-		{
-		}
-
 		public FesDatabase(string dllName, Charset charset)
 		{
 			_fbClient = FbClientFactory.GetFbClient(dllName);
@@ -190,7 +185,6 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			byte[] databaseBuffer = Encoding.Default.GetBytes(database);
 
-			// Clear status vector
 			ClearStatusVector();
 
 			_fbClient.isc_create_database(
@@ -202,21 +196,20 @@ namespace FirebirdSql.Data.Client.Native
 				dpb.ToArray(),
 				0);
 
-			ParseStatusVector(_statusVector);
+			ProcessStatusVector(_statusVector);
 
 			Detach();
 		}
 
 		public void DropDatabase()
 		{
-			// Clear status vector
 			ClearStatusVector();
 
 			_fbClient.isc_drop_database(_statusVector, ref _handle);
 
 			_handle.Close();
 
-			ParseStatusVector(_statusVector);
+			ProcessStatusVector(_statusVector);
 		}
 
 		#endregion
@@ -251,7 +244,6 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			byte[] databaseBuffer = Encoding.Default.GetBytes(database);
 
-			// Clear status vector
 			ClearStatusVector();
 
 			_fbClient.isc_attach_database(
@@ -262,9 +254,8 @@ namespace FirebirdSql.Data.Client.Native
 				dpb.Length,
 				dpb.ToArray());
 
-			ParseStatusVector(_statusVector);
+			ProcessStatusVector(_statusVector);
 
-			// Get server version
 			_serverVersion = GetServerVersion();
 		}
 
@@ -280,12 +271,11 @@ namespace FirebirdSql.Data.Client.Native
 				throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
 			}
 
-			// Clear status vector
 			ClearStatusVector();
 
 			_fbClient.isc_detach_database(_statusVector, ref _handle);
 
-			FesConnection.ParseStatusVector(_statusVector, _charset);
+			ProcessStatusVector(_statusVector);
 		}
 
 		#endregion
@@ -310,7 +300,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, kind);
 
-			FesConnection.ParseStatusVector(localStatusVector, _charset);
+			ProcessStatusVector(localStatusVector);
 		}
 
 		#endregion
@@ -360,7 +350,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Internal Methods
 
-		internal void ParseStatusVector(IntPtr[] statusVector)
+		internal void ProcessStatusVector(IntPtr[] statusVector)
 		{
 			IscException ex = FesConnection.ParseStatusVector(statusVector, _charset);
 
@@ -388,7 +378,6 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
 		{
-			// Clear status vector
 			ClearStatusVector();
 
 			_fbClient.isc_database_info(
@@ -399,7 +388,7 @@ namespace FirebirdSql.Data.Client.Native
 				(short)bufferLength,
 				buffer);
 
-			ParseStatusVector(_statusVector);
+			ProcessStatusVector(_statusVector);
 		}
 
 		#endregion
