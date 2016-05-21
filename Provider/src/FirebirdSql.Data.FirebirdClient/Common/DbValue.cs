@@ -28,9 +28,9 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private StatementBase	_statement;
-		private DbField			_field;
-		private object			_value;
+		private StatementBase _statement;
+		private DbField _field;
+		private object _value;
 
 		#endregion
 
@@ -424,9 +424,9 @@ namespace FirebirdSql.Data.Common
 
 			ArrayBase gdsArray = _statement.CreateArray(_field.ArrayHandle.Descriptor);
 
-			gdsArray.Handle			= handle;
-			gdsArray.DB				= _statement.Database;
-			gdsArray.Transaction	= _statement.Transaction;
+			gdsArray.Handle = handle;
+			gdsArray.DB = _statement.Database;
+			gdsArray.Transaction = _statement.Transaction;
 
 			return gdsArray.Read();
 		}
