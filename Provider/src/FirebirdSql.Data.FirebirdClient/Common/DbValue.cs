@@ -243,29 +243,28 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case DbDataType.VarChar:
-					if (Field.Charset.IsOctetsCharset)
 					{
-						return (byte[])_value;
-					}
-					else
-					{
-						string svalue = GetString();
-
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
-							svalue.Length > Field.CharCount)
+						byte[] bytes;
+						if (Field.Charset.IsOctetsCharset)
 						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							bytes = GetBinary();
+						}
+						else
+						{
+							var svalue = GetString();
+
+							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
+								svalue.Length > Field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+
+							bytes = Field.Charset.GetBytes(svalue);
 						}
 
-						byte[] sbuffer = Field.Charset.GetBytes(svalue);
-						byte[] buffer = new byte[Field.Length + 2];
-
-						// Copy	length
-						Buffer.BlockCopy(BitConverter.GetBytes((short)sbuffer.Length), 0, buffer, 0, 2);
-
-						// Copy	string value
-						Buffer.BlockCopy(sbuffer, 0, buffer, 2, sbuffer.Length);
-
+						var buffer = new byte[Field.Length + 2];
+						Buffer.BlockCopy(BitConverter.GetBytes((short)bytes.Length), 0, buffer, 0, 2);
+						Buffer.BlockCopy(bytes, 0, buffer, 2, bytes.Length);
 						return buffer;
 					}
 
