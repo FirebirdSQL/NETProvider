@@ -217,12 +217,10 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.Char:
 					{
 						var buffer = new byte[Field.Length];
-						byte padding;
 						byte[] bytes;
 
 						if (Field.Charset.IsOctetsCharset)
 						{
-							padding = 0;
 							bytes = GetBinary();
 						}
 						else
@@ -235,13 +233,12 @@ namespace FirebirdSql.Data.Common
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
 
-							padding = 32;
 							bytes = Field.Charset.GetBytes(svalue);
 						}
 
 						for (var i = 0; i < buffer.Length; i++)
 						{
-							buffer[i] = padding;
+							buffer[i] = (byte)' ';
 						}
 						Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
 						return buffer;
