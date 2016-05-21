@@ -215,30 +215,38 @@ namespace FirebirdSql.Data.Common
 			switch (Field.DbDataType)
 			{
 				case DbDataType.Char:
-					if (Field.Charset.IsOctetsCharset)
 					{
-						return (byte[])_value;
-					}
-					else
-					{
-						string svalue = GetString();
+						var buffer = new byte[Field.Length];
+						byte[] bytes;
 
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
-							svalue.Length > Field.CharCount)
+						if (Field.Charset.IsOctetsCharset)
 						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-						}
+							for (var i = 0; i < buffer.Length; i++)
+							{
+								buffer[i] = 0;
+							}
 
-						byte[] buffer = new byte[Field.Length];
-						for (int i = 0; i < buffer.Length; i++)
+							bytes = GetBinary();
+						}
+						else
 						{
-							buffer[i] = 32;
-						}
+							var svalue = GetString();
 
-						byte[] bytes = Field.Charset.GetBytes(svalue);
+							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
+								svalue.Length > Field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+
+							for (var i = 0; i < buffer.Length; i++)
+							{
+								buffer[i] = 32;
+							}
+
+							bytes = Field.Charset.GetBytes(svalue);
+						}
 
 						Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
-
 						return buffer;
 					}
 
