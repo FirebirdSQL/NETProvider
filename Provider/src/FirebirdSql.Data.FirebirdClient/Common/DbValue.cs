@@ -299,10 +299,10 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.TimeStamp:
 					var dt = GetDateTime();
-					byte[] date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
-					byte[] time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+					var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
+					var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
 
-					byte[] result = new byte[8];
+					var result = new byte[8];
 
 					Buffer.BlockCopy(date, 0, result, 0, date.Length);
 					Buffer.BlockCopy(time, 0, result, 4, time.Length);
