@@ -244,7 +244,9 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.VarChar:
 					{
+						var buffer = new byte[Field.Length + 2];
 						byte[] bytes;
+
 						if (Field.Charset.IsOctetsCharset)
 						{
 							bytes = GetBinary();
@@ -262,7 +264,6 @@ namespace FirebirdSql.Data.Common
 							bytes = Field.Charset.GetBytes(svalue);
 						}
 
-						var buffer = new byte[Field.Length + 2];
 						Buffer.BlockCopy(BitConverter.GetBytes((short)bytes.Length), 0, buffer, 0, 2);
 						Buffer.BlockCopy(bytes, 0, buffer, 2, bytes.Length);
 						return buffer;
