@@ -28,9 +28,9 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Fields
 
-		private StatementBase	_statement;
-		private DbField			_field;
-		private object			_value;
+		private StatementBase _statement;
+		private DbField _field;
+		private object _value;
 
 		#endregion
 
@@ -215,57 +215,59 @@ namespace FirebirdSql.Data.Common
 			switch (Field.DbDataType)
 			{
 				case DbDataType.Char:
-					if (Field.Charset.IsOctetsCharset)
 					{
-						return (byte[])_value;
-					}
-					else
-					{
-						string svalue = GetString();
+						var buffer = new byte[Field.Length];
+						byte[] bytes;
 
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
-							svalue.Length > Field.CharCount)
+						if (Field.Charset.IsOctetsCharset)
 						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							bytes = GetBinary();
+						}
+						else
+						{
+							var svalue = GetString();
+
+							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
+								svalue.Length > Field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+
+							bytes = Field.Charset.GetBytes(svalue);
 						}
 
-						byte[] buffer = new byte[Field.Length];
-						for (int i = 0; i < buffer.Length; i++)
+						for (var i = 0; i < buffer.Length; i++)
 						{
-							buffer[i] = 32;
+							buffer[i] = (byte)' ';
 						}
-
-						byte[] bytes = Field.Charset.GetBytes(svalue);
-
 						Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
-
 						return buffer;
 					}
 
 				case DbDataType.VarChar:
-					if (Field.Charset.IsOctetsCharset)
 					{
-						return (byte[])_value;
-					}
-					else
-					{
-						string svalue = GetString();
+						var buffer = new byte[Field.Length + 2];
+						byte[] bytes;
 
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
-							svalue.Length > Field.CharCount)
+						if (Field.Charset.IsOctetsCharset)
 						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							bytes = GetBinary();
+						}
+						else
+						{
+							var svalue = GetString();
+
+							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
+								svalue.Length > Field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+
+							bytes = Field.Charset.GetBytes(svalue);
 						}
 
-						byte[] sbuffer = Field.Charset.GetBytes(svalue);
-						byte[] buffer = new byte[Field.Length + 2];
-
-						// Copy	length
-						Buffer.BlockCopy(BitConverter.GetBytes((short)sbuffer.Length), 0, buffer, 0, 2);
-
-						// Copy	string value
-						Buffer.BlockCopy(sbuffer, 0, buffer, 2, sbuffer.Length);
-
+						Buffer.BlockCopy(BitConverter.GetBytes((short)bytes.Length), 0, buffer, 0, 2);
+						Buffer.BlockCopy(bytes, 0, buffer, 2, bytes.Length);
 						return buffer;
 					}
 
@@ -299,10 +301,10 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.TimeStamp:
 					var dt = GetDateTime();
-					byte[] date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
-					byte[] time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+					var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
+					var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
 
-					byte[] result = new byte[8];
+					var result = new byte[8];
 
 					Buffer.BlockCopy(date, 0, result, 0, date.Length);
 					Buffer.BlockCopy(time, 0, result, 4, time.Length);
@@ -416,9 +418,9 @@ namespace FirebirdSql.Data.Common
 
 			ArrayBase gdsArray = _statement.CreateArray(_field.ArrayHandle.Descriptor);
 
-			gdsArray.Handle			= handle;
-			gdsArray.DB				= _statement.Database;
-			gdsArray.Transaction	= _statement.Transaction;
+			gdsArray.Handle = handle;
+			gdsArray.DB = _statement.Database;
+			gdsArray.Transaction = _statement.Transaction;
 
 			return gdsArray.Read();
 		}

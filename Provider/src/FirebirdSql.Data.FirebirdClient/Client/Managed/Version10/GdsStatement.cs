@@ -828,7 +828,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					case DbDataType.VarChar:
 						if (field.Charset.IsOctetsCharset)
 						{
-							xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
+							xdr.WriteBuffer(field.DbValue.GetBinary());
 						}
 						else
 						{

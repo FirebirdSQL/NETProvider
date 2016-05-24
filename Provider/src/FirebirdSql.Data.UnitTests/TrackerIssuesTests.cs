@@ -366,6 +366,42 @@ CREATE TABLE TABMAT (
 			}
 		}
 
+		[Test]
+		public void DNET304_VarcharOctetsParameterRoundtrip()
+		{
+			var data = new byte[] { 10, 20 };
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
+				cmd.CommandText = "select cast(@x as varchar(10) character set octets) from rdb$database";
+				using (FbDataReader reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						Assert.AreEqual(data, reader[0]);
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void DNET304_CharOctetsParameterRoundtrip()
+		{
+			var data = new byte[] { 10, 20 };
+			using (FbCommand cmd = Connection.CreateCommand())
+			{
+				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
+				cmd.CommandText = "select cast(@x as char(10) character set octets) from rdb$database";
+				using (FbDataReader reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						Assert.AreEqual(new byte[] { data[0], data[1], 32, 32, 32, 32, 32, 32, 32, 32 }, reader[0]);
+					}
+				}
+			}
+		}
+
 		#endregion
 
 		#region Methods
