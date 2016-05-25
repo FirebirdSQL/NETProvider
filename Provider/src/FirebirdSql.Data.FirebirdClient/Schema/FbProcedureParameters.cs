@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Schema
 					CAST(fld.rdb$field_scale AS integer) AS NUMERIC_SCALE,
 					CAST(fld.rdb$character_length AS integer) AS CHARACTER_MAX_LENGTH,
 					CAST(fld.rdb$field_length AS integer) AS CHARACTER_OCTET_LENGTH,
-					fld.rdb$null_flag AS COLUMN_NULLABLE,
+					coalesce(fld.rdb$null_flag, pp.rdb$null_flag) AS COLUMN_NULLABLE,
 					null AS CHARACTER_SET_CATALOG,
 					null AS CHARACTER_SET_SCHEMA,
 					cs.rdb$character_set_name AS CHARACTER_SET_NAME,
