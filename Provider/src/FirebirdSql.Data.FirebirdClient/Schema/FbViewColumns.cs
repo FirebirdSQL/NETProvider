@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Schema
 					CAST(fld.rdb$field_length AS integer) AS CHARACTER_OCTET_LENGTH,
 					rfr.rdb$field_position AS ORDINAL_POSITION,
 					fld.rdb$default_source AS COLUMN_DEFAULT,
-					fld.rdb$null_flag AS COLUMN_NULLABLE,
+					coalesce(fld.rdb$null_flag, rfr.rdb$null_flag) AS COLUMN_NULLABLE,
 					fld.rdb$dimensions AS COLUMN_ARRAY,
 					0 AS IS_READONLY,
 					fld.rdb$field_type AS FIELD_TYPE,
