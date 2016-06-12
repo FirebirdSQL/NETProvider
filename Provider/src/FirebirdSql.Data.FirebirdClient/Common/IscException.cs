@@ -228,7 +228,7 @@ namespace FirebirdSql.Data.Common
 							case IscCodes.isc_except:
 								// Custom exception	add	the	first argument as error	code
 								ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
-								// ignoring the message
+								// ignoring the message - historical reason
 								break;
 							case IscCodes.isc_except2:
 								// Custom exception. Next Error should be the exception name.
