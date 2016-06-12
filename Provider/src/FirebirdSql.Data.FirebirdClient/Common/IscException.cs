@@ -213,17 +213,13 @@ namespace FirebirdSql.Data.Common
 					int code = Errors[i].ErrorCode;
 					string message = GetValueOrDefault(IscErrorMessages.Values, code, BuildDefaultErrorMessage);
 
-					ArrayList param = new ArrayList();
-
+					List<string> args = new List<string>();
 					int index = i + 1;
-
 					while (index < Errors.Count && Errors[index].IsArgument)
 					{
-						param.Add(Errors[index++].StrParam);
+						args.Add(Errors[index++].StrParam);
 						i++;
 					}
-
-					object[] args = (object[])param.ToArray(typeof(object));
 
 					try
 					{
@@ -232,6 +228,7 @@ namespace FirebirdSql.Data.Common
 							case IscCodes.isc_except:
 								// Custom exception	add	the	first argument as error	code
 								ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
+								// ignoring the message
 								break;
 							case IscCodes.isc_except2:
 								// Custom exception. Next Error should be the exception name.
@@ -239,25 +236,17 @@ namespace FirebirdSql.Data.Common
 								break;
 							case IscCodes.isc_stack_trace:
 								// The next error contains the PSQL Stack Trace
-								if (builder.Length > 0)
-								{
-									builder.Append(Environment.NewLine);
-								}
-								builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
+								AppendMessage(builder, message, args);
 								break;
 							default:
-								if (builder.Length > 0)
-								{
-									builder.Append(Environment.NewLine);
-								}
-								builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
+								AppendMessage(builder, message, args);
 								break;
 						}
 					}
 					catch
 					{
 						message = BuildDefaultErrorMessage(code);
-						builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
+						AppendMessage(builder, message, args);
 					}
 				}
 			}
@@ -289,6 +278,15 @@ namespace FirebirdSql.Data.Common
 				result = defaultValueFactory(key);
 			}
 			return result;
+		}
+
+		private static void AppendMessage(StringBuilder builder, string message, List<string> args)
+		{
+			if (builder.Length > 0)
+			{
+				builder.Append(Environment.NewLine);
+			}
+			builder.AppendFormat(CultureInfo.CurrentCulture, message, args.ToArray());
 		}
 
 		#endregion
