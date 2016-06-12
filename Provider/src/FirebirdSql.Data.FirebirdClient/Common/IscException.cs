@@ -208,8 +208,7 @@ namespace FirebirdSql.Data.Common
 
 			for (int i = 0; i < Errors.Count; i++)
 			{
-				if (Errors[i].Type == IscCodes.isc_arg_gds ||
-					Errors[i].Type == IscCodes.isc_arg_warning)
+				if (Errors[i].Type == IscCodes.isc_arg_gds || Errors[i].Type == IscCodes.isc_arg_warning)
 				{
 					int code = Errors[i].ErrorCode;
 					string message = GetValueOrDefault(IscErrorMessages.Values, code, BuildDefaultErrorMessage);
@@ -228,39 +227,36 @@ namespace FirebirdSql.Data.Common
 
 					try
 					{
-						if (code == IscCodes.isc_except)
+						switch (code)
 						{
-							// Custom exception	add	the	first argument as error	code
-							ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
-						}
-						else if (code == IscCodes.isc_except2)
-						{
-							// Custom exception. Next Error should be the exception name.
-							// And the next one the Exception message
-						}
-						else if (code == IscCodes.isc_stack_trace)
-						{
-							// The next error contains the PSQL Stack Trace
-							if (builder.Length > 0)
-							{
-								builder.Append(Environment.NewLine);
-							}
-							builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
-						}
-						else
-						{
-							if (builder.Length > 0)
-							{
-								builder.Append(Environment.NewLine);
-							}
-
-							builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
+							case IscCodes.isc_except:
+								// Custom exception	add	the	first argument as error	code
+								ErrorCode = Convert.ToInt32(args[0], CultureInfo.InvariantCulture);
+								break;
+							case IscCodes.isc_except2:
+								// Custom exception. Next Error should be the exception name.
+								// And the next one the Exception message
+								break;
+							case IscCodes.isc_stack_trace:
+								// The next error contains the PSQL Stack Trace
+								if (builder.Length > 0)
+								{
+									builder.Append(Environment.NewLine);
+								}
+								builder.AppendFormat(CultureInfo.CurrentCulture, "{0}", args);
+								break;
+							default:
+								if (builder.Length > 0)
+								{
+									builder.Append(Environment.NewLine);
+								}
+								builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
+								break;
 						}
 					}
 					catch
 					{
 						message = BuildDefaultErrorMessage(code);
-
 						builder.AppendFormat(CultureInfo.CurrentCulture, message, args);
 					}
 				}
