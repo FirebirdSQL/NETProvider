@@ -845,6 +845,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_except2 = 335544848;
 		public const int isc_arith_except = 335544321;
 		public const int isc_string_truncation = 335544914;
+		public const int isc_formatted_exception = 335545016;
 
 		#endregion
 
