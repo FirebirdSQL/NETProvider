@@ -287,6 +287,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_dpb_trusted_auth = 73;
 		public const int isc_dpb_process_name = 74;
 		public const int isc_dpb_utf8_filename = 77;
+		public const int isc_dpb_client_version = 80;
 		public const int isc_dpb_specific_auth_data = 84;
 
 		#endregion
