@@ -25,31 +25,19 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbLog : FbService
 	{
-		#region Constructors
-
 		public FbLog(string connectionString = null)
 			: base(connectionString)
 		{ }
-
-		#endregion
-
-		#region Methods
 
 		public void Execute()
 		{
 			try
 			{
-				// Configure Spb
 				StartSpb = new ServiceParameterBuffer();
-
 				StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
 
 				Open();
-
-				// Start execution
 				StartTask();
-
-				// Process service output
 				ProcessServiceOutput();
 			}
 			catch (Exception ex)
@@ -61,7 +49,5 @@ namespace FirebirdSql.Data.Services
 				Close();
 			}
 		}
-
-		#endregion
 	}
 }

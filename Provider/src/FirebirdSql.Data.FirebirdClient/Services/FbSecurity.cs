@@ -14,231 +14,126 @@
  *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *
+ *  Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
 using System.Collections;
-
+using System.Linq;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
 	public sealed class FbSecurity : FbService
 	{
-		#region Constructors
-
 		public FbSecurity(string connectionString = null)
 			: base(connectionString)
 		{ }
 
-		#endregion
-
-		#region Methods
-
 		public void AddUser(FbUserData user)
 		{
-			if (user.UserName != null && user.UserName.Length == 0)
-			{
+			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
-			}
-			if (user.UserPassword != null && user.UserPassword.Length == 0)
-			{
-				throw new InvalidOperationException("Invalid user password.");
-			}
 
-			// Configure Spb
 			StartSpb = new ServiceParameterBuffer();
-
 			StartSpb.Append(IscCodes.isc_action_svc_add_user);
-
 			StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
 			StartSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
-
-			if (user.FirstName != null && user.FirstName.Length > 0)
-			{
+			if ((user.FirstName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
-			}
-
-			if (user.MiddleName != null && user.MiddleName.Length > 0)
-			{
+			if ((user.MiddleName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
-			}
-
-			if (user.LastName != null && user.LastName.Length > 0)
-			{
+			if ((user.LastName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
-			}
-
 			if (user.UserID != 0)
-			{
 				StartSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
-			}
-
 			if (user.GroupID != 0)
-			{
 				StartSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
-			}
-
-			if (user.GroupName != null && user.GroupName.Length > 0)
-			{
+			if ((user.GroupName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
-			}
-
-			if (user.RoleName != null && user.RoleName.Length > 0)
-			{
+			if ((user.RoleName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			}
 
 			Open();
-
-			// Start execution
 			StartTask();
-
 			Close();
 		}
 
 		public void DeleteUser(FbUserData user)
 		{
-			if (user.UserName != null && user.UserName.Length == 0)
-			{
+			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
-			}
 
-			// Configure Spb
 			StartSpb = new ServiceParameterBuffer();
-
 			StartSpb.Append(IscCodes.isc_action_svc_delete_user);
-
 			StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
-
-			if (user.RoleName != null && user.RoleName.Length > 0)
-			{
+			if ((user.RoleName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			}
 
 			Open();
-
-			// Start execution
 			StartTask();
-
 			Close();
 		}
 
 		public void ModifyUser(FbUserData user)
 		{
-			if (user.UserName != null && user.UserName.Length == 0)
-			{
+			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
-			}
-			if (user.UserPassword != null && user.UserPassword.Length == 0)
-			{
-				throw new InvalidOperationException("Invalid user password.");
-			}
 
-			// Configure Spb
 			StartSpb = new ServiceParameterBuffer();
-
 			StartSpb.Append(IscCodes.isc_action_svc_modify_user);
 			StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
-
-			if (user.UserPassword != null && user.UserPassword.Length > 0)
-			{
+			if ((user.UserPassword?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
-			}
-
-			if (user.FirstName != null && user.FirstName.Length > 0)
-			{
+			if ((user.FirstName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
-			}
-
-			if (user.MiddleName != null && user.MiddleName.Length > 0)
-			{
+			if ((user.MiddleName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
-			}
-
-			if (user.LastName != null && user.LastName.Length > 0)
-			{
+			if ((user.LastName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
-			}
-
 			StartSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
 			StartSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
-
-			if (user.GroupName != null && user.GroupName.Length > 0)
-			{
+			if ((user.GroupName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
-			}
-
-			if (user.RoleName != null && user.RoleName.Length > 0)
-			{
+			if ((user.RoleName?.Length ?? 0) != 0)
 				StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			}
 
 			Open();
-
-			// Start execution
 			StartTask();
-
 			Close();
 		}
 
 		public FbUserData DisplayUser(string userName)
 		{
-			// Configure Spb
 			StartSpb = new ServiceParameterBuffer();
-
 			StartSpb.Append(IscCodes.isc_action_svc_display_user);
 			StartSpb.Append(IscCodes.isc_spb_sec_username, userName);
 
 			Open();
-
-			// Start execution
 			StartTask();
-
-			ArrayList info = Query(new byte[] { IscCodes.isc_info_svc_get_users });
-
+			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users });
 			Close();
-
-			if (info.Count == 0)
-			{
-				return null;
-			}
-
-			FbUserData[] users = (FbUserData[])info[0];
-
-			return (users != null && users.Length > 0) ? users[0] : null;
+			return ((FbUserData[])info.FirstOrDefault())?.FirstOrDefault();
 		}
 
 		public FbUserData[] DisplayUsers()
 		{
-			// Configure Spb
 			StartSpb = new ServiceParameterBuffer();
-
 			StartSpb.Append(IscCodes.isc_action_svc_display_user);
 
 			Open();
-
-			// Start execution
 			StartTask();
-
-			ArrayList info = Query(new byte[] { IscCodes.isc_info_svc_get_users });
-
+			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users });
 			Close();
-
-			if (info.Count == 0)
-			{
-				return null;
-			}
-
-			return (FbUserData[])info[0];
+			return (FbUserData[])info.FirstOrDefault();
 		}
 
 		public string GetUsersDbPath()
 		{
-			ArrayList info = Query(new byte[] { IscCodes.isc_info_svc_user_dbpath });
+			var info = Query(new byte[] { IscCodes.isc_info_svc_user_dbpath });
 			return info.Count != 0 ? (string)info[0] : null;
 		}
-
-		#endregion
 	}
 }

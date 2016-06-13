@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2014, 2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -75,9 +75,7 @@ namespace FirebirdSql.Data.Services
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
-
 				StartTask();
-
 				ReadInput();
 			}
 			catch (Exception ex)
@@ -124,7 +122,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		static int GetLength(ArrayList items)
+		static int GetLength(IList<object> items)
 		{
 			// minus the size of isc code
 			const int MaxLength = IscCodes.BUFFER_SIZE_32K - 4;

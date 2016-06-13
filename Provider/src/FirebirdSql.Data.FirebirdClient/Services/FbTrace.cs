@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2010 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2010, 2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -26,28 +26,22 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbTrace : FbService
 	{
-		#region Constructors
 		public FbTrace(string connectionString = null)
 			: base(connectionString)
 		{
 			DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
 		}
-		#endregion
 
-		#region Properties
 		public FbDatabaseTraceConfigurationCollection DatabasesConfigurations { get; private set; }
 		public FbServiceTraceConfiguration ServiceConfiguration { get; set; }
-		#endregion
 
-		#region Methods
 		public void Start(string sessionName)
 		{
 			try
 			{
-				string config = DatabasesConfigurations.ToString() + (ServiceConfiguration != null ? ServiceConfiguration.ToString() : string.Empty);
+				var config = DatabasesConfigurations.ToString() + (ServiceConfiguration != null ? ServiceConfiguration.ToString() : string.Empty);
 
 				StartSpb = new ServiceParameterBuffer();
-
 				StartSpb.Append(IscCodes.isc_action_svc_trace_start);
 				if (!string.IsNullOrEmpty(sessionName))
 					StartSpb.Append(IscCodes.isc_spb_trc_name, sessionName);
@@ -86,14 +80,12 @@ namespace FirebirdSql.Data.Services
 		{
 			DoSimpleAction(IscCodes.isc_action_svc_trace_list);
 		}
-		#endregion
 
 		void DoSimpleAction(int action, int? sessionID = null)
 		{
 			try
 			{
 				StartSpb = new ServiceParameterBuffer();
-
 				StartSpb.Append(action);
 				if (sessionID.HasValue)
 					StartSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);

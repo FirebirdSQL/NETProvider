@@ -19,11 +19,8 @@
 using System;
 using System.Collections.Generic;
 
-using FirebirdSql.Data.Services;
-
 namespace FirebirdSql.Data.Services
 {
 	public class FbBackupFileCollection : List<FbBackupFile>
-	{
-	}
+	{ }
 }

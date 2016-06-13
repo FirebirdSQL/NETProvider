@@ -33,43 +33,28 @@ namespace FirebirdSql.Data.Services
 {
 	public abstract class FbService
 	{
-		#region Events
-
 		public event EventHandler<ServiceOutputEventArgs> ServiceOutput;
 
-		#endregion
-
-		#region Fields
+		private const string ServiceName = "service_mgr";
 
 		private IServiceManager _svc;
-		private FbServiceState _state;
 		private FbConnectionString _csManager;
-		private string _connectionString;
-		private string _serviceName;
-		private int _queryBufferSize;
-
-		#endregion
-
-		#region Protected Fields
 
 		internal ServiceParameterBuffer StartSpb;
 		internal ServiceParameterBuffer QuerySpb;
 
-		#endregion
+		protected string Database => _csManager.Database;
 
-		#region Properties
+		public FbServiceState State { get; private set; }
+		public int QueryBufferSize { get; set; }
 
-		public FbServiceState State
-		{
-			get { return _state; }
-		}
-
+		private string _connectionString;
 		public string ConnectionString
 		{
 			get { return _connectionString; }
 			set
 			{
-				if (_svc != null && _state == FbServiceState.Open)
+				if (_svc != null && State == FbServiceState.Open)
 				{
 					throw new InvalidOperationException("ConnectionString cannot be modified on active service instances.");
 				}
@@ -87,41 +72,16 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		public int QueryBufferSize
-		{
-			get { return _queryBufferSize; }
-			set { _queryBufferSize = value; }
-		}
-
-		#endregion
-
-		#region Protected Properties
-
-		protected string Database
-		{
-			get { return _csManager.Database; }
-		}
-
-		#endregion
-
-		#region Constructors
-
 		protected FbService(string connectionString = null)
 		{
-			_state = FbServiceState.Closed;
-			_serviceName = "service_mgr";
-			_queryBufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
+			State = FbServiceState.Closed;
+			QueryBufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
 			ConnectionString = connectionString;
 		}
-
-		#endregion
-
-		#region Internal Methods
 
 		internal ServiceParameterBuffer BuildSpb()
 		{
 			ServiceParameterBuffer spb = new ServiceParameterBuffer();
-
 			spb.Append(IscCodes.isc_spb_version);
 			spb.Append(IscCodes.isc_spb_current_version);
 			var gdsSvc = _svc as Client.Managed.Version10.GdsServiceManager;
@@ -135,48 +95,28 @@ namespace FirebirdSql.Data.Services
 				spb.Append((byte)IscCodes.isc_spb_password, _csManager.Password);
 			}
 			spb.Append((byte)IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-
-			if (_csManager.Role != null && _csManager.Role.Length > 0)
-			{
+			if ((_csManager?.Role.Length ?? 0) != 0)
 				spb.Append((byte)IscCodes.isc_spb_sql_role_name, _csManager.Role);
-			}
-
 			return spb;
 		}
 
-		#endregion
-
-		#region Protected Methods
-
 		protected void Open()
 		{
-			if (_state != FbServiceState.Closed)
-			{
+			if (State != FbServiceState.Closed)
 				throw new InvalidOperationException("Service already Open.");
-			}
-
-			if (_csManager.UserID == null || _csManager.UserID.Length == 0)
-			{
+			if (string.IsNullOrEmpty(_csManager.UserID))
 				throw new InvalidOperationException("No user name was specified.");
-			}
-
-			if (_csManager.Password == null || _csManager.Password.Length == 0)
-			{
+			if (string.IsNullOrEmpty(_csManager.Password))
 				throw new InvalidOperationException("No user password was specified.");
-			}
 
 			try
 			{
 				if (_svc == null)
 				{
-					// New instance	for	Service	handler
 					_svc = ClientFactory.CreateServiceManager(_csManager);
 				}
-
-				// Initialize Services API
-				_svc.Attach(BuildSpb(), _csManager.DataSource, _csManager.Port, _serviceName);
-
-				_state = FbServiceState.Open;
+				_svc.Attach(BuildSpb(), _csManager.DataSource, _csManager.Port, ServiceName);
+				State = FbServiceState.Open;
 			}
 			catch (Exception ex)
 			{
@@ -186,17 +126,15 @@ namespace FirebirdSql.Data.Services
 
 		protected void Close()
 		{
-			if (_state != FbServiceState.Open)
+			if (State != FbServiceState.Open)
 			{
 				return;
 			}
-
 			try
 			{
 				_svc.Detach();
 				_svc = null;
-
-				_state = FbServiceState.Closed;
+				State = FbServiceState.Closed;
 			}
 			catch (Exception ex)
 			{
@@ -206,14 +144,11 @@ namespace FirebirdSql.Data.Services
 
 		protected void StartTask()
 		{
-			if (_state == FbServiceState.Closed)
-			{
+			if (State == FbServiceState.Closed)
 				throw new InvalidOperationException("Service is Closed.");
-			}
 
 			try
 			{
-				// Start service operation
 				_svc.Start(StartSpb);
 			}
 			catch (Exception ex)
@@ -222,9 +157,9 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		protected ArrayList Query(byte[] items)
+		protected IList<object> Query(byte[] items)
 		{
-			var result = new ArrayList();
+			var result = new List<object>();
 			Query(items, (truncated, item) =>
 			{
 				var stringItem = item as string;
@@ -272,7 +207,6 @@ namespace FirebirdSql.Data.Services
 		protected void ProcessServiceOutput()
 		{
 			string line;
-
 			while ((line = GetNextLine()) != null)
 			{
 				OnServiceOutput(line);
@@ -291,10 +225,6 @@ namespace FirebirdSql.Data.Services
 		{
 			ServiceOutput?.Invoke(this, new ServiceOutputEventArgs(message));
 		}
-
-		#endregion
-
-		#region Private Methods
 
 		private void ProcessQuery(byte[] items, Action<bool, object> queryResponseAction)
 		{
@@ -410,22 +340,18 @@ namespace FirebirdSql.Data.Services
 		private byte[] QueryService(byte[] items)
 		{
 			bool shouldClose = false;
-			if (_state == FbServiceState.Closed)
+			if (State == FbServiceState.Closed)
 			{
-				// Attach to Service Manager
 				Open();
 				shouldClose = true;
 			}
-
 			if (QuerySpb == null)
 			{
 				QuerySpb = new ServiceParameterBuffer();
 			}
-
 			try
 			{
-				// Response	buffer
-				byte[] buffer = new byte[_queryBufferSize];
+				byte[] buffer = new byte[QueryBufferSize];
 				_svc.Query(QuerySpb, items.Length, items, buffer.Length, buffer);
 				return buffer;
 			}
@@ -437,10 +363,6 @@ namespace FirebirdSql.Data.Services
 				}
 			}
 		}
-
-		#endregion
-
-		#region Private Static Methods
 
 		private static FbServerConfig ParseServerConfig(byte[] buffer, ref int pos)
 		{
@@ -643,7 +565,5 @@ namespace FirebirdSql.Data.Services
 			pos += size;
 			return result;
 		}
-
-		#endregion
 	}
 }

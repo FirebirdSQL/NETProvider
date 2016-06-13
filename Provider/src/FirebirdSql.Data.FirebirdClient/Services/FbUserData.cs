@@ -23,101 +23,49 @@ namespace FirebirdSql.Data.Services
 	public sealed class FbUserData
 	{
 		private string _userName;
-		private string _firstName;
-		private string _lastName;
-		private string _middleName;
-		private string _userPassword;
-		private string _groupName;
-		private string _roleName;
-		private int _userID;
-		private int _groupID;
-
 		public string UserName
 		{
 			get { return _userName; }
 			set
 			{
 				if (value == null)
-				{
 					throw new InvalidOperationException("The user name cannot be null.");
-				}
 				if (value.Length > 31)
-				{
 					throw new InvalidOperationException("The user name cannot have more than 31 characters.");
-				}
-
 				_userName = value;
 			}
 		}
 
+		private string _userPassword;
 		public string UserPassword
 		{
 			get { return _userPassword; }
 			set
 			{
 				if (value == null)
-				{
 					throw new InvalidOperationException("The user password cannot be null.");
-				}
 				if (value.Length > 31)
-				{
 					throw new InvalidOperationException("The user password cannot have more than 31 characters.");
-				}
-
 				_userPassword = value;
 			}
 		}
 
-		public string FirstName
-		{
-			get { return _firstName; }
-			set { _firstName = value; }
-		}
-
-		public string LastName
-		{
-			get { return _lastName; }
-			set { _lastName = value; }
-		}
-
-		public string MiddleName
-		{
-			get { return _middleName; }
-			set { _middleName = value; }
-		}
-
-		public int UserID
-		{
-			get { return _userID; }
-			set { _userID = value; }
-		}
-
-		public int GroupID
-		{
-			get { return _groupID; }
-			set { _groupID = value; }
-		}
-
-		public string GroupName
-		{
-			get { return _groupName; }
-			set { _groupName = value; }
-		}
-
-		public string RoleName
-		{
-			get { return _roleName; }
-			set { _roleName = value; }
-		}
+		public string FirstName { get; set; }
+		public string LastName { get; set; }
+		public string MiddleName { get; set; }
+		public int UserID { get; set; }
+		public int GroupID { get; set; }
+		public string GroupName { get; set; }
+		public string RoleName { get; set; }
 
 		public FbUserData()
 		{
-			_userName = string.Empty;
-			_firstName = string.Empty;
-			_lastName = string.Empty;
-			_middleName = string.Empty;
-			_userPassword = string.Empty;
-			_roleName = string.Empty;
+			UserName = string.Empty;
+			UserPassword = string.Empty;
+			FirstName = string.Empty;
+			LastName = string.Empty;
+			MiddleName = string.Empty;
+			RoleName = string.Empty;
 		}
 	}
 }

@@ -29,61 +29,36 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbBackup : FbService
 	{
-		#region Properties
-
-		private FbBackupFileCollection _backupFiles;
-		public FbBackupFileCollection BackupFiles
-		{
-			get { return _backupFiles; }
-		}
-
+		public FbBackupFileCollection BackupFiles { get; }
 		public bool Verbose { get; set; }
 		public int Factor { get; set; }
 		public FbBackupFlags Options { get; set; }
 
-		#endregion
-
-		#region Constructors
-
 		public FbBackup(string connectionString = null)
 			: base(connectionString)
 		{
-			_backupFiles = new FbBackupFileCollection();
+			BackupFiles = new FbBackupFileCollection();
 		}
-
-		#endregion
-
-		#region Methods
 
 		public void Execute()
 		{
 			try
 			{
-				// Configure Spb
 				StartSpb = new ServiceParameterBuffer();
-
 				StartSpb.Append(IscCodes.isc_action_svc_backup);
 				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-
-				foreach (FbBackupFile file in _backupFiles)
+				foreach (FbBackupFile file in BackupFiles)
 				{
 					StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
 					if (file.BackupLength.HasValue)
 						StartSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
 				}
-
 				if (Verbose)
-				{
 					StartSpb.Append(IscCodes.isc_spb_verbose);
-				}
-
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
-
-				// Start execution
 				StartTask();
-
 				if (Verbose)
 				{
 					ProcessServiceOutput();
@@ -95,11 +70,8 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				// Close
 				Close();
 			}
 		}
-
-		#endregion
 	}
 }

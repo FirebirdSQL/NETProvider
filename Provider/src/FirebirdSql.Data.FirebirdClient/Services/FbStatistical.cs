@@ -14,6 +14,9 @@
  *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
  *	All Rights Reserved.
+ *
+ *  Contributors:
+ *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -25,49 +28,23 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbStatistical : FbService
 	{
-		#region Fields
-
-		private FbStatisticalFlags _options;
-
-		#endregion
-
-		#region Properties
-
-		public FbStatisticalFlags Options
-		{
-			get { return _options; }
-			set { _options = value; }
-		}
-
-		#endregion
-
-		#region Constructors
+		public FbStatisticalFlags Options { get; set; }
 
 		public FbStatistical(string connectionString = null)
 			: base(connectionString)
 		{ }
-
-		#endregion
-
-		#region Methods
 
 		public void Execute()
 		{
 			try
 			{
 				StartSpb = new ServiceParameterBuffer();
-
-				// Configure Spb
 				StartSpb.Append(IscCodes.isc_action_svc_db_stats);
 				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-				StartSpb.Append(IscCodes.isc_spb_options, (int)_options);
+				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
-
-				// Start execution
 				StartTask();
-
-				// Process service output
 				ProcessServiceOutput();
 			}
 			catch (Exception ex)
@@ -79,7 +56,5 @@ namespace FirebirdSql.Data.Services
 				Close();
 			}
 		}
-
-		#endregion
 	}
 }
