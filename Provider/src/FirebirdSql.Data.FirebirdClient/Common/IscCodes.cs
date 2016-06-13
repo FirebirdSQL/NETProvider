@@ -445,6 +445,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_bkp_file = 5;
 		public const int isc_spb_bkp_factor = 6;
 		public const int isc_spb_bkp_length = 7;
+		public const int isc_spb_bkp_skip_data = 8;
 
 		public const int isc_spb_bkp_ignore_checksums = 0x01;
 		public const int isc_spb_bkp_ignore_limbo = 0x02;
@@ -460,6 +461,7 @@ namespace FirebirdSql.Data.Common
 
 		#region Restore Service
 
+		public const int isc_spb_res_skip_data = isc_spb_bkp_skip_data;
 		public const int isc_spb_res_buffers = 9;
 		public const int isc_spb_res_page_size = 10;
 		public const int isc_spb_res_length = 11;
