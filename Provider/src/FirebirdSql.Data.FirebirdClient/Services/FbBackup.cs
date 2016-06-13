@@ -77,6 +77,8 @@ namespace FirebirdSql.Data.Services
 					StartSpb.Append(IscCodes.isc_spb_verbose);
 				}
 
+				if (Factor > 0)
+					StartSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
