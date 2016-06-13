@@ -36,7 +36,7 @@ before_test:
   - ps: ni firebird.log -ItemType File | Out-Null
 test_script:
   - ps: cd $testsDir
-  - ps: nunit3-console FirebirdSql.Data.UnitTests.dll --framework=net-4.0 --where='cat != Local' --stoponerror --result='myresults.xml;format=AppVeyor'
+  - ps: nunit3-console FirebirdSql.Data.UnitTests.dll --framework=net-4.0 --where='cat != Local' --stoponerror --inprocess --result='myresults.xml;format=AppVeyor'
 artifacts:
   - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.dll
   - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.pdb
