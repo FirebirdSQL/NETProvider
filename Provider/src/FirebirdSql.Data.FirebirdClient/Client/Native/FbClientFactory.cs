@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.Client.Native
 			IFbClient fbClient;
 
 			// First, try to get the IFbClient from the cache.
-			lock(cache)
+			lock (cache)
 			{
 				if (cache.TryGetValue(dllName, out fbClient))
 				{
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.Client.Native
 			fbClient = GenerateFbClient(dllName);
 
 			// Add it into the cache for next time
-			lock(cache)
+			lock (cache)
 			{
 				if (cache.ContainsKey(dllName))
 				{
@@ -121,11 +121,11 @@ namespace FirebirdSql.Data.Client.Native
 			TypeBuilder tb = CreateTypeBuilder(dllName);
 
 			// It needs to implement IFbClient, obviously!
-			tb.AddInterfaceImplementation(typeof (IFbClient));
+			tb.AddInterfaceImplementation(typeof(IFbClient));
 
 			// Now, go through all the methods in IFbClient and generate the corresponding methods
 			// in our dynamic type.
-			foreach(MethodInfo mi in typeof(IFbClient).GetMethods())
+			foreach (MethodInfo mi in typeof(IFbClient).GetMethods())
 			{
 				GenerateMethod(tb, mi, dllName);
 			}
@@ -158,12 +158,12 @@ namespace FirebirdSql.Data.Client.Native
 			// P/Invoke declaration. We'll create the P/Invoke definition first.
 			MethodBuilder smb = tb.DefineMethod(
 				mi.Name, // The name is the same as the interface name
-				// P/Invoke methods need special attributes...
+						 // P/Invoke methods need special attributes...
 				MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig,
 				mi.ReturnType, ptypes);
 
 			// Get the type of the DllImportAttribute, which we'll attach to this method
-			Type diaType = typeof (DllImportAttribute);
+			Type diaType = typeof(DllImportAttribute);
 
 			// Create a CustomAttributeBuilder for the DLLImportAttribute, specifying the constructor that takes a string argument.
 			ConstructorInfo ctor = diaType.GetConstructor(new Type[] { typeof(string) });
@@ -266,12 +266,12 @@ namespace FirebirdSql.Data.Client.Native
 
 #if (DEBUG)
 			// In debug mode, we'll save the assembly out to disk, so we can look at it in Reflector.
-			AssemblyBuilder ab = (AssemblyBuilder) tb.Assembly;
+			AssemblyBuilder ab = (AssemblyBuilder)tb.Assembly;
 			ab.Save("DynamicAssembly.dll");
 #endif
 
 			// Create an instance of the type and return it.
-			return (IFbClient) Activator.CreateInstance(t);
+			return (IFbClient)Activator.CreateInstance(t);
 		}
 
 		/// <summary>

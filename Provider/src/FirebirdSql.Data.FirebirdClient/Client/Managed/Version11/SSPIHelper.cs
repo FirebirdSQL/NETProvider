@@ -18,8 +18,6 @@
  *  Adapted from pinvoke.net.
  */
 
-#if (!LINUX)  //SSPI is available only on Windows
-
 using System;
 using System.Text;
 using System.Collections;
@@ -464,5 +462,3 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#endregion
 	}
 }
-
-#endif

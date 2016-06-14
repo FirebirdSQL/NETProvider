@@ -74,19 +74,6 @@
     </TargetFrameworkProfile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_Mono_w_Linux|AnyCPU'">
-    <OutputPath>bin\Release_Mono_w_Linux\</OutputPath>
-    <DefineConstants>TRACE;MONO;LINUX;NET_40</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <Reference Include="System.Data.Entity" />
     <Reference Include="EntityFramework">
@@ -105,13 +92,6 @@
     <Reference Include="System.Data.Entity" />
     <Reference Include="EntityFramework">
       <HintPath>..\..\lib\EF5\net45\EntityFramework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_Mono_w_Linux|AnyCPU'">
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="EntityFramework">
-      <HintPath>..\..\lib\EF5\net40\EntityFramework.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -203,7 +183,6 @@
     <Compile Include="Client\Native\Marshalers\XSQLDA.cs" />
     <Compile Include="Client\Native\Marshalers\XsqldaMarshaler.cs" />
     <Compile Include="Client\Native\Marshalers\XSQLVAR.cs" />
-    <Compile Include="Client\Native\FbClient.cs" />
     <Compile Include="Client\Native\FesArray.cs" />
     <Compile Include="Client\Native\FesBlob.cs" />
     <Compile Include="Client\Native\FesConnection.cs" />

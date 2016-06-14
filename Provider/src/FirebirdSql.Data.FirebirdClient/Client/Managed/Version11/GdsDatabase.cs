@@ -67,7 +67,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#region Trusted Auth
 		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
-#if (!LINUX)
 			lock (SyncObject)
 			{
 				try
@@ -97,12 +96,8 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 				AfterAttachActions();
 			}
-#else
-			throw new NotSupportedException();
-#endif
 		}
 
-#if (!LINUX)
 		protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBuffer dpb, byte[] authData)
 		{
 			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
@@ -119,7 +114,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				response = ReadResponse();
 			}
 		}
-#endif
 		#endregion
 
 		#region Public methods
