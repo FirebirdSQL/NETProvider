@@ -20,8 +20,6 @@
  */
 
 using System;
-using System.Collections;
-
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
@@ -32,6 +30,7 @@ namespace FirebirdSql.Data.Services
 		public FbBackupFileCollection BackupFiles { get; }
 		public bool Verbose { get; set; }
 		public int Factor { get; set; }
+		public string SkipData { get; set; }
 		public FbBackupFlags Options { get; set; }
 
 		public FbBackup(string connectionString = null)
@@ -57,6 +56,8 @@ namespace FirebirdSql.Data.Services
 					StartSpb.Append(IscCodes.isc_spb_verbose);
 				if (Factor > 0)
 					StartSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
+				if (!string.IsNullOrEmpty(SkipData))
+					StartSpb.Append(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();

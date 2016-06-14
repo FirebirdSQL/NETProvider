@@ -29,6 +29,7 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbStreamingBackup : FbService
 	{
+		public string SkipData { get; set; }
 		public FbBackupFlags Options { get; set; }
 		public Stream OutputStream { get; set; }
 
@@ -44,6 +45,8 @@ namespace FirebirdSql.Data.Services
 				StartSpb.Append(IscCodes.isc_action_svc_backup);
 				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
 				StartSpb.Append(IscCodes.isc_spb_bkp_file, "stdout");
+				if (!string.IsNullOrEmpty(SkipData))
+					StartSpb.Append(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
