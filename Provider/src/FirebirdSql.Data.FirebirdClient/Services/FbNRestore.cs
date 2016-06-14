@@ -26,40 +26,28 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbNRestore : FbService
 	{
-		#region Properties
 		public IEnumerable<string> BackupFiles { get; set; }
 		public bool DirectIO { get; set; }
-		#endregion
 
-		#region Constructors
 		public FbNRestore(string connectionString = null)
 			: base(connectionString)
 		{ }
-		#endregion
 
-		#region Methods
 		public void Execute()
 		{
 			try
 			{
-				// Configure Spb
 				StartSpb = new ServiceParameterBuffer();
-
 				StartSpb.Append(IscCodes.isc_action_svc_nrest);
 				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-
 				foreach (var file in BackupFiles)
 				{
 					StartSpb.Append(IscCodes.isc_spb_nbk_file, file);
 				}
-
 				StartSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 
 				Open();
-
-				// Start execution
 				StartTask();
-
 				ProcessServiceOutput();
 			}
 			catch (Exception ex)
@@ -68,10 +56,8 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				// Close
 				Close();
 			}
 		}
-		#endregion
 	}
 }

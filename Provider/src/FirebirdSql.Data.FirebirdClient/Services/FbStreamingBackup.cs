@@ -47,9 +47,7 @@ namespace FirebirdSql.Data.Services
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
-
 				StartTask();
-
 				ReadOutput();
 			}
 			catch (Exception ex)

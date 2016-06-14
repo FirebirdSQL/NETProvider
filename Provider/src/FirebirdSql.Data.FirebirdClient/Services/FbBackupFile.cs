@@ -25,22 +25,13 @@ namespace FirebirdSql.Data.Services
 {
 	public class FbBackupFile
 	{
-		#region Properties
-
 		public string BackupFile { get; set; }
-
 		public int? BackupLength { get; set; }
-
-		#endregion
-
-		#region Constructors
 
 		public FbBackupFile(string fileName, int? fileLength = null)
 		{
 			BackupFile = fileName;
 			BackupLength = fileLength;
 		}
-
-		#endregion
 	}
 }

@@ -13,29 +13,24 @@
  *	   language governing rights and limitations under the License.
  *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
- *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2014, 2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
-
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
 	public sealed class FbServerProperties : FbService
 	{
-		#region Constructors
-
 		public FbServerProperties(string connectionString = null)
 			: base(connectionString)
 		{ }
-
-		#endregion
-
-		#region Methods
 
 		public int GetVersion()
 		{
@@ -69,47 +64,33 @@ namespace FirebirdSql.Data.Services
 
 		public FbDatabasesInfo GetDatabasesInfo()
 		{
-			ArrayList info = GetInfo(IscCodes.isc_info_svc_svr_db_info);
-			return info.Count != 0 ? (FbDatabasesInfo)info[0] : new FbDatabasesInfo();
+			return (FbDatabasesInfo)GetInfo(IscCodes.isc_info_svc_svr_db_info).FirstOrDefault() ?? new FbDatabasesInfo();
 		}
 
 		public FbServerConfig GetServerConfig()
 		{
-			ArrayList info = GetInfo(IscCodes.isc_info_svc_get_config);
-			return info.Count != 0 ? (FbServerConfig)info[0] : new FbServerConfig();
+			return (FbServerConfig)GetInfo(IscCodes.isc_info_svc_get_config).FirstOrDefault() ?? new FbServerConfig();
 		}
-
-		#endregion
-
-		#region Private Methods
 
 		private string GetString(int item)
 		{
-			ArrayList info = GetInfo(item);
-
-			return info.Count != 0 ? (string)info[0] : null;
+			return (string)GetInfo(item).FirstOrDefault();
 		}
 
 		private int GetInt32(int item)
 		{
-			ArrayList info = GetInfo(item);
-
-			return info.Count != 0 ? (int)info[0] : 0;
+			return (int)GetInfo(item).FirstOrDefault();
 		}
 
-		private ArrayList GetInfo(int item)
+		private IList<object> GetInfo(int item)
 		{
 			return GetInfo(new byte[] { (byte)item });
 		}
 
-		private ArrayList GetInfo(byte[] items)
+		private IList<object> GetInfo(byte[] items)
 		{
 			return Query(items);
 		}
-
-		#endregion
-
-		#region Static Methods
 
 		public static Version ParseServerVersion(string version)
 		{
@@ -118,7 +99,5 @@ namespace FirebirdSql.Data.Services
 				return null;
 			return new Version(m.Groups[1].Value);
 		}
-
-		#endregion
 	}
 }

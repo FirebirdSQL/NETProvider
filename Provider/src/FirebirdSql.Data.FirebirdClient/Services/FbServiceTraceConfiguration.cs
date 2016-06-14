@@ -31,9 +31,7 @@ namespace FirebirdSql.Data.Services
 		}
 
 		public bool Enabled { get; set; }
-
 		public FbServiceTraceEvents Events { get; set; }
-
 		public string IncludeFilter { get; set; }
 		public string ExcludeFilter { get; set; }
 

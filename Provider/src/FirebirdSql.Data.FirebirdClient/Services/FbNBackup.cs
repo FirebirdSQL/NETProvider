@@ -25,7 +25,6 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbNBackup : FbService
 	{
-		#region Properties
 		private int _level;
 		public int Level
 		{
@@ -40,37 +39,25 @@ namespace FirebirdSql.Data.Services
 		public string BackupFile { get; set; }
 		public bool DirectIO { get; set; }
 		public FbNBackupFlags Options { get; set; }
-		#endregion
 
-		#region Constructors
 		public FbNBackup(string connectionString = null)
 			: base(connectionString)
 		{ }
-		#endregion
 
-		#region Methods
 		public void Execute()
 		{
 			try
 			{
-				// Configure Spb
 				StartSpb = new ServiceParameterBuffer();
-
 				StartSpb.Append(IscCodes.isc_action_svc_nbak);
 				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-
 				StartSpb.Append(IscCodes.isc_spb_nbk_level, _level);
 				StartSpb.Append(IscCodes.isc_spb_nbk_file, BackupFile);
-
 				StartSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
-
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
-
-				// Start execution
 				StartTask();
-
 				ProcessServiceOutput();
 			}
 			catch (Exception ex)
@@ -79,10 +66,8 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				// Close
 				Close();
 			}
 		}
-		#endregion
 	}
 }

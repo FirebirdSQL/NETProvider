@@ -29,14 +29,6 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbRestore : FbService
 	{
-		#region Properties
-
-		private FbBackupFileCollection _backupFiles;
-		public FbBackupFileCollection BackupFiles
-		{
-			get { return _backupFiles; }
-		}
-
 		private int? _pageSize;
 		public int? PageSize
 		{
@@ -50,45 +42,31 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
+		public FbBackupFileCollection BackupFiles { get; }
 		public bool Verbose { get; set; }
 		public int? PageBuffers { get; set; }
 		public bool ReadOnly { get; set; }
 		public FbRestoreFlags Options { get; set; }
 
-		#endregion
-
-		#region Constructors
-
 		public FbRestore(string connectionString = null)
 			: base(connectionString)
 		{
-			_backupFiles = new FbBackupFileCollection();
+			BackupFiles = new FbBackupFileCollection();
 		}
-
-		#endregion
-
-		#region Methods
 
 		public void Execute()
 		{
 			try
 			{
 				StartSpb = new ServiceParameterBuffer();
-
 				StartSpb.Append(IscCodes.isc_action_svc_restore);
-
-				foreach (FbBackupFile bkpFile in _backupFiles)
+				foreach (var bkpFile in BackupFiles)
 				{
 					StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
 				}
-
 				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-
 				if (Verbose)
-				{
 					StartSpb.Append(IscCodes.isc_spb_verbose);
-				}
-
 				if (PageBuffers.HasValue)
 					StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
 				if (_pageSize.HasValue)
@@ -97,9 +75,7 @@ namespace FirebirdSql.Data.Services
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
 
 				Open();
-
 				StartTask();
-
 				if (Verbose)
 				{
 					ProcessServiceOutput();
@@ -114,7 +90,5 @@ namespace FirebirdSql.Data.Services
 				Close();
 			}
 		}
-
-		#endregion
 	}
 }
