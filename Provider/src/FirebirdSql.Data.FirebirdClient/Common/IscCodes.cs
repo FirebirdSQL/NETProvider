@@ -79,6 +79,8 @@ namespace FirebirdSql.Data.Common
 		public const int ptype_out_of_band = 4;
 		public const int ptype_lazy_send = 5;
 
+		public const int pflag_compress = 0x100;
+
 		#endregion
 
 		#region Statement Flags
