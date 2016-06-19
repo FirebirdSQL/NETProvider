@@ -70,6 +70,9 @@ namespace FirebirdSql.Data.Client.Managed
 		private bool _ownsStream;
 		private int _operation;
 
+		private Stream _compressStream;
+		private Stream _decompressStream;
+
 		#endregion
 
 		#region Stream Properties
@@ -109,22 +112,31 @@ namespace FirebirdSql.Data.Client.Managed
 		{ }
 
 		public XdrStream(Charset charset)
-			: this(new MemoryStream(), charset, true)
+			: this(new MemoryStream(), charset, false, true)
 		{ }
 
 		public XdrStream(byte[] buffer, Charset charset)
-			: this(new MemoryStream(buffer), charset, true)
+			: this(new MemoryStream(buffer), charset, false, true)
 		{ }
 
-		public XdrStream(Stream innerStream, Charset charset, bool ownsStream)
+		public XdrStream(Stream innerStream, Charset charset, bool compress, bool ownsStream)
 			: base()
 		{
 			_innerStream = innerStream;
 			_charset = charset;
 			_ownsStream = ownsStream;
 			ResetOperation();
-		}
 
+			if (compress)
+			{
+				_compressStream = new Ionic.Zlib.ZlibStream(_innerStream, Ionic.Zlib.CompressionMode.Compress, true)
+				{
+					FlushMode = Ionic.Zlib.FlushType.Sync,
+				};
+				_decompressStream = new Ionic.Zlib.ZlibStream(_innerStream, Ionic.Zlib.CompressionMode.Decompress, true);
+			}
+
+		}
 		#endregion
 
 		#region Stream methods
@@ -133,6 +145,8 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			try
 			{
+				_compressStream?.Dispose();
+				_decompressStream?.Dispose();
 				if (_ownsStream)
 				{
 					_innerStream?.Close();
@@ -142,6 +156,8 @@ namespace FirebirdSql.Data.Client.Managed
 			{ }
 			finally
 			{
+				_compressStream = null;
+				_decompressStream = null;
 				_innerStream = null;
 				_charset = null;
 			}
@@ -151,7 +167,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			CheckDisposed();
 
-			_innerStream.Flush();
+			(_compressStream ?? _innerStream).Flush();
 		}
 
 		public override void SetLength(long length)
@@ -161,7 +177,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_innerStream.SetLength(length);
 		}
 
-		public override long Seek(long offset, System.IO.SeekOrigin loc)
+		public override long Seek(long offset, SeekOrigin loc)
 		{
 			CheckDisposed();
 
@@ -175,14 +191,14 @@ namespace FirebirdSql.Data.Client.Managed
 			if (!CanRead)
 				throw new InvalidOperationException("Read operations are not allowed by this stream");
 
-			return _innerStream.Read(buffer, offset, count);
+			return (_decompressStream ?? _innerStream).Read(buffer, offset, count);
 		}
 
 		public override void WriteByte(byte value)
 		{
 			CheckDisposed();
 
-			_innerStream.WriteByte(value);
+			(_compressStream ?? _innerStream).WriteByte(value);
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
@@ -192,7 +208,7 @@ namespace FirebirdSql.Data.Client.Managed
 			if (!CanWrite)
 				throw new InvalidOperationException("Write operations are not allowed by this stream");
 
-			_innerStream.Write(buffer, offset, count);
+			(_compressStream ?? _innerStream).Write(buffer, offset, count);
 		}
 
 		public byte[] ToArray()

@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public virtual void Identify(string database)
 		{
-			using (var xdrStream = CreateXdrStream())
+			using (var xdrStream = CreateXdrStream(false))
 			{
 				try
 				{
@@ -215,9 +215,9 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public XdrStream CreateXdrStream()
+		public XdrStream CreateXdrStream(bool compress)
 		{
-			return new XdrStream(new BufferedStream(_networkStream, 32 * 1024), _characterSet, false);
+			return new XdrStream(new BufferedStream(_networkStream, 32 * 1024), _characterSet, compress, false);
 		}
 
 		public virtual void Disconnect()
