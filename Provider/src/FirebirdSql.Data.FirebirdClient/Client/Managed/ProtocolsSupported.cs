@@ -41,18 +41,15 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public static ICollection<Protocol> Protocols
+		public static ICollection<Protocol> Get(bool compression)
 		{
-			get
+			return new[]
 			{
-				return new[]
-				{
-					new Protocol(IscCodes.PROTOCOL_VERSION10, IscCodes.ptype_rpc, IscCodes.ptype_batch_send),
-					new Protocol(IscCodes.PROTOCOL_VERSION11, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send),
-					new Protocol(IscCodes.PROTOCOL_VERSION12, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send),
-					new Protocol(IscCodes.PROTOCOL_VERSION13, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send | IscCodes.pflag_compress),
-				};
-			}
+				new Protocol(IscCodes.PROTOCOL_VERSION10, IscCodes.ptype_rpc, IscCodes.ptype_batch_send),
+				new Protocol(IscCodes.PROTOCOL_VERSION11, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send),
+				new Protocol(IscCodes.PROTOCOL_VERSION12, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send),
+				new Protocol(IscCodes.PROTOCOL_VERSION13, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
+			};
 		}
 	}
 }

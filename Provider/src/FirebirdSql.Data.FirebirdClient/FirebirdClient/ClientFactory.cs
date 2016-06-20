@@ -55,15 +55,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		private static Exception IncorrectServerTypeException()
-		{
-			return new NotSupportedException("Specified server type is not correct.");
-		}
-
 		private static IDatabase CreateManagedDatabase(FbConnectionString options)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
-
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression);
 			connection.Connect();
 			connection.Identify(options.Database);
 
@@ -84,8 +78,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static IServiceManager CreateManagedServiceManager(FbConnectionString options)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset));
-
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression);
 			connection.Connect();
 			connection.Identify(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty);
 
@@ -97,13 +90,18 @@ namespace FirebirdSql.Data.FirebirdClient
 				case IscCodes.PROTOCOL_VERSION10:
 					return new Client.Managed.Version10.GdsServiceManager(connection);
 				default:
-					throw new NotSupportedException("Protocol not supported.");
+					throw UnsupportedProtocolException();
 			}
 		}
 
 		private static NotSupportedException UnsupportedProtocolException()
 		{
 			return new NotSupportedException("Protocol not supported.");
+		}
+
+		private static Exception IncorrectServerTypeException()
+		{
+			return new NotSupportedException("Specified server type is not correct.");
 		}
 	}
 }

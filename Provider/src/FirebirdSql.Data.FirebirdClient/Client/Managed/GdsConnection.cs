@@ -19,6 +19,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -42,6 +43,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private int _portNumber;
 		private int _packetSize;
 		private Charset _characterSet;
+		private bool _compression;
 		private int _protocolVersion;
 		private int _protocolArchitecture;
 		private int _protocolMinimunType;
@@ -94,11 +96,11 @@ namespace FirebirdSql.Data.Client.Managed
 		#region Constructors
 
 		public GdsConnection(string dataSource, int port)
-			: this(null, null, dataSource, port, 8192, Charset.DefaultCharset)
+			: this(null, null, dataSource, port, 8192, Charset.DefaultCharset, false)
 		{
 		}
 
-		public GdsConnection(string userID, string password, string dataSource, int portNumber, int packetSize, Charset characterSet)
+		public GdsConnection(string userID, string password, string dataSource, int portNumber, int packetSize, Charset characterSet, bool compression)
 		{
 			_userID = userID;
 			_password = password;
@@ -106,6 +108,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_portNumber = portNumber;
 			_packetSize = packetSize;
 			_characterSet = characterSet;
+			_compression = compression;
 			_srpClient = new SrpClient();
 		}
 
@@ -148,11 +151,13 @@ namespace FirebirdSql.Data.Client.Managed
 					xdrStream.Write(IscCodes.GenericAchitectureClient);
 
 					xdrStream.Write(database);
-					xdrStream.Write(ProtocolsSupported.Protocols.Count);
+
+					var protocols = ProtocolsSupported.Get(_compression);
+					xdrStream.Write(protocols.Count());
 					xdrStream.WriteBuffer(UserIdentificationData());
 
 					var priority = 0;
-					foreach (var protocol in ProtocolsSupported.Protocols)
+					foreach (var protocol in protocols)
 					{
 						xdrStream.Write(protocol.Version);
 						xdrStream.Write(IscCodes.GenericAchitectureClient);
@@ -175,6 +180,11 @@ namespace FirebirdSql.Data.Client.Managed
 						if (_protocolVersion < 0)
 						{
 							_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
+						}
+
+						if (_compression && (_protocolMinimunType & IscCodes.pflag_compress) == 0)
+						{
+							_compression = false;
 						}
 					}
 					else if (operation == IscCodes.op_response)
@@ -215,9 +225,9 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public XdrStream CreateXdrStream(bool compress)
+		public XdrStream CreateXdrStream()
 		{
-			return new XdrStream(new BufferedStream(_networkStream, 32 * 1024), _characterSet, compress, false);
+			return CreateXdrStream(_compression);
 		}
 
 		public virtual void Disconnect()
@@ -297,6 +307,11 @@ namespace FirebirdSql.Data.Client.Managed
 
 				return result.ToArray();
 			}
+		}
+
+		private XdrStream CreateXdrStream(bool compression)
+		{
+			return new XdrStream(new BufferedStream(_networkStream, 32 * 1024), _characterSet, compression, false);
 		}
 
 		#endregion

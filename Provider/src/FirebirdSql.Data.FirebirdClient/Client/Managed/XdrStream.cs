@@ -119,7 +119,7 @@ namespace FirebirdSql.Data.Client.Managed
 			: this(new MemoryStream(buffer), charset, false, true)
 		{ }
 
-		public XdrStream(Stream innerStream, Charset charset, bool compress, bool ownsStream)
+		public XdrStream(Stream innerStream, Charset charset, bool compression, bool ownsStream)
 			: base()
 		{
 			_innerStream = innerStream;
@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_ownsStream = ownsStream;
 			ResetOperation();
 
-			if (compress)
+			if (compression)
 			{
 				_compressStream = new Ionic.Zlib.ZlibStream(_innerStream, Ionic.Zlib.CompressionMode.Compress, true)
 				{
