@@ -235,13 +235,13 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		[Category("Advanced")]
-		[DisplayName("Cache Pages")]
+		[DisplayName("DB Cache Pages")]
 		[Description("How many cache buffers to use for this session.")]
-		[DefaultValue(FbConnectionString.DefaultValueCachePages)]
+		[DefaultValue(FbConnectionString.DefaultValueDbCachePages)]
 		public int DbCachePages
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyCachePages, FbConnectionString.DefaultValueCachePages); }
-			set { SetValue(FbConnectionString.DefaultKeyCachePages, value); }
+			get { return GetInt32(FbConnectionString.DefaultKeyDbCachePages, FbConnectionString.DefaultValueDbCachePages); }
+			set { SetValue(FbConnectionString.DefaultKeyDbCachePages, value); }
 		}
 
 		[Category("Advanced")]
@@ -255,13 +255,23 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		[Category("Advanced")]
-		[DisplayName("NoGarbageCollect")]
+		[DisplayName("No Garbage Collect")]
 		[Description("If true, disables sweeping the database upon attachment.")]
 		[DefaultValue(FbConnectionString.DefaultValueNoGarbageCollect)]
 		public bool NoGarbageCollect
 		{
 			get { return GetBoolean(FbConnectionString.DefaultKeyNoGarbageCollect, FbConnectionString.DefaultValueNoGarbageCollect); }
 			set { SetValue(FbConnectionString.DefaultKeyNoGarbageCollect, value); }
+		}
+
+		[Category("Advanced")]
+		[DisplayName("Compression")]
+		[Description("Enables or disables wire compression.")]
+		[DefaultValue(FbConnectionString.DefaultValueCompression)]
+		public bool Compression
+		{
+			get { return GetBoolean(FbConnectionString.DefaultKeyCompression, FbConnectionString.DefaultValueCompression); }
+			set { SetValue(FbConnectionString.DefaultKeyCompression, value); }
 		}
 
 		#endregion
