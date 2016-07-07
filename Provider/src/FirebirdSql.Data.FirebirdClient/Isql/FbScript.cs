@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Firebird ADO.NET Data provider for .NET and Mono
  *
  *     The contents of this file are subject to the Initial
@@ -110,9 +110,7 @@ namespace FirebirdSql.Data.Isql
 					}
 					else
 					{
-						throw new ArgumentException(string.Format("The type of the SQL statement could not be determined.{0}Statement: {1}.",
-							Environment.NewLine,
-							statement.Text));
+						throw new ArgumentException($"The type of the SQL statement could not be determined. See also {nameof(UnknownStatement)} event.{Environment.NewLine}Statement: {statement.Text}.");
 					}
 				}
 			}
