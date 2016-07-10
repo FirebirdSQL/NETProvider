@@ -23,8 +23,6 @@ using System;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Runtime.Serialization;
-using System.Security;
-using System.Security.Permissions;
 
 using FirebirdSql.Data.Common;
 
@@ -99,8 +97,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Methods
 
-		[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
-		[SecurityCritical]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);

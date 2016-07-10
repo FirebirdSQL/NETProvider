@@ -60,6 +60,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbCommand();
 		}
 
+		public override DbCommandBuilder CreateCommandBuilder()
+		{
+			return new FbCommandBuilder();
+		}
+
 		public override DbConnection CreateConnection()
 		{
 			return new FbConnection();
@@ -78,16 +83,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		public override DbParameter CreateParameter()
 		{
 			return new FbParameter();
-		}
-
-		public override System.Security.CodeAccessPermission CreatePermission(System.Security.Permissions.PermissionState state)
-		{
-			return new FirebirdClientPermission(state);
-		}
-
-		public override DbCommandBuilder CreateCommandBuilder()
-		{
-			return new FbCommandBuilder();
 		}
 
 		#endregion

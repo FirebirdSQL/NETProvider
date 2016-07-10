@@ -27,8 +27,6 @@ using System.Text;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Serialization;
-using System.Security;
-using System.Security.Permissions;
 
 namespace FirebirdSql.Data.Common
 {
@@ -163,8 +161,6 @@ namespace FirebirdSql.Data.Common
 			BuildExceptionMessage();
 		}
 
-		[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
-		[SecurityCritical]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);

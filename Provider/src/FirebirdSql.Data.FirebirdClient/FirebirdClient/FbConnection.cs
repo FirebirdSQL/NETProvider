@@ -462,8 +462,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
 				}
 
-				DemandPermission();
-
 				try
 				{
 					OnStateChange(_state, ConnectionState.Connecting);
@@ -583,12 +581,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 
 		#region Private Methods
-
-		internal void DemandPermission()
-		{
-			FirebirdClientPermission permission = new FirebirdClientPermission(_connectionString);
-			permission.Demand();
-		}
 
 		private void CheckClosed()
 		{

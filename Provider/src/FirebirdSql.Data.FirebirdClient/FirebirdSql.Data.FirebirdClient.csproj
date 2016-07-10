@@ -250,8 +250,6 @@
     <Compile Include="FirebirdClient\FbParameter.cs" />
     <Compile Include="FirebirdClient\FbParameterCollection.cs" />
     <Compile Include="FirebirdClient\FbServerType.cs" />
-    <Compile Include="FirebirdClient\FirebirdClientPermission.cs" />
-    <Compile Include="FirebirdClient\FirebirdClientPermissionAtrribute.cs" />
     <Compile Include="FirebirdClient\FbRemoteEvent.cs" />
     <Compile Include="FirebirdClient\FbRemoteEventEventArgs.cs" />
     <Compile Include="FirebirdClient\FbRowUpdatedEventArgs.cs" />
