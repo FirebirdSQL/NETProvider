@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		public static bool IsInMigrations()
 		{
 			var stackTrace = new StackTrace(false);
-			return stackTrace.GetFrames().Any(f => f.GetMethod().ReflectedType.Namespace.Equals("System.Data.Entity.Migrations", StringComparison.Ordinal));
+			return stackTrace.GetFrames().Any(f => f.GetMethod().ReflectedType?.Namespace.Equals("System.Data.Entity.Migrations", StringComparison.Ordinal) ?? false);
 		}
 
 		public void BeganTransaction(DbConnection connection, BeginTransactionInterceptionContext interceptionContext)
