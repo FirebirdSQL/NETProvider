@@ -32,9 +32,9 @@ namespace FirebirdSql.Data.Common
 		{
 			ArrayList info = new ArrayList();
 
-			int pos     = 0;
-			int length  = 0;
-			int type    = 0;
+			int pos = 0;
+			int length = 0;
+			int type = 0;
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Common
 						 * - 1 byte containing the number 1
 						 * - 1 byte containing the version number
 						 */
-						info.Add(String.Format(CultureInfo.CurrentCulture, "{0}.{1}", buffer[pos], buffer[pos + 1]));
+						info.Add(string.Format(CultureInfo.CurrentCulture, "{0}.{1}", buffer[pos], buffer[pos + 1]));
 						break;
 
 					case IscCodes.isc_info_db_id:
@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Common
 						 * - 1 byte containing the implementation number
 						 * - 1 byte containing a class number, either 1 or 12
 						 */
-						info.Add(String.Format(CultureInfo.CurrentCulture, "{0}.{1}.{2}", buffer[pos], buffer[pos + 1], buffer[pos + 2]));
+						info.Add(string.Format(CultureInfo.CurrentCulture, "{0}.{1}.{2}", buffer[pos], buffer[pos + 1], buffer[pos + 2]));
 						break;
 
 					case IscCodes.isc_info_no_reserve:
@@ -128,11 +128,18 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.isc_info_isc_version:
 					case IscCodes.isc_info_firebird_version:
 						/* Version identification string of the database implementation:
-						 * - 1 byte containing the number 1
-						 * - 1 byte specifying the length, n, of the following string
-						 * - n bytes containing the version identification string
+						 * - 1 byte containing the number number of message
+						 * - 1 byte specifying the length, of the following string
+						 * - n bytes containing the string
 						 */
-						info.Add(Encoding.Default.GetString(buffer, pos + 2, buffer[pos + 1]));
+						var messagePosition = pos;
+						var count = buffer[messagePosition];
+						for (int i = 0; i < count; i++)
+						{
+							var messageLength = buffer[messagePosition + 1];
+							info.Add(Encoding.Default.GetString(buffer, messagePosition + 2, messageLength));
+							messagePosition += 1 + messageLength;
+						}
 						break;
 
 					//

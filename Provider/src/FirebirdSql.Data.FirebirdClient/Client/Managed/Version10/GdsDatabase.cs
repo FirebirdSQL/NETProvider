@@ -605,13 +605,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual string GetServerVersion()
 		{
-			byte[] items = new byte[]
+			var items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
-
-			return GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256)[0].ToString();
+			var info = GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256);
+			return (string)info[info.Count - 1];
 		}
 
 		public virtual ArrayList GetDatabaseInfo(byte[] items)
@@ -621,10 +621,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
 		{
-			byte[] buffer = new byte[bufferLength];
-
+			var buffer = new byte[bufferLength];
 			DatabaseInfo(items, buffer, buffer.Length);
-
 			return IscHelper.ParseDatabaseInfo(buffer);
 		}
 
