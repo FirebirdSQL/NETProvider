@@ -182,7 +182,7 @@ namespace FirebirdSql.Data.Client.Managed
 							_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
 						}
 
-						if (_compression && (_protocolMinimunType & IscCodes.pflag_compress) == 0)
+						if (_compression && !((_protocolMinimunType & IscCodes.pflag_compress) != 0))
 						{
 							_compression = false;
 						}
