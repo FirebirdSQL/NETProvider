@@ -108,7 +108,6 @@ namespace FirebirdSql.Data.UnitTests
 			restoreSvc.Execute();
 		}
 
-		[Test]
 		[TestCase(true)]
 		[TestCase(false)]
 		public void StreamingBackupRestoreTest(bool verbose)
