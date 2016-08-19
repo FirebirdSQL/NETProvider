@@ -302,27 +302,52 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-        [Test]
-        public void UserIDCorrectlyPassedToServer()
-        {
-            using (var conn = new FbConnection(BuildConnectionString(FbServerType)))
-            {
-                conn.Open();
-                using (var command = conn.CreateCommand())
-                {
-                    command.CommandText = "select CURRENT_USER from RDB$DATABASE";
-                    var loggedUser = (string)command.ExecuteScalar();
-                    Assert.AreEqual(TestsSetup.UserID, loggedUser);
-                }
-            }
+		[Test]
+		public void UserIDCorrectlyPassedToServer()
+		{
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType)))
+			{
+				conn.Open();
+				using (var command = conn.CreateCommand())
+				{
+					command.CommandText = "select CURRENT_USER from RDB$DATABASE";
+					var loggedUser = (string)command.ExecuteScalar();
+					Assert.AreEqual(TestsSetup.UserID, loggedUser);
+				}
+			}
 
-        }
+		}
 
-        #endregion
+		[TestCase(false)]
+		[TestCase(true)]
+		public void UseCompression(bool compression)
+		{
+			if (!EnsureVersion(new Version("3.0.0.0")))
+				return;
 
-        #region Methods
+			var csb = BuildConnectionStringBuilder(FbServerType);
+			csb.Compression = compression;
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
+				TestContext.WriteLine(conn.ServerVersion);
+				const string Pattern = ":[^:]*Z[^:]*$";
+				if (compression)
+				{
+					StringAssert.IsMatch(Pattern, conn.ServerVersion);
+				}
+				else
+				{
+					StringAssert.DoesNotMatch(Pattern, conn.ServerVersion);
+				}
+			}
+		}
 
-        public FbTransaction BeginTransaction(IsolationLevel level)
+		#endregion
+
+		#region Methods
+
+		public FbTransaction BeginTransaction(IsolationLevel level)
 		{
 			switch (level)
 			{
