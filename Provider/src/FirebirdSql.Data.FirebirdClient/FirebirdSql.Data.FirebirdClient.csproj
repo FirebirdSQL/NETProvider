@@ -96,9 +96,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zlib">
-      <HintPath>..\..\..\..\..\..\..\Downloads\Ionic.Zlib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
@@ -119,6 +116,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client\Managed\Compression\CRC32.cs" />
+    <Compile Include="Client\Managed\Compression\Deflate.cs" />
+    <Compile Include="Client\Managed\Compression\GZipStream.cs" />
+    <Compile Include="Client\Managed\Compression\Inflate.cs" />
+    <Compile Include="Client\Managed\Compression\InfTree.cs" />
+    <Compile Include="Client\Managed\Compression\Tree.cs" />
+    <Compile Include="Client\Managed\Compression\Zlib.cs" />
+    <Compile Include="Client\Managed\Compression\ZlibBaseStream.cs" />
+    <Compile Include="Client\Managed\Compression\ZlibCodec.cs" />
+    <Compile Include="Client\Managed\Compression\ZlibConstants.cs" />
+    <Compile Include="Client\Managed\Compression\ZlibStream.cs" />
     <Compile Include="Client\Managed\ProtocolsSupported.cs" />
     <Compile Include="Client\Managed\Version11\AuthResponse.cs" />
     <Compile Include="Client\Managed\Version11\SSPIHelper.cs" />
@@ -351,6 +359,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Entity\ProviderManifest.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
