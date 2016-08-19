@@ -94,7 +94,7 @@ namespace FirebirdSql.Data.Services
 
 		public static Version ParseServerVersion(string version)
 		{
-			var m = Regex.Match(version, @"\w{2}-\w(\d+\.\d+\.\d+\.\d+) .*");
+			var m = Regex.Match(version, @"\w{2}-\w(\d+\.\d+\.\d+\.\d+)");
 			if (!m.Success)
 				return null;
 			return new Version(m.Groups[1].Value);
