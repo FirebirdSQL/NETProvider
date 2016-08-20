@@ -324,6 +324,8 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			if (!EnsureVersion(new Version("3.0.0.0")))
 				return;
+			if (!EnsureServerType(FbServerType.Default))
+				return;
 
 			var csb = BuildConnectionStringBuilder(FbServerType);
 			csb.Compression = compression;

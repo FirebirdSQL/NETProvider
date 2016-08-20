@@ -256,8 +256,15 @@ end";
 		{
 			if (GetServerVersion() >= version)
 				return true;
-
 			Assert.Inconclusive("Not supported on this version.");
+			return false;
+		}
+
+		protected bool EnsureServerType(FbServerType type)
+		{
+			if (FbServerType == type)
+				return true;
+			Assert.Inconclusive("Not supported on this server type.");
 			return false;
 		}
 
