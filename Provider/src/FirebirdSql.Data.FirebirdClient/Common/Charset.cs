@@ -159,12 +159,14 @@ namespace FirebirdSql.Data.Common
 		private string _name;
 		private string _systemName;
 		private Encoding _encoding;
+        private bool _isNone;
+        private bool _isOctets;
 
-		#endregion
+        #endregion
 
-		#region Properties
+        #region Properties
 
-		public int Identifier
+        public int Identifier
 		{
 			get { return _id; }
 		}
@@ -181,12 +183,12 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsOctetsCharset
 		{
-			get { return (_id == GetCharset(Octets).Identifier); }
+			get { return _isOctets; }
 		}
 
 		public bool IsNoneCharset
 		{
-			get { return (_id == GetCharset(None).Identifier); }
+			get { return _isNone; }
 		}
 
 		#endregion
@@ -199,13 +201,17 @@ namespace FirebirdSql.Data.Common
 			_name = name;
 			_bytesPerCharacter = bytesPerCharacter;
 			_systemName = systemName;
-			switch (_systemName)
+            _isNone = false;
+            _isOctets = false;
+            switch (_systemName)
 			{
 				case None:
 					_encoding = Encoding.Default;
-					break;
+                    _isNone = true;
+                    break;
 				case Octets:
 					_encoding = new BinaryEncoding();
+                    _isOctets = true;
 					break;
 				default:
 					_encoding = Encoding.GetEncoding(_systemName);
