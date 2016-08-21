@@ -40,9 +40,8 @@ namespace FirebirdSql.Data.UnitTests
 		#region Constructors
 
 		public FbCommandBuilderTests(FbServerType serverType)
-			: base(serverType, false)
-		{
-		}
+			: base(serverType)
+		{ }
 
 		#endregion
 
@@ -52,7 +51,7 @@ namespace FirebirdSql.Data.UnitTests
 		public override void SetUp()
 		{
 			base.SetUp();
-			_adapter = new FbDataAdapter(new FbCommand("select *	from TEST where	VARCHAR_FIELD =	?", Connection));
+			_adapter = new FbDataAdapter(new FbCommand("select * from TEST where	VARCHAR_FIELD =	?", Connection));
 		}
 
 		[TearDown]

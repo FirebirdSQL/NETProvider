@@ -15,7 +15,7 @@ namespace FirebirdSql.Data.UnitTests
 		private bool _shouldTearDown;
 
 		public FbBooleanSupportTests(FbServerType serverType)
-			: base(serverType, false)
+			: base(serverType)
 		{
 			_shouldTearDown = false;
 		}

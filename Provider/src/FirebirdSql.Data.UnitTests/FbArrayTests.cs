@@ -32,9 +32,8 @@ namespace FirebirdSql.Data.UnitTests
 		#region Constructors
 
 		public FbArrayTests(FbServerType serverType)
-			: base(serverType, true)
-		{
-		}
+			: base(serverType)
+		{ }
 
 		#endregion
 
@@ -43,6 +42,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void IntegerArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	iarray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -90,6 +91,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ShortArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	sarray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -137,6 +140,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BigIntArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	larray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -184,6 +189,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void FloatArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	farray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -231,6 +238,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DoubleArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	barray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -278,6 +287,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NumericArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	narray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -325,6 +336,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DateArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	darray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -372,6 +385,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void TimeArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	tarray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -419,6 +434,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void TimeStampArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	tsarray_field FROM TEST	WHERE int_field	= " + id_value.ToString();
@@ -466,6 +483,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void CharArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	carray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -513,6 +532,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void VarCharArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 
 			string selectText = "SELECT	varray_field FROM TEST WHERE int_field = " + id_value.ToString();
@@ -568,7 +589,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = 100;
 			new_values[1] = 200;
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -589,7 +610,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = 500;
 			new_values[1] = 600;
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -612,7 +633,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[2] = 1100;
 			new_values[3] = 1200;
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -633,7 +654,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = 1300.10F;
 			new_values[1] = 1400.20F;
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -654,7 +675,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = 1700.10;
 			new_values[1] = 1800.20;
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -675,7 +696,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = 2100.10M;
 			new_values[1] = 2200.20M;
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -696,7 +717,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = DateTime.Now.AddDays(100);
 			new_values[1] = DateTime.Now.AddDays(200);
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -717,7 +738,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = new TimeSpan(11, 13, 14);
 			new_values[1] = new TimeSpan(12, 15, 16);
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -738,7 +759,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = DateTime.Now.AddSeconds(100);
 			new_values[1] = DateTime.Now.AddSeconds(200);
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -759,7 +780,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = "abc";
 			new_values[1] = "abcdef";
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -780,7 +801,7 @@ namespace FirebirdSql.Data.UnitTests
 			new_values[0] = "abc";
 			new_values[1] = "abcdef";
 
-			FbCommand update = new FbCommand(updateText, Connection, Transaction);
+			FbCommand update = new FbCommand(updateText, Connection);
 
 			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
 
@@ -793,6 +814,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BigArrayTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 			int elements = short.MaxValue;
 
@@ -846,6 +869,8 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void PartialUpdatesTest()
 		{
+			Transaction = Connection.BeginTransaction();
+
 			int id_value = GetId();
 			int elements = 16384;
 

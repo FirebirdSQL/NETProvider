@@ -39,9 +39,8 @@ namespace FirebirdSql.Data.UnitTests
 		#region Constructors
 
 		public TrackerIssuesTests(FbServerType serverType)
-			: base(serverType, false)
-		{
-		}
+			: base(serverType)
+		{ }
 
 		#endregion
 

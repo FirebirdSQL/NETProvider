@@ -25,9 +25,6 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	/// <summary>
-	/// All the test in this TestFixture are using implicit transaction support.
-	/// </summary>
 	[FbServerTypeTestFixture(FbServerType.Default)]
 	[FbServerTypeTestFixture(FbServerType.Embedded)]
 	public class TransactionScopeTests : TestsBase
@@ -36,8 +33,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		public TransactionScopeTests(FbServerType serverType)
 			: base(serverType)
-		{
-		}
+		{ }
 
 		#endregion
 

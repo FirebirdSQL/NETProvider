@@ -27,9 +27,6 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	/// <summary>
-	/// All the test in this TestFixture are using implicit transaction support.
-	/// </summary>
 	[FbServerTypeTestFixture(FbServerType.Default)]
 	[FbServerTypeTestFixture(FbServerType.Embedded)]
 	public class GuidTests : TestsBase
@@ -37,9 +34,8 @@ namespace FirebirdSql.Data.UnitTests
 		#region Constructors
 
 		public GuidTests(FbServerType serverType)
-			: base(serverType, false)
-		{
-		}
+			: base(serverType)
+		{ }
 
 		#endregion
 
@@ -75,7 +71,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			// Insert the Guid
 			var id = GetId();
-            FbCommand insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection);
+			FbCommand insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection);
 			insert.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
 			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = DBNull.Value;
 			insert.ExecuteNonQuery();

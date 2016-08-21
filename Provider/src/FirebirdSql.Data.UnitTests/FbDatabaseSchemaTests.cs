@@ -34,9 +34,8 @@ namespace FirebirdSql.Data.UnitTests
 		#region Constructors
 
 		public FbDatabaseSchemaTests(FbServerType serverType)
-			: base(serverType, false)
-		{
-		}
+			: base(serverType)
+		{ }
 
 		#endregion
 

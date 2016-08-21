@@ -41,7 +41,6 @@ namespace FirebirdSql.Data.UnitTests
 
 		private FbConnection _connection;
 		private FbTransaction _transaction;
-		private bool _withTransaction;
 		private FbServerType _fbServerType;
 
 		#endregion
@@ -69,14 +68,8 @@ namespace FirebirdSql.Data.UnitTests
 		#region	Constructors
 
 		public TestsBase(FbServerType serverType)
-			: this(serverType, false)
-		{
-		}
-
-		public TestsBase(FbServerType serverType, bool withTransaction)
 		{
 			_fbServerType = serverType;
-			_withTransaction = withTransaction;
 		}
 
 		#endregion
@@ -92,38 +85,13 @@ namespace FirebirdSql.Data.UnitTests
 			InsertTestData(cs);
 			_connection = new FbConnection(cs);
 			_connection.Open();
-			if (_withTransaction)
-			{
-				_transaction = _connection.BeginTransaction();
-			}
 		}
 
 		[TearDown]
 		public virtual void TearDown()
 		{
 			string cs = BuildConnectionString(_fbServerType);
-			if (_withTransaction)
-			{
-				try
-				{
-					if (!_transaction.IsCompleted)
-					{
-						_transaction.Commit();
-					}
-				}
-				catch
-				{ }
-				try
-				{
-					_transaction.Dispose();
-				}
-				catch
-				{ }
-			}
-			if (_connection != null)
-			{
-				_connection.Dispose();
-			}
+			_connection?.Dispose();
 			DeleteAllData(cs);
 			FbConnection.ClearAllPools();
 		}
@@ -233,7 +201,6 @@ end";
 		public static string BuildServicesConnectionString(FbServerType serverType, bool includeDatabase)
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
-
 			cs.UserID = TestsSetup.UserID;
 			cs.Password = TestsSetup.Password;
 			cs.DataSource = TestsSetup.DataSource;
@@ -248,7 +215,6 @@ end";
 		public static FbConnectionStringBuilder BuildConnectionStringBuilder(FbServerType serverType)
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
-
 			cs.UserID = TestsSetup.UserID;
 			cs.Password = TestsSetup.Password;
 			cs.DataSource = TestsSetup.DataSource;
