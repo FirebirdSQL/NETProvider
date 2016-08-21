@@ -99,29 +99,30 @@ namespace FirebirdSql.Data.Common
 
 		public byte[] Read()
 		{
-			MemoryStream ms = new MemoryStream();
-
-			try
+			using (MemoryStream ms = new MemoryStream())
 			{
-				Open();
-
-				while (!EOF)
+				try
 				{
-					byte[] segment = GetSegment();
-					ms.Write(segment, 0, segment.Length);
+					Open();
+
+					while (!EOF)
+					{
+						byte[] segment = GetSegment();
+						ms.Write(segment, 0, segment.Length);
+					}
+
+					Close();
+				}
+				catch
+				{
+					// Cancel the blob and rethrow the exception
+					Cancel();
+
+					throw;
 				}
 
-				Close();
+				return ms.ToArray();
 			}
-			catch
-			{
-				// Cancel the blob and rethrow the exception
-				Cancel();
-
-				throw;
-			}
-
-			return ms.ToArray();
 		}
 
 		public void Write(string data)
