@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					_database.XdrStream.Write(IscCodes.op_get_segment);
 					_database.XdrStream.Write(_blobHandle);
 					_database.XdrStream.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
-					_database.XdrStream.Write(0); // Data	segment
+					_database.XdrStream.Write(0); // Data segment
 					_database.XdrStream.Flush();
 
 					GenericResponse response = _database.ReadGenericResponse();
