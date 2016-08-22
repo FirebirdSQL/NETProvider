@@ -184,12 +184,18 @@ namespace FirebirdSql.Data.Client.Managed
 			return _innerStream.Seek(offset, loc);
 		}
 
+		public override int ReadByte()
+		{
+			CheckDisposed();
+			EnsureReadable();
+
+			return (_decompressStream ?? _innerStream).ReadByte();
+		}
+
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			CheckDisposed();
-
-			if (!CanRead)
-				throw new InvalidOperationException("Read operations are not allowed by this stream");
+			EnsureReadable();
 
 			return (_decompressStream ?? _innerStream).Read(buffer, offset, count);
 		}
@@ -197,6 +203,7 @@ namespace FirebirdSql.Data.Client.Managed
 		public override void WriteByte(byte value)
 		{
 			CheckDisposed();
+			EnsureWritable();
 
 			(_compressStream ?? _innerStream).WriteByte(value);
 		}
@@ -204,9 +211,7 @@ namespace FirebirdSql.Data.Client.Managed
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			CheckDisposed();
-
-			if (!CanWrite)
-				throw new InvalidOperationException("Write operations are not allowed by this stream");
+			EnsureWritable();
 
 			(_compressStream ?? _innerStream).Write(buffer, offset, count);
 		}
@@ -596,6 +601,18 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			if (_innerStream == null)
 				throw new ObjectDisposedException($"The {nameof(XdrStream)} is closed.");
+		}
+
+		private void EnsureWritable()
+		{
+			if (!CanWrite)
+				throw new InvalidOperationException("Write operations are not allowed by this stream.");
+		}
+
+		private void EnsureReadable()
+		{
+			if (!CanRead)
+				throw new InvalidOperationException("Read operations are not allowed by this stream.");
 		}
 
 		#endregion
