@@ -311,6 +311,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private XdrStream CreateXdrStream(bool compression)
 		{
+			return new XdrStream(_networkStream, _characterSet, compression, false);
 			return new XdrStream(new BufferedStream(_networkStream, 32 * 1024), _characterSet, compression, false);
 		}
 

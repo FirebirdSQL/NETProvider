@@ -23,8 +23,9 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Globalization;
-
+using System.Linq;
 using FirebirdSql.Data.Common;
+using System.Collections.Generic;
 
 namespace FirebirdSql.Data.Client.Managed
 {
@@ -67,11 +68,15 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private Stream _innerStream;
 		private Charset _charset;
+		private bool _compression;
 		private bool _ownsStream;
-		private int _operation;
 
-		private Stream _compressStream;
-		private Stream _decompressStream;
+		private Ionic.Zlib.ZlibCodec _deflate;
+		private Ionic.Zlib.ZlibCodec _inflate;
+		private List<byte> _outputBuffer;
+		private List<byte> _inputBuffer;
+
+		private int _operation;
 
 		#endregion
 
@@ -124,18 +129,15 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			_innerStream = innerStream;
 			_charset = charset;
+			_compression = compression;
 			_ownsStream = ownsStream;
+
+			_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
+			_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
+			_outputBuffer = new List<byte>(32 * 1024);
+			_inputBuffer = new List<byte>(32 * 1024);
+
 			ResetOperation();
-
-			if (compression)
-			{
-				_compressStream = new Ionic.Zlib.ZlibStream(_innerStream, Ionic.Zlib.CompressionMode.Compress, true)
-				{
-					FlushMode = Ionic.Zlib.FlushType.Sync,
-				};
-				_decompressStream = new Ionic.Zlib.ZlibStream(_innerStream, Ionic.Zlib.CompressionMode.Decompress, true);
-			}
-
 		}
 		#endregion
 
@@ -145,8 +147,6 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			try
 			{
-				_compressStream?.Dispose();
-				_decompressStream?.Dispose();
 				if (_ownsStream)
 				{
 					_innerStream?.Close();
@@ -156,8 +156,6 @@ namespace FirebirdSql.Data.Client.Managed
 			{ }
 			finally
 			{
-				_compressStream = null;
-				_decompressStream = null;
 				_innerStream = null;
 				_charset = null;
 			}
@@ -167,7 +165,25 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			CheckDisposed();
 
-			(_compressStream ?? _innerStream).Flush();
+			var buffer = _outputBuffer.ToArray();
+			_outputBuffer.Clear();
+			var count = buffer.Length;
+			if (_compression)
+			{
+				var tmp = new byte[_outputBuffer.Capacity];
+				_deflate.OutputBuffer = tmp;
+				_deflate.AvailableBytesOut = tmp.Length;
+				_deflate.NextOut = 0;
+				_deflate.InputBuffer = buffer;
+				_deflate.AvailableBytesIn = buffer.Length;
+				_deflate.NextIn = 0;
+				if (_deflate.Deflate(Ionic.Zlib.FlushType.Sync) != Ionic.Zlib.ZlibConstants.Z_OK)
+					throw new IOException("Error while compressing the data.");
+				buffer = tmp;
+				count = _deflate.NextOut;
+			}
+			_innerStream.Write(buffer, 0, count);
+			_innerStream.Flush();
 		}
 
 		public override void SetLength(long length)
@@ -189,7 +205,36 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureReadable();
 
-			return (_decompressStream ?? _innerStream).ReadByte();
+			var buffer = new byte[1];
+			if (Read(buffer, 0, 1) == 1)
+				return buffer[0];
+			return -1;
+		}
+
+		void ReadFill()
+		{
+			var buffer = new byte[32 * 1024];
+			var read = 0;
+			do
+			{
+				read = _innerStream.Read(buffer, read, buffer.Length - read);
+			} while ((_innerStream as System.Net.Sockets.NetworkStream)?.DataAvailable ?? false);
+			if (_compression)
+			{
+				var tmp = new byte[1024 * 1024];
+				_inflate.OutputBuffer = tmp;
+				_inflate.AvailableBytesOut = tmp.Length;
+				_inflate.NextOut = 0;
+				_inflate.InputBuffer = buffer;
+				_inflate.AvailableBytesIn = read;
+				_inflate.NextIn = 0;
+				if (_inflate.Inflate(Ionic.Zlib.FlushType.None) != Ionic.Zlib.ZlibConstants.Z_OK)
+					throw new IOException("Error while decompressing the data.");
+				buffer = tmp;
+				read = _inflate.NextOut;
+				System.Diagnostics.Debug.Assert(_inflate.AvailableBytesIn == 0);
+			}
+			_inputBuffer.AddRange(buffer.Take(read));
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
@@ -197,7 +242,14 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureReadable();
 
-			return (_decompressStream ?? _innerStream).Read(buffer, offset, count);
+			if (_inputBuffer.Count < count)
+			{
+				ReadFill();
+			}
+			var data = _inputBuffer.Take(count).ToArray();
+			_inputBuffer.RemoveRange(0, count);
+			Array.Copy(data, 0, buffer, offset, count);
+			return count;
 		}
 
 		public override void WriteByte(byte value)
@@ -205,7 +257,7 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureWritable();
 
-			(_compressStream ?? _innerStream).WriteByte(value);
+			_outputBuffer.Add(value);
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
@@ -213,7 +265,7 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureWritable();
 
-			(_compressStream ?? _innerStream).Write(buffer, offset, count);
+			_outputBuffer.AddRange(buffer.Skip(offset).Take(count));
 		}
 
 		public byte[] ToArray()
