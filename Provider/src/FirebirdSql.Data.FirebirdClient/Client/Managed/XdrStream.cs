@@ -211,32 +211,6 @@ namespace FirebirdSql.Data.Client.Managed
 			return -1;
 		}
 
-		void ReadFill()
-		{
-			var buffer = new byte[32 * 1024];
-			var read = 0;
-			do
-			{
-				read = _innerStream.Read(buffer, read, buffer.Length - read);
-			} while ((_innerStream as System.Net.Sockets.NetworkStream)?.DataAvailable ?? false);
-			if (_compression)
-			{
-				var tmp = new byte[1024 * 1024];
-				_inflate.OutputBuffer = tmp;
-				_inflate.AvailableBytesOut = tmp.Length;
-				_inflate.NextOut = 0;
-				_inflate.InputBuffer = buffer;
-				_inflate.AvailableBytesIn = read;
-				_inflate.NextIn = 0;
-				if (_inflate.Inflate(Ionic.Zlib.FlushType.None) != Ionic.Zlib.ZlibConstants.Z_OK)
-					throw new IOException("Error while decompressing the data.");
-				buffer = tmp;
-				read = _inflate.NextOut;
-				System.Diagnostics.Debug.Assert(_inflate.AvailableBytesIn == 0);
-			}
-			_inputBuffer.AddRange(buffer.Take(read));
-		}
-
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			CheckDisposed();
@@ -244,7 +218,30 @@ namespace FirebirdSql.Data.Client.Managed
 
 			if (_inputBuffer.Count < count)
 			{
-				ReadFill();
+				var readBuffer = new byte[32 * 1024];
+				var read = 0;
+				do
+				{
+					read = _innerStream.Read(readBuffer, read, readBuffer.Length - read);
+#warning How's the condition below align with i.e. slow connection?
+				} while ((_innerStream as System.Net.Sockets.NetworkStream)?.DataAvailable ?? false);
+				if (_compression)
+				{
+					var tmp = new byte[1024 * 1024];
+					_inflate.OutputBuffer = tmp;
+					_inflate.AvailableBytesOut = tmp.Length;
+					_inflate.NextOut = 0;
+					_inflate.InputBuffer = readBuffer;
+					_inflate.AvailableBytesIn = read;
+					_inflate.NextIn = 0;
+					if (_inflate.Inflate(Ionic.Zlib.FlushType.None) != Ionic.Zlib.ZlibConstants.Z_OK)
+						throw new IOException("Error while decompressing the data.");
+					readBuffer = tmp;
+					read = _inflate.NextOut;
+					if (_inflate.AvailableBytesIn != 0)
+						throw new IOException("Buffer for decompressing too small."); // should not happen
+				}
+				_inputBuffer.AddRange(readBuffer.Take(read));
 			}
 			var data = _inputBuffer.Take(count).ToArray();
 			_inputBuffer.RemoveRange(0, count);
