@@ -77,6 +77,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private bool _compression;
 		private bool _ownsStream;
 
+		private long _position;
 		private List<byte> _outputBuffer;
 		private List<byte> _inputBuffer;
 		private Ionic.Zlib.ZlibCodec _deflate;
@@ -106,8 +107,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public override long Position
 		{
-			get { return _innerStream.Position; }
-			set { _innerStream.Position = value; }
+			get { return _position; }
+			set { throw new NotSupportedException(); }
 		}
 
 		public override long Length
@@ -139,6 +140,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_compression = compression;
 			_ownsStream = ownsStream;
 
+			_position = 0;
 			_outputBuffer = new List<byte>(PreferredBufferSize);
 			_inputBuffer = new List<byte>(PreferredBufferSize);
 			_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
@@ -147,6 +149,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 			ResetOperation();
 		}
+
 		#endregion
 
 		#region Stream methods
@@ -199,14 +202,14 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			CheckDisposed();
 
-			_innerStream.SetLength(length);
+			throw new NotSupportedException();
 		}
 
 		public override long Seek(long offset, SeekOrigin loc)
 		{
 			CheckDisposed();
 
-			return _innerStream.Seek(offset, loc);
+			throw new NotSupportedException();
 		}
 
 		public override int ReadByte()
@@ -214,10 +217,7 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureReadable();
 
-			var buffer = new byte[1];
-			if (Read(buffer, 0, 1) == 1)
-				return buffer[0];
-			return -1;
+			throw new NotSupportedException();
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
@@ -254,6 +254,7 @@ namespace FirebirdSql.Data.Client.Managed
 			var data = _inputBuffer.Take(count).ToArray();
 			_inputBuffer.RemoveRange(0, data.Length);
 			Array.Copy(data, 0, buffer, offset, data.Length);
+			_position += data.Length;
 			return data.Length;
 		}
 
