@@ -34,9 +34,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 	{
 		#region Fields
 
-		private long			_handle;
-		private GdsDatabase		_database;
-		private GdsTransaction	_transaction;
+		private long _handle;
+		private GdsDatabase _database;
+		private GdsTransaction _transaction;
 
 		#endregion
 
@@ -159,20 +159,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected override System.Array DecodeSlice(byte[] slice)
 		{
-			DbDataType	dbType		= DbDataType.Array;
-			Array		sliceData	= null;
-			Array		tempData	= null;
-			Type		systemType	= GetSystemType();
-			int[]		lengths		= new int[Descriptor.Dimensions];
-			int[]		lowerBounds = new int[Descriptor.Dimensions];
-			int			type		= 0;
-			int			index		= 0;
+			DbDataType dbType = DbDataType.Array;
+			Array sliceData = null;
+			Array tempData = null;
+			Type systemType = GetSystemType();
+			int[] lengths = new int[Descriptor.Dimensions];
+			int[] lowerBounds = new int[Descriptor.Dimensions];
+			int type = 0;
+			int index = 0;
 
 			// Get upper and lower bounds of each dimension
 			for (int i = 0; i < Descriptor.Dimensions; i++)
 			{
-				lowerBounds[i]	= Descriptor.Bounds[i].LowerBound;
-				lengths[i]		= Descriptor.Bounds[i].UpperBound;
+				lowerBounds[i] = Descriptor.Bounds[i].LowerBound;
+				lengths[i] = Descriptor.Bounds[i].UpperBound;
 
 				if (lowerBounds[i] == 0)
 				{
@@ -185,77 +185,75 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			tempData = Array.CreateInstance(systemType, sliceData.Length);
 
 			// Infer Firebird and Db datatypes
-			type	= TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
-			dbType	= TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
+			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
+			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
 			// Decode slice	data
-			XdrStream xdr = new XdrStream(slice, _database.Charset);
-
-			while (xdr.Position < xdr.Length)
+			using (XdrStream xdr = new XdrStream(slice, _database.Charset))
 			{
-				switch (dbType)
+				while (xdr.Position < xdr.Length)
 				{
-					case DbDataType.Char:
-						tempData.SetValue(xdr.ReadString(Descriptor.Length), index);
-						break;
+					switch (dbType)
+					{
+						case DbDataType.Char:
+							tempData.SetValue(xdr.ReadString(Descriptor.Length), index);
+							break;
 
-					case DbDataType.VarChar:
-						tempData.SetValue(xdr.ReadString(), index);
-						break;
+						case DbDataType.VarChar:
+							tempData.SetValue(xdr.ReadString(), index);
+							break;
 
-					case DbDataType.SmallInt:
-						tempData.SetValue(xdr.ReadInt16(), index);
-						break;
+						case DbDataType.SmallInt:
+							tempData.SetValue(xdr.ReadInt16(), index);
+							break;
 
-					case DbDataType.Integer:
-						tempData.SetValue(xdr.ReadInt32(), index);
-						break;
+						case DbDataType.Integer:
+							tempData.SetValue(xdr.ReadInt32(), index);
+							break;
 
-					case DbDataType.BigInt:
-						tempData.SetValue(xdr.ReadInt64(), index);
-						break;
+						case DbDataType.BigInt:
+							tempData.SetValue(xdr.ReadInt64(), index);
+							break;
 
-					case DbDataType.Numeric:
-					case DbDataType.Decimal:
-						tempData.SetValue(xdr.ReadDecimal(type, Descriptor.Scale), index);
-						break;
+						case DbDataType.Numeric:
+						case DbDataType.Decimal:
+							tempData.SetValue(xdr.ReadDecimal(type, Descriptor.Scale), index);
+							break;
 
-					case DbDataType.Float:
-						tempData.SetValue(xdr.ReadSingle(), index);
-						break;
+						case DbDataType.Float:
+							tempData.SetValue(xdr.ReadSingle(), index);
+							break;
 
-					case DbDataType.Double:
-						tempData.SetValue(xdr.ReadDouble(), index);
-						break;
+						case DbDataType.Double:
+							tempData.SetValue(xdr.ReadDouble(), index);
+							break;
 
-					case DbDataType.Date:
-						tempData.SetValue(xdr.ReadDate(), index);
-						break;
+						case DbDataType.Date:
+							tempData.SetValue(xdr.ReadDate(), index);
+							break;
 
-					case DbDataType.Time:
-						tempData.SetValue(xdr.ReadTime(), index);
-						break;
+						case DbDataType.Time:
+							tempData.SetValue(xdr.ReadTime(), index);
+							break;
 
-					case DbDataType.TimeStamp:
-						tempData.SetValue(xdr.ReadDateTime(), index);
-						break;
+						case DbDataType.TimeStamp:
+							tempData.SetValue(xdr.ReadDateTime(), index);
+							break;
+					}
+
+					index++;
 				}
 
-				index++;
+				if (systemType.IsPrimitive)
+				{
+					// For primitive types we can use System.Buffer	to copy	generated data to destination array
+					Buffer.BlockCopy(tempData, 0, sliceData, 0, Buffer.ByteLength(tempData));
+				}
+				else
+				{
+					sliceData = tempData;
+				}
 			}
-
-			if (systemType.IsPrimitive)
-			{
-				// For primitive types we can use System.Buffer	to copy	generated data to destination array
-				Buffer.BlockCopy(tempData, 0, sliceData, 0, Buffer.ByteLength(tempData));
-			}
-			else
-			{
-				sliceData = tempData;
-			}
-
-			// Close XDR stream
-			xdr.Close();
 
 			return sliceData;
 		}
@@ -273,9 +271,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				if (operation == IscCodes.op_slice)
 				{
 					// Read	slice length
-					bool	isVariying = false;
-					int		elements = 0;
-					int		length = _database.XdrStream.ReadInt32();
+					bool isVariying = false;
+					int elements = 0;
+					int length = _database.XdrStream.ReadInt32();
 
 					length = _database.XdrStream.ReadInt32();
 
@@ -302,16 +300,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					if (isVariying)
 					{
-						XdrStream xdr = new XdrStream();
-
-						for (int i = 0; i < elements; i++)
+						using (XdrStream xdr = new XdrStream())
 						{
-							byte[] buffer = _database.XdrStream.ReadOpaque(_database.XdrStream.ReadInt32());
+							for (int i = 0; i < elements; i++)
+							{
+								byte[] buffer = _database.XdrStream.ReadOpaque(_database.XdrStream.ReadInt32());
 
-							xdr.WriteBuffer(buffer, buffer.Length);
+								xdr.WriteBuffer(buffer, buffer.Length);
+							}
+
+							return xdr.ToArray();
 						}
-
-						return xdr.ToArray();
 					}
 					else
 					{
@@ -334,71 +333,73 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private byte[] EncodeSliceArray(Array sourceArray)
 		{
-			DbDataType	dbType	= DbDataType.Array;
-			Charset		charset = _database.Charset;
-			XdrStream	xdr		= new XdrStream(_database.Charset);
-			int         subType = (Descriptor.Scale < 0) ? 2 : 0;
-			int			type	= 0;
+			DbDataType dbType = DbDataType.Array;
+			Charset charset = _database.Charset;
+			int subType = (Descriptor.Scale < 0) ? 2 : 0;
+			int type = 0;
 
-			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
-
-			foreach (object source in sourceArray)
+			using (XdrStream xdr = new XdrStream(_database.Charset))
 			{
-				switch (dbType)
+				type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
+				dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
+
+				foreach (object source in sourceArray)
 				{
-					case DbDataType.Char:
-						byte[] buffer = charset.GetBytes(source.ToString());
-						xdr.WriteOpaque(buffer, Descriptor.Length);
-						break;
+					switch (dbType)
+					{
+						case DbDataType.Char:
+							byte[] buffer = charset.GetBytes(source.ToString());
+							xdr.WriteOpaque(buffer, Descriptor.Length);
+							break;
 
-					case DbDataType.VarChar:
-						xdr.Write((string)source);
-						break;
+						case DbDataType.VarChar:
+							xdr.Write((string)source);
+							break;
 
-					case DbDataType.SmallInt:
-						xdr.Write((short)source);
-						break;
+						case DbDataType.SmallInt:
+							xdr.Write((short)source);
+							break;
 
-					case DbDataType.Integer:
-						xdr.Write((int)source);
-						break;
+						case DbDataType.Integer:
+							xdr.Write((int)source);
+							break;
 
-					case DbDataType.BigInt:
-						xdr.Write((long)source);
-						break;
+						case DbDataType.BigInt:
+							xdr.Write((long)source);
+							break;
 
-					case DbDataType.Decimal:
-					case DbDataType.Numeric:
-						xdr.Write((decimal)source, type, Descriptor.Scale);
-						break;
+						case DbDataType.Decimal:
+						case DbDataType.Numeric:
+							xdr.Write((decimal)source, type, Descriptor.Scale);
+							break;
 
-					case DbDataType.Float:
-						xdr.Write((float)source);
-						break;
+						case DbDataType.Float:
+							xdr.Write((float)source);
+							break;
 
-					case DbDataType.Double:
-						xdr.Write((double)source);
-						break;
+						case DbDataType.Double:
+							xdr.Write((double)source);
+							break;
 
-					case DbDataType.Date:
-						xdr.WriteDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
-						break;
+						case DbDataType.Date:
+							xdr.WriteDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
+							break;
 
-					case DbDataType.Time:
-						xdr.WriteTime((TimeSpan)source);
-						break;
+						case DbDataType.Time:
+							xdr.WriteTime((TimeSpan)source);
+							break;
 
-					case DbDataType.TimeStamp:
-						xdr.Write(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
-						break;
+						case DbDataType.TimeStamp:
+							xdr.Write(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
+							break;
 
-					default:
-						throw TypeHelper.InvalidDataType((int)dbType);
+						default:
+							throw TypeHelper.InvalidDataType((int)dbType);
+					}
 				}
-			}
 
-			return xdr.ToArray();
+				return xdr.ToArray();
+			}
 		}
 
 		private byte[] GenerateSDL(ArrayDesc desc)
