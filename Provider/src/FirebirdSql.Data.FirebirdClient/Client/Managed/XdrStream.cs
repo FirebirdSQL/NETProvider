@@ -143,9 +143,12 @@ namespace FirebirdSql.Data.Client.Managed
 			_position = 0;
 			_outputBuffer = new List<byte>(PreferredBufferSize);
 			_inputBuffer = new List<byte>(PreferredBufferSize);
-			_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
-			_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
-			_compressionBuffer = new byte[1024 * 1024];
+			if (_compression)
+			{
+				_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
+				_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
+				_compressionBuffer = new byte[1024 * 1024];
+			}
 
 			ResetOperation();
 		}
