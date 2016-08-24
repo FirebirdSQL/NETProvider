@@ -8,14 +8,15 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
-	[FbServerTypeTestFixture(FbServerType.Embedded)]
+	[FbTestFixture(FbServerType.Default, false)]
+	[FbTestFixture(FbServerType.Default, true)]
+	[FbTestFixture(FbServerType.Embedded, default(bool))]
 	public class FbBooleanSupportTests : TestsBase
 	{
 		private bool _shouldTearDown;
 
-		public FbBooleanSupportTests(FbServerType serverType)
-			: base(serverType)
+		public FbBooleanSupportTests(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{
 			_shouldTearDown = false;
 		}

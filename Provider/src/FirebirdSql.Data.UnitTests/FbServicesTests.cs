@@ -34,13 +34,14 @@ using System.Threading;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
+	[FbTestFixture(FbServerType.Default, false)]
+	[FbTestFixture(FbServerType.Default, true)]
 	public class FbServicesTests : TestsBase
 	{
 		#region Constructors
 
-		public FbServicesTests(FbServerType serverType)
-			: base(serverType)
+		public FbServicesTests(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{ }
 
 		#endregion
@@ -379,7 +380,7 @@ end";
 		}
 		void NBackupBackupRestoreTest_RestorePart()
 		{
-			FbConnection.DropDatabase(BuildConnectionString(FbServerType));
+			FbConnection.DropDatabase(BuildConnectionString(FbServerType, Compression));
 
 			var nrest = new FbNRestore();
 

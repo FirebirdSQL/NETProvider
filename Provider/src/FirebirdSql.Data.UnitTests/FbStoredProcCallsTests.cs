@@ -24,14 +24,15 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
-	[FbServerTypeTestFixture(FbServerType.Embedded)]
+	[FbTestFixture(FbServerType.Default, false)]
+	[FbTestFixture(FbServerType.Default, true)]
+	[FbTestFixture(FbServerType.Embedded, default(bool))]
 	public class FbStoredProcCallsTests : TestsBase
 	{
 		#region Constructors
 
-		public FbStoredProcCallsTests(FbServerType serverType)
-			: base(serverType)
+		public FbStoredProcCallsTests(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{ }
 
 		#endregion

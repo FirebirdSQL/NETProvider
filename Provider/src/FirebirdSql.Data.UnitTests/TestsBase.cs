@@ -41,20 +41,17 @@ namespace FirebirdSql.Data.UnitTests
 
 		private FbConnection _connection;
 		private FbTransaction _transaction;
-		private FbServerType _fbServerType;
 
 		#endregion
 
 		#region	Properties
 
+		public FbServerType FbServerType { get; }
+		public bool Compression { get; }
+
 		public FbConnection Connection
 		{
 			get { return _connection; }
-		}
-
-		public FbServerType FbServerType
-		{
-			get { return _fbServerType; }
 		}
 
 		public FbTransaction Transaction
@@ -67,9 +64,10 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region	Constructors
 
-		public TestsBase(FbServerType serverType)
+		public TestsBase(FbServerType serverType, bool compression)
 		{
-			_fbServerType = serverType;
+			FbServerType = serverType;
+			Compression = compression;
 		}
 
 		#endregion
@@ -79,9 +77,9 @@ namespace FirebirdSql.Data.UnitTests
 		[SetUp]
 		public virtual void SetUp()
 		{
-			TestsSetup.SetUp(_fbServerType);
+			TestsSetup.SetUp(FbServerType, Compression);
 
-			string cs = BuildConnectionString(_fbServerType);
+			string cs = BuildConnectionString(FbServerType, Compression);
 			InsertTestData(cs);
 			_connection = new FbConnection(cs);
 			_connection.Open();
@@ -90,7 +88,7 @@ namespace FirebirdSql.Data.UnitTests
 		[TearDown]
 		public virtual void TearDown()
 		{
-			string cs = BuildConnectionString(_fbServerType);
+			string cs = BuildConnectionString(FbServerType, Compression);
 			_connection.Dispose();
 			DeleteAllData(cs);
 			FbConnection.ClearAllPools();
@@ -188,9 +186,9 @@ end";
 
 		#region	ConnectionString Building methods
 
-		public static string BuildConnectionString(FbServerType serverType)
+		public static string BuildConnectionString(FbServerType serverType, bool compression)
 		{
-			return BuildConnectionStringBuilder(serverType).ToString();
+			return BuildConnectionStringBuilder(serverType, compression).ToString();
 		}
 
 		public static string BuildServicesConnectionString(FbServerType serverType)
@@ -212,7 +210,7 @@ end";
 			return cs.ToString();
 		}
 
-		public static FbConnectionStringBuilder BuildConnectionStringBuilder(FbServerType serverType)
+		public static FbConnectionStringBuilder BuildConnectionStringBuilder(FbServerType serverType, bool compression)
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 			cs.UserID = TestsSetup.UserID;
@@ -222,6 +220,7 @@ end";
 			cs.Port = TestsSetup.Port;
 			cs.Charset = TestsSetup.Charset;
 			cs.Pooling = TestsSetup.Pooling;
+			cs.Compression = compression;
 			cs.ServerType = serverType;
 			return cs;
 		}
@@ -232,7 +231,7 @@ end";
 
 		protected int GetActiveConnections()
 		{
-			var csb = BuildConnectionStringBuilder(_fbServerType);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = false;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
@@ -248,7 +247,7 @@ end";
 		protected Version GetServerVersion()
 		{
 			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(_fbServerType);
+			server.ConnectionString = BuildServicesConnectionString(FbServerType);
 			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
 		}
 

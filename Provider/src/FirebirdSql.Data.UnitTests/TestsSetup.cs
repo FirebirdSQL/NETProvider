@@ -41,14 +41,15 @@ namespace FirebirdSql.Data.UnitTests
 		internal const bool ForcedWrite = false;
 		internal const string BackupRestoreFile = "netprovider_tests.fbk";
 
-		private static HashSet<FbServerType> _initalized = new HashSet<FbServerType>();
+		private static HashSet<Tuple<FbServerType, bool>> _initalized = new HashSet<Tuple<FbServerType, bool>>();
 
-		public static void SetUp(FbServerType serverType)
+		public static void SetUp(FbServerType serverType, bool compression)
 		{
-			if (!_initalized.Contains(serverType))
+			var item = Tuple.Create(serverType, compression);
+			if (!_initalized.Contains(item))
 			{
-				Prepare(serverType);
-				_initalized.Add(serverType);
+				Prepare(serverType, compression);
+				_initalized.Add(item);
 			}
 		}
 
@@ -58,20 +59,20 @@ namespace FirebirdSql.Data.UnitTests
 			FbConnection.ClearAllPools();
 			foreach (var item in _initalized)
 			{
-				Drop(item);
+				Drop(item.Item1, item.Item2);
 			}
 			_initalized.Clear();
 		}
 
-		private static void Drop(FbServerType serverType)
+		private static void Drop(FbServerType serverType, bool compression)
 		{
-			string cs = TestsBase.BuildConnectionString(serverType);
+			string cs = TestsBase.BuildConnectionString(serverType, compression);
 			DropDatabase(cs);
 		}
 
-		private static void Prepare(FbServerType serverType)
+		private static void Prepare(FbServerType serverType, bool compression)
 		{
-			string cs = TestsBase.BuildConnectionString(serverType);
+			string cs = TestsBase.BuildConnectionString(serverType, compression);
 			CreateDatabase(cs);
 			CreateTables(cs);
 			CreateProcedures(cs);

@@ -27,8 +27,9 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
-	[FbServerTypeTestFixture(FbServerType.Embedded)]
+	[FbTestFixture(FbServerType.Default, false)]
+	[FbTestFixture(FbServerType.Default, true)]
+	[FbTestFixture(FbServerType.Embedded, default(bool))]
 	public class FbCommandBuilderTests : TestsBase
 	{
 		#region Fields
@@ -39,8 +40,8 @@ namespace FirebirdSql.Data.UnitTests
 
 		#region Constructors
 
-		public FbCommandBuilderTests(FbServerType serverType)
-			: base(serverType)
+		public FbCommandBuilderTests(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{ }
 
 		#endregion
