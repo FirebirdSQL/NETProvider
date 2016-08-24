@@ -31,6 +31,12 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal class XdrStream : Stream
 	{
+		#region Constants
+
+		private const int PreferredBufferSize = 32 * 1024;
+
+		#endregion
+
 		#region Static Fields
 
 		private static byte[] fill;
@@ -133,8 +139,8 @@ namespace FirebirdSql.Data.Client.Managed
 			_compression = compression;
 			_ownsStream = ownsStream;
 
-			_outputBuffer = new List<byte>(32 * 1024);
-			_inputBuffer = new List<byte>(32 * 1024);
+			_outputBuffer = new List<byte>(PreferredBufferSize);
+			_inputBuffer = new List<byte>(PreferredBufferSize);
 			_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
 			_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
 			_compressionBuffer = new byte[1024 * 1024];
