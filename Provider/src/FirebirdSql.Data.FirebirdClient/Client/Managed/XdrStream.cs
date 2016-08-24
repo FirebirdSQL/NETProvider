@@ -71,10 +71,11 @@ namespace FirebirdSql.Data.Client.Managed
 		private bool _compression;
 		private bool _ownsStream;
 
-		private Ionic.Zlib.ZlibCodec _deflate;
-		private Ionic.Zlib.ZlibCodec _inflate;
 		private List<byte> _outputBuffer;
 		private List<byte> _inputBuffer;
+		private Ionic.Zlib.ZlibCodec _deflate;
+		private Ionic.Zlib.ZlibCodec _inflate;
+		private byte[] _compressionBuffer;
 
 		private int _operation;
 
@@ -132,10 +133,11 @@ namespace FirebirdSql.Data.Client.Managed
 			_compression = compression;
 			_ownsStream = ownsStream;
 
-			_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
-			_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
 			_outputBuffer = new List<byte>(32 * 1024);
 			_inputBuffer = new List<byte>(32 * 1024);
+			_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
+			_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
+			_compressionBuffer = new byte[1024 * 1024];
 
 			ResetOperation();
 		}
@@ -170,17 +172,15 @@ namespace FirebirdSql.Data.Client.Managed
 			var count = buffer.Length;
 			if (_compression)
 			{
-#warning Will it fit?
-				var tmp = new byte[1024 * 1024];
-				_deflate.OutputBuffer = tmp;
-				_deflate.AvailableBytesOut = tmp.Length;
+				_deflate.OutputBuffer = _compressionBuffer;
+				_deflate.AvailableBytesOut = _compressionBuffer.Length;
 				_deflate.NextOut = 0;
 				_deflate.InputBuffer = buffer;
 				_deflate.AvailableBytesIn = buffer.Length;
 				_deflate.NextIn = 0;
 				if (_deflate.Deflate(Ionic.Zlib.FlushType.Sync) != Ionic.Zlib.ZlibConstants.Z_OK)
 					throw new IOException("Error while compressing the data.");
-				buffer = tmp;
+				buffer = _compressionBuffer;
 				count = _deflate.NextOut;
 			}
 			_innerStream.Write(buffer, 0, count);
@@ -219,10 +219,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 			if (_compression)
 			{
-#warning Will it fit?
-				var tmp = new byte[1024 * 1024];
-				_inflate.OutputBuffer = tmp;
-				_inflate.AvailableBytesOut = tmp.Length;
+				_inflate.OutputBuffer = _compressionBuffer;
+				_inflate.AvailableBytesOut = _compressionBuffer.Length;
 				_inflate.NextOut = 0;
 				if (_inputBuffer.Count < count)
 				{
@@ -236,7 +234,7 @@ namespace FirebirdSql.Data.Client.Managed
 					if (_inflate.Inflate(Ionic.Zlib.FlushType.None) != Ionic.Zlib.ZlibConstants.Z_OK)
 						throw new IOException("Error while decompressing the data.");
 				}
-				_inputBuffer.AddRange(tmp.Take(_inflate.NextOut));
+				_inputBuffer.AddRange(_compressionBuffer.Take(_inflate.NextOut));
 				var data = _inputBuffer.Take(count).ToArray();
 				_inputBuffer.RemoveRange(0, data.Length);
 				Array.Copy(data, 0, buffer, offset, data.Length);
