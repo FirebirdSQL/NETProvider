@@ -170,7 +170,8 @@ namespace FirebirdSql.Data.Client.Managed
 			var count = buffer.Length;
 			if (_compression)
 			{
-				var tmp = new byte[_outputBuffer.Capacity];
+#warning Will it fit?
+				var tmp = new byte[1024 * 1024];
 				_deflate.OutputBuffer = tmp;
 				_deflate.AvailableBytesOut = tmp.Length;
 				_deflate.NextOut = 0;
@@ -216,37 +217,35 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureReadable();
 
-			if (_inputBuffer.Count < count)
+			if (_compression)
 			{
-				var readBuffer = new byte[32 * 1024];
-				var read = 0;
-				do
+#warning Will it fit?
+				var tmp = new byte[1024 * 1024];
+				_inflate.OutputBuffer = tmp;
+				_inflate.AvailableBytesOut = tmp.Length;
+				_inflate.NextOut = 0;
+				if (_inputBuffer.Count < count)
 				{
-					read = _innerStream.Read(readBuffer, read, readBuffer.Length - read);
-#warning How's the condition below align with i.e. slow connection?
-				} while ((_innerStream as System.Net.Sockets.NetworkStream)?.DataAvailable ?? false);
-				if (_compression)
-				{
-					var tmp = new byte[1024 * 1024];
-					_inflate.OutputBuffer = tmp;
-					_inflate.AvailableBytesOut = tmp.Length;
-					_inflate.NextOut = 0;
+					var readBuffer = new byte[32 * 1024];
+					var remainingBuffer = _inflate.InputBuffer?.Skip(_inflate.NextIn).Take(_inflate.AvailableBytesIn) ?? Enumerable.Empty<byte>();
+					var read = _innerStream.Read(readBuffer, 0, readBuffer.Length);
+					readBuffer = remainingBuffer.Concat(readBuffer.Take(read)).ToArray();
 					_inflate.InputBuffer = readBuffer;
-					_inflate.AvailableBytesIn = read;
+					_inflate.AvailableBytesIn = readBuffer.Length;
 					_inflate.NextIn = 0;
 					if (_inflate.Inflate(Ionic.Zlib.FlushType.None) != Ionic.Zlib.ZlibConstants.Z_OK)
 						throw new IOException("Error while decompressing the data.");
-					readBuffer = tmp;
-					read = _inflate.NextOut;
-					if (_inflate.AvailableBytesIn != 0)
-						throw new IOException("Buffer for decompressing too small."); // should not happen
 				}
-				_inputBuffer.AddRange(readBuffer.Take(read));
+				_inputBuffer.AddRange(tmp.Take(_inflate.NextOut));
+				var data = _inputBuffer.Take(count).ToArray();
+				_inputBuffer.RemoveRange(0, data.Length);
+				Array.Copy(data, 0, buffer, offset, data.Length);
+				return data.Length;
 			}
-			var data = _inputBuffer.Take(count).ToArray();
-			_inputBuffer.RemoveRange(0, count);
-			Array.Copy(data, 0, buffer, offset, count);
-			return count;
+			else
+			{
+				return _innerStream.Read(buffer, offset, count);
+			}
 		}
 
 		public override void WriteByte(byte value)
