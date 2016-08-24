@@ -281,10 +281,10 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			CheckDisposed();
 
-			Flush();
 			var memoryStream = _innerStream as MemoryStream;
 			if (memoryStream == null)
 				throw new InvalidOperationException();
+			Flush();
 			return memoryStream.ToArray();
 		}
 
