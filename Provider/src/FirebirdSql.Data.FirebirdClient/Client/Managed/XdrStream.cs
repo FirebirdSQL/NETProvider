@@ -186,6 +186,8 @@ namespace FirebirdSql.Data.Client.Managed
 				_deflate.NextIn = 0;
 				if (_deflate.Deflate(Ionic.Zlib.FlushType.Sync) != Ionic.Zlib.ZlibConstants.Z_OK)
 					throw new IOException("Error while compressing the data.");
+				if (_deflate.AvailableBytesIn != 0)
+					throw new IOException("Compression buffer too small.");
 				buffer = _compressionBuffer;
 				count = _deflate.NextOut;
 			}
@@ -223,33 +225,36 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureReadable();
 
-			if (_compression)
+			if (_inputBuffer.Count < count)
 			{
-				_inflate.OutputBuffer = _compressionBuffer;
-				_inflate.AvailableBytesOut = _compressionBuffer.Length;
-				_inflate.NextOut = 0;
-				if (_inputBuffer.Count < count)
+				var readBuffer = new byte[PreferredBufferSize];
+				var read = _innerStream.Read(readBuffer, 0, readBuffer.Length);
+				if (_compression)
 				{
-					var readBuffer = new byte[32 * 1024];
-					var remainingBuffer = _inflate.InputBuffer?.Skip(_inflate.NextIn).Take(_inflate.AvailableBytesIn) ?? Enumerable.Empty<byte>();
-					var read = _innerStream.Read(readBuffer, 0, readBuffer.Length);
-					readBuffer = remainingBuffer.Concat(readBuffer.Take(read)).ToArray();
-					_inflate.InputBuffer = readBuffer;
-					_inflate.AvailableBytesIn = readBuffer.Length;
-					_inflate.NextIn = 0;
-					if (_inflate.Inflate(Ionic.Zlib.FlushType.None) != Ionic.Zlib.ZlibConstants.Z_OK)
-						throw new IOException("Error while decompressing the data.");
+					_inflate.OutputBuffer = _compressionBuffer;
+					_inflate.AvailableBytesOut = _compressionBuffer.Length;
+					_inflate.NextOut = 0;
+					if (_inputBuffer.Count < count)
+					{
+						var remainingBuffer = _inflate.InputBuffer?.Skip(_inflate.NextIn).Take(_inflate.AvailableBytesIn) ?? Enumerable.Empty<byte>();
+						readBuffer = remainingBuffer.Concat(readBuffer.Take(read)).ToArray();
+						_inflate.InputBuffer = readBuffer;
+						_inflate.AvailableBytesIn = readBuffer.Length;
+						_inflate.NextIn = 0;
+						if (_inflate.Inflate(Ionic.Zlib.FlushType.None) != Ionic.Zlib.ZlibConstants.Z_OK)
+							throw new IOException("Error while decompressing the data.");
+						if (_inflate.AvailableBytesIn != 0)
+							throw new IOException("Decompression buffer too small.");
+					}
+					readBuffer = _compressionBuffer;
+					read = _inflate.NextOut;
 				}
-				_inputBuffer.AddRange(_compressionBuffer.Take(_inflate.NextOut));
-				var data = _inputBuffer.Take(count).ToArray();
-				_inputBuffer.RemoveRange(0, data.Length);
-				Array.Copy(data, 0, buffer, offset, data.Length);
-				return data.Length;
+				_inputBuffer.AddRange(readBuffer.Take(read));
 			}
-			else
-			{
-				return _innerStream.Read(buffer, offset, count);
-			}
+			var data = _inputBuffer.Take(count).ToArray();
+			_inputBuffer.RemoveRange(0, data.Length);
+			Array.Copy(data, 0, buffer, offset, data.Length);
+			return data.Length;
 		}
 
 		public override void WriteByte(byte value)
