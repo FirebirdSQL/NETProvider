@@ -13,10 +13,8 @@
  *	   language	governing rights and limitations under the License.
  *
  *	Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *	Copyright (c) 2015-2016 Jiri Cincura (jiri@cincura.net)
  *	All	Rights Reserved.
- *
- *  Contributors:
- *   Jiri Cincura (jiri@cincura.net)
  */
 
 using System;
@@ -104,16 +102,14 @@ namespace FirebirdSql.Data.UnitTests
 			{
 				connection.Open();
 
-				var commandText = new StringBuilder();
-
-				commandText.Append("insert into	test (int_field, char_field, varchar_field,	bigint_field, smallint_field, float_field, double_field, numeric_field,	date_field,	time_field,	timestamp_field, clob_field, blob_field)");
-				commandText.Append(" values(@int_field,	@char_field, @varchar_field, @bigint_field,	@smallint_field, @float_field, @double_field, @numeric_field, @date_field, @time_field,	@timestamp_field, @clob_field, @blob_field)");
+				var commandText = @"
+insert into test (int_field, char_field, varchar_field, bigint_field, smallint_field, float_field, double_field, numeric_field, date_field, time_field, timestamp_field, clob_field, blob_field)
+values(@int_field, @char_field, @varchar_field, @bigint_field, @smallint_field, @float_field, @double_field, @numeric_field, @date_field, @time_field, @timestamp_field, @clob_field, @blob_field)";
 
 				using (var transaction = connection.BeginTransaction())
 				{
-					using (var command = new FbCommand(commandText.ToString(), connection, transaction))
+					using (var command = new FbCommand(commandText, connection, transaction))
 					{
-						// Add command parameters
 						command.Parameters.Add("@int_field", FbDbType.Integer);
 						command.Parameters.Add("@char_field", FbDbType.Char);
 						command.Parameters.Add("@varchar_field", FbDbType.VarChar);
