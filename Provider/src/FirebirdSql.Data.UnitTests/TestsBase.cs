@@ -270,11 +270,8 @@ end";
 		protected static int GetId()
 		{
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-
 			byte[] buffer = new byte[4];
-
 			rng.GetBytes(buffer);
-
 			return BitConverter.ToInt32(buffer, 0);
 		}
 
