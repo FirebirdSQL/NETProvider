@@ -117,58 +117,50 @@ namespace FirebirdSql.Data.Common
 		{
 			LookupDesc();
 
-			StatementBase lookup = DB.CreateStatement(Transaction);
-
-			lookup.Prepare(GetArrayBounds());
-			lookup.Execute();
-
-			int i = 0;
-			_descriptor.Bounds = new ArrayBound[16];
-			DbValue[] values;
-
-			while ((values = lookup.Fetch()) != null)
+			using (StatementBase lookup = DB.CreateStatement(Transaction))
 			{
-				_descriptor.Bounds[i].LowerBound = values[0].GetInt32();
-				_descriptor.Bounds[i].UpperBound = values[1].GetInt32();
+				lookup.Prepare(GetArrayBounds());
+				lookup.Execute();
 
-				i++;
+				_descriptor.Bounds = new ArrayBound[16];
+				DbValue[] values;
+				int i = 0;
+				while ((values = lookup.Fetch()) != null)
+				{
+					_descriptor.Bounds[i].LowerBound = values[0].GetInt32();
+					_descriptor.Bounds[i].UpperBound = values[1].GetInt32();
+
+					i++;
+				}
 			}
-
-			lookup.Release();
-			lookup = null;
 		}
 
 		public void LookupDesc()
 		{
-			// Initializa array descriptor information
-			_descriptor = new ArrayDesc();
-
-			// Create statement for retrieve information
-			StatementBase lookup = DB.CreateStatement(Transaction);
-
-			lookup.Prepare(GetArrayDesc());
-			lookup.Execute();
-
-			DbValue[] values = lookup.Fetch();
-			if (values != null && values.Length > 0)
+			using (StatementBase lookup = DB.CreateStatement(Transaction))
 			{
-				_descriptor.RelationName = _tableName;
-				_descriptor.FieldName = _fieldName;
-				_descriptor.DataType = values[0].GetByte();
-				_descriptor.Scale = values[1].GetInt16();
-				_descriptor.Length = values[2].GetInt16();
-				_descriptor.Dimensions = values[3].GetInt16();
-				_descriptor.Flags = 0;
+				lookup.Prepare(GetArrayDesc());
+				lookup.Execute();
 
-				_rdbFieldName = values[4].GetString().Trim();
-			}
-			else
-			{
-				throw new InvalidOperationException();
-			}
+				_descriptor = new ArrayDesc();
+				DbValue[] values = lookup.Fetch();
+				if (values != null && values.Length > 0)
+				{
+					_descriptor.RelationName = _tableName;
+					_descriptor.FieldName = _fieldName;
+					_descriptor.DataType = values[0].GetByte();
+					_descriptor.Scale = values[1].GetInt16();
+					_descriptor.Length = values[2].GetInt16();
+					_descriptor.Dimensions = values[3].GetInt16();
+					_descriptor.Flags = 0;
 
-			lookup.Release();
-			lookup = null;
+					_rdbFieldName = values[4].GetString().Trim();
+				}
+				else
+				{
+					throw new InvalidOperationException();
+				}
+			}
 		}
 
 		#endregion
