@@ -176,24 +176,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbDataReader reader = command.ExecuteReader(CommandBehavior.SchemaOnly);
 
 			DataTable schema = reader.GetSchemaTable();
-
 			DataRow[] currRows = schema.Select(null, null, DataViewRowState.CurrentRows);
-
-			foreach (DataColumn myCol in schema.Columns)
-			{
-				TestContext.Write("{0}\t\t", myCol.ColumnName);
-			}
-
-			TestContext.WriteLine();
-
-			foreach (DataRow myRow in currRows)
-			{
-				foreach (DataColumn myCol in schema.Columns)
-				{
-					TestContext.Write("{0}\t\t", myRow[myCol]);
-				}
-				TestContext.WriteLine();
-			}
 
 			reader.Close();
 			transaction.Rollback();
@@ -209,24 +192,7 @@ namespace FirebirdSql.Data.UnitTests
 			FbDataReader reader = command.ExecuteReader(CommandBehavior.SchemaOnly);
 
 			DataTable schema = reader.GetSchemaTable();
-
 			DataRow[] currRows = schema.Select(null, null, DataViewRowState.CurrentRows);
-
-			foreach (DataColumn myCol in schema.Columns)
-			{
-				TestContext.Write("{0}\t\t", myCol.ColumnName);
-			}
-
-			TestContext.WriteLine();
-
-			foreach (DataRow myRow in currRows)
-			{
-				foreach (DataColumn myCol in schema.Columns)
-				{
-					TestContext.Write("{0}\t\t", myRow[myCol]);
-				}
-				TestContext.WriteLine();
-			}
 
 			reader.Close();
 			transaction.Rollback();
