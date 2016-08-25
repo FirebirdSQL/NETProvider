@@ -30,16 +30,16 @@ namespace FirebirdSql.Data.UnitTests
 	[SetUpFixture]
 	public class TestsSetup
 	{
+		internal const string FilenameBase = "netprovider_tests";
 		internal const string UserID = "SYSDBA";
 		internal const string Password = "masterkey";
-		internal const string Database = "netprovider_tests.fdb";
+		internal const string Database = FilenameBase + ".fdb";
 		internal const string DataSource = "localhost";
 		internal const int Port = 3050;
 		internal const string Charset = "utf8";
 		internal const bool Pooling = false;
 		internal const int PageSize = 16384;
 		internal const bool ForcedWrite = false;
-		internal const string BackupRestoreFile = "netprovider_tests.fbk";
 
 		private static HashSet<Tuple<FbServerType, bool>> _initalized = new HashSet<Tuple<FbServerType, bool>>();
 
