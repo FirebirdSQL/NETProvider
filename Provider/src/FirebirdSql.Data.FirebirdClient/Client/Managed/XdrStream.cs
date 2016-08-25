@@ -190,8 +190,9 @@ namespace FirebirdSql.Data.Client.Managed
 				_deflate.InputBuffer = buffer;
 				_deflate.AvailableBytesIn = buffer.Length;
 				_deflate.NextIn = 0;
-				if (_deflate.Deflate(Ionic.Zlib.FlushType.Sync) != Ionic.Zlib.ZlibConstants.Z_OK)
-					throw new IOException("Error while compressing the data.");
+				var rc = _deflate.Deflate(Ionic.Zlib.FlushType.Sync);
+				if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+					throw new IOException($"Error '{rc}' while compressing the data.");
 				if (_deflate.AvailableBytesIn != 0)
 					throw new IOException("Compression buffer too small.");
 				buffer = _compressionBuffer;
@@ -244,8 +245,9 @@ namespace FirebirdSql.Data.Client.Managed
 						_inflate.InputBuffer = readBuffer;
 						_inflate.AvailableBytesIn = readBuffer.Length;
 						_inflate.NextIn = 0;
-						if (_inflate.Inflate(Ionic.Zlib.FlushType.None) != Ionic.Zlib.ZlibConstants.Z_OK)
-							throw new IOException("Error while decompressing the data.");
+						var rc = _inflate.Inflate(Ionic.Zlib.FlushType.None);
+						if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+							throw new IOException($"Error '{rc}' while decompressing the data.");
 						if (_inflate.AvailableBytesIn != 0)
 							throw new IOException("Decompression buffer too small.");
 					}
