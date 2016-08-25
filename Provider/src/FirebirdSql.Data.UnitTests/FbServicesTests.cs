@@ -120,7 +120,7 @@ namespace FirebirdSql.Data.UnitTests
 as
 declare cnt int;
 begin
-	cnt = 999999;
+	cnt = 199999;
 	while (cnt > 0) do
 	begin
 		insert into dummy_data values (uuid_to_char(gen_uuid()));
