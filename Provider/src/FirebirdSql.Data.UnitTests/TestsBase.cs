@@ -91,7 +91,7 @@ namespace FirebirdSql.Data.UnitTests
 		public virtual void TearDown()
 		{
 			string cs = BuildConnectionString(_fbServerType);
-			_connection?.Dispose();
+			_connection.Dispose();
 			DeleteAllData(cs);
 			FbConnection.ClearAllPools();
 		}
