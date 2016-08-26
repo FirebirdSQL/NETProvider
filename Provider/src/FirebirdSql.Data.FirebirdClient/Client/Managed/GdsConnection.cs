@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.Client.Managed
 				_socket.SetKeepAlive(KeepAliveTime, KeepAliveInterval);
 
 				_socket.Connect(endPoint);
-				_networkStream = new NetworkStream(_socket, true);
+				_networkStream = new NetworkStream(_socket, false);
 			}
 			catch (SocketException ex)
 			{
@@ -232,9 +232,9 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public virtual void Disconnect()
 		{
-			// socket is owned by network stream, so it'll be closed automatically
 			_networkStream?.Close();
 			_networkStream = null;
+			_socket?.Close();
 			_socket = null;
 		}
 
