@@ -13,8 +13,7 @@ else {
 }
 
 7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-NET45.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb
-7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-NET40.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb
-7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-MONO_LINUX.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_Mono_w_Linux\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_Mono_w_Linux\FirebirdSql.Data.FirebirdClient.pdb 
+7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-NET40.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb 
 
 7z a -mx=9 $outDir\EntityFramework.Firebird-$Version-NET45.7z $baseDir\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release_45\EntityFramework.Firebird.pdb
 7z a -mx=9 $outDir\EntityFramework.Firebird-$Version-NET40.7z $baseDir\src\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release_40\EntityFramework.Firebird.pdb
