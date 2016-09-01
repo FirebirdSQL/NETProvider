@@ -13,7 +13,7 @@
  *	   language governing rights and limitations under the License.
  *
  *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
- *	Copyright (c) 2007 - 2012 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2007 - 2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
@@ -259,7 +259,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			using (var result = new MemoryStream())
 			{
-				if (_userID != null)
+				if (!string.IsNullOrEmpty(_userID))
 				{
 					var login = Encoding.UTF8.GetBytes(_userID);
 					result.WriteByte(IscCodes.CNCT_login);
