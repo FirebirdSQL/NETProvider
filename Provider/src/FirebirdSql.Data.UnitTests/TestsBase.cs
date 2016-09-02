@@ -261,6 +261,15 @@ end";
 			return false;
 		}
 
+		protected bool EnsureServerType(FbServerType serverType)
+		{
+			if (FbServerType == serverType)
+				return true;
+
+			Assert.Inconclusive("Not supported on this version.");
+			return false;
+		}
+
 		protected static int GetId()
 		{
 			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();

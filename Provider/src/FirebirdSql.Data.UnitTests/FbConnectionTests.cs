@@ -321,6 +321,9 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void UseTrustedAuth()
 		{
+			if (!EnsureServerType(FbServerType.Default))
+				return;
+
 			var csb = BuildConnectionStringBuilder(FbServerType);
 			csb.UserID = string.Empty;
 			csb.Password = string.Empty;
