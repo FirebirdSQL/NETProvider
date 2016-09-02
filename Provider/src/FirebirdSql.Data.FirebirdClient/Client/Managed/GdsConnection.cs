@@ -177,6 +177,28 @@ namespace FirebirdSql.Data.Client.Managed
 						{
 							_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
 						}
+
+						if (operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
+						{
+							var data = xdrStream.ReadBuffer();
+							var acceptPluginName = xdrStream.ReadString();
+							var isAuthenticated = xdrStream.ReadBoolean();
+							var keys = xdrStream.ReadString();
+							if (!isAuthenticated)
+							{
+								switch (acceptPluginName)
+								{
+									case SrpClient.PluginName:
+										_authData = Encoding.ASCII.GetBytes(_srp.ClientProof(_userID, _password, data).ToHexString());
+										break;
+									case SspiHelper.PluginName:
+										_authData = _sspi.GetClientSecurity(data);
+										break;
+									default:
+										throw new ArgumentOutOfRangeException();
+								}
+							}
+						}
 					}
 					else if (operation == IscCodes.op_response)
 					{
@@ -194,28 +216,6 @@ namespace FirebirdSql.Data.Client.Managed
 						finally
 						{
 							throw IscException.ForErrorCode(IscCodes.isc_connect_reject);
-						}
-					}
-
-					if (operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
-					{
-						var data = xdrStream.ReadBuffer();
-						var acceptPluginName = xdrStream.ReadString();
-						var isAuthenticated = xdrStream.ReadBoolean();
-						var keys = xdrStream.ReadString();
-						if (!isAuthenticated)
-						{
-							switch (acceptPluginName)
-							{
-								case SrpClient.PluginName:
-									_authData = Encoding.ASCII.GetBytes(_srp.ClientProof(_userID, _password, data).ToHexString());
-									break;
-								case SspiHelper.PluginName:
-									_authData = _sspi.GetClientSecurity(data);
-									break;
-								default:
-									throw new ArgumentOutOfRangeException();
-							}
 						}
 					}
 				}
