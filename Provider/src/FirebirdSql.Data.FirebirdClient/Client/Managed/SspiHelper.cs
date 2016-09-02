@@ -23,10 +23,12 @@ using System.Text;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Managed.Version11
+namespace FirebirdSql.Data.Client.Managed
 {
-	internal sealed class SSPIHelper : IDisposable
+	internal sealed class SspiHelper : IDisposable
 	{
+		public const string PluginName = "Win_Sspi";
+
 		private enum SecBufferType
 		{
 			SECBUFFER_VERSION = 0,
@@ -281,7 +283,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// <summary>
 		/// Creates SSPIHelper with default "NTLM" security package and no remote principal and gets client credentials
 		/// </summary>
-		public SSPIHelper()
+		public SspiHelper()
 			: this("NTLM")
 		{
 		}
@@ -290,7 +292,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// Creates SSPIHelper with given security package and no remote principal and gets client credentials
 		/// </summary>
 		/// <param name="securityPackage">Name of security package (e.g. NTLM, Kerberos, ...)</param>
-		public SSPIHelper(string securityPackage)
+		public SspiHelper(string securityPackage)
 			: this(securityPackage, null)
 		{
 		}
@@ -300,7 +302,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		/// </summary>
 		/// <param name="securityPackage">Name of security package (e.g. NTLM, Kerberos, ...)</param>
 		/// <param name="remotePrincipal">SPN of server (may be necessary for Kerberos</param>
-		public SSPIHelper(string securityPackage, string remotePrincipal)
+		public SspiHelper(string securityPackage, string remotePrincipal)
 		{
 			_securPackage = securityPackage;
 			_remotePrincipal = remotePrincipal;
@@ -405,7 +407,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		#region Finalizer
 
-		~SSPIHelper()
+		~SspiHelper()
 		{
 			Dispose(false);
 		}

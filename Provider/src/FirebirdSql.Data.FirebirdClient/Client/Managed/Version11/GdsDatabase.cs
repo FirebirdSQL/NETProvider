@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				try
 				{
-					using (SSPIHelper sspiHelper = new SSPIHelper())
+					using (SspiHelper sspiHelper = new SspiHelper())
 					{
 						byte[] authData = sspiHelper.InitializeClientSecurity();
 						SendTrustedAuthToBuffer(dpb, authData);
@@ -103,7 +103,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
 		}
 
-		protected void ProcessTrustedAuthResponse(SSPIHelper sspiHelper, ref IResponse response)
+		protected void ProcessTrustedAuthResponse(SspiHelper sspiHelper, ref IResponse response)
 		{
 			while (response is AuthResponse)
 			{
