@@ -302,27 +302,39 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
-        [Test]
-        public void UserIDCorrectlyPassedToServer()
-        {
-            using (var conn = new FbConnection(BuildConnectionString(FbServerType)))
-            {
-                conn.Open();
-                using (var command = conn.CreateCommand())
-                {
-                    command.CommandText = "select CURRENT_USER from RDB$DATABASE";
-                    var loggedUser = (string)command.ExecuteScalar();
-                    Assert.AreEqual(TestsSetup.UserID, loggedUser);
-                }
-            }
+		[Test]
+		public void UserIDCorrectlyPassedToServer()
+		{
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType)))
+			{
+				conn.Open();
+				using (var command = conn.CreateCommand())
+				{
+					command.CommandText = "select CURRENT_USER from RDB$DATABASE";
+					var loggedUser = (string)command.ExecuteScalar();
+					Assert.AreEqual(TestsSetup.UserID, loggedUser);
+				}
+			}
 
-        }
+		}
 
-        #endregion
+		[Test]
+		public void UseTrustedAuth()
+		{
+			var csb = BuildConnectionStringBuilder(FbServerType);
+			csb.UserID = string.Empty;
+			csb.Password = string.Empty;
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				Assert.DoesNotThrow(conn.Open);
+			}
+		}
 
-        #region Methods
+		#endregion
 
-        public FbTransaction BeginTransaction(IsolationLevel level)
+		#region Methods
+
+		public FbTransaction BeginTransaction(IsolationLevel level)
 		{
 			switch (level)
 			{
