@@ -45,8 +45,10 @@ namespace FirebirdSql.Data.Client.Managed
 		private int _protocolVersion;
 		private int _protocolArchitecture;
 		private int _protocolMinimunType;
-		private SrpClient _srpClient;
 		private byte[] _authData;
+
+		private SrpClient _srp;
+		private SspiHelper _sspi;
 
 		#endregion
 
@@ -106,7 +108,6 @@ namespace FirebirdSql.Data.Client.Managed
 			_portNumber = portNumber;
 			_packetSize = packetSize;
 			_characterSet = characterSet;
-			_srpClient = new SrpClient();
 		}
 
 		#endregion
@@ -200,17 +201,34 @@ namespace FirebirdSql.Data.Client.Managed
 					{
 						var data = xdrStream.ReadBuffer();
 						var acceptPluginName = xdrStream.ReadString();
-						var isAuthenticated = xdrStream.ReadInt32();
+						var isAuthenticated = xdrStream.ReadBoolean();
 						var keys = xdrStream.ReadString();
-						if (isAuthenticated == 0)
+						if (!isAuthenticated)
 						{
-							_authData = _srpClient.ClientProof(_userID, _password, data);
+							switch (acceptPluginName)
+							{
+								case SrpClient.PluginName:
+									_authData = Encoding.ASCII.GetBytes(_srp.ClientProof(_userID, _password, data).ToHexString());
+									break;
+								case SspiHelper.PluginName:
+									_authData = _sspi.GetClientSecurity(data);
+									break;
+								default:
+									throw new ArgumentOutOfRangeException();
+							}
 						}
 					}
 				}
 				catch (IOException ex)
 				{
 					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				}
+				finally
+				{
+					// UserIdentificationData might allocate these
+					_srp = null;
+					_sspi?.Dispose();
+					_sspi = null;
 				}
 			}
 		}
@@ -261,6 +279,8 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				if (!string.IsNullOrEmpty(_userID))
 				{
+					_srp = new SrpClient();
+
 					var login = Encoding.UTF8.GetBytes(_userID);
 					result.WriteByte(IscCodes.CNCT_login);
 					result.WriteByte((byte)login.Length);
@@ -274,13 +294,28 @@ namespace FirebirdSql.Data.Client.Managed
 					result.WriteByte((byte)pluginName.Length);
 					result.Write(pluginName, 0, pluginName.Length);
 
-					var specificData = Encoding.ASCII.GetBytes(_srpClient.PublicKeyHex);
+					var specificData = Encoding.ASCII.GetBytes(_srp.PublicKeyHex);
 					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
-
-					result.WriteByte(IscCodes.CNCT_client_crypt);
-					result.WriteByte(4);
-					result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 				}
+				else
+				{
+					_sspi = new SspiHelper();
+
+					var pluginName = Encoding.ASCII.GetBytes(SspiHelper.PluginName);
+					result.WriteByte(IscCodes.CNCT_plugin_name);
+					result.WriteByte((byte)pluginName.Length);
+					result.Write(pluginName, 0, pluginName.Length);
+					result.WriteByte(IscCodes.CNCT_plugin_list);
+					result.WriteByte((byte)pluginName.Length);
+					result.Write(pluginName, 0, pluginName.Length);
+
+					var specificData = _sspi.InitializeClientSecurity();
+					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
+				}
+
+				result.WriteByte(IscCodes.CNCT_client_crypt);
+				result.WriteByte(4);
+				result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 
 				var user = Encoding.UTF8.GetBytes(Environment.UserName);
 				result.WriteByte(IscCodes.CNCT_user);

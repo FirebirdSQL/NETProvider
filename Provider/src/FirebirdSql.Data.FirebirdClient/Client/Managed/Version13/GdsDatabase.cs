@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			XdrStream.Write(0);
 			if (AuthData != null)
 			{
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(AuthData.ToHexString()));
+				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
@@ -56,11 +56,16 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			XdrStream.Write(0);
 			if (AuthData != null)
 			{
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, Encoding.UTF8.GetBytes(AuthData.ToHexString()));
+				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
 			XdrStream.WriteBuffer(dpb.ToArray());
+		}
+
+		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		{
+			Attach(dpb, dataSource, port, database);
 		}
 
 		#region Override Statement Creation Methods
