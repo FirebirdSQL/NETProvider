@@ -332,7 +332,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			{
 				writer.Write("ALTER TABLE ");
 				writer.Write(Quote(CheckName(ExtractName(operation.Table))));
-				writer.Write(" DROP COLUMN ");
+				writer.Write(" DROP ");
 				writer.Write(Quote(CheckName(operation.Name)));
 				yield return Statement(writer);
 			}
