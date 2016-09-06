@@ -190,13 +190,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			for (int i = 0; i < actualCounts.Length; i++)
 			{
 				FbRemoteEventEventArgs args = new FbRemoteEventEventArgs(_revent.Events[i], actualCounts[i]);
-				if (RemoteEventCounts != null)
+				_synchronizationContext.Send(_ =>
 				{
-					_synchronizationContext.Send(_ =>
-					{
-						RemoteEventCounts(this, args);
-					}, null);
-				}
+					RemoteEventCounts?.Invoke(this, args);
+				}, null);
 
 				if (args.Cancel)
 				{
