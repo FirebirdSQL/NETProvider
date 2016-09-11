@@ -2,7 +2,7 @@ param([Parameter(Mandatory=$True)]$Version)
 
 $wix = 'I:\devel\bin\wix-binaries'
 $nuget = 'I:\devel\bin\NuGet\nuget.exe'
-$baseDir = Split-Path -Parent (Split-Path -parent $MyInvocation.MyCommand.Definition)
+$baseDir = Split-Path -Parent (Split-Path -parent $PSCommandPath)
 $outDir = "$baseDir\deploy\out"
 
 if (Test-Path $outDir) {
