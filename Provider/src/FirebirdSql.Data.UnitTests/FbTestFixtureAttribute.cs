@@ -22,10 +22,10 @@ using FirebirdSql.Data.FirebirdClient;
 namespace FirebirdSql.Data.UnitTests
 {
 	// prevents CLS warning because of `params` in `TestFixtureAttribute`
-	class FbServerTypeTestFixtureAttribute : NUnit.Framework.TestFixtureAttribute
+	class FbTestFixtureAttribute : NUnit.Framework.TestFixtureAttribute
 	{
-		public FbServerTypeTestFixtureAttribute(FbServerType serverType)
-			: base(serverType)
+		public FbTestFixtureAttribute(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{ }
 	}
 }

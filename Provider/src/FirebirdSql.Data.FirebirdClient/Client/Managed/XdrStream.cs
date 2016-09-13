@@ -23,13 +23,20 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Globalization;
-
+using System.Linq;
 using FirebirdSql.Data.Common;
+using System.Collections.Generic;
 
 namespace FirebirdSql.Data.Client.Managed
 {
 	internal class XdrStream : Stream
 	{
+		#region Constants
+
+		private const int PreferredBufferSize = 32 * 1024;
+
+		#endregion
+
 		#region Static Fields
 
 		private static byte[] fill;
@@ -67,7 +74,16 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private Stream _innerStream;
 		private Charset _charset;
+		private bool _compression;
 		private bool _ownsStream;
+
+		private long _position;
+		private List<byte> _outputBuffer;
+		private List<byte> _inputBuffer;
+		private Ionic.Zlib.ZlibCodec _deflate;
+		private Ionic.Zlib.ZlibCodec _inflate;
+		private byte[] _compressionBuffer;
+
 		private int _operation;
 
 		#endregion
@@ -91,8 +107,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public override long Position
 		{
-			get { return _innerStream.Position; }
-			set { _innerStream.Position = value; }
+			get { return _position; }
+			set { throw new NotSupportedException(); }
 		}
 
 		public override long Length
@@ -109,19 +125,31 @@ namespace FirebirdSql.Data.Client.Managed
 		{ }
 
 		public XdrStream(Charset charset)
-			: this(new MemoryStream(), charset, true)
+			: this(new MemoryStream(), charset, false, true)
 		{ }
 
 		public XdrStream(byte[] buffer, Charset charset)
-			: this(new MemoryStream(buffer), charset, true)
+			: this(new MemoryStream(buffer), charset, false, true)
 		{ }
 
-		public XdrStream(Stream innerStream, Charset charset, bool ownsStream)
+		public XdrStream(Stream innerStream, Charset charset, bool compression, bool ownsStream)
 			: base()
 		{
 			_innerStream = innerStream;
 			_charset = charset;
+			_compression = compression;
 			_ownsStream = ownsStream;
+
+			_position = 0;
+			_outputBuffer = new List<byte>(PreferredBufferSize);
+			_inputBuffer = new List<byte>(PreferredBufferSize);
+			if (_compression)
+			{
+				_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
+				_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
+				_compressionBuffer = new byte[1024 * 1024];
+			}
+
 			ResetOperation();
 		}
 
@@ -151,6 +179,26 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			CheckDisposed();
 
+			var buffer = _outputBuffer.ToArray();
+			_outputBuffer.Clear();
+			var count = buffer.Length;
+			if (_compression)
+			{
+				_deflate.OutputBuffer = _compressionBuffer;
+				_deflate.AvailableBytesOut = _compressionBuffer.Length;
+				_deflate.NextOut = 0;
+				_deflate.InputBuffer = buffer;
+				_deflate.AvailableBytesIn = buffer.Length;
+				_deflate.NextIn = 0;
+				var rc = _deflate.Deflate(Ionic.Zlib.FlushType.Sync);
+				if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+					throw new IOException($"Error '{rc}' while compressing the data.");
+				if (_deflate.AvailableBytesIn != 0)
+					throw new IOException("Compression buffer too small.");
+				buffer = _compressionBuffer;
+				count = _deflate.NextOut;
+			}
+			_innerStream.Write(buffer, 0, count);
 			_innerStream.Flush();
 		}
 
@@ -158,41 +206,75 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			CheckDisposed();
 
-			_innerStream.SetLength(length);
+			throw new NotSupportedException();
 		}
 
-		public override long Seek(long offset, System.IO.SeekOrigin loc)
+		public override long Seek(long offset, SeekOrigin loc)
 		{
 			CheckDisposed();
 
-			return _innerStream.Seek(offset, loc);
+			throw new NotSupportedException();
+		}
+
+		public override int ReadByte()
+		{
+			CheckDisposed();
+			EnsureReadable();
+
+			throw new NotSupportedException();
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			CheckDisposed();
+			EnsureReadable();
 
-			if (!CanRead)
-				throw new InvalidOperationException("Read operations are not allowed by this stream");
-
-			return _innerStream.Read(buffer, offset, count);
+			if (_inputBuffer.Count < count)
+			{
+				var readBuffer = new byte[PreferredBufferSize];
+				var read = _innerStream.Read(readBuffer, 0, readBuffer.Length);
+				if (read != 0)
+				{
+					if (_compression)
+					{
+						_inflate.OutputBuffer = _compressionBuffer;
+						_inflate.AvailableBytesOut = _compressionBuffer.Length;
+						_inflate.NextOut = 0;
+						_inflate.InputBuffer = readBuffer;
+						_inflate.AvailableBytesIn = read;
+						_inflate.NextIn = 0;
+						var rc = _inflate.Inflate(Ionic.Zlib.FlushType.None);
+						if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+							throw new IOException($"Error '{rc}' while decompressing the data.");
+						if (_inflate.AvailableBytesIn != 0)
+							throw new IOException("Decompression buffer too small.");
+						readBuffer = _compressionBuffer;
+						read = _inflate.NextOut;
+					}
+					_inputBuffer.AddRange(readBuffer.Take(read));
+				}
+			}
+			var data = _inputBuffer.Take(count).ToArray();
+			_inputBuffer.RemoveRange(0, data.Length);
+			Array.Copy(data, 0, buffer, offset, data.Length);
+			_position += data.Length;
+			return data.Length;
 		}
 
 		public override void WriteByte(byte value)
 		{
 			CheckDisposed();
+			EnsureWritable();
 
-			_innerStream.WriteByte(value);
+			_outputBuffer.Add(value);
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			CheckDisposed();
+			EnsureWritable();
 
-			if (!CanWrite)
-				throw new InvalidOperationException("Write operations are not allowed by this stream");
-
-			_innerStream.Write(buffer, offset, count);
+			_outputBuffer.AddRange(buffer.Skip(offset).Take(count));
 		}
 
 		public byte[] ToArray()
@@ -202,6 +284,7 @@ namespace FirebirdSql.Data.Client.Managed
 			var memoryStream = _innerStream as MemoryStream;
 			if (memoryStream == null)
 				throw new InvalidOperationException();
+			Flush();
 			return memoryStream.ToArray();
 		}
 
@@ -580,6 +663,18 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			if (_innerStream == null)
 				throw new ObjectDisposedException($"The {nameof(XdrStream)} is closed.");
+		}
+
+		private void EnsureWritable()
+		{
+			if (!CanWrite)
+				throw new InvalidOperationException("Write operations are not allowed by this stream.");
+		}
+
+		private void EnsureReadable()
+		{
+			if (!CanRead)
+				throw new InvalidOperationException("Read operations are not allowed by this stream.");
 		}
 
 		#endregion

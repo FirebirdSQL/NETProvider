@@ -32,14 +32,15 @@ using System.Diagnostics;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
-	[FbServerTypeTestFixture(FbServerType.Embedded)]
+	[FbTestFixture(FbServerType.Default, false)]
+	[FbTestFixture(FbServerType.Default, true)]
+	[FbTestFixture(FbServerType.Embedded, default(bool))]
 	public class TrackerIssuesTests : TestsBase
 	{
 		#region Constructors
 
-		public TrackerIssuesTests(FbServerType serverType)
-			: base(serverType)
+		public TrackerIssuesTests(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{ }
 
 		#endregion
@@ -272,7 +273,7 @@ END
 			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
 
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			csb.MinPoolSize = 0;

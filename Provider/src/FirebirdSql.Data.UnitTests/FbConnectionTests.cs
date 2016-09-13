@@ -30,14 +30,15 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
-	[FbServerTypeTestFixture(FbServerType.Embedded)]
+	[FbTestFixture(FbServerType.Default, false)]
+	[FbTestFixture(FbServerType.Default, true)]
+	[FbTestFixture(FbServerType.Embedded, default(bool))]
 	public class FbConnectionTests : TestsBase
 	{
 		#region Constructors
 
-		public FbConnectionTests(FbServerType serverType)
-			: base(serverType)
+		public FbConnectionTests(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{ }
 
 		#endregion
@@ -77,7 +78,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BeginTransactionNoWaitTimeoutTest()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
 			{
 				conn.Open();
 				FbTransaction tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = null });
@@ -89,7 +90,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutTest()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
 			{
 				conn.Open();
 				FbTransaction tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromSeconds(10) });
@@ -101,7 +102,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutInvalidValue1Test()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
 			{
 				conn.Open();
 				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromDays(9999) }));
@@ -111,7 +112,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutInvalidValue2Test()
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
 			{
 				conn.Open();
 				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromMilliseconds(1) }));
@@ -130,7 +131,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void ConnectionPoolingOnTest()
 		{
 			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
@@ -154,7 +155,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void ConnectionPoolingOffTest()
 		{
 			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = false;
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
@@ -178,7 +179,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void ConnectionPoolingLifeTimeTest()
 		{
 			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			string cs = csb.ToString();
@@ -203,7 +204,7 @@ namespace FirebirdSql.Data.UnitTests
 		public void ConnectionPoolingMaxPoolSizeTest()
 		{
 			FbConnection.ClearAllPools();
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 120;
 			csb.MaxPoolSize = 10;
@@ -235,7 +236,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ConnectionPoolingMinPoolSizeTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			csb.MinPoolSize = 3;
@@ -265,7 +266,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void NoDatabaseTriggersWrongConnectionStringTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = true;
 			csb.NoDatabaseTriggers = true;
 			Assert.Throws<ArgumentException>(() => new FbConnection(csb.ToString()));
@@ -274,7 +275,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void DatabaseTriggersTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType);
+			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = false;
 
 			int rows;
@@ -305,7 +306,7 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void UserIDCorrectlyPassedToServer()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(FbServerType)))
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
 			{
 				conn.Open();
 				using (var command = conn.CreateCommand())
@@ -324,12 +325,39 @@ namespace FirebirdSql.Data.UnitTests
 			if (!EnsureServerType(FbServerType.Default))
 				return;
 
-			var csb = BuildConnectionStringBuilder(FbServerType);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.UserID = string.Empty;
 			csb.Password = string.Empty;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
 				Assert.DoesNotThrow(conn.Open);
+			}
+		}
+
+		[TestCase(false)]
+		[TestCase(true)]
+		public void UseCompression(bool compression)
+		{
+			if (!EnsureVersion(new Version("3.0.0.0")))
+				return;
+			if (!EnsureServerType(FbServerType.Default))
+				return;
+
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			csb.Compression = compression;
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
+				TestContext.WriteLine(conn.ServerVersion);
+				const string Pattern = ":[^:]*Z[^:]*$";
+				if (compression)
+				{
+					StringAssert.IsMatch(Pattern, conn.ServerVersion);
+				}
+				else
+				{
+					StringAssert.DoesNotMatch(Pattern, conn.ServerVersion);
+				}
 			}
 		}
 
@@ -351,7 +379,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		private void BeginTransactionILTestsHelper(IsolationLevel level)
 		{
-			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType)))
+			using (FbConnection conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
 			{
 				conn.Open();
 				FbTransaction tx = conn.BeginTransaction(level);

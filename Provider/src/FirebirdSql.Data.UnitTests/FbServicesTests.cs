@@ -34,13 +34,14 @@ using System.Threading;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
+	[FbTestFixture(FbServerType.Default, false)]
+	[FbTestFixture(FbServerType.Default, true)]
 	public class FbServicesTests : TestsBase
 	{
 		#region Constructors
 
-		public FbServicesTests(FbServerType serverType)
-			: base(serverType)
+		public FbServicesTests(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{ }
 
 		#endregion
@@ -60,40 +61,32 @@ namespace FirebirdSql.Data.UnitTests
 
 		#endregion
 
-		#region Event Handlers
-
-		void ServiceOutput(object sender, ServiceOutputEventArgs e)
-		{
-			TestContext.WriteLine(e.Message);
-		}
-
-		#endregion
-
 		#region Unit Tests
 
 		[Test]
 		public void BackupRestoreTest()
 		{
-			BackupRestoreTest_BackupPart();
-			BackupRestoreTest_RestorePart();
+			var id = Guid.NewGuid();
+			BackupRestoreTest_BackupPart(id);
+			BackupRestoreTest_RestorePart(id);
 			// test the database was actually restored fine
 			Connection.Open();
 			Connection.Close();
 		}
-		void BackupRestoreTest_BackupPart()
+		void BackupRestoreTest_BackupPart(Guid id)
 		{
 			FbBackup backupSvc = new FbBackup();
 
 			backupSvc.ConnectionString = BuildServicesConnectionString(FbServerType);
 			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
-			backupSvc.BackupFiles.Add(new FbBackupFile(TestsSetup.BackupRestoreFile, 2048));
+			backupSvc.BackupFiles.Add(new FbBackupFile(CreateBackupFilename(id), 2048));
 			backupSvc.Verbose = true;
 
 			backupSvc.ServiceOutput += new EventHandler<ServiceOutputEventArgs>(ServiceOutput);
 
 			backupSvc.Execute();
 		}
-		void BackupRestoreTest_RestorePart()
+		void BackupRestoreTest_RestorePart(Guid id)
 		{
 			FbRestore restoreSvc = new FbRestore();
 
@@ -101,14 +94,13 @@ namespace FirebirdSql.Data.UnitTests
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
 			restoreSvc.PageSize = TestsSetup.PageSize;
 			restoreSvc.Verbose = true;
-			restoreSvc.BackupFiles.Add(new FbBackupFile(TestsSetup.BackupRestoreFile, 2048));
+			restoreSvc.BackupFiles.Add(new FbBackupFile(CreateBackupFilename(id), 2048));
 
 			restoreSvc.ServiceOutput += new EventHandler<ServiceOutputEventArgs>(ServiceOutput);
 
 			restoreSvc.Execute();
 		}
 
-		[Test]
 		[TestCase(true)]
 		[TestCase(false)]
 		public void StreamingBackupRestoreTest(bool verbose)
@@ -128,7 +120,7 @@ namespace FirebirdSql.Data.UnitTests
 as
 declare cnt int;
 begin
-	cnt = 999999;
+	cnt = 199999;
 	while (cnt > 0) do
 	begin
 		insert into dummy_data values (uuid_to_char(gen_uuid()));
@@ -356,10 +348,11 @@ end";
 			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
 
-			NBackupBackupRestoreTest_BackupPart();
-			NBackupBackupRestoreTest_RestorePart();
+			var id = Guid.NewGuid();
+			NBackupBackupRestoreTest_BackupPart(id);
+			NBackupBackupRestoreTest_RestorePart(id);
 		}
-		void NBackupBackupRestoreTest_BackupPart()
+		void NBackupBackupRestoreTest_BackupPart(Guid id)
 		{
 			Action<int> doLevel = l =>
 			{
@@ -367,7 +360,7 @@ end";
 
 				nbak.ConnectionString = BuildServicesConnectionString(FbServerType);
 				nbak.Level = l;
-				nbak.BackupFile = TestsSetup.BackupRestoreFile + l.ToString();
+				nbak.BackupFile = CreateBackupFilename(id) + l.ToString();
 				nbak.DirectIO = true;
 				nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
 
@@ -378,14 +371,14 @@ end";
 			doLevel(0);
 			doLevel(1);
 		}
-		void NBackupBackupRestoreTest_RestorePart()
+		void NBackupBackupRestoreTest_RestorePart(Guid id)
 		{
-			FbConnection.DropDatabase(BuildConnectionString(FbServerType));
+			FbConnection.DropDatabase(BuildConnectionString(FbServerType, Compression));
 
 			var nrest = new FbNRestore();
 
 			nrest.ConnectionString = BuildServicesConnectionString(FbServerType);
-			nrest.BackupFiles = Enumerable.Range(0, 2).Select(l => TestsSetup.BackupRestoreFile + l.ToString());
+			nrest.BackupFiles = Enumerable.Range(0, 2).Select(l => CreateBackupFilename(id) + l.ToString());
 			nrest.DirectIO = true;
 
 			nrest.ServiceOutput += ServiceOutput;
@@ -425,6 +418,20 @@ end";
 				new FbTrace(BuildServicesConnectionString(FbServerType, false)).Stop(sessionId);
 			});
 			trace.Start("test");
+		}
+
+		#endregion
+
+		#region Methods
+
+		void ServiceOutput(object sender, ServiceOutputEventArgs e)
+		{
+			TestContext.WriteLine(e.Message);
+		}
+
+		static string CreateBackupFilename(Guid id)
+		{
+			return $"{TestsSetup.FilenameBase}_{id}.fbk";
 		}
 
 		#endregion

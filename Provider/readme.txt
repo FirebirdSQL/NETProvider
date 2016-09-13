@@ -31,3 +31,8 @@ There are two ways you can report bugs:
 
 	http://tracker.firebirdsql.org/DNET
 
+3rd party code
+--------------
+
+For zlib compression the provider uses pieces from DotNetZip (http://dotnetzip.codeplex.com/) library.
+

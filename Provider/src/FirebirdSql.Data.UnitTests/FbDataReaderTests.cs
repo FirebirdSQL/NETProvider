@@ -24,14 +24,15 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests
 {
-	[FbServerTypeTestFixture(FbServerType.Default)]
-	[FbServerTypeTestFixture(FbServerType.Embedded)]
+	[FbTestFixture(FbServerType.Default, false)]
+	[FbTestFixture(FbServerType.Default, true)]
+	[FbTestFixture(FbServerType.Embedded, default(bool))]
 	public class FbDataReaderTests : TestsBase
 	{
 		#region Constructors
 
-		public FbDataReaderTests(FbServerType serverType)
-			: base(serverType)
+		public FbDataReaderTests(FbServerType serverType, bool compression)
+			: base(serverType, compression)
 		{ }
 
 		#endregion
@@ -71,7 +72,6 @@ namespace FirebirdSql.Data.UnitTests
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
-				reader.GetValue(reader.GetOrdinal("clob_field"));
 				reader.GetValue(reader.GetOrdinal("clob_field"));
 			}
 
@@ -367,6 +367,32 @@ namespace FirebirdSql.Data.UnitTests
 			reader.Close();
 			transaction.Rollback();
 			command.Dispose();
+		}
+
+		[Test]
+		public void ReadBinaryTest()
+		{
+			FbTransaction transaction = Connection.BeginTransaction();
+
+			byte[] bytes = new byte[1024];
+			var random = new Random();
+			for (int i = 0; i < bytes.Length; i++)
+			{
+				bytes[i] = (byte)random.Next(byte.MinValue, byte.MaxValue);
+			}
+			var binaryString = $"x'{BitConverter.ToString(bytes).Replace("-", string.Empty)}'";
+
+			FbCommand command = new FbCommand($"select {binaryString} from TEST", Connection, transaction);
+
+			IDataReader reader = command.ExecuteReader();
+			if (reader.Read())
+			{
+				reader.GetValue(0);
+			}
+
+			reader.Close();
+			command.Dispose();
+			transaction.Rollback();
 		}
 
 		#endregion

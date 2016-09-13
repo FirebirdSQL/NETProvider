@@ -52,9 +52,10 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal const bool DefaultValueRecordsAffected = true;
 		internal const bool DefaultValueEnlist = false;
 		internal const string DefaultValueClientLibrary = "fbembed";
-		internal const int DefaultValueCachePages = 0;
+		internal const int DefaultValueDbCachePages = 0;
 		internal const bool DefaultValueNoDbTriggers = false;
 		internal const bool DefaultValueNoGarbageCollect = false;
+		internal const bool DefaultValueCompression = false;
 
 		internal const string DefaultKeyUserId = "user id";
 		internal const string DefaultKeyPortNumber = "port number";
@@ -76,9 +77,10 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal const string DefaultKeyRecordsAffected = "records affected";
 		internal const string DefaultKeyEnlist = "enlist";
 		internal const string DefaultKeyClientLibrary = "client library";
-		internal const string DefaultKeyCachePages = "cache pages";
+		internal const string DefaultKeyDbCachePages = "cache pages";
 		internal const string DefaultKeyNoDbTriggers = "no db triggers";
 		internal const string DefaultKeyNoGarbageCollect = "no garbage collect";
+		internal const string DefaultKeyCompression = "compression";
 		#endregion
 
 		#region Static Fields
@@ -129,17 +131,19 @@ namespace FirebirdSql.Data.FirebirdClient
 			{ DefaultKeyEnlist, DefaultKeyEnlist },
 			{ "clientlibrary", DefaultKeyClientLibrary },
 			{ DefaultKeyClientLibrary, DefaultKeyClientLibrary },
-			{ DefaultKeyCachePages, DefaultKeyCachePages },
-			{ "cachepages", DefaultKeyCachePages },
-			{ "pagebuffers", DefaultKeyCachePages },
-			{ "page buffers", DefaultKeyCachePages },
+			{ DefaultKeyDbCachePages, DefaultKeyDbCachePages },
+			{ "cachepages", DefaultKeyDbCachePages },
+			{ "pagebuffers", DefaultKeyDbCachePages },
+			{ "page buffers", DefaultKeyDbCachePages },
 			{ DefaultKeyNoDbTriggers, DefaultKeyNoDbTriggers },
 			{ "nodbtriggers", DefaultKeyNoDbTriggers },
 			{ "no dbtriggers", DefaultKeyNoDbTriggers },
 			{ "no database triggers", DefaultKeyNoDbTriggers },
 			{ "nodatabasetriggers", DefaultKeyNoDbTriggers },
-			{ DefaultKeyNoGarbageCollect, DefaultKeyNoGarbageCollect},
-			{ "nogarbagecollect", DefaultKeyNoGarbageCollect}
+			{ DefaultKeyNoGarbageCollect, DefaultKeyNoGarbageCollect },
+			{ "nogarbagecollect", DefaultKeyNoGarbageCollect },
+			{ DefaultKeyCompression, DefaultKeyCompression },
+			{ "wire compression", DefaultKeyCompression },
 		};
 
 		internal static readonly IDictionary<string, object> DefaultValues = new Dictionary<string, object>(StringComparer.Ordinal)
@@ -164,9 +168,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			{ DefaultKeyRecordsAffected, DefaultValueRecordsAffected },
 			{ DefaultKeyEnlist, DefaultValueEnlist },
 			{ DefaultKeyClientLibrary, DefaultValueClientLibrary },
-			{ DefaultKeyCachePages, DefaultValueCachePages },
+			{ DefaultKeyDbCachePages, DefaultValueDbCachePages },
 			{ DefaultKeyNoDbTriggers, DefaultValueNoDbTriggers },
 			{ DefaultKeyNoGarbageCollect, DefaultValueNoGarbageCollect },
+			{ DefaultKeyCompression, DefaultValueCompression },
 		};
 
 		#endregion
@@ -282,7 +287,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public int DbCachePages
 		{
-			get { return GetInt32(DefaultKeyCachePages); }
+			get { return GetInt32(DefaultKeyDbCachePages); }
 		}
 
 		public bool NoDatabaseTriggers
@@ -293,6 +298,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		public bool NoGarbageCollect
 		{
 			get { return GetBoolean(DefaultKeyNoGarbageCollect); }
+		}
+
+		public bool Compression
+		{
+			get { return GetBoolean(DefaultKeyCompression); }
 		}
 
 		#endregion
