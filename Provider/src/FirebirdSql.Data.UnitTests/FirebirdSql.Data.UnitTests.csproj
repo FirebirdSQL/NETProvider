@@ -10,69 +10,30 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FirebirdSql.Data.UnitTests</RootNamespace>
     <AssemblyName>FirebirdSql.Data.UnitTests</AssemblyName>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.UnitTests.snk</AssemblyOriginatorKeyFile>
     <Prefer32Bit>false</Prefer32Bit>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Optimize>false</Optimize>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.UnitTests.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_40|AnyCPU'">
-    <OutputPath>bin\Release_40\</OutputPath>
-    <DefineConstants>TRACE;NET_40</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_45|AnyCPU'">
-    <OutputPath>bin\Release_45\</OutputPath>
-    <DefineConstants>TRACE;NET_45</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <Reference Include="EntityFramework">
-      <HintPath>..\..\lib\EF6\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_40|AnyCPU'">
-    <Reference Include="EntityFramework">
-      <HintPath>..\..\lib\EF6\net40\EntityFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NUnit.3.2.1\lib\net40\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release_45|AnyCPU'">
+  <ItemGroup>
     <Reference Include="EntityFramework">
       <HintPath>..\..\lib\EF6\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -85,14 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Data.Entity">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -128,15 +85,13 @@
     <Compile Include="SrpClientTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EntityFramework.Firebird\EntityFramework.Firebird.csproj">
-      <Project>{5ff27ba8-4843-4207-a5ea-273bc5f7e8e4}</Project>
-      <Name>EntityFramework.Firebird</Name>
-      <Private>True</Private>
+    <ProjectReference Include="..\EntityFramework.Firebird\EntityFramework.Firebird_NET45.csproj">
+      <Project>{8de3edee-c361-4da2-96f0-35795d5bf071}</Project>
+      <Name>EntityFramework.Firebird_NET45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj">
-      <Project>{326A24F9-6259-45DB-835C-18DB80728460}</Project>
-      <Name>FirebirdSql.Data.FirebirdClient</Name>
-      <Private>True</Private>
+    <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET45.csproj">
+      <Project>{b37720ac-3b59-438b-afba-1e27547dd200}</Project>
+      <Name>FirebirdSql.Data.FirebirdClient_NET45</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

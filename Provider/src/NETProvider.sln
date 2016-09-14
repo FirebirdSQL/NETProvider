@@ -1,38 +1,43 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj", "{326A24F9-6259-45DB-835C-18DB80728460}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient_NET40", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET40.csproj", "{326A24F9-6259-45DB-835C-18DB80728460}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.FirebirdClient_NET45", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET45.csproj", "{B37720AC-3B59-438B-AFBA-1E27547DD200}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests", "FirebirdSql.Data.UnitTests\FirebirdSql.Data.UnitTests.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Firebird", "EntityFramework.Firebird\EntityFramework.Firebird.csproj", "{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Firebird_NET40", "EntityFramework.Firebird\EntityFramework.Firebird_NET40.csproj", "{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Firebird_NET45", "EntityFramework.Firebird\EntityFramework.Firebird_NET45.csproj", "{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Release_40|Any CPU = Release_40|Any CPU
-		Release_45|Any CPU = Release_45|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{326A24F9-6259-45DB-835C-18DB80728460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{326A24F9-6259-45DB-835C-18DB80728460}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release_40|Any CPU.ActiveCfg = Release_40|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release_40|Any CPU.Build.0 = Release_40|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release_45|Any CPU.ActiveCfg = Release_45|Any CPU
-		{326A24F9-6259-45DB-835C-18DB80728460}.Release_45|Any CPU.Build.0 = Release_45|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{326A24F9-6259-45DB-835C-18DB80728460}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B37720AC-3B59-438B-AFBA-1E27547DD200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B37720AC-3B59-438B-AFBA-1E27547DD200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B37720AC-3B59-438B-AFBA-1E27547DD200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B37720AC-3B59-438B-AFBA-1E27547DD200}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_40|Any CPU.ActiveCfg = Release_40|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_40|Any CPU.Build.0 = Release_40|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.ActiveCfg = Release_45|Any CPU
-		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release_45|Any CPU.Build.0 = Release_45|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_40|Any CPU.ActiveCfg = Release_40|Any CPU
-		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_40|Any CPU.Build.0 = Release_40|Any CPU
-		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_45|Any CPU.ActiveCfg = Release_45|Any CPU
-		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release_45|Any CPU.Build.0 = Release_45|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
