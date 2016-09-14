@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-#if (!EF6)
+#if !EF6
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 #else
@@ -29,7 +29,7 @@ using System.Data.Common.CommandTrees;
 
 using FirebirdSql.Data.FirebirdClient;
 
-#if (!EF6)
+#if !EF6
 namespace FirebirdSql.Data.Entity
 #else
 namespace FirebirdSql.Data.EntityFramework6.SqlGen

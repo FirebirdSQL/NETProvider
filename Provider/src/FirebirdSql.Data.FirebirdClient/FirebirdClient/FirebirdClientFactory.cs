@@ -21,7 +21,7 @@
 
 using System;
 using System.Data.Common;
-#if (!EF6)
+#if !EF6
 #else
 using System.Data.Entity.Core.Common;
 #endif
