@@ -14,10 +14,10 @@
     <tags>firebird firebirsql firebirdclient adonet database</tags>
   </metadata>
   <files>
-    <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.dll" target="lib\net40-client" />
-    <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_40\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net40-client" />
-    <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.dll" target="lib\net45" />
-    <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release_45\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net45" />
+    <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET40\FirebirdSql.Data.FirebirdClient.dll" target="lib\net40-client" />
+    <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET40\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net40-client" />
+    <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET45\FirebirdSql.Data.FirebirdClient.dll" target="lib\net45" />
+    <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET45\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net45" />
     <file src="..\..\readme.txt" target="" />
     <file src="app.config.transform" target="content" />
     <file src="web.config.transform" target="content" />
