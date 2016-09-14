@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if (!EF_6)
+#if (!EF6)
 using System.Data.Metadata.Edm;
 #else
 using System.Data.Entity.Core.Metadata.Edm;
@@ -30,7 +30,7 @@ using FirebirdSql.Data.EntityFramework6.SqlGen;
 
 using FirebirdSql.Data.Common;
 
-#if (!EF_6)
+#if (!EF6)
 namespace FirebirdSql.Data.Entity
 #else
 namespace FirebirdSql.Data.EntityFramework6

@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Services
 		public int ConnectionCount { get; internal set; }
 
 		private List<string> _databases;
-#if (NET_40)
+#if (NET40)
 		public IList<string> Databases
 #else
 		public IReadOnlyList<string> Databases

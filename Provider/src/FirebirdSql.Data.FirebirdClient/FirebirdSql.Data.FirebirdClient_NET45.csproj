@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <OutputPath>bin\Debug\NET45\</OutputPath>
     <IntermediateOutputPath>obj\Debug\NET45\</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_45</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Optimize>false</Optimize>
     <DebugSymbols>true</DebugSymbols>
@@ -31,7 +31,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\NET45\</OutputPath>
     <IntermediateOutputPath>obj\Release\NET45\</IntermediateOutputPath>
-    <DefineConstants>TRACE;NET_45</DefineConstants>
+    <DefineConstants>TRACE;NET45</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>

@@ -26,7 +26,7 @@ using System.Xml;
 using System.Data;
 using System.Reflection;
 using System.IO;
-#if (!EF_6)
+#if (!EF6)
 using System.Data.Metadata.Edm;
 #else
 using System.Data.Entity.Core;
@@ -36,7 +36,7 @@ using System.Data.Entity.Core.Metadata.Edm;
 
 using FirebirdSql.Data.Entity;
 
-#if (!EF_6)
+#if (!EF6)
 namespace FirebirdSql.Data.FirebirdClient
 #else
 namespace FirebirdSql.Data.EntityFramework6
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		protected override XmlReader GetDbInformation(string informationType)
 		{
 			if (informationType == DbProviderManifest.StoreSchemaDefinition
-#if (NET_45 || EF_6)
+#if (NET45 || EF6)
  || informationType == DbProviderManifest.StoreSchemaDefinitionVersion3
 #endif
 )
@@ -94,14 +94,14 @@ namespace FirebirdSql.Data.EntityFramework6
 				return GetStoreSchemaDescription(informationType);
 			}
 			if (informationType == DbProviderManifest.StoreSchemaMapping
-#if (NET_45 || EF_6)
+#if (NET45 || EF6)
  || informationType == DbProviderManifest.StoreSchemaMappingVersion3
 #endif
 )
 			{
 				return GetStoreSchemaMapping(informationType);
 			}
-#if (NET_45 || EF_6)
+#if (NET45 || EF6)
 			if (informationType == DbProviderManifest.ConceptualSchemaDefinition || informationType == DbProviderManifest.ConceptualSchemaDefinitionVersion3)
 			{
 				return null;
@@ -436,7 +436,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		private static string GetManifestResourceName()
 		{
-#if (!EF_6)
+#if (!EF6)
 			return "FirebirdSql.Data.Entity.ProviderManifest.xml";
 #else
 			return "FirebirdSql.Data.EntityFramework6.Resources.ProviderManifest.xml";
@@ -445,7 +445,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		private static string GetStoreSchemaResourceName(string name, string type)
 		{
-#if (!EF_6)
+#if (!EF6)
 			return string.Format("FirebirdSql.Data.Entity.{0}.{1}", name, type);
 #else
 			return string.Format("FirebirdSql.Data.EntityFramework6.Resources.{0}.{1}", name, type);
@@ -467,7 +467,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			return sb.ToString();
 		}
 
-#if (EF_6)
+#if (EF6)
 		public override bool SupportsInExpression()
 		{
 			return true;

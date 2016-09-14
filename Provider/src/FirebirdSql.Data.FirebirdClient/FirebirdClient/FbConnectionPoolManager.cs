@@ -258,7 +258,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		void CleanupCallback(object o)
 		{
-#if (NET_40)
+#if (NET40)
 			if (Thread.VolatileRead(ref _disposed) == 1)
 #else
 			if (Volatile.Read(ref _disposed) == 1)
@@ -270,7 +270,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		void CheckDisposed()
 		{
-#if (NET_40)
+#if (NET40)
 			if (Thread.VolatileRead(ref _disposed) == 1)
 #else
 			if (Volatile.Read(ref _disposed) == 1)

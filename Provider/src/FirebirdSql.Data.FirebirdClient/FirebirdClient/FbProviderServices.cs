@@ -26,7 +26,7 @@ using System.Reflection;
 using System.IO;
 using System.Diagnostics;
 using System.Linq;
-#if (!EF_6)
+#if (!EF6)
 using System.Data.Common.CommandTrees;
 using System.Data.Metadata.Edm;
 
@@ -49,7 +49,7 @@ using FirebirdSql.Data.Services;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-#if (!EF_6)
+#if (!EF6)
 namespace FirebirdSql.Data.FirebirdClient
 #else
 namespace FirebirdSql.Data.EntityFramework6
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		public FbProviderServices()
 		{
-#if (EF_6)
+#if (EF6)
 			AddDependencyResolver(new SingletonDependencyResolver<IDbConnectionFactory>(new FbConnectionFactory()));
 			AddDependencyResolver(new SingletonDependencyResolver<Func<MigrationSqlGenerator>>(() => new FbMigrationSqlGenerator(), ProviderInvariantName));
 			DbInterception.Add(new FbMigrationsTransactionsInterceptor());
