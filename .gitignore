@@ -3,6 +3,7 @@
 .vs
 bin
 obj
+packages
 DDEX/installer/out/
 DDEX/installer/in/
-Provider/deploy/out
+Provider/deploy/out/
