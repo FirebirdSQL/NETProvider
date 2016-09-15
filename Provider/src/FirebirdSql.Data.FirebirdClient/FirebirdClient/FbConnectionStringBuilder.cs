@@ -46,7 +46,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Security")]
 		[DisplayName("Password")]
 		[Description("Indicates the password to be used when connecting to the data source.")]
+#if !NETCORE10
 		[PasswordPropertyText(true)]
+#endif
 		[DefaultValue(FbConnectionString.DefaultValuePassword)]
 		public string Password
 		{

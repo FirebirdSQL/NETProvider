@@ -25,14 +25,19 @@ using System.Data;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+#if NETCORE10
+using Microsoft.Extensions.PlatformAbstractions;
+#endif
 
 using FirebirdSql.Data.Common;
+#if !NETCORE10
 using FirebirdSql.Data.Schema;
-using System.Reflection;
+#endif
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	internal class FbConnectionInternal : MarshalByRefObject, IDisposable
+	internal class FbConnectionInternal : IDisposable
 	{
 		#region Fields
 
@@ -43,7 +48,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		private FbConnection _owningConnection;
 		private bool _disposed;
 		private object _preparedCommandsCleanupSyncRoot;
+#if !NETCORE10
 		private FbEnlistmentNotification _enlistmentNotification;
+#endif
 
 		#endregion
 
@@ -74,7 +81,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public bool IsEnlisted
 		{
-			get { return _enlistmentNotification != null && !_enlistmentNotification.IsCompleted; }
+			get
+			{
+#if NETCORE10
+				return false;
+#else
+				return _enlistmentNotification != null && !_enlistmentNotification.IsCompleted;
+#endif
+			}
 		}
 
 		public FbConnectionString Options
@@ -353,10 +367,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Schema Methods
 
+#if !NETCORE10
 		public DataTable GetSchema(string collectionName, string[] restrictions)
 		{
 			return FbSchemaFactory.GetSchema(_owningConnection, collectionName, restrictions);
 		}
+#endif
 
 		#endregion
 
@@ -368,7 +384,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
 				FbCommand current;
-				if (!_preparedCommands[i].TryGetTarget<FbCommand>(out current))
+				if (!_preparedCommands[i].TryGetTarget(out current))
 				{
 					position = i;
 					break;
@@ -527,6 +543,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetHostingPath()
 		{
+#if NETCORE10
+			return PlatformServices.Default.Application.ApplicationBasePath;
+#else
 			Assembly assembly;
 			try
 			{
@@ -548,34 +567,22 @@ namespace FirebirdSql.Data.FirebirdClient
 				.GetType("System.Web.Hosting.HostingEnvironment")
 				.GetProperty("ApplicationPhysicalPath")
 				.GetValue(null, null);
+#endif
 		}
 		private string GetRealProcessName()
 		{
 			Assembly assembly = Assembly.GetEntryAssembly();
-			if (assembly != null)
-			{
-				return assembly.Location;
-			}
-			else // if we're not loaded from managed code
-			{
-				return Process.GetCurrentProcess().MainModule.FileName;
-			}
+			return assembly?.Location ?? Process.GetCurrentProcess().MainModule.FileName;
 		}
 
 		private int GetProcessId()
 		{
+#if !NETCORE10
 			Assembly assembly = Assembly.GetEntryAssembly();
-			if (assembly != null)
-			{
-				if (assembly.IsFullyTrusted)
-					return Process.GetCurrentProcess().Id;
-				else
-					return -1;
-			}
-			else // if we're not loaded from managed code
-			{
-				return Process.GetCurrentProcess().Id;
-			}
+			if (!(assembly?.IsFullyTrusted) ?? false)
+				return -1;
+#endif
+			return Process.GetCurrentProcess().Id;
 		}
 		#endregion
 

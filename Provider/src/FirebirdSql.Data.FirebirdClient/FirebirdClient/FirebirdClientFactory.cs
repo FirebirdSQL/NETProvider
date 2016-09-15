@@ -21,8 +21,7 @@
 
 using System;
 using System.Data.Common;
-#if !EF6
-#else
+#if EF6
 using System.Data.Entity.Core.Common;
 #endif
 
@@ -38,10 +37,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Properties
 
+#if !NETCORE10
 		public override bool CanCreateDataSourceEnumerator
 		{
 			get { return false; }
 		}
+#endif
 
 		#endregion
 
@@ -60,10 +61,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbCommand();
 		}
 
+#if !NETCORE10
 		public override DbCommandBuilder CreateCommandBuilder()
 		{
 			return new FbCommandBuilder();
 		}
+#endif
 
 		public override DbConnection CreateConnection()
 		{
@@ -75,10 +78,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbConnectionStringBuilder();
 		}
 
+#if !NETCORE10
 		public override DbDataAdapter CreateDataAdapter()
 		{
 			return new FbDataAdapter();
 		}
+#endif
 
 		public override DbParameter CreateParameter()
 		{
@@ -91,6 +96,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		object IServiceProvider.GetService(Type serviceType)
 		{
+#if NETCORE10
+			return null;
+#else
 			if (serviceType == typeof(DbProviderServices))
 			{
 				return FbProviderServices.Instance;
@@ -99,6 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				return null;
 			}
+#endif
 		}
 
 		#endregion

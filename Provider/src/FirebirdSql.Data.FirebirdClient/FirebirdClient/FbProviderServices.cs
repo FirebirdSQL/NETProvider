@@ -16,6 +16,7 @@
  *  All Rights Reserved.
  */
 
+#if !NETCORE10
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -475,3 +476,4 @@ namespace FirebirdSql.Data.EntityFramework6
 		}
 	}
 }
+#endif

@@ -29,7 +29,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Services;
 
 namespace FirebirdSql.Data.FirebirdClient
 {

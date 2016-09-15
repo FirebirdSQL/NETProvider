@@ -41,7 +41,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
+#if !NETCORE10
 		private DataTable _schemaTable;
+#endif
 		private FbCommand _command;
 		private FbConnection _connection;
 		private DbValue[] _row;
@@ -103,32 +105,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region IDisposable methods
-
-		//protected override void Dispose(bool disposing)
-		//{
-		//    if (!this.disposed)
-		//    {
-		//        try
-		//        {
-		//            if (disposing)
-		//            {
-		//                // release any managed resources
-		//                this.Close();
-		//            }
-
-		//            // release any unmanaged resources
-		//        }
-		//        finally
-		//        {
-		//        }
-
-		//        this.disposed = true;
-		//    }
-		//}
-
-		#endregion
-
 		#region DbDataReader overriden Properties
 
 		public override int Depth
@@ -180,46 +156,58 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region DbDataReader overriden methods
 
+#if !NETCORE10
 		public override void Close()
 		{
-			if (!IsClosed)
+			Dispose();
+		}
+#endif
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
 			{
-				try
+				if (!IsClosed)
 				{
-					if (_command != null && !_command.IsDisposed)
+					try
 					{
-						if (_command.CommandType == CommandType.StoredProcedure)
+						if (_command != null && !_command.IsDisposed)
 						{
-							// Set values of output parameters
-							_command.SetOutputParameters();
+							if (_command.CommandType == CommandType.StoredProcedure)
+							{
+								// Set values of output parameters
+								_command.SetOutputParameters();
+							}
+
+							if (_command.HasImplicitTransaction)
+							{
+								// Commit implicit transaction if needed
+								_command.CommitImplicitTransaction();
+							}
+
+							// Set null the active reader of the command
+							_command.ActiveReader = null;
+						}
+					}
+					catch
+					{ }
+					finally
+					{
+						if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
+						{
+							_connection.Close();
 						}
 
-						if (_command.HasImplicitTransaction)
-						{
-							// Commit implicit transaction if needed
-							_command.CommitImplicitTransaction();
-						}
-
-						// Set null the active reader of the command
-						_command.ActiveReader = null;
+						_isClosed = true;
+						_position = STARTPOS;
+						_command = null;
+						_connection = null;
+						_row = null;
+#if !NETCORE10
+						_schemaTable = null;
+#endif
+						_fields = null;
 					}
-				}
-				catch
-				{ }
-				finally
-				{
-					if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
-					{
-						_connection.Close();
-					}
-
-					_isClosed = true;
-					_position = STARTPOS;
-					_command = null;
-					_connection = null;
-					_row = null;
-					_schemaTable = null;
-					_fields = null;
 				}
 			}
 		}
@@ -681,9 +669,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return false;
 		}
 
-		#endregion
+#endregion
 
-		#region Private Methods
+#region Private Methods
 
 		private void CheckPosition()
 		{
@@ -762,9 +750,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return index;
 		}
 
-		#endregion
+#endregion
 
-		#region Static Methods
+#region Static Methods
 
 		private static bool IsReadOnly(FbDataReader r)
 		{
@@ -855,6 +843,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 	}
 }

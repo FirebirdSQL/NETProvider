@@ -579,7 +579,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			object value;
 			if (_options.TryGetValue(key, out value))
 			{
-				string il = value.ToString().ToLower(CultureInfo.InvariantCulture);
+				string il = value.ToString().ToLowerInvariant();
 
 				switch (il)
 				{
@@ -611,7 +611,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckIsolationLevel()
 		{
-			string il = _options[DefaultKeyIsolationLevel].ToString().ToLower(CultureInfo.InvariantCulture);
+			string il = _options[DefaultKeyIsolationLevel].ToString().ToLowerInvariant();
 
 			switch (il)
 			{

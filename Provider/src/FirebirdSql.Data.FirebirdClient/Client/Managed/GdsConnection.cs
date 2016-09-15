@@ -250,7 +250,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public virtual void Disconnect()
 		{
-			_networkStream?.Close();
+			_networkStream?.Dispose();
 			_networkStream = null;
 			_socket?.Close();
 			_socket = null;
