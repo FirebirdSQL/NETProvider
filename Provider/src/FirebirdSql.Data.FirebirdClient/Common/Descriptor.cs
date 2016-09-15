@@ -32,9 +32,6 @@ namespace FirebirdSql.Data.Common
 	/// in the Interbase 6.0 API docs.
 	/// </remarks>
 	internal sealed class Descriptor
-#if !NETCORE10
-		: ICloneable
-#endif
 	{
 		#region Fields
 
@@ -94,32 +91,6 @@ namespace FirebirdSql.Data.Common
 			{
 				_fields[i] = new DbField();
 			}
-		}
-
-		#endregion
-
-		#region ICloneable Methods
-
-		public object Clone()
-		{
-			Descriptor descriptor = new Descriptor(Count);
-			descriptor.Version = _version;
-
-			for (int i = 0; i < descriptor.Count; i++)
-			{
-				descriptor[i].DataType	= _fields[i].DataType;
-				descriptor[i].NumericScale = _fields[i].NumericScale;
-				descriptor[i].SubType	= _fields[i].SubType;
-				descriptor[i].Length	= _fields[i].Length;
-				descriptor[i].Value		= _fields[i].Value;
-				descriptor[i].NullFlag	= _fields[i].NullFlag;
-				descriptor[i].Name		= _fields[i].Name;
-				descriptor[i].Relation	= _fields[i].Relation;
-				descriptor[i].Owner		= _fields[i].Owner;
-				descriptor[i].Alias		= _fields[i].Alias;
-			}
-
-			return descriptor;
 		}
 
 		#endregion
