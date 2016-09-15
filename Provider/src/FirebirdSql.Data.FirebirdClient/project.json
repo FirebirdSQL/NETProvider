@@ -28,6 +28,7 @@
 		"define": [ "NETCORE10" ],
 		"compile": {
 			"exclude": [ "Schema/**", "Services/**", "Isql/**", "Entity/**" ]
-		}
+		},
+		"allowUnsafe": true
 	}
 }
