@@ -16,6 +16,7 @@
  *  All Rights Reserved.
  */
 
+#if !NETCORE10
 using System;
 using System.Data;
 using System.Data.Common;
@@ -48,3 +49,4 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 	}
 }
+#endif

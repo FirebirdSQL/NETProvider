@@ -28,7 +28,7 @@ using System.IO;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Schema;
-
+using System.Reflection;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -293,6 +293,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Transaction Enlistement
 
+#if !NETCORE10
 		public void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
 			if (_owningConnection != null && _options.Enlist)
@@ -346,6 +347,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					return BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
 			}
 		}
+#endif
 
 		#endregion
 
@@ -525,10 +527,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetHostingPath()
 		{
-			System.Reflection.Assembly assembly;
+			Assembly assembly;
 			try
 			{
-				assembly = System.Reflection.Assembly.Load(string.Format("System.Web, Version={0}.{1}.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", Environment.Version.Major, Environment.Version.Minor));
+				assembly = Assembly.Load(string.Format("System.Web, Version={0}.{1}.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", Environment.Version.Major, Environment.Version.Minor));
 			}
 			catch (FileNotFoundException)
 			{
@@ -549,7 +551,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 		private string GetRealProcessName()
 		{
-			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+			Assembly assembly = Assembly.GetEntryAssembly();
 			if (assembly != null)
 			{
 				return assembly.Location;
@@ -562,7 +564,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private int GetProcessId()
 		{
-			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+			Assembly assembly = Assembly.GetEntryAssembly();
 			if (assembly != null)
 			{
 				if (assembly.IsFullyTrusted)

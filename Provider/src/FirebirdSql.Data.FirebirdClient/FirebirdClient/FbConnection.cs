@@ -318,7 +318,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 
 		#region ICloneable Methods
-
 #if NETCORE10
 		object Clone()
 #else

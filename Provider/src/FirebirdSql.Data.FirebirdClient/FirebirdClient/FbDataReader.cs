@@ -258,6 +258,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return retValue;
 		}
 
+#if !NETCORE10
 		public override DataTable GetSchemaTable()
 		{
 			CheckState();
@@ -368,6 +369,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return _schemaTable;
 		}
+#endif
 
 		public override int GetOrdinal(string name)
 		{
@@ -782,6 +784,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return false;
 		}
 
+#if !NETCORE10
 		private static DataTable GetSchemaTableStructure()
 		{
 			DataTable schema = new DataTable("Schema");
@@ -838,6 +841,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return sql;
 		}
+#endif
 
 		private static T CheckedGetValue<T>(Func<T> f)
 		{
