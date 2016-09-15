@@ -1,5 +1,6 @@
 *.suo
 *.user
+*.lock.json
 .vs
 bin
 obj
