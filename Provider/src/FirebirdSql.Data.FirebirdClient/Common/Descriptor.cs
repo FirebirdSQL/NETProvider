@@ -31,7 +31,10 @@ namespace FirebirdSql.Data.Common
 	/// This is similar to the XSQLDA structure described
 	/// in the Interbase 6.0 API docs.
 	/// </remarks>
-	internal sealed class Descriptor : ICloneable
+	internal sealed class Descriptor
+#if !NETCORE10
+		: ICloneable
+#endif
 	{
 		#region Fields
 

@@ -36,6 +36,7 @@ using System.Data.Entity.Core.Metadata.Edm;
 #endif
 
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Common;
 
 #if !EF6
 namespace FirebirdSql.Data.Entity

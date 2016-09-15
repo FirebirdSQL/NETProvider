@@ -212,7 +212,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Prototypes of native Win API functions
 
-		[DllImport("secur32", CharSet = CharSet.Auto)]
+		[DllImport("secur32")]
 		static extern int AcquireCredentialsHandle(
 			string pszPrincipal, //SEC_CHAR*
 			string pszPackage, //SEC_CHAR* //"Kerberos","NTLM","Negotiative"
@@ -225,7 +225,7 @@ namespace FirebirdSql.Data.Client.Managed
 			out SecInteger ptsExpiry //PTimeStamp //TimeStamp ref
 		);
 
-		[DllImport("secur32", CharSet = CharSet.Auto, SetLastError = true)]
+		[DllImport("secur32", SetLastError = true)]
 		static extern int InitializeSecurityContext(
 			ref SecHandle phCredential,//PCredHandle
 			IntPtr phContext, //PCtxtHandle
@@ -243,7 +243,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		// 2 signatures of this API function needed because different usage
 
-		[DllImport("secur32", CharSet = CharSet.Auto, SetLastError = true)]
+		[DllImport("secur32", SetLastError = true)]
 		static extern int InitializeSecurityContext(
 			ref SecHandle phCredential,//PCredHandle
 			ref SecHandle phContext, //PCtxtHandle

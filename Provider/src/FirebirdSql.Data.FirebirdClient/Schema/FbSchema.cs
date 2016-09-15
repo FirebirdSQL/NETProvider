@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 using System.Collections;
 
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Schema
 {
