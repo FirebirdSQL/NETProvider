@@ -206,7 +206,7 @@ namespace FirebirdSql.Data.Common
             switch (_systemName)
 			{
 				case None:
-					_encoding = Encoding.Default;
+					_encoding = Encoding.UTF8;
                     _isNone = true;
                     break;
 				case Octets:

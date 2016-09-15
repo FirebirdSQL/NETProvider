@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Common
 
 		public void Append(string content, int actualCount)
 		{
-			Append(Encoding.Default.GetBytes(content), actualCount);
+			Append(Encoding.UTF8.GetBytes(content), actualCount);
 		}
 
 		public void Append(byte[] content, int actualCount)

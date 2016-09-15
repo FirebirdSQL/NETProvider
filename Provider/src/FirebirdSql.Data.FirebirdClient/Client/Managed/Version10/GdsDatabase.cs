@@ -237,7 +237,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));
+			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 
@@ -283,7 +283,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 #warning Here
 					// Close Input and Output streams
-					_xdrStream?.Close();
+					_xdrStream?.Dispose();
 
 					// Clear members
 					_transactionCount = 0;
@@ -367,7 +367,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));
+			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 

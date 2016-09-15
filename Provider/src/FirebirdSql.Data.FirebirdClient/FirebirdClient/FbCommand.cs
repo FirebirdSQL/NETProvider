@@ -410,7 +410,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region ICloneable Methods
 
 #if NETCORE10
-		object Clone()
+		internal object Clone()
 #else
 		object ICloneable.Clone()
 #endif

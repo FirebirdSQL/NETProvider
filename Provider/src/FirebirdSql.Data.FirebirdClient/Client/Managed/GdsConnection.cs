@@ -269,7 +269,11 @@ namespace FirebirdSql.Data.Client.Managed
 				return ipaddress;
 			}
 
+#if NETCORE10
+			IPAddress[] addresses = Dns.GetHostEntryAsync(dataSource).GetAwaiter().GetResult().AddressList;
+#else
 			IPAddress[] addresses = Dns.GetHostEntry(dataSource).AddressList;
+#endif
 
 			// Try to avoid problems with IPV6 addresses
 			foreach (IPAddress address in addresses)
@@ -327,10 +331,13 @@ namespace FirebirdSql.Data.Client.Managed
 				result.WriteByte(4);
 				result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 
+#warning This the CNCT_user needed in general?
+#if !NETCORE10
 				var user = Encoding.UTF8.GetBytes(Environment.UserName);
 				result.WriteByte(IscCodes.CNCT_user);
 				result.WriteByte((byte)user.Length);
 				result.Write(user, 0, user.Length);
+#endif
 
 				var host = Encoding.UTF8.GetBytes(Dns.GetHostName());
 				result.WriteByte(IscCodes.CNCT_host);
