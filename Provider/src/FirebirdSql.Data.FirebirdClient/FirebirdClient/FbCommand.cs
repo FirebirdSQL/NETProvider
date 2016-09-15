@@ -28,16 +28,21 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using System.Diagnostics;
+#if !NETCORE10
+using System.Runtime.Remoting.Messaging;
+#endif
 
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	public sealed class FbCommand : DbCommand, ICloneable
+	public sealed class FbCommand : DbCommand
+#if !NETCORE10
+		, ICloneable
+#endif
 	{
-		#region Fields
+#region Fields
 
 		private CommandType _commandType;
 		private UpdateRowSource _updatedRowSource;
@@ -55,9 +60,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		private int _fetchSize;
 		private Type[] _expectedColumnTypes;
 
-		#endregion
+#endregion
 
-		#region Properties
+#region Properties
 
 		[Category("Data")]
 		[DefaultValue("")]
@@ -215,9 +220,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Protected DbCommand Properties
+#region Protected DbCommand Properties
 
 		protected override DbConnection DbConnection
 		{
@@ -236,9 +241,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return Parameters; }
 		}
 
-		#endregion
+#endregion
 
-		#region Design-Time properties
+#region Design-Time properties
 
 		[Browsable(false)]
 		[DesignOnly(true)]
@@ -253,9 +258,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Internal Properties
+#region Internal Properties
 
 		internal int RecordsAffected
 		{
@@ -305,9 +310,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _expectedColumnTypes; }
 		}
 
-		#endregion
+#endregion
 
-		#region Constructors
+#region Constructors
 
 		public FbCommand()
 			: this(null, null, null)
@@ -356,9 +361,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return result;
 		}
 
-		#endregion
+#endregion
 
-		#region IDisposable methods
+#region IDisposable methods
 
 		protected override void Dispose(bool disposing)
 		{
@@ -404,7 +409,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region ICloneable Methods
 
+#if NETCORE10
+		object Clone()
+#else
 		object ICloneable.Clone()
+#endif
 		{
 			FbCommand command = new FbCommand();
 
@@ -424,15 +433,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			for (int i = 0; i < Parameters.Count; i++)
 			{
+#if NETCORE10
+				command.Parameters.Add(Parameters[i].Clone());
+#else
 				command.Parameters.Add(((ICloneable)Parameters[i]).Clone());
+#endif
 			}
 
 			return command;
 		}
 
-		#endregion
+#endregion
 
-		#region Methods
+#region Methods
 
 		public override void Cancel()
 		{
@@ -502,6 +515,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return RecordsAffected;
 		}
+#if !NETCORE10
 		public IAsyncResult BeginExecuteNonQuery(AsyncCallback callback, object objectState)
 		{
 			// BeginInvoke might be slow, but the query processing will make this irrelevant
@@ -511,6 +525,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			return ((Func<int>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
 		}
+#endif
 
 		public new FbDataReader ExecuteReader()
 		{
@@ -554,6 +569,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			// BeginInvoke might be slow, but the query processing will make this irrelevant
 			return ((Func<CommandBehavior, FbDataReader>)ExecuteReader).BeginInvoke(behavior, callback, objectState);
 		}
+#if !NETCORE10
 		public FbDataReader EndExecuteReader(IAsyncResult asyncResult)
 		{
 			if ((asyncResult as AsyncResult).AsyncDelegate is Func<FbDataReader>)
@@ -565,6 +581,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				return ((Func<CommandBehavior, FbDataReader>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
 			}
 		}
+#endif
 
 		public override object ExecuteScalar()
 		{
@@ -615,6 +632,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return val;
 		}
+#if !NETCORE10
 		public IAsyncResult BeginExecuteScalar(AsyncCallback callback, object objectState)
 		{
 			// BeginInvoke might be slow, but the query processing will make this irrelevant
@@ -624,10 +642,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			return ((Func<object>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
 		}
+#endif
 
-		#endregion
+#endregion
 
-		#region DbCommand Protected Methods
+#region DbCommand Protected Methods
 
 		protected override DbParameter CreateDbParameter()
 		{
@@ -639,9 +658,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return ExecuteReader(behavior);
 		}
 
-		#endregion
+#endregion
 
-		#region Internal Methods
+#region Internal Methods
 
 		internal void CloseReader()
 		{
@@ -822,9 +841,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Input parameter descriptor generation methods
+#region Input parameter descriptor generation methods
 
 		private void DescribeInput()
 		{
@@ -1104,9 +1123,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Private Methods
+#region Private Methods
 
 		private void Prepare(bool returnsSet)
 		{
@@ -1227,8 +1246,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			string sql = spName == null ? string.Empty : spName.Trim();
 
 			if (sql.Length > 0 &&
-				!sql.ToLower(CultureInfo.InvariantCulture).StartsWith("execute procedure ") &&
-				!sql.ToLower(CultureInfo.InvariantCulture).StartsWith("select "))
+				!sql.ToLowerInvariant().StartsWith("execute procedure ") &&
+				!sql.ToLowerInvariant().StartsWith("select "))
 			{
 				StringBuilder paramsText = new StringBuilder();
 
@@ -1398,6 +1417,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			return (value == DBNull.Value || value == null);
 		}
 
-		#endregion
+#endregion
 	}
 }
