@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				_events[remoteEvent.LocalId] = remoteEvent;
 
-				// Jiri Cincura: I'm pretty sure this is a race condition.
+#warning Jiri Cincura: I'm pretty sure this is a race condition.
 				if (_eventsThread == null || _eventsThread.ThreadState.HasFlag(ThreadState.Stopped | ThreadState.Unstarted))
 				{
 					_eventsThread = new Thread(ThreadHandler);
