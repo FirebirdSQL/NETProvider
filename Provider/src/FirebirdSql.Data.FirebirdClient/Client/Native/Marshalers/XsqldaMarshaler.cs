@@ -22,25 +22,25 @@
 
 using System;
 using System.Runtime.InteropServices;
-using FirebirdSql.Data.Common;
 using System.IO;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	internal static class XsqldaMarshaler
 	{
-		private static int sizeofXSQLDA = Marshal.SizeOf(typeof(XSQLDA));
-		private static int sizeofXSQLVAR = Marshal.SizeOf(typeof(XSQLVAR));
+		private static int sizeofXSQLDA = Marshal2.SizeOf<XSQLDA>();
+		private static int sizeofXSQLVAR = Marshal2.SizeOf<XSQLVAR>();
 
 		public static void CleanUpNativeData(ref IntPtr pNativeData)
 		{
 			if (pNativeData != IntPtr.Zero)
 			{
 				// Obtain XSQLDA information
-				XSQLDA xsqlda = (XSQLDA)Marshal.PtrToStructure(pNativeData, typeof(XSQLDA));
+				XSQLDA xsqlda = Marshal2.PtrToStructure<XSQLDA>(pNativeData);
 
 				// Destroy XSQLDA structure
-				Marshal.DestroyStructure(pNativeData, typeof(XSQLDA));
+				Marshal2.DestroyStructure<XSQLDA>(pNativeData);
 
 				// Destroy XSQLVAR structures
 				for (var i = 0; i < xsqlda.sqln; i++)
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 						sqlvar.sqlind = IntPtr.Zero;
 					}
 
-					Marshal.DestroyStructure(ptr, typeof(XSQLVAR));
+					Marshal2.DestroyStructure<XSQLVAR>(ptr);
 				}
 
 				// Free	pointer	memory
@@ -110,7 +110,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 				}
 
 				// Create a	new	pointer	for	the	sqlind value
-				xsqlvar[i].sqlind = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(short)));
+				xsqlvar[i].sqlind = Marshal.AllocHGlobal(Marshal2.SizeOf<short>());
 				Marshal.WriteInt16(xsqlvar[i].sqlind, descriptor[i].NullFlag);
 
 				// Name
@@ -157,7 +157,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 		public static Descriptor MarshalNativeToManaged(Charset charset, IntPtr pNativeData, bool fetching)
 		{
 			// Obtain XSQLDA information
-			var xsqlda = (XSQLDA)Marshal.PtrToStructure(pNativeData, typeof(XSQLDA));
+			var xsqlda = Marshal2.PtrToStructure<XSQLDA>(pNativeData);
 
 			// Create a	new	Descriptor
 			var descriptor = new Descriptor(xsqlda.sqln) { ActualCount = xsqlda.sqld };

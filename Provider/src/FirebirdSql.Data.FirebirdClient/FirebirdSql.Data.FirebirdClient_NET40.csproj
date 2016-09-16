@@ -82,6 +82,7 @@
     <Compile Include="Client\Native\Handle\TransactionHandle.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\IscErrorMessages.cs" />
+    <Compile Include="Common\Marshal2.cs" />
     <Compile Include="Common\PageSizeHelper.cs" />
     <Compile Include="Common\SqlStateMapping.cs" />
     <Compile Include="Common\TimeoutHelper.cs" />
