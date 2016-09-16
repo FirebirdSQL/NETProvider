@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Static Fields
 
-		internal static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+		internal static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 		{
 			{ DefaultKeyDataSource, DefaultKeyDataSource },
 			{ "datasource", DefaultKeyDataSource },
@@ -310,7 +310,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Internal Properties
 		internal string NormalizedConnectionString
 		{
-			get { return string.Join(";", _options.Keys.OrderBy(x => x, StringComparer.InvariantCulture).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(_options[key].ToString())))); }
+			get { return string.Join(";", _options.Keys.OrderBy(x => x, StringComparer.Ordinal).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(_options[key].ToString())))); }
 		}
 		#endregion
 
