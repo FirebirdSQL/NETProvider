@@ -207,7 +207,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fbClient.isc_drop_database(_statusVector, ref _handle);
 
-			_handle.Close();
+			_handle.Dispose();
 
 			ProcessStatusVector(_statusVector);
 		}

@@ -662,11 +662,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 #region Internal Methods
 
-		internal void CloseReader()
+		internal void DisposeReader()
 		{
 			if (_activeReader != null)
 			{
-				_activeReader.Close();
+				_activeReader.Dispose();
 				_activeReader = null;
 			}
 		}
@@ -825,7 +825,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			RollbackImplicitTransaction();
 
 			// If there	are	an active reader close it
-			CloseReader();
+			DisposeReader();
 
 			// Remove the command from the Prepared commands list
 			if (_connection != null && _connection.State == ConnectionState.Open)
@@ -1164,7 +1164,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (!_statement.IsPrepared)
 			{
 				// Close the inner DataReader if needed
-				CloseReader();
+				DisposeReader();
 
 				// Reformat the SQL statement if needed
 				string sql = _commandText;

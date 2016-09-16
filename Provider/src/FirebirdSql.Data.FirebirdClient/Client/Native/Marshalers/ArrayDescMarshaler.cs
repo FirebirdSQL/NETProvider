@@ -33,12 +33,12 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 			if (pNativeData != IntPtr.Zero)
 			{
 				// Destroy ArrayDescMarshal	structure
-				Marshal.DestroyStructure(pNativeData, typeof(ArrayDescMarshal));
+				Marshal2.DestroyStructure<ArrayDescMarshal>(pNativeData);
 
 				// Destroy ArrayBound structures
 				for (int i = 0; i < 16; i++)
 				{
-					Marshal.DestroyStructure(pNativeData + ArrayDescMarshal.ComputeLength(i), typeof(ArrayBoundMarshal));
+					Marshal2.DestroyStructure<ArrayBoundMarshal>(pNativeData + ArrayDescMarshal.ComputeLength(i));
 				}
 
 				// Free	pointer	memory

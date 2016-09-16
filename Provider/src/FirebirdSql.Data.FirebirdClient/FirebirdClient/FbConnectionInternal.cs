@@ -297,7 +297,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (command.Transaction != null)
 				{
-					command.CloseReader();
+					command.DisposeReader();
 					command.Transaction = null;
 				}
 			}
