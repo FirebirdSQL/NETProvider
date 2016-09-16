@@ -516,14 +516,20 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string ExpandDataDirectory(string s)
 		{
-			const string dataDirectoryKeyword = "|DataDirectory|";
+			const string DataDirectoryKeyword = "|DataDirectory|";
+#if NETCORE10
+			if (s.IndexOf(DataDirectoryKeyword, StringComparison.OrdinalIgnoreCase) != -1)
+				throw new NotSupportedException();
 
+			return s;
+#else
 			if (s == null)
 				return s;
 
 			string dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
-			string pattern = string.Format("{0}{1}?", Regex.Escape(dataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
+			string pattern = string.Format("{0}{1}?", Regex.Escape(DataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
 			return Regex.Replace(s, pattern, dataDirectoryLocation + Path.DirectorySeparatorChar, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+#endif
 		}
 
 		private string GetString(string key)
