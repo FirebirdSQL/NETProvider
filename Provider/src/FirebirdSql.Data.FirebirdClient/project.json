@@ -25,11 +25,28 @@
 			"imports": "dnxcore50"
 		}
 	},
+	"configurations": {
+		"Debug": {
+			"buildOptions": {
+				"define": [ "DEBUG", "TRACE", "NETCORE10" ],
+				"optimize": false,
+				"debugType": "full"
+			}
+		},
+		"Release": {
+			"buildOptions": {
+				"define": [ "TRACE", "NETCORE10" ],
+				"optimize": true,
+				"debugType": "portable"
+			}
+		}
+	},
 	"buildOptions": {
-		"define": [ "NETCORE10" ],
 		"compile": {
 			"exclude": [ "Schema/**", "Services/**", "Isql/**", "Entity/**" ]
 		},
+		"publicSign": true,
+		"keyFile": "Properties\\FirebirdSql.Data.FirebirdClient.snk",
 		"allowUnsafe": true
 	}
 }
