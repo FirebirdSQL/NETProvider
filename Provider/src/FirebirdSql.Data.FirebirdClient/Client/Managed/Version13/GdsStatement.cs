@@ -58,7 +58,12 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						bits.Set(i, field.DbValue.IsDBNull());
 					}
 					var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
-					bits.CopyTo(buffer, 0);
+					for (int i = 0; i < buffer.Length * 8; i++)
+					{
+						var index = i / 8;
+						// LSB
+						buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
+					}
 					xdr.WriteOpaque(buffer);
 
 					for (var i = 0; i < _parameters.Count; i++)
