@@ -26,7 +26,6 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using FirebirdSql.Data.Common;
 
