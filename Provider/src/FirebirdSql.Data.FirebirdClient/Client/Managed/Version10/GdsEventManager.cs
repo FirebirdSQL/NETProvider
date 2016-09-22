@@ -20,6 +20,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,7 +34,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private GdsDatabase _database;
 		private Thread _eventsThread;
-		private int _eventsThreadShouldEnd;
 		private ConcurrentDictionary<int, RemoteEvent> _events;
 		private int _handle;
 
@@ -73,7 +73,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					_eventsThread = new Thread(ThreadHandler);
 					_eventsThread.IsBackground = true;
 					_eventsThread.Name = "FirebirdClient - Events Thread";
-					_eventsThreadShouldEnd = 0;
 					_eventsThread.Start();
 				}
 			}
@@ -99,7 +98,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					// we don't have here clue about disposing vs. finalizer
 					if (!Environment.HasShutdownStarted)
 					{
-						Volatile2.Write(ref _eventsThreadShouldEnd, 1);
 						_eventsThread.Join();
 					}
 
@@ -114,41 +112,42 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void ThreadHandler(object _)
 		{
-			while (_events.Any())
+			try
 			{
-				System.Diagnostics.Debugger.Launch();
-				if (Volatile2.Read(ref _eventsThreadShouldEnd) == 1)
-					return;
-
-#warning NETCORE10: Stop the reading
-				var operation = _database.NextOperation();
-
-				switch (operation)
+				while (_events.Any())
 				{
-					case IscCodes.op_response:
-						_database.ReadResponse();
-						continue;
+					var operation = _database.NextOperation();
 
-					case IscCodes.op_exit:
-					case IscCodes.op_disconnect:
-						Close();
-						return;
+					switch (operation)
+					{
+						case IscCodes.op_response:
+							_database.ReadResponse();
+							continue;
 
-					case IscCodes.op_event:
-						var dbHandle = _database.XdrStream.ReadInt32();
-						var buffer = _database.XdrStream.ReadBuffer();
-						var ast = _database.XdrStream.ReadBytes(8);
-						var eventId = _database.XdrStream.ReadInt32();
+						case IscCodes.op_exit:
+						case IscCodes.op_disconnect:
+							Close();
+							return;
 
-						RemoteEvent currentEvent;
-						if (_events.TryRemove(eventId, out currentEvent))
-						{
-							// Notify new event counts
-							currentEvent.EventCounts(buffer);
-						}
+						case IscCodes.op_event:
+							var dbHandle = _database.XdrStream.ReadInt32();
+							var buffer = _database.XdrStream.ReadBuffer();
+							var ast = _database.XdrStream.ReadBytes(8);
+							var eventId = _database.XdrStream.ReadInt32();
 
-						continue;
+							RemoteEvent currentEvent;
+							if (_events.TryRemove(eventId, out currentEvent))
+							{
+								// Notify new event counts
+								currentEvent.EventCounts(buffer);
+							}
+							continue;
+					}
 				}
+			}
+			catch (IOException ex) when ((ex.InnerException as SocketException)?.SocketErrorCode == SocketError.Interrupted)
+			{
+				return;
 			}
 		}
 
