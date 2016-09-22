@@ -40,9 +40,13 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		{
 			XdrStream.Write(IscCodes.op_attach);
 			XdrStream.Write(0);
-			if (!string.IsNullOrEmpty(Password))
+			if (!string.IsNullOrEmpty(UserID))
 			{
-				dpb.Append(IscCodes.isc_dpb_password, Password);
+				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
+				if (!string.IsNullOrEmpty(Password))
+				{
+					dpb.Append(IscCodes.isc_dpb_password, Password);
+				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
@@ -53,9 +57,13 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		{
 			XdrStream.Write(IscCodes.op_create);
 			XdrStream.Write(0);
-			if (!string.IsNullOrEmpty(Password))
+			if (!string.IsNullOrEmpty(UserID))
 			{
-				dpb.Append(IscCodes.isc_dpb_password, Password);
+				dpb.Append(IscCodes.isc_dpb_user_name, UserID);
+				if (!string.IsNullOrEmpty(Password))
+				{
+					dpb.Append(IscCodes.isc_dpb_password, Password);
+				}
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));

@@ -327,22 +327,19 @@ namespace FirebirdSql.Data.Client.Managed
 					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 				}
 
-				result.WriteByte(IscCodes.CNCT_client_crypt);
-				result.WriteByte(4);
-				result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
-
-#warning This the CNCT_user needed in general?
-#if !NETCORE10
-				var user = Encoding.UTF8.GetBytes(Environment.UserName);
+				var user = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("USERNAME"));
 				result.WriteByte(IscCodes.CNCT_user);
 				result.WriteByte((byte)user.Length);
 				result.Write(user, 0, user.Length);
-#endif
 
 				var host = Encoding.UTF8.GetBytes(Dns.GetHostName());
 				result.WriteByte(IscCodes.CNCT_host);
 				result.WriteByte((byte)host.Length);
 				result.Write(host, 0, host.Length);
+
+				result.WriteByte(IscCodes.CNCT_client_crypt);
+				result.WriteByte(4);
+				result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 
 				result.WriteByte(IscCodes.CNCT_user_verification);
 				result.WriteByte(0);
