@@ -20,7 +20,9 @@ using System;
 
 namespace FirebirdSql.Data.Isql
 {
+#if !NETCORE10
 	[Serializable]
+#endif
 	public class FbStatement
 	{
 		public string Text { get; private set; }

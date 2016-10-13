@@ -335,7 +335,7 @@ namespace FirebirdSql.Data.Isql
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
-				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "CONNECT")
+				if (enumerator.Current.Text.ToUpperInvariant() != "CONNECT")
 				{
 					throw new ArgumentException("Malformed isql CONNECT statement. Expected keyword CONNECT but something else was found.");
 				}
@@ -343,7 +343,7 @@ namespace FirebirdSql.Data.Isql
 				_connectionString.Database = enumerator.Current.Text.Replace("'", string.Empty);
 				while (enumerator.MoveNext())
 				{
-					switch (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture))
+					switch (enumerator.Current.Text.ToUpperInvariant())
 					{
 						case "USER":
 							enumerator.MoveNext();
@@ -392,7 +392,7 @@ namespace FirebirdSql.Data.Isql
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
-				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "CREATE")
+				if (enumerator.Current.Text.ToUpperInvariant() != "CREATE")
 				{
 					throw new ArgumentException("Malformed isql CREATE statement. Expected keyword CREATE but something else was found.");
 				}
@@ -401,7 +401,7 @@ namespace FirebirdSql.Data.Isql
 				_connectionString.Database = enumerator.Current.Text.Replace("'", string.Empty);
 				while (enumerator.MoveNext())
 				{
-					switch (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture))
+					switch (enumerator.Current.Text.ToUpperInvariant())
 					{
 						case "USER":
 							enumerator.MoveNext();
@@ -422,11 +422,11 @@ namespace FirebirdSql.Data.Isql
 
 						case "DEFAULT":
 							enumerator.MoveNext();
-							if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "CHARACTER")
+							if (enumerator.Current.Text.ToUpperInvariant() != "CHARACTER")
 								throw new ArgumentException("Expected the keyword CHARACTER but something else was found.");
 
 							enumerator.MoveNext();
-							if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
+							if (enumerator.Current.Text.ToUpperInvariant() != "SET")
 								throw new ArgumentException("Expected the keyword SET but something else was found.");
 
 							enumerator.MoveNext();
@@ -452,14 +452,14 @@ namespace FirebirdSql.Data.Isql
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
-				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
+				if (enumerator.Current.Text.ToUpperInvariant() != "SET")
 				{
 					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
 				}
 				enumerator.MoveNext(); // AUTO
 				if (enumerator.MoveNext())
 				{
-					string onOff = enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture);
+					string onOff = enumerator.Current.Text.ToUpperInvariant();
 					if (onOff == "ON")
 					{
 						autoCommit = true;
@@ -492,7 +492,7 @@ namespace FirebirdSql.Data.Isql
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
-				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
+				if (enumerator.Current.Text.ToUpperInvariant() != "SET")
 				{
 					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
 				}
@@ -514,7 +514,7 @@ namespace FirebirdSql.Data.Isql
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
-				if (enumerator.Current.Text.ToUpper(CultureInfo.InvariantCulture) != "SET")
+				if (enumerator.Current.Text.ToUpperInvariant() != "SET")
 				{
 					throw new ArgumentException("Malformed isql SET statement. Expected keyword SET but something else was found.");
 				}
