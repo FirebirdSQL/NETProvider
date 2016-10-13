@@ -128,15 +128,15 @@
     <None Include="Properties\EntityFramework.Firebird.snk" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\FirebirdSql.Data.FirebirdClient\Entity\ProviderManifest.xml">
+      <Link>Resources\ProviderManifest.xml</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET40.csproj">
       <Project>{326a24f9-6259-45db-835c-18db80728460}</Project>
       <Name>FirebirdSql.Data.FirebirdClient_NET40</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\FirebirdSql.Data.FirebirdClient\Entity\ProviderManifest.xml">
-      <Link>Resources\ProviderManifest.xml</Link>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -18,8 +18,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <OutputPath>bin\Debug\NET40\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
     <IntermediateOutputPath>obj\Debug\NET40\</IntermediateOutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Optimize>false</Optimize>
     <DebugSymbols>true</DebugSymbols>
@@ -302,7 +302,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Entity\ProviderManifest.xml" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

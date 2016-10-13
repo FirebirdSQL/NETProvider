@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -60,6 +60,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client\Managed\Compression\Deflate.cs" />
+    <Compile Include="Client\Managed\Compression\Inflate.cs" />
+    <Compile Include="Client\Managed\Compression\InfTree.cs" />
+    <Compile Include="Client\Managed\Compression\Tree.cs" />
+    <Compile Include="Client\Managed\Compression\Zlib.cs" />
+    <Compile Include="Client\Managed\Compression\ZlibCodec.cs" />
+    <Compile Include="Client\Managed\Compression\ZlibConstants.cs" />
     <Compile Include="Client\Managed\ProtocolsSupported.cs" />
     <Compile Include="Client\Managed\Version11\AuthResponse.cs" />
     <Compile Include="Client\Managed\SspiHelper.cs" />

@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			_networkStream?.Dispose();
 			_networkStream = null;
-			_socket?.Close();
+			_socket?.Dispose();
 			_socket = null;
 		}
 
