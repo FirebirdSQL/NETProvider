@@ -346,13 +346,13 @@ namespace Ionic.Zlib
 
         internal static byte[] ToByteArray(System.String sourceString)
         {
-            return System.Text.UTF8Encoding.UTF8.GetBytes(sourceString);
+            return System.Text.Encoding.UTF8.GetBytes(sourceString);
         }
 
 
         internal static char[] ToCharArray(byte[] byteArray)
         {
-            return System.Text.UTF8Encoding.UTF8.GetChars(byteArray);
+            return System.Text.Encoding.UTF8.GetChars(byteArray);
         }
     }
 
