@@ -76,11 +76,6 @@ namespace FirebirdSql.Data.Client.Managed
 			get { return _protocolMinimunType; }
 		}
 
-		public string UserID
-		{
-			get { return _userID; }
-		}
-
 		public string Password
 		{
 			get { return _password; }

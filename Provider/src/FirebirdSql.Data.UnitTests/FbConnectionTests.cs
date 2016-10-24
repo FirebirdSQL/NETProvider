@@ -306,7 +306,6 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void UserIDCorrectlyPassedToServer()
 		{
-#warning https://github.com/cincuranet/FirebirdSql.Data.FirebirdClient/commit/7e1e4a1e1eb362c2c96a141a51952b23c9970f79
 			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
 			{
 				conn.Open();

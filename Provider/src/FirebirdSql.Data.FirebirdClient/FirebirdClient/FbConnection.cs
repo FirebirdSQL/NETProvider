@@ -78,6 +78,10 @@ namespace FirebirdSql.Data.FirebirdClient
 				dpb.Append(IscCodes.isc_dpb_version1);
 				dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 				dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { options.Dialect, 0, 0, 0 });
+				if (!string.IsNullOrEmpty(options.UserID))
+				{
+					dpb.Append(IscCodes.isc_dpb_user_name, options.UserID);
+				}
 				if (options.Charset.Length > 0)
 				{
 					Charset charset = Charset.GetCharset(options.Charset);
