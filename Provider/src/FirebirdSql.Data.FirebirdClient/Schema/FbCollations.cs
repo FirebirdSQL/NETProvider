@@ -19,6 +19,7 @@
  *      Jiri Cincura (jiri@cincura.net)
  */
 
+#if !NETCORE10
 using System;
 using System.Globalization;
 using System.Data;
@@ -79,3 +80,4 @@ namespace FirebirdSql.Data.Schema
 		#endregion
 	}
 }
+#endif

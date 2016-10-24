@@ -50,7 +50,7 @@
 	},
 	"buildOptions": {
 		"compile": {
-			"exclude": [ "Schema/**", "Entity/**" ]
+			"exclude": [ "Entity/**" ]
 		},
 		"publicSign": true,
 		"keyFile": "Properties\\FirebirdSql.Data.FirebirdClient.snk",
