@@ -12,6 +12,36 @@
     <iconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>firebird firebirsql firebirdclient adonet database</tags>
+    <dependencies>
+      <group targetFramework="netstandard1.6">
+        <dependency id="Microsoft.Extensions.PlatformAbstractions" version="[1.0.0, )" />
+        <dependency id="System.Collections.NonGeneric" version="[4.0.1, )" />
+        <dependency id="System.ComponentModel.Primitives" version="[4.1.0, )" />
+        <dependency id="System.ComponentModel.TypeConverter" version="[4.1.0, )" />
+        <dependency id="System.Data.Common" version="[4.1.0, )" />
+        <dependency id="System.Diagnostics.Contracts" version="[4.0.1, )" />
+        <dependency id="System.Diagnostics.Debug" version="[4.0.11, )" />
+        <dependency id="System.Diagnostics.Process" version="[4.1.0, )" />
+        <dependency id="System.Diagnostics.TraceSource" version="[4.0.0, )" />
+        <dependency id="System.Globalization.Calendars" version="[4.0.1, )" />
+        <dependency id="System.IO.FileSystem" version="[4.0.1, )" />
+        <dependency id="System.IO.UnmanagedMemoryStream" version="[4.0.1, )" />
+        <dependency id="System.Linq.Parallel" version="[4.0.1, )" />
+        <dependency id="System.Net.NameResolution" version="[4.0.0, )" />
+        <dependency id="System.Net.Sockets" version="[4.1.0, )" />
+        <dependency id="System.Reflection" version="[4.1.0, )" />
+        <dependency id="System.Reflection.Emit" version="[4.0.1, )" />
+        <dependency id="System.Reflection.Emit.ILGeneration" version="[4.0.1, )" />
+        <dependency id="System.Reflection.TypeExtensions" version="[4.1.0, )" />
+        <dependency id="System.Runtime.Numerics" version="[4.0.1, )" />
+        <dependency id="System.Security.Cryptography.Algorithms" version="[4.2.0, )" />
+        <dependency id="System.Text.RegularExpressions" version="[4.1.0, )" />
+        <dependency id="System.Threading" version="[4.0.11, )" />
+        <dependency id="System.Threading.Tasks.Parallel" version="[4.0.1, )" />
+        <dependency id="System.Threading.Thread" version="[4.0.0, )" />
+        <dependency id="System.Threading.Timer" version="[4.0.1, )" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET40\FirebirdSql.Data.FirebirdClient.dll" target="lib\net40-client" />
