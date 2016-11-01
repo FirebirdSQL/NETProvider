@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Native
 		/// specified.
 		/// </summary>
 		private static IDictionary<string, IFbClient> cache;
-		private static List<Type> injectionTypes;
+		private static HashSet<Type> injectionTypes;
 
 		/// <summary>
 		/// Static constructor sets up member variables.
@@ -47,12 +47,17 @@ namespace FirebirdSql.Data.Client.Native
 		static FbClientFactory()
 		{
 			cache = new SortedDictionary<string, IFbClient>();
-			injectionTypes = typeof(FbClientFactory).Assembly.GetTypes()
-				.Where(x => !x.IsAbstract)
-				.Where(x => !x.IsInterface)
+#if NETCORE10
+			injectionTypes = new HashSet<Type>(typeof(FbClientFactory).GetTypeInfo().Assembly.GetTypes()
+				.Where(x => !x.GetTypeInfo().IsAbstract && !x.GetTypeInfo().IsInterface)
 				.Where(x => typeof(IFirebirdHandle).IsAssignableFrom(x))
-				.Select(x => x.MakeByRefType())
-				.ToList();
+				.Select(x => x.MakeByRefType()));
+#else
+			injectionTypes = new HashSet<Type>(typeof(FbClientFactory).Assembly.GetTypes()
+				.Where(x => !x.IsAbstract && !x.IsInterface)
+				.Where(x => typeof(IFirebirdHandle).IsAssignableFrom(x))
+				.Select(x => x.MakeByRefType()));
+#endif
 		}
 
 		/// <summary>
@@ -262,15 +267,19 @@ namespace FirebirdSql.Data.Client.Native
 		/// <returns>An instance of our type, cast as an <see cref="IFbClient"/>.</returns>
 		private static IFbClient CreateInstance(TypeBuilder tb)
 		{
+#if NET40
 			Type t = tb.CreateType();
+#else
+			Type t = tb.CreateTypeInfo().AsType();
+#endif
 
-#if (DEBUG)
-			// In debug mode, we'll save the assembly out to disk, so we can look at it in Reflector.
+#if DEBUG
+#if !NETCORE10
 			AssemblyBuilder ab = (AssemblyBuilder)tb.Assembly;
 			ab.Save("DynamicAssembly.dll");
 #endif
+#endif
 
-			// Create an instance of the type and return it.
 			return (IFbClient)Activator.CreateInstance(t);
 		}
 
@@ -294,14 +303,18 @@ namespace FirebirdSql.Data.Client.Native
 			assemblyName.Name = baseName + "_Assembly";
 
 			// We create the dynamic assembly in our current AppDomain
-			AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
-					assemblyName,
-					AssemblyBuilderAccess.RunAndSave);
+#if NETCORE10
+			AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+#else
+			AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
+#endif
 
 			// Generate the actual module (which is the DLL itself)
-			ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(
-					baseName + "_Module",
-					baseName + ".dll");
+#if NETCORE10
+			ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module");
+#else
+			ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module", baseName + ".dll");
+#endif
 
 			// Add our type to the module.
 			return moduleBuilder.DefineType(baseName + "_Class", TypeAttributes.Class);

@@ -159,11 +159,11 @@ namespace FirebirdSql.Data.Client.Native
 					Marshal.Copy(tpb.ToArray(), 0, teb.tpb_ptr, tpb.Length);
 
 					// Alloc memory	for	the	IscTeb structure
-					int size = Marshal.SizeOf(typeof(IscTeb));
+					int size = Marshal2.SizeOf<IscTeb>();
 					tebData = Marshal.AllocHGlobal(size);
 
 					Marshal.StructureToPtr(teb, tebData, true);
-					
+
 					_db.FbClient.isc_start_multiple(
 						_statusVector,
 						ref _handle,
@@ -196,7 +196,7 @@ namespace FirebirdSql.Data.Client.Native
 					}
 					if (tebData != IntPtr.Zero)
 					{
-						Marshal.DestroyStructure(tebData, typeof(IscTeb));
+						Marshal2.DestroyStructure<IscTeb>(tebData);
 						Marshal.FreeHGlobal(tebData);
 					}
 				}
@@ -211,9 +211,9 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				// Clear the status vector
 				ClearStatusVector();
-				
+
 				_db.FbClient.isc_commit_transaction(_statusVector, ref _handle);
-				
+
 				_db.ProcessStatusVector(_statusVector);
 
 				_db.TransactionCount--;
@@ -232,9 +232,9 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				// Clear the status vector
 				ClearStatusVector();
-				
+
 				_db.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
-				
+
 				_db.ProcessStatusVector(_statusVector);
 
 				_db.TransactionCount--;
@@ -253,7 +253,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				// Clear the status vector
 				ClearStatusVector();
-				
+
 				_db.FbClient.isc_commit_retaining(_statusVector, ref _handle);
 
 				_db.ProcessStatusVector(_statusVector);
@@ -270,7 +270,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				// Clear the status vector
 				ClearStatusVector();
-				
+
 				_db.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
 
 				_db.ProcessStatusVector(_statusVector);

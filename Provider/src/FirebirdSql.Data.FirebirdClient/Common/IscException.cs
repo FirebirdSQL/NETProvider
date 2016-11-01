@@ -26,18 +26,22 @@ using System.Globalization;
 using System.Text;
 using System.Reflection;
 using System.Resources;
+#if !NETCORE10
 using System.Runtime.Serialization;
+#endif
 
 namespace FirebirdSql.Data.Common
 {
+#if !NETCORE10
 	[Serializable]
+#endif
 	internal sealed class IscException : Exception
 	{
-		#region Fields
+#region Fields
 		private string _message;
-		#endregion
+#endregion
 
-		#region Properties
+#region Properties
 
 		public List<IscError> Errors { get; private set; }
 
@@ -65,9 +69,9 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Constructors
+#region Constructors
 
 		private IscException(Exception innerException = null)
 			: base(innerException?.Message, innerException)
@@ -143,16 +147,18 @@ namespace FirebirdSql.Data.Common
 			return result;
 		}
 
+#if !NETCORE10
 		private IscException(SerializationInfo info, StreamingContext context)
 				: base(info, context)
 		{
 			Errors = (List<IscError>)info.GetValue("errors", typeof(List<IscError>));
 			ErrorCode = info.GetInt32("errorCode");
 		}
+#endif
 
-		#endregion
+#endregion
 
-		#region Public Methods
+#region Public Methods
 
 		public void BuildExceptionData()
 		{
@@ -161,6 +167,7 @@ namespace FirebirdSql.Data.Common
 			BuildExceptionMessage();
 		}
 
+#if !NETCORE10
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);
@@ -168,15 +175,16 @@ namespace FirebirdSql.Data.Common
 			info.AddValue("errors", Errors);
 			info.AddValue("errorCode", ErrorCode);
 		}
+#endif
 
 		public override string ToString()
 		{
 			return _message;
 		}
 
-		#endregion
+#endregion
 
-		#region Private Methods
+#region Private Methods
 
 		private void BuildErrorCode()
 		{
@@ -262,9 +270,9 @@ namespace FirebirdSql.Data.Common
 			return string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
 		}
 
-		#endregion
+#endregion
 
-		#region Static Methods
+#region Static Methods
 
 		private static string GetValueOrDefault(IDictionary<int, string> dictionary, int key, Func<int, string> defaultValueFactory)
 		{
@@ -285,6 +293,6 @@ namespace FirebirdSql.Data.Common
 			builder.AppendFormat(CultureInfo.CurrentCulture, message, args.ToArray());
 		}
 
-		#endregion
+#endregion
 	}
 }

@@ -1,8 +1,7 @@
 version: '{build}'
 configuration:
   - Debug
-  - Release_40
-  - Release_45
+  - Release
 environment:
   matrix:
   - fb_download: https://www.dropbox.com/s/4o7nzyljrlr8sgs/fb30.7z?dl=1
@@ -15,6 +14,8 @@ environment:
 #    fb_start: .\bin\fb_inet_server.exe -a
 shallow_clone: true
 test: off
+before_build:
+  - ps: nuget restore Provider\src\NETProvider.sln
 build:
   project: Provider\src\NETProvider.sln
   parallel: true
@@ -36,9 +37,15 @@ before_test:
   - ps: ni firebird.log -ItemType File | Out-Null
 test_script:
   - ps: cd $testsDir
-  - ps: nunit3-console FirebirdSql.Data.UnitTests.dll --framework=net-4.0 --where='cat != Local' --result='myresults.xml;format=AppVeyor'
+  - ps: nunit3-console FirebirdSql.Data.UnitTests.dll --framework=net-4.5 --where='cat != Local' --result='myresults.xml;format=AppVeyor'
 artifacts:
-  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.dll
-  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\FirebirdSql.Data.FirebirdClient.pdb
-  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\EntityFramework.Firebird.dll
-  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\EntityFramework.Firebird.pdb
+  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\NET45\FirebirdSql.Data.FirebirdClient.dll
+  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\NET45\FirebirdSql.Data.FirebirdClient.pdb
+  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\NET40\FirebirdSql.Data.FirebirdClient.dll
+  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\NET40\FirebirdSql.Data.FirebirdClient.pdb
+  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\netstandard1.6\FirebirdSql.Data.FirebirdClient.dll
+  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\netstandard1.6\FirebirdSql.Data.FirebirdClient.pdb
+  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\NET45\EntityFramework.Firebird.dll
+  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\NET45\EntityFramework.Firebird.pdb
+  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\NET40\EntityFramework.Firebird.dll
+  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\NET40\EntityFramework.Firebird.pdb

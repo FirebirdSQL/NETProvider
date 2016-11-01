@@ -19,7 +19,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 using FirebirdSql.Data.Common;
 
@@ -95,7 +98,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					// we don't have here clue about disposing vs. finalizer
 					if (!Environment.HasShutdownStarted)
 					{
-						_eventsThread.Abort();
 						_eventsThread.Join();
 					}
 
@@ -108,11 +110,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Private Methods
 
-		private void ThreadHandler(object o)
+		private void ThreadHandler(object _)
 		{
 			try
 			{
-				while (GetEventsCountLocked() > 0)
+				while (_events.Any())
 				{
 					var operation = _database.NextOperation();
 
@@ -139,24 +141,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								// Notify new event counts
 								currentEvent.EventCounts(buffer);
 							}
-
 							continue;
 					}
 				}
 			}
-			catch (ThreadAbortException)
+			catch (IOException ex) when ((ex.InnerException as SocketException)?.SocketErrorCode == SocketError.Interrupted)
 			{
 				return;
 			}
-			catch
-			{
-				return;
-			}
-		}
-
-		private int GetEventsCountLocked()
-		{
-			return _events.Count;
 		}
 
 		#endregion

@@ -22,7 +22,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Data.Common;
-#if (!EF_6)
+#if !EF6
 using System.Data.Metadata.Edm;
 using System.Data.Common.CommandTrees;
 #else
@@ -35,7 +35,7 @@ using System.Linq;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-#if (!EF_6)
+#if !EF6
 namespace FirebirdSql.Data.Entity
 #else
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
@@ -1718,7 +1718,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			return result;
 		}
 
-#if (EF_6)
+#if EF6
 		public override ISqlFragment Visit(DbInExpression e)
 		{
 			SqlBuilder result = new SqlBuilder();

@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.Client.Native
 						_state = StatementState.Deallocated;
 						_statementType = DbStatementType.None;
 						_recordsAffected = 0;
-						_handle.Close();
+						_handle.Dispose();
 						FetchSize = 0;
 					}
 				}

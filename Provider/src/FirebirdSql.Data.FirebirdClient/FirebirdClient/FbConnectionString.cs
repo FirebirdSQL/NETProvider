@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Static Fields
 
-		internal static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+		internal static readonly IDictionary<string, string> Synonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 		{
 			{ DefaultKeyDataSource, DefaultKeyDataSource },
 			{ "datasource", DefaultKeyDataSource },
@@ -310,7 +310,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Internal Properties
 		internal string NormalizedConnectionString
 		{
-			get { return string.Join(";", _options.Keys.OrderBy(x => x, StringComparer.InvariantCulture).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(_options[key].ToString())))); }
+			get { return string.Join(";", _options.Keys.OrderBy(x => x, StringComparer.Ordinal).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(_options[key].ToString())))); }
 		}
 		#endregion
 
@@ -516,14 +516,20 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string ExpandDataDirectory(string s)
 		{
-			const string dataDirectoryKeyword = "|DataDirectory|";
+			const string DataDirectoryKeyword = "|DataDirectory|";
+#if NETCORE10
+			if (s.IndexOf(DataDirectoryKeyword, StringComparison.OrdinalIgnoreCase) != -1)
+				throw new NotSupportedException();
 
+			return s;
+#else
 			if (s == null)
 				return s;
 
 			string dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
-			string pattern = string.Format("{0}{1}?", Regex.Escape(dataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
+			string pattern = string.Format("{0}{1}?", Regex.Escape(DataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
 			return Regex.Replace(s, pattern, dataDirectoryLocation + Path.DirectorySeparatorChar, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+#endif
 		}
 
 		private string GetString(string key)
@@ -579,7 +585,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			object value;
 			if (_options.TryGetValue(key, out value))
 			{
-				string il = value.ToString().ToLower(CultureInfo.InvariantCulture);
+				string il = value.ToString().ToLowerInvariant();
 
 				switch (il)
 				{
@@ -611,7 +617,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckIsolationLevel()
 		{
-			string il = _options[DefaultKeyIsolationLevel].ToString().ToLower(CultureInfo.InvariantCulture);
+			string il = _options[DefaultKeyIsolationLevel].ToString().ToLowerInvariant();
 
 			switch (il)
 			{

@@ -12,32 +12,42 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
 using System;
+using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Isql
+namespace FirebirdSql.Data.Common
 {
-#if !NETCORE10
-	[Serializable]
-#endif
-	public class FbStatement
+	static class Marshal2
 	{
-		public string Text { get; private set; }
-		internal string CleanText { get; private set; }
-		public SqlStatementType StatementType { get; private set; }
-
-		internal FbStatement(string text, string cleanText)
+		public static int SizeOf<T>()
 		{
-			Text = text;
-			CleanText = cleanText;
+#if NET40
+			return Marshal.SizeOf(typeof(T));
+#else
+			return Marshal.SizeOf<T>();
+#endif
 		}
 
-		internal void SetStatementType(SqlStatementType statementType)
+		public static T PtrToStructure<T>(IntPtr ptr)
 		{
-			StatementType = statementType;
+#if NET40
+			return (T)Marshal.PtrToStructure(ptr, typeof(T));
+#else
+			return Marshal.PtrToStructure<T>(ptr);
+#endif
+		}
+
+		public static void DestroyStructure<T>(IntPtr ptr)
+		{
+#if NET40
+			Marshal.DestroyStructure(ptr, typeof(T));
+#else
+			Marshal.DestroyStructure<T>(ptr);
+#endif
 		}
 	}
 }

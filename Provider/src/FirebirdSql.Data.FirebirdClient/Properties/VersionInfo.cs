@@ -16,7 +16,7 @@
  *  All Rights Reserved.
  */
 
-#if (EF_6)
+#if EF6
 namespace FirebirdSql.Data.EntityFramework6.Properties
 #else
 namespace FirebirdSql.Data.FirebirdClient.Properties

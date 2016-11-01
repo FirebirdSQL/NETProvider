@@ -24,7 +24,7 @@ namespace FirebirdSql.Data.Common
 	static class TimeoutHelper
 	{
 		public static readonly TimeSpan InfiniteTimeSpan =
-#if (NET_40)
+#if NET40
 			new TimeSpan(0, 0, 0, 0, -1);
 #else
 			Timeout.InfiniteTimeSpan;

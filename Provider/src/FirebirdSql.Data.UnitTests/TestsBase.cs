@@ -140,7 +140,7 @@ values(@int_field, @char_field, @varchar_field, @bigint_field, @smallint_field, 
 							command.Parameters["@time_field"].Value = DateTime.Now;
 							command.Parameters["@timestamp_field"].Value = DateTime.Now;
 							command.Parameters["@clob_field"].Value = "IRow Number " + i.ToString();
-							command.Parameters["@blob_field"].Value = Encoding.Default.GetBytes("IRow Number " + i.ToString());
+							command.Parameters["@blob_field"].Value = Encoding.UTF8.GetBytes("IRow Number " + i.ToString());
 
 							command.ExecuteNonQuery();
 						}

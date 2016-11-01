@@ -19,7 +19,7 @@
 using System;
 using System.Globalization;
 
-#if (!EF_6)
+#if !EF6
 namespace FirebirdSql.Data.Entity
 #else
 namespace FirebirdSql.Data.EntityFramework6.SqlGen

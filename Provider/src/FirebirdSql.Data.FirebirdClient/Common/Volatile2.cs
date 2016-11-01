@@ -12,32 +12,33 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2016 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
 using System;
+using System.Threading;
 
-namespace FirebirdSql.Data.Isql
+namespace FirebirdSql.Data.Common
 {
-#if !NETCORE10
-	[Serializable]
-#endif
-	public class FbStatement
+	static class Volatile2
 	{
-		public string Text { get; private set; }
-		internal string CleanText { get; private set; }
-		public SqlStatementType StatementType { get; private set; }
-
-		internal FbStatement(string text, string cleanText)
+		public static int Read(ref int location)
 		{
-			Text = text;
-			CleanText = cleanText;
+#if NET40
+			return Thread.VolatileRead(ref location);
+#else
+			return Volatile.Read(ref location);
+#endif
 		}
 
-		internal void SetStatementType(SqlStatementType statementType)
+		public static void Write(ref int location, int value)
 		{
-			StatementType = statementType;
+#if NET40
+			Thread.VolatileWrite(ref location, value);
+#else
+			Volatile.Write(ref location, value);
+#endif
 		}
 	}
 }

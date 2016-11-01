@@ -16,6 +16,7 @@
  *  All Rights Reserved.
  */
 
+#if !NETCORE10
 using System;
 using System.Data;
 using System.Data.Common;
@@ -25,6 +26,7 @@ using System.Text.RegularExpressions;
 using System.Collections;
 
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Schema
 {
@@ -143,3 +145,4 @@ namespace FirebirdSql.Data.Schema
 		#endregion
 	}
 }
+#endif

@@ -27,7 +27,10 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	[Serializable, ListBindable(false)]
+#if !NETCORE10
+	[Serializable]
+	[ListBindable(false)]
+#endif
 	public sealed class FbErrorCollection : ICollection<FbError>
 	{
 		#region Fields

@@ -19,6 +19,8 @@
 using System;
 using System.Runtime.InteropServices;
 
+using FirebirdSql.Data.Common;
+
 namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	[StructLayout(LayoutKind.Sequential)]
@@ -42,7 +44,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 		public static int ComputeLength(int n)
 		{
-			return (Marshal.SizeOf(typeof(ArrayDescMarshal)) + n * Marshal.SizeOf(typeof(ArrayBoundMarshal)));
+			return Marshal2.SizeOf<ArrayDescMarshal>() + n * Marshal2.SizeOf<ArrayBoundMarshal>();
 		}
 
 		#endregion

@@ -41,7 +41,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
+#if !NETCORE10
 		private DataTable _schemaTable;
+#endif
 		private FbCommand _command;
 		private FbConnection _connection;
 		private DbValue[] _row;
@@ -53,7 +55,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		private int _recordsAffected;
 		private Dictionary<string, int> _columnsIndexesOrdinal;
 		private Dictionary<string, int> _columnsIndexesOrdinalCI;
-		private Dictionary<string, int> _columnsIndexesInvariantCI;
 
 		#endregion
 
@@ -100,32 +101,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			Dispose(false);
 		}
-
-		#endregion
-
-		#region IDisposable methods
-
-		//protected override void Dispose(bool disposing)
-		//{
-		//    if (!this.disposed)
-		//    {
-		//        try
-		//        {
-		//            if (disposing)
-		//            {
-		//                // release any managed resources
-		//                this.Close();
-		//            }
-
-		//            // release any unmanaged resources
-		//        }
-		//        finally
-		//        {
-		//        }
-
-		//        this.disposed = true;
-		//    }
-		//}
 
 		#endregion
 
@@ -180,46 +155,58 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region DbDataReader overriden methods
 
+#if !NETCORE10
 		public override void Close()
 		{
-			if (!IsClosed)
+			Dispose();
+		}
+#endif
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
 			{
-				try
+				if (!IsClosed)
 				{
-					if (_command != null && !_command.IsDisposed)
+					try
 					{
-						if (_command.CommandType == CommandType.StoredProcedure)
+						if (_command != null && !_command.IsDisposed)
 						{
-							// Set values of output parameters
-							_command.SetOutputParameters();
+							if (_command.CommandType == CommandType.StoredProcedure)
+							{
+								// Set values of output parameters
+								_command.SetOutputParameters();
+							}
+
+							if (_command.HasImplicitTransaction)
+							{
+								// Commit implicit transaction if needed
+								_command.CommitImplicitTransaction();
+							}
+
+							// Set null the active reader of the command
+							_command.ActiveReader = null;
+						}
+					}
+					catch
+					{ }
+					finally
+					{
+						if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
+						{
+							_connection.Close();
 						}
 
-						if (_command.HasImplicitTransaction)
-						{
-							// Commit implicit transaction if needed
-							_command.CommitImplicitTransaction();
-						}
-
-						// Set null the active reader of the command
-						_command.ActiveReader = null;
+						_isClosed = true;
+						_position = STARTPOS;
+						_command = null;
+						_connection = null;
+						_row = null;
+#if !NETCORE10
+						_schemaTable = null;
+#endif
+						_fields = null;
 					}
-				}
-				catch
-				{ }
-				finally
-				{
-					if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
-					{
-						_connection.Close();
-					}
-
-					_isClosed = true;
-					_position = STARTPOS;
-					_command = null;
-					_connection = null;
-					_row = null;
-					_schemaTable = null;
-					_fields = null;
 				}
 			}
 		}
@@ -258,6 +245,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return retValue;
 		}
 
+#if !NETCORE10
 		public override DataTable GetSchemaTable()
 		{
 			CheckState();
@@ -368,6 +356,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return _schemaTable;
 		}
+#endif
 
 		public override int GetOrdinal(string name)
 		{
@@ -733,7 +722,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_columnsIndexesOrdinal = new Dictionary<string, int>(_fields.Count, StringComparer.Ordinal);
 			_columnsIndexesOrdinalCI = new Dictionary<string, int>(_fields.Count, StringComparer.OrdinalIgnoreCase);
-			_columnsIndexesInvariantCI = new Dictionary<string, int>(_fields.Count, StringComparer.InvariantCultureIgnoreCase);
 			for (int i = 0; i < _fields.Count; i++)
 			{
 				string fieldName = _fields[i].Alias;
@@ -741,22 +729,19 @@ namespace FirebirdSql.Data.FirebirdClient
 					_columnsIndexesOrdinal.Add(fieldName, i);
 				if (!_columnsIndexesOrdinalCI.ContainsKey(fieldName))
 					_columnsIndexesOrdinalCI.Add(fieldName, i);
-				if (!_columnsIndexesInvariantCI.ContainsKey(fieldName))
-					_columnsIndexesInvariantCI.Add(fieldName, i);
 			}
 		}
 
 		private int GetColumnIndex(string name)
 		{
-			if (_columnsIndexesOrdinal == null || _columnsIndexesOrdinalCI == null || _columnsIndexesInvariantCI == null)
+			if (_columnsIndexesOrdinal == null || _columnsIndexesOrdinalCI == null)
 			{
 				InitializeColumnsIndexes();
 			}
 			int index;
 			if (!_columnsIndexesOrdinal.TryGetValue(name, out index))
 				if (!_columnsIndexesOrdinalCI.TryGetValue(name, out index))
-					if (!_columnsIndexesInvariantCI.TryGetValue(name, out index))
-						throw new IndexOutOfRangeException("Could not find specified column in results.");
+					throw new IndexOutOfRangeException($"Could not find specified column '{name}' in results.");
 			return index;
 		}
 
@@ -782,6 +767,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return false;
 		}
 
+#if !NETCORE10
 		private static DataTable GetSchemaTableStructure()
 		{
 			DataTable schema = new DataTable("Schema");
@@ -838,6 +824,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return sql;
 		}
+#endif
 
 		private static T CheckedGetValue<T>(Func<T> f)
 		{

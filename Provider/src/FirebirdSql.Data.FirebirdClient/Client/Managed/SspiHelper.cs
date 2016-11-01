@@ -13,6 +13,7 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2008 Vladimir Bodecek, Nathan Fox, Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2016 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *
  *  Adapted from pinvoke.net.
@@ -22,6 +23,8 @@ using System;
 using System.Text;
 using System.Collections;
 using System.Runtime.InteropServices;
+
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
@@ -150,7 +153,7 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				if (pBuffers != IntPtr.Zero)
 				{
-					SecBuffer secBuffer = (SecBuffer)Marshal.PtrToStructure(pBuffers, typeof(SecBuffer));
+					SecBuffer secBuffer = Marshal2.PtrToStructure<SecBuffer>(pBuffers);
 					secBuffer.Dispose();
 					Marshal.FreeHGlobal(pBuffers);
 					pBuffers = IntPtr.Zero;
@@ -160,8 +163,8 @@ namespace FirebirdSql.Data.Client.Managed
 			public byte[] GetSecBufferBytes()
 			{
 				if (pBuffers == IntPtr.Zero)
-					throw new ObjectDisposedException("SecBufferDesc");
-				SecBuffer secBuffer = (SecBuffer)Marshal.PtrToStructure(pBuffers, typeof(SecBuffer));
+					throw new ObjectDisposedException(nameof(SecBufferDesc));
+				SecBuffer secBuffer = Marshal2.PtrToStructure<SecBuffer>(pBuffers);
 				return secBuffer.GetBytes();
 			}
 		}
@@ -212,7 +215,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Prototypes of native Win API functions
 
-		[DllImport("secur32", CharSet = CharSet.Auto)]
+		[DllImport("secur32")]
 		static extern int AcquireCredentialsHandle(
 			string pszPrincipal, //SEC_CHAR*
 			string pszPackage, //SEC_CHAR* //"Kerberos","NTLM","Negotiative"
@@ -225,7 +228,7 @@ namespace FirebirdSql.Data.Client.Managed
 			out SecInteger ptsExpiry //PTimeStamp //TimeStamp ref
 		);
 
-		[DllImport("secur32", CharSet = CharSet.Auto, SetLastError = true)]
+		[DllImport("secur32", SetLastError = true)]
 		static extern int InitializeSecurityContext(
 			ref SecHandle phCredential,//PCredHandle
 			IntPtr phContext, //PCtxtHandle
@@ -243,7 +246,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		// 2 signatures of this API function needed because different usage
 
-		[DllImport("secur32", CharSet = CharSet.Auto, SetLastError = true)]
+		[DllImport("secur32", SetLastError = true)]
 		static extern int InitializeSecurityContext(
 			ref SecHandle phCredential,//PCredHandle
 			ref SecHandle phContext, //PCtxtHandle
@@ -310,7 +313,7 @@ namespace FirebirdSql.Data.Client.Managed
 			if (AcquireCredentialsHandle(null, securityPackage, SECPKG_CRED_OUTBOUND,
 																	IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero,
 																	out _clientCredentials, out expiry) != SEC_E_OK)
-				throw new Exception("Acquiring client credentials failed");
+				throw new Exception($"{nameof(AcquireCredentialsHandle)} failed");
 		}
 
 		#endregion
@@ -324,7 +327,7 @@ namespace FirebirdSql.Data.Client.Managed
 		public byte[] InitializeClientSecurity()
 		{
 			if (_disposed)
-				throw new ObjectDisposedException("SSPIHelper");
+				throw new ObjectDisposedException(nameof(SspiHelper));
 			CloseClientContext();
 			SecInteger expiry = new SecInteger(0);
 			uint contextAttributes;
@@ -345,7 +348,7 @@ namespace FirebirdSql.Data.Client.Managed
 					out contextAttributes,//ref int pfContextAttr,
 					out expiry); //ref IntPtr ptsExpiry ); //PTimeStamp
 				if (resCode != SEC_E_OK && resCode != SEC_I_CONTINUE_NEEDED)
-					throw new Exception("InitializeSecurityContext failed");
+					throw new Exception($"{nameof(InitializeSecurityContext)} failed");
 				return clientTokenBuf.GetSecBufferBytes();
 			}
 			finally
@@ -364,9 +367,9 @@ namespace FirebirdSql.Data.Client.Managed
 		public byte[] GetClientSecurity(byte[] serverToken)
 		{
 			if (_disposed)
-				throw new ObjectDisposedException("SSPIHelper");
+				throw new ObjectDisposedException(nameof(SspiHelper));
 			if (_clientContext.IsInvalid)
-				throw new InvalidOperationException("InitializeClientSecurity not called");
+				throw new InvalidOperationException($"{nameof(InitializeClientSecurity)} not called");
 			SecInteger expiry = new SecInteger();
 			uint contextAttributes;
 			SecBufferDesc clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
@@ -389,7 +392,7 @@ namespace FirebirdSql.Data.Client.Managed
 						out contextAttributes,//ref int pfContextAttr,
 						out expiry); //ref IntPtr ptsExpiry ); //PTimeStamp
 					if (resCode != SEC_E_OK && resCode != SEC_I_CONTINUE_NEEDED)
-						throw new Exception("InitializeSecurityContext() failed");
+						throw new Exception($"{nameof(InitializeSecurityContext)} failed");
 					return clientTokenBuf.GetSecBufferBytes();
 				}
 				finally

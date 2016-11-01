@@ -258,11 +258,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		void CleanupCallback(object o)
 		{
-#if (NET_40)
-			if (Thread.VolatileRead(ref _disposed) == 1)
-#else
-			if (Volatile.Read(ref _disposed) == 1)
-#endif
+			if (Volatile2.Read(ref _disposed) == 1)
 				return;
 			_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
 			_cleanupTimer.Change(TimeSpan.FromSeconds(2), TimeoutHelper.InfiniteTimeSpan);
@@ -270,11 +266,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		void CheckDisposed()
 		{
-#if (NET_40)
-			if (Thread.VolatileRead(ref _disposed) == 1)
-#else
-			if (Volatile.Read(ref _disposed) == 1)
-#endif
+			if (Volatile2.Read(ref _disposed) == 1)
 				throw new ObjectDisposedException(typeof(FbConnectionPoolManager).Name);
 		}
 	}

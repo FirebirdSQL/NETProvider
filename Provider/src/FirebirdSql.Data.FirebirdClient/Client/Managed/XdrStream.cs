@@ -157,21 +157,24 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Stream methods
 
-		public override void Close()
+		protected override void Dispose(bool disposing)
 		{
-			try
+			if (disposing)
 			{
-				if (_ownsStream)
+				try
 				{
-					_innerStream?.Close();
+					if (_ownsStream)
+					{
+						_innerStream?.Dispose();
+					}
 				}
-			}
-			catch
-			{ }
-			finally
-			{
-				_innerStream = null;
-				_charset = null;
+				catch
+				{ }
+				finally
+				{
+					_innerStream = null;
+					_charset = null;
+				}
 			}
 		}
 

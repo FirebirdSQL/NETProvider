@@ -76,11 +76,6 @@ namespace FirebirdSql.Data.Client.Managed
 			get { return _protocolMinimunType; }
 		}
 
-		public string UserID
-		{
-			get { return _userID; }
-		}
-
 		public string Password
 		{
 			get { return _password; }
@@ -250,9 +245,9 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public virtual void Disconnect()
 		{
-			_networkStream?.Close();
+			_networkStream?.Dispose();
 			_networkStream = null;
-			_socket?.Close();
+			_socket?.Dispose();
 			_socket = null;
 		}
 
@@ -269,7 +264,11 @@ namespace FirebirdSql.Data.Client.Managed
 				return ipaddress;
 			}
 
+#if NETCORE10
+			IPAddress[] addresses = Dns.GetHostEntryAsync(dataSource).GetAwaiter().GetResult().AddressList;
+#else
 			IPAddress[] addresses = Dns.GetHostEntry(dataSource).AddressList;
+#endif
 
 			// Try to avoid problems with IPV6 addresses
 			foreach (IPAddress address in addresses)
@@ -323,11 +322,7 @@ namespace FirebirdSql.Data.Client.Managed
 					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 				}
 
-				result.WriteByte(IscCodes.CNCT_client_crypt);
-				result.WriteByte(4);
-				result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
-
-				var user = Encoding.UTF8.GetBytes(Environment.UserName);
+				var user = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("USERNAME"));
 				result.WriteByte(IscCodes.CNCT_user);
 				result.WriteByte((byte)user.Length);
 				result.Write(user, 0, user.Length);
@@ -336,6 +331,10 @@ namespace FirebirdSql.Data.Client.Managed
 				result.WriteByte(IscCodes.CNCT_host);
 				result.WriteByte((byte)host.Length);
 				result.Write(host, 0, host.Length);
+
+				result.WriteByte(IscCodes.CNCT_client_crypt);
+				result.WriteByte(4);
+				result.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 
 				result.WriteByte(IscCodes.CNCT_user_verification);
 				result.WriteByte(0);

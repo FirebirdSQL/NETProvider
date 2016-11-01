@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.Isql
 				{
 					foreach (var token in Tokens)
 					{
-						if (string.Compare(_source, index, token, 0, token.Length, false, CultureInfo.CurrentUICulture) == 0)
+						if (string.Compare(_source, index, token, 0, token.Length, StringComparison.Ordinal) == 0)
 						{
 							index += token.Length;
 							yield return new FbStatement(_source.Substring(lastYield, index - lastYield - token.Length), rawResult.ToString());

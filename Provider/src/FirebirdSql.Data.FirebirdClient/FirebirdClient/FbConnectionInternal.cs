@@ -25,14 +25,19 @@ using System.Data;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+#if NETCORE10
+using Microsoft.Extensions.PlatformAbstractions;
+#endif
 
 using FirebirdSql.Data.Common;
+#if !NETCORE10
 using FirebirdSql.Data.Schema;
-
+#endif
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	internal class FbConnectionInternal : MarshalByRefObject, IDisposable
+	internal class FbConnectionInternal : IDisposable
 	{
 		#region Fields
 
@@ -43,7 +48,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		private FbConnection _owningConnection;
 		private bool _disposed;
 		private object _preparedCommandsCleanupSyncRoot;
+#if !NETCORE10
 		private FbEnlistmentNotification _enlistmentNotification;
+#endif
 
 		#endregion
 
@@ -74,7 +81,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public bool IsEnlisted
 		{
-			get { return _enlistmentNotification != null && !_enlistmentNotification.IsCompleted; }
+			get
+			{
+#if NETCORE10
+				return false;
+#else
+				return _enlistmentNotification != null && !_enlistmentNotification.IsCompleted;
+#endif
+			}
 		}
 
 		public FbConnectionString Options
@@ -283,7 +297,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (command.Transaction != null)
 				{
-					command.CloseReader();
+					command.DisposeReader();
 					command.Transaction = null;
 				}
 			}
@@ -293,6 +307,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Transaction Enlistement
 
+#if !NETCORE10
 		public void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
 			if (_owningConnection != null && _options.Enlist)
@@ -346,15 +361,18 @@ namespace FirebirdSql.Data.FirebirdClient
 					return BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
 			}
 		}
+#endif
 
 		#endregion
 
 		#region Schema Methods
 
+#if !NETCORE10
 		public DataTable GetSchema(string collectionName, string[] restrictions)
 		{
 			return FbSchemaFactory.GetSchema(_owningConnection, collectionName, restrictions);
 		}
+#endif
 
 		#endregion
 
@@ -366,7 +384,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
 				FbCommand current;
-				if (!_preparedCommands[i].TryGetTarget<FbCommand>(out current))
+				if (!_preparedCommands[i].TryGetTarget(out current))
 				{
 					position = i;
 					break;
@@ -525,10 +543,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetHostingPath()
 		{
-			System.Reflection.Assembly assembly;
+#if NETCORE10
+			return PlatformServices.Default.Application.ApplicationBasePath;
+#else
+			Assembly assembly;
 			try
 			{
-				assembly = System.Reflection.Assembly.Load(string.Format("System.Web, Version={0}.{1}.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", Environment.Version.Major, Environment.Version.Minor));
+				assembly = Assembly.Load(string.Format("System.Web, Version={0}.{1}.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", Environment.Version.Major, Environment.Version.Minor));
 			}
 			catch (FileNotFoundException)
 			{
@@ -546,34 +567,22 @@ namespace FirebirdSql.Data.FirebirdClient
 				.GetType("System.Web.Hosting.HostingEnvironment")
 				.GetProperty("ApplicationPhysicalPath")
 				.GetValue(null, null);
+#endif
 		}
 		private string GetRealProcessName()
 		{
-			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
-			if (assembly != null)
-			{
-				return assembly.Location;
-			}
-			else // if we're not loaded from managed code
-			{
-				return Process.GetCurrentProcess().MainModule.FileName;
-			}
+			Assembly assembly = Assembly.GetEntryAssembly();
+			return assembly?.Location ?? Process.GetCurrentProcess().MainModule.FileName;
 		}
 
 		private int GetProcessId()
 		{
-			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
-			if (assembly != null)
-			{
-				if (assembly.IsFullyTrusted)
-					return Process.GetCurrentProcess().Id;
-				else
-					return -1;
-			}
-			else // if we're not loaded from managed code
-			{
-				return Process.GetCurrentProcess().Id;
-			}
+#if !NETCORE10
+			Assembly assembly = Assembly.GetEntryAssembly();
+			if (!(assembly?.IsFullyTrusted) ?? false)
+				return -1;
+#endif
+			return Process.GetCurrentProcess().Id;
 		}
 		#endregion
 
