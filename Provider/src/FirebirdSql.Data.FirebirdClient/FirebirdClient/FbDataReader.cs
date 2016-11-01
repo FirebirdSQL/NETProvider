@@ -668,9 +668,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return false;
 		}
 
-#endregion
+		#endregion
 
-#region Private Methods
+		#region Private Methods
 
 		private void CheckPosition()
 		{
@@ -741,13 +741,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			int index;
 			if (!_columnsIndexesOrdinal.TryGetValue(name, out index))
 				if (!_columnsIndexesOrdinalCI.TryGetValue(name, out index))
-						throw new IndexOutOfRangeException($"Could not find specified column '{name}' in results.");
+					throw new IndexOutOfRangeException($"Could not find specified column '{name}' in results.");
 			return index;
 		}
 
-#endregion
+		#endregion
 
-#region Static Methods
+		#region Static Methods
 
 		private static bool IsReadOnly(FbDataReader r)
 		{
@@ -838,6 +838,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#endregion
+		#endregion
 	}
 }
