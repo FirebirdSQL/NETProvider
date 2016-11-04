@@ -467,9 +467,10 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 					throw new InvalidOperationException();
 			}
 
+			throw new NotSupportedException($"{joinString} statement is not supported in Firebird.");
 			// The join condition does not exist in this case, so we use null.
 			// We do not have a on clause, so we use JoinType.CrossJoin.
-			return VisitJoinExpression(inputs, DbExpressionKind.CrossJoin, joinString, null);
+			//return VisitJoinExpression(inputs, DbExpressionKind.CrossJoin, joinString, null);
 		}
 
 		/// <summary>
