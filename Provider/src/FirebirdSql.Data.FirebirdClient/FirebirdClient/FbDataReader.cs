@@ -188,8 +188,6 @@ namespace FirebirdSql.Data.FirebirdClient
 							_command.ActiveReader = null;
 						}
 					}
-					catch
-					{ }
 					finally
 					{
 						if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
