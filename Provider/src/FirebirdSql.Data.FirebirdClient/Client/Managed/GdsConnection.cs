@@ -322,7 +322,8 @@ namespace FirebirdSql.Data.Client.Managed
 					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 				}
 
-				var user = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("USERNAME"));
+				var userString = Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER") ?? string.Empty;
+				var user = Encoding.UTF8.GetBytes(userString);
 				result.WriteByte(IscCodes.CNCT_user);
 				result.WriteByte((byte)user.Length);
 				result.Write(user, 0, user.Length);
