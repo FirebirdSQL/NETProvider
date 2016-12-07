@@ -46,13 +46,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_events = new ConcurrentDictionary<int, RemoteEvent>();
 			_handle = handle;
 
-			// Initialize the connection
 			if (_database == null)
 			{
 				GdsConnection connection = new GdsConnection(ipAddress, portNumber);
-
 				connection.Connect();
-
 				_database = new GdsDatabase(connection);
 			}
 		}
@@ -138,7 +135,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							RemoteEvent currentEvent;
 							if (_events.TryRemove(eventId, out currentEvent))
 							{
-								// Notify new event counts
 								currentEvent.EventCounts(buffer);
 							}
 							continue;
