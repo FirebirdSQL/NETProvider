@@ -141,10 +141,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 				}
 			}
-			catch (IOException ex) when ((ex.InnerException as SocketException)?.SocketErrorCode == SocketError.Interrupted)
+			catch (IOException ex) when (IsEventsReturnSocketError((ex.InnerException as SocketException)?.SocketErrorCode))
 			{
 				return;
 			}
+		}
+
+		private bool IsEventsReturnSocketError(SocketError? error)
+		{
+			return error == SocketError.Interrupted
+				|| error == SocketError.ConnectionReset
+				|| error == SocketError.ConnectionAborted;
 		}
 
 		#endregion
