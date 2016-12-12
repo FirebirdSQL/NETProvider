@@ -27,11 +27,27 @@ namespace FirebirdSql.Data.Common
 {
 	internal static class Extensions
 	{
-		public static bool SetKeepAlive(this Socket socket, ulong time, ulong interval)
+		static bool TrySocketAction(Action action)
+		{
+			try
+			{
+				action();
+				return true;
+			}
+			catch (SocketException)
+			{
+				return false;
+			}
+			catch (PlatformNotSupportedException)
+			{
+				return false;
+			}
+		}
+
+		public static bool TrySetKeepAlive(this Socket socket, ulong time, ulong interval)
 		{
 			const int BytesPerLong = 4;
 			const int BitsPerByte = 8;
-
 			bool turnOn = time != 0 && interval != 0;
 			ulong[] input = new[]
 				{
@@ -39,7 +55,6 @@ namespace FirebirdSql.Data.Common
 					time,
 					interval
 				};
-
 			// tcp_keepalive struct
 			byte[] inValue = new byte[3 * BytesPerLong];
 			for (int i = 0; i < input.Length; i++)
@@ -49,19 +64,23 @@ namespace FirebirdSql.Data.Common
 				inValue[i * BytesPerLong + 1] = (byte)(input[i] >> ((BytesPerLong - 3) * BitsPerByte) & 0xFF);
 				inValue[i * BytesPerLong + 0] = (byte)(input[i] >> ((BytesPerLong - 4) * BitsPerByte) & 0xFF);
 			}
-
 			byte[] outValue = BitConverter.GetBytes(0);
 
-			try
+			return TrySocketAction(() =>
 			{
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, turnOn ? 1 : 0);
 				socket.IOControl(IOControlCode.KeepAliveValues, inValue, outValue);
-			}
-			catch (SocketException)
+			});
+		}
+
+		public static bool TryEnableLoopbackFastPath(this Socket socket)
+		{
+			const int SIOLoopbackFastPath = -1744830448; //0x98000010;
+			byte[] inValue = BitConverter.GetBytes(1);
+			return TrySocketAction(() =>
 			{
-				return false;
-			}
-			return true;
+				socket.IOControl(SIOLoopbackFastPath, inValue, null);
+			});
 		}
 
 		public static int AsInt(this IntPtr ptr)
