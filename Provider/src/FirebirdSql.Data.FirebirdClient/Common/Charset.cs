@@ -30,8 +30,8 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Constants
 
-		const string Octets = "OCTETS";
-		const string None = "NONE";
+		internal const string Octets = "OCTETS";
+		internal const string None = "NONE";
 
 		#endregion
 
