@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Constants
 
-		private const int STARTPOS = -1;
+		private const int StartPosition = -1;
 
 		#endregion
 
@@ -84,22 +84,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			FbConnection connection,
 			CommandBehavior commandBehavior)
 		{
-			_position = STARTPOS;
+			_position = StartPosition;
 			_command = command;
 			_connection = connection;
 			_commandBehavior = commandBehavior;
 			_fields = _command.GetFieldsDescriptor();
 
 			UpdateRecordsAffected();
-		}
-
-		#endregion
-
-		#region Finalizer
-
-		~FbDataReader()
-		{
-			Dispose(false);
 		}
 
 		#endregion
@@ -168,43 +159,31 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (!IsClosed)
 				{
-					try
+					if (_command != null && !_command.IsDisposed)
 					{
-						if (_command != null && !_command.IsDisposed)
+						if (_command.CommandType == CommandType.StoredProcedure)
 						{
-							if (_command.CommandType == CommandType.StoredProcedure)
-							{
-								// Set values of output parameters
-								_command.SetOutputParameters();
-							}
-
-							if (_command.HasImplicitTransaction)
-							{
-								// Commit implicit transaction if needed
-								_command.CommitImplicitTransaction();
-							}
-
-							// Set null the active reader of the command
-							_command.ActiveReader = null;
+							_command.SetOutputParameters();
 						}
+						if (_command.HasImplicitTransaction)
+						{
+							_command.CommitImplicitTransaction();
+						}
+						_command.ActiveReader = null;
 					}
-					finally
+					if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
 					{
-						if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
-						{
-							_connection.Close();
-						}
-
-						_isClosed = true;
-						_position = STARTPOS;
-						_command = null;
-						_connection = null;
-						_row = null;
+						_connection.Close();
+					}
+					_isClosed = true;
+					_position = StartPosition;
+					_command = null;
+					_connection = null;
+					_row = null;
 #if !NETCORE10
-						_schemaTable = null;
+					_schemaTable = null;
 #endif
-						_fields = null;
-					}
+					_fields = null;
 				}
 			}
 		}
@@ -215,8 +194,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			bool retValue = false;
 
-			if (IsCommandBehavior(CommandBehavior.SingleRow) &&
-				_position != STARTPOS)
+			if (IsCommandBehavior(CommandBehavior.SingleRow) && _position != StartPosition)
 			{
 			}
 			else
@@ -672,7 +650,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckPosition()
 		{
-			if (_eof || _position == STARTPOS)
+			if (_eof || _position == StartPosition)
 			{
 				throw new InvalidOperationException("There are no data to read.");
 			}

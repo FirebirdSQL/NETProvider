@@ -63,11 +63,11 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			if (!(db is FesDatabase))
 			{
-				throw new ArgumentException("Specified argument is not of FesDatabase type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(FesDatabase)} type.");
 			}
 			if (!(transaction is FesTransaction))
 			{
-				throw new ArgumentException("Specified argument is not of FesTransaction type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(FesTransaction)} type.");
 			}
 
 			_db = (FesDatabase)db;
@@ -84,50 +84,42 @@ namespace FirebirdSql.Data.Client.Native
 
 		protected override void Create()
 		{
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				DatabaseHandle dbHandle = _db.HandlePtr;
-				TransactionHandle trHandle = ((FesTransaction)_transaction).HandlePtr;
+			DatabaseHandle dbHandle = _db.HandlePtr;
+			TransactionHandle trHandle = ((FesTransaction)_transaction).HandlePtr;
 
-				_db.FbClient.isc_create_blob2(
-					_statusVector,
-					ref	dbHandle,
-					ref	trHandle,
-					ref _blobHandle,
-					ref _blobId,
-					0,
-					new byte[0]);
+			_db.FbClient.isc_create_blob2(
+				_statusVector,
+				ref dbHandle,
+				ref trHandle,
+				ref _blobHandle,
+				ref _blobId,
+				0,
+				new byte[0]);
 
-				_db.ProcessStatusVector(_statusVector);
+			_db.ProcessStatusVector(_statusVector);
 
-				RblAddValue(IscCodes.RBL_create);
-			}
+			RblAddValue(IscCodes.RBL_create);
 		}
 
 		protected override void Open()
 		{
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				DatabaseHandle dbHandle = _db.HandlePtr;
-				TransactionHandle trHandle = ((FesTransaction)_transaction).HandlePtr;
+			DatabaseHandle dbHandle = _db.HandlePtr;
+			TransactionHandle trHandle = ((FesTransaction)_transaction).HandlePtr;
 
-				_db.FbClient.isc_open_blob2(
-					_statusVector,
-					ref	dbHandle,
-					ref	trHandle,
-					ref _blobHandle,
-					ref _blobId,
-					0,
-					new byte[0]);
+			_db.FbClient.isc_open_blob2(
+				_statusVector,
+				ref dbHandle,
+				ref trHandle,
+				ref _blobHandle,
+				ref _blobId,
+				0,
+				new byte[0]);
 
-				_db.ProcessStatusVector(_statusVector);
-			}
+			_db.ProcessStatusVector(_statusVector);
 		}
 
 		protected override byte[] GetSegment()
@@ -135,66 +127,58 @@ namespace FirebirdSql.Data.Client.Native
 			short requested = (short)SegmentSize;
 			short segmentLength = 0;
 
-			lock (_db)
+			ClearStatusVector();
+
+			using (MemoryStream segment = new MemoryStream())
 			{
-				// Clear the status vector
-				ClearStatusVector();
+				byte[] tmp = new byte[requested];
 
-				using (MemoryStream segment = new MemoryStream())
+				IntPtr status = _db.FbClient.isc_get_segment(
+					_statusVector,
+					ref _blobHandle,
+					ref segmentLength,
+					requested,
+					tmp);
+
+				if (segmentLength > 0)
 				{
-					byte[] tmp = new byte[requested];
+					segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
+				}
 
-					IntPtr status = _db.FbClient.isc_get_segment(
-						_statusVector,
-						ref _blobHandle,
-						ref	segmentLength,
-						requested,
-						tmp);
+				RblRemoveValue(IscCodes.RBL_segment);
 
-					if (segmentLength > 0)
+				if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
+				{
+					segment.SetLength(0);
+					RblAddValue(IscCodes.RBL_eof_pending);
+				}
+				else
+				{
+					if (status == IntPtr.Zero || _statusVector[1] == new IntPtr(IscCodes.isc_segment))
 					{
-						segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
-					}
-
-					RblRemoveValue(IscCodes.RBL_segment);
-
-					if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
-					{
-						segment.SetLength(0);
-						RblAddValue(IscCodes.RBL_eof_pending);
+						RblAddValue(IscCodes.RBL_segment);
 					}
 					else
 					{
-						if (status == IntPtr.Zero || _statusVector[1] == new IntPtr(IscCodes.isc_segment))
-						{
-							RblAddValue(IscCodes.RBL_segment);
-						}
-						else
-						{
-							_db.ProcessStatusVector(_statusVector);
-						}
+						_db.ProcessStatusVector(_statusVector);
 					}
-
-					return segment.ToArray();
 				}
+
+				return segment.ToArray();
 			}
 		}
 
 		protected override void PutSegment(byte[] buffer)
 		{
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				_db.FbClient.isc_put_segment(
-					_statusVector,
-					ref _blobHandle,
-					(short)buffer.Length,
-					buffer);
+			_db.FbClient.isc_put_segment(
+				_statusVector,
+				ref _blobHandle,
+				(short)buffer.Length,
+				buffer);
 
-				_db.ProcessStatusVector(_statusVector);
-			}
+			_db.ProcessStatusVector(_statusVector);
 		}
 
 		protected override void Seek(int position)
@@ -209,28 +193,20 @@ namespace FirebirdSql.Data.Client.Native
 
 		protected override void Close()
 		{
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				_db.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
+			_db.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
 
-				_db.ProcessStatusVector(_statusVector);
-			}
+			_db.ProcessStatusVector(_statusVector);
 		}
 
 		protected override void Cancel()
 		{
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				_db.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
+			_db.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
 
-				_db.ProcessStatusVector(_statusVector);
-			}
+			_db.ProcessStatusVector(_statusVector);
 		}
 
 		#endregion

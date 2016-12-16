@@ -45,13 +45,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				public DateTimeOffset Created { get; private set; }
 				public FbConnectionInternal Connection { get; private set; }
 
-				public Item()
-				{
-					_disposed = false;
-				}
-
 				public Item(DateTimeOffset created, FbConnectionInternal connection)
-					: this()
 				{
 					Created = created;
 					Connection = connection;
@@ -76,7 +70,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			public Pool(FbConnectionString connectionString)
 			{
-				_disposed = false;
 				_syncRoot = new object();
 				_connectionString = connectionString;
 				_available = new Stack<Item>();

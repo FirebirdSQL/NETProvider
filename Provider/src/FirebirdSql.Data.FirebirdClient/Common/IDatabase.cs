@@ -27,65 +27,15 @@ namespace FirebirdSql.Data.Common
 {
 	internal interface IDatabase : IDisposable
 	{
-		#region Callbacks
+		WarningMessageCallback WarningMessage { get; set; }
 
-		WarningMessageCallback WarningMessage
-		{
-			get;
-			set;
-		}
-
-		#endregion
-
-		#region Properties
-
-		int Handle
-		{
-			get;
-		}
-
-		int TransactionCount
-		{
-			get;
-			set;
-		}
-
-		string ServerVersion
-		{
-			get;
-		}
-
-		Charset Charset
-		{
-			get;
-			set;
-		}
-
-		short PacketSize
-		{
-			get;
-			set;
-		}
-
-		short Dialect
-		{
-			get;
-			set;
-		}
-
-		bool HasRemoteEventSupport
-		{
-			get;
-		}
-
-		object SyncObject
-		{
-			get;
-		}
-
-		#endregion
-
-		#region Methods
+		int Handle { get; }
+		int TransactionCount { get; set; }
+		string ServerVersion { get; }
+		Charset Charset { get; set; }
+		short PacketSize { get; set; }
+		short Dialect { get; set; }
+		bool HasRemoteEventSupport { get; }
 
 		void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database);
 		void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database);
@@ -108,7 +58,5 @@ namespace FirebirdSql.Data.Common
 		void CancelEvents(RemoteEvent events);
 
 		void CancelOperation(int kind);
-
-		#endregion
 	}
 }

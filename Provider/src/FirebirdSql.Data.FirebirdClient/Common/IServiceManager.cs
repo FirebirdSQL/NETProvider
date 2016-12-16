@@ -25,26 +25,11 @@ namespace FirebirdSql.Data.Common
 {
 	internal interface IServiceManager
 	{
-		#region Properties
-
-		int Handle
-		{
-			get;
-		}
-
-		#endregion
-
-		#region Methods
+		int Handle { get; }
 
 		void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service);
-
 		void Detach();
-
 		void Start(ServiceParameterBuffer spb);
-
-		void Query(ServiceParameterBuffer spb, int requestLength,
-			byte[] requestBuffer, int bufferLength, byte[] buffer);
-
-		#endregion
+		void Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer);
 	}
 }

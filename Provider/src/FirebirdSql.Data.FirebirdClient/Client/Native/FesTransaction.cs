@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			if (!(db is FesDatabase))
 			{
-				throw new ArgumentException("Specified argument is not of FesDatabase type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(FesDatabase)} type.");
 			}
 
 			_db = (FesDatabase)db;
@@ -94,35 +94,20 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region IDisposable methods
 
-		protected override void Dispose(bool disposing)
+		public override void Dispose()
 		{
 			if (!_disposed)
 			{
-				if (disposing)
+				_disposed = true;
+				if (_state != TransactionState.NoTransaction)
 				{
-					try
-					{
-						if (_state != TransactionState.NoTransaction)
-						{
-							Rollback();
-						}
-					}
-					catch
-					{ }
-					finally
-					{
-						if (disposing)
-						{
-							_db = null;
-							_handle.Dispose();
-							_state = TransactionState.NoTransaction;
-							_statusVector = null;
-						}
-
-						_disposed = true;
-						base.Dispose(disposing);
-					}
+					Rollback();
 				}
+				_db = null;
+				_handle.Dispose();
+				_state = TransactionState.NoTransaction;
+				_statusVector = null;
+				base.Dispose();
 			}
 		}
 
@@ -137,68 +122,56 @@ namespace FirebirdSql.Data.Client.Native
 				throw new InvalidOperationException();
 			}
 
-			lock (_db)
+			IscTeb teb = new IscTeb();
+			IntPtr tebData = IntPtr.Zero;
+
+			try
 			{
-				IscTeb teb = new IscTeb();
-				IntPtr tebData = IntPtr.Zero;
+				ClearStatusVector();
 
-				try
+				teb.dbb_ptr = Marshal.AllocHGlobal(4);
+				Marshal.WriteInt32(teb.dbb_ptr, _db.Handle);
+
+				teb.tpb_len = tpb.Length;
+
+				teb.tpb_ptr = Marshal.AllocHGlobal(tpb.Length);
+				Marshal.Copy(tpb.ToArray(), 0, teb.tpb_ptr, tpb.Length);
+
+				int size = Marshal2.SizeOf<IscTeb>();
+				tebData = Marshal.AllocHGlobal(size);
+
+				Marshal.StructureToPtr(teb, tebData, true);
+
+				_db.FbClient.isc_start_multiple(
+					_statusVector,
+					ref _handle,
+					1,
+					tebData);
+
+				_db.ProcessStatusVector(_statusVector);
+
+				_state = TransactionState.Active;
+
+				_db.TransactionCount++;
+			}
+			catch
+			{
+				throw;
+			}
+			finally
+			{
+				if (teb.dbb_ptr != IntPtr.Zero)
 				{
-					// Clear the status vector
-					ClearStatusVector();
-
-					// Set db handle
-					teb.dbb_ptr = Marshal.AllocHGlobal(4);
-					Marshal.WriteInt32(teb.dbb_ptr, _db.Handle);
-
-					// Set tpb length
-					teb.tpb_len = tpb.Length;
-
-					// Set TPB data
-					teb.tpb_ptr = Marshal.AllocHGlobal(tpb.Length);
-					Marshal.Copy(tpb.ToArray(), 0, teb.tpb_ptr, tpb.Length);
-
-					// Alloc memory	for	the	IscTeb structure
-					int size = Marshal2.SizeOf<IscTeb>();
-					tebData = Marshal.AllocHGlobal(size);
-
-					Marshal.StructureToPtr(teb, tebData, true);
-
-					_db.FbClient.isc_start_multiple(
-						_statusVector,
-						ref _handle,
-						1,
-						tebData);
-
-					// Parse status	vector
-					_db.ProcessStatusVector(_statusVector);
-
-					// Update transaction state
-					_state = TransactionState.Active;
-
-					// Update transaction count
-					_db.TransactionCount++;
+					Marshal.FreeHGlobal(teb.dbb_ptr);
 				}
-				catch
+				if (teb.tpb_ptr != IntPtr.Zero)
 				{
-					throw;
+					Marshal.FreeHGlobal(teb.tpb_ptr);
 				}
-				finally
+				if (tebData != IntPtr.Zero)
 				{
-					// Free	memory
-					if (teb.dbb_ptr != IntPtr.Zero)
-					{
-						Marshal.FreeHGlobal(teb.dbb_ptr);
-					}
-					if (teb.tpb_ptr != IntPtr.Zero)
-					{
-						Marshal.FreeHGlobal(teb.tpb_ptr);
-					}
-					if (tebData != IntPtr.Zero)
-					{
-						Marshal2.DestroyStructure<IscTeb>(tebData);
-						Marshal.FreeHGlobal(tebData);
-					}
+					Marshal2.DestroyStructure<IscTeb>(tebData);
+					Marshal.FreeHGlobal(tebData);
 				}
 			}
 		}
@@ -207,76 +180,60 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			EnsureActiveTransactionState();
 
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				_db.FbClient.isc_commit_transaction(_statusVector, ref _handle);
+			_db.FbClient.isc_commit_transaction(_statusVector, ref _handle);
 
-				_db.ProcessStatusVector(_statusVector);
+			_db.ProcessStatusVector(_statusVector);
 
-				_db.TransactionCount--;
+			_db.TransactionCount--;
 
-				Update?.Invoke(this, new EventArgs());
+			Update?.Invoke(this, new EventArgs());
 
-				_state = TransactionState.NoTransaction;
-			}
+			_state = TransactionState.NoTransaction;
 		}
 
 		public override void Rollback()
 		{
 			EnsureActiveTransactionState();
 
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				_db.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
+			_db.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
 
-				_db.ProcessStatusVector(_statusVector);
+			_db.ProcessStatusVector(_statusVector);
 
-				_db.TransactionCount--;
+			_db.TransactionCount--;
 
-				Update?.Invoke(this, new EventArgs());
+			Update?.Invoke(this, new EventArgs());
 
-				_state = TransactionState.NoTransaction;
-			}
+			_state = TransactionState.NoTransaction;
 		}
 
 		public override void CommitRetaining()
 		{
 			EnsureActiveTransactionState();
 
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				_db.FbClient.isc_commit_retaining(_statusVector, ref _handle);
+			_db.FbClient.isc_commit_retaining(_statusVector, ref _handle);
 
-				_db.ProcessStatusVector(_statusVector);
+			_db.ProcessStatusVector(_statusVector);
 
-				_state = TransactionState.Active;
-			}
+			_state = TransactionState.Active;
 		}
 
 		public override void RollbackRetaining()
 		{
 			EnsureActiveTransactionState();
 
-			lock (_db)
-			{
-				// Clear the status vector
-				ClearStatusVector();
+			ClearStatusVector();
 
-				_db.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
+			_db.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
 
-				_db.ProcessStatusVector(_statusVector);
+			_db.ProcessStatusVector(_statusVector);
 
-				_state = TransactionState.Active;
-			}
+			_state = TransactionState.Active;
 		}
 
 		#endregion

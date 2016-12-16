@@ -26,15 +26,9 @@ namespace FirebirdSql.Data.Common
 {
 	internal sealed class TransactionParameterBuffer : ParameterBuffer
 	{
-		#region Constructors
-
 		public TransactionParameterBuffer()
 			: base(BitConverter.IsLittleEndian)
 		{ }
-
-		#endregion
-
-		#region Methods
 
 		public void Append(int type, short value)
 		{
@@ -54,7 +48,5 @@ namespace FirebirdSql.Data.Common
 			WriteByte(buffer.Length);
 			Write(buffer);
 		}
-
-		#endregion
 	}
 }

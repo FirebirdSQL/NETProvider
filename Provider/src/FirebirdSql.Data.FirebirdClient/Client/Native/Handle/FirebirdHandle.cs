@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.Client.Native.Handle
 		// Method added because we can't inject IFbClient in ctor
 		public void SetClient(IFbClient fbClient)
 		{
-			Contract.Requires(_fbClient == null); // We shouldn't set this if already set
+			Contract.Requires(_fbClient == null);
 			Contract.Requires(fbClient != null);
 			Contract.Ensures(_fbClient != null);
 

@@ -161,20 +161,12 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			if (disposing)
 			{
-				try
+				if (_ownsStream)
 				{
-					if (_ownsStream)
-					{
-						_innerStream?.Dispose();
-					}
+					_innerStream?.Dispose();
 				}
-				catch
-				{ }
-				finally
-				{
-					_innerStream = null;
-					_charset = null;
-				}
+				_innerStream = null;
+				_charset = null;
 			}
 		}
 

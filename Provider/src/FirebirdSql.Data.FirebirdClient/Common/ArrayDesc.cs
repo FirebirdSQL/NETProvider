@@ -23,77 +23,15 @@ namespace FirebirdSql.Data.Common
 {
 	internal struct ArrayDesc
 	{
-		#region Fields
-
-		private byte	dataType;
-		private short	scale;
-		private short	length;
-		private string	fieldName;
-		private string	relationName;
-		private short	dimensions;
-		private short	flags;
-		private ArrayBound[] bounds;
-
-		#endregion
-
-		#region Properties
-
-		public byte DataType
-		{
-			get { return dataType; }
-			set { dataType = value; }
-		}
-
-		// Scale for numeric datatypes
-		public short Scale
-		{
-			get { return scale; }
-			set { scale = value; }
-		}
-
-		// Legth in bytes of each array element
-		public short Length
-		{
-			get { return length; }
-			set { length = value; }
-		}
-
-		// Column name - 32
-		public string FieldName
-		{
-			get { return fieldName; }
-			set { fieldName = value; }
-		}
-
-		// Table name -32
-		public string RelationName
-		{
-			get { return relationName; }
-			set { relationName = value; }
-		}
-
-		// Number of array dimensions
-		public short Dimensions
-		{
-			get { return dimensions; }
-			set { dimensions = value; }
-		}
-
+		public byte DataType { get; set; }
+		public short Scale { get; set; }
+		public short Length { get; set; }
+		public string FieldName { get; set; }
+		public string RelationName { get; set; }
+		public short Dimensions { get; set; }
 		// Specifies wheter array is to be accesed in
 		// row mayor or column-mayor order
-		public short Flags
-		{
-			get { return flags; }
-			set { flags = value; }
-		}
-
-		// Lower and upper bounds for each dimension - 16
-		public ArrayBound[] Bounds
-		{
-			get { return bounds; }
-			set { bounds = value; }
-		}
-
-		#endregion
+		public short Flags { get; set; }
+		public ArrayBound[] Bounds { get; set; }
 	}
 }

@@ -101,8 +101,10 @@ namespace FirebirdSql.Data.FirebirdClient
 					dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
 				}
 
-				FbConnectionInternal db = new FbConnectionInternal(options);
-				db.CreateDatabase(dpb);
+				using (FbConnectionInternal db = new FbConnectionInternal(options))
+				{
+					db.CreateDatabase(dpb);
+				}
 			}
 			catch (IscException ex)
 			{
@@ -117,8 +119,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			try
 			{
-				FbConnectionInternal db = new FbConnectionInternal(options);
-				db.DropDatabase();
+				using (FbConnectionInternal db = new FbConnectionInternal(options))
+				{
+					db.DropDatabase();
+				}
 			}
 			catch (IscException ex)
 			{
@@ -159,19 +163,16 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _connectionString; }
 			set
 			{
-				lock (this)
+				if (_state == ConnectionState.Closed)
 				{
-					if (_state == ConnectionState.Closed)
+					if (value == null)
 					{
-						if (value == null)
-						{
-							value = string.Empty;
-						}
-
-						_options.Load(value);
-						_options.Validate();
-						_connectionString = value;
+						value = string.Empty;
 					}
+
+					_options.Load(value);
+					_options.Validate();
+					_connectionString = value;
 				}
 			}
 		}
@@ -285,30 +286,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override void Dispose(bool disposing)
 		{
-			lock (this)
+			if (disposing)
 			{
 				if (!_disposed)
 				{
-					try
-					{
-						// release any unmanaged resources
-						Close();
-
-						if (disposing)
-						{
-							// release any managed resources
-							_innerConnection = null;
-							_options = null;
-							_connectionString = null;
-						}
-					}
-					catch
-					{ }
-					finally
-					{
-						_disposed = true;
-						base.Dispose(disposing);
-					}
+					_disposed = true;
+					Close();
+					_innerConnection = null;
+					_options = null;
+					_connectionString = null;
+					base.Dispose(disposing);
 				}
 			}
 		}
@@ -424,115 +411,109 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override void ChangeDatabase(string db)
 		{
-			lock (this)
+			CheckClosed();
+
+			if (string.IsNullOrEmpty(db))
 			{
-				CheckClosed();
+				throw new InvalidOperationException("Database name is not valid.");
+			}
 
-				if (string.IsNullOrEmpty(db))
-				{
-					throw new InvalidOperationException("Database name is not valid.");
-				}
+			string cs = _connectionString;
 
-				string cs = _connectionString;
+			try
+			{
+				FbConnectionStringBuilder csb = new FbConnectionStringBuilder(_connectionString);
 
-				try
-				{
-					FbConnectionStringBuilder csb = new FbConnectionStringBuilder(_connectionString);
+				/* Close current connection	*/
+				Close();
 
-					/* Close current connection	*/
-					Close();
+				/* Set up the new Database	*/
+				csb.Database = db;
+				ConnectionString = csb.ToString();
 
-					/* Set up the new Database	*/
-					csb.Database = db;
-					ConnectionString = csb.ToString();
-
-					/* Open	new	connection	*/
-					Open();
-				}
-				catch (IscException ex)
-				{
-					ConnectionString = cs;
-					throw new FbException(ex.Message, ex);
-				}
+				/* Open	new	connection	*/
+				Open();
+			}
+			catch (IscException ex)
+			{
+				ConnectionString = cs;
+				throw new FbException(ex.Message, ex);
 			}
 		}
 
 		public override void Open()
 		{
-			lock (this)
+			if (string.IsNullOrEmpty(_connectionString))
 			{
-				if (string.IsNullOrEmpty(_connectionString))
-				{
-					throw new InvalidOperationException("Connection String is not initialized.");
-				}
-				if (!IsClosed && _state != ConnectionState.Connecting)
-				{
-					throw new InvalidOperationException("Connection already Open.");
-				}
+				throw new InvalidOperationException("Connection String is not initialized.");
+			}
+			if (!IsClosed && _state != ConnectionState.Connecting)
+			{
+				throw new InvalidOperationException("Connection already Open.");
+			}
 #if !NETCORE10
-				if (_options.Enlist && System.Transactions.Transaction.Current == null)
-				{
-					throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
-				}
+			if (_options.Enlist && System.Transactions.Transaction.Current == null)
+			{
+				throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
+			}
 #endif
 
+			try
+			{
+				OnStateChange(_state, ConnectionState.Connecting);
+
+				if (_options.Pooling)
+				{
+					_innerConnection = FbConnectionPoolManager.Instance.Get(_options, this);
+				}
+				else
+				{
+					// Do not use Connection Pooling
+					_innerConnection = new FbConnectionInternal(_options);
+					_innerConnection.SetOwningConnection(this);
+					_innerConnection.Connect();
+				}
+
+#if !NETCORE10
 				try
 				{
-					OnStateChange(_state, ConnectionState.Connecting);
-
-					if (_options.Pooling)
-					{
-						_innerConnection = FbConnectionPoolManager.Instance.Get(_options, this);
-					}
-					else
-					{
-						// Do not use Connection Pooling
-						_innerConnection = new FbConnectionInternal(_options);
-						_innerConnection.SetOwningConnection(this);
-						_innerConnection.Connect();
-					}
-
-#if !NETCORE10
-					try
-					{
-						_innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
-					}
-					catch
-					{
-						// if enlistment fails clean up innerConnection
-						_innerConnection.DisposeTransaction();
-
-						if (_options.Pooling)
-						{
-							// Send connection return back to the Pool
-							FbConnectionPoolManager.Instance.Release(_innerConnection);
-						}
-						else
-						{
-							_innerConnection.Dispose();
-							_innerConnection = null;
-						}
-
-						throw;
-					}
-#endif
-
-					// Bind	Warning	messages event
-					_innerConnection.Database.WarningMessage = new WarningMessageCallback(OnWarningMessage);
-
-					// Update the connection state
-					OnStateChange(_state, ConnectionState.Open);
-				}
-				catch (IscException ex)
-				{
-					OnStateChange(_state, ConnectionState.Closed);
-					throw new FbException(ex.Message, ex);
+					_innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
 				}
 				catch
 				{
-					OnStateChange(_state, ConnectionState.Closed);
+					// if enlistment fails clean up innerConnection
+					_innerConnection.DisposeTransaction();
+
+					if (_options.Pooling)
+					{
+						// Send connection return back to the Pool
+						FbConnectionPoolManager.Instance.Release(_innerConnection);
+					}
+					else
+					{
+						_innerConnection.Dispose();
+						_innerConnection = null;
+					}
+
 					throw;
 				}
+#endif
+
+				// Bind	Warning	messages event
+				_innerConnection.Database.WarningMessage = new WarningMessageCallback(OnWarningMessage);
+
+				// Update the connection state
+				OnStateChange(_state, ConnectionState.Open);
+			}
+			catch (IscException ex)
+			{
+				OnStateChange(_state, ConnectionState.Closed);
+				throw new FbException(ex.Message, ex);
+			}
+			catch
+			{
+				OnStateChange(_state, ConnectionState.Closed);
+				throw;
 			}
 		}
 
@@ -540,56 +521,42 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (!IsClosed && _innerConnection != null)
 			{
-				lock (this)
+				try
 				{
-					try
+					_innerConnection.CloseEventManager();
+
+					if (_innerConnection.Database != null)
 					{
-						lock (_innerConnection)
+						_innerConnection.Database.WarningMessage = null;
+					}
+
+					_innerConnection.DisposeTransaction();
+
+					_innerConnection.ReleasePreparedCommands();
+
+					if (_options.Pooling)
+					{
+						if (_innerConnection.CancelDisabled)
 						{
-							// Close the Remote	Event Manager
-							_innerConnection.CloseEventManager();
-
-							// Unbind Warning messages event
-							if (_innerConnection.Database != null)
-							{
-								_innerConnection.Database.WarningMessage = null;
-							}
-
-							// Dispose Transaction
-							_innerConnection.DisposeTransaction();
-
-							// Dispose all active statemenets
-							_innerConnection.ReleasePreparedCommands();
-
-							// Close connection	or send	it back	to the pool
-							if (_options.Pooling)
-							{
-								if (_innerConnection.CancelDisabled)
-								{
-									// Enable fb_cancel_operation if going into pool
-									_innerConnection.EnableCancel();
-								}
-
-								// Send	connection to the Pool
-								FbConnectionPoolManager.Instance.Release(_innerConnection);
-							}
-							else
-							{
-								if (!_innerConnection.IsEnlisted)
-								{
-									_innerConnection.Dispose();
-								}
-								_innerConnection = null;
-							}
+							_innerConnection.EnableCancel();
 						}
+
+						FbConnectionPoolManager.Instance.Release(_innerConnection);
 					}
-					catch
-					{ }
-					finally
+					else
 					{
-						// Update connection state
-						OnStateChange(_state, ConnectionState.Closed);
+						if (!_innerConnection.IsEnlisted)
+						{
+							_innerConnection.Dispose();
+						}
+						_innerConnection = null;
 					}
+				}
+				catch
+				{ }
+				finally
+				{
+					OnStateChange(_state, ConnectionState.Closed);
 				}
 			}
 		}

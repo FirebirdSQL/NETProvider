@@ -55,25 +55,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbConnection Connection
 		{
 			get { return _connection; }
-			set { _connection = value; }
-		}
-
-		public bool HasChanges
-		{
-			get { return _revent.HasChanges; }
 		}
 
 		public int RemoteEventId
 		{
-			get
-			{
-				if (_revent != null)
-				{
-					return _revent.RemoteId;
-				}
-
-				return -1;
-			}
+			get { return _revent?.RemoteId ?? -1; }
 		}
 
 		#endregion
@@ -82,8 +68,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbRemoteEvent(FbConnection connection)
 			: this(connection, null)
-		{
-		}
+		{ }
 
 		public FbRemoteEvent(FbConnection connection, params string[] events)
 		{
@@ -110,13 +95,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		public void AddEvents(params string[] events)
 		{
 			if (events == null)
-			{
-				throw new ArgumentNullException("events cannot be null.");
-			}
+				throw new ArgumentNullException(nameof(events));
 			if (events.Length > 15)
-			{
-				throw new ArgumentException("Max number of events for request interest is 15");
-			}
+				throw new ArgumentOutOfRangeException(nameof(events), "Maximum number of events is 15.");
 
 			if (events.Length != _revent.Events.Count)
 			{
@@ -186,7 +167,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
-			// Send individual event notifications
 			for (int i = 0; i < actualCounts.Length; i++)
 			{
 				FbRemoteEventEventArgs args = new FbRemoteEventEventArgs(_revent.Events[i], actualCounts[i]);
@@ -204,12 +184,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			if (canceled)
 			{
-				// Requeque
 				CancelEvents();
 			}
 			else
 			{
-				// Requeque
 				QueueEvents();
 			}
 		}

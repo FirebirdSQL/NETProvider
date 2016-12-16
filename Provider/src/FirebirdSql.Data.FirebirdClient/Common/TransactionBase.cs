@@ -44,18 +44,7 @@ namespace FirebirdSql.Data.Common
 		public abstract void Prepare();
 		public abstract void Prepare(byte[] buffer);
 
-		~TransactionBase()
-		{
-			Dispose(false);
-		}
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
+		public virtual void Dispose()
 		{ }
 	}
 }
