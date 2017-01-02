@@ -290,8 +290,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		private static FbDbType GetStringDbType(TypeUsage type)
 		{
-			Debug.Assert(type.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType &&
-				PrimitiveTypeKind.String == ((PrimitiveType)type.EdmType).PrimitiveTypeKind, "only valid for string type");
+			Debug.Assert(type.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType && PrimitiveTypeKind.String == ((PrimitiveType)type.EdmType).PrimitiveTypeKind, "only valid for string type");
 
 			FbDbType dbType;
 			// Specific type depends on whether the string is a unicode string and whether it is a fixed length string.

@@ -262,7 +262,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			{
 				throw new ArgumentNullException("edmType");
 			}
-			System.Diagnostics.Debug.Assert(edmType.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType);
+			Debug.Assert(edmType.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType);
 
 			PrimitiveType primitiveType = edmType.EdmType as PrimitiveType;
 			if (primitiveType == null)
@@ -327,7 +327,7 @@ namespace FirebirdSql.Data.EntityFramework6
 							if (isMaxLength)
 							{
 								tu = TypeUsage.CreateBinaryTypeUsage(StoreTypeNameToStorePrimitiveType["blob"], false);
-								System.Diagnostics.Debug.Assert(tu.Facets["MaxLength"].Description.IsConstant, "blob is not constant!");
+								Debug.Assert(tu.Facets["MaxLength"].Description.IsConstant, "blob is not constant!");
 							}
 							else
 							{

@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 using FirebirdSql.Data.Common;
 
@@ -496,7 +497,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected byte[] ProcessInfoSqlResponse(GenericResponse respose)
 		{
-			System.Diagnostics.Debug.Assert(respose.Data != null && respose.Data.Length > 0);
+			Debug.Assert(respose.Data != null && respose.Data.Length > 0);
 			return respose.Data;
 		}
 		#endregion
