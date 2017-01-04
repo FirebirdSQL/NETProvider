@@ -52,6 +52,11 @@
 		"compile": {
 			"exclude": [ "Entity/**" ]
 		},
+		"embed": {
+			"mappings": {
+				"FirebirdSql.Data.Schema.FbMetaData.xml": "Schema/FbMetaData.xml"
+			}
+		},
 		"publicSign": true,
 		"keyFile": "Properties\\FirebirdSql.Data.FirebirdClient.snk",
 		"allowUnsafe": true
