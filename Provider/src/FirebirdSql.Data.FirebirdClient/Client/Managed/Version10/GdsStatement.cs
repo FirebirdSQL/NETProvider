@@ -429,13 +429,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void Describe()
 		{
-			System.Diagnostics.Debug.Assert(true);
+			Debug.Assert(false);
 		}
 		// these are not needed for Gds, because it's pre-fetched in Prepare
 		// maybe we can fetch these also for Fes and Ext etc.
 		public override void DescribeParameters()
 		{
-			System.Diagnostics.Debug.Assert(true);
+			Debug.Assert(false);
 		}
 
 		#endregion
