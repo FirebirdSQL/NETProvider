@@ -51,25 +51,21 @@ namespace FirebirdSql.Data.Schema
 		public DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
 			DataTable dataTable = new DataTable(collectionName);
-			FbCommand command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions));
-			FbDataAdapter adapter = new FbDataAdapter(command);
-
-			try
+			using (FbCommand command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions)))
 			{
-				adapter.Fill(dataTable);
+				using (FbDataAdapter adapter = new FbDataAdapter(command))
+				{
+					try
+					{
+						adapter.Fill(dataTable);
+					}
+					catch (Exception ex)
+					{
+						throw new FbException(ex.Message);
+					}
+				}
 			}
-			catch (Exception ex)
-			{
-				throw new FbException(ex.Message);
-			}
-			finally
-			{
-				adapter.Dispose();
-				command.Dispose();
-			}
-
 			TrimStringFields(dataTable);
-
 			return ProcessResult(dataTable);
 		}
 
@@ -79,11 +75,11 @@ namespace FirebirdSql.Data.Schema
 
 		protected FbCommand BuildCommand(FbConnection connection, string collectionName, string[] restrictions)
 		{
-			string          filter = String.Format("CollectionName='{0}'", collectionName);
-			StringBuilder	builder = GetCommandText(restrictions);
-			DataRow[]       restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
-			FbTransaction	transaction = connection.InnerConnection.ActiveTransaction;
-			FbCommand		command	= new FbCommand(builder.ToString(), connection, transaction);
+			string filter = String.Format("CollectionName='{0}'", collectionName);
+			StringBuilder builder = GetCommandText(restrictions);
+			DataRow[] restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
+			FbTransaction transaction = connection.InnerConnection.ActiveTransaction;
+			FbCommand command = new FbCommand(builder.ToString(), connection, transaction);
 
 			if (restrictions != null && restrictions.Length > 0)
 			{

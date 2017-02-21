@@ -33,6 +33,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal sealed class GdsArray : ArrayBase
 	{
+		const long ArrayHandle = 0;
+
 		#region Fields
 
 		private long _handle;
@@ -79,12 +81,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (!(db is GdsDatabase))
 			{
-				throw new ArgumentException("Specified argument is not of GdsDatabase type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
 			}
 
 			if (!(transaction is GdsTransaction))
 			{
-				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(GdsTransaction)} type.");
 			}
 
 			_database = (GdsDatabase)db;
@@ -100,57 +102,51 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override byte[] GetSlice(int sliceLength)
 		{
-			lock (_database.SyncObject)
+			try
 			{
-				try
-				{
-					byte[] sdl = GenerateSDL(Descriptor);
+				byte[] sdl = GenerateSDL(Descriptor);
 
-					_database.XdrStream.Write(IscCodes.op_get_slice); // Op code
-					_database.XdrStream.Write(_transaction.Handle);// Transaction
-					_database.XdrStream.Write(_handle);           // Array id
-					_database.XdrStream.Write(sliceLength);           // Slice length
-					_database.XdrStream.WriteBuffer(sdl);             // Slice descriptor	language
-					_database.XdrStream.Write(string.Empty);          // Slice parameters
-					_database.XdrStream.Write(0);                     // Slice proper
-					_database.XdrStream.Flush();
+				_database.XdrStream.Write(IscCodes.op_get_slice);
+				_database.XdrStream.Write(_transaction.Handle);
+				_database.XdrStream.Write(_handle);
+				_database.XdrStream.Write(sliceLength);
+				_database.XdrStream.WriteBuffer(sdl);
+				_database.XdrStream.Write(string.Empty);
+				_database.XdrStream.Write(0);
+				_database.XdrStream.Flush();
 
-					return ReceiveSliceResponse(Descriptor);
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				return ReceiveSliceResponse(Descriptor);
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
-		public override void PutSlice(System.Array sourceArray, int sliceLength)
+		public override void PutSlice(Array sourceArray, int sliceLength)
 		{
-			lock (_database.SyncObject)
+			try
 			{
-				try
-				{
-					byte[] sdl = GenerateSDL(Descriptor);
-					byte[] slice = EncodeSliceArray(sourceArray);
+				byte[] sdl = GenerateSDL(Descriptor);
+				byte[] slice = EncodeSliceArray(sourceArray);
 
-					_database.XdrStream.Write(IscCodes.op_put_slice);     // Op code
-					_database.XdrStream.Write(_transaction.Handle);   // Transaction
-					_database.XdrStream.Write((long)0);                   // Array Handle
-					_database.XdrStream.Write(sliceLength);               // Slice length
-					_database.XdrStream.WriteBuffer(sdl);                 // Slice descriptor	language
-					_database.XdrStream.Write(string.Empty);              // Slice parameters
-					_database.XdrStream.Write(sliceLength);               // Slice length
-					_database.XdrStream.Write(slice, 0, slice.Length);    // Slice proper
-					_database.XdrStream.Flush();
+				_database.XdrStream.Write(IscCodes.op_put_slice);
+				_database.XdrStream.Write(_transaction.Handle);
+				_database.XdrStream.Write(ArrayHandle);
+				_database.XdrStream.Write(sliceLength);
+				_database.XdrStream.WriteBuffer(sdl);
+				_database.XdrStream.Write(string.Empty);
+				_database.XdrStream.Write(sliceLength);
+				_database.XdrStream.Write(slice, 0, slice.Length);
+				_database.XdrStream.Flush();
 
-					GenericResponse response = _database.ReadGenericResponse();
+				GenericResponse response = _database.ReadGenericResponse();
 
-					_handle = response.BlobId;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_handle = response.BlobId;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
@@ -158,7 +154,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Protected Methods
 
-		protected override System.Array DecodeSlice(byte[] slice)
+		protected override Array DecodeSlice(byte[] slice)
 		{
 			DbDataType dbType = DbDataType.Array;
 			Array sliceData = null;
@@ -169,7 +165,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			int type = 0;
 			int index = 0;
 
-			// Get upper and lower bounds of each dimension
 			for (int i = 0; i < Descriptor.Dimensions; i++)
 			{
 				lowerBounds[i] = Descriptor.Bounds[i].LowerBound;
@@ -181,15 +176,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 			}
 
-			// Create arrays
 			sliceData = Array.CreateInstance(systemType, lengths, lowerBounds);
 			tempData = Array.CreateInstance(systemType, sliceData.Length);
 
-			// Infer Firebird and Db datatypes
 			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
-			// Decode slice	data
 			using (XdrStream xdr = new XdrStream(slice, _database.Charset))
 			{
 				while (xdr.Position < xdr.Length)
@@ -275,7 +267,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				if (operation == IscCodes.op_slice)
 				{
-					// Read	slice length
 					bool isVariying = false;
 					int elements = 0;
 					int length = _database.XdrStream.ReadInt32();
@@ -481,9 +472,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				StuffLiteral(sdl, tail.UpperBound);
 			}
 
-			Stuff(
-				sdl, 5, IscCodes.isc_sdl_element,
-				1, IscCodes.isc_sdl_scalar, 0, dimensions);
+			Stuff(sdl, 5, IscCodes.isc_sdl_element, 1, IscCodes.isc_sdl_scalar, 0, dimensions);
 
 			for (n = 0; n < dimensions; n++)
 			{

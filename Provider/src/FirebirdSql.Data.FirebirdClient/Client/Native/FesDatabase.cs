@@ -53,7 +53,6 @@ namespace FirebirdSql.Data.Client.Native
 		private short _dialect;
 		private bool _disposed;
 		private IntPtr[] _statusVector;
-		private object _syncObject;
 
 		private IFbClient _fbClient;
 
@@ -110,19 +109,6 @@ namespace FirebirdSql.Data.Client.Native
 			get { return _fbClient; }
 		}
 
-		public object SyncObject
-		{
-			get
-			{
-				if (_syncObject == null)
-				{
-					Interlocked.CompareExchange(ref _syncObject, new object(), null);
-				}
-
-				return _syncObject;
-			}
-		}
-
 		#endregion
 
 		#region Constructors
@@ -139,41 +125,22 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region Finalizer
-
-		~FesDatabase()
-		{
-			Dispose(false);
-		}
-
-		#endregion
-
 		#region IDisposable methods
 
 		public void Dispose()
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		private void Dispose(bool disposing)
-		{
 			if (!_disposed)
 			{
-				if (disposing)
-				{
-					Detach();
-					_warningMessage = null;
-					_charset = null;
-					_serverVersion = null;
-					_statusVector = null;
-					_transactionCount = 0;
-					_dialect = 0;
-					_handle.Dispose();
-					_packetSize = 0;
-				}
-
 				_disposed = true;
+				Detach();
+				_warningMessage = null;
+				_charset = null;
+				_serverVersion = null;
+				_statusVector = null;
+				_transactionCount = 0;
+				_dialect = 0;
+				_handle.Dispose();
+				_packetSize = 0;
 			}
 		}
 

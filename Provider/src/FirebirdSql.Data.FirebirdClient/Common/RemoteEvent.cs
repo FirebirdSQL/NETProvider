@@ -28,24 +28,19 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Callbacks
 
-		public RemoteEventCountsCallback EventCountsCallback
-		{
-			get { return _eventCountsCallback; }
-			set { _eventCountsCallback = value; }
-		}
+		public RemoteEventCountsCallback EventCountsCallback { get; set; }
 
 		#endregion
 
 		#region Fields
 
-		private RemoteEventCountsCallback _eventCountsCallback;
-		private List<string>	_events;
-		private IDatabase	_db;
-		private int			_localId;
-		private int			_remoteId;
-		private bool		_initialCounts;
-		private int[]		_previousCounts;
-		private int[]		_actualCounts;
+		private List<string> _events;
+		private IDatabase _db;
+		private int _localId;
+		private int _remoteId;
+		private bool _initialCounts;
+		private int[] _previousCounts;
+		private int[] _actualCounts;
 
 		#endregion
 
@@ -65,39 +60,7 @@ namespace FirebirdSql.Data.Common
 
 		public List<string> Events
 		{
-			get
-			{
-				return _events;
-			}
-		}
-
-		public bool HasChanges
-		{
-			get
-			{
-				if (_actualCounts == null && _previousCounts == null)
-				{
-					return false;
-				}
-				else if (_actualCounts != null && _previousCounts == null)
-				{
-					return true;
-				}
-				else if (_actualCounts.Length != _previousCounts.Length)
-				{
-					return true;
-				}
-
-				for (int i = 0; i < _actualCounts.Length; i++)
-				{
-					if (_actualCounts[i] != _previousCounts[i])
-					{
-						return true;
-					}
-				}
-
-				return false;
-			}
+			get { return _events; }
 		}
 
 		public int[] PreviousCounts
@@ -114,16 +77,12 @@ namespace FirebirdSql.Data.Common
 
 		#region Constructors
 
-		public RemoteEvent(IDatabase db) : this(db, 0, 0, new List<string>())
+		public RemoteEvent(IDatabase db)
 		{
-		}
-
-		public RemoteEvent(IDatabase db, int localId, int remoteId, List<string> events)
-		{
+			_localId = 0;
+			_remoteId = 0;
+			_events = new List<string>();
 			_db = db;
-			_localId = localId;
-			_remoteId = remoteId;
-			_events = events;
 		}
 
 		#endregion
@@ -132,19 +91,13 @@ namespace FirebirdSql.Data.Common
 
 		public void QueueEvents()
 		{
-			lock (_db.SyncObject)
-			{
-				_db.QueueEvents(this);
-			}
+			_db.QueueEvents(this);
 		}
 
 		public void CancelEvents()
 		{
-			lock (_db.SyncObject)
-			{
-				_db.CancelEvents(this);
-				ResetCounts();
-			}
+			_db.CancelEvents(this);
+			ResetCounts();
 		}
 
 		public void ResetCounts()
@@ -199,9 +152,7 @@ namespace FirebirdSql.Data.Common
 		public EventParameterBuffer ToEpb()
 		{
 			EventParameterBuffer epb = new EventParameterBuffer();
-
 			epb.Append(IscCodes.EPB_version1);
-
 			for (int i = 0; i < _events.Count; i++)
 			{
 				if (_actualCounts != null)
@@ -213,7 +164,6 @@ namespace FirebirdSql.Data.Common
 					epb.Append(_events[i], 0);
 				}
 			}
-
 			return epb;
 		}
 

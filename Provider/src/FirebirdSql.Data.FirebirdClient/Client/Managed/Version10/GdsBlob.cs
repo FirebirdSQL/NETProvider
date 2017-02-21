@@ -25,6 +25,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal sealed class GdsBlob : BlobBase
 	{
+		const int DataSegment = 0;
+		const int SeekMode = 0;
+
 		#region Fields
 
 		private GdsDatabase _database;
@@ -58,11 +61,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (!(db is GdsDatabase))
 			{
-				throw new ArgumentException("Specified argument is not of GdsDatabase type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
 			}
 			if (!(transaction is GdsTransaction))
 			{
-				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(GdsTransaction)} type.");
 			}
 
 			_database = (GdsDatabase)db;
@@ -105,102 +108,93 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			int requested = SegmentSize;
 
-			lock (_database.SyncObject)
+			try
 			{
-				try
+				_database.XdrStream.Write(IscCodes.op_get_segment);
+				_database.XdrStream.Write(_blobHandle);
+				_database.XdrStream.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
+				_database.XdrStream.Write(DataSegment);
+				_database.XdrStream.Flush();
+
+				GenericResponse response = _database.ReadGenericResponse();
+
+				RblRemoveValue(IscCodes.RBL_segment);
+				if (response.ObjectHandle == 1)
 				{
-					_database.XdrStream.Write(IscCodes.op_get_segment);
-					_database.XdrStream.Write(_blobHandle);
-					_database.XdrStream.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
-					_database.XdrStream.Write(0); // Data segment
-					_database.XdrStream.Flush();
-
-					GenericResponse response = _database.ReadGenericResponse();
-
-					RblRemoveValue(IscCodes.RBL_segment);
-					if (response.ObjectHandle == 1)
-					{
-						RblAddValue(IscCodes.RBL_segment);
-					}
-					else if (response.ObjectHandle == 2)
-					{
-						RblAddValue(IscCodes.RBL_eof_pending);
-					}
-
-					byte[] buffer = response.Data;
-
-					if (buffer.Length == 0)
-					{
-						// previous	segment	was	last, this has no data
-						return buffer;
-					}
-
-					int len = 0;
-					int srcpos = 0;
-					int destpos = 0;
-
-					while (srcpos < buffer.Length)
-					{
-						len = IscHelper.VaxInteger(buffer, srcpos, 2);
-						srcpos += 2;
-
-						Buffer.BlockCopy(buffer, srcpos, buffer, destpos, len);
-						srcpos += len;
-						destpos += len;
-					}
-
-					byte[] result = new byte[destpos];
-					Buffer.BlockCopy(buffer, 0, result, 0, destpos);
-
-					return result;
+					RblAddValue(IscCodes.RBL_segment);
 				}
-				catch (IOException ex)
+				else if (response.ObjectHandle == 2)
 				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
+					RblAddValue(IscCodes.RBL_eof_pending);
 				}
+
+				byte[] buffer = response.Data;
+
+				if (buffer.Length == 0)
+				{
+					// previous	segment	was	last, this has no data
+					return buffer;
+				}
+
+				int len = 0;
+				int srcpos = 0;
+				int destpos = 0;
+
+				while (srcpos < buffer.Length)
+				{
+					len = IscHelper.VaxInteger(buffer, srcpos, 2);
+					srcpos += 2;
+
+					Buffer.BlockCopy(buffer, srcpos, buffer, destpos, len);
+					srcpos += len;
+					destpos += len;
+				}
+
+				byte[] result = new byte[destpos];
+				Buffer.BlockCopy(buffer, 0, result, 0, destpos);
+
+				return result;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
 		protected override void PutSegment(byte[] buffer)
 		{
-			lock (_database.SyncObject)
+			try
 			{
-				try
-				{
-					_database.XdrStream.Write(IscCodes.op_batch_segments);
-					_database.XdrStream.Write(_blobHandle);
-					_database.XdrStream.WriteBlobBuffer(buffer);
-					_database.XdrStream.Flush();
+				_database.XdrStream.Write(IscCodes.op_batch_segments);
+				_database.XdrStream.Write(_blobHandle);
+				_database.XdrStream.WriteBlobBuffer(buffer);
+				_database.XdrStream.Flush();
 
-					_database.ReadResponse();
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_database.ReadResponse();
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
 		protected override void Seek(int position)
 		{
-			lock (_database.SyncObject)
+			try
 			{
-				try
-				{
-					_database.XdrStream.Write(IscCodes.op_seek_blob);
-					_database.XdrStream.Write(_blobHandle);
-					_database.XdrStream.Write(0);                 // Seek mode
-					_database.XdrStream.Write(position);          // Seek offset
-					_database.XdrStream.Flush();
+				_database.XdrStream.Write(IscCodes.op_seek_blob);
+				_database.XdrStream.Write(_blobHandle);
+				_database.XdrStream.Write(SeekMode);
+				_database.XdrStream.Write(position);
+				_database.XdrStream.Flush();
 
-					GenericResponse response = (GenericResponse)_database.ReadResponse();
+				GenericResponse response = (GenericResponse)_database.ReadResponse();
 
-					_position = response.ObjectHandle;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
-				}
+				_position = response.ObjectHandle;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
 
@@ -225,28 +219,25 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void CreateOrOpen(int op, BlobParameterBuffer bpb)
 		{
-			lock (_database.SyncObject)
+			try
 			{
-				try
+				_database.XdrStream.Write(op);
+				if (bpb != null)
 				{
-					_database.XdrStream.Write(op);
-					if (bpb != null)
-					{
-						_database.XdrStream.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
-					}
-					_database.XdrStream.Write(_transaction.Handle);
-					_database.XdrStream.Write(_blobId);
-					_database.XdrStream.Flush();
-
-					GenericResponse response = _database.ReadGenericResponse();
-
-					_blobId = response.BlobId;
-					_blobHandle = response.ObjectHandle;
+					_database.XdrStream.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
 				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_database.XdrStream.Write(_transaction.Handle);
+				_database.XdrStream.Write(_blobId);
+				_database.XdrStream.Flush();
+
+				GenericResponse response = _database.ReadGenericResponse();
+
+				_blobId = response.BlobId;
+				_blobHandle = response.ObjectHandle;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 

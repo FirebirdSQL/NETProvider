@@ -49,77 +49,69 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
 
-			// Clear data
 			Clear();
 
-			lock (_database.SyncObject)
+			try
 			{
+				RecordsAffected = -1;
+
+				SendExecuteToBuffer();
+
+				_database.XdrStream.Flush();
+
+				int numberOfResponses =
+					(StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
 				try
 				{
-					RecordsAffected = -1;
+					SqlResponse sqlStoredProcedureResponse = null;
+					if (StatementType == DbStatementType.StoredProcedure)
+					{
+						numberOfResponses--;
+						sqlStoredProcedureResponse = _database.ReadSqlResponse();
+						ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
+					}
 
-					SendExecuteToBuffer();
+					numberOfResponses--;
+					GenericResponse executeResponse = _database.ReadGenericResponse();
+					ProcessExecuteResponse(executeResponse);
+				}
+				finally
+				{
+					SafeFinishFetching(ref numberOfResponses);
+				}
+
+				// we need to split this in two, to alloow server handle op_cancel properly
+
+				if (ReturnRecordsAffected &&
+					(StatementType == DbStatementType.Insert ||
+					StatementType == DbStatementType.Delete ||
+					StatementType == DbStatementType.Update ||
+					StatementType == DbStatementType.StoredProcedure ||
+					StatementType == DbStatementType.Select))
+				{
+					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
 					_database.XdrStream.Flush();
 
-					// sql?, execute
-					int numberOfResponses =
-						(StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
+					numberOfResponses = 1;
 					try
 					{
-						SqlResponse sqlStoredProcedureResponse = null;
-						if (StatementType == DbStatementType.StoredProcedure)
-						{
-							numberOfResponses--;
-							sqlStoredProcedureResponse = _database.ReadSqlResponse();
-							ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
-						}
-
 						numberOfResponses--;
-						GenericResponse executeResponse = _database.ReadGenericResponse();
-						ProcessExecuteResponse(executeResponse);
+						GenericResponse rowsAffectedResponse = _database.ReadGenericResponse();
+						RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(rowsAffectedResponse));
 					}
 					finally
 					{
 						SafeFinishFetching(ref numberOfResponses);
 					}
-
-					//we need to split this in two, to alloow server handle op_cancel properly
-
-					// Obtain records affected by query execution
-					if (ReturnRecordsAffected &&
-						(StatementType == DbStatementType.Insert ||
-						StatementType == DbStatementType.Delete ||
-						StatementType == DbStatementType.Update ||
-						StatementType == DbStatementType.StoredProcedure ||
-						StatementType == DbStatementType.Select))
-					{
-						// Grab rows affected
-						SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
-
-						_database.XdrStream.Flush();
-
-						//rows affected
-						numberOfResponses = 1;
-						try
-						{
-							numberOfResponses--;
-							GenericResponse rowsAffectedResponse = _database.ReadGenericResponse();
-							RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(rowsAffectedResponse));
-						}
-						finally
-						{
-							SafeFinishFetching(ref numberOfResponses);
-						}
-					}
-
-					_state = StatementState.Executed;
 				}
-				catch (IOException ex)
-				{
-					_state = StatementState.Error;
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+
+				_state = StatementState.Executed;
+			}
+			catch (IOException ex)
+			{
+				_state = StatementState.Error;
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 

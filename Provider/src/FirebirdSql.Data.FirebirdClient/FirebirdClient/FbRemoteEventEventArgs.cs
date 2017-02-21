@@ -17,33 +17,14 @@
  */
 
 using System;
+using System.ComponentModel;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	public sealed class FbRemoteEventEventArgs : System.ComponentModel.CancelEventArgs
+	public sealed class FbRemoteEventEventArgs : CancelEventArgs
 	{
-		#region Fields
-
-		private string _name;
-		private int _counts;
-
-		#endregion
-
-		#region Properties
-
-		public string Name
-		{
-			get { return _name; }
-		}
-
-		public int Counts
-		{
-			get { return _counts; }
-		}
-
-		#endregion
-
-		#region Constructors
+		public string Name { get; }
+		public int Counts { get; }
 
 		public FbRemoteEventEventArgs(string name, int counts)
 			: this(name, counts, false)
@@ -52,10 +33,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbRemoteEventEventArgs(string name, int counts, bool cancel)
 			: base(cancel)
 		{
-			_name = name;
-			_counts = counts;
+			Name = name;
+			Counts = counts;
 		}
-
-		#endregion
 	}
 }

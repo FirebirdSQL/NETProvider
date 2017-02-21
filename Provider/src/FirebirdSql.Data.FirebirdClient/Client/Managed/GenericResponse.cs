@@ -23,49 +23,17 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal sealed class GenericResponse : IResponse
 	{
-		#region Fields
-
-		private int			    _objectHandle;
-		private long		    _blobId;
-		private byte[]		    _data;
-		private IscException    _exception;
-
-		#endregion
-
-		#region Properties
-
-		public int ObjectHandle
-		{
-			get { return _objectHandle; }
-		}
-
-		public long BlobId
-		{
-			get { return _blobId; }
-		}
-
-		public byte[] Data
-		{
-			get { return _data; }
-		}
-
-		public IscException Exception
-		{
-			get { return _exception; }
-		}
-
-		#endregion
-
-		#region Constructors
+		public int ObjectHandle { get; }
+		public long BlobId { get; }
+		public byte[] Data { get; }
+		public IscException Exception { get; }
 
 		public GenericResponse(int objectHandle, long blobId, byte[] data, IscException exception)
 		{
-			_objectHandle = objectHandle;
-			_blobId = blobId;
-			_data = data;
-			_exception = exception;
+			ObjectHandle = objectHandle;
+			BlobId = blobId;
+			Data = data;
+			Exception = exception;
 		}
-
-		#endregion
 	}
 }

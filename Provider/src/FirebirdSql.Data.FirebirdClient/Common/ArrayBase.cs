@@ -38,32 +38,15 @@ namespace FirebirdSql.Data.Common
 
 		#region Properties
 
-		public ArrayDesc Descriptor
-		{
-			get { return _descriptor; }
-		}
+		public ArrayDesc Descriptor => _descriptor;
 
 		#endregion
 
 		#region Abstract Properties
 
-		public abstract long Handle
-		{
-			get;
-			set;
-		}
-
-		public abstract IDatabase DB
-		{
-			get;
-			set;
-		}
-
-		public abstract TransactionBase Transaction
-		{
-			get;
-			set;
-		}
+		public abstract long Handle { get; set; }
+		public abstract IDatabase DB { get; set; }
+		public abstract TransactionBase Transaction { get; set; }
 
 		#endregion
 
@@ -94,13 +77,13 @@ namespace FirebirdSql.Data.Common
 			return DecodeSlice(slice);
 		}
 
-		public void Write(System.Array sourceArray)
+		public void Write(Array sourceArray)
 		{
 			SetDesc(sourceArray);
 			PutSlice(sourceArray, GetSliceLength(false));
 		}
 
-		public void SetDesc(System.Array sourceArray)
+		public void SetDesc(Array sourceArray)
 		{
 			_descriptor.Dimensions = (short)sourceArray.Rank;
 
@@ -199,13 +182,13 @@ namespace FirebirdSql.Data.Common
 		#region Abstract Methods
 
 		public abstract byte[] GetSlice(int slice_length);
-		public abstract void PutSlice(System.Array source_array, int slice_length);
+		public abstract void PutSlice(Array source_array, int slice_length);
 
 		#endregion
 
 		#region Protected Abstract Methods
 
-		protected abstract System.Array DecodeSlice(byte[] slice);
+		protected abstract Array DecodeSlice(byte[] slice);
 
 		#endregion
 

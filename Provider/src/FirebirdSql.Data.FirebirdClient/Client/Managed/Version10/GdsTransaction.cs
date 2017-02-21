@@ -38,7 +38,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private bool _disposed;
 		private GdsDatabase _database;
 		private TransactionState _state;
-		private object _stateSyncRoot;
 
 		#endregion
 
@@ -58,17 +57,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Constructors
 
-		private GdsTransaction()
-		{
-			_stateSyncRoot = new object();
-		}
-
 		public GdsTransaction(IDatabase db)
-			: this()
 		{
 			if (!(db is GdsDatabase))
 			{
-				throw new ArgumentException("Specified argument is not of GdsDatabase type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
 			}
 
 			_database = (GdsDatabase)db;
@@ -79,34 +72,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region IDisposable methods
 
-		protected override void Dispose(bool disposing)
+		public override void Dispose()
 		{
-			lock (_stateSyncRoot)
+			if (!_disposed)
 			{
-				if (!_disposed)
+				_disposed = true;
+				if (_state != TransactionState.NoTransaction)
 				{
-					try
-					{
-						if (_state != TransactionState.NoTransaction)
-						{
-							Rollback();
-						}
-					}
-					catch
-					{ }
-					finally
-					{
-						if (disposing)
-						{
-							_database = null;
-							_handle = 0;
-							_state = TransactionState.NoTransaction;
-						}
-
-						_disposed = true;
-						base.Dispose(disposing);
-					}
+					Rollback();
 				}
+				_database = null;
+				_handle = 0;
+				_state = TransactionState.NoTransaction;
+				base.Dispose();
 			}
 		}
 
@@ -116,147 +94,117 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void BeginTransaction(TransactionParameterBuffer tpb)
 		{
-			lock (_stateSyncRoot)
+			if (_state != TransactionState.NoTransaction)
 			{
-				if (_state != TransactionState.NoTransaction)
-				{
-					throw new InvalidOperationException();
-				}
+				throw new InvalidOperationException();
+			}
 
-				try
-				{
-					GenericResponse response;
-					lock (_database.SyncObject)
-					{
-						_database.XdrStream.Write(IscCodes.op_transaction);
-						_database.XdrStream.Write(_database.Handle);
-						_database.XdrStream.WriteBuffer(tpb.ToArray());
-						_database.XdrStream.Flush();
+			try
+			{
+				GenericResponse response;
+				_database.XdrStream.Write(IscCodes.op_transaction);
+				_database.XdrStream.Write(_database.Handle);
+				_database.XdrStream.WriteBuffer(tpb.ToArray());
+				_database.XdrStream.Flush();
 
-						response = _database.ReadGenericResponse();
+				response = _database.ReadGenericResponse();
 
-						_database.TransactionCount++;
-					}
+				_database.TransactionCount++;
 
-					_handle = response.ObjectHandle;
-					_state = TransactionState.Active;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_handle = response.ObjectHandle;
+				_state = TransactionState.Active;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
 		public override void Commit()
 		{
-			lock (_stateSyncRoot)
+			EnsureActiveTransactionState();
+
+			try
 			{
-				EnsureActiveTransactionState();
+				_database.XdrStream.Write(IscCodes.op_commit);
+				_database.XdrStream.Write(_handle);
+				_database.XdrStream.Flush();
 
-				try
-				{
-					lock (_database.SyncObject)
-					{
-						_database.XdrStream.Write(IscCodes.op_commit);
-						_database.XdrStream.Write(_handle);
-						_database.XdrStream.Flush();
+				_database.ReadResponse();
 
-						_database.ReadResponse();
+				_database.TransactionCount--;
 
-						_database.TransactionCount--;
-					}
+				Update?.Invoke(this, new EventArgs());
 
-					Update?.Invoke(this, new EventArgs());
-
-					_state = TransactionState.NoTransaction;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_state = TransactionState.NoTransaction;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
 		public override void Rollback()
 		{
-			lock (_stateSyncRoot)
+			EnsureActiveTransactionState();
+
+			try
 			{
-				EnsureActiveTransactionState();
+				_database.XdrStream.Write(IscCodes.op_rollback);
+				_database.XdrStream.Write(_handle);
+				_database.XdrStream.Flush();
 
-				try
-				{
-					lock (_database.SyncObject)
-					{
-						_database.XdrStream.Write(IscCodes.op_rollback);
-						_database.XdrStream.Write(_handle);
-						_database.XdrStream.Flush();
+				_database.ReadResponse();
 
-						_database.ReadResponse();
+				_database.TransactionCount--;
 
-						_database.TransactionCount--;
-					}
+				Update?.Invoke(this, new EventArgs());
 
-					Update?.Invoke(this, new EventArgs());
-
-					_state = TransactionState.NoTransaction;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_state = TransactionState.NoTransaction;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
 		public override void CommitRetaining()
 		{
-			lock (_stateSyncRoot)
+			EnsureActiveTransactionState();
+
+			try
 			{
-				EnsureActiveTransactionState();
+				_database.XdrStream.Write(IscCodes.op_commit_retaining);
+				_database.XdrStream.Write(_handle);
+				_database.XdrStream.Flush();
 
-				try
-				{
-					lock (_database.SyncObject)
-					{
-						_database.XdrStream.Write(IscCodes.op_commit_retaining);
-						_database.XdrStream.Write(_handle);
-						_database.XdrStream.Flush();
+				_database.ReadResponse();
 
-						_database.ReadResponse();
-					}
-
-					_state = TransactionState.Active;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_state = TransactionState.Active;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
 		public override void RollbackRetaining()
 		{
-			lock (_stateSyncRoot)
+			EnsureActiveTransactionState();
+
+			try
 			{
-				EnsureActiveTransactionState();
+				_database.XdrStream.Write(IscCodes.op_rollback_retaining);
+				_database.XdrStream.Write(_handle);
+				_database.XdrStream.Flush();
 
-				try
-				{
-					lock (_database.SyncObject)
-					{
-						_database.XdrStream.Write(IscCodes.op_rollback_retaining);
-						_database.XdrStream.Write(_handle);
-						_database.XdrStream.Flush();
+				_database.ReadResponse();
 
-						_database.ReadResponse();
-					}
-
-					_state = TransactionState.Active;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_state = TransactionState.Active;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
@@ -266,58 +214,46 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void Prepare()
 		{
-			lock (_stateSyncRoot)
+			EnsureActiveTransactionState();
+
+			try
 			{
-				EnsureActiveTransactionState();
+				_state = TransactionState.NoTransaction;
 
-				try
-				{
-					_state = TransactionState.NoTransaction;
+				_database.XdrStream.Write(IscCodes.op_prepare);
+				_database.XdrStream.Write(_handle);
+				_database.XdrStream.Flush();
 
-					lock (_database.SyncObject)
-					{
-						_database.XdrStream.Write(IscCodes.op_prepare);
-						_database.XdrStream.Write(_handle);
-						_database.XdrStream.Flush();
+				_database.ReadResponse();
 
-						_database.ReadResponse();
-					}
-
-					_state = TransactionState.Prepared;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_state = TransactionState.Prepared;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
 		public override void Prepare(byte[] buffer)
 		{
-			lock (_stateSyncRoot)
+			EnsureActiveTransactionState();
+
+			try
 			{
-				EnsureActiveTransactionState();
+				_state = TransactionState.NoTransaction;
 
-				try
-				{
-					_state = TransactionState.NoTransaction;
+				_database.XdrStream.Write(IscCodes.op_prepare2);
+				_database.XdrStream.Write(_handle);
+				_database.XdrStream.WriteBuffer(buffer, buffer.Length);
+				_database.XdrStream.Flush();
 
-					lock (_database.SyncObject)
-					{
-						_database.XdrStream.Write(IscCodes.op_prepare2);
-						_database.XdrStream.Write(_handle);
-						_database.XdrStream.WriteBuffer(buffer, buffer.Length);
-						_database.XdrStream.Flush();
+				_database.ReadResponse();
 
-						_database.ReadResponse();
-					}
-
-					_state = TransactionState.Prepared;
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				_state = TransactionState.Prepared;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 

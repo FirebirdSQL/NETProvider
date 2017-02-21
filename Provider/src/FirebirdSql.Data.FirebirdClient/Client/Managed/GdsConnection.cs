@@ -30,8 +30,8 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal class GdsConnection
 	{
-		const ulong KeepAliveTime = 1800000; //30min
-		const ulong KeepAliveInterval = 1800000; //30min
+		const ulong KeepAliveTime = 1800000; // 30min
+		const ulong KeepAliveInterval = 1800000; // 30min
 
 		#region Fields
 
@@ -271,7 +271,7 @@ namespace FirebirdSql.Data.Client.Managed
 			IPAddress[] addresses = Dns.GetHostEntry(dataSource).AddressList;
 #endif
 
-			// Try to avoid problems with IPV6 addresses
+			// try to avoid problems with IPv6 addresses
 			foreach (IPAddress address in addresses)
 			{
 				if (address.AddressFamily == addressFamily)

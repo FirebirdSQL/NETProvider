@@ -94,11 +94,11 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			if (!(db is FesDatabase))
 			{
-				throw new ArgumentException("Specified argument is not of GdsDatabase type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(FesDatabase)} type.");
 			}
 			if (!(transaction is FesTransaction))
 			{
-				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(FesTransaction)} type.");
 			}
 			_db = (FesDatabase)db;
 			_transaction = (FesTransaction)transaction;
@@ -114,7 +114,6 @@ namespace FirebirdSql.Data.Client.Native
 
 		public override byte[] GetSlice(int sliceLength)
 		{
-			// Clear the status vector
 			ClearStatusVector();
 
 			DatabaseHandle dbHandle = _db.HandlePtr;
@@ -133,7 +132,6 @@ namespace FirebirdSql.Data.Client.Native
 				buffer,
 				ref sliceLength);
 
-			// Free	memory
 			ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
 			_db.ProcessStatusVector(_statusVector);
@@ -141,9 +139,8 @@ namespace FirebirdSql.Data.Client.Native
 			return buffer;
 		}
 
-		public override void PutSlice(System.Array sourceArray, int sliceLength)
+		public override void PutSlice(Array sourceArray, int sliceLength)
 		{
-			// Clear the status vector
 			ClearStatusVector();
 
 			DatabaseHandle dbHandle = _db.HandlePtr;
@@ -151,8 +148,6 @@ namespace FirebirdSql.Data.Client.Native
 
 			IntPtr arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 
-			// Obtain the System of	type of	Array elements and
-			// Fill	buffer
 			Type systemType = GetSystemType();
 
 			byte[] buffer = new byte[sliceLength];
@@ -178,7 +173,6 @@ namespace FirebirdSql.Data.Client.Native
 				buffer,
 				ref sliceLength);
 
-			// Free	memory
 			ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
 			_db.ProcessStatusVector(_statusVector);
@@ -188,7 +182,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override System.Array DecodeSlice(byte[] slice)
+		protected override Array DecodeSlice(byte[] slice)
 		{
 			Array sliceData = null;
 			int slicePosition = 0;
@@ -199,7 +193,6 @@ namespace FirebirdSql.Data.Client.Native
 			int[] lengths = new int[Descriptor.Dimensions];
 			int[] lowerBounds = new int[Descriptor.Dimensions];
 
-			// Get upper and lower bounds of each dimension
 			for (int i = 0; i < Descriptor.Dimensions; i++)
 			{
 				lowerBounds[i] = Descriptor.Bounds[i].LowerBound;
@@ -211,12 +204,10 @@ namespace FirebirdSql.Data.Client.Native
 				}
 			}
 
-			// Create slice	arrays
 			sliceData = Array.CreateInstance(systemType, lengths, lowerBounds);
 
 			Array tempData = Array.CreateInstance(systemType, sliceData.Length);
 
-			// Infer data types
 			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
@@ -368,7 +359,6 @@ namespace FirebirdSql.Data.Client.Native
 			int subType = (Descriptor.Scale < 0) ? 2 : 0;
 			int type = 0;
 
-			// Infer data types
 			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 

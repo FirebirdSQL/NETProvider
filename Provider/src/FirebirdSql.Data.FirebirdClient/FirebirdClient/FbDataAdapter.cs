@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Events
 
-		public event EventHandler<FbRowUpdatedEventArgs>   RowUpdated
+		public event EventHandler<FbRowUpdatedEventArgs> RowUpdated
 		{
 			add
 			{
@@ -143,32 +143,20 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override void Dispose(bool disposing)
 		{
-			lock (this)
+			if (disposing)
 			{
 				if (!_disposed)
 				{
-					try
+					_disposed = true;
+					if (_shouldDisposeSelectCommand)
 					{
-						// Release any unmanaged resources
-
-						// Release any managed resources
-						if (disposing)
+						if (SelectCommand != null)
 						{
-							if (_shouldDisposeSelectCommand)
-							{
-								if (SelectCommand != null)
-								{
-									SelectCommand.Dispose();
-									SelectCommand = null;
-								}
-							}
+							SelectCommand.Dispose();
+							SelectCommand = null;
 						}
 					}
-					finally
-					{
-						_disposed = true;
-						base.Dispose(disposing);
-					}
+					base.Dispose(disposing);
 				}
 			}
 		}

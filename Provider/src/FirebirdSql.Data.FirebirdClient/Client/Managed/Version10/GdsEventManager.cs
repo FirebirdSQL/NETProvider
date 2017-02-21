@@ -28,14 +28,15 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
+#warning Reevaluate threading races
 	internal class GdsEventManager
 	{
 		#region Fields
 
-		private GdsDatabase _database;
-		private Thread _eventsThread;
 		private ConcurrentDictionary<int, RemoteEvent> _events;
 		private int _handle;
+		private GdsDatabase _database;
+		private Thread _eventsThread;
 
 		#endregion
 
@@ -45,13 +46,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			_events = new ConcurrentDictionary<int, RemoteEvent>();
 			_handle = handle;
-
-			if (_database == null)
-			{
-				GdsConnection connection = new GdsConnection(ipAddress, portNumber);
-				connection.Connect();
-				_database = new GdsDatabase(connection);
-			}
+			GdsConnection connection = new GdsConnection(ipAddress, portNumber);
+			connection.Connect();
+			_database = new GdsDatabase(connection);
 		}
 
 		#endregion
@@ -60,18 +57,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void QueueEvents(RemoteEvent remoteEvent)
 		{
-			lock (this)
-			{
-				_events[remoteEvent.LocalId] = remoteEvent;
+			_events[remoteEvent.LocalId] = remoteEvent;
 
 #warning Jiri Cincura: I'm pretty sure this is a race condition.
-				if (_eventsThread == null || _eventsThread.ThreadState.HasFlag(ThreadState.Stopped | ThreadState.Unstarted))
-				{
-					_eventsThread = new Thread(ThreadHandler);
-					_eventsThread.IsBackground = true;
-					_eventsThread.Name = "FirebirdClient - Events Thread";
-					_eventsThread.Start();
-				}
+			if (_eventsThread == null || _eventsThread.ThreadState.HasFlag(ThreadState.Stopped | ThreadState.Unstarted))
+			{
+				_eventsThread = new Thread(ThreadHandler);
+				_eventsThread.IsBackground = true;
+				_eventsThread.Name = "FirebirdClient - Events Thread";
+				_eventsThread.Start();
 			}
 		}
 
@@ -83,23 +77,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void Close()
 		{
-			lock (_database.SyncObject)
+			if (_database != null)
 			{
-				if (_database != null)
+				_database.CloseConnection();
+			}
+
+			if (_eventsThread != null)
+			{
+				// we don't have here clue about disposing vs. finalizer
+				if (!Environment.HasShutdownStarted)
 				{
-					_database.CloseConnection();
+					_eventsThread.Join();
 				}
 
-				if (_eventsThread != null)
-				{
-					// we don't have here clue about disposing vs. finalizer
-					if (!Environment.HasShutdownStarted)
-					{
-						_eventsThread.Join();
-					}
-
-					_eventsThread = null;
-				}
+				_eventsThread = null;
 			}
 		}
 

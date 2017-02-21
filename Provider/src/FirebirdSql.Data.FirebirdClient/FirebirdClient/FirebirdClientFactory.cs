@@ -48,9 +48,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Constructors
 
-		private FirebirdClientFactory() : base()
-		{
-		}
+		private FirebirdClientFactory()
+			: base()
+		{ }
 
 		#endregion
 

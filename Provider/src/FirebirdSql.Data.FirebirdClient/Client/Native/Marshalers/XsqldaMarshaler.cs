@@ -36,18 +36,14 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 		{
 			if (pNativeData != IntPtr.Zero)
 			{
-				// Obtain XSQLDA information
 				XSQLDA xsqlda = Marshal2.PtrToStructure<XSQLDA>(pNativeData);
 
-				// Destroy XSQLDA structure
 				Marshal2.DestroyStructure<XSQLDA>(pNativeData);
 
-				// Destroy XSQLVAR structures
 				for (var i = 0; i < xsqlda.sqln; i++)
 				{
 					IntPtr ptr = GetIntPtr(pNativeData, ComputeLength(i));
 
-					// Free	sqldata	and	sqlind pointers	if needed
 					var sqlvar = new XSQLVAR();
 					MarshalXSQLVARNativeToManaged(ptr, sqlvar, true);
 
@@ -66,7 +62,6 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 					Marshal2.DestroyStructure<XSQLVAR>(ptr);
 				}
 
-				// Free	pointer	memory
 				Marshal.FreeHGlobal(pNativeData);
 
 				pNativeData = IntPtr.Zero;
@@ -75,7 +70,6 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 		public static IntPtr MarshalManagedToNative(Charset charset, Descriptor descriptor)
 		{
-			// Set up XSQLDA structure
 			var xsqlda = new XSQLDA
 			{
 				version = descriptor.Version,
@@ -87,7 +81,6 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 			for (var i = 0; i < xsqlvar.Length; i++)
 			{
-				// Create a	new	XSQLVAR	structure and fill it
 				xsqlvar[i] = new XSQLVAR
 				{
 					sqltype = descriptor[i].DataType,
@@ -97,7 +90,6 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 				};
 
 
-				// Create a	new	pointer	for	the	xsqlvar	data
 				if (descriptor[i].HasDataType() && descriptor[i].DbDataType != DbDataType.Null)
 				{
 					var buffer = descriptor[i].DbValue.GetBytes();
@@ -109,23 +101,18 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 					xsqlvar[i].sqldata = Marshal.AllocHGlobal(0);
 				}
 
-				// Create a	new	pointer	for	the	sqlind value
 				xsqlvar[i].sqlind = Marshal.AllocHGlobal(Marshal2.SizeOf<short>());
 				Marshal.WriteInt16(xsqlvar[i].sqlind, descriptor[i].NullFlag);
 
-				// Name
 				xsqlvar[i].sqlname = GetStringBuffer(charset, descriptor[i].Name);
 				xsqlvar[i].sqlname_length = (short)descriptor[i].Name.Length;
 
-				// Relation	Name
 				xsqlvar[i].relname = GetStringBuffer(charset, descriptor[i].Relation);
 				xsqlvar[i].relname_length = (short)descriptor[i].Relation.Length;
 
-				// Owner name
 				xsqlvar[i].ownername = GetStringBuffer(charset, descriptor[i].Owner);
 				xsqlvar[i].ownername_length = (short)descriptor[i].Owner.Length;
 
-				// Alias name
 				xsqlvar[i].aliasname = GetStringBuffer(charset, descriptor[i].Alias);
 				xsqlvar[i].aliasname_length = (short)descriptor[i].Alias.Length;
 			}
@@ -156,31 +143,25 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 		public static Descriptor MarshalNativeToManaged(Charset charset, IntPtr pNativeData, bool fetching)
 		{
-			// Obtain XSQLDA information
 			var xsqlda = Marshal2.PtrToStructure<XSQLDA>(pNativeData);
 
-			// Create a	new	Descriptor
 			var descriptor = new Descriptor(xsqlda.sqln) { ActualCount = xsqlda.sqld };
 
-			// Obtain XSQLVAR members information
 			var xsqlvar = new XSQLVAR();
 			for (var i = 0; i < xsqlda.sqln; i++)
 			{
 				var ptr = GetIntPtr(pNativeData, ComputeLength(i));
 				MarshalXSQLVARNativeToManaged(ptr, xsqlvar);
 
-				// Map XSQLVAR information to Descriptor
 				descriptor[i].DataType = xsqlvar.sqltype;
 				descriptor[i].NumericScale = xsqlvar.sqlscale;
 				descriptor[i].SubType = xsqlvar.sqlsubtype;
 				descriptor[i].Length = xsqlvar.sqllen;
 
-				// Decode sqlind value
 				descriptor[i].NullFlag = xsqlvar.sqlind == IntPtr.Zero
 					? (short)0
 					: Marshal.ReadInt16(xsqlvar.sqlind);
 
-				// Set value
 				if (fetching)
 				{
 					if (descriptor[i].NullFlag != -1)

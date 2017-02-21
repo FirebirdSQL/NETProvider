@@ -81,89 +81,28 @@ namespace FirebirdSql.Data.Common
 
 		#region Protected Fields
 
-		protected EventHandler _TransactionUpdate;
+		protected EventHandler TransactionUpdate;
 
 		#endregion
 
 		#region Abstract Properties
 
-		public abstract IDatabase Database
-		{
-			get;
-		}
-
-		public abstract TransactionBase Transaction
-		{
-			get;
-			set;
-		}
-
-		public abstract Descriptor Parameters
-		{
-			get;
-			set;
-		}
-
-		public abstract Descriptor Fields
-		{
-			get;
-		}
-
-		public abstract int RecordsAffected
-		{
-			get;
-			protected set;
-		}
-
-		public abstract bool IsPrepared
-		{
-			get;
-		}
-
-		public abstract DbStatementType StatementType
-		{
-			get;
-			protected set;
-		}
-
-		public abstract StatementState State
-		{
-			get;
-			protected set;
-		}
-
-		public abstract int FetchSize
-		{
-			get;
-			set;
-		}
-
-		public abstract bool ReturnRecordsAffected
-		{
-			get;
-			set;
-		}
-
-		#endregion
-
-		#region Finalizer
-
-		~StatementBase()
-		{
-			Dispose(false);
-		}
+		public abstract IDatabase Database { get; }
+		public abstract TransactionBase Transaction { get; set; }
+		public abstract Descriptor Parameters { get; set; }
+		public abstract Descriptor Fields { get; }
+		public abstract int RecordsAffected { get; protected set; }
+		public abstract bool IsPrepared { get; }
+		public abstract DbStatementType StatementType { get; protected set; }
+		public abstract StatementState State { get; protected set; }
+		public abstract int FetchSize { get; set; }
+		public abstract bool ReturnRecordsAffected { get; set; }
 
 		#endregion
 
 		#region IDisposable methods
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
+		public virtual void Dispose()
 		{ }
 
 		#endregion
@@ -232,10 +171,10 @@ namespace FirebirdSql.Data.Common
 
 		public virtual void Release()
 		{
-			if (Transaction != null && _TransactionUpdate != null)
+			if (Transaction != null && TransactionUpdate != null)
 			{
-				Transaction.Update -= _TransactionUpdate;
-				_TransactionUpdate = null;
+				Transaction.Update -= TransactionUpdate;
+				TransactionUpdate = null;
 			}
 
 			Free(IscCodes.DSQL_drop);

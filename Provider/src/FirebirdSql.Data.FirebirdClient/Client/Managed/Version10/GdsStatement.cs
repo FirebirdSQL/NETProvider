@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Firebird ADO.NET Data provider for .NET and Mono
  *
  *	   The contents of this file are subject to the Initial
@@ -61,10 +61,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (_transaction != value)
 				{
-					if (_TransactionUpdate != null && _transaction != null)
+					if (TransactionUpdate != null && _transaction != null)
 					{
-						_transaction.Update -= _TransactionUpdate;
-						_TransactionUpdate = null;
+						_transaction.Update -= TransactionUpdate;
+						TransactionUpdate = null;
 					}
 
 					if (value == null)
@@ -74,8 +74,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					else
 					{
 						_transaction = (GdsTransaction)value;
-						_TransactionUpdate = new EventHandler(TransactionUpdated);
-						_transaction.Update += _TransactionUpdate;
+						TransactionUpdate = new EventHandler(TransactionUpdated);
+						_transaction.Update += TransactionUpdate;
 					}
 				}
 			}
@@ -146,11 +146,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (!(db is GdsDatabase))
 			{
-				throw new ArgumentException("Specified argument is not of GdsDatabase type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
 			}
 			if (transaction != null && !(transaction is GdsTransaction))
 			{
-				throw new ArgumentException("Specified argument is not of GdsTransaction type.");
+				throw new ArgumentException($"Specified argument is not of {nameof(GdsTransaction)} type.");
 			}
 
 			_handle = IscCodes.INVALID_OBJECT;
@@ -171,42 +171,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region IDisposable methods
 
-		protected override void Dispose(bool disposing)
+		public override void Dispose()
 		{
-			lock (this)
+			if (!_disposed)
 			{
-				if (!_disposed)
-				{
-					try
-					{
-						Release();
-					}
-					catch
-					{ }
-					finally
-					{
-						if (disposing)
-						{
-							Clear();
-
-							_rows = null;
-							_outputParams = null;
-							_database = null;
-							_fields = null;
-							_parameters = null;
-							_transaction = null;
-							_allRowsFetched = false;
-							_state = StatementState.Deallocated;
-							_statementType = DbStatementType.None;
-							_handle = 0;
-							_fetchSize = 0;
-							RecordsAffected = 0;
-						}
-
-						_disposed = true;
-						base.Dispose(disposing);
-					}
-				}
+				_disposed = true;
+				Release();
+				Clear();
+				_rows = null;
+				_outputParams = null;
+				_database = null;
+				_fields = null;
+				_parameters = null;
+				_transaction = null;
+				_allRowsFetched = false;
+				_state = StatementState.Deallocated;
+				_statementType = DbStatementType.None;
+				_handle = 0;
+				_fetchSize = 0;
+				RecordsAffected = 0;
+				base.Dispose();
 			}
 		}
 
@@ -249,40 +233,33 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void Prepare(string commandText)
 		{
-			// Clear data
 			ClearAll();
 
-			lock (_database.SyncObject)
+			try
 			{
-				try
+				if (_state == StatementState.Deallocated)
 				{
-					if (_state == StatementState.Deallocated)
-					{
-						// Allocate statement
-						SendAllocateToBuffer();
-						_database.XdrStream.Flush();
-						ProcessAllocateResponce(_database.ReadGenericResponse());
-					}
-
-					SendPrepareToBuffer(commandText);
+					SendAllocateToBuffer();
 					_database.XdrStream.Flush();
-					ProcessPrepareResponse(_database.ReadGenericResponse());
-
-					// Grab statement type
-					SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
-					_database.XdrStream.Flush();
-					_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
-
-
-					_state = StatementState.Prepared;
+					ProcessAllocateResponce(_database.ReadGenericResponse());
 				}
-				catch (IOException ex)
-				{
-					// if the statement has been already allocated, it's now in error
-					if (_state == StatementState.Allocated)
-						_state = StatementState.Error;
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+
+				SendPrepareToBuffer(commandText);
+				_database.XdrStream.Flush();
+				ProcessPrepareResponse(_database.ReadGenericResponse());
+
+				SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+				_database.XdrStream.Flush();
+				_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
+
+
+				_state = StatementState.Prepared;
+			}
+			catch (IOException ex)
+			{
+				if (_state == StatementState.Allocated)
+					_state = StatementState.Error;
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
@@ -293,46 +270,41 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
 
-			// Clear data
 			Clear();
 
-			lock (_database.SyncObject)
+			try
 			{
-				try
+				RecordsAffected = -1;
+
+				SendExecuteToBuffer();
+
+				_database.XdrStream.Flush();
+
+				if (_statementType == DbStatementType.StoredProcedure)
 				{
-					RecordsAffected = -1;
+					ProcessStoredProcedureExecuteResponse(_database.ReadSqlResponse());
+				}
 
-					SendExecuteToBuffer();
+				GenericResponse executeResponse = _database.ReadGenericResponse();
+				ProcessExecuteResponse(executeResponse);
 
+				if (ReturnRecordsAffected &&
+					(StatementType == DbStatementType.Insert ||
+					StatementType == DbStatementType.Delete ||
+					StatementType == DbStatementType.Update ||
+					StatementType == DbStatementType.StoredProcedure))
+				{
+					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 					_database.XdrStream.Flush();
-
-					if (_statementType == DbStatementType.StoredProcedure)
-					{
-						ProcessStoredProcedureExecuteResponse(_database.ReadSqlResponse());
-					}
-
-					GenericResponse executeResponse = _database.ReadGenericResponse();
-					ProcessExecuteResponse(executeResponse);
-
-					// Updated number of records affected by the statement execution
-					if (ReturnRecordsAffected &&
-						(StatementType == DbStatementType.Insert ||
-						StatementType == DbStatementType.Delete ||
-						StatementType == DbStatementType.Update ||
-						StatementType == DbStatementType.StoredProcedure))
-					{
-						SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
-						_database.XdrStream.Flush();
-						RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
-					}
-
-					_state = StatementState.Executed;
+					RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
 				}
-				catch (IOException ex)
-				{
-					_state = StatementState.Error;
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+
+				_state = StatementState.Executed;
+			}
+			catch (IOException ex)
+			{
+				_state = StatementState.Error;
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 
@@ -350,58 +322,54 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (!_allRowsFetched && _rows.Count == 0)
 			{
-				// Fetch next batch of rows
-				lock (_database.SyncObject)
+				try
 				{
-					try
+					_database.XdrStream.Write(IscCodes.op_fetch);
+					_database.XdrStream.Write(_handle);
+					_database.XdrStream.WriteBuffer(_fields.ToBlrArray());
+					_database.XdrStream.Write(0); // p_sqldata_message_number
+					_database.XdrStream.Write(_fetchSize); // p_sqldata_messages
+					_database.XdrStream.Flush();
+
+					if (_database.NextOperation() == IscCodes.op_fetch_response)
 					{
-						_database.XdrStream.Write(IscCodes.op_fetch);
-						_database.XdrStream.Write(_handle);
-						_database.XdrStream.WriteBuffer(_fields.ToBlrArray());
-						_database.XdrStream.Write(0);             // p_sqldata_message_number
-						_database.XdrStream.Write(_fetchSize);    // p_sqldata_messages
-						_database.XdrStream.Flush();
+						IResponse response = null;
 
-						if (_database.NextOperation() == IscCodes.op_fetch_response)
+						while (!_allRowsFetched)
 						{
-							IResponse response = null;
+							response = _database.ReadResponse();
 
-							while (!_allRowsFetched)
+							if (response is FetchResponse)
 							{
-								response = _database.ReadResponse();
+								FetchResponse fetchResponse = (FetchResponse)response;
 
-								if (response is FetchResponse)
+								if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 								{
-									FetchResponse fetchResponse = (FetchResponse)response;
-
-									if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
-									{
-										_rows.Enqueue(ReadRow());
-									}
-									else if (fetchResponse.Status == 100)
-									{
-										_allRowsFetched = true;
-									}
-									else
-									{
-										break;
-									}
+									_rows.Enqueue(ReadRow());
+								}
+								else if (fetchResponse.Status == 100)
+								{
+									_allRowsFetched = true;
 								}
 								else
 								{
 									break;
 								}
 							}
-						}
-						else
-						{
-							_database.ReadResponse();
+							else
+							{
+								break;
+							}
 						}
 					}
-					catch (IOException ex)
+					else
 					{
-						throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
+						_database.ReadResponse();
 					}
+				}
+				catch (IOException ex)
+				{
+					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 				}
 			}
 
@@ -429,13 +397,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override void Describe()
 		{
-			Debug.Assert(false);
+			Debug.Assert(false, "Nothing for Gds, because it's pre-fetched in Prepare.");
 		}
-		// these are not needed for Gds, because it's pre-fetched in Prepare
-		// maybe we can fetch these also for Fes and Ext etc.
+
 		public override void DescribeParameters()
 		{
-			Debug.Assert(false);
+			Debug.Assert(false, "Nothing for Gds, because it's pre-fetched in Prepare.");
 		}
 
 		#endregion
@@ -466,12 +433,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region op_info_sql methods
 		protected override byte[] GetSqlInfo(byte[] items, int bufferLength)
 		{
-			lock (_database.SyncObject)
-			{
-				DoInfoSqlPacket(items, bufferLength);
-				_database.XdrStream.Flush();
-				return ProcessInfoSqlResponse(_database.ReadGenericResponse());
-			}
+			DoInfoSqlPacket(items, bufferLength);
+			_database.XdrStream.Flush();
+			return ProcessInfoSqlResponse(_database.ReadGenericResponse());
 		}
 
 		protected void DoInfoSqlPacket(byte[] items, int bufferLength)
@@ -508,12 +472,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			if (FreeNotNeeded(option))
 				return;
 
-			lock (_database.SyncObject)
-			{
-				DoFreePacket(option);
-				_database.XdrStream.Flush();
-				ProcessFreeResponse(_database.ReadResponse());
-			}
+			DoFreePacket(option);
+			_database.XdrStream.Flush();
+			ProcessFreeResponse(_database.ReadResponse());
 		}
 
 		protected bool FreeNotNeeded(int option)
@@ -536,7 +497,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				SendFreeToBuffer(option);
 
-				// Reset statement information
 				if (option == IscCodes.DSQL_drop)
 				{
 					_parameters = null;
@@ -587,7 +547,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			// this may throw error, so it needs to be before any writing
 			var descriptor = WriteParameters();
 
-			// Write the message
 			if (_statementType == DbStatementType.StoredProcedure)
 			{
 				_database.XdrStream.Write(IscCodes.op_execute2);
@@ -644,17 +603,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected override void TransactionUpdated(object sender, EventArgs e)
 		{
-			lock (this)
+			if (Transaction != null && TransactionUpdate != null)
 			{
-				if (Transaction != null && _TransactionUpdate != null)
-				{
-					Transaction.Update -= _TransactionUpdate;
-				}
-
-				_state = StatementState.Closed;
-				_TransactionUpdate = null;
-				_allRowsFetched = false;
+				Transaction.Update -= TransactionUpdate;
 			}
+
+			_state = StatementState.Closed;
+			TransactionUpdate = null;
+			_allRowsFetched = false;
 		}
 
 		protected void ParseSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
@@ -1027,32 +983,29 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected virtual DbValue[] ReadRow()
 		{
 			DbValue[] row = new DbValue[_fields.Count];
-			lock (_database.SyncObject)
+			try
 			{
-				try
+				for (int i = 0; i < _fields.Count; i++)
 				{
-					for (int i = 0; i < _fields.Count; i++)
+					var value = ReadRawValue(_fields[i]);
+					var sqlInd = _database.XdrStream.ReadInt32();
+					if (sqlInd == -1)
 					{
-						var value = ReadRawValue(_fields[i]);
-						var sqlInd = _database.XdrStream.ReadInt32();
-						if (sqlInd == -1)
-						{
-							row[i] = new DbValue(this, _fields[i], null);
-						}
-						else if (sqlInd == 0)
-						{
-							row[i] = new DbValue(this, _fields[i], value);
-						}
-						else
-						{
-							throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
-						}
+						row[i] = new DbValue(this, _fields[i], null);
+					}
+					else if (sqlInd == 0)
+					{
+						row[i] = new DbValue(this, _fields[i], value);
+					}
+					else
+					{
+						throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
 					}
 				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 			return row;
 		}

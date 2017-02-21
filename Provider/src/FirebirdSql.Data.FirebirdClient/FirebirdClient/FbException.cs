@@ -72,9 +72,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#endregion
+		#endregion
 
-#region Constructors
+		#region Constructors
 
 		internal FbException()
 			: base()
@@ -128,6 +128,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#endregion
+		#endregion
 	}
 }

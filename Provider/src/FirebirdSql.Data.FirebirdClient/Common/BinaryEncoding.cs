@@ -16,8 +16,6 @@ namespace FirebirdSql.Data.Common
 {
 	internal class BinaryEncoding : Encoding
 	{
-		#region Static Methods
-
 		public static string BytesToString(byte[] byteArray)
 		{
 			// This code isn't great because it requires a double copy,
@@ -40,10 +38,6 @@ namespace FirebirdSql.Data.Common
 				throw new ArgumentOutOfRangeException();
 			}
 		}
-
-		#endregion
-
-		#region Methods
 
 		public override int GetByteCount(char[] chars, int index, int count)
 		{
@@ -151,7 +145,5 @@ namespace FirebirdSql.Data.Common
 		{
 			return count;
 		}
-
-		#endregion
 	}
 }

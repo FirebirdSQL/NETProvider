@@ -67,35 +67,32 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#region Trusted Auth
 		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
-			lock (SyncObject)
+			try
 			{
-				try
+				using (SspiHelper sspiHelper = new SspiHelper())
 				{
-					using (SspiHelper sspiHelper = new SspiHelper())
-					{
-						byte[] authData = sspiHelper.InitializeClientSecurity();
-						SendTrustedAuthToBuffer(dpb, authData);
-						SendAttachToBuffer(dpb, database);
-						XdrStream.Flush();
+					byte[] authData = sspiHelper.InitializeClientSecurity();
+					SendTrustedAuthToBuffer(dpb, authData);
+					SendAttachToBuffer(dpb, database);
+					XdrStream.Flush();
 
-						IResponse response = ReadResponse();
-						ProcessTrustedAuthResponse(sspiHelper, ref response);
-						ProcessAttachResponse((GenericResponse)response);
-					}
+					IResponse response = ReadResponse();
+					ProcessTrustedAuthResponse(sspiHelper, ref response);
+					ProcessAttachResponse((GenericResponse)response);
 				}
-				catch (IscException)
-				{
-					SafelyDetach();
-					throw;
-				}
-				catch (IOException ex)
-				{
-					SafelyDetach();
-					throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
-				}
-
-				AfterAttachActions();
 			}
+			catch (IscException)
+			{
+				SafelyDetach();
+				throw;
+			}
+			catch (IOException ex)
+			{
+				SafelyDetach();
+				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
+			}
+
+			AfterAttachActions();
 		}
 
 		protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBuffer dpb, byte[] authData)
@@ -119,17 +116,14 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#region Public methods
 		public override void ReleaseObject(int op, int id)
 		{
-			lock (SyncObject)
+			try
 			{
-				try
-				{
-					DoReleaseObjectPacket(op, id);
-					DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
-				}
+				DoReleaseObjectPacket(op, id);
+				DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
 		}
 

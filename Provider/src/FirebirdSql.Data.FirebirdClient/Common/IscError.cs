@@ -29,33 +29,17 @@ namespace FirebirdSql.Data.Common
 #endif
 	internal sealed class IscError
 	{
-		#region Fields
+		private string _strParam;
 
-		private string	_message;
-		private int		_type;
-		private int		_errorCode;
-		private string	_strParam;
-
-		#endregion
-
-		#region Properties
-
-		public string Message
-		{
-			get { return _message; }
-			set { _message = value; }
-		}
-
-		public int ErrorCode
-		{
-			get { return _errorCode; }
-		}
+		public string Message { get; set; }
+		public int ErrorCode { get; }
+		public int Type { get; }
 
 		public string StrParam
 		{
 			get
 			{
-				switch (_type)
+				switch (Type)
 				{
 					case IscCodes.isc_arg_interpreted:
 					case IscCodes.isc_arg_string:
@@ -64,7 +48,7 @@ namespace FirebirdSql.Data.Common
 						return _strParam;
 
 					case IscCodes.isc_arg_number:
-						return _errorCode.ToString(CultureInfo.InvariantCulture);
+						return ErrorCode.ToString(CultureInfo.InvariantCulture);
 
 					default:
 						return string.Empty;
@@ -72,16 +56,11 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public int Type
-		{
-			get { return _type; }
-		}
-
 		public bool IsArgument
 		{
 			get
 			{
-				switch (_type)
+				switch (Type)
 				{
 					case IscCodes.isc_arg_interpreted:
 					case IscCodes.isc_arg_string:
@@ -97,30 +76,24 @@ namespace FirebirdSql.Data.Common
 
 		public bool IsWarning
 		{
-			get { return _type == IscCodes.isc_arg_warning; }
+			get { return Type == IscCodes.isc_arg_warning; }
 		}
-
-		#endregion
-
-		#region Constructors
 
 		internal IscError(int errorCode)
 		{
-			_errorCode = errorCode;
+			ErrorCode = errorCode;
 		}
 
 		internal IscError(int type, string strParam)
 		{
-			_type = type;
+			Type = type;
 			_strParam = strParam;
 		}
 
 		internal IscError(int type, int errorCode)
 		{
-			_type = type;
-			_errorCode = errorCode;
+			Type = type;
+			ErrorCode = errorCode;
 		}
-
-		#endregion
 	}
 }

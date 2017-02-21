@@ -28,42 +28,16 @@ namespace FirebirdSql.Data.Common
 {
 	internal abstract class ParameterBuffer
 	{
-		#region Fields
-
 		private MemoryStream _stream;
-		private bool _isLittleEndian;
 
-		#endregion
-
-		#region Properties
-
-		public short Length
-		{
-			get { return (short)ToArray().Length; }
-		}
-
-		#endregion
-
-		#region Protected Properties
-
-		protected bool IsLittleEndian
-		{
-			get { return _isLittleEndian; }
-		}
-
-		#endregion
-
-		#region Constructors
+		public short Length => (short)ToArray().Length;
+		protected bool IsLittleEndian { get; }
 
 		protected ParameterBuffer(bool isLittleEndian)
 		{
 			_stream = new MemoryStream();
-			_isLittleEndian = isLittleEndian;
+			IsLittleEndian = isLittleEndian;
 		}
-
-		#endregion
-
-		#region Methods
 
 		public virtual void Append(int type)
 		{
@@ -74,10 +48,6 @@ namespace FirebirdSql.Data.Common
 		{
 			return _stream.ToArray();
 		}
-
-		#endregion
-
-		#region Protected Methods
 
 		protected void WriteByte(int value)
 		{
@@ -127,7 +97,5 @@ namespace FirebirdSql.Data.Common
 		{
 			_stream.Write(buffer, offset, count);
 		}
-
-		#endregion
 	}
 }
