@@ -13,7 +13,7 @@
  *	   language governing rights and limitations under the License.
  *
  *	Copyright (c) 2002 - 2007 Carlos Guzman Alvarez
- *	Copyright (c) 2007 - 2008 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2007 - 2017 Jiri Cincura (jiri@cincura.net)
  *
  *  Contributors:
  *      Vladimir Bodecek

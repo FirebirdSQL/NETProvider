@@ -14,6 +14,9 @@
  *
  *	Copyright (c) 2007 Dean Harding
  *	All Rights Reserved.
+ *
+ *  Contributors:
+ *      Jiri Cincura (jiri@cincura.net)
  */
 
 using System;

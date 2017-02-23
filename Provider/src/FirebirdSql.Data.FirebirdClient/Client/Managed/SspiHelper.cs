@@ -13,7 +13,7 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2008 Vladimir Bodecek, Nathan Fox, Jiri Cincura (jiri@cincura.net)
- *  Copyright (c) 2016 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2016-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *
  *  Adapted from pinvoke.net.

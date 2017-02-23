@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2015 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2015-2017 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
