@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2014-2016 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2014-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -24,6 +24,6 @@ namespace FirebirdSql.Data.FirebirdClient.Properties
 {
 	static class VersionInfo
 	{
-		internal const string Version = "5.7.0.0";
+		internal const string Version = "5.8.0.0";
 	}
 }
