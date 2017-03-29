@@ -23,7 +23,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Globalization;
-using System.Linq;
 using FirebirdSql.Data.Common;
 using System.Collections.Generic;
 
@@ -79,7 +78,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private long _position;
 		private List<byte> _outputBuffer;
-		private List<byte> _inputBuffer;
+		private ReadBuffer _inputBuffer;
 		private Ionic.Zlib.ZlibCodec _deflate;
 		private Ionic.Zlib.ZlibCodec _inflate;
 		private byte[] _compressionBuffer;
@@ -142,7 +141,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 			_position = 0;
 			_outputBuffer = new List<byte>(PreferredBufferSize);
-			_inputBuffer = new List<byte>(PreferredBufferSize);
+			_inputBuffer = new ReadBuffer(PreferredBufferSize);
 			if (_compression)
 			{
 				_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
@@ -224,7 +223,7 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureReadable();
 
-			if (_inputBuffer.Count < count)
+			if (_inputBuffer.Length < count)
 			{
 				var readBuffer = new byte[PreferredBufferSize];
 				var read = _innerStream.Read(readBuffer, 0, readBuffer.Length);
@@ -246,14 +245,12 @@ namespace FirebirdSql.Data.Client.Managed
 						readBuffer = _compressionBuffer;
 						read = _inflate.NextOut;
 					}
-					_inputBuffer.AddRange(readBuffer.Take(read));
+					_inputBuffer.AddRange(readBuffer, read);
 				}
 			}
-			var data = _inputBuffer.Take(count).ToArray();
-			_inputBuffer.RemoveRange(0, data.Length);
-			Array.Copy(data, 0, buffer, offset, data.Length);
-			_position += data.Length;
-			return data.Length;
+			var dataLength = _inputBuffer.ReadInto(ref buffer, offset, count);
+			_position += dataLength;
+			return dataLength;
 		}
 
 		public override void WriteByte(byte value)
@@ -269,7 +266,7 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureWritable();
 
-			_outputBuffer.AddRange(buffer.Skip(offset).Take(count));
+			_outputBuffer.AddRange(new ArraySegment<byte>(buffer, offset, count));
 		}
 
 		public byte[] ToArray()

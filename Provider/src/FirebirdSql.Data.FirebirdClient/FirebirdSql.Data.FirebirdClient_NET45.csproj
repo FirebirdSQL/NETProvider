@@ -80,6 +80,7 @@
     <Compile Include="Common\IscErrorMessages.cs" />
     <Compile Include="Common\Marshal2.cs" />
     <Compile Include="Common\PageSizeHelper.cs" />
+    <Compile Include="Common\ReadBuffer.cs" />
     <Compile Include="Common\SqlStateMapping.cs" />
     <Compile Include="Common\TimeoutHelper.cs" />
     <Compile Include="Common\TraceHelper.cs" />
