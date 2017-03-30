@@ -19,7 +19,7 @@
  *   Jiri Cincura (jiri@cincura.net)
  */
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 using System;
 using System.Collections;
 using System.ComponentModel;

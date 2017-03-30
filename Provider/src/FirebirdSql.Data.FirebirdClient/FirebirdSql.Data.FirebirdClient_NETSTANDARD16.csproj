@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard1.6</TargetFramework>
+		<AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
+		<RootNamespace>FirebirdSql.Data</RootNamespace>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
+		<DelaySign>False</DelaySign>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Remove="Entity\**" />
+		<EmbeddedResource Remove="Entity\**" />
+		<None Remove="Entity\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="Schema\FbMetaData.xml" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Schema\FbMetaData.xml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+	  <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
+	  <PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
+	  <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+	  <PackageReference Include="System.Data.Common" Version="4.3.0" />
+	  <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
+	  <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+	  <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+	  <PackageReference Include="System.IO.UnmanagedMemoryStream" Version="4.3.0" />
+	  <PackageReference Include="System.Linq.Parallel" Version="4.3.0" />
+	  <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
+	  <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+	  <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
+	  <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+	</ItemGroup>
+</Project>

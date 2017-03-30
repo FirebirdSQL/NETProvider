@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Properties
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override bool CanCreateDataSourceEnumerator
 		{
 			get { return false; }
@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbCommand();
 		}
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override DbCommandBuilder CreateCommandBuilder()
 		{
 			return new FbCommandBuilder();
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbConnectionStringBuilder();
 		}
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override DbDataAdapter CreateDataAdapter()
 		{
 			return new FbDataAdapter();
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		object IServiceProvider.GetService(Type serviceType)
 		{
-#if NETCORE10
+#if NETSTANDARD1_6
 			return null;
 #else
 			if (serviceType == typeof(DbProviderServices))

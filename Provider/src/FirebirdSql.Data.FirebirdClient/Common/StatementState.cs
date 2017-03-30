@@ -19,7 +19,7 @@ using System;
 
 namespace FirebirdSql.Data.Common
 {
-#if !NETCORE10
+#if !NETSTANDARD1_6
 	[Serializable]
 #endif
 	internal enum StatementState

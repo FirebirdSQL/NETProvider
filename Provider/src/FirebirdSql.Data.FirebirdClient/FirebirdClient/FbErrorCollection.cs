@@ -27,7 +27,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if !NETCORE10
+#if !NETSTANDARD1_6
 	[Serializable]
 	[ListBindable(false)]
 #endif

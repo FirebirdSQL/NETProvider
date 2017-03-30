@@ -26,12 +26,11 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-#if NETCORE10
+#if NETSTANDARD1_6
 using Microsoft.Extensions.PlatformAbstractions;
 #endif
-
 using FirebirdSql.Data.Common;
-#if !NETCORE10
+#if !NETSTANDARD1_6
 using FirebirdSql.Data.Schema;
 #endif
 
@@ -47,7 +46,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private FbConnectionString _options;
 		private FbConnection _owningConnection;
 		private bool _disposed;
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		private FbEnlistmentNotification _enlistmentNotification;
 #endif
 
@@ -82,7 +81,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-#if NETCORE10
+#if NETSTANDARD1_6
 				return false;
 #else
 				return _enlistmentNotification != null && !_enlistmentNotification.IsCompleted;
@@ -277,7 +276,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Transaction Enlistement
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
 			if (_owningConnection != null && _options.Enlist)
@@ -337,7 +336,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Schema Methods
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public DataTable GetSchema(string collectionName, string[] restrictions)
 		{
 			return FbSchemaFactory.GetSchema(_owningConnection, collectionName, restrictions);
@@ -500,7 +499,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetHostingPath()
 		{
-#if NETCORE10
+#if NETSTANDARD1_6
 			return PlatformServices.Default.Application.ApplicationBasePath;
 #else
 			Assembly assembly;
@@ -534,7 +533,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private int GetProcessId()
 		{
-#if !NETCORE10
+#if !NETSTANDARD1_6
 			Assembly assembly = Assembly.GetEntryAssembly();
 			if (!(assembly?.IsFullyTrusted) ?? false)
 				return -1;

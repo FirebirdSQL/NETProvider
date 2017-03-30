@@ -22,7 +22,7 @@
 using System;
 using System.ComponentModel;
 using System.Data.Common;
-#if !NETCORE10
+#if !NETSTANDARD1_6
 using System.Runtime.Serialization;
 #endif
 
@@ -30,7 +30,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if !NETCORE10
+#if !NETSTANDARD1_6
 	[Serializable]
 #endif
 	public sealed class FbException : DbException
@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if NETCORE10
+#if NETSTANDARD1_6
 		public int ErrorCode
 #else
 		public override int ErrorCode
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		internal FbException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Methods
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);

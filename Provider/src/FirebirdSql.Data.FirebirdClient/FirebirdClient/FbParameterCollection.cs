@@ -33,7 +33,7 @@ using System.Text;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if !NETCORE10
+#if !NETSTANDARD1_6
 	[ListBindable(false)]
 #endif
 	public sealed class FbParameterCollection : DbParameterCollection
@@ -74,21 +74,21 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _parameters.Count; }
 		}
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override bool IsFixedSize
 		{
 			get { return ((IList)_parameters).IsFixedSize; }
 		}
 #endif
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override bool IsReadOnly
 		{
 			get { return ((IList)_parameters).IsReadOnly; }
 		}
 #endif
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override bool IsSynchronized
 		{
 			get { return ((ICollection)_parameters).IsSynchronized; }

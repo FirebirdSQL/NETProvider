@@ -20,7 +20,7 @@ using System;
 
 namespace FirebirdSql.Data.Isql
 {
-#if !NETCORE10
+#if !NETSTANDARD1_6
 	[Serializable]
 #endif
 	public class FbStatement

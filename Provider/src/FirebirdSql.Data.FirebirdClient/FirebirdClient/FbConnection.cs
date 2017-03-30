@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	[DefaultEvent("InfoMessage")]
 	public sealed class FbConnection : DbConnection
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		, ICloneable
 #endif
 	{
@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Properties
 
 		[Category("Data")]
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		[SettingsBindable(true)]
 #endif
 		[RefreshProperties(RefreshProperties.All)]
@@ -251,7 +251,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Protected Properties
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		protected override DbProviderFactory DbProviderFactory
 		{
 			get { return FirebirdClientFactory.Instance; }
@@ -303,7 +303,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 
 		#region ICloneable Methods
-#if NETCORE10
+#if NETSTANDARD1_6
 		internal object Clone()
 #else
 		object ICloneable.Clone()
@@ -354,7 +354,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Transaction Enlistement
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
 			CheckClosed();
@@ -381,7 +381,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Database Schema Methods
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		public override DataTable GetSchema()
 		{
 			return GetSchema("MetaDataCollections");
@@ -451,7 +451,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				throw new InvalidOperationException("Connection already Open.");
 			}
-#if !NETCORE10
+#if !NETSTANDARD1_6
 			if (_options.Enlist && System.Transactions.Transaction.Current == null)
 			{
 				throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
@@ -474,7 +474,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					_innerConnection.Connect();
 				}
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 				try
 				{
 					_innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);

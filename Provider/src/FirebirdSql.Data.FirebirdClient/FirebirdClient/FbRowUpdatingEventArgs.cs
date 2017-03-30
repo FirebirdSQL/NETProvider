@@ -16,7 +16,7 @@
  *  All Rights Reserved.
  */
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 using System;
 using System.Data;
 using System.Data.Common;

@@ -20,7 +20,7 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if !NETCORE10
+#if !NETSTANDARD1_6
 	[Serializable]
 #endif
 	[Flags]

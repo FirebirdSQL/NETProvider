@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Client.Native
 		static FbClientFactory()
 		{
 			cache = new ConcurrentDictionary<string, IFbClient>();
-#if NETCORE10
+#if NETSTANDARD1_6
 			injectionTypes = new HashSet<Type>(typeof(FbClientFactory).GetTypeInfo().Assembly.GetTypes()
 				.Where(x => !x.GetTypeInfo().IsAbstract && !x.GetTypeInfo().IsInterface)
 				.Where(x => typeof(IFirebirdHandle).IsAssignableFrom(x))
@@ -244,7 +244,7 @@ namespace FirebirdSql.Data.Client.Native
 #endif
 
 #if DEBUG
-#if !NETCORE10
+#if !NETSTANDARD1_6
 			AssemblyBuilder ab = (AssemblyBuilder)tb.Assembly;
 			ab.Save("DynamicAssembly.dll");
 #endif
@@ -273,14 +273,14 @@ namespace FirebirdSql.Data.Client.Native
 			assemblyName.Name = baseName + "_Assembly";
 
 			// We create the dynamic assembly in our current AppDomain
-#if NETCORE10
+#if NETSTANDARD1_6
 			AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 #else
 			AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
 #endif
 
 			// Generate the actual module (which is the DLL itself)
-#if NETCORE10
+#if NETSTANDARD1_6
 			ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module");
 #else
 			ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module", baseName + ".dll");

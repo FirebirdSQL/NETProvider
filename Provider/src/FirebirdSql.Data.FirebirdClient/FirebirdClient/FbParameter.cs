@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	[ParenthesizePropertyName(true)]
 	public sealed class FbParameter : DbParameter
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		, ICloneable
 #endif
 	{
@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private FbParameterCollection _parent;
 		private FbDbType _fbDbType;
 		private ParameterDirection _direction;
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		private DataRowVersion _sourceVersion;
 #endif
 		private FbCharset _charset;
@@ -122,7 +122,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { _sourceColumn = value; }
 		}
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 		[Category("Data")]
 		[DefaultValue(DataRowVersion.Current)]
 		public override DataRowVersion SourceVersion
@@ -202,7 +202,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Data")]
 		[DefaultValue((byte)0)]
-#if NET45 || NETCORE10
+#if NET45 || NETSTANDARD1_6
 		public override byte Precision
 #else
 		public byte Precision
@@ -214,7 +214,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Data")]
 		[DefaultValue((byte)0)]
-#if NET45 || NETCORE10
+#if NET45 || NETSTANDARD1_6
 		public override byte Scale
 #else
 		public byte Scale
@@ -282,7 +282,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_fbDbType = FbDbType.VarChar;
 			_direction = ParameterDirection.Input;
-#if !NETCORE10
+#if !NETSTANDARD1_6
 			_sourceVersion = DataRowVersion.Current;
 #endif
 			_sourceColumn = string.Empty;
@@ -332,7 +332,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			byte precision,
 			byte scale,
 			string sourceColumn,
-#if !NETCORE10
+#if !NETSTANDARD1_6
 			DataRowVersion sourceVersion,
 #endif
 			object value)
@@ -345,7 +345,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_precision = precision;
 			_scale = scale;
 			_sourceColumn = sourceColumn;
-#if !NETCORE10
+#if !NETSTANDARD1_6
 			_sourceVersion = sourceVersion;
 #endif
 			Value = value;
@@ -355,7 +355,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 
 		#region ICloneable Methods
-#if NETCORE10
+#if NETSTANDARD1_6
 		internal object Clone()
 #else
 		object ICloneable.Clone()
@@ -370,7 +370,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_precision,
 				_scale,
 				_sourceColumn,
-#if !NETCORE10
+#if !NETSTANDARD1_6
 				_sourceVersion,
 #endif
 				_value)
@@ -412,7 +412,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					_fbDbType = FbDbType.Char;
 					break;
 
-#if !NETCORE10
+#if !NETSTANDARD1_6
 				case TypeCode.DBNull:
 #endif
 				case TypeCode.String:
