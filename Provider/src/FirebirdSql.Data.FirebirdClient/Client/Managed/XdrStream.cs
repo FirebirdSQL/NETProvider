@@ -266,7 +266,15 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureWritable();
 
+#if NET40
+			_outputBuffer.Capacity = Math.Max(_outputBuffer.Capacity, _outputBuffer.Count + count);
+			for (var i = offset; i < count; i++)
+			{
+				_outputBuffer.Add(buffer[i]);
+			}
+#else
 			_outputBuffer.AddRange(new ArraySegment<byte>(buffer, offset, count));
+#endif
 		}
 
 		public byte[] ToArray()
