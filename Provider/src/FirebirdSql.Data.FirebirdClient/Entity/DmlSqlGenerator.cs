@@ -304,7 +304,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			}
 
 			commandText.AppendLine(";");
-			commandText.AppendLine("SUSPEND;");
+			commandText.AppendLine("IF (ROW_COUNT > 0) THEN");
+			commandText.AppendLine("  SUSPEND;");
 			commandText.AppendLine("END");
 		}
 
