@@ -144,9 +144,9 @@ namespace FirebirdSql.Data.UnitTests
 		[Test]
 		public void ProcedureParameters()
 		{
-			Connection.GetSchema("ProcedureParameters");
+			DataTable procedureParameters = Connection.GetSchema("ProcedureParameters");
 
-			DataTable procedureParameters = Connection.GetSchema("ProcedureParameters", new string[] { null, null, "SELECT_DATA" });
+			procedureParameters = Connection.GetSchema("ProcedureParameters", new string[] { null, null, "SELECT_DATA" });
 
 			Assert.AreEqual(3, procedureParameters.Rows.Count);
 		}
