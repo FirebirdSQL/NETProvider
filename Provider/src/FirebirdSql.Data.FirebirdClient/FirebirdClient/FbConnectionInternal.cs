@@ -374,8 +374,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			for (int i = _preparedCommands.Count - 1; i >= 0; i--)
 			{
 				var item = _preparedCommands[i];
-				FbCommand current;
-				if (item.TryGetTarget(out current) && current == command)
+				if (item.TryGetTarget<FbCommand>(out var current) && current == command)
 				{
 					_preparedCommands.RemoveAt(i);
 					return;

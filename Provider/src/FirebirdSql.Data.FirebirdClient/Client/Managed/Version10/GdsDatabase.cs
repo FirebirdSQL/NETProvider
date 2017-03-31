@@ -437,10 +437,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (_eventManager == null)
 			{
-				string ipAddress;
-				int portNumber;
-				int auxHandle;
-				ConnectionRequest(out auxHandle, out ipAddress, out portNumber);
+				ConnectionRequest(out var auxHandle, out var ipAddress, out var portNumber);
 				_eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
 			}
 			try

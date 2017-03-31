@@ -232,8 +232,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckDisposed();
 
-			var pool = default(Pool);
-			if (_pools.TryGetValue(connectionString.NormalizedConnectionString, out pool))
+			if (_pools.TryGetValue(connectionString.NormalizedConnectionString, out var pool))
 			{
 				pool.ClearPool();
 			}

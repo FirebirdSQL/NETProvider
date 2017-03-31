@@ -36,10 +36,8 @@ namespace FirebirdSql.Data.EntityFramework6
 	{
 		public static bool TryGetPrecision(TypeUsage tu, out byte precision)
 		{
-			Facet f;
-
 			precision = 0;
-			if (tu.Facets.TryGetValue("Precision", false, out f))
+			if (tu.Facets.TryGetValue("Precision", false, out var f))
 			{
 				if (!f.IsUnbounded && f.Value != null)
 				{
@@ -52,10 +50,8 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		public static bool TryGetMaxLength(TypeUsage tu, out int maxLength)
 		{
-			Facet f;
-
 			maxLength = 0;
-			if (tu.Facets.TryGetValue("MaxLength", false, out f))
+			if (tu.Facets.TryGetValue("MaxLength", false, out var f))
 			{
 				if (!f.IsUnbounded && f.Value != null)
 				{
@@ -68,10 +64,8 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		public static bool TryGetScale(TypeUsage tu, out byte scale)
 		{
-			Facet f;
-
 			scale = 0;
-			if (tu.Facets.TryGetValue("Scale", false, out f))
+			if (tu.Facets.TryGetValue("Scale", false, out var f))
 			{
 				if (!f.IsUnbounded && f.Value != null)
 				{

@@ -296,16 +296,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private int GetInt32(string keyword, int defaultValue)
 		{
-			object value;
-			return TryGetValue(GetKey(keyword), out value)
+			return TryGetValue(GetKey(keyword), out var value)
 				? Convert.ToInt32(value)
 				: defaultValue;
 		}
 
 		private FbServerType GetServerType(string keyword, FbServerType defaultValue)
 		{
-			object value;
-			if (!TryGetValue(GetKey(keyword), out value))
+			if (!TryGetValue(GetKey(keyword), out var value))
 				return defaultValue;
 
 			if (value is FbServerType)
@@ -329,8 +327,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private IsolationLevel GetIsolationLevel(string keyword, IsolationLevel defaultValue)
 		{
-			object value;
-			if (!TryGetValue(GetKey(keyword), out value))
+			if (!TryGetValue(GetKey(keyword), out var value))
 				return defaultValue;
 
 			return (IsolationLevel)GetInt32(keyword, (int)defaultValue);
@@ -338,16 +335,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetString(string keyword, string defaultValue)
 		{
-			object value;
-			return TryGetValue(GetKey(keyword), out value)
+			return TryGetValue(GetKey(keyword), out var value)
 				? Convert.ToString(value)
 				: defaultValue;
 		}
 
 		private bool GetBoolean(string keyword, bool defaultValue)
 		{
-			object value;
-			return TryGetValue(GetKey(keyword), out value)
+			return TryGetValue(GetKey(keyword), out var value)
 				? Convert.ToBoolean(value)
 				: defaultValue;
 		}

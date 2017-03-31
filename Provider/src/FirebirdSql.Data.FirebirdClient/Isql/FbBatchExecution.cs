@@ -521,8 +521,7 @@ namespace FirebirdSql.Data.Isql
 				enumerator.MoveNext(); // SQL
 				enumerator.MoveNext(); // DIALECT
 				enumerator.MoveNext();
-				int dialect = 3;
-				int.TryParse(enumerator.Current.Text, out dialect);
+				int.TryParse(enumerator.Current.Text, out var dialect);
 				_connectionString.Dialect = dialect;
 			}
 		}

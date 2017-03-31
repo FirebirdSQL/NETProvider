@@ -233,8 +233,7 @@ namespace FirebirdSql.Data.Common
 
 		private static string GetValueOrDefault(IDictionary<int, string> dictionary, int key, Func<int, string> defaultValueFactory)
 		{
-			string result;
-			if (!dictionary.TryGetValue(key, out result))
+			if (!dictionary.TryGetValue(key, out var result))
 			{
 				result = defaultValueFactory(key);
 			}

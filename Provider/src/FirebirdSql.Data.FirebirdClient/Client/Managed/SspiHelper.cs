@@ -306,10 +306,9 @@ namespace FirebirdSql.Data.Client.Managed
 			_securPackage = securityPackage;
 			_remotePrincipal = remotePrincipal;
 			_clientCredentials = new SecHandle();
-			SecInteger expiry = new SecInteger();
 			int resCode = AcquireCredentialsHandle(null, securityPackage, SECPKG_CRED_OUTBOUND,
 				IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero,
-				out _clientCredentials, out expiry);
+				out _clientCredentials, out var expiry);
 			if (resCode != SEC_E_OK)
 				throw new Exception($"{nameof(AcquireCredentialsHandle)} failed");
 		}
@@ -327,8 +326,6 @@ namespace FirebirdSql.Data.Client.Managed
 			EnsureDisposed();
 			CloseClientContext();
 			_clientContext = new SecHandle();
-			SecInteger expiry = new SecInteger();
-			uint contextAttributes;
 			SecBufferDesc clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
 			try
 			{
@@ -343,8 +340,8 @@ namespace FirebirdSql.Data.Client.Managed
 					0,
 					out _clientContext,
 					ref clientTokenBuf,
-					out contextAttributes,
-					out expiry);
+					out var contextAttributes,
+					out var expiry);
 				if (resCode != SEC_E_OK && resCode != SEC_I_CONTINUE_NEEDED)
 					throw new Exception($"{nameof(InitializeSecurityContext)} failed");
 				return clientTokenBuf.GetSecBufferBytes();
@@ -367,8 +364,6 @@ namespace FirebirdSql.Data.Client.Managed
 			EnsureDisposed();
 			if (_clientContext.IsInvalid)
 				throw new InvalidOperationException($"{nameof(InitializeClientSecurity)} not called");
-			SecInteger expiry = new SecInteger();
-			uint contextAttributes;
 			SecBufferDesc clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
 			try
 			{
@@ -386,8 +381,8 @@ namespace FirebirdSql.Data.Client.Managed
 						0,
 						out _clientContext,
 						ref clientTokenBuf,
-						out contextAttributes,
-						out expiry);
+						out var contextAttributes,
+						out var expiry);
 					if (resCode != SEC_E_OK && resCode != SEC_I_CONTINUE_NEEDED)
 						throw new Exception($"{nameof(InitializeSecurityContext)} failed");
 					return clientTokenBuf.GetSecBufferBytes();

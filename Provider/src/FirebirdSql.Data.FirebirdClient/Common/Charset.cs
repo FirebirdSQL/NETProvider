@@ -54,16 +54,14 @@ namespace FirebirdSql.Data.Common
 
 		public static Charset GetCharset(int charsetId)
 		{
-			var value = default(Charset);
-			if (charsetsById.TryGetValue(charsetId, out value))
+			if (charsetsById.TryGetValue(charsetId, out var value))
 				return value;
 			return null;
 		}
 
 		public static Charset GetCharset(string charsetName)
 		{
-			var value = default(Charset);
-			if (charsetsByName.TryGetValue(charsetName, out value))
+			if (charsetsByName.TryGetValue(charsetName, out var value))
 				return value;
 			return null;
 		}

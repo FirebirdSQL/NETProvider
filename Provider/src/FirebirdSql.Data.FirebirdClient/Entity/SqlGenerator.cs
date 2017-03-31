@@ -615,8 +615,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		{
 			SqlBuilder result = new SqlBuilder();
 
-			PrimitiveTypeKind typeKind;
-			if (MetadataHelpers.TryGetPrimitiveTypeKind(e.ResultType, out typeKind))
+			if (MetadataHelpers.TryGetPrimitiveTypeKind(e.ResultType, out var typeKind))
 			{
 				switch (typeKind)
 				{
@@ -668,9 +667,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 						var pointPosition = strDecimal.IndexOf('.');
 
 						var precision = 9;
-						FacetDescription precisionFacetDescription;
 						// there's always the max value in manifest
-						if (MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, MetadataHelpers.PrecisionFacetName, out precisionFacetDescription))
+						if (MetadataHelpers.TryGetTypeFacetDescriptionByName(e.ResultType.EdmType, MetadataHelpers.PrecisionFacetName, out var precisionFacetDescription))
 						{
 							if (precisionFacetDescription.DefaultValue != null)
 								precision = (int)precisionFacetDescription.DefaultValue;
@@ -750,9 +748,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
-				Symbol fromSymbol;
 				TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(e.Argument.ResultType);
-				result = CreateNewSelectStatement(result, "DISTINCT", inputType, out fromSymbol);
+				result = CreateNewSelectStatement(result, "DISTINCT", inputType, out var fromSymbol);
 				AddFromSymbol(result, "DISTINCT", fromSymbol, false);
 			}
 
@@ -979,10 +976,9 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <returns>A <see cref="SqlSelectStatement"/></returns>
 		public override ISqlFragment Visit(DbGroupByExpression e)
 		{
-			Symbol fromSymbol;
 			string varName = GetShortenedName(e.Input.VariableName);
 			SqlSelectStatement innerQuery = VisitInputExpression(e.Input.Expression,
-				varName, e.Input.VariableType, out fromSymbol);
+				varName, e.Input.VariableType, out var fromSymbol);
 
 			// GroupBy is compatible with Filter and OrderBy
 			// but not with Project, GroupBy
@@ -1259,13 +1255,12 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			Debug.Assert(e.Limit is DbConstantExpression || e.Limit is DbParameterReferenceExpression, "DbLimitExpression.Limit is of invalid expression type");
 
 			SqlSelectStatement result = VisitExpressionEnsureSqlStatement(e.Argument, false);
-			Symbol fromSymbol;
 
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
 				TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(e.Argument.ResultType);
 
-				result = CreateNewSelectStatement(result, "top", inputType, out fromSymbol);
+				result = CreateNewSelectStatement(result, "top", inputType, out var fromSymbol);
 				AddFromSymbol(result, "top", fromSymbol, false);
 			}
 
@@ -1413,9 +1408,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <seealso cref="Visit(DbFilterExpression)"/>
 		public override ISqlFragment Visit(DbProjectExpression e)
 		{
-			Symbol fromSymbol;
 			string varName = GetShortenedName(e.Input.VariableName);
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
+			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
 
 			// Project is compatible with Filter
 			// but not with Project, GroupBy
@@ -1605,8 +1599,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			Debug.Assert(e.Count is DbConstantExpression || e.Count is DbParameterReferenceExpression, "DbSkipExpression.Count is of invalid expression type");
 
 			string varName = GetShortenedName(e.Input.VariableName);
-			Symbol fromSymbol;
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
+			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
 
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
@@ -1641,9 +1634,8 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <seealso cref="Visit(DbFilterExpression)"/>
 		public override ISqlFragment Visit(DbSortExpression e)
 		{
-			Symbol fromSymbol;
 			string varName = GetShortenedName(e.Input.VariableName);
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out fromSymbol);
+			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
 
 			// OrderBy is compatible with Filter
 			// and nothing else
@@ -1924,10 +1916,9 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 				if (!IsCompatible(result, DbExpressionKind.Element))
 				{
-					Symbol fromSymbol;
 					TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(elementExpr.Argument.ResultType);
 
-					result = CreateNewSelectStatement(result, "element", inputType, out fromSymbol);
+					result = CreateNewSelectStatement(result, "element", inputType, out var fromSymbol);
 					AddFromSymbol(result, "element", fromSymbol, false);
 				}
 
@@ -2901,8 +2892,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 					_allColumnNames[recordMemberName] = 0;
 
 					// Create a new symbol/reuse existing symbol for the column
-					Symbol columnSymbol;
-					if (!symbol.Columns.TryGetValue(recordMemberName, out columnSymbol))
+					if (!symbol.Columns.TryGetValue(recordMemberName, out var columnSymbol))
 					{
 						// we do not care about the types of columns, so we pass null
 						// when construction the symbol.
@@ -3512,7 +3502,6 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 					break;
 
 				default:
-					Symbol fromSymbol;
 					string inputVarName = "c";  // any name will do - this is my random choice.
 					_symbolTable.EnterScope();
 
@@ -3535,7 +3524,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 							break;
 					}
 
-					result = VisitInputExpression(e, inputVarName, type, out fromSymbol);
+					result = VisitInputExpression(e, inputVarName, type, out var fromSymbol);
 					AddFromSymbol(result, inputVarName, fromSymbol);
 					_symbolTable.ExitScope();
 					break;
@@ -3561,10 +3550,9 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <returns></returns>
 		SqlSelectStatement VisitFilterExpression(DbExpressionBinding input, DbExpression predicate, bool negatePredicate)
 		{
-			Symbol fromSymbol;
 			string varName = GetShortenedName(input.VariableName);
 			SqlSelectStatement result = VisitInputExpression(input.Expression,
-				varName, input.VariableType, out fromSymbol);
+				varName, input.VariableType, out var fromSymbol);
 
 			// Filter is compatible with OrderBy
 			// but not with Project, another Filter or GroupBy
@@ -3738,8 +3726,7 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		/// <returns></returns>
 		internal string GetShortenedName(string name)
 		{
-			string shortened;
-			if (!_shortenedNames.TryGetValue(name, out shortened))
+			if (!_shortenedNames.TryGetValue(name, out var shortened))
 			{
 				shortened = BuildName(_shortenedNames.Count);
 				_shortenedNames[name] = shortened;

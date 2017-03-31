@@ -91,10 +91,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 			var command = FbCommand.CreateWithTypeCoercions(expectedTypes);
 
-			List<DbParameter> parameters;
-			CommandType commandType;
-
-			command.CommandText = SqlGenerator.GenerateSql(commandTree, out parameters, out commandType);
+			command.CommandText = SqlGenerator.GenerateSql(commandTree, out var parameters, out var commandType);
 			command.CommandType = commandType;
 
 			// Get the function (if any) implemented by the command tree since this influences our interpretation of parameters
@@ -111,8 +108,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 				// Use the corresponding function parameter TypeUsage where available (currently, the SSDL facets and
 				// type trump user-defined facets and type in the EntityCommand).
-				FunctionParameter functionParameter;
-				if (null != function && function.Parameters.TryGetValue(queryParameter.Key, false, out functionParameter))
+				if (null != function && function.Parameters.TryGetValue(queryParameter.Key, false, out var functionParameter))
 				{
 					parameter = CreateSqlParameter(functionParameter.Name, functionParameter.TypeUsage, functionParameter.Mode, DBNull.Value);
 				}
@@ -177,8 +173,6 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		internal static FbParameter CreateSqlParameter(string name, TypeUsage type, ParameterMode mode, object value)
 		{
-			int? size;
-
 			FbParameter result = new FbParameter(name, value);
 
 			ParameterDirection direction = MetadataHelpers.ParameterModeToParameterDirection(mode);
@@ -190,7 +184,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			// output parameters are handled differently (we need to ensure there is space for return
 			// values where the user has not given a specific Size/MaxLength)
 			var isOutParam = mode != ParameterMode.In;
-			FbDbType sqlDbType = GetSqlDbType(type, isOutParam, out size);
+			FbDbType sqlDbType = GetSqlDbType(type, isOutParam, out var size);
 
 			if (result.FbDbType != sqlDbType)
 			{
@@ -269,8 +263,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		private static int? GetParameterSize(TypeUsage type, bool isOutParam)
 		{
-			int? maxLength;
-			if (MetadataHelpers.TryGetMaxLength(type, out maxLength))
+			if (MetadataHelpers.TryGetMaxLength(type, out var maxLength))
 			{
 				// if the MaxLength facet has a specific value use it
 				return maxLength;
@@ -295,14 +288,12 @@ namespace FirebirdSql.Data.EntityFramework6
 			FbDbType dbType;
 			// Specific type depends on whether the string is a unicode string and whether it is a fixed length string.
 			// By default, assume widest type (unicode) and most common type (variable length)
-			bool unicode;
-			bool fixedLength;
-			if (!MetadataHelpers.TryGetIsFixedLength(type, out fixedLength))
+			if (!MetadataHelpers.TryGetIsFixedLength(type, out var fixedLength))
 			{
 				fixedLength = false;
 			}
 
-			if (!MetadataHelpers.TryGetIsUnicode(type, out unicode))
+			if (!MetadataHelpers.TryGetIsUnicode(type, out var unicode))
 			{
 				unicode = true;
 			}
@@ -313,8 +304,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 			else
 			{
-				int? maxLength;
-				if (!MetadataHelpers.TryGetMaxLength(type, out maxLength))
+				if (!MetadataHelpers.TryGetMaxLength(type, out var maxLength))
 				{
 					maxLength = (unicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize);
 				}

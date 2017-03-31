@@ -175,8 +175,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		internal static PrimitiveTypeKind GetPrimitiveTypeKind(TypeUsage type)
 		{
-			PrimitiveTypeKind returnValue;
-			if (!MetadataHelpers.TryGetPrimitiveTypeKind(type, out returnValue))
+			if (!MetadataHelpers.TryGetPrimitiveTypeKind(type, out var returnValue))
 			{
 				Debug.Assert(false, "Cannot create parameter of non-primitive type");
 				throw new NotSupportedException("Cannot create parameter of non-primitive type");
@@ -193,8 +192,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		/// <returns></returns>
 		internal static T TryGetValueForMetadataProperty<T>(MetadataItem item, string propertyName)
 		{
-			MetadataProperty property;
-			if (!item.MetadataProperties.TryGetValue(propertyName, true, out property))
+			if (!item.MetadataProperties.TryGetValue(propertyName, true, out var property))
 			{
 				return default(T);
 			}
@@ -204,8 +202,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		internal static bool IsPrimitiveType(TypeUsage type, PrimitiveTypeKind primitiveType)
 		{
-			PrimitiveTypeKind typeKind;
-			if (TryGetPrimitiveTypeKind(type, out typeKind))
+			if (TryGetPrimitiveTypeKind(type, out var typeKind))
 			{
 				return (typeKind == primitiveType);
 			}
@@ -281,8 +278,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		internal static T GetFacetValueOrDefault<T>(TypeUsage type, string facetName, T defaultValue)
 		{
 			//Get the value for the facet, if any
-			Facet facet;
-			if (type.Facets.TryGetValue(facetName, false, out facet) && facet.Value != null && !facet.IsUnbounded)
+			if (type.Facets.TryGetValue(facetName, false, out var facet) && facet.Value != null && !facet.IsUnbounded)
 			{
 				return (T)facet.Value;
 			}
@@ -337,8 +333,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		internal static bool IsNullable(TypeUsage type)
 		{
-			Facet nullableFacet;
-			if (type.Facets.TryGetValue(NullableFacetName, false, out nullableFacet))
+			if (type.Facets.TryGetValue(NullableFacetName, false, out var nullableFacet))
 			{
 				return (bool)nullableFacet.Value;
 			}
@@ -361,9 +356,8 @@ namespace FirebirdSql.Data.EntityFramework6
 		internal static bool TryGetIntFacetValue(TypeUsage type, string facetName, out int? intValue)
 		{
 			intValue = 0;
-			Facet intFacet;
 
-			if (type.Facets.TryGetValue(facetName, false, out intFacet) && intFacet.Value != null)
+			if (type.Facets.TryGetValue(facetName, false, out var intFacet) && intFacet.Value != null)
 			{
 				if (!intFacet.IsUnbounded)
 					intValue = (int)intFacet.Value;
@@ -391,8 +385,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		internal static bool TryGetBooleanFacetValue(TypeUsage type, string facetName, out bool boolValue)
 		{
 			boolValue = false;
-			Facet boolFacet;
-			if (type.Facets.TryGetValue(facetName, false, out boolFacet) && boolFacet.Value != null)
+			if (type.Facets.TryGetValue(facetName, false, out var boolFacet) && boolFacet.Value != null)
 			{
 				boolValue = (bool)boolFacet.Value;
 				return true;
@@ -459,8 +452,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		private static bool IsStoreGeneratedPattern(EdmMember member, StoreGeneratedPattern pattern)
 		{
-			Facet item = null;
-			return (member.TypeUsage.Facets.TryGetValue(StoreGeneratedPatternFacetName, false, out item) && ((StoreGeneratedPattern)item.Value) == pattern);
+			return (member.TypeUsage.Facets.TryGetValue(StoreGeneratedPatternFacetName, false, out var item) && ((StoreGeneratedPattern)item.Value) == pattern);
 		}
 		internal static bool IsStoreGeneratedComputed(EdmMember member)
 		{

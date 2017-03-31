@@ -90,10 +90,8 @@ namespace FirebirdSql.Data.Client.Managed
 			var v = BigInteger.ModPow(g, GetUserHash(user, password, salt), N);
 			var b = GetSecret();
 			var gb = BigInteger.ModPow(g, b, N);
-			var kv = default(BigInteger);
-			BigInteger.DivRem(k * v, N, out kv);
-			var B = default(BigInteger);
-			BigInteger.DivRem(BigInteger.Add(kv, gb), N, out B);
+			BigInteger.DivRem(k * v, N, out var kv);
+			BigInteger.DivRem(BigInteger.Add(kv, gb), N, out var B);
 			return Tuple.Create(B, b);
 		}
 
@@ -102,8 +100,7 @@ namespace FirebirdSql.Data.Client.Managed
 			var u = GetScramble(A, B);
 			var v = BigInteger.ModPow(g, GetUserHash(user, password, salt), N);
 			var vu = BigInteger.ModPow(v, u, N);
-			var Avu = default(BigInteger);
-			BigInteger.DivRem(A * vu, N, out Avu);
+			BigInteger.DivRem(A * vu, N, out var Avu);
 			var sessionSecret = BigInteger.ModPow(Avu, b, N);
 			return ComputeHash(BigIntegerToByteArray(sessionSecret));
 		}
@@ -123,19 +120,15 @@ namespace FirebirdSql.Data.Client.Managed
 			var u = GetScramble(PublicKey, serverPublicKey);
 			var x = GetUserHash(user, password, salt);
 			var gx = BigInteger.ModPow(g, x, N);
-			var kgx = default(BigInteger);
-			BigInteger.DivRem(k * gx, N, out kgx);
+			BigInteger.DivRem(k * gx, N, out var kgx);
 			var Bkgx = serverPublicKey - kgx;
 			if (Bkgx < 0)
 			{
 				Bkgx = Bkgx + N;
 			}
-			var diff = default(BigInteger);
-			BigInteger.DivRem(Bkgx, N, out diff);
-			var ux = default(BigInteger);
-			BigInteger.DivRem(u * x, N, out ux);
-			var aux = default(BigInteger);
-			BigInteger.DivRem(PrivateKey + ux, N, out aux);
+			BigInteger.DivRem(Bkgx, N, out var diff);
+			BigInteger.DivRem(u * x, N, out var ux);
+			BigInteger.DivRem(PrivateKey + ux, N, out var aux);
 			var sessionSecret = BigInteger.ModPow(diff, aux, N);
 			return ComputeHash(BigIntegerToByteArray(sessionSecret));
 		}

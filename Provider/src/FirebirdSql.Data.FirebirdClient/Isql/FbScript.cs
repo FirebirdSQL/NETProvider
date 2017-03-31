@@ -72,8 +72,7 @@ namespace FirebirdSql.Data.Isql
 			_results.Clear();
 			foreach (var statement in _parser.Parse())
 			{
-				string newParserToken;
-				if (IsSetTermStatement(statement.CleanText, out newParserToken))
+				if (IsSetTermStatement(statement.CleanText, out var newParserToken))
 				{
 					_parser.Tokens = new[] { newParserToken };
 					continue;

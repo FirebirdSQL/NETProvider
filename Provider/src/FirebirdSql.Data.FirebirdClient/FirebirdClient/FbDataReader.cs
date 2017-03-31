@@ -714,8 +714,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				InitializeColumnsIndexes();
 			}
-			int index;
-			if (!_columnsIndexesOrdinal.TryGetValue(name, out index))
+			if (!_columnsIndexesOrdinal.TryGetValue(name, out var index))
 				if (!_columnsIndexesOrdinalCI.TryGetValue(name, out index))
 					throw new IndexOutOfRangeException($"Could not find specified column '{name}' in results.");
 			return index;

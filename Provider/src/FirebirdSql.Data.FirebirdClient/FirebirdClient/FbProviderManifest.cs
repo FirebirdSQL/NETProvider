@@ -174,9 +174,7 @@ namespace FirebirdSql.Data.EntityFramework6
 
 				case "decimal":
 				case "numeric":
-					byte precision;
-					byte scale;
-					if (TypeHelpers.TryGetPrecision(storeType, out precision) && TypeHelpers.TryGetScale(storeType, out scale))
+					if (TypeHelpers.TryGetPrecision(storeType, out var precision) && TypeHelpers.TryGetScale(storeType, out var scale))
 					{
 						return TypeUsage.CreateDecimalTypeUsage(edmPrimitiveType, precision, scale);
 					}
@@ -294,14 +292,12 @@ namespace FirebirdSql.Data.EntityFramework6
 
 				case PrimitiveTypeKind.Decimal: // decimal, numeric
 					{
-						byte precision;
-						if (!TypeHelpers.TryGetPrecision(edmType, out precision))
+						if (!TypeHelpers.TryGetPrecision(edmType, out var precision))
 						{
 							precision = 9;
 						}
 
-						byte scale;
-						if (!TypeHelpers.TryGetScale(edmType, out scale))
+						if (!TypeHelpers.TryGetScale(edmType, out var scale))
 						{
 							scale = 0;
 						}
@@ -390,9 +386,8 @@ namespace FirebirdSql.Data.EntityFramework6
 
 				case PrimitiveTypeKind.DateTime: // datetime, date
 					{
-						byte precision;
 						bool useTimestamp;
-						if (TypeHelpers.TryGetPrecision(edmType, out precision))
+						if (TypeHelpers.TryGetPrecision(edmType, out var precision))
 						{
 							if (precision == 0)
 								useTimestamp = false;
