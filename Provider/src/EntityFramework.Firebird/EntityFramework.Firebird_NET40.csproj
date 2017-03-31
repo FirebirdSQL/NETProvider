@@ -134,7 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET40.csproj">
-      <Project>{326a24f9-6259-45db-835c-18db80728460}</Project>
+      <Project>{9866d35a-31d1-4ad6-86d8-e19688d847f5}</Project>
       <Name>FirebirdSql.Data.FirebirdClient_NET40</Name>
     </ProjectReference>
   </ItemGroup>

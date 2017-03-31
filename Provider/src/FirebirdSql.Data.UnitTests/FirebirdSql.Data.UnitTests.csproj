@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -84,16 +84,6 @@
     <Compile Include="SrpClientTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EntityFramework.Firebird\EntityFramework.Firebird_NET45.csproj">
-      <Project>{8de3edee-c361-4da2-96f0-35795d5bf071}</Project>
-      <Name>EntityFramework.Firebird_NET45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET45.csproj">
-      <Project>{b37720ac-3b59-438b-afba-1e27547dd200}</Project>
-      <Name>FirebirdSql.Data.FirebirdClient_NET45</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
@@ -102,6 +92,16 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EntityFramework.Firebird\EntityFramework.Firebird_NET45.csproj">
+      <Project>{8de3edee-c361-4da2-96f0-35795d5bf071}</Project>
+      <Name>EntityFramework.Firebird_NET45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET45.csproj">
+      <Project>{23d8fdba-b992-4652-9489-35a2d53445ca}</Project>
+      <Name>FirebirdSql.Data.FirebirdClient_NET45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
