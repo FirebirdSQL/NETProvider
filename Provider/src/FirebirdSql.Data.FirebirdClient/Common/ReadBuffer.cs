@@ -40,12 +40,7 @@ namespace FirebirdSql.Data.Common
 
 		public void AddRange(byte[] source, int count)
 		{
-			if ((_length + count) >= _buffer.Length)
-			{
-				var newBuffer = new byte[_buffer.Length * 2];
-				Array.Copy(_buffer, newBuffer, _buffer.Length);
-				_buffer = newBuffer;
-			}
+			ResizeBufferIfNeeded(count);
 			for (var i = 0; i < count; i++)
 			{
 				if (_writePosition == _buffer.Length)
@@ -57,8 +52,8 @@ namespace FirebirdSql.Data.Common
 		}
 
 		public int ReadInto(ref byte[] destination, int offset, int count)
-        {
-			count = Math.Min(count, Length);
+		{
+			count = Math.Min(count, _length);
 			for (var i = 0; i < count; i++)
 			{
 				if (_readPosition == _buffer.Length)
@@ -68,6 +63,20 @@ namespace FirebirdSql.Data.Common
 			}
 			_length -= count;
 			return count;
+		}
+
+		void ResizeBufferIfNeeded(int count)
+		{
+			var requiredLength = _length + count;
+			if (requiredLength > _buffer.Length)
+			{
+				var newLength = _buffer.Length * 2;
+				while (requiredLength > newLength)
+					newLength *= 2;
+				var newBuffer = new byte[newLength];
+				Array.Copy(_buffer, newBuffer, _buffer.Length);
+				_buffer = newBuffer;
+			}
 		}
 	}
 }
