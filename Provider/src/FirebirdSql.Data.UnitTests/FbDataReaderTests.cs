@@ -430,6 +430,22 @@ namespace FirebirdSql.Data.UnitTests
 			}
 		}
 
+		[Test]
+		public void DNET749_CommandBehaviorCloseConnectionStackOverflow()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select * from rdb$database";
+				var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+				{
+					while (reader.Read())
+					{
+
+					}
+				}
+			}
+		}
+
 		#endregion
 	}
 }
