@@ -395,6 +395,41 @@ namespace FirebirdSql.Data.UnitTests
 			transaction.Rollback();
 		}
 
+		[Test]
+		public void DNET60_EmptyFieldReadingError()
+		{
+			using (var command = Connection.CreateCommand())
+			{
+				command.CommandText = "select '' AS EmptyColumn from rdb$database";
+
+				using (var r = command.ExecuteReader())
+				{
+					while (r.Read())
+					{
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void DNET183_VarcharSpacesShouldNotBeTrimmed()
+		{
+			const string value = "foo  ";
+
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast(@foo as varchar(5)) from rdb$database";
+				cmd.Parameters.Add(new FbParameter() { ParameterName = "@foo", FbDbType = FbDbType.VarChar, Size = 5, Value = value });
+				using (var reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						Assert.AreEqual(value, (string)reader[0]);
+					}
+				}
+			}
+		}
+
 		#endregion
 	}
 }

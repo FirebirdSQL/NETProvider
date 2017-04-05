@@ -48,41 +48,6 @@ namespace FirebirdSql.Data.UnitTests
 		#region Unit Tests
 
 		[Test]
-		public void DNET60_EmptyFieldReadingError()
-		{
-			using (FbCommand command = Connection.CreateCommand())
-			{
-				command.CommandText = "select '' AS EmptyColumn from rdb$database";
-
-				using (FbDataReader r = command.ExecuteReader())
-				{
-					while (r.Read())
-					{
-					}
-				}
-			}
-		}
-
-		[Test]
-		public void DNET183_VarcharSpacesShouldNotBeTrimmed()
-		{
-			const string value = "foo  ";
-
-			using (FbCommand cmd = Connection.CreateCommand())
-			{
-				cmd.CommandText = "select cast(@foo as varchar(5)) from rdb$database";
-				cmd.Parameters.Add(new FbParameter() { ParameterName = "@foo", FbDbType = FbDbType.VarChar, Size = 5, Value = value });
-				using (FbDataReader reader = cmd.ExecuteReader())
-				{
-					while (reader.Read())
-					{
-						Assert.AreEqual(value, (string)reader[0]);
-					}
-				}
-			}
-		}
-
-		[Test]
 		public void DNET217_ReadingALotOfFields()
 		{
 			StringBuilder cols = new StringBuilder();
@@ -110,7 +75,7 @@ namespace FirebirdSql.Data.UnitTests
 		}
 
 		[Test]
-		public void DNET260_ProcedureWithALotOfParamters()
+		public void DNET260_ProcedureWithALotOfParameters()
 		{
 			using (FbCommand cmd = Connection.CreateCommand())
 			{
