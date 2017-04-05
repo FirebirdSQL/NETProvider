@@ -215,7 +215,6 @@ end";
 		}
 
 		[Test]
-		[Category("Local")]
 		public void ShutdownOnlineTest()
 		{
 			FbConfiguration configurationSvc = new FbConfiguration();
@@ -227,7 +226,6 @@ end";
 		}
 
 		[Test]
-		[Category("Local")]
 		public void ShutdownOnline2Test()
 		{
 			if (!EnsureVersion(new Version("2.5.0.0")))
