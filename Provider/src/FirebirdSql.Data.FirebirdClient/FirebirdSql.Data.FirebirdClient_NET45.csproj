@@ -13,13 +13,13 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<OutputPath>bin\Release\NET45</OutputPath>
 		<BaseIntermediateOutputPath>obj\NET45</BaseIntermediateOutputPath>
-		<DefineConstants>NET45</DefineConstants>
+		<DefineConstants>TRACE;NET45</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<OutputPath>bin\Debug\NET45</OutputPath>
 		<BaseIntermediateOutputPath>obj\NET45</BaseIntermediateOutputPath>
-		<DefineConstants>NET45</DefineConstants>
+		<DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
 	</PropertyGroup> 
 	<ItemGroup>
 		<None Remove="Entity\ProviderManifest.xml" />

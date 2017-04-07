@@ -12,12 +12,14 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<OutputPath>bin\Release\netstandard1.6</OutputPath>
-		<BaseIntermediateOutputPath>obj\netstandard1.6</BaseIntermediateOutputPath>    
+		<BaseIntermediateOutputPath>obj\netstandard1.6</BaseIntermediateOutputPath>
+		<DefineConstants>TRACE</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<OutputPath>bin\Debug\netstandard1.6</OutputPath>
-		<BaseIntermediateOutputPath>obj\netstandard1.6</BaseIntermediateOutputPath>  
+		<BaseIntermediateOutputPath>obj\netstandard1.6</BaseIntermediateOutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup> 
 	<ItemGroup>
 		<None Remove="Schema\FbMetaData.xml" />

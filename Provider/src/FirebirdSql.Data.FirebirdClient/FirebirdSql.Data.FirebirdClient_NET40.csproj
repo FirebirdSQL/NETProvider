@@ -16,11 +16,13 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<OutputPath>bin\Release\NET40</OutputPath>
 		<BaseIntermediateOutputPath>obj\NET40</BaseIntermediateOutputPath>
+		<DefineConstants>TRACE</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks> 
 		<OutputPath>bin\Debug\NET40</OutputPath>
 		<BaseIntermediateOutputPath>obj\NET40</BaseIntermediateOutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Entity\ProviderManifest.xml" />
