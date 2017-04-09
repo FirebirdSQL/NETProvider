@@ -187,12 +187,7 @@ end";
 			return BuildConnectionStringBuilder(serverType, compression).ToString();
 		}
 
-		public static string BuildServicesConnectionString(FbServerType serverType)
-		{
-			return BuildServicesConnectionString(serverType, true);
-		}
-
-		public static string BuildServicesConnectionString(FbServerType serverType, bool includeDatabase)
+		public static string BuildServicesConnectionString(FbServerType serverType, bool compression, bool includeDatabase)
 		{
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
 			cs.UserID = TestsSetup.UserID;
@@ -200,7 +195,7 @@ end";
 			cs.DataSource = TestsSetup.DataSource;
 			if (includeDatabase)
 			{
-				cs.Database = TestsSetup.Database;
+				cs.Database = TestsSetup.Database(serverType, compression);
 			}
 			cs.ServerType = serverType;
 			return cs.ToString();
@@ -212,7 +207,7 @@ end";
 			cs.UserID = TestsSetup.UserID;
 			cs.Password = TestsSetup.Password;
 			cs.DataSource = TestsSetup.DataSource;
-			cs.Database = TestsSetup.Database;
+			cs.Database = TestsSetup.Database(serverType, compression);
 			cs.Port = TestsSetup.Port;
 			cs.Charset = TestsSetup.Charset;
 			cs.Pooling = TestsSetup.Pooling;
@@ -243,7 +238,7 @@ end";
 		protected Version GetServerVersion()
 		{
 			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(FbServerType);
+			server.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
 		}
 
@@ -262,7 +257,6 @@ end";
 			Assert.Inconclusive("Not supported on this server type.");
 			return false;
 		}
-
 
 		protected static int GetId()
 		{

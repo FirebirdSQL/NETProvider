@@ -30,10 +30,9 @@ namespace FirebirdSql.Data.UnitTests
 	[SetUpFixture]
 	public class TestsSetup
 	{
-		internal const string FilenameBase = "netprovider_tests";
+		private const string DatabaseBase = "netprovider_tests";
 		internal const string UserID = "SYSDBA";
 		internal const string Password = "masterkey";
-		internal const string Database = FilenameBase + ".fdb";
 		internal const string DataSource = "localhost";
 		internal const int Port = 3050;
 		internal const string Charset = "utf8";
@@ -51,6 +50,11 @@ namespace FirebirdSql.Data.UnitTests
 				Prepare(serverType, compression);
 				_initalized.Add(item);
 			}
+		}
+
+		public static string Database(FbServerType serverType, bool compression)
+		{
+			return $"{DatabaseBase}_{serverType}_{compression}.fdb";
 		}
 
 		[OneTimeTearDown]
