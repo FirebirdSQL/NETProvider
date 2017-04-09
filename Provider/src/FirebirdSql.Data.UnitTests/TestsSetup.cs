@@ -47,7 +47,11 @@ namespace FirebirdSql.Data.UnitTests
 			var item = Tuple.Create(serverType, compression);
 			if (!_initalized.Contains(item))
 			{
-				Prepare(serverType, compression);
+				var cs = TestsBase.BuildConnectionString(serverType, compression);
+				FbConnection.CreateDatabase(cs, PageSize, ForcedWrite, true);
+				CreateTables(cs);
+				CreateProcedures(cs);
+				CreateTriggers(cs);
 				_initalized.Add(item);
 			}
 		}
@@ -63,34 +67,10 @@ namespace FirebirdSql.Data.UnitTests
 			FbConnection.ClearAllPools();
 			foreach (var item in _initalized)
 			{
-				Drop(item.Item1, item.Item2);
+				var cs = TestsBase.BuildConnectionString(item.Item1, item.Item2);
+				FbConnection.DropDatabase(cs);
 			}
 			_initalized.Clear();
-		}
-
-		private static void Drop(FbServerType serverType, bool compression)
-		{
-			string cs = TestsBase.BuildConnectionString(serverType, compression);
-			DropDatabase(cs);
-		}
-
-		private static void Prepare(FbServerType serverType, bool compression)
-		{
-			string cs = TestsBase.BuildConnectionString(serverType, compression);
-			CreateDatabase(cs);
-			CreateTables(cs);
-			CreateProcedures(cs);
-			CreateTriggers(cs);
-		}
-
-		private static void CreateDatabase(string connectionString)
-		{
-			FbConnection.CreateDatabase(connectionString, PageSize, ForcedWrite, true);
-		}
-
-		private static void DropDatabase(string connectionString)
-		{
-			FbConnection.DropDatabase(connectionString);
 		}
 
 		private static void CreateTables(string connectionString)
