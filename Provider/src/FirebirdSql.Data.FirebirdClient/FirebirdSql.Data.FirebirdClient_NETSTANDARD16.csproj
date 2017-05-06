@@ -22,6 +22,8 @@
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup> 
 	<ItemGroup>
+		<None Remove="app.FirebirdSql.Data.FirebirdClient_NET40.config" />
+		<None Remove="Microsoft.Bcl.Build.targets" />
 		<None Remove="Schema\FbMetaData.xml" />
 	</ItemGroup>
 	<ItemGroup>

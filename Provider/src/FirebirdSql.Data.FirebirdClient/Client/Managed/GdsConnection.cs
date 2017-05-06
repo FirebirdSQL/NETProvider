@@ -56,10 +56,11 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Properties
 
-		public bool IsConnected
-		{
-			get { return _socket?.Connected ?? false; }
-		}
+#warning Events
+		//public bool IsConnected
+		//{
+		//	get { return _socket?.Connected ?? false; }
+		//}
 
 		public int ProtocolVersion
 		{

@@ -22,11 +22,13 @@
 		<DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
 	</PropertyGroup> 
 	<ItemGroup>
+		<None Remove="app.FirebirdSql.Data.FirebirdClient_NET40.config" />
 		<None Remove="Entity\ProviderManifest.xml" />
 		<None Remove="Entity\StoreSchemaDefinition.ssdl" />
 		<None Remove="Entity\StoreSchemaDefinitionVersion3.ssdl" />
 		<None Remove="Entity\StoreSchemaMapping.msl" />
 		<None Remove="Entity\StoreSchemaMappingVersion3.msl" />
+		<None Remove="Microsoft.Bcl.Build.targets" />
 		<None Remove="Schema\FbMetaData.xml" />
 	</ItemGroup>
 	<ItemGroup>
@@ -41,7 +43,7 @@
 		<Reference Include="System.Data.Entity" />
 		<Reference Include="System.Transactions" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
+	<ItemGroup>
 		<Reference Include="EntityFramework">
 			<HintPath>..\..\lib\EF5\NET45\EntityFramework.dll</HintPath>
 		</Reference>

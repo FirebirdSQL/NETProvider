@@ -26,7 +26,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
-
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
@@ -61,7 +61,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected string _serverVersion;
 		private short _packetSize;
 		private short _dialect;
-		private int _eventsId;
 		private bool _disposed;
 		private XdrStream _xdrStream;
 
@@ -154,7 +153,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_eventManager = null;
 				_serverVersion = null;
 				_dialect = 0;
-				_eventsId = 0;
 				_handle = 0;
 				_packetSize = 0;
 				_warningMessage = null;
@@ -224,6 +222,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
+				CloseEventManager();
+
 				if (_handle != 0)
 				{
 					XdrStream.Write(IscCodes.op_detach);
@@ -231,8 +231,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				}
 				XdrStream.Write(IscCodes.op_disconnect);
 				XdrStream.Flush();
-
-				CloseEventManager();
 
 				CloseConnection();
 
@@ -258,7 +256,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex2);
 				}
-
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
@@ -411,10 +408,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#endregion
 
 		#region Connection Methods
+
 		public void CloseConnection()
 		{
 			_connection.Disconnect();
 		}
+
 		#endregion
 
 		#region Remote Events Methods
@@ -423,42 +422,39 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			if (_eventManager != null)
 			{
-				_eventManager.Close();
+				_eventManager.Dispose();
 				_eventManager = null;
 			}
 		}
 
-		public RemoteEvent CreateEvent()
+		public void QueueEvents(RemoteEvent remoteEvent)
 		{
-			return new RemoteEvent(this);
-		}
-
-		public void QueueEvents(RemoteEvent events)
-		{
-			if (_eventManager == null)
-			{
-				ConnectionRequest(out var auxHandle, out var ipAddress, out var portNumber);
-				_eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
-			}
 			try
 			{
-				events.LocalId = Interlocked.Increment(ref _eventsId);
-				_eventManager.QueueEvents(events);
+				if (_eventManager == null)
+				{
+					ConnectionRequest(out var auxHandle, out var ipAddress, out var portNumber);
+					_eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
+					var dummy = _eventManager.WaitForEventsAsync(remoteEvent);
+				}
 
-				EventParameterBuffer epb = events.ToEpb();
+				remoteEvent.LocalId++;
+
+				EventParameterBuffer epb = remoteEvent.BuildEpb();
+				byte[] epbData = epb.ToArray();
 
 				XdrStream.Write(IscCodes.op_que_events);
 				XdrStream.Write(_handle);
-				XdrStream.WriteBuffer(epb.ToArray());
+				XdrStream.WriteBuffer(epbData);
 				XdrStream.Write(AddressOfAstRoutine);
 				XdrStream.Write(ArgumentToAstRoutine);
-				XdrStream.Write(events.LocalId);
+				XdrStream.Write(remoteEvent.LocalId);
 
 				XdrStream.Flush();
 
 				GenericResponse response = (GenericResponse)ReadResponse();
 
-				events.RemoteId = response.ObjectHandle;
+				remoteEvent.RemoteId = response.ObjectHandle;
 			}
 			catch (IOException ex)
 			{
@@ -477,8 +473,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				XdrStream.Flush();
 
 				ReadResponse();
-
-				_eventManager.CancelEvents(events);
 			}
 			catch (IOException ex)
 			{
@@ -583,6 +577,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public virtual int NextOperation()
 		{
 			return _xdrStream.ReadNextOperation();
+		}
+		public virtual Task<int> NextOperationAsync()
+		{
+			return _xdrStream.ReadNextOperationAsync();
 		}
 
 		public virtual IResponse ReadResponse()

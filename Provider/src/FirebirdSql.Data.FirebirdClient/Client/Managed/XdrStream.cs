@@ -23,8 +23,11 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Globalization;
+using System.Linq;
 using FirebirdSql.Data.Common;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace FirebirdSql.Data.Client.Managed
 {
@@ -252,6 +255,44 @@ namespace FirebirdSql.Data.Client.Managed
 			_position += dataLength;
 			return dataLength;
 		}
+#if NET40
+		public async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default(CancellationToken))
+#else
+		public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+#endif
+		{
+			CheckDisposed();
+			EnsureReadable();
+
+			if (_inputBuffer.Length < count)
+			{
+				var readBuffer = new byte[PreferredBufferSize];
+				var read = await _innerStream.ReadAsync(readBuffer, 0, readBuffer.Length).ConfigureAwait(false);
+				if (read != 0)
+				{
+					if (_compression)
+					{
+						_inflate.OutputBuffer = _compressionBuffer;
+						_inflate.AvailableBytesOut = _compressionBuffer.Length;
+						_inflate.NextOut = 0;
+						_inflate.InputBuffer = readBuffer;
+						_inflate.AvailableBytesIn = read;
+						_inflate.NextIn = 0;
+						var rc = _inflate.Inflate(Ionic.Zlib.FlushType.None);
+						if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+							throw new IOException($"Error '{rc}' while decompressing the data.");
+						if (_inflate.AvailableBytesIn != 0)
+							throw new IOException("Decompression buffer too small.");
+						readBuffer = _compressionBuffer;
+						read = _inflate.NextOut;
+					}
+					_inputBuffer.AddRange(readBuffer, read);
+				}
+			}
+			var dataLength = _inputBuffer.ReadInto(ref buffer, offset, count);
+			_position += dataLength;
+			return dataLength;
+		}
 
 		public override void WriteByte(byte value)
 		{
@@ -299,17 +340,26 @@ namespace FirebirdSql.Data.Client.Managed
 			return op;
 		}
 
+		/* loop	as long	as we are receiving	dummy packets, just
+		 * throwing	them away--note	that if	we are a server	we won't
+		 * be receiving	them, but it is	better to check	for	them at
+		 * this	level rather than try to catch them	in all places where
+		 * this	routine	is called
+		 */
 		public int ReadNextOperation()
 		{
 			do
 			{
-				/* loop	as long	as we are receiving	dummy packets, just
-				 * throwing	them away--note	that if	we are a server	we won't
-				 * be receiving	them, but it is	better to check	for	them at
-				 * this	level rather than try to catch them	in all places where
-				 * this	routine	is called
-				 */
 				_operation = ReadInt32();
+			} while (_operation == IscCodes.op_dummy);
+
+			return _operation;
+		}
+		public async Task<int> ReadNextOperationAsync()
+		{
+			do
+			{
+				_operation = await ReadInt32Async().ConfigureAwait(false);
 			} while (_operation == IscCodes.op_dummy);
 
 			return _operation;
@@ -339,6 +389,24 @@ namespace FirebirdSql.Data.Client.Managed
 				while (toRead > 0 && currentlyRead != 0)
 				{
 					toRead -= (currentlyRead = Read(buffer, count - toRead, toRead));
+				}
+				if (toRead == count)
+				{
+					throw new IOException();
+				}
+			}
+			return buffer;
+		}
+		public async Task<byte[]> ReadBytesAsync(int count)
+		{
+			var buffer = new byte[count];
+			if (count > 0)
+			{
+				var toRead = count;
+				var currentlyRead = -1;
+				while (toRead > 0 && currentlyRead != 0)
+				{
+					toRead -= (currentlyRead = await ReadAsync(buffer, count - toRead, toRead).ConfigureAwait(false));
 				}
 				if (toRead == count)
 				{
@@ -393,6 +461,10 @@ namespace FirebirdSql.Data.Client.Managed
 		public int ReadInt32()
 		{
 			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(ReadBytes(4), 0));
+		}
+		public async Task<int> ReadInt32Async()
+		{
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(await ReadBytesAsync(4).ConfigureAwait(false), 0));
 		}
 
 		public long ReadInt64()

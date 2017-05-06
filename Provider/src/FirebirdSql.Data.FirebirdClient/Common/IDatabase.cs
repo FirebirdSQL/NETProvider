@@ -53,7 +53,6 @@ namespace FirebirdSql.Data.Common
 		ArrayList GetDatabaseInfo(byte[] items, int bufferLength);
 
 		void CloseEventManager();
-		RemoteEvent CreateEvent();
 		void QueueEvents(RemoteEvent events);
 		void CancelEvents(RemoteEvent events);
 

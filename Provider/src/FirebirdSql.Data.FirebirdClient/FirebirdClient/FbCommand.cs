@@ -1318,11 +1318,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_transaction = null;
 			}
 
-			if (_connection == null ||
-				_connection.State != ConnectionState.Open)
-			{
-				throw new InvalidOperationException("Connection must be valid and open");
-			}
+			FbConnection.EnsureOpen(_connection);
 
 			if (_activeReader != null)
 			{

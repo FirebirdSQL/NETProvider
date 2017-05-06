@@ -20,117 +20,44 @@
  */
 
 using System;
+using System.Linq;
 using System.Threading;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	public sealed class FbRemoteEvent
+	public sealed class FbRemoteEvent : IDisposable
 	{
-		#region Events
-
-		public event EventHandler<FbRemoteEventEventArgs> RemoteEventCounts;
-
-		#endregion
-
-		#region Fields
-
-		private FbConnection _connection;
+		private FbConnectionInternal _connection;
 		private RemoteEvent _revent;
 		private SynchronizationContext _synchronizationContext;
 
-		#endregion
+		public event EventHandler<FbRemoteEventCountsEventArgs> RemoteEventCounts;
+		public event EventHandler<FbRemoteEventErrorEventArgs> RemoteEventError;
 
-		#region Indexers
+		public string this[int index] => _revent.Events[index];
+		public int RemoteEventId => _revent?.RemoteId ?? -1;
 
-		public string this[int index]
+		public FbRemoteEvent(string connectionString)
 		{
-			get { return _revent.Events[index]; }
-		}
-
-		#endregion
-
-		#region Properties
-
-		public FbConnection Connection
-		{
-			get { return _connection; }
-		}
-
-		public int RemoteEventId
-		{
-			get { return _revent?.RemoteId ?? -1; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		public FbRemoteEvent(FbConnection connection)
-			: this(connection, null)
-		{ }
-
-		public FbRemoteEvent(FbConnection connection, params string[] events)
-		{
-			if (connection == null || connection.State != System.Data.ConnectionState.Open)
-			{
-				throw new InvalidOperationException("Connection must be valid and open");
-			}
-
-			_connection = connection;
-			_revent = connection.InnerConnection.Database.CreateEvent();
-			_revent.EventCountsCallback = new RemoteEventCountsCallback(OnRemoteEventCounts);
+			_connection = new FbConnectionInternal(new FbConnectionString(connectionString));
+			_connection.Connect();
+			_revent = new RemoteEvent(_connection.Database);
+			_revent.EventCountsCallback = OnRemoteEventCounts;
+			_revent.EventErrorCallback = OnRemoteEventError;
 			_synchronizationContext = SynchronizationContext.Current ?? new SynchronizationContext();
-
-			if (events != null)
-			{
-				AddEvents(events);
-			}
 		}
 
-		#endregion
-
-		#region Methods
-
-		public void AddEvents(params string[] events)
+		public void Dispose()
 		{
-			if (events == null)
-				throw new ArgumentNullException(nameof(events));
-			if (events.Length > 15)
-				throw new ArgumentOutOfRangeException(nameof(events), "Maximum number of events is 15.");
-
-			if (events.Length != _revent.Events.Count)
-			{
-				_revent.ResetCounts();
-			}
-			else
-			{
-				string[] actualEvents = new string[_revent.Events.Count];
-				_revent.Events.CopyTo(actualEvents, 0);
-
-				for (int i = 0; i < actualEvents.Length; i++)
-				{
-					if (events[i] != actualEvents[i])
-					{
-						_revent.ResetCounts();
-						break;
-					}
-				}
-			}
-
-			_revent.Events.Clear();
-
-			for (int i = 0; i < events.Length; i++)
-			{
-				_revent.Events.Add(events[i]);
-			}
+			_connection.Dispose();
 		}
 
-		public void QueueEvents()
+		public void QueueEvents(params string[] events)
 		{
 			try
 			{
-				_revent.QueueEvents();
+				_revent.QueueEvents(events);
 			}
 			catch (IscException ex)
 			{
@@ -150,48 +77,22 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
-
-		#region Callbacks Handlers
-
-		private void OnRemoteEventCounts()
+		private void OnRemoteEventCounts(string name, int count)
 		{
-			bool canceled = false;
-
-			int[] actualCounts = (int[])_revent.ActualCounts.Clone();
-			if (_revent.PreviousCounts != null)
+			var args = new FbRemoteEventCountsEventArgs(name, count);
+			_synchronizationContext.Post(_ =>
 			{
-				for (int i = 0; i < _revent.ActualCounts.Length; i++)
-				{
-					actualCounts[i] -= _revent.PreviousCounts[i];
-				}
-			}
-
-			for (int i = 0; i < actualCounts.Length; i++)
-			{
-				FbRemoteEventEventArgs args = new FbRemoteEventEventArgs(_revent.Events[i], actualCounts[i]);
-				_synchronizationContext.Send(_ =>
-				{
-					RemoteEventCounts?.Invoke(this, args);
-				}, null);
-
-				if (args.Cancel)
-				{
-					canceled = true;
-					break;
-				}
-			}
-
-			if (canceled)
-			{
-				CancelEvents();
-			}
-			else
-			{
-				QueueEvents();
-			}
+				RemoteEventCounts?.Invoke(this, args);
+			}, null);
 		}
 
-		#endregion
+		private void OnRemoteEventError(Exception error)
+		{
+			var args = new FbRemoteEventErrorEventArgs(error);
+			_synchronizationContext.Post(_ =>
+			{
+				RemoteEventError?.Invoke(this, args);
+			}, null);
+		}
 	}
 }

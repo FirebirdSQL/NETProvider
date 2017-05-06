@@ -13,6 +13,9 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>firebird firebirsql firebirdclient adonet database</tags>
     <dependencies>
+      <group targetFramework="net40-client">
+        <dependency id="Microsoft.Bcl.Async" version="1.0.168" />
+      </group>
       <group targetFramework="netstandard1.6">
         <dependency id="Microsoft.Extensions.PlatformAbstractions" version="1.0.0" />
         <dependency id="System.Collections.NonGeneric" version="4.0.1" />

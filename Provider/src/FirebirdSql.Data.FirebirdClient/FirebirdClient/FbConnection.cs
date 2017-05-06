@@ -612,5 +612,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			_innerConnection.CancelCommand();
 		}
 		#endregion
+
+		#region Internal Methods
+
+		internal static void EnsureOpen(FbConnection connection)
+		{
+			if (connection == null || connection.State != ConnectionState.Open)
+				throw new InvalidOperationException("Connection must be valid and open.");
+		}
+
+		#endregion
 	}
 }

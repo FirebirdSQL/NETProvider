@@ -21,152 +21,129 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 
 namespace FirebirdSql.Data.Common
 {
 	internal class RemoteEvent
 	{
-		#region Callbacks
+		const int MaxEventNameLength = 255;
+		const int MaxEpbLength = 65535;
 
-		public RemoteEventCountsCallback EventCountsCallback { get; set; }
+		List<string> _events;
+		Charset _charset;
+		IDatabase _db;
+		int[] _previousCounts;
+		int[] _currentCounts;
+		int _running;
 
-		#endregion
-
-		#region Fields
-
-		private List<string> _events;
-		private IDatabase _db;
-		private int _localId;
-		private int _remoteId;
-		private bool _initialCounts;
-		private int[] _previousCounts;
-		private int[] _actualCounts;
-
-		#endregion
-
-		#region Properties
-
-		public int LocalId
-		{
-			get { return _localId; }
-			set { _localId = value; }
-		}
-
-		public int RemoteId
-		{
-			get { return _remoteId; }
-			set { _remoteId = value; }
-		}
+		public int LocalId { get; set; }
+		public int RemoteId { get; set; }
+		public Action<string, int> EventCountsCallback { get; set; }
+		public Action<Exception> EventErrorCallback { get; set; }
 
 		public List<string> Events
 		{
 			get { return _events; }
 		}
 
-		public int[] PreviousCounts
-		{
-			get { return _previousCounts; }
-		}
-
-		public int[] ActualCounts
-		{
-			get { return _actualCounts; }
-		}
-
-		#endregion
-
-		#region Constructors
-
 		public RemoteEvent(IDatabase db)
 		{
-			_localId = 0;
-			_remoteId = 0;
+			LocalId = 0;
+			RemoteId = 0;
 			_events = new List<string>();
+			_charset = db.Charset;
 			_db = db;
 		}
 
-		#endregion
-
-		#region Methods
-
-		public void QueueEvents()
+		public void QueueEvents(ICollection<string> events)
 		{
-			_db.QueueEvents(this);
+			if (Interlocked.Exchange(ref _running, 1) == 1)
+				throw new InvalidOperationException("Events are already running.");
+			if (events == null)
+				throw new ArgumentNullException(nameof(events));
+			if (events.Count == 0)
+				throw new ArgumentOutOfRangeException(nameof(events), "Need to provide at least one event.");
+			if (events.Any(x => x.Length > MaxEventNameLength))
+				throw new ArgumentOutOfRangeException(nameof(events), $"Some events are longer than {MaxEventNameLength}.");
+			if (BuildEpb(events.ToList(), _ => default(int)).ToArray().Length > MaxEpbLength)
+				throw new ArgumentOutOfRangeException(nameof(events), $"Whole events buffer is bigger than {MaxEpbLength}.");
+			_events.AddRange(events);
+			QueueEventsImpl();
 		}
 
 		public void CancelEvents()
 		{
 			_db.CancelEvents(this);
-			ResetCounts();
-		}
-
-		public void ResetCounts()
-		{
-			_initialCounts = false;
-			_actualCounts = null;
+			_currentCounts = null;
 			_previousCounts = null;
+			_events.Clear();
+			Volatile2.Write(ref _running, 0);
 		}
 
-		public void EventCounts(byte[] buffer)
+		void QueueEventsImpl()
 		{
-			int pos = 1;
-			Charset charset = _db.Charset;
+			_db.QueueEvents(this);
+		}
 
-			if (buffer != null)
+		internal void EventCounts(byte[] buffer)
+		{
+			if (Volatile2.Read(ref _running) == 0)
+				return;
+
+			_previousCounts = _currentCounts;
+			_currentCounts = new int[_events.Count];
+
+			var pos = 1;
+			while (pos < buffer.Length)
 			{
-				if (_initialCounts)
-				{
-					_previousCounts = _actualCounts;
-				}
+				var length = buffer[pos++];
+				var eventName = _charset.GetString(buffer, pos, length);
 
-				_actualCounts = new int[_events.Count];
+				pos += length;
 
-				while (pos < buffer.Length)
-				{
-					int length = buffer[pos++];
-					string eventName = charset.GetString(buffer, pos, length);
+				var index = _events.IndexOf(eventName);
+				if (index == -1)
+					Debugger.Break();
+				Debug.Assert(index != -1);
+				_currentCounts[index] = BitConverter.ToInt32(buffer, pos) - 1;
 
-					pos += length;
-
-					int index = _events.IndexOf(eventName);
-					if (index != -1)
-					{
-						_actualCounts[index] = BitConverter.ToInt32(buffer, pos) - 1;
-					}
-
-					pos += 4;
-				}
-
-				if (!_initialCounts)
-				{
-					QueueEvents();
-					_initialCounts = true;
-				}
-				else
-				{
-					EventCountsCallback?.Invoke();
-				}
+				pos += 4;
 			}
+
+			for (var i = 0; i < _events.Count; i++)
+			{
+				var count = _currentCounts[i] - _previousCounts[i];
+				if (count == 0)
+					continue;
+				EventCountsCallback(_events[i], count);
+			}
+
+			QueueEventsImpl();
 		}
 
-		public EventParameterBuffer ToEpb()
+		internal void EventError(Exception error)
 		{
-			EventParameterBuffer epb = new EventParameterBuffer();
+			EventErrorCallback(error);
+		}
+
+		internal EventParameterBuffer BuildEpb()
+		{
+			_currentCounts = _currentCounts ?? new int[_events.Count];
+			return BuildEpb(_events, i => _currentCounts[i] + 1);
+		}
+
+		static EventParameterBuffer BuildEpb(IList<string> events, Func<int, int> countFactory)
+		{
+			var epb = new EventParameterBuffer();
 			epb.Append(IscCodes.EPB_version1);
-			for (int i = 0; i < _events.Count; i++)
+			for (var i = 0; i < events.Count; i++)
 			{
-				if (_actualCounts != null)
-				{
-					epb.Append(_events[i], _actualCounts[i] + 1);
-				}
-				else
-				{
-					epb.Append(_events[i], 0);
-				}
+				epb.Append(events[i], countFactory(i));
 			}
 			return epb;
 		}
-
-		#endregion
 	}
 }

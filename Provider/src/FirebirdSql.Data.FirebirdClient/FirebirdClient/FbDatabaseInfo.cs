@@ -240,7 +240,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetString(byte item)
 		{
-			CheckConnection();
+			FbConnection.EnsureOpen(_connection);
 
 			IDatabase db = Connection.InnerConnection.Database;
 			byte[] items = new byte[]
@@ -254,7 +254,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private int GetInt32(byte item)
 		{
-			CheckConnection();
+			FbConnection.EnsureOpen(_connection);
 
 			IDatabase db = Connection.InnerConnection.Database;
 			byte[] items = new byte[]
@@ -270,7 +270,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private bool GetBoolean(byte item)
 		{
-			CheckConnection();
+			FbConnection.EnsureOpen(_connection);
 
 			IDatabase db = Connection.InnerConnection.Database;
 			byte[] items = new byte[]
@@ -286,7 +286,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private ArrayList GetArrayList(byte item)
 		{
-			CheckConnection();
+			FbConnection.EnsureOpen(_connection);
 
 			IDatabase db = Connection.InnerConnection.Database;
 			byte[] items = new byte[]
@@ -296,15 +296,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				};
 
 			return db.GetDatabaseInfo(items);
-		}
-
-		private void CheckConnection()
-		{
-			if (_connection == null ||
-				_connection.State == ConnectionState.Closed)
-			{
-				throw new InvalidOperationException("Connection must be valid and open");
-			}
 		}
 
 		#endregion

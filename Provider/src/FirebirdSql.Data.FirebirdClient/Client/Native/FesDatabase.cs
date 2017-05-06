@@ -188,11 +188,6 @@ namespace FirebirdSql.Data.Client.Native
 			throw new NotSupportedException();
 		}
 
-		public RemoteEvent CreateEvent()
-		{
-			throw new NotSupportedException();
-		}
-
 		public void QueueEvents(RemoteEvent events)
 		{
 			throw new NotSupportedException();

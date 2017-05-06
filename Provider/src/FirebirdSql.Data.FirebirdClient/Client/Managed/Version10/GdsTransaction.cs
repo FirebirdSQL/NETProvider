@@ -27,7 +27,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-	internal sealed class GdsTransaction : TransactionBase
+	internal class GdsTransaction : TransactionBase
 	{
 		#region Events
 
