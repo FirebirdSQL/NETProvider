@@ -7,7 +7,7 @@
     <description>Firebird ADO.NET Data provider</description>
     <authors>FirebirdSQL</authors>
     <owners>FirebirdSQL</owners>
-    <licenseUrl>http://firebird.svn.sourceforge.net/viewvc/firebird/NETProvider/trunk/NETProvider/license.txt</licenseUrl>
+    <licenseUrl>https://raw.githubusercontent.com/cincuranet/FirebirdSql.Data.FirebirdClient/master/license.txt</licenseUrl>
     <projectUrl>http://www.firebirdsql.org/en/net-provider/</projectUrl>
     <iconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,33 +16,24 @@
       <group targetFramework="net40-client">
         <dependency id="Microsoft.Bcl.Async" version="1.0.168" />
       </group>
+      <group targetFramework="net452">
+      </group>
       <group targetFramework="netstandard1.6">
-        <dependency id="Microsoft.Extensions.PlatformAbstractions" version="1.0.0" />
-        <dependency id="System.Collections.NonGeneric" version="4.0.1" />
-        <dependency id="System.ComponentModel.Primitives" version="4.1.0" />
-        <dependency id="System.ComponentModel.TypeConverter" version="4.1.0" />
-        <dependency id="System.Data.Common" version="4.1.0" />
-        <dependency id="System.Diagnostics.Contracts" version="4.0.1" />
-        <dependency id="System.Diagnostics.Debug" version="4.0.11" />
-        <dependency id="System.Diagnostics.Process" version="4.1.0" />
-        <dependency id="System.Diagnostics.TraceSource" version="4.0.0" />
-        <dependency id="System.Globalization.Calendars" version="4.0.1" />
-        <dependency id="System.IO.FileSystem" version="4.0.1" />
-        <dependency id="System.IO.UnmanagedMemoryStream" version="4.0.1" />
-        <dependency id="System.Linq.Parallel" version="4.0.1" />
-        <dependency id="System.Net.NameResolution" version="4.0.0" />
-        <dependency id="System.Net.Sockets" version="4.1.0" />
-        <dependency id="System.Reflection" version="4.1.0" />
-        <dependency id="System.Reflection.Emit" version="4.0.1" />
-        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1" />
-        <dependency id="System.Reflection.TypeExtensions" version="4.1.0" />
-        <dependency id="System.Runtime.Numerics" version="4.0.1" />
-        <dependency id="System.Security.Cryptography.Algorithms" version="4.2.0" />
-        <dependency id="System.Text.RegularExpressions" version="4.1.0" />
-        <dependency id="System.Threading" version="4.0.11" />
-        <dependency id="System.Threading.Tasks.Parallel" version="4.0.1" />
-        <dependency id="System.Threading.Thread" version="4.0.0" />
-        <dependency id="System.Threading.Timer" version="4.0.1" />
+        <dependency id="NETStandard.Library" version="1.6.0" />
+        <dependency id="Microsoft.Extensions.PlatformAbstractions" version="1.1.0" />
+        <dependency id="System.Collections.NonGeneric" version="4.3.0" />
+        <dependency id="System.ComponentModel.Primitives" version="4.3.0" />
+        <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" />
+        <dependency id="System.Data.Common" version="4.3.0" />
+        <dependency id="System.Diagnostics.Contracts" version="4.3.0" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" />
+        <dependency id="System.Diagnostics.TraceSource" version="4.3.0" />
+        <dependency id="System.IO.UnmanagedMemoryStream" version="4.3.0" />
+        <dependency id="System.Linq.Parallel" version="4.3.0" />
+        <dependency id="System.Net.NameResolution" version="4.3.0" />
+        <dependency id="System.Reflection.Emit" version="4.3.0" />
+        <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" />
+        <dependency id="System.Threading.Thread" version="4.3.0" />
       </group>
     </dependencies>
   </metadata>
