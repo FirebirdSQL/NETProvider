@@ -248,6 +248,11 @@ namespace FirebirdSql.Data.Isql
 		DropExternalFunction,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>DROP FUNCTION</b>
+		/// </summary>
+		DropFunction,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>DROP FILTER</b>
 		/// </summary>
 		DropFilter,

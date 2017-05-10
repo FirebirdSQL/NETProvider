@@ -332,6 +332,10 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.DropExternalFunction;
 					}
+					if (sqlStatement.StartsWith("DROP FUNCTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropFunction;
+					}
 					if (sqlStatement.StartsWith("DROP FILTER", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.DropFilter;

@@ -161,6 +161,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.DropDomain:
 						case SqlStatementType.DropException:
 						case SqlStatementType.DropExternalFunction:
+						case SqlStatementType.DropFunction:
 						case SqlStatementType.DropFilter:
 						case SqlStatementType.DropGenerator:
 						case SqlStatementType.DropIndex:
