@@ -129,6 +129,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.AlterDatabase:
 						case SqlStatementType.AlterDomain:
 						case SqlStatementType.AlterException:
+						case SqlStatementType.AlterFunction:
 						case SqlStatementType.AlterIndex:
 						case SqlStatementType.AlterProcedure:
 						case SqlStatementType.AlterRole:
@@ -140,6 +141,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.CreateCollation:
 						case SqlStatementType.CreateDomain:
 						case SqlStatementType.CreateException:
+						case SqlStatementType.CreateFunction:
 						case SqlStatementType.CreateGenerator:
 						case SqlStatementType.CreateIndex:
 						case SqlStatementType.CreateProcedure:
@@ -180,6 +182,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Open:
 						case SqlStatementType.Prepare:
 						case SqlStatementType.Revoke:
+						case SqlStatementType.RecreateFunction:
 						case SqlStatementType.RecreateProcedure:
 						case SqlStatementType.RecreateTable:
 						case SqlStatementType.RecreateTrigger:

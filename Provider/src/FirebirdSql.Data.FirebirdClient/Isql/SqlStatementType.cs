@@ -53,6 +53,11 @@ namespace FirebirdSql.Data.Isql
 		AlterException,
 
 		/// <summary>
+		/// Represents the SQL statement: <b>ALTER FUNCTION</b>
+		/// </summary>
+		AlterFunction,
+
+		/// <summary>
 		/// Represents the SQL statement: <b>ALTER INDEX</b>
 		/// </summary>
 		AlterIndex,
@@ -126,6 +131,11 @@ namespace FirebirdSql.Data.Isql
 		/// Represents the SQL statement: <b>CREATE EXCEPTION</b>
 		/// </summary>
 		CreateException,
+
+		/// <summary>
+		/// Represents the SQL statement: <b>CREATE FUNCTION</b>
+		/// </summary>
+		CreateFunction,
 
 		/// <summary>
 		/// Represents the SQL statement: <b>CREATE GENERATOR</b>
@@ -351,6 +361,11 @@ namespace FirebirdSql.Data.Isql
 		/// Represents the SQL statement: <b>PREPARE</b>
 		/// </summary>
 		Prepare,
+
+		/// <summary>
+		/// Represents the SQL statement: <b>RECREATE FUNCTION</b>
+		/// </summary>
+		RecreateFunction,
 
 		/// <summary>
 		/// Represents the SQL statement: <b>RECREATE PROCEDURE</b>

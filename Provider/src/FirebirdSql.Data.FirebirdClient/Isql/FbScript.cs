@@ -150,6 +150,10 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.AlterException;
 					}
+					if (sqlStatement.StartsWith("ALTER FUNCTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterFunction;
+					}
 					if (sqlStatement.StartsWith("ALTER INDEX", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.AlterIndex;
@@ -214,6 +218,11 @@ namespace FirebirdSql.Data.Isql
 						sqlStatement.StartsWith("CREATE OR ALTER EXCEPTION", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.CreateException;
+					}
+					if (sqlStatement.StartsWith("CREATE FUNCTION", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE OR ALTER FUNCTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreateFunction;
 					}
 					if (sqlStatement.StartsWith("CREATE GENERATOR", StringComparison.OrdinalIgnoreCase))
 					{
@@ -446,6 +455,10 @@ namespace FirebirdSql.Data.Isql
 					if (sqlStatement.StartsWith("REVOKE", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.Revoke;
+					}
+					if (sqlStatement.StartsWith("RECREATE FUNCTION", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.RecreateFunction;
 					}
 					if (sqlStatement.StartsWith("RECREATE PROCEDURE", StringComparison.OrdinalIgnoreCase))
 					{
