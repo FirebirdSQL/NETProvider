@@ -55,9 +55,19 @@ namespace FirebirdSql.Data.EntityFramework6
 			var updateDatabaseOperation = lastOperation as UpdateDatabaseOperation;
 			var historyOperation = updateDatabaseOperation != null
 				? updateDatabaseOperation.Migrations.First().Operations.OfType<HistoryOperation>().First()
-				: (HistoryOperation)lastOperation;
-			var modify = historyOperation.CommandTrees.First();
-			_migrationsHistoryTableName = (modify.Target.Expression as DbScanExpression).Target.Table;
+				: lastOperation as HistoryOperation;
+
+			if (historyOperation != null)
+			{
+				var modify = historyOperation.CommandTrees.First();
+				_migrationsHistoryTableName = ((DbScanExpression)modify.Target.Expression).Target.Table;
+			}
+			//This happens only and only if downgrading database to initial point (ie. reverting also Initial migration)
+			else
+			{
+				var dropTableOperation = (DropTableOperation)lastOperation; //DropTableOperation for MigrationHistory-table
+				_migrationsHistoryTableName = Regex.Replace(dropTableOperation.Name, @".+\.(.+)", "$1");
+			}
 
 			return GenerateStatements(migrationOperations).ToArray();
 		}
