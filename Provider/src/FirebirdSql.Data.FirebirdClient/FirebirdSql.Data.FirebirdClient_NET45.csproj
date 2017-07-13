@@ -20,7 +20,12 @@
 		<OutputPath>bin\Debug\NET45</OutputPath>
 		<BaseIntermediateOutputPath>obj\NET45</BaseIntermediateOutputPath>
 		<DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
-	</PropertyGroup> 
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="obj\**" />
+	  <EmbeddedResource Remove="obj\**" />
+	  <None Remove="obj\**" />
+	</ItemGroup>
 	<ItemGroup>
 		<None Remove="app.FirebirdSql.Data.FirebirdClient_NET40.config" />
 		<None Remove="Entity\ProviderManifest.xml" />

@@ -25,6 +25,11 @@
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="obj\**" />
+	  <EmbeddedResource Remove="obj\**" />
+	  <None Remove="obj\**" />
+	</ItemGroup>
+	<ItemGroup>
 		<None Remove="Entity\ProviderManifest.xml" />
 		<None Remove="Entity\StoreSchemaDefinition.ssdl" />
 		<None Remove="Entity\StoreSchemaDefinitionVersion3.ssdl" />
