@@ -228,7 +228,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Advanced")]
 		[DisplayName("Client Library")]
-		[Description("Client library for Firebird Embedded Server.")]
+		[Description("Client library for Firebird Embedded.")]
 		[DefaultValue(FbConnectionString.DefaultValueClientLibrary)]
 		public string ClientLibrary
 		{
@@ -276,6 +276,16 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { SetValue(FbConnectionString.DefaultKeyCompression, value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("CryptKey")]
+		[Description("Key used for database decryption.")]
+		[DefaultValue(FbConnectionString.DefaultValueCryptKey)]
+		public byte[] CryptKey
+		{
+			get { return GetBytes(FbConnectionString.DefaultKeyCryptKey, FbConnectionString.DefaultValueCryptKey); }
+			set { SetValue(FbConnectionString.DefaultKeyCryptKey, value); }
+		}
+
 		#endregion
 
 		#region Constructors
@@ -306,23 +316,17 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (!TryGetValue(GetKey(keyword), out var value))
 				return defaultValue;
 
-			if (value is FbServerType)
+			switch (value)
 			{
-				return (FbServerType)value;
+				case FbServerType fbServerType:
+					return fbServerType;
+				case string s when s == "Default":
+					return FbServerType.Default;
+				case string s when s == "Embedded":
+					return FbServerType.Embedded;
+				default:
+					return (FbServerType)GetInt32(keyword, (int)defaultValue);
 			}
-			else if (value is string)
-			{
-				switch ((string)value)
-				{
-					case "Default":
-						return FbServerType.Default;
-
-					case "Embedded":
-						return FbServerType.Embedded;
-				}
-			}
-
-			return (FbServerType)GetInt32(keyword, (int)defaultValue);
 		}
 
 		private IsolationLevel GetIsolationLevel(string keyword, IsolationLevel defaultValue)
@@ -345,6 +349,22 @@ namespace FirebirdSql.Data.FirebirdClient
 			return TryGetValue(GetKey(keyword), out var value)
 				? Convert.ToBoolean(value)
 				: defaultValue;
+		}
+
+		private byte[] GetBytes(string keyword, byte[] defaultValue)
+		{
+			if (!TryGetValue(GetKey(keyword), out var value))
+				return defaultValue;
+
+			switch (value)
+			{
+				case byte[] bytes:
+					return bytes;
+				case string s:
+					return Convert.FromBase64String(s);
+				default:
+					return defaultValue;
+			}
 		}
 
 		private void SetValue<T>(string keyword, T value)

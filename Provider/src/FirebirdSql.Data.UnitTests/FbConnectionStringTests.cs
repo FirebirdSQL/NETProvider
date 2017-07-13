@@ -153,5 +153,29 @@ namespace FirebirdSql.Data.UnitTests
 			Assert.AreEqual("", cs.UserID);
 			Assert.AreEqual("testpwd", cs.Password);
 		}
+
+		[Test]
+		public void CryptKeyWithBase64FullPadding()
+		{
+			const string ConnectionString = "user=u;cryptkey=dGVzdA==;password=p";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("test", cs.CryptKey);
+		}
+
+		[Test]
+		public void CryptKeyWithBase64SinglePadding()
+		{
+			const string ConnectionString = "user=u;cryptkey=YWE=;password=p";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("aa", cs.CryptKey);
+		}
+
+		[Test]
+		public void CryptKeyWithBase64NoPadding()
+		{
+			const string ConnectionString = "user=u;cryptkey=YWFh;password=p";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual("aaa", cs.CryptKey);
+		}
 	}
 }

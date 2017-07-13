@@ -37,6 +37,36 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			: base(connection)
 		{ }
 
+		public override void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		{
+			try
+			{
+				SendAttachToBuffer(dpb, database);
+				XdrStream.Flush();
+				var response = ReadResponse();
+				while (response is CryptKeyCallbackReponse cryptResponse)
+				{
+					XdrStream.Write(IscCodes.op_crypt_key_callback);
+					XdrStream.WriteBuffer(cryptKey);
+					XdrStream.Flush();
+					response = ReadResponse();
+				}
+				ProcessAttachResponse(response as GenericResponse);
+			}
+			catch (IscException)
+			{
+				SafelyDetach();
+				throw;
+			}
+			catch (IOException ex)
+			{
+				SafelyDetach();
+				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
+			}
+
+			AfterAttachActions();
+		}
+
 		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			XdrStream.Write(IscCodes.op_attach);
@@ -63,9 +93,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 
-		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
-			Attach(dpb, dataSource, port, database);
+			Attach(dpb, dataSource, port, database, cryptKey);
 		}
 
 		#region Override Statement Creation Methods

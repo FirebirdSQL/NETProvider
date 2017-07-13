@@ -133,7 +133,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public void DropDatabase()
 		{
 			IDatabase db = ClientFactory.CreateDatabase(_options);
-			db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database);
+			db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
 			db.DropDatabase();
 		}
 
@@ -159,11 +159,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
-					_db.AttachWithTrustedAuth(dpb, _options.DataSource, _options.Port, _options.Database);
+					_db.AttachWithTrustedAuth(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
 				}
 				else
 				{
-					_db.Attach(dpb, _options.DataSource, _options.Port, _options.Database);
+					_db.Attach(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
 				}
 			}
 			catch (IscException ex)

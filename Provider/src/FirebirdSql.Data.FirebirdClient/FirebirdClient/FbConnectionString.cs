@@ -56,6 +56,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal const bool DefaultValueNoDbTriggers = false;
 		internal const bool DefaultValueNoGarbageCollect = false;
 		internal const bool DefaultValueCompression = false;
+		internal const byte[] DefaultValueCryptKey = null;
 
 		internal const string DefaultKeyUserId = "user id";
 		internal const string DefaultKeyPortNumber = "port number";
@@ -81,6 +82,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		internal const string DefaultKeyNoDbTriggers = "no db triggers";
 		internal const string DefaultKeyNoGarbageCollect = "no garbage collect";
 		internal const string DefaultKeyCompression = "compression";
+		internal const string DefaultKeyCryptKey = "crypt key";
 		#endregion
 
 		#region Static Fields
@@ -144,6 +146,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			{ "nogarbagecollect", DefaultKeyNoGarbageCollect },
 			{ DefaultKeyCompression, DefaultKeyCompression },
 			{ "wire compression", DefaultKeyCompression },
+			{ DefaultKeyCryptKey, DefaultKeyCryptKey },
+			{ "cryptkey", DefaultKeyCryptKey },
 		};
 
 		internal static readonly IDictionary<string, object> DefaultValues = new Dictionary<string, object>(StringComparer.Ordinal)
@@ -172,6 +176,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{ DefaultKeyNoDbTriggers, DefaultValueNoDbTriggers },
 			{ DefaultKeyNoGarbageCollect, DefaultValueNoGarbageCollect },
 			{ DefaultKeyCompression, DefaultValueCompression },
+			{ DefaultKeyCryptKey, DefaultValueCryptKey },
 		};
 
 		#endregion
@@ -185,132 +190,38 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Properties
 
-		public string UserID
-		{
-			get { return GetString(DefaultKeyUserId); }
-		}
-
-		public string Password
-		{
-			get { return GetString(DefaultKeyPassword); }
-		}
-
-		public string DataSource
-		{
-			get { return GetString(DefaultKeyDataSource); }
-		}
-
-		public int Port
-		{
-			get { return GetInt32(DefaultKeyPortNumber); }
-		}
-
-		public string Database
-		{
-			get { return ExpandDataDirectory(GetString(DefaultKeyCatalog)); }
-		}
-
-		public short PacketSize
-		{
-			get { return GetInt16(DefaultKeyPacketSize); }
-		}
-
-		public string Role
-		{
-			get { return GetString(DefaultKeyRoleName); }
-		}
-
-		public byte Dialect
-		{
-			get { return GetByte(DefaultKeyDialect); }
-		}
-
-		public string Charset
-		{
-			get { return GetString(DefaultKeyCharacterSet); }
-		}
-
-		public int ConnectionTimeout
-		{
-			get { return GetInt32(DefaultKeyConnectionTimeout); }
-		}
-
-		public bool Pooling
-		{
-			get { return GetBoolean(DefaultKeyPooling); }
-		}
-
-		public long ConnectionLifeTime
-		{
-			get { return GetInt64(DefaultKeyConnectionLifetime); }
-		}
-
-		public int MinPoolSize
-		{
-			get { return GetInt32(DefaultKeyMinPoolSize); }
-		}
-
-		public int MaxPoolSize
-		{
-			get { return GetInt32(DefaultKeyMaxPoolSize); }
-		}
-
-		public int FetchSize
-		{
-			get { return GetInt32(DefaultKeyFetchSize); }
-		}
-
-		public FbServerType ServerType
-		{
-			get { return (FbServerType)GetInt32(DefaultKeyServerType); }
-		}
-
-		public IsolationLevel IsolationLevel
-		{
-			get { return GetIsolationLevel(DefaultKeyIsolationLevel); }
-		}
-
-		public bool ReturnRecordsAffected
-		{
-			get { return GetBoolean(DefaultKeyRecordsAffected); }
-		}
-
-		public bool Enlist
-		{
-			get { return GetBoolean(DefaultKeyEnlist); }
-		}
-
-		public string ClientLibrary
-		{
-			get { return GetString(DefaultKeyClientLibrary); }
-		}
-
-		public int DbCachePages
-		{
-			get { return GetInt32(DefaultKeyDbCachePages); }
-		}
-
-		public bool NoDatabaseTriggers
-		{
-			get { return GetBoolean(DefaultKeyNoDbTriggers); }
-		}
-
-		public bool NoGarbageCollect
-		{
-			get { return GetBoolean(DefaultKeyNoGarbageCollect); }
-		}
-
-		public bool Compression
-		{
-			get { return GetBoolean(DefaultKeyCompression); }
-		}
+		public string UserID => GetString(DefaultKeyUserId);
+		public string Password => GetString(DefaultKeyPassword);
+		public string DataSource => GetString(DefaultKeyDataSource);
+		public int Port => GetInt32(DefaultKeyPortNumber);
+		public string Database => ExpandDataDirectory(GetString(DefaultKeyCatalog));
+		public short PacketSize => GetInt16(DefaultKeyPacketSize);
+		public string Role => GetString(DefaultKeyRoleName);
+		public byte Dialect => GetByte(DefaultKeyDialect);
+		public string Charset => GetString(DefaultKeyCharacterSet);
+		public int ConnectionTimeout => GetInt32(DefaultKeyConnectionTimeout);
+		public bool Pooling => GetBoolean(DefaultKeyPooling);
+		public long ConnectionLifeTime => GetInt64(DefaultKeyConnectionLifetime);
+		public int MinPoolSize => GetInt32(DefaultKeyMinPoolSize);
+		public int MaxPoolSize => GetInt32(DefaultKeyMaxPoolSize);
+		public int FetchSize => GetInt32(DefaultKeyFetchSize);
+		public FbServerType ServerType => (FbServerType)GetInt32(DefaultKeyServerType);
+		public IsolationLevel IsolationLevel => GetIsolationLevel(DefaultKeyIsolationLevel);
+		public bool ReturnRecordsAffected => GetBoolean(DefaultKeyRecordsAffected);
+		public bool Enlist => GetBoolean(DefaultKeyEnlist);
+		public string ClientLibrary => GetString(DefaultKeyClientLibrary);
+		public int DbCachePages => GetInt32(DefaultKeyDbCachePages);
+		public bool NoDatabaseTriggers => GetBoolean(DefaultKeyNoDbTriggers);
+		public bool NoGarbageCollect => GetBoolean(DefaultKeyNoGarbageCollect);
+		public bool Compression => GetBoolean(DefaultKeyCompression);
+		public byte[] CryptKey => GetBytes(DefaultKeyCryptKey);
 
 		#endregion
 
 		#region Internal Properties
 		internal string NormalizedConnectionString
 		{
-			get { return string.Join(";", _options.Keys.OrderBy(x => x, StringComparer.Ordinal).Select(key => string.Format("{0}={1}", key, WrapValueIfNeeded(_options[key].ToString())))); }
+			get { return string.Join(";", _options.OrderBy(x => x.Key, StringComparer.Ordinal).Where(x => x.Value != null).Select(x => string.Format("{0}={1}", x.Key, WrapValueIfNeeded(x.Value.ToString())))); }
 		}
 		#endregion
 
@@ -366,25 +277,37 @@ namespace FirebirdSql.Data.FirebirdClient
 
 						if (values.Length == 2 && !string.IsNullOrEmpty(values[0]) && !string.IsNullOrEmpty(values[1]))
 						{
-							string key;
-							if (Synonyms.TryGetValue(values[0], out key))
+							if (Synonyms.TryGetValue(values[0], out var key))
 							{
-								if (key == DefaultKeyServerType)
+								switch (key)
 								{
-									FbServerType serverType = default(FbServerType);
-									try
-									{
-										serverType = (FbServerType)Enum.Parse(typeof(FbServerType), values[1], true);
-									}
-									catch
-									{
-										throw new NotSupportedException("Not supported 'server type'.");
-									}
-									_options[key] = serverType;
-								}
-								else
-								{
-									_options[key] = values[1];
+									case DefaultKeyServerType:
+										var serverType = default(FbServerType);
+										try
+										{
+											serverType = (FbServerType)Enum.Parse(typeof(FbServerType), values[1], true);
+										}
+										catch
+										{
+											throw new NotSupportedException($"Not supported '{DefaultKeyServerType}'.");
+										}
+										_options[key] = serverType;
+										break;
+									case DefaultKeyCryptKey:
+										var cryptKey = default(byte[]);
+										try
+										{
+											cryptKey = Convert.FromBase64String(values[1]);
+										}
+										catch
+										{
+											throw new NotSupportedException($"Not supported '{DefaultKeyCryptKey}'.");
+										}
+										_options[key] = cryptKey;
+										break;
+									default:
+										_options[key] = values[1];
+										break;
 								}
 							}
 						}
@@ -442,9 +365,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void ParseConnectionInfo(string connectInfo)
 		{
-			string database = null;
-			string dataSource = null;
-			int portNumber = -1;
+			var database = (string)null;
+			var dataSource = (string)null;
+			var portNumber = -1;
 
 			// allows standard syntax //host:port/....
 			// and old fb syntax host/port:....
@@ -526,66 +449,66 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (s == null)
 				return s;
 
-			string dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
-			string pattern = string.Format("{0}{1}?", Regex.Escape(DataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
+			var dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
+			var pattern = string.Format("{0}{1}?", Regex.Escape(DataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
 			return Regex.Replace(s, pattern, dataDirectoryLocation + Path.DirectorySeparatorChar, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 #endif
 		}
 
 		private string GetString(string key)
 		{
-			object value;
-			return _options.TryGetValue(key, out value)
+			return _options.TryGetValue(key, out var value)
 				? (string)value
 				: null;
 		}
 
 		private bool GetBoolean(string key)
 		{
-			object value;
-			return _options.TryGetValue(key, out value)
+			return _options.TryGetValue(key, out var value)
 				? bool.Parse(value.ToString())
 				: false;
 		}
 
 		private byte GetByte(string key)
 		{
-			object value;
-			return _options.TryGetValue(key, out value)
+			return _options.TryGetValue(key, out var value)
 				? Convert.ToByte(value, CultureInfo.CurrentCulture)
 				: (byte)0;
 		}
 
 		private short GetInt16(string key)
 		{
-			object value;
-			return _options.TryGetValue(key, out value)
+			return _options.TryGetValue(key, out var value)
 				? Convert.ToInt16(value, CultureInfo.InvariantCulture)
 				: (short)0;
 		}
 
 		private int GetInt32(string key)
 		{
-			object value;
-			return _options.TryGetValue(key, out value)
+			return _options.TryGetValue(key, out var value)
 				? Convert.ToInt32(value, CultureInfo.InvariantCulture)
 				: 0;
 		}
 
 		private long GetInt64(string key)
 		{
-			object value;
-			return _options.TryGetValue(key, out value)
+			return _options.TryGetValue(key, out var value)
 				? Convert.ToInt64(value, CultureInfo.InvariantCulture)
 				: 0;
 		}
 
+		private byte[] GetBytes(string key)
+		{
+			return _options.TryGetValue(key, out var value)
+				? (byte[])value
+				: null;
+		}
+
 		private IsolationLevel GetIsolationLevel(string key)
 		{
-			object value;
-			if (_options.TryGetValue(key, out value))
+			if (_options.TryGetValue(key, out var value))
 			{
-				string il = value.ToString().ToLowerInvariant();
+				var il = value.ToString().ToLowerInvariant();
 
 				switch (il)
 				{
@@ -617,7 +540,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckIsolationLevel()
 		{
-			string il = _options[DefaultKeyIsolationLevel].ToString().ToLowerInvariant();
+			var il = _options[DefaultKeyIsolationLevel].ToString().ToLowerInvariant();
 
 			switch (il)
 			{

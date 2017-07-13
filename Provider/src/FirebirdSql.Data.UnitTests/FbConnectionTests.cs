@@ -24,6 +24,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
@@ -358,6 +359,17 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					StringAssert.DoesNotMatch(Pattern, conn.ServerVersion);
 				}
+			}
+		}
+
+		[Test, Ignore("Needs plugin")]
+		public void PassCryptKey()
+		{
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			csb.CryptKey = Encoding.ASCII.GetBytes("1234567890123456");
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
 			}
 		}
 

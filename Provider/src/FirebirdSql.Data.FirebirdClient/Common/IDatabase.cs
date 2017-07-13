@@ -37,8 +37,8 @@ namespace FirebirdSql.Data.Common
 		short Dialect { get; set; }
 		bool HasRemoteEventSupport { get; }
 
-		void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database);
-		void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database);
+		void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
+		void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
 		void Detach();
 
 		void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database);

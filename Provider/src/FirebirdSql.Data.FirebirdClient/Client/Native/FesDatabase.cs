@@ -202,8 +202,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
+			// ICryptKeyCallbackImpl would have to be passed from C# for 'cryptKey' passing
+			if (cryptKey?.Length > 0)
+				throw new NotSupportedException("Passing Encryption Key isn't, yet, supported on Firebird Embedded.");
+
 			byte[] databaseBuffer = Encoding2.Default.GetBytes(database);
 
 			ClearStatusVector();
@@ -221,9 +225,9 @@ namespace FirebirdSql.Data.Client.Native
 			_serverVersion = GetServerVersion();
 		}
 
-		public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
-			throw new NotSupportedException("Trusted Auth isn't supported on Embedded Firebird.");
+			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
 
 		public void Detach()

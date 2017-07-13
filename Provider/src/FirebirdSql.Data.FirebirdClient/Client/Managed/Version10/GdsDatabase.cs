@@ -164,7 +164,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Attach/Detach Methods
 
-		public virtual void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public virtual void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			try
 			{
@@ -208,7 +208,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_serverVersion = GetServerVersion();
 		}
 
-		public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}

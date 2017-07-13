@@ -24,6 +24,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using FirebirdSql.Data.Client.Managed.Version11;
+using FirebirdSql.Data.Client.Managed.Version13;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
@@ -368,6 +369,9 @@ namespace FirebirdSql.Data.Client.Managed
 
 				case IscCodes.op_trusted_auth:
 					return new AuthResponse(xdr.ReadBuffer());
+
+				case IscCodes.op_crypt_key_callback:
+					return new CryptKeyCallbackReponse(xdr.ReadBuffer());
 
 				default:
 					return null;

@@ -65,7 +65,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#endregion
 
 		#region Trusted Auth
-		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			try
 			{
