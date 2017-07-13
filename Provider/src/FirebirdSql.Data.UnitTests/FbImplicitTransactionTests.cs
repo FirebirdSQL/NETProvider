@@ -181,8 +181,7 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			FbCommand command = new FbCommand("update TEST set blob_field = @blob_field where int_field = @int_field", Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-			command.Parameters.Add("@blob_field", FbDbType.Binary).Value =
-				Encoding.UTF8.GetBytes("Blob field update with implicit transaction");
+			command.Parameters.Add("@blob_field", FbDbType.Binary).Value = Encoding.UTF8.GetBytes("Blob field update with implicit transaction");
 
 			int i = command.ExecuteNonQuery();
 
