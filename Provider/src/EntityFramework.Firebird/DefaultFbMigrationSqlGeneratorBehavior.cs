@@ -12,7 +12,7 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2014 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2014,2017 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  *
  */
@@ -28,10 +28,9 @@ namespace FirebirdSql.Data.EntityFramework6
 {
 	public class DefaultFbMigrationSqlGeneratorBehavior : IFbMigrationSqlGeneratorBehavior
 	{
-		const string IdentitySequenceName = "GEN_IDENTITY";
-
-		public IEnumerable<string> CreateIdentityForColumn(string columnName, string tableName)
+		public virtual IEnumerable<string> CreateIdentityForColumn(string columnName, string tableName)
 		{
+			var identitySequenceName = CreateIdentitySequenceName(columnName, tableName);
 			using (var writer = FbMigrationSqlGenerator.SqlWriter())
 			{
 				writer.WriteLine("EXECUTE BLOCK");
@@ -39,13 +38,13 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.WriteLine("BEGIN");
 				writer.Indent++;
 				writer.Write("if (not exists(select 1 from rdb$generators where rdb$generator_name = '");
-				writer.Write(IdentitySequenceName);
+				writer.Write(identitySequenceName);
 				writer.Write("')) then");
 				writer.WriteLine();
 				writer.WriteLine("begin");
 				writer.Indent++;
 				writer.Write("execute statement 'create sequence ");
-				writer.Write(IdentitySequenceName);
+				writer.Write(identitySequenceName);
 				writer.Write("';");
 				writer.WriteLine();
 				writer.Indent--;
@@ -74,7 +73,7 @@ namespace FirebirdSql.Data.EntityFramework6
 				writer.Write("new.");
 				writer.Write(FbMigrationSqlGenerator.Quote(columnName));
 				writer.Write(" = next value for ");
-				writer.Write(IdentitySequenceName);
+				writer.Write(identitySequenceName);
 				writer.Write(";");
 				writer.WriteLine();
 				writer.Indent--;
@@ -85,7 +84,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 		}
 
-		public IEnumerable<string> DropIdentityForColumn(string columnName, string tableName)
+		public virtual IEnumerable<string> DropIdentityForColumn(string columnName, string tableName)
 		{
 			var triggerName = CreateTriggerName(columnName, tableName);
 			using (var writer = FbMigrationSqlGenerator.SqlWriter())
@@ -112,9 +111,14 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 		}
 
-		static string CreateTriggerName(string columnName, string tableName)
+		protected virtual string CreateTriggerName(string columnName, string tableName)
 		{
 			return string.Format("ID_{0}_{1}", tableName, columnName);
+		}
+
+		protected virtual string CreateIdentitySequenceName(string columnName, string tableName)
+		{
+			return "GEN_IDENTITY";
 		}
 	}
 }
