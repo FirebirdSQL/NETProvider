@@ -21,7 +21,7 @@ using System.Threading;
 
 namespace FirebirdSql.Data.Common
 {
-	static class TimeoutHelper
+	internal static class TimeoutHelper
 	{
 		public static readonly TimeSpan InfiniteTimeSpan =
 #if NET40

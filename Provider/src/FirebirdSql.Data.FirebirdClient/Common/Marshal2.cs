@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Common
 {
-	static class Marshal2
+	internal static class Marshal2
 	{
 		public static int SizeOf<T>()
 		{

@@ -22,7 +22,7 @@ using System.Linq;
 
 namespace FirebirdSql.Data.Common
 {
-	static class TraceHelper
+	internal static class TraceHelper
 	{
 		public const string Name = "FirebirdSql.Data.FirebirdClient";
 		public const string ConditionalSymbol = "TRACE";

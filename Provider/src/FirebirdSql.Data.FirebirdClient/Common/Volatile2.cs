@@ -21,7 +21,7 @@ using System.Threading;
 
 namespace FirebirdSql.Data.Common
 {
-	static class Volatile2
+	internal static class Volatile2
 	{
 		public static int Read(ref int location)
 		{

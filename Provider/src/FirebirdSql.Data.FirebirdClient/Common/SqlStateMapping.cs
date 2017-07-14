@@ -21,7 +21,7 @@ using System.Collections.ObjectModel;
 
 namespace FirebirdSql.Data.Common
 {
-	static class SqlStateMapping
+	internal static class SqlStateMapping
 	{
 		static IDictionary<int, string> _mapping = new Dictionary<int, string>()
 		{

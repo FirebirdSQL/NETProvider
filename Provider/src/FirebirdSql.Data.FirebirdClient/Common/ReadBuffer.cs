@@ -21,7 +21,7 @@ using System;
 
 namespace FirebirdSql.Data.Common
 {
-	class ReadBuffer
+	internal class ReadBuffer
 	{
 		byte[] _buffer;
 		int _readPosition;
