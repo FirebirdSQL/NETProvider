@@ -82,13 +82,13 @@ namespace FirebirdSql.Data.Common
 
 		public string GetString()
 		{
-			if (Field.DbDataType == DbDataType.Text && _value is long)
+			if (Field.DbDataType == DbDataType.Text && _value is long l)
 			{
-				_value = GetClobData((long)_value);
+				_value = GetClobData(l);
 			}
-			if (_value is byte[])
+			if (_value is byte[] bytes)
 			{
-				return Field.Charset.GetString((byte[])_value);
+				return Field.Charset.GetString(bytes);
 			}
 
 			return _value.ToString();
@@ -136,16 +136,15 @@ namespace FirebirdSql.Data.Common
 
 		public Guid GetGuid()
 		{
-			if (Value is Guid)
+			switch (_value)
 			{
-				return (Guid)Value;
+				case Guid guid:
+					return guid;
+				case byte[] bytes:
+					return TypeDecoder.DecodeGuid(bytes);
+				default:
+					throw new InvalidOperationException($"Incorrect {nameof(Guid)} value.");
 			}
-			else if (Value is byte[])
-			{
-				return new Guid((byte[])_value);
-			}
-
-			throw new InvalidOperationException("Incorrect Guid value");
 		}
 
 		public double GetDouble()
@@ -155,19 +154,22 @@ namespace FirebirdSql.Data.Common
 
 		public DateTime GetDateTime()
 		{
-			if (_value is TimeSpan)
-				return new DateTime(0 * 10000L + 621355968000000000 + ((TimeSpan)_value).Ticks);
-			else if (_value is DateTimeOffset)
-				return Convert.ToDateTime(((DateTimeOffset)_value).DateTime, CultureInfo.CurrentCulture.DateTimeFormat);
-			else
-				return Convert.ToDateTime(_value, CultureInfo.CurrentCulture.DateTimeFormat);
+			switch (_value)
+			{
+				case TimeSpan ts:
+					return new DateTime(0 * 10000L + 621355968000000000 + ts.Ticks);
+				case DateTimeOffset dto:
+					return Convert.ToDateTime(dto.DateTime, CultureInfo.CurrentCulture.DateTimeFormat);
+				default:
+					return Convert.ToDateTime(_value, CultureInfo.CurrentCulture.DateTimeFormat);
+			}
 		}
 
 		public Array GetArray()
 		{
-			if (_value is long)
+			if (_value is long l)
 			{
-				_value = GetArrayData((long)_value);
+				_value = GetArrayData(l);
 			}
 
 			return (Array)_value;
@@ -175,9 +177,13 @@ namespace FirebirdSql.Data.Common
 
 		public byte[] GetBinary()
 		{
-			if (_value is long)
+			if (_value is long l)
 			{
-				_value = GetBlobData((long)_value);
+				_value = GetBlobData(l);
+			}
+			if (_value is Guid guid)
+			{
+				return TypeEncoder.EncodeGuid(guid);
 			}
 
 			return (byte[])_value;
@@ -190,10 +196,13 @@ namespace FirebirdSql.Data.Common
 
 		public int GetTime()
 		{
-			if (_value is TimeSpan)
-				return TypeEncoder.EncodeTime((TimeSpan)_value);
-			else
-				return TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(GetDateTime()));
+			switch (_value)
+			{
+				case TimeSpan ts:
+					return TypeEncoder.EncodeTime(ts);
+				default:
+					return TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(GetDateTime()));
+			}
 		}
 
 		public byte[] GetBytes()
@@ -312,7 +321,7 @@ namespace FirebirdSql.Data.Common
 					return result;
 
 				case DbDataType.Guid:
-					return GetGuid().ToByteArray();
+					return TypeEncoder.EncodeGuid(GetGuid());
 
 				case DbDataType.Boolean:
 					return BitConverter.GetBytes(GetBoolean());

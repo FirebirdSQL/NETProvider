@@ -326,7 +326,7 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.SQL_VARYING:
 						if (DbDataType == DbDataType.Guid)
 						{
-							Value = new Guid(buffer);
+							Value = TypeDecoder.DecodeGuid(buffer);
 						}
 						else
 						{

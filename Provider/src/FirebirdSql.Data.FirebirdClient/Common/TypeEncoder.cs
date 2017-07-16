@@ -13,6 +13,7 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2016 - 2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  *
  *  Contributors:
@@ -21,6 +22,7 @@
 
 using System;
 using System.Globalization;
+using System.Net;
 
 namespace FirebirdSql.Data.Common
 {
@@ -88,6 +90,21 @@ namespace FirebirdSql.Data.Common
 		public static byte[] EncodeBoolean(bool value)
 		{
 			return new[] { (byte)(value ? 1 : 0) };
+		}
+
+		public static byte[] EncodeGuid(Guid value)
+		{
+			var data = value.ToByteArray();
+			var a = BitConverter.GetBytes(IPAddress.NetworkToHostOrder(BitConverter.ToInt32(data, 0)));
+			var b = BitConverter.GetBytes(IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data, 4)));
+			var c = BitConverter.GetBytes(IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data, 6)));
+			return new[]
+			{
+				a[0], a[1], a[2], a[3],
+				b[0], b[1],
+				c[0], c[1],
+				data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]
+			};
 		}
 	}
 }

@@ -13,6 +13,7 @@
  *     language governing rights and limitations under the License.
  *
  *  Copyright (c) 2002, 2007 Carlos Guzman Alvarez
+ *  Copyright (c) 2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -393,6 +394,83 @@ namespace FirebirdSql.Data.UnitTests
 			reader.Close();
 			command.Dispose();
 			transaction.Rollback();
+		}
+
+		[Test]
+		public void ReadGuidRoundTripTest()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				var guid = Guid.NewGuid();
+				var commandText = $"select char_to_uuid('{guid}') from rdb$database";
+				cmd.CommandText = commandText;
+				using (var reader = cmd.ExecuteReader())
+				{
+					if (reader.Read())
+					{
+						Assert.AreEqual(guid, reader.GetGuid(0));
+					}
+					else
+					{
+						Assert.Fail();
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void ReadGuidRoundTrip2Test()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				var commandText = @"
+execute block
+returns (a varchar(16) character set octets, b varchar(36) character set ascii)
+as
+declare guid varchar(16) character set octets;
+begin
+	guid = gen_uuid();
+	for select :guid, uuid_to_char(:guid) from rdb$database into a, b do
+	begin
+		suspend;
+	end
+end";
+				cmd.CommandText = commandText;
+				using (var reader = cmd.ExecuteReader())
+				{
+					if (reader.Read())
+					{
+						StringAssert.AreEqualIgnoringCase(reader.GetString(1), reader.GetGuid(0).ToString());
+					}
+					else
+					{
+						Assert.Fail();
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void ReadGuidRoundTrip3Test()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				var guid = Guid.NewGuid();
+				var commandText = $"select cast(@guid as varchar(16) character set octets) from rdb$database";
+				cmd.CommandText = commandText;
+				cmd.Parameters.Add("guid", guid);
+				using (var reader = cmd.ExecuteReader())
+				{
+					if (reader.Read())
+					{
+						Assert.AreEqual(guid, reader.GetGuid(0));
+					}
+					else
+					{
+						Assert.Fail();
+					}
+				}
+			}
 		}
 
 		[Test]

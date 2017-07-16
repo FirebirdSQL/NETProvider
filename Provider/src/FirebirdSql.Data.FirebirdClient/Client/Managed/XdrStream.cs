@@ -472,9 +472,9 @@ namespace FirebirdSql.Data.Client.Managed
 			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(ReadBytes(8), 0));
 		}
 
-		public Guid ReadGuid(int length)
+		public Guid ReadGuid()
 		{
-			return new Guid(ReadOpaque(length));
+			return TypeDecoder.DecodeGuid(ReadOpaque(16));
 		}
 
 		public float ReadSingle()
@@ -715,6 +715,11 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			WriteDate(value);
 			WriteTime(TypeHelper.DateTimeToTimeSpan(value));
+		}
+
+		public void Write(Guid value)
+		{
+			WriteOpaque(TypeEncoder.EncodeGuid(value));
 		}
 
 		public void WriteDate(DateTime value)

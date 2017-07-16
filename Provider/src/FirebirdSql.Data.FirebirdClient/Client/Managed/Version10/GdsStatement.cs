@@ -826,7 +826,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						break;
 
 					case DbDataType.Guid:
-						xdr.WriteOpaque(field.DbValue.GetGuid().ToByteArray());
+						xdr.Write(field.DbValue.GetGuid());
 						break;
 
 					case DbDataType.Double:
@@ -847,7 +847,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						break;
 
 					case DbDataType.Boolean:
-						xdr.Write(Convert.ToBoolean(field.Value));
+						xdr.Write(field.DbValue.GetBoolean());
 						break;
 
 					default:
@@ -911,7 +911,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					return _database.XdrStream.ReadSingle();
 
 				case DbDataType.Guid:
-					return _database.XdrStream.ReadGuid(field.Length);
+					return _database.XdrStream.ReadGuid();
 
 				case DbDataType.Double:
 					return _database.XdrStream.ReadDouble();
