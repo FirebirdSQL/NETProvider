@@ -19,7 +19,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\NET40\</OutputPath>
     <IntermediateOutputPath>obj\Debug\NET40\</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;NET40;EF6</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
     <Optimize>false</Optimize>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -29,7 +29,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\NET40\</OutputPath>
     <IntermediateOutputPath>obj\Release\NET40\</IntermediateOutputPath>
-    <DefineConstants>TRACE;NET40;EF6</DefineConstants>
+    <DefineConstants>TRACE;NET40</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -68,97 +68,51 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\DmlSqlGenerator.cs">
-      <Link>SqlGen\DmlSqlGenerator.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\ExpressionTranslator.cs">
-      <Link>SqlGen\ExpressionTranslator.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\FirstClause.cs">
-      <Link>SqlGen\FirstClause.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\ISqlFragment.cs">
-      <Link>SqlGen\ISqlFragment.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\JoinSymbol.cs">
-      <Link>SqlGen\JoinSymbol.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\MetadataHelpers.cs">
-      <Link>MetadataHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\SkipClause.cs">
-      <Link>SqlGen\SkipClause.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\SqlBuilder.cs">
-      <Link>SqlGen\SqlBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\SqlGenerator.cs">
-      <Link>SqlGen\SqlGenerator.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\SqlSelectStatement.cs">
-      <Link>SqlGen\SqlSelectStatement.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\SqlWriter.cs">
-      <Link>SqlGen\SqlWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\SsdlToFb.cs">
-      <Link>SsdlToFb.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\Symbol.cs">
-      <Link>SqlGen\Symbol.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\SymbolPair.cs">
-      <Link>SqlGen\SymbolPair.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\SymbolTable.cs">
-      <Link>SqlGen\SymbolTable.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\Entity\TypeHelpers.cs">
-      <Link>TypeHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\FirebirdClient\FbProviderManifest.cs">
-      <Link>FbProviderManifest.cs</Link>
-    </Compile>
-    <Compile Include="..\FirebirdSql.Data.FirebirdClient\FirebirdClient\FbProviderServices.cs">
-      <Link>FbProviderServices.cs</Link>
-    </Compile>
     <Compile Include="..\FirebirdSql.Data.FirebirdClient\Properties\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="DefaultFbMigrationSqlGeneratorBehavior.cs" />
     <Compile Include="FbConnectionFactory.cs" />
     <Compile Include="FbMigrationSqlGenerator.cs" />
+    <Compile Include="FbProviderManifest.cs" />
+    <Compile Include="FbProviderServices.cs" />
     <Compile Include="IFbMigrationSqlGeneratorBehavior.cs" />
     <Compile Include="FbMigrationsTransactionsInterceptor.cs" />
+    <Compile Include="MetadataHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlGen\DmlSqlGenerator.cs" />
+    <Compile Include="SqlGen\ExpressionTranslator.cs" />
+    <Compile Include="SqlGen\FirstClause.cs" />
+    <Compile Include="SqlGen\ISqlFragment.cs" />
+    <Compile Include="SqlGen\JoinSymbol.cs" />
+    <Compile Include="SqlGen\SkipClause.cs" />
+    <Compile Include="SqlGen\SqlBuilder.cs" />
+    <Compile Include="SqlGen\SqlGenerator.cs" />
+    <Compile Include="SqlGen\SqlSelectStatement.cs" />
+    <Compile Include="SqlGen\SqlWriter.cs" />
+    <Compile Include="SqlGen\Symbol.cs" />
+    <Compile Include="SqlGen\SymbolPair.cs" />
+    <Compile Include="SqlGen\SymbolTable.cs" />
+    <Compile Include="SsdlToFb.cs" />
+    <Compile Include="TypeHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\FirebirdSql.Data.FirebirdClient\Entity\StoreSchemaDefinition.ssdl">
-      <Link>Resources\StoreSchemaDefinition.ssdl</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\FirebirdSql.Data.FirebirdClient\Entity\StoreSchemaDefinitionVersion3.ssdl">
-      <Link>Resources\StoreSchemaDefinitionVersion3.ssdl</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\FirebirdSql.Data.FirebirdClient\Entity\StoreSchemaMapping.msl">
-      <Link>Resources\StoreSchemaMapping.msl</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\FirebirdSql.Data.FirebirdClient\Entity\StoreSchemaMappingVersion3.msl">
-      <Link>Resources\StoreSchemaMappingVersion3.msl</Link>
-    </EmbeddedResource>
     <None Include="app.EntityFramework.Firebird_NET40.config" />
     <None Include="packages.config" />
     <None Include="Properties\EntityFramework.Firebird.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\FirebirdSql.Data.FirebirdClient\Entity\ProviderManifest.xml">
-      <Link>Resources\ProviderManifest.xml</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\StoreSchemaDefinition.ssdl" />
+    <EmbeddedResource Include="Resources\StoreSchemaDefinitionVersion3.ssdl" />
+    <EmbeddedResource Include="Resources\StoreSchemaMapping.msl" />
+    <EmbeddedResource Include="Resources\StoreSchemaMappingVersion3.msl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET40.csproj">
       <Project>{9866d35a-31d1-4ad6-86d8-e19688d847f5}</Project>
       <Name>FirebirdSql.Data.FirebirdClient_NET40</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ProviderManifest.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

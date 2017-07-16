@@ -19,15 +19,11 @@
  *   Jiri Cincura (jiri@cincura.net)
  */
 
-using System;
 using System.Data.Common;
-#if EF6
-using System.Data.Entity.Core.Common;
-#endif
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	public class FirebirdClientFactory : DbProviderFactory, IServiceProvider
+	public class FirebirdClientFactory : DbProviderFactory
 	{
 		#region Static Properties
 
@@ -88,26 +84,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		public override DbParameter CreateParameter()
 		{
 			return new FbParameter();
-		}
-
-		#endregion
-
-		#region IServiceProvider Members
-
-		object IServiceProvider.GetService(Type serviceType)
-		{
-#if NETSTANDARD1_6 || NETSTANDARD2_0
-			return null;
-#else
-			if (serviceType == typeof(DbProviderServices))
-			{
-				return FbProviderServices.Instance;
-			}
-			else
-			{
-				return null;
-			}
-#endif
 		}
 
 		#endregion

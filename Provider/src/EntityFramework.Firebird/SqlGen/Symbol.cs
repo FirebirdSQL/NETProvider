@@ -12,27 +12,15 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-#if !EF6
-using System.Data.Metadata.Edm;
-using System.Data.Common.CommandTrees;
-#else
 using System.Data.Entity.Core.Metadata.Edm;
-#endif
 
-#if !EF6
-namespace FirebirdSql.Data.Entity
-#else
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
-#endif
 {
 	internal class Symbol : ISqlFragment
 	{

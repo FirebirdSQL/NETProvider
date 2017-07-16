@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2013-2016 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2013-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -20,21 +20,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if !EF6
-using System.Data.Metadata.Edm;
-#else
 using System.Data.Entity.Core.Metadata.Edm;
-
 using FirebirdSql.Data.EntityFramework6.SqlGen;
-#endif
 
-using FirebirdSql.Data.Common;
-
-#if !EF6
-namespace FirebirdSql.Data.Entity
-#else
 namespace FirebirdSql.Data.EntityFramework6
-#endif
 {
 	internal static class SsdlToFb
 	{

@@ -17,13 +17,12 @@
  */
 
 using System;
-using System.Data;
-using System.Configuration;
-using System.Data.Common;
-using System.Data.Entity;
-using System.Linq;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Core.Common;
+using System.Linq;
 
+using FirebirdSql.Data.EntityFramework6;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
@@ -217,7 +216,7 @@ namespace FirebirdSql.Data.UnitTests
 
 		private DbProviderServices GetProviderServices()
 		{
-			return (DbProviderServices)(FirebirdClientFactory.Instance as IServiceProvider).GetService(typeof(DbProviderServices));
+			return FbProviderServices.Instance;
 		}
 
 		class FbTestDbContext : DbContext

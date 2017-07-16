@@ -12,7 +12,7 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
@@ -22,24 +22,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Data.Common;
-#if !EF6
-using System.Data.Metadata.Edm;
-using System.Data.Common.CommandTrees;
-#else
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Core.Common.CommandTrees;
-#endif
 using System.Data;
-using System.Linq;
-
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.FirebirdClient;
 
-#if !EF6
-namespace FirebirdSql.Data.Entity
-#else
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
-#endif
 {
 	internal sealed class SqlGenerator : DbExpressionVisitor<ISqlFragment>
 	{
@@ -1711,7 +1699,6 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 			return result;
 		}
 
-#if EF6
 		public override ISqlFragment Visit(DbInExpression e)
 		{
 			SqlBuilder result = new SqlBuilder();
@@ -1732,7 +1719,6 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 			return result;
 		}
-#endif
 
 		#region Visits shared by multiple nodes
 		/// <summary>
@@ -3750,5 +3736,4 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 
 		#endregion
 	}
-
 }

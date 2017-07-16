@@ -12,49 +12,29 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data;
 using System.Data.Common;
-using System.Xml;
-using System.Reflection;
-using System.IO;
-using System.Diagnostics;
-using System.Linq;
-#if !EF6
-using System.Data.Common.CommandTrees;
-using System.Data.Metadata.Edm;
-
-using FirebirdSql.Data.Entity;
-#else
 using System.Data.Entity.Core.Common;
 using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Infrastructure.DependencyResolution;
-using System.Data.Entity.Migrations.Sql;
-using System.Data.Entity.Migrations.History;
 using System.Data.Entity.Infrastructure.Interception;
-
+using System.Data.Entity.Migrations.Sql;
+using System.Diagnostics;
+using System.Linq;
 using FirebirdSql.Data.EntityFramework6.SqlGen;
-#endif
-
+using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
 using FirebirdSql.Data.Services;
-using FirebirdSql.Data.Common;
-using FirebirdSql.Data.FirebirdClient;
 
-#if !EF6
-namespace FirebirdSql.Data.FirebirdClient
-#else
 namespace FirebirdSql.Data.EntityFramework6
-#endif
 {
 #pragma warning disable 3009
 	public class FbProviderServices : DbProviderServices
@@ -65,11 +45,9 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		public FbProviderServices()
 		{
-#if EF6
 			AddDependencyResolver(new SingletonDependencyResolver<IDbConnectionFactory>(new FbConnectionFactory()));
 			AddDependencyResolver(new SingletonDependencyResolver<Func<MigrationSqlGenerator>>(() => new FbMigrationSqlGenerator(), ProviderInvariantName));
 			DbInterception.Add(new FbMigrationsTransactionsInterceptor());
-#endif
 		}
 
 		protected override DbCommandDefinition CreateDbCommandDefinition(DbProviderManifest manifest, DbCommandTree commandTree)
@@ -465,4 +443,3 @@ namespace FirebirdSql.Data.EntityFramework6
 		}
 	}
 }
-#endif

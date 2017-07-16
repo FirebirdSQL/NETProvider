@@ -12,36 +12,21 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data.Common;
-using System.Diagnostics;
-using System.Xml;
-using System.Data;
-using System.Reflection;
-using System.IO;
-#if !EF6
-using System.Data.Metadata.Edm;
-#else
 using System.Data.Entity.Core;
 using System.Data.Entity.Core.Common;
 using System.Data.Entity.Core.Metadata.Edm;
-#endif
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Xml;
 
-using FirebirdSql.Data.Entity;
-
-#if !EF6
-namespace FirebirdSql.Data.FirebirdClient
-#else
 namespace FirebirdSql.Data.EntityFramework6
-#endif
 {
 	public class FbProviderManifest : DbXmlEnabledProviderManifest
 	{
@@ -86,28 +71,18 @@ namespace FirebirdSql.Data.EntityFramework6
 		/// <returns>An XmlReader at the begining of the information requested.</returns>
 		protected override XmlReader GetDbInformation(string informationType)
 		{
-			if (informationType == DbProviderManifest.StoreSchemaDefinition
-#if NET45 || EF6
- || informationType == DbProviderManifest.StoreSchemaDefinitionVersion3
-#endif
-)
+			if (informationType == StoreSchemaDefinition || informationType == StoreSchemaDefinitionVersion3)
 			{
 				return GetStoreSchemaDescription(informationType);
 			}
-			if (informationType == DbProviderManifest.StoreSchemaMapping
-#if NET45 || EF6
- || informationType == DbProviderManifest.StoreSchemaMappingVersion3
-#endif
-)
+			if (informationType == StoreSchemaMapping || informationType == StoreSchemaMappingVersion3)
 			{
 				return GetStoreSchemaMapping(informationType);
 			}
-#if NET45 || EF6
-			if (informationType == DbProviderManifest.ConceptualSchemaDefinition || informationType == DbProviderManifest.ConceptualSchemaDefinitionVersion3)
+			if (informationType == ConceptualSchemaDefinition || informationType == ConceptualSchemaDefinitionVersion3)
 			{
 				return null;
 			}
-#endif
 
 			throw new ProviderIncompatibleException(String.Format("The provider returned null for the informationType '{0}'.", informationType));
 		}
@@ -146,7 +121,7 @@ namespace FirebirdSql.Data.EntityFramework6
 			}
 
 			string storeTypeName = storeType.EdmType.Name.ToLowerInvariant();
-			if (!base.StoreTypeNameToEdmPrimitiveType.ContainsKey(storeTypeName))
+			if (!StoreTypeNameToEdmPrimitiveType.ContainsKey(storeTypeName))
 			{
 				throw new ArgumentException(String.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
 			}
@@ -432,20 +407,12 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		private static string GetManifestResourceName()
 		{
-#if !EF6
-			return "FirebirdSql.Data.Entity.ProviderManifest.xml";
-#else
 			return "FirebirdSql.Data.EntityFramework6.Resources.ProviderManifest.xml";
-#endif
 		}
 
 		private static string GetStoreSchemaResourceName(string name, string type)
 		{
-#if !EF6
-			return string.Format("FirebirdSql.Data.Entity.{0}.{1}", name, type);
-#else
 			return string.Format("FirebirdSql.Data.EntityFramework6.Resources.{0}.{1}", name, type);
-#endif
 		}
 
 		public override bool SupportsEscapingLikeArgument(out char escapeCharacter)
@@ -463,12 +430,9 @@ namespace FirebirdSql.Data.EntityFramework6
 			return sb.ToString();
 		}
 
-#if EF6
 		public override bool SupportsInExpression()
 		{
 			return true;
 		}
-#endif
 	}
 }
-#endif

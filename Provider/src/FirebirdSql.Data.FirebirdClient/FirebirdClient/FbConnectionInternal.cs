@@ -473,7 +473,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			dpb.Append(IscCodes.isc_dpb_connect_timeout, options.ConnectionTimeout);
 			dpb.Append(IscCodes.isc_dpb_process_id, GetProcessId());
 			dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
-			dpb.Append(IscCodes.isc_dpb_client_version, Properties.VersionInfo.Version);
+			dpb.Append(IscCodes.isc_dpb_client_version, _VersionInfo.Version);
 			if (options.NoDatabaseTriggers)
 			{
 				dpb.Append(IscCodes.isc_dpb_no_db_triggers, 1);

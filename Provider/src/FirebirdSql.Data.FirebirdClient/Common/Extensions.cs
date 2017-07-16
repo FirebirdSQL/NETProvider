@@ -12,15 +12,12 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2011-2013,2015-2016 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2011-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 
 namespace FirebirdSql.Data.Common
@@ -109,7 +106,10 @@ namespace FirebirdSql.Data.Common
 				throw new NotSupportedException();
 			}
 		}
+	}
 
+	public static class PublicExtensions
+	{
 		public static string ToHexString(this byte[] b)
 		{
 			return BitConverter.ToString(b).Replace("-", string.Empty);

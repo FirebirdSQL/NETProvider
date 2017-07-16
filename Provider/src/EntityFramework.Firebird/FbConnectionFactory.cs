@@ -12,19 +12,16 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2013-2014 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2013-2017 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  *
  */
 
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using FirebirdSql.Data.FirebirdClient;
 
@@ -35,7 +32,7 @@ namespace FirebirdSql.Data.EntityFramework6
 		public DbConnection CreateConnection(string nameOrConnectionString)
 		{
 			if (nameOrConnectionString == null)
-				throw new ArgumentNullException("nameOrConnectionString cannot be null.");
+				throw new ArgumentNullException(nameof(nameOrConnectionString));
 
 			if (nameOrConnectionString.Contains('='))
 			{

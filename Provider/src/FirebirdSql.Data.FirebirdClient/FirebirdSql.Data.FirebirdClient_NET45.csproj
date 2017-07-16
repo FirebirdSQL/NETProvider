@@ -28,30 +28,14 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="app.FirebirdSql.Data.FirebirdClient_NET40.config" />
-		<None Remove="Entity\ProviderManifest.xml" />
-		<None Remove="Entity\StoreSchemaDefinition.ssdl" />
-		<None Remove="Entity\StoreSchemaDefinitionVersion3.ssdl" />
-		<None Remove="Entity\StoreSchemaMapping.msl" />
-		<None Remove="Entity\StoreSchemaMappingVersion3.msl" />
 		<None Remove="Microsoft.Bcl.Build.targets" />
 		<None Remove="Schema\FbMetaData.xml" />
 	</ItemGroup>
 	<ItemGroup>
-		<EmbeddedResource Include="Entity\ProviderManifest.xml" />
-		<EmbeddedResource Include="Entity\StoreSchemaDefinition.ssdl" />
-		<EmbeddedResource Include="Entity\StoreSchemaDefinitionVersion3.ssdl" />
-		<EmbeddedResource Include="Entity\StoreSchemaMapping.msl" />
-		<EmbeddedResource Include="Entity\StoreSchemaMappingVersion3.msl" />
 		<EmbeddedResource Include="Schema\FbMetaData.xml" />
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="System.Data.Entity" />
 		<Reference Include="System.Transactions" />
-	</ItemGroup>
-	<ItemGroup>
-		<Reference Include="EntityFramework">
-			<HintPath>..\..\lib\EF5\NET45\EntityFramework.dll</HintPath>
-		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="FirebirdClient\FbCommand.cs">

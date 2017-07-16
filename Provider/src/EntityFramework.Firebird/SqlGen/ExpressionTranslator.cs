@@ -12,35 +12,21 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using System.Data;
 using System.Data.Common;
-#if !EF6
-using System.Data.Metadata.Edm;
-using System.Data.Common.CommandTrees;
-using System.Data.Common.Utils;
-using System.Data.Mapping.Update.Internal;
-#else
 using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.Entity.Core.Metadata.Edm;
-#endif
-
+using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 
-#if !EF6
-namespace FirebirdSql.Data.Entity
-#else
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
-#endif
 {
 	internal class ExpressionTranslator : DbExpressionVisitor
 	{

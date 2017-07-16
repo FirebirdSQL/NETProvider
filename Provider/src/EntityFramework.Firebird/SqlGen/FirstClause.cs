@@ -12,35 +12,30 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2008-2014 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
-using System;
 using System.Globalization;
 
-#if !EF6
-namespace FirebirdSql.Data.Entity
-#else
 namespace FirebirdSql.Data.EntityFramework6.SqlGen
-#endif
 {
-	internal class SkipClause : ISqlFragment
+	internal class FirstClause : ISqlFragment
 	{
 		#region Fields
 
-		private ISqlFragment _skipCount;
+		private ISqlFragment _firstCount;
 
 		#endregion
 
 		#region Internal Properties
 
 		/// <summary>
-		/// How many rows should be skipped.
+		/// How many first rows should be selected.
 		/// </summary>
-		internal ISqlFragment SkipCount
+		internal ISqlFragment FirstCount
 		{
-			get { return _skipCount; }
+			get { return _firstCount; }
 		}
 
 		#endregion
@@ -48,23 +43,23 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		#region Constructors
 
 		/// <summary>
-		/// Creates a SkipClause with the given skipCount.
+		/// Creates a FirstClause with the given topCount and withTies.
 		/// </summary>
 		/// <param name="topCount"></param>
-		internal SkipClause(ISqlFragment skipCount)
+		internal FirstClause(ISqlFragment firstCount)
 		{
-			_skipCount = skipCount;
+			_firstCount = firstCount;
 		}
 
 		/// <summary>
-		/// Creates a SkipClause with the given skipCount.
+		/// Creates a TopClause with the given topCount and withTies.
 		/// </summary>
 		/// <param name="topCount"></param>
-		internal SkipClause(int skipCount)
+		internal FirstClause(int firstCount)
 		{
 			SqlBuilder sqlBuilder = new SqlBuilder();
-			sqlBuilder.Append(skipCount.ToString(CultureInfo.InvariantCulture));
-			_skipCount = sqlBuilder;
+			sqlBuilder.Append(firstCount.ToString(CultureInfo.InvariantCulture));
+			_firstCount = sqlBuilder;
 		}
 
 		#endregion
@@ -72,15 +67,15 @@ namespace FirebirdSql.Data.EntityFramework6.SqlGen
 		#region ISqlFragment Members
 
 		/// <summary>
-		/// Write out the SKIP part of sql select statement
-		/// It basically writes SKIP (X).
+		/// Write out the FIRST part of sql select statement
+		/// It basically writes FIRST (X).
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="sqlGenerator"></param>
 		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
 		{
-			writer.Write("SKIP (");
-			SkipCount.WriteSql(writer, sqlGenerator);
+			writer.Write("FIRST (");
+			FirstCount.WriteSql(writer, sqlGenerator);
 			writer.Write(")");
 
 			writer.Write(" ");

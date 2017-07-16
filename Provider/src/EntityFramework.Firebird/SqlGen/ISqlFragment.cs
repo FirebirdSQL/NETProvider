@@ -12,21 +12,14 @@
  *     express or implied.  See the License for the specific
  *     language governing rights and limitations under the License.
  *
- *  Copyright (c) 2014-2017 Jiri Cincura (jiri@cincura.net)
+ *  Copyright (c) 2008-2017 Jiri Cincura (jiri@cincura.net)
  *  All Rights Reserved.
  */
 
-using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
-
-[assembly: CLSCompliant(true)]
-[assembly: ComVisible(false)]
-[assembly: AssemblyCompany("FirebirdSQL")]
-[assembly: AssemblyProduct("FirebirdClient")]
-[assembly: AssemblyDelaySign(false)]
-[assembly: AssemblyCopyright("(c) 2014-2017")]
-[assembly: AssemblyTitle("FirebirdClient - Entity Framework Provider")]
-[assembly: AssemblyDescription("FirebirdClient - Entity Framework Provider")]
-[assembly: AssemblyVersion(_VersionInfo.Version)]
-[assembly: AssemblyFileVersion(_VersionInfo.Version)]
+namespace FirebirdSql.Data.EntityFramework6.SqlGen
+{
+	internal interface ISqlFragment
+	{
+		void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator);
+	}
+}
