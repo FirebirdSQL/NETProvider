@@ -45,12 +45,12 @@ namespace FirebirdSql.Data.Common
 
 		public void Append(int type, string value)
 		{
-			Append(type, Encoding.UTF8.GetBytes(value));
+			Append(type, Encoding2.Default.GetBytes(value));
 		}
 
 		public void Append(byte type, string value)
 		{
-			Append(type, Encoding.UTF8.GetBytes(value));
+			Append(type, Encoding2.Default.GetBytes(value));
 		}
 
 		public void Append(int type, byte[] value)

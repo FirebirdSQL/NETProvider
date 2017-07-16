@@ -150,7 +150,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
-			byte[] databaseBuffer = Encoding.UTF8.GetBytes(database);
+			byte[] databaseBuffer = Encoding2.Default.GetBytes(database);
 
 			ClearStatusVector();
 
@@ -204,7 +204,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
-			byte[] databaseBuffer = Encoding.UTF8.GetBytes(database);
+			byte[] databaseBuffer = Encoding2.Default.GetBytes(database);
 
 			ClearStatusVector();
 

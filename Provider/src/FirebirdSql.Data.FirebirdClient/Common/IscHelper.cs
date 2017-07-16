@@ -68,14 +68,14 @@ namespace FirebirdSql.Data.Common
 						 * - 1 byte containing the length, l, of the site name in bytes
 						 * - A string of l bytes, containing the site name
 						 */
-						string dbFile = Encoding.UTF8.GetString(buffer, pos + 2, buffer[pos + 1]);
+						string dbFile = Encoding2.Default.GetString(buffer, pos + 2, buffer[pos + 1]);
 						int sitePos = pos + 2 + buffer[pos + 1];
 						int siteLength = buffer[sitePos];
-						string siteName = Encoding.UTF8.GetString(buffer, sitePos + 1, siteLength);
+						string siteName = Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
 
 						sitePos += siteLength + 1;
 						siteLength = buffer[sitePos];
-						siteName += "." + Encoding.UTF8.GetString(buffer, sitePos + 1, siteLength);
+						siteName += "." + Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
 
 						info.Add(siteName + ":" + dbFile);
 						break;
@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.Common
 						for (int i = 0; i < count; i++)
 						{
 							var messageLength = buffer[messagePosition + 1];
-							info.Add(Encoding.UTF8.GetString(buffer, messagePosition + 2, messageLength));
+							info.Add(Encoding2.Default.GetString(buffer, messagePosition + 2, messageLength));
 							messagePosition += 1 + messageLength;
 						}
 						break;
@@ -302,7 +302,7 @@ namespace FirebirdSql.Data.Common
 
 					case IscCodes.isc_info_user_names:
 						// Active user name
-						info.Add(Encoding.UTF8.GetString(buffer, pos + 1, buffer[pos]));
+						info.Add(Encoding2.Default.GetString(buffer, pos + 1, buffer[pos]));
 						break;
 				}
 

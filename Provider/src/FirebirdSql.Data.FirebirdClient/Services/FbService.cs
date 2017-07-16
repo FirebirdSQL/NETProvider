@@ -271,7 +271,7 @@ namespace FirebirdSql.Data.Services
 							var length = GetLength(buffer, 2, ref pos);
 							if (length == 0)
 								continue;
-							queryResponseAction(truncated, Encoding.UTF8.GetString(buffer, pos, length));
+							queryResponseAction(truncated, Encoding2.Default.GetString(buffer, pos, length));
 							pos += length;
 							truncated = false;
 							break;
@@ -487,7 +487,7 @@ namespace FirebirdSql.Data.Services
 					case IscCodes.isc_spb_dbname:
 						length = IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
-						dbInfo.AddDatabase(Encoding.UTF8.GetString(buffer, pos, length));
+						dbInfo.AddDatabase(Encoding2.Default.GetString(buffer, pos, length));
 						pos += length;
 						break;
 				}
@@ -514,7 +514,7 @@ namespace FirebirdSql.Data.Services
 							length = IscHelper.VaxInteger(buffer, pos, 2);
 							pos += 2;
 							currentUser = new FbUserData();
-							currentUser.UserName = Encoding.UTF8.GetString(buffer, pos, length);
+							currentUser.UserName = Encoding2.Default.GetString(buffer, pos, length);
 							pos += length;
 
 							users.Add(currentUser);
@@ -524,21 +524,21 @@ namespace FirebirdSql.Data.Services
 					case IscCodes.isc_spb_sec_firstname:
 						length = IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
-						currentUser.FirstName = Encoding.UTF8.GetString(buffer, pos, length);
+						currentUser.FirstName = Encoding2.Default.GetString(buffer, pos, length);
 						pos += length;
 						break;
 
 					case IscCodes.isc_spb_sec_middlename:
 						length = IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
-						currentUser.MiddleName = Encoding.UTF8.GetString(buffer, pos, length);
+						currentUser.MiddleName = Encoding2.Default.GetString(buffer, pos, length);
 						pos += length;
 						break;
 
 					case IscCodes.isc_spb_sec_lastname:
 						length = IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
-						currentUser.LastName = Encoding.UTF8.GetString(buffer, pos, length);
+						currentUser.LastName = Encoding2.Default.GetString(buffer, pos, length);
 						pos += length;
 						break;
 

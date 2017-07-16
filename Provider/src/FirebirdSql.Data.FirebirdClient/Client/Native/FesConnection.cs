@@ -65,7 +65,7 @@ namespace FirebirdSql.Data.Client.Native
 						{
 							IntPtr ptr = statusVector[i++];
 							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(Encoding.UTF8.GetBytes(s));
+							string arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.Client.Native
 
 							IntPtr ptr = statusVector[i++];
 							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(Encoding.UTF8.GetBytes(s));
+							string arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
@@ -89,7 +89,7 @@ namespace FirebirdSql.Data.Client.Native
 						{
 							IntPtr ptr = statusVector[i++];
 							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(Encoding.UTF8.GetBytes(s));
+							string arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;

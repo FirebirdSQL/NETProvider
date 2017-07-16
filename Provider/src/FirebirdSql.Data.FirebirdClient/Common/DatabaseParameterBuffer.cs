@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Common
 
 		public void Append(int type, string content)
 		{
-			Append(type, Encoding.UTF8.GetBytes(content));
+			Append(type, Encoding2.Default.GetBytes(content));
 		}
 
 		public void Append(int type, byte[] buffer)
