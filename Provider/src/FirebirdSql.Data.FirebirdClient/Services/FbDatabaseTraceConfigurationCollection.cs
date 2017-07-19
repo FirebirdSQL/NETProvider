@@ -24,9 +24,9 @@ namespace FirebirdSql.Data.Services
 {
 	public class FbDatabaseTraceConfigurationCollection : List<FbDatabaseTraceConfiguration>
 	{
-		public override string ToString()
+		public string BuildConfiguration(FbTraceVersion version)
 		{
-			return string.Join(Environment.NewLine, this.Select(x => x.ToString()));
+			return string.Join(Environment.NewLine, this.Select(x => x.BuildConfiguration(version)));
 		}
 	}
 }

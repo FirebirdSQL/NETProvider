@@ -12,14 +12,12 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2010-2012 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2010-2017 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
 using System;
 using System.Text;
-
-using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
@@ -31,13 +29,30 @@ namespace FirebirdSql.Data.Services
 		}
 
 		public bool Enabled { get; set; }
+
 		public FbServiceTraceEvents Events { get; set; }
+
 		public string IncludeFilter { get; set; }
 		public string ExcludeFilter { get; set; }
 
-		public override string ToString()
+		public string IncludeGdsCodes { get; set; }
+		public string ExcludeGdsCodes { get; set; }
+
+		public string BuildConfiguration(FbTraceVersion version)
 		{
-			StringBuilder sb = new StringBuilder();
+			switch (version)
+			{
+				case FbTraceVersion.Version1:
+					return BuildConfiguration1();
+				case FbTraceVersion.Version2:
+					return BuildConfiguration2();
+				default:
+					throw new ArgumentOutOfRangeException(nameof(version));
+			}
+		}
+		string BuildConfiguration1()
+		{
+			var sb = new StringBuilder();
 			sb.AppendLine("<services>");
 			sb.AppendFormat("enabled {0}", WriteBoolValue(Enabled));
 			sb.AppendLine();
@@ -51,13 +66,67 @@ namespace FirebirdSql.Data.Services
 				sb.AppendFormat("exclude_filter {0}", WriteRegEx(ExcludeFilter));
 				sb.AppendLine();
 			}
+			if (!string.IsNullOrEmpty(IncludeGdsCodes))
+			{
+				sb.AppendFormat("include_gds_codes {0}", WriteString(IncludeGdsCodes));
+				sb.AppendLine();
+			}
+			if (!string.IsNullOrEmpty(ExcludeGdsCodes))
+			{
+				sb.AppendFormat("exclude_gds_codes {0}", WriteString(ExcludeGdsCodes));
+				sb.AppendLine();
+			}
 			sb.AppendFormat("log_services {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.Services)));
 			sb.AppendLine();
 			sb.AppendFormat("log_service_query {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.ServiceQuery)));
 			sb.AppendLine();
 			sb.AppendFormat("log_errors {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.Errors)));
 			sb.AppendLine();
+			sb.AppendFormat("log_warnings {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.Warnings)));
+			sb.AppendLine();
+			sb.AppendFormat("log_initfini {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.InitFini)));
+			sb.AppendLine();
 			sb.AppendLine("</services>");
+			return sb.ToString();
+		}
+		string BuildConfiguration2()
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine("services");
+			sb.AppendLine("{");
+			sb.AppendFormat("enabled = {0}", WriteBoolValue(Enabled));
+			sb.AppendLine();
+			if (!string.IsNullOrEmpty(IncludeFilter))
+			{
+				sb.AppendFormat("include_filter = {0}", WriteRegEx(IncludeFilter));
+				sb.AppendLine();
+			}
+			if (!string.IsNullOrEmpty(ExcludeFilter))
+			{
+				sb.AppendFormat("exclude_filter = {0}", WriteRegEx(ExcludeFilter));
+				sb.AppendLine();
+			}
+			if (!string.IsNullOrEmpty(IncludeGdsCodes))
+			{
+				sb.AppendFormat("include_gds_codes = {0}", WriteString(IncludeGdsCodes));
+				sb.AppendLine();
+			}
+			if (!string.IsNullOrEmpty(ExcludeGdsCodes))
+			{
+				sb.AppendFormat("exclude_gds_codes = {0}", WriteString(ExcludeGdsCodes));
+				sb.AppendLine();
+			}
+			sb.AppendFormat("log_services = {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.Services)));
+			sb.AppendLine();
+			sb.AppendFormat("log_service_query = {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.ServiceQuery)));
+			sb.AppendLine();
+			sb.AppendFormat("log_errors = {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.Errors)));
+			sb.AppendLine();
+			sb.AppendFormat("log_warnings = {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.Warnings)));
+			sb.AppendLine();
+			sb.AppendFormat("log_initfini = {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.InitFini)));
+			sb.AppendLine();
+			sb.AppendLine("}");
 			return sb.ToString();
 		}
 	}

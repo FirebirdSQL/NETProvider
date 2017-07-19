@@ -416,9 +416,11 @@ end";
 			ThreadPool.QueueUserWorkItem(_ =>
 			{
 				Thread.Sleep(2000);
-				new FbTrace(BuildServicesConnectionString(FbServerType, Compression, false)).Stop(sessionId);
+				new FbTrace(connectionString: BuildServicesConnectionString(FbServerType, Compression, false)).Stop(sessionId);
 			});
 			trace.Start("test");
+
+			Assert.AreNotEqual(-1, sessionId);
 		}
 
 		#endregion

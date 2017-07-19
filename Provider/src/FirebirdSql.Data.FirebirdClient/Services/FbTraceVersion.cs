@@ -12,21 +12,16 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2010-2017 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2017 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
-using System;
-
 namespace FirebirdSql.Data.Services
 {
-	[Flags]
-	public enum FbServiceTraceEvents
+	public enum FbTraceVersion
 	{
-		Services		= 0x01,
-		ServiceQuery	= 0x02,
-		Errors			= 0x04,
-		Warnings		= 0x08,
-		InitFini		= 0x10,
+		Detect,
+		Version1,
+		Version2,
 	}
 }

@@ -12,12 +12,11 @@
  *	   express or implied. See the License for the specific
  *	   language governing rights and limitations under the License.
  *
- *	Copyright (c) 2010, 2016 Jiri Cincura (jiri@cincura.net)
+ *	Copyright (c) 2010-2017 Jiri Cincura (jiri@cincura.net)
  *	All Rights Reserved.
  */
 
 using System;
-using System.Collections.Generic;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
@@ -26,20 +25,28 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbTrace : FbService
 	{
-		public FbTrace(string connectionString = null)
+		FbTraceVersion _version;
+
+		public FbDatabaseTraceConfigurationCollection DatabasesConfigurations { get; }
+		public FbServiceTraceConfiguration ServiceConfiguration { get; set; }
+
+		public FbTrace(FbTraceVersion version = FbTraceVersion.Detect, string connectionString = null)
 			: base(connectionString)
 		{
+			_version = version;
 			DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
 		}
 
-		public FbDatabaseTraceConfigurationCollection DatabasesConfigurations { get; private set; }
-		public FbServiceTraceConfiguration ServiceConfiguration { get; set; }
-
 		public void Start(string sessionName)
 		{
+			var version = _version;
+			if (version == FbTraceVersion.Detect)
+			{
+				version = DetectVersion();
+			}
 			try
 			{
-				var config = DatabasesConfigurations.ToString() + (ServiceConfiguration != null ? ServiceConfiguration.ToString() : string.Empty);
+				var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
 				StartSpb = new ServiceParameterBuffer();
 				StartSpb.Append(IscCodes.isc_action_svc_trace_start);
@@ -102,6 +109,16 @@ namespace FirebirdSql.Data.Services
 			{
 				Close();
 			}
+		}
+
+		FbTraceVersion DetectVersion()
+		{
+			var serverProperties = new FbServerProperties(ConnectionString);
+			var serverVersion = FbServerProperties.ParseServerVersion(serverProperties.GetServerVersion());
+			if (serverVersion < new Version(3, 0, 0, 0))
+				return FbTraceVersion.Version1;
+			else
+				return FbTraceVersion.Version2;
 		}
 	}
 }
