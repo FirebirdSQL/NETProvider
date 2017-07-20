@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Common
 
 			if (scale < 0)
 			{
-				multiplier = (long)System.Math.Pow(10, scale * (-1));
+				multiplier = (long)Math.Pow(10, -scale);
 			}
 
 			switch (sqltype & ~1)
