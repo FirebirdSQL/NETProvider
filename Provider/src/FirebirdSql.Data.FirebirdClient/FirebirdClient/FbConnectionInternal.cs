@@ -211,6 +211,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
+				DisposeTransaction();
 				throw new FbException(ex.Message, ex);
 			}
 
@@ -233,6 +234,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
+				DisposeTransaction();
 				throw new FbException(ex.Message, ex);
 			}
 
