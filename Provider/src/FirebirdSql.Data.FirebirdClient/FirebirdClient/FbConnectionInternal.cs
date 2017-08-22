@@ -197,10 +197,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
 		{
-			if (HasActiveTransaction)
-			{
-				throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
-			}
+			EnsureActiveTransaction();
 
 			try
 			{
@@ -222,16 +219,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
 		{
-			if (HasActiveTransaction)
-			{
-				throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
-			}
+			EnsureActiveTransaction();
 
 			try
 			{
-				_activeTransaction = new FbTransaction(
-					_owningConnection, IsolationLevel.Unspecified);
-
+				_activeTransaction = new FbTransaction(_owningConnection, IsolationLevel.Unspecified);
 				_activeTransaction.BeginTransaction(options);
 
 				if (transactionName != null)
@@ -260,8 +252,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
-				FbCommand command;
-				if (!_preparedCommands[i].TryGetTarget(out command))
+				if (!_preparedCommands[i].TryGetTarget(out FbCommand command))
 					continue;
 
 				if (command.Transaction != null)
@@ -352,8 +343,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			int position = _preparedCommands.Count;
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
-				FbCommand current;
-				if (!_preparedCommands[i].TryGetTarget(out current))
+				if (!_preparedCommands[i].TryGetTarget(out FbCommand current))
 				{
 					position = i;
 					break;
@@ -386,8 +376,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
-				FbCommand current;
-				if (!_preparedCommands[i].TryGetTarget(out current))
+				if (!_preparedCommands[i].TryGetTarget(out FbCommand current))
 					continue;
 
 				try
@@ -538,6 +527,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				return -1;
 #endif
 			return Process.GetCurrentProcess().Id;
+		}
+
+		private void EnsureActiveTransaction()
+		{
+			if (HasActiveTransaction)
+				throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
 		}
 		#endregion
 
