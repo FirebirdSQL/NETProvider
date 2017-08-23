@@ -47,7 +47,9 @@
 		<EmbeddedResource Include="Schema\FbMetaData.xml" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
+		<PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
+		<PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
+		<PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
 	</ItemGroup>
 	<Import Project="$(ProjectDir)Microsoft.Bcl.Build.targets" />
 	<PropertyGroup>
