@@ -7,7 +7,7 @@
     <description>The Entity Framework Provider for Firebird enables you to develop .NET applications that connect to the Firebird database using Entity Framework.</description>
     <authors>FirebirdSQL</authors>
     <owners>FirebirdSQL</owners>
-    <licenseUrl>http://firebird.svn.sourceforge.net/viewvc/firebird/NETProvider/trunk/NETProvider/license.txt</licenseUrl>
+    <licenseUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/license.txt</licenseUrl>
     <projectUrl>http://www.firebirdsql.org/en/net-provider/</projectUrl>
     <iconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
