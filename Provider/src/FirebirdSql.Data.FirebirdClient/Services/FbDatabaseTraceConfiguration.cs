@@ -86,16 +86,6 @@ namespace FirebirdSql.Data.Services
 				sb.AppendFormat("exclude_filter {0}", WriteRegEx(ExcludeFilter));
 				sb.AppendLine();
 			}
-			if (!string.IsNullOrEmpty(IncludeGdsCodes))
-			{
-				sb.AppendFormat("include_gds_codes {0}", WriteString(IncludeGdsCodes));
-				sb.AppendLine();
-			}
-			if (!string.IsNullOrEmpty(ExcludeGdsCodes))
-			{
-				sb.AppendFormat("exclude_gds_codes {0}", WriteString(ExcludeGdsCodes));
-				sb.AppendLine();
-			}
 			sb.AppendFormat("log_connections {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.Connections)));
 			sb.AppendLine();
 			sb.AppendFormat("connection_id {0}", WriteNumber(ConnectionID));
@@ -114,10 +104,6 @@ namespace FirebirdSql.Data.Services
 			sb.AppendLine();
 			sb.AppendFormat("log_procedure_finish {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.ProcedureFinish)));
 			sb.AppendLine();
-			sb.AppendFormat("log_function_start {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.FunctionStart)));
-			sb.AppendLine();
-			sb.AppendFormat("log_function_finish {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.FunctionFinish)));
-			sb.AppendLine();
 			sb.AppendFormat("log_trigger_start {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.TriggerStart)));
 			sb.AppendLine();
 			sb.AppendFormat("log_trigger_finish {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.TriggerFinish)));
@@ -133,8 +119,6 @@ namespace FirebirdSql.Data.Services
 			sb.AppendFormat("log_sweep {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.Sweep)));
 			sb.AppendLine();
 			sb.AppendFormat("print_plan {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.PrintPlan)));
-			sb.AppendLine();
-			sb.AppendFormat("explain_plan {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.ExplainPlan)));
 			sb.AppendLine();
 			sb.AppendFormat("print_perf {0}", WriteBoolValue(Events.HasFlag(FbDatabaseTraceEvents.PrintPerf)));
 			sb.AppendLine();

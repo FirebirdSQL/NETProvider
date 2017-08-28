@@ -66,16 +66,6 @@ namespace FirebirdSql.Data.Services
 				sb.AppendFormat("exclude_filter {0}", WriteRegEx(ExcludeFilter));
 				sb.AppendLine();
 			}
-			if (!string.IsNullOrEmpty(IncludeGdsCodes))
-			{
-				sb.AppendFormat("include_gds_codes {0}", WriteString(IncludeGdsCodes));
-				sb.AppendLine();
-			}
-			if (!string.IsNullOrEmpty(ExcludeGdsCodes))
-			{
-				sb.AppendFormat("exclude_gds_codes {0}", WriteString(ExcludeGdsCodes));
-				sb.AppendLine();
-			}
 			sb.AppendFormat("log_services {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.Services)));
 			sb.AppendLine();
 			sb.AppendFormat("log_service_query {0}", WriteBoolValue(Events.HasFlag(FbServiceTraceEvents.ServiceQuery)));
