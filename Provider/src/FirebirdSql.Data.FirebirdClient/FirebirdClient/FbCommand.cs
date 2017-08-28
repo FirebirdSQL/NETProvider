@@ -28,7 +28,7 @@ using System.Globalization;
 using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
-#if !NETSTANDARD1_6
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System.Runtime.Remoting.Messaging;
 #endif
 
@@ -486,7 +486,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return RecordsAffected;
 		}
-#if !NETSTANDARD1_6
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 		public IAsyncResult BeginExecuteNonQuery(AsyncCallback callback, object objectState)
 		{
 			// BeginInvoke might be slow, but the query processing will make this irrelevant
@@ -527,7 +527,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return _activeReader;
 		}
-#if !NETSTANDARD1_6
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 		public IAsyncResult BeginExecuteReader(AsyncCallback callback, object objectState)
 		{
 			// BeginInvoke might be slow, but the query processing will make this irrelevant
@@ -597,7 +597,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return val;
 		}
-#if !NETSTANDARD1_6
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 		public IAsyncResult BeginExecuteScalar(AsyncCallback callback, object objectState)
 		{
 			// BeginInvoke might be slow, but the query processing will make this irrelevant

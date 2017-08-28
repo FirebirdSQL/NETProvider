@@ -708,17 +708,17 @@ begin
   begin
   end
 end";
-				cmd.BeginExecuteNonQuery(o =>
+				ThreadPool.QueueUserWorkItem(_ =>
 				{
 					try
 					{
-						cmd.EndExecuteNonQuery(o as IAsyncResult);
+						cmd.ExecuteNonQuery();
 					}
 					catch (FbException ex)
 					{
 						cancelled = "HY008" == ex.SQLSTATE;
 					}
-				}, null);
+				});
 				Thread.Sleep(2000);
 				cmd.Cancel();
 				Thread.Sleep(2000);

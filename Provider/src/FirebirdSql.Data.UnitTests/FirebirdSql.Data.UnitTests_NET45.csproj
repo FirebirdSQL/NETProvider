@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<ProductVersion>9.0.30729</ProductVersion>
+		<SchemaVersion>2.0</SchemaVersion>
+		<ProjectGuid>{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}</ProjectGuid>
+		<OutputType>Library</OutputType>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
+		<AssemblyName>FirebirdSql.Data.UnitTests</AssemblyName>
+		<RootNamespace>FirebirdSql.Data.UnitTests</RootNamespace>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.UnitTests.snk</AssemblyOriginatorKeyFile>
+		<Prefer32Bit>false</Prefer32Bit>
+		<TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<OutputPath>bin\Debug\NET45</OutputPath>
+		<BaseIntermediateOutputPath>obj\NET45</BaseIntermediateOutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Optimize>false</Optimize>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+		<OutputPath>bin\Release\NET45</OutputPath>
+		<BaseIntermediateOutputPath>obj\NET45</BaseIntermediateOutputPath>
+		<DefineConstants>TRACE</DefineConstants>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Optimize>true</Optimize>
+		<DebugType>pdbonly</DebugType>
+		<ErrorReport>prompt</ErrorReport>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="EntityFramework">
+			<HintPath>..\..\lib\EF6\net45\EntityFramework.dll</HintPath>
+			<Private>True</Private>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="nunit.framework, Version=3.7.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+			<HintPath>..\packages\NUnit.3.7.1\lib\net45\nunit.framework.dll</HintPath>
+		</Reference>
+		<Reference Include="System" />
+		<Reference Include="System.Core" />
+		<Reference Include="System.Data" />
+		<Reference Include="System.Numerics" />
+		<Reference Include="System.Data.Entity" />
+		<Reference Include="System.Transactions" />
+		<Reference Include="System.Xml" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="FbBooleanSupportTests.cs" />
+		<Compile Include="FbConnectionStringTests.cs" />
+		<Compile Include="FbConnectionStringBuilderTests.cs" />
+		<Compile Include="FbExceptionTests.cs" />
+		<Compile Include="FbRemoteEventTests.cs" />
+		<Compile Include="FbTestFixtureAttribute.cs" />
+		<Compile Include="TestsSetup.cs" />
+		<Compile Include="TrackerIssuesTests.cs" />
+		<Compile Include="Properties\AssemblyInfo.cs" />
+		<Compile Include="TestsBase.cs" />
+		<Compile Include="FbArrayTests.cs" />
+		<Compile Include="FbBlobTests.cs" />
+		<Compile Include="FbCommandBuilderTests.cs" />
+		<Compile Include="FbCommandTests.cs" />
+		<Compile Include="FbConnectionTests.cs" />
+		<Compile Include="FbDataAdapterTests.cs" />
+		<Compile Include="FbDatabaseInfoTests.cs" />
+		<Compile Include="FbDatabaseSchemaTests.cs" />
+		<Compile Include="FbDataReaderTests.cs" />
+		<Compile Include="FbImplicitTransactionTests.cs" />
+		<Compile Include="FbParameterCollectionTests.cs" />
+		<Compile Include="FbParameterTests.cs" />
+		<Compile Include="FbScriptTests.cs" />
+		<Compile Include="FbServicesTests.cs" />
+		<Compile Include="FbStoredProcCallsTests.cs" />
+		<Compile Include="FbTransactionTests.cs" />
+		<Compile Include="GuidTests.cs" />
+		<Compile Include="EntityFrameworkTests.cs" />
+		<Compile Include="TransactionScopeTests.cs" />
+		<Compile Include="SrpClientTests.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\EntityFramework.Firebird\EntityFramework.Firebird_NET45.csproj">
+			<Project>{8de3edee-c361-4da2-96f0-35795d5bf071}</Project>
+			<Name>EntityFramework.Firebird_NET45</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET45.csproj">
+			<Project>{b37720ac-3b59-438b-afba-1e27547dd200}</Project>
+			<Name>FirebirdSql.Data.FirebirdClient_NET45</Name>
+		</ProjectReference>
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="App.config">
+			<SubType>Designer</SubType>
+		</None>
+		<None Include="packages.config" />
+		<None Include="Properties\FirebirdSql.Data.UnitTests.snk" />
+	</ItemGroup>
+	<ItemGroup>
+		<Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+	</ItemGroup>
+	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

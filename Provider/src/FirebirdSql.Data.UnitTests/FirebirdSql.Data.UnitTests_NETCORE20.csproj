@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>netcoreapp2.0</TargetFramework>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<AssemblyName>FirebirdSql.Data.UnitTests</AssemblyName>
+		<RootNamespace>FirebirdSql.Data.UnitTests</RootNamespace>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.UnitTests.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Remove="EntityFrameworkTests.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="App.config" />
+		<None Remove="packages.config" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+		<PackageReference Include="NUnit" Version="3.7.1" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NETSTANDARD.csproj" />
+	</ItemGroup>
+</Project>

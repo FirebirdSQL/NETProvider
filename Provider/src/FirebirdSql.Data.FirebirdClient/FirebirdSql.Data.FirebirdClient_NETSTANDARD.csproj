@@ -1,26 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>netstandard1.6</TargetFramework>
+		<TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
 		<AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
 		<RootNamespace>FirebirdSql.Data</RootNamespace>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
 		<DelaySign>False</DelaySign>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<OutputPath>bin\$(Configuration)\$(TargetFramework)</OutputPath>
+		<IntermediateOutputPath>obj\$(Configuration)\$(TargetFramework)</IntermediateOutputPath>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<OutputPath>bin\Release\netstandard1.6</OutputPath>
-		<BaseIntermediateOutputPath>obj\netstandard1.6</BaseIntermediateOutputPath>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>TRACE</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<OutputPath>bin\Debug\netstandard1.6</OutputPath>
-		<BaseIntermediateOutputPath>obj\netstandard1.6</BaseIntermediateOutputPath>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
-	</PropertyGroup> 
+	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="app.FirebirdSql.Data.FirebirdClient_NET40.config" />
 		<None Remove="Microsoft.Bcl.Build.targets" />
@@ -31,13 +28,14 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="Entity\**" />
-		<Compile Remove="obj\**" />
 		<EmbeddedResource Remove="Entity\**" />
-		<EmbeddedResource Remove="obj\**" />
 		<None Remove="Entity\**" />
-		<None Remove="obj\**" />
 	</ItemGroup>
-	<ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+		<PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
 	  <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
 	  <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
 	  <PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />

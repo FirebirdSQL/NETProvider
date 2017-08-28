@@ -202,10 +202,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Data")]
 		[DefaultValue((byte)0)]
-#if NET45 || NETSTANDARD1_6
-		public override byte Precision
-#else
+#if NET40
 		public byte Precision
+#else
+		public override byte Precision
 #endif
 		{
 			get { return _precision; }
@@ -214,10 +214,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		[Category("Data")]
 		[DefaultValue((byte)0)]
-#if NET45 || NETSTANDARD1_6
-		public override byte Scale
-#else
+#if NET40
 		public byte Scale
+#else
+		public override byte Scale
 #endif
 		{
 			get { return _scale; }

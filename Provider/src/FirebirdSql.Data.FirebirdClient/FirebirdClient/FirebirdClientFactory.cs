@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		object IServiceProvider.GetService(Type serviceType)
 		{
-#if NETSTANDARD1_6
+#if NETSTANDARD1_6 || NETSTANDARD2_0
 			return null;
 #else
 			if (serviceType == typeof(DbProviderServices))

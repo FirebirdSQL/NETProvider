@@ -44,10 +44,10 @@
 									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET45\FirebirdSql.Data.FirebirdClient.pdb" />
 						<File Id="FirebirdSql.Data.UnitTests.dll"
 									Name="FirebirdSql.Data.UnitTests.dll"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release\FirebirdSql.Data.UnitTests.dll" />
+									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release\NET45\FirebirdSql.Data.UnitTests.dll" />
 						<File Id="FirebirdSql.Data.UnitTests.config"
 									Name="FirebirdSql.Data.UnitTests.dll.config"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release\FirebirdSql.Data.UnitTests.dll.config" />
+									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release\NET45\FirebirdSql.Data.UnitTests.dll.config" />
 					</Component>
 				</Directory>
 			</Directory>

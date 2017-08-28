@@ -34,11 +34,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal class GdsEventManager : IDisposable
 	{
+		bool _disposing;
 		int _handle;
 		GdsDatabase _database;
 
 		public GdsEventManager(int handle, string ipAddress, int portNumber)
 		{
+			_disposing = false;
 			_handle = handle;
 			var connection = new GdsConnection(ipAddress, portNumber);
 			connection.Connect();
@@ -70,12 +72,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							break;
 					}
 				}
-				// happens as the connection is closed
-				catch (ObjectDisposedException)
+				catch (Exception) when (_disposing)
 				{
 					return;
 				}
-				catch (Exception ex)
+				catch (Exception ex) when (!_disposing)
 				{
 					remoteEvent.EventError(ex);
 					break;
@@ -85,6 +86,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public void Dispose()
 		{
+			_disposing = true;
 			_database.CloseConnection();
 		}
 	}
