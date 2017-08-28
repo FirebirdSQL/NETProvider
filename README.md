@@ -1,5 +1,4 @@
-Firebird .NET Data Provider
-===========================
+# Firebird .NET Data Provider
 
 Read more in readme in appropriate folders.
 

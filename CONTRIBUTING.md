@@ -1,5 +1,4 @@
-Contributing
-============
+# Contributing
 
 Thanks for considering contributing. Here are some items to consider before starting (in no particular order).
 
