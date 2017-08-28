@@ -12,4 +12,5 @@ Thanks for considering contributing. Here are some items to consider before star
 * Consider backward compatibility.
 * Don't be afraid to ask (i.e. backward compatibility).
 * Be prepared to do some changes after your PR is reviewed.
-* Consider whether your change is benefit for majority of users (opposite to only a small group). 
+* Consider whether your change is benefit for majority of users (opposite to only a small group).
+* All contributions are licensed under [_Initial Developer's Public License_](license.txt).
