@@ -19,9 +19,7 @@ using System;
 
 namespace FirebirdSql.Data.Common
 {
-#if !NETSTANDARD1_6
 	[Serializable]
-#endif
 	internal enum StatementState
 	{
 		Deallocated,

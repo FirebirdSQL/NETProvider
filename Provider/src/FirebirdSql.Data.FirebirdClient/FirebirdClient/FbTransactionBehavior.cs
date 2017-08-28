@@ -20,9 +20,7 @@ using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if !NETSTANDARD1_6
 	[Serializable]
-#endif
 	[Flags]
 	public enum FbTransactionBehavior : int
 	{

@@ -33,9 +33,7 @@ using System.Runtime.Serialization;
 
 namespace FirebirdSql.Data.Common
 {
-#if !NETSTANDARD1_6
 	[Serializable]
-#endif
 	internal sealed class IscException : Exception
 	{
 		private string _message;

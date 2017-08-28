@@ -27,9 +27,7 @@ namespace FirebirdSql.Data.Isql
 	/// <summary>
 	/// DSQL and ISQL statement types.
 	/// </summary>
-#if !NETSTANDARD1_6
 	[Serializable]
-#endif
 	public enum SqlStatementType
 	{
 		/// <summary>

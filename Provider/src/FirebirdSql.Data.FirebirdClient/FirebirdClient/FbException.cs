@@ -30,9 +30,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if !NETSTANDARD1_6
 	[Serializable]
-#endif
 	public sealed class FbException : DbException
 	{
 		#region Fields
