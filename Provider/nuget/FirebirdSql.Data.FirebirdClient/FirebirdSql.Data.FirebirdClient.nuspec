@@ -45,11 +45,8 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET40\FirebirdSql.Data.FirebirdClient.dll" target="lib\net40-client" />
-		<file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET40\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net40-client" />
-
-		<file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET45\FirebirdSql.Data.FirebirdClient.dll" target="lib\net452" />
-		<file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\NET45\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net452" />
+		<file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.dll" target="lib\net452" />
+		<file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.pdb" target="lib\net452" />
 
 		<file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard1.6\FirebirdSql.Data.FirebirdClient.dll" target="lib\netstandard1.6" />
 		<file src="..\..\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard1.6\FirebirdSql.Data.FirebirdClient.pdb" target="lib\netstandard1.6" />
