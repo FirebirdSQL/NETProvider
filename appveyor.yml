@@ -23,6 +23,8 @@ build_script:
   - ps: $env:build_nuget = 'C:\Program Files\AppVeyor\BuildAgent\Tools\nuget.exe'
   - ps: $env:build_wix = 'C:\Program Files (x86)\WiX Toolset v3.11\bin'
   - ps: "& $baseDir\\Provider\\build.ps1 -Configuration $env:CONFIGURATION -Version $env:APPVEYOR_BUILD_VERSION"
+after_build:
+  - ps: gci "$baseDir\Provider\out" | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 before_test:
   - ps: $testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.UnitTests"
   - ps: $testsNETDir = "$testsBaseDir\bin\$env:CONFIGURATION\net452"
@@ -49,5 +51,3 @@ test_script:
   - ps: dotnet test FirebirdSql.Data.UnitTests.csproj -c $env:CONFIGURATION -f netcoreapp2.0 --no-build --no-restore --logger="trx;LogFileName=$resultsCORE"
   - ps: $wc = New-Object System.Net.WebClient
   - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$env:APPVEYOR_JOB_ID", $resultsCORE)
-artifacts:
-  - path: Provider\out\**
