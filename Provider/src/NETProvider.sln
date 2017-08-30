@@ -1,20 +1,16 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests_NET45", "FirebirdSql.Data.UnitTests\FirebirdSql.Data.UnitTests_NET45.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Firebird_NET40", "EntityFramework.Firebird\EntityFramework.Firebird_NET40.csproj", "{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Firebird_NET45", "EntityFramework.Firebird\EntityFramework.Firebird_NET45.csproj", "{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.Data.FirebirdClient_NET45", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET45.csproj", "{23D8FDBA-B992-4652-9489-35A2D53445CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.Data.FirebirdClient_NET40", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET40.csproj", "{9866D35A-31D1-4AD6-86D8-E19688D847F5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.Data.FirebirdClient_NETSTANDARD", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NETSTANDARD.csproj", "{ADC34658-2605-4588-A056-5288EDE4F5DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests_NETCORE20", "FirebirdSql.Data.UnitTests\FirebirdSql.Data.UnitTests_NETCORE20.csproj", "{C954BC7E-8C16-472F-BA78-93AFB11C69A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.Data.UnitTests_NETCORE20", "FirebirdSql.Data.UnitTests\FirebirdSql.Data.UnitTests_NETCORE20.csproj", "{C954BC7E-8C16-472F-BA78-93AFB11C69A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,10 +22,6 @@ Global
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FF27BA8-4843-4207-A5EA-273BC5F7E8E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -38,10 +30,6 @@ Global
 		{23D8FDBA-B992-4652-9489-35A2D53445CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23D8FDBA-B992-4652-9489-35A2D53445CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23D8FDBA-B992-4652-9489-35A2D53445CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9866D35A-31D1-4AD6-86D8-E19688D847F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9866D35A-31D1-4AD6-86D8-E19688D847F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9866D35A-31D1-4AD6-86D8-E19688D847F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9866D35A-31D1-4AD6-86D8-E19688D847F5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ADC34658-2605-4588-A056-5288EDE4F5DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ADC34658-2605-4588-A056-5288EDE4F5DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADC34658-2605-4588-A056-5288EDE4F5DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
