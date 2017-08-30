@@ -8,9 +8,6 @@
 		<DelaySign>False</DelaySign>
 		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-		<IntermediateOutputPath>obj\$(TargetFramework)</IntermediateOutputPath>
-		<OutputPath>bin\$(Configuration)\$(TargetFramework)</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>TRACE</DefineConstants>

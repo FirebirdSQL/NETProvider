@@ -7,9 +7,6 @@
 		<AssemblyOriginatorKeyFile>Properties\EntityFramework.Firebird.snk</AssemblyOriginatorKeyFile>
 		<DelaySign>False</DelaySign>
 		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-		<IntermediateOutputPath>obj\$(TargetFramework)</IntermediateOutputPath>
-		<OutputPath>bin\$(Configuration)\$(TargetFramework)</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>TRACE</DefineConstants>
