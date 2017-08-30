@@ -7,5 +7,5 @@ obj
 packages
 DDEX/installer/out/
 DDEX/installer/in/
-Provider/deploy/out/
+Provider/out/
 .idea
