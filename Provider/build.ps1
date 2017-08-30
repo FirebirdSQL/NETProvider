@@ -1,5 +1,5 @@
 param(
-	[Parameter(Mandatory=$True)]$Configuration, 
+	[Parameter(Mandatory=$True)]$Configuration,
 	[Parameter(Mandatory=$True)]$Version)
 
 $baseDir = Split-Path -parent $PSCommandPath
@@ -17,14 +17,16 @@ function Clean() {
 }
 
 function Build() {
-	msbuild /t:Clean,Build /p:Configuration=$Configuration $baseDir\src\NETProvider.sln /v:m /m	
+	$solutionFile = "$baseDir\src\NETProvider.sln"
+	& $nuget restore $solutionFile
+	msbuild /t:Clean,Build /p:Configuration=$Configuration $solutionFile /v:m /m
 }
 
 function Pack() {
 	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-net452.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.pdb
 	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-netstandard1.6.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard1.6\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard1.6\FirebirdSql.Data.FirebirdClient.pdb
 	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-netstandard2.0.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard2.0\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard2.0\FirebirdSql.Data.FirebirdClient.pdb
-	
+
 	7z a -mx=9 $outDir\EntityFramework.Firebird-$Version-net452.7z $baseDir\src\EntityFramework.Firebird\bin\Release\net452\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release\net452\EntityFramework.Firebird.pdb
 }
 
@@ -37,7 +39,7 @@ function WiX() {
 	& $wix\candle.exe "-dBaseDir=$baseDir" "-dVersion=$Version" -ext $wix\WixUtilExtension.dll -out $outDir\Installer.wixobj $baseDir\installer\Installer.wxs
 	& $wix\light.exe -ext $wix\WixUIExtension.dll -ext $wix\WixUtilExtension.dll -out $outDir\FirebirdSql.Data.FirebirdClient-$Version.msi $outDir\Installer.wixobj
 	rm $outDir\Installer.wixobj
-	rm $outDir\FirebirdSql.Data.FirebirdClient-$Version.wixpdb	
+	rm $outDir\FirebirdSql.Data.FirebirdClient-$Version.wixpdb
 }
 
 Clean

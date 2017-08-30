@@ -20,7 +20,6 @@ test: off
 before_build:
   - ps: $baseDir = Resolve-Path .
 build_script:
-  - ps: nuget restore $baseDir\Provider\src\NETProvider.sln
   - ps: $baseDir\Provider\build.ps1 -Configuration $env:CONFIGURATION -Version $env:APPVEYOR_BUILD_VERSION  
 before_test:
   - ps: $testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.UnitTests"
