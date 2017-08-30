@@ -21,9 +21,11 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Schema\FbMetaData.xml" />
 	</ItemGroup>
+
 	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
 		<Reference Include="System.Transactions" />
 	</ItemGroup>
+
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
 		<PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
 		<PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
@@ -41,6 +43,7 @@
 		<PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
 		<PackageReference Include="System.Threading.Thread" Version="4.3.0" />
 	</ItemGroup>
+
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
 		<PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
 		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
