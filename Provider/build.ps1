@@ -2,6 +2,8 @@ param(
 	[Parameter(Mandatory=$True)]$Configuration,
 	[Parameter(Mandatory=$True)]$Version)
 
+$ErrorActionPreference = 'Stop'
+
 $baseDir = Split-Path -parent $PSCommandPath
 $outDir = "$baseDir\out"
 
