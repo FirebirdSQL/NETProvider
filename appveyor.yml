@@ -59,3 +59,5 @@ artifacts:
   - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\netstandard2.0\FirebirdSql.Data.FirebirdClient.pdb
   - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\net452\EntityFramework.Firebird.dll
   - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\net452\EntityFramework.Firebird.pdb
+  - path: Provider\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$(Configuration)\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.dll
+  - path: Provider\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$(Configuration)\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.pdb
