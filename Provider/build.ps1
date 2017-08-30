@@ -48,6 +48,7 @@ function Pack() {
 function NuGet() {
 	& $nuget pack $baseDir\nuget\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.nuspec -OutputDirectory $outDir -Version $Version
 	& $nuget pack $baseDir\nuget\EntityFramework.Firebird\EntityFramework.Firebird.nuspec -OutputDirectory $outDir -Version $Version
+	& $nuget pack $baseDir\nuget\FirebirdSql.EntityFrameworkCore.Firebird\FirebirdSql.EntityFrameworkCore.Firebird.nuspec -OutputDirectory $outDir -Version $Version
 }
 
 function WiX() {
