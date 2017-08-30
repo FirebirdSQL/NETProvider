@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Common
 			_currentCounts = null;
 			_previousCounts = null;
 			_events.Clear();
-			Volatile2.Write(ref _running, 0);
+			Volatile.Write(ref _running, 0);
 		}
 
 		void QueueEventsImpl()
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.Common
 
 		internal void EventCounts(byte[] buffer)
 		{
-			if (Volatile2.Read(ref _running) == 0)
+			if (Volatile.Read(ref _running) == 0)
 				return;
 
 			_previousCounts = _currentCounts;

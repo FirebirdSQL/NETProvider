@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 		public static int ComputeLength(int n)
 		{
-			return Marshal2.SizeOf<ArrayDescMarshal>() + n * Marshal2.SizeOf<ArrayBoundMarshal>();
+			return Marshal.SizeOf<ArrayDescMarshal>() + n * Marshal.SizeOf<ArrayBoundMarshal>();
 		}
 
 		#endregion

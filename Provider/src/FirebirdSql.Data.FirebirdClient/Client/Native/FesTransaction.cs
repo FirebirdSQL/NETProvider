@@ -140,7 +140,7 @@ namespace FirebirdSql.Data.Client.Native
 				teb.tpb_ptr = Marshal.AllocHGlobal(tpb.Length);
 				Marshal.Copy(tpb.ToArray(), 0, teb.tpb_ptr, tpb.Length);
 
-				int size = Marshal2.SizeOf<IscTeb>();
+				int size = Marshal.SizeOf<IscTeb>();
 				tebData = Marshal.AllocHGlobal(size);
 
 				Marshal.StructureToPtr(teb, tebData, true);
@@ -173,7 +173,7 @@ namespace FirebirdSql.Data.Client.Native
 				}
 				if (tebData != IntPtr.Zero)
 				{
-					Marshal2.DestroyStructure<IscTeb>(tebData);
+					Marshal.DestroyStructure<IscTeb>(tebData);
 					Marshal.FreeHGlobal(tebData);
 				}
 			}

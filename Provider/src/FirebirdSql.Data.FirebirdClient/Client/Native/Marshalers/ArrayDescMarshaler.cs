@@ -32,11 +32,11 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 		{
 			if (pNativeData != IntPtr.Zero)
 			{
-				Marshal2.DestroyStructure<ArrayDescMarshal>(pNativeData);
+				Marshal.DestroyStructure<ArrayDescMarshal>(pNativeData);
 
 				for (int i = 0; i < 16; i++)
 				{
-					Marshal2.DestroyStructure<ArrayBoundMarshal>(pNativeData + ArrayDescMarshal.ComputeLength(i));
+					Marshal.DestroyStructure<ArrayBoundMarshal>(pNativeData + ArrayDescMarshal.ComputeLength(i));
 				}
 
 				Marshal.FreeHGlobal(pNativeData);

@@ -149,7 +149,7 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				if (pBuffers != IntPtr.Zero)
 				{
-					SecBuffer secBuffer = Marshal2.PtrToStructure<SecBuffer>(pBuffers);
+					SecBuffer secBuffer = Marshal.PtrToStructure<SecBuffer>(pBuffers);
 					secBuffer.Dispose();
 					Marshal.FreeHGlobal(pBuffers);
 					pBuffers = IntPtr.Zero;
@@ -160,7 +160,7 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				if (pBuffers == IntPtr.Zero)
 					throw new ObjectDisposedException(nameof(SecBufferDesc));
-				SecBuffer secBuffer = Marshal2.PtrToStructure<SecBuffer>(pBuffers);
+				SecBuffer secBuffer = Marshal.PtrToStructure<SecBuffer>(pBuffers);
 				return secBuffer.GetBytes();
 			}
 		}

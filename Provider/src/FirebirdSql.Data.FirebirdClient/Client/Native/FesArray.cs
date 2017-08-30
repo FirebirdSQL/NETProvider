@@ -151,11 +151,7 @@ namespace FirebirdSql.Data.Client.Native
 			Type systemType = GetSystemType();
 
 			byte[] buffer = new byte[sliceLength];
-#if NET40
-			if (systemType.IsPrimitive)
-#else
 			if (systemType.GetTypeInfo().IsPrimitive)
-#endif
 			{
 				Buffer.BlockCopy(sourceArray, 0, buffer, 0, buffer.Length);
 			}
@@ -325,11 +321,7 @@ namespace FirebirdSql.Data.Client.Native
 				slicePosition += itemLength;
 			}
 
-#if NET40
-			if (systemType.IsPrimitive)
-#else
 			if (systemType.GetTypeInfo().IsPrimitive)
-#endif
 			{
 				// For primitive types we can use System.Buffer	to copy	generated data to destination array
 				Buffer.BlockCopy(tempData, 0, sliceData, 0, Buffer.ByteLength(tempData));

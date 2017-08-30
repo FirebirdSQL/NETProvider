@@ -237,11 +237,7 @@ namespace FirebirdSql.Data.Client.Native
 		/// <returns>An instance of our type, cast as an <see cref="IFbClient"/>.</returns>
 		private static IFbClient CreateInstance(TypeBuilder tb)
 		{
-#if NET40
-			Type t = tb.CreateType();
-#else
 			Type t = tb.CreateTypeInfo().AsType();
-#endif
 
 #if DEBUG
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0

@@ -29,16 +29,16 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	internal static class XsqldaMarshaler
 	{
-		private static int sizeofXSQLDA = Marshal2.SizeOf<XSQLDA>();
-		private static int sizeofXSQLVAR = Marshal2.SizeOf<XSQLVAR>();
+		private static int sizeofXSQLDA = Marshal.SizeOf<XSQLDA>();
+		private static int sizeofXSQLVAR = Marshal.SizeOf<XSQLVAR>();
 
 		public static void CleanUpNativeData(ref IntPtr pNativeData)
 		{
 			if (pNativeData != IntPtr.Zero)
 			{
-				XSQLDA xsqlda = Marshal2.PtrToStructure<XSQLDA>(pNativeData);
+				XSQLDA xsqlda = Marshal.PtrToStructure<XSQLDA>(pNativeData);
 
-				Marshal2.DestroyStructure<XSQLDA>(pNativeData);
+				Marshal.DestroyStructure<XSQLDA>(pNativeData);
 
 				for (var i = 0; i < xsqlda.sqln; i++)
 				{
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 						sqlvar.sqlind = IntPtr.Zero;
 					}
 
-					Marshal2.DestroyStructure<XSQLVAR>(ptr);
+					Marshal.DestroyStructure<XSQLVAR>(ptr);
 				}
 
 				Marshal.FreeHGlobal(pNativeData);
@@ -101,7 +101,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 					xsqlvar[i].sqldata = Marshal.AllocHGlobal(0);
 				}
 
-				xsqlvar[i].sqlind = Marshal.AllocHGlobal(Marshal2.SizeOf<short>());
+				xsqlvar[i].sqlind = Marshal.AllocHGlobal(Marshal.SizeOf<short>());
 				Marshal.WriteInt16(xsqlvar[i].sqlind, descriptor[i].NullFlag);
 
 				xsqlvar[i].sqlname = GetStringBuffer(charset, descriptor[i].Name);
@@ -143,7 +143,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 		public static Descriptor MarshalNativeToManaged(Charset charset, IntPtr pNativeData, bool fetching)
 		{
-			var xsqlda = Marshal2.PtrToStructure<XSQLDA>(pNativeData);
+			var xsqlda = Marshal.PtrToStructure<XSQLDA>(pNativeData);
 
 			var descriptor = new Descriptor(xsqlda.sqln) { ActualCount = xsqlda.sqld };
 
