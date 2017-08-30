@@ -1,4 +1,4 @@
-version: '{build}'
+version: '0.0.0.{build}'
 image: Visual Studio 2017
 configuration:
   - Release
@@ -18,16 +18,14 @@ environment:
 shallow_clone: true
 test: off
 before_build:
-  - ps: nuget restore Provider\src\NETProvider.sln
-build:
-  project: Provider\src\NETProvider.sln
-  parallel: true
-  verbosity: minimal
+  - ps: $baseDir = Resolve-Path .
+build_script:
+  - ps: nuget restore $baseDir\Provider\src\NETProvider.sln
+  - ps: $baseDir\Provider\build.ps1 -Configuration $env:CONFIGURATION -Version $env:APPVEYOR_BUILD_VERSION  
 before_test:
-  - ps: $sourceDir = Resolve-Path .
-  - ps: $testsBaseDir = "$sourceDir\Provider\src\FirebirdSql.Data.UnitTests"
-  - ps: $testsNETDir = "$testsBaseDir\bin\$env:Configuration\net452"
-  - ps: $testsCOREDir = "$testsBaseDir\bin\$env:Configuration\netcoreapp2.0"
+  - ps: $testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.UnitTests"
+  - ps: $testsNETDir = "$testsBaseDir\bin\$env:CONFIGURATION\net452"
+  - ps: $testsCOREDir = "$testsBaseDir\bin\$env:CONFIGURATION\netcoreapp2.0"
 
   - ps: mkdir C:\firebird | Out-Null
   - ps: cd C:\firebird
@@ -47,17 +45,8 @@ test_script:
                        
   - ps: cd $testsBaseDir
   - ps: $resultsCORE = "$testsCOREDir\CORE_results.xml"
-  - ps: dotnet test FirebirdSql.Data.UnitTests.csproj -c $env:Configuration -f netcoreapp2.0 --no-build --no-restore --logger="trx;LogFileName=$resultsCORE"
+  - ps: dotnet test FirebirdSql.Data.UnitTests.csproj -c $env:CONFIGURATION -f netcoreapp2.0 --no-build --no-restore --logger="trx;LogFileName=$resultsCORE"
   - ps: $wc = New-Object System.Net.WebClient
   - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$env:APPVEYOR_JOB_ID", $resultsCORE)
 artifacts:
-  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\net452\FirebirdSql.Data.FirebirdClient.dll
-  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\net452\FirebirdSql.Data.FirebirdClient.pdb
-  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\netstandard1.6\FirebirdSql.Data.FirebirdClient.dll
-  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\netstandard1.6\FirebirdSql.Data.FirebirdClient.pdb
-  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\netstandard2.0\FirebirdSql.Data.FirebirdClient.dll
-  - path: Provider\src\FirebirdSql.Data.FirebirdClient\bin\$(Configuration)\netstandard2.0\FirebirdSql.Data.FirebirdClient.pdb
-  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\net452\EntityFramework.Firebird.dll
-  - path: Provider\src\EntityFramework.Firebird\bin\$(Configuration)\net452\EntityFramework.Firebird.pdb
-  - path: Provider\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$(Configuration)\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.dll
-  - path: Provider\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$(Configuration)\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.pdb
+  - path: Provider\out\**
