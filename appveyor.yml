@@ -20,6 +20,8 @@ test: off
 before_build:
   - ps: $baseDir = Resolve-Path .
 build_script:
+  - ps: $env:build_nuget = 'C:\Program Files\AppVeyor\BuildAgent\Tools\nuget.exe' 
+  - ps: $env:build_wix = 'C:\Program Files (x86)\WiX Toolset v3.11\bin' 
   - ps: $baseDir\Provider\build.ps1 -Configuration $env:CONFIGURATION -Version $env:APPVEYOR_BUILD_VERSION  
 before_test:
   - ps: $testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.UnitTests"

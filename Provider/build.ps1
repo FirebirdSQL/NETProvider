@@ -3,9 +3,20 @@ param(
 	[Parameter(Mandatory=$True)]$Version)
 
 $baseDir = Split-Path -parent $PSCommandPath
-$wix = 'I:\devel\bin\wix-binaries'
-$nuget = 'I:\devel\bin\NuGet\nuget.exe'
 $outDir = "$baseDir\out"
+
+if ($env:build_nuget) {
+	$nuget = $env:build_nuget
+}
+else {
+	$nuget = 'I:\devel\bin\NuGet\nuget.exe'
+}
+if ($env:build_wix) {
+	$wix = $env:build_wix
+}
+else {
+	$wix = 'I:\devel\bin\wix-binaries'
+}
 
 function Clean() {
 	if (Test-Path $outDir) {
