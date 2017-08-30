@@ -91,9 +91,9 @@
 			<Project>{8de3edee-c361-4da2-96f0-35795d5bf071}</Project>
 			<Name>EntityFramework.Firebird_NET45</Name>
 		</ProjectReference>
-		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET45.csproj">
-			<Project>{b37720ac-3b59-438b-afba-1e27547dd200}</Project>
-			<Name>FirebirdSql.Data.FirebirdClient_NET45</Name>
+		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj">
+			<Project>{adc34658-2605-4588-a056-5288ede4f5de}</Project>
+			<Name>FirebirdSql.Data.FirebirdClient</Name>
 		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>

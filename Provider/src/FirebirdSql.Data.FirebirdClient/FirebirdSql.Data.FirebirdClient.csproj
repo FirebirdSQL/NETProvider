@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net452;netstandard1.6;netstandard2.0</TargetFrameworks>
 		<AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
 		<RootNamespace>FirebirdSql.Data</RootNamespace>
 		<SignAssembly>True</SignAssembly>
@@ -19,17 +19,10 @@
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Remove="app.FirebirdSql.Data.FirebirdClient_NET40.config" />
-		<None Remove="Microsoft.Bcl.Build.targets" />
 		<None Remove="Schema\FbMetaData.xml" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Schema\FbMetaData.xml" />
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Remove="Entity\**" />
-		<EmbeddedResource Remove="Entity\**" />
-		<None Remove="Entity\**" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
 		<PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
@@ -51,5 +44,8 @@
 		<PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
 		<PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
 		<PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
+		<Reference Include="System.Transactions" />
 	</ItemGroup>
 </Project>

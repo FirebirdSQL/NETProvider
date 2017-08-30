@@ -84,13 +84,13 @@
     <EmbeddedResource Include="Resources\StoreSchemaMappingVersion3.msl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NET45.csproj">
-      <Project>{23d8fdba-b992-4652-9489-35a2d53445ca}</Project>
-      <Name>FirebirdSql.Data.FirebirdClient_NET45</Name>
-    </ProjectReference>
+    <EmbeddedResource Include="Resources\ProviderManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ProviderManifest.xml" />
+    <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj">
+      <Project>{adc34658-2605-4588-a056-5288ede4f5de}</Project>
+      <Name>FirebirdSql.Data.FirebirdClient</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

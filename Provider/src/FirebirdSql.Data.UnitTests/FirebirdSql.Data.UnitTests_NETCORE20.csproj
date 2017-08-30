@@ -21,6 +21,6 @@
 		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient_NETSTANDARD.csproj" />
+		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
 	</ItemGroup>
 </Project>
