@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Metadata.Edm;
 
-namespace FirebirdSql.Data.EntityFramework6.SqlGen
+namespace EntityFramework.Firebird.SqlGen
 {
 	internal class Symbol : ISqlFragment
 	{

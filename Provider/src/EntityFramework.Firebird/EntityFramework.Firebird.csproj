@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net452</TargetFramework>
+		<AssemblyName>EntityFramework.Firebird</AssemblyName>
+		<RootNamespace>EntityFramework.Firebird</RootNamespace>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>Properties\EntityFramework.Firebird.snk</AssemblyOriginatorKeyFile>
+		<DelaySign>False</DelaySign>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+		<IntermediateOutputPath>obj\$(TargetFramework)</IntermediateOutputPath>
+		<OutputPath>bin\$(Configuration)\$(TargetFramework)</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<DefineConstants>TRACE</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="..\FirebirdSql.Data.FirebirdClient\Properties\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="Resources\ProviderManifest.xml" />
+		<None Remove="Resources\StoreSchemaDefinition.ssdl" />
+		<None Remove="Resources\StoreSchemaDefinitionVersion3.ssdl" />
+		<None Remove="Resources\StoreSchemaMapping.msl" />
+		<None Remove="Resources\StoreSchemaMappingVersion3.msl" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\ProviderManifest.xml" />
+		<EmbeddedResource Include="Resources\StoreSchemaDefinition.ssdl" />
+		<EmbeddedResource Include="Resources\StoreSchemaDefinitionVersion3.ssdl" />
+		<EmbeddedResource Include="Resources\StoreSchemaMapping.msl" />
+		<EmbeddedResource Include="Resources\StoreSchemaMappingVersion3.msl" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="System.Configuration" />
+		<Reference Include="Microsoft.CSharp" />
+		<Reference Include="..\..\lib\EF6\net45\EntityFramework.dll" />
+	</ItemGroup>
+</Project>

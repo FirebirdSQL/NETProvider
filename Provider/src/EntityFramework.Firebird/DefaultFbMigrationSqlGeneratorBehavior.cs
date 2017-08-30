@@ -19,7 +19,7 @@
 
 using System.Collections.Generic;
 
-namespace FirebirdSql.Data.EntityFramework6
+namespace EntityFramework.Firebird
 {
 	public class DefaultFbMigrationSqlGeneratorBehavior : IFbMigrationSqlGeneratorBehavior
 	{

@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.EntityFramework6.SqlGen
+namespace EntityFramework.Firebird.SqlGen
 {
 	internal static class DmlSqlGenerator
 	{

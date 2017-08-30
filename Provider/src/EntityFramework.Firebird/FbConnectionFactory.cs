@@ -25,7 +25,7 @@ using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.EntityFramework6
+namespace EntityFramework.Firebird
 {
 	public class FbConnectionFactory : IDbConnectionFactory
 	{

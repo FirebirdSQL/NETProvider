@@ -7,10 +7,10 @@
 		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
 		<DelaySign>False</DelaySign>
 		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+		<IntermediateOutputPath>obj\$(TargetFramework)</IntermediateOutputPath>
 		<OutputPath>bin\$(Configuration)\$(TargetFramework)</OutputPath>
-		<IntermediateOutputPath>obj\$(Configuration)\$(TargetFramework)</IntermediateOutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>TRACE</DefineConstants>

@@ -26,7 +26,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 
-namespace FirebirdSql.Data.EntityFramework6
+namespace EntityFramework.Firebird
 {
 	public class FbProviderManifest : DbXmlEnabledProviderManifest
 	{
@@ -407,12 +407,12 @@ namespace FirebirdSql.Data.EntityFramework6
 
 		private static string GetManifestResourceName()
 		{
-			return "FirebirdSql.Data.EntityFramework6.Resources.ProviderManifest.xml";
+			return "EntityFramework.Firebird.Resources.ProviderManifest.xml";
 		}
 
 		private static string GetStoreSchemaResourceName(string name, string type)
 		{
-			return string.Format("FirebirdSql.Data.EntityFramework6.Resources.{0}.{1}", name, type);
+			return string.Format("EntityFramework.Firebird.Resources.{0}.{1}", name, type);
 		}
 
 		public override bool SupportsEscapingLikeArgument(out char escapeCharacter)

@@ -18,7 +18,7 @@
 
 using System.Data.Entity.Core.Metadata.Edm;
 
-namespace FirebirdSql.Data.EntityFramework6
+namespace EntityFramework.Firebird
 {
 	internal static class TypeHelpers
 	{

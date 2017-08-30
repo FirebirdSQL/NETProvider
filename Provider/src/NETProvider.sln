@@ -4,11 +4,11 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.Data.UnitTests_NET45", "FirebirdSql.Data.UnitTests\FirebirdSql.Data.UnitTests_NET45.csproj", "{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Firebird_NET45", "EntityFramework.Firebird\EntityFramework.Firebird_NET45.csproj", "{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj", "{ADC34658-2605-4588-A056-5288EDE4F5DE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.Data.UnitTests_NETCORE20", "FirebirdSql.Data.UnitTests\FirebirdSql.Data.UnitTests_NETCORE20.csproj", "{C954BC7E-8C16-472F-BA78-93AFB11C69A4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFramework.Firebird", "EntityFramework.Firebird\EntityFramework.Firebird.csproj", "{29A1073A-42C9-4AA9-9B2D-6025C5082C7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,10 +20,6 @@ Global
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D58FD6C4-BC7F-455B-B5FF-9DD7E4B94172}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8DE3EDEE-C361-4DA2-96F0-35795D5BF071}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ADC34658-2605-4588-A056-5288EDE4F5DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ADC34658-2605-4588-A056-5288EDE4F5DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADC34658-2605-4588-A056-5288EDE4F5DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -32,6 +28,10 @@ Global
 		{C954BC7E-8C16-472F-BA78-93AFB11C69A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C954BC7E-8C16-472F-BA78-93AFB11C69A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C954BC7E-8C16-472F-BA78-93AFB11C69A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29A1073A-42C9-4AA9-9B2D-6025C5082C7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29A1073A-42C9-4AA9-9B2D-6025C5082C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29A1073A-42C9-4AA9-9B2D-6025C5082C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29A1073A-42C9-4AA9-9B2D-6025C5082C7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

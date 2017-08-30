@@ -22,7 +22,7 @@ using System.Data.Entity;
 using System.Data.Entity.Core.Common;
 using System.Linq;
 
-using FirebirdSql.Data.EntityFramework6;
+using EntityFramework.Firebird;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 

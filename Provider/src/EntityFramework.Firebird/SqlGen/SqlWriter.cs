@@ -20,7 +20,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace FirebirdSql.Data.EntityFramework6.SqlGen
+namespace EntityFramework.Firebird.SqlGen
 {
 	internal class SqlWriter : StringWriter
 	{

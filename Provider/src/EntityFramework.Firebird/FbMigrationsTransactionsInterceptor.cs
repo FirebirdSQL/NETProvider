@@ -25,7 +25,7 @@ using System.Diagnostics;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.EntityFramework6
+namespace EntityFramework.Firebird
 {
 	// Migrations are executed in Serializable transaction. Because of my "AUTONOMOUS TRANSACTION" usage
 	// I better use ReadCommitted. Here I plug in, in case of Migrations.

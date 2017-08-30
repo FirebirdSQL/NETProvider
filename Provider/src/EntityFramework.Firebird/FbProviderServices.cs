@@ -29,12 +29,12 @@ using System.Data.Entity.Infrastructure.Interception;
 using System.Data.Entity.Migrations.Sql;
 using System.Diagnostics;
 using System.Linq;
-using FirebirdSql.Data.EntityFramework6.SqlGen;
+using EntityFramework.Firebird.SqlGen;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
 using FirebirdSql.Data.Services;
 
-namespace FirebirdSql.Data.EntityFramework6
+namespace EntityFramework.Firebird
 {
 #pragma warning disable 3009
 	public class FbProviderServices : DbProviderServices

@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace FirebirdSql.Data.EntityFramework6.SqlGen
+namespace EntityFramework.Firebird.SqlGen
 {
 	internal sealed class SqlBuilder : ISqlFragment
 	{

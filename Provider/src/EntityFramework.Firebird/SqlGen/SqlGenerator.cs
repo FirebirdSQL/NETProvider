@@ -27,7 +27,7 @@ using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.EntityFramework6.SqlGen
+namespace EntityFramework.Firebird.SqlGen
 {
 	internal sealed class SqlGenerator : DbExpressionVisitor<ISqlFragment>
 	{

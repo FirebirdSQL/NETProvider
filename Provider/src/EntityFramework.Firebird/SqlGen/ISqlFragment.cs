@@ -16,7 +16,7 @@
  *  All Rights Reserved.
  */
 
-namespace FirebirdSql.Data.EntityFramework6.SqlGen
+namespace EntityFramework.Firebird.SqlGen
 {
 	internal interface ISqlFragment
 	{

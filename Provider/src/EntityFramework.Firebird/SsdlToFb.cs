@@ -21,9 +21,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.Entity.Core.Metadata.Edm;
-using FirebirdSql.Data.EntityFramework6.SqlGen;
+using EntityFramework.Firebird.SqlGen;
 
-namespace FirebirdSql.Data.EntityFramework6
+namespace EntityFramework.Firebird
 {
 	internal static class SsdlToFb
 	{

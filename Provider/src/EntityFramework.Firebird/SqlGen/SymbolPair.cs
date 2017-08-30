@@ -18,7 +18,7 @@
 
 using System.Diagnostics;
 
-namespace FirebirdSql.Data.EntityFramework6.SqlGen
+namespace EntityFramework.Firebird.SqlGen
 {
 	internal class SymbolPair : ISqlFragment
 	{

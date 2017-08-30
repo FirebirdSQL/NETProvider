@@ -22,7 +22,7 @@ using System.Data;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Diagnostics;
 
-namespace FirebirdSql.Data.EntityFramework6
+namespace EntityFramework.Firebird
 {
 	internal static class MetadataHelpers
 	{

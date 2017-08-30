@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace FirebirdSql.Data.EntityFramework6.SqlGen
+namespace EntityFramework.Firebird.SqlGen
 {
 	internal sealed class SymbolTable
 	{
