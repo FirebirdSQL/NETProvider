@@ -22,7 +22,7 @@ else {
 
 function Clean() {
 	if (Test-Path $outDir) {
-	rm -Recurse -Force $outDir\*
+		rm -Recurse -Force $outDir\*
 	}
 	else {
 		mkdir $outDir | Out-Null
