@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<AssemblyName>FirebirdSql.Data.FirebirdClient.Tests</AssemblyName>
+		<RootNamespace>FirebirdSql.Data.FirebirdClient.Tests</RootNamespace>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="NUnit" Version="3.7.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
+	</ItemGroup>
+	<Import Project="..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems" Label="Shared" />
+
+	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
+		<Reference Include="System.Transactions" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+	</ItemGroup>
+</Project>

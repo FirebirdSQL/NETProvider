@@ -42,12 +42,9 @@
 						<File Id="FirebirdSql.Data.FirebirdClient.pdb"
 									Name="FirebirdSql.Data.FirebirdClient.pdb"
 									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.pdb" />
-						<File Id="FirebirdSql.Data.UnitTests.dll"
-									Name="FirebirdSql.Data.UnitTests.dll"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release\net452\FirebirdSql.Data.UnitTests.dll" />
-						<File Id="FirebirdSql.Data.UnitTests.config"
-									Name="FirebirdSql.Data.UnitTests.dll.config"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.UnitTests\bin\Release\net452\FirebirdSql.Data.UnitTests.dll.config" />
+						<File Id="FirebirdSql.Data.FirebirdClient.Tests.dll"
+									Name="FirebirdSql.Data.FirebirdClient.Tests.dll"
+									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient.Tests\bin\Release\net452\FirebirdSql.Data.FirebirdClient.Tests.dll" />
 					</Component>
 				</Directory>
 			</Directory>

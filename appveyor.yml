@@ -26,7 +26,7 @@ build_script:
 after_build:
   - ps: gci "$baseDir\Provider\out" | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 before_test:
-  - ps: $testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.UnitTests"
+  - ps: $testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.FirebirdClient.Tests"
   - ps: $testsNETDir = "$testsBaseDir\bin\$env:CONFIGURATION\net452"
   - ps: $testsCOREDir = "$testsBaseDir\bin\$env:CONFIGURATION\netcoreapp2.0"
 
@@ -44,10 +44,8 @@ before_test:
   - ps: ni firebird.log -ItemType File | Out-Null
 test_script:
   - ps: cd $testsNETDir
-  - ps: nunit3-console FirebirdSql.Data.UnitTests.dll --framework=net-4.5 --result='NET_results.xml;format=AppVeyor'
+  - ps: nunit3-console FirebirdSql.Data.FirebirdClient.Tests.dll --framework=net-4.5 --result='dummy.xml;format=AppVeyor'
 
   - ps: cd $testsBaseDir
-  - ps: $resultsCORE = "$testsCOREDir\CORE_results.xml"
-  - ps: dotnet test FirebirdSql.Data.UnitTests.csproj -c $env:CONFIGURATION -f netcoreapp2.0 --no-build --no-restore --logger="trx;LogFileName=$resultsCORE"
-  - ps: $wc = New-Object System.Net.WebClient
-  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$env:APPVEYOR_JOB_ID", $resultsCORE)
+  - ps: dotnet add FirebirdSql.Data.FirebirdClient.Tests.csproj package Appveyor.TestLogger -v 1.0.1-post-rtm 
+  - ps: dotnet test FirebirdSql.Data.FirebirdClient.Tests.csproj -c $env:CONFIGURATION -f netcoreapp2.0 --logger=Appveyor

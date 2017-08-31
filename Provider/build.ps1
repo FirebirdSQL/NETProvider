@@ -31,7 +31,7 @@ function Clean() {
 
 function Build() {
 	$solutionFile = "$baseDir\src\NETProvider.sln"
-	& $nuget restore $solutionFile
+	dotnet restore $solutionFile
 	msbuild /t:Clean,Build /p:Configuration=$Configuration $solutionFile /v:m /m
 }
 

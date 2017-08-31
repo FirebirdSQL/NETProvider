@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net452</TargetFramework>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<AssemblyName>EntityFramework.Firebird.Tests</AssemblyName>
+		<RootNamespace>EntityFramework.Firebird.Tests</RootNamespace>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="NUnit" Version="3.7.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="..\..\lib\EF6\net45\EntityFramework.dll" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
+		<ProjectReference Include="..\EntityFramework.Firebird\EntityFramework.Firebird.csproj" />
+	</ItemGroup>
+	<Import Project="..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems" Label="Shared" />
+</Project>
