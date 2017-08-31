@@ -6,6 +6,7 @@ Thanks for considering contributing. Here are some items to consider before star
 * Before you start working on something announce your intention on the mailing list (or in comment in tracker).
 * Issue only complete PRs (no WIPs).
 * Make sure your PR doesn't contain unneccessary changes (whitespaces, new lines, ...).
+* Consider squashing your commits.
 * Follow existing code formatting/styling (even for new files).
 * Make sure you swept all corners (i.e. all build configurations are fine, works with all Firebird version, etc.).
 * Make sure your changes merge without conflicts.
