@@ -17,12 +17,14 @@
  */
 
 #if EF6
-namespace FirebirdSql.Data.EntityFramework6.Properties
+namespace EntityFramework.Firebird
+#elif EFCORE
+namespace FirebirdSql.EntityFrameworkCore.Firebird
 #else
-namespace FirebirdSql.Data.FirebirdClient.Properties
+namespace FirebirdSql.Data.FirebirdClient
 #endif
 {
-	static class VersionInfo
+	static class _VersionInfo
 	{
 		internal const string Version = "5.12.1.0";
 	}

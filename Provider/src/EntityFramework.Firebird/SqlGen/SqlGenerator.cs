@@ -103,7 +103,6 @@ namespace EntityFramework.Firebird.SqlGen
 		static private readonly Dictionary<string, FunctionHandler> _builtInFunctionHandlers = InitializeBuiltInFunctionHandlers();
 		static private readonly Dictionary<string, FunctionHandler> _canonicalFunctionHandlers = InitializeCanonicalFunctionHandlers();
 		static private readonly Dictionary<string, string> _functionNameToOperatorDictionary = InitializeFunctionNameToOperatorDictionary();
-		static private readonly char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 		private delegate ISqlFragment FunctionHandler(SqlGenerator sqlgen, DbFunctionExpression functionExpr);
 
@@ -3651,16 +3650,6 @@ namespace EntityFramework.Firebird.SqlGen
 				//result.Append(".");
 				result.Append(QuoteIdentifier(storeFunctionName));
 			}
-		}
-
-		static string ByteArrayToBinaryString(Byte[] binaryArray)
-		{
-			StringBuilder sb = new StringBuilder(binaryArray.Length * 2);
-			for (int i = 0; i < binaryArray.Length; i++)
-			{
-				sb.Append(hexDigits[(binaryArray[i] & 0xF0) >> 4]).Append(hexDigits[binaryArray[i] & 0x0F]);
-			}
-			return sb.ToString();
 		}
 
 		/// <summary>

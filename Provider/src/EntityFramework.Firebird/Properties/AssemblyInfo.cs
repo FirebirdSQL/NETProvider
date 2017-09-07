@@ -20,7 +20,7 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 [assembly: ComVisible(false)]
 [assembly: AssemblyCompany("FirebirdSQL")]
 [assembly: AssemblyProduct("FirebirdClient")]
@@ -28,5 +28,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("(c) 2014-2017")]
 [assembly: AssemblyTitle("FirebirdClient - Entity Framework Provider")]
 [assembly: AssemblyDescription("FirebirdClient - Entity Framework Provider")]
-[assembly: AssemblyVersion(_VersionInfo.Version)]
-[assembly: AssemblyFileVersion(_VersionInfo.Version)]
+[assembly: AssemblyVersion(EntityFramework.Firebird._VersionInfo.Version)]
+[assembly: AssemblyFileVersion(EntityFramework.Firebird._VersionInfo.Version)]

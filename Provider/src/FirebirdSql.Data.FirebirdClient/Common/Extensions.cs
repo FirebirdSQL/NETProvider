@@ -106,10 +106,7 @@ namespace FirebirdSql.Data.Common
 				throw new NotSupportedException();
 			}
 		}
-	}
 
-	public static class PublicExtensions
-	{
 		public static string ToHexString(this byte[] b)
 		{
 			return BitConverter.ToString(b).Replace("-", string.Empty);

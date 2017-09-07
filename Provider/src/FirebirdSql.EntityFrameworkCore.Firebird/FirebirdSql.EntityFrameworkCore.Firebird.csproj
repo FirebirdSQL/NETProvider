@@ -9,15 +9,22 @@
 		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<DefineConstants>TRACE</DefineConstants>
+		<DefineConstants>EFCORE;TRACE</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<DefineConstants>EFCORE;DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.0" />
+	</ItemGroup>
 	<ItemGroup>
 		<Compile Include="..\FirebirdSql.Data.FirebirdClient\Properties\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Migrations\Operations\" />
 	</ItemGroup>
 </Project>
