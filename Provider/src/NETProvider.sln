@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.EntityFramework
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFramework.Firebird.Tests", "EntityFramework.Firebird.Tests\EntityFramework.Firebird.Tests.csproj", "{E6849FF6-D309-433A-B3EE-0554F07E3B21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirebirdSql.EntityFrameworkCore.Firebird", "FirebirdSql.EntityFrameworkCore.Firebird\FirebirdSql.EntityFrameworkCore.Firebird.csproj", "{42A00B25-673E-449A-9B89-BE89344F96F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.EntityFrameworkCore.Firebird", "FirebirdSql.EntityFrameworkCore.Firebird\FirebirdSql.EntityFrameworkCore.Firebird.csproj", "{42A00B25-673E-449A-9B89-BE89344F96F0}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
