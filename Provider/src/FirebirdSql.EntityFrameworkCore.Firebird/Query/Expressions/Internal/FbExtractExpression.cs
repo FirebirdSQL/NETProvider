@@ -17,7 +17,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 
 		public override ExpressionType NodeType => ExpressionType.Extension;
 		public override bool CanReduce => false;
-		public override Type Type => typeof(float);
+		public override Type Type => typeof(int);
 
 		protected override Expression Accept(ExpressionVisitor visitor)
 		{
