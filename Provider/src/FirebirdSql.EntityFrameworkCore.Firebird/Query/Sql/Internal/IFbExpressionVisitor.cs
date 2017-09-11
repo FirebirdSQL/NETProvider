@@ -6,5 +6,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 	public interface IFbExpressionVisitor
 	{
 		Expression VisitSubstring(FbSubstringExpression substringExpression);
+		Expression VisitExtract(FbExtractExpression extractExpression);
 	}
 }

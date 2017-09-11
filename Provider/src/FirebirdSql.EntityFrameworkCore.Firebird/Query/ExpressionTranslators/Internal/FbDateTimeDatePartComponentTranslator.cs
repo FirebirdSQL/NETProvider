@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
 using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
@@ -33,15 +33,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 
 		public virtual Expression Translate(MemberExpression memberExpression)
 		{
-			if (MemberDatePartMapping.TryGetValue(memberExpression.Member, out var part))
-			{
-				return new SqlFunctionExpression("EXTRACT", memberExpression.Type, new[]
-				{
-#warning Expression wrong
-					new SqlFragmentExpression($"{part} FROM {memberExpression.Expression}")
-				});
-			}
-			return null;
+			if (!MemberDatePartMapping.TryGetValue(memberExpression.Member, out var part))
+				return null;
+
+			return new FbExtractExpression(part, memberExpression.Expression);
 		}
 	}
 }

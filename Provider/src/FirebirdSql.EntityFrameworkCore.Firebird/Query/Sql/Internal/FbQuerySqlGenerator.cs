@@ -54,10 +54,23 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			Visit(substringExpression.ValueExpression);
 			Sql.Append(" FROM ");
 			Visit(substringExpression.FromExpression);
-			Sql.Append(" FOR ");
-			Visit(substringExpression.ForExpression);
+			if (substringExpression.ForExpression != null)
+			{
+				Sql.Append(" FOR ");
+				Visit(substringExpression.ForExpression);
+			}
 			Sql.Append(")");
 			return substringExpression;
+		}
+
+		public virtual Expression VisitExtract(FbExtractExpression extractExpression)
+		{
+			Sql.Append("EXTRACT(");
+			Sql.Append(extractExpression.Part);
+			Sql.Append(" FROM ");
+			Visit(extractExpression.ValueExpression);
+			Sql.Append(")");
+			return extractExpression;
 		}
 	}
 }

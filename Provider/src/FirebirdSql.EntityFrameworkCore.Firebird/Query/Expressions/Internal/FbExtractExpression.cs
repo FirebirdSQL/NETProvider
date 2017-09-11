@@ -4,28 +4,26 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 {
-	public class FbSubstringExpression : Expression
+	public class FbExtractExpression : Expression
 	{
+		public virtual string Part { get; }
 		public virtual Expression ValueExpression { get; }
-		public virtual Expression FromExpression { get; }
-		public virtual Expression ForExpression { get; }
 
-		public FbSubstringExpression(Expression valueExpression, Expression fromExpression, Expression forExpression)
+		public FbExtractExpression(string part, Expression valueExpression)
 		{
+			Part = part;
 			ValueExpression = valueExpression;
-			FromExpression = fromExpression;
-			ForExpression = forExpression;
 		}
 
 		public override ExpressionType NodeType => ExpressionType.Extension;
 		public override bool CanReduce => false;
-		public override Type Type => typeof(string);
+		public override Type Type => typeof(float);
 
 		protected override Expression Accept(ExpressionVisitor visitor)
 		{
 			if (visitor is IFbExpressionVisitor specificVisitor)
 			{
-				return specificVisitor.VisitSubstring(this);
+				return specificVisitor.VisitExtract(this);
 			}
 			else
 			{
@@ -36,11 +34,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 		protected override Expression VisitChildren(ExpressionVisitor visitor)
 		{
 			var newValueExpression = visitor.Visit(ValueExpression);
-			var newFromExpression = visitor.Visit(FromExpression);
-			var newForExpression = visitor.Visit(ForExpression);
 
-			return newValueExpression != ValueExpression || newFromExpression != FromExpression || newForExpression != ForExpression
-				? new FbSubstringExpression(newValueExpression, newFromExpression, newForExpression)
+			return newValueExpression != ValueExpression
+				? new FbExtractExpression(Part, newValueExpression)
 				: this;
 		}
 
@@ -54,16 +50,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 			{
 				return true;
 			}
-			return obj.GetType() == GetType() && Equals((FbSubstringExpression)obj);
+			return obj.GetType() == GetType() && Equals((FbExtractExpression)obj);
 		}
 
 		public override int GetHashCode()
 		{
 			unchecked
 			{
-				var hashCode = ValueExpression.GetHashCode();
-				hashCode = (hashCode * 397) ^ FromExpression.GetHashCode();
-				hashCode = (hashCode * 397) ^ ForExpression.GetHashCode();
+				var hashCode = Part.GetHashCode();
+				hashCode = (hashCode * 397) ^ ValueExpression.GetHashCode();
 				return hashCode;
 			}
 		}

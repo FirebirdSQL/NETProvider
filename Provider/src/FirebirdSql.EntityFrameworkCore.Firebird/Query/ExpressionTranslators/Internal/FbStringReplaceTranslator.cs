@@ -12,7 +12,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 
 		public virtual Expression Translate(MethodCallExpression methodCallExpression)
 		{
-			if (!methodCallExpression.Equals(ReplaceMethod))
+			if (!methodCallExpression.Method.Equals(ReplaceMethod))
 				return null;
 
 			return new SqlFunctionExpression(
