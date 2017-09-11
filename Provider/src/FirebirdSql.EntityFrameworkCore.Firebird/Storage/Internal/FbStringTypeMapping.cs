@@ -1,5 +1,4 @@
 ﻿using System.Data.Common;
-using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -22,8 +21,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		protected override string GenerateNonNullSqlLiteral(object value)
 		{
-#warning Duplicate from SqlGenerator.FormatBinary
-			return string.Format("x'{0}'", ((byte[])value).ToHexString());
+			return IsUnicode
+				? $"_UTF8'{EscapeSqlLiteral((string)value)}'"
+				: $"'{EscapeSqlLiteral((string)value)}'";
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		protected override string GenerateNonNullSqlLiteral(object value)
 		{
-			// DUP: SqlGenerator.FormatBinary
+#warning Duplicate from SqlGenerator.FormatBinary
 			return string.Format("x'{0}'", ((byte[])value).ToHexString());
 		}
 	}
