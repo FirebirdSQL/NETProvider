@@ -1,20 +1,30 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using FirebirdSql.EntityFrameworkCore.Firebird.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using NUnitLite;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 {
+	static class Program
+	{
+		static int Main()
+		{
+			return new AutoRun(Assembly.GetExecutingAssembly()).Execute(new[] { "--noresult" });
+		}
+	}
+
 	[TestFixture]
 	public class Scratchpad
 	{
 		[Test]
 		public void Test()
 		{
-			using (var db = new TestContext())
+			using (var db = new TestDbContext())
 			{
 				var loggerFactory = db.GetService<ILoggerFactory>();
 				loggerFactory.AddConsole();
@@ -22,7 +32,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 				db.Set<MonAttachment>()
 					.Select(x => new
 					{
-						Name = x.AttachmentName,
+						Name = x.AttachmentName.Trim(),
 						Test = x.Timestamp.Second,
 					})
 					.ToList();
@@ -30,7 +40,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 		}
 	}
 
-	class TestContext : DbContext
+	class TestDbContext : DbContext
 	{
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
