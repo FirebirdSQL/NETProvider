@@ -13,7 +13,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 
 		public virtual Expression Translate(MethodCallExpression methodCallExpression)
 		{
-			if (methodCallExpression.Equals(TrimWithoutArgsMethod) || methodCallExpression.Equals(TrimWithCharArrayArgMethod)
+			if (methodCallExpression.Method.Equals(TrimWithoutArgsMethod) || methodCallExpression.Method.Equals(TrimWithCharArrayArgMethod)
 				// no arguments
 				&& ((methodCallExpression.Arguments[0] as ConstantExpression)?.Value as Array)?.Length == 0)
 			{
