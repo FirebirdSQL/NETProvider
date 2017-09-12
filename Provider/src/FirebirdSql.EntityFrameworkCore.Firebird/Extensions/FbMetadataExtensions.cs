@@ -20,7 +20,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 		public static RelationalIndexAnnotations Firebird(this IIndex index)
 			=> new RelationalIndexAnnotations(index);
 
-		public static RelationalModelAnnotations Firebird(this IModel model)
-			=> new RelationalModelAnnotations(model);
+		public static IFbModelAnnotations Firebird(this IModel model)
+			=> new FbModelAnnotations(model);
 	}
 }

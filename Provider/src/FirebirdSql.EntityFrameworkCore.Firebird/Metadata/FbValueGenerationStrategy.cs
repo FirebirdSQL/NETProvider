@@ -3,6 +3,6 @@
 	public enum FbValueGenerationStrategy
     {
 		SequenceTrigger,
-		Identity,
+		IdentityColumn,
     }
 }
