@@ -24,7 +24,4 @@
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Migrations\Operations\" />
-	</ItemGroup>
 </Project>
