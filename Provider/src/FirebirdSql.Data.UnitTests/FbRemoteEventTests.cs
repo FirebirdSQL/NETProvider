@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					cmd.CommandText = "execute block as begin post_event 'test'; end";
 					cmd.ExecuteNonQuery();
-					Thread.Sleep(200);
+					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
 				Assert.IsTrue(triggered);
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					cmd.CommandText = "execute block as begin post_event 'test'; post_event 'test'; post_event 'test'; post_event 'test'; post_event 'test'; end";
 					cmd.ExecuteNonQuery();
-					Thread.Sleep(200);
+					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
 				Assert.IsTrue(triggered);
@@ -117,7 +117,7 @@ namespace FirebirdSql.Data.UnitTests
 					cmd.ExecuteNonQuery();
 					cmd.CommandText = "execute block as begin post_event 'a'; end";
 					cmd.ExecuteNonQuery();
-					Thread.Sleep(200);
+					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
 				Assert.IsTrue(triggeredA);
@@ -154,7 +154,7 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					cmd.CommandText = "execute block as begin post_event 'b'; post_event 'a'; end";
 					cmd.ExecuteNonQuery();
-					Thread.Sleep(200);
+					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
 				Assert.IsTrue(triggeredA);
@@ -182,14 +182,14 @@ namespace FirebirdSql.Data.UnitTests
 				{
 					cmd.CommandText = "execute block as begin post_event 'test'; end";
 					cmd.ExecuteNonQuery();
-					Thread.Sleep(200);
+					Thread.Sleep(2000);
 				}
 				@event.CancelEvents();
 				using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "execute block as begin post_event 'test'; end";
 					cmd.ExecuteNonQuery();
-					Thread.Sleep(200);
+					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
 				Assert.AreEqual(1, triggered);
@@ -217,14 +217,14 @@ namespace FirebirdSql.Data.UnitTests
 					triggered++;
 				};
 				@event.QueueEvents("test");
-				Thread.Sleep(200);
+				Thread.Sleep(2000);
 			}
-			Thread.Sleep(200);
+			Thread.Sleep(2000);
 			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "execute block as begin post_event 'test'; end";
 				cmd.ExecuteNonQuery();
-				Thread.Sleep(200);
+				Thread.Sleep(2000);
 			}
 			Assert.AreEqual(0, triggered);
 		}
@@ -240,9 +240,9 @@ namespace FirebirdSql.Data.UnitTests
 					exception = e.Error;
 				};
 				@event.QueueEvents("test");
-				Thread.Sleep(200);
+				Thread.Sleep(2000);
 			}
-			Thread.Sleep(200);
+			Thread.Sleep(2000);
 			Assert.IsNull(exception);
 		}
 	}
