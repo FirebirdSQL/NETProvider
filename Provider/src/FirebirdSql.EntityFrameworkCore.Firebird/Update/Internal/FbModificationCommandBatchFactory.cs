@@ -23,7 +23,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 
 		public ModificationCommandBatch Create()
 		{
-			return new FbModificationCommandBatch(
+			return new SingularModificationCommandBatch(
 				_commandBuilderFactory,
 				_sqlGenerationHelper,
 				_updateSqlGenerator,
