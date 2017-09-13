@@ -5,7 +5,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 {
 	public static class FbMetadataExtensions
 	{
-		public static IFbPropertyAnnotations Firebird(this IProperty property)
+		public static FbPropertyAnnotations Firebird(this IProperty property)
 			=> new FbPropertyAnnotations(property);
 
 		public static RelationalEntityTypeAnnotations Firebird(this IEntityType entityType)
@@ -20,7 +20,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 		public static RelationalIndexAnnotations Firebird(this IIndex index)
 			=> new RelationalIndexAnnotations(index);
 
-		public static IFbModelAnnotations Firebird(this IModel model)
+		public static FbModelAnnotations Firebird(this IModel model)
 			=> new FbModelAnnotations(model);
 	}
 }
