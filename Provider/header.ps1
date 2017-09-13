@@ -15,7 +15,9 @@ $LicenseHeader = @"
  */
 "@
 
-gci -Recurse -Filter *.cs | %{
+$baseDir = Split-Path -Parent $PSCommandPath
+
+gci $baseDir -Recurse -Filter *.cs | %{
 	$content = gc $_.FullName -Encoding UTF8
 	$newContent = @()
 	
@@ -23,7 +25,6 @@ gci -Recurse -Filter *.cs | %{
 	foreach ($line in $content) {
 		if ($line.StartsWith('//$Authors')) {
 			$started = $true
-			$header = $LicenseHeader
 			$line = $LicenseHeader + "`r`n`r`n" + $line
 		}
 		if ($started) {
@@ -33,5 +34,6 @@ gci -Recurse -Filter *.cs | %{
 	if (!$started) {
 		return
 	}
+
 	sc $_.FullName $newContent -Encoding UTF8
 }

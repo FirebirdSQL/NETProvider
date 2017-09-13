@@ -4,7 +4,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$baseDir = Split-Path -parent $PSCommandPath
+$baseDir = Split-Path -Parent $PSCommandPath
 $outDir = "$baseDir\out"
 
 if ($env:build_nuget) {
