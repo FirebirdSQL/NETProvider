@@ -115,18 +115,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata
 			{
 				if (GetDefaultValue(false) != null)
 				{
-					throw new InvalidOperationException(
-						RelationalStrings.ConflictingColumnServerGeneration(nameof(ValueGenerationStrategy), Property.Name, nameof(DefaultValue)));
+					throw new InvalidOperationException(RelationalStrings.ConflictingColumnServerGeneration(nameof(ValueGenerationStrategy), Property.Name, nameof(DefaultValue)));
 				}
 				if (GetDefaultValueSql(false) != null)
 				{
-					throw new InvalidOperationException(
-						RelationalStrings.ConflictingColumnServerGeneration(nameof(ValueGenerationStrategy), Property.Name, nameof(DefaultValueSql)));
+					throw new InvalidOperationException(RelationalStrings.ConflictingColumnServerGeneration(nameof(ValueGenerationStrategy), Property.Name, nameof(DefaultValueSql)));
 				}
 				if (GetComputedColumnSql(false) != null)
 				{
-					throw new InvalidOperationException(
-						RelationalStrings.ConflictingColumnServerGeneration(nameof(ValueGenerationStrategy), Property.Name, nameof(ComputedColumnSql)));
+					throw new InvalidOperationException(RelationalStrings.ConflictingColumnServerGeneration(nameof(ValueGenerationStrategy), Property.Name, nameof(ComputedColumnSql)));
 				}
 			}
 			else if (value != null
