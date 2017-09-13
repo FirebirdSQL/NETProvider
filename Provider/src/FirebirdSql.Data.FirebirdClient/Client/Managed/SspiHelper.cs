@@ -1,23 +1,21 @@
 ﻿/*
- *  Firebird ADO.NET Data provider for .NET and Mono
+ *    The contents of this file are subject to the Initial
+ *    Developer's Public License Version 1.0 (the "License");
+ *    you may not use this file except in compliance with the
+ *    License. You may obtain a copy of the License at
+ *    https://github.com/FirebirdSQL/NETProvider/blob/master/license.txt.
  *
- *     The contents of this file are subject to the Initial
- *     Developer's Public License Version 1.0 (the "License");
- *     you may not use this file except in compliance with the
- *     License. You may obtain a copy of the License at
- *     http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *    Software distributed under the License is distributed on
+ *    an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *    express or implied. See the License for the specific
+ *    language governing rights and limitations under the License.
  *
- *     Software distributed under the License is distributed on
- *     an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
- *     express or implied.  See the License for the specific
- *     language governing rights and limitations under the License.
- *
- *  Copyright (c) 2008 Vladimir Bodecek, Nathan Fox, Jiri Cincura (jiri@cincura.net)
- *  Copyright (c) 2016-2017 Jiri Cincura (jiri@cincura.net)
- *  All Rights Reserved.
- *
- *  Adapted from pinvoke.net.
+ *    All Rights Reserved.
  */
+
+//$Authors = Vladimir Bodecek, Nathan Fox, Jiri Cincura (jiri@cincura.net)
+
+// Adapted from pinvoke.net
 
 using System;
 using System.Text;
