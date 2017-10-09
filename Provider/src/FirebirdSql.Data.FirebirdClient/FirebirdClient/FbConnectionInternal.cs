@@ -358,9 +358,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 			if (position >= 0)
+			{
 				_preparedCommands[position].Target = command;
+			}
 			else
+			{
 				_preparedCommands.Add(new WeakReference(command));
+			}
 		}
 
 		public void RemovePreparedCommand(FbCommand command)
