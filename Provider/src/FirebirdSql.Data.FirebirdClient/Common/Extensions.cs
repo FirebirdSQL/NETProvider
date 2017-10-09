@@ -84,12 +84,6 @@ namespace FirebirdSql.Data.Common
 			return (int)ptr.ToInt64();
 		}
 
-		public static bool TryGetTarget<T>(this WeakReference weakReference, out T target) where T : class
-		{
-			target = (T)weakReference.Target;
-			return target != null;
-		}
-
 		public static IntPtr ReadIntPtr(this BinaryReader self)
 		{
 			if (IntPtr.Size == sizeof(int))

@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private IDatabase _db;
 		private FbTransaction _activeTransaction;
-		private List<WeakReference> _preparedCommands;
+		private List<WeakReference<FbCommand>> _preparedCommands;
 		private FbConnectionString _options;
 		private FbConnection _owningConnection;
 		private bool _disposed;
@@ -98,7 +98,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnectionInternal(FbConnectionString options)
 		{
-			_preparedCommands = new List<WeakReference>();
+			_preparedCommands = new List<WeakReference<FbCommand>>();
 
 			_options = options;
 		}
@@ -250,7 +250,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
-				if (!_preparedCommands[i].TryGetTarget(out FbCommand command))
+				if (!_preparedCommands[i].TryGetTarget(out var command))
 					continue;
 
 				if (command.Transaction != null)
@@ -341,7 +341,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			int position = -1;
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
-				if (!_preparedCommands[i].TryGetTarget(out FbCommand current))
+				if (!_preparedCommands[i].TryGetTarget(out var current))
 				{
 					position = i;
 				}
@@ -353,13 +353,13 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 				}
 			}
-			if (position >= 0)
+			if (position != -1)
 			{
 				_preparedCommands[position].Target = command;
 			}
 			else
 			{
-				_preparedCommands.Add(new WeakReference(command));
+				_preparedCommands.Add(new WeakReference<FbCommand>(command));
 			}
 		}
 
@@ -368,7 +368,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			for (int i = _preparedCommands.Count - 1; i >= 0; i--)
 			{
 				var item = _preparedCommands[i];
-				if (item.TryGetTarget<FbCommand>(out var current) && current == command)
+				if (item.TryGetTarget(out var current) && current == command)
 				{
 					_preparedCommands.RemoveAt(i);
 					return;
@@ -380,14 +380,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
-				if (!_preparedCommands[i].TryGetTarget(out FbCommand current))
+				if (!_preparedCommands[i].TryGetTarget(out var current))
 					continue;
 
 				try
 				{
 					current.Release();
 				}
-				catch (System.IO.IOException)
+				catch (IOException)
 				{
 					// If an IO error occurs weh trying to release the command
 					// avoid it. ( It maybe the connection to the server was down
