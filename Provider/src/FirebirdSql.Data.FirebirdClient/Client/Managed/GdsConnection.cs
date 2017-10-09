@@ -115,14 +115,6 @@ namespace FirebirdSql.Data.Client.Managed
 				IPAddress = GetIPAddress(_dataSource, AddressFamily.InterNetwork);
 				var endPoint = new IPEndPoint(IPAddress, _portNumber);
 
-				//Changed by Robert Dickens @RobertTheArchitect on Oct-04-2017 as
-				//Existing code bellow will fail connection when attempting to remotly connect to a
-				//Remote Firebird installation via IPv6 protocol only
-				//_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-
-				//Address family being passed into Socket should reflect the AddressFamily of the IpAddress Object and not
-				//forced to InterNetwork creating a protocol conflict
 				_socket = new Socket(IPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
 				_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, _packetSize);
