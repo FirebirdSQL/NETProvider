@@ -185,7 +185,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			void CheckDisposedImpl()
 			{
 				if (_disposed)
-					throw new ObjectDisposedException(typeof(Pool).Name);
+					throw new ObjectDisposedException(nameof(Pool));
 			}
 
 			FbConnectionInternal CreateNewConnectionIfPossibleImpl(FbConnectionString connectionString)
@@ -259,7 +259,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		void CheckDisposed()
 		{
 			if (Volatile2.Read(ref _disposed) == 1)
-				throw new ObjectDisposedException(typeof(FbConnectionPoolManager).Name);
+				throw new ObjectDisposedException(nameof(FbConnectionPoolManager));
 		}
 	}
 }
