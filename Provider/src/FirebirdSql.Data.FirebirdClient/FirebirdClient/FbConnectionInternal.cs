@@ -355,7 +355,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			if (position != -1)
 			{
-				_preparedCommands[position].Target = command;
+				_preparedCommands[position].SetTarget(command);
 			}
 			else
 			{
