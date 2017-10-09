@@ -312,8 +312,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
-			if (_statementType != DbStatementType.Select &&
-				_statementType != DbStatementType.SelectForUpdate)
+			if (_statementType == DbStatementType.StoredProcedure && !_allRowsFetched)
+			{
+				_allRowsFetched = true;
+				return GetOutputParameters();
+			}
+			else if (_statementType == DbStatementType.Insert && _allRowsFetched)
+			{
+				return null;
+			}
+			else if (_statementType != DbStatementType.Select && _statementType != DbStatementType.SelectForUpdate)
 			{
 				return null;
 			}
