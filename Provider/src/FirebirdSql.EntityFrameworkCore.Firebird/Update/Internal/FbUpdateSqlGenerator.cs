@@ -16,16 +16,22 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 {
 	public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 	{
-		public FbUpdateSqlGenerator(UpdateSqlGeneratorDependencies dependencies)
+		readonly IRelationalTypeMapper _typeMapper;
+
+		public FbUpdateSqlGenerator(UpdateSqlGeneratorDependencies dependencies, IRelationalTypeMapper typeMapper)
 			: base(dependencies)
-		{ }
+		{
+			_typeMapper = typeMapper;
+		}
 
 		protected override void AppendIdentityWhereCondition(StringBuilder commandStringBuilder, ColumnModification columnModification)
 		{
@@ -37,6 +43,26 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 		{
 #warning Finish
 			throw new NotImplementedException();
+		}
+
+		public override ResultSetMapping AppendInsertOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
+		{
+			commandStringBuilder.Clear();
+			var name = command.TableName;
+			var operations = command.ColumnModifications;
+			var writeOperations = operations.Where(o => o.IsWrite).ToList();
+			var readOperations = operations.Where(o => o.IsRead).ToList();
+			AppendInsertCommandHeader(commandStringBuilder, name, null, writeOperations);
+			AppendValuesHeader(commandStringBuilder, writeOperations);
+			AppendValues(commandStringBuilder, writeOperations);
+			if (readOperations.Any())
+			{
+				commandStringBuilder.AppendLine();
+				commandStringBuilder.Append("RETURNING ");
+				commandStringBuilder.Append(string.Join(", ", readOperations.Select(x => SqlGenerationHelper.DelimitIdentifier(x.ColumnName))));
+			}
+			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
+			return ResultSetMapping.LastInResultSet;
 		}
 	}
 }
