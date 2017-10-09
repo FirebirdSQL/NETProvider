@@ -342,13 +342,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void AddPreparedCommand(FbCommand command)
 		{
-			int position = _preparedCommands.Count;
+			int position = -1;
 			for (int i = 0; i < _preparedCommands.Count; i++)
 			{
 				if (!_preparedCommands[i].TryGetTarget(out FbCommand current))
 				{
 					position = i;
-					break;
 				}
 				else
 				{
@@ -358,7 +357,10 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 				}
 			}
-			_preparedCommands.Insert(position, new WeakReference(command));
+			if (position >= 0)
+				_preparedCommands[position].Target = command;
+			else
+				_preparedCommands.Add(new WeakReference(command));
 		}
 
 		public void RemovePreparedCommand(FbCommand command)
