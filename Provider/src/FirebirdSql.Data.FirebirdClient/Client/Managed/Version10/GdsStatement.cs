@@ -345,10 +345,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						{
 							response = _database.ReadResponse();
 
-							if (response is FetchResponse)
+							if (response is FetchResponse fetchResponse)
 							{
-								FetchResponse fetchResponse = (FetchResponse)response;
-
 								if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 								{
 									_rows.Enqueue(ReadRow());
