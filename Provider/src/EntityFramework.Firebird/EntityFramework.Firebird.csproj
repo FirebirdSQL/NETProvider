@@ -37,6 +37,6 @@
 	<ItemGroup>
 		<Reference Include="System.Configuration" />
 		<Reference Include="Microsoft.CSharp" />
-		<Reference Include="..\..\lib\EF6\net45\EntityFramework.dll" />
+		<Reference Include="..\..\lib\EF6\NET45\EntityFramework.dll" />
 	</ItemGroup>
 </Project>

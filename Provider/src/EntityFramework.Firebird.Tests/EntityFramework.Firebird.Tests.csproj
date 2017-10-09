@@ -11,7 +11,7 @@
 		<PackageReference Include="NUnit" Version="3.8.1" />
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="..\..\lib\EF6\net45\EntityFramework.dll" />
+		<Reference Include="..\..\lib\EF6\NET45\EntityFramework.dll" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
