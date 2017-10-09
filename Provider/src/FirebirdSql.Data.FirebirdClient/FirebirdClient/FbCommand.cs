@@ -440,14 +440,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				DiscardImplicitTransaction();
-
+				RollbackImplicitTransaction();
 				throw new FbException(ex.Message, ex);
 			}
 			catch
 			{
-				DiscardImplicitTransaction();
-
+				RollbackImplicitTransaction();
 				throw;
 			}
 		}
@@ -469,14 +467,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				DiscardImplicitTransaction();
-
+				RollbackImplicitTransaction();
 				throw new FbException(ex.Message, ex);
 			}
 			catch
 			{
-				DiscardImplicitTransaction();
-
+				RollbackImplicitTransaction();
 				throw;
 			}
 
@@ -508,14 +504,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				DiscardImplicitTransaction();
-
+				RollbackImplicitTransaction();
 				throw new FbException(ex.Message, ex);
 			}
 			catch
 			{
-				DiscardImplicitTransaction();
-
+				RollbackImplicitTransaction();
 				throw;
 			}
 
@@ -580,14 +574,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				DiscardImplicitTransaction();
-
+				RollbackImplicitTransaction();
 				throw new FbException(ex.Message, ex);
 			}
 			catch
 			{
-				DiscardImplicitTransaction();
-
+				RollbackImplicitTransaction();
 				throw;
 			}
 
@@ -693,18 +685,6 @@ namespace FirebirdSql.Data.FirebirdClient
 						}
 					}
 				}
-			}
-		}
-
-		internal void DiscardImplicitTransaction()
-		{
-			if (IsSelectCommand)
-			{
-				CommitImplicitTransaction();
-			}
-			else
-			{
-				RollbackImplicitTransaction();
 			}
 		}
 
