@@ -25,6 +25,6 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	static class _VersionInfo
 	{
-		internal const string Version = "5.12.1.0";
+		internal const string Version = "6.0.0.0";
 	}
 }
