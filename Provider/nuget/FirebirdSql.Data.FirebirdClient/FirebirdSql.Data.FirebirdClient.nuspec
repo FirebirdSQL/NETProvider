@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-	<metadata>
+	<metadata minClientVersion="3.6">
 		<id>FirebirdSql.Data.FirebirdClient</id>
 		<version>0.0.0.0</version>
 		<title>Firebird ADO.NET Data provider</title>
