@@ -281,14 +281,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _implicitTransaction; }
 		}
 
-		internal bool IsSelectCommand
+		internal bool HasFields
 		{
-			get { return _statement != null && (_statement.StatementType == DbStatementType.Select || _statement.StatementType == DbStatementType.SelectForUpdate); }
+			get { return _statement?.Fields?.Count > 0; }
 		}
 
 		internal bool IsDDLCommand
 		{
-			get { return _statement != null && _statement.StatementType == DbStatementType.DDL; }
+			get { return _statement?.StatementType == DbStatementType.DDL; }
 		}
 
 		internal Type[] ExpectedColumnTypes

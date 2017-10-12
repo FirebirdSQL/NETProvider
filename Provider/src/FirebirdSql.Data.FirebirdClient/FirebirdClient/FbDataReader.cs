@@ -106,7 +106,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override bool HasRows
 		{
-			get { return _command.IsSelectCommand; }
+			get { return _command.HasFields; }
 		}
 
 		public override bool IsClosed
