@@ -355,6 +355,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckClosed();
 
+			if (transaction == null)
+				return;
+
 			_innerConnection.EnlistTransaction(transaction);
 		}
 #endif
@@ -447,12 +450,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				throw new InvalidOperationException("Connection already Open.");
 			}
-#if !NETSTANDARD1_6
-			if (_options.Enlist && System.Transactions.Transaction.Current == null)
-			{
-				throw new InvalidOperationException("There is no active TransactionScope to enlist transactions.");
-			}
-#endif
 
 			try
 			{
@@ -471,27 +468,30 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 
 #if !NETSTANDARD1_6
-				try
+				if (_options.Enlist)
 				{
-					_innerConnection.EnlistTransaction(System.Transactions.Transaction.Current);
-				}
-				catch
-				{
-					// if enlistment fails clean up innerConnection
-					_innerConnection.DisposeTransaction();
-
-					if (_options.Pooling)
+					try
 					{
-						// Send connection return back to the Pool
-						FbConnectionPoolManager.Instance.Release(_innerConnection);
+						EnlistTransaction(System.Transactions.Transaction.Current);
 					}
-					else
+					catch
 					{
-						_innerConnection.Dispose();
-						_innerConnection = null;
-					}
+						// if enlistment fails clean up innerConnection
+						_innerConnection.DisposeTransaction();
 
-					throw;
+						if (_options.Pooling)
+						{
+							// Send connection return back to the Pool
+							FbConnectionPoolManager.Instance.Release(_innerConnection);
+						}
+						else
+						{
+							_innerConnection.Dispose();
+							_innerConnection = null;
+						}
+
+						throw;
+					}
 				}
 #endif
 

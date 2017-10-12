@@ -268,7 +268,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #if !NETSTANDARD1_6
 		public void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
-			if (_owningConnection != null && _options.Enlist)
+			if (_owningConnection != null)
 			{
 				if (_enlistmentNotification != null && _enlistmentNotification.SystemTransaction == transaction)
 					return;

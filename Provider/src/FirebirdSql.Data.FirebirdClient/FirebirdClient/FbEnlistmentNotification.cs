@@ -17,9 +17,6 @@
 
 #if !NETSTANDARD1_6
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using System.Transactions;
 
 namespace FirebirdSql.Data.FirebirdClient
@@ -62,7 +59,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_transaction = connection.BeginTransaction(systemTransaction.IsolationLevel);
 			_systemTransaction = systemTransaction;
 
-			_systemTransaction.EnlistVolatile(this, System.Transactions.EnlistmentOptions.None);
+			_systemTransaction.EnlistVolatile(this, EnlistmentOptions.None);
 		}
 
 		#endregion
