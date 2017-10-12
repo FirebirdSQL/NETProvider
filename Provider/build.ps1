@@ -52,7 +52,8 @@ function NuGet() {
 }
 
 function WiX() {
-	& $wix\candle.exe "-dBaseDir=$baseDir" "-dVersion=$Version" -ext $wix\WixUtilExtension.dll -out $outDir\Installer.wixobj $baseDir\installer\Installer.wxs
+	$wixVersion = $Version -replace '(.+?)(-.+)?','$1'
+	& $wix\candle.exe "-dBaseDir=$baseDir" "-dVersion=$wixVersion" -ext $wix\WixUtilExtension.dll -out $outDir\Installer.wixobj $baseDir\installer\Installer.wxs
 	& $wix\light.exe -ext $wix\WixUIExtension.dll -ext $wix\WixUtilExtension.dll -out $outDir\FirebirdSql.Data.FirebirdClient-$Version.msi $outDir\Installer.wixobj
 	rm $outDir\Installer.wixobj
 	rm $outDir\FirebirdSql.Data.FirebirdClient-$Version.wixpdb
