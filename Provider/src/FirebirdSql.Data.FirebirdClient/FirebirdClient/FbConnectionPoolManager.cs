@@ -20,7 +20,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -42,10 +41,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				bool _disposed;
 
-				public DateTimeOffset Created { get; private set; }
+				public long Created { get; private set; }
 				public FbConnectionInternal Connection { get; private set; }
 
-				public Item(DateTimeOffset created, FbConnectionInternal connection)
+				public Item(long created, FbConnectionInternal connection)
 				{
 					Created = created;
 					Connection = connection;
@@ -56,7 +55,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					if (_disposed)
 						return;
 					_disposed = true;
-					Created = default(DateTimeOffset);
+					Created = default(long);
 					Connection.Dispose();
 					Connection = null;
 				}
@@ -114,7 +113,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					var removed = _busy.Remove(connection);
 					if (removed)
 					{
-						_available.Push(new Item(DateTimeOffset.UtcNow, connection));
+						_available.Push(new Item(GetTicks(), connection));
 					}
 				}
 			}
@@ -125,7 +124,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					CheckDisposedImpl();
 
-					var now = DateTimeOffset.UtcNow;
+					var now = GetTicks();
 					var available = _available.ToArray();
 					if (available.Count() <= _connectionString.MinPoolSize)
 						return;
@@ -160,11 +159,17 @@ namespace FirebirdSql.Data.FirebirdClient
 				return result;
 			}
 
-			static bool IsAlive(long connectionLifeTime, DateTimeOffset created, DateTimeOffset now)
+			static bool IsAlive(long connectionLifeTime, long created, long now)
 			{
 				if (connectionLifeTime == 0)
 					return true;
-				return created.AddSeconds(connectionLifeTime) > now;
+				return (now - created) > (connectionLifeTime * 1000);
+			}
+
+			static long GetTicks()
+			{
+				var ticks = Environment.TickCount;
+				return ticks + -(long)int.MinValue;
 			}
 
 			void CleanConnectionsImpl()
