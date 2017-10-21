@@ -22,7 +22,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Internal
 {
 	public class FbHistoryRepository : HistoryRepository
 	{
-		protected FbHistoryRepository(HistoryRepositoryDependencies dependencies)
+		public FbHistoryRepository(HistoryRepositoryDependencies dependencies)
 			: base(dependencies)
 		{ }
 

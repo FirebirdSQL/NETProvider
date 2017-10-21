@@ -13,10 +13,9 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Rafael Almeida (ralms@ralms.net)
- 
+//$Authors = Jiri Cincura (jiri@cincura.net)
+
 using Microsoft.EntityFrameworkCore.Migrations;
-using System.Collections.Generic;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird
 {

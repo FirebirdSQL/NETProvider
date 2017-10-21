@@ -26,7 +26,7 @@ using NUnit.Framework;
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 {
 	[TestFixture]
-	public class BasicTests
+	public class Scratchpad
 	{
 		[Test]
 		public void SimpleSelect()
