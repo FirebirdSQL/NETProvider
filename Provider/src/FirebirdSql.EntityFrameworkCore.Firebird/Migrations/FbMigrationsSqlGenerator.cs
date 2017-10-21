@@ -57,10 +57,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 						var valueGenerationStrategy = columnAnnotation.Value as FbValueGenerationStrategy?;
 						if (valueGenerationStrategy == FbValueGenerationStrategy.SequenceTrigger)
 						{
-							foreach (var item in _behavior.CreateIdentityForColumn(builder, column.Name, column.Table))
-							{
-								EndStatement(builder);
-							}
+							_behavior.CreateIdentityForColumn(column.Name, column.Table, builder);
 						}
 					}
 				}

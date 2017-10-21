@@ -15,7 +15,6 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -30,58 +29,92 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			_sqlHelper = sqlHelper;
 		}
 
-		public IEnumerable<MigrationCommandListBuilder> CreateIdentityForColumn(MigrationCommandListBuilder builder, string columnName, string tableName)
+		public virtual void CreateIdentityForColumn(string columnName, string tableName, MigrationCommandListBuilder builder)
 		{
-			var mergeColumnTable = string.Format("{0}_{1}", columnName, tableName).ToUpper();
-			var sequenceName = string.Format("GEN_{0}", mergeColumnTable);
-			var triggerName = string.Format("ID_{0}", mergeColumnTable);
+			var identitySequenceName = CreateIdentitySequenceName(columnName, tableName);
 
 			builder.AppendLine("EXECUTE BLOCK");
 			builder.AppendLine("AS");
 			builder.AppendLine("BEGIN");
+			builder.IncrementIndent();
 			builder.Append("if (not exists(select 1 from rdb$generators where rdb$generator_name = '");
-			builder.Append(sequenceName);
+			builder.Append(identitySequenceName);
 			builder.Append("')) then");
 			builder.AppendLine();
 			builder.AppendLine("begin");
-			builder.Indent();
+			builder.IncrementIndent();
 			builder.Append("execute statement 'create sequence ");
-			builder.Append(sequenceName);
-			builder.Append("';");
-			builder.DecrementIndent();
+			builder.Append(identitySequenceName);
+			builder.Append("'");
+			builder.Append(_sqlHelper.StatementTerminator);
 			builder.AppendLine();
+			builder.DecrementIndent();
 			builder.AppendLine("end");
-			builder.AppendLine("END");
-			yield return builder;
+			builder.DecrementIndent();
+			builder.Append("END");
+			builder.EndCommand();
 
 			builder.Append("CREATE OR ALTER TRIGGER ");
-			builder.Append(_sqlHelper.DelimitIdentifier(triggerName));
+			builder.Append(_sqlHelper.DelimitIdentifier(CreateTriggerName(columnName, tableName)));
 			builder.Append(" ACTIVE BEFORE INSERT ON ");
 			builder.Append(_sqlHelper.DelimitIdentifier(tableName));
 			builder.AppendLine();
 			builder.AppendLine("AS");
 			builder.AppendLine("BEGIN");
+			builder.IncrementIndent();
 			builder.Append("if (new.");
 			builder.Append(_sqlHelper.DelimitIdentifier(columnName));
 			builder.Append(" is null) then");
 			builder.AppendLine();
 			builder.AppendLine("begin");
-			builder.Indent();
+			builder.IncrementIndent();
 			builder.Append("new.");
 			builder.Append(_sqlHelper.DelimitIdentifier(columnName));
 			builder.Append(" = next value for ");
-			builder.Append(sequenceName);
-			builder.Append(";");
-			builder.DecrementIndent();
+			builder.Append(identitySequenceName);
+			builder.Append(_sqlHelper.StatementTerminator);
 			builder.AppendLine();
+			builder.DecrementIndent();
 			builder.AppendLine("end");
+			builder.DecrementIndent();
 			builder.Append("END");
-			yield return builder;
+			builder.EndCommand();
 		}
 
-		public IEnumerable<MigrationCommandListBuilder> DropIdentityForColumn(MigrationCommandListBuilder builder, string columnName, string tableName)
+		public virtual void DropIdentityForColumn(string columnName, string tableName, MigrationCommandListBuilder builder)
 		{
-			throw new System.NotImplementedException();
+			var triggerName = CreateTriggerName(columnName, tableName);
+
+			builder.AppendLine("EXECUTE BLOCK");
+			builder.AppendLine("AS");
+			builder.AppendLine("BEGIN");
+			builder.IncrementIndent();
+			builder.Append("if (exists(select 1 from rdb$triggers where rdb$trigger_name = '");
+			builder.Append(triggerName);
+			builder.Append("')) then");
+			builder.AppendLine();
+			builder.AppendLine("begin");
+			builder.IncrementIndent();
+			builder.Append("execute statement 'drop trigger ");
+			builder.Append(_sqlHelper.DelimitIdentifier(triggerName));
+			builder.Append("'");
+			builder.Append(_sqlHelper.StatementTerminator);
+			builder.AppendLine();
+			builder.DecrementIndent();
+			builder.AppendLine("end");
+			builder.DecrementIndent();
+			builder.Append("END");
+			builder.EndCommand();
+		}
+
+		protected virtual string CreateTriggerName(string columnName, string tableName)
+		{
+			return string.Format("ID_{0}_{1}", tableName, columnName);
+		}
+
+		protected virtual string CreateIdentitySequenceName(string columnName, string tableName)
+		{
+			return "GEN_IDENTITY";
 		}
 	}
 }

@@ -16,10 +16,16 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.Extensions;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
@@ -74,6 +80,77 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 				db.SaveChanges();
 				Assert.AreEqual(27, entity.Id);
 			}
+		}
+
+		[Test]
+		public void MigrationsTester()
+		{
+			using (var db = GetDbContext())
+			{
+				var script = db.GetService<IMigrator>().GenerateScript();
+				TestContext.WriteLine(script);
+			}
+			using (var db = GetDbContext())
+			{
+				var generator = db.GetService<IMigrationsSqlGenerator>();
+				var batch = generator.Generate(CreateTableMigrationTest().ToList());
+				var result = string.Join(Environment.NewLine + Environment.NewLine, batch.Select(b => b.CommandText));
+				TestContext.WriteLine(result);
+			}
+		}
+
+		static IEnumerable<MigrationOperation> CreateTableMigrationTest()
+		{
+			yield return new CreateTableOperation
+			{
+				Name = "People",
+				Columns =
+				{
+						new AddColumnOperation
+						{
+							Name = "Id",
+							Table = "People",
+							ClrType = typeof(int),
+							IsNullable = false,
+							[FbAnnotationNames.ValueGenerationStrategy] = FbValueGenerationStrategy.SequenceTrigger,
+						},
+						new AddColumnOperation
+						{
+							Name = "EmployerId",
+							Table = "People",
+							ClrType = typeof(int),
+							IsNullable = true
+						},
+						new AddColumnOperation
+						{
+							Name = "SSN",
+							Table = "People",
+							ClrType = typeof(string),
+							ColumnType = "char(11)",
+							IsNullable = true
+						}
+				},
+				PrimaryKey = new AddPrimaryKeyOperation
+				{
+					Columns = new[] { "Id" }
+				},
+				UniqueConstraints =
+				{
+						new AddUniqueConstraintOperation
+						{
+							Columns = new[] { "SSN" }
+						}
+				},
+				ForeignKeys =
+				{
+						new AddForeignKeyOperation
+						{
+							Columns = new[] { "EmployerId" },
+							PrincipalTable = "Companies",
+							PrincipalColumns = new[] { "Id" }
+						}
+				}
+			};
 		}
 
 		static TestDbContext GetDbContext()
