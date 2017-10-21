@@ -28,7 +28,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 	{
 		public static DbContextOptionsBuilder UseFirebird(this DbContextOptionsBuilder optionsBuilder, string connectionString, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
 		{
-			var extension = GetOrCreateExtension(optionsBuilder).WithConnectionString(connectionString);
+			var extension = (FbOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnectionString(connectionString);
 			((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
 			fbOptionsAction?.Invoke(new FbDbContextOptionsBuilder(optionsBuilder));
 			return optionsBuilder;
@@ -36,7 +36,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 
 		public static DbContextOptionsBuilder UseFirebird(this DbContextOptionsBuilder optionsBuilder, DbConnection connection, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
 		{
-			var extension = GetOrCreateExtension(optionsBuilder).WithConnection(connection);
+			var extension = (FbOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnection(connection);
 			((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
 			fbOptionsAction?.Invoke(new FbDbContextOptionsBuilder(optionsBuilder));
 			return optionsBuilder;

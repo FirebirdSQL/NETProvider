@@ -22,14 +22,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Internal
 {
 	public class FbOptions : IFbOptions
 	{
+		public FbOptionsExtension FirebirdOptions { get; private set; }
+
 		public void Initialize(IDbContextOptions options)
 		{
-			var fbOptions = GetOptions(options);
+			FirebirdOptions = GetOptions(options);
 		}
 
 		public void Validate(IDbContextOptions options)
 		{
-			var fbOptions = GetOptions(options);
+			FirebirdOptions = GetOptions(options);
 		}
 
 		static FbOptionsExtension GetOptions(IDbContextOptions options)

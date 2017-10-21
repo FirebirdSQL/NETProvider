@@ -13,14 +13,16 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net), Rafael Almeida (ralms@ralms.net)
+ 
+using Microsoft.EntityFrameworkCore.Migrations;
+using System.Collections.Generic;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata
+namespace FirebirdSql.EntityFrameworkCore.Firebird
 {
-	public enum FbValueGenerationStrategy
+	public interface IFbMigrationSqlGeneratorBehavior
 	{
-		None,
-		SequenceTrigger,
-		IdentityColumn,
+		IEnumerable<MigrationCommandListBuilder> CreateIdentityForColumn(MigrationCommandListBuilder builder, string columnName, string tableName);
+		IEnumerable<MigrationCommandListBuilder> DropIdentityForColumn(MigrationCommandListBuilder builder, string columnName, string tableName);
 	}
 }

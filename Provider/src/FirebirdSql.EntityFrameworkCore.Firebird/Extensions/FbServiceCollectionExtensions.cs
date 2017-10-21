@@ -58,6 +58,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 				.TryAddProviderSpecificServices(b => b
 					.TryAddSingleton<IFbOptions, FbOptions>()
 					.TryAddScoped<IFbUpdateSqlGenerator, FbUpdateSqlGenerator>()
+					.TryAddScoped<IFbMigrationSqlGeneratorBehavior, FbMigrationSqlGeneratorBehavior>()
 					.TryAddScoped<IFbConnection, FbConnection>());
 
 			builder.TryAddCoreServices();
