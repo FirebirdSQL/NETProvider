@@ -27,19 +27,11 @@ using NUnit.Framework;
 namespace EntityFramework.Firebird.Tests
 {
 	[FbTestFixture(FbServerType.Default, false)]
-	[FbTestFixture(FbServerType.Default, true)]
-	[FbTestFixture(FbServerType.Embedded, default(bool))]
 	public class EntityFrameworkTests : FbTestsBase
 	{
-		#region Constructors
-
 		public EntityFrameworkTests(FbServerType serverType, bool compression)
 			: base(serverType, compression)
 		{ }
-
-		#endregion
-
-		#region Unit Tests
 
 		[Test]
 		public void DbProviderServicesTest()
@@ -70,19 +62,6 @@ namespace EntityFramework.Firebird.Tests
 			Assert.AreEqual(v.Revision, -1);
 		}
 
-		#region Query1
-
-		[Test]
-		public void QueryTest1()
-		{
-			Database.SetInitializer<QueryTest1Context>(null);
-			Connection.Close();
-			using (var c = new QueryTest1Context(Connection))
-			{
-				Assert.DoesNotThrow(() => c.QueryTest1Entity.Max(x => x.ID));
-			}
-		}
-
 		class QueryTest1Context : FbTestDbContext
 		{
 			public QueryTest1Context(FbConnection conn)
@@ -99,15 +78,34 @@ namespace EntityFramework.Firebird.Tests
 
 			public IDbSet<QueryTest1Entity> QueryTest1Entity { get; set; }
 		}
+		[Test]
+		public void QueryTest1()
+		{
+			Database.SetInitializer<QueryTest1Context>(null);
+			Connection.Close();
+			using (var c = new QueryTest1Context(Connection))
+			{
+				Assert.DoesNotThrow(() => c.QueryTest1Entity.Max(x => x.ID));
+			}
+		}
 
-		#endregion
+		class QueryTest2Context : FbTestDbContext
+		{
+			public QueryTest2Context(FbConnection conn)
+				: base(conn)
+			{ }
 
-		#region Query2
+			protected override void OnModelCreating(DbModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+			}
 
+			public IDbSet<Foo> Foos { get; set; }
+		}
 		[Test]
 		public void QueryTest2()
 		{
-			Database.SetInitializer<QueryTest1Context>(null);
+			Database.SetInitializer<QueryTest2Context>(null);
 			Connection.Close();
 			using (var c = new QueryTest2Context(Connection))
 			{
@@ -128,42 +126,6 @@ namespace EntityFramework.Firebird.Tests
 			}
 		}
 
-		class QueryTest2Context : FbTestDbContext
-		{
-			public QueryTest2Context(FbConnection conn)
-				: base(conn)
-			{ }
-
-			protected override void OnModelCreating(DbModelBuilder modelBuilder)
-			{
-				base.OnModelCreating(modelBuilder);
-			}
-
-			public IDbSet<Foo> Foos { get; set; }
-		}
-
-		#endregion
-
-		#region Query3
-
-		[Test]
-		public void QueryTest3()
-		{
-			Database.SetInitializer<QueryTest1Context>(null);
-			Connection.Close();
-			using (var c = new QueryTest3Context(Connection))
-			{
-				var q = c.Foos
-					 .OrderByDescending(m => m.Bars.Count())
-					 .Skip(3)
-					 .SelectMany(m => m.Bars);
-				Assert.DoesNotThrow(() =>
-				{
-					q.ToString();
-				});
-			}
-		}
-
 		class QueryTest3Context : FbTestDbContext
 		{
 			public QueryTest3Context(FbConnection conn)
@@ -177,20 +139,21 @@ namespace EntityFramework.Firebird.Tests
 
 			public IDbSet<Foo> Foos { get; set; }
 		}
-
-		#endregion
-
-		#region ProperVarcharLengthForConstant
-
 		[Test]
-		public void ProperVarcharLengthForConstantTest()
+		public void QueryTest3()
 		{
-			Database.SetInitializer<ProperVarcharLengthForConstantContext>(null);
+			Database.SetInitializer<QueryTest3Context>(null);
 			Connection.Close();
-			using (var c = new ProperVarcharLengthForConstantContext(Connection))
+			using (var c = new QueryTest3Context(Connection))
 			{
-				var q = c.Bars.Where(x => x.BarString == "TEST");
-				StringAssert.Contains("CAST(_UTF8'TEST' AS VARCHAR(8191))", q.ToString());
+				var q = c.Foos
+					 .OrderByDescending(m => m.Bars.Count())
+					 .Skip(3)
+					 .SelectMany(m => m.Bars);
+				Assert.DoesNotThrow(() =>
+				{
+					q.ToString();
+				});
 			}
 		}
 
@@ -207,12 +170,19 @@ namespace EntityFramework.Firebird.Tests
 
 			public IDbSet<Bar> Bars { get; set; }
 		}
+		[Test]
+		public void ProperVarcharLengthForConstantTest()
+		{
+			Database.SetInitializer<ProperVarcharLengthForConstantContext>(null);
+			Connection.Close();
+			using (var c = new ProperVarcharLengthForConstantContext(Connection))
+			{
+				var q = c.Bars.Where(x => x.BarString == "TEST");
+				StringAssert.Contains("CAST(_UTF8'TEST' AS VARCHAR(8191))", q.ToString());
+			}
+		}
 
-		#endregion
-
-		#endregion
-
-		private DbProviderServices GetProviderServices()
+		DbProviderServices GetProviderServices()
 		{
 			return FbProviderServices.Instance;
 		}
