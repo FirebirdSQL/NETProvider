@@ -48,3 +48,6 @@ test_script:
 
   - ps: cd $testsBaseDir
   - ps: dotnet test FirebirdSql.Data.FirebirdClient.Tests.csproj -c $env:CONFIGURATION -f netcoreapp2.0 --no-build --no-restore
+
+  - ps: cd "$baseDir\Provider\src\EntityFramework.Firebird.Tests\$env:Configuration\net452"
+  - ps: nunit3-console EntityFramework.Firebird.Tests.dll --framework=net-4.5 --result='dummy.xml;format=AppVeyor'
