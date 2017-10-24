@@ -24,7 +24,7 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.TestsBase
 {
-	public class FbTestsBase
+	public abstract class FbTestsBase
 	{
 		#region	Fields
 

@@ -355,7 +355,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
-		[Test, Ignore("Needs plugin")]
+		[Test, Ignore("Needs plugin.")]
 		public void PassCryptKey()
 		{
 			var csb = BuildConnectionStringBuilder(FbServerType, Compression);

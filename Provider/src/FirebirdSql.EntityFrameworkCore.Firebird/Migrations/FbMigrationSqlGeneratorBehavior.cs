@@ -54,7 +54,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.Append("END");
 			builder.EndCommand();
 
-			builder.Append("CREATE OR ALTER TRIGGER ");
+			builder.Append("CREATE TRIGGER ");
 			builder.Append(_sqlHelper.DelimitIdentifier(CreateTriggerName(columnName, tableName)));
 			builder.Append(" ACTIVE BEFORE INSERT ON ");
 			builder.Append(_sqlHelper.DelimitIdentifier(tableName));

@@ -21,46 +21,12 @@ using System.Data.Entity;
 using System.Data.Entity.Core.Common;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
-using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
 namespace EntityFramework.Firebird.Tests
 {
-	[FbTestFixture(FbServerType.Default, false)]
-	public class EntityFrameworkTests : FbTestsBase
+	public class QueryTests : EntityFrameworkTestsBase
 	{
-		public EntityFrameworkTests(FbServerType serverType, bool compression)
-			: base(serverType, compression)
-		{ }
-
-		[Test]
-		public void DbProviderServicesTest()
-		{
-			object dbproviderservices = GetProviderServices();
-			Assert.IsNotNull(dbproviderservices);
-			Assert.IsInstanceOf<FbProviderServices>(dbproviderservices);
-		}
-
-		[Test]
-		public void ProviderManifestTest()
-		{
-			DbProviderManifest manifest = GetProviderServices().GetProviderManifest("foobar");
-			Assert.IsNotNull(manifest);
-		}
-
-		[Test]
-		public void ProviderManifestTokenTest()
-		{
-			string token = GetProviderServices().GetProviderManifestToken(Connection);
-			Assert.IsNotNull(token);
-			Assert.IsNotEmpty(token);
-			Version v = new Version(token);
-			Assert.Greater(v.Major, 0);
-			Assert.GreaterOrEqual(v.Minor, 0);
-			Assert.AreEqual(v.Build, -1);
-			Assert.AreEqual(v.Revision, -1);
-		}
-
 		class QueryTest1Context : FbTestDbContext
 		{
 			public QueryTest1Context(FbConnection conn)
@@ -80,9 +46,7 @@ namespace EntityFramework.Firebird.Tests
 		[Test]
 		public void QueryTest1()
 		{
-			Database.SetInitializer<QueryTest1Context>(null);
-			Connection.Close();
-			using (var c = new QueryTest1Context(Connection))
+			using (var c = GetDbContext<QueryTest1Context>())
 			{
 				Assert.DoesNotThrow(() => c.QueryTest1Entity.Max(x => x.ID));
 			}
@@ -104,9 +68,7 @@ namespace EntityFramework.Firebird.Tests
 		[Test]
 		public void QueryTest2()
 		{
-			Database.SetInitializer<QueryTest2Context>(null);
-			Connection.Close();
-			using (var c = new QueryTest2Context(Connection))
+			using (var c = GetDbContext<QueryTest2Context>())
 			{
 				var q = c.Foos
 					.OrderBy(x => x.ID)
@@ -141,9 +103,7 @@ namespace EntityFramework.Firebird.Tests
 		[Test]
 		public void QueryTest3()
 		{
-			Database.SetInitializer<QueryTest3Context>(null);
-			Connection.Close();
-			using (var c = new QueryTest3Context(Connection))
+			using (var c = GetDbContext<QueryTest3Context>())
 			{
 				var q = c.Foos
 					 .OrderByDescending(m => m.Bars.Count())
@@ -172,25 +132,11 @@ namespace EntityFramework.Firebird.Tests
 		[Test]
 		public void ProperVarcharLengthForConstantTest()
 		{
-			Database.SetInitializer<ProperVarcharLengthForConstantContext>(null);
-			Connection.Close();
-			using (var c = new ProperVarcharLengthForConstantContext(Connection))
+			using (var c = GetDbContext<ProperVarcharLengthForConstantContext>())
 			{
 				var q = c.Bars.Where(x => x.BarString == "TEST");
 				StringAssert.Contains("CAST(_UTF8'TEST' AS VARCHAR(8191))", q.ToString());
 			}
-		}
-
-		DbProviderServices GetProviderServices()
-		{
-			return FbProviderServices.Instance;
-		}
-
-		class FbTestDbContext : DbContext
-		{
-			public FbTestDbContext(FbConnection conn)
-				: base(conn, false)
-			{ }
 		}
 	}
 
@@ -199,21 +145,21 @@ namespace EntityFramework.Firebird.Tests
 		public int ID { get; set; }
 	}
 
-	public class Foo
+	class Foo
 	{
 		public int ID { get; set; }
 		public int BazID { get; set; }
 		public ICollection<Bar> Bars { get; set; }
 		public Baz Baz { get; set; }
 	}
-	public class Bar
+	class Bar
 	{
 		public int ID { get; set; }
 		public int FooID { get; set; }
 		public string BarString { get; set; }
 		public Foo Foo { get; set; }
 	}
-	public class Baz
+	class Baz
 	{
 		public int ID { get; set; }
 		public string BazString { get; set; }

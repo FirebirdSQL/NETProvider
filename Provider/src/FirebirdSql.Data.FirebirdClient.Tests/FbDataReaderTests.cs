@@ -189,42 +189,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		[Ignore("Not supported")]
-		public void NextResultTest()
-		{
-			string querys = "select * from TEST order by INT_FIELD asc;" +
-							"select * from TEST order by INT_FIELD desc;";
-
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(querys, Connection, transaction);
-
-			FbDataReader reader = command.ExecuteReader();
-
-			while (reader.Read())
-			{
-				for (int i = 0; i < reader.FieldCount; i++)
-				{
-					reader.GetValue(i);
-				}
-			}
-
-			if (reader.NextResult())
-			{
-				while (reader.Read())
-				{
-					for (int i = 0; i < reader.FieldCount; i++)
-					{
-						reader.GetValue(i);
-					}
-				}
-			}
-
-			reader.Close();
-			transaction.Rollback();
-			command.Dispose();
-		}
-
-		[Test]
 		public void RecordAffectedTest()
 		{
 			string sql = "insert into test (int_field) values (100000)";

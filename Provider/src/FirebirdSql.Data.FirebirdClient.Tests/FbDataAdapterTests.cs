@@ -675,53 +675,27 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			string selectSql = "SELECT * FROM test";
 			string deleteSql = "DELETE FROM test WHERE int_field = @id";
 
-			// Set up conenction and select/delete commands
 			FbConnection connection = new FbConnection(Connection.ConnectionString);
 			FbCommand select = new FbCommand(selectSql, connection);
 			FbCommand delete = new FbCommand(deleteSql, connection);
 			delete.Parameters.Add("@id", FbDbType.Integer);
 			delete.Parameters[0].SourceColumn = "INT_FIELD";
 
-			// Set up the FbDataAdapter
 			FbDataAdapter adapter = new FbDataAdapter(select);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 			adapter.DeleteCommand = delete;
 
-			// Set up dataset
 			DataSet ds = new DataSet();
 			adapter.Fill(ds);
 
-			// Delete one row
 			ds.Tables[0].Rows[0].Delete();
 			adapter.Update(ds);
 
-			// Delete another row
 			ds.Tables[0].Rows[0].Delete();
 			adapter.Update(ds);
 
-			// Delete another row
 			ds.Tables[0].Rows[0].Delete();
 			adapter.Update(ds);
-		}
-
-		[Test]
-		[Ignore("Not supported")]
-		public void MultipleResultsetTest()
-		{
-			FbCommand command = new FbCommand("", Connection);
-
-			command.CommandText = "select * from test;";
-			command.CommandText += "select int_field from test;";
-			command.CommandText += "select int_field, char_field from test;";
-
-			FbDataAdapter adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
-
-			DataSet ds = new DataSet();
-
-			adapter.Fill(ds);
-
-			Assert.AreEqual(3, ds.Tables.Count, "Incorrect tables count");
 		}
 
 		#endregion

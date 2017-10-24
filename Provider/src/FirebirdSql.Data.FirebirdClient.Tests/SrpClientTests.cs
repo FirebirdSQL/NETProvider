@@ -20,7 +20,6 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[TestFixture]
 	public class SrpClientTests
 	{
 		[Test]
