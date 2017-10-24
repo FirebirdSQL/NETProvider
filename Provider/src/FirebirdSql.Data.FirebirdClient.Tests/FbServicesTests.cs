@@ -19,9 +19,9 @@ using System;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
-using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Services;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				backupSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 				backupSvc.Verbose = true;
 
-				backupSvc.ServiceOutput += new EventHandler<ServiceOutputEventArgs>(ServiceOutput);
+				backupSvc.ServiceOutput += ServiceOutput;
 
 				backupSvc.Execute();
 			}
@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				restoreSvc.Verbose = true;
 				restoreSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 
-				restoreSvc.ServiceOutput += new EventHandler<ServiceOutputEventArgs>(ServiceOutput);
+				restoreSvc.ServiceOutput += ServiceOutput;
 
 				restoreSvc.Execute();
 			}
@@ -151,7 +151,7 @@ end";
 			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 			backupSvc.OutputStream = buffer;
 
-			backupSvc.ServiceOutput += new EventHandler<ServiceOutputEventArgs>(ServiceOutput);
+			backupSvc.ServiceOutput += ServiceOutput;
 
 			backupSvc.Execute();
 		}
@@ -259,32 +259,24 @@ end";
 		}
 
 		[Test]
-		public void AddUserTest()
+		public void AddDeleteUserTest()
 		{
 			FbSecurity securitySvc = new FbSecurity();
 
 			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
-			FbUserData user = new FbUserData();
+			{
+				FbUserData user = new FbUserData();
+				user.UserName = "new_user";
+				user.UserPassword = "1";
+				securitySvc.AddUser(user);
+			}
 
-			user.UserName = "new_user";
-			user.UserPassword = "1";
-
-			securitySvc.AddUser(user);
-		}
-
-		[Test]
-		public void DeleteUser()
-		{
-			FbSecurity securitySvc = new FbSecurity();
-
-			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
-
-			FbUserData user = new FbUserData();
-
-			user.UserName = "new_user";
-
-			securitySvc.DeleteUser(user);
+			{
+				FbUserData user = new FbUserData();
+				user.UserName = "new_user";
+				securitySvc.DeleteUser(user);
+			}
 		}
 
 		[Test]
@@ -295,8 +287,6 @@ end";
 			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
 			FbUserData user = securitySvc.DisplayUser("SYSDBA");
-
-			TestContext.WriteLine("User name {0}", user.UserName);
 		}
 
 		[Test]
@@ -307,13 +297,6 @@ end";
 			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
 			FbUserData[] users = securitySvc.DisplayUsers();
-
-			TestContext.WriteLine("User List");
-
-			for (int i = 0; i < users.Length; i++)
-			{
-				TestContext.WriteLine("User {0} name {1}", i, users[i].UserName);
-			}
 		}
 
 		[Test]
@@ -323,15 +306,10 @@ end";
 
 			serverProp.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
-			FbServerConfig serverConfig = serverProp.GetServerConfig();
-			FbDatabasesInfo databasesInfo = serverProp.GetDatabasesInfo();
-
-			TestContext.WriteLine(serverProp.GetMessageFile());
-			TestContext.WriteLine(serverProp.GetLockManager());
-			TestContext.WriteLine(serverProp.GetRootDirectory());
-			TestContext.WriteLine(serverProp.GetImplementation());
-			TestContext.WriteLine(serverProp.GetServerVersion());
-			TestContext.WriteLine(serverProp.GetVersion());
+			foreach (var m in serverProp.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly).Where(x => !x.IsSpecialName))
+			{
+				Assert.DoesNotThrow(() => m.Invoke(serverProp, null), m.Name);
+			}
 		}
 
 		[Test]
@@ -423,7 +401,7 @@ end";
 
 		void ServiceOutput(object sender, ServiceOutputEventArgs e)
 		{
-			TestContext.WriteLine(e.Message);
+			var dummy = e.Message;
 		}
 
 		#endregion

@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DataAdapterFillTest()
 		{
-			FbCommand command = new FbCommand("select * from TEST where DATE_FIELD = ?", Connection);
+			FbCommand command = new FbCommand("select * from TEST where DATE_FIELD <> ?", Connection);
 			FbDataAdapter adapter = new FbDataAdapter(command);
 
 			adapter.SelectCommand.Parameters.Add("@DATE_FIELD", FbDbType.Date, 4, "DATE_FIELD").Value = new DateTime(2003, 1, 5);
@@ -52,102 +52,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			DataSet ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
-			TestContext.WriteLine();
-			TestContext.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
-
-			foreach (DataTable table in ds.Tables)
-			{
-				foreach (DataColumn col in table.Columns)
-				{
-					TestContext.Write(col.ColumnName + "\t\t");
-				}
-
-				TestContext.WriteLine();
-
-				foreach (DataRow row in table.Rows)
-				{
-					for (int i = 0; i < table.Columns.Count; i++)
-					{
-						TestContext.Write(row[i] + "\t\t");
-					}
-
-					TestContext.WriteLine("");
-				}
-			}
-
 			adapter.Dispose();
 			builder.Dispose();
 			command.Dispose();
-		}
 
-		[Test]
-		public void MultipleDataAdapterFillTest()
-		{
-			FbCommand command = new FbCommand("select * from TEST where DATE_FIELD = ?", Connection);
-			FbDataAdapter adapter = new FbDataAdapter(command);
-
-			adapter.SelectCommand.Parameters.Add("@DATE_FIELD", FbDbType.Date, 4, "DATE_FIELD").Value = new DateTime(2003, 1, 5);
-
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
-
-			DataSet ds = new DataSet();
-			adapter.Fill(ds, "TEST");
-
-			TestContext.WriteLine();
-			TestContext.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
-
-			foreach (DataTable table in ds.Tables)
-			{
-				foreach (DataColumn col in table.Columns)
-				{
-					TestContext.Write(col.ColumnName + "\t\t");
-				}
-
-				TestContext.WriteLine();
-
-				foreach (DataRow row in table.Rows)
-				{
-					for (int i = 0; i < table.Columns.Count; i++)
-					{
-						TestContext.Write(row[i] + "\t\t");
-					}
-
-					TestContext.WriteLine("");
-				}
-			}
-
-			adapter.SelectCommand.Parameters[0].Value = new DateTime(2003, 1, 6);
-
-			ds = new DataSet();
-			adapter.Fill(ds, "TEST");
-
-			TestContext.WriteLine();
-			TestContext.WriteLine("Implicit transactions - DataAdapter Fill Method - Test");
-
-			foreach (DataTable table in ds.Tables)
-			{
-				foreach (DataColumn col in table.Columns)
-				{
-					TestContext.Write(col.ColumnName + "\t\t");
-				}
-
-				TestContext.WriteLine();
-
-				foreach (DataRow row in table.Rows)
-				{
-					for (int i = 0; i < table.Columns.Count; i++)
-					{
-						TestContext.Write(row[i] + "\t\t");
-					}
-
-					TestContext.WriteLine("");
-				}
-			}
-
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
+			Assert.AreEqual(1, ds.Tables.Count);
+			Assert.Greater(ds.Tables[0].Rows.Count, 0);
+			Assert.Greater(ds.Tables[0].Columns.Count, 0);
 		}
 
 		[Test]
@@ -171,7 +82,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			Assert.AreEqual(i, 1, "Clob field update with implicit transaction failed");
 
-			// Force the implicit transaction to be committed
 			command.Dispose();
 		}
 
@@ -186,7 +96,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			Assert.AreEqual(i, 1, "Blob field update with implicit transaction failed");
 
-			// Force the implicit transaction to be committed
 			command.Dispose();
 		}
 
@@ -208,7 +117,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			Assert.AreEqual(i, 1, "Array field update with implicit transaction failed");
 
-			// Force the implicit transaction to be committed
 			command.Dispose();
 		}
 

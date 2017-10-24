@@ -280,22 +280,21 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			using (var conn = new FbConnection(csb.ToString()))
 			{
 				conn.Open();
-				rows = LogRowsCount(conn);
-				TestContext.WriteLine(rows);
+				rows = GetLogRowsCount(conn);
 			}
 
 			csb.NoDatabaseTriggers = true;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
 				conn.Open();
-				Assert.AreEqual(rows, LogRowsCount(conn));
+				Assert.AreEqual(rows, GetLogRowsCount(conn));
 			}
 
 			csb.NoDatabaseTriggers = false;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
 				conn.Open();
-				Assert.AreEqual(rows + 1, LogRowsCount(conn));
+				Assert.AreEqual(rows + 1, GetLogRowsCount(conn));
 			}
 		}
 
@@ -344,7 +343,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			using (var conn = new FbConnection(csb.ToString()))
 			{
 				conn.Open();
-				TestContext.WriteLine(conn.ServerVersion);
 				const string Pattern = ":[^:]*Z[^:]*$";
 				if (compression)
 				{
@@ -395,7 +393,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
-		private int LogRowsCount(FbConnection conn)
+		private int GetLogRowsCount(FbConnection conn)
 		{
 			using (FbCommand cmd = conn.CreateCommand())
 			{

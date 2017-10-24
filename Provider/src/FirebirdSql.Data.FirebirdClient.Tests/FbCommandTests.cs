@@ -124,7 +124,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			string charFieldValue = command.ExecuteScalar().ToString();
 
-			TestContext.WriteLine("Scalar value: {0}", charFieldValue);
+			Assert.AreEqual("IRow 2", charFieldValue.TrimEnd(' '));
 
 			command.Dispose();
 		}
@@ -147,7 +147,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void PrepareTest()
 		{
-			// Insert data using a prepared	statement
 			FbCommand command = new FbCommand("insert into PrepareTest(test_field) values(@test_field);", Connection);
 
 			command.Parameters.Add("@test_field", FbDbType.VarChar).Value = DBNull.Value;
@@ -168,7 +167,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.Dispose();
 
-			// Check that data is correct
 			FbCommand select = new FbCommand("select * from	PrepareTest", Connection);
 			FbDataReader reader = select.ExecuteReader();
 			int count = 0;
@@ -271,11 +269,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.Parameters[0].Value = 1;
 
-			// This	will fill output parameters	values
 			command.ExecuteNonQuery();
 
-			TestContext.WriteLine("Output Parameters");
-			TestContext.WriteLine(command.Parameters[1].Value);
+			Assert.AreEqual("IRow Number 1", command.Parameters[1].Value);
 		}
 
 		[Test]
@@ -287,22 +283,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			FbDataReader reader = command.ExecuteReader();
 
-			Assert.AreEqual(1, reader.RecordsAffected, "RecordsAffected value is incorrect");
+			Assert.AreEqual(1, reader.RecordsAffected);
 
-			bool nextResult = true;
-
-			while (nextResult)
+			while (reader.Read())
 			{
-				while (reader.Read())
-				{
-				}
-
-				nextResult = reader.NextResult();
 			}
 
 			reader.Close();
 
-			Assert.AreEqual(1, reader.RecordsAffected, "RecordsAffected value is incorrect");
+			Assert.AreEqual(1, reader.RecordsAffected);
 		}
 
 		[Test]
@@ -317,13 +306,10 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.Parameters[0].Value = 1;
 
-			// This	will fill output parameters	values
 			command.ExecuteNonQuery();
 
-			// Check that the output parameter has a correct value
 			Assert.AreEqual("IRow Number 1", command.Parameters[1].Value, "Output parameter value is not valid");
 
-			// Dispose command - this will do a	transaction	commit
 			command.Dispose();
 		}
 
@@ -384,7 +370,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					{
 						while (r.Read())
 						{
-							TestContext.WriteLine("{0} :: {1}", r[0], r[0].ToString().Length);
+							object dummy = r[0];
 						}
 					}
 				}

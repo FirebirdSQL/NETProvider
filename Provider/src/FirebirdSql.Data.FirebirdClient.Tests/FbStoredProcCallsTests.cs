@@ -15,6 +15,7 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Data;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
@@ -49,14 +50,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.Parameters[0].Value = 1;
 
-			// This will fill output parameters values
 			command.ExecuteNonQuery();
 
-			// Check the value
-			Assert.AreEqual("IRow Number 1", command.Parameters[1].Value);
+			object value = command.Parameters[1].Value;
 
-			// Dispose command - this will do a transaction commit
 			command.Dispose();
+
+			Assert.AreEqual("IRow Number 1", value);
 		}
 
 		[Test]
@@ -68,18 +68,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
 			command.Parameters[0].Value = 1;
 
-			// This will fill output parameters values
 			FbDataReader reader = command.ExecuteReader();
 			reader.Read();
-
-			// Print output value
-			TestContext.WriteLine("Output Parameters - Result of SELECT command");
-			TestContext.WriteLine(reader[0]);
-
+			object value = reader[0];
 			reader.Close();
 
-			// Dispose command - this will do a transaction commit
 			command.Dispose();
+
+			Assert.AreEqual("IRow Number 1", value);
 		}
 
 		[Test]
@@ -94,15 +90,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.Parameters[0].Value = 1;
 
-			// This will fill output parameters values
 			command.ExecuteNonQuery();
 
-			// Print output value
-			TestContext.WriteLine("Output Parameters");
-			TestContext.WriteLine(command.Parameters[1].Value);
+			object value = command.Parameters[1].Value;
 
-			// Dispose command - this will do a transaction commit
 			command.Dispose();
+
+			Assert.AreEqual("IRow Number 1", value);
 		}
 
 		[Test]
@@ -113,15 +107,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.Parameters.Add("@RECORDCOUNT", FbDbType.Integer).Direction = ParameterDirection.Output;
 
-			// This will fill output parameters values
 			command.ExecuteNonQuery();
 
-			// Print output value
-			TestContext.WriteLine("Output Parameters - Record Count");
-			TestContext.WriteLine(command.Parameters[0].Value);
+			object value = command.Parameters[0].Value;
 
-			// Dispose command - this will do a transaction commit
 			command.Dispose();
+
+			Assert.Greater(Convert.ToInt32(value), 0);
 		}
 
 		[Test]
@@ -133,7 +125,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.Parameters.Add("@ID", FbDbType.VarChar).Value = 1;
 
-			// This will fill output parameters values
 			FbDataReader r = command.ExecuteReader();
 
 			int count = 0;
@@ -145,7 +136,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			r.Close();
 
-			// Dispose command - this will do a transaction commit
 			command.Dispose();
 
 			Assert.AreEqual(1, count);

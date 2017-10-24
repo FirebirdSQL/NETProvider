@@ -50,10 +50,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
-					TestContext.Write(reader.GetValue(i) + "\t");
+					reader.GetValue(i);
 				}
-
-				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -89,7 +87,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
-				TestContext.WriteLine(reader.GetString(reader.GetOrdinal("bigint_field")) + "\t");
+				reader.GetString(reader.GetOrdinal("bigint_field"));
 			}
 
 			reader.Close();
@@ -109,12 +107,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				object[] values = new object[reader.FieldCount];
 				reader.GetValues(values);
-
-				for (int i = 0; i < values.Length; i++)
-				{
-					TestContext.Write(values[i] + "\t");
-				}
-				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -134,9 +126,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
-					TestContext.Write(reader[i] + "\t");
+					object dummy = reader[i];
 				}
-				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -156,9 +147,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
-					TestContext.Write(reader[reader.GetName(i)] + "\t");
+					object dummy = reader[reader.GetName(i)];
 				}
-				TestContext.WriteLine();
 			}
 
 			reader.Close();
@@ -214,12 +204,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				for (int i = 0; i < reader.FieldCount; i++)
 				{
-					TestContext.Write(reader.GetValue(i) + "\t");
+					reader.GetValue(i);
 				}
-				TestContext.WriteLine();
 			}
-
-			TestContext.WriteLine("===");
 
 			if (reader.NextResult())
 			{
@@ -227,9 +214,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					for (int i = 0; i < reader.FieldCount; i++)
 					{
-						TestContext.Write(reader.GetValue(i) + "\t");
+						reader.GetValue(i);
 					}
-					TestContext.WriteLine();
 				}
 			}
 
@@ -247,15 +233,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			FbDataReader reader = command.ExecuteReader();
 
-			bool nextResult = true;
-
-			while (nextResult)
+			while (reader.Read())
 			{
-				while (reader.Read())
-				{
-				}
-
-				nextResult = reader.NextResult();
 			}
 
 			reader.Close();

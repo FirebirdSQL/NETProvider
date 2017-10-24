@@ -17,7 +17,6 @@
 
 using System;
 using System.Data;
-using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -48,7 +47,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public override void SetUp()
 		{
 			base.SetUp();
-			_adapter = new FbDataAdapter(new FbCommand("select * from TEST where	VARCHAR_FIELD =	?", Connection));
+			_adapter = new FbDataAdapter(new FbCommand("select * from TEST where VARCHAR_FIELD = ?", Connection));
 		}
 
 		[TearDown]
@@ -67,7 +66,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
+			StringAssert.StartsWith("INSERT", builder.GetInsertCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -77,7 +76,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
+			StringAssert.StartsWith("UPDATE", builder.GetUpdateCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -87,7 +86,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
+			StringAssert.StartsWith("DELETE", builder.GetDeleteCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -97,17 +96,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
-			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
-			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
+			Assert.DoesNotThrow(() => builder.GetInsertCommand());
+			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
+			Assert.DoesNotThrow(() => builder.GetDeleteCommand());
 
-			_adapter.SelectCommand.CommandText = "select	* from TEST	where BIGINT_FIELD = ?";
+			_adapter.SelectCommand.CommandText = "select * from TEST where BIGINT_FIELD = ?";
 
 			builder.RefreshSchema();
 
-			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
-			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
-			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
+			Assert.DoesNotThrow(() => builder.GetInsertCommand());
+			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
+			Assert.DoesNotThrow(() => builder.GetDeleteCommand());
 
 			builder.Dispose();
 		}
@@ -115,11 +114,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void CommandBuilderWithExpressionFieldTest()
 		{
-			_adapter.SelectCommand.CommandText = "select	TEST.*,	0 AS VALOR from	TEST";
+			_adapter.SelectCommand.CommandText = "select TEST.*, 0 AS VALOR from TEST";
 
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
+			StringAssert.DoesNotContain("VALOR", builder.GetUpdateCommand().CommandText);
 
 			builder.Dispose();
 		}
@@ -176,17 +175,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
 
-			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
-			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
-			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
+			Assert.DoesNotThrow(() => builder.GetInsertCommand());
+			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
+			Assert.DoesNotThrow(() => builder.GetDeleteCommand());
 
-			_adapter.SelectCommand.CommandText = "select	* from TEST	where BIGINT_FIELD = ?";
+			_adapter.SelectCommand.CommandText = "select * from TEST where BIGINT_FIELD = ?";
 
 			builder.RefreshSchema();
 
-			TestContext.WriteLine(builder.GetInsertCommand().CommandText);
-			TestContext.WriteLine(builder.GetUpdateCommand().CommandText);
-			TestContext.WriteLine(builder.GetDeleteCommand().CommandText);
+			Assert.DoesNotThrow(() => builder.GetInsertCommand());
+			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
+			Assert.DoesNotThrow(() => builder.GetDeleteCommand());
 
 			builder.Dispose();
 		}

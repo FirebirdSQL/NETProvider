@@ -54,7 +54,6 @@ namespace EntityFramework.Firebird.Tests
 			string token = GetProviderServices().GetProviderManifestToken(Connection);
 			Assert.IsNotNull(token);
 			Assert.IsNotEmpty(token);
-			TestContext.WriteLine(token);
 			Version v = new Version(token);
 			Assert.Greater(v.Major, 0);
 			Assert.GreaterOrEqual(v.Minor, 0);

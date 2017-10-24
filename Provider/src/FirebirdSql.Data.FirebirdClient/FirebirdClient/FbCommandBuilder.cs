@@ -277,7 +277,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (!(adapter is FbDataAdapter))
 			{
-				throw new InvalidOperationException("adapter needs to be a FbDataAdapter");
+				throw new ArgumentException($"Argument needs to be a {nameof(FbDataAdapter)}.", nameof(adapter));
 			}
 
 			_rowUpdatingHandler = new EventHandler<FbRowUpdatingEventArgs>(RowUpdatingHandler);
