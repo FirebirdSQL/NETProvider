@@ -15,8 +15,9 @@ environment:
 #  - name: FB 2.5 (CS)
 #    fb_download: https://www.dropbox.com/s/ayzjnxjx20vb7s5/fb25.7z?dl=1
 #    fb_start: .\bin\fb_inet_server.exe -a
-shallow_clone: true
 test: off
+init:
+  - git config --global core.autocrlf true
 before_build:
   - ps: $baseDir = Resolve-Path .
 build_script:
