@@ -36,13 +36,13 @@ function Build() {
 }
 
 function Pack() {
-	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-net452.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.pdb
-	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-netstandard1.6.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard1.6\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard1.6\FirebirdSql.Data.FirebirdClient.pdb
-	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-netstandard2.0.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard2.0\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard2.0\FirebirdSql.Data.FirebirdClient.pdb
+	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-net452.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.pdb | Out-Null
+	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-netstandard1.6.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard1.6\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard1.6\FirebirdSql.Data.FirebirdClient.pdb | Out-Null
+	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$Version-netstandard2.0.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard2.0\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\Release\netstandard2.0\FirebirdSql.Data.FirebirdClient.pdb | Out-Null
 
-	7z a -mx=9 $outDir\EntityFramework.Firebird-$Version-net452.7z $baseDir\src\EntityFramework.Firebird\bin\Release\net452\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release\net452\EntityFramework.Firebird.pdb
+	7z a -mx=9 $outDir\EntityFramework.Firebird-$Version-net452.7z $baseDir\src\EntityFramework.Firebird\bin\Release\net452\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\Release\net452\EntityFramework.Firebird.pdb | Out-Null
 
-	7z a -mx=9 $outDir\FirebirdSql.EntityFrameworkCore.Firebird-$Version-netstandard2.0.7z $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\Release\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.dll $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\Release\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.pdb
+	7z a -mx=9 $outDir\FirebirdSql.EntityFrameworkCore.Firebird-$Version-netstandard2.0.7z $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\Release\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.dll $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\Release\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.pdb | Out-Null
 }
 
 function NuGet() {
