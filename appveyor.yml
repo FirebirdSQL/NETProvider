@@ -33,7 +33,7 @@ before_test:
   - ps: mkdir C:\firebird | Out-Null
   - ps: cd C:\firebird
   - ps: Start-FileDownload "$env:fb_download" | Out-Null
-  - ps: 7z x ($env:fb_download -replace '.+/([^/]+)\?dl=1','$1')
+  - ps: 7z x ($env:fb_download -replace '.+/([^/]+)\?dl=1','$1') | Out-Null
   - ps: cp -Recurse .\embedded\* $testsNETDir
   - ps: cp -Recurse .\embedded\* $testsCOREDir
   - ps: rmdir -Recurse .\embedded
