@@ -21,6 +21,7 @@ using System.Configuration;
 using System.Data;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
@@ -42,6 +43,21 @@ namespace FirebirdSql.Data.UnitTests
 		{
 			var b = new FbConnectionStringBuilder();
 			Assert.AreEqual(b.MaxPoolSize, FbConnectionString.DefaultValueMaxPoolSize);
+		}
+
+		[Test]
+		public void CryptKeyValueSetter()
+		{
+			var b = new FbConnectionStringBuilder();
+			b.CryptKey = Encoding.ASCII.GetBytes("test");
+			Assert.AreEqual("crypt key=\"dGVzdA==\"", b.ToString());
+		}
+
+		[Test]
+		public void CryptKeyValueGetter()
+		{
+			var b = new FbConnectionStringBuilder("CryptKey=dGVzdA==");
+			Assert.AreEqual("test", Encoding.ASCII.GetString(b.CryptKey));
 		}
 	}
 }

@@ -353,23 +353,22 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private byte[] GetBytes(string keyword, byte[] defaultValue)
 		{
-			if (!TryGetValue(GetKey(keyword), out var value))
-				return defaultValue;
-
-			switch (value)
-			{
-				case byte[] bytes:
-					return bytes;
-				case string s:
-					return Convert.FromBase64String(s);
-				default:
-					return defaultValue;
-			}
+			return TryGetValue(GetKey(keyword), out var value)
+				? Convert.FromBase64String(value as string)
+				: defaultValue;
 		}
 
 		private void SetValue<T>(string keyword, T value)
 		{
-			this[GetKey(keyword)] = value;
+			var index = GetKey(keyword);
+			if (typeof(T) == typeof(byte[]))
+			{
+				this[index] = Convert.ToBase64String(value as byte[]);
+			}
+			else
+			{
+				this[index] = value;
+			}
 		}
 
 		private string GetKey(string keyword)
