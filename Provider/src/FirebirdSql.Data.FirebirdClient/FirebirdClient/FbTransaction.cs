@@ -222,26 +222,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal void BeginTransaction()
 		{
-			try
-			{
-				_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb());
-			}
-			catch (IscException ex)
-			{
-				throw new FbException(ex.Message, ex);
-			}
+			_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb());
 		}
 
 		internal void BeginTransaction(FbTransactionOptions options)
 		{
-			try
-			{
-				_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb(options));
-			}
-			catch (IscException ex)
-			{
-				throw new FbException(ex.Message, ex);
-			}
+			_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb(options));
 		}
 
 		#endregion
