@@ -153,10 +153,6 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.TransactionCount++;
 			}
-			catch
-			{
-				throw;
-			}
 			finally
 			{
 				if (teb.dbb_ptr != IntPtr.Zero)
