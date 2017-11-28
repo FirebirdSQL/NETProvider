@@ -27,7 +27,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
-	internal class GdsConnection
+	internal sealed class GdsConnection
 	{
 		const ulong KeepAliveTime = 1800000; // 30min
 		const ulong KeepAliveInterval = 1800000; // 30min
@@ -106,7 +106,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Methods
 
-		public virtual void Connect()
+		public void Connect()
 		{
 			try
 			{
@@ -130,7 +130,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public virtual void Identify(string database)
+		public void Identify(string database)
 		{
 			using (var xdrStream = CreateXdrStream(false))
 			{
@@ -238,7 +238,7 @@ namespace FirebirdSql.Data.Client.Managed
 			return CreateXdrStream(_compression);
 		}
 
-		public virtual void Disconnect()
+		public void Disconnect()
 		{
 			_networkStream?.Dispose();
 			_networkStream = null;
