@@ -52,7 +52,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 		{
 			using (var db = GetDbContext<UpdateContext>())
 			{
-				db.Database.ExecuteSqlCommand("recreate table test_update (id int primary key, foo varchar(20), bar varchar(20))");
+				db.Database.ExecuteSqlCommand("create table test_update (id int primary key, foo varchar(20), bar varchar(20))");
 				db.Database.ExecuteSqlCommand("update or insert into test_update values (66, 'foo', 'bar')");
 				var entity = new UpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
 				var entry = db.Attach(entity);
@@ -98,13 +98,52 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 		{
 			using (var db = GetDbContext<ComputedUpdateContext>())
 			{
-				db.Database.ExecuteSqlCommand("recreate table test_update_computed (id int primary key, foo varchar(20), bar varchar(20), computed generated always as (foo || bar))");
+				db.Database.ExecuteSqlCommand("create table test_update_computed (id int primary key, foo varchar(20), bar varchar(20), computed generated always as (foo || bar))");
 				db.Database.ExecuteSqlCommand("update or insert into test_update_computed values (66, 'foo', 'bar')");
 				var entity = new ComputedUpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
 				db.SaveChanges();
 				Assert.AreEqual("testbar", entity.Computed);
+			}
+		}
+
+		class ConcurrencyUpdateContext : FbTestDbContext
+		{
+			public ConcurrencyUpdateContext(string connectionString)
+				: base(connectionString)
+			{ }
+
+			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+
+				var insertEntityConf = modelBuilder.Entity<ConcurrencyUpdateEntity>();
+				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
+				insertEntityConf.Property(x => x.Foo).HasColumnName("FOO");
+				insertEntityConf.Property(x => x.Stamp).HasColumnName("STAMP")
+					.ValueGeneratedOnAddOrUpdate()
+					.IsConcurrencyToken();
+				insertEntityConf.ToTable("TEST_UPDATE_CONCURRENCY");
+			}
+		}
+		class ConcurrencyUpdateEntity
+		{
+			public int Id { get; set; }
+			public string Foo { get; set; }
+			public DateTime Stamp { get; set; }
+		}
+		[Test, Ignore("")]
+		public void ConcurrencyUpdate()
+		{
+			using (var db = GetDbContext<ConcurrencyUpdateContext>())
+			{
+				db.Database.ExecuteSqlCommand("create table test_update_concurrency (id int primary key, foo varchar(20), stamp timestamp)");
+				db.Database.ExecuteSqlCommand("update or insert into test_update_concurrency values (66, 'foo', current_timestamp)");
+				var entity = new ConcurrencyUpdateEntity() { Id = 66, Foo = "test", Stamp = new DateTime(1970, 1, 1) };
+				var entry = db.Attach(entity);
+				entry.Property(x => x.Foo).IsModified = true;
+				Assert.Throws<DbUpdateConcurrencyException>(() => db.SaveChanges());
 			}
 		}
 	}
