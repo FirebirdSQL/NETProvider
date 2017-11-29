@@ -66,5 +66,46 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 				Assert.AreNotEqual("test", value.Bar);
 			}
 		}
+
+		class ComputedUpdateContext : FbTestDbContext
+		{
+			public ComputedUpdateContext(string connectionString)
+				: base(connectionString)
+			{ }
+
+			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+
+				var insertEntityConf = modelBuilder.Entity<ComputedUpdateEntity>();
+				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
+				insertEntityConf.Property(x => x.Foo).HasColumnName("FOO");
+				insertEntityConf.Property(x => x.Bar).HasColumnName("BAR");
+				insertEntityConf.Property(x => x.Computed).HasColumnName("COMPUTED")
+					.ValueGeneratedOnAddOrUpdate();
+				insertEntityConf.ToTable("TEST_UPDATE_COMPUTED");
+			}
+		}
+		class ComputedUpdateEntity
+		{
+			public int Id { get; set; }
+			public string Foo { get; set; }
+			public string Bar { get; set; }
+			public string Computed { get; set; }
+		}
+		[Test]
+		public void ComputedUpdate()
+		{
+			using (var db = GetDbContext<ComputedUpdateContext>())
+			{
+				db.Database.ExecuteSqlCommand("recreate table test_update_computed (id int primary key, foo varchar(20), bar varchar(20), computed generated always as (foo || bar))");
+				db.Database.ExecuteSqlCommand("update or insert into test_update_computed values (66, 'foo', 'bar')");
+				var entity = new ComputedUpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
+				var entry = db.Attach(entity);
+				entry.Property(x => x.Foo).IsModified = true;
+				db.SaveChanges();
+				Assert.AreEqual("testbar", entity.Computed);
+			}
+		}
 	}
 }

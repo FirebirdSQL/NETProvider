@@ -35,14 +35,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 
 		protected override void AppendIdentityWhereCondition(StringBuilder commandStringBuilder, ColumnModification columnModification)
 		{
-#warning Finish
-			throw new NotImplementedException();
+			throw new InvalidOperationException();
 		}
 
 		protected override void AppendRowsAffectedWhereCondition(StringBuilder commandStringBuilder, int expectedRowsAffected)
 		{
-#warning Finish
-			throw new NotImplementedException();
+			throw new InvalidOperationException();
 		}
 
 		public override ResultSetMapping AppendInsertOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
@@ -56,6 +54,28 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			AppendInsertCommandHeader(commandStringBuilder, name, null, writeOperations);
 			AppendValuesHeader(commandStringBuilder, writeOperations);
 			AppendValues(commandStringBuilder, writeOperations);
+			if (readOperations.Any())
+			{
+				commandStringBuilder.AppendLine();
+				commandStringBuilder.Append("RETURNING ");
+				commandStringBuilder.Append(string.Join(", ", readOperations.Select(x => SqlGenerationHelper.DelimitIdentifier(x.ColumnName))));
+				result = ResultSetMapping.LastInResultSet;
+			}
+			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
+			return result;
+		}
+
+		public override ResultSetMapping AppendUpdateOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
+		{
+			var result = ResultSetMapping.NoResultSet;
+			commandStringBuilder.Clear();
+			var name = command.TableName;
+			var operations = command.ColumnModifications;
+			var writeOperations = operations.Where(o => o.IsWrite).ToList();
+			var readOperations = operations.Where(o => o.IsRead).ToList();
+			var conditionOperations = operations.Where(o => o.IsCondition).ToList();
+			AppendUpdateCommandHeader(commandStringBuilder, name, null, writeOperations);
+			AppendWhereClause(commandStringBuilder, conditionOperations);
 			if (readOperations.Any())
 			{
 				commandStringBuilder.AppendLine();
