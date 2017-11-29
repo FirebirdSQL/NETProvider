@@ -18,6 +18,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 
@@ -46,7 +47,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 		public override ResultSetMapping AppendInsertOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
 		{
 			var result = ResultSetMapping.NoResultSet;
-			commandStringBuilder.Clear();
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
 			var writeOperations = operations.Where(o => o.IsWrite).ToList();
@@ -68,7 +68,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 		public override ResultSetMapping AppendUpdateOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
 		{
 			var result = ResultSetMapping.NoResultSet;
-			commandStringBuilder.Clear();
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
 			var writeOperations = operations.Where(o => o.IsWrite).ToList();
@@ -85,6 +84,58 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			}
 			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
 			return result;
+		}
+
+		public override ResultSetMapping AppendDeleteOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
+		{
+			var sqlGenerationHelper = (IFbSqlGenerationHelper)SqlGenerationHelper;
+			var name = command.TableName;
+			var operations = command.ColumnModifications;
+			var conditionOperations = operations.Where(o => o.IsCondition).ToList();
+			commandStringBuilder.Append("EXECUTE BLOCK (");
+			var separator = string.Empty;
+			foreach (var item in conditionOperations)
+			{
+				commandStringBuilder.Append(separator);
+
+				var type = GetColumnType(item);
+				var parameterName = item.UseOriginalValueParameter
+					? item.OriginalParameterName
+					: item.ParameterName;
+				commandStringBuilder.Append(parameterName);
+				commandStringBuilder.Append(" ");
+				commandStringBuilder.Append(type);
+				commandStringBuilder.Append(" = ?");
+
+				separator = ", ";
+			}
+			commandStringBuilder.AppendLine(")");
+			commandStringBuilder.AppendLine("RETURNS (ROWS_AFFECTED INT)");
+			commandStringBuilder.AppendLine("AS");
+			commandStringBuilder.AppendLine("BEGIN");
+			AppendDeleteCommandHeader(commandStringBuilder, name, null);
+			var oldParameterNameMarker = sqlGenerationHelper.ParameterNameMarker;
+			sqlGenerationHelper.ParameterNameMarker = ":";
+			try
+			{
+				AppendWhereClause(commandStringBuilder, conditionOperations);
+			}
+			finally
+			{
+				sqlGenerationHelper.ParameterNameMarker = oldParameterNameMarker;
+			}
+			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
+			commandStringBuilder.AppendLine();
+			commandStringBuilder.AppendLine("ROWS_AFFECTED = ROW_COUNT;");
+			commandStringBuilder.AppendLine("SUSPEND;");
+			commandStringBuilder.AppendLine("END");
+			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
+			return ResultSetMapping.LastInResultSet;
+		}
+
+		string GetColumnType(ColumnModification column)
+		{
+			return _typeMapper.GetMapping(column.Property).StoreType;
 		}
 	}
 }

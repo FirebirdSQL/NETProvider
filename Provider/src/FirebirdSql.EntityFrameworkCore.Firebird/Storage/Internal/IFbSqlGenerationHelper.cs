@@ -15,25 +15,12 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Text;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
-	public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenerationHelper
+	public interface IFbSqlGenerationHelper : ISqlGenerationHelper
 	{
-		public string ParameterNameMarker { get; set; }
-
-		public FbSqlGenerationHelper(RelationalSqlGenerationHelperDependencies dependencies)
-			: base(dependencies)
-		{
-			ParameterNameMarker = "@";
-		}
-
-		public override string GenerateParameterName(string name)
-			=> ParameterNameMarker + name;
-
-		public override void GenerateParameterName(StringBuilder builder, string name)
-			=> builder.Append(ParameterNameMarker).Append(name);
+		string ParameterNameMarker { get; set; }
 	}
 }

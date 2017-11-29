@@ -70,5 +70,46 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 				Assert.AreEqual(67, values[1].Id);
 			}
 		}
+
+		class ConcurrencyDeleteContext : FbTestDbContext
+		{
+			public ConcurrencyDeleteContext(string connectionString)
+				: base(connectionString)
+			{ }
+
+			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+
+				var insertEntityConf = modelBuilder.Entity<ConcurrencyDeleteEntity>();
+				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
+				insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
+				insertEntityConf.Property(x => x.Stamp).HasColumnName("STAMP")
+					.ValueGeneratedOnAddOrUpdate()
+					.IsConcurrencyToken();
+				insertEntityConf.ToTable("TEST_DELETE_CONCURRENCY");
+			}
+		}
+		class ConcurrencyDeleteEntity
+		{
+			public int Id { get; set; }
+			public string Name { get; set; }
+			public DateTime Stamp { get; set; }
+		}
+		[Test]
+		public void ConcurrencyDelete()
+		{
+			using (var db = GetDbContext<ConcurrencyDeleteContext>())
+			{
+				db.Database.ExecuteSqlCommand("create table test_delete_concurrency (id int primary key, name varchar(20), stamp timestamp)");
+				db.Database.ExecuteSqlCommand("insert into test_delete_concurrency values (65, 'test', current_timestamp)");
+				db.Database.ExecuteSqlCommand("insert into test_delete_concurrency values (66, 'test', current_timestamp)");
+				db.Database.ExecuteSqlCommand("insert into test_delete_concurrency values (67, 'test', current_timestamp)");
+				var entity = new ConcurrencyDeleteEntity() { Id = 66, Stamp = new DateTime(1970, 1, 1) };
+				var entry = db.Attach(entity);
+				entry.State = EntityState.Deleted;
+				Assert.Throws<DbUpdateConcurrencyException>(() => db.SaveChanges());
+			}
+		}
 	}
 }
