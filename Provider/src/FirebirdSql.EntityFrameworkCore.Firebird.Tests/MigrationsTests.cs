@@ -113,7 +113,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
     FOREIGN KEY (""EmployerId"") REFERENCES ""Companies"" (""Id"")
 )";
 			var batch = Generate(new[] { operation });
-			Assert.AreEqual(3, batch.Count);
+			Assert.AreEqual(3, batch.Count());
 			StringAssert.StartsWith(expectedCreateTable, batch[0].CommandText);
 			StringAssert.Contains("rdb$generator_name = ", batch[1].CommandText);
 			StringAssert.StartsWith("CREATE TRIGGER ", batch[2].CommandText);
