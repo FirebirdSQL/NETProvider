@@ -26,7 +26,7 @@ namespace EntityFramework.Firebird.Tests
 	public abstract class EntityFrameworkTestsBase : FbTestsBase
 	{
 		public EntityFrameworkTestsBase()
-			: base(FbServerType.Default, false)
+			: base(FbServerType.Default, false, false)
 		{ }
 
 		public DbProviderServices GetProviderServices()

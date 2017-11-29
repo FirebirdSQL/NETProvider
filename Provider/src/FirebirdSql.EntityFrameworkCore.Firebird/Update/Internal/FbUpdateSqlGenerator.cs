@@ -51,10 +51,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			var operations = command.ColumnModifications;
 			var writeOperations = operations.Where(o => o.IsWrite).ToList();
 			var readOperations = operations.Where(o => o.IsRead).ToList();
+			var anyRead = readOperations.Any();
 			AppendInsertCommandHeader(commandStringBuilder, name, null, writeOperations);
 			AppendValuesHeader(commandStringBuilder, writeOperations);
 			AppendValues(commandStringBuilder, writeOperations);
-			if (readOperations.Any())
+			if (anyRead)
 			{
 				commandStringBuilder.AppendLine();
 				commandStringBuilder.Append("RETURNING ");
@@ -67,23 +68,97 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 
 		public override ResultSetMapping AppendUpdateOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
 		{
-			var result = ResultSetMapping.NoResultSet;
+			var sqlGenerationHelper = (IFbSqlGenerationHelper)SqlGenerationHelper;
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
 			var writeOperations = operations.Where(o => o.IsWrite).ToList();
 			var readOperations = operations.Where(o => o.IsRead).ToList();
 			var conditionOperations = operations.Where(o => o.IsCondition).ToList();
-			AppendUpdateCommandHeader(commandStringBuilder, name, null, writeOperations);
-			AppendWhereClause(commandStringBuilder, conditionOperations);
-			if (readOperations.Any())
+			var inputOperations = operations.Where(o => o.IsWrite || o.IsCondition).ToList();
+			var anyRead = readOperations.Any();
+			commandStringBuilder.Append("EXECUTE BLOCK (");
+			var separator = string.Empty;
+			foreach (var item in inputOperations)
+			{
+				commandStringBuilder.Append(separator);
+
+				var type = GetColumnType(item);
+				var parameterName = item.UseOriginalValueParameter
+					? item.OriginalParameterName
+					: item.ParameterName;
+				commandStringBuilder.Append(parameterName);
+				commandStringBuilder.Append(" ");
+				commandStringBuilder.Append(type);
+				commandStringBuilder.Append(" = ?");
+
+				separator = ", ";
+			}
+			commandStringBuilder.AppendLine(")");
+			commandStringBuilder.Append("RETURNS (");
+			if (anyRead)
+			{
+				separator = string.Empty;
+				foreach (var item in readOperations)
+				{
+					commandStringBuilder.Append(separator);
+
+					var type = GetColumnType(item);
+					commandStringBuilder.Append(SqlGenerationHelper.DelimitIdentifier(item.ColumnName));
+					commandStringBuilder.Append(" ");
+					commandStringBuilder.Append(type);
+
+					separator = ", ";
+				}
+			}
+			else
+			{
+				commandStringBuilder.Append("ROWS_AFFECTED INT");
+			}
+			commandStringBuilder.AppendLine(")");
+			commandStringBuilder.AppendLine("AS");
+			commandStringBuilder.AppendLine("BEGIN");
+			var oldParameterNameMarker = sqlGenerationHelper.ParameterNameMarker;
+			sqlGenerationHelper.ParameterNameMarker = ":";
+			try
+			{
+				AppendUpdateCommandHeader(commandStringBuilder, name, null, writeOperations);
+				AppendWhereClause(commandStringBuilder, conditionOperations);
+			}
+			finally
+			{
+				sqlGenerationHelper.ParameterNameMarker = oldParameterNameMarker;
+			}
+			if (anyRead)
 			{
 				commandStringBuilder.AppendLine();
 				commandStringBuilder.Append("RETURNING ");
-				commandStringBuilder.Append(string.Join(", ", readOperations.Select(x => SqlGenerationHelper.DelimitIdentifier(x.ColumnName))));
-				result = ResultSetMapping.LastInResultSet;
+				separator = string.Empty;
+				foreach (var item in readOperations)
+				{
+					commandStringBuilder.Append(separator);
+
+					var type = GetColumnType(item);
+					commandStringBuilder.Append(SqlGenerationHelper.DelimitIdentifier(item.ColumnName));
+					commandStringBuilder.Append(" INTO :");
+					commandStringBuilder.Append(SqlGenerationHelper.DelimitIdentifier(item.ColumnName));
+
+					separator = ", ";
+				}
 			}
 			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
-			return result;
+			if (!anyRead)
+			{
+				commandStringBuilder.AppendLine("ROWS_AFFECTED = ROW_COUNT;");
+				commandStringBuilder.AppendLine("SUSPEND;");
+			}
+			else
+			{
+				commandStringBuilder.AppendLine("IF (ROW_COUNT > 0) THEN");
+				commandStringBuilder.AppendLine("SUSPEND;");
+			}
+			commandStringBuilder.AppendLine("END");
+			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
+			return ResultSetMapping.LastInResultSet;
 		}
 
 		public override ResultSetMapping AppendDeleteOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
@@ -92,9 +167,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
 			var conditionOperations = operations.Where(o => o.IsCondition).ToList();
+			var inputOperations = conditionOperations;
 			commandStringBuilder.Append("EXECUTE BLOCK (");
 			var separator = string.Empty;
-			foreach (var item in conditionOperations)
+			foreach (var item in inputOperations)
 			{
 				commandStringBuilder.Append(separator);
 
@@ -113,11 +189,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			commandStringBuilder.AppendLine("RETURNS (ROWS_AFFECTED INT)");
 			commandStringBuilder.AppendLine("AS");
 			commandStringBuilder.AppendLine("BEGIN");
-			AppendDeleteCommandHeader(commandStringBuilder, name, null);
 			var oldParameterNameMarker = sqlGenerationHelper.ParameterNameMarker;
 			sqlGenerationHelper.ParameterNameMarker = ":";
 			try
 			{
+				AppendDeleteCommandHeader(commandStringBuilder, name, null);
 				AppendWhereClause(commandStringBuilder, conditionOperations);
 			}
 			finally

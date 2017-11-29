@@ -28,6 +28,7 @@ namespace FirebirdSql.Data.TestsBase
 	{
 		#region	Fields
 
+		private readonly bool _insertTestData;
 		private FbConnection _connection;
 		private FbTransaction _transaction;
 
@@ -53,10 +54,11 @@ namespace FirebirdSql.Data.TestsBase
 
 		#region	Constructors
 
-		public FbTestsBase(FbServerType serverType, bool compression)
+		public FbTestsBase(FbServerType serverType, bool compression, bool insertTestData = true)
 		{
 			FbServerType = serverType;
 			Compression = compression;
+			_insertTestData = insertTestData;
 		}
 
 		#endregion
@@ -69,7 +71,10 @@ namespace FirebirdSql.Data.TestsBase
 			FbTestsSetup.SetUp(FbServerType, Compression);
 
 			string cs = BuildConnectionString(FbServerType, Compression);
-			InsertTestData(cs);
+			if (_insertTestData)
+			{
+				InsertTestData(cs);
+			}
 			_connection = new FbConnection(cs);
 			_connection.Open();
 		}
@@ -79,7 +84,10 @@ namespace FirebirdSql.Data.TestsBase
 		{
 			string cs = BuildConnectionString(FbServerType, Compression);
 			_connection.Dispose();
-			DeleteAllData(cs);
+			if (_insertTestData)
+			{
+				DeleteAllData(cs);
+			}
 			FbConnection.ClearAllPools();
 		}
 

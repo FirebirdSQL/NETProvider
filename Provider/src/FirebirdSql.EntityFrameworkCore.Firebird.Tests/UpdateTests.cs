@@ -133,7 +133,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 			public string Foo { get; set; }
 			public DateTime Stamp { get; set; }
 		}
-		[Test, Ignore("")]
+		[Test]
 		public void ConcurrencyUpdate()
 		{
 			using (var db = GetDbContext<ConcurrencyUpdateContext>())

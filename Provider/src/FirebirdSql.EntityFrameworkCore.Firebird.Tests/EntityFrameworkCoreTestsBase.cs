@@ -26,7 +26,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 	public abstract class EntityFrameworkCoreTestsBase : FbTestsBase
 	{
 		public EntityFrameworkCoreTestsBase()
-			: base(FbServerType.Default, false)
+			: base(FbServerType.Default, false, false)
 		{ }
 
 		public TContext GetDbContext<TContext>() where TContext : FbTestDbContext
