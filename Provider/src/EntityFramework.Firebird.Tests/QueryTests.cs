@@ -37,8 +37,8 @@ namespace EntityFramework.Firebird.Tests
 			{
 				base.OnModelCreating(modelBuilder);
 				var queryTest1Entity = modelBuilder.Entity<QueryTest1Entity>();
-				queryTest1Entity.Property(x => x.ID).HasColumnName("INT_FIELD");
-				queryTest1Entity.ToTable("TEST");
+				queryTest1Entity.Property(x => x.ID).HasColumnName("ID");
+				queryTest1Entity.ToTable("TEST_QUERYTEST1ENTITY");
 			}
 
 			public IDbSet<QueryTest1Entity> QueryTest1Entity { get; set; }
@@ -48,6 +48,7 @@ namespace EntityFramework.Firebird.Tests
 		{
 			using (var c = GetDbContext<QueryTest1Context>())
 			{
+				c.Database.ExecuteSqlCommand("create table test_querytest1entity (id int primary key)");
 				Assert.DoesNotThrow(() => c.QueryTest1Entity.Max(x => x.ID));
 			}
 		}
