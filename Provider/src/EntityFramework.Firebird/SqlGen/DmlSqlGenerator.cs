@@ -176,32 +176,6 @@ namespace EntityFramework.Firebird.SqlGen
 			return SqlGenerator.QuoteIdentifier(member.Name);
 		}
 
-		/// <summary>
-		/// Generates SQL fragment returning server-generated values.
-		/// Requires: translator knows about member values so that we can figure out
-		/// how to construct the key predicate.
-		/// <code>
-		/// Sample SQL:
-		///
-		///     select IdentityValue
-		///     from dbo.MyTable
-		///     where @@ROWCOUNT > 0 and IdentityValue = scope_identity()
-		///
-		/// or
-		///
-		///     select TimestamptValue
-		///     from dbo.MyTable
-		///     where @@ROWCOUNT > 0 and Id = 1
-		///
-		/// Note that we filter on rowcount to ensure no rows are returned if no rows were modified.
-		/// </code>
-		/// </summary>
-		/// <param name="commandText">Builder containing command text</param>
-		/// <param name="tree">Modification command tree</param>
-		/// <param name="translator">Translator used to produce DML SQL statement
-		/// for the tree</param>
-		/// <param name="returning">Returning expression. If null, the method returns
-		/// immediately without producing a SELECT statement.</param>
 		private static void GenerateReturningSql(
 			StringBuilder commandText,
 			DbModificationCommandTree tree,
@@ -216,9 +190,9 @@ namespace EntityFramework.Firebird.SqlGen
 
 			EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
 			IEnumerable<EdmMember> columnsToFetch =
-			table.ElementType.Members
-				.Where(m => MetadataHelpers.IsStoreGenerated(m))
-				.Except((!(tree is DbInsertCommandTree) ? table.ElementType.KeyMembers : Enumerable.Empty<EdmMember>()));
+				table.ElementType.Members
+					.Where(m => MetadataHelpers.IsStoreGenerated(m))
+					.Except((!(tree is DbInsertCommandTree) ? table.ElementType.KeyMembers : Enumerable.Empty<EdmMember>()));
 
 			StringBuilder startBlock = new StringBuilder();
 			string separator = string.Empty;
