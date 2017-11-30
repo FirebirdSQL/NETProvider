@@ -49,7 +49,7 @@ namespace EntityFramework.Firebird.Tests
 			using (var c = GetDbContext<QueryTest1Context>())
 			{
 				c.Database.ExecuteSqlCommand("create table test_querytest1entity (id int primary key)");
-				Assert.DoesNotThrow(() => c.QueryTest1Entity.Max(x => x.ID));
+				Assert.DoesNotThrow(() => c.QueryTest1Entity.Max<QueryTest1Entity, int?>(x => x.ID));
 			}
 		}
 
