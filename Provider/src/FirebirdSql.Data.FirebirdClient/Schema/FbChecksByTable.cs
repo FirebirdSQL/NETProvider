@@ -61,13 +61,13 @@ namespace FirebirdSql.Data.Schema
 				/* CONSTRAINT_NAME */
 				if (restrictions.Length >= 3 && restrictions[2] != null)
 				{
-					where.AppendFormat(CultureInfo.CurrentUICulture, "chktb.rdb$constraint_name = @p{0}", index++);
+					where.AppendFormat("chktb.rdb$constraint_name = @p{0}", index++);
 				}
 			}
 
 			if (where.Length > 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
+				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
 			sql.Append(" ORDER BY chktb.rdb$relation_name, chktb.rdb$constraint_name");

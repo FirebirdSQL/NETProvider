@@ -62,25 +62,25 @@ namespace FirebirdSql.Data.Schema
 				/* TABLE_NAME */
 				if (restrictions.Length >= 3 && restrictions[2] != null)
 				{
-					where.AppendFormat(CultureInfo.CurrentUICulture, " AND rdb$relation_name = @p{0}", index++);
+					where.AppendFormat(" AND rdb$relation_name = @p{0}", index++);
 				}
 
 				/* GRANTOR */
 				if (restrictions.Length >= 4 && restrictions[3] != null)
 				{
-					where.AppendFormat(CultureInfo.CurrentUICulture, " AND rdb$grantor = @p{0}", index++);
+					where.AppendFormat(" AND rdb$grantor = @p{0}", index++);
 				}
 
 				/* GRANTEE */
 				if (restrictions.Length >= 5 && restrictions[4] != null)
 				{
-					where.AppendFormat(CultureInfo.CurrentUICulture, " AND rdb$user = @p{0}", index++);
+					where.AppendFormat(" AND rdb$user = @p{0}", index++);
 				}
 			}
 
 			if (where.Length > 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
+				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
 			sql.Append(" ORDER BY rdb$relation_name");

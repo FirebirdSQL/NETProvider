@@ -86,19 +86,19 @@ namespace FirebirdSql.Data.Schema
 				/* VIEW_NAME */
 				if (restrictions.Length >= 3 && restrictions[2] != null)
 				{
-					where.AppendFormat(CultureInfo.CurrentUICulture, " AND rel.rdb$relation_name = @p{0}", index++);
+					where.AppendFormat(" AND rel.rdb$relation_name = @p{0}", index++);
 				}
 
 				/* COLUMN_NAME */
 				if (restrictions.Length >= 4 && restrictions[3] != null)
 				{
-					where.AppendFormat(CultureInfo.CurrentUICulture, " AND rfr.rdb$field_name = @p{0}", index++);
+					where.AppendFormat(" AND rfr.rdb$field_name = @p{0}", index++);
 				}
 			}
 
 			if (where.Length > 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
+				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
 			sql.Append(" ORDER BY rel.rdb$relation_name, rfr.rdb$field_position");

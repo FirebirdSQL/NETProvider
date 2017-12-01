@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.Schema
 				/* TABLE_NAME */
 				if (restrictions.Length >= 3 && restrictions[2] != null)
 				{
-					where.AppendFormat(CultureInfo.CurrentUICulture, "rdb$relation_name = @p{0}", index++);
+					where.AppendFormat("rdb$relation_name = @p{0}", index++);
 				}
 
 				/* TABLE_TYPE */
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.Schema
 
 			if (where.Length > 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
+				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
 			sql.Append(" ORDER BY rdb$system_flag, rdb$owner_name, rdb$relation_name");

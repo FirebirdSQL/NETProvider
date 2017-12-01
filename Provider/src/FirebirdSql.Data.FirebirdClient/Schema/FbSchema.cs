@@ -74,7 +74,7 @@ namespace FirebirdSql.Data.Schema
 
 		protected FbCommand BuildCommand(FbConnection connection, string collectionName, string[] restrictions)
 		{
-			string filter = String.Format("CollectionName='{0}'", collectionName);
+			string filter = string.Format("CollectionName='{0}'", collectionName);
 			StringBuilder builder = GetCommandText(restrictions);
 			DataRow[] restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
 			FbTransaction transaction = connection.InnerConnection.ActiveTransaction;
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.Schema
 						// Catalog, Schema and TableType are no real restrictions
 						if (!rname.EndsWith("Catalog") && !rname.EndsWith("Schema") && rname != "TableType")
 						{
-							string pname = String.Format(CultureInfo.CurrentUICulture, "@p{0}", index++);
+							string pname = string.Format("@p{0}", index++);
 
 							command.Parameters.Add(pname, FbDbType.VarChar, 255).Value = restrictions[i];
 						}

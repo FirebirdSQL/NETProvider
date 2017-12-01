@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.Schema
 				/* PROCEDURE_NAME */
 				if (restrictions.Length >= 3 && restrictions[2] != null)
 				{
-					where.AppendFormat(CultureInfo.CurrentCulture, "pp.rdb$procedure_name = @p{0}", index++);
+					where.AppendFormat("pp.rdb$procedure_name = @p{0}", index++);
 				}
 
 				/* PARAMETER_NAME */
@@ -94,13 +94,13 @@ namespace FirebirdSql.Data.Schema
 						where.Append(" AND ");
 					}
 
-					where.AppendFormat(CultureInfo.CurrentCulture, "pp.rdb$parameter_name = @p{0}", index++);
+					where.AppendFormat("pp.rdb$parameter_name = @p{0}", index++);
 				}
 			}
 
 			if (where.Length > 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentCulture, " WHERE {0} ", where.ToString());
+				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
 			sql.Append(" ORDER BY pp.rdb$procedure_name, pp.rdb$parameter_type, pp.rdb$parameter_number");

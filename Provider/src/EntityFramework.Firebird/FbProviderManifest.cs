@@ -83,7 +83,7 @@ namespace EntityFramework.Firebird
 				return null;
 			}
 
-			throw new ProviderIncompatibleException(String.Format("The provider returned null for the informationType '{0}'.", informationType));
+			throw new ProviderIncompatibleException(string.Format("The provider returned null for the informationType '{0}'.", informationType));
 		}
 
 		public override System.Collections.ObjectModel.ReadOnlyCollection<PrimitiveType> GetStoreTypes()
@@ -122,7 +122,7 @@ namespace EntityFramework.Firebird
 			string storeTypeName = storeType.EdmType.Name.ToLowerInvariant();
 			if (!StoreTypeNameToEdmPrimitiveType.ContainsKey(storeTypeName))
 			{
-				throw new ArgumentException(String.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
+				throw new ArgumentException(string.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
 			}
 
 			PrimitiveType edmPrimitiveType = base.StoreTypeNameToEdmPrimitiveType[storeTypeName];
@@ -218,7 +218,7 @@ namespace EntityFramework.Firebird
 						return TypeUsage.CreateBinaryTypeUsage(edmPrimitiveType, isFixedLen);
 					}
 				default:
-					throw new NotSupportedException(String.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
+					throw new NotSupportedException(string.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
 			}
 		}
 
@@ -239,7 +239,7 @@ namespace EntityFramework.Firebird
 			PrimitiveType primitiveType = edmType.EdmType as PrimitiveType;
 			if (primitiveType == null)
 			{
-				throw new ArgumentException(String.Format("The underlying provider does not support the type '{0}'.", edmType));
+				throw new ArgumentException(string.Format("The underlying provider does not support the type '{0}'.", edmType));
 			}
 
 			ReadOnlyMetadataCollection<Facet> facets = edmType.Facets;

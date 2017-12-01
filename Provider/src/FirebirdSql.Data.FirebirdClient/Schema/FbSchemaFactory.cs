@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Schema
 
 		public static DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
-			string filter = String.Format("CollectionName = '{0}'", collectionName);
+			string filter = string.Format("CollectionName = '{0}'", collectionName);
 			DataSet ds = new DataSet();
 			using (var xmlStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName))
 			{

@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			else
 			{
-				spName = spName.ToUpper(CultureInfo.CurrentUICulture);
+				spName = spName.ToUpper(CultureInfo.CurrentCulture);
 			}
 
 			string paramsText = string.Empty;
@@ -70,8 +70,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			foreach (DataRow row in spSchema.Rows)
 			{
-				dataTypes.RowFilter = String.Format(
-					CultureInfo.CurrentUICulture,
+				dataTypes.RowFilter = string.Format(
 					"TypeName = '{0}'",
 					row["PARAMETER_DATA_TYPE"]);
 
@@ -214,7 +213,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new ArgumentNullException("Unquoted identifier parameter cannot be null");
 			}
 
-			return String.Format("{0}{1}{2}", QuotePrefix, unquotedIdentifier, QuoteSuffix);
+			return string.Format("{0}{1}{2}", QuotePrefix, unquotedIdentifier, QuoteSuffix);
 		}
 
 		public override string UnquoteIdentifier(string quotedIdentifier)
@@ -260,12 +259,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override string GetParameterName(int parameterOrdinal)
 		{
-			return String.Format("@p{0}", parameterOrdinal);
+			return string.Format("@p{0}", parameterOrdinal);
 		}
 
 		protected override string GetParameterName(string parameterName)
 		{
-			return String.Format("@{0}", parameterName);
+			return string.Format("@{0}", parameterName);
 		}
 
 		protected override string GetParameterPlaceholder(int parameterOrdinal)

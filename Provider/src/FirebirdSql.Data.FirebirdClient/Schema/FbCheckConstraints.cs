@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Schema
 
 			if (where.Length > 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0}", where.ToString());
+				sql.AppendFormat(" WHERE {0}", where.ToString());
 			}
 
 			sql.Append(" ORDER BY chk.rdb$constraint_name");

@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.Schema
 						where.Append(" AND ");
 					}
 
-					where.AppendFormat(CultureInfo.CurrentUICulture, "rc.rdb$constraint_name = @p{0}", index++);
+					where.AppendFormat("rc.rdb$constraint_name = @p{0}", index++);
 				}
 
 				/* TABLE_CATALOG */
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.Schema
 						where.Append(" AND ");
 					}
 
-					where.AppendFormat(CultureInfo.CurrentUICulture, "rc.rdb$relation_name = @p{0}", index++);
+					where.AppendFormat("rc.rdb$relation_name = @p{0}", index++);
 				}
 
 				/* CONSTRAINT_TYPE */
@@ -99,13 +99,13 @@ namespace FirebirdSql.Data.Schema
 						where.Append(" AND ");
 					}
 
-					where.AppendFormat(CultureInfo.CurrentUICulture, "rc.rdb$constraint_type = @p{0}", index++);
+					where.AppendFormat("rc.rdb$constraint_type = @p{0}", index++);
 				}
 			}
 
 			if (where.Length > 0)
 			{
-				sql.AppendFormat(CultureInfo.CurrentUICulture, " WHERE {0} ", where.ToString());
+				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
 			sql.Append(" ORDER BY rc.rdb$relation_name, rc.rdb$constraint_name");
