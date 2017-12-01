@@ -59,7 +59,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			{
 				commandStringBuilder.AppendLine();
 				commandStringBuilder.Append("RETURNING ");
-				commandStringBuilder.Append(string.Join(", ", readOperations.Select(x => SqlGenerationHelper.DelimitIdentifier(x.ColumnName))));
+				commandStringBuilder.AppendJoin(readOperations, (b, e) =>
+				{
+					b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
+				}, ", ");
 				result = ResultSetMapping.LastInResultSet;
 			}
 			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
@@ -77,38 +80,28 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			var inputOperations = operations.Where(o => o.IsWrite || o.IsCondition).ToList();
 			var anyRead = readOperations.Any();
 			commandStringBuilder.Append("EXECUTE BLOCK (");
-			var separator = string.Empty;
-			foreach (var item in inputOperations)
+			commandStringBuilder.AppendJoin(inputOperations, (b, e) =>
 			{
-				commandStringBuilder.Append(separator);
-
-				var type = GetColumnType(item);
-				var parameterName = item.UseOriginalValueParameter
-					? item.OriginalParameterName
-					: item.ParameterName;
-				commandStringBuilder.Append(parameterName);
-				commandStringBuilder.Append(" ");
-				commandStringBuilder.Append(type);
-				commandStringBuilder.Append(" = ?");
-
-				separator = ", ";
-			}
+				var type = GetColumnType(e);
+				var parameterName = e.UseOriginalValueParameter
+					? e.OriginalParameterName
+					: e.ParameterName;
+				b.Append(parameterName);
+				b.Append(" ");
+				b.Append(type);
+				b.Append(" = ?");
+			}, ", ");
 			commandStringBuilder.AppendLine(")");
 			commandStringBuilder.Append("RETURNS (");
 			if (anyRead)
 			{
-				separator = string.Empty;
-				foreach (var item in readOperations)
+				commandStringBuilder.AppendJoin(readOperations, (b, e) =>
 				{
-					commandStringBuilder.Append(separator);
-
-					var type = GetColumnType(item);
-					commandStringBuilder.Append(SqlGenerationHelper.DelimitIdentifier(item.ColumnName));
-					commandStringBuilder.Append(" ");
-					commandStringBuilder.Append(type);
-
-					separator = ", ";
-				}
+					var type = GetColumnType(e);
+					b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
+					b.Append(" ");
+					b.Append(type);
+				}, ", ");
 			}
 			else
 			{
@@ -132,18 +125,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			{
 				commandStringBuilder.AppendLine();
 				commandStringBuilder.Append("RETURNING ");
-				separator = string.Empty;
-				foreach (var item in readOperations)
+				commandStringBuilder.AppendJoin(readOperations, (b, e) =>
 				{
-					commandStringBuilder.Append(separator);
-
-					var type = GetColumnType(item);
-					commandStringBuilder.Append(SqlGenerationHelper.DelimitIdentifier(item.ColumnName));
-					commandStringBuilder.Append(" INTO :");
-					commandStringBuilder.Append(SqlGenerationHelper.DelimitIdentifier(item.ColumnName));
-
-					separator = ", ";
-				}
+					var type = GetColumnType(e);
+					b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
+					b.Append(" INTO :");
+					b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
+				}, ", ");
 			}
 			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
 			if (!anyRead)
@@ -169,22 +157,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			var conditionOperations = operations.Where(o => o.IsCondition).ToList();
 			var inputOperations = conditionOperations;
 			commandStringBuilder.Append("EXECUTE BLOCK (");
-			var separator = string.Empty;
-			foreach (var item in inputOperations)
+			commandStringBuilder.AppendJoin(inputOperations, (b, e) =>
 			{
-				commandStringBuilder.Append(separator);
-
-				var type = GetColumnType(item);
-				var parameterName = item.UseOriginalValueParameter
-					? item.OriginalParameterName
-					: item.ParameterName;
-				commandStringBuilder.Append(parameterName);
-				commandStringBuilder.Append(" ");
-				commandStringBuilder.Append(type);
-				commandStringBuilder.Append(" = ?");
-
-				separator = ", ";
-			}
+				var type = GetColumnType(e);
+				var parameterName = e.UseOriginalValueParameter
+					? e.OriginalParameterName
+					: e.ParameterName;
+				b.Append(parameterName);
+				b.Append(" ");
+				b.Append(type);
+				b.Append(" = ?");
+			}, ", ");
 			commandStringBuilder.AppendLine(")");
 			commandStringBuilder.AppendLine("RETURNS (ROWS_AFFECTED INT)");
 			commandStringBuilder.AppendLine("AS");
