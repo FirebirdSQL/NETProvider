@@ -15,18 +15,13 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using FirebirdSql.EntityFrameworkCore.Firebird.Extensions;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
