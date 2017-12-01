@@ -22,7 +22,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 {
 	public class DeleteTests : EntityFrameworkCoreTestsBase
 	{

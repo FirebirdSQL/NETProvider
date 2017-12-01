@@ -29,7 +29,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 {
 	public class MigrationsTests : EntityFrameworkCoreTestsBase
 	{
