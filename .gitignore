@@ -8,3 +8,4 @@ packages
 DDEX/installer/out/
 DDEX/installer/in/
 Provider/deploy/out/
+.idea
