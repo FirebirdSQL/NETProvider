@@ -54,6 +54,7 @@
 	<Import Project="$(ProjectDir)Microsoft.Bcl.Build.targets" />
 	<PropertyGroup>
 		<SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+		<SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
 	</PropertyGroup>
 	<PropertyGroup>
 		<AppConfig>app.FirebirdSql.Data.FirebirdClient_NET40.config</AppConfig>
