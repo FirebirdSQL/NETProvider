@@ -172,7 +172,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ConnectionPoolingLifeTimeTest()
+		public void ConnectionPoolingLifetimeTest()
 		{
 			FbConnection.ClearAllPools();
 			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);

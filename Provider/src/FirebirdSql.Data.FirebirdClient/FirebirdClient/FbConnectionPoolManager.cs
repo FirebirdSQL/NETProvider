@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					var available = _available.ToArray();
 					if (available.Count() <= _connectionString.MinPoolSize)
 						return;
-					var keep = available.Where(x => ConnectionPoolLifetimeHelper.IsAlive(_connectionString.ConnectionLifeTime, x.Created, now)).ToArray();
+					var keep = available.Where(x => ConnectionPoolLifetimeHelper.IsAlive(_connectionString.ConnectionLifetime, x.Created, now)).ToArray();
 					var keepCount = keep.Count();
 					if (keepCount < _connectionString.MinPoolSize)
 					{

@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public string Charset => GetString(DefaultKeyCharacterSet);
 		public int ConnectionTimeout => GetInt32(DefaultKeyConnectionTimeout);
 		public bool Pooling => GetBoolean(DefaultKeyPooling);
-		public long ConnectionLifeTime => GetInt64(DefaultKeyConnectionLifetime);
+		public long ConnectionLifetime => GetInt64(DefaultKeyConnectionLifetime);
 		public int MinPoolSize => GetInt32(DefaultKeyMinPoolSize);
 		public int MaxPoolSize => GetInt32(DefaultKeyMaxPoolSize);
 		public int FetchSize => GetInt32(DefaultKeyFetchSize);

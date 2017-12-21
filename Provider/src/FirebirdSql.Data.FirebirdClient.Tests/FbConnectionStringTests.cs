@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string ConnectionString = "connection lifetime=6";
 			var cs = new FbConnectionString(ConnectionString);
-			Assert.AreEqual(6, cs.ConnectionLifeTime);
+			Assert.AreEqual(6, cs.ConnectionLifetime);
 		}
 
 		[Test]

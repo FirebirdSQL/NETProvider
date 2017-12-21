@@ -21,11 +21,11 @@ namespace FirebirdSql.Data.Common
 {
 	internal static class ConnectionPoolLifetimeHelper
 	{
-		internal static bool IsAlive(long connectionLifeTime, long created, long now)
+		internal static bool IsAlive(long connectionLifetime, long created, long now)
 		{
-			if (connectionLifeTime == 0)
+			if (connectionLifetime == 0)
 				return true;
-			return (now - created) < (connectionLifeTime * 1000);
+			return (now - created) < (connectionLifetime * 1000);
 		}
 	}
 }
