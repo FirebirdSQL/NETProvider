@@ -57,7 +57,7 @@
 		<Compile Include="FbBooleanSupportTests.cs" />
 		<Compile Include="FbConnectionStringTests.cs" />
 		<Compile Include="FbConnectionStringBuilderTests.cs" />
-		<Compile Include="FbConnectionPoolManagerTest.cs" />
+		<Compile Include="ConnectionPoolLifetimeHelperTests.cs" />
 		<Compile Include="FbExceptionTests.cs" />
 		<Compile Include="FbRemoteEventTests.cs" />
 		<Compile Include="FbTestFixtureAttribute.cs" />
