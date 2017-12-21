@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net40-client</TargetFramework>
-		<TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>  
+		<TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
 		<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
 		<TargetFrameworkProfile>Client</TargetFrameworkProfile>
 		<AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
@@ -9,7 +9,7 @@
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
 		<DelaySign>False</DelaySign>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>    
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -19,7 +19,7 @@
 		<DefineConstants>TRACE</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks> 
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<OutputPath>bin\Debug\NET40</OutputPath>
 		<BaseIntermediateOutputPath>obj\NET40</BaseIntermediateOutputPath>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
