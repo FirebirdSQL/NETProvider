@@ -48,6 +48,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			}
 		}
 
+		protected override void GenerateLimitOffset(SelectExpression selectExpression)
+		{
+			// handled by GenerateTop
+		}
+
 		protected override Expression VisitBinary(BinaryExpression binaryExpression)
 		{
 			if (binaryExpression.NodeType == ExpressionType.Add && binaryExpression.Left.Type == typeof(string) && binaryExpression.Right.Type == typeof(string))

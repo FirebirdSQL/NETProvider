@@ -47,6 +47,49 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 				StringAssert.Contains("EXTRACT(SECOND FROM", sql);
 			}
 		}
+
+		[Test]
+		public void SelectTake()
+		{
+			using (var db = GetDbContext<SelectContext>())
+			{
+				var query = db.Set<MonAttachment>()
+					.Take(3);
+				Assert.DoesNotThrow(() => query.Load());
+				var sql = query.ToSql();
+				StringAssert.Contains("FIRST 3", sql);
+				StringAssert.DoesNotContain("SKIP", sql);
+			}
+		}
+
+		[Test]
+		public void SelectSkipTake()
+		{
+			using (var db = GetDbContext<SelectContext>())
+			{
+				var query = db.Set<MonAttachment>()
+					.Skip(1)
+					.Take(3);
+				Assert.DoesNotThrow(() => query.Load());
+				var sql = query.ToSql();
+				StringAssert.Contains("FIRST 3", sql);
+				StringAssert.Contains("SKIP 1", sql);
+			}
+		}
+
+		[Test]
+		public void SelectSkip()
+		{
+			using (var db = GetDbContext<SelectContext>())
+			{
+				var query = db.Set<MonAttachment>()
+					.Skip(1);
+				Assert.DoesNotThrow(() => query.Load());
+				var sql = query.ToSql();
+				StringAssert.DoesNotContain("FIRST", sql);
+				StringAssert.Contains("SKIP 1", sql);
+			}
+		}
 	}
 
 	class SelectContext : FbTestDbContext
