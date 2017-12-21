@@ -16,16 +16,31 @@
 //$Authors = @realic, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using FirebirdSql.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
+using NUnit.Framework;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.UnitTests
 {
-	internal static class ConnectionPoolLifetimeHelper
+	[TestFixture]
+	public class ConnectionPoolLifetimeHelperTests
 	{
-		internal static bool IsAlive(long connectionLifeTime, long created, long now)
+		[Test]
+		public void IsAliveTrueIfLifetimeNotExceed()
 		{
-			if (connectionLifeTime == 0)
-				return true;
-			return (now - created) < (connectionLifeTime * 1000);
+			var now = 1_000_000;
+			var timeAgo = now - (10 * 1000);
+			var isAlive = ConnectionPoolLifetimeHelper.IsAlive(20, timeAgo, now);
+			Assert.IsTrue(isAlive);
+		}
+
+		[Test]
+		public void IsAliveFalseIfLifetimeIsExceed()
+		{
+			var now = 1_000_000;
+			var timeAgo = now - (30 * 1000);
+			var isAlive = ConnectionPoolLifetimeHelper.IsAlive(20, timeAgo, now);
+			Assert.IsFalse(isAlive);
 		}
 	}
 }
