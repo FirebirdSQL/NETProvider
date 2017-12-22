@@ -433,5 +433,10 @@ namespace EntityFramework.Firebird
 		{
 			return true;
 		}
+
+		public override bool SupportsParameterOptimizationInSchemaQueries()
+		{
+			return true;
+		}
 	}
 }
