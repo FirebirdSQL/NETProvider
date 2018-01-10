@@ -127,7 +127,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 				commandStringBuilder.Append("RETURNING ");
 				commandStringBuilder.AppendJoin(readOperations, (b, e) =>
 				{
-					var type = GetColumnType(e);
 					b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
 					b.Append(" INTO :");
 					b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
