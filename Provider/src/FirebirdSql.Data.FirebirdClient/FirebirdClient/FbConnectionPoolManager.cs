@@ -147,7 +147,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					CleanConnectionsImpl();
 					_available.Clear();
-					_busy.Clear();
 				}
 			}
 
@@ -166,17 +165,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			void CleanConnectionsImpl()
 			{
-				Parallel.Invoke(
-					() =>
-					{
-						foreach (var item in _available)
-							item.Dispose();
-					},
-					() =>
-					{
-						foreach (var item in _busy)
-							item.Dispose();
-					});
+				foreach (var item in _available)
+					item.Dispose();
 			}
 
 			void CheckDisposedImpl()
