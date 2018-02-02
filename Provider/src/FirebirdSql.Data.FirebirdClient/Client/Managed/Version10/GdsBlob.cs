@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				_database.XdrStream.Write(IscCodes.op_get_segment);
 				_database.XdrStream.Write(_blobHandle);
-				_database.XdrStream.Write((requested + 2 < short.MaxValue) ? requested + 2 : short.MaxValue);
+				_database.XdrStream.Write(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12);
 				_database.XdrStream.Write(DataSegment);
 				_database.XdrStream.Flush();
 
