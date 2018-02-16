@@ -58,6 +58,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		// Russian KOI8R
 		Koi8R = 63,
 		// Ukrainian KOI8U
-		Koi8U = 64
+		Koi8U = 64,
+		// TIS-620 Thai character set, single byte (since Firebird 2.1)
+		TIS620 = 65
 	}
 }
