@@ -129,7 +129,8 @@ namespace FirebirdSql.Data.Common
 			TryAddCharset(charsets, () => new Charset(63, "KOI8R", 2, "koi8-r"));
 			// Ukrainian KOI8U
 			TryAddCharset(charsets, () => new Charset(64, "KOI8U", 2, "koi8-u"));
-
+			// TIS-620 Thai character set, single byte (since Firebird 2.1)
+			TryAddCharset(charsets, () => new Charset(65, "TIS620", 1, "tis-620"));
 			return charsets;
 		}
 
