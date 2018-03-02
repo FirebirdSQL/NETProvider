@@ -10,20 +10,6 @@ $testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.FirebirdClient.Tests"
 $testsNETDir = "$testsBaseDir\bin\$Configuration\net452"
 $testsCOREDir = "$testsBaseDir\bin\$Configuration\netcoreapp2.0"
 
-$fbDownloadName = $FbDownload -Replace '.+/([^/]+)\?dl=1','$1'
-mkdir $env:tests_firebird_dir | Out-Null
-cd $env:tests_firebird_dir
-(New-Object System.Net.WebClient).DownloadFile($FbDownload, (Join-Path (pwd) $fbDownloadName))
-7z x $fbDownloadName | Out-Null
-cp -Recurse .\embedded\* $testsNETDir
-cp -Recurse .\embedded\* $testsCOREDir
-rmdir -Recurse .\embedded
-mv .\server\* .
-rmdir .\server
-
-iex $FbStart
-ni firebird.log -ItemType File | Out-Null
-
 function Exec($command) {
 	& $command
 	if (-not $?) {
@@ -31,13 +17,40 @@ function Exec($command) {
 	}
 }
 
-cd $testsNETDir
-Exec { .\FirebirdSql.Data.FirebirdClient.Tests.exe --result=tests.xml }
-cd $testsCOREDir
-Exec { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --result=tests.xml }
+function Prepare() {
+	$fbDownloadName = $FbDownload -Replace '.+/([^/]+)\?dl=1','$1'
+	mkdir $env:tests_firebird_dir | Out-Null
+	cd $env:tests_firebird_dir
+	(New-Object System.Net.WebClient).DownloadFile($FbDownload, (Join-Path (pwd) $fbDownloadName))
+	7z x $fbDownloadName | Out-Null
+	cp -Recurse .\embedded\* $testsNETDir
+	cp -Recurse .\embedded\* $testsCOREDir
+	rmdir -Recurse .\embedded
+	mv .\server\* .
+	rmdir .\server
+	
+	iex $FbStart
+	ni firebird.log -ItemType File | Out-Null
+}
 
-cd "$baseDir\Provider\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
-Exec { .\EntityFramework.Firebird.Tests.exe --result=tests.xml }
+function Tests-FirebirdClient() {
+	cd $testsNETDir
+	Exec { .\FirebirdSql.Data.FirebirdClient.Tests.exe --result=tests.xml }
+	cd $testsCOREDir
+	Exec { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --result=tests.xml }
+}
 
-cd "$baseDir\Provider\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
-Exec { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml }
+function Tests-EF() {
+	cd "$baseDir\Provider\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
+	Exec { .\EntityFramework.Firebird.Tests.exe --result=tests.xml }
+}
+
+function Tests-EFCore() {
+	cd "$baseDir\Provider\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
+	Exec { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml }
+}
+
+Prepare
+Tests-FirebirdClient
+Tests-EF
+Tests-EFCore
