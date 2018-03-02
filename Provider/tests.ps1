@@ -24,13 +24,20 @@ rmdir .\server
 iex $FbStart
 ni firebird.log -ItemType File | Out-Null
 
+function Exec($command) {
+	& $command
+	if (-not $?) {
+		exit 1
+	}
+}
+
 cd $testsNETDir
-.\FirebirdSql.Data.FirebirdClient.Tests.exe --result=tests.xml
+Exec { .\FirebirdSql.Data.FirebirdClient.Tests.exe --result=tests.xml }
 cd $testsCOREDir
-dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --result=tests.xml
+Exec { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --result=tests.xml }
 
 cd "$baseDir\Provider\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
-.\EntityFramework.Firebird.Tests.exe --result=tests.xml
+Exec { .\EntityFramework.Firebird.Tests.exe --result=tests.xml }
 
 cd "$baseDir\Provider\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
-dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml
+Exec { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml }
