@@ -22,11 +22,9 @@ else {
 
 function Clean() {
 	if (Test-Path $outDir) {
-		rm -Recurse -Force $outDir\*
+		rm -Force -Recurse $outDir
 	}
-	else {
-		mkdir $outDir | Out-Null
-	}
+	mkdir $outDir | Out-Null
 }
 
 function Build() {
