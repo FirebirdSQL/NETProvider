@@ -42,9 +42,6 @@
 						<File Id="FirebirdSql.Data.FirebirdClient.pdb"
 									Name="FirebirdSql.Data.FirebirdClient.pdb"
 									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\Release\net452\FirebirdSql.Data.FirebirdClient.pdb" />
-						<File Id="FirebirdSql.Data.FirebirdClient.Tests.dll"
-									Name="FirebirdSql.Data.FirebirdClient.Tests.dll"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient.Tests\bin\Release\net452\FirebirdSql.Data.FirebirdClient.Tests.dll" />
 					</Component>
 				</Directory>
 			</Directory>
