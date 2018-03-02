@@ -32,7 +32,7 @@ function Clean() {
 function Build() {
 	$solutionFile = "$baseDir\src\NETProvider.sln"
 	dotnet restore $solutionFile
-	msbuild /t:Clean,Build /p:Configuration=$Configuration $solutionFile /v:m /m
+	dotnet msbuild /t:'Clean,Build' /p:Configuration=$Configuration $solutionFile /v:m /m
 }
 
 function Pack() {
