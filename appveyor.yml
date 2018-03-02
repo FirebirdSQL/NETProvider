@@ -26,32 +26,7 @@ build_script:
   - ps: "& $baseDir\\Provider\\build.ps1 -Configuration $env:CONFIGURATION -Version $env:APPVEYOR_BUILD_VERSION"
 after_build:
   - ps: gci "$baseDir\Provider\out" | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
-before_test:
-  - ps: $testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.FirebirdClient.Tests"
-  - ps: $testsNETDir = "$testsBaseDir\bin\$env:CONFIGURATION\net452"
-  - ps: $testsCOREDir = "$testsBaseDir\bin\$env:CONFIGURATION\netcoreapp2.0"
-
-  - ps: mkdir C:\firebird | Out-Null
-  - ps: cd C:\firebird
-  - ps: Start-FileDownload "$env:fb_download" | Out-Null
-  - ps: 7z x ($env:fb_download -replace '.+/([^/]+)\?dl=1','$1') | Out-Null
-  - ps: cp -Recurse .\embedded\* $testsNETDir
-  - ps: cp -Recurse .\embedded\* $testsCOREDir
-  - ps: rmdir -Recurse .\embedded
-  - ps: mv .\server\* .
-  - ps: rmdir .\server
-
-  - ps: iex $env:fb_start
-  - ps: ni firebird.log -ItemType File | Out-Null
 test_script:
-  - ps: cd $testsNETDir
-  - ps: nunit3-console FirebirdSql.Data.FirebirdClient.Tests.dll --framework=net-4.5 --result='dummy.xml;format=AppVeyor'
-
-  - ps: cd $testsBaseDir
-  - ps: dotnet test FirebirdSql.Data.FirebirdClient.Tests.csproj -c $env:CONFIGURATION -f netcoreapp2.0 --no-build --no-restore
-
-  - ps: cd "$baseDir\Provider\src\EntityFramework.Firebird.Tests\bin\$env:Configuration\net452"
-  - ps: nunit3-console EntityFramework.Firebird.Tests.dll --framework=net-4.5 --result='dummy.xml;format=AppVeyor'
-
-  - ps: cd "$baseDir\Provider\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests"
-  - ps: dotnet test FirebirdSql.EntityFrameworkCore.Firebird.Tests.csproj -c $env:CONFIGURATION -f netcoreapp2.0 --no-build --no-restore
+  - ps: $env:tests_firebird_dir = 'C:\firebird'
+  - ps: $env:tests_result_format = 'AppVeyor'
+  - ps: "& $baseDir\\Provider\\tests.ps1 -Configuration $env:CONFIGURATION -FbDownload $env:fb_download -FbStart $env:fb_start"
