@@ -6,9 +6,12 @@
 		<RootNamespace>FirebirdSql.Data.FirebirdClient.Tests</RootNamespace>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.snk</AssemblyOriginatorKeyFile>
+		<OutputType>Exe</OutputType>
+		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="NUnit" Version="3.8.1" />
+		<PackageReference Include="NUnitLite" Version="3.8.1" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
@@ -20,7 +23,5 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
 	</ItemGroup>
 </Project>

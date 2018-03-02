@@ -25,13 +25,12 @@ iex $FbStart
 ni firebird.log -ItemType File | Out-Null
 
 cd $testsNETDir
-nunit3-console FirebirdSql.Data.FirebirdClient.Tests.dll --framework=net-4.5 --result="dummy.xml;format=$env:tests_result_format"
-
-cd $testsBaseDir
-dotnet test FirebirdSql.Data.FirebirdClient.Tests.csproj -c $Configuration -f netcoreapp2.0 --no-build --no-restore
+.\FirebirdSql.Data.FirebirdClient.Tests.exe --result=tests.xml
+cd $testsCOREDir
+dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --result=tests.xml
 
 cd "$baseDir\Provider\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
-nunit3-console EntityFramework.Firebird.Tests.dll --framework=net-4.5 --result="dummy.xml;format=$env:tests_result_format"
+.\EntityFramework.Firebird.Tests.exe --result=tests.xml
 
-cd "$baseDir\Provider\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests"
-dotnet test FirebirdSql.EntityFrameworkCore.Firebird.Tests.csproj -c $Configuration -f netcoreapp2.0 --no-build --no-restore
+cd "$baseDir\Provider\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
+dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml

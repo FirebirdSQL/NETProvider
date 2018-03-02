@@ -6,15 +6,11 @@
 		<RootNamespace>FirebirdSql.EntityFrameworkCore.Firebird.Tests</RootNamespace>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.snk</AssemblyOriginatorKeyFile>
-	</PropertyGroup>
-	<PropertyGroup>
-		<GenerateProgramFile>False</GenerateProgramFile>
+		<OutputType>Exe</OutputType>
+		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="NUnit" Version="3.8.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0" />
 		<PackageReference Include="NUnitLite" Version="3.8.1" />
 	</ItemGroup>
 	<ItemGroup>

@@ -28,5 +28,4 @@ after_build:
   - ps: gci "$baseDir\Provider\out" | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 test_script:
   - ps: $env:tests_firebird_dir = 'C:\firebird'
-  - ps: $env:tests_result_format = 'AppVeyor'
   - ps: "& $baseDir\\Provider\\tests.ps1 -Configuration $env:CONFIGURATION -FbDownload $env:fb_download -FbStart $env:fb_start"

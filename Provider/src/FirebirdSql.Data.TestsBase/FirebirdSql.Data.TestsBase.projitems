@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FbTestFixtureAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FbTestsBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FbTestsSetup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)FirebirdSql.Data.TestsBase.snk" />
