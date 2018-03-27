@@ -461,7 +461,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					// Do not use Connection Pooling
 					_innerConnection = new FbConnectionInternal(_options);
 					_innerConnection.SetOwningConnection(this);
 					_innerConnection.Connect();
@@ -481,7 +480,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 						if (_options.Pooling)
 						{
-							// Send connection return back to the Pool
 							FbConnectionPoolManager.Instance.Release(_innerConnection);
 						}
 						else
