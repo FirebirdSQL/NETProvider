@@ -348,22 +348,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region Transaction Enlistement
-
-#if !NETSTANDARD1_6
-		public override void EnlistTransaction(System.Transactions.Transaction transaction)
-		{
-			CheckClosed();
-
-			if (transaction == null)
-				return;
-
-			_innerConnection.EnlistTransaction(transaction);
-		}
-#endif
-
-		#endregion
-
 		#region DbConnection methods
 
 		protected override DbCommand CreateDbCommand()
@@ -471,7 +455,11 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					try
 					{
-						EnlistTransaction(System.Transactions.Transaction.Current);
+						var transaction = System.Transactions.Transaction.Current;
+						if (transaction != null)
+						{
+							_innerConnection.EnlistTransaction(transaction);
+						}
 					}
 					catch
 					{
