@@ -420,30 +420,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region Connection Verification
-
-		public bool Verify()
-		{
-			// Do not actually ask for any information
-			byte[] items = new byte[]
-			{
-				IscCodes.isc_info_end
-			};
-
-			try
-			{
-				_db.GetDatabaseInfo(items, 16);
-
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
-		#endregion
-
 		#region Private Methods
 
 		private DatabaseParameterBuffer BuildDpb(IDatabase db, FbConnectionString options)
