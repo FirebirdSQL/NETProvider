@@ -193,7 +193,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				return;
 
 			DoFreePacket(option);
-			_database.XdrStream.Flush();
 			(Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponse);
 		}
 		#endregion

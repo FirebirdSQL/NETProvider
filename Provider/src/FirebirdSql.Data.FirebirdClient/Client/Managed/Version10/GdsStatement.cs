@@ -477,7 +477,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				return;
 
 			DoFreePacket(option);
-			_database.XdrStream.Flush();
 			ProcessFreeResponse(_database.ReadResponse());
 		}
 
@@ -499,7 +498,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				SendFreeToBuffer(option);
+				_database.XdrStream.Write(IscCodes.op_free_statement);
+				_database.XdrStream.Write(_handle);
+				_database.XdrStream.Write(option);
+				_database.XdrStream.Flush();
 
 				if (option == IscCodes.DSQL_drop)
 				{
@@ -514,13 +516,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_state = StatementState.Error;
 				throw IscException.ForErrorCode(IscCodes.isc_net_read_err, ex);
 			}
-		}
-
-		protected void SendFreeToBuffer(int option)
-		{
-			_database.XdrStream.Write(IscCodes.op_free_statement);
-			_database.XdrStream.Write(_handle);
-			_database.XdrStream.Write(option);
 		}
 
 		protected void ProcessFreeResponse(IResponse response)

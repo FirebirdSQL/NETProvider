@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void Identify(string database)
 		{
-			using (var xdrStream = CreateXdrStream(false))
+			using (var xdrStream = CreateXdrStreamImpl(false))
 			{
 				try
 				{
@@ -235,7 +235,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public XdrStream CreateXdrStream()
 		{
-			return CreateXdrStream(_compression);
+			return CreateXdrStreamImpl(_compression);
 		}
 
 		public void Disconnect()
@@ -252,9 +252,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private IPAddress GetIPAddress(string dataSource, AddressFamily addressFamily)
 		{
-			IPAddress ipaddress = null;
-
-			if (IPAddress.TryParse(dataSource, out ipaddress))
+			if (IPAddress.TryParse(dataSource, out var ipaddress))
 			{
 				return ipaddress;
 			}
@@ -339,7 +337,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		private XdrStream CreateXdrStream(bool compression)
+		private XdrStream CreateXdrStreamImpl(bool compression)
 		{
 			return new XdrStream(_networkStream, _characterSet, compression, false);
 		}

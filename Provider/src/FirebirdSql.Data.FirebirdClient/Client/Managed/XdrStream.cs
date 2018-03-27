@@ -34,6 +34,7 @@ namespace FirebirdSql.Data.Client.Managed
 		#region Constants
 
 		private const int PreferredBufferSize = 32 * 1024;
+		private const int InvalidOperation = -1;
 
 		#endregion
 
@@ -308,8 +309,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			CheckDisposed();
 
-			var memoryStream = _innerStream as MemoryStream;
-			if (memoryStream == null)
+			if(!(_innerStream is MemoryStream memoryStream))
 				throw new InvalidOperationException();
 			Flush();
 			return memoryStream.ToArray();
@@ -321,7 +321,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public int ReadOperation()
 		{
-			var op = ValidOperationAvailable ? _operation : ReadNextOperation();
+			var op = _operation != InvalidOperation ? _operation : ReadNextOperation();
 			ResetOperation();
 			return op;
 		}
@@ -358,7 +358,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private void ResetOperation()
 		{
-			_operation = -1;
+			_operation = InvalidOperation;
 		}
 
 		#endregion
@@ -738,15 +738,6 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			if (!CanRead)
 				throw new InvalidOperationException("Read operations are not allowed by this stream.");
-		}
-
-		#endregion
-
-		#region Private Properties
-
-		private bool ValidOperationAvailable
-		{
-			get { return _operation >= 0; }
 		}
 
 		#endregion
