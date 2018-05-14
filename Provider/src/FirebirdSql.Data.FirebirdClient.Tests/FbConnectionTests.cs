@@ -355,7 +355,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
-		[Test, Ignore("Needs plugin.")]
+		[Test, Explicit]
 		public void PassCryptKey()
 		{
 			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
@@ -363,6 +363,34 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			using (var conn = new FbConnection(csb.ToString()))
 			{
 				conn.Open();
+			}
+		}
+
+		[Test, Explicit]
+		public void DoNotGoBackToPoolAfterBroken()
+		{
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
+			}
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
+				try
+				{
+					using (var cmd = conn.CreateCommand())
+					{
+						cmd.CommandText = "select * from mon$statements union all select * from mon$statements";
+						using (var reader = cmd.ExecuteReader())
+						{
+							while (reader.Read())
+							{ }
+						}
+					}
+				}
+				catch (FbException ex)
+				{ }
 			}
 		}
 
