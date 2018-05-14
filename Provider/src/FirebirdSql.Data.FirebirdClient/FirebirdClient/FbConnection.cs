@@ -523,7 +523,18 @@ namespace FirebirdSql.Data.FirebirdClient
 							_innerConnection.EnableCancel();
 						}
 
-						FbConnectionPoolManager.Instance.Release(_innerConnection);
+						if (!_innerConnection.Database.ConnectionBroken)
+						{
+							FbConnectionPoolManager.Instance.Release(_innerConnection);
+						}
+						else
+						{
+							if (!_innerConnection.IsEnlisted)
+							{
+								_innerConnection.Dispose();
+							}
+							_innerConnection = null;
+						}
 					}
 					else
 					{

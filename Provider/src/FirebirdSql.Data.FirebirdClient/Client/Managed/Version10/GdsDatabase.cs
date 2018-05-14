@@ -122,6 +122,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return _connection.AuthData; }
 		}
 
+		public bool ConnectionBroken
+		{
+			get { return _xdrStream.IOFailed; }
+		}
 
 		#endregion
 

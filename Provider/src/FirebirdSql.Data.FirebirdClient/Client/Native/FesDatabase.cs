@@ -105,6 +105,11 @@ namespace FirebirdSql.Data.Client.Native
 			get { return _fbClient; }
 		}
 
+		public bool ConnectionBroken
+		{
+			get { return false; }
+		}
+
 		#endregion
 
 		#region Constructors

@@ -32,6 +32,7 @@ namespace FirebirdSql.Data.Common
 		short PacketSize { get; set; }
 		short Dialect { get; set; }
 		bool HasRemoteEventSupport { get; }
+		bool ConnectionBroken { get; }
 
 		void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
 		void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);

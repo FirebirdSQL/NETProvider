@@ -85,6 +85,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private Ionic.Zlib.ZlibCodec _inflate;
 		private byte[] _compressionBuffer;
 
+		private bool _ioFailed;
 		private int _operation;
 
 		#endregion
@@ -115,6 +116,15 @@ namespace FirebirdSql.Data.Client.Managed
 		public override long Length
 		{
 			get { return _innerStream.Length; }
+		}
+
+		#endregion
+
+		#region Properties
+
+		public bool IOFailed
+		{
+			get { return _ioFailed; }
 		}
 
 		#endregion
@@ -151,6 +161,7 @@ namespace FirebirdSql.Data.Client.Managed
 				_compressionBuffer = new byte[1024 * 1024];
 			}
 
+			_ioFailed = false;
 			ResetOperation();
 		}
 
@@ -194,8 +205,16 @@ namespace FirebirdSql.Data.Client.Managed
 				buffer = _compressionBuffer;
 				count = _deflate.NextOut;
 			}
-			_innerStream.Write(buffer, 0, count);
-			_innerStream.Flush();
+			try
+			{
+				_innerStream.Write(buffer, 0, count);
+				_innerStream.Flush();
+			}
+			catch (IOException)
+			{
+				_ioFailed = true;
+				throw;
+			}
 		}
 
 		public override void SetLength(long length)
@@ -228,7 +247,16 @@ namespace FirebirdSql.Data.Client.Managed
 			if (_inputBuffer.Length < count)
 			{
 				var readBuffer = new byte[PreferredBufferSize];
-				var read = _innerStream.Read(readBuffer, 0, readBuffer.Length);
+				var read = default(int);
+				try
+				{
+					read = _innerStream.Read(readBuffer, 0, readBuffer.Length);
+				}
+				catch (IOException)
+				{
+					_ioFailed = true;
+					throw;
+				}
 				if (read != 0)
 				{
 					if (_compression)
@@ -262,7 +290,16 @@ namespace FirebirdSql.Data.Client.Managed
 			if (_inputBuffer.Length < count)
 			{
 				var readBuffer = new byte[PreferredBufferSize];
-				var read = await _innerStream.ReadAsync(readBuffer, 0, readBuffer.Length).ConfigureAwait(false);
+				var read = default(int);
+				try
+				{
+					read = await _innerStream.ReadAsync(readBuffer, 0, readBuffer.Length).ConfigureAwait(false);
+				}
+				catch (IOException)
+				{
+					_ioFailed = true;
+					throw;
+				}
 				if (read != 0)
 				{
 					if (_compression)
@@ -309,7 +346,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			CheckDisposed();
 
-			if(!(_innerStream is MemoryStream memoryStream))
+			if (!(_innerStream is MemoryStream memoryStream))
 				throw new InvalidOperationException();
 			Flush();
 			return memoryStream.ToArray();
