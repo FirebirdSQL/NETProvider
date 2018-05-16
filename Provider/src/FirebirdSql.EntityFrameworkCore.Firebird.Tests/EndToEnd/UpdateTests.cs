@@ -146,5 +146,44 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				Assert.Throws<DbUpdateConcurrencyException>(() => db.SaveChanges());
 			}
 		}
+
+		class ConcurrencyUpdateNoGeneratedContext : FbTestDbContext
+		{
+			public ConcurrencyUpdateNoGeneratedContext(string connectionString)
+				: base(connectionString)
+			{ }
+
+			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+
+				var insertEntityConf = modelBuilder.Entity<ConcurrencyUpdateNoGeneratedEntity>();
+				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
+				insertEntityConf.Property(x => x.Foo).HasColumnName("FOO");
+				insertEntityConf.Property(x => x.Stamp).HasColumnName("STAMP")
+					.IsConcurrencyToken();
+				insertEntityConf.ToTable("TEST_UPDATE_CONCURRENCY_NG");
+			}
+		}
+		class ConcurrencyUpdateNoGeneratedEntity
+		{
+			public int Id { get; set; }
+			public string Foo { get; set; }
+			public DateTime Stamp { get; set; }
+		}
+		[Test]
+		public void ConcurrencyUpdateNoGenerated()
+		{
+			using (var db = GetDbContext<ConcurrencyUpdateNoGeneratedContext>())
+			{
+				db.Database.ExecuteSqlCommand("create table test_update_concurrency_ng (id int primary key, foo varchar(20), stamp timestamp)");
+				db.Database.ExecuteSqlCommand("update or insert into test_update_concurrency_ng values (66, 'foo', current_timestamp)");
+				var entity = new ConcurrencyUpdateNoGeneratedEntity() { Id = 66, Foo = "test", Stamp = new DateTime(1970, 1, 1) };
+				var entry = db.Attach(entity);
+				entry.Property(x => x.Foo).IsModified = true;
+				entry.Property(x => x.Stamp).IsModified = true;
+				Assert.Throws<DbUpdateConcurrencyException>(() => db.SaveChanges());
+			}
+		}
 	}
 }
