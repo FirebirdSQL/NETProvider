@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
@@ -77,18 +78,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			var writeOperations = operations.Where(o => o.IsWrite).ToList();
 			var readOperations = operations.Where(o => o.IsRead).ToList();
 			var conditionOperations = operations.Where(o => o.IsCondition).ToList();
-			var inputOperations = operations.Where(o => o.IsWrite || o.IsCondition).ToList();
+			var inputOperations = GenerateParameters(operations.Where(o => o.IsWrite || o.IsCondition)).ToList();
 			var anyRead = readOperations.Any();
 			commandStringBuilder.Append("EXECUTE BLOCK (");
-			commandStringBuilder.AppendJoin(inputOperations, (b, e) =>
+			commandStringBuilder.AppendJoin(inputOperations, (b, p) =>
 			{
-				var type = GetColumnType(e);
-				var parameterName = e.UseOriginalValueParameter
-					? e.OriginalParameterName
-					: e.ParameterName;
-				b.Append(parameterName);
+				b.Append(p.name);
 				b.Append(" ");
-				b.Append(type);
+				b.Append(p.type);
 				b.Append(" = ?");
 			}, ", ");
 			commandStringBuilder.AppendLine(")");
@@ -154,17 +151,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
 			var conditionOperations = operations.Where(o => o.IsCondition).ToList();
-			var inputOperations = conditionOperations;
+			var inputOperations = GenerateParameters(conditionOperations);
 			commandStringBuilder.Append("EXECUTE BLOCK (");
-			commandStringBuilder.AppendJoin(inputOperations, (b, e) =>
+			commandStringBuilder.AppendJoin(inputOperations, (b, p) =>
 			{
-				var type = GetColumnType(e);
-				var parameterName = e.UseOriginalValueParameter
-					? e.OriginalParameterName
-					: e.ParameterName;
-				b.Append(parameterName);
+				b.Append(p.name);
 				b.Append(" ");
-				b.Append(type);
+				b.Append(p.type);
 				b.Append(" = ?");
 			}, ", ");
 			commandStringBuilder.AppendLine(")");
@@ -194,6 +187,22 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 		string GetColumnType(ColumnModification column)
 		{
 			return _typeMapper.GetMapping(column.Property).StoreType;
+		}
+
+		IEnumerable<(string name, string type)> GenerateParameters(IEnumerable<ColumnModification> columns)
+		{
+			foreach (var item in columns)
+			{
+				var type = GetColumnType(item);
+				if (item.UseCurrentValueParameter)
+				{
+					yield return (item.ParameterName, type);
+				}
+				if (item.UseOriginalValueParameter)
+				{
+					yield return (item.OriginalParameterName, type);
+				}
+			}
 		}
 	}
 }
