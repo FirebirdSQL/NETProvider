@@ -5,15 +5,17 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$baseDir = Resolve-Path .
-$testsBaseDir = "$baseDir\Provider\src\FirebirdSql.Data.FirebirdClient.Tests"
+$baseDir = Split-Path -Parent $PSCommandPath
+$testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
 $testsNETDir = "$testsBaseDir\bin\$Configuration\net452"
 $testsCOREDir = "$testsBaseDir\bin\$Configuration\netcoreapp2.0"
 
-function Exec($command) {
+function Check-ExitCode($command) {
 	& $command
-	if (-not $?) {
-		exit 1
+	$exitCode = $LASTEXITCODE
+	if ($exitCode -ne 0) {
+		echo "Non-zero ($exitCode) exit code. Exiting..."
+		exit $exitCode
 	}
 }
 
@@ -23,9 +25,10 @@ function Prepare() {
 	cd $env:tests_firebird_dir
 	(New-Object System.Net.WebClient).DownloadFile($FbDownload, (Join-Path (pwd) $fbDownloadName))
 	7z x $fbDownloadName | Out-Null
-	cp -Recurse .\embedded\* $testsNETDir
-	cp -Recurse .\embedded\* $testsCOREDir
+	cp -Recurse -Force .\embedded\* $testsNETDir
+	cp -Recurse -Force .\embedded\* $testsCOREDir
 	rmdir -Recurse .\embedded
+	rm $fbDownloadName
 	mv .\server\* .
 	rmdir .\server
 
@@ -37,9 +40,9 @@ function Tests-FirebirdClient() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd $testsNETDir
-	Exec { .\FirebirdSql.Data.FirebirdClient.Tests.exe --result=tests.xml }
+	Check-ExitCode { .\FirebirdSql.Data.FirebirdClient.Tests.exe --result=tests.xml }
 	cd $testsCOREDir
-	Exec { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --result=tests.xml }
+	Check-ExitCode { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --result=tests.xml }
 
 	echo "=== END ==="
 }
@@ -47,8 +50,8 @@ function Tests-FirebirdClient() {
 function Tests-EF() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
-	cd "$baseDir\Provider\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
-	Exec { .\EntityFramework.Firebird.Tests.exe --result=tests.xml }
+	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
+	Check-ExitCode { .\EntityFramework.Firebird.Tests.exe --result=tests.xml }
 
 	echo "=== END ==="
 }
@@ -56,8 +59,8 @@ function Tests-EF() {
 function Tests-EFCore() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
-	cd "$baseDir\Provider\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
-	Exec { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml }
+	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
+	Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml }
 
 	echo "=== END ==="
 }
