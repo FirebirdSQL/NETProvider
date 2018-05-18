@@ -1,14 +1,31 @@
 param(
 	[Parameter(Mandatory=$True)]$Configuration,
-	[Parameter(Mandatory=$True)]$FbDownload,
-	[Parameter(Mandatory=$True)]$FbStart)
+	[Parameter(Mandatory=$True)]$FirebirdSelection)
 
 $ErrorActionPreference = 'Stop'
+
+$FirebirdConfiguration = @{
+	FB30_Default = @{
+		Download = 'https://www.dropbox.com/s/x46uy7e5zrtsnux/fb30.7z?dl=1';
+		Start = '.\firebird.exe -a';
+	};
+	FB25_SC = @{
+		Download = 'https://www.dropbox.com/s/ayzjnxjx20vb7s5/fb25.7z?dl=1';
+		Start = '.\bin\fb_inet_server.exe -a -m';
+	};
+}
 
 $baseDir = Split-Path -Parent $PSCommandPath
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
 $testsNETDir = "$testsBaseDir\bin\$Configuration\net452"
 $testsCOREDir = "$testsBaseDir\bin\$Configuration\netcoreapp2.0"
+
+if ($env:tests_firebird_dir) {
+	$firebirdDir = $env:tests_firebird_dir
+}
+else {
+	$firebirdDir = 'I:\Downloads\fb_tests'
+}
 
 function Check-ExitCode($command) {
 	& $command
@@ -20,10 +37,18 @@ function Check-ExitCode($command) {
 }
 
 function Prepare() {
-	$fbDownloadName = $FbDownload -Replace '.+/([^/]+)\?dl=1','$1'
-	mkdir $env:tests_firebird_dir | Out-Null
-	cd $env:tests_firebird_dir
-	(New-Object System.Net.WebClient).DownloadFile($FbDownload, (Join-Path (pwd) $fbDownloadName))
+	$selectedConfiguration = $FirebirdConfiguration[$FirebirdSelection]
+	$fbDownload = $selectedConfiguration.Download
+	$fbStart = $selectedConfiguration.Start
+	$fbDownloadName = $fbDownload -Replace '.+/([^/]+)\?dl=1','$1'
+	if (Test-Path $firebirdDir) {
+		rm -Force -Recurse $firebirdDir
+	}
+	mkdir $firebirdDir | Out-Null
+	cd $firebirdDir
+	echo "Downloading: $fbDownload"
+	(New-Object System.Net.WebClient).DownloadFile($fbDownload, (Join-Path (pwd) $fbDownloadName))
+	echo "Extracting: $fbDownloadName"
 	7z x $fbDownloadName | Out-Null
 	cp -Recurse -Force .\embedded\* $testsNETDir
 	cp -Recurse -Force .\embedded\* $testsCOREDir
@@ -31,9 +56,11 @@ function Prepare() {
 	rm $fbDownloadName
 	mv .\server\* .
 	rmdir .\server
-
-	iex $FbStart
+	
 	ni firebird.log -ItemType File | Out-Null
+
+	echo "Starting: $fbStart"
+	iex $fbStart
 }
 
 function Tests-FirebirdClient() {

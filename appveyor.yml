@@ -4,17 +4,8 @@ configuration:
   - Release
 environment:
   matrix:
-  - name: FB 3.0 (Default)
-    fb_download: https://www.dropbox.com/s/x46uy7e5zrtsnux/fb30.7z?dl=1
-    fb_start: .\firebird.exe -a
-
-  - name: FB 2.5 (SC)
-    fb_download: https://www.dropbox.com/s/ayzjnxjx20vb7s5/fb25.7z?dl=1
-    fb_start: .\bin\fb_inet_server.exe -a -m
-
-#  - name: FB 2.5 (CS)
-#    fb_download: https://www.dropbox.com/s/ayzjnxjx20vb7s5/fb25.7z?dl=1
-#    fb_start: .\bin\fb_inet_server.exe -a
+  - firebird_selection: FB30_Default
+  - firebird_selection: FB25_SC
 test: off
 init:
   - git config --global core.autocrlf true
@@ -28,4 +19,4 @@ after_build:
   - ps: gci "$baseDir\Provider\out" | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 test_script:
   - ps: $env:tests_firebird_dir = 'C:\firebird'
-  - ps: "& $baseDir\\Provider\\tests.ps1 -Configuration $env:CONFIGURATION -FbDownload $env:fb_download -FbStart $env:fb_start"
+  - ps: "& $baseDir\\Provider\\tests.ps1 -Configuration $env:CONFIGURATION -FirebirdSelection $env:firebird_selection"
