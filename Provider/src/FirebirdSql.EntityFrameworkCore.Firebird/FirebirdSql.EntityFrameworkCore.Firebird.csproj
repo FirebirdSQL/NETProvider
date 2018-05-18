@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<AssemblyName>FirebirdSql.EntityFrameworkCore.Firebird</AssemblyName>
@@ -15,8 +15,8 @@
 		<DefineConstants>EFCORE;DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.3" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Include="..\FirebirdSql.Data.FirebirdClient\Properties\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
