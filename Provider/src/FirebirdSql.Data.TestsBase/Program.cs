@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.TestsBase
 		{
 			args = args?.Any() ?? false
 				? args
-				: new[] { "--noresult" };
+				: new[] { "--noresult", "--labels=All" };
 			return new AutoRun(Assembly.GetEntryAssembly()).Execute(args);
 		}
 	}
