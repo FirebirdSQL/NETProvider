@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netcoreapp2.0</TargetFramework>
 		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
@@ -10,8 +10,8 @@
 		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="NUnit" Version="3.8.1" />
-		<PackageReference Include="NUnitLite" Version="3.8.1" />
+		<PackageReference Include="NUnit" Version="3.10.1" />
+		<PackageReference Include="NUnitLite" Version="3.10.1" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
