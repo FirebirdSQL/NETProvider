@@ -7,11 +7,13 @@ $ErrorActionPreference = 'Stop'
 $FirebirdConfiguration = @{
 	FB30_Default = @{
 		Download = 'https://www.dropbox.com/s/x46uy7e5zrtsnux/fb30.7z?dl=1';
-		Start = '.\firebird.exe -a';
+		Executable = '.\firebird.exe';
+		Args = @('-a');
 	};
 	FB25_SC = @{
 		Download = 'https://www.dropbox.com/s/ayzjnxjx20vb7s5/fb25.7z?dl=1';
-		Start = '.\bin\fb_inet_server.exe -a -m';
+		Executable = '.\bin\fb_inet_server.exe';
+		Args = @('-a', '-m');
 	};
 }
 
@@ -19,6 +21,9 @@ $baseDir = Split-Path -Parent $PSCommandPath
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
 $testsNETDir = "$testsBaseDir\bin\$Configuration\net452"
 $testsCOREDir = "$testsBaseDir\bin\$Configuration\netcoreapp2.0"
+
+$startDir = $null
+$firebirdProcess = $null
 
 if ($env:tests_firebird_dir) {
 	$firebirdDir = $env:tests_firebird_dir
@@ -37,18 +42,18 @@ function Check-ExitCode($command) {
 }
 
 function Prepare() {
+	$script:startDir = $pwd
 	$selectedConfiguration = $FirebirdConfiguration[$FirebirdSelection]
 	$fbDownload = $selectedConfiguration.Download
-	$fbStart = $selectedConfiguration.Start
 	$fbDownloadName = $fbDownload -Replace '.+/([^/]+)\?dl=1','$1'
 	if (Test-Path $firebirdDir) {
 		rm -Force -Recurse $firebirdDir
 	}
 	mkdir $firebirdDir | Out-Null
 	cd $firebirdDir
-	echo "Downloading: $fbDownload"
+	echo "Downloading $fbDownload"
 	(New-Object System.Net.WebClient).DownloadFile($fbDownload, (Join-Path (pwd) $fbDownloadName))
-	echo "Extracting: $fbDownloadName"
+	echo "Extracting $fbDownloadName"
 	7z x $fbDownloadName | Out-Null
 	cp -Recurse -Force .\embedded\* $testsNETDir
 	cp -Recurse -Force .\embedded\* $testsCOREDir
@@ -59,8 +64,16 @@ function Prepare() {
 	
 	ni firebird.log -ItemType File | Out-Null
 
-	echo "Starting: $fbStart"
-	iex $fbStart
+	echo "Starting Firebird"
+	$script:firebirdProcess = Start-Process -FilePath $selectedConfiguration.Executable -ArgumentList $selectedConfiguration.Args -PassThru
+}
+
+function Cleanup() {
+	cd $script:startDir
+	$process = $script:firebirdProcess
+	$process.Kill()
+	$process.WaitForExit()
+	rm -Force -Recurse $firebirdDir
 }
 
 function Tests-FirebirdClient() {
@@ -93,6 +106,11 @@ function Tests-EFCore() {
 }
 
 Prepare
-Tests-FirebirdClient
-Tests-EF
-Tests-EFCore
+try {
+	Tests-FirebirdClient
+	Tests-EF
+	Tests-EFCore
+}
+finally {
+	Cleanup
+}
