@@ -59,6 +59,8 @@ function WiX() {
 
 Clean
 Build
-Pack
-NuGet
-WiX
+if ($Configuration -eq 'Release') {
+	Pack
+	NuGet
+	WiX
+}
