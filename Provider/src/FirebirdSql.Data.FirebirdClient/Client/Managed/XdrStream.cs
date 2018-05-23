@@ -643,7 +643,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			var length = buffer.Length; // 2 for short for buffer length
 			if (length > short.MaxValue)
-				throw new IOException();
+				throw new IOException("Blob buffer too big.");
 			Write(length + 2);
 			Write(length + 2);  //bizarre but true! three copies of the length
 			WriteByte((byte)((length >> 0) & 0xff));
