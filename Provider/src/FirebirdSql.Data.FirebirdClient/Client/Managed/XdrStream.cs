@@ -415,6 +415,7 @@ namespace FirebirdSql.Data.Client.Managed
 				}
 				if (toRead == count)
 				{
+					_ioFailed = true;
 					throw new IOException();
 				}
 			}
@@ -433,6 +434,7 @@ namespace FirebirdSql.Data.Client.Managed
 				}
 				if (toRead == count)
 				{
+					_ioFailed = true;
 					throw new IOException();
 				}
 			}
