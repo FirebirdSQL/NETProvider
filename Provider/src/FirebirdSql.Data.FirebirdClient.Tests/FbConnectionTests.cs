@@ -370,6 +370,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void DoNotGoBackToPoolAfterBroken()
 		{
 			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			csb.Pooling = true;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
 				conn.Open();
