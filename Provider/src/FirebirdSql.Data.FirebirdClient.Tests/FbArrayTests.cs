@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections;
+using System.Linq;
 using System.Security.Cryptography;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
@@ -71,12 +72,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					int[] select_values = new int[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -115,12 +112,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					short[] select_values = new short[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -159,12 +152,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					long[] select_values = new long[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -203,12 +192,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					float[] select_values = new float[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -247,12 +232,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					double[] select_values = new double[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -291,12 +272,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					decimal[] select_values = new decimal[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -335,12 +312,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					DateTime[] select_values = new DateTime[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -379,12 +352,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					TimeSpan[] select_values = new TimeSpan[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -423,13 +392,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					DateTime[] select_values = new DateTime[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						var truncatedPrecision = new DateTime(insert_values[i].Ticks / 1000 * 1000);
-						Assert.AreEqual(truncatedPrecision, select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					insert_values = insert_values.Select(x => new DateTime(x.Ticks / 1000 * 1000)).ToArray();
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -468,12 +433,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					string[] select_values = new string[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i].TrimEnd(' '));
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					select_values = select_values.Select(x => x.TrimEnd(' ')).ToArray();
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -512,12 +474,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					string[] select_values = new string[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 			reader.Close();
@@ -768,12 +726,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					int[] select_values = new int[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 
@@ -814,12 +768,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				if (!reader.IsDBNull(0))
 				{
 					int[] select_values = new int[insert_values.Length];
-					System.Array.Copy((System.Array)reader.GetValue(0), select_values, select_values.Length);
-
-					for (int i = 0; i < insert_values.Length; i++)
-					{
-						Assert.AreEqual(insert_values[i], select_values[i]);
-					}
+					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+					CollectionAssert.AreEqual(insert_values, select_values);
 				}
 			}
 
