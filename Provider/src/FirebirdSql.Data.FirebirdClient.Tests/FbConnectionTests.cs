@@ -390,7 +390,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 						}
 					}
 				}
-				catch (FbException ex)
+				catch (FbException)
 				{ }
 			}
 		}
