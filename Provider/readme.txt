@@ -13,7 +13,7 @@ Development list
 
 You can subscribe to the developement list at:
 
-	http://lists.sourceforge.net/lists/listinfo/firebird-net-provider
+	https://groups.google.com/forum/#!forum/firebird-net-provider
 
 
 You can access the lastest developement sources at:
