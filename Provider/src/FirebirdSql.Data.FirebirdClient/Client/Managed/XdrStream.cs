@@ -38,39 +38,6 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#endregion
 
-		#region Static Fields
-
-		private static byte[] fill;
-		private static byte[] pad;
-
-		#endregion
-
-		#region Static Properties
-
-		internal static byte[] Fill
-		{
-			get
-			{
-				if (fill == null)
-				{
-					fill = new byte[32767];
-					for (int i = 0; i < fill.Length; i++)
-					{
-						fill[i] = 32;
-					}
-				}
-
-				return fill;
-			}
-		}
-
-		private static byte[] Pad
-		{
-			get { return pad ?? (pad = new byte[] { 0, 0, 0, 0 }); }
-		}
-
-		#endregion
-
 		#region Fields
 
 		private Stream _innerStream;
@@ -447,7 +414,8 @@ namespace FirebirdSql.Data.Client.Managed
 			var padLength = ((4 - length) & 3);
 			if (padLength > 0)
 			{
-				Read(Pad, 0, padLength);
+				var dummy = new byte[padLength];
+				Read(dummy, 0, padLength);
 			}
 			return buffer;
 		}
@@ -621,8 +589,8 @@ namespace FirebirdSql.Data.Client.Managed
 			if (buffer != null && length > 0)
 			{
 				Write(buffer, 0, buffer.Length);
-				Write(Fill, 0, length - buffer.Length);
-				Write(Pad, 0, ((4 - length) & 3));
+				WriteFill(length - buffer.Length);
+				WritePad((4 - length) & 3);
 			}
 		}
 
@@ -637,7 +605,7 @@ namespace FirebirdSql.Data.Client.Managed
 			if (buffer != null && length > 0)
 			{
 				Write(buffer, 0, length);
-				Write(Pad, 0, ((4 - length) & 3));
+				WritePad((4 - length) & 3);
 			}
 		}
 
@@ -651,7 +619,7 @@ namespace FirebirdSql.Data.Client.Managed
 			WriteByte((byte)((length >> 0) & 0xff));
 			WriteByte((byte)((length >> 8) & 0xff));
 			Write(buffer, 0, length);
-			Write(Pad, 0, ((4 - length + 2) & 3));
+			WritePad((4 - length + 2) & 3);
 		}
 
 		public void WriteTyped(int type, byte[] buffer)
@@ -670,7 +638,7 @@ namespace FirebirdSql.Data.Client.Managed
 				WriteByte((byte)type);
 				Write(buffer, 0, buffer.Length);
 			}
-			Write(Pad, 0, ((4 - length) & 3));
+			WritePad((4 - length) & 3);
 		}
 
 		public void Write(string value)
@@ -777,6 +745,18 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			if (!CanRead)
 				throw new InvalidOperationException("Read operations are not allowed by this stream.");
+		}
+
+		private readonly static byte[] PadArray = new byte[] { 0, 0, 0, 0 };
+		private void WritePad(int length)
+		{
+			Write(PadArray, 0, length);
+		}
+
+		private readonly static byte[] FillArray = Enumerable.Repeat((byte)32, 32767).ToArray();
+		private void WriteFill(int length)
+		{
+			Write(FillArray, 0, length);
 		}
 
 		#endregion
