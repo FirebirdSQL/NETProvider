@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net452</TargetFramework>
-		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<AssemblyName>EntityFramework.Firebird.Tests</AssemblyName>
 		<RootNamespace>EntityFramework.Firebird.Tests</RootNamespace>
-		<SignAssembly>True</SignAssembly>
+		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.snk</AssemblyOriginatorKeyFile>
 		<OutputType>Exe</OutputType>
+		<LangVersion>latest</LangVersion>
 		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
 	<ItemGroup>

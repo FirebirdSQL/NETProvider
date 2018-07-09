@@ -1,13 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net452;netstandard1.6;netstandard2.0</TargetFrameworks>
 		<AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
 		<RootNamespace>FirebirdSql.Data</RootNamespace>
-		<SignAssembly>True</SignAssembly>
+		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
-		<DelaySign>False</DelaySign>
-		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<DelaySign>false</DelaySign>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>TRACE</DefineConstants>

@@ -1,12 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net452</TargetFramework>
 		<AssemblyName>EntityFramework.Firebird</AssemblyName>
 		<RootNamespace>EntityFramework.Firebird</RootNamespace>
-		<SignAssembly>True</SignAssembly>
+		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>Properties\EntityFramework.Firebird.snk</AssemblyOriginatorKeyFile>
-		<DelaySign>False</DelaySign>
-		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<DelaySign>false</DelaySign>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>EF6;TRACE</DefineConstants>

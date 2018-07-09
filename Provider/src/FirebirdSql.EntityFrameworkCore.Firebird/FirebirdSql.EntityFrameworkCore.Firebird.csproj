@@ -3,10 +3,11 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<AssemblyName>FirebirdSql.EntityFrameworkCore.Firebird</AssemblyName>
 		<RootNamespace>FirebirdSql.EntityFrameworkCore.Firebird</RootNamespace>
-		<SignAssembly>True</SignAssembly>
+		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.EntityFrameworkCore.Firebird.snk</AssemblyOriginatorKeyFile>
-		<DelaySign>False</DelaySign>
-		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<DelaySign>false</DelaySign>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>EFCORE;TRACE</DefineConstants>

@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netcoreapp2.0</TargetFramework>
-		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<AssemblyName>FirebirdSql.EntityFrameworkCore.Firebird.Tests</AssemblyName>
 		<RootNamespace>FirebirdSql.EntityFrameworkCore.Firebird.Tests</RootNamespace>
-		<SignAssembly>True</SignAssembly>
+		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.snk</AssemblyOriginatorKeyFile>
 		<OutputType>Exe</OutputType>
+		<LangVersion>latest</LangVersion>
 		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
 	<ItemGroup>
