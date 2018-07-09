@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			_fbClient = FbClientFactory.GetFbClient(dllName);
 			_handle = new DatabaseHandle();
-			_charset = (charset != null ? charset : Charset.DefaultCharset);
+			_charset = charset ?? Charset.DefaultCharset;
 			_dialect = 3;
 			_packetSize = 8192;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];

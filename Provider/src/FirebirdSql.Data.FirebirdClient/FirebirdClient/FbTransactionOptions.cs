@@ -51,10 +51,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			set
 			{
-				if (value == null)
-					throw new ArgumentNullException($"{nameof(LockTables)} cannot be null.");
-
-				_lockTables = value;
+				_lockTables = value ?? throw new ArgumentNullException($"{nameof(LockTables)} cannot be null.");
 			}
 		}
 	}

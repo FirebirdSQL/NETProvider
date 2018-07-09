@@ -574,7 +574,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (_statementType == DbStatementType.StoredProcedure)
 			{
-				_database.XdrStream.WriteBuffer(_fields == null ? null : _fields.ToBlrArray());
+				_database.XdrStream.WriteBuffer(_fields?.ToBlrArray());
 				_database.XdrStream.Write(0); // Output message number
 			}
 		}
