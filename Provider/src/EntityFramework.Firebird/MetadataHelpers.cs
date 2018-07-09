@@ -159,7 +159,7 @@ namespace EntityFramework.Firebird
 				return true;
 			}
 
-			typeKind = default(PrimitiveTypeKind);
+			typeKind = default;
 			return false;
 		}
 
@@ -184,7 +184,7 @@ namespace EntityFramework.Firebird
 		{
 			if (!item.MetadataProperties.TryGetValue(propertyName, true, out var property))
 			{
-				return default(T);
+				return default;
 			}
 
 			return (T)property.Value;
@@ -352,7 +352,7 @@ namespace EntityFramework.Firebird
 				if (!intFacet.IsUnbounded)
 					intValue = (int)intFacet.Value;
 				else
-					intValue = default(int?);
+					intValue = default;
 				return true;
 			}
 
@@ -428,7 +428,7 @@ namespace EntityFramework.Firebird
 
 				default:
 					Debug.Fail("unrecognized mode " + mode.ToString());
-					return default(ParameterDirection);
+					return default;
 			}
 		}
 

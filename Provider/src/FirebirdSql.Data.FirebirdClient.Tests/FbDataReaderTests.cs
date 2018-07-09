@@ -25,7 +25,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 {
 	[FbTestFixture(FbServerType.Default, false)]
 	[FbTestFixture(FbServerType.Default, true)]
-	[FbTestFixture(FbServerType.Embedded, default(bool))]
+	[FbTestFixture(FbServerType.Embedded, default)]
 	public class FbDataReaderTests : FbTestsBase
 	{
 		#region Constructors

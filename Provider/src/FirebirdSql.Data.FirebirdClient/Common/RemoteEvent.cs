@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Common
 				throw new ArgumentOutOfRangeException(nameof(events), "Need to provide at least one event.");
 			if (events.Any(x => x.Length > MaxEventNameLength))
 				throw new ArgumentOutOfRangeException(nameof(events), $"Some events are longer than {MaxEventNameLength}.");
-			if (BuildEpb(events.ToList(), _ => default(int)).ToArray().Length > MaxEpbLength)
+			if (BuildEpb(events.ToList(), _ => default).ToArray().Length > MaxEpbLength)
 				throw new ArgumentOutOfRangeException(nameof(events), $"Whole events buffer is bigger than {MaxEpbLength}.");
 			_events.AddRange(events);
 			QueueEventsImpl();

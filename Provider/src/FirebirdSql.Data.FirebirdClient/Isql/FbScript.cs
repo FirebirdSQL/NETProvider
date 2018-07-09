@@ -122,7 +122,7 @@ namespace FirebirdSql.Data.Isql
 				return true;
 			}
 
-			newTerm = default(string);
+			newTerm = default;
 			return false;
 		}
 

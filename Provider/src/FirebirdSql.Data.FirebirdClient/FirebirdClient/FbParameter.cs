@@ -259,7 +259,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal bool HasSize
 		{
-			get { return _size != default(int); }
+			get { return _size != default; }
 		}
 
 		#endregion

@@ -187,7 +187,7 @@ namespace EntityFramework.Firebird
 			// only supported for primitive type
 			PrimitiveTypeKind primitiveTypeKind = MetadataHelpers.GetPrimitiveTypeKind(type);
 
-			size = default(int?);
+			size = default;
 
 			switch (primitiveTypeKind)
 			{
@@ -252,7 +252,7 @@ namespace EntityFramework.Firebird
 			else
 			{
 				// no value
-				return default(int?);
+				return default;
 			}
 		}
 
@@ -283,7 +283,7 @@ namespace EntityFramework.Firebird
 				{
 					maxLength = (unicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize);
 				}
-				if (maxLength == default(int?) || maxLength > (unicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize))
+				if (maxLength == default || maxLength > (unicode ? FbProviderManifest.UnicodeVarcharMaxSize : FbProviderManifest.AsciiVarcharMaxSize))
 				{
 					dbType = FbDbType.Text;
 				}

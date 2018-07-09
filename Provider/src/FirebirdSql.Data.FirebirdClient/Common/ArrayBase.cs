@@ -170,7 +170,7 @@ namespace FirebirdSql.Data.Common
 
 		protected Type GetSystemType()
 		{
-			return TypeHelper.GetTypeFromBlrType(_descriptor.DataType, default(int), _descriptor.Scale);
+			return TypeHelper.GetTypeFromBlrType(_descriptor.DataType, default, _descriptor.Scale);
 		}
 
 		#endregion

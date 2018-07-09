@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					if (_disposed)
 						return;
 					_disposed = true;
-					Created = default(long);
+					Created = default;
 					Connection.Dispose();
 					Connection = null;
 				}

@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Common
 
 		public static void Trace(TraceEventType eventType, string message)
 		{
-			_instance.TraceEvent(eventType, default(int), message);
+			_instance.TraceEvent(eventType, default, message);
 			_instance.Flush();
 		}
 
