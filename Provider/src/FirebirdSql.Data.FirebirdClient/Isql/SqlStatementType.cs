@@ -90,6 +90,7 @@ namespace FirebirdSql.Data.Isql
 		Grant,
 		Insert,
 		InsertCursor,
+		Merge,
 		Open,
 		Prepare,
 		RecreateFunction,

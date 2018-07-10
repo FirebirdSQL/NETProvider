@@ -267,6 +267,17 @@ foo
 			Assert.AreEqual(SqlStatementType.RecreatePackageBody, script.Results[0].StatementType);
 		}
 
+		[Test]
+		public void Merge()
+		{
+			const string text =
+@"merge into table t using foo f on f.id = t.id when ";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(SqlStatementType.Merge, script.Results[0].StatementType);
+		}
+
 		#endregion
 	}
 }

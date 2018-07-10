@@ -238,7 +238,6 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.CreateIndex;
 					}
-					// this needs to be before CREATE PACKAGE to properly match
 					if (sqlStatement.StartsWith("CREATE PACKAGE BODY", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.CreatePackageBody;
@@ -450,6 +449,14 @@ namespace FirebirdSql.Data.Isql
 					}
 					break;
 
+				case 'M':
+				case 'm':
+					if (sqlStatement.StartsWith("MERGE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.Merge;
+					}
+					break;
+
 				case 'O':
 				case 'o':
 					if (sqlStatement.StartsWith("OPEN", StringComparison.OrdinalIgnoreCase))
@@ -476,7 +483,6 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.RecreateFunction;
 					}
-					// this needs to be before RECREATE PACKAGE to properly match
 					if (sqlStatement.StartsWith("RECREATE PACKAGE BODY", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.RecreatePackageBody;

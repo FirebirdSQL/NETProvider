@@ -178,6 +178,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Grant:
 						case SqlStatementType.Insert:
 						case SqlStatementType.InsertCursor:
+						case SqlStatementType.Merge:
 						case SqlStatementType.Open:
 						case SqlStatementType.Prepare:
 						case SqlStatementType.Revoke:
