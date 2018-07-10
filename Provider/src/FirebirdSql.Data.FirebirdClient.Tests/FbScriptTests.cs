@@ -223,6 +223,50 @@ foo
 			Assert.AreEqual(SqlStatementType.CreateDatabase, script.Results[0].StatementType);
 		}
 
+		[Test]
+		public void CreatePackage()
+		{
+			const string text =
+@"create package p as begin end";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(SqlStatementType.CreatePackage, script.Results[0].StatementType);
+		}
+
+		[Test]
+		public void RecreatePackage()
+		{
+			const string text =
+@"recreate package p as begin end";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(SqlStatementType.RecreatePackage, script.Results[0].StatementType);
+		}
+
+		[Test]
+		public void CreatePackageBody()
+		{
+			const string text =
+@"create package body p as begin end";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(SqlStatementType.CreatePackageBody, script.Results[0].StatementType);
+		}
+
+		[Test]
+		public void RecreatePackageBody()
+		{
+			const string text =
+@"recreate package body p as begin end";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(SqlStatementType.RecreatePackageBody, script.Results[0].StatementType);
+		}
+
 		#endregion
 	}
 }

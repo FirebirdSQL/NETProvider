@@ -156,6 +156,10 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.AlterIndex;
 					}
+					if (sqlStatement.StartsWith("ALTER PACKAGE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.AlterPackage;
+					}
 					if (sqlStatement.StartsWith("ALTER PROCEDURE", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.AlterProcedure;
@@ -233,6 +237,16 @@ namespace FirebirdSql.Data.Isql
 						sqlStatement.StartsWith("CREATE DESCENDING INDEX", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.CreateIndex;
+					}
+					// this needs to be before CREATE PACKAGE to properly match
+					if (sqlStatement.StartsWith("CREATE PACKAGE BODY", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreatePackageBody;
+					}
+					if (sqlStatement.StartsWith("CREATE PACKAGE", StringComparison.OrdinalIgnoreCase) ||
+						sqlStatement.StartsWith("CREATE OR ALTER PACKAGE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.CreatePackage;
 					}
 					if (sqlStatement.StartsWith("CREATE PROCEDURE", StringComparison.OrdinalIgnoreCase) ||
 						sqlStatement.StartsWith("CREATE OR ALTER PROCEDURE", StringComparison.OrdinalIgnoreCase))
@@ -461,6 +475,15 @@ namespace FirebirdSql.Data.Isql
 					if (sqlStatement.StartsWith("RECREATE FUNCTION", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.RecreateFunction;
+					}
+					// this needs to be before RECREATE PACKAGE to properly match
+					if (sqlStatement.StartsWith("RECREATE PACKAGE BODY", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.RecreatePackageBody;
+					}
+					if (sqlStatement.StartsWith("RECREATE PACKAGE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.RecreatePackage;
 					}
 					if (sqlStatement.StartsWith("RECREATE PROCEDURE", StringComparison.OrdinalIgnoreCase))
 					{
