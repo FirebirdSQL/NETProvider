@@ -119,7 +119,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			using (var db = GetDbContext<FbTestDbContext>())
 			{
 				var generator = db.GetService<IMigrationsSqlGenerator>();
-				return generator.Generate(operations);
+				return generator.Generate(operations, db.Model);
 			}
 		}
 	}
