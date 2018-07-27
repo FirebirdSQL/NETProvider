@@ -359,6 +359,14 @@ namespace FirebirdSql.Data.Isql
 					{
 						return SqlStatementType.DropIndex;
 					}
+					if (sqlStatement.StartsWith("DROP PACKAGE BODY", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropPackageBody;
+					}
+					if (sqlStatement.StartsWith("DROP PACKAGE", StringComparison.OrdinalIgnoreCase))
+					{
+						return SqlStatementType.DropPackage;
+					}
 					if (sqlStatement.StartsWith("DROP PROCEDURE", StringComparison.OrdinalIgnoreCase))
 					{
 						return SqlStatementType.DropProcedure;

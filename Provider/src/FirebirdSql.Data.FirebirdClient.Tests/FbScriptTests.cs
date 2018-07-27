@@ -268,6 +268,28 @@ foo
 		}
 
 		[Test]
+		public void DropPackage()
+		{
+			const string text =
+@"drop package p as begin end";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(SqlStatementType.DropPackage, script.Results[0].StatementType);
+		}
+
+		[Test]
+		public void DropPackageBody()
+		{
+			const string text =
+@"drop package body p as begin end";
+			FbScript script = new FbScript(text);
+			script.Parse();
+			Assert.AreEqual(1, script.Results.Count());
+			Assert.AreEqual(SqlStatementType.DropPackageBody, script.Results[0].StatementType);
+		}
+
+		[Test]
 		public void Merge()
 		{
 			const string text =

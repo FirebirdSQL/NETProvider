@@ -163,6 +163,8 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.DropFilter:
 						case SqlStatementType.DropGenerator:
 						case SqlStatementType.DropIndex:
+						case SqlStatementType.DropPackage:
+						case SqlStatementType.DropPackageBody:
 						case SqlStatementType.DropProcedure:
 						case SqlStatementType.DropSequence:
 						case SqlStatementType.DropRole:

@@ -72,6 +72,8 @@ namespace FirebirdSql.Data.Isql
 		DropFilter,
 		DropGenerator,
 		DropIndex,
+		DropPackage,
+		DropPackageBody,
 		DropProcedure,
 		DropSequence,
 		DropRole,
