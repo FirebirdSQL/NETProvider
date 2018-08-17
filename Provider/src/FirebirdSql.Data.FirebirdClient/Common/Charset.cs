@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Common
 
 		private static List<Charset> GetSupportedCharsets()
 		{
-			List<Charset> charsets = new List<Charset>();
+			var charsets = new List<Charset>();
 
 			// NONE
 			charsets.Add(new Charset(0, None, 1, None));

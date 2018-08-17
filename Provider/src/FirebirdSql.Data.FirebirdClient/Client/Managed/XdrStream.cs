@@ -482,8 +482,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public DateTime ReadDateTime()
 		{
-			DateTime date = ReadDate();
-			TimeSpan time = ReadTime();
+			var date = ReadDate();
+			var time = ReadTime();
 			return date.Add(time);
 		}
 
@@ -531,17 +531,17 @@ namespace FirebirdSql.Data.Client.Managed
 		public IscException ReadStatusVector()
 		{
 			IscException exception = null;
-			bool eof = false;
+			var eof = false;
 
 			while (!eof)
 			{
-				int arg = ReadInt32();
+				var arg = ReadInt32();
 
 				switch (arg)
 				{
 					case IscCodes.isc_arg_gds:
 					default:
-						int er = ReadInt32();
+						var er = ReadInt32();
 						if (er != 0)
 						{
 							if (exception == null)
@@ -643,7 +643,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void Write(string value)
 		{
-			byte[] buffer = _charset.GetBytes(value);
+			var buffer = _charset.GetBytes(value);
 			WriteBuffer(buffer, buffer.Length);
 		}
 
@@ -676,7 +676,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void Write(decimal value, int type, int scale)
 		{
-			object numeric = TypeEncoder.EncodeDecimal(value, scale, type);
+			var numeric = TypeEncoder.EncodeDecimal(value, scale, type);
 			switch (type & ~1)
 			{
 				case IscCodes.SQL_SHORT:

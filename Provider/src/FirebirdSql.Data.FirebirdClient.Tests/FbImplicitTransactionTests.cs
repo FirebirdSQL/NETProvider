@@ -42,14 +42,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DataAdapterFillTest()
 		{
-			FbCommand command = new FbCommand("select * from TEST where DATE_FIELD <> ?", Connection);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var command = new FbCommand("select * from TEST where DATE_FIELD <> ?", Connection);
+			var adapter = new FbDataAdapter(command);
 
 			adapter.SelectCommand.Parameters.Add("@DATE_FIELD", FbDbType.Date, 4, "DATE_FIELD").Value = new DateTime(2003, 1, 5);
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			adapter.Dispose();
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ExecuteScalarTest()
 		{
-			FbCommand command = new FbCommand("select sum(int_field) from TEST", Connection);
+			var command = new FbCommand("select sum(int_field) from TEST", Connection);
 
 			Assert.DoesNotThrow(() => command.ExecuteScalar());
 
@@ -74,11 +74,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdatedClobFieldTest()
 		{
-			FbCommand command = new FbCommand("update TEST set clob_field = @clob_field where int_field = @int_field", Connection);
+			var command = new FbCommand("update TEST set clob_field = @clob_field where int_field = @int_field", Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 			command.Parameters.Add("@clob_field", FbDbType.Text).Value = "Clob field update with implicit transaction";
 
-			int i = command.ExecuteNonQuery();
+			var i = command.ExecuteNonQuery();
 
 			Assert.AreEqual(i, 1, "Clob field update with implicit transaction failed");
 
@@ -88,11 +88,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdatedBlobFieldTest()
 		{
-			FbCommand command = new FbCommand("update TEST set blob_field = @blob_field where int_field = @int_field", Connection);
+			var command = new FbCommand("update TEST set blob_field = @blob_field where int_field = @int_field", Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 			command.Parameters.Add("@blob_field", FbDbType.Binary).Value = Encoding.UTF8.GetBytes("Blob field update with implicit transaction");
 
-			int i = command.ExecuteNonQuery();
+			var i = command.ExecuteNonQuery();
 
 			Assert.AreEqual(i, 1, "Blob field update with implicit transaction failed");
 
@@ -102,18 +102,18 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdatedArrayFieldTest()
 		{
-			int[] values = new int[4];
+			var values = new int[4];
 
 			values[0] = 10;
 			values[1] = 20;
 			values[2] = 30;
 			values[3] = 40;
 
-			FbCommand command = new FbCommand("update TEST set iarray_field = @iarray_field where int_field = @int_field", Connection);
+			var command = new FbCommand("update TEST set iarray_field = @iarray_field where int_field = @int_field", Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 			command.Parameters.Add("@iarray_field", FbDbType.Array).Value = values;
 
-			int i = command.ExecuteNonQuery();
+			var i = command.ExecuteNonQuery();
 
 			Assert.AreEqual(i, 1, "Array field update with implicit transaction failed");
 

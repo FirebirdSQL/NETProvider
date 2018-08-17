@@ -82,8 +82,8 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			ClearStatusVector();
 
-			DatabaseHandle dbHandle = _db.HandlePtr;
-			TransactionHandle trHandle = ((FesTransaction)_transaction).HandlePtr;
+			var dbHandle = _db.HandlePtr;
+			var trHandle = ((FesTransaction)_transaction).HandlePtr;
 
 			_db.FbClient.isc_create_blob2(
 				_statusVector,
@@ -103,8 +103,8 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			ClearStatusVector();
 
-			DatabaseHandle dbHandle = _db.HandlePtr;
-			TransactionHandle trHandle = ((FesTransaction)_transaction).HandlePtr;
+			var dbHandle = _db.HandlePtr;
+			var trHandle = ((FesTransaction)_transaction).HandlePtr;
 
 			_db.FbClient.isc_open_blob2(
 				_statusVector,
@@ -120,16 +120,16 @@ namespace FirebirdSql.Data.Client.Native
 
 		protected override byte[] GetSegment()
 		{
-			short requested = (short)SegmentSize;
+			var requested = (short)SegmentSize;
 			short segmentLength = 0;
 
 			ClearStatusVector();
 
-			using (MemoryStream segment = new MemoryStream())
+			using (var segment = new MemoryStream())
 			{
-				byte[] tmp = new byte[requested];
+				var tmp = new byte[requested];
 
-				IntPtr status = _db.FbClient.isc_get_segment(
+				var status = _db.FbClient.isc_get_segment(
 					_statusVector,
 					ref _blobHandle,
 					ref segmentLength,

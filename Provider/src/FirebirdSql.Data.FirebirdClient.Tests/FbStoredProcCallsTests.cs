@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void FirebirdLikeTest00()
 		{
-			FbCommand command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection);
+			var command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection);
 
 			command.CommandType = CommandType.StoredProcedure;
 
@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.ExecuteNonQuery();
 
-			object value = command.Parameters[1].Value;
+			var value = command.Parameters[1].Value;
 
 			command.Dispose();
 
@@ -62,15 +62,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void FirebirdLikeTest01()
 		{
-			FbCommand command = new FbCommand("SELECT * FROM GETVARCHARFIELD(?)", Connection);
+			var command = new FbCommand("SELECT * FROM GETVARCHARFIELD(?)", Connection);
 			command.CommandType = CommandType.StoredProcedure;
 
 			command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
 			command.Parameters[0].Value = 1;
 
-			FbDataReader reader = command.ExecuteReader();
+			var reader = command.ExecuteReader();
 			reader.Read();
-			object value = reader[0];
+			var value = reader[0];
 			reader.Close();
 
 			command.Dispose();
@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SqlServerLikeTest00()
 		{
-			FbCommand command = new FbCommand("GETVARCHARFIELD", Connection);
+			var command = new FbCommand("GETVARCHARFIELD", Connection);
 
 			command.CommandType = CommandType.StoredProcedure;
 
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.ExecuteNonQuery();
 
-			object value = command.Parameters[1].Value;
+			var value = command.Parameters[1].Value;
 
 			command.Dispose();
 
@@ -102,14 +102,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SqlServerLikeTest01()
 		{
-			FbCommand command = new FbCommand("GETRECORDCOUNT", Connection);
+			var command = new FbCommand("GETRECORDCOUNT", Connection);
 			command.CommandType = CommandType.StoredProcedure;
 
 			command.Parameters.Add("@RECORDCOUNT", FbDbType.Integer).Direction = ParameterDirection.Output;
 
 			command.ExecuteNonQuery();
 
-			object value = command.Parameters[0].Value;
+			var value = command.Parameters[0].Value;
 
 			command.Dispose();
 
@@ -119,15 +119,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SqlServerLikeTest02()
 		{
-			FbCommand command = new FbCommand("GETVARCHARFIELD", Connection);
+			var command = new FbCommand("GETVARCHARFIELD", Connection);
 
 			command.CommandType = CommandType.StoredProcedure;
 
 			command.Parameters.Add("@ID", FbDbType.VarChar).Value = 1;
 
-			FbDataReader r = command.ExecuteReader();
+			var r = command.ExecuteReader();
 
-			int count = 0;
+			var count = 0;
 
 			while (r.Read())
 			{

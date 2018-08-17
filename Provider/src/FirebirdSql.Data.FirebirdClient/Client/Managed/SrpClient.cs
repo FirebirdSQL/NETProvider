@@ -157,7 +157,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private static byte[] ComputeHash(params byte[][] ba)
 		{
-			using (SHA1 hash = SHA1.Create())
+			using (var hash = SHA1.Create())
 			{
 				return hash.ComputeHash(ba.SelectMany(x => x).ToArray());
 			}
@@ -177,7 +177,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private static byte[] GetRandomBytes(int count)
 		{
 			var result = new byte[count];
-			using (RandomNumberGenerator random = RandomNumberGenerator.Create())
+			using (var random = RandomNumberGenerator.Create())
 			{
 				random.GetBytes(result);
 			}

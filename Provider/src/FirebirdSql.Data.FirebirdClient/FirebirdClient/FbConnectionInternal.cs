@@ -122,13 +122,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb)
 		{
-			IDatabase db = ClientFactory.CreateDatabase(_options);
+			var db = ClientFactory.CreateDatabase(_options);
 			db.CreateDatabase(dpb, _options.DataSource, _options.Port, _options.Database);
 		}
 
 		public void DropDatabase()
 		{
-			IDatabase db = ClientFactory.CreateDatabase(_options);
+			var db = ClientFactory.CreateDatabase(_options);
 			db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
 			db.DropDatabase();
 		}
@@ -151,7 +151,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_db.Dialect = _options.Dialect;
 				_db.PacketSize = _options.PacketSize;
 
-				DatabaseParameterBuffer dpb = BuildDpb(_db, _options);
+				var dpb = BuildDpb(_db, _options);
 
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
@@ -248,7 +248,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void TransactionCompleted()
 		{
-			for (int i = 0; i < _preparedCommands.Count; i++)
+			for (var i = 0; i < _preparedCommands.Count; i++)
 			{
 				if (!_preparedCommands[i].TryGetTarget(out var command))
 					continue;
@@ -338,8 +338,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void AddPreparedCommand(FbCommand command)
 		{
-			int position = -1;
-			for (int i = 0; i < _preparedCommands.Count; i++)
+			var position = -1;
+			for (var i = 0; i < _preparedCommands.Count; i++)
 			{
 				if (!_preparedCommands[i].TryGetTarget(out var current))
 				{
@@ -365,7 +365,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void RemovePreparedCommand(FbCommand command)
 		{
-			for (int i = _preparedCommands.Count - 1; i >= 0; i--)
+			for (var i = _preparedCommands.Count - 1; i >= 0; i--)
 			{
 				var item = _preparedCommands[i];
 				if (item.TryGetTarget(out var current) && current == command)
@@ -378,7 +378,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void ReleasePreparedCommands()
 		{
-			for (int i = 0; i < _preparedCommands.Count; i++)
+			for (var i = 0; i < _preparedCommands.Count; i++)
 			{
 				if (!_preparedCommands[i].TryGetTarget(out var current))
 					continue;
@@ -424,7 +424,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private DatabaseParameterBuffer BuildDpb(IDatabase db, FbConnectionString options)
 		{
-			DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
+			var dpb = new DatabaseParameterBuffer();
 
 			dpb.Append(IscCodes.isc_dpb_version1);
 			dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
@@ -497,14 +497,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 		private string GetRealProcessName()
 		{
-			Assembly assembly = Assembly.GetEntryAssembly();
+			var assembly = Assembly.GetEntryAssembly();
 			return assembly?.Location ?? Process.GetCurrentProcess().MainModule.FileName;
 		}
 
 		private int GetProcessId()
 		{
 #if !NETSTANDARD1_6
-			Assembly assembly = Assembly.GetEntryAssembly();
+			var assembly = Assembly.GetEntryAssembly();
 			if (!(assembly?.IsFullyTrusted) ?? false)
 				return -1;
 #endif

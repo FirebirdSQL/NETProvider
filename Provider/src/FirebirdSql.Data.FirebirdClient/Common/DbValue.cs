@@ -329,8 +329,8 @@ namespace FirebirdSql.Data.Common
 
 		private byte[] GetNumericBytes()
 		{
-			decimal value = GetDecimal();
-			object numeric = TypeEncoder.EncodeDecimal(value, Field.NumericScale, Field.DataType);
+			var value = GetDecimal();
+			var numeric = TypeEncoder.EncodeDecimal(value, Field.NumericScale, Field.DataType);
 
 			switch (_field.SqlType)
 			{
@@ -402,14 +402,14 @@ namespace FirebirdSql.Data.Common
 
 		private string GetClobData(long blobId)
 		{
-			BlobBase clob = _statement.CreateBlob(blobId);
+			var clob = _statement.CreateBlob(blobId);
 
 			return clob.ReadString();
 		}
 
 		private byte[] GetBlobData(long blobId)
 		{
-			BlobBase blob = _statement.CreateBlob(blobId);
+			var blob = _statement.CreateBlob(blobId);
 
 			return blob.Read();
 		}
@@ -421,7 +421,7 @@ namespace FirebirdSql.Data.Common
 				_field.ArrayHandle = _statement.CreateArray(handle, Field.Relation, Field.Name);
 			}
 
-			ArrayBase gdsArray = _statement.CreateArray(_field.ArrayHandle.Descriptor);
+			var gdsArray = _statement.CreateArray(_field.ArrayHandle.Descriptor);
 
 			gdsArray.Handle = handle;
 			gdsArray.DB = _statement.Database;

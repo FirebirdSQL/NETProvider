@@ -129,7 +129,7 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				ulVersion = (int)SecBufferType.SECBUFFER_VERSION;
 				cBuffers = 1;
-				SecBuffer secBuffer = new SecBuffer(bufferSize);
+				var secBuffer = new SecBuffer(bufferSize);
 				pBuffers = Marshal.AllocHGlobal(Marshal.SizeOf(secBuffer));
 				Marshal.StructureToPtr(secBuffer, pBuffers, false);
 			}
@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				ulVersion = (int)SecBufferType.SECBUFFER_VERSION;
 				cBuffers = 1;
-				SecBuffer secBuffer = new SecBuffer(secBufferBytes);
+				var secBuffer = new SecBuffer(secBufferBytes);
 				pBuffers = Marshal.AllocHGlobal(Marshal.SizeOf(secBuffer));
 				Marshal.StructureToPtr(secBuffer, pBuffers, false);
 			}
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				if (pBuffers != IntPtr.Zero)
 				{
-					SecBuffer secBuffer = Marshal.PtrToStructure<SecBuffer>(pBuffers);
+					var secBuffer = Marshal.PtrToStructure<SecBuffer>(pBuffers);
 					secBuffer.Dispose();
 					Marshal.FreeHGlobal(pBuffers);
 					pBuffers = IntPtr.Zero;
@@ -158,7 +158,7 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				if (pBuffers == IntPtr.Zero)
 					throw new ObjectDisposedException(nameof(SecBufferDesc));
-				SecBuffer secBuffer = Marshal.PtrToStructure<SecBuffer>(pBuffers);
+				var secBuffer = Marshal.PtrToStructure<SecBuffer>(pBuffers);
 				return secBuffer.GetBytes();
 			}
 		}
@@ -304,7 +304,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_securPackage = securityPackage;
 			_remotePrincipal = remotePrincipal;
 			_clientCredentials = new SecHandle();
-			int resCode = AcquireCredentialsHandle(null, securityPackage, SECPKG_CRED_OUTBOUND,
+			var resCode = AcquireCredentialsHandle(null, securityPackage, SECPKG_CRED_OUTBOUND,
 				IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero,
 				out _clientCredentials, out var expiry);
 			if (resCode != SEC_E_OK)
@@ -324,10 +324,10 @@ namespace FirebirdSql.Data.Client.Managed
 			EnsureDisposed();
 			CloseClientContext();
 			_clientContext = new SecHandle();
-			SecBufferDesc clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
+			var clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
 			try
 			{
-				int resCode = InitializeSecurityContext(
+				var resCode = InitializeSecurityContext(
 					ref _clientCredentials,
 					IntPtr.Zero,
 					_remotePrincipal,
@@ -362,13 +362,13 @@ namespace FirebirdSql.Data.Client.Managed
 			EnsureDisposed();
 			if (_clientContext.IsInvalid)
 				throw new InvalidOperationException($"{nameof(InitializeClientSecurity)} not called");
-			SecBufferDesc clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
+			var clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
 			try
 			{
-				SecBufferDesc serverTokenBuf = new SecBufferDesc(serverToken);
+				var serverTokenBuf = new SecBufferDesc(serverToken);
 				try
 				{
-					int resCode = InitializeSecurityContext(
+					var resCode = InitializeSecurityContext(
 						ref _clientCredentials,
 						ref _clientContext,
 						_remotePrincipal,

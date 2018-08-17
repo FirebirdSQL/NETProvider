@@ -241,15 +241,15 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				string svalue = (_value as string);
+				var svalue = (_value as string);
 				if (svalue != null)
 				{
 					return svalue.Substring(0, Math.Min(Size, svalue.Length));
 				}
-				byte[] bvalue = (_value as byte[]);
+				var bvalue = (_value as byte[]);
 				if (bvalue != null)
 				{
-					byte[] result = new byte[Math.Min(Size, bvalue.Length)];
+					var result = new byte[Math.Min(Size, bvalue.Length)];
 					Array.Copy(bvalue, result, result.Length);
 					return result;
 				}
@@ -392,7 +392,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				value = DBNull.Value;
 			}
 
-			TypeCode code = Type.GetTypeCode(value.GetType());
+			var code = Type.GetTypeCode(value.GetType());
 
 			switch (code)
 			{
@@ -470,12 +470,12 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				string svalue = (_value as string);
+				var svalue = (_value as string);
 				if (svalue != null)
 				{
 					return svalue.Length;
 				}
-				byte[] bvalue = (_value as byte[]);
+				var bvalue = (_value as byte[]);
 				if (bvalue != null)
 				{
 					return bvalue.Length;

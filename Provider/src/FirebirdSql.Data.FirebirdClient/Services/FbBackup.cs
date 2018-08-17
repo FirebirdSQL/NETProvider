@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Services
 				StartSpb = new ServiceParameterBuffer();
 				StartSpb.Append(IscCodes.isc_action_svc_backup);
 				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-				foreach (FbBackupFile file in BackupFiles)
+				foreach (var file in BackupFiles)
 				{
 					StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
 					if (file.BackupLength.HasValue)

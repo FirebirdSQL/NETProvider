@@ -60,7 +60,7 @@ namespace FirebirdSql.Data.Common
 			int day, month, year;
 			int c, ya;
 
-			GregorianCalendar calendar = new GregorianCalendar();
+			var calendar = new GregorianCalendar();
 
 			day = calendar.GetDayOfMonth(d);
 			month = calendar.GetMonth(d);

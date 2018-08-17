@@ -129,7 +129,7 @@ namespace Ionic.Zlib
 
         internal uint Reset()
         {
-            uint oldCheck = check;
+            var oldCheck = check;
             mode = InflateBlockMode.TYPE;
             bitk = 0;
             bitb = 0;
@@ -202,10 +202,10 @@ namespace Ionic.Zlib
                                 break;
 
                             case 1:  // fixed
-                                int[] bl = new int[1];
-                                int[] bd = new int[1];
-                                int[][] tl = new int[1][];
-                                int[][] td = new int[1][];
+                                var bl = new int[1];
+                                var bd = new int[1];
+                                var tl = new int[1][];
+                                var td = new int[1][];
                                 InfTree.inflate_trees_fixed(bl, bd, tl, td, _codec);
                                 codes.Init(bl[0], bd[0], tl[0], 0, td[0], 0);
                                 b >>= 3; k -= 3;
@@ -544,10 +544,10 @@ namespace Ionic.Zlib
 
                         tb[0] = -1;
                         {
-                            int[] bl = new int[] { 9 };  // must be <= 9 for lookahead assumptions
-                            int[] bd = new int[] { 6 }; // must be <= 9 for lookahead assumptions
-                            int[] tl = new int[1];
-                            int[] td = new int[1];
+                            var bl = new int[] { 9 };  // must be <= 9 for lookahead assumptions
+                            var bd = new int[] { 6 }; // must be <= 9 for lookahead assumptions
+                            var tl = new int[1];
+                            var td = new int[1];
 
                             t = table;
                             t = inftree.inflate_trees_dynamic(257 + (t & 0x1f), 1 + ((t >> 5) & 0x1f), blens, bl, bd, tl, td, hufts, _codec);
@@ -678,7 +678,7 @@ namespace Ionic.Zlib
         {
             int nBytes;
 
-            for (int pass=0; pass < 2; pass++)
+            for (var pass=0; pass < 2; pass++)
             {
                 if (pass==0)
                 {
@@ -805,15 +805,15 @@ namespace Ionic.Zlib
             int j;      // temporary storage
             int tindex; // temporary pointer
             int e;      // extra bits or operation
-            int b = 0;  // bit buffer
-            int k = 0;  // bits in bit buffer
-            int p = 0;  // input data pointer
+            var b = 0;  // bit buffer
+            var k = 0;  // bits in bit buffer
+            var p = 0;  // input data pointer
             int n;      // bytes available there
             int q;      // output window write pointer
             int m;      // bytes to end of window or read pointer
             int f;      // pointer to copy strings from
 
-            ZlibCodec z = blocks._codec;
+            var z = blocks._codec;
 
             // copy input/output information to locals (UPDATE macro restores)
             p = z.NextIn;
@@ -1522,8 +1522,8 @@ namespace Ionic.Zlib
 //                 : ZlibConstants.Z_OK;
 
             // workitem 8870
-            int f = ZlibConstants.Z_OK;
-            int r = ZlibConstants.Z_BUF_ERROR;
+            var f = ZlibConstants.Z_OK;
+            var r = ZlibConstants.Z_BUF_ERROR;
 
             while (true)
             {
@@ -1700,8 +1700,8 @@ namespace Ionic.Zlib
 
         internal int SetDictionary(byte[] dictionary)
         {
-            int index = 0;
-            int length = dictionary.Length;
+            var index = 0;
+            var length = dictionary.Length;
             if (mode != InflateManagerMode.DICT0)
                 throw new ZlibException("Stream error.");
 

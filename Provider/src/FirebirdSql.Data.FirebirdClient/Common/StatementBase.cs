@@ -107,9 +107,9 @@ namespace FirebirdSql.Data.Common
 
 		public string GetExecutionPlan()
 		{
-			int count = 0;
-			int bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
-			byte[] buffer = GetSqlInfo(DescribePlanInfoItems, bufferSize);
+			var count = 0;
+			var bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
+			var buffer = GetSqlInfo(DescribePlanInfoItems, bufferSize);
 
 			if (buffer[0] == IscCodes.isc_info_end)
 			{
@@ -217,20 +217,20 @@ namespace FirebirdSql.Data.Common
 
 		protected int GetRecordsAffected()
 		{
-			byte[] buffer = GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+			var buffer = GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
 			return ProcessRecordsAffectedBuffer(buffer);
 		}
 
 		protected int ProcessRecordsAffectedBuffer(byte[] buffer)
 		{
-			int insertCount = 0;
-			int updateCount = 0;
-			int deleteCount = 0;
-			int selectCount = 0;
-			int pos = 0;
-			int length = 0;
-			int type = 0;
+			var insertCount = 0;
+			var updateCount = 0;
+			var deleteCount = 0;
+			var selectCount = 0;
+			var pos = 0;
+			var length = 0;
+			var type = 0;
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
@@ -282,17 +282,17 @@ namespace FirebirdSql.Data.Common
 
 		protected DbStatementType GetStatementType()
 		{
-			byte[] buffer = GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+			var buffer = GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 
 			return ProcessStatementTypeInfoBuffer(buffer);
 		}
 
 		protected DbStatementType ProcessStatementTypeInfoBuffer(byte[] buffer)
 		{
-			DbStatementType stmtType = DbStatementType.None;
-			int pos = 0;
-			int length = 0;
-			int type = 0;
+			var stmtType = DbStatementType.None;
+			var pos = 0;
+			var length = 0;
+			var type = 0;
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
@@ -318,7 +318,7 @@ namespace FirebirdSql.Data.Common
 		{
 			if (Fields != null && Fields.Count > 0)
 			{
-				for (int i = 0; i < Fields.Count; i++)
+				for (var i = 0; i < Fields.Count; i++)
 				{
 					if (Fields[i].IsArray())
 					{

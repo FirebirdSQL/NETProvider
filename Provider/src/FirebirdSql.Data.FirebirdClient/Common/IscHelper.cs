@@ -27,11 +27,11 @@ namespace FirebirdSql.Data.Common
 	{
 		public static ArrayList ParseDatabaseInfo(byte[] buffer)
 		{
-			ArrayList info = new ArrayList();
+			var info = new ArrayList();
 
-			int pos = 0;
-			int length = 0;
-			int type = 0;
+			var pos = 0;
+			var length = 0;
+			var type = 0;
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
@@ -64,10 +64,10 @@ namespace FirebirdSql.Data.Common
 						 * - 1 byte containing the length, l, of the site name in bytes
 						 * - A string of l bytes, containing the site name
 						 */
-						string dbFile = Encoding2.Default.GetString(buffer, pos + 2, buffer[pos + 1]);
-						int sitePos = pos + 2 + buffer[pos + 1];
+						var dbFile = Encoding2.Default.GetString(buffer, pos + 2, buffer[pos + 1]);
+						var sitePos = pos + 2 + buffer[pos + 1];
 						int siteLength = buffer[sitePos];
-						string siteName = Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
+						var siteName = Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
 
 						sitePos += siteLength + 1;
 						siteLength = buffer[sitePos];
@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.Common
 						 */
 						var messagePosition = pos;
 						var count = buffer[messagePosition];
-						for (int i = 0; i < count; i++)
+						for (var i = 0; i < count; i++)
 						{
 							var messageLength = buffer[messagePosition + 1];
 							info.Add(Encoding2.Default.GetString(buffer, messagePosition + 2, messageLength));
@@ -251,7 +251,7 @@ namespace FirebirdSql.Data.Common
 					//
 
 					case IscCodes.isc_info_db_class:
-						int serverClass = VaxInteger(buffer, pos, length);
+						var serverClass = VaxInteger(buffer, pos, length);
 						if (serverClass == IscCodes.isc_info_db_class_classic_access)
 						{
 							info.Add("CLASSIC SERVER");
@@ -315,7 +315,7 @@ namespace FirebirdSql.Data.Common
 
 			newValue = shift = 0;
 
-			int i = index;
+			var i = index;
 			while (--length >= 0)
 			{
 				newValue += (buffer[i++] & 0xff) << shift;

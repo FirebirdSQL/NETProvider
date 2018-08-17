@@ -29,8 +29,8 @@ namespace FirebirdSql.Data.Schema
 
 		protected override StringBuilder GetCommandText(string[] restrictions)
 		{
-			StringBuilder sql = new StringBuilder();
-			StringBuilder where = new StringBuilder();
+			var sql = new StringBuilder();
+			var where = new StringBuilder();
 
 			sql.Append(
 				@"SELECT

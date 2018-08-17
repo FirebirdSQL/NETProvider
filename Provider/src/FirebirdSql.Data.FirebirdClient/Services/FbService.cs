@@ -77,7 +77,7 @@ namespace FirebirdSql.Data.Services
 
 		internal ServiceParameterBuffer BuildSpb()
 		{
-			ServiceParameterBuffer spb = new ServiceParameterBuffer();
+			var spb = new ServiceParameterBuffer();
 			spb.Append(IscCodes.isc_spb_version);
 			spb.Append(IscCodes.isc_spb_current_version);
 			var gdsSvc = _svc as Client.Managed.Version10.GdsServiceManager;
@@ -335,7 +335,7 @@ namespace FirebirdSql.Data.Services
 
 		private byte[] QueryService(byte[] items)
 		{
-			bool shouldClose = false;
+			var shouldClose = false;
 			if (State == FbServiceState.Closed)
 			{
 				Open();
@@ -347,7 +347,7 @@ namespace FirebirdSql.Data.Services
 			}
 			try
 			{
-				byte[] buffer = new byte[QueryBufferSize];
+				var buffer = new byte[QueryBufferSize];
 				_svc.Query(QuerySpb, items.Length, items, buffer.Length, buffer);
 				return buffer;
 			}
@@ -362,7 +362,7 @@ namespace FirebirdSql.Data.Services
 
 		private static FbServerConfig ParseServerConfig(byte[] buffer, ref int pos)
 		{
-			FbServerConfig config = new FbServerConfig();
+			var config = new FbServerConfig();
 
 			pos = 1;
 			while (buffer[pos] != IscCodes.isc_info_flag_end)
@@ -370,7 +370,7 @@ namespace FirebirdSql.Data.Services
 				pos++;
 
 				int key = buffer[pos - 1];
-				int keyValue = IscHelper.VaxInteger(buffer, pos, 4);
+				var keyValue = IscHelper.VaxInteger(buffer, pos, 4);
 
 				pos += 4;
 
@@ -461,9 +461,9 @@ namespace FirebirdSql.Data.Services
 
 		private static FbDatabasesInfo ParseDatabasesInfo(byte[] buffer, ref int pos)
 		{
-			FbDatabasesInfo dbInfo = new FbDatabasesInfo();
-			int type = 0;
-			int length = 0;
+			var dbInfo = new FbDatabasesInfo();
+			var type = 0;
+			var length = 0;
 
 			pos = 1;
 
@@ -496,10 +496,10 @@ namespace FirebirdSql.Data.Services
 
 		private static FbUserData[] ParseUserData(byte[] buffer, ref int pos)
 		{
-			List<FbUserData> users = new List<FbUserData>();
+			var users = new List<FbUserData>();
 			FbUserData currentUser = null;
-			int type = 0;
-			int length = 0;
+			var type = 0;
+			var length = 0;
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{

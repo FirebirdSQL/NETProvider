@@ -38,9 +38,9 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("DeriveParameters only supports CommandType.StoredProcedure.");
 			}
 
-			string spName = command.CommandText.Trim();
-			string quotePrefix = "\"";
-			string quoteSuffix = "\"";
+			var spName = command.CommandText.Trim();
+			var quotePrefix = "\"";
+			var quoteSuffix = "\"";
 
 			if (spName.StartsWith(quotePrefix) && spName.EndsWith(quoteSuffix))
 			{
@@ -51,13 +51,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				spName = spName.ToUpper(CultureInfo.CurrentCulture);
 			}
 
-			string paramsText = string.Empty;
+			var paramsText = string.Empty;
 
 			command.Parameters.Clear();
 
-			DataView dataTypes = command.Connection.GetSchema("DataTypes").DefaultView;
+			var dataTypes = command.Connection.GetSchema("DataTypes").DefaultView;
 
-			DataTable spSchema = command.Connection.GetSchema(
+			var spSchema = command.Connection.GetSchema(
 				"ProcedureParameters", new string[] { null, null, spName });
 
 			// SP has zero params. or not exist
@@ -74,7 +74,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					"TypeName = '{0}'",
 					row["PARAMETER_DATA_TYPE"]);
 
-				FbParameter parameter = command.Parameters.Add(
+				var parameter = command.Parameters.Add(
 					"@" + row["PARAMETER_NAME"].ToString().Trim(),
 					FbDbType.VarChar);
 
@@ -223,7 +223,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new ArgumentNullException("Quoted identifier parameter cannot be null");
 			}
 
-			string unquotedIdentifier = quotedIdentifier.Trim();
+			var unquotedIdentifier = quotedIdentifier.Trim();
 
 			if (unquotedIdentifier.StartsWith(QuotePrefix))
 			{
@@ -243,7 +243,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override void ApplyParameterInfo(DbParameter p, DataRow row, StatementType statementType, bool whereClause)
 		{
-			FbParameter parameter = (FbParameter)p;
+			var parameter = (FbParameter)p;
 
 			parameter.Size = int.Parse(row["ColumnSize"].ToString());
 			if (row["NumericPrecision"] != DBNull.Value)

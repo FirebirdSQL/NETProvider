@@ -37,9 +37,9 @@ namespace EntityFramework.Firebird.SqlGen
 
 		internal static string GenerateUpdateSql(DbUpdateCommandTree tree, out List<DbParameter> parameters, bool generateParameters = true)
 		{
-			StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
-			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning, generateParameters);
-			bool first = true;
+			var commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
+			var translator = new ExpressionTranslator(commandText, tree, null != tree.Returning, generateParameters);
+			var first = true;
 
 			commandText.Append("UPDATE ");
 			tree.Target.Expression.Accept(translator);
@@ -73,9 +73,9 @@ namespace EntityFramework.Firebird.SqlGen
 				// - we acquire the appropriate locks
 				// - server-gen columns (e.g. timestamp) get recomputed
 
-				EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
+				var table = ((DbScanExpression)tree.Target.Expression).Target;
 				// hope this column isn't indexed to not waste power
-				EdmMember someColumn = table.ElementType.Members.Last(x => !MetadataHelpers.IsStoreGenerated(x));
+				var someColumn = table.ElementType.Members.Last(x => !MetadataHelpers.IsStoreGenerated(x));
 				commandText.AppendFormat("{0} = {0}", GenerateMemberSql(someColumn));
 			}
 			commandText.AppendLine();
@@ -94,8 +94,8 @@ namespace EntityFramework.Firebird.SqlGen
 
 		internal static string GenerateDeleteSql(DbDeleteCommandTree tree, out List<DbParameter> parameters, bool generateParameters = true)
 		{
-			StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
-			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, false, generateParameters);
+			var commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
+			var translator = new ExpressionTranslator(commandText, tree, false, generateParameters);
 
 			commandText.Append("DELETE FROM ");
 			tree.Target.Expression.Accept(translator);
@@ -111,9 +111,9 @@ namespace EntityFramework.Firebird.SqlGen
 
 		internal static string GenerateInsertSql(DbInsertCommandTree tree, out List<DbParameter> parameters, bool generateParameters = true)
 		{
-			StringBuilder commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
-			ExpressionTranslator translator = new ExpressionTranslator(commandText, tree, null != tree.Returning, generateParameters);
-			bool first = true;
+			var commandText = new StringBuilder(CommandTextBuilderInitialCapacity);
+			var translator = new ExpressionTranslator(commandText, tree, null != tree.Returning, generateParameters);
+			var first = true;
 
 			commandText.Append("INSERT INTO ");
 			tree.Target.Expression.Accept(translator);
@@ -188,14 +188,14 @@ namespace EntityFramework.Firebird.SqlGen
 				return;
 			}
 
-			EntitySetBase table = ((DbScanExpression)tree.Target.Expression).Target;
-			IEnumerable<EdmMember> columnsToFetch =
+			var table = ((DbScanExpression)tree.Target.Expression).Target;
+			var columnsToFetch =
 				table.ElementType.Members
 					.Where(m => MetadataHelpers.IsStoreGenerated(m))
 					.Except((!(tree is DbInsertCommandTree) ? table.ElementType.KeyMembers : Enumerable.Empty<EdmMember>()));
 
-			StringBuilder startBlock = new StringBuilder();
-			string separator = string.Empty;
+			var startBlock = new StringBuilder();
+			var separator = string.Empty;
 
 			startBlock.Append("EXECUTE BLOCK ");
 			if (translator.Parameters.Any())
@@ -207,7 +207,7 @@ namespace EntityFramework.Firebird.SqlGen
 					startBlock.Append(separator);
 					startBlock.Append(param.ParameterName.Replace("@", string.Empty));
 					startBlock.Append(" ");
-					EdmMember member = translator.MemberValues.First(m => m.Value.Contains(param)).Key;
+					var member = translator.MemberValues.First(m => m.Value.Contains(param)).Key;
 					startBlock.Append(SqlGenerator.GetSqlPrimitiveType(member.TypeUsage));
 					if (param.FbDbType == FbDbType.VarChar || param.FbDbType == FbDbType.Char)
 						startBlock.Append(" CHARACTER SET UTF8");
@@ -222,7 +222,7 @@ namespace EntityFramework.Firebird.SqlGen
 
 			startBlock.AppendLine("RETURNS (");
 			separator = string.Empty;
-			foreach (EdmMember m in columnsToFetch)
+			foreach (var m in columnsToFetch)
 			{
 				startBlock.Append(separator);
 				startBlock.Append(GenerateMemberSql(m));
@@ -234,14 +234,14 @@ namespace EntityFramework.Firebird.SqlGen
 			startBlock.AppendLine(")");
 			startBlock.AppendLine("AS BEGIN");
 
-			string newCommand = ChangeParamsToPSQLParams(commandText.ToString(), translator.Parameters.Select(p => p.ParameterName).ToArray());
+			var newCommand = ChangeParamsToPSQLParams(commandText.ToString(), translator.Parameters.Select(p => p.ParameterName).ToArray());
 			commandText.Remove(0, commandText.Length);
 			commandText.Insert(0, newCommand);
 			commandText.Insert(0, startBlock.ToString());
 
 			commandText.Append("RETURNING ");
 			separator = string.Empty;
-			foreach (EdmMember m in columnsToFetch)
+			foreach (var m in columnsToFetch)
 			{
 				commandText.Append(separator);
 				commandText.Append(GenerateMemberSql(m));
@@ -250,7 +250,7 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 			commandText.Append(" INTO ");
 			separator = string.Empty;
-			foreach (EdmMember m in columnsToFetch)
+			foreach (var m in columnsToFetch)
 			{
 				commandText.Append(separator);
 				commandText.Append(":" + GenerateMemberSql(m));
@@ -266,8 +266,8 @@ namespace EntityFramework.Firebird.SqlGen
 
 		private static string ChangeParamsToPSQLParams(string commandText, string[] parametersUsed)
 		{
-			StringBuilder command = new StringBuilder(commandText);
-			foreach (string param in parametersUsed)
+			var command = new StringBuilder(commandText);
+			foreach (var param in parametersUsed)
 			{
 				command.Replace(param, ":" + param.Remove(0, 1));
 			}

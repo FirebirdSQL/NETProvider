@@ -121,8 +121,8 @@ namespace FirebirdSql.Data.Client.Native
 				throw new InvalidOperationException();
 			}
 
-			IscTeb teb = new IscTeb();
-			IntPtr tebData = IntPtr.Zero;
+			var teb = new IscTeb();
+			var tebData = IntPtr.Zero;
 
 			try
 			{
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.Client.Native
 				teb.tpb_ptr = Marshal.AllocHGlobal(tpb.Length);
 				Marshal.Copy(tpb.ToArray(), 0, teb.tpb_ptr, tpb.Length);
 
-				int size = Marshal.SizeOf<IscTeb>();
+				var size = Marshal.SizeOf<IscTeb>();
 				tebData = Marshal.AllocHGlobal(size);
 
 				Marshal.StructureToPtr(teb, tebData, true);

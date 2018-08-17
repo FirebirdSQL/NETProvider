@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void AddTest()
 		{
-			FbCommand command = new FbCommand();
+			var command = new FbCommand();
 
 			command.Parameters.Add(new FbParameter("@p292", 10000));
 			command.Parameters.Add("@p01", FbDbType.Integer);
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
             try
 			{
 				System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("tr-TR");
-				FbCommand command = new FbCommand();
+				var command = new FbCommand();
 
 				// \u0131 is turkish symbol "i without dot" that uppercases to "I" symbol.
 				// see https://msdn.microsoft.com/en-us/library/ms973919.aspx#stringsinnet20_topic5 for more information
@@ -60,10 +60,10 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DNET532_CheckFlagForUsingOrdinalIgnoreCase()
 		{
-			FbCommand command = new FbCommand();
+			var command = new FbCommand();
 			command.Parameters.IndexOf("SomeField");
 
-			for (int i = 0; i < 100; ++i)
+			for (var i = 0; i < 100; ++i)
 			{
 				command.Parameters.Add("FIELD" + i.ToString(), FbDbType.Integer);
 			}

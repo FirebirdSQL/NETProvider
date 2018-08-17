@@ -283,7 +283,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					ProcessStoredProcedureExecuteResponse(_database.ReadSqlResponse());
 				}
 
-				GenericResponse executeResponse = _database.ReadGenericResponse();
+				var executeResponse = _database.ReadGenericResponse();
 				ProcessExecuteResponse(executeResponse);
 
 				if (ReturnRecordsAffected &&
@@ -427,7 +427,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void ProcessPrepareResponse(GenericResponse response)
 		{
-			Descriptor[] descriptors = new Descriptor[] { null, null };
+			var descriptors = new Descriptor[] { null, null };
 			ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref descriptors);
 			_fields = descriptors[0];
 			_parameters = descriptors[1];
@@ -619,9 +619,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void ParseTruncSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
 		{
-			int currentPosition = 0;
-			int currentDescriptorIndex = -1;
-			int currentItemIndex = 0;
+			var currentPosition = 0;
+			var currentDescriptorIndex = -1;
+			var currentItemIndex = 0;
 			while (info[currentPosition] != IscCodes.isc_info_end)
 			{
 				byte item;
@@ -632,17 +632,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						case IscCodes.isc_info_truncated:
 							currentItemIndex--;
 
-							List<byte> newItems = new List<byte>(items.Length);
-							int part = 0;
-							int chock = 0;
-							for (int i = 0; i < items.Length; i++)
+							var newItems = new List<byte>(items.Length);
+							var part = 0;
+							var chock = 0;
+							for (var i = 0; i < items.Length; i++)
 							{
 								if (items[i] == IscCodes.isc_info_sql_describe_end)
 								{
 									newItems.Insert(chock, IscCodes.isc_info_sql_sqlda_start);
 									newItems.Insert(chock + 1, 2);
 
-									short processedItems = (rowDescs[part] != null ? rowDescs[part].Count : (short)0);
+									var processedItems = (rowDescs[part] != null ? rowDescs[part].Count : (short)0);
 									newItems.Insert(chock + 2, (byte)((part == currentDescriptorIndex ? currentItemIndex : processedItems) & 255));
 									newItems.Insert(chock + 3, (byte)((part == currentDescriptorIndex ? currentItemIndex : processedItems) >> 8));
 
@@ -666,11 +666,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								break;
 
 							currentPosition++;
-							int len = IscHelper.VaxInteger(info, currentPosition, 2);
+							var len = IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							if (rowDescs[currentDescriptorIndex] == null)
 							{
-								int n = IscHelper.VaxInteger(info, currentPosition, len);
+								var n = IscHelper.VaxInteger(info, currentPosition, len);
 								rowDescs[currentDescriptorIndex] = new Descriptor((short)n);
 								if (n == 0)
 								{
@@ -981,10 +981,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual DbValue[] ReadRow()
 		{
-			DbValue[] row = new DbValue[_fields.Count];
+			var row = new DbValue[_fields.Count];
 			try
 			{
-				for (int i = 0; i < _fields.Count; i++)
+				for (var i = 0; i < _fields.Count; i++)
 				{
 					var value = ReadRawValue(_fields[i]);
 					var sqlInd = _database.XdrStream.ReadInt32();

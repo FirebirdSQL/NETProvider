@@ -331,13 +331,13 @@ namespace Ionic.Zlib
             // Returns 0 bytes if not enough space in target
             if (target.Length == 0) return 0;
 
-            char[] charArray = new char[target.Length];
-            int bytesRead = sourceTextReader.Read(charArray, start, count);
+            var charArray = new char[target.Length];
+            var bytesRead = sourceTextReader.Read(charArray, start, count);
 
             // Returns -1 if EOF
             if (bytesRead == 0) return -1;
 
-            for (int index = start; index < start + bytesRead; index++)
+            for (var index = start; index < start + bytesRead; index++)
                 target[index] = (byte)charArray[index];
 
             return bytesRead;
@@ -496,12 +496,12 @@ namespace Ionic.Zlib
             if (buf == null)
                 return 1;
 
-            uint s1 = (uint) (adler & 0xffff);
-            uint s2 = (uint) ((adler >> 16) & 0xffff);
+            var s1 = (uint) (adler & 0xffff);
+            var s2 = (uint) ((adler >> 16) & 0xffff);
 
             while (len > 0)
             {
-                int k = len < NMAX ? len : NMAX;
+                var k = len < NMAX ? len : NMAX;
                 len -= k;
                 while (k >= 16)
                 {

@@ -41,20 +41,20 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void BinaryBlobTest()
 		{
-			int id_value = GetId();
+			var id_value = GetId();
 
-			string selectText = "SELECT blob_field FROM TEST WHERE int_field = " + id_value.ToString();
-			string insertText = "INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)";
+			var selectText = "SELECT blob_field FROM TEST WHERE int_field = " + id_value.ToString();
+			var insertText = "INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)";
 
 			// Generate an array of temp data
-			byte[] insert_values = new byte[100000 * 4];
-			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+			var insert_values = new byte[100000 * 4];
+			var rng = new RNGCryptoServiceProvider();
 			rng.GetBytes(insert_values);
 
 			// Execute insert command
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand insert = new FbCommand(insertText, Connection, transaction);
+			var insert = new FbCommand(insertText, Connection, transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
 			insert.ExecuteNonQuery();
@@ -62,10 +62,10 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			transaction.Commit();
 
 			// Check that inserted values are correct
-			FbCommand select = new FbCommand(selectText, Connection);
-			byte[] select_values = (byte[])select.ExecuteScalar();
+			var select = new FbCommand(selectText, Connection);
+			var select_values = (byte[])select.ExecuteScalar();
 
-			for (int i = 0; i < insert_values.Length; i++)
+			for (var i = 0; i < insert_values.Length; i++)
 			{
 				if (insert_values[i] != select_values[i])
 				{
@@ -77,20 +77,20 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ReaderGetBytes()
 		{
-			int id_value = GetId();
+			var id_value = GetId();
 
-			string selectText = "SELECT blob_field FROM TEST WHERE int_field = " + id_value.ToString();
-			string insertText = "INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)";
+			var selectText = "SELECT blob_field FROM TEST WHERE int_field = " + id_value.ToString();
+			var insertText = "INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)";
 
 			// Generate an array of temp data
-			byte[] insert_values = new byte[100000 * 4];
-			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+			var insert_values = new byte[100000 * 4];
+			var rng = new RNGCryptoServiceProvider();
 			rng.GetBytes(insert_values);
 
 			// Execute insert command
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand insert = new FbCommand(insertText, Connection, transaction);
+			var insert = new FbCommand(insertText, Connection, transaction);
 			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 			insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
 			insert.ExecuteNonQuery();
@@ -98,14 +98,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			transaction.Commit();
 
 			// Check that inserted values are correct
-			FbCommand select = new FbCommand(selectText, Connection);
+			var select = new FbCommand(selectText, Connection);
 
-			byte[] select_values = new byte[100000 * 4];
+			var select_values = new byte[100000 * 4];
 
-			using (FbDataReader reader = select.ExecuteReader())
+			using (var reader = select.ExecuteReader())
 			{
-				int index = 0;
-				int segmentSize = 1000;
+				var index = 0;
+				var segmentSize = 1000;
 				while (reader.Read())
 				{
 					while (index < 400000)
@@ -117,7 +117,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				}
 			}
 
-			for (int i = 0; i < insert_values.Length; i++)
+			for (var i = 0; i < insert_values.Length; i++)
 			{
 				if (insert_values[i] != select_values[i])
 				{

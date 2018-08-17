@@ -30,8 +30,8 @@ namespace FirebirdSql.Data.Client.Native.Handle
 				return true;
 			}
 
-			IntPtr[] statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-			BlobHandle @ref = this;
+			var statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+			var @ref = this;
 			FbClient.isc_close_blob(statusVector, ref @ref);
 			handle = @ref.handle;
 			var exception = FesConnection.ParseStatusVector(statusVector, Charset.DefaultCharset);

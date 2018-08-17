@@ -119,18 +119,18 @@ namespace EntityFramework.Firebird
 				throw new ArgumentNullException("storeType");
 			}
 
-			string storeTypeName = storeType.EdmType.Name.ToLowerInvariant();
+			var storeTypeName = storeType.EdmType.Name.ToLowerInvariant();
 			if (!StoreTypeNameToEdmPrimitiveType.ContainsKey(storeTypeName))
 			{
 				throw new ArgumentException(string.Format("The underlying provider does not support the type '{0}'.", storeTypeName));
 			}
 
-			PrimitiveType edmPrimitiveType = base.StoreTypeNameToEdmPrimitiveType[storeTypeName];
+			var edmPrimitiveType = base.StoreTypeNameToEdmPrimitiveType[storeTypeName];
 
-			int maxLength = 0;
-			bool isUnicode = true;
-			bool isFixedLen = false;
-			bool isUnbounded = true;
+			var maxLength = 0;
+			var isUnicode = true;
+			var isFixedLen = false;
+			var isUnbounded = true;
 
 			PrimitiveTypeKind newPrimitiveTypeKind;
 
@@ -236,13 +236,13 @@ namespace EntityFramework.Firebird
 			}
 			Debug.Assert(edmType.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType);
 
-			PrimitiveType primitiveType = edmType.EdmType as PrimitiveType;
+			var primitiveType = edmType.EdmType as PrimitiveType;
 			if (primitiveType == null)
 			{
 				throw new ArgumentException(string.Format("The underlying provider does not support the type '{0}'.", edmType));
 			}
 
-			ReadOnlyMetadataCollection<Facet> facets = edmType.Facets;
+			var facets = edmType.Facets;
 
 			switch (primitiveType.PrimitiveTypeKind)
 			{
@@ -281,11 +281,11 @@ namespace EntityFramework.Firebird
 
 				case PrimitiveTypeKind.Binary: // blob
 					{
-						bool isFixedLength = null != facets[MetadataHelpers.FixedLengthFacetName].Value && (bool)facets[MetadataHelpers.FixedLengthFacetName].Value;
-						Facet f = facets[MetadataHelpers.MaxLengthFacetName];
+						var isFixedLength = null != facets[MetadataHelpers.FixedLengthFacetName].Value && (bool)facets[MetadataHelpers.FixedLengthFacetName].Value;
+						var f = facets[MetadataHelpers.MaxLengthFacetName];
 
-						bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > BinaryMaxSize;
-						int maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
+						var isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > BinaryMaxSize;
+						var maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
 
 						TypeUsage tu;
 						if (isFixedLength)
@@ -309,13 +309,13 @@ namespace EntityFramework.Firebird
 
 				case PrimitiveTypeKind.String: // char, varchar, text blob
 					{
-						bool isUnicode = null == facets[MetadataHelpers.UnicodeFacetName].Value || (bool)facets[MetadataHelpers.UnicodeFacetName].Value;
-						bool isFixedLength = null != facets[MetadataHelpers.FixedLengthFacetName].Value && (bool)facets[MetadataHelpers.FixedLengthFacetName].Value;
-						Facet f = facets[MetadataHelpers.MaxLengthFacetName];
+						var isUnicode = null == facets[MetadataHelpers.UnicodeFacetName].Value || (bool)facets[MetadataHelpers.UnicodeFacetName].Value;
+						var isFixedLength = null != facets[MetadataHelpers.FixedLengthFacetName].Value && (bool)facets[MetadataHelpers.FixedLengthFacetName].Value;
+						var f = facets[MetadataHelpers.MaxLengthFacetName];
 						// maxlen is true if facet value is unbounded, the value is bigger than the limited string sizes *or* the facet
 						// value is null. this is needed since functions still have maxlength facet value as null
-						bool isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > (isUnicode ? UnicodeVarcharMaxSize : AsciiVarcharMaxSize);
-						int maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
+						var isMaxLength = f.IsUnbounded || null == f.Value || (int)f.Value > (isUnicode ? UnicodeVarcharMaxSize : AsciiVarcharMaxSize);
+						var maxLength = !isMaxLength ? (int)f.Value : Int32.MinValue;
 
 						TypeUsage tu;
 
@@ -399,8 +399,8 @@ namespace EntityFramework.Firebird
 
 		private static XmlReader GetXmlResource(string resourceName)
 		{
-			Assembly executingAssembly = Assembly.GetExecutingAssembly();
-			Stream stream = executingAssembly.GetManifestResourceStream(resourceName);
+			var executingAssembly = Assembly.GetExecutingAssembly();
+			var stream = executingAssembly.GetManifestResourceStream(resourceName);
 			return XmlReader.Create(stream);
 		}
 
@@ -422,7 +422,7 @@ namespace EntityFramework.Firebird
 
 		public override string EscapeLikeArgument(string argument)
 		{
-			StringBuilder sb = new StringBuilder(argument);
+			var sb = new StringBuilder(argument);
 			sb.Replace(LikeEscapeCharacter.ToString(), LikeEscapeCharacter.ToString() + LikeEscapeCharacter.ToString());
 			sb.Replace("%", LikeEscapeCharacter + "%");
 			sb.Replace("_", LikeEscapeCharacter + "_");

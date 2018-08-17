@@ -49,7 +49,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_message = ex.Message;
 			_errors = new FbErrorCollection();
-			foreach (IscError error in ex.Errors)
+			foreach (var error in ex.Errors)
 			{
 				_errors.Add(error.Message, error.ErrorCode);
 			}

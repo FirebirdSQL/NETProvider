@@ -90,16 +90,16 @@ namespace EntityFramework.Firebird.SqlGen
 		{
 			if (null != _sqlFragments)
 			{
-				foreach (object o in _sqlFragments)
+				foreach (var o in _sqlFragments)
 				{
-					string str = (o as string);
+					var str = (o as string);
 					if (null != str)
 					{
 						writer.Write(str);
 					}
 					else
 					{
-						ISqlFragment sqlFragment = (o as ISqlFragment);
+						var sqlFragment = (o as ISqlFragment);
 						if (null != sqlFragment)
 						{
 							sqlFragment.WriteSql(writer, sqlGenerator);

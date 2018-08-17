@@ -337,7 +337,7 @@ namespace FirebirdSql.Data.Isql
 			// [PASSWORD 'password']
 			// [CACHE int]
 			// [ROLE 'rolename']
-			SqlStringParser parser = new SqlStringParser(connectDbStatement);
+			var parser = new SqlStringParser(connectDbStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
@@ -393,8 +393,8 @@ namespace FirebirdSql.Data.Isql
 			// [LENGTH [=] int [PAGE[S]]]
 			// [DEFAULT CHARACTER SET charset]
 			// [<secondary_file>];
-			int pageSize = 0;
-			SqlStringParser parser = new SqlStringParser(createDatabaseStatement);
+			var pageSize = 0;
+			var parser = new SqlStringParser(createDatabaseStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
@@ -454,7 +454,7 @@ namespace FirebirdSql.Data.Isql
 		protected void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
 		{
 			// SET AUTODDL [ON | OFF]
-			SqlStringParser parser = new SqlStringParser(setAutoDdlStatement);
+			var parser = new SqlStringParser(setAutoDdlStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
@@ -466,7 +466,7 @@ namespace FirebirdSql.Data.Isql
 				enumerator.MoveNext(); // AUTO
 				if (enumerator.MoveNext())
 				{
-					string onOff = enumerator.Current.Text.ToUpperInvariant();
+					var onOff = enumerator.Current.Text.ToUpperInvariant();
 					if (onOff == "ON")
 					{
 						autoCommit = true;
@@ -494,7 +494,7 @@ namespace FirebirdSql.Data.Isql
 		protected void SetNames(string setNamesStatement)
 		{
 			// SET NAMES charset
-			SqlStringParser parser = new SqlStringParser(setNamesStatement);
+			var parser = new SqlStringParser(setNamesStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
@@ -516,7 +516,7 @@ namespace FirebirdSql.Data.Isql
 		protected void SetSqlDialect(string setSqlDialectStatement)
 		{
 			// SET SQL DIALECT dialect
-			SqlStringParser parser = new SqlStringParser(setSqlDialectStatement);
+			var parser = new SqlStringParser(setSqlDialectStatement);
 			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
@@ -573,7 +573,7 @@ namespace FirebirdSql.Data.Isql
 		/// <returns>The number of rows affected by the query execution.</returns>
 		protected int ExecuteCommand(bool autoCommit)
 		{
-			int rowsAffected = _sqlCommand.ExecuteNonQuery();
+			var rowsAffected = _sqlCommand.ExecuteNonQuery();
 			if (autoCommit && _sqlCommand.IsDDLCommand)
 			{
 				CommitTransaction();

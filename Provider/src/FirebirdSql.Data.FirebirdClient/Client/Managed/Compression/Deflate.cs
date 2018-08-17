@@ -386,11 +386,11 @@ namespace Ionic.Zlib
         internal void _InitializeBlocks()
         {
             // Initialize the trees.
-            for (int i = 0; i < InternalConstants.L_CODES; i++)
+            for (var i = 0; i < InternalConstants.L_CODES; i++)
                 dyn_ltree[i * 2] = 0;
-            for (int i = 0; i < InternalConstants.D_CODES; i++)
+            for (var i = 0; i < InternalConstants.D_CODES; i++)
                 dyn_dtree[i * 2] = 0;
-            for (int i = 0; i < InternalConstants.BL_CODES; i++)
+            for (var i = 0; i < InternalConstants.BL_CODES; i++)
                 bl_tree[i * 2] = 0;
 
             dyn_ltree[END_BLOCK * 2] = 1;
@@ -404,8 +404,8 @@ namespace Ionic.Zlib
         // two sons).
         internal void pqdownheap(short[] tree, int k)
         {
-            int v = heap[k];
-            int j = k << 1; // left son of k
+            var v = heap[k];
+            var j = k << 1; // left son of k
             while (j <= heap_len)
             {
                 // Set j to the smallest of the two sons:
@@ -427,8 +427,8 @@ namespace Ionic.Zlib
 
         internal static bool _IsSmaller(short[] tree, int n, int m, sbyte[] depth)
         {
-            short tn2 = tree[n * 2];
-            short tm2 = tree[m * 2];
+            var tn2 = tree[n * 2];
+            var tm2 = tree[m * 2];
             return (tn2 < tm2 || (tn2 == tm2 && depth[n] <= depth[m]));
         }
 
@@ -438,12 +438,12 @@ namespace Ionic.Zlib
         internal void scan_tree(short[] tree, int max_code)
         {
             int n; // iterates over all tree elements
-            int prevlen = -1; // last emitted length
+            var prevlen = -1; // last emitted length
             int curlen; // length of current code
-            int nextlen = (int)tree[0 * 2 + 1]; // length of next code
-            int count = 0; // repeat count of the current code
-            int max_count = 7; // max repeat count
-            int min_count = 4; // min repeat count
+            var nextlen = (int)tree[0 * 2 + 1]; // length of next code
+            var count = 0; // repeat count of the current code
+            var max_count = 7; // max repeat count
+            var min_count = 4; // min repeat count
 
             if (nextlen == 0)
             {
@@ -545,12 +545,12 @@ namespace Ionic.Zlib
         internal void send_tree(short[] tree, int max_code)
         {
             int n;                           // iterates over all tree elements
-            int prevlen   = -1;              // last emitted length
+            var prevlen   = -1;              // last emitted length
             int curlen;                      // length of current code
             int nextlen   = tree[0 * 2 + 1]; // length of next code
-            int count     = 0;               // repeat count of the current code
-            int max_count = 7;               // max repeat count
-            int min_count = 4;               // min repeat count
+            var count     = 0;               // repeat count of the current code
+            var max_count = 7;               // max repeat count
+            var min_count = 4;               // min repeat count
 
             if (nextlen == 0)
             {
@@ -640,13 +640,13 @@ namespace Ionic.Zlib
 
         internal void send_code(int c, short[] tree)
         {
-            int c2 = c * 2;
+            var c2 = c * 2;
             send_bits((tree[c2] & 0xffff), (tree[c2 + 1] & 0xffff));
         }
 
         internal void send_bits(int value, int length)
         {
-            int len = length;
+            var len = length;
             unchecked
             {
                 if (bi_valid > (int)Buf_size - len)
@@ -728,8 +728,8 @@ namespace Ionic.Zlib
             if ((last_lit & 0x1fff) == 0 && (int)compressionLevel > 2)
             {
                 // Compute an upper bound for the compressed length
-                int out_length = last_lit << 3;
-                int in_length = strstart - block_start;
+                var out_length = last_lit << 3;
+                var in_length = strstart - block_start;
                 int dcode;
                 for (dcode = 0; dcode < InternalConstants.D_CODES; dcode++)
                 {
@@ -754,7 +754,7 @@ namespace Ionic.Zlib
         {
             int distance; // distance of matched string
             int lc;       // match length or unmatched char (if dist == 0)
-            int lx = 0;   // running index in l_buf
+            var lx = 0;   // running index in l_buf
             int code;     // the code to send
             int extra;    // number of extra bits to send
 
@@ -762,7 +762,7 @@ namespace Ionic.Zlib
             {
                 do
                 {
-                    int ix = _distanceOffset + lx * 2;
+                    var ix = _distanceOffset + lx * 2;
                     distance = ((pending[ix] << 8) & 0xff00) |
                         (pending[ix + 1] & 0xff);
                     lc = (pending[_lengthOffset + lx]) & 0xff;
@@ -819,9 +819,9 @@ namespace Ionic.Zlib
         // frequencies does not exceed 64K (to fit in an int on 16 bit machines).
         internal void set_data_type()
         {
-            int n = 0;
-            int ascii_freq = 0;
-            int bin_freq = 0;
+            var n = 0;
+            var ascii_freq = 0;
+            var bin_freq = 0;
             while (n < 7)
             {
                 bin_freq += dyn_ltree[n * 2]; n++;
@@ -915,7 +915,7 @@ namespace Ionic.Zlib
             // Stored blocks are limited to 0xffff bytes, pending is limited
             // to pending_buf_size, and each stored block has a 5 byte header:
 
-            int max_block_size = 0xffff;
+            var max_block_size = 0xffff;
             int max_start;
 
             if (max_block_size > pending.Length - 5)
@@ -982,7 +982,7 @@ namespace Ionic.Zlib
         internal void _tr_flush_block(int buf, int stored_len, bool eof)
         {
             int opt_lenb, static_lenb; // opt_len and static_len in bytes
-            int max_blindex = 0; // index of last bit length code of non zero freq
+            var max_blindex = 0; // index of last bit length code of non zero freq
 
             // Build the Huffman trees unless a stored block is forced
             if (compressionLevel > 0)
@@ -1152,7 +1152,7 @@ namespace Ionic.Zlib
         internal BlockState DeflateFast(FlushType flush)
         {
             //    short hash_head = 0; // head of the hash chain
-            int hash_head = 0; // head of the hash chain
+            var hash_head = 0; // head of the hash chain
             bool bflush; // set if current block must be flushed
 
             while (true)
@@ -1271,7 +1271,7 @@ namespace Ionic.Zlib
         internal BlockState DeflateSlow(FlushType flush)
         {
             //    short hash_head = 0;    // head of hash chain
-            int hash_head = 0; // head of hash chain
+            var hash_head = 0; // head of hash chain
             bool bflush; // set if current block must be flushed
 
             // Process the input block.
@@ -1336,7 +1336,7 @@ namespace Ionic.Zlib
                 // match is not better, output the previous match:
                 if (prev_length >= MIN_MATCH && match_length <= prev_length)
                 {
-                    int max_insert = strstart + lookahead - MIN_MATCH;
+                    var max_insert = strstart + lookahead - MIN_MATCH;
                     // Do not insert strings in hash table beyond this.
 
                     //          check_match(strstart-1, prev_match, prev_length);
@@ -1422,23 +1422,23 @@ namespace Ionic.Zlib
 
         internal int longest_match(int cur_match)
         {
-            int chain_length = config.MaxChainLength; // max hash chain length
-            int scan         = strstart;              // current string
+            var chain_length = config.MaxChainLength; // max hash chain length
+            var scan         = strstart;              // current string
             int match;                                // matched string
             int len;                                  // length of current match
-            int best_len     = prev_length;           // best match length so far
-            int limit        = strstart > (w_size - MIN_LOOKAHEAD) ? strstart - (w_size - MIN_LOOKAHEAD) : 0;
+            var best_len     = prev_length;           // best match length so far
+            var limit        = strstart > (w_size - MIN_LOOKAHEAD) ? strstart - (w_size - MIN_LOOKAHEAD) : 0;
 
-            int niceLength = config.NiceLength;
+            var niceLength = config.NiceLength;
 
             // Stop when cur_match becomes <= limit. To simplify the code,
             // we prevent matches with the string of window index 0.
 
-            int wmask = w_mask;
+            var wmask = w_mask;
 
-            int strend = strstart + MAX_MATCH;
-            byte scan_end1 = window[scan + best_len - 1];
-            byte scan_end = window[scan + best_len];
+            var strend = strstart + MAX_MATCH;
+            var scan_end1 = window[scan + best_len - 1];
+            var scan_end = window[scan + best_len];
 
             // The code is optimized for HASH_BITS >= 8 and MAX_MATCH-2 multiple of 16.
             // It is easy to get rid of this optimization if necessary.
@@ -1640,11 +1640,11 @@ namespace Ionic.Zlib
 
         internal int SetParams(CompressionLevel level, CompressionStrategy strategy)
         {
-            int result = ZlibConstants.Z_OK;
+            var result = ZlibConstants.Z_OK;
 
             if (compressionLevel != level)
             {
-                Config newConfig = Config.Lookup(level);
+                var newConfig = Config.Lookup(level);
 
                 // change in the deflate flavor (Fast vs slow vs none)?
                 if (newConfig.Flavor != config.Flavor && _codec.TotalBytesIn != 0)
@@ -1667,8 +1667,8 @@ namespace Ionic.Zlib
 
         internal int SetDictionary(byte[] dictionary)
         {
-            int length = dictionary.Length;
-            int index = 0;
+            var length = dictionary.Length;
+            var index = 0;
 
             if (dictionary == null || status != INIT_STATE)
                 throw new ZlibException("Stream error.");
@@ -1693,7 +1693,7 @@ namespace Ionic.Zlib
             ins_h = window[0] & 0xff;
             ins_h = (((ins_h) << hash_shift) ^ (window[1] & 0xff)) & hash_mask;
 
-            for (int n = 0; n <= length - MIN_MATCH; n++)
+            for (var n = 0; n <= length - MIN_MATCH; n++)
             {
                 ins_h = (((ins_h) << hash_shift) ^ (window[(n) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
                 prev[n & w_mask] = head[ins_h];
@@ -1727,8 +1727,8 @@ namespace Ionic.Zlib
             // Write the zlib (rfc1950) header bytes
             if (status == INIT_STATE)
             {
-                int header = (Z_DEFLATED + ((w_bits - 8) << 4)) << 8;
-                int level_flags = (((int)compressionLevel - 1) & 0xff) >> 1;
+                var header = (Z_DEFLATED + ((w_bits - 8) << 4)) << 8;
+                var level_flags = (((int)compressionLevel - 1) & 0xff) >> 1;
 
                 if (level_flags > 3)
                     level_flags = 3;
@@ -1802,7 +1802,7 @@ namespace Ionic.Zlib
             // Start a new block or continue the current one.
             if (_codec.AvailableBytesIn != 0 || lookahead != 0 || (flush != FlushType.None && status != FINISH_STATE))
             {
-                BlockState bstate = DeflateFunction(flush);
+                var bstate = DeflateFunction(flush);
 
                 if (bstate == BlockState.FinishStarted || bstate == BlockState.FinishDone)
                 {
@@ -1838,7 +1838,7 @@ namespace Ionic.Zlib
                         if (flush == FlushType.Full)
                         {
                             // clear hash (forget the history)
-                            for (int i = 0; i < hash_size; i++)
+                            for (var i = 0; i < hash_size; i++)
                                 head[i] = 0;
                         }
                     }

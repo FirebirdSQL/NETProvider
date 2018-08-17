@@ -161,9 +161,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				_database.XdrStream.Flush();
 
-				GenericResponse response = _database.ReadGenericResponse();
+				var response = _database.ReadGenericResponse();
 
-				int responseLength = bufferLength;
+				var responseLength = bufferLength;
 
 				if (response.Data.Length < bufferLength)
 				{

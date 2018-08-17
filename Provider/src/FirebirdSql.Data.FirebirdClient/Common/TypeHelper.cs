@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Common
 
 		public static int GetSqlTypeFromDbDataType(DbDataType type, bool isNullable)
 		{
-			int sqltype = 0;
+			var sqltype = 0;
 
 			switch (type)
 			{

@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.Common
 				value = (short)IPAddress.NetworkToHostOrder(value);
 			}
 
-			byte[] buffer = BitConverter.GetBytes(value);
+			var buffer = BitConverter.GetBytes(value);
 
 			_stream.Write(buffer, 0, buffer.Length);
 		}
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.Common
 				value = (int)IPAddress.NetworkToHostOrder(value);
 			}
 
-			byte[] buffer = BitConverter.GetBytes(value);
+			var buffer = BitConverter.GetBytes(value);
 
 			_stream.Write(buffer, 0, buffer.Length);
 		}

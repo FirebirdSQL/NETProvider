@@ -63,14 +63,14 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		{
 			try
 			{
-				using (SspiHelper sspiHelper = new SspiHelper())
+				using (var sspiHelper = new SspiHelper())
 				{
-					byte[] authData = sspiHelper.InitializeClientSecurity();
+					var authData = sspiHelper.InitializeClientSecurity();
 					SendTrustedAuthToBuffer(dpb, authData);
 					SendAttachToBuffer(dpb, database);
 					XdrStream.Flush();
 
-					IResponse response = ReadResponse();
+					var response = ReadResponse();
 					ProcessTrustedAuthResponse(sspiHelper, ref response);
 					ProcessAttachResponse((GenericResponse)response);
 				}
@@ -98,7 +98,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		{
 			while (response is AuthResponse)
 			{
-				byte[] authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
+				var authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
 				XdrStream.Write(IscCodes.op_trusted_auth);
 				XdrStream.WriteBuffer(authData);
 				XdrStream.Flush();
@@ -140,9 +140,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			if (DeferredPackets.Count > 0)
 			{
 				// copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
-				Action<IResponse>[] methods = DeferredPackets.ToArray();
+				var methods = DeferredPackets.ToArray();
 				DeferredPackets.Clear();
-				foreach (Action<IResponse> method in methods)
+				foreach (var method in methods)
 				{
 					method(ReadSingleResponse());
 				}

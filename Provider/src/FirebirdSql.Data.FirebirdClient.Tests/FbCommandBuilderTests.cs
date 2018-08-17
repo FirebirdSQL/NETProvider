@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetInsertCommandTest()
 		{
-			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
+			var builder = new FbCommandBuilder(_adapter);
 
 			StringAssert.StartsWith("INSERT", builder.GetInsertCommand().CommandText);
 
@@ -74,7 +74,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetUpdateCommandTest()
 		{
-			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
+			var builder = new FbCommandBuilder(_adapter);
 
 			StringAssert.StartsWith("UPDATE", builder.GetUpdateCommand().CommandText);
 
@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetDeleteCommandTest()
 		{
-			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
+			var builder = new FbCommandBuilder(_adapter);
 
 			StringAssert.StartsWith("DELETE", builder.GetDeleteCommand().CommandText);
 
@@ -94,7 +94,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void RefreshSchemaTest()
 		{
-			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
+			var builder = new FbCommandBuilder(_adapter);
 
 			Assert.DoesNotThrow(() => builder.GetInsertCommand());
 			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			_adapter.SelectCommand.CommandText = "select TEST.*, 0 AS VALOR from TEST";
 
-			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
+			var builder = new FbCommandBuilder(_adapter);
 
 			StringAssert.DoesNotContain("VALOR", builder.GetUpdateCommand().CommandText);
 
@@ -126,7 +126,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DeriveParameters()
 		{
-			FbCommand command = new FbCommand("GETVARCHARFIELD", Connection);
+			var command = new FbCommand("GETVARCHARFIELD", Connection);
 
 			command.CommandType = CommandType.StoredProcedure;
 
@@ -138,9 +138,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DeriveParameters2()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand command = new FbCommand("GETVARCHARFIELD", Connection, transaction);
+			var command = new FbCommand("GETVARCHARFIELD", Connection, transaction);
 
 			command.CommandType = CommandType.StoredProcedure;
 
@@ -156,9 +156,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			Assert.Throws<InvalidOperationException>(() =>
 			{
-				FbTransaction transaction = Connection.BeginTransaction();
+				var transaction = Connection.BeginTransaction();
 
-				FbCommand command = new FbCommand("BlaBlaBla", Connection, transaction);
+				var command = new FbCommand("BlaBlaBla", Connection, transaction);
 
 				command.CommandType = CommandType.StoredProcedure;
 
@@ -173,7 +173,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			Connection.Close();
 
-			FbCommandBuilder builder = new FbCommandBuilder(_adapter);
+			var builder = new FbCommandBuilder(_adapter);
 
 			Assert.DoesNotThrow(() => builder.GetInsertCommand());
 			Assert.DoesNotThrow(() => builder.GetUpdateCommand());

@@ -51,13 +51,13 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				try
 				{
 					var bits = new BitArray(_parameters.Count);
-					for (int i = 0; i < _parameters.Count; i++)
+					for (var i = 0; i < _parameters.Count; i++)
 					{
 						var field = _parameters[i];
 						bits.Set(i, field.DbValue.IsDBNull());
 					}
 					var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
-					for (int i = 0; i < buffer.Length * 8; i++)
+					for (var i = 0; i < buffer.Length * 8; i++)
 					{
 						var index = i / 8;
 						// LSB
@@ -87,12 +87,12 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		protected override DbValue[] ReadRow()
 		{
-			DbValue[] row = new DbValue[_fields.Count];
+			var row = new DbValue[_fields.Count];
 			try
 			{
 				var nullBytes = _database.XdrStream.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
 				var nullBits = new BitArray(nullBytes);
-				for (int i = 0; i < _fields.Count; i++)
+				for (var i = 0; i < _fields.Count; i++)
 				{
 					if (nullBits.Get(i))
 					{

@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SQLSTATETest()
 		{
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "drop exception nonexisting";
 				try

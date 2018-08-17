@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Common
 		public static IscException ForErrorCodes(IEnumerable<int> errorCodes, Exception innerException = null)
 		{
 			var result = new IscException(innerException);
-			foreach (int errorCode in errorCodes)
+			foreach (var errorCode in errorCodes)
 			{
 				result.Errors.Add(new IscError(IscCodes.isc_arg_gds, errorCode));
 			}
@@ -148,7 +148,7 @@ namespace FirebirdSql.Data.Common
 
 		private void BuildSqlState()
 		{
-			IscError error = Errors.Find(e => e.Type == IscCodes.isc_arg_sql_state);
+			var error = Errors.Find(e => e.Type == IscCodes.isc_arg_sql_state);
 			// step #1, maybe we already have a SQLSTATE stuffed in the status vector
 			if (error != null)
 			{
@@ -163,17 +163,17 @@ namespace FirebirdSql.Data.Common
 
 		private void BuildExceptionMessage()
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 
-			for (int i = 0; i < Errors.Count; i++)
+			for (var i = 0; i < Errors.Count; i++)
 			{
 				if (Errors[i].Type == IscCodes.isc_arg_gds || Errors[i].Type == IscCodes.isc_arg_warning)
 				{
-					int code = Errors[i].ErrorCode;
-					string message = GetValueOrDefault(IscErrorMessages.Values, code, BuildDefaultErrorMessage);
+					var code = Errors[i].ErrorCode;
+					var message = GetValueOrDefault(IscErrorMessages.Values, code, BuildDefaultErrorMessage);
 
-					List<string> args = new List<string>();
-					int index = i + 1;
+					var args = new List<string>();
+					var index = i + 1;
 					while (index < Errors.Count && Errors[index].IsArgument)
 					{
 						args.Add(Errors[index++].StrParam);
@@ -211,7 +211,7 @@ namespace FirebirdSql.Data.Common
 			}
 
 			// Update error	collection only	with the main error
-			IscError mainError = new IscError(ErrorCode);
+			var mainError = new IscError(ErrorCode);
 			mainError.Message = builder.ToString();
 
 			Errors.Add(mainError);

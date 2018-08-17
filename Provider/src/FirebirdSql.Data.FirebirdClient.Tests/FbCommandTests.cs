@@ -46,14 +46,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			Transaction = Connection.BeginTransaction();
 
-			FbCommand command = Connection.CreateCommand();
+			var command = Connection.CreateCommand();
 
 			command.Transaction = Transaction;
 			command.CommandText = "insert into TEST	(INT_FIELD)	values (?) ";
 
 			command.Parameters.Add("@INT_FIELD", 100);
 
-			int affectedRows = command.ExecuteNonQuery();
+			var affectedRows = command.ExecuteNonQuery();
 
 			Assert.AreEqual(affectedRows, 1);
 
@@ -65,11 +65,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ExecuteReaderTest()
 		{
-			FbCommand command = Connection.CreateCommand();
+			var command = Connection.CreateCommand();
 
 			command.CommandText = "select *	from TEST";
 
-			FbDataReader reader = command.ExecuteReader();
+			var reader = command.ExecuteReader();
 			reader.Close();
 
 			command.Dispose();
@@ -78,14 +78,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ExecuteMultipleReaderTest()
 		{
-			FbCommand command1 = Connection.CreateCommand();
-			FbCommand command2 = Connection.CreateCommand();
+			var command1 = Connection.CreateCommand();
+			var command2 = Connection.CreateCommand();
 
 			command1.CommandText = "select * from test where int_field = 1";
 			command2.CommandText = "select * from test where int_field = 2";
 
-			FbDataReader r1 = command1.ExecuteReader();
-			FbDataReader r2 = command2.ExecuteReader();
+			var r1 = command1.ExecuteReader();
+			var r2 = command2.ExecuteReader();
 
 			r2.Close();
 
@@ -106,9 +106,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ExecuteReaderWithBehaviorTest()
 		{
-			FbCommand command = new FbCommand("select *	from TEST", Connection);
+			var command = new FbCommand("select *	from TEST", Connection);
 
-			FbDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
+			var reader = command.ExecuteReader(CommandBehavior.CloseConnection);
 			reader.Close();
 
 			command.Dispose();
@@ -117,12 +117,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ExecuteScalarTest()
 		{
-			FbCommand command = Connection.CreateCommand();
+			var command = Connection.CreateCommand();
 
 			command.CommandText = "select CHAR_FIELD from TEST where INT_FIELD = ?";
 			command.Parameters.Add("@INT_FIELD", 2);
 
-			string charFieldValue = command.ExecuteScalar().ToString();
+			var charFieldValue = command.ExecuteScalar().ToString();
 
 			Assert.AreEqual("IRow 2", charFieldValue.TrimEnd(' '));
 
@@ -132,12 +132,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ExecuteScalarWithStoredProcedureTest()
 		{
-			FbCommand command = Connection.CreateCommand();
+			var command = Connection.CreateCommand();
 
 			command.CommandText = "SimpleSP";
 			command.CommandType = CommandType.StoredProcedure;
 
-			int result = (int)command.ExecuteScalar();
+			var result = (int)command.ExecuteScalar();
 
 			Assert.AreEqual(1000, result);
 
@@ -147,12 +147,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void PrepareTest()
 		{
-			FbCommand command = new FbCommand("insert into PrepareTest(test_field) values(@test_field);", Connection);
+			var command = new FbCommand("insert into PrepareTest(test_field) values(@test_field);", Connection);
 
 			command.Parameters.Add("@test_field", FbDbType.VarChar).Value = DBNull.Value;
 			command.Prepare();
 
-			for (int i = 0; i < 5; i++)
+			for (var i = 0; i < 5; i++)
 			{
 				if (i < 1)
 				{
@@ -167,9 +167,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			command.Dispose();
 
-			FbCommand select = new FbCommand("select * from	PrepareTest", Connection);
-			FbDataReader reader = select.ExecuteReader();
-			int count = 0;
+			var select = new FbCommand("select * from	PrepareTest", Connection);
+			var reader = select.ExecuteReader();
+			var count = 0;
 			while (reader.Read())
 			{
 				if (count == 0)
@@ -190,16 +190,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void NamedParametersTest()
 		{
-			FbCommand command = Connection.CreateCommand();
+			var command = Connection.CreateCommand();
 
 			command.CommandText = "select CHAR_FIELD from TEST where INT_FIELD = @int_field	or CHAR_FIELD =	@char_field";
 
 			command.Parameters.Add("@int_field", 2);
 			command.Parameters.Add("@char_field", "TWO");
 
-			FbDataReader reader = command.ExecuteReader();
+			var reader = command.ExecuteReader();
 
-			int count = 0;
+			var count = 0;
 
 			while (reader.Read())
 			{
@@ -215,13 +215,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void NamedParametersAndLiterals()
 		{
-			string sql = "update test set char_field = 'carlos@firebird.org', bigint_field = @bigint, varchar_field	= 'carlos@ado.net' where int_field = @integer";
+			var sql = "update test set char_field = 'carlos@firebird.org', bigint_field = @bigint, varchar_field	= 'carlos@ado.net' where int_field = @integer";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@bigint", FbDbType.BigInt).Value = 200;
 			command.Parameters.Add("@integer", FbDbType.Integer).Value = 1;
 
-			int recordsAffected = command.ExecuteNonQuery();
+			var recordsAffected = command.ExecuteNonQuery();
 
 			command.Dispose();
 
@@ -231,15 +231,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void NamedParametersReuseTest()
 		{
-			string sql = "select * from	test where int_field >=	@lang and int_field	<= @lang";
+			var sql = "select * from	test where int_field >=	@lang and int_field	<= @lang";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@lang", FbDbType.Integer).Value = 10;
 
-			FbDataReader reader = command.ExecuteReader();
+			var reader = command.ExecuteReader();
 
-			int count = 0;
-			int intValue = 0;
+			var count = 0;
+			var intValue = 0;
 
 			while (reader.Read())
 			{
@@ -260,7 +260,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ExecuteStoredProcTest()
 		{
-			FbCommand command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection);
+			var command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection);
 
 			command.CommandType = CommandType.StoredProcedure;
 
@@ -277,11 +277,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void RecordAffectedTest()
 		{
-			string sql = "insert into test (int_field) values (100000)";
+			var sql = "insert into test (int_field) values (100000)";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 
-			FbDataReader reader = command.ExecuteReader();
+			var reader = command.ExecuteReader();
 
 			Assert.AreEqual(1, reader.RecordsAffected);
 
@@ -297,7 +297,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ExecuteNonQueryWithOutputParameters()
 		{
-			FbCommand command = new FbCommand("EXECUTE PROCEDURE GETASCIIBLOB(?)", Connection);
+			var command = new FbCommand("EXECUTE PROCEDURE GETASCIIBLOB(?)", Connection);
 
 			command.CommandType = CommandType.StoredProcedure;
 
@@ -316,12 +316,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InvalidParameterFormat()
 		{
-			string sql = "update test set timestamp_field =	@timestamp where int_field = @integer";
+			var sql = "update test set timestamp_field =	@timestamp where int_field = @integer";
 
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 			try
 			{
-				FbCommand command = new FbCommand(sql, Connection, transaction);
+				var command = new FbCommand(sql, Connection, transaction);
 				command.Parameters.Add("@timestamp", FbDbType.TimeStamp).Value = 1;
 				command.Parameters.Add("@integer", FbDbType.Integer).Value = 1;
 
@@ -342,12 +342,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			try
 			{
-				using (FbCommand create = new FbCommand("CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10))", Connection))
+				using (var create = new FbCommand("CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10))", Connection))
 				{
 					create.ExecuteNonQuery();
 				}
 
-				ArrayList l = new ArrayList();
+				var l = new ArrayList();
 
 				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1')");
 				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11')");
@@ -356,28 +356,28 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 				foreach (string statement in l)
 				{
-					using (FbCommand insert = new FbCommand(statement, Connection))
+					using (var insert = new FbCommand(statement, Connection))
 					{
 						insert.ExecuteNonQuery();
 					}
 				}
 
-				string sql = "select * from	varchartest";
+				var sql = "select * from	varchartest";
 
-				using (FbCommand cmd = new FbCommand(sql, Connection))
+				using (var cmd = new FbCommand(sql, Connection))
 				{
-					using (FbDataReader r = cmd.ExecuteReader())
+					using (var r = cmd.ExecuteReader())
 					{
 						while (r.Read())
 						{
-							object dummy = r[0];
+							var dummy = r[0];
 						}
 					}
 				}
 			}
 			finally
 			{
-				using (FbCommand drop = new FbCommand("DROP TABLE VARCHARTEST", Connection))
+				using (var drop = new FbCommand("DROP TABLE VARCHARTEST", Connection))
 				{
 					drop.ExecuteNonQuery();
 				}
@@ -428,13 +428,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertDateTest()
 		{
-			string sql = "insert into TEST (int_field, date_field) values (1002, @date)";
+			var sql = "insert into TEST (int_field, date_field) values (1002, @date)";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 
 			command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
 
-			int ra = command.ExecuteNonQuery();
+			var ra = command.ExecuteNonQuery();
 
 			Assert.AreEqual(ra, 1);
 		}
@@ -442,9 +442,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertNullTest()
 		{
-			string sql = "insert into TEST (int_field) values (@value)";
+			var sql = "insert into TEST (int_field) values (@value)";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@value", FbDbType.Integer).Value = null;
 
 			try
@@ -460,22 +460,22 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertDateTimeTest()
 		{
-			DateTime value = DateTime.Now;
+			var value = DateTime.Now;
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (int_field, timestamp_field) values (1002, @dt)";
 				cmd.Parameters.Add("@dt", FbDbType.TimeStamp).Value = value;
 
-				int ra = cmd.ExecuteNonQuery();
+				var ra = cmd.ExecuteNonQuery();
 
 				Assert.AreEqual(ra, 1);
 			}
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select timestamp_field from test where int_field = 1002";
-				DateTime result = (DateTime)cmd.ExecuteScalar();
+				var result = (DateTime)cmd.ExecuteScalar();
 
 				Assert.AreEqual(value.ToString(), result.ToString());
 			}
@@ -484,22 +484,22 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertTimeStampTest()
 		{
-			string value = DateTime.Now.ToString();
+			var value = DateTime.Now.ToString();
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (int_field, timestamp_field) values (1002, @ts)";
 				cmd.Parameters.Add("@ts", FbDbType.TimeStamp).Value = value;
 
-				int ra = cmd.ExecuteNonQuery();
+				var ra = cmd.ExecuteNonQuery();
 
 				Assert.AreEqual(ra, 1);
 			}
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select timestamp_field from test where int_field = 1002";
-				DateTime result = (DateTime)cmd.ExecuteScalar();
+				var result = (DateTime)cmd.ExecuteScalar();
 
 				Assert.AreEqual(value, result.ToString());
 			}
@@ -508,22 +508,22 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertTimeTest()
 		{
-			TimeSpan t = new TimeSpan(0, 5, 6, 7, 231);
+			var t = new TimeSpan(0, 5, 6, 7, 231);
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (int_field, time_field) values (2245, @t)";
 				cmd.Parameters.Add("@t", FbDbType.Time).Value = t;
 
-				int ra = cmd.ExecuteNonQuery();
+				var ra = cmd.ExecuteNonQuery();
 
 				Assert.AreEqual(ra, 1);
 			}
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select time_field from test where int_field = 2245";
-				TimeSpan result = (TimeSpan)cmd.ExecuteScalar();
+				var result = (TimeSpan)cmd.ExecuteScalar();
 
 				Assert.AreEqual(t.Hours, result.Hours, "hours are not same");
 				Assert.AreEqual(t.Minutes, result.Minutes, "minutes are not same");
@@ -535,26 +535,26 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertTimeOldTest()
 		{
-			DateTime t = DateTime.Today;
+			var t = DateTime.Today;
 			t = t.AddHours(5);
 			t = t.AddMinutes(6);
 			t = t.AddSeconds(7);
 			t = t.AddMilliseconds(231);
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (int_field, time_field) values (2245, @t)";
 				cmd.Parameters.Add("@t", FbDbType.Time).Value = t;
 
-				int ra = cmd.ExecuteNonQuery();
+				var ra = cmd.ExecuteNonQuery();
 
 				Assert.AreEqual(ra, 1);
 			}
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select time_field from test where int_field = 2245";
-				TimeSpan result = (TimeSpan)cmd.ExecuteScalar();
+				var result = (TimeSpan)cmd.ExecuteScalar();
 
 				Assert.AreEqual(t.Hour, result.Hours, "hours are not same");
 				Assert.AreEqual(t.Minute, result.Minutes, "minutes are not same");
@@ -566,9 +566,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ParameterDescribeTest()
 		{
-			string sql = "insert into TEST (int_field) values (@value)";
+			var sql = "insert into TEST (int_field) values (@value)";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 			command.Prepare();
 			command.Parameters.Add("@value", FbDbType.Integer).Value = 100000;
 
@@ -602,11 +602,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DisposeTest()
 		{
-			DataTable tables = Connection.GetSchema("Tables", new string[] { null, null, null, null });
+			var tables = Connection.GetSchema("Tables", new string[] { null, null, null, null });
 
-			string selectSql = "SELECT * FROM TEST";
+			var selectSql = "SELECT * FROM TEST";
 
-			FbCommand c1 = new FbCommand(selectSql, Connection);
+			var c1 = new FbCommand(selectSql, Connection);
 			IDataReader r = c1.ExecuteReader();
 
 			while (r.Read())
@@ -618,7 +618,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ReturningClauseParameterTest()
 		{
 			const int ColumnValue = 1234;
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
@@ -632,7 +632,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ReturningClauseScalarTest()
 		{
 			const int ColumnValue = 1234;
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
@@ -645,7 +645,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ReturningClauseReaderTest()
 		{
 			const int ColumnValue = 1234;
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
@@ -661,13 +661,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ReadingVarcharOctetsTest()
 		{
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				const string data = "1234";
 				byte[] read = null;
 
 				cmd.CommandText = string.Format("select cast('{0}' as varchar(10) character set octets) from rdb$database", data);
-				using (FbDataReader reader = cmd.ExecuteReader())
+				using (var reader = cmd.ExecuteReader())
 				{
 					if (reader.Read())
 					{
@@ -675,7 +675,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					}
 				}
 
-				byte[] expected = Encoding.ASCII.GetBytes(data);
+				var expected = Encoding.ASCII.GetBytes(data);
 				Assert.AreEqual(expected, read);
 			}
 		}
@@ -683,13 +683,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ReadingCharOctetsTest()
 		{
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				const string data = "1234";
 				byte[] read = null;
 
 				cmd.CommandText = string.Format("select cast('{0}' as char(10) character set octets) from rdb$database", data);
-				using (FbDataReader reader = cmd.ExecuteReader())
+				using (var reader = cmd.ExecuteReader())
 				{
 					if (reader.Read())
 					{
@@ -697,7 +697,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					}
 				}
 
-				byte[] expected = new byte[10];
+				var expected = new byte[10];
 				Encoding.ASCII.GetBytes(data).CopyTo(expected, 0);
 				Assert.AreEqual(expected, read);
 			}
@@ -709,9 +709,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
 
-			bool cancelled = false;
+			var cancelled = false;
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText =
 @"execute block as

@@ -89,14 +89,14 @@ namespace FirebirdSql.Data.Client.Native
 		private static IFbClient GenerateFbClient(string dllName)
 		{
 			// Get the initial TypeBuilder, with a "blank" class definition
-			TypeBuilder tb = CreateTypeBuilder(dllName);
+			var tb = CreateTypeBuilder(dllName);
 
 			// It needs to implement IFbClient, obviously!
 			tb.AddInterfaceImplementation(typeof(IFbClient));
 
 			// Now, go through all the methods in IFbClient and generate the corresponding methods
 			// in our dynamic type.
-			foreach (MethodInfo mi in typeof(IFbClient).GetMethods())
+			foreach (var mi in typeof(IFbClient).GetMethods())
 			{
 				GenerateMethod(tb, mi, dllName);
 			}
@@ -114,12 +114,12 @@ namespace FirebirdSql.Data.Client.Native
 		private static void GenerateMethod(TypeBuilder tb, MethodInfo mi, string dllName)
 		{
 			// These are all the parameters in our method
-			List<ParameterInfo> pis = new List<ParameterInfo>(mi.GetParameters());
+			var pis = new List<ParameterInfo>(mi.GetParameters());
 
 			// We need to keep the parameter types and attributes in a separate array.
-			Type[] ptypes = new Type[pis.Count];
-			ParameterAttributes[] attrs = new ParameterAttributes[pis.Count];
-			for (int i = 0; i < pis.Count; i++)
+			var ptypes = new Type[pis.Count];
+			var attrs = new ParameterAttributes[pis.Count];
+			for (var i = 0; i < pis.Count; i++)
 			{
 				ptypes[i] = pis[i].ParameterType;
 				attrs[i] = pis[i].Attributes;
@@ -127,45 +127,45 @@ namespace FirebirdSql.Data.Client.Native
 
 			// We actually need to create TWO methods - one for the interface implementation, and one for the
 			// P/Invoke declaration. We'll create the P/Invoke definition first.
-			MethodBuilder smb = tb.DefineMethod(
+			var smb = tb.DefineMethod(
 				mi.Name, // The name is the same as the interface name
 						 // P/Invoke methods need special attributes...
 				MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig,
 				mi.ReturnType, ptypes);
 
 			// Get the type of the DllImportAttribute, which we'll attach to this method
-			Type diaType = typeof(DllImportAttribute);
+			var diaType = typeof(DllImportAttribute);
 
 			// Create a CustomAttributeBuilder for the DLLImportAttribute, specifying the constructor that takes a string argument.
-			ConstructorInfo ctor = diaType.GetConstructor(new Type[] { typeof(string) });
-			CustomAttributeBuilder cab = new CustomAttributeBuilder(ctor, new object[] { dllName });
+			var ctor = diaType.GetConstructor(new Type[] { typeof(string) });
+			var cab = new CustomAttributeBuilder(ctor, new object[] { dllName });
 
 			// Assign the DllImport attribute to the smb
 			smb.SetCustomAttribute(cab);
 
 			// Also, any attributes on the actual parameters need to be copied to the P/Invoke declaration as well.
-			for (int i = 0; i < attrs.Length; i++)
+			for (var i = 0; i < attrs.Length; i++)
 			{
 				smb.DefineParameter(i + 1, attrs[i], pis[i].Name);
 			}
 
 			// Now create the interface implementation method
-			MethodBuilder mb = tb.DefineMethod(
+			var mb = tb.DefineMethod(
 				"IFbClient." + mi.Name, // We use the standard "Interface.Method" to do an explicit interface implementation
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual |
 				MethodAttributes.Final,
 				mi.ReturnType, ptypes);
 
 			// Also, any attributes on the actual parameters need to be copied to the P/Invoke declaration as well.
-			for (int i = 0; i < attrs.Length; i++)
+			for (var i = 0; i < attrs.Length; i++)
 			{
 				mb.DefineParameter(i + 1, attrs[i], pis[i].Name);
 			}
 
 			// We need to generate a little IL here to actually call the P/Invoke declaration. Luckily for us, since we're just
 			// going to pass our parameters to the P/Invoke method as-is, we don't need to muck with the eval stack ;-)
-			ILGenerator il = mb.GetILGenerator();
-			for (int i = 1; i <= pis.Count; i++)
+			var il = mb.GetILGenerator();
+			for (var i = 1; i <= pis.Count; i++)
 			{
 				EmitLdarg(il, i);
 			}
@@ -185,12 +185,12 @@ namespace FirebirdSql.Data.Client.Native
 			List<ParameterInfo> pis,
 			ILGenerator il)
 		{
-			bool injectProperties = pis.Select(x => x.ParameterType).Intersect(injectionTypes).Any();
+			var injectProperties = pis.Select(x => x.ParameterType).Intersect(injectionTypes).Any();
 			if (injectProperties)
 			{
 				il.DeclareLocal(returnType);
 				il.Emit(OpCodes.Stloc_0);
-				for (int i = 0; i < pis.Count; i++)
+				for (var i = 0; i < pis.Count; i++)
 				{
 					if (injectionTypes.Contains(pis[i].ParameterType))
 					{
@@ -233,11 +233,11 @@ namespace FirebirdSql.Data.Client.Native
 		/// <returns>An instance of our type, cast as an <see cref="IFbClient"/>.</returns>
 		private static IFbClient CreateInstance(TypeBuilder tb)
 		{
-			Type t = tb.CreateTypeInfo().AsType();
+			var t = tb.CreateTypeInfo().AsType();
 
 #if DEBUG
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
-			AssemblyBuilder ab = (AssemblyBuilder)tb.Assembly;
+			var ab = (AssemblyBuilder)tb.Assembly;
 			ab.Save("DynamicAssembly.dll");
 #endif
 #endif
@@ -261,21 +261,21 @@ namespace FirebirdSql.Data.Client.Native
 			baseName = SanitizeBaseName(baseName);
 
 			// Generate a name for our assembly, based on the name of the DLL.
-			AssemblyName assemblyName = new AssemblyName();
+			var assemblyName = new AssemblyName();
 			assemblyName.Name = baseName + "_Assembly";
 
 			// We create the dynamic assembly in our current AppDomain
 #if NETSTANDARD1_6 || NETSTANDARD2_0
-			AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+			var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 #else
-			AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
+			var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
 #endif
 
 			// Generate the actual module (which is the DLL itself)
 #if NETSTANDARD1_6 || NETSTANDARD2_0
-			ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module");
+			var moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module");
 #else
-			ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module", baseName + ".dll");
+			var moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module", baseName + ".dll");
 #endif
 
 			// Add our type to the module.

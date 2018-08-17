@@ -241,7 +241,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private TransactionParameterBuffer BuildTpb()
 		{
-			FbTransactionOptions options = new FbTransactionOptions();
+			var options = new FbTransactionOptions();
 			options.WaitTimeout = null;
 			options.TransactionBehavior = FbTransactionBehavior.Write;
 
@@ -279,7 +279,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
 		{
-			TransactionParameterBuffer tpb = new TransactionParameterBuffer();
+			var tpb = new TransactionParameterBuffer();
 
 			tpb.Append(IscCodes.isc_tpb_version3);
 

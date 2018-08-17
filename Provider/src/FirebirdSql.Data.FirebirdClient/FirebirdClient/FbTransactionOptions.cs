@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (value.HasValue)
 				{
-					double secs = ((TimeSpan)value).TotalSeconds;
+					var secs = ((TimeSpan)value).TotalSeconds;
 					if (secs < 1 || secs > short.MaxValue)
 						throw new ArgumentException($"The value must be between 1 and {short.MaxValue}.");
 				}

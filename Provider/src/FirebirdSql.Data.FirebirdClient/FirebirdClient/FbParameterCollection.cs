@@ -267,7 +267,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new IndexOutOfRangeException("The specified index does not exist.");
 			}
 
-			FbParameter parameter = this[index];
+			var parameter = this[index];
 			_parameters.RemoveAt(index);
 			ReleaseParameter(parameter);
 		}

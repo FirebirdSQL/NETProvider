@@ -77,7 +77,7 @@ namespace EntityFramework.Firebird
 			}
 
 			// Now make sure we populate the command's parameters from the CQT's parameters:
-			foreach (KeyValuePair<string, TypeUsage> queryParameter in commandTree.Parameters)
+			foreach (var queryParameter in commandTree.Parameters)
 			{
 				FbParameter parameter;
 
@@ -106,7 +106,7 @@ namespace EntityFramework.Firebird
 					throw new InvalidOperationException("SqlGenParametersNotPermitted");
 				}
 
-				foreach (DbParameter parameter in parameters)
+				foreach (var parameter in parameters)
 				{
 					command.Parameters.Add(parameter);
 				}
@@ -148,9 +148,9 @@ namespace EntityFramework.Firebird
 
 		internal static FbParameter CreateSqlParameter(string name, TypeUsage type, ParameterMode mode, object value)
 		{
-			FbParameter result = new FbParameter(name, value);
+			var result = new FbParameter(name, value);
 
-			ParameterDirection direction = MetadataHelpers.ParameterModeToParameterDirection(mode);
+			var direction = MetadataHelpers.ParameterModeToParameterDirection(mode);
 			if (result.Direction != direction)
 			{
 				result.Direction = direction;
@@ -159,7 +159,7 @@ namespace EntityFramework.Firebird
 			// output parameters are handled differently (we need to ensure there is space for return
 			// values where the user has not given a specific Size/MaxLength)
 			var isOutParam = mode != ParameterMode.In;
-			FbDbType sqlDbType = GetSqlDbType(type, isOutParam, out var size);
+			var sqlDbType = GetSqlDbType(type, isOutParam, out var size);
 
 			if (result.FbDbType != sqlDbType)
 			{
@@ -185,7 +185,7 @@ namespace EntityFramework.Firebird
 		private static FbDbType GetSqlDbType(TypeUsage type, bool isOutParam, out int? size)
 		{
 			// only supported for primitive type
-			PrimitiveTypeKind primitiveTypeKind = MetadataHelpers.GetPrimitiveTypeKind(type);
+			var primitiveTypeKind = MetadataHelpers.GetPrimitiveTypeKind(type);
 
 			size = default;
 

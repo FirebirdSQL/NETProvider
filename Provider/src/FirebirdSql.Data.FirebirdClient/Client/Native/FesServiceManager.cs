@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			ClearStatusVector();
 
-			int svcHandle = Handle;
+			var svcHandle = Handle;
 
 			_fbClient.isc_service_attach(
 				_statusVector,
@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			ClearStatusVector();
 
-			int svcHandle = Handle;
+			var svcHandle = Handle;
 
 			_fbClient.isc_service_detach(_statusVector, ref svcHandle);
 
@@ -100,8 +100,8 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			ClearStatusVector();
 
-			int svcHandle = Handle;
-			int reserved = 0;
+			var svcHandle = Handle;
+			var reserved = 0;
 
 			_fbClient.isc_service_start(
 				_statusVector,
@@ -122,8 +122,8 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			ClearStatusVector();
 
-			int svcHandle = Handle;
-			int reserved = 0;
+			var svcHandle = Handle;
+			var reserved = 0;
 
 			_fbClient.isc_service_query(
 				_statusVector,
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void ProcessStatusVector(IntPtr[] statusVector)
 		{
-			IscException ex = FesConnection.ParseStatusVector(statusVector, _charset);
+			var ex = FesConnection.ParseStatusVector(statusVector, _charset);
 
 			if (ex != null)
 			{

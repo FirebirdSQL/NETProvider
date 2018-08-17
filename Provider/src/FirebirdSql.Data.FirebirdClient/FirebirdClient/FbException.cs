@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal void ProcessIscExceptionErrors(IscException innerException)
 		{
-			foreach (IscError error in innerException.Errors)
+			foreach (var error in innerException.Errors)
 			{
 				Errors.Add(error.Message, error.ErrorCode);
 			}

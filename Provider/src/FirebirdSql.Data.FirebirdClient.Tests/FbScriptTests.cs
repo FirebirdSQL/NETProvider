@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void EmptyScript()
 		{
-			FbScript script = new FbScript(string.Empty);
+			var script = new FbScript(string.Empty);
 			script.Parse();
 			Assert.AreEqual(0, script.Results.Count());
 		}
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void WhiteSpacesScript()
 		{
-			FbScript script = new FbScript("\t    \t ");
+			var script = new FbScript("\t    \t ");
 			script.Parse();
 			Assert.AreEqual(0, script.Results.Count());
 		}
@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo where x = 'foobar'";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text, script.Results[0].Text);
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo where x = 'foobar';";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo where x = 'foo;bar'";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text, script.Results[0].Text);
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo where x = 'foo''bar'";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text, script.Results[0].Text);
@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo;select * from bar";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(2, script.Results.Count());
 		}
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo--;select * from bar";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text, script.Results[0].Text);
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo /* foo */";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text, script.Results[0].Text);
@@ -129,7 +129,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo /* foo */;";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
@@ -140,7 +140,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo /* ;foo */";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text, script.Results[0].Text);
@@ -151,7 +151,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @"select * from foo /* ;foo */;";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
@@ -162,7 +162,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			const string text =
 @";";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(0, script.Results.Count());
 		}
@@ -174,7 +174,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 @"/*
 foo
 */;";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.UnknownStatement += (sender, e) =>
 			{
 				if (e.Statement.Text == text.Substring(0, text.Length - 1))
@@ -191,7 +191,7 @@ foo
 		{
 			const string text =
 @"select * from foo;--select * from bar";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.UnknownStatement += (sender, e) =>
 			{
 				if (e.Statement.Text == "--select * from bar")
@@ -209,7 +209,7 @@ foo
 		{
 			const string text =
 @"create db 'foobar'";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.UnknownStatement += (sender, e) =>
 			{
 				if (e.Statement.Text == text)
@@ -228,7 +228,7 @@ foo
 		{
 			const string text =
 @"create package p as begin end";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(SqlStatementType.CreatePackage, script.Results[0].StatementType);
@@ -239,7 +239,7 @@ foo
 		{
 			const string text =
 @"recreate package p as begin end";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(SqlStatementType.RecreatePackage, script.Results[0].StatementType);
@@ -250,7 +250,7 @@ foo
 		{
 			const string text =
 @"create package body p as begin end";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(SqlStatementType.CreatePackageBody, script.Results[0].StatementType);
@@ -261,7 +261,7 @@ foo
 		{
 			const string text =
 @"recreate package body p as begin end";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(SqlStatementType.RecreatePackageBody, script.Results[0].StatementType);
@@ -272,7 +272,7 @@ foo
 		{
 			const string text =
 @"drop package p as begin end";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(SqlStatementType.DropPackage, script.Results[0].StatementType);
@@ -283,7 +283,7 @@ foo
 		{
 			const string text =
 @"drop package body p as begin end";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(SqlStatementType.DropPackageBody, script.Results[0].StatementType);
@@ -294,7 +294,7 @@ foo
 		{
 			const string text =
 @"merge into table t using foo f on f.id = t.id when ";
-			FbScript script = new FbScript(text);
+			var script = new FbScript(text);
 			script.Parse();
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(SqlStatementType.Merge, script.Results[0].StatementType);

@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SavePointTest()
 		{
-			FbCommand command = new FbCommand();
+			var command = new FbCommand();
 
 			Transaction = Connection.BeginTransaction("InitialSavePoint");
 

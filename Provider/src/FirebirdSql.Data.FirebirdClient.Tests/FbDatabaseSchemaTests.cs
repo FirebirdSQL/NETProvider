@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void Columns()
 		{
-			DataTable columns = Connection.GetSchema("Columns");
+			var columns = Connection.GetSchema("Columns");
 
 			columns = Connection.GetSchema("Columns", new string[] { null, null, "TEST", "INT_FIELD" });
 
@@ -92,11 +92,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ForeignKeyColumns()
 		{
-			DataTable foreignKeys = Connection.GetSchema("ForeignKeys");
+			var foreignKeys = Connection.GetSchema("ForeignKeys");
 
 			foreach (DataRow row in foreignKeys.Rows)
 			{
-				DataTable foreignKeyColumns = Connection.GetSchema(
+				var foreignKeyColumns = Connection.GetSchema(
 					"ForeignKeyColumns",
 					new string[] { (string)row["TABLE_CATALOG"], (string)row["TABLE_SCHEMA"], (string)row["TABLE_NAME"], (string)row["CONSTRAINT_NAME"] });
 			}
@@ -129,7 +129,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void PrimaryKeys()
 		{
-			DataTable primaryKeys = Connection.GetSchema("PrimaryKeys");
+			var primaryKeys = Connection.GetSchema("PrimaryKeys");
 
 			primaryKeys = Connection.GetSchema("PrimaryKeys", new string[] { null, null, "TEST" });
 
@@ -139,7 +139,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ProcedureParameters()
 		{
-			DataTable procedureParameters = Connection.GetSchema("ProcedureParameters");
+			var procedureParameters = Connection.GetSchema("ProcedureParameters");
 
 			procedureParameters = Connection.GetSchema("ProcedureParameters", new string[] { null, null, "SELECT_DATA" });
 
@@ -155,7 +155,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void Procedures()
 		{
-			DataTable procedures = Connection.GetSchema("Procedures");
+			var procedures = Connection.GetSchema("Procedures");
 
 			procedures = Connection.GetSchema("Procedures", new string[] { null, null, "SELECT_DATA" });
 
@@ -165,7 +165,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void Procedures_ShouldSkipSchemaAndProperlyUseParametersForProcedureName()
 		{
-			DataTable procedures = Connection.GetSchema("Procedures");
+			var procedures = Connection.GetSchema("Procedures");
 
 			procedures = Connection.GetSchema("Procedures", new string[] { null, "DUMMY_SCHEMA", "SELECT_DATA" });
 
@@ -187,7 +187,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void Tables()
 		{
-			DataTable tables = Connection.GetSchema("Tables");
+			var tables = Connection.GetSchema("Tables");
 
 			tables = Connection.GetSchema("Tables", new string[] { null, null, "TEST" });
 

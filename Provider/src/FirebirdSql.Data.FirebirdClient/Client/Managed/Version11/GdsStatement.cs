@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 			try
 			{
-				int numberOfResponses = 0;
+				var numberOfResponses = 0;
 				if (_state == StatementState.Deallocated)
 				{
 					SendAllocateToBuffer();
@@ -72,11 +72,11 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					}
 
 					numberOfResponses--;
-					GenericResponse prepareResponse = _database.ReadGenericResponse();
-					bool deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
+					var prepareResponse = _database.ReadGenericResponse();
+					var deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
 
 					numberOfResponses--;
-					GenericResponse statementTypeResponse = _database.ReadGenericResponse();
+					var statementTypeResponse = _database.ReadGenericResponse();
 
 					if (allocateResponse != null)
 					{
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 				SendExecuteToBuffer();
 
-				bool readRowsAffectedResponse = false;
+				var readRowsAffectedResponse = false;
 				if (ReturnRecordsAffected &&
 					(StatementType == DbStatementType.Insert ||
 					StatementType == DbStatementType.Delete ||
@@ -130,7 +130,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 				_database.XdrStream.Flush();
 
-				int numberOfResponses =
+				var numberOfResponses =
 					(StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
 				try
 				{
@@ -143,7 +143,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					}
 
 					numberOfResponses--;
-					GenericResponse executeResponse = _database.ReadGenericResponse();
+					var executeResponse = _database.ReadGenericResponse();
 
 					GenericResponse rowsAffectedResponse = null;
 					if (readRowsAffectedResponse)

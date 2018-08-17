@@ -102,7 +102,7 @@ namespace EntityFramework.Firebird.SqlGen
 			if (NeedsRenaming)
 			{
 				string newName;
-				int i = sqlGenerator.AllColumnNames[NewName];
+				var i = sqlGenerator.AllColumnNames[NewName];
 				do
 				{
 					++i;

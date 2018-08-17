@@ -49,10 +49,10 @@ namespace FirebirdSql.Data.Schema
 
 		public DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
-			DataTable dataTable = new DataTable(collectionName);
-			using (FbCommand command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions)))
+			var dataTable = new DataTable(collectionName);
+			using (var command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions)))
 			{
-				using (FbDataAdapter adapter = new FbDataAdapter(command))
+				using (var adapter = new FbDataAdapter(command))
 				{
 					try
 					{
@@ -74,25 +74,25 @@ namespace FirebirdSql.Data.Schema
 
 		protected FbCommand BuildCommand(FbConnection connection, string collectionName, string[] restrictions)
 		{
-			string filter = string.Format("CollectionName='{0}'", collectionName);
-			StringBuilder builder = GetCommandText(restrictions);
-			DataRow[] restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
-			FbTransaction transaction = connection.InnerConnection.ActiveTransaction;
-			FbCommand command = new FbCommand(builder.ToString(), connection, transaction);
+			var filter = string.Format("CollectionName='{0}'", collectionName);
+			var builder = GetCommandText(restrictions);
+			var restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
+			var transaction = connection.InnerConnection.ActiveTransaction;
+			var command = new FbCommand(builder.ToString(), connection, transaction);
 
 			if (restrictions != null && restrictions.Length > 0)
 			{
-				int index = 0;
+				var index = 0;
 
-				for (int i = 0; i < restrictions.Length; i++)
+				for (var i = 0; i < restrictions.Length; i++)
 				{
-					string rname = restriction[i]["RestrictionName"].ToString();
+					var rname = restriction[i]["RestrictionName"].ToString();
 					if (restrictions[i] != null)
 					{
 						// Catalog, Schema and TableType are no real restrictions
 						if (!rname.EndsWith("Catalog") && !rname.EndsWith("Schema") && rname != "TableType")
 						{
-							string pname = string.Format("@p{0}", index++);
+							var pname = string.Format("@p{0}", index++);
 
 							command.Parameters.Add(pname, FbDbType.VarChar, 255).Value = restrictions[i];
 						}
@@ -123,7 +123,7 @@ namespace FirebirdSql.Data.Schema
 
 			foreach (DataRow row in schema.Rows)
 			{
-				for (int i = 0; i < schema.Columns.Count; i++)
+				for (var i = 0; i < schema.Columns.Count; i++)
 				{
 					if (!row.IsNull(schema.Columns[i]) &&
 						schema.Columns[i].DataType == typeof(System.String))

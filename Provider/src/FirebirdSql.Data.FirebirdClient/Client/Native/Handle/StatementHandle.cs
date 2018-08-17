@@ -33,8 +33,8 @@ namespace FirebirdSql.Data.Client.Native.Handle
 				return true;
 			}
 
-			IntPtr[] statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-			StatementHandle @ref = this;
+			var statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+			var @ref = this;
 			FbClient.isc_dsql_free_statement(statusVector, ref @ref, IscCodes.DSQL_drop);
 			handle = @ref.handle;
 

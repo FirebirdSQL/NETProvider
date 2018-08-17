@@ -152,7 +152,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				cmd.Parameters.Add("bool", value);
 				Assert.DoesNotThrow(() => cmd.ExecuteNonQuery());
 			}
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = $"SELECT bool FROM withboolean WHERE id = @id";
 				cmd.Parameters.Add("id", id);

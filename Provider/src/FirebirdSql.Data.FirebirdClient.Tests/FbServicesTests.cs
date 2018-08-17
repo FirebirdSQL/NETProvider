@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var backupName = $"{Guid.NewGuid().ToString()}.bak";
 			void BackupPart()
 			{
-				FbBackup backupSvc = new FbBackup();
+				var backupSvc = new FbBackup();
 
 				backupSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
@@ -77,7 +77,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 			void RestorePart()
 			{
-				FbRestore restoreSvc = new FbRestore();
+				var restoreSvc = new FbRestore();
 
 				restoreSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 				restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
@@ -146,7 +146,7 @@ end";
 		}
 		private void StreamingBackupRestoreTest_BackupPart(MemoryStream buffer)
 		{
-			FbStreamingBackup backupSvc = new FbStreamingBackup();
+			var backupSvc = new FbStreamingBackup();
 
 			backupSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
@@ -158,7 +158,7 @@ end";
 		}
 		private void StreamingBackupRestoreTest_RestorePart(MemoryStream buffer, bool verbose)
 		{
-			FbStreamingRestore restoreSvc = new FbStreamingRestore();
+			var restoreSvc = new FbStreamingRestore();
 
 			restoreSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
@@ -174,7 +174,7 @@ end";
 		[Test]
 		public void ValidationTest()
 		{
-			FbValidation validationSvc = new FbValidation();
+			var validationSvc = new FbValidation();
 
 			validationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 			validationSvc.Options = FbValidationFlags.ValidateDatabase;
@@ -187,7 +187,7 @@ end";
 		[Test]
 		public void SweepTest()
 		{
-			FbValidation validationSvc = new FbValidation();
+			var validationSvc = new FbValidation();
 
 			validationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 			validationSvc.Options = FbValidationFlags.SweepDatabase;
@@ -200,7 +200,7 @@ end";
 		[Test]
 		public void SetPropertiesTest()
 		{
-			FbConfiguration configurationSvc = new FbConfiguration();
+			var configurationSvc = new FbConfiguration();
 
 			configurationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 
@@ -212,7 +212,7 @@ end";
 		[Test]
 		public void ShutdownOnlineTest()
 		{
-			FbConfiguration configurationSvc = new FbConfiguration();
+			var configurationSvc = new FbConfiguration();
 
 			configurationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 
@@ -226,7 +226,7 @@ end";
 			if (!EnsureVersion(new Version("2.5.0.0")))
 				return;
 
-			FbConfiguration configurationSvc = new FbConfiguration();
+			var configurationSvc = new FbConfiguration();
 
 			configurationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 
@@ -237,7 +237,7 @@ end";
 		[Test]
 		public void StatisticsTest()
 		{
-			FbStatistical statisticalSvc = new FbStatistical();
+			var statisticalSvc = new FbStatistical();
 
 			statisticalSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
 			statisticalSvc.Options = FbStatisticalFlags.SystemTablesRelations;
@@ -250,7 +250,7 @@ end";
 		[Test]
 		public void FbLogTest()
 		{
-			FbLog logSvc = new FbLog();
+			var logSvc = new FbLog();
 
 			logSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
@@ -262,19 +262,19 @@ end";
 		[Test]
 		public void AddDeleteUserTest()
 		{
-			FbSecurity securitySvc = new FbSecurity();
+			var securitySvc = new FbSecurity();
 
 			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
 			{
-				FbUserData user = new FbUserData();
+				var user = new FbUserData();
 				user.UserName = "new_user";
 				user.UserPassword = "1";
 				securitySvc.AddUser(user);
 			}
 
 			{
-				FbUserData user = new FbUserData();
+				var user = new FbUserData();
 				user.UserName = "new_user";
 				securitySvc.DeleteUser(user);
 			}
@@ -283,27 +283,27 @@ end";
 		[Test]
 		public void DisplayUser()
 		{
-			FbSecurity securitySvc = new FbSecurity();
+			var securitySvc = new FbSecurity();
 
 			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
-			FbUserData user = securitySvc.DisplayUser("SYSDBA");
+			var user = securitySvc.DisplayUser("SYSDBA");
 		}
 
 		[Test]
 		public void DisplayUsers()
 		{
-			FbSecurity securitySvc = new FbSecurity();
+			var securitySvc = new FbSecurity();
 
 			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
-			FbUserData[] users = securitySvc.DisplayUsers();
+			var users = securitySvc.DisplayUsers();
 		}
 
 		[Test]
 		public void ServerPropertiesTest()
 		{
-			FbServerProperties serverProp = new FbServerProperties();
+			var serverProp = new FbServerProperties();
 
 			serverProp.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
 
@@ -337,7 +337,7 @@ end";
 
 					nbak.Execute();
 				}
-				for (int i = 0; i < Levels; i++)
+				for (var i = 0; i < Levels; i++)
 				{
 					DoLevel(i);
 				}

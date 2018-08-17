@@ -38,17 +38,17 @@ namespace EntityFramework.Firebird.Tests
 		[Test]
 		public void ProviderManifestTest()
 		{
-			DbProviderManifest manifest = GetProviderServices().GetProviderManifest("foobar");
+			var manifest = GetProviderServices().GetProviderManifest("foobar");
 			Assert.IsNotNull(manifest);
 		}
 
 		[Test]
 		public void ProviderManifestTokenTest()
 		{
-			string token = GetProviderServices().GetProviderManifestToken(Connection);
+			var token = GetProviderServices().GetProviderManifestToken(Connection);
 			Assert.IsNotNull(token);
 			Assert.IsNotEmpty(token);
-			Version v = new Version(token);
+			var v = new Version(token);
 			Assert.Greater(v.Major, 0);
 			Assert.GreaterOrEqual(v.Minor, 0);
 			Assert.AreEqual(v.Build, -1);

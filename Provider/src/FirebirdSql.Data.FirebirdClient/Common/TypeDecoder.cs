@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Common
 		public static decimal DecodeDecimal(object value, int scale, int sqltype)
 		{
 			long divisor = 1;
-			decimal returnValue = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+			var returnValue = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
 
 			if (scale < 0)
 			{
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Common
 				year += 1;
 			}
 
-			DateTime date = new DateTime(year, month, day);
+			var date = new DateTime(year, month, day);
 
 			return date.Date;
 		}

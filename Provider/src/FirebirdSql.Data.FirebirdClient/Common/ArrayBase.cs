@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Common
 
 		public Array Read()
 		{
-			byte[] slice = GetSlice(GetSliceLength(true));
+			var slice = GetSlice(GetSliceLength(true));
 
 			return DecodeSlice(slice);
 		}
@@ -83,10 +83,10 @@ namespace FirebirdSql.Data.Common
 		{
 			_descriptor.Dimensions = (short)sourceArray.Rank;
 
-			for (int i = 0; i < sourceArray.Rank; i++)
+			for (var i = 0; i < sourceArray.Rank; i++)
 			{
-				int lb = _descriptor.Bounds[i].LowerBound;
-				int ub = sourceArray.GetLength(i) - 1 + lb;
+				var lb = _descriptor.Bounds[i].LowerBound;
+				var ub = sourceArray.GetLength(i) - 1 + lb;
 
 				_descriptor.Bounds[i].UpperBound = ub;
 			}
@@ -96,14 +96,14 @@ namespace FirebirdSql.Data.Common
 		{
 			LookupDesc();
 
-			using (StatementBase lookup = DB.CreateStatement(Transaction))
+			using (var lookup = DB.CreateStatement(Transaction))
 			{
 				lookup.Prepare(GetArrayBounds());
 				lookup.Execute();
 
 				_descriptor.Bounds = new ArrayBound[16];
 				DbValue[] values;
-				int i = 0;
+				var i = 0;
 				while ((values = lookup.Fetch()) != null)
 				{
 					_descriptor.Bounds[i].LowerBound = values[0].GetInt32();
@@ -116,13 +116,13 @@ namespace FirebirdSql.Data.Common
 
 		public void LookupDesc()
 		{
-			using (StatementBase lookup = DB.CreateStatement(Transaction))
+			using (var lookup = DB.CreateStatement(Transaction))
 			{
 				lookup.Prepare(GetArrayDesc());
 				lookup.Execute();
 
 				_descriptor = new ArrayDesc();
-				DbValue[] values = lookup.Fetch();
+				var values = lookup.Fetch();
 				if (values != null && values.Length > 0)
 				{
 					_descriptor.RelationName = _tableName;
@@ -148,14 +148,14 @@ namespace FirebirdSql.Data.Common
 
 		protected int GetSliceLength(bool read)
 		{
-			int elements = 1;
-			for (int i = 0; i < _descriptor.Dimensions; i++)
+			var elements = 1;
+			for (var i = 0; i < _descriptor.Dimensions; i++)
 			{
-				ArrayBound bound = _descriptor.Bounds[i];
+				var bound = _descriptor.Bounds[i];
 				elements *= bound.UpperBound - bound.LowerBound + 1;
 			}
 
-			int length = elements * _descriptor.Length;
+			var length = elements * _descriptor.Length;
 
 			switch (_descriptor.DataType)
 			{
@@ -192,7 +192,7 @@ namespace FirebirdSql.Data.Common
 
 		private string GetArrayDesc()
 		{
-			StringBuilder sql = new StringBuilder();
+			var sql = new StringBuilder();
 
 			sql.Append(
 				"SELECT Y.RDB$FIELD_TYPE, Y.RDB$FIELD_SCALE, Y.RDB$FIELD_LENGTH, Y.RDB$DIMENSIONS, X.RDB$FIELD_SOURCE " +
@@ -214,7 +214,7 @@ namespace FirebirdSql.Data.Common
 
 		private string GetArrayBounds()
 		{
-			StringBuilder sql = new StringBuilder();
+			var sql = new StringBuilder();
 
 			sql.Append("SELECT X.RDB$LOWER_BOUND, X.RDB$UPPER_BOUND FROM RDB$FIELD_DIMENSIONS X ");
 

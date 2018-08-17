@@ -41,19 +41,19 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SimpleSelectTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
 
 			csb.Enlist = true;
 
-			using (TransactionScope scope = new TransactionScope())
+			using (var scope = new TransactionScope())
 			{
-				using (FbConnection c = new FbConnection(csb.ToString()))
+				using (var c = new FbConnection(csb.ToString()))
 				{
 					c.Open();
 
-					using (FbCommand command = new FbCommand("select * from TEST where (0=1)", c))
+					using (var command = new FbCommand("select * from TEST where (0=1)", c))
 					{
-						using (FbDataReader r = command.ExecuteReader())
+						using (var r = command.ExecuteReader())
 						{
 							while (r.Read())
 							{
@@ -69,23 +69,23 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertTest()
 		{
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
 
 			csb.Enlist = true;
 
-			using (TransactionScope scope = new TransactionScope())
+			using (var scope = new TransactionScope())
 			{
-				using (FbConnection c = new FbConnection(csb.ToString()))
+				using (var c = new FbConnection(csb.ToString()))
 				{
 					c.Open();
 
-					string sql = "insert into TEST (int_field, date_field) values (1002, @date)";
+					var sql = "insert into TEST (int_field, date_field) values (1002, @date)";
 
-					using (FbCommand command = new FbCommand(sql, c))
+					using (var command = new FbCommand(sql, c))
 					{
 						command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
 
-						int ra = command.ExecuteNonQuery();
+						var ra = command.ExecuteNonQuery();
 
 						Assert.AreEqual(ra, 1);
 					}

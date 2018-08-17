@@ -87,7 +87,7 @@ namespace EntityFramework.Firebird.SqlGen
 			_extentList = new List<Symbol>(extents.Count);
 			_nameToExtent = new Dictionary<string, Symbol>(extents.Count, StringComparer.OrdinalIgnoreCase);
 
-			foreach (Symbol symbol in extents)
+			foreach (var symbol in extents)
 			{
 				_nameToExtent[symbol.Name] = symbol;
 				ExtentList.Add(symbol);

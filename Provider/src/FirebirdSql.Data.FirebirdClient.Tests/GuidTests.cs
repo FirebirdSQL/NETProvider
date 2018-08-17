@@ -40,18 +40,18 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertGuidTest()
 		{
-			Guid newGuid = Guid.Empty;
-			Guid guidValue = Guid.NewGuid();
+			var newGuid = Guid.Empty;
+			var guidValue = Guid.NewGuid();
 
 			// Insert the Guid
-			FbCommand insert = new FbCommand("INSERT INTO GUID_TEST (GUID_FIELD) VALUES (@GuidValue)", Connection);
+			var insert = new FbCommand("INSERT INTO GUID_TEST (GUID_FIELD) VALUES (@GuidValue)", Connection);
 			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = guidValue;
 			insert.ExecuteNonQuery();
 			insert.Dispose();
 
 			// Select the value
-			using (FbCommand select = new FbCommand("SELECT * FROM GUID_TEST", Connection))
-			using (FbDataReader r = select.ExecuteReader())
+			using (var select = new FbCommand("SELECT * FROM GUID_TEST", Connection))
+			using (var r = select.ExecuteReader())
 			{
 				if (r.Read())
 				{
@@ -67,17 +67,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			// Insert the Guid
 			var id = GetId();
-			FbCommand insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection);
+			var insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection);
 			insert.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
 			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = DBNull.Value;
 			insert.ExecuteNonQuery();
 			insert.Dispose();
 
 			// Select the value
-			using (FbCommand select = new FbCommand("SELECT * FROM GUID_TEST WHERE INT_FIELD = @IntField", Connection))
+			using (var select = new FbCommand("SELECT * FROM GUID_TEST WHERE INT_FIELD = @IntField", Connection))
 			{
 				select.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
-				using (FbDataReader r = select.ExecuteReader())
+				using (var r = select.ExecuteReader())
 				{
 					if (r.Read())
 					{

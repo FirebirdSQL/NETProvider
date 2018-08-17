@@ -31,13 +31,13 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 		{
 			if (pNativeData != IntPtr.Zero)
 			{
-				XSQLDA xsqlda = Marshal.PtrToStructure<XSQLDA>(pNativeData);
+				var xsqlda = Marshal.PtrToStructure<XSQLDA>(pNativeData);
 
 				Marshal.DestroyStructure<XSQLDA>(pNativeData);
 
 				for (var i = 0; i < xsqlda.sqln; i++)
 				{
-					IntPtr ptr = GetIntPtr(pNativeData, ComputeLength(i));
+					var ptr = GetIntPtr(pNativeData, ComputeLength(i));
 
 					var sqlvar = new XSQLVAR();
 					MarshalXSQLVARNativeToManaged(ptr, sqlvar, true);
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 		{
 			unsafe
 			{
-				using (BinaryReader reader = new BinaryReader(new UnmanagedMemoryStream((byte*)ptr.ToPointer(), sizeofXSQLVAR)))
+				using (var reader = new BinaryReader(new UnmanagedMemoryStream((byte*)ptr.ToPointer(), sizeofXSQLVAR)))
 				{
 					if (!onlyPointers) xsqlvar.sqltype = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
 					if (!onlyPointers) xsqlvar.sqlscale = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);

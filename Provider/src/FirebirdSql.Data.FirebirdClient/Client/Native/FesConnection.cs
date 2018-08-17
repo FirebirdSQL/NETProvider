@@ -29,17 +29,17 @@ namespace FirebirdSql.Data.Client.Native
 		public static IscException ParseStatusVector(IntPtr[] statusVector, Charset charset)
 		{
 			IscException exception = null;
-			bool eof = false;
+			var eof = false;
 
-			for (int i = 0; i < statusVector.Length;)
+			for (var i = 0; i < statusVector.Length;)
 			{
-				IntPtr arg = statusVector[i++];
+				var arg = statusVector[i++];
 
 				switch (arg.AsInt())
 				{
 					case IscCodes.isc_arg_gds:
 					default:
-						IntPtr er = statusVector[i++];
+						var er = statusVector[i++];
 						if (er != IntPtr.Zero)
 						{
 							if (exception == null)
@@ -58,9 +58,9 @@ namespace FirebirdSql.Data.Client.Native
 					case IscCodes.isc_arg_interpreted:
 					case IscCodes.isc_arg_string:
 						{
-							IntPtr ptr = statusVector[i++];
-							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
+							var ptr = statusVector[i++];
+							var s = Marshal.PtrToStringAnsi(ptr);
+							var arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
@@ -69,9 +69,9 @@ namespace FirebirdSql.Data.Client.Native
 						{
 							i++;
 
-							IntPtr ptr = statusVector[i++];
-							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
+							var ptr = statusVector[i++];
+							var s = Marshal.PtrToStringAnsi(ptr);
+							var arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;
@@ -82,9 +82,9 @@ namespace FirebirdSql.Data.Client.Native
 						break;
 					case IscCodes.isc_arg_sql_state:
 						{
-							IntPtr ptr = statusVector[i++];
-							string s = Marshal.PtrToStringAnsi(ptr);
-							string arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
+							var ptr = statusVector[i++];
+							var s = Marshal.PtrToStringAnsi(ptr);
+							var arg_value = charset.GetString(Encoding2.Default.GetBytes(s));
 							exception.Errors.Add(new IscError(arg.AsInt(), arg_value));
 						}
 						break;

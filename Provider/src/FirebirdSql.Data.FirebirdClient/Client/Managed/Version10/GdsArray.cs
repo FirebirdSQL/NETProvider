@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				byte[] sdl = GenerateSDL(Descriptor);
+				var sdl = GenerateSDL(Descriptor);
 
 				_database.XdrStream.Write(IscCodes.op_get_slice);
 				_database.XdrStream.Write(_transaction.Handle);
@@ -123,8 +123,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				byte[] sdl = GenerateSDL(Descriptor);
-				byte[] slice = EncodeSliceArray(sourceArray);
+				var sdl = GenerateSDL(Descriptor);
+				var slice = EncodeSliceArray(sourceArray);
 
 				_database.XdrStream.Write(IscCodes.op_put_slice);
 				_database.XdrStream.Write(_transaction.Handle);
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.Write(slice, 0, slice.Length);
 				_database.XdrStream.Flush();
 
-				GenericResponse response = _database.ReadGenericResponse();
+				var response = _database.ReadGenericResponse();
 
 				_handle = response.BlobId;
 			}
@@ -152,16 +152,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected override Array DecodeSlice(byte[] slice)
 		{
-			DbDataType dbType = DbDataType.Array;
+			var dbType = DbDataType.Array;
 			Array sliceData = null;
 			Array tempData = null;
-			Type systemType = GetSystemType();
-			int[] lengths = new int[Descriptor.Dimensions];
-			int[] lowerBounds = new int[Descriptor.Dimensions];
-			int type = 0;
-			int index = 0;
+			var systemType = GetSystemType();
+			var lengths = new int[Descriptor.Dimensions];
+			var lowerBounds = new int[Descriptor.Dimensions];
+			var type = 0;
+			var index = 0;
 
-			for (int i = 0; i < Descriptor.Dimensions; i++)
+			for (var i = 0; i < Descriptor.Dimensions; i++)
 			{
 				lowerBounds[i] = Descriptor.Bounds[i].LowerBound;
 				lengths[i] = Descriptor.Bounds[i].UpperBound;
@@ -178,7 +178,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
-			using (XdrStream xdr = new XdrStream(slice, _database.Charset))
+			using (var xdr = new XdrStream(slice, _database.Charset))
 			{
 				while (xdr.Position < xdr.Length)
 				{
@@ -255,13 +255,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				int operation = _database.ReadOperation();
+				var operation = _database.ReadOperation();
 
 				if (operation == IscCodes.op_slice)
 				{
-					bool isVariying = false;
-					int elements = 0;
-					int length = _database.XdrStream.ReadInt32();
+					var isVariying = false;
+					var elements = 0;
+					var length = _database.XdrStream.ReadInt32();
 
 					length = _database.XdrStream.ReadInt32();
 
@@ -288,11 +288,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					if (isVariying)
 					{
-						using (XdrStream xdr = new XdrStream())
+						using (var xdr = new XdrStream())
 						{
-							for (int i = 0; i < elements; i++)
+							for (var i = 0; i < elements; i++)
 							{
-								byte[] buffer = _database.XdrStream.ReadOpaque(_database.XdrStream.ReadInt32());
+								var buffer = _database.XdrStream.ReadOpaque(_database.XdrStream.ReadInt32());
 
 								xdr.WriteBuffer(buffer, buffer.Length);
 							}
@@ -321,22 +321,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private byte[] EncodeSliceArray(Array sourceArray)
 		{
-			DbDataType dbType = DbDataType.Array;
-			Charset charset = _database.Charset;
-			int subType = (Descriptor.Scale < 0) ? 2 : 0;
-			int type = 0;
+			var dbType = DbDataType.Array;
+			var charset = _database.Charset;
+			var subType = (Descriptor.Scale < 0) ? 2 : 0;
+			var type = 0;
 
-			using (XdrStream xdr = new XdrStream(_database.Charset))
+			using (var xdr = new XdrStream(_database.Charset))
 			{
 				type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 				dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
-				foreach (object source in sourceArray)
+				foreach (var source in sourceArray)
 				{
 					switch (dbType)
 					{
 						case DbDataType.Char:
-							byte[] buffer = charset.GetBytes(source.ToString());
+							var buffer = charset.GetBytes(source.ToString());
 							xdr.WriteOpaque(buffer, Descriptor.Length);
 							break;
 
@@ -478,7 +478,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void Stuff(BinaryWriter sdl, short count, params object[] args)
 		{
-			for (int i = 0; i < count; i++)
+			for (var i = 0; i < count; i++)
 			{
 				sdl.Write(Convert.ToByte(args[i], CultureInfo.InvariantCulture));
 			}
@@ -530,7 +530,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			StuffSdl(sdl, (byte)constant);
 			StuffSdl(sdl, (byte)value.Length);
 
-			for (int i = 0; i < value.Length; i++)
+			for (var i = 0; i < value.Length; i++)
 			{
 				StuffSdl(sdl, (byte)value[i]);
 			}

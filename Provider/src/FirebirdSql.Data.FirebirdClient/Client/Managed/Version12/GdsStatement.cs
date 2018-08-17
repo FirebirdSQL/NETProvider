@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 				_database.XdrStream.Flush();
 
-				int numberOfResponses =
+				var numberOfResponses =
 					(StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
 				try
 				{
@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					}
 
 					numberOfResponses--;
-					GenericResponse executeResponse = _database.ReadGenericResponse();
+					var executeResponse = _database.ReadGenericResponse();
 					ProcessExecuteResponse(executeResponse);
 				}
 				finally
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					try
 					{
 						numberOfResponses--;
-						GenericResponse rowsAffectedResponse = _database.ReadGenericResponse();
+						var rowsAffectedResponse = _database.ReadGenericResponse();
 						RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(rowsAffectedResponse));
 					}
 					finally

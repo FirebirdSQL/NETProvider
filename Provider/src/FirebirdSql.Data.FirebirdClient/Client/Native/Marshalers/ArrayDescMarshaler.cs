@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 			{
 				Marshal.DestroyStructure<ArrayDescMarshal>(pNativeData);
 
-				for (int i = 0; i < 16; i++)
+				for (var i = 0; i < 16; i++)
 				{
 					Marshal.DestroyStructure<ArrayBoundMarshal>(pNativeData + ArrayDescMarshal.ComputeLength(i));
 				}
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 		public static IntPtr MarshalManagedToNative(ArrayDesc descriptor)
 		{
-			ArrayDescMarshal arrayDesc = new ArrayDescMarshal();
+			var arrayDesc = new ArrayDescMarshal();
 
 			arrayDesc.DataType = descriptor.DataType;
 			arrayDesc.Scale = (byte)descriptor.Scale;
@@ -53,9 +53,9 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 			arrayDesc.Dimensions = descriptor.Dimensions;
 			arrayDesc.Flags = descriptor.Flags;
 
-			ArrayBoundMarshal[] arrayBounds = new ArrayBoundMarshal[descriptor.Bounds.Length];
+			var arrayBounds = new ArrayBoundMarshal[descriptor.Bounds.Length];
 
-			for (int i = 0; i < descriptor.Dimensions; i++)
+			for (var i = 0; i < descriptor.Dimensions; i++)
 			{
 				arrayBounds[i].LowerBound = (short)descriptor.Bounds[i].LowerBound;
 				arrayBounds[i].UpperBound = (short)descriptor.Bounds[i].UpperBound;
@@ -66,11 +66,11 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 		public static IntPtr MarshalManagedToNative(ArrayDescMarshal arrayDesc, ArrayBoundMarshal[] arrayBounds)
 		{
-			int size = ArrayDescMarshal.ComputeLength(arrayBounds.Length);
-			IntPtr ptr = Marshal.AllocHGlobal(size);
+			var size = ArrayDescMarshal.ComputeLength(arrayBounds.Length);
+			var ptr = Marshal.AllocHGlobal(size);
 
 			Marshal.StructureToPtr(arrayDesc, ptr, true);
-			for (int i = 0; i < arrayBounds.Length; i++)
+			for (var i = 0; i < arrayBounds.Length; i++)
 			{
 				Marshal.StructureToPtr(arrayBounds[i], ptr + ArrayDescMarshal.ComputeLength(i), true);
 			}

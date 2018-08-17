@@ -32,8 +32,8 @@ namespace FirebirdSql.Data.Schema
 
 		protected override StringBuilder GetCommandText(string[] restrictions)
 		{
-			StringBuilder sql = new StringBuilder();
-			StringBuilder where = new StringBuilder();
+			var sql = new StringBuilder();
+			var where = new StringBuilder();
 
 			sql.Append(
 				@"SELECT
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Schema
 
 			if (restrictions != null)
 			{
-				int index = 0;
+				var index = 0;
 
 				/* TABLE_CATALOG */
 				if (restrictions.Length >= 1 && restrictions[0] != null)
@@ -121,15 +121,15 @@ namespace FirebirdSql.Data.Schema
 
 			foreach (DataRow row in schema.Rows)
 			{
-				int blrType = Convert.ToInt32(row["FIELD_TYPE"], CultureInfo.InvariantCulture);
+				var blrType = Convert.ToInt32(row["FIELD_TYPE"], CultureInfo.InvariantCulture);
 
-				int subType = 0;
+				var subType = 0;
 				if (row["COLUMN_SUB_TYPE"] != DBNull.Value)
 				{
 					subType = Convert.ToInt32(row["COLUMN_SUB_TYPE"], CultureInfo.InvariantCulture);
 				}
 
-				int scale = 0;
+				var scale = 0;
 				if (row["NUMERIC_SCALE"] != DBNull.Value)
 				{
 					scale = Convert.ToInt32(row["NUMERIC_SCALE"], CultureInfo.InvariantCulture);
@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.Schema
 				row["IS_NULLABLE"] = (row["COLUMN_NULLABLE"] == DBNull.Value);
 				row["IS_ARRAY"] = (row["COLUMN_ARRAY"] != DBNull.Value);
 
-				FbDbType dbType = (FbDbType)TypeHelper.GetDbDataTypeFromBlrType(blrType, subType, scale);
+				var dbType = (FbDbType)TypeHelper.GetDbDataTypeFromBlrType(blrType, subType, scale);
 				row["COLUMN_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLower(CultureInfo.InvariantCulture);
 
 				if (dbType == FbDbType.Binary || dbType == FbDbType.Text)
@@ -168,7 +168,7 @@ namespace FirebirdSql.Data.Schema
 
 				row["NUMERIC_SCALE"] = (-1) * scale;
 
-				string domainName = row["DOMAIN_NAME"].ToString();
+				var domainName = row["DOMAIN_NAME"].ToString();
 				if (domainName != null && domainName.StartsWith("RDB$"))
 				{
 					row["DOMAIN_NAME"] = null;

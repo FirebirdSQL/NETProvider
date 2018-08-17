@@ -289,9 +289,9 @@ namespace EntityFramework.Firebird.SqlGen
 		{
 			// assumes all arguments are self-describing (no need to use aliases
 			// because no renames are ever used in the projection)
-			bool first = true;
+			var first = true;
 
-			foreach (DbExpression argument in expression.Arguments)
+			foreach (var argument in expression.Arguments)
 			{
 				if (first)
 				{
@@ -336,10 +336,10 @@ namespace EntityFramework.Firebird.SqlGen
 		// generate parameter (name based on parameter ordinal)
 		internal FbParameter CreateParameter(object value, TypeUsage type)
 		{
-			string parameterName = string.Concat("@p", _parameterNameCount.ToString(CultureInfo.InvariantCulture));
+			var parameterName = string.Concat("@p", _parameterNameCount.ToString(CultureInfo.InvariantCulture));
 			_parameterNameCount++;
 
-			FbParameter parameter = FbProviderServices.CreateSqlParameter(parameterName, type, ParameterMode.In, value);
+			var parameter = FbProviderServices.CreateSqlParameter(parameterName, type, ParameterMode.In, value);
 
 			_parameters.Add(parameter);
 
@@ -362,7 +362,7 @@ namespace EntityFramework.Firebird.SqlGen
 							 "DML predicates and setters must be of the form property = value");
 
 				// get name of left property
-				EdmMember property = ((DbPropertyExpression)propertyExpression).Property;
+				var property = ((DbPropertyExpression)propertyExpression).Property;
 
 				// don't track null values
 				if (value.ExpressionKind != DbExpressionKind.Null)
@@ -370,7 +370,7 @@ namespace EntityFramework.Firebird.SqlGen
 					Debug.Assert(value.ExpressionKind == DbExpressionKind.Constant, "value must either constant or null");
 
 					// retrieve the last parameter added (which describes the parameter)
-					DbParameter p = _parameters[_parameters.Count - 1];
+					var p = _parameters[_parameters.Count - 1];
 					if (!_memberValues.ContainsKey(property))
 						_memberValues.Add(property, new List<DbParameter>(new[] { p }));
 					else

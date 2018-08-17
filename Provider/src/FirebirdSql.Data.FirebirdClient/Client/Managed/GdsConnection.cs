@@ -258,13 +258,13 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 
 #if NETSTANDARD1_6
-			IPAddress[] addresses = Dns.GetHostEntryAsync(dataSource).GetAwaiter().GetResult().AddressList;
+			var addresses = Dns.GetHostEntryAsync(dataSource).GetAwaiter().GetResult().AddressList;
 #else
-			IPAddress[] addresses = Dns.GetHostEntry(dataSource).AddressList;
+			var addresses = Dns.GetHostEntry(dataSource).AddressList;
 #endif
 
 			// try to avoid problems with IPv6 addresses
-			foreach (IPAddress address in addresses)
+			foreach (var address in addresses)
 			{
 				if (address.AddressFamily == addressFamily)
 				{
@@ -378,7 +378,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			const int MaxLength = 255 - 1;
 			var part = 0;
-			for (int i = 0; i < data.Length; i += MaxLength)
+			for (var i = 0; i < data.Length; i += MaxLength)
 			{
 				stream.WriteByte(code);
 				var length = Math.Min(data.Length - i, MaxLength);

@@ -111,7 +111,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		private static Dictionary<string, FunctionHandler> InitializeBuiltInFunctionHandlers()
 		{
-			Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(0, StringComparer.Ordinal);
+			var functionHandlers = new Dictionary<string, FunctionHandler>(0, StringComparer.Ordinal);
 			return functionHandlers;
 		}
 
@@ -121,7 +121,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		private static Dictionary<string, FunctionHandler> InitializeCanonicalFunctionHandlers()
 		{
-			Dictionary<string, FunctionHandler> functionHandlers = new Dictionary<string, FunctionHandler>(StringComparer.Ordinal);
+			var functionHandlers = new Dictionary<string, FunctionHandler>(StringComparer.Ordinal);
 
 			#region Other Canonical Functions
 			functionHandlers.Add("NewGuid", HandleCanonicalFunctionNewGuid);
@@ -209,7 +209,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		private static Dictionary<string, string> InitializeFunctionNameToOperatorDictionary()
 		{
-			Dictionary<string, string> functionNameToOperatorDictionary = new Dictionary<string, string>(StringComparer.Ordinal);
+			var functionNameToOperatorDictionary = new Dictionary<string, string>(StringComparer.Ordinal);
 			functionNameToOperatorDictionary.Add("Concat", "||");
 			functionNameToOperatorDictionary.Add("Contains", "CONTAINING");
 			functionNameToOperatorDictionary.Add("StartsWith", "STARTING WITH");
@@ -241,42 +241,42 @@ namespace EntityFramework.Firebird.SqlGen
 			commandType = CommandType.Text;
 
 			//Handle Query
-			DbQueryCommandTree queryCommandTree = tree as DbQueryCommandTree;
+			var queryCommandTree = tree as DbQueryCommandTree;
 			if (queryCommandTree != null)
 			{
-				SqlGenerator sqlGen = new SqlGenerator();
+				var sqlGen = new SqlGenerator();
 				parameters = null;
 				return sqlGen.GenerateSql((DbQueryCommandTree)tree);
 			}
 
 			//Handle Function
-			DbFunctionCommandTree DbFunctionCommandTree = tree as DbFunctionCommandTree;
+			var DbFunctionCommandTree = tree as DbFunctionCommandTree;
 			if (DbFunctionCommandTree != null)
 			{
-				SqlGenerator sqlGen = new SqlGenerator();
+				var sqlGen = new SqlGenerator();
 				parameters = null;
 
-				string sql = sqlGen.GenerateFunctionSql(DbFunctionCommandTree, out commandType);
+				var sql = sqlGen.GenerateFunctionSql(DbFunctionCommandTree, out commandType);
 
 				return sql;
 			}
 
 			//Handle Insert
-			DbInsertCommandTree insertCommandTree = tree as DbInsertCommandTree;
+			var insertCommandTree = tree as DbInsertCommandTree;
 			if (insertCommandTree != null)
 			{
 				return DmlSqlGenerator.GenerateInsertSql(insertCommandTree, out parameters);
 			}
 
 			//Handle Delete
-			DbDeleteCommandTree deleteCommandTree = tree as DbDeleteCommandTree;
+			var deleteCommandTree = tree as DbDeleteCommandTree;
 			if (deleteCommandTree != null)
 			{
 				return DmlSqlGenerator.GenerateDeleteSql(deleteCommandTree, out parameters);
 			}
 
 			//Handle Update
-			DbUpdateCommandTree updateCommandTree = tree as DbUpdateCommandTree;
+			var updateCommandTree = tree as DbUpdateCommandTree;
 			if (updateCommandTree != null)
 			{
 				return DmlSqlGenerator.GenerateUpdateSql(updateCommandTree, out parameters);
@@ -311,7 +311,7 @@ namespace EntityFramework.Firebird.SqlGen
 			ISqlFragment result;
 			if (MetadataHelpers.IsCollectionType(tree.Query.ResultType))
 			{
-				SqlSelectStatement sqlStatement = VisitExpressionEnsureSqlStatement(tree.Query);
+				var sqlStatement = VisitExpressionEnsureSqlStatement(tree.Query);
 				Debug.Assert(sqlStatement != null, "The outer most sql statment is null");
 				sqlStatement.IsTopMost = true;
 				result = sqlStatement;
@@ -319,7 +319,7 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 			else
 			{
-				SqlBuilder sqlBuilder = new SqlBuilder();
+				var sqlBuilder = new SqlBuilder();
 				sqlBuilder.Append("SELECT ");
 				sqlBuilder.Append(tree.Query.Accept(this));
 
@@ -344,13 +344,13 @@ namespace EntityFramework.Firebird.SqlGen
 		/// </summary>
 		private string GenerateFunctionSql(DbFunctionCommandTree tree, out CommandType commandType)
 		{
-			EdmFunction function = tree.EdmFunction;
+			var function = tree.EdmFunction;
 
 			// We expect function to always have these properties
-			string userCommandText = (string)function.MetadataProperties["CommandTextAttribute"].Value;
+			var userCommandText = (string)function.MetadataProperties["CommandTextAttribute"].Value;
 			/// No schema in FB
 			//string userSchemaName = (string)function.MetadataProperties["Schema"].Value;
-			string userFuncName = (string)function.MetadataProperties["StoreFunctionNameAttribute"].Value;
+			var userFuncName = (string)function.MetadataProperties["StoreFunctionNameAttribute"].Value;
 
 			if (String.IsNullOrEmpty(userCommandText))
 			{
@@ -363,13 +363,13 @@ namespace EntityFramework.Firebird.SqlGen
 				//    function.NamespaceName : userSchemaName;
 
 				// if the function store name is not explicitly given, it is assumed to be the metadata name
-				string functionName = String.IsNullOrEmpty(userFuncName) ?
+				var functionName = String.IsNullOrEmpty(userFuncName) ?
 					function.Name : userFuncName;
 
 				// quote elements of function text
 				/// No schema in FB
 				//string quotedSchemaName = QuoteIdentifier(schemaName);
-				string quotedFunctionName = QuoteIdentifier(functionName);
+				var quotedFunctionName = QuoteIdentifier(functionName);
 
 				// separator
 				/// No schema in FB
@@ -377,7 +377,7 @@ namespace EntityFramework.Firebird.SqlGen
 				// concatenate elements of function text
 
 				/// No schema in FB
-				string quotedFunctionText = /*quotedSchemaName + schemaSeparator + */quotedFunctionName;
+				var quotedFunctionText = /*quotedSchemaName + schemaSeparator + */quotedFunctionName;
 
 				return quotedFunctionText;
 			}
@@ -397,8 +397,8 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A string representing the SQL to be executed.</returns>
 		string WriteSql(ISqlFragment sqlStatement)
 		{
-			StringBuilder builder = new StringBuilder(1024);
-			using (SqlWriter writer = new SqlWriter(builder))
+			var builder = new StringBuilder(1024);
+			using (var writer = new SqlWriter(builder))
 			{
 				WriteSql(writer, sqlStatement);
 			}
@@ -433,7 +433,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A <see cref="SqlSelectStatement"/>.</returns>
 		public override ISqlFragment Visit(DbApplyExpression e)
 		{
-			List<DbExpressionBinding> inputs = new List<DbExpressionBinding>();
+			var inputs = new List<DbExpressionBinding>();
 			inputs.Add(e.Input);
 			inputs.Add(e.Apply);
 
@@ -515,12 +515,12 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A <see cref="SqlBuilder"/></returns>
 		public override ISqlFragment Visit(DbCaseExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
 			Debug.Assert(e.When.Count == e.Then.Count);
 
 			result.Append("CASE");
-			for (int i = 0; i < e.When.Count; ++i)
+			for (var i = 0; i < e.When.Count; ++i)
 			{
 				result.Append(" WHEN (");
 				result.Append(e.When[i].Accept(this));
@@ -545,8 +545,8 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		public override ISqlFragment Visit(DbCastExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
-			string sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType);
+			var result = new SqlBuilder();
+			var sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType);
 
 			switch (sqlPrimitiveType.ToLowerInvariant())
 			{
@@ -599,7 +599,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// quotes and escaped.  Numbers are written literally.</returns>
 		public override ISqlFragment Visit(DbConstantExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
 			if (MetadataHelpers.TryGetPrimitiveTypeKind(e.ResultType, out var typeKind))
 			{
@@ -660,7 +660,7 @@ namespace EntityFramework.Firebird.SqlGen
 								precision = (int)precisionFacetDescription.DefaultValue;
 						}
 
-						int maxScale = (pointPosition != -1 ? precision - pointPosition + 1 : 0);
+						var maxScale = (pointPosition != -1 ? precision - pointPosition + 1 : 0);
 
 						result.Append("CAST(");
 						result.Append(strDecimal);
@@ -730,11 +730,11 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A <see cref="SqlSelectStatement"/></returns>
 		public override ISqlFragment Visit(DbDistinctExpression e)
 		{
-			SqlSelectStatement result = VisitExpressionEnsureSqlStatement(e.Argument);
+			var result = VisitExpressionEnsureSqlStatement(e.Argument);
 
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
-				TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(e.Argument.ResultType);
+				var inputType = MetadataHelpers.GetElementTypeUsage(e.Argument.ResultType);
 				result = CreateNewSelectStatement(result, "DISTINCT", inputType, out var fromSymbol);
 				AddFromSymbol(result, "DISTINCT", fromSymbol, false);
 			}
@@ -751,7 +751,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		public override ISqlFragment Visit(DbElementExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("(");
 			result.Append(VisitExpressionEnsureSqlStatement(e.Argument));
 			result.Append(")");
@@ -789,18 +789,18 @@ namespace EntityFramework.Firebird.SqlGen
 		/// with the From field set.</returns>
 		public override ISqlFragment Visit(DbScanExpression e)
 		{
-			EntitySetBase target = e.Target;
+			var target = e.Target;
 
 			if (IsParentAJoin)
 			{
-				SqlBuilder result = new SqlBuilder();
+				var result = new SqlBuilder();
 				result.Append(GetTargetSql(target));
 
 				return result;
 			}
 			else
 			{
-				SqlSelectStatement result = new SqlSelectStatement();
+				var result = new SqlSelectStatement();
 				result.From.Append(GetTargetSql(target));
 
 				return result;
@@ -815,8 +815,8 @@ namespace EntityFramework.Firebird.SqlGen
 		internal static string GetTargetSql(EntitySetBase entitySetBase)
 		{
 			// construct escaped SQL referencing entity set
-			StringBuilder builder = new StringBuilder();
-			string definingQuery = MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "DefiningQuery");
+			var builder = new StringBuilder();
+			var definingQuery = MetadataHelpers.TryGetValueForMetadataProperty<string>(entitySetBase, "DefiningQuery");
 			if (!string.IsNullOrEmpty(definingQuery))
 			{
 				builder.Append("(");
@@ -962,8 +962,8 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A <see cref="SqlSelectStatement"/></returns>
 		public override ISqlFragment Visit(DbGroupByExpression e)
 		{
-			string varName = GetShortenedName(e.Input.VariableName);
-			SqlSelectStatement innerQuery = VisitInputExpression(e.Input.Expression,
+			var varName = GetShortenedName(e.Input.VariableName);
+			var innerQuery = VisitInputExpression(e.Input.Expression,
 				varName, e.Input.VariableType, out var fromSymbol);
 
 			// GroupBy is compatible with Filter and OrderBy
@@ -983,11 +983,11 @@ namespace EntityFramework.Firebird.SqlGen
 
 			// The enumerator is shared by both the keys and the aggregates,
 			// so, we do not close it in between.
-			RowType groupByType = MetadataHelpers.GetEdmType<RowType>(MetadataHelpers.GetEdmType<CollectionType>(e.ResultType).TypeUsage);
+			var groupByType = MetadataHelpers.GetEdmType<RowType>(MetadataHelpers.GetEdmType<CollectionType>(e.ResultType).TypeUsage);
 
 			// Whenever there exists at least one aggregate with an argument that is not simply a PropertyExpression
 			// over a VarRefExpression, we need a nested query in which we alias the arguments to the aggregates.
-			bool needsInnerQuery = NeedsInnerQuery(e.Aggregates);
+			var needsInnerQuery = NeedsInnerQuery(e.Aggregates);
 
 			SqlSelectStatement result;
 			if (needsInnerQuery)
@@ -1006,16 +1006,16 @@ namespace EntityFramework.Firebird.SqlGen
 				members.MoveNext();
 				Debug.Assert(result.Select.IsEmpty);
 
-				string separator = string.Empty;
+				var separator = string.Empty;
 
-				foreach (DbExpression key in e.Keys)
+				foreach (var key in e.Keys)
 				{
-					EdmProperty member = members.Current;
-					string alias = QuoteIdentifier(member.Name);
+					var member = members.Current;
+					var alias = QuoteIdentifier(member.Name);
 
 					result.GroupBy.Append(separator);
 
-					ISqlFragment keySql = key.Accept(this);
+					var keySql = key.Accept(this);
 
 					if (!needsInnerQuery)
 					{
@@ -1054,13 +1054,13 @@ namespace EntityFramework.Firebird.SqlGen
 					members.MoveNext();
 				}
 
-				foreach (DbAggregate aggregate in e.Aggregates)
+				foreach (var aggregate in e.Aggregates)
 				{
-					EdmProperty member = members.Current;
-					string alias = QuoteIdentifier(member.Name);
+					var member = members.Current;
+					var alias = QuoteIdentifier(member.Name);
 
 					Debug.Assert(aggregate.Arguments.Count == 1);
-					ISqlFragment translatedAggregateArgument = aggregate.Arguments[0].Accept(this);
+					var translatedAggregateArgument = aggregate.Arguments[0].Accept(this);
 
 					object aggregateArgument;
 
@@ -1068,7 +1068,7 @@ namespace EntityFramework.Firebird.SqlGen
 					{
 						//In this case the argument to the aggratete is reference to the one projected out by the
 						// inner query
-						SqlBuilder wrappingAggregateArgument = new SqlBuilder();
+						var wrappingAggregateArgument = new SqlBuilder();
 						wrappingAggregateArgument.Append(fromSymbol);
 						wrappingAggregateArgument.Append(".");
 						wrappingAggregateArgument.Append(alias);
@@ -1193,7 +1193,7 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 			#endregion
 
-			List<DbExpressionBinding> inputs = new List<DbExpressionBinding>(2);
+			var inputs = new List<DbExpressionBinding>(2);
 			inputs.Add(e.Left);
 			inputs.Add(e.Right);
 
@@ -1207,7 +1207,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A <see cref="SqlBuilder"/></returns>
 		public override ISqlFragment Visit(DbLikeExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
 			if (!(e.Argument is DbParameterReferenceExpression && e.Pattern is DbParameterReferenceExpression))
 			{
@@ -1240,17 +1240,17 @@ namespace EntityFramework.Firebird.SqlGen
 		{
 			Debug.Assert(e.Limit is DbConstantExpression || e.Limit is DbParameterReferenceExpression, "DbLimitExpression.Limit is of invalid expression type");
 
-			SqlSelectStatement result = VisitExpressionEnsureSqlStatement(e.Argument, false);
+			var result = VisitExpressionEnsureSqlStatement(e.Argument, false);
 
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
-				TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(e.Argument.ResultType);
+				var inputType = MetadataHelpers.GetElementTypeUsage(e.Argument.ResultType);
 
 				result = CreateNewSelectStatement(result, "top", inputType, out var fromSymbol);
 				AddFromSymbol(result, "top", fromSymbol, false);
 			}
 
-			ISqlFragment topCount = HandleCountExpression(e.Limit);
+			var topCount = HandleCountExpression(e.Limit);
 
 			result.First = new FirstClause(topCount);
 			return result;
@@ -1291,25 +1291,25 @@ namespace EntityFramework.Firebird.SqlGen
 		public override ISqlFragment Visit(DbNotExpression e)
 		{
 			// Flatten Not(Not(x)) to x.
-			DbNotExpression notExpression = e.Argument as DbNotExpression;
+			var notExpression = e.Argument as DbNotExpression;
 			if (notExpression != null)
 			{
 				return notExpression.Argument.Accept(this);
 			}
 
-			DbIsEmptyExpression isEmptyExpression = e.Argument as DbIsEmptyExpression;
+			var isEmptyExpression = e.Argument as DbIsEmptyExpression;
 			if (isEmptyExpression != null)
 			{
 				return VisitIsEmptyExpression(isEmptyExpression, true);
 			}
 
-			DbIsNullExpression isNullExpression = e.Argument as DbIsNullExpression;
+			var isNullExpression = e.Argument as DbIsNullExpression;
 			if (isNullExpression != null)
 			{
 				return VisitIsNullExpression(isNullExpression, true);
 			}
 
-			DbComparisonExpression comparisonExpression = e.Argument as DbComparisonExpression;
+			var comparisonExpression = e.Argument as DbComparisonExpression;
 			if (comparisonExpression != null)
 			{
 				if (comparisonExpression.ExpressionKind == DbExpressionKind.Equals)
@@ -1318,7 +1318,7 @@ namespace EntityFramework.Firebird.SqlGen
 				}
 			}
 
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append(" NOT (");
 			result.Append(e.Argument.Accept(this));
 			result.Append(")");
@@ -1332,7 +1332,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns><see cref="SqlBuilder"/></returns>
 		public override ISqlFragment Visit(DbNullExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("NULL");
 			return result;
 		}
@@ -1365,7 +1365,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A <see cref="SqlBuilder"/></returns>
 		public override ISqlFragment Visit(DbParameterReferenceExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
 			string sqlPrimitiveType = null;
 			if (_shouldCastParameter)
@@ -1394,8 +1394,8 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <seealso cref="Visit(DbFilterExpression)"/>
 		public override ISqlFragment Visit(DbProjectExpression e)
 		{
-			string varName = GetShortenedName(e.Input.VariableName);
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
+			var varName = GetShortenedName(e.Input.VariableName);
+			var result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
 
 			// Project is compatible with Filter
 			// but not with Project, GroupBy
@@ -1413,7 +1413,7 @@ namespace EntityFramework.Firebird.SqlGen
 			// so we have to check it here.
 			// We call VisitNewInstanceExpression instead of Visit(DbNewInstanceExpression), since
 			// the latter throws.
-			DbNewInstanceExpression newInstanceExpression = e.Projection as DbNewInstanceExpression;
+			var newInstanceExpression = e.Projection as DbNewInstanceExpression;
 			if (newInstanceExpression != null)
 			{
 				result.Select.Append(VisitNewInstanceExpression(newInstanceExpression));
@@ -1454,20 +1454,20 @@ namespace EntityFramework.Firebird.SqlGen
 		public override ISqlFragment Visit(DbPropertyExpression e)
 		{
 			SqlBuilder result;
-			string varName = e.Property.Name;
+			var varName = e.Property.Name;
 
-			ISqlFragment instanceSql = e.Instance.Accept(this);
+			var instanceSql = e.Instance.Accept(this);
 
 			// Since the DbVariableReferenceExpression is a proper child of ours, we can reset
 			// isVarSingle.
-			DbVariableReferenceExpression DbVariableReferenceExpression = e.Instance as DbVariableReferenceExpression;
+			var DbVariableReferenceExpression = e.Instance as DbVariableReferenceExpression;
 			if (DbVariableReferenceExpression != null)
 			{
 				_isVarRefSingle = false;
 			}
 
 			// We need to flatten, and have not yet seen the first nested SELECT statement.
-			JoinSymbol joinSymbol = instanceSql as JoinSymbol;
+			var joinSymbol = instanceSql as JoinSymbol;
 			if (joinSymbol != null)
 			{
 				varName = GetShortenedName(varName);
@@ -1483,11 +1483,11 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 			// ---------------------------------------
 			// We have seen the first nested SELECT statement, but not the column.
-			SymbolPair symbolPair = instanceSql as SymbolPair;
+			var symbolPair = instanceSql as SymbolPair;
 			if (symbolPair != null)
 			{
 				varName = GetShortenedName(varName);
-				JoinSymbol columnJoinSymbol = symbolPair.Column as JoinSymbol;
+				var columnJoinSymbol = symbolPair.Column as JoinSymbol;
 				if (columnJoinSymbol != null)
 				{
 					Debug.Assert(columnJoinSymbol.NameToExtent.ContainsKey(varName));
@@ -1530,9 +1530,9 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		public override ISqlFragment Visit(DbQuantifierExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
-			bool negatePredicate = (e.ExpressionKind == DbExpressionKind.All);
+			var negatePredicate = (e.ExpressionKind == DbExpressionKind.All);
 			if (e.ExpressionKind == DbExpressionKind.Any)
 			{
 				result.Append("EXISTS (");
@@ -1543,7 +1543,7 @@ namespace EntityFramework.Firebird.SqlGen
 				result.Append("NOT EXISTS (");
 			}
 
-			SqlSelectStatement filter = VisitFilterExpression(e.Input, e.Predicate, negatePredicate);
+			var filter = VisitFilterExpression(e.Input, e.Predicate, negatePredicate);
 			if (filter.Select.IsEmpty)
 			{
 				AddDefaultColumns(filter);
@@ -1584,18 +1584,18 @@ namespace EntityFramework.Firebird.SqlGen
 		{
 			Debug.Assert(e.Count is DbConstantExpression || e.Count is DbParameterReferenceExpression, "DbSkipExpression.Count is of invalid expression type");
 
-			string varName = GetShortenedName(e.Input.VariableName);
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
+			var varName = GetShortenedName(e.Input.VariableName);
+			var result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
 
 			if (!IsCompatible(result, e.ExpressionKind))
 			{
-				TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(e.ResultType);
+				var inputType = MetadataHelpers.GetElementTypeUsage(e.ResultType);
 
 				result = CreateNewSelectStatement(result, varName, inputType, out fromSymbol);
 				AddFromSymbol(result, varName, fromSymbol, false);
 			}
 
-			ISqlFragment skipCount = HandleCountExpression(e.Count);
+			var skipCount = HandleCountExpression(e.Count);
 
 			result.Skip = new SkipClause(skipCount);
 
@@ -1620,8 +1620,8 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <seealso cref="Visit(DbFilterExpression)"/>
 		public override ISqlFragment Visit(DbSortExpression e)
 		{
-			string varName = GetShortenedName(e.Input.VariableName);
-			SqlSelectStatement result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
+			var varName = GetShortenedName(e.Input.VariableName);
+			var result = VisitInputExpression(e.Input.Expression, varName, e.Input.VariableType, out var fromSymbol);
 
 			// OrderBy is compatible with Filter
 			// and nothing else
@@ -1687,8 +1687,8 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 			_isVarRefSingle = true; // This will be reset by DbPropertyExpression or MethodExpression
 
-			string varName = GetShortenedName(e.VariableName);
-			Symbol result = _symbolTable.Lookup(varName);
+			var varName = GetShortenedName(e.VariableName);
+			var result = _symbolTable.Lookup(varName);
 			if (!CurrentSelectStatement.FromExtents.Contains(result))
 			{
 				CurrentSelectStatement.OuterExtents[result] = true;
@@ -1699,7 +1699,7 @@ namespace EntityFramework.Firebird.SqlGen
 
 		public override ISqlFragment Visit(DbInExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
 			result.Append(e.Item.Accept(this));
 			result.Append(" IN (");
@@ -1727,8 +1727,8 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		SqlBuilder VisitAggregate(DbAggregate aggregate, object aggregateArgument)
 		{
-			SqlBuilder aggregateResult = new SqlBuilder();
-			DbFunctionAggregate functionAggregate = aggregate as DbFunctionAggregate;
+			var aggregateResult = new SqlBuilder();
+			var functionAggregate = aggregate as DbFunctionAggregate;
 
 			if (functionAggregate == null)
 			{
@@ -1762,7 +1762,7 @@ namespace EntityFramework.Firebird.SqlGen
 
 		SqlBuilder VisitBinaryExpression(string op, DbExpression left, DbExpression right)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
 			if (!(left is DbParameterReferenceExpression && right is DbParameterReferenceExpression))
 			{
@@ -1824,7 +1824,7 @@ namespace EntityFramework.Firebird.SqlGen
 			string inputVarName, TypeUsage inputVarType, out Symbol fromSymbol)
 		{
 			SqlSelectStatement result;
-			ISqlFragment sqlFragment = inputExpression.Accept(this);
+			var sqlFragment = inputExpression.Accept(this);
 			result = sqlFragment as SqlSelectStatement;
 
 			if (result == null)
@@ -1850,7 +1850,7 @@ namespace EntityFramework.Firebird.SqlGen
 				// we are reusing the select statement produced by a Join node
 				// we need to remove the original extents, and replace them with a
 				// new extent with just the Join symbol.
-				JoinSymbol joinSymbol = new JoinSymbol(inputVarName, inputVarType, result.FromExtents);
+				var joinSymbol = new JoinSymbol(inputVarName, inputVarType, result.FromExtents);
 				joinSymbol.FlattenedExtentList = result.AllJoinExtents;
 
 				fromSymbol = joinSymbol;
@@ -1869,7 +1869,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		SqlBuilder VisitIsEmptyExpression(DbIsEmptyExpression e, bool negate)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			if (!negate)
 			{
 				result.Append(" NOT");
@@ -1895,12 +1895,12 @@ namespace EntityFramework.Firebird.SqlGen
 
 			if (e.Arguments.Count == 1 && e.Arguments[0].ExpressionKind == DbExpressionKind.Element)
 			{
-				DbElementExpression elementExpr = e.Arguments[0] as DbElementExpression;
-				SqlSelectStatement result = VisitExpressionEnsureSqlStatement(elementExpr.Argument);
+				var elementExpr = e.Arguments[0] as DbElementExpression;
+				var result = VisitExpressionEnsureSqlStatement(elementExpr.Argument);
 
 				if (!IsCompatible(result, DbExpressionKind.Element))
 				{
-					TypeUsage inputType = MetadataHelpers.GetElementTypeUsage(elementExpr.Argument.ResultType);
+					var inputType = MetadataHelpers.GetElementTypeUsage(elementExpr.Argument.ResultType);
 
 					result = CreateNewSelectStatement(result, "element", inputType, out var fromSymbol);
 					AddFromSymbol(result, "element", fromSymbol, false);
@@ -1912,12 +1912,12 @@ namespace EntityFramework.Firebird.SqlGen
 
 
 			// Otherwise simply build this out as a union-all ladder
-			CollectionType collectionType = MetadataHelpers.GetEdmType<CollectionType>(e.ResultType);
+			var collectionType = MetadataHelpers.GetEdmType<CollectionType>(e.ResultType);
 			Debug.Assert(collectionType != null);
-			bool isScalarElement = MetadataHelpers.IsPrimitiveType(collectionType.TypeUsage);
+			var isScalarElement = MetadataHelpers.IsPrimitiveType(collectionType.TypeUsage);
 
-			SqlBuilder resultSql = new SqlBuilder();
-			string separator = string.Empty;
+			var resultSql = new SqlBuilder();
+			var separator = string.Empty;
 
 			// handle empty table
 			if (e.Arguments.Count == 0)
@@ -1928,7 +1928,7 @@ namespace EntityFramework.Firebird.SqlGen
 				resultSql.Append(") AS X FROM (SELECT 1 FROM RDB$DATABASE) WHERE 1=0");
 			}
 
-			foreach (DbExpression arg in e.Arguments)
+			foreach (var arg in e.Arguments)
 			{
 				resultSql.Append(separator);
 				resultSql.Append(" SELECT ");
@@ -1953,7 +1953,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		SqlBuilder VisitIsNullExpression(DbIsNullExpression e, bool negate)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			_shouldCastParameter = false;
 			result.Append(e.Argument.Accept(this));
 			if (!negate)
@@ -2015,12 +2015,12 @@ namespace EntityFramework.Firebird.SqlGen
 			// but the Join postprocessing is messy and prevents this reuse.
 			_symbolTable.EnterScope();
 
-			string separator = string.Empty;
-			bool isLeftMostInput = true;
-			int inputCount = inputs.Count;
-			for (int idx = 0; idx < inputCount; idx++)
+			var separator = string.Empty;
+			var isLeftMostInput = true;
+			var inputCount = inputs.Count;
+			for (var idx = 0; idx < inputCount; idx++)
 			{
-				DbExpressionBinding input = inputs[idx];
+				var input = inputs[idx];
 
 				if (separator != string.Empty)
 				{
@@ -2029,7 +2029,7 @@ namespace EntityFramework.Firebird.SqlGen
 				result.From.Append(separator + " ");
 				// Change this if other conditions are required
 				// to force the child to produce a nested SqlStatement.
-				bool needsJoinContext = (input.Expression.ExpressionKind == DbExpressionKind.Scan)
+				var needsJoinContext = (input.Expression.ExpressionKind == DbExpressionKind.Scan)
 										|| (isLeftMostInput &&
 											(IsJoinExpression(input.Expression)
 											 || IsApplyExpression(input.Expression)))
@@ -2039,9 +2039,9 @@ namespace EntityFramework.Firebird.SqlGen
 				// if the child reuses our select statement, it will append the from
 				// symbols to our FromExtents list.  So, we need to remember the
 				// start of the child's entries.
-				int fromSymbolStart = result.FromExtents.Count;
+				var fromSymbolStart = result.FromExtents.Count;
 
-				ISqlFragment fromExtentFragment = input.Expression.Accept(this);
+				var fromExtentFragment = input.Expression.Accept(this);
 
 				_isParentAJoinStack.Pop();
 
@@ -2112,25 +2112,25 @@ namespace EntityFramework.Firebird.SqlGen
 			DbExpressionBinding input, int fromSymbolStart)
 		{
 			Symbol fromSymbol = null;
-			string varName = GetShortenedName(input.VariableName);
+			var varName = GetShortenedName(input.VariableName);
 
 			if (result != fromExtentFragment)
 			{
 				// The child has its own select statement, and is not reusing
 				// our select statement.
 				// This should look a lot like VisitInputExpression().
-				SqlSelectStatement sqlSelectStatement = fromExtentFragment as SqlSelectStatement;
+				var sqlSelectStatement = fromExtentFragment as SqlSelectStatement;
 				if (sqlSelectStatement != null)
 				{
 					if (sqlSelectStatement.Select.IsEmpty)
 					{
-						List<Symbol> columns = AddDefaultColumns(sqlSelectStatement);
+						var columns = AddDefaultColumns(sqlSelectStatement);
 
 						if (IsJoinExpression(input.Expression)
 							|| IsApplyExpression(input.Expression))
 						{
-							List<Symbol> extents = sqlSelectStatement.FromExtents;
-							JoinSymbol newJoinSymbol = new JoinSymbol(varName, input.VariableType, extents);
+							var extents = sqlSelectStatement.FromExtents;
+							var newJoinSymbol = new JoinSymbol(varName, input.VariableType, extents);
 							newJoinSymbol.IsNestedJoin = true;
 							newJoinSymbol.ColumnList = columns;
 
@@ -2144,12 +2144,12 @@ namespace EntityFramework.Firebird.SqlGen
 							// clone the join symbol, so that we "reuse" the
 							// join symbol.  Normally, we create a new symbol - see the next block
 							// of code.
-							JoinSymbol oldJoinSymbol = sqlSelectStatement.FromExtents[0] as JoinSymbol;
+							var oldJoinSymbol = sqlSelectStatement.FromExtents[0] as JoinSymbol;
 							if (oldJoinSymbol != null)
 							{
 								// Note: sqlSelectStatement.FromExtents will not do, since it might
 								// just be an alias of joinSymbol, and we want an actual JoinSymbol.
-								JoinSymbol newJoinSymbol = new JoinSymbol(varName, input.VariableType, oldJoinSymbol.ExtentList);
+								var newJoinSymbol = new JoinSymbol(varName, input.VariableType, oldJoinSymbol.ExtentList);
 								// This indicates that the sqlSelectStatement is a blocking scope
 								// i.e. it hides/renames extent columns
 								newJoinSymbol.IsNestedJoin = true;
@@ -2189,13 +2189,13 @@ namespace EntityFramework.Firebird.SqlGen
 				// We are replacing the child's extents with a single Join symbol.
 				// The child's extents are all those following the index fromSymbolStart.
 				//
-				List<Symbol> extents = new List<Symbol>();
+				var extents = new List<Symbol>();
 
 				// We cannot call extents.AddRange, since the is no simple way to
 				// get the range of symbols fromSymbolStart..result.FromExtents.Count
 				// from result.FromExtents.
 				// We copy these symbols to create the JoinSymbol later.
-				for (int i = fromSymbolStart; i < result.FromExtents.Count; ++i)
+				for (var i = fromSymbolStart; i < result.FromExtents.Count; ++i)
 				{
 					extents.Add(result.FromExtents[i]);
 				}
@@ -2226,23 +2226,23 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A <see cref="SqlBuilder"/></returns>
 		ISqlFragment VisitNewInstanceExpression(DbNewInstanceExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
-			RowType rowType = e.ResultType.EdmType as RowType;
+			var result = new SqlBuilder();
+			var rowType = e.ResultType.EdmType as RowType;
 
 			if (null != rowType)
 			{
-				ReadOnlyMetadataCollection<EdmProperty> members = rowType.Properties;
-				string separator = string.Empty;
-				for (int i = 0; i < e.Arguments.Count; ++i)
+				var members = rowType.Properties;
+				var separator = string.Empty;
+				for (var i = 0; i < e.Arguments.Count; ++i)
 				{
-					DbExpression argument = e.Arguments[i];
+					var argument = e.Arguments[i];
 					if (MetadataHelpers.IsRowType(argument.ResultType))
 					{
 						// We do not support nested records or other complex objects.
 						throw new NotSupportedException();
 					}
 
-					EdmProperty member = members[i];
+					var member = members[i];
 					result.Append(separator);
 					result.AppendLine();
 					result.Append(argument.Accept(this));
@@ -2265,10 +2265,10 @@ namespace EntityFramework.Firebird.SqlGen
 		ISqlFragment VisitSetOpExpression(DbExpression left, DbExpression right, string separator)
 		{
 
-			SqlSelectStatement leftSelectStatement = VisitExpressionEnsureSqlStatement(left);
-			SqlSelectStatement rightSelectStatement = VisitExpressionEnsureSqlStatement(right);
+			var leftSelectStatement = VisitExpressionEnsureSqlStatement(left);
+			var rightSelectStatement = VisitExpressionEnsureSqlStatement(right);
 
-			SqlBuilder setStatement = new SqlBuilder();
+			var setStatement = new SqlBuilder();
 			setStatement.Append(leftSelectStatement);
 			setStatement.AppendLine();
 			setStatement.Append(separator); // e.g. UNION ALL
@@ -2310,7 +2310,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		private ISqlFragment HandleFunctionDefault(DbFunctionExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			WriteFunctionName(result, e.Function);
 			HandleFunctionArgumentsDefault(e, result);
 			return result;
@@ -2325,7 +2325,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		private ISqlFragment HandleFunctionDefaultGivenName(DbFunctionExpression e, string functionName)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append(functionName);
 			HandleFunctionArgumentsDefault(e, result);
 			return result;
@@ -2341,7 +2341,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <param name="result"></param>
 		private void HandleFunctionArgumentsDefault(DbFunctionExpression e, SqlBuilder result)
 		{
-			bool isNiladicFunction = MetadataHelpers.TryGetValueForMetadataProperty<bool>(e.Function, "NiladicFunctionAttribute");
+			var isNiladicFunction = MetadataHelpers.TryGetValueForMetadataProperty<bool>(e.Function, "NiladicFunctionAttribute");
 			if (isNiladicFunction && e.Arguments.Count > 0)
 			{
 				throw new InvalidOperationException("Niladic functions cannot have parameters");
@@ -2350,8 +2350,8 @@ namespace EntityFramework.Firebird.SqlGen
 			if (!isNiladicFunction)
 			{
 				result.Append("(");
-				string separator = string.Empty;
-				foreach (DbExpression arg in e.Arguments)
+				var separator = string.Empty;
+				foreach (var arg in e.Arguments)
 				{
 					result.Append(separator);
 					result.Append(arg.Accept(this));
@@ -2409,7 +2409,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		private ISqlFragment HandleSpecialFunctionToOperator(DbFunctionExpression e, bool parenthesiseArguments)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			Debug.Assert(e.Arguments.Count > 0 && e.Arguments.Count <= 2, "There should be 1 or 2 arguments for operator");
 
 			if (e.Arguments.Count > 1)
@@ -2456,7 +2456,7 @@ namespace EntityFramework.Firebird.SqlGen
 		private static ISqlFragment HandleCanonicalEndsWithFunction(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
 			sqlgen._shouldHandleBoolComparison = false;
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("REVERSE(");
 			result.Append(e.Arguments[0].Accept(sqlgen));
 			result.Append(") STARTING WITH REVERSE(");
@@ -2496,7 +2496,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// </summary>
 		private static ISqlFragment TrimHelper(SqlGenerator sqlgen, DbFunctionExpression e, string what)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
 			result.Append("TRIM(");
 			result.Append(what);
@@ -2538,7 +2538,7 @@ namespace EntityFramework.Firebird.SqlGen
 
 		private static ISqlFragment HandleCanonicalFunctionSubstring(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 
 			result.Append("SUBSTRING(");
 
@@ -2605,7 +2605,7 @@ namespace EntityFramework.Firebird.SqlGen
 
 		private static ISqlFragment HandleCanonicalFunctionCurrentDateTime(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("CURRENT_TIMESTAMP");
 			return result;
 		}
@@ -2620,7 +2620,7 @@ namespace EntityFramework.Firebird.SqlGen
 			if (extractPart == null)
 				throw new NotSupportedException();
 
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("EXTRACT(");
 			result.Append(extractPart);
 			result.Append(" FROM ");
@@ -2635,7 +2635,7 @@ namespace EntityFramework.Firebird.SqlGen
 			if (addPart == null)
 				throw new NotSupportedException();
 
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("DATEADD(");
 			result.Append(addPart);
 			result.Append(", ");
@@ -2652,7 +2652,7 @@ namespace EntityFramework.Firebird.SqlGen
 			if (diffPart == null)
 				throw new NotSupportedException();
 
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("DATEDIFF(");
 			result.Append(diffPart);
 			result.Append(", ");
@@ -2670,7 +2670,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// </summary>
 		private static ISqlFragment HandleCanonicalFunctionCreateDateTime(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("CAST('");
 			result.Append(e.Arguments[0].Accept(sqlgen));
 			result.Append("-");
@@ -2698,7 +2698,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// </summary>
 		private static ISqlFragment HandleCanonicalFunctionCreateTime(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("CAST('");
 			result.Append(e.Arguments[0].Accept(sqlgen));
 			result.Append(":");
@@ -2711,7 +2711,7 @@ namespace EntityFramework.Firebird.SqlGen
 
 		private static ISqlFragment HandleCanonicalFunctionTruncateTime(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
-			SqlBuilder result = new SqlBuilder();
+			var result = new SqlBuilder();
 			result.Append("CAST(CAST(");
 			result.Append(e.Arguments[0].Accept(sqlgen));
 			result.Append(" as DATE) as TIMESTAMP)");
@@ -2798,13 +2798,13 @@ namespace EntityFramework.Firebird.SqlGen
 		void AddColumns(SqlSelectStatement selectStatement, Symbol symbol,
 			List<Symbol> columnList, Dictionary<string, Symbol> columnDictionary, ref string separator)
 		{
-			JoinSymbol joinSymbol = symbol as JoinSymbol;
+			var joinSymbol = symbol as JoinSymbol;
 			if (joinSymbol != null)
 			{
 				if (!joinSymbol.IsNestedJoin)
 				{
 					// Recurse if the join symbol is a collection of flattened extents
-					foreach (Symbol sym in joinSymbol.ExtentList)
+					foreach (var sym in joinSymbol.ExtentList)
 					{
 						// if sym is ScalarType means we are at base case in the
 						// recursion and there are not columns to add, just skip
@@ -2818,7 +2818,7 @@ namespace EntityFramework.Firebird.SqlGen
 				}
 				else
 				{
-					foreach (Symbol joinColumn in joinSymbol.ColumnList)
+					foreach (var joinColumn in joinSymbol.ColumnList)
 					{
 						// we write tableName.columnName
 						// rather than tableName.columnName as alias
@@ -2867,9 +2867,9 @@ namespace EntityFramework.Firebird.SqlGen
 				// not already exist.
 				//
 
-				foreach (EdmProperty property in MetadataHelpers.GetProperties(symbol.Type))
+				foreach (var property in MetadataHelpers.GetProperties(symbol.Type))
 				{
-					string recordMemberName = property.Name;
+					var recordMemberName = property.Name;
 					// Since all renaming happens in the second phase
 					// we lose nothing by setting the next column name index to 0
 					// many times.
@@ -2932,13 +2932,13 @@ namespace EntityFramework.Firebird.SqlGen
 			// This is the list of columns added in this select statement
 			// This forms the "type" of the Select statement, if it has to
 			// be expanded in another SELECT *
-			List<Symbol> columnList = new List<Symbol>();
+			var columnList = new List<Symbol>();
 
 			// A lookup for the previous set of columns to aid column name
 			// collision detection.
-			Dictionary<string, Symbol> columnDictionary = new Dictionary<string, Symbol>(StringComparer.OrdinalIgnoreCase);
+			var columnDictionary = new Dictionary<string, Symbol>(StringComparer.OrdinalIgnoreCase);
 
-			string separator = string.Empty;
+			var separator = string.Empty;
 			// The Select should usually be empty before we are called,
 			// but we do not mind if it is not.
 			if (!selectStatement.Select.IsEmpty)
@@ -2946,7 +2946,7 @@ namespace EntityFramework.Firebird.SqlGen
 				separator = ", ";
 			}
 
-			foreach (Symbol symbol in selectStatement.FromExtents)
+			foreach (var symbol in selectStatement.FromExtents)
 			{
 				AddColumns(selectStatement, symbol, columnList, columnDictionary, ref separator);
 			}
@@ -3032,8 +3032,8 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <param name="sortKeys"></param>
 		void AddSortKeys(SqlBuilder orderByClause, IList<DbSortClause> sortKeys)
 		{
-			string separator = string.Empty;
-			foreach (DbSortClause sortClause in sortKeys)
+			var separator = string.Empty;
+			foreach (var sortClause in sortKeys)
 			{
 				orderByClause.Append(separator);
 				orderByClause.Append(sortClause.Expression.Accept(this));
@@ -3094,7 +3094,7 @@ namespace EntityFramework.Firebird.SqlGen
 			// Finalize the old statement
 			if (finalizeOldStatement && oldStatement.Select.IsEmpty)
 			{
-				List<Symbol> columns = AddDefaultColumns(oldStatement);
+				var columns = AddDefaultColumns(oldStatement);
 
 				// Thid could not have been called from a join node.
 				Debug.Assert(oldStatement.FromExtents.Count == 1);
@@ -3103,12 +3103,12 @@ namespace EntityFramework.Firebird.SqlGen
 				// clone the join symbol, so that we "reuse" the
 				// join symbol.  Normally, we create a new symbol - see the next block
 				// of code.
-				JoinSymbol oldJoinSymbol = oldStatement.FromExtents[0] as JoinSymbol;
+				var oldJoinSymbol = oldStatement.FromExtents[0] as JoinSymbol;
 				if (oldJoinSymbol != null)
 				{
 					// Note: oldStatement.FromExtents will not do, since it might
 					// just be an alias of joinSymbol, and we want an actual JoinSymbol.
-					JoinSymbol newJoinSymbol = new JoinSymbol(inputVarName, inputVarType, oldJoinSymbol.ExtentList);
+					var newJoinSymbol = new JoinSymbol(inputVarName, inputVarType, oldJoinSymbol.ExtentList);
 					// This indicates that the oldStatement is a blocking scope
 					// i.e. it hides/renames extent columns
 					newJoinSymbol.IsNestedJoin = true;
@@ -3127,7 +3127,7 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 
 			// Observe that the following looks like the body of Visit(ExtentExpression).
-			SqlSelectStatement selectStatement = new SqlSelectStatement();
+			var selectStatement = new SqlSelectStatement();
 			selectStatement.From.Append("( ");
 			selectStatement.From.Append(oldStatement);
 			selectStatement.From.AppendLine();
@@ -3203,12 +3203,12 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		internal static string GetSqlPrimitiveType(TypeUsage type)
 		{
-			PrimitiveType primitiveType = MetadataHelpers.GetEdmType<PrimitiveType>(type);
+			var primitiveType = MetadataHelpers.GetEdmType<PrimitiveType>(type);
 
-			string typeName = primitiveType.Name;
-			bool isUnicode = true;
-			bool isFixedLength = false;
-			int length = 0;
+			var typeName = primitiveType.Name;
+			var isUnicode = true;
+			var isFixedLength = false;
+			var length = 0;
 			byte precision = 0;
 			byte scale = 0;
 
@@ -3308,7 +3308,7 @@ namespace EntityFramework.Firebird.SqlGen
 			{
 				//For constant expression we should not cast the value,
 				// thus we don't go throught the default DbConstantExpression handling
-				SqlBuilder sqlBuilder = new SqlBuilder();
+				var sqlBuilder = new SqlBuilder();
 				sqlBuilder.Append(((DbConstantExpression)e).Value.ToString());
 				result = sqlBuilder;
 			}
@@ -3486,7 +3486,7 @@ namespace EntityFramework.Firebird.SqlGen
 					break;
 
 				default:
-					string inputVarName = "c";  // any name will do - this is my random choice.
+					var inputVarName = "c";  // any name will do - this is my random choice.
 					_symbolTable.EnterScope();
 
 					TypeUsage type = null;
@@ -3534,8 +3534,8 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		SqlSelectStatement VisitFilterExpression(DbExpressionBinding input, DbExpression predicate, bool negatePredicate)
 		{
-			string varName = GetShortenedName(input.VariableName);
-			SqlSelectStatement result = VisitInputExpression(input.Expression,
+			var varName = GetShortenedName(input.VariableName);
+			var result = VisitInputExpression(input.Expression,
 				varName, input.VariableType, out var fromSymbol);
 
 			// Filter is compatible with OrderBy
@@ -3613,7 +3613,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <param name="result"></param>
 		void WriteFunctionName(SqlBuilder result, EdmFunction function)
 		{
-			string storeFunctionName = MetadataHelpers.TryGetValueForMetadataProperty<string>(function, "StoreFunctionNameAttribute");
+			var storeFunctionName = MetadataHelpers.TryGetValueForMetadataProperty<string>(function, "StoreFunctionNameAttribute");
 
 			if (string.IsNullOrEmpty(storeFunctionName))
 			{
@@ -3661,7 +3661,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		static bool NeedsInnerQuery(IList<DbAggregate> aggregates)
 		{
-			foreach (DbAggregate aggregate in aggregates)
+			foreach (var aggregate in aggregates)
 			{
 				Debug.Assert(aggregate.Arguments.Count == 1);
 				if (!IsPropertyOverVarRef(aggregate.Arguments[0]))
@@ -3680,12 +3680,12 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		static bool IsPropertyOverVarRef(DbExpression expression)
 		{
-			DbPropertyExpression propertyExpression = expression as DbPropertyExpression;
+			var propertyExpression = expression as DbPropertyExpression;
 			if (propertyExpression == null)
 			{
 				return false;
 			}
-			DbVariableReferenceExpression varRefExpression = propertyExpression.Instance as DbVariableReferenceExpression;
+			var varRefExpression = propertyExpression.Instance as DbVariableReferenceExpression;
 			if (varRefExpression == null)
 			{
 				return false;

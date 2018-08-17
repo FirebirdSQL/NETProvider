@@ -29,8 +29,8 @@ namespace FirebirdSql.Data.Schema
 
 		protected override StringBuilder GetCommandText(string[] restrictions)
 		{
-			StringBuilder sql = new StringBuilder();
-			StringBuilder where = new StringBuilder();
+			var sql = new StringBuilder();
+			var where = new StringBuilder();
 
 			sql.Append(
 				@"SELECT
@@ -45,7 +45,7 @@ namespace FirebirdSql.Data.Schema
 
 			if (restrictions != null)
 			{
-				int index = 0;
+				var index = 0;
 
 				/* CHARACTER_SET_CATALOG */
 				if (restrictions.Length >= 1 && restrictions[0] != null)

@@ -241,8 +241,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			FbConnection.EnsureOpen(_connection);
 
-			IDatabase db = Connection.InnerConnection.Database;
-			byte[] items = new byte[]
+			var db = Connection.InnerConnection.Database;
+			var items = new byte[]
 				{
 					item,
 					IscCodes.isc_info_end
@@ -255,14 +255,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			FbConnection.EnsureOpen(_connection);
 
-			IDatabase db = Connection.InnerConnection.Database;
-			byte[] items = new byte[]
+			var db = Connection.InnerConnection.Database;
+			var items = new byte[]
 				{
 					item,
 					IscCodes.isc_info_end
 				};
 
-			ArrayList info = db.GetDatabaseInfo(items);
+			var info = db.GetDatabaseInfo(items);
 
 			return (info.Count > 0 ? (int)info[0] : 0);
 		}
@@ -271,14 +271,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			FbConnection.EnsureOpen(_connection);
 
-			IDatabase db = Connection.InnerConnection.Database;
-			byte[] items = new byte[]
+			var db = Connection.InnerConnection.Database;
+			var items = new byte[]
 				{
 					item,
 					IscCodes.isc_info_end
 				};
 
-			ArrayList info = db.GetDatabaseInfo(items);
+			var info = db.GetDatabaseInfo(items);
 
 			return (info.Count > 0 ? (bool)info[0] : false);
 		}
@@ -287,8 +287,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			FbConnection.EnsureOpen(_connection);
 
-			IDatabase db = Connection.InnerConnection.Database;
-			byte[] items = new byte[]
+			var db = Connection.InnerConnection.Database;
+			var items = new byte[]
 				{
 					item,
 					IscCodes.isc_info_end

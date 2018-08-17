@@ -253,13 +253,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			if (connectionString != null && connectionString.Length > 0)
 			{
-				MatchCollection keyPairs = Regex.Matches(connectionString, KeyPairsRegex);
+				var keyPairs = Regex.Matches(connectionString, KeyPairsRegex);
 
 				foreach (Match keyPair in keyPairs)
 				{
 					if (keyPair.Groups.Count == 8)
 					{
-						string[] values = new string[]
+						var values = new string[]
 						{
 							(keyPair.Groups[2].Success ? keyPair.Groups[2].Value
 								: keyPair.Groups[4].Success ? keyPair.Groups[4].Value
@@ -385,7 +385,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				portSepChar = '/';
 			}
 
-			int sep = connectInfo.IndexOf(hostSepChar);
+			var sep = connectInfo.IndexOf(hostSepChar);
 			if (sep == 0 || sep == connectInfo.Length - 1)
 			{
 				throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
@@ -394,7 +394,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				dataSource = connectInfo.Substring(0, sep);
 				database = connectInfo.Substring(sep + 1);
-				int portSep = dataSource.IndexOf(portSepChar);
+				var portSep = dataSource.IndexOf(portSepChar);
 
 				if (portSep == 0 || portSep == dataSource.Length - 1)
 				{

@@ -56,7 +56,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <param name="topCount"></param>
 		internal SkipClause(int skipCount)
 		{
-			SqlBuilder sqlBuilder = new SqlBuilder();
+			var sqlBuilder = new SqlBuilder();
 			sqlBuilder.Append(skipCount.ToString(CultureInfo.InvariantCulture));
 			_skipCount = sqlBuilder;
 		}

@@ -189,7 +189,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckState();
 
-			bool retValue = false;
+			var retValue = false;
 
 			if (IsCommandBehavior(CommandBehavior.SingleRow) && _position != StartPosition)
 			{
@@ -229,13 +229,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 
 			DataRow schemaRow = null;
-			int tableCount = 0;
-			string currentTable = string.Empty;
+			var tableCount = 0;
+			var currentTable = string.Empty;
 
 			_schemaTable = GetSchemaTableStructure();
 
 			/* Prepare statement for schema fields information	*/
-			FbCommand schemaCmd = new FbCommand(
+			var schemaCmd = new FbCommand(
 				GetSchemaCommandText(),
 				_command.Connection,
 				_command.Connection.InnerConnection.ActiveTransaction);
@@ -246,19 +246,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			_schemaTable.BeginLoadData();
 
-			for (int i = 0; i < _fields.Count; i++)
+			for (var i = 0; i < _fields.Count; i++)
 			{
-				bool isKeyColumn = false;
-				bool isUnique = false;
-				bool isReadOnly = false;
-				int precision = 0;
-				bool isExpression = false;
+				var isKeyColumn = false;
+				var isUnique = false;
+				var isReadOnly = false;
+				var precision = 0;
+				var isExpression = false;
 
 				/* Get Schema data for the field	*/
 				schemaCmd.Parameters[0].Value = _fields[i].Relation;
 				schemaCmd.Parameters[1].Value = _fields[i].Name;
 
-				using (FbDataReader r = schemaCmd.ExecuteReader())
+				using (var r = schemaCmd.ExecuteReader())
 				{
 					if (r.Read())
 					{
@@ -420,7 +420,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckState();
 			CheckPosition();
 
-			for (int i = 0; i < _fields.Count; i++)
+			for (var i = 0; i < _fields.Count; i++)
 			{
 				values[i] = CheckedGetValue(() => GetValue(i));
 			}
@@ -454,8 +454,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			int bytesRead = 0;
-			int realLength = length;
+			var bytesRead = 0;
+			var realLength = length;
 
 			if (buffer == null)
 			{
@@ -470,7 +470,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			else
 			{
-				byte[] byteArray = CheckedGetValue(() => _row[i].GetBinary());
+				var byteArray = CheckedGetValue(() => _row[i].GetBinary());
 
 				if (length > (byteArray.Length - dataIndex))
 				{
@@ -525,10 +525,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			else
 			{
 
-				char[] charArray = (CheckedGetValue(() => (string)GetValue(i))).ToCharArray();
+				var charArray = (CheckedGetValue(() => (string)GetValue(i))).ToCharArray();
 
-				int charsRead = 0;
-				int realLength = length;
+				var charsRead = 0;
+				var realLength = length;
 
 				if (length > (charArray.Length - dataIndex))
 				{
@@ -695,9 +695,9 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_columnsIndexesOrdinal = new Dictionary<string, int>(_fields.Count, StringComparer.Ordinal);
 			_columnsIndexesOrdinalCI = new Dictionary<string, int>(_fields.Count, StringComparer.OrdinalIgnoreCase);
-			for (int i = 0; i < _fields.Count; i++)
+			for (var i = 0; i < _fields.Count; i++)
 			{
-				string fieldName = _fields[i].Alias;
+				var fieldName = _fields[i].Alias;
 				if (!_columnsIndexesOrdinal.ContainsKey(fieldName))
 					_columnsIndexesOrdinal.Add(fieldName, i);
 				if (!_columnsIndexesOrdinalCI.ContainsKey(fieldName))
@@ -742,7 +742,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #if !NETSTANDARD1_6
 		private static DataTable GetSchemaTableStructure()
 		{
-			DataTable schema = new DataTable("Schema");
+			var schema = new DataTable("Schema");
 
 			// Schema table structure
 			schema.Columns.Add("ColumnName", System.Type.GetType("System.String"));

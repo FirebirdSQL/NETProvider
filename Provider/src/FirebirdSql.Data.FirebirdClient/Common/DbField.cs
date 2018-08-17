@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.Common
 					// Bits 0-7 of sqlsubtype is charset_id (127 is a special value -
 					// current attachment charset).
 					// Bits 8-17 hold collation_id for this value.
-					byte[] cs = BitConverter.GetBytes(value);
+					var cs = BitConverter.GetBytes(value);
 
 					_charset = Charset.GetCharset(cs[0]);
 
@@ -332,7 +332,7 @@ namespace FirebirdSql.Data.Common
 							}
 							else
 							{
-								string s = Charset.GetString(buffer, 0, buffer.Length);
+								var s = Charset.GetString(buffer, 0, buffer.Length);
 
 								if ((Length % Charset.BytesPerCharacter) == 0 &&
 									s.Length > CharCount)
@@ -400,8 +400,8 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					case IscCodes.SQL_TIMESTAMP:
-						DateTime date = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
-						TimeSpan time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 4));
+						var date = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
+						var time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 4));
 
 						Value = date.Add(time);
 						break;

@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected override byte[] GetSegment()
 		{
-			int requested = SegmentSize;
+			var requested = SegmentSize;
 
 			try
 			{
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.Write(DataSegment);
 				_database.XdrStream.Flush();
 
-				GenericResponse response = _database.ReadGenericResponse();
+				var response = _database.ReadGenericResponse();
 
 				RblRemoveValue(IscCodes.RBL_segment);
 				if (response.ObjectHandle == 1)
@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					RblAddValue(IscCodes.RBL_eof_pending);
 				}
 
-				byte[] buffer = response.Data;
+				var buffer = response.Data;
 
 				if (buffer.Length == 0)
 				{
@@ -135,9 +135,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					return buffer;
 				}
 
-				int len = 0;
-				int srcpos = 0;
-				int destpos = 0;
+				var len = 0;
+				var srcpos = 0;
+				var destpos = 0;
 
 				while (srcpos < buffer.Length)
 				{
@@ -149,7 +149,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					destpos += len;
 				}
 
-				byte[] result = new byte[destpos];
+				var result = new byte[destpos];
 				Buffer.BlockCopy(buffer, 0, result, 0, destpos);
 
 				return result;
@@ -187,7 +187,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.Write(position);
 				_database.XdrStream.Flush();
 
-				GenericResponse response = (GenericResponse)_database.ReadResponse();
+				var response = (GenericResponse)_database.ReadResponse();
 
 				_position = response.ObjectHandle;
 			}
@@ -229,7 +229,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.Write(_blobId);
 				_database.XdrStream.Flush();
 
-				GenericResponse response = _database.ReadGenericResponse();
+				var response = _database.ReadGenericResponse();
 
 				_blobId = response.BlobId;
 				_blobHandle = response.ObjectHandle;

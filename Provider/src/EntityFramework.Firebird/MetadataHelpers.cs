@@ -285,7 +285,7 @@ namespace EntityFramework.Firebird
 
 		private static FacetDescription GetFacet(IEnumerable<FacetDescription> facetCollection, string facetName)
 		{
-			foreach (FacetDescription facetDescription in facetCollection)
+			foreach (var facetDescription in facetCollection)
 			{
 				if (facetDescription.FacetName == facetName)
 				{
@@ -308,8 +308,8 @@ namespace EntityFramework.Firebird
 			facetDescription = null;
 			if (MetadataHelpers.IsPrimitiveType(edmType))
 			{
-				PrimitiveType primitiveType = (PrimitiveType)edmType;
-				foreach (FacetDescription fd in primitiveType.FacetDescriptions)
+				var primitiveType = (PrimitiveType)edmType;
+				foreach (var fd in primitiveType.FacetDescriptions)
 				{
 					if (facetName.Equals(fd.FacetName, StringComparison.OrdinalIgnoreCase))
 					{

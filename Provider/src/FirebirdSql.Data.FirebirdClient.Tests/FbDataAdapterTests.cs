@@ -41,14 +41,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void FillTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand("select * from TEST", Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(100, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -62,15 +62,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void FillMultipleTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand("select * from TEST", Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds1 = new DataSet();
-			DataSet ds2 = new DataSet();
+			var ds1 = new DataSet();
+			var ds2 = new DataSet();
 
 			adapter.Fill(ds1, "TEST");
 			adapter.Fill(ds2, "TEST");
@@ -87,14 +87,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void FillMultipleWithImplicitTransactionTest()
 		{
-			FbCommand command = new FbCommand("select * from TEST", Connection);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var command = new FbCommand("select * from TEST", Connection);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds1 = new DataSet();
-			DataSet ds2 = new DataSet();
+			var ds1 = new DataSet();
+			var ds2 = new DataSet();
 
 			adapter.Fill(ds1, "TEST");
 			adapter.Fill(ds2, "TEST");
@@ -110,19 +110,19 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand("select * from TEST", Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(100, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			DataRow newRow = ds.Tables["TEST"].NewRow();
+			var newRow = ds.Tables["TEST"].NewRow();
 
 			newRow["int_field"] = 101;
 			newRow["CHAR_FIELD"] = "ONE THOUSAND";
@@ -150,17 +150,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateCharTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -181,7 +181,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			string val = (string)command.ExecuteScalar();
+			var val = (string)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -191,17 +191,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateVarCharTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -222,7 +222,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			string val = (string)command.ExecuteScalar();
+			var val = (string)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -232,17 +232,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateSmallIntTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -263,7 +263,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			short val = (short)command.ExecuteScalar();
+			var val = (short)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -273,17 +273,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateBigIntTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -304,7 +304,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			long val = (long)command.ExecuteScalar();
+			var val = (long)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -314,17 +314,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateDoubleTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -345,7 +345,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			double val = (double)command.ExecuteScalar();
+			var val = (double)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -355,17 +355,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateFloatTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -386,7 +386,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			float val = (float)command.ExecuteScalar();
+			var val = (float)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -396,17 +396,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateNumericTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -427,7 +427,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			decimal val = (decimal)command.ExecuteScalar();
+			var val = (decimal)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -437,17 +437,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateDecimalTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -468,7 +468,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			decimal val = (decimal)command.ExecuteScalar();
+			var val = (decimal)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -478,22 +478,22 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateDateTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			DateTime dtValue = DateTime.Now;
+			var dtValue = DateTime.Now;
 
 			ds.Tables["TEST"].Rows[0]["DATE_FIELD"] = dtValue;
 
@@ -511,7 +511,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			DateTime val = (DateTime)command.ExecuteScalar();
+			var val = (DateTime)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -523,22 +523,22 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateTimeTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			TimeSpan dtValue = new TimeSpan(5, 6, 7);
+			var dtValue = new TimeSpan(5, 6, 7);
 
 			ds.Tables["TEST"].Rows[0]["TIME_FIELD"] = dtValue;
 
@@ -556,7 +556,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			TimeSpan val = (TimeSpan)command.ExecuteScalar();
+			var val = (TimeSpan)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -568,22 +568,22 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateTimeStampTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			DateTime dtValue = DateTime.Now;
+			var dtValue = DateTime.Now;
 
 			ds.Tables["TEST"].Rows[0]["TIMESTAMP_FIELD"] = dtValue;
 
@@ -601,7 +601,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			command = new FbCommand(sql, Connection, transaction);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			DateTime val = (DateTime)command.ExecuteScalar();
+			var val = (DateTime)command.ExecuteScalar();
 
 			transaction.Commit();
 
@@ -616,17 +616,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UpdateClobTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -644,17 +644,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DeleteTest()
 		{
-			string sql = "select * from TEST where int_field = @int_field";
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand(sql, Connection, transaction);
-			FbDataAdapter adapter = new FbDataAdapter(command);
+			var sql = "select * from TEST where int_field = @int_field";
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand(sql, Connection, transaction);
+			var adapter = new FbDataAdapter(command);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
 			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 10;
 
-			FbCommandBuilder builder = new FbCommandBuilder(adapter);
+			var builder = new FbCommandBuilder(adapter);
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds, "TEST");
 
 			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
@@ -672,20 +672,20 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SubsequentDeletes()
 		{
-			string selectSql = "SELECT * FROM test";
-			string deleteSql = "DELETE FROM test WHERE int_field = @id";
+			var selectSql = "SELECT * FROM test";
+			var deleteSql = "DELETE FROM test WHERE int_field = @id";
 
-			FbConnection connection = new FbConnection(Connection.ConnectionString);
-			FbCommand select = new FbCommand(selectSql, connection);
-			FbCommand delete = new FbCommand(deleteSql, connection);
+			var connection = new FbConnection(Connection.ConnectionString);
+			var select = new FbCommand(selectSql, connection);
+			var delete = new FbCommand(deleteSql, connection);
 			delete.Parameters.Add("@id", FbDbType.Integer);
 			delete.Parameters[0].SourceColumn = "INT_FIELD";
 
-			FbDataAdapter adapter = new FbDataAdapter(select);
+			var adapter = new FbDataAdapter(select);
 			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 			adapter.DeleteCommand = delete;
 
-			DataSet ds = new DataSet();
+			var ds = new DataSet();
 			adapter.Fill(ds);
 
 			ds.Tables[0].Rows[0].Delete();

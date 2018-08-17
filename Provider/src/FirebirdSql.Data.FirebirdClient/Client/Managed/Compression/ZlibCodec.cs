@@ -197,12 +197,12 @@ namespace Ionic.Zlib
         {
             if (mode == CompressionMode.Compress)
             {
-                int rc = InitializeDeflate();
+                var rc = InitializeDeflate();
                 if (rc != ZlibConstants.Z_OK) throw new ZlibException("Cannot initialize for deflate.");
             }
             else if (mode == CompressionMode.Decompress)
             {
-                int rc = InitializeInflate();
+                var rc = InitializeInflate();
                 if (rc != ZlibConstants.Z_OK) throw new ZlibException("Cannot initialize for inflate.");
             }
             else throw new ZlibException("Invalid ZlibStreamFlavor.");
@@ -367,7 +367,7 @@ namespace Ionic.Zlib
         {
             if (istate == null)
                 throw new ZlibException("No Inflate State!");
-            int ret = istate.End();
+            var ret = istate.End();
             istate = null;
             return ret;
         }
@@ -653,7 +653,7 @@ namespace Ionic.Zlib
         // (See also read_buf()).
         internal void flush_pending()
         {
-            int len = dstate.pendingCount;
+            var len = dstate.pendingCount;
 
             if (len > AvailableBytesOut)
                 len = AvailableBytesOut;
@@ -689,7 +689,7 @@ namespace Ionic.Zlib
         // (See also flush_pending()).
         internal int read_buf(byte[] buf, int start, int size)
         {
-            int len = AvailableBytesIn;
+            var len = AvailableBytesIn;
 
             if (len > size)
                 len = size;

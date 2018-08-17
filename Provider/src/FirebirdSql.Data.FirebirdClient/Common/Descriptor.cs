@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.Common
 			_actualCount = n;
 			_fields = new DbField[n];
 
-			for (int i = 0; i < n; i++)
+			for (var i = 0; i < n; i++)
 			{
 				_fields[i] = new DbField();
 			}
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Common
 
 		public void ResetValues()
 		{
-			for (int i = 0; i < _fields.Length; i++)
+			for (var i = 0; i < _fields.Length; i++)
 			{
 				_fields[i].Value = null;
 			}
@@ -103,9 +103,9 @@ namespace FirebirdSql.Data.Common
 
 		public byte[] ToBlrArray()
 		{
-			using (MemoryStream blr = new MemoryStream())
+			using (var blr = new MemoryStream())
 			{
-				int par_count = Count * 2;
+				var par_count = Count * 2;
 
 				blr.WriteByte(IscCodes.blr_version5);
 				blr.WriteByte(IscCodes.blr_begin);
@@ -114,9 +114,9 @@ namespace FirebirdSql.Data.Common
 				blr.WriteByte((byte)(par_count & 255));
 				blr.WriteByte((byte)(par_count >> 8));
 
-				for (int i = 0; i < _fields.Length; i++)
+				for (var i = 0; i < _fields.Length; i++)
 				{
-					int dtype = _fields[i].SqlType;
+					var dtype = _fields[i].SqlType;
 					int len = _fields[i].Length;
 
 					switch (dtype)

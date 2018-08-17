@@ -48,11 +48,11 @@ namespace FirebirdSql.Data.Schema
 
 		public static DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
 		{
-			string filter = string.Format("CollectionName = '{0}'", collectionName);
-			DataSet ds = new DataSet();
+			var filter = string.Format("CollectionName = '{0}'", collectionName);
+			var ds = new DataSet();
 			using (var xmlStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName))
 			{
-				CultureInfo oldCulture = Thread.CurrentThread.CurrentCulture;
+				var oldCulture = Thread.CurrentThread.CurrentCulture;
 				try
 				{
 					Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -66,7 +66,7 @@ namespace FirebirdSql.Data.Schema
 				}
 			}
 
-			DataRow[] collection = ds.Tables[DbMetaDataCollectionNames.MetaDataCollections].Select(filter);
+			var collection = ds.Tables[DbMetaDataCollectionNames.MetaDataCollections].Select(filter);
 
 			if (collection.Length != 1)
 			{

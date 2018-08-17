@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DatabaseInfoTest()
 		{
-			FbDatabaseInfo dbInfo = new FbDatabaseInfo(Connection);
+			var dbInfo = new FbDatabaseInfo(Connection);
 
 			foreach (var p in dbInfo.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly).Where(x => !x.IsSpecialName))
 			{

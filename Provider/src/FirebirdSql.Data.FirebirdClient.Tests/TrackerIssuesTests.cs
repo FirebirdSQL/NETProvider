@@ -45,9 +45,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DNET217_ReadingALotOfFields()
 		{
-			StringBuilder cols = new StringBuilder();
-			string separator = string.Empty;
-			for (int i = 0; i < 1235; i++)
+			var cols = new StringBuilder();
+			var separator = string.Empty;
+			for (var i = 0; i < 1235; i++)
 			{
 				if (i % 2 == 0)
 					cols.AppendFormat("{0}'r' as col{1}", separator, i);
@@ -56,12 +56,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 				separator = ",";
 			}
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select " + cols.ToString() + " from rdb$database where 'x' = @x or 'x' = @x and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y";
 				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "z" });
 				cmd.Parameters.Add(new FbParameter() { ParameterName = "@y", Value = DateTime.Now });
-				using (FbDataReader reader = cmd.ExecuteReader())
+				using (var reader = cmd.ExecuteReader())
 				{
 					while (reader.Read())
 					{ }
@@ -72,7 +72,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DNET260_ProcedureWithALotOfParameters()
 		{
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = @"
 RECREATE PROCEDURE TEST_SP (
@@ -188,7 +188,7 @@ END
 				cmd.ExecuteNonQuery();
 			}
 
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "TEST_SP";
 				cmd.CommandType = CommandType.StoredProcedure;
@@ -209,7 +209,7 @@ END
 		[Test]
 		public void DNET273_WritingClobAsBinary()
 		{
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (INT_FIELD, CLOB_FIELD) values (@INT_FIELD, @CLOB_FIELD)";
 				cmd.Parameters.Add("@INT_FIELD", FbDbType.Integer).Value = 100;
@@ -221,7 +221,7 @@ END
 		[Test]
 		public void DNET274_EFCommandsHandlingShouldNotBlockGC()
 		{
-			for (int i = 1000; i < 21000; i++)
+			for (var i = 1000; i < 21000; i++)
 			{
 				new FbCommand() { CommandText = string.Format("insert into test (INT_FIELD) values ({0})", i), Connection = Connection }.ExecuteNonQuery();
 			}
@@ -233,20 +233,20 @@ END
 			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
 
-			FbConnectionStringBuilder csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			csb.MinPoolSize = 0;
-			string cs = csb.ToString();
+			var cs = csb.ToString();
 
 			var active = GetActiveConnections();
 
 			var threads = new List<Thread>();
-			for (int i = 0; i < NumberOfThreads; i++)
+			for (var i = 0; i < NumberOfThreads; i++)
 			{
 				var t = new Thread(o =>
 				{
-					for (int j = 0; j < 50; j++)
+					for (var j = 0; j < 50; j++)
 					{
 						GetSomething(cs);
 					}
@@ -287,12 +287,12 @@ CREATE TABLE TABMAT (
 			}
 			try
 			{
-				string sql = "INSERT INTO TabMat (Id,Matrix) Values(@ValId,@ValMat)";
+				var sql = "INSERT INTO TabMat (Id,Matrix) Values(@ValId,@ValMat)";
 				int[,] mat = { { 1, 2, 3, 4 }, { 10, 20, 30, 40 }, { 101, 102, 103, 104 } };
-				Random random = new Random();
-				using (FbTransaction tx = Connection.BeginTransaction())
+				var random = new Random();
+				using (var tx = Connection.BeginTransaction())
 				{
-					using (FbCommand cmd = new FbCommand(sql, Connection, tx))
+					using (var cmd = new FbCommand(sql, Connection, tx))
 					{
 						cmd.Parameters.Add("@ValId", FbDbType.Integer).Value = random.Next();
 						cmd.Parameters.Add("@ValMat", FbDbType.Array).Value = mat;
@@ -330,11 +330,11 @@ CREATE TABLE TABMAT (
 		public void DNET304_VarcharOctetsParameterRoundtrip()
 		{
 			var data = new byte[] { 10, 20 };
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
 				cmd.CommandText = "select cast(@x as varchar(10) character set octets) from rdb$database";
-				using (FbDataReader reader = cmd.ExecuteReader())
+				using (var reader = cmd.ExecuteReader())
 				{
 					while (reader.Read())
 					{
@@ -348,11 +348,11 @@ CREATE TABLE TABMAT (
 		public void DNET304_CharOctetsParameterRoundtrip()
 		{
 			var data = new byte[] { 10, 20 };
-			using (FbCommand cmd = Connection.CreateCommand())
+			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
 				cmd.CommandText = "select cast(@x as char(10) character set octets) from rdb$database";
-				using (FbDataReader reader = cmd.ExecuteReader())
+				using (var reader = cmd.ExecuteReader())
 				{
 					while (reader.Read())
 					{
@@ -368,10 +368,10 @@ CREATE TABLE TABMAT (
 
 		private static void GetSomething(string connectionString)
 		{
-			using (FbConnection conn = new FbConnection(connectionString))
+			using (var conn = new FbConnection(connectionString))
 			{
 				conn.Open();
-				using (FbCommand command = new FbCommand("select current_timestamp from mon$database", conn))
+				using (var command = new FbCommand("select current_timestamp from mon$database", conn))
 				{
 					command.ExecuteScalar();
 				}

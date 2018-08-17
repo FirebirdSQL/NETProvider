@@ -86,9 +86,9 @@ namespace EntityFramework.Firebird
 			foreach (var associationSet in storeItems.GetItems<EntityContainer>()[0].BaseEntitySets.OfType<AssociationSet>())
 			{
 				var result = new StringBuilder();
-				ReferentialConstraint constraint = associationSet.ElementType.ReferentialConstraints.Single<ReferentialConstraint>();
-				AssociationSetEnd end = associationSet.AssociationSetEnds[constraint.FromRole.Name];
-				AssociationSetEnd end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
+				var constraint = associationSet.ElementType.ReferentialConstraints.Single<ReferentialConstraint>();
+				var end = associationSet.AssociationSetEnds[constraint.FromRole.Name];
+				var end2 = associationSet.AssociationSetEnds[constraint.ToRole.Name];
 				result.AppendFormat("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2})",
 					SqlGenerator.QuoteIdentifier(MetadataHelpers.GetTableName(end2.EntitySet)),
 					SqlGenerator.QuoteIdentifier(string.Format("FK_{0}", associationSet.Name)),

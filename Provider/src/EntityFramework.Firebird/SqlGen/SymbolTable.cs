@@ -47,7 +47,7 @@ namespace EntityFramework.Firebird.SqlGen
 
 		internal Symbol Lookup(string name)
 		{
-			for (int i = _symbols.Count - 1; i >= 0; --i)
+			for (var i = _symbols.Count - 1; i >= 0; --i)
 			{
 				if (_symbols[i].ContainsKey(name))
 				{

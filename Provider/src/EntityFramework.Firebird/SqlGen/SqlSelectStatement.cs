@@ -189,12 +189,12 @@ namespace EntityFramework.Firebird.SqlGen
 
 			if ((null != _outerExtents) && (0 < _outerExtents.Count))
 			{
-				foreach (Symbol outerExtent in _outerExtents.Keys)
+				foreach (var outerExtent in _outerExtents.Keys)
 				{
-					JoinSymbol joinSymbol = outerExtent as JoinSymbol;
+					var joinSymbol = outerExtent as JoinSymbol;
 					if (joinSymbol != null)
 					{
-						foreach (Symbol symbol in joinSymbol.FlattenedExtentList)
+						foreach (var symbol in joinSymbol.FlattenedExtentList)
 						{
 							if (null == outerExtentAliases)
 							{
@@ -217,14 +217,14 @@ namespace EntityFramework.Firebird.SqlGen
 			// An then rename each of the FromExtents we have
 			// If AllJoinExtents is non-null - it has precedence.
 			// The new name is derived from the old name - we append an increasing int.
-			List<Symbol> extentList = AllJoinExtents ?? _fromExtents;
+			var extentList = AllJoinExtents ?? _fromExtents;
 			if (null != extentList)
 			{
-				foreach (Symbol fromAlias in extentList)
+				foreach (var fromAlias in extentList)
 				{
 					if ((null != outerExtentAliases) && outerExtentAliases.Contains(fromAlias.Name))
 					{
-						int i = sqlGenerator.AllExtentNames[fromAlias.Name];
+						var i = sqlGenerator.AllExtentNames[fromAlias.Name];
 						string newName;
 
 						do

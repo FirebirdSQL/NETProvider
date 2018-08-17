@@ -20,7 +20,7 @@ namespace FirebirdSql.Data.Common
 		{
 			// This code isn't great because it requires a double copy,
 			// but it requires unsafe code to solve the problem efficiently.
-			char[] charArray = new char[byteArray.GetLength(0)];
+			var charArray = new char[byteArray.GetLength(0)];
 			Array.Copy(byteArray, charArray, byteArray.Length);
 
 			return new string(charArray);
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Common
 				throw new ArgumentException();
 			}
 
-			int charEnd = charIndex + charCount;
+			var charEnd = charIndex + charCount;
 			while (charIndex < charEnd)
 			{
 				bytes[index++] = (byte)chars[charIndex++];
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.Common
 				throw new ArgumentException();
 			}
 
-			int charEnd = charIndex + charCount;
+			var charEnd = charIndex + charCount;
 			while (charIndex < charEnd)
 			{
 				bytes[index++] = (byte)chars[charIndex++];
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.Common
 				throw new ArgumentException();
 			}
 
-			int byteEnd = index + count;
+			var byteEnd = index + count;
 			while (index < byteEnd)
 			{
 				chars[charIndex++] = (char)bytes[index++];

@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.TestsBase
 		{
 			FbTestsSetup.SetUp(FbServerType, Compression);
 
-			string cs = BuildConnectionString(FbServerType, Compression);
+			var cs = BuildConnectionString(FbServerType, Compression);
 			if (_insertTestData)
 			{
 				InsertTestData(cs);
@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.TestsBase
 		[TearDown]
 		public virtual void TearDown()
 		{
-			string cs = BuildConnectionString(FbServerType, Compression);
+			var cs = BuildConnectionString(FbServerType, Compression);
 			_connection.Dispose();
 			if (_insertTestData)
 			{
@@ -125,7 +125,7 @@ values(@int_field, @char_field, @varchar_field, @bigint_field, @smallint_field, 
 
 						command.Prepare();
 
-						for (int i = 0; i < 100; i++)
+						for (var i = 0; i < 100; i++)
 						{
 							command.Parameters["@int_field"].Value = i;
 							command.Parameters["@char_field"].Value = "IRow " + i.ToString();
@@ -193,7 +193,7 @@ end";
 
 		public static FbConnectionStringBuilder BuildServicesConnectionStringBuilder(FbServerType serverType, bool compression, bool includeDatabase)
 		{
-			FbConnectionStringBuilder builder = new FbConnectionStringBuilder();
+			var builder = new FbConnectionStringBuilder();
 			builder.UserID = FbTestsSetup.UserID;
 			builder.Password = FbTestsSetup.Password;
 			builder.DataSource = FbTestsSetup.DataSource;
@@ -207,7 +207,7 @@ end";
 
 		public static FbConnectionStringBuilder BuildConnectionStringBuilder(FbServerType serverType, bool compression)
 		{
-			FbConnectionStringBuilder builder = new FbConnectionStringBuilder();
+			var builder = new FbConnectionStringBuilder();
 			builder.UserID = FbTestsSetup.UserID;
 			builder.Password = FbTestsSetup.Password;
 			builder.DataSource = FbTestsSetup.DataSource;
@@ -264,8 +264,8 @@ end";
 
 		protected static int GetId()
 		{
-			RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-			byte[] buffer = new byte[4];
+			var rng = new RNGCryptoServiceProvider();
+			var buffer = new byte[4];
 			rng.GetBytes(buffer);
 			return BitConverter.ToInt32(buffer, 0);
 		}

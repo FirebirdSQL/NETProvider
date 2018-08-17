@@ -372,7 +372,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				// garbage
 				XdrStream.ReadBytes(8);
 
-				int respLen = XdrStream.ReadInt32();
+				var respLen = XdrStream.ReadInt32();
 				respLen += respLen % 4;
 
 				// sin_family
@@ -380,7 +380,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				respLen -= 2;
 
 				// sin_port
-				byte[] buffer = XdrStream.ReadBytes(2);
+				var buffer = XdrStream.ReadBytes(2);
 				portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
 				respLen -= 2;
 
@@ -442,8 +442,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				remoteEvent.LocalId++;
 
-				EventParameterBuffer epb = remoteEvent.BuildEpb();
-				byte[] epbData = epb.ToArray();
+				var epb = remoteEvent.BuildEpb();
+				var epbData = epb.ToArray();
 
 				XdrStream.Write(IscCodes.op_que_events);
 				XdrStream.Write(_handle);
@@ -454,7 +454,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				XdrStream.Flush();
 
-				GenericResponse response = (GenericResponse)ReadResponse();
+				var response = (GenericResponse)ReadResponse();
 
 				remoteEvent.RemoteId = response.ObjectHandle;
 			}
@@ -488,7 +488,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual TransactionBase BeginTransaction(TransactionParameterBuffer tpb)
 		{
-			GdsTransaction transaction = new GdsTransaction(this);
+			var transaction = new GdsTransaction(this);
 
 			transaction.BeginTransaction(tpb);
 
@@ -587,7 +587,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual IResponse ReadResponse()
 		{
-			IResponse response = ReadSingleResponse();
+			var response = ReadSingleResponse();
 
 			if (response is GenericResponse)
 			{
@@ -632,9 +632,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual IResponse ReadSingleResponse()
 		{
-			int operation = ReadOperation();
+			var operation = ReadOperation();
 
-			IResponse response = GdsConnection.ProcessOperation(operation, XdrStream);
+			var response = GdsConnection.ProcessOperation(operation, XdrStream);
 
 			ProcessResponseWarnings(response);
 
@@ -653,9 +653,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				XdrStream.Flush();
 
-				GenericResponse response = (GenericResponse)ReadResponse();
+				var response = (GenericResponse)ReadResponse();
 
-				int responseLength = bufferLength;
+				var responseLength = bufferLength;
 
 				if (response.Data.Length < bufferLength)
 				{

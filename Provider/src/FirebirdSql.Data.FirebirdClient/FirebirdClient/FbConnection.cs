@@ -64,12 +64,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static void CreateDatabaseImpl(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false)
 		{
-			FbConnectionString options = new FbConnectionString(connectionString);
+			var options = new FbConnectionString(connectionString);
 			options.Validate();
 
 			try
 			{
-				DatabaseParameterBuffer dpb = new DatabaseParameterBuffer();
+				var dpb = new DatabaseParameterBuffer();
 
 				dpb.Append(IscCodes.isc_dpb_version1);
 				dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				if (options.Charset.Length > 0)
 				{
-					Charset charset = Charset.GetCharset(options.Charset);
+					var charset = Charset.GetCharset(options.Charset);
 					if (charset == null)
 					{
 						throw new ArgumentException("Character set is not valid.");
@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
 				}
 
-				using (FbConnectionInternal db = new FbConnectionInternal(options))
+				using (var db = new FbConnectionInternal(options))
 				{
 					db.CreateDatabase(dpb);
 				}
@@ -110,12 +110,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public static void DropDatabase(string connectionString)
 		{
-			FbConnectionString options = new FbConnectionString(connectionString);
+			var options = new FbConnectionString(connectionString);
 			options.Validate();
 
 			try
 			{
-				using (FbConnectionInternal db = new FbConnectionInternal(options))
+				using (var db = new FbConnectionInternal(options))
 				{
 					db.DropDatabase();
 				}
@@ -401,11 +401,11 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("Database name is not valid.");
 			}
 
-			string cs = _connectionString;
+			var cs = _connectionString;
 
 			try
 			{
-				FbConnectionStringBuilder csb = new FbConnectionStringBuilder(_connectionString);
+				var csb = new FbConnectionStringBuilder(_connectionString);
 
 				/* Close current connection	*/
 				Close();

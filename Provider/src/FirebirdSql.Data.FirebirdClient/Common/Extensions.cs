@@ -44,23 +44,23 @@ namespace FirebirdSql.Data.Common
 		{
 			const int BytesPerLong = 4;
 			const int BitsPerByte = 8;
-			bool turnOn = time != 0 && interval != 0;
-			ulong[] input = new[]
+			var turnOn = time != 0 && interval != 0;
+			var input = new[]
 				{
 					turnOn ? (ulong)1 : (ulong)0,
 					time,
 					interval
 				};
 			// tcp_keepalive struct
-			byte[] inValue = new byte[3 * BytesPerLong];
-			for (int i = 0; i < input.Length; i++)
+			var inValue = new byte[3 * BytesPerLong];
+			for (var i = 0; i < input.Length; i++)
 			{
 				inValue[i * BytesPerLong + 3] = (byte)(input[i] >> ((BytesPerLong - 1) * BitsPerByte) & 0xFF);
 				inValue[i * BytesPerLong + 2] = (byte)(input[i] >> ((BytesPerLong - 2) * BitsPerByte) & 0xFF);
 				inValue[i * BytesPerLong + 1] = (byte)(input[i] >> ((BytesPerLong - 3) * BitsPerByte) & 0xFF);
 				inValue[i * BytesPerLong + 0] = (byte)(input[i] >> ((BytesPerLong - 4) * BitsPerByte) & 0xFF);
 			}
-			byte[] outValue = BitConverter.GetBytes(0);
+			var outValue = BitConverter.GetBytes(0);
 
 			return TrySocketAction(() =>
 			{
@@ -72,7 +72,7 @@ namespace FirebirdSql.Data.Common
 		public static bool TryEnableLoopbackFastPath(this Socket socket)
 		{
 			const int SIOLoopbackFastPath = -1744830448; //0x98000010;
-			byte[] inValue = BitConverter.GetBytes(1);
+			var inValue = BitConverter.GetBytes(1);
 			return TrySocketAction(() =>
 			{
 				socket.IOControl(SIOLoopbackFastPath, inValue, null);

@@ -70,11 +70,11 @@ public class FbTestsSetup
 
 	private static void CreateTables(string connectionString)
 	{
-		using (FbConnection connection = new FbConnection(connectionString))
+		using (var connection = new FbConnection(connectionString))
 		{
 			connection.Open();
 
-			StringBuilder commandText = new StringBuilder();
+			var commandText = new StringBuilder();
 
 			commandText.Append("RECREATE TABLE TEST (");
 			commandText.Append("INT_FIELD		 INTEGER DEFAULT 0 NOT NULL	PRIMARY	KEY,");
@@ -107,22 +107,22 @@ public class FbTestsSetup
 			commandText.Append("CS_FIELD		 CHAR(1) CHARACTER SET UNICODE_FSS,");
 			commandText.Append("UCCHAR_ARRAY	 CHAR(10) [1:10] CHARACTER SET UNICODE_FSS);");
 
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
 
-			using (FbCommand command = new FbCommand("recreate table PrepareTest(test_field varchar(20));", connection))
+			using (var command = new FbCommand("recreate table PrepareTest(test_field varchar(20));", connection))
 			{
 				command.ExecuteNonQuery();
 			}
 
-			using (FbCommand command = new FbCommand("recreate table log(occured timestamp, text varchar(20));", connection))
+			using (var command = new FbCommand("recreate table log(occured timestamp, text varchar(20));", connection))
 			{
 				command.ExecuteNonQuery();
 			}
 
-			using (FbCommand command = new FbCommand("RECREATE TABLE GUID_TEST (INT_FIELD INTEGER, GUID_FIELD CHAR(16) CHARACTER SET OCTETS)", connection))
+			using (var command = new FbCommand("RECREATE TABLE GUID_TEST (INT_FIELD INTEGER, GUID_FIELD CHAR(16) CHARACTER SET OCTETS)", connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -131,11 +131,11 @@ public class FbTestsSetup
 
 	private static void CreateProcedures(string connectionString)
 	{
-		using (FbConnection connection = new FbConnection(connectionString))
+		using (var connection = new FbConnection(connectionString))
 		{
 			connection.Open();
 
-			StringBuilder commandText = new StringBuilder();
+			var commandText = new StringBuilder();
 
 			commandText.Clear();
 			commandText.Append("RECREATE PROCEDURE SELECT_DATA  \r\n");
@@ -149,7 +149,7 @@ public class FbTestsSetup
 			commandText.Append("DO \r\n");
 			commandText.Append("SUSPEND; \r\n");
 			commandText.Append("end;");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -164,7 +164,7 @@ public class FbTestsSetup
 			commandText.Append("do \r\n");
 			commandText.Append("suspend; \r\n");
 			commandText.Append("end\r\n");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -180,7 +180,7 @@ public class FbTestsSetup
 			commandText.Append("do\r\n");
 			commandText.Append("suspend;\r\n");
 			commandText.Append("end\r\n");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -196,7 +196,7 @@ public class FbTestsSetup
 			commandText.Append("do\r\n");
 			commandText.Append("suspend;\r\n");
 			commandText.Append("end\r\n");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -210,7 +210,7 @@ public class FbTestsSetup
 			commandText.Append("content	= 'test';\r\n");
 			commandText.Append("suspend;\r\n");
 			commandText.Append("end\r\n");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -221,7 +221,7 @@ public class FbTestsSetup
 			commandText.Append("begin\r\n");
 			commandText.Append("result = 1000;\r\n");
 			commandText.Append("end \r\n");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -230,11 +230,11 @@ public class FbTestsSetup
 
 	private static void CreateTriggers(string connectionString)
 	{
-		using (FbConnection connection = new FbConnection(connectionString))
+		using (var connection = new FbConnection(connectionString))
 		{
 			connection.Open();
 
-			StringBuilder commandText = new StringBuilder();
+			var commandText = new StringBuilder();
 
 			commandText.Clear();
 			commandText.Append("RECREATE TRIGGER new_row FOR test	ACTIVE\r\n");
@@ -243,7 +243,7 @@ public class FbTestsSetup
 			commandText.Append("BEGIN\r\n");
 			commandText.Append("POST_EVENT 'new	row';\r\n");
 			commandText.Append("END");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -255,7 +255,7 @@ public class FbTestsSetup
 			commandText.Append("BEGIN\r\n");
 			commandText.Append("POST_EVENT 'updated	row';\r\n");
 			commandText.Append("END");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -266,7 +266,7 @@ public class FbTestsSetup
 			commandText.Append("begin\r\n");
 			commandText.Append("insert into log (occured, text) values (current_timestamp, 'on connect');\r\n");
 			commandText.Append("end");
-			using (FbCommand command = new FbCommand(commandText.ToString(), connection))
+			using (var command = new FbCommand(commandText.ToString(), connection))
 			{
 				command.ExecuteNonQuery();
 			}

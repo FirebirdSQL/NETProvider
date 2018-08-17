@@ -151,7 +151,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
 		{
-			byte[] databaseBuffer = Encoding2.Default.GetBytes(database);
+			var databaseBuffer = Encoding2.Default.GetBytes(database);
 
 			ClearStatusVector();
 
@@ -209,7 +209,7 @@ namespace FirebirdSql.Data.Client.Native
 			if (cryptKey?.Length > 0)
 				throw new NotSupportedException("Passing Encryption Key isn't, yet, supported on Firebird Embedded.");
 
-			byte[] databaseBuffer = Encoding2.Default.GetBytes(database);
+			var databaseBuffer = Encoding2.Default.GetBytes(database);
 
 			ClearStatusVector();
 
@@ -251,7 +251,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public TransactionBase BeginTransaction(TransactionParameterBuffer tpb)
 		{
-			FesTransaction transaction = new FesTransaction(this);
+			var transaction = new FesTransaction(this);
 			transaction.BeginTransaction(tpb);
 
 			return transaction;
@@ -263,7 +263,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void CancelOperation(int kind)
 		{
-			IntPtr[] localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+			var localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
 			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, kind);
 
@@ -290,7 +290,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public string GetServerVersion()
 		{
-			byte[] items = new byte[]
+			var items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
@@ -306,7 +306,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
 		{
-			byte[] buffer = new byte[bufferLength];
+			var buffer = new byte[bufferLength];
 
 			DatabaseInfo(items, buffer, buffer.Length);
 
@@ -319,7 +319,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		internal void ProcessStatusVector(IntPtr[] statusVector)
 		{
-			IscException ex = FesConnection.ParseStatusVector(statusVector, _charset);
+			var ex = FesConnection.ParseStatusVector(statusVector, _charset);
 
 			if (ex != null)
 			{

@@ -388,7 +388,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		object ICloneable.Clone()
 #endif
 		{
-			FbCommand command = new FbCommand();
+			var command = new FbCommand();
 
 			command.CommandText = CommandText;
 			command.Connection = Connection;
@@ -404,7 +404,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				command._expectedColumnTypes = (Type[])_expectedColumnTypes.Clone();
 			}
 
-			for (int i = 0; i < Parameters.Count; i++)
+			for (var i = 0; i < Parameters.Count; i++)
 			{
 #if NETSTANDARD1_6
 				command.Parameters.Add(Parameters[i].Clone());
@@ -664,7 +664,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				if (_statement != null &&
 					_statement.StatementType == DbStatementType.StoredProcedure)
 				{
-					DbValue[] values = outputParameterValues;
+					var values = outputParameterValues;
 					if (outputParameterValues == null)
 					{
 						values = _statement.GetOutputParameters();
@@ -672,7 +672,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 					if (values != null && values.Length > 0)
 					{
-						int i = 0;
+						var i = 0;
 						foreach (FbParameter parameter in Parameters)
 						{
 							if (parameter.Direction == ParameterDirection.Output ||
@@ -725,7 +725,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
 			{
-				int transactionCount = Connection.InnerConnection.Database.TransactionCount;
+				var transactionCount = Connection.InnerConnection.Database.TransactionCount;
 
 				try
 				{
@@ -786,7 +786,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (Parameters.Count > 0)
 			{
-				Descriptor descriptor = BuildParametersDescriptor();
+				var descriptor = BuildParametersDescriptor();
 				if (descriptor == null)
 				{
 					_statement.DescribeParameters();
@@ -800,7 +800,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private Descriptor BuildParametersDescriptor()
 		{
-			short count = ValidateInputParameters();
+			var count = ValidateInputParameters();
 
 			if (count > 0)
 			{
@@ -820,10 +820,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private Descriptor BuildNamedParametersDescriptor(short count)
 		{
-			Descriptor descriptor = new Descriptor(count);
-			int index = 0;
+			var descriptor = new Descriptor(count);
+			var index = 0;
 
-			for (int i = 0; i < _namedParameters.Count; i++)
+			for (var i = 0; i < _namedParameters.Count; i++)
 			{
 				var parametersIndex = Parameters.IndexOf(_namedParameters[i], i);
 				if (parametersIndex == -1)
@@ -831,7 +831,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					throw new FbException(string.Format("Must declare the variable '{0}'", _namedParameters[i]));
 				}
 
-				FbParameter parameter = Parameters[parametersIndex];
+				var parameter = Parameters[parametersIndex];
 
 				if (parameter.Direction == ParameterDirection.Input ||
 					parameter.Direction == ParameterDirection.InputOutput)
@@ -848,12 +848,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private Descriptor BuildPlaceHoldersDescriptor(short count)
 		{
-			Descriptor descriptor = new Descriptor(count);
-			int index = 0;
+			var descriptor = new Descriptor(count);
+			var index = 0;
 
-			for (int i = 0; i < Parameters.Count; i++)
+			for (var i = 0; i < Parameters.Count; i++)
 			{
-				FbParameter parameter = Parameters[i];
+				var parameter = Parameters[i];
 
 				if (parameter.Direction == ParameterDirection.Input ||
 					parameter.Direction == ParameterDirection.InputOutput)
@@ -875,8 +875,8 @@ namespace FirebirdSql.Data.FirebirdClient
 				return false;
 			}
 
-			FbDbType type = parameter.FbDbType;
-			Charset charset = _connection.InnerConnection.Database.Charset;
+			var type = parameter.FbDbType;
+			var charset = _connection.InnerConnection.Database.Charset;
 
 			// Check the parameter character set
 			if (parameter.Charset == FbCharset.Octets && !(parameter.InternalValue is byte[]))
@@ -919,7 +919,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 					else if (parameter.HasSize)
 					{
-						short len = (short)(parameter.Size * charset.BytesPerCharacter);
+						var len = (short)(parameter.Size * charset.BytesPerCharacter);
 						descriptor[index].Length = len;
 					}
 					break;
@@ -944,12 +944,12 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			short count = 0;
 
-			for (int i = 0; i < Parameters.Count; i++)
+			for (var i = 0; i < Parameters.Count; i++)
 			{
 				if (Parameters[i].Direction == ParameterDirection.Input ||
 					Parameters[i].Direction == ParameterDirection.InputOutput)
 				{
-					FbDbType type = Parameters[i].FbDbType;
+					var type = Parameters[i].FbDbType;
 
 					if (type == FbDbType.Array || type == FbDbType.Decimal || type == FbDbType.Numeric)
 					{
@@ -967,9 +967,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void UpdateParameterValues()
 		{
-			int index = -1;
+			var index = -1;
 
-			for (int i = 0; i < _statement.Parameters.Count; i++)
+			for (var i = 0; i < _statement.Parameters.Count; i++)
 			{
 				var statementParameter = _statement.Parameters[i];
 				index = i;
@@ -1004,7 +1004,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						{
 							case DbDataType.Binary:
 								{
-									BlobBase blob = _statement.CreateBlob();
+									var blob = _statement.CreateBlob();
 									blob.Write((byte[])commandParameter.InternalValue);
 									statementParameter.Value = blob.Id;
 								}
@@ -1012,7 +1012,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 							case DbDataType.Text:
 								{
-									BlobBase blob = _statement.CreateBlob();
+									var blob = _statement.CreateBlob();
 									if (commandParameter.InternalValue is byte[])
 										blob.Write((byte[])commandParameter.InternalValue);
 									else
@@ -1067,7 +1067,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			LogCommand();
 
-			FbConnectionInternal innerConn = _connection.InnerConnection;
+			var innerConn = _connection.InnerConnection;
 
 			// Check if	we have	a valid	transaction
 			if (_transaction == null)
@@ -1103,7 +1103,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				DisposeReader();
 
 				// Reformat the SQL statement if needed
-				string sql = _commandText;
+				var sql = _commandText;
 
 				if (_commandType == CommandType.StoredProcedure)
 				{
@@ -1179,20 +1179,20 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string BuildStoredProcedureSql(string spName, bool returnsSet)
 		{
-			string sql = spName == null ? string.Empty : spName.Trim();
+			var sql = spName == null ? string.Empty : spName.Trim();
 
 			if (sql.Length > 0 &&
 				!sql.ToLowerInvariant().StartsWith("execute procedure ") &&
 				!sql.ToLowerInvariant().StartsWith("select "))
 			{
-				StringBuilder paramsText = new StringBuilder();
+				var paramsText = new StringBuilder();
 
 				// Append the stored proc parameter	name
 				paramsText.Append(sql);
 				if (Parameters.Count > 0)
 				{
 					paramsText.Append("(");
-					for (int i = 0; i < Parameters.Count; i++)
+					for (var i = 0; i < Parameters.Count; i++)
 					{
 						if (Parameters[i].Direction == ParameterDirection.Input ||
 							Parameters[i].Direction == ParameterDirection.InputOutput)
@@ -1225,11 +1225,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string ParseNamedParameters(string sql)
 		{
-			StringBuilder builder = new StringBuilder();
-			StringBuilder paramBuilder = new StringBuilder();
-			bool inSingleQuotes = false;
-			bool inDoubleQuotes = false;
-			bool inParam = false;
+			var builder = new StringBuilder();
+			var paramBuilder = new StringBuilder();
+			var inSingleQuotes = false;
+			var inDoubleQuotes = false;
+			var inParam = false;
 
 			_namedParameters.Clear();
 
@@ -1238,9 +1238,9 @@ namespace FirebirdSql.Data.FirebirdClient
 				return sql;
 			}
 
-			for (int i = 0; i < sql.Length; i++)
+			for (var i = 0; i < sql.Length; i++)
 			{
-				char sym = sql[i];
+				var sym = sql[i];
 
 				if (inParam)
 				{
@@ -1325,7 +1325,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (TraceHelper.HasListeners)
 			{
-				StringBuilder message = new StringBuilder();
+				var message = new StringBuilder();
 				message.AppendLine("Command:");
 				message.AppendLine(_commandText);
 				message.AppendLine("Parameters:");

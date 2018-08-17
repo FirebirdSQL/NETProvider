@@ -112,12 +112,12 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			ClearStatusVector();
 
-			DatabaseHandle dbHandle = _db.HandlePtr;
-			TransactionHandle trHandle = _transaction.HandlePtr;
+			var dbHandle = _db.HandlePtr;
+			var trHandle = _transaction.HandlePtr;
 
-			IntPtr arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
+			var arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 
-			byte[] buffer = new byte[sliceLength];
+			var buffer = new byte[sliceLength];
 
 			_db.FbClient.isc_array_get_slice(
 				_statusVector,
@@ -139,14 +139,14 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			ClearStatusVector();
 
-			DatabaseHandle dbHandle = _db.HandlePtr;
-			TransactionHandle trHandle = _transaction.HandlePtr;
+			var dbHandle = _db.HandlePtr;
+			var trHandle = _transaction.HandlePtr;
 
-			IntPtr arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
+			var arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 
-			Type systemType = GetSystemType();
+			var systemType = GetSystemType();
 
-			byte[] buffer = new byte[sliceLength];
+			var buffer = new byte[sliceLength];
 			if (systemType.GetTypeInfo().IsPrimitive)
 			{
 				Buffer.BlockCopy(sourceArray, 0, buffer, 0, buffer.Length);
@@ -177,15 +177,15 @@ namespace FirebirdSql.Data.Client.Native
 		protected override Array DecodeSlice(byte[] slice)
 		{
 			Array sliceData = null;
-			int slicePosition = 0;
-			int type = 0;
-			DbDataType dbType = DbDataType.Array;
-			Type systemType = GetSystemType();
-			Charset charset = _db.Charset;
-			int[] lengths = new int[Descriptor.Dimensions];
-			int[] lowerBounds = new int[Descriptor.Dimensions];
+			var slicePosition = 0;
+			var type = 0;
+			var dbType = DbDataType.Array;
+			var systemType = GetSystemType();
+			var charset = _db.Charset;
+			var lengths = new int[Descriptor.Dimensions];
+			var lowerBounds = new int[Descriptor.Dimensions];
 
-			for (int i = 0; i < Descriptor.Dimensions; i++)
+			for (var i = 0; i < Descriptor.Dimensions; i++)
 			{
 				lowerBounds[i] = Descriptor.Bounds[i].LowerBound;
 				lengths[i] = Descriptor.Bounds[i].UpperBound;
@@ -198,14 +198,14 @@ namespace FirebirdSql.Data.Client.Native
 
 			sliceData = Array.CreateInstance(systemType, lengths, lowerBounds);
 
-			Array tempData = Array.CreateInstance(systemType, sliceData.Length);
+			var tempData = Array.CreateInstance(systemType, sliceData.Length);
 
 			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
 			int itemLength = Descriptor.Length;
 
-			for (int i = 0; i < tempData.Length; i++)
+			for (var i = 0; i < tempData.Length; i++)
 			{
 				if (slicePosition >= slice.Length)
 				{
@@ -220,8 +220,8 @@ namespace FirebirdSql.Data.Client.Native
 
 					case DbDataType.VarChar:
 						{
-							int index = slicePosition;
-							int count = 0;
+							var index = slicePosition;
+							var count = 0;
 							while (slice[index++] != 0)
 							{
 								count++;
@@ -265,7 +265,7 @@ namespace FirebirdSql.Data.Client.Native
 									break;
 							}
 
-							decimal dvalue = TypeDecoder.DecodeDecimal(evalue, Descriptor.Scale, type);
+							var dvalue = TypeDecoder.DecodeDecimal(evalue, Descriptor.Scale, type);
 
 							tempData.SetValue(dvalue, i);
 						}
@@ -281,9 +281,9 @@ namespace FirebirdSql.Data.Client.Native
 
 					case DbDataType.Date:
 						{
-							int idate = BitConverter.ToInt32(slice, slicePosition);
+							var idate = BitConverter.ToInt32(slice, slicePosition);
 
-							DateTime date = TypeDecoder.DecodeDate(idate);
+							var date = TypeDecoder.DecodeDate(idate);
 
 							tempData.SetValue(date, i);
 						}
@@ -291,9 +291,9 @@ namespace FirebirdSql.Data.Client.Native
 
 					case DbDataType.Time:
 						{
-							int itime = BitConverter.ToInt32(slice, slicePosition);
+							var itime = BitConverter.ToInt32(slice, slicePosition);
 
-							TimeSpan time = TypeDecoder.DecodeTime(itime);
+							var time = TypeDecoder.DecodeTime(itime);
 
 							tempData.SetValue(time, i);
 						}
@@ -301,13 +301,13 @@ namespace FirebirdSql.Data.Client.Native
 
 					case DbDataType.TimeStamp:
 						{
-							int idate = BitConverter.ToInt32(slice, slicePosition);
-							int itime = BitConverter.ToInt32(slice, slicePosition + 4);
+							var idate = BitConverter.ToInt32(slice, slicePosition);
+							var itime = BitConverter.ToInt32(slice, slicePosition + 4);
 
-							DateTime date = TypeDecoder.DecodeDate(idate);
-							TimeSpan time = TypeDecoder.DecodeTime(itime);
+							var date = TypeDecoder.DecodeDate(idate);
+							var time = TypeDecoder.DecodeTime(itime);
 
-							DateTime timestamp = date.Add(time);
+							var timestamp = date.Add(time);
 
 							tempData.SetValue(timestamp, i);
 						}
@@ -341,29 +341,29 @@ namespace FirebirdSql.Data.Client.Native
 
 		private byte[] EncodeSlice(ArrayDesc desc, Array sourceArray, int length)
 		{
-			BinaryWriter writer = new BinaryWriter(new MemoryStream());
-			Charset charset = _db.Charset;
-			DbDataType dbType = DbDataType.Array;
-			int subType = (Descriptor.Scale < 0) ? 2 : 0;
-			int type = 0;
+			var writer = new BinaryWriter(new MemoryStream());
+			var charset = _db.Charset;
+			var dbType = DbDataType.Array;
+			var subType = (Descriptor.Scale < 0) ? 2 : 0;
+			var type = 0;
 
 			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
-			foreach (object source in sourceArray)
+			foreach (var source in sourceArray)
 			{
 				switch (dbType)
 				{
 					case DbDataType.Char:
 						{
-							string value = source != null ? (string)source : string.Empty;
-							byte[] buffer = charset.GetBytes(value);
+							var value = source != null ? (string)source : string.Empty;
+							var buffer = charset.GetBytes(value);
 
 							writer.Write(buffer);
 
 							if (desc.Length > buffer.Length)
 							{
-								for (int j = buffer.Length; j < desc.Length; j++)
+								for (var j = buffer.Length; j < desc.Length; j++)
 								{
 									writer.Write((byte)32);
 								}
@@ -373,14 +373,14 @@ namespace FirebirdSql.Data.Client.Native
 
 					case DbDataType.VarChar:
 						{
-							string value = source != null ? (string)source : string.Empty;
+							var value = source != null ? (string)source : string.Empty;
 
-							byte[] buffer = charset.GetBytes(value);
+							var buffer = charset.GetBytes(value);
 							writer.Write(buffer);
 
 							if (desc.Length > buffer.Length)
 							{
-								for (int j = buffer.Length; j < desc.Length; j++)
+								for (var j = buffer.Length; j < desc.Length; j++)
 								{
 									writer.Write((byte)0);
 								}
@@ -412,7 +412,7 @@ namespace FirebirdSql.Data.Client.Native
 					case DbDataType.Numeric:
 					case DbDataType.Decimal:
 						{
-							object numeric = TypeEncoder.EncodeDecimal((decimal)source, desc.Scale, type);
+							var numeric = TypeEncoder.EncodeDecimal((decimal)source, desc.Scale, type);
 
 							switch (type)
 							{

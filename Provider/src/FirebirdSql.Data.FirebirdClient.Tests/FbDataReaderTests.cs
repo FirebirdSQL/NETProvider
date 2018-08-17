@@ -41,14 +41,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ReadTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
+			var command = new FbCommand("select * from TEST", Connection, transaction);
 
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
-				for (int i = 0; i < reader.FieldCount; i++)
+				for (var i = 0; i < reader.FieldCount; i++)
 				{
 					reader.GetValue(i);
 				}
@@ -62,9 +62,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ReadClobTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
+			var command = new FbCommand("select * from TEST", Connection, transaction);
 
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
@@ -80,9 +80,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void BigIntGetStringTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
+			var command = new FbCommand("select * from TEST", Connection, transaction);
 
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
@@ -98,14 +98,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetValuesTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
+			var command = new FbCommand("select * from TEST", Connection, transaction);
 
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
-				object[] values = new object[reader.FieldCount];
+				var values = new object[reader.FieldCount];
 				reader.GetValues(values);
 			}
 
@@ -117,16 +117,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void IndexerByIndexTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
+			var command = new FbCommand("select * from TEST", Connection, transaction);
 
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
-				for (int i = 0; i < reader.FieldCount; i++)
+				for (var i = 0; i < reader.FieldCount; i++)
 				{
-					object dummy = reader[i];
+					var dummy = reader[i];
 				}
 			}
 
@@ -138,16 +138,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void IndexerByNameTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
+			var command = new FbCommand("select * from TEST", Connection, transaction);
 
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
-				for (int i = 0; i < reader.FieldCount; i++)
+				for (var i = 0; i < reader.FieldCount; i++)
 				{
-					object dummy = reader[reader.GetName(i)];
+					var dummy = reader[reader.GetName(i)];
 				}
 			}
 
@@ -159,13 +159,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetSchemaTableTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand("select * from TEST", Connection, transaction);
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand("select * from TEST", Connection, transaction);
 
-			FbDataReader reader = command.ExecuteReader(CommandBehavior.SchemaOnly);
+			var reader = command.ExecuteReader(CommandBehavior.SchemaOnly);
 
-			DataTable schema = reader.GetSchemaTable();
-			DataRow[] currRows = schema.Select(null, null, DataViewRowState.CurrentRows);
+			var schema = reader.GetSchemaTable();
+			var currRows = schema.Select(null, null, DataViewRowState.CurrentRows);
 
 			reader.Close();
 			transaction.Rollback();
@@ -175,13 +175,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetSchemaTableWithExpressionFieldTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
-			FbCommand command = new FbCommand("select TEST.*, 0 AS VALOR from TEST", Connection, transaction);
+			var transaction = Connection.BeginTransaction();
+			var command = new FbCommand("select TEST.*, 0 AS VALOR from TEST", Connection, transaction);
 
-			FbDataReader reader = command.ExecuteReader(CommandBehavior.SchemaOnly);
+			var reader = command.ExecuteReader(CommandBehavior.SchemaOnly);
 
-			DataTable schema = reader.GetSchemaTable();
-			DataRow[] currRows = schema.Select(null, null, DataViewRowState.CurrentRows);
+			var schema = reader.GetSchemaTable();
+			var currRows = schema.Select(null, null, DataViewRowState.CurrentRows);
 
 			reader.Close();
 			transaction.Rollback();
@@ -191,11 +191,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void RecordAffectedTest()
 		{
-			string sql = "insert into test (int_field) values (100000)";
+			var sql = "insert into test (int_field) values (100000)";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 
-			FbDataReader reader = command.ExecuteReader();
+			var reader = command.ExecuteReader();
 
 			while (reader.Read())
 			{
@@ -209,16 +209,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetBytesLengthTest()
 		{
-			string sql = "select blob_field from TEST where int_field = @int_field";
+			var sql = "select blob_field from TEST where int_field = @int_field";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 2;
 
-			FbDataReader reader = command.ExecuteReader();
+			var reader = command.ExecuteReader();
 
 			reader.Read();
 
-			long length = reader.GetBytes(0, 0, null, 0, 0);
+			var length = reader.GetBytes(0, 0, null, 0, 0);
 
 			reader.Close();
 
@@ -228,16 +228,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetCharsLengthTest()
 		{
-			string sql = "select clob_field from TEST where int_field = @int_field";
+			var sql = "select clob_field from TEST where int_field = @int_field";
 
-			FbCommand command = new FbCommand(sql, Connection);
+			var command = new FbCommand(sql, Connection);
 			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 50;
 
-			FbDataReader reader = command.ExecuteReader();
+			var reader = command.ExecuteReader();
 
 			reader.Read();
 
-			long length = reader.GetChars(0, 0, null, 0, 0);
+			var length = reader.GetChars(0, 0, null, 0, 0);
 
 			reader.Close();
 
@@ -247,12 +247,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ValidateDecimalSchema()
 		{
-			string sql = "select decimal_field from test";
+			var sql = "select decimal_field from test";
 
-			FbCommand test = new FbCommand(sql, Connection);
-			FbDataReader r = test.ExecuteReader(CommandBehavior.SchemaOnly);
+			var test = new FbCommand(sql, Connection);
+			var r = test.ExecuteReader(CommandBehavior.SchemaOnly);
 
-			DataTable schema = r.GetSchemaTable();
+			var schema = r.GetSchemaTable();
 
 			r.Close();
 
@@ -265,7 +265,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DisposeTest()
 		{
-			using (FbCommand command = new FbCommand("DATAREADERTEST", Connection))
+			using (var command = new FbCommand("DATAREADERTEST", Connection))
 			{
 				command.CommandType = CommandType.StoredProcedure;
 
@@ -283,26 +283,26 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void GetOrdinalTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			FbCommand command = new FbCommand("select first 1 0 as fOo, 0 as \"BaR\", 0 as BAR from TEST", Connection, transaction);
+			var command = new FbCommand("select first 1 0 as fOo, 0 as \"BaR\", 0 as BAR from TEST", Connection, transaction);
 
 			IDataReader reader = command.ExecuteReader();
 			while (reader.Read())
 			{
-				int foo = reader.GetOrdinal("foo");
-				int FOO = reader.GetOrdinal("FOO");
-				int fOo = reader.GetOrdinal("fOo");
+				var foo = reader.GetOrdinal("foo");
+				var FOO = reader.GetOrdinal("FOO");
+				var fOo = reader.GetOrdinal("fOo");
 				Assert.AreEqual(0, foo);
 				Assert.AreEqual(0, FOO);
 				Assert.AreEqual(0, fOo);
 
-				int bar = reader.GetOrdinal("bar");
-				int BaR = reader.GetOrdinal("BaR");
+				var bar = reader.GetOrdinal("bar");
+				var BaR = reader.GetOrdinal("BaR");
 				Assert.AreEqual(1, bar);
 				Assert.AreEqual(1, BaR);
 
-				int BAR = reader.GetOrdinal("BAR");
+				var BAR = reader.GetOrdinal("BAR");
 				Assert.AreEqual(2, BAR);
 			}
 
@@ -314,17 +314,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ReadBinaryTest()
 		{
-			FbTransaction transaction = Connection.BeginTransaction();
+			var transaction = Connection.BeginTransaction();
 
-			byte[] bytes = new byte[1024];
+			var bytes = new byte[1024];
 			var random = new Random();
-			for (int i = 0; i < bytes.Length; i++)
+			for (var i = 0; i < bytes.Length; i++)
 			{
 				bytes[i] = (byte)random.Next(byte.MinValue, byte.MaxValue);
 			}
 			var binaryString = $"x'{BitConverter.ToString(bytes).Replace("-", string.Empty)}'";
 
-			FbCommand command = new FbCommand($"select {binaryString} from TEST", Connection, transaction);
+			var command = new FbCommand($"select {binaryString} from TEST", Connection, transaction);
 
 			IDataReader reader = command.ExecuteReader();
 			if (reader.Read())

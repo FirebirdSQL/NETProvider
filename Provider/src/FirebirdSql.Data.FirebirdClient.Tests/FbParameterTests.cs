@@ -41,12 +41,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ConstructorsTest()
 		{
-			FbParameter ctor01 = new FbParameter();
-			FbParameter ctor02 = new FbParameter("ctor2", 10);
-			FbParameter ctor03 = new FbParameter("ctor3", FbDbType.Char);
-			FbParameter ctor04 = new FbParameter("ctor4", FbDbType.Integer, 4);
-			FbParameter ctor05 = new FbParameter("ctor5", FbDbType.Integer, 4, "int_field");
-			FbParameter ctor06 = new FbParameter(
+			var ctor01 = new FbParameter();
+			var ctor02 = new FbParameter("ctor2", 10);
+			var ctor03 = new FbParameter("ctor3", FbDbType.Char);
+			var ctor04 = new FbParameter("ctor4", FbDbType.Integer, 4);
+			var ctor05 = new FbParameter("ctor5", FbDbType.Integer, 4, "int_field");
+			var ctor06 = new FbParameter(
 				"ctor6",
 				FbDbType.Integer,
 				4,
@@ -69,11 +69,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void CloneTest()
 		{
-			FbParameter p = new FbParameter("@p1", FbDbType.Integer);
+			var p = new FbParameter("@p1", FbDbType.Integer);
 			p.Value = 1;
 			p.Charset = FbCharset.Dos850;
 
-			FbParameter p1 = ((ICloneable)p).Clone() as FbParameter;
+			var p1 = ((ICloneable)p).Clone() as FbParameter;
 
 			Assert.AreEqual(p1.ParameterName, p.ParameterName);
 			Assert.AreEqual(p1.FbDbType, p.FbDbType);

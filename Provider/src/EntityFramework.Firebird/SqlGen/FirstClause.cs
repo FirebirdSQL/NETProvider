@@ -56,7 +56,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <param name="topCount"></param>
 		internal FirstClause(int firstCount)
 		{
-			SqlBuilder sqlBuilder = new SqlBuilder();
+			var sqlBuilder = new SqlBuilder();
 			sqlBuilder.Append(firstCount.ToString(CultureInfo.InvariantCulture));
 			_firstCount = sqlBuilder;
 		}

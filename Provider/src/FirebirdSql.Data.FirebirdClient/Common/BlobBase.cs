@@ -49,13 +49,13 @@ namespace FirebirdSql.Data.Common
 
 		public string ReadString()
 		{
-			byte[] buffer = Read();
+			var buffer = Read();
 			return _charset.GetString(buffer, 0, buffer.Length);
 		}
 
 		public byte[] Read()
 		{
-			using (MemoryStream ms = new MemoryStream())
+			using (var ms = new MemoryStream())
 			{
 				try
 				{
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Common
 
 					while (!EOF)
 					{
-						byte[] segment = GetSegment();
+						var segment = GetSegment();
 						ms.Write(segment, 0, segment.Length);
 					}
 
@@ -97,11 +97,11 @@ namespace FirebirdSql.Data.Common
 			{
 				Create();
 
-				int length = count;
-				int offset = index;
-				int chunk = length >= _segmentSize ? _segmentSize : length;
+				var length = count;
+				var offset = index;
+				var chunk = length >= _segmentSize ? _segmentSize : length;
 
-				byte[] tmpBuffer = new byte[chunk];
+				var tmpBuffer = new byte[chunk];
 
 				while (length > 0)
 				{
