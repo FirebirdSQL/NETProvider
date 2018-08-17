@@ -49,8 +49,7 @@ namespace EntityFramework.Firebird
 			InitializeProviderServices(providerManifestToken);
 
 			var lastOperation = migrationOperations.Last();
-			var updateDatabaseOperation = lastOperation as UpdateDatabaseOperation;
-			var historyOperation = updateDatabaseOperation != null
+			var historyOperation = lastOperation is UpdateDatabaseOperation updateDatabaseOperation
 				? updateDatabaseOperation.Migrations.First().Operations.OfType<HistoryOperation>().First()
 				: lastOperation as HistoryOperation;
 

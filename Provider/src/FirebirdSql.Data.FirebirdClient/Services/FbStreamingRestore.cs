@@ -114,8 +114,7 @@ namespace FirebirdSql.Data.Services
 				{
 					break;
 				}
-				var message = response[1] as string;
-				if (message != null)
+				if (response[1] is string message)
 				{
 					OnServiceOutput(message);
 				}

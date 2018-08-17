@@ -31,7 +31,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (methodCallExpression.Method.Equals(MethodInfo))
 			{
 				var patternExpression = methodCallExpression.Arguments[0];
-				var patternConstantExpression = patternExpression as ConstantExpression;
 
 				var endsWithExpression = new NullCompensatedExpression(
 					Expression.Equal(
@@ -45,7 +44,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 							}),
 						patternExpression));
 
-				return patternConstantExpression != null
+				return patternExpression is ConstantExpression patternConstantExpression
 					? (string)patternConstantExpression.Value == string.Empty
 						? (Expression)Expression.Constant(true)
 						: endsWithExpression

@@ -191,8 +191,7 @@ namespace EntityFramework.Firebird.SqlGen
 			{
 				foreach (var outerExtent in _outerExtents.Keys)
 				{
-					var joinSymbol = outerExtent as JoinSymbol;
-					if (joinSymbol != null)
+					if (outerExtent is JoinSymbol joinSymbol)
 					{
 						foreach (var symbol in joinSymbol.FlattenedExtentList)
 						{

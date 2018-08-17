@@ -241,8 +241,7 @@ namespace EntityFramework.Firebird.SqlGen
 			commandType = CommandType.Text;
 
 			//Handle Query
-			var queryCommandTree = tree as DbQueryCommandTree;
-			if (queryCommandTree != null)
+			if (tree is DbQueryCommandTree queryCommandTree)
 			{
 				var sqlGen = new SqlGenerator();
 				parameters = null;
@@ -250,8 +249,7 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 
 			//Handle Function
-			var DbFunctionCommandTree = tree as DbFunctionCommandTree;
-			if (DbFunctionCommandTree != null)
+			if (tree is DbFunctionCommandTree DbFunctionCommandTree)
 			{
 				var sqlGen = new SqlGenerator();
 				parameters = null;
@@ -262,22 +260,19 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 
 			//Handle Insert
-			var insertCommandTree = tree as DbInsertCommandTree;
-			if (insertCommandTree != null)
+			if (tree is DbInsertCommandTree insertCommandTree)
 			{
 				return DmlSqlGenerator.GenerateInsertSql(insertCommandTree, out parameters);
 			}
 
 			//Handle Delete
-			var deleteCommandTree = tree as DbDeleteCommandTree;
-			if (deleteCommandTree != null)
+			if (tree is DbDeleteCommandTree deleteCommandTree)
 			{
 				return DmlSqlGenerator.GenerateDeleteSql(deleteCommandTree, out parameters);
 			}
 
 			//Handle Update
-			var updateCommandTree = tree as DbUpdateCommandTree;
-			if (updateCommandTree != null)
+			if (tree is DbUpdateCommandTree updateCommandTree)
 			{
 				return DmlSqlGenerator.GenerateUpdateSql(updateCommandTree, out parameters);
 			}
@@ -1291,26 +1286,22 @@ namespace EntityFramework.Firebird.SqlGen
 		public override ISqlFragment Visit(DbNotExpression e)
 		{
 			// Flatten Not(Not(x)) to x.
-			var notExpression = e.Argument as DbNotExpression;
-			if (notExpression != null)
+			if (e.Argument is DbNotExpression notExpression)
 			{
 				return notExpression.Argument.Accept(this);
 			}
 
-			var isEmptyExpression = e.Argument as DbIsEmptyExpression;
-			if (isEmptyExpression != null)
+			if (e.Argument is DbIsEmptyExpression isEmptyExpression)
 			{
 				return VisitIsEmptyExpression(isEmptyExpression, true);
 			}
 
-			var isNullExpression = e.Argument as DbIsNullExpression;
-			if (isNullExpression != null)
+			if (e.Argument is DbIsNullExpression isNullExpression)
 			{
 				return VisitIsNullExpression(isNullExpression, true);
 			}
 
-			var comparisonExpression = e.Argument as DbComparisonExpression;
-			if (comparisonExpression != null)
+			if (e.Argument is DbComparisonExpression comparisonExpression)
 			{
 				if (comparisonExpression.ExpressionKind == DbExpressionKind.Equals)
 				{
@@ -1413,8 +1404,7 @@ namespace EntityFramework.Firebird.SqlGen
 			// so we have to check it here.
 			// We call VisitNewInstanceExpression instead of Visit(DbNewInstanceExpression), since
 			// the latter throws.
-			var newInstanceExpression = e.Projection as DbNewInstanceExpression;
-			if (newInstanceExpression != null)
+			if (e.Projection is DbNewInstanceExpression newInstanceExpression)
 			{
 				result.Select.Append(VisitNewInstanceExpression(newInstanceExpression));
 			}
@@ -1460,15 +1450,13 @@ namespace EntityFramework.Firebird.SqlGen
 
 			// Since the DbVariableReferenceExpression is a proper child of ours, we can reset
 			// isVarSingle.
-			var DbVariableReferenceExpression = e.Instance as DbVariableReferenceExpression;
-			if (DbVariableReferenceExpression != null)
+			if (e.Instance is DbVariableReferenceExpression DbVariableReferenceExpression)
 			{
 				_isVarRefSingle = false;
 			}
 
 			// We need to flatten, and have not yet seen the first nested SELECT statement.
-			var joinSymbol = instanceSql as JoinSymbol;
-			if (joinSymbol != null)
+			if (instanceSql is JoinSymbol joinSymbol)
 			{
 				varName = GetShortenedName(varName);
 				Debug.Assert(joinSymbol.NameToExtent.ContainsKey(varName));
@@ -1483,12 +1471,10 @@ namespace EntityFramework.Firebird.SqlGen
 			}
 			// ---------------------------------------
 			// We have seen the first nested SELECT statement, but not the column.
-			var symbolPair = instanceSql as SymbolPair;
-			if (symbolPair != null)
+			if (instanceSql is SymbolPair symbolPair)
 			{
 				varName = GetShortenedName(varName);
-				var columnJoinSymbol = symbolPair.Column as JoinSymbol;
-				if (columnJoinSymbol != null)
+				if (symbolPair.Column is JoinSymbol columnJoinSymbol)
 				{
 					Debug.Assert(columnJoinSymbol.NameToExtent.ContainsKey(varName));
 					symbolPair.Column = columnJoinSymbol.NameToExtent[varName];
@@ -1728,9 +1714,8 @@ namespace EntityFramework.Firebird.SqlGen
 		SqlBuilder VisitAggregate(DbAggregate aggregate, object aggregateArgument)
 		{
 			var aggregateResult = new SqlBuilder();
-			var functionAggregate = aggregate as DbFunctionAggregate;
 
-			if (functionAggregate == null)
+			if (!(aggregate is DbFunctionAggregate functionAggregate))
 			{
 				throw new NotSupportedException();
 			}
@@ -2119,8 +2104,7 @@ namespace EntityFramework.Firebird.SqlGen
 				// The child has its own select statement, and is not reusing
 				// our select statement.
 				// This should look a lot like VisitInputExpression().
-				var sqlSelectStatement = fromExtentFragment as SqlSelectStatement;
-				if (sqlSelectStatement != null)
+				if (fromExtentFragment is SqlSelectStatement sqlSelectStatement)
 				{
 					if (sqlSelectStatement.Select.IsEmpty)
 					{
@@ -2144,8 +2128,7 @@ namespace EntityFramework.Firebird.SqlGen
 							// clone the join symbol, so that we "reuse" the
 							// join symbol.  Normally, we create a new symbol - see the next block
 							// of code.
-							var oldJoinSymbol = sqlSelectStatement.FromExtents[0] as JoinSymbol;
-							if (oldJoinSymbol != null)
+							if (sqlSelectStatement.FromExtents[0] is JoinSymbol oldJoinSymbol)
 							{
 								// Note: sqlSelectStatement.FromExtents will not do, since it might
 								// just be an alias of joinSymbol, and we want an actual JoinSymbol.
@@ -2227,9 +2210,8 @@ namespace EntityFramework.Firebird.SqlGen
 		ISqlFragment VisitNewInstanceExpression(DbNewInstanceExpression e)
 		{
 			var result = new SqlBuilder();
-			var rowType = e.ResultType.EdmType as RowType;
 
-			if (null != rowType)
+			if (e.ResultType.EdmType is RowType rowType)
 			{
 				var members = rowType.Properties;
 				var separator = string.Empty;
@@ -2798,8 +2780,7 @@ namespace EntityFramework.Firebird.SqlGen
 		void AddColumns(SqlSelectStatement selectStatement, Symbol symbol,
 			List<Symbol> columnList, Dictionary<string, Symbol> columnDictionary, ref string separator)
 		{
-			var joinSymbol = symbol as JoinSymbol;
-			if (joinSymbol != null)
+			if (symbol is JoinSymbol joinSymbol)
 			{
 				if (!joinSymbol.IsNestedJoin)
 				{
@@ -3103,8 +3084,7 @@ namespace EntityFramework.Firebird.SqlGen
 				// clone the join symbol, so that we "reuse" the
 				// join symbol.  Normally, we create a new symbol - see the next block
 				// of code.
-				var oldJoinSymbol = oldStatement.FromExtents[0] as JoinSymbol;
-				if (oldJoinSymbol != null)
+				if (oldStatement.FromExtents[0] is JoinSymbol oldJoinSymbol)
 				{
 					// Note: oldStatement.FromExtents will not do, since it might
 					// just be an alias of joinSymbol, and we want an actual JoinSymbol.
@@ -3680,13 +3660,11 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		static bool IsPropertyOverVarRef(DbExpression expression)
 		{
-			var propertyExpression = expression as DbPropertyExpression;
-			if (propertyExpression == null)
+			if (!(expression is DbPropertyExpression propertyExpression))
 			{
 				return false;
 			}
-			var varRefExpression = propertyExpression.Instance as DbVariableReferenceExpression;
-			if (varRefExpression == null)
+			if (!(propertyExpression.Instance is DbVariableReferenceExpression varRefExpression))
 			{
 				return false;
 			}

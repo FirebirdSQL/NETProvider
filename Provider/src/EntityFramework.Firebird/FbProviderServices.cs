@@ -313,15 +313,12 @@ namespace EntityFramework.Firebird
 
 		private static Type[] PrepareTypeCoercions(DbCommandTree commandTree)
 		{
-			var queryTree = commandTree as DbQueryCommandTree;
-			if (queryTree != null)
+			if (commandTree is DbQueryCommandTree queryTree)
 			{
-				var projectExpression = queryTree.Query as DbProjectExpression;
-				if (projectExpression != null)
+				if (queryTree.Query is DbProjectExpression projectExpression)
 				{
 					var resultsType = projectExpression.Projection.ResultType.EdmType;
-					var resultsAsStructuralType = resultsType as StructuralType;
-					if (resultsAsStructuralType != null)
+					if (resultsType is StructuralType resultsAsStructuralType)
 					{
 						var members = resultsAsStructuralType.Members;
 						return members.Select(ExtractExpectedTypeForCoercion).ToArray();
@@ -329,8 +326,7 @@ namespace EntityFramework.Firebird
 				}
 			}
 
-			var functionTree = commandTree as DbFunctionCommandTree;
-			if (functionTree != null)
+			if (commandTree is DbFunctionCommandTree functionTree)
 			{
 				if (functionTree.ResultType != null)
 				{

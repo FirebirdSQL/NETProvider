@@ -236,8 +236,7 @@ namespace EntityFramework.Firebird
 			}
 			Debug.Assert(edmType.EdmType.BuiltInTypeKind == BuiltInTypeKind.PrimitiveType);
 
-			var primitiveType = edmType.EdmType as PrimitiveType;
-			if (primitiveType == null)
+			if (!(edmType.EdmType is PrimitiveType primitiveType))
 			{
 				throw new ArgumentException(string.Format("The underlying provider does not support the type '{0}'.", edmType));
 			}

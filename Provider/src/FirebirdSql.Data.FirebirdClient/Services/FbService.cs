@@ -158,8 +158,7 @@ namespace FirebirdSql.Data.Services
 			var result = new List<object>();
 			Query(items, (truncated, item) =>
 			{
-				var stringItem = item as string;
-				if (stringItem != null)
+				if (item is string stringItem)
 				{
 					if (!truncated)
 					{
@@ -173,8 +172,7 @@ namespace FirebirdSql.Data.Services
 					return;
 				}
 
-				var byteArrayItem = item as byte[];
-				if (byteArrayItem != null)
+				if (item is byte[] byteArrayItem)
 				{
 					if (!truncated)
 					{
