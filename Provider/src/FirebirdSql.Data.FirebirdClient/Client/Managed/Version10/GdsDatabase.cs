@@ -550,22 +550,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void ProcessResponse(IResponse response)
 		{
-			if (response != null && response is GenericResponse)
+			if (response is GenericResponse genericResponse)
 			{
-				if (((GenericResponse)response).Exception != null && !((GenericResponse)response).Exception.IsWarning)
+				if (genericResponse.Exception != null && !genericResponse.Exception.IsWarning)
 				{
-					throw ((GenericResponse)response).Exception;
+					throw genericResponse.Exception;
 				}
 			}
 		}
 
 		protected void ProcessResponseWarnings(IResponse response)
 		{
-			if (response is GenericResponse)
+			if (response is GenericResponse genericResponse)
 			{
-				if (((GenericResponse)response).Exception != null && ((GenericResponse)response).Exception.IsWarning)
+				if (genericResponse.Exception != null && genericResponse.Exception.IsWarning)
 				{
-					_warningMessage?.Invoke(((GenericResponse)response).Exception);
+					_warningMessage?.Invoke(genericResponse.Exception);
 				}
 			}
 		}
