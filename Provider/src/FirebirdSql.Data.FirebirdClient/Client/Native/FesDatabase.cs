@@ -149,8 +149,10 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Methods
 
-		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
+			CheckCryptKeyForSupport(cryptKey);
+
 			var databaseBuffer = Encoding2.Default.GetBytes(database);
 
 			ClearStatusVector();
@@ -205,9 +207,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
-			// ICryptKeyCallbackImpl would have to be passed from C# for 'cryptKey' passing
-			if (cryptKey?.Length > 0)
-				throw new NotSupportedException("Passing Encryption Key isn't, yet, supported on Firebird Embedded.");
+			CheckCryptKeyForSupport(cryptKey);
 
 			var databaseBuffer = Encoding2.Default.GetBytes(database);
 
@@ -356,6 +356,17 @@ namespace FirebirdSql.Data.Client.Native
 				buffer);
 
 			ProcessStatusVector(_statusVector);
+		}
+
+		#endregion
+
+		#region Internal Static Methods
+
+		internal static void CheckCryptKeyForSupport(byte[] cryptKey)
+		{
+			// ICryptKeyCallbackImpl would have to be passed from C# for 'cryptKey' passing
+			if (cryptKey?.Length > 0)
+				throw new NotSupportedException("Passing Encryption Key isn't, yet, supported on Firebird Embedded.");
 		}
 
 		#endregion

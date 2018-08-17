@@ -276,7 +276,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Methods
 
-		public virtual void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database)
+		public virtual void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			try
 			{

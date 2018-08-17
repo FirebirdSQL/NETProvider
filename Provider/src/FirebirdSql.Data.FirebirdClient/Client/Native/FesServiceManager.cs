@@ -62,9 +62,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey)
 		{
-			// ICryptKeyCallbackImpl would have to be passed from C# for 'cryptKey' passing
-			if (cryptKey?.Length > 0)
-				throw new NotSupportedException("Passing Encryption Key isn't, yet, supported on Firebird Embedded.");
+			FesDatabase.CheckCryptKeyForSupport(cryptKey);
 
 			ClearStatusVector();
 

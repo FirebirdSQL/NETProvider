@@ -33,13 +33,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				SendAttachToBuffer(spb, service);
 				Database.XdrStream.Flush();
 				var response = Database.ReadResponse();
-				while (response is CryptKeyCallbackReponse cryptResponse)
-				{
-					Database.XdrStream.Write(IscCodes.op_crypt_key_callback);
-					Database.XdrStream.WriteBuffer(cryptKey);
-					Database.XdrStream.Flush();
-					response = Database.ReadResponse();
-				}
+				response = (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
 				ProcessAttachResponse(response as GenericResponse);
 			}
 			catch (IOException ex)
@@ -47,6 +41,11 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				Database.Detach();
 				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
 			}
+		}
+
+		protected override Version10.GdsDatabase CreateDatabase(GdsConnection connection)
+		{
+			return new GdsDatabase(connection);
 		}
 	}
 }

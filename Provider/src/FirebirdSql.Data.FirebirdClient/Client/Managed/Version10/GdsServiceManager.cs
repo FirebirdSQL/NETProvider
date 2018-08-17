@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public GdsServiceManager(GdsConnection connection)
 		{
 			_connection = connection;
-			_database = new GdsDatabase(_connection);
+			_database = CreateDatabase(_connection);
 		}
 
 		#endregion
@@ -176,6 +176,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
+		}
+
+		protected virtual GdsDatabase CreateDatabase(GdsConnection connection)
+		{
+			return new GdsDatabase(connection);
 		}
 
 		#endregion

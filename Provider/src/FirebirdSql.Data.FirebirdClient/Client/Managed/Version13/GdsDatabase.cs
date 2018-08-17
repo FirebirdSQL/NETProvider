@@ -30,7 +30,6 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 {
 	internal class GdsDatabase : Version12.GdsDatabase
 	{
-#warning Refactoring op_attach and op_create.
 		public GdsDatabase(GdsConnection connection)
 			: base(connection)
 		{ }
@@ -42,14 +41,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				SendAttachToBuffer(dpb, database);
 				XdrStream.Flush();
 				var response = ReadResponse();
-#warning Unification
-				while (response is CryptKeyCallbackReponse cryptResponse)
-				{
-					XdrStream.Write(IscCodes.op_crypt_key_callback);
-					XdrStream.WriteBuffer(cryptKey);
-					XdrStream.Flush();
-					response = ReadResponse();
-				}
+				response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
 				ProcessAttachResponse(response as GenericResponse);
 			}
 			catch (IscException)
@@ -79,6 +71,38 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 
+		public override void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		{
+			try
+			{
+				SendCreateToBuffer(dpb, database);
+				XdrStream.Flush();
+
+				try
+				{
+					var response = ReadResponse();
+					response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
+					ProcessCreateResponse(response as GenericResponse);
+
+					Detach();
+				}
+				catch (IscException)
+				{
+					try
+					{
+						CloseConnection();
+					}
+					catch
+					{ }
+					throw;
+				}
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
+			}
+		}
+
 		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
 			XdrStream.Write(IscCodes.op_create);
@@ -95,6 +119,18 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			Attach(dpb, dataSource, port, database, cryptKey);
+		}
+
+		public IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
+		{
+			while (response is CryptKeyCallbackReponse cryptResponse)
+			{
+				XdrStream.Write(IscCodes.op_crypt_key_callback);
+				XdrStream.WriteBuffer(cryptKey);
+				XdrStream.Flush();
+				response = ReadResponse();
+			}
+			return response;
 		}
 
 		#region Override Statement Creation Methods
