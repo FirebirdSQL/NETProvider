@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public static void ClearPool(FbConnection connection)
 		{
 			if (connection == null)
-				throw new ArgumentNullException("connection");
+				throw new ArgumentNullException(nameof(connection));
 
 			FbConnectionPoolManager.Instance.ClearPool(connection._options);
 		}
