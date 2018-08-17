@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Client.Native
 	{
 		#region Callbacks
 
-		public WarningMessageCallback WarningMessage
+		public Action<IscException> WarningMessage
 		{
 			get { return _warningMessage; }
 			set { _warningMessage = value; }
@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Fields
 
-		private WarningMessageCallback _warningMessage;
+		private Action<IscException> _warningMessage;
 
 		private DatabaseHandle _handle;
 		private int _transactionCount;

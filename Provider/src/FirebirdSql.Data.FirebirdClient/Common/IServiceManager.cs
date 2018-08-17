@@ -21,6 +21,8 @@ namespace FirebirdSql.Data.Common
 {
 	internal interface IServiceManager
 	{
+		Action<IscException> WarningMessage { get; set; }
+
 		int Handle { get; }
 
 		void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey);

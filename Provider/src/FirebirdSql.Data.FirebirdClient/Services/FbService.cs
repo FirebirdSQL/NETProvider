@@ -30,6 +30,8 @@ namespace FirebirdSql.Data.Services
 	{
 		public event EventHandler<ServiceOutputEventArgs> ServiceOutput;
 
+		public event EventHandler<FbInfoMessageEventArgs> InfoMessage;
+
 		private const string ServiceName = "service_mgr";
 
 		private IServiceManager _svc;
@@ -111,6 +113,7 @@ namespace FirebirdSql.Data.Services
 					_svc = ClientFactory.CreateServiceManager(_csManager);
 				}
 				_svc.Attach(BuildSpb(), _csManager.DataSource, _csManager.Port, ServiceName, _csManager.CryptKey);
+				_svc.WarningMessage = OnWarningMessage;
 				State = FbServiceState.Open;
 			}
 			catch (Exception ex)
@@ -355,6 +358,11 @@ namespace FirebirdSql.Data.Services
 					Close();
 				}
 			}
+		}
+
+		private void OnWarningMessage(IscException warning)
+		{
+			InfoMessage?.Invoke(this, new FbInfoMessageEventArgs(warning));
 		}
 
 		private static FbServerConfig ParseServerConfig(byte[] buffer, ref int pos)

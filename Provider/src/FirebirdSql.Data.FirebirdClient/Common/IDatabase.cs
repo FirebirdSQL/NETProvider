@@ -23,7 +23,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal interface IDatabase : IDisposable
 	{
-		WarningMessageCallback WarningMessage { get; set; }
+		Action<IscException> WarningMessage { get; set; }
 
 		int Handle { get; }
 		int TransactionCount { get; set; }

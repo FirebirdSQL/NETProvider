@@ -23,7 +23,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal class GdsServiceManager : IServiceManager
 	{
+		#region Callbacks
+
+		public Action<IscException> WarningMessage
+		{
+			get { return _warningMessage; }
+			set { _warningMessage = value; }
+		}
+
+		#endregion
+
 		#region Fields
+
+		private Action<IscException> _warningMessage;
 
 		private int _handle;
 		private GdsConnection _connection;
@@ -56,6 +68,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			_connection = connection;
 			_database = CreateDatabase(_connection);
+			RewireWarningMessage();
 		}
 
 		#endregion
@@ -181,6 +194,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected virtual GdsDatabase CreateDatabase(GdsConnection connection)
 		{
 			return new GdsDatabase(connection);
+		}
+
+		private void RewireWarningMessage()
+		{
+			_database.WarningMessage = ex => _warningMessage?.Invoke(ex);
 		}
 
 		#endregion

@@ -481,7 +481,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
 
 				// Bind	Warning	messages event
-				_innerConnection.Database.WarningMessage = new WarningMessageCallback(OnWarningMessage);
+				_innerConnection.Database.WarningMessage = OnWarningMessage;
 
 				// Update the connection state
 				OnStateChange(_state, ConnectionState.Open);

@@ -23,7 +23,19 @@ namespace FirebirdSql.Data.Client.Native
 {
 	internal sealed class FesServiceManager : IServiceManager
 	{
+		#region Callbacks
+
+		public Action<IscException> WarningMessage
+		{
+			get { return _warningMessage; }
+			set { _warningMessage = value; }
+		}
+
+		#endregion
+
 		#region Fields
+
+		private Action<IscException> _warningMessage;
 
 		private IFbClient _fbClient;
 		private int _handle;
@@ -149,8 +161,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				if (ex.IsWarning)
 				{
-#warning This is not propagated to FesDatabase's callback as with GdsDatabase
-					//_warningMessage?.Invoke(ex);
+					_warningMessage?.Invoke(ex);
 				}
 				else
 				{

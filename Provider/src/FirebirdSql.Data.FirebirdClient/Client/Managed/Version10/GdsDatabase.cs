@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Callbacks
 
-		public WarningMessageCallback WarningMessage
+		public Action<IscException> WarningMessage
 		{
 			get { return _warningMessage; }
 			set { _warningMessage = value; }
@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Fields
 
-		protected WarningMessageCallback _warningMessage;
+		protected Action<IscException> _warningMessage;
 
 		private GdsConnection _connection;
 		private GdsEventManager _eventManager;
