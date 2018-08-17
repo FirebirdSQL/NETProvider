@@ -117,7 +117,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return base.QuotePrefix; }
 			set
 			{
-				if (String.IsNullOrEmpty(value))
+				if (string.IsNullOrEmpty(value))
 				{
 					base.QuotePrefix = value;
 				}
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return base.QuoteSuffix; }
 			set
 			{
-				if (String.IsNullOrEmpty(value))
+				if (string.IsNullOrEmpty(value))
 				{
 					base.QuoteSuffix = value;
 				}

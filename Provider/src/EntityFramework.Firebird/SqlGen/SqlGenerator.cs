@@ -347,18 +347,18 @@ namespace EntityFramework.Firebird.SqlGen
 			//string userSchemaName = (string)function.MetadataProperties["Schema"].Value;
 			var userFuncName = (string)function.MetadataProperties["StoreFunctionNameAttribute"].Value;
 
-			if (String.IsNullOrEmpty(userCommandText))
+			if (string.IsNullOrEmpty(userCommandText))
 			{
 				// build a quoted description of the function
 				commandType = CommandType.StoredProcedure;
 
 				// if the schema name is not explicitly given, it is assumed to be the metadata namespace
 				/// No schema in FB
-				//string schemaName = String.IsNullOrEmpty(userSchemaName) ?
+				//string schemaName = string.IsNullOrEmpty(userSchemaName) ?
 				//    function.NamespaceName : userSchemaName;
 
 				// if the function store name is not explicitly given, it is assumed to be the metadata name
-				var functionName = String.IsNullOrEmpty(userFuncName) ?
+				var functionName = string.IsNullOrEmpty(userFuncName) ?
 					function.Name : userFuncName;
 
 				// quote elements of function text
@@ -3413,7 +3413,7 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		internal static string QuoteIdentifier(string name)
 		{
-			Debug.Assert(!String.IsNullOrEmpty(name));
+			Debug.Assert(!string.IsNullOrEmpty(name));
 			// We assume that the names are not quoted to begin with.
 			return "\"" + name.Replace("\"", "\"\"") + "\"";
 		}

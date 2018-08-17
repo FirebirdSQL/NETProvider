@@ -303,7 +303,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				_schemaTable.Rows.Add(schemaRow);
 
-				if (!String.IsNullOrEmpty(_fields[i].Relation) && currentTable != _fields[i].Relation)
+				if (!string.IsNullOrEmpty(_fields[i].Relation) && currentTable != _fields[i].Relation)
 				{
 					tableCount++;
 					currentTable = _fields[i].Relation;

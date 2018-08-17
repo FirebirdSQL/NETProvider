@@ -367,7 +367,7 @@ namespace FirebirdSql.Data.FirebirdClient
 								if ((parameter.Direction == ParameterDirection.Output ||
 									parameter.Direction == ParameterDirection.ReturnValue ||
 									parameter.Direction == ParameterDirection.InputOutput) &&
-									!String.IsNullOrEmpty(parameter.SourceColumn))
+									!string.IsNullOrEmpty(parameter.SourceColumn))
 								{
 									DataColumn column = null;
 
@@ -493,7 +493,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				// Process only input parameters
 				if ((parameter.Direction == ParameterDirection.Input || parameter.Direction == ParameterDirection.InputOutput) &&
-					!String.IsNullOrEmpty(parameter.SourceColumn))
+					!string.IsNullOrEmpty(parameter.SourceColumn))
 				{
 					DataColumn column = null;
 
