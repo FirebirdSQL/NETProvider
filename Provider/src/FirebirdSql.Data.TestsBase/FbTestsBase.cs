@@ -188,31 +188,36 @@ end";
 
 		public static string BuildServicesConnectionString(FbServerType serverType, bool compression, bool includeDatabase)
 		{
-			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
-			cs.UserID = FbTestsSetup.UserID;
-			cs.Password = FbTestsSetup.Password;
-			cs.DataSource = FbTestsSetup.DataSource;
+			return BuildServicesConnectionStringBuilder(serverType, compression, includeDatabase).ToString();
+		}
+
+		public static FbConnectionStringBuilder BuildServicesConnectionStringBuilder(FbServerType serverType, bool compression, bool includeDatabase)
+		{
+			FbConnectionStringBuilder builder = new FbConnectionStringBuilder();
+			builder.UserID = FbTestsSetup.UserID;
+			builder.Password = FbTestsSetup.Password;
+			builder.DataSource = FbTestsSetup.DataSource;
 			if (includeDatabase)
 			{
-				cs.Database = FbTestsSetup.Database(serverType, compression);
+				builder.Database = FbTestsSetup.Database(serverType, compression);
 			}
-			cs.ServerType = serverType;
-			return cs.ToString();
+			builder.ServerType = serverType;
+			return builder;
 		}
 
 		public static FbConnectionStringBuilder BuildConnectionStringBuilder(FbServerType serverType, bool compression)
 		{
-			FbConnectionStringBuilder cs = new FbConnectionStringBuilder();
-			cs.UserID = FbTestsSetup.UserID;
-			cs.Password = FbTestsSetup.Password;
-			cs.DataSource = FbTestsSetup.DataSource;
-			cs.Database = FbTestsSetup.Database(serverType, compression);
-			cs.Port = FbTestsSetup.Port;
-			cs.Charset = FbTestsSetup.Charset;
-			cs.Pooling = FbTestsSetup.Pooling;
-			cs.Compression = compression;
-			cs.ServerType = serverType;
-			return cs;
+			FbConnectionStringBuilder builder = new FbConnectionStringBuilder();
+			builder.UserID = FbTestsSetup.UserID;
+			builder.Password = FbTestsSetup.Password;
+			builder.DataSource = FbTestsSetup.DataSource;
+			builder.Database = FbTestsSetup.Database(serverType, compression);
+			builder.Port = FbTestsSetup.Port;
+			builder.Charset = FbTestsSetup.Charset;
+			builder.Pooling = FbTestsSetup.Pooling;
+			builder.Compression = compression;
+			builder.ServerType = serverType;
+			return builder;
 		}
 
 		#endregion

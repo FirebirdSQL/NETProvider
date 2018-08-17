@@ -42,6 +42,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				SendAttachToBuffer(dpb, database);
 				XdrStream.Flush();
 				var response = ReadResponse();
+#warning Unification
 				while (response is CryptKeyCallbackReponse cryptResponse)
 				{
 					XdrStream.Write(IscCodes.op_crypt_key_callback);

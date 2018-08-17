@@ -20,6 +20,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using FirebirdSql.Data.Services;
@@ -395,11 +396,27 @@ end";
 			Assert.AreNotEqual(-1, sessionId);
 		}
 
+		[Test, Explicit]
+		public void StatisticsWithEncryptedTest()
+		{
+			var csb = BuildServicesConnectionStringBuilder(FbServerType, Compression, true);
+			csb.Database = "enc.fdb";
+			void Test()
+			{
+				var statisticalSvc = new FbStatistical(csb.ToString());
+				statisticalSvc.ServiceOutput += ServiceOutput;
+				statisticalSvc.Execute();
+			}
+			Assert.Throws<FbException>(Test);
+			csb.CryptKey = Encoding.ASCII.GetBytes("1234567890123456");
+			Assert.DoesNotThrow(Test);
+		}
+
 		#endregion
 
 		#region Methods
 
-		void ServiceOutput(object sender, ServiceOutputEventArgs e)
+		static void ServiceOutput(object sender, ServiceOutputEventArgs e)
 		{
 			var dummy = e.Message;
 		}

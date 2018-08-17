@@ -359,11 +359,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void PassCryptKey()
 		{
 			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
-			csb.CryptKey = Encoding.ASCII.GetBytes("1234567890123456");
-			using (var conn = new FbConnection(csb.ToString()))
+			csb.Database = "enc.fdb";
+			void Test()
 			{
-				conn.Open();
+				using (var conn = new FbConnection(csb.ToString()))
+				{
+					conn.Open();
+				}
 			}
+			Assert.Throws<FbException>(Test);
+			csb.CryptKey = Encoding.ASCII.GetBytes("1234567890123456");
+			Assert.DoesNotThrow(Test);
 		}
 
 		[Test, Explicit]

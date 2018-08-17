@@ -15,17 +15,12 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
-using System;
-
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Client.Managed.Version11
 {
-	internal interface IServiceManager
+	internal class GdsServiceManager : Version10.GdsServiceManager
 	{
-		int Handle { get; }
-
-		void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey);
-		void Detach();
-		void Start(ServiceParameterBuffer spb);
-		void Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer);
+		public GdsServiceManager(GdsConnection connection)
+			: base(connection)
+		{ }
 	}
 }

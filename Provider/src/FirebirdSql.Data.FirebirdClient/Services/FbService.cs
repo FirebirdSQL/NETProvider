@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.Services
 				{
 					_svc = ClientFactory.CreateServiceManager(_csManager);
 				}
-				_svc.Attach(BuildSpb(), _csManager.DataSource, _csManager.Port, ServiceName);
+				_svc.Attach(BuildSpb(), _csManager.DataSource, _csManager.Port, ServiceName, _csManager.CryptKey);
 				State = FbServiceState.Open;
 			}
 			catch (Exception ex)

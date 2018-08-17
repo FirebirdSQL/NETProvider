@@ -21,13 +21,13 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-	internal sealed class GdsServiceManager : IServiceManager
+	internal class GdsServiceManager : IServiceManager
 	{
 		#region Fields
 
 		private int _handle;
-		private GdsDatabase _database;
 		private GdsConnection _connection;
+		private GdsDatabase _database;
 
 		#endregion
 
@@ -41,6 +41,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public byte[] AuthData
 		{
 			get { return _connection.AuthData; }
+		}
+
+		public GdsDatabase Database
+		{
+			get { return _database; }
 		}
 
 		#endregion
@@ -57,22 +62,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service)
+		public virtual void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey)
 		{
-			GenericResponse response = null;
-
 			try
 			{
-#warning Separate method for op_service_attach as for i.e. op_attach
-				_database.XdrStream.Write(IscCodes.op_service_attach);
-				_database.XdrStream.Write(0);
-				_database.XdrStream.Write(service);
-				_database.XdrStream.WriteBuffer(spb.ToArray());
+				SendAttachToBuffer(spb, service);
 				_database.XdrStream.Flush();
-
-				response = _database.ReadGenericResponse();
-
-				_handle = response.ObjectHandle;
+				ProcessAttachResponse(_database.ReadGenericResponse());
 			}
 			catch (IOException ex)
 			{
@@ -81,7 +77,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void Detach()
+		protected virtual void SendAttachToBuffer(ServiceParameterBuffer spb, string service)
+		{
+			_database.XdrStream.Write(IscCodes.op_service_attach);
+			_database.XdrStream.Write(0);
+			_database.XdrStream.Write(service);
+			_database.XdrStream.WriteBuffer(spb.ToArray());
+		}
+
+		protected virtual void ProcessAttachResponse(GenericResponse response)
+		{
+			_handle = response.ObjectHandle;
+		}
+
+		public virtual void Detach()
 		{
 			try
 			{
@@ -114,7 +123,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void Start(ServiceParameterBuffer spb)
+		public virtual void Start(ServiceParameterBuffer spb)
 		{
 			try
 			{
@@ -139,7 +148,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer)
+		public virtual void Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer)
 		{
 			try
 			{
