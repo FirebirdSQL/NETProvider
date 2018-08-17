@@ -16,12 +16,12 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
 using FirebirdSql.Data.Common;
+using System.Collections;
 
 namespace FirebirdSql.Data.Client.Managed.Version13
 {

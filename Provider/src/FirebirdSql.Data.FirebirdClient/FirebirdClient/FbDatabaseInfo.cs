@@ -18,9 +18,10 @@
 using System;
 using System.Text;
 using System.Data;
-using System.Collections;
 
 using FirebirdSql.Data.Common;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -215,9 +216,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return GetInt32(IscCodes.isc_info_active_transactions); }
 		}
 
-		public ArrayList ActiveUsers
+		public List<string> ActiveUsers
 		{
-			get { return GetArrayList(IscCodes.isc_info_user_names); }
+			get { return GetList<string>(IscCodes.isc_info_user_names); }
 		}
 
 		#endregion
@@ -283,7 +284,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return (info.Count > 0 ? (bool)info[0] : false);
 		}
 
-		private ArrayList GetArrayList(byte item)
+		private List<T> GetList<T>(byte item)
 		{
 			FbConnection.EnsureOpen(_connection);
 
@@ -294,7 +295,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					IscCodes.isc_info_end
 				};
 
-			return db.GetDatabaseInfo(items);
+			return db.GetDatabaseInfo(items).Cast<T>().ToList();
 		}
 
 		#endregion

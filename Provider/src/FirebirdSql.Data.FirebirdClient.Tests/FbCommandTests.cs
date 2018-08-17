@@ -16,7 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Threading;
@@ -347,7 +347,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					create.ExecuteNonQuery();
 				}
 
-				var l = new ArrayList();
+				var l = new List<string>();
 
 				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1')");
 				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11')");

@@ -16,12 +16,12 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
 using System.Threading;
 using System.Text;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Client.Native.Handle;
+using System.Collections.Generic;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -299,12 +299,12 @@ namespace FirebirdSql.Data.Client.Native
 			return GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_128)[0].ToString();
 		}
 
-		public ArrayList GetDatabaseInfo(byte[] items)
+		public List<object> GetDatabaseInfo(byte[] items)
 		{
 			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
 		}
 
-		public ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
+		public List<object> GetDatabaseInfo(byte[] items, int bufferLength)
 		{
 			var buffer = new byte[bufferLength];
 

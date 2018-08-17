@@ -18,7 +18,6 @@
 using System;
 using System.Data;
 using System.Data.Common;
-using System.Collections;
 
 using FirebirdSql.Data.Common;
 

@@ -16,7 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 using FirebirdSql.Data.Common;
@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Client.Native
 		private StatementState _state;
 		private DbStatementType _statementType;
 		private bool _allRowsFetched;
-		private Queue _outputParams;
+		private Queue<DbValue[]> _outputParams;
 		private int _recordsAffected;
 		private bool _returnRecordsAffected;
 		private IntPtr[] _statusVector;
@@ -155,7 +155,7 @@ namespace FirebirdSql.Data.Client.Native
 			_recordsAffected = -1;
 			_db = (FesDatabase)db;
 			_handle = new StatementHandle();
-			_outputParams = new Queue();
+			_outputParams = new Queue<DbValue[]>();
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 			_fetchSqlDa = IntPtr.Zero;
 
@@ -428,7 +428,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			if (_outputParams != null && _outputParams.Count > 0)
 			{
-				return (DbValue[])_outputParams.Dequeue();
+				return _outputParams.Dequeue();
 			}
 
 			return null;
@@ -589,10 +589,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void Clear()
 		{
-			if (_outputParams != null && _outputParams.Count > 0)
-			{
-				_outputParams.Clear();
-			}
+			_outputParams?.Clear();
 		}
 
 		private void ClearAll()

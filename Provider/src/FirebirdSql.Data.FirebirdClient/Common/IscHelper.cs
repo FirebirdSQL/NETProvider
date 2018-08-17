@@ -16,7 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Resources;
 using System.Text;
@@ -25,9 +25,9 @@ namespace FirebirdSql.Data.Common
 {
 	internal static class IscHelper
 	{
-		public static ArrayList ParseDatabaseInfo(byte[] buffer)
+		public static List<object> ParseDatabaseInfo(byte[] buffer)
 		{
-			var info = new ArrayList();
+			var info = new List<object>();
 
 			var pos = 0;
 			var length = 0;

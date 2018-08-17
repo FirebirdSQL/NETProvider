@@ -16,7 +16,6 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -533,12 +532,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return (string)info[info.Count - 1];
 		}
 
-		public virtual ArrayList GetDatabaseInfo(byte[] items)
+		public virtual List<object> GetDatabaseInfo(byte[] items)
 		{
 			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
 		}
 
-		public virtual ArrayList GetDatabaseInfo(byte[] items, int bufferLength)
+		public virtual List<object> GetDatabaseInfo(byte[] items, int bufferLength)
 		{
 			var buffer = new byte[bufferLength];
 			DatabaseInfo(items, buffer, buffer.Length);

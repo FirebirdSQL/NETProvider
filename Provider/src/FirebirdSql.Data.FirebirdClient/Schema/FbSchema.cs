@@ -22,7 +22,6 @@ using System.Data.Common;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Collections;
 
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Common;

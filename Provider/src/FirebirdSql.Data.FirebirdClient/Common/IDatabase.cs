@@ -16,8 +16,8 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Collections;
 
 namespace FirebirdSql.Data.Common
 {
@@ -46,8 +46,8 @@ namespace FirebirdSql.Data.Common
 		StatementBase CreateStatement();
 		StatementBase CreateStatement(TransactionBase transaction);
 
-		ArrayList GetDatabaseInfo(byte[] items);
-		ArrayList GetDatabaseInfo(byte[] items, int bufferLength);
+		List<object> GetDatabaseInfo(byte[] items);
+		List<object> GetDatabaseInfo(byte[] items, int bufferLength);
 
 		void CloseEventManager();
 		void QueueEvents(RemoteEvent events);

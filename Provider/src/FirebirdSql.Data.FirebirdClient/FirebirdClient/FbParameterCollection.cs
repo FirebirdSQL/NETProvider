@@ -16,7 +16,6 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -26,6 +25,7 @@ using System.Linq;
 
 using FirebirdSql.Data.Common;
 using System.Text;
+using System.Collections;
 
 namespace FirebirdSql.Data.FirebirdClient
 {

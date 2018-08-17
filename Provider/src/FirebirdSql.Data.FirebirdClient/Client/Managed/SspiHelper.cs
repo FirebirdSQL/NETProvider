@@ -19,7 +19,6 @@
 
 using System;
 using System.Text;
-using System.Collections;
 using System.Runtime.InteropServices;
 
 using FirebirdSql.Data.Common;

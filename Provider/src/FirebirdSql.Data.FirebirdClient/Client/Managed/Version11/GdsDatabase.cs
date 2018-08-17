@@ -16,7 +16,6 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net), Vladimir Bodecek
 
 using System;
-using System.Collections;
 using System.Data;
 using System.Globalization;
 using System.IO;

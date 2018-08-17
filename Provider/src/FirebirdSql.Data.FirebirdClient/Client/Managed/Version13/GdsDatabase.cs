@@ -16,7 +16,6 @@
 //$Authors = Hajime Nakagami, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
 using System.Data;
 using System.Globalization;
 using System.IO;

@@ -16,11 +16,11 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Collections.Generic;
 
 using FirebirdSql.Data.Common;
+using System.Collections;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
