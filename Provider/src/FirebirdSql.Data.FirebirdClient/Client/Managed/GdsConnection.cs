@@ -363,7 +363,7 @@ namespace FirebirdSql.Data.Client.Managed
 					return new AuthResponse(xdr.ReadBuffer());
 
 				case IscCodes.op_crypt_key_callback:
-					return new CryptKeyCallbackReponse(xdr.ReadBuffer());
+					return new CryptKeyCallbackResponse(xdr.ReadBuffer());
 
 				default:
 					return null;

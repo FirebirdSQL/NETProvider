@@ -20,11 +20,11 @@ using FirebirdSql.Data.Client.Managed;
 
 namespace FirebirdSql.Data.Client.Managed.Version13
 {
-	internal class CryptKeyCallbackReponse : IResponse
+	internal class CryptKeyCallbackResponse : IResponse
 	{
 		public byte[] Data { get; }
 
-		public CryptKeyCallbackReponse(byte[] data)
+		public CryptKeyCallbackResponse(byte[] data)
 		{
 			Data = data;
 		}

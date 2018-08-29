@@ -122,7 +122,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		public IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
 		{
-			while (response is CryptKeyCallbackReponse cryptResponse)
+			while (response is CryptKeyCallbackResponse cryptResponse)
 			{
 				XdrStream.Write(IscCodes.op_crypt_key_callback);
 				XdrStream.WriteBuffer(cryptKey);
