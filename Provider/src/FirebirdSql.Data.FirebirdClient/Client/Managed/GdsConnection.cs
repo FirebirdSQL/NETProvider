@@ -34,7 +34,6 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Fields
 
-		private Socket _socket;
 		private NetworkStream _networkStream;
 		private string _userID;
 		private string _password;
@@ -113,16 +112,15 @@ namespace FirebirdSql.Data.Client.Managed
 				IPAddress = GetIPAddress(_dataSource, AddressFamily.InterNetwork);
 				var endPoint = new IPEndPoint(IPAddress, _portNumber);
 
-				_socket = new Socket(IPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+				var socket = new Socket(IPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, _packetSize);
+				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, _packetSize);
+				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
+				socket.TrySetKeepAlive(KeepAliveTime, KeepAliveInterval);
+				socket.TryEnableLoopbackFastPath();
+				socket.Connect(endPoint);
 
-				_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, _packetSize);
-				_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, _packetSize);
-				_socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
-				_socket.TrySetKeepAlive(KeepAliveTime, KeepAliveInterval);
-				_socket.TryEnableLoopbackFastPath();
-
-				_socket.Connect(endPoint);
-				_networkStream = new NetworkStream(_socket, false);
+				_networkStream = new NetworkStream(socket, true);
 			}
 			catch (SocketException ex)
 			{
@@ -242,8 +240,6 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			_networkStream?.Dispose();
 			_networkStream = null;
-			_socket?.Dispose();
-			_socket = null;
 		}
 
 		#endregion
