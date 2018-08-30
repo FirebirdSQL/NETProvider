@@ -193,7 +193,7 @@ namespace FirebirdSql.Data.Client.Managed
 										_authData = _sspi.GetClientSecurity(data);
 										break;
 									default:
-										throw new ArgumentOutOfRangeException();
+										throw new ArgumentOutOfRangeException(nameof(acceptPluginName), $"{nameof(acceptPluginName)}={acceptPluginName}");
 								}
 							}
 						}

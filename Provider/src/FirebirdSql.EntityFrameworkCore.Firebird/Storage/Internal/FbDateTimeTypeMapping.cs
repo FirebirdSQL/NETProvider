@@ -50,7 +50,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 					case FbDbType.Time:
 						return "{0:HH:mm:ss}";
 					default:
-						throw new ArgumentOutOfRangeException();
+						throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
 				}
 			}
 		}

@@ -209,7 +209,7 @@ namespace FirebirdSql.Data.Services
 				case FbShutdownOnlineMode.Full:
 					return IscCodes.isc_spb_prp_sm_full;
 				default:
-					throw new ArgumentOutOfRangeException();
+					throw new ArgumentOutOfRangeException(nameof(mode));
 			}
 		}
 	}
