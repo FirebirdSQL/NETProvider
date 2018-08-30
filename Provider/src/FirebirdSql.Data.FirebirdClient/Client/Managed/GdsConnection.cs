@@ -366,7 +366,7 @@ namespace FirebirdSql.Data.Client.Managed
 					return new CryptKeyCallbackResponse(xdr.ReadBuffer());
 
 				default:
-					return null;
+					throw new ArgumentOutOfRangeException(nameof(operation), $"{nameof(operation)}={operation}");
 			}
 		}
 
