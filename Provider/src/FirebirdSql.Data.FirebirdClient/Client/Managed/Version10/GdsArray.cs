@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			set { _handle = value; }
 		}
 
-		public override IDatabase DB
+		public override IDatabase Database
 		{
 			get { return _database; }
 			set { _database = (GdsDatabase)value; }

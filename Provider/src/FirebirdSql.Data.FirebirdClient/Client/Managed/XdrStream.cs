@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private long _position;
 		private List<byte> _outputBuffer;
-		private ReadBuffer _inputBuffer;
+		private Queue<byte> _inputBuffer;
 		private Ionic.Zlib.ZlibCodec _deflate;
 		private Ionic.Zlib.ZlibCodec _inflate;
 		private byte[] _compressionBuffer;
@@ -119,7 +119,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 			_position = 0;
 			_outputBuffer = new List<byte>(PreferredBufferSize);
-			_inputBuffer = new ReadBuffer(PreferredBufferSize);
+			_inputBuffer = new Queue<byte>(PreferredBufferSize);
 			if (_compression)
 			{
 				_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
@@ -157,19 +157,7 @@ namespace FirebirdSql.Data.Client.Managed
 			var count = buffer.Length;
 			if (_compression)
 			{
-				_deflate.OutputBuffer = _compressionBuffer;
-				_deflate.AvailableBytesOut = _compressionBuffer.Length;
-				_deflate.NextOut = 0;
-				_deflate.InputBuffer = buffer;
-				_deflate.AvailableBytesIn = buffer.Length;
-				_deflate.NextIn = 0;
-				var rc = _deflate.Deflate(Ionic.Zlib.FlushType.Sync);
-				if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
-					throw new IOException($"Error '{rc}' while compressing the data.");
-				if (_deflate.AvailableBytesIn != 0)
-					throw new IOException("Compression buffer too small.");
-				buffer = _compressionBuffer;
-				count = _deflate.NextOut;
+				HandleCompression(ref buffer, ref count);
 			}
 			try
 			{
@@ -210,7 +198,7 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureReadable();
 
-			if (_inputBuffer.Length < count)
+			if (_inputBuffer.Count < count)
 			{
 				var readBuffer = new byte[PreferredBufferSize];
 				var read = default(int);
@@ -227,33 +215,22 @@ namespace FirebirdSql.Data.Client.Managed
 				{
 					if (_compression)
 					{
-						_inflate.OutputBuffer = _compressionBuffer;
-						_inflate.AvailableBytesOut = _compressionBuffer.Length;
-						_inflate.NextOut = 0;
-						_inflate.InputBuffer = readBuffer;
-						_inflate.AvailableBytesIn = read;
-						_inflate.NextIn = 0;
-						var rc = _inflate.Inflate(Ionic.Zlib.FlushType.None);
-						if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
-							throw new IOException($"Error '{rc}' while decompressing the data.");
-						if (_inflate.AvailableBytesIn != 0)
-							throw new IOException("Decompression buffer too small.");
-						readBuffer = _compressionBuffer;
-						read = _inflate.NextOut;
+						HandleDecompression(ref readBuffer, ref read);
 					}
-					_inputBuffer.AddRange(readBuffer, read);
+					WriteToInputBuffer(readBuffer, read);
 				}
 			}
-			var dataLength = _inputBuffer.ReadInto(ref buffer, offset, count);
+			var dataLength = ReadFromInputBuffer(buffer, offset, count);
 			_position += dataLength;
 			return dataLength;
 		}
+
 		public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
 		{
 			CheckDisposed();
 			EnsureReadable();
 
-			if (_inputBuffer.Length < count)
+			if (_inputBuffer.Count < count)
 			{
 				var readBuffer = new byte[PreferredBufferSize];
 				var read = default(int);
@@ -270,24 +247,12 @@ namespace FirebirdSql.Data.Client.Managed
 				{
 					if (_compression)
 					{
-						_inflate.OutputBuffer = _compressionBuffer;
-						_inflate.AvailableBytesOut = _compressionBuffer.Length;
-						_inflate.NextOut = 0;
-						_inflate.InputBuffer = readBuffer;
-						_inflate.AvailableBytesIn = read;
-						_inflate.NextIn = 0;
-						var rc = _inflate.Inflate(Ionic.Zlib.FlushType.None);
-						if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
-							throw new IOException($"Error '{rc}' while decompressing the data.");
-						if (_inflate.AvailableBytesIn != 0)
-							throw new IOException("Decompression buffer too small.");
-						readBuffer = _compressionBuffer;
-						read = _inflate.NextOut;
+						HandleDecompression(ref readBuffer, ref read);
 					}
-					_inputBuffer.AddRange(readBuffer, read);
+					WriteToInputBuffer(readBuffer, read);
 				}
 			}
-			var dataLength = _inputBuffer.ReadInto(ref buffer, offset, count);
+			var dataLength = ReadFromInputBuffer(buffer, offset, count);
 			_position += dataLength;
 			return dataLength;
 		}
@@ -744,6 +709,58 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			if (!CanRead)
 				throw new InvalidOperationException("Read operations are not allowed by this stream.");
+		}
+
+		private int ReadFromInputBuffer(byte[] buffer, int offset, int count)
+		{
+			var read = Math.Min(count, _inputBuffer.Count);
+			for (var i = 0; i < read; i++)
+			{
+				buffer[offset + i] = _inputBuffer.Dequeue();
+			}
+			return read;
+		}
+
+		private void WriteToInputBuffer(byte[] data, int count)
+		{
+			for (var i = 0; i < count; i++)
+			{
+				_inputBuffer.Enqueue(data[i]);
+			}
+		}
+
+		private void HandleDecompression(ref byte[] buffer, ref int count)
+		{
+			_inflate.OutputBuffer = _compressionBuffer;
+			_inflate.AvailableBytesOut = _compressionBuffer.Length;
+			_inflate.NextOut = 0;
+			_inflate.InputBuffer = buffer;
+			_inflate.AvailableBytesIn = count;
+			_inflate.NextIn = 0;
+			var rc = _inflate.Inflate(Ionic.Zlib.FlushType.None);
+			if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+				throw new IOException($"Error '{rc}' while decompressing the data.");
+			if (_inflate.AvailableBytesIn != 0)
+				throw new IOException("Decompression buffer too small.");
+			buffer = _compressionBuffer;
+			count = _inflate.NextOut;
+		}
+
+		private void HandleCompression(ref byte[] buffer, ref int count)
+		{
+			_deflate.OutputBuffer = _compressionBuffer;
+			_deflate.AvailableBytesOut = _compressionBuffer.Length;
+			_deflate.NextOut = 0;
+			_deflate.InputBuffer = buffer;
+			_deflate.AvailableBytesIn = buffer.Length;
+			_deflate.NextIn = 0;
+			var rc = _deflate.Deflate(Ionic.Zlib.FlushType.Sync);
+			if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+				throw new IOException($"Error '{rc}' while compressing the data.");
+			if (_deflate.AvailableBytesIn != 0)
+				throw new IOException("Compression buffer too small.");
+			buffer = _compressionBuffer;
+			count = _deflate.NextOut;
 		}
 
 		private readonly static byte[] PadArray = new byte[] { 0, 0, 0, 0 };

@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Client.Native
 			set { _handle = value; }
 		}
 
-		public override IDatabase DB
+		public override IDatabase Database
 		{
 			get { return _db; }
 			set { _db = (FesDatabase)value; }

@@ -424,7 +424,7 @@ namespace FirebirdSql.Data.Common
 			var gdsArray = _statement.CreateArray(_field.ArrayHandle.Descriptor);
 
 			gdsArray.Handle = handle;
-			gdsArray.DB = _statement.Database;
+			gdsArray.Database = _statement.Database;
 			gdsArray.Transaction = _statement.Transaction;
 
 			return gdsArray.Read();

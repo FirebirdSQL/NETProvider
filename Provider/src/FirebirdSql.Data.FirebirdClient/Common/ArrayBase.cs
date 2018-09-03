@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.Common
 		#region Abstract Properties
 
 		public abstract long Handle { get; set; }
-		public abstract IDatabase DB { get; set; }
+		public abstract IDatabase Database { get; set; }
 		public abstract TransactionBase Transaction { get; set; }
 
 		#endregion
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.Common
 		{
 			LookupDesc();
 
-			using (var lookup = DB.CreateStatement(Transaction))
+			using (var lookup = Database.CreateStatement(Transaction))
 			{
 				lookup.Prepare(GetArrayBounds());
 				lookup.Execute();
@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.Common
 
 		public void LookupDesc()
 		{
-			using (var lookup = DB.CreateStatement(Transaction))
+			using (var lookup = Database.CreateStatement(Transaction))
 			{
 				lookup.Prepare(GetArrayDesc());
 				lookup.Execute();

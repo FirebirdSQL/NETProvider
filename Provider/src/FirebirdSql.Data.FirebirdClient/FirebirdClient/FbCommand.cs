@@ -1031,7 +1031,7 @@ namespace FirebirdSql.Data.FirebirdClient
 									}
 									else
 									{
-										statementParameter.ArrayHandle.DB = _statement.Database;
+										statementParameter.ArrayHandle.Database = _statement.Database;
 										statementParameter.ArrayHandle.Transaction = _statement.Transaction;
 									}
 
