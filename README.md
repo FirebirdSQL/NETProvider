@@ -19,3 +19,8 @@ Read more:
 | TeamCity (FB30_Default) | [![TeamCity (FB25_SC)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_BuildFb25sc.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=OpenSourceProjects_FirebirdClient_BuildFb25sc) |
 | TeamCity (FB25_SC) | [![TeamCity (FB25_SC)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_BuildFb30Default.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=OpenSourceProjects_FirebirdClient_BuildFb30Default) |
 | AppVeyor | [![AppVeyor](https://img.shields.io/appveyor/ci/cincura_net/firebirdsql-data-firebirdclient/master.svg)](https://ci.appveyor.com/project/cincura_net/firebirdsql-data-firebirdclient/history) |
+
+| GitHub |  |
+|--------|--|
+| Downloads | ![](https://img.shields.io/github/downloads/firebirdsql/netprovider/total.svg) |
+| Code size | ![](https://img.shields.io/github/languages/code-size/firebirdsql/netprovider.svg) |
