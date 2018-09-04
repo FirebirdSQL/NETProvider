@@ -34,6 +34,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private const int PreferredBufferSize = 32 * 1024;
 		private const int InvalidOperation = -1;
+		private const int CompressionBufferSize = 1 * 1024 * 1024;
 
 		#endregion
 
@@ -124,7 +125,7 @@ namespace FirebirdSql.Data.Client.Managed
 			{
 				_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
 				_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
-				_compressionBuffer = new byte[1024 * 1024];
+				_compressionBuffer = new byte[CompressionBufferSize];
 			}
 
 			_ioFailed = false;
