@@ -56,7 +56,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						case IscCodes.op_event:
 							var dbHandle = _database.XdrStream.ReadInt32();
 							var buffer = _database.XdrStream.ReadBuffer();
-							var ast = _database.XdrStream.ReadBytes(8);
+							var ast = new byte[8];
+							_database.XdrStream.ReadBytes(ast);
 							var eventId = _database.XdrStream.ReadInt32();
 
 							remoteEvent.EventCounts(buffer);

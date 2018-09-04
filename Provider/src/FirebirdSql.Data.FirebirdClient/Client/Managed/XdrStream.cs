@@ -334,9 +334,9 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region XDR Read Methods
 
-		public byte[] ReadBytes(int count)
+		public byte[] ReadBytes(byte[] buffer)
 		{
-			var buffer = new byte[count];
+			var count = buffer.Length;
 			if (count > 0)
 			{
 				var toRead = count;
@@ -353,9 +353,9 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			return buffer;
 		}
-		public async Task<byte[]> ReadBytesAsync(int count)
+		public async Task<byte[]> ReadBytesAsync(byte[] buffer)
 		{
-			var buffer = new byte[count];
+			var count = buffer.Length;
 			if (count > 0)
 			{
 				var toRead = count;
@@ -375,7 +375,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public byte[] ReadOpaque(int length)
 		{
-			var buffer = ReadBytes(length);
+			var buffer = new byte[length];
+			ReadBytes(buffer);
 			var padLength = ((4 - length) & 3);
 			if (padLength > 0)
 			{
@@ -416,18 +417,26 @@ namespace FirebirdSql.Data.Client.Managed
 			return Convert.ToInt16(ReadInt32());
 		}
 
+		private byte[] int32Buffer = new byte[4];
 		public int ReadInt32()
 		{
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(ReadBytes(4), 0));
+			Array.Clear(int32Buffer, 0, 4);
+			ReadBytes(int32Buffer);
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(int32Buffer, 0));
 		}
 		public async Task<int> ReadInt32Async()
 		{
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(await ReadBytesAsync(4).ConfigureAwait(false), 0));
+			Array.Clear(int32Buffer, 0, 4);
+			await ReadBytesAsync(int32Buffer).ConfigureAwait(false);
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(int32Buffer, 0));
 		}
 
+		private byte[] int64Buffer = new byte[8];
 		public long ReadInt64()
 		{
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(ReadBytes(8), 0));
+			Array.Clear(int64Buffer, 0, 8);
+			ReadBytes(int64Buffer);
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(int64Buffer, 0));
 		}
 
 		public Guid ReadGuid()

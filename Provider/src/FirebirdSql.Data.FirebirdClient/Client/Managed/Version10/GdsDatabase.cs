@@ -368,26 +368,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				auxHandle = XdrStream.ReadInt32();
 
-				// garbage
-				XdrStream.ReadBytes(8);
+				var garbage1 = new byte[8];
+				XdrStream.ReadBytes(garbage1);
 
 				var respLen = XdrStream.ReadInt32();
 				respLen += respLen % 4;
 
-				// sin_family
-				XdrStream.ReadBytes(2);
+				var sin_family = new byte[2];
+				XdrStream.ReadBytes(sin_family);
 				respLen -= 2;
 
-				// sin_port
-				var buffer = XdrStream.ReadBytes(2);
-				portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+				var sin_port = new byte[2];
+				XdrStream.ReadBytes(sin_port);
+				portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sin_port, 0));
 				respLen -= 2;
 
 				// * The address returned by the server may be incorrect if it is behind a NAT box
 				// * so we must use the address that was used to connect the main socket, not the
 				// * address reported by the server.
-				// sin_addr
-				buffer = XdrStream.ReadBytes(4);
+				var sin_addr = new byte[4];
+				XdrStream.ReadBytes(sin_addr);
 				//ipAddress = string.Format(
 				//    CultureInfo.InvariantCulture,
 				//    "{0}.{1}.{2}.{3}",
@@ -395,8 +395,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				ipAddress = _connection.IPAddress.ToString();
 				respLen -= 4;
 
-				// garbage
-				XdrStream.ReadBytes(respLen);
+				var garbage2 = new byte[respLen];
+				XdrStream.ReadBytes(garbage2);
 
 				XdrStream.ReadStatusVector();
 			}
