@@ -437,6 +437,7 @@ namespace FirebirdSql.Data.Common
 		// Option Flags
 		public const int isc_spb_prp_activate = 0x0100;
 		public const int isc_spb_prp_db_online = 0x0200;
+		public const int isc_spb_prp_nolinger = 0x0400;
 
 		#endregion
 

@@ -396,6 +396,16 @@ end";
 			Assert.AreNotEqual(-1, sessionId);
 		}
 
+		[Test]
+		public void NoLingerTest()
+		{
+			var configurationSvc = new FbConfiguration();
+
+			configurationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
+
+			configurationSvc.NoLinger();
+		}
+
 		[Test, Explicit]
 		public void StatisticsWithEncryptedTest()
 		{
