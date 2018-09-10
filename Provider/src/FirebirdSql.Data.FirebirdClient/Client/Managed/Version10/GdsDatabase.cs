@@ -369,17 +369,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				auxHandle = XdrStream.ReadInt32();
 
 				var garbage1 = new byte[8];
-				XdrStream.ReadBytes(garbage1);
+				XdrStream.ReadBytes(garbage1, 8);
 
 				var respLen = XdrStream.ReadInt32();
 				respLen += respLen % 4;
 
 				var sin_family = new byte[2];
-				XdrStream.ReadBytes(sin_family);
+				XdrStream.ReadBytes(sin_family, 2);
 				respLen -= 2;
 
 				var sin_port = new byte[2];
-				XdrStream.ReadBytes(sin_port);
+				XdrStream.ReadBytes(sin_port, 2);
 				portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sin_port, 0));
 				respLen -= 2;
 
@@ -387,7 +387,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				// * so we must use the address that was used to connect the main socket, not the
 				// * address reported by the server.
 				var sin_addr = new byte[4];
-				XdrStream.ReadBytes(sin_addr);
+				XdrStream.ReadBytes(sin_addr, 4);
 				//ipAddress = string.Format(
 				//    CultureInfo.InvariantCulture,
 				//    "{0}.{1}.{2}.{3}",
@@ -396,7 +396,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				respLen -= 4;
 
 				var garbage2 = new byte[respLen];
-				XdrStream.ReadBytes(garbage2);
+				XdrStream.ReadBytes(garbage2, respLen);
 
 				XdrStream.ReadStatusVector();
 			}

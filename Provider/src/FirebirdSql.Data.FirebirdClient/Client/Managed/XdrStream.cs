@@ -48,6 +48,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private long _position;
 		private List<byte> _outputBuffer;
 		private Queue<byte> _inputBuffer;
+		private byte[] _smallBuffer;
 		private Ionic.Zlib.ZlibCodec _deflate;
 		private Ionic.Zlib.ZlibCodec _inflate;
 		private byte[] _compressionBuffer;
@@ -121,6 +122,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_position = 0;
 			_outputBuffer = new List<byte>(PreferredBufferSize);
 			_inputBuffer = new Queue<byte>(PreferredBufferSize);
+			_smallBuffer = new byte[8];
 			if (_compression)
 			{
 				_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
@@ -334,9 +336,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region XDR Read Methods
 
-		public byte[] ReadBytes(byte[] buffer)
+		public byte[] ReadBytes(byte[] buffer, int count)
 		{
-			var count = buffer.Length;
 			if (count > 0)
 			{
 				var toRead = count;
@@ -353,9 +354,8 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			return buffer;
 		}
-		public async Task<byte[]> ReadBytesAsync(byte[] buffer)
+		public async Task<byte[]> ReadBytesAsync(byte[] buffer, int count)
 		{
-			var count = buffer.Length;
 			if (count > 0)
 			{
 				var toRead = count;
@@ -376,7 +376,7 @@ namespace FirebirdSql.Data.Client.Managed
 		public byte[] ReadOpaque(int length)
 		{
 			var buffer = new byte[length];
-			ReadBytes(buffer);
+			ReadBytes(buffer, length);
 			var padLength = ((4 - length) & 3);
 			if (padLength > 0)
 			{
@@ -417,26 +417,24 @@ namespace FirebirdSql.Data.Client.Managed
 			return Convert.ToInt16(ReadInt32());
 		}
 
-		private byte[] int32Buffer = new byte[4];
 		public int ReadInt32()
 		{
-			Array.Clear(int32Buffer, 0, 4);
-			ReadBytes(int32Buffer);
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(int32Buffer, 0));
+			Array.Clear(_smallBuffer, 0, 4);
+			ReadBytes(_smallBuffer, 4);
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(_smallBuffer, 0));
 		}
 		public async Task<int> ReadInt32Async()
 		{
-			Array.Clear(int32Buffer, 0, 4);
-			await ReadBytesAsync(int32Buffer).ConfigureAwait(false);
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(int32Buffer, 0));
+			Array.Clear(_smallBuffer, 0, 4);
+			await ReadBytesAsync(_smallBuffer, 4).ConfigureAwait(false);
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(_smallBuffer, 0));
 		}
 
-		private byte[] int64Buffer = new byte[8];
 		public long ReadInt64()
 		{
-			Array.Clear(int64Buffer, 0, 8);
-			ReadBytes(int64Buffer);
-			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(int64Buffer, 0));
+			Array.Clear(_smallBuffer, 0, 8);
+			ReadBytes(_smallBuffer, 8);
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(_smallBuffer, 0));
 		}
 
 		public Guid ReadGuid()
