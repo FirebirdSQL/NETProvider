@@ -19,4 +19,4 @@ after_build:
   - ps: gci "$baseDir\Provider\out" | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 test_script:
   - ps: $env:tests_firebird_dir = 'C:\firebird'
-  - ps: "& $baseDir\\Provider\\tests.ps1 -Configuration $env:CONFIGURATION -FirebirdSelection $env:firebird_selection"
+  - ps: "& $baseDir\\Provider\\tests.ps1 -Configuration $env:CONFIGURATION -FirebirdSelection $env:firebird_selection -TestSuite Tests-All"

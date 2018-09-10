@@ -1,6 +1,7 @@
 param(
 	[Parameter(Mandatory=$True)]$Configuration,
-	[Parameter(Mandatory=$True)]$FirebirdSelection)
+	[Parameter(Mandatory=$True)]$FirebirdSelection,
+	[Parameter(Mandatory=$True)]$TestSuite)
 
 $ErrorActionPreference = 'Stop'
 
@@ -61,7 +62,7 @@ function Prepare() {
 	rm $fbDownloadName
 	mv .\server\* .
 	rmdir .\server
-	
+
 	ni firebird.log -ItemType File | Out-Null
 
 	echo "Starting Firebird"
@@ -76,6 +77,12 @@ function Cleanup() {
 	rm -Force -Recurse $firebirdDir
 }
 
+function Tests-All() {
+	Tests-FirebirdClient
+	Tests-EF6
+	Tests-EFCore
+}
+
 function Tests-FirebirdClient() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
@@ -87,7 +94,7 @@ function Tests-FirebirdClient() {
 	echo "=== END ==="
 }
 
-function Tests-EF() {
+function Tests-EF6() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
@@ -107,9 +114,7 @@ function Tests-EFCore() {
 
 Prepare
 try {
-	Tests-FirebirdClient
-	Tests-EF
-	Tests-EFCore
+	& $TestSuite
 }
 finally {
 	Cleanup
