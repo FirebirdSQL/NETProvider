@@ -30,9 +30,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				: base(connectionString)
 			{ }
 
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
 			{
-				base.OnModelCreating(modelBuilder);
+				base.OnTestModelCreating(modelBuilder);
 
 				var insertEntityConf = modelBuilder.Entity<UpdateEntity>();
 				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
@@ -73,9 +73,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				: base(connectionString)
 			{ }
 
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
 			{
-				base.OnModelCreating(modelBuilder);
+				base.OnTestModelCreating(modelBuilder);
 
 				var insertEntityConf = modelBuilder.Entity<ComputedUpdateEntity>();
 				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
@@ -114,9 +114,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				: base(connectionString)
 			{ }
 
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
 			{
-				base.OnModelCreating(modelBuilder);
+				base.OnTestModelCreating(modelBuilder);
 
 				var insertEntityConf = modelBuilder.Entity<ConcurrencyUpdateEntity>();
 				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
@@ -153,9 +153,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				: base(connectionString)
 			{ }
 
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
 			{
-				base.OnModelCreating(modelBuilder);
+				base.OnTestModelCreating(modelBuilder);
 
 				var insertEntityConf = modelBuilder.Entity<ConcurrencyUpdateNoGeneratedEntity>();
 				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
@@ -192,9 +192,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				: base(connectionString)
 			{ }
 
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
 			{
-				base.OnModelCreating(modelBuilder);
+				base.OnTestModelCreating(modelBuilder);
 
 				var insertEntityConf = modelBuilder.Entity<TwoComputedUpdateEntity>();
 				insertEntityConf.Property(x => x.Id).HasColumnName("ID");

@@ -32,9 +32,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				: base(connectionString)
 			{ }
 
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
 			{
-				base.OnModelCreating(modelBuilder);
+				base.OnTestModelCreating(modelBuilder);
 
 				var insertEntityConf = modelBuilder.Entity<DeleteEntity>();
 				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
@@ -77,9 +77,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				: base(connectionString)
 			{ }
 
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
 			{
-				base.OnModelCreating(modelBuilder);
+				base.OnTestModelCreating(modelBuilder);
 
 				var insertEntityConf = modelBuilder.Entity<ConcurrencyDeleteEntity>();
 				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
