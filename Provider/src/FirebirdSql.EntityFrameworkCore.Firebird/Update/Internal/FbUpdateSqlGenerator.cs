@@ -125,7 +125,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 				commandStringBuilder.AppendJoin(readOperations, (b, e) =>
 				{
 					b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
-					b.Append(" INTO :");
+				}, ", ");
+				commandStringBuilder.Append(" INTO ");
+				commandStringBuilder.AppendJoin(readOperations, (b, e) =>
+				{
+					b.Append(":");
 					b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
 				}, ", ");
 			}

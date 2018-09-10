@@ -185,5 +185,50 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 				Assert.Throws<DbUpdateConcurrencyException>(() => db.SaveChanges());
 			}
 		}
+
+		class TwoComputedUpdateContext : FbTestDbContext
+		{
+			public TwoComputedUpdateContext(string connectionString)
+				: base(connectionString)
+			{ }
+
+			protected override void OnModelCreating(ModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+
+				var insertEntityConf = modelBuilder.Entity<TwoComputedUpdateEntity>();
+				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
+				insertEntityConf.Property(x => x.Foo).HasColumnName("FOO");
+				insertEntityConf.Property(x => x.Bar).HasColumnName("BAR");
+				insertEntityConf.Property(x => x.Computed1).HasColumnName("COMPUTED1")
+					.ValueGeneratedOnAddOrUpdate();
+				insertEntityConf.Property(x => x.Computed2).HasColumnName("COMPUTED2")
+					.ValueGeneratedOnAddOrUpdate();
+				insertEntityConf.ToTable("TEST_UPDATE_2COMPUTED");
+			}
+		}
+		class TwoComputedUpdateEntity
+		{
+			public int Id { get; set; }
+			public string Foo { get; set; }
+			public string Bar { get; set; }
+			public string Computed1 { get; set; }
+			public string Computed2 { get; set; }
+		}
+		[Test]
+		public void TwoComputedUpdate()
+		{
+			using (var db = GetDbContext<TwoComputedUpdateContext>())
+			{
+				db.Database.ExecuteSqlCommand("create table test_update_2computed (id int primary key, foo varchar(20), bar varchar(20), computed1 generated always as (foo || bar), computed2 generated always as (bar || bar))");
+				db.Database.ExecuteSqlCommand("update or insert into test_update_2computed values (66, 'foo', 'bar')");
+				var entity = new TwoComputedUpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
+				var entry = db.Attach(entity);
+				entry.Property(x => x.Foo).IsModified = true;
+				db.SaveChanges();
+				Assert.AreEqual("testbar", entity.Computed1);
+				Assert.AreEqual("barbar", entity.Computed2);
+			}
+		}
 	}
 }
