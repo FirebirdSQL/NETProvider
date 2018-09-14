@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using FirebirdSql.Data.Common;
+using System.Linq;
 #if !NETSTANDARD1_6
 using FirebirdSql.Data.Schema;
 #endif
@@ -457,42 +458,38 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetProcessName()
 		{
-			// showing ApplicationPhysicalPath may be wrong because of connection pooling; better idea?
-			return GetHostingPath() ?? GetRealProcessName();
+			return GetSystemWebHostingPath() ?? GetRealProcessName() ?? string.Empty;
 		}
 
 
-		private string GetHostingPath()
+		private string GetSystemWebHostingPath()
 		{
 #if NETSTANDARD1_6 || NETSTANDARD2_0
-			return System.AppContext.BaseDirectory;
+			return null;
 #else
-			Assembly assembly;
-			try
-			{
-				assembly = Assembly.Load(string.Format("System.Web, Version={0}.{1}.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", Environment.Version.Major, Environment.Version.Minor));
-			}
-			catch (FileNotFoundException)
-			{
+			var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.GetName().Name.Equals("System.Web", StringComparison.Ordinal)).FirstOrDefault();
+			if (assembly == null)
 				return null;
-			}
-			catch (FileLoadException)
-			{
-				return null;
-			}
-			catch (BadImageFormatException)
-			{
-				return null;
-			}
-			return (string)assembly
-				.GetType("System.Web.Hosting.HostingEnvironment")
-				.GetProperty("ApplicationPhysicalPath")
-				.GetValue(null, null);
+			// showing ApplicationPhysicalPath may be wrong because of connection pooling
+			// better idea?
+			return (string)assembly.GetType("System.Web.Hosting.HostingEnvironment").GetProperty("ApplicationPhysicalPath").GetValue(null, null);
 #endif
 		}
+
 		private string GetRealProcessName()
 		{
-			return Assembly.GetEntryAssembly()?.Location ?? Process.GetCurrentProcess().MainModule.FileName;
+			string FromProcess()
+			{
+				try
+				{
+					return Process.GetCurrentProcess().MainModule.FileName;
+				}
+				catch (InvalidOperationException)
+				{
+					return null;
+				}
+			}
+			return Assembly.GetEntryAssembly()?.Location ?? FromProcess();
 		}
 
 		private int GetProcessId()
