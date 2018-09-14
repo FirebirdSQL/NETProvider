@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				if (segmentLength > 0)
 				{
-					segment.Write(tmp, 0, segmentLength > requested ? requested : segmentLength);
+					segment.Write(tmp, 0, segmentLength);
 				}
 
 				RblRemoveValue(IscCodes.RBL_segment);
