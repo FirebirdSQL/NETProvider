@@ -22,9 +22,6 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-#if NETSTANDARD1_6
-using Microsoft.Extensions.PlatformAbstractions;
-#endif
 using FirebirdSql.Data.Common;
 #if !NETSTANDARD1_6
 using FirebirdSql.Data.Schema;
@@ -467,9 +464,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetHostingPath()
 		{
-#if NETSTANDARD1_6
-			return PlatformServices.Default.Application.ApplicationBasePath;
-#elif NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0
 			return System.AppContext.BaseDirectory;
 #else
 			Assembly assembly;
@@ -497,18 +492,19 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 		private string GetRealProcessName()
 		{
-			var assembly = Assembly.GetEntryAssembly();
-			return assembly?.Location ?? Process.GetCurrentProcess().MainModule.FileName;
+			return Assembly.GetEntryAssembly()?.Location ?? Process.GetCurrentProcess().MainModule.FileName;
 		}
 
 		private int GetProcessId()
 		{
-#if !NETSTANDARD1_6
-			var assembly = Assembly.GetEntryAssembly();
-			if (!(assembly?.IsFullyTrusted) ?? false)
+			try
+			{
+				return Process.GetCurrentProcess().Id;
+			}
+			catch (InvalidOperationException)
+			{
 				return -1;
-#endif
-			return Process.GetCurrentProcess().Id;
+			}
 		}
 
 		private void EnsureActiveTransaction()
