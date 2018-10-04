@@ -372,9 +372,9 @@ namespace FirebirdSql.Data.FirebirdClient
 						_namedParameters.Clear();
 						_namedParameters = null;
 					}
-					base.Dispose(disposing);
 				}
 			}
+			base.Dispose(disposing);
 		}
 
 		#endregion

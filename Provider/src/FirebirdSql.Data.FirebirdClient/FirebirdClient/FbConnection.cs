@@ -290,9 +290,9 @@ namespace FirebirdSql.Data.FirebirdClient
 					_innerConnection = null;
 					_options = null;
 					_connectionString = null;
-					base.Dispose(disposing);
 				}
 			}
+			base.Dispose(disposing);
 		}
 
 		#endregion

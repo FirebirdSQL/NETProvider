@@ -93,9 +93,9 @@ namespace FirebirdSql.Data.FirebirdClient
 					_connection = null;
 					_transaction = null;
 					_isCompleted = true;
-					base.Dispose(disposing);
 				}
 			}
+			base.Dispose(disposing);
 		}
 
 		#endregion
