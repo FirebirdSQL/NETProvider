@@ -124,16 +124,16 @@ namespace FirebirdSql.Data.FirebirdClient
 					CheckDisposedImpl();
 
 					var now = GetTicks();
-					var available = _available.ToArray();
+					var available = _available.ToList();
 					if (available.Count() <= _connectionString.MinPoolSize)
 						return;
-					var keep = available.Where(x => ConnectionPoolLifetimeHelper.IsAlive(_connectionString.ConnectionLifetime, x.Created, now)).ToArray();
+					var keep = available.Where(x => ConnectionPoolLifetimeHelper.IsAlive(_connectionString.ConnectionLifetime, x.Created, now)).ToList();
 					var keepCount = keep.Count();
 					if (keepCount < _connectionString.MinPoolSize)
 					{
-						keep = keep.Concat(available.Except(keep).OrderByDescending(x => x.Created).Take(_connectionString.MinPoolSize - keepCount)).ToArray();
+						keep = keep.Concat(available.Except(keep).OrderByDescending(x => x.Created).Take(_connectionString.MinPoolSize - keepCount)).ToList();
 					}
-					var release = available.Except(keep).ToArray();
+					var release = available.Except(keep).ToList();
 					release.AsParallel().ForAll(x => x.Dispose());
 					_available = new Stack<Item>(keep);
 				}
