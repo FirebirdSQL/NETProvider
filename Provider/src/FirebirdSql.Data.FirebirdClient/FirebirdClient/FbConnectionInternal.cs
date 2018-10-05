@@ -387,9 +387,9 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				catch (IOException)
 				{
-					// If an IO error occurs weh trying to release the command
-					// avoid it. ( It maybe the connection to the server was down
-					// for unknown reasons. )
+					// If an IO error occurs when trying to release the command
+					// avoid it. (It maybe the connection to the server was down
+					// for unknown reasons.)
 				}
 				catch (IscException ex)
 				{
