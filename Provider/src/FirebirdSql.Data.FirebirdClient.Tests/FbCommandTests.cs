@@ -450,8 +450,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			try
 			{
 				command.ExecuteNonQuery();
-
-				throw new Exception("The command was executed without throw	an exception");
+				Assert.Fail("The command was executed without throwing an exception");
 			}
 			catch
 			{ }

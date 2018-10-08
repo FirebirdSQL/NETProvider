@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				if (insert_values[i] != select_values[i])
 				{
-					throw new Exception("differences at index " + i.ToString());
+					Assert.Fail("differences at index " + i.ToString());
 				}
 			}
 		}
@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				if (insert_values[i] != select_values[i])
 				{
-					throw new Exception("differences at index " + i.ToString());
+					Assert.Fail("differences at index " + i.ToString());
 				}
 			}
 		}

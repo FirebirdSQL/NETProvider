@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					{
 						if (!r.IsDBNull(1))
 						{
-							throw new Exception();
+							Assert.Fail();
 						}
 					}
 				}
