@@ -401,6 +401,47 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
+		[Test]
+		public void CaseSensitiveLogin()
+		{
+			if (!EnsureVersion(new Version("3.0.0.0")))
+				return;
+
+			var connectionString = BuildConnectionString(FbServerType, Compression);
+			using (var conn = new FbConnection(connectionString))
+			{
+				conn.Open();
+				using (var cmd = conn.CreateCommand())
+				{
+					cmd.CommandText = "create or alter user \"CaseSensitive\" password 'password' using plugin Srp";
+					cmd.ExecuteNonQuery();
+				}
+
+				var csBuilder = new FbConnectionStringBuilder(connectionString)
+				{
+					Pooling = false,
+					UserID = "\"CaseSensitive\"",
+					Password = "password"
+				};
+				try
+				{
+					using (var conn2 = new FbConnection(csBuilder.ToString()))
+					//using (var conn2 = new FbConnection("user id='\"CaseSensitive\"';..."))
+					{
+						conn2.Open();
+					}
+				}
+				finally
+				{
+					using (var cmd = conn.CreateCommand())
+					{
+						cmd.CommandText = "drop user \"CaseSensitive\" using plugin Srp";
+						cmd.ExecuteNonQuery();
+					}
+				} 
+			}
+		}
+
 		#endregion
 
 		#region Methods

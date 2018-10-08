@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Client.Managed
 			var n2 = BigIntegerFromByteArray(ComputeHash(BigIntegerToByteArray(g)));
 
 			n1 = BigInteger.ModPow(n1, n2, N);
-			n2 = BigIntegerFromByteArray(ComputeHash(Encoding.UTF8.GetBytes(user.ToUpper())));
+			n2 = BigIntegerFromByteArray(ComputeHash(Encoding.UTF8.GetBytes(user)));
 			var M = ComputeHash(BigIntegerToByteArray(n1), BigIntegerToByteArray(n2), salt, BigIntegerToByteArray(PublicKey), BigIntegerToByteArray(serverPublicKey), K);
 
 			SessionKey = K;
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Client.Managed
 			Array.Copy(authData, serverKeyStart, hexServerPublicKey, 0, serverKeyLength);
 			var hexServerPublicKeyString = Encoding.UTF8.GetString(hexServerPublicKey);
 			var serverPublicKey = BigInteger.Parse($"00{hexServerPublicKeyString}", NumberStyles.HexNumber);
-			return ClientProof(user.ToUpper(), password, salt, serverPublicKey);
+			return ClientProof(user, password, salt, serverPublicKey);
 		}
 
 		public Tuple<BigInteger, BigInteger> ServerSeed(string user, string password, byte[] salt)
@@ -133,7 +133,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private static BigInteger GetUserHash(string user, string password, byte[] salt)
 		{
-			var userBytes = Encoding.UTF8.GetBytes(user.ToUpper());
+			var userBytes = Encoding.UTF8.GetBytes(user);
 			var passwordBytes = Encoding.UTF8.GetBytes(password);
 			var hash1 = ComputeHash(userBytes, SEPARATOR_BYTES, passwordBytes);
 			var hash2 = ComputeHash(salt, hash1);

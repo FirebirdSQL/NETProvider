@@ -187,7 +187,7 @@ namespace FirebirdSql.Data.Client.Managed
 								switch (acceptPluginName)
 								{
 									case SrpClient.PluginName:
-										_authData = Encoding.ASCII.GetBytes(_srp.ClientProof(_userID, _password, data).ToHexString());
+										_authData = Encoding.ASCII.GetBytes(_srp.ClientProof(NormalizeLogin(_userID), _password, data).ToHexString());
 										break;
 									case SspiHelper.PluginName:
 										_authData = _sspi.GetClientSecurity(data);
@@ -383,6 +383,46 @@ namespace FirebirdSql.Data.Client.Managed
 				stream.Write(data, i, length);
 				part++;
 			}
+		}
+
+		public static string NormalizeLogin(string login)
+		{
+			if (string.IsNullOrEmpty(login))
+			{
+				return login;
+			}
+			if (login.Length > 2 && login[0] == '"' && login[login.Length - 1] == '"')
+			{
+				return NormalizeQuotedLogin(login);
+			}
+			return login.ToUpperInvariant();
+		}
+
+		private static string NormalizeQuotedLogin(string login)
+		{
+			var sb = new StringBuilder(login, 1, login.Length - 2, login.Length - 2);
+			for (int idx = 0; idx < sb.Length; idx++)
+			{
+				// Double double quotes ("") escape a double quote in a quoted string
+				if (sb[idx] == '"')
+				{
+					// Strip double quote escape
+					sb.Remove(idx, 1);
+					if (idx < sb.Length && sb[idx] == '"')
+					{
+						// Retain escaped double quote
+						idx += 1;
+					}
+					else
+					{
+						// The character after escape is not a double quote, we terminate the conversion and truncate.
+						// Firebird does this as well (see common/utils.cpp#dpbItemUpper)
+						sb.Length = idx;
+						return sb.ToString();
+					}
+				}
+			}
+			return sb.ToString();
 		}
 
 		#endregion
