@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private IDatabase _db;
 		private FbTransaction _activeTransaction;
-		private List<WeakReference<FbCommand>> _preparedCommands;
+		private HashSet<FbCommand> _preparedCommands;
 		private FbConnectionString _options;
 		private FbConnection _owningConnection;
 		private bool _disposed;
@@ -96,7 +96,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnectionInternal(FbConnectionString options)
 		{
-			_preparedCommands = new List<WeakReference<FbCommand>>();
+			_preparedCommands = new HashSet<FbCommand>();
 
 			_options = options;
 		}
@@ -246,11 +246,8 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void TransactionCompleted()
 		{
-			for (var i = 0; i < _preparedCommands.Count; i++)
+			foreach (var command in _preparedCommands)
 			{
-				if (!_preparedCommands[i].TryGetTarget(out var command))
-					continue;
-
 				if (command.Transaction != null)
 				{
 					command.DisposeReader();
@@ -336,54 +333,26 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void AddPreparedCommand(FbCommand command)
 		{
-			var position = -1;
-			for (var i = 0; i < _preparedCommands.Count; i++)
-			{
-				if (!_preparedCommands[i].TryGetTarget(out var current))
-				{
-					position = i;
-				}
-				else
-				{
-					if (current == command)
-					{
-						return;
-					}
-				}
-			}
-			if (position != -1)
-			{
-				_preparedCommands[position].SetTarget(command);
-			}
-			else
-			{
-				_preparedCommands.Add(new WeakReference<FbCommand>(command));
-			}
+			if (_preparedCommands.Contains(command))
+				return;
+			_preparedCommands.Add(command);
 		}
 
 		public void RemovePreparedCommand(FbCommand command)
 		{
-			for (var i = _preparedCommands.Count - 1; i >= 0; i--)
-			{
-				var item = _preparedCommands[i];
-				if (item.TryGetTarget(out var current) && current == command)
-				{
-					_preparedCommands.RemoveAt(i);
-					return;
-				}
-			}
+			var removed = _preparedCommands.Remove(command);
+			Debug.Assert(removed);
 		}
 
 		public void ReleasePreparedCommands()
 		{
-			for (var i = 0; i < _preparedCommands.Count; i++)
+			// copy the data because the collection will be modified via RemovePreparedCommand from Release
+			var data = _preparedCommands.ToList();
+			foreach (var item in data)
 			{
-				if (!_preparedCommands[i].TryGetTarget(out var current))
-					continue;
-
 				try
 				{
-					current.Release();
+					item.Release();
 				}
 				catch (IOException)
 				{
@@ -401,7 +370,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 				}
 			}
-			_preparedCommands.Clear();
 		}
 
 		#endregion

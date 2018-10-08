@@ -219,15 +219,6 @@ END
 		}
 
 		[Test]
-		public void DNET274_EFCommandsHandlingShouldNotBlockGC()
-		{
-			for (var i = 1000; i < 21000; i++)
-			{
-				new FbCommand() { CommandText = string.Format("insert into test (INT_FIELD) values ({0})", i), Connection = Connection }.ExecuteNonQuery();
-			}
-		}
-
-		[Test]
 		public void DNET595_ProperConnectionPoolConnectionsClosing()
 		{
 			FbConnection.ClearAllPools();
