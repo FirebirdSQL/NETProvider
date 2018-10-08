@@ -449,19 +449,17 @@ namespace EntityFramework.Firebird
 				switch (commandTree.CommandTreeKind)
 				{
 					case DbCommandTreeKind.Insert:
-						const int migrationIdColumn = 0;
-						const int contextKeyColumn  = 1;
-						const int modelColumn		= 2;
-						const int versionColumn		= 3;
-
-						// Trial and error value, not sure if correct or how to get correct one
-						const int maxChunkLength = 32000;
+						const int MigrationIdColumn = 0;
+						const int ContextKeyColumn = 1;
+						const int ModelColumn = 2;
+						const int VersionColumn = 3;
+						const int MaxChunkLength = 32000;
 
 						var dbInsert = (DbInsertCommandTree)commandTree;
-						var modelData = ((dbInsert.SetClauses[modelColumn] as DbSetClause).Value as DbConstantExpression).Value as byte[];
+						var modelData = ((dbInsert.SetClauses[ModelColumn] as DbSetClause).Value as DbConstantExpression).Value as byte[];
 
 						// If model length is less than max value, stick to original version
-						if (modelData.Length < maxChunkLength)
+						if (modelData.Length < MaxChunkLength)
 						{
 							using (var writer = SqlWriter())
 							{
@@ -472,30 +470,25 @@ namespace EntityFramework.Firebird
 						else
 						{
 							// If it's bigger - we split it into chunks, as big as possible
-							var dataChunks = modelData.Split(maxChunkLength);
+							var dataChunks = modelData.Split(MaxChunkLength);
 
 							// We can't change CommandTree, but we can create new one, only difference being data length
 							using (var writer = SqlWriter())
 							{
-								ReadOnlyCollection<DbModificationClause> setClauses = new ReadOnlyCollection<DbModificationClause>(
+								var setClauses = new ReadOnlyCollection<DbModificationClause>(
 										new List<DbModificationClause>
 										{
-											dbInsert.SetClauses[migrationIdColumn],
-											dbInsert.SetClauses[contextKeyColumn],
+											dbInsert.SetClauses[MigrationIdColumn],
+											dbInsert.SetClauses[ContextKeyColumn],
 											DbExpressionBuilder.SetClause(
-												((DbSetClause)dbInsert.SetClauses[modelColumn]).Property,
+												((DbSetClause)dbInsert.SetClauses[ModelColumn]).Property,
 												dataChunks.ElementAt(0).ToArray()
 											),
-											dbInsert.SetClauses[versionColumn],
+											dbInsert.SetClauses[VersionColumn],
 										});
 
 
-								var newCommandTree = new DbInsertCommandTree(
-														dbInsert.MetadataWorkspace,
-														commandTree.DataSpace,
-														dbInsert.Target,
-														setClauses,
-														dbInsert.Returning);
+								var newCommandTree = new DbInsertCommandTree(dbInsert.MetadataWorkspace, commandTree.DataSpace, dbInsert.Target, setClauses, dbInsert.Returning);
 
 								writer.Write(DmlSqlGenerator.GenerateInsertSql(newCommandTree, out _, generateParameters: false));
 								yield return Statement(writer);
@@ -506,10 +499,9 @@ namespace EntityFramework.Firebird
 							{
 								using (var writer = SqlWriter())
 								{
-									DbPropertyExpression modelProperty = (dbInsert.SetClauses[modelColumn] as DbSetClause).Property as DbPropertyExpression;
+									var modelProperty = (dbInsert.SetClauses[ModelColumn] as DbSetClause).Property as DbPropertyExpression;
 
-									ReadOnlyCollection<DbModificationClause> modificationClauses = new ReadOnlyCollection<DbModificationClause>(
-									new List<DbModificationClause>
+									var modificationClauses = new List<DbModificationClause>
 									{
 										// Updating existing chunk of data with subsequent part
 										DbExpressionBuilder.SetClause(
@@ -519,15 +511,15 @@ namespace EntityFramework.Firebird
 											// Here we'll get SET Model = 'data', which we can update as text later
 											dataChunk.ToArray()
 										)
-									});
+									}.AsReadOnly();
 
 									var updateCommandTree = new DbUpdateCommandTree(dbInsert.MetadataWorkspace,
 										dbInsert.DataSpace,
 										dbInsert.Target,
 										// Predicate is MigrationId value
 										DbExpressionBuilder.Equal(
-											((DbSetClause)dbInsert.SetClauses[migrationIdColumn]).Property,
-											((DbSetClause)dbInsert.SetClauses[migrationIdColumn]).Value),
+											((DbSetClause)dbInsert.SetClauses[MigrationIdColumn]).Property,
+											((DbSetClause)dbInsert.SetClauses[MigrationIdColumn]).Value),
 										modificationClauses,
 										dbInsert.Returning);
 
@@ -538,8 +530,7 @@ namespace EntityFramework.Firebird
 									//		with SET Model = Model || 'data'
 									// Model being first is important, since these are parts of single value
 									var statement = writer.ToString();
-									var newStatement = statement.Replace($"SET \"{modelProperty.Property.Name}\" = ",
-																		 $"SET \"{modelProperty.Property.Name}\" = \"{modelProperty.Property.Name}\" || ");
+									var newStatement = statement.Replace($"SET \"{modelProperty.Property.Name}\" = ", $"SET \"{modelProperty.Property.Name}\" = \"{modelProperty.Property.Name}\" || ");
 
 									yield return Statement(newStatement);
 								}
@@ -549,8 +540,7 @@ namespace EntityFramework.Firebird
 					case DbCommandTreeKind.Delete:
 						using (var writer = SqlWriter())
 						{
-							writer.Write(DmlSqlGenerator.GenerateDeleteSql((DbDeleteCommandTree)commandTree, out _,
-								generateParameters: false));
+							writer.Write(DmlSqlGenerator.GenerateDeleteSql((DbDeleteCommandTree)commandTree, out _, generateParameters: false));
 							yield return Statement(writer);
 						}
 						break;
