@@ -17,10 +17,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Core.Common;
 using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure.DependencyResolution;
 using System.Data.Entity.Migrations.Model;
@@ -30,6 +32,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using EntityFramework.Firebird.SqlGen;
+using FirebirdSql.Data.Common;
 
 namespace EntityFramework.Firebird
 {
@@ -446,11 +449,101 @@ namespace EntityFramework.Firebird
 				switch (commandTree.CommandTreeKind)
 				{
 					case DbCommandTreeKind.Insert:
-						using (var writer = SqlWriter())
+						const int migrationIdColumn = 0;
+						const int contextKeyColumn  = 1;
+						const int modelColumn		= 2;
+						const int versionColumn		= 3;
+
+						// Trial and error value, not sure if correct or how to get correct one
+						const int maxChunkLength = 32000;
+
+						var dbInsert = (DbInsertCommandTree)commandTree;
+						var modelData = ((dbInsert.SetClauses[modelColumn] as DbSetClause).Value as DbConstantExpression).Value as byte[];
+
+						// If model length is less than max value, stick to original version
+						if (modelData.Length < maxChunkLength)
 						{
-							writer.Write(DmlSqlGenerator.GenerateInsertSql((DbInsertCommandTree)commandTree, out _,
-								generateParameters: false));
-							yield return Statement(writer);
+							using (var writer = SqlWriter())
+							{
+								writer.Write(DmlSqlGenerator.GenerateInsertSql(dbInsert, out _, generateParameters: false));
+								yield return Statement(writer);
+							}
+						}
+						else
+						{
+							// If it's bigger - we split it into chunks, as big as possible
+							var dataChunks = modelData.Split(maxChunkLength);
+
+							// We can't change CommandTree, but we can create new one, only difference being data length
+							using (var writer = SqlWriter())
+							{
+								ReadOnlyCollection<DbModificationClause> setClauses = new ReadOnlyCollection<DbModificationClause>(
+										new List<DbModificationClause>
+										{
+											dbInsert.SetClauses[migrationIdColumn],
+											dbInsert.SetClauses[contextKeyColumn],
+											DbExpressionBuilder.SetClause(
+												((DbSetClause)dbInsert.SetClauses[modelColumn]).Property,
+												dataChunks.ElementAt(0).ToArray()
+											),
+											dbInsert.SetClauses[versionColumn],
+										});
+
+
+								var newCommandTree = new DbInsertCommandTree(
+														dbInsert.MetadataWorkspace,
+														commandTree.DataSpace,
+														dbInsert.Target,
+														setClauses,
+														dbInsert.Returning);
+
+								writer.Write(DmlSqlGenerator.GenerateInsertSql(newCommandTree, out _, generateParameters: false));
+								yield return Statement(writer);
+							}
+
+							// Now we have first Insert, let's update it with chunks of remaing data
+							foreach (var dataChunk in dataChunks.Skip(1))
+							{
+								using (var writer = SqlWriter())
+								{
+									DbPropertyExpression modelProperty = (dbInsert.SetClauses[modelColumn] as DbSetClause).Property as DbPropertyExpression;
+
+									ReadOnlyCollection<DbModificationClause> modificationClauses = new ReadOnlyCollection<DbModificationClause>(
+									new List<DbModificationClause>
+									{
+										// Updating existing chunk of data with subsequent part
+										DbExpressionBuilder.SetClause(
+											modelProperty,
+											// TODO: Better solution required
+											// Best if we could use DbExpression.Concat, but it returns DbFunctionExpression, which is not supported
+											// Here we'll get SET Model = 'data', which we can update as text later
+											dataChunk.ToArray()
+										)
+									});
+
+									var updateCommandTree = new DbUpdateCommandTree(dbInsert.MetadataWorkspace,
+										dbInsert.DataSpace,
+										dbInsert.Target,
+										// Predicate is MigrationId value
+										DbExpressionBuilder.Equal(
+											((DbSetClause)dbInsert.SetClauses[migrationIdColumn]).Property,
+											((DbSetClause)dbInsert.SetClauses[migrationIdColumn]).Value),
+										modificationClauses,
+										dbInsert.Returning);
+
+									writer.Write(DmlSqlGenerator.GenerateUpdateSql(updateCommandTree, out _, generateParameters: false));
+
+									// Since we couldn't concat before, replacing query as string
+									// Replacing SET Model = 'data'
+									//		with SET Model = Model || 'data'
+									// Model being first is important, since these are parts of single value
+									var statement = writer.ToString();
+									var newStatement = statement.Replace($"SET \"{modelProperty.Property.Name}\" = ",
+																		 $"SET \"{modelProperty.Property.Name}\" = \"{modelProperty.Property.Name}\" || ");
+
+									yield return Statement(newStatement);
+								}
+							}
 						}
 						break;
 					case DbCommandTreeKind.Delete:
