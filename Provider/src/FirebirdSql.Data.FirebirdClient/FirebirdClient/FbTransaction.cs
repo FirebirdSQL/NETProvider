@@ -87,7 +87,14 @@ namespace FirebirdSql.Data.FirebirdClient
 					{
 						if (!_isCompleted)
 						{
-							_transaction.Dispose();
+							try
+							{
+								_transaction.Dispose();
+							}
+							catch (IscException ex)
+							{
+								throw new FbException(ex.Message, ex);
+							}
 						}
 					}
 					_connection = null;
