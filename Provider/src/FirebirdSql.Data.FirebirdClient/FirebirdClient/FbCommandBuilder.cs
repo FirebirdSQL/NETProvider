@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			else
 			{
-				spName = spName.ToUpper(CultureInfo.CurrentCulture);
+				spName = spName.ToUpperInvariant();
 			}
 
 			var paramsText = string.Empty;
