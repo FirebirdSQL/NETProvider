@@ -543,7 +543,7 @@ namespace EntityFramework.Firebird.SqlGen
 			var result = new SqlBuilder();
 			var sqlPrimitiveType = GetSqlPrimitiveType(e.ResultType);
 
-			switch (sqlPrimitiveType.ToLowerInvariant())
+			switch (sqlPrimitiveType.ToUpperInvariant())
 			{
 				default:
 					result.Append("CAST(");

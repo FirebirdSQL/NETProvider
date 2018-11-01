@@ -538,17 +538,17 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void CheckIsolationLevel()
 		{
-			var il = _options[DefaultKeyIsolationLevel].ToString().ToLowerInvariant();
+			var il = _options[DefaultKeyIsolationLevel].ToString().ToUpperInvariant();
 
 			switch (il)
 			{
-				case "readcommitted":
-				case "readuncommitted":
-				case "repeatableread":
-				case "serializable":
-				case "chaos":
-				case "unspecified":
-				case "snapshot":
+				case "READCOMMITTED":
+				case "READUNCOMMITTED":
+				case "REPEATABLEREAD":
+				case "SERIALIZABLE":
+				case "CHAOS":
+				case "UNSPECIFIED":
+				case "SNAPSHOT":
 					break;
 
 				default:

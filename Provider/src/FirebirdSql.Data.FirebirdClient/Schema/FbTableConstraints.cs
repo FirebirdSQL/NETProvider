@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.Schema
 			{
 				if (parsed.Length == 7 && parsed[6] != null)
 				{
-					switch (parsed[6].ToString().ToUpper(CultureInfo.InvariantCulture))
+					switch (parsed[6].ToString().ToUpperInvariant())
 					{
 						case "UNIQUE":
 							parsed[3] = "u";

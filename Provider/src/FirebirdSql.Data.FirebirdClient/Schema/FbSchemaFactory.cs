@@ -107,109 +107,109 @@ namespace FirebirdSql.Data.Schema
 		{
 			FbSchema returnSchema = null;
 
-			switch (collectionName.ToLower(CultureInfo.InvariantCulture))
+			switch (collectionName.ToUpperInvariant())
 			{
-				case "charactersets":
+				case "CHARACTERSETS":
 					returnSchema = new FbCharacterSets();
 					break;
 
-				case "checkconstraints":
+				case "CHECKCONSTRAINTS":
 					returnSchema = new FbCheckConstraints();
 					break;
 
-				case "checkconstraintsbytable":
+				case "CHECKCONSTRAINTSBYTABLE":
 					returnSchema = new FbChecksByTable();
 					break;
 
-				case "collations":
+				case "COLLATIONS":
 					returnSchema = new FbCollations();
 					break;
 
-				case "columns":
+				case "COLUMNS":
 					returnSchema = new FbColumns();
 					break;
 
-				case "columnprivileges":
+				case "COLUMNPRIVILEGES":
 					returnSchema = new FbColumnPrivileges();
 					break;
 
-				case "domains":
+				case "DOMAINS":
 					returnSchema = new FbDomains();
 					break;
 
-				case "foreignkeycolumns":
+				case "FOREIGNKEYCOLUMNS":
 					returnSchema = new FbForeignKeyColumns();
 					break;
 
-				case "foreignkeys":
+				case "FOREIGNKEYS":
 					returnSchema = new FbForeignKeys();
 					break;
 
-				case "functions":
+				case "FUNCTIONS":
 					returnSchema = new FbFunctions();
 					break;
 
-				case "generators":
+				case "GENERATORS":
 					returnSchema = new FbGenerators();
 					break;
 
-				case "indexcolumns":
+				case "INDEXCOLUMNS":
 					returnSchema = new FbIndexColumns();
 					break;
 
-				case "indexes":
+				case "INDEXES":
 					returnSchema = new FbIndexes();
 					break;
 
-				case "primarykeys":
+				case "PRIMARYKEYS":
 					returnSchema = new FbPrimaryKeys();
 					break;
 
-				case "procedures":
+				case "PROCEDURES":
 					returnSchema = new FbProcedures();
 					break;
 
-				case "procedureparameters":
+				case "PROCEDUREPARAMETERS":
 					returnSchema = new FbProcedureParameters();
 					break;
 
-				case "procedureprivileges":
+				case "PROCEDUREPRIVILEGES":
 					returnSchema = new FbProcedurePrivilegesSchema();
 					break;
 
-				case "roles":
+				case "ROLES":
 					returnSchema = new FbRoles();
 					break;
 
-				case "tables":
+				case "TABLES":
 					returnSchema = new FbTables();
 					break;
 
-				case "tableconstraints":
+				case "TABLECONSTRAINTS":
 					returnSchema = new FbTableConstraints();
 					break;
 
-				case "tableprivileges":
+				case "TABLEPRIVILEGES":
 					returnSchema = new FbTablePrivileges();
 					break;
 
-				case "triggers":
+				case "TRIGGERS":
 					returnSchema = new FbTriggers();
 					break;
 
-				case "uniquekeys":
+				case "UNIQUEKEYS":
 					returnSchema = new FbUniqueKeys();
 					break;
 
-				case "viewcolumns":
+				case "VIEWCOLUMNS":
 					returnSchema = new FbViewColumns();
 					break;
 
-				case "views":
+				case "VIEWS":
 					returnSchema = new FbViews();
 					break;
 
-				case "viewprivileges":
+				case "VIEWPRIVILEGES":
 					returnSchema = new FbViewPrivileges();
 					break;
 

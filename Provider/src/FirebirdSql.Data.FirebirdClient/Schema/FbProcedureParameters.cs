@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.Schema
 				row["IS_NULLABLE"] = (row["COLUMN_NULLABLE"] == DBNull.Value);
 
 				var dbType = (FbDbType)TypeHelper.GetDbDataTypeFromBlrType(blrType, subType, scale);
-				row["PARAMETER_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLower(CultureInfo.InvariantCulture);
+				row["PARAMETER_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLowerInvariant();
 
 				if (dbType == FbDbType.Char || dbType == FbDbType.VarChar)
 				{
