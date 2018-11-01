@@ -370,6 +370,19 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
+		public static string NormalizeLogin(string login)
+		{
+			if (string.IsNullOrEmpty(login))
+			{
+				return login;
+			}
+			if (login.Length > 2 && login[0] == '"' && login[login.Length - 1] == '"')
+			{
+				return NormalizeQuotedLogin(login);
+			}
+			return login.ToUpperInvariant();
+		}
+
 		private static void WriteMultiPartHelper(Stream stream, byte code, byte[] data)
 		{
 			const int MaxLength = 255 - 1;
@@ -383,19 +396,6 @@ namespace FirebirdSql.Data.Client.Managed
 				stream.Write(data, i, length);
 				part++;
 			}
-		}
-
-		public static string NormalizeLogin(string login)
-		{
-			if (string.IsNullOrEmpty(login))
-			{
-				return login;
-			}
-			if (login.Length > 2 && login[0] == '"' && login[login.Length - 1] == '"')
-			{
-				return NormalizeQuotedLogin(login);
-			}
-			return login.ToUpperInvariant();
 		}
 
 		private static string NormalizeQuotedLogin(string login)
