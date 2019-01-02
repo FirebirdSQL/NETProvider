@@ -90,6 +90,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 				StringAssert.Contains("SKIP 1", sql);
 			}
 		}
+
+		[Test]
+		public void SelectTopLevelAny()
+		{
+			using (var db = GetDbContext<SelectContext>())
+			{
+				Assert.DoesNotThrow(() => db.Set<MonAttachment>().Any(x => x.AttachmentId != 0));
+			}
+		}
 	}
 
 	class SelectContext : FbTestDbContext
