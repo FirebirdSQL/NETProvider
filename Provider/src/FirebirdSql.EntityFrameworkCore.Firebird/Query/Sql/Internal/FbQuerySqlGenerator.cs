@@ -31,6 +31,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			: base(dependencies, selectExpression)
 		{ }
 
+		protected override string TypedTrueLiteral => "TRUE";
+
+		protected override string TypedFalseLiteral => "FALSE";
+
 		protected override void GenerateTop(SelectExpression selectExpression)
 		{
 			if (selectExpression.Limit != null)
