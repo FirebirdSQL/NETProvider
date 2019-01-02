@@ -340,8 +340,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void RemovePreparedCommand(FbCommand command)
 		{
-			var removed = _preparedCommands.Remove(command);
-			Debug.Assert(removed);
+			_preparedCommands.Remove(command);
 		}
 
 		public void ReleasePreparedCommands()
