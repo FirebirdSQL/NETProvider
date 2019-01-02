@@ -105,7 +105,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			base.VisitSelect(selectExpression);
 			if (!selectExpression.Tables.Any())
 			{
-				Sql.Append(" FROM RDB$DATABASE");
+				Sql.AppendLine();
+				Sql.Append("FROM RDB$DATABASE");
 			}
 			return selectExpression;
 		}
