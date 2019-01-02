@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
 using JetBrains.Annotations;
@@ -97,6 +98,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			Visit(extractExpression.ValueExpression);
 			Sql.Append(")");
 			return extractExpression;
+		}
+
+		public override Expression VisitSelect(SelectExpression selectExpression)
+		{
+			base.VisitSelect(selectExpression);
+			if (!selectExpression.Tables.Any())
+			{
+				Sql.Append(" FROM RDB$DATABASE");
+			}
+			return selectExpression;
 		}
 	}
 }
