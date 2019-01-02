@@ -94,6 +94,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 		[Test]
 		public void SelectTopLevelAny()
 		{
+			if (!EnsureVersion(new Version("3.0.0.0")))
+				return;
+
 			using (var db = GetDbContext<SelectContext>())
 			{
 				Assert.DoesNotThrow(() => db.Set<MonAttachment>().Any(x => x.AttachmentId != 0));
