@@ -5,9 +5,31 @@
 		<RootNamespace>EntityFramework.Firebird</RootNamespace>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>Properties\EntityFramework.Firebird.snk</AssemblyOriginatorKeyFile>
-		<DelaySign>false</DelaySign>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<PropertyGroup>
+		<Company>FirebirdSQL</Company>
+		<Product>NETProvider</Product>
+		<AssemblyTitle>NETProvider - Entity Framework Provider</AssemblyTitle>
+		<Copyright>(c) 2014-2019</Copyright>
+	</PropertyGroup>
+	<PropertyGroup>
+		<PackageId>EntityFramework.Firebird</PackageId>
+		<Title>Firebird Entity Framework Provider</Title>
+		<Authors>FirebirdSQL</Authors>
+		<PackageDescription>The Entity Framework provider for Firebird enables you to develop .NET applications that connect to the Firebird database using Entity Framework.</PackageDescription>
+		<PackageTags>firebird;firebirsql;firebirdclient;entityframewor;adonet;database</PackageTags>
+		<PackageProjectUrl>http://www.firebirdsql.org/en/net-provider/</PackageProjectUrl>
+		<PackageIconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</PackageIconUrl>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/license.txt</PackageLicenseUrl>
+		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryType>git</RepositoryType>
+		<MinClientVersion>3.6</MinClientVersion>
+		<IncludeBuildOutput>true</IncludeBuildOutput>
+		<IncludeSymbols>false</IncludeSymbols>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>EF6;TRACE</DefineConstants>
@@ -15,9 +37,6 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DefineConstants>EF6;DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
-	<ItemGroup>
-		<Compile Include="..\FirebirdSql.Data.FirebirdClient\Properties\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
-	</ItemGroup>
 	<ItemGroup>
 		<None Remove="Resources\ProviderManifest.xml" />
 		<None Remove="Resources\StoreSchemaDefinition.ssdl" />
@@ -33,11 +52,16 @@
 		<EmbeddedResource Include="Resources\StoreSchemaMappingVersion3.msl" />
 	</ItemGroup>
 	<ItemGroup>
+		<None Update="install.ps1" Pack="true" PackagePath="tools" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="EntityFramework" Version="6.2.0" />
+	</ItemGroup>
+	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System.Configuration" />
 		<Reference Include="Microsoft.CSharp" />
-		<Reference Include="..\..\lib\EF6\NET45\EntityFramework.dll" />
 	</ItemGroup>
 </Project>

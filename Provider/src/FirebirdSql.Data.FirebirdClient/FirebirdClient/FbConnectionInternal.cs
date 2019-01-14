@@ -410,7 +410,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			dpb.Append(IscCodes.isc_dpb_connect_timeout, options.ConnectionTimeout);
 			dpb.Append(IscCodes.isc_dpb_process_id, GetProcessId());
 			dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
-			dpb.Append(IscCodes.isc_dpb_client_version, _VersionInfo.Version);
+			dpb.Append(IscCodes.isc_dpb_client_version, GetClientVersion());
 			if (options.NoDatabaseTriggers)
 			{
 				dpb.Append(IscCodes.isc_dpb_no_db_triggers, 1);
@@ -471,14 +471,23 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
+		private string GetClientVersion()
+		{
+#if NETSTANDARD1_6
+			return string.Empty;
+#else
+			return GetType().Assembly.GetName().Version.ToString();
+#endif
+		}
+
 		private void EnsureActiveTransaction()
 		{
 			if (HasActiveTransaction)
 				throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
 		}
-		#endregion
+#endregion
 
-		#region Cancelation
+#region Cancelation
 		public void EnableCancel()
 		{
 			_db.CancelOperation(IscCodes.fb_cancel_enable);
@@ -495,14 +504,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_db.CancelOperation(IscCodes.fb_cancel_raise);
 		}
-		#endregion
+#endregion
 
-		#region Infrastructure
+#region Infrastructure
 		public FbConnectionInternal SetOwningConnection(FbConnection owningConnection)
 		{
 			_owningConnection = owningConnection;
 			return this;
 		}
-		#endregion
+#endregion
 	}
 }

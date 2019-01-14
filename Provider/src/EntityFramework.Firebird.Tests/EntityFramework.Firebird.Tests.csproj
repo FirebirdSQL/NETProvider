@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net452</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<AssemblyName>EntityFramework.Firebird.Tests</AssemblyName>
 		<RootNamespace>EntityFramework.Firebird.Tests</RootNamespace>
 		<SignAssembly>true</SignAssembly>
@@ -13,9 +14,7 @@
 	<ItemGroup>
 		<PackageReference Include="NUnit" Version="3.10.1" />
 		<PackageReference Include="NUnitLite" Version="3.10.1" />
-	</ItemGroup>
-	<ItemGroup>
-		<Reference Include="..\..\lib\EF6\NET45\EntityFramework.dll" />
+		<PackageReference Include="EntityFramework" Version="6.2.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />

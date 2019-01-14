@@ -5,9 +5,29 @@
 		<RootNamespace>FirebirdSql.EntityFrameworkCore.Firebird</RootNamespace>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.EntityFrameworkCore.Firebird.snk</AssemblyOriginatorKeyFile>
-		<DelaySign>false</DelaySign>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<PropertyGroup>
+		<AssemblyTitle>NETProvider - Entity Framework Core Provider</AssemblyTitle>
+		<Copyright>(c) 2017-2019</Copyright>
+	</PropertyGroup>
+	<PropertyGroup>
+		<PackageId>FirebirdSql.EntityFrameworkCore.Firebird</PackageId>
+		<Title>Firebird Entity Framework Core Provider</Title>
+		<Authors>FirebirdSQL</Authors>
+		<PackageDescription>The Entity Framework Core provider for Firebird enables you to develop .NET applications that connect to the Firebird database using Entity Framework Core.</PackageDescription>
+		<PackageTags>firebird;firebirsql;firebirdclient;entityframeworkcore;adonet;database</PackageTags>
+		<PackageProjectUrl>http://www.firebirdsql.org/en/net-provider/</PackageProjectUrl>
+		<PackageIconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</PackageIconUrl>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/license.txt</PackageLicenseUrl>
+		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryType>git</RepositoryType>
+		<MinClientVersion>3.6</MinClientVersion>
+		<IncludeBuildOutput>true</IncludeBuildOutput>
+		<IncludeSymbols>false</IncludeSymbols>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>EFCORE;TRACE</DefineConstants>
@@ -18,9 +38,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.3" />
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="..\FirebirdSql.Data.FirebirdClient\Properties\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />

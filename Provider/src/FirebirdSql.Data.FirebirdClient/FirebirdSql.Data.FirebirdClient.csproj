@@ -5,10 +5,30 @@
 		<RootNamespace>FirebirdSql.Data</RootNamespace>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.Data.FirebirdClient.snk</AssemblyOriginatorKeyFile>
-		<DelaySign>false</DelaySign>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<PropertyGroup>
+		<AssemblyTitle>NETProvider - ADO.NET Data Provider</AssemblyTitle>
+		<Copyright>(c) 2002-2019</Copyright>
+	</PropertyGroup>
+	<PropertyGroup>
+		<PackageId>FirebirdSql.Data.FirebirdClient</PackageId>
+		<Title>Firebird ADO.NET Data provider</Title>
+		<Authors>FirebirdSQL</Authors>
+		<PackageDescription>Firebird ADO.NET data provider</PackageDescription>
+		<PackageTags>firebird;firebirsql;firebirdclient;adonet;database</PackageTags>
+		<PackageProjectUrl>http://www.firebirdsql.org/en/net-provider/</PackageProjectUrl>
+		<PackageIconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</PackageIconUrl>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/license.txt</PackageLicenseUrl>
+		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryType>git</RepositoryType>
+		<MinClientVersion>3.6</MinClientVersion>
+		<IncludeBuildOutput>true</IncludeBuildOutput>
+		<IncludeSymbols>false</IncludeSymbols>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>TRACE</DefineConstants>
@@ -22,11 +42,12 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Schema\FbMetaData.xml" />
 	</ItemGroup>
-
+	<ItemGroup>
+		<None Include="..\..\readme.txt" Link="readme.txt" Pack="true" PackagePath="" />
+	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
 		<Reference Include="System.Transactions" />
 	</ItemGroup>
-
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
 		<PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
 		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
@@ -42,7 +63,6 @@
 		<PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
 		<PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
 	</ItemGroup>
-
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
 		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
 	</ItemGroup>
