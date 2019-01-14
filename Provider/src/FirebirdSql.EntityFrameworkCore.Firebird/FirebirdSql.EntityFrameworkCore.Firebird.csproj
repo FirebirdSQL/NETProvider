@@ -21,8 +21,8 @@
 		<PackageProjectUrl>http://www.firebirdsql.org/en/net-provider/</PackageProjectUrl>
 		<PackageIconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</PackageIconUrl>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/license.txt</PackageLicenseUrl>
-		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<MinClientVersion>3.6</MinClientVersion>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
