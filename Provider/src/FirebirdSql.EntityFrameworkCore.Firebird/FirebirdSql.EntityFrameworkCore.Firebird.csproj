@@ -7,7 +7,6 @@
 		<AssemblyOriginatorKeyFile>Properties\FirebirdSql.EntityFrameworkCore.Firebird.snk</AssemblyOriginatorKeyFile>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup>
 		<AssemblyTitle>NETProvider - Entity Framework Core Provider</AssemblyTitle>

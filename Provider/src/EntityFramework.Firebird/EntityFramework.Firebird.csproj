@@ -7,7 +7,6 @@
 		<AssemblyOriginatorKeyFile>Properties\EntityFramework.Firebird.snk</AssemblyOriginatorKeyFile>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup>
 		<Company>FirebirdSQL</Company>

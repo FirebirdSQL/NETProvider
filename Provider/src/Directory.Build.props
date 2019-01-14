@@ -1,5 +1,8 @@
 <Project>
 	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<PropertyGroup>
 		<VersionPrefix>6.4.0.0</VersionPrefix>
 		<VersionSuffix></VersionSuffix>
 		<Company>FirebirdSQL</Company>
