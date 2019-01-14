@@ -3,6 +3,7 @@
 		<TargetFramework>net452</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<SkipSourceLink>true</SkipSourceLink>
 		<AssemblyName>EntityFramework.Firebird.Tests</AssemblyName>
 		<RootNamespace>EntityFramework.Firebird.Tests</RootNamespace>
 		<SignAssembly>true</SignAssembly>

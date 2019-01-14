@@ -5,13 +5,14 @@
 		<Company>FirebirdSQL</Company>
 		<Product>NETProvider</Product>
 	</PropertyGroup>
+
 	<!-- SourceLink -->
-	<PropertyGroup>
+	<PropertyGroup Condition="'$(SkipSourceLink)' != 'true'">
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 	</PropertyGroup>
-	<ItemGroup>
+	<ItemGroup Condition="'$(SkipSourceLink)' != 'true'">
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
 	</ItemGroup>
 </Project>

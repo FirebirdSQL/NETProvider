@@ -3,6 +3,7 @@
 		<TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<SkipSourceLink>true</SkipSourceLink>
 		<AssemblyName>FirebirdSql.Data.FirebirdClient.Tests</AssemblyName>
 		<RootNamespace>FirebirdSql.Data.FirebirdClient.Tests</RootNamespace>
 		<SignAssembly>true</SignAssembly>
