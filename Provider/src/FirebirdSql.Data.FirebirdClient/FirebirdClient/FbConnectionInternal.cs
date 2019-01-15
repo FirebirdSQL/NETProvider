@@ -473,11 +473,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetClientVersion()
 		{
-#if NETSTANDARD1_6
-			return string.Empty;
-#else
-			return GetType().Assembly.GetName().Version.ToString();
-#endif
+			return GetType().GetTypeInfo().Assembly.GetName().Version.ToString();
 		}
 
 		private void EnsureActiveTransaction()
