@@ -22,7 +22,7 @@
 		<PackageTags>firebird;firebirsql;firebirdclient;entityframewor;adonet;database</PackageTags>
 		<PackageProjectUrl>http://www.firebirdsql.org/en/net-provider/</PackageProjectUrl>
 		<PackageIconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</PackageIconUrl>
-		<PackageLicenseUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/license.txt</PackageLicenseUrl>
+		<PackageLicenseFile>license.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -52,6 +52,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="install.ps1" Pack="true" PackagePath="tools" />
+		<None Include="..\..\..\license.txt" Link="license.txt" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="EntityFramework" Version="6.2.0" />

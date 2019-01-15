@@ -21,7 +21,7 @@
 		<PackageTags>firebird;firebirsql;firebirdclient;adonet;database</PackageTags>
 		<PackageProjectUrl>http://www.firebirdsql.org/en/net-provider/</PackageProjectUrl>
 		<PackageIconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</PackageIconUrl>
-		<PackageLicenseUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/license.txt</PackageLicenseUrl>
+		<PackageLicenseFile>license.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -43,6 +43,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="..\..\readme.txt" Link="readme.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\..\license.txt" Link="license.txt" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
 		<Reference Include="System.Transactions" />

@@ -20,7 +20,7 @@
 		<PackageTags>firebird;firebirsql;firebirdclient;entityframeworkcore;adonet;database</PackageTags>
 		<PackageProjectUrl>http://www.firebirdsql.org/en/net-provider/</PackageProjectUrl>
 		<PackageIconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</PackageIconUrl>
-		<PackageLicenseUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/license.txt</PackageLicenseUrl>
+		<PackageLicenseFile>license.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -34,6 +34,9 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DefineConstants>EFCORE;DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\..\license.txt" Link="license.txt" Pack="true" PackagePath="" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.3" />
