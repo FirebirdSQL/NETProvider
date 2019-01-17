@@ -371,6 +371,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_action_svc_set_mapping = 27;   // Set auto admins mapping in security database
 		public const int isc_action_svc_drop_mapping = 28;  // Drop auto admins mapping in security database
 		public const int isc_action_svc_display_user_adm = 29;  // Displays user(s) from security database with admin info
+		public const int isc_action_svc_validate = 30;  // Starts database online validation
 
 		#endregion
 
@@ -480,6 +481,14 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_res_am_readonly = isc_spb_prp_am_readonly;
 		public const int isc_spb_res_am_readwrite = isc_spb_prp_am_readwrite;
 
+		#endregion
+
+		#region Validate Service
+		public const int isc_spb_val_tab_incl = 1;  // include filter based on regular expression
+		public const int isc_spb_val_tab_excl = 2;  // exclude filter based on regular expression
+		public const int isc_spb_val_idx_incl = 3;  // regexp of indices to validate
+		public const int isc_spb_val_idx_excl = 4;  // regexp of indices to NOT validate
+		public const int isc_spb_val_lock_timeout = 5;  // how long to wait for table lock
 		#endregion
 
 		#region Repair Service
