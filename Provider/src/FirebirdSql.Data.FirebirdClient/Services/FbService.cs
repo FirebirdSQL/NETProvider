@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.Services
 			ConnectionString = connectionString;
 		}
 
-		internal ServiceParameterBuffer BuildSpb()
+		private ServiceParameterBuffer BuildSpb()
 		{
 			var spb = new ServiceParameterBuffer();
 			spb.Append(IscCodes.isc_spb_version);
