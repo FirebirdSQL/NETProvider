@@ -32,10 +32,7 @@ namespace FirebirdSql.Data.Services
 
 		public void Execute()
 		{
-			if (string.IsNullOrEmpty(Database))
-			{
-				throw new FbException("Validation should be used against a specific database");
-			}
+			EnsureDatabase();
 
 			try
 			{

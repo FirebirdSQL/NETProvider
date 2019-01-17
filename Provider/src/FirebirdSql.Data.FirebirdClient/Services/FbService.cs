@@ -222,6 +222,12 @@ namespace FirebirdSql.Data.Services
 			ServiceOutput?.Invoke(this, new ServiceOutputEventArgs(message));
 		}
 
+		protected void EnsureDatabase()
+		{
+			if (string.IsNullOrEmpty(Database))
+				throw new FbException("Validation should be used against a specific database.");
+		}
+
 		private void ProcessQuery(byte[] items, Action<bool, object> queryResponseAction)
 		{
 			var pos = 0;
