@@ -32,6 +32,8 @@ namespace FirebirdSql.Data.Services
 
 		public void Execute()
 		{
+			EnsureDatabase();
+
 			try
 			{
 				StartSpb = new ServiceParameterBuffer();

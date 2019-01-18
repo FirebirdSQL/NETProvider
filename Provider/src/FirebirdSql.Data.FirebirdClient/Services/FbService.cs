@@ -225,7 +225,7 @@ namespace FirebirdSql.Data.Services
 		protected void EnsureDatabase()
 		{
 			if (string.IsNullOrEmpty(Database))
-				throw new FbException("Validation should be used against a specific database.");
+				throw new FbException("Action should be executed against a specific database.");
 		}
 
 		private void ProcessQuery(byte[] items, Action<bool, object> queryResponseAction)
