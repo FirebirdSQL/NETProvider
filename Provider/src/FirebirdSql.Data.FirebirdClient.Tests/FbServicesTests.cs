@@ -425,6 +425,26 @@ end";
 			Assert.DoesNotThrow(Test);
 		}
 
+		[Test]
+		public void Validation2Test()
+		{
+			if (!EnsureVersion(new Version("3.0.0.0")))
+				return;
+
+			var validationSvc = new FbValidation2();
+
+			validationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, true);
+			validationSvc.TablesInclude = "_*";
+			validationSvc.TablesExclude = "X*";
+			validationSvc.IndicesInclude = "_*";
+			validationSvc.IndicesExclude= "X*";
+			validationSvc.LockTimeout = 6;
+
+			validationSvc.ServiceOutput += ServiceOutput;
+
+			validationSvc.Execute();
+		}
+
 		#endregion
 
 		#region Methods
