@@ -1,5 +1,5 @@
-ADO.NET 2.0+ Data Provider for Firebird
-=======================================
+ADO.NET Data Provider for Firebird
+==================================
 
 This project is supported by:
 -----------------------------
@@ -35,4 +35,3 @@ There are two ways you can report bugs:
 --------------
 
 For zlib compression the provider uses pieces from DotNetZip (http://dotnetzip.codeplex.com/) library.
-
