@@ -359,15 +359,10 @@ namespace FirebirdSql.Data.FirebirdClient
 					// avoid it. (It maybe the connection to the server was down
 					// for unknown reasons.)
 				}
-				catch (IscException ex)
-				{
-					if (ex.ErrorCode != IscCodes.isc_net_read_err &&
-						ex.ErrorCode != IscCodes.isc_net_write_err &&
-						ex.ErrorCode != IscCodes.isc_network_error)
-					{
-						throw;
-					}
-				}
+				catch (IscException ex) when (ex.ErrorCode == IscCodes.isc_network_error
+					|| ex.ErrorCode == IscCodes.isc_net_read_err
+					|| ex.ErrorCode == IscCodes.isc_net_write_err)
+				{ }
 			}
 		}
 
@@ -481,9 +476,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (HasActiveTransaction)
 				throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
 		}
-#endregion
+		#endregion
 
-#region Cancelation
+		#region Cancelation
 		public void EnableCancel()
 		{
 			_db.CancelOperation(IscCodes.fb_cancel_enable);
@@ -500,14 +495,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_db.CancelOperation(IscCodes.fb_cancel_raise);
 		}
-#endregion
+		#endregion
 
-#region Infrastructure
+		#region Infrastructure
 		public FbConnectionInternal SetOwningConnection(FbConnection owningConnection)
 		{
 			_owningConnection = owningConnection;
 			return this;
 		}
-#endregion
+		#endregion
 	}
 }
