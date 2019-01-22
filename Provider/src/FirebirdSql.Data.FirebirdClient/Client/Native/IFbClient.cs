@@ -31,6 +31,8 @@ namespace FirebirdSql.Data.Client.Native
 	/// </summary>
 	public interface IFbClient
 	{
+#pragma warning disable IDE1006
+
 		#region Array Functions
 
 		IntPtr isc_array_get_slice(
@@ -268,5 +270,7 @@ namespace FirebirdSql.Data.Client.Native
 			byte[] buffer);
 
 		#endregion
+
+#pragma warning restore IDE1006
 	}
 }
