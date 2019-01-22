@@ -20,19 +20,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
 	sealed class FbConnectionPoolManager : IDisposable
 	{
-		static Lazy<FbConnectionPoolManager> _instanceLazy = new Lazy<FbConnectionPoolManager>(() => new FbConnectionPoolManager(), LazyThreadSafetyMode.ExecutionAndPublication);
-
-		internal static FbConnectionPoolManager Instance
-		{
-			get { return _instanceLazy.Value; }
-		}
+		internal static FbConnectionPoolManager Instance { get; private set; }
 
 		sealed class Pool : IDisposable
 		{
@@ -186,6 +180,15 @@ namespace FirebirdSql.Data.FirebirdClient
 		int _disposed;
 		ConcurrentDictionary<string, Pool> _pools;
 		Timer _cleanupTimer;
+
+		static FbConnectionPoolManager()
+		{
+			Instance = new FbConnectionPoolManager();
+#if !NETSTANDARD1_6
+			AppDomain.CurrentDomain.DomainUnload += (sender, args) => Instance.Dispose();
+			AppDomain.CurrentDomain.ProcessExit += (sender, args) => Instance.Dispose();
+#endif
+		}
 
 		FbConnectionPoolManager()
 		{
