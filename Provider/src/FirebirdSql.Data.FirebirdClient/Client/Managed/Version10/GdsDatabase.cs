@@ -154,7 +154,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_eventManager = null;
 				_serverVersion = null;
 				_dialect = 0;
-				_handle = 0;
+				_handle = -1;
 				_packetSize = 0;
 				_warningMessage = null;
 				_transactionCount = 0;
@@ -225,13 +225,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				CloseEventManager();
 
-				if (_handle != 0)
+				var detach = _handle != -1;
+				if (detach)
 				{
 					XdrStream.Write(IscCodes.op_detach);
 					XdrStream.Write(_handle);
 				}
 				XdrStream.Write(IscCodes.op_disconnect);
 				XdrStream.Flush();
+				if (detach)
+				{
+					ReadResponse();
+				}
 
 				CloseConnection();
 
@@ -239,7 +244,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_xdrStream?.Dispose();
 
 				_transactionCount = 0;
-				_handle = 0;
+				_handle = -1;
 				_dialect = 0;
 				_packetSize = 0;
 				_xdrStream = null;
@@ -281,23 +286,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				SendCreateToBuffer(dpb, database);
 				XdrStream.Flush();
-
-				try
-				{
-					ProcessCreateResponse(ReadGenericResponse());
-
-					Detach();
-				}
-				catch (IscException)
-				{
-					try
-					{
-						CloseConnection();
-					}
-					catch
-					{ }
-					throw;
-				}
+				ProcessCreateResponse(ReadGenericResponse());
 			}
 			catch (IOException ex)
 			{
@@ -332,20 +321,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				ReadResponse();
 
-				_handle = 0;
+				_handle = -1;
 			}
 			catch (IOException ex)
 			{
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
-			}
-			finally
-			{
-				try
-				{
-					CloseConnection();
-				}
-				catch
-				{ }
 			}
 		}
 
@@ -587,12 +567,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public virtual IResponse ReadResponse()
 		{
 			var response = ReadSingleResponse();
-
-			if (response is GenericResponse)
-			{
-				ProcessResponse(response);
-			}
-
+			ProcessResponse(response);
 			return response;
 		}
 
@@ -632,11 +607,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected virtual IResponse ReadSingleResponse()
 		{
 			var operation = ReadOperation();
-
 			var response = GdsConnection.ProcessOperation(operation, XdrStream);
-
 			ProcessResponseWarnings(response);
-
 			return response;
 		}
 

@@ -167,8 +167,6 @@ namespace FirebirdSql.Data.Client.Native
 				0);
 
 			ProcessStatusVector(_statusVector);
-
-			Detach();
 		}
 
 		public void DropDatabase()
@@ -177,9 +175,9 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fbClient.isc_drop_database(_statusVector, ref _handle);
 
-			_handle.Dispose();
-
 			ProcessStatusVector(_statusVector);
+
+			_handle.Dispose();
 		}
 
 		#endregion
@@ -238,11 +236,16 @@ namespace FirebirdSql.Data.Client.Native
 				throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
 			}
 
-			ClearStatusVector();
+			if (!_handle.IsClosed)
+			{
+				ClearStatusVector();
 
-			_fbClient.isc_detach_database(_statusVector, ref _handle);
+				_fbClient.isc_detach_database(_statusVector, ref _handle);
 
-			ProcessStatusVector(_statusVector);
+				ProcessStatusVector(_statusVector);
+
+				_handle.Dispose();
+			}
 		}
 
 		#endregion

@@ -120,15 +120,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void CreateDatabase(DatabaseParameterBuffer dpb)
 		{
-			var db = ClientFactory.CreateDatabase(_options);
-			db.CreateDatabase(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+			using (var db = ClientFactory.CreateDatabase(_options))
+			{
+				db.CreateDatabase(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+			}
 		}
 
 		public void DropDatabase()
 		{
-			var db = ClientFactory.CreateDatabase(_options);
-			db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
-			db.DropDatabase();
+			using (var db = ClientFactory.CreateDatabase(_options))
+			{
+				db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+				db.DropDatabase();
+			}
 		}
 
 		#endregion

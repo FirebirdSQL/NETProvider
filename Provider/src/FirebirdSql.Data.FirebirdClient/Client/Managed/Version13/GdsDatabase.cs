@@ -76,25 +76,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			{
 				SendCreateToBuffer(dpb, database);
 				XdrStream.Flush();
-
-				try
-				{
-					var response = ReadResponse();
-					response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
-					ProcessCreateResponse(response as GenericResponse);
-
-					Detach();
-				}
-				catch (IscException)
-				{
-					try
-					{
-						CloseConnection();
-					}
-					catch
-					{ }
-					throw;
-				}
+				var response = ReadResponse();
+				response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
+				ProcessCreateResponse(response as GenericResponse);
 			}
 			catch (IOException ex)
 			{
