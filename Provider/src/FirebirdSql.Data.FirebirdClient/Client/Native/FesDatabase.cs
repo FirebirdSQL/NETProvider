@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public FesDatabase(string dllName, Charset charset)
 		{
-			_fbClient = FbClientFactory.GetFbClient(dllName);
+			_fbClient = FbClientFactory.Create(dllName);
 			_handle = new DatabaseHandle();
 			_charset = charset ?? Charset.DefaultCharset;
 			_dialect = 3;

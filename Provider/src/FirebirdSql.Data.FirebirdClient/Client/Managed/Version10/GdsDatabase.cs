@@ -243,6 +243,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 #warning Here
 				_xdrStream?.Dispose();
 
+#warning Same as in Dispose
 				_transactionCount = 0;
 				_handle = -1;
 				_dialect = 0;

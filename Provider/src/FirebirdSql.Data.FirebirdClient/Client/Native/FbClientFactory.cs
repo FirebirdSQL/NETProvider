@@ -23,6 +23,7 @@ using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Collections.Concurrent;
 using FirebirdSql.Data.Client.Native.Handle;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -66,13 +67,19 @@ namespace FirebirdSql.Data.Client.Native
 		/// </summary>
 		/// <param name="dllName">The name of the DLL to load (e.g. "fbembed", "C:\path\to\fbembed.dll", etc)</param>
 		/// <returns>A class that implements <see cref="IFbClient"/> and calls into the native library you specify.</returns>
-		public static IFbClient GetFbClient(string dllName)
+		public static IFbClient Create(string dllName)
 		{
 			if (string.IsNullOrEmpty(dllName))
 			{
 				dllName = DefaultDllName;
 			}
-			return cache.GetOrAdd(dllName, GenerateFbClient);
+			var createdNew = false;
+			var result = cache.GetOrAdd(dllName, s => { createdNew = true; return BuildFbClient(s); });
+			if (createdNew)
+			{
+				ShutdownHelper.RegisterFbClientShutdown(() => result.fb_shutdown(0, 0));
+			}
+			return result;
 		}
 
 		/// <summary>
@@ -86,7 +93,7 @@ namespace FirebirdSql.Data.Client.Native
 		/// <para>Note: To be completly generic, we actually reflect through <see cref="IFbClient"/>
 		/// to get the methods and parameters to generate.</para>
 		/// </remarks>
-		private static IFbClient GenerateFbClient(string dllName)
+		private static IFbClient BuildFbClient(string dllName)
 		{
 			// Get the initial TypeBuilder, with a "blank" class definition
 			var tb = CreateTypeBuilder(dllName);
@@ -253,7 +260,7 @@ namespace FirebirdSql.Data.Client.Native
 		/// <returns>A <see cref="TypeBuilder"/> which we can use for building our type.</returns>
 		/// <remarks>
 		/// <para>Notice that we actually generate a new assembly for every different <c>dllName</c> that is
-		/// passed into <see cref="GenerateFbClient"/>. This might be inefficient, but since we're mostly
+		/// passed into <see cref="BuildFbClient"/>. This might be inefficient, but since we're mostly
 		/// only ever going to have one (or maybe two) different <c>dllName</c>s, it's not a big deal.</para>
 		/// </remarks>
 		private static TypeBuilder CreateTypeBuilder(string baseName)

@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public FesServiceManager(string dllName, Charset charset)
 		{
-			_fbClient = FbClientFactory.GetFbClient(dllName);
+			_fbClient = FbClientFactory.Create(dllName);
 			_charset = charset ?? Charset.DefaultCharset;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
