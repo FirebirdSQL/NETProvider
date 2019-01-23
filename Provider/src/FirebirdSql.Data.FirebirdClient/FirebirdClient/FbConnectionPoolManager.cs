@@ -185,8 +185,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			Instance = new FbConnectionPoolManager();
 #if !NETSTANDARD1_6
-			AppDomain.CurrentDomain.DomainUnload += (sender, args) => Instance.Dispose();
-			AppDomain.CurrentDomain.ProcessExit += (sender, args) => Instance.Dispose();
+			AppDomain.CurrentDomain.DomainUnload += (sender, e) => Instance.Dispose();
+			AppDomain.CurrentDomain.ProcessExit += (sender, e) => Instance.Dispose();
 #endif
 		}
 
