@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			catch (IOException ex)
 			{
 				Database.Detach();
-				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
+				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
 

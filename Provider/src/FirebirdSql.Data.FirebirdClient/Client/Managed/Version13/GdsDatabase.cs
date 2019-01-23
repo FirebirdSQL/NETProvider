@@ -51,7 +51,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			catch (IOException ex)
 			{
 				SafelyDetach();
-				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
+				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 
 			AfterAttachActions();
@@ -98,7 +98,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_net_write_err, ex);
+				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
 
