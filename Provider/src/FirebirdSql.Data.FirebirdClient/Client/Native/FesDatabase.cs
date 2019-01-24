@@ -236,7 +236,7 @@ namespace FirebirdSql.Data.Client.Native
 				throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
 			}
 
-			if (!_handle.IsClosed)
+			if (!_handle.IsInvalid)
 			{
 				ClearStatusVector();
 
