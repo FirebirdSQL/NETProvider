@@ -48,9 +48,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					if (_disposed)
 						return;
 					_disposed = true;
-					Created = default;
 					Connection.Dispose();
-					Connection = null;
 				}
 			}
 
@@ -75,10 +73,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					if (_disposed)
 						return;
 					_disposed = true;
-					_connectionString = null;
 					CleanConnectionsImpl();
-					_available = null;
-					_busy = null;
 				}
 			}
 
@@ -177,9 +172,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		int _disposed;
+		bool _disposed;
 		ConcurrentDictionary<string, Pool> _pools;
 		Timer _cleanupTimer;
+		object _syncRootDisposeTimerCallback;
 
 		static FbConnectionPoolManager()
 		{
@@ -189,9 +185,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		FbConnectionPoolManager()
 		{
-			_disposed = 0;
+			_disposed = false;
 			_pools = new ConcurrentDictionary<string, Pool>();
 			_cleanupTimer = new Timer(CleanupCallback, null, TimeSpan.FromSeconds(2), Timeout.InfiniteTimeSpan);
+			_syncRootDisposeTimerCallback = new object();
 		}
 
 		internal FbConnectionInternal Get(FbConnectionString connectionString, FbConnection owner)
@@ -227,25 +224,31 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public void Dispose()
 		{
-			if (Interlocked.Exchange(ref _disposed, 1) == 1)
-				return;
-			_cleanupTimer.Dispose();
-			_cleanupTimer = null;
-			_pools.Values.AsParallel().ForAll(x => x.Dispose());
-			_pools = null;
+			lock (_syncRootDisposeTimerCallback)
+			{
+				if (_disposed)
+					return;
+				_disposed = true;
+				// when NS1.6 is dropped it can be switched to Dispose(WaitHandle) and Volatile/Interlocked
+				_cleanupTimer.Dispose();
+				_pools.Values.AsParallel().ForAll(x => x.Dispose());
+			}
 		}
 
 		void CleanupCallback(object o)
 		{
-			if (Volatile.Read(ref _disposed) == 1)
-				return;
-			_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
-			_cleanupTimer.Change(TimeSpan.FromSeconds(2), Timeout.InfiniteTimeSpan);
+			lock (_syncRootDisposeTimerCallback)
+			{
+				if (_disposed)
+					return;
+				_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
+				_cleanupTimer.Change(TimeSpan.FromSeconds(2), Timeout.InfiniteTimeSpan);
+			}
 		}
 
 		void CheckDisposed()
 		{
-			if (Volatile.Read(ref _disposed) == 1)
+			if (Volatile.Read(ref _disposed))
 				throw new ObjectDisposedException(nameof(FbConnectionPoolManager));
 		}
 	}
