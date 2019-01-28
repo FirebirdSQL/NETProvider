@@ -437,7 +437,44 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 						cmd.CommandText = "drop user \"CaseSensitive\" using plugin Srp";
 						cmd.ExecuteNonQuery();
 					}
-				} 
+				}
+			}
+		}
+
+		[Test]
+		public void CreateDropDatabaseUsingTrustedAuth()
+		{
+			if (!EnsureServerType(FbServerType.Default))
+				return;
+
+			if (GetServerVersion() >= new Version("3.0.0.0"))
+			{
+				using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = "create or alter global mapping admin_trusted_auth using plugin win_sspi from any user to role rdb$admin";
+					cmd.ExecuteNonQuery();
+				}
+			}
+			try
+			{
+				var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+				csb.UserID = string.Empty;
+				csb.Password = string.Empty;
+				csb.Database = $"{Guid.NewGuid().ToString()}.fdb";
+				var cs = csb.ToString();
+				Assert.DoesNotThrow(() => FbConnection.CreateDatabase(cs, true));
+				Assert.DoesNotThrow(() => FbConnection.DropDatabase(cs));
+			}
+			finally
+			{
+				if (GetServerVersion() >= new Version("3.0.0.0"))
+				{
+					using (var cmd = Connection.CreateCommand())
+					{
+						cmd.CommandText = "drop global mapping admin_trusted_auth";
+						cmd.ExecuteNonQuery();
+					}
+				}
 			}
 		}
 
