@@ -135,6 +135,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_connection = connection;
 			_charset = Charset.DefaultCharset;
 			_dialect = 3;
+			_handle = -1;
 			_packetSize = 8192;
 			_xdrStream = _connection.CreateXdrStream();
 		}
