@@ -39,6 +39,7 @@ namespace FirebirdSql.Data.Common
 		void Detach();
 
 		void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
+		void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
 		void DropDatabase();
 
 		TransactionBase BeginTransaction(TransactionParameterBuffer tpb);

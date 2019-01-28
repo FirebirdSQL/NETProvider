@@ -104,6 +104,11 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			Attach(dpb, dataSource, port, database, cryptKey);
 		}
 
+		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		{
+			CreateDatabase(dpb, dataSource, port, database, cryptKey);
+		}
+
 		public IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
 		{
 			while (response is CryptKeyCallbackResponse cryptResponse)

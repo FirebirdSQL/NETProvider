@@ -104,6 +104,21 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				response = ReadResponse();
 			}
 		}
+
+		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		{
+			using (var sspiHelper = new SspiHelper())
+			{
+				var authData = sspiHelper.InitializeClientSecurity();
+				SendTrustedAuthToBuffer(dpb, authData);
+				SendCreateToBuffer(dpb, database);
+				XdrStream.Flush();
+
+				var response = ReadResponse();
+				ProcessTrustedAuthResponse(sspiHelper, ref response);
+				ProcessCreateResponse((GenericResponse)response);
+			}
+		}
 		#endregion
 
 		#region Public methods

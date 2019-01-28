@@ -122,7 +122,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			using (var db = ClientFactory.CreateDatabase(_options))
 			{
-				db.CreateDatabase(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+				{
+					db.CreateDatabaseWithTrustedAuth(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+				}
+				else
+				{
+					db.CreateDatabase(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+				}
 			}
 		}
 
@@ -130,7 +137,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			using (var db = ClientFactory.CreateDatabase(_options))
 			{
-				db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+				{
+					db.AttachWithTrustedAuth(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+				}
+				else
+				{
+					db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+				}
 				db.DropDatabase();
 			}
 		}

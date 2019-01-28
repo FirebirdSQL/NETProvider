@@ -149,16 +149,59 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			if (!_disposed)
 			{
 				_disposed = true;
-				Detach();
-				_connection = null;
-				_charset = null;
-				_eventManager = null;
-				_serverVersion = null;
-				_dialect = 0;
-				_handle = -1;
-				_packetSize = 0;
-				_warningMessage = null;
-				_transactionCount = 0;
+
+				if (TransactionCount > 0)
+				{
+					throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
+				}
+
+				try
+				{
+					CloseEventManager();
+
+					var detach = _handle != -1;
+					if (detach)
+					{
+						XdrStream.Write(IscCodes.op_detach);
+						XdrStream.Write(_handle);
+					}
+					XdrStream.Write(IscCodes.op_disconnect);
+					XdrStream.Flush();
+					if (detach)
+					{
+						ReadResponse();
+					}
+
+					CloseConnection();
+
+#warning Here
+					_xdrStream?.Dispose();
+				}
+				catch (IOException ex)
+				{
+					try
+					{
+						CloseConnection();
+					}
+					catch (IOException ex2)
+					{
+						throw IscException.ForErrorCode(IscCodes.isc_network_error, ex2);
+					}
+					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				}
+				finally
+				{
+					_xdrStream = null;
+					_connection = null;
+					_charset = null;
+					_eventManager = null;
+					_serverVersion = null;
+					_dialect = 0;
+					_handle = -1;
+					_packetSize = 0;
+					_warningMessage = null;
+					_transactionCount = 0;
+				}
 			}
 		}
 
@@ -217,55 +260,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual void Detach()
 		{
-			if (TransactionCount > 0)
-			{
-				throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
-			}
-
-			try
-			{
-				CloseEventManager();
-
-				var detach = _handle != -1;
-				if (detach)
-				{
-					XdrStream.Write(IscCodes.op_detach);
-					XdrStream.Write(_handle);
-				}
-				XdrStream.Write(IscCodes.op_disconnect);
-				XdrStream.Flush();
-				if (detach)
-				{
-					ReadResponse();
-				}
-
-				CloseConnection();
-
-#warning Here
-				_xdrStream?.Dispose();
-
-#warning Same as in Dispose
-				_transactionCount = 0;
-				_handle = -1;
-				_dialect = 0;
-				_packetSize = 0;
-				_xdrStream = null;
-				_charset = null;
-				_connection = null;
-				_serverVersion = null;
-			}
-			catch (IOException ex)
-			{
-				try
-				{
-					CloseConnection();
-				}
-				catch (IOException ex2)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex2);
-				}
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
-			}
+			Dispose();
 		}
 
 		protected void SafelyDetach()
@@ -311,6 +306,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected void ProcessCreateResponse(GenericResponse response)
 		{
 			_handle = response.ObjectHandle;
+		}
+
+		public virtual void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		{
+			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
 
 		public virtual void DropDatabase()

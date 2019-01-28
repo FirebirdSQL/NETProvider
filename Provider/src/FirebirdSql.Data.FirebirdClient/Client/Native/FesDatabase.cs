@@ -169,6 +169,11 @@ namespace FirebirdSql.Data.Client.Native
 			ProcessStatusVector(_statusVector);
 		}
 
+		public void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		{
+			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
+		}
+
 		public void DropDatabase()
 		{
 			ClearStatusVector();
