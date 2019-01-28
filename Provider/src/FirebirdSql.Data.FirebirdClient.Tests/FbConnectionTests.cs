@@ -426,7 +426,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				try
 				{
 					using (var conn2 = new FbConnection(csBuilder.ToString()))
-					//using (var conn2 = new FbConnection("user id='\"CaseSensitive\"';..."))
 					{
 						conn2.Open();
 					}
