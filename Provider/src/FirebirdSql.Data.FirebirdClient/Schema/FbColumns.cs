@@ -148,7 +148,10 @@ namespace FirebirdSql.Data.Schema
 
 				if (dbType == FbDbType.Char || dbType == FbDbType.VarChar)
 				{
-					row["COLUMN_SIZE"] = row["CHARACTER_MAX_LENGTH"];
+					if (!row.IsNull("CHARACTER_MAX_LENGTH"))
+					{
+						row["COLUMN_SIZE"] = row["CHARACTER_MAX_LENGTH"];
+					}
 				}
 				else
 				{
