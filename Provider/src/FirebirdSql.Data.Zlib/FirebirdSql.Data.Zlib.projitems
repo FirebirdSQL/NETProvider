@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>8523bdf3-f378-487d-afee-89b5b0a6b9ec</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>FirebirdSql.Data.Zlib</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Deflate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Inflate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InfTree.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Zlib.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ZlibCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ZlibConstants.cs" />
+  </ItemGroup>
+</Project>
