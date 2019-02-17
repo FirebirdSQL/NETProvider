@@ -739,9 +739,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				finally
 				{
-					_transaction.Dispose();
-					_transaction = null;
-					_implicitTransaction = false;
+					if (_transaction != null)
+					{
+						_transaction.Dispose();
+						_transaction = null;
+						_implicitTransaction = false;
+					}
 
 					if (_statement != null)
 					{
