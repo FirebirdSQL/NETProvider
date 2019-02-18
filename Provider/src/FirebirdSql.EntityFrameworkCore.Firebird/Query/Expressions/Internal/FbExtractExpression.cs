@@ -59,7 +59,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 
 		public override bool Equals(object obj)
 		{
-			if (ReferenceEquals(null, obj))
+			if (obj is null)
 			{
 				return false;
 			}
