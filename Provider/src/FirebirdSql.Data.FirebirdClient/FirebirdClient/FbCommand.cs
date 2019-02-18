@@ -689,9 +689,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal void CommitImplicitTransaction()
 		{
-			if (HasImplicitTransaction &&
-				_transaction != null &&
-				_transaction.Transaction != null)
+			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
 			{
 				try
 				{
