@@ -347,12 +347,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					create.ExecuteNonQuery();
 				}
 
-				var l = new List<string>();
-
-				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1')");
-				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11')");
-				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111')");
-				l.Add("INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111')");
+				var l = new List<string>
+				{
+					"INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1')",
+					"INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11')",
+					"INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111')",
+					"INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111')"
+				};
 
 				foreach (string statement in l)
 				{

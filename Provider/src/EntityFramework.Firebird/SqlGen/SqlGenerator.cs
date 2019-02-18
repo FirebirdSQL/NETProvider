@@ -209,11 +209,12 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns></returns>
 		private static Dictionary<string, string> InitializeFunctionNameToOperatorDictionary()
 		{
-			var functionNameToOperatorDictionary = new Dictionary<string, string>(StringComparer.Ordinal);
-			functionNameToOperatorDictionary.Add("Concat", "||");
-			functionNameToOperatorDictionary.Add("Contains", "CONTAINING");
-			functionNameToOperatorDictionary.Add("StartsWith", "STARTING WITH");
-			return functionNameToOperatorDictionary;
+			return new Dictionary<string, string>(StringComparer.Ordinal)
+			{
+				{ nameof(string.Concat), "||" },
+				{ nameof(string.Contains), "CONTAINING" },
+				{ nameof(string.StartsWith), "STARTING WITH" },
+			};
 		}
 
 		#endregion
