@@ -428,10 +428,6 @@ namespace EntityFramework.Firebird.SqlGen
 		/// <returns>A <see cref="SqlSelectStatement"/>.</returns>
 		public override ISqlFragment Visit(DbApplyExpression e)
 		{
-			var inputs = new List<DbExpressionBinding>();
-			inputs.Add(e.Input);
-			inputs.Add(e.Apply);
-
 			string joinString;
 			switch (e.ExpressionKind)
 			{
