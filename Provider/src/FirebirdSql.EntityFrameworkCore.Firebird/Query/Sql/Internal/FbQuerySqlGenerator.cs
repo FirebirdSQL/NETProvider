@@ -100,15 +100,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			return extractExpression;
 		}
 
-		public override Expression VisitSelect(SelectExpression selectExpression)
+		protected override void GeneratePseudoFromClause()
 		{
-			base.VisitSelect(selectExpression);
-			if (!selectExpression.Tables.Any())
-			{
-				Sql.AppendLine();
-				Sql.Append("FROM RDB$DATABASE");
-			}
-			return selectExpression;
+			Sql.Append(" FROM RDB$DATABASE");
 		}
 	}
 }
