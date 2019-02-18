@@ -19,18 +19,15 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using FirebirdSql.Data.FirebirdClient;
-using FirebirdSql.EntityFrameworkCore.Firebird.Extensions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
-	public class FbTypeMapper : RelationalTypeMapper
+	public class FbTypeMappingSource : RelationalTypeMappingSource
 	{
 		public const int BinaryMaxSize = Int32.MaxValue;
-		public const int VarcharMaxSize = 32765;
-		public const int NVarcharMaxSize = VarcharMaxSize / 4;
+		public const int VarcharMaxSize = 32765 / 4;
 		public const int DefaultDecimalPrecision = 18;
 		public const int DefaultDecimalScale = 2;
 
@@ -42,10 +39,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		readonly FbStringTypeMapping _char = new FbStringTypeMapping("CHAR", FbDbType.Char);
 		readonly FbStringTypeMapping _varchar = new FbStringTypeMapping("VARCHAR", FbDbType.VarChar);
-		readonly FbStringTypeMapping _varcharMax = new FbStringTypeMapping($"VARCHAR({VarcharMaxSize})", FbDbType.VarChar, size: VarcharMaxSize);
-		readonly FbStringTypeMapping _nvarcharMax = new FbStringTypeMapping($"VARCHAR({NVarcharMaxSize})", FbDbType.VarChar, size: NVarcharMaxSize);
-		readonly FbStringTypeMapping _varchar256 = new FbStringTypeMapping($"VARCHAR(256)", FbDbType.VarChar, size: 256);
-		readonly FbStringTypeMapping _nvarchar256 = new FbStringTypeMapping($"VARCHAR(256)", FbDbType.VarChar, size: 256);
 		readonly FbStringTypeMapping _clob = new FbStringTypeMapping("BLOB SUB_TYPE TEXT", FbDbType.Text);
 
 		readonly FbByteArrayTypeMapping _binary = new FbByteArrayTypeMapping();
@@ -64,8 +57,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		readonly Dictionary<Type, RelationalTypeMapping> _clrTypeMappings;
 		readonly HashSet<string> _disallowedMappings;
 
-		public FbTypeMapper(RelationalTypeMapperDependencies dependencies)
-			: base(dependencies)
+		public FbTypeMappingSource(TypeMappingSourceDependencies dependencies, RelationalTypeMappingSourceDependencies relationalDependencies)
+			: base(dependencies, relationalDependencies)
 		{
 			_storeTypeMappings = new Dictionary<string, RelationalTypeMapping>(StringComparer.OrdinalIgnoreCase)
 			{
@@ -107,58 +100,94 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 					"CHARACTER VARYING",
 					"CHAR VARYING",
 			};
-
-			ByteArrayMapper = new ByteArrayRelationalTypeMapper(
-				maxBoundedLength: BinaryMaxSize,
-				defaultMapping: _binary,
-				unboundedMapping: _binary,
-				keyMapping: _binary,
-				rowVersionMapping: null,
-				createBoundedMapping: _ => _binary);
-
-			StringMapper = new StringRelationalTypeMapper(
-				maxBoundedAnsiLength: VarcharMaxSize,
-				defaultAnsiMapping: _varcharMax,
-				unboundedAnsiMapping: _varcharMax,
-				keyAnsiMapping: _varchar256,
-				createBoundedAnsiMapping: size => new FbStringTypeMapping($"VARCHAR({size})", FbDbType.VarChar, size),
-				maxBoundedUnicodeLength: NVarcharMaxSize,
-				defaultUnicodeMapping: _nvarcharMax,
-				unboundedUnicodeMapping: _nvarcharMax,
-				keyUnicodeMapping: _nvarchar256,
-				createBoundedUnicodeMapping: size => new FbStringTypeMapping($"VARCHAR({size})", FbDbType.VarChar, size));
 		}
 
-		public override IByteArrayRelationalTypeMapper ByteArrayMapper { get; }
-		public override IStringRelationalTypeMapper StringMapper { get; }
-
-		public override void ValidateTypeName(string storeType)
+		protected override RelationalTypeMapping FindMapping(in RelationalTypeMappingInfo mappingInfo)
 		{
-			if (_disallowedMappings.Contains(storeType))
-				throw new ArgumentException($"Data type '{storeType}' is invalid.");
+			return FindRawMapping(mappingInfo)?.Clone(mappingInfo) ?? base.FindMapping(mappingInfo);
 		}
 
-		protected override string GetColumnType(IProperty property)
-			=> property.Firebird().ColumnType;
-
-		protected override IReadOnlyDictionary<Type, RelationalTypeMapping> GetClrTypeMappings()
-			=> _clrTypeMappings;
-
-		protected override IReadOnlyDictionary<string, RelationalTypeMapping> GetStoreTypeMappings()
-			=> _storeTypeMappings;
-
-		public override RelationalTypeMapping FindMapping(Type clrType)
+		protected override void ValidateMapping(CoreTypeMapping mapping, IProperty property)
 		{
-			clrType = clrType.UnwrapNullableType().UnwrapEnumType();
+			var relationalMapping = mapping as RelationalTypeMapping;
 
-			return clrType == typeof(string)
-				? _nvarcharMax
-				: clrType == typeof(byte[])
-					? _binary
-					: base.FindMapping(clrType);
+			if (_disallowedMappings.Contains(relationalMapping?.StoreType))
+			{
+				if (property == null)
+				{
+					throw new ArgumentException($"Data type '{relationalMapping.StoreType}' is not supported in this form. Either specify the length explicitly in the type name or remove the data type and use APIs such as HasMaxLength.");
+				}
+
+				throw new ArgumentException($"Data type '{relationalMapping.StoreType}' for property '{property}' is not supported in this form. Either specify the length explicitly in the type name or remove the data type and use APIs such as HasMaxLength.");
+			}
 		}
 
-		protected override bool RequiresKeyMapping(IProperty property)
-			=> base.RequiresKeyMapping(property) || property.IsIndex();
+		RelationalTypeMapping FindRawMapping(RelationalTypeMappingInfo mappingInfo)
+		{
+			var clrType = mappingInfo.ClrType;
+			var storeTypeName = mappingInfo.StoreTypeName;
+			var storeTypeNameBase = mappingInfo.StoreTypeNameBase;
+
+			if (storeTypeName != null)
+			{
+				if (clrType == typeof(float)
+					&& mappingInfo.Size != null
+					&& mappingInfo.Size <= 24
+					&& (storeTypeNameBase.Equals("float", StringComparison.OrdinalIgnoreCase)
+						|| storeTypeNameBase.Equals("double precision", StringComparison.OrdinalIgnoreCase)))
+				{
+					return _float;
+				}
+
+				if (_storeTypeMappings.TryGetValue(storeTypeName, out var mapping) || _storeTypeMappings.TryGetValue(storeTypeNameBase, out mapping))
+				{
+					return clrType == null || mapping.ClrType == clrType
+						? mapping
+						: null;
+				}
+			}
+
+			if (clrType != null)
+			{
+				if (_clrTypeMappings.TryGetValue(clrType, out var mapping))
+				{
+					return mapping;
+				}
+
+				if (clrType == typeof(string))
+				{
+					var isFixedLength = mappingInfo.IsFixedLength == true;
+					var size = mappingInfo.Size ?? (mappingInfo.IsKeyOrIndex ? 256 : (int?)null);
+
+					if (size > VarcharMaxSize)
+					{
+						size = isFixedLength ? VarcharMaxSize : (int?)null;
+					}
+
+					if (size == null)
+					{
+						return _clob;
+					}
+					else
+					{
+						if (!isFixedLength)
+						{
+							return new FbStringTypeMapping($"VARCHAR({size})", FbDbType.VarChar, size);
+						}
+						else
+						{
+							return new FbStringTypeMapping($"CHAR({size})", FbDbType.Char, size);
+						}
+					}
+				}
+
+				if (clrType == typeof(byte[]))
+				{
+					return _binary;
+				}
+			}
+
+			return null;
+		}
 	}
 }

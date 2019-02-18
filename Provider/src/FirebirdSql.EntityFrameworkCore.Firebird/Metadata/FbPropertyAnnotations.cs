@@ -16,7 +16,6 @@
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
 using System;
-using FirebirdSql.EntityFrameworkCore.Firebird.Extensions;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;

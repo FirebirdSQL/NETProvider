@@ -16,9 +16,8 @@
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
-using Microsoft.EntityFrameworkCore;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
+namespace Microsoft.EntityFrameworkCore
 {
 	public static class FbModelBuilderExtensions
 	{

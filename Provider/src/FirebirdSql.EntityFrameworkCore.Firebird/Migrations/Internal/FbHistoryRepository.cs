@@ -17,6 +17,7 @@
 
 using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Internal
 {
@@ -30,7 +31,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Internal
 		{
 			get
 			{
-				var escapedTableName = SqlGenerationHelper.EscapeLiteral(TableName);
+				var escapedTableName = Dependencies.TypeMappingSource.GetMapping(typeof(string)).GenerateSqlLiteral(TableName);
 				return $@"
 SELECT COUNT(*)
 FROM rdb$relations r

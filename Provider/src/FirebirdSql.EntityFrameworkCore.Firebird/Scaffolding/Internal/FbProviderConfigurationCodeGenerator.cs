@@ -13,20 +13,27 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 {
-	public class FbScaffoldingCodeGenerator: IScaffoldingProviderCodeGenerator
+	public class FbProviderConfigurationCodeGenerator : ProviderCodeGenerator
 	{
-		public virtual string GenerateUseProvider(string connectionString, string language)
-		   => language == "CSharp"
-			   ? $".{nameof(FbDbContextOptionsExtensions.UseFirebird)}({GenerateVerbatimStringLiteral(connectionString)})"
-			   : null;
+		public FbProviderConfigurationCodeGenerator(ProviderCodeGeneratorDependencies dependencies)
+			: base(dependencies)
+		{ }
 
-		static string GenerateVerbatimStringLiteral(string value) => "@\"" + value.Replace("\"", "\"\"") + "\"";
+		public override MethodCallCodeFragment GenerateUseProvider(string connectionString, MethodCallCodeFragment providerOptions)
+		{
+			return new MethodCallCodeFragment(
+				nameof(FbDbContextOptionsExtensions.UseFirebird),
+				providerOptions == null
+					? new object[] { connectionString }
+					: new object[] { connectionString, new NestedClosureCodeFragment("x", providerOptions) });
+		}
 	}
 }

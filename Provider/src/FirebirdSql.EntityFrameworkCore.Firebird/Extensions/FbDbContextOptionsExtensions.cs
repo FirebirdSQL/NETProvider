@@ -19,10 +19,9 @@ using System;
 using System.Data.Common;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
+namespace Microsoft.EntityFrameworkCore
 {
 	public static class FbDbContextOptionsExtensions
 	{

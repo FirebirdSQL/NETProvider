@@ -28,9 +28,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Design.Internal
 	{
 		public void ConfigureDesignTimeServices(IServiceCollection serviceCollection)
 			=> serviceCollection
-				.AddSingleton<IRelationalTypeMapper, FbTypeMapper>()
+				.AddSingleton<IRelationalTypeMappingSource, FbTypeMappingSource>()
 				.AddSingleton<IDatabaseModelFactory, FbDatabaseModelFactory>()
-				.AddSingleton<IScaffoldingProviderCodeGenerator, FbScaffoldingCodeGenerator>()
+				.AddSingleton<IProviderConfigurationCodeGenerator, FbProviderConfigurationCodeGenerator>()
 				.AddSingleton<IAnnotationCodeGenerator, AnnotationCodeGenerator>();
 	}
 }

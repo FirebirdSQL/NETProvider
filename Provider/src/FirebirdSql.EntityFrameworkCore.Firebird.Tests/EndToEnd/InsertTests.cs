@@ -16,7 +16,6 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using FirebirdSql.EntityFrameworkCore.Firebird.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 

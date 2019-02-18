@@ -21,7 +21,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
+namespace Microsoft.EntityFrameworkCore
 {
 	public static class FbPropertyBuilderExtensions
     {

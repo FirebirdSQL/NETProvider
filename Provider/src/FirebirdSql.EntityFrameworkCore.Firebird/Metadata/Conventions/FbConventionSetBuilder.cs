@@ -13,12 +13,12 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 {
@@ -30,10 +30,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 
 		public static ConventionSet Build()
 		{
-			var typeMapper = new FbTypeMapper(new RelationalTypeMapperDependencies());
-			var dependencies = new RelationalConventionSetBuilderDependencies(typeMapper, null, null);
-			return new FbConventionSetBuilder(dependencies)
-				.AddConventions(new CoreConventionSetBuilder(new CoreConventionSetBuilderDependencies(typeMapper)).CreateConventionSet());
+			var serviceProvider = new ServiceCollection()
+				.AddEntityFrameworkFirebird()
+				.AddDbContext<DbContext>(o => o.UseFirebird("database=localhost:_.fdb;user=sysdba;password=masterkey"))
+				.BuildServiceProvider();
+
+			using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
+			{
+				using (var context = serviceScope.ServiceProvider.GetService<DbContext>())
+				{
+					return ConventionSet.CreateConventionSet(context);
+				}
+			}
 		}
 	}
 }

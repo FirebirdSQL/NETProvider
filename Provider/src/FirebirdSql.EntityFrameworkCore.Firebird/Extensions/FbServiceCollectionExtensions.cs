@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions;
@@ -33,7 +34,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
+namespace Microsoft.EntityFrameworkCore
 {
 	public static class FbServiceCollectionExtensions
 	{
@@ -42,7 +43,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 			var builder = new EntityFrameworkRelationalServicesBuilder(serviceCollection)
 				.TryAdd<IDatabaseProvider, DatabaseProvider<FbOptionsExtension>>()
 				.TryAdd<IRelationalDatabaseCreator, FbDatabaseCreator>()
-				.TryAdd<IRelationalTypeMapper, FbTypeMapper>()
+				.TryAdd<IRelationalTypeMappingSource, FbTypeMappingSource>()
 				.TryAdd<ISqlGenerationHelper, FbSqlGenerationHelper>()
 				.TryAdd<IMigrationsAnnotationProvider, FbMigrationsAnnotationProvider>()
 				.TryAdd<IConventionSetBuilder, FbConventionSetBuilder>()

@@ -88,7 +88,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			}
 			else if (defaultValue != null)
 			{
-				var defaultValueLiteral = Dependencies.TypeMapper.GetMapping(clrType);
+				var defaultValueLiteral = Dependencies.TypeMappingSource.GetMapping(clrType);
 				builder.Append(" DEFAULT ")
 					.Append(defaultValueLiteral.GenerateSqlLiteral(defaultValue));
 			}

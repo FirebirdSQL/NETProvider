@@ -27,13 +27,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 {
 	public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 	{
-		readonly IRelationalTypeMapper _typeMapper;
-
-		public FbUpdateSqlGenerator(UpdateSqlGeneratorDependencies dependencies, IRelationalTypeMapper typeMapper)
+		public FbUpdateSqlGenerator(UpdateSqlGeneratorDependencies dependencies)
 			: base(dependencies)
-		{
-			_typeMapper = typeMapper;
-		}
+		{ }
 
 		protected override void AppendIdentityWhereCondition(StringBuilder commandStringBuilder, ColumnModification columnModification)
 		{
@@ -190,7 +186,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 
 		string GetColumnType(ColumnModification column)
 		{
-			return _typeMapper.GetMapping(column.Property).StoreType;
+			return Dependencies.TypeMappingSource.GetMapping(column.Property).StoreType;
 		}
 
 		IEnumerable<(string name, string type)> GenerateParameters(IEnumerable<ColumnModification> columns)

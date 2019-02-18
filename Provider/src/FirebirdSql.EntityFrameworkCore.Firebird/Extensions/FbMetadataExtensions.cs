@@ -18,7 +18,7 @@
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
+namespace Microsoft.EntityFrameworkCore
 {
 	public static class FbMetadataExtensions
 	{
