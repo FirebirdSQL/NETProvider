@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
@@ -29,7 +30,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 	public class MigrationsTests : EntityFrameworkCoreTestsBase
 	{
 		[Test]
-		public void CreateTableOperation()
+		public void CreateTable()
 		{
 			var operation = new CreateTableOperation
 			{
@@ -122,20 +123,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
     ""EmployerId"" INTEGER,
     ""SSN"" char(11),
     ""DEF_O"" VARCHAR(20) DEFAULT _UTF8'test',
-    ""DEF_S"" VARCHAR(20) DEFAULT '',
+    ""DEF_S"" VARCHAR(20) DEFAULT (''),
     PRIMARY KEY (""Id""),
     UNIQUE (""SSN""),
     FOREIGN KEY (""EmployerId"") REFERENCES ""Companies"" (""Id"")
-)";
+);";
 			var batch = Generate(new[] { operation });
 			Assert.AreEqual(3, batch.Count());
-			StringAssert.StartsWith(expectedCreateTable, batch[0].CommandText);
+			Assert.AreEqual(expectedCreateTable, batch[0].CommandText);
 			StringAssert.Contains("rdb$generator_name = ", batch[1].CommandText);
 			StringAssert.StartsWith("CREATE TRIGGER ", batch[2].CommandText);
 		}
 
 		[Test]
-		public void DropTableOperation()
+		public void DropTable()
 		{
 			var operation = new DropTableOperation()
 			{
@@ -143,7 +144,186 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			};
 			var batch = Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
-			StringAssert.StartsWith(@"DROP TABLE ""People""", batch[0].CommandText);
+			Assert.AreEqual(NewLineEnd(@"DROP TABLE ""People"";"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddColumn()
+		{
+			var operation = new AddColumnOperation()
+			{
+				Table = "People",
+				Name = "NewColumn",
+				ClrType = typeof(decimal),
+				Schema = "schema",
+				IsNullable = false,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""schema"".""People"" ADD ""NewColumn"" DECIMAL(18,2) NOT NULL;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void DropColumn()
+		{
+			var operation = new DropColumnOperation()
+			{
+				Table = "People",
+				Name = "DropMe",
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP COLUMN ""DropMe"";"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AlterColumnLength()
+		{
+			var operation = new AlterColumnOperation()
+			{
+				Table = "People",
+				Name = "Col",
+				ClrType = typeof(string),
+				IsNullable = true,
+				MaxLength = 200,
+				OldColumn = new ColumnOperation()
+				{
+					ClrType = typeof(string),
+					IsNullable = true,
+					MaxLength = 100,
+				},
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(2, batch.Count());
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE VARCHAR(200);", batch[1].CommandText);
+		}
+
+		[Test]
+		public void AlterColumnNullableToNotNull()
+		{
+			var operation = new AlterColumnOperation()
+			{
+				Table = "People",
+				Name = "Col",
+				ClrType = typeof(string),
+				IsNullable = false,
+				MaxLength = 100,
+				OldColumn = new ColumnOperation()
+				{
+					ClrType = typeof(string),
+					IsNullable = true,
+					MaxLength = 100,
+				},
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(2, batch.Count());
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" DROP NOT NULL;", batch[0].CommandText);
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE VARCHAR(100) NOT NULL;", batch[1].CommandText);
+		}
+
+		[Test]
+		public void AlterColumnNotNullToNullable()
+		{
+			var operation = new AlterColumnOperation()
+			{
+				Table = "People",
+				Name = "Col",
+				ClrType = typeof(string),
+				IsNullable = true,
+				MaxLength = 100,
+				OldColumn = new ColumnOperation()
+				{
+					ClrType = typeof(string),
+					IsNullable = false,
+					MaxLength = 100,
+				},
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(2, batch.Count());
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" DROP NOT NULL;", batch[0].CommandText);
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE VARCHAR(100);", batch[1].CommandText);
+		}
+
+		[Test]
+		public void AlterColumnType()
+		{
+			var operation = new AlterColumnOperation()
+			{
+				Table = "People",
+				Name = "Col",
+				ClrType = typeof(long),
+				IsNullable = false,
+				OldColumn = new ColumnOperation()
+				{
+					ClrType = typeof(int),
+					IsNullable = false,
+				},
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(2, batch.Count());
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE BIGINT NOT NULL;", batch[1].CommandText);
+		}
+
+		[Test]
+		public void AlterColumnDefault()
+		{
+			var operation = new AlterColumnOperation()
+			{
+				Table = "People",
+				Name = "Col",
+				ClrType = typeof(int),
+				DefaultValue = 20,
+				OldColumn = new ColumnOperation()
+				{
+					ClrType = typeof(int),
+					DefaultValue = 10,
+				},
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(4, batch.Count());
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER NOT NULL;", batch[1].CommandText);
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" DROP DEFAULT;", batch[2].CommandText);
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" SET DEFAULT 20;", batch[3].CommandText);
+		}
+
+		[Test]
+		public void AlterColumnAddIdentity()
+		{
+			var operation = new AlterColumnOperation()
+			{
+				Table = "People",
+				Name = "Col",
+				ClrType = typeof(int),
+				[FbAnnotationNames.ValueGenerationStrategy] = FbValueGenerationStrategy.IdentityColumn,
+				OldColumn = new ColumnOperation()
+				{
+					ClrType = typeof(int),
+				},
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(2, batch.Count());
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER GENERATED BY DEFAULT AS IDENTITY NOT NULL;", batch[1].CommandText);
+		}
+
+		[Test]
+		public void AlterColumnAddSequence()
+		{
+			var operation = new AlterColumnOperation()
+			{
+				Table = "People",
+				Name = "Col",
+				ClrType = typeof(int),
+				[FbAnnotationNames.ValueGenerationStrategy] = FbValueGenerationStrategy.SequenceTrigger,
+				OldColumn = new ColumnOperation()
+				{
+					ClrType = typeof(int),
+				},
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(4, batch.Count());
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER NOT NULL;", batch[1].CommandText);
+			StringAssert.Contains("rdb$generator_name = ", batch[2].CommandText);
+			StringAssert.StartsWith("CREATE TRIGGER ", batch[3].CommandText);
 		}
 
 		IReadOnlyList<MigrationCommand> Generate(IReadOnlyList<MigrationOperation> operations)
@@ -154,5 +334,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				return generator.Generate(operations, db.Model);
 			}
 		}
+
+		static string NewLineEnd(string s) => s + Environment.NewLine;
 	}
 }

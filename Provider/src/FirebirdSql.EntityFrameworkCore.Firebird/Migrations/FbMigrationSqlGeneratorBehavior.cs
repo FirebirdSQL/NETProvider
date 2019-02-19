@@ -29,9 +29,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			_sqlHelper = sqlHelper;
 		}
 
-		public virtual void CreateIdentityForColumn(string columnName, string tableName, MigrationCommandListBuilder builder)
+		public virtual void CreateSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationCommandListBuilder builder)
 		{
-			var identitySequenceName = CreateIdentitySequenceName(columnName, tableName);
+			var identitySequenceName = CreateSequenceTriggerSequenceName(columnName, tableName, schemaName);
 
 			builder.AppendLine("EXECUTE BLOCK");
 			builder.AppendLine("AS");
@@ -55,9 +55,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.EndCommand();
 
 			builder.Append("CREATE TRIGGER ");
-			builder.Append(_sqlHelper.DelimitIdentifier(CreateTriggerName(columnName, tableName)));
+			builder.Append(_sqlHelper.DelimitIdentifier(CreateSequenceTriggerName(columnName, tableName, schemaName)));
 			builder.Append(" ACTIVE BEFORE INSERT ON ");
-			builder.Append(_sqlHelper.DelimitIdentifier(tableName));
+			builder.Append(_sqlHelper.DelimitIdentifier(tableName, schemaName));
 			builder.AppendLine();
 			builder.AppendLine("AS");
 			builder.AppendLine("BEGIN");
@@ -81,9 +81,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.EndCommand();
 		}
 
-		public virtual void DropIdentityForColumn(string columnName, string tableName, MigrationCommandListBuilder builder)
+		public virtual void DropSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationCommandListBuilder builder)
 		{
-			var triggerName = CreateTriggerName(columnName, tableName);
+			var triggerName = CreateSequenceTriggerName(columnName, tableName, schemaName);
 
 			builder.AppendLine("EXECUTE BLOCK");
 			builder.AppendLine("AS");
@@ -107,12 +107,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.EndCommand();
 		}
 
-		protected virtual string CreateTriggerName(string columnName, string tableName)
+		protected virtual string CreateSequenceTriggerName(string columnName, string tableName, string schemaName)
 		{
-			return $"ID_{tableName}_{columnName}";
+			return !string.IsNullOrEmpty(schemaName)
+				? $"ID_{schemaName}_{tableName}_{columnName}"
+				: $"ID_{tableName}_{columnName}";
 		}
 
-		protected virtual string CreateIdentitySequenceName(string columnName, string tableName)
+		protected virtual string CreateSequenceTriggerSequenceName(string columnName, string tableName, string schemaName)
 		{
 			return "GEN_IDENTITY";
 		}
