@@ -210,8 +210,34 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			TerminateStatement(builder);
 		}
 
+		protected override void Generate(RestartSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			builder.Append("ALTER SEQUENCE ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name, operation.Schema));
+			builder.Append(" START WITH ");
+			builder.Append(operation.StartValue);
+			TerminateStatement(builder);
+		}
+
 		protected override void Generate(RenameSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> throw new NotSupportedException("Renaming sequence is not supported by Firebird.");
+
+
+		protected override void Generate(AddPrimaryKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
+
+		protected override void Generate(DropPrimaryKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
+
+
+		protected override void Generate(AddForeignKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
+
+		protected override void Generate(DropForeignKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			base.Generate(operation, model, builder);
+		}
+
 
 		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)
 		{
@@ -233,11 +259,41 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			DefaultValue(defaultValue, defaultValueSql, builder);
 		}
 
+		protected override void ForeignKeyConstraint(AddForeignKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			if (operation.Name != null)
+			{
+				builder.Append("CONSTRAINT ");
+				builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name));
+				builder.Append(" ");
+			}
+			builder.Append("FOREIGN KEY (");
+			builder.Append(ColumnList(operation.Columns));
+			builder.Append(") REFERENCES ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.PrincipalTable, operation.PrincipalSchema));
+			if (operation.PrincipalColumns != null)
+			{
+				builder.Append(" (");
+				builder.Append(ColumnList(operation.PrincipalColumns));
+				builder.Append(")");
+			}
+			if (operation.OnUpdate != ReferentialAction.Restrict)
+			{
+				builder.Append(" ON UPDATE ");
+				ForeignKeyAction(operation.OnUpdate, builder);
+			}
+			if (operation.OnDelete != ReferentialAction.Restrict)
+			{
+				builder.Append(" ON DELETE ");
+				ForeignKeyAction(operation.OnDelete, builder);
+			}
+		}
+
 		protected override void ForeignKeyAction(ReferentialAction referentialAction, MigrationCommandListBuilder builder)
 		{
 			switch (referentialAction)
 			{
-				case ReferentialAction.Restrict:
+				case ReferentialAction.NoAction:
 					builder.Append("NO ACTION");
 					break;
 				default:

@@ -126,7 +126,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
     ""DEF_S"" VARCHAR(20) DEFAULT (''),
     PRIMARY KEY (""Id""),
     UNIQUE (""SSN""),
-    FOREIGN KEY (""EmployerId"") REFERENCES ""Companies"" (""Id"")
+    FOREIGN KEY (""EmployerId"") REFERENCES ""Companies"" (""Id"") ON UPDATE NO ACTION ON DELETE NO ACTION
 );";
 			var batch = Generate(new[] { operation });
 			Assert.AreEqual(3, batch.Count());
@@ -442,6 +442,287 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			var batch = Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER SEQUENCE ""MySequence"" RESTART INCREMENT BY 12;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void RestartSequence()
+		{
+			var operation = new RestartSequenceOperation()
+			{
+				Name = "MySequence",
+				StartValue = 23,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER SEQUENCE ""MySequence"" START WITH 23;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddPrimaryKey()
+		{
+			var operation = new AddPrimaryKeyOperation()
+			{
+				Table = "People",
+				Name = "PK_People",
+				Columns = new[] { "Foo" },
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""PK_People"" PRIMARY KEY (""Foo"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddPrimaryKeyNoName()
+		{
+			var operation = new AddPrimaryKeyOperation()
+			{
+				Table = "People",
+				Columns = new[] { "Foo" },
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD PRIMARY KEY (""Foo"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void DropPrimaryKey()
+		{
+			var operation = new DropPrimaryKeyOperation()
+			{
+				Table = "People",
+				Name = "PK_People",
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP CONSTRAINT ""PK_People"";"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKey()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Restrict,
+				OnUpdate = ReferentialAction.Restrict,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyNoName()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Restrict,
+				OnUpdate = ReferentialAction.Restrict,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyDeleteCascade()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Cascade,
+				OnUpdate = ReferentialAction.Restrict,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON DELETE CASCADE;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyDeleteNoAction()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.NoAction,
+				OnUpdate = ReferentialAction.Restrict,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON DELETE NO ACTION;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyDeleteRestrict()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Restrict,
+				OnUpdate = ReferentialAction.Restrict,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyDeleteSetDefault()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.SetDefault,
+				OnUpdate = ReferentialAction.Restrict,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON DELETE SET DEFAULT;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyDeleteSetNull()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.SetNull,
+				OnUpdate = ReferentialAction.Restrict,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON DELETE SET NULL;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyUpdateCascade()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Restrict,
+				OnUpdate = ReferentialAction.Cascade,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON UPDATE CASCADE;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyUpdateNoAction()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Restrict,
+				OnUpdate = ReferentialAction.NoAction,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON UPDATE NO ACTION;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyUpdateRestrict()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Restrict,
+				OnUpdate = ReferentialAction.Restrict,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyUpdateSetDefault()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Restrict,
+				OnUpdate = ReferentialAction.SetDefault,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON UPDATE SET DEFAULT;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddForeignKeyUpdateSetNull()
+		{
+			var operation = new AddForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+				Columns = new[] { "Foo" },
+				PrincipalTable = "Principal",
+				PrincipalColumns = new[] { "Bar" },
+				OnDelete = ReferentialAction.Restrict,
+				OnUpdate = ReferentialAction.SetNull,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON UPDATE SET NULL;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void DropForeignKey()
+		{
+			var operation = new DropForeignKeyOperation()
+			{
+				Table = "People",
+				Name = "FK_People_Principal",
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP CONSTRAINT ""FK_People_Principal"";"), batch[0].CommandText);
 		}
 
 		IReadOnlyList<MigrationCommand> Generate(IReadOnlyList<MigrationOperation> operations)
