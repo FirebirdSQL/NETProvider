@@ -109,7 +109,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 
 		protected virtual string CreateTriggerName(string columnName, string tableName)
 		{
-			return string.Format("ID_{0}_{1}", tableName, columnName);
+			return $"ID_{tableName}_{columnName}";
 		}
 
 		protected virtual string CreateIdentitySequenceName(string columnName, string tableName)
