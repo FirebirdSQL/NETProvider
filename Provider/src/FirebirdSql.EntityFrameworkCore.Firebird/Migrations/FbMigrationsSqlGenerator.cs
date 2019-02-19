@@ -20,12 +20,10 @@ using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 {
@@ -140,6 +138,33 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			{
 				_behavior.CreateSequenceTriggerForColumn(operation.Name, operation.Table, operation.Schema, builder);
 			}
+		}
+
+		protected override void Generate(RenameColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			builder.Append("ALTER TABLE ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Table, operation.Schema));
+			builder.Append(" ALTER COLUMN ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name));
+			builder.Append(" TO ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.NewName));
+			builder.Append(Dependencies.SqlGenerationHelper.StatementTerminator);
+			EndStatement(builder);
+		}
+
+		protected override void Generate(RenameTableOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			throw new NotSupportedException("Renaming table is not supported by Firebird.");
+		}
+
+		protected override void Generate(RenameIndexOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			throw new NotSupportedException("Renaming index is not supported by Firebird.");
+		}
+
+		protected override void Generate(RenameSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			throw new NotSupportedException("Renaming sequence is not supported by Firebird.");
 		}
 
 		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)

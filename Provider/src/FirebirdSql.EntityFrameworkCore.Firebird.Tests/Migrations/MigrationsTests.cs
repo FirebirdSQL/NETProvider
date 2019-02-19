@@ -346,6 +346,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER NOT NULL;", batch[2].CommandText);
 		}
 
+		[Test]
+		public void RenameColumn()
+		{
+			var operation = new RenameColumnOperation()
+			{
+				Table = "People",
+				Name = "OldCol",
+				NewName = "NewCol",
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""OldCol"" TO ""NewCol"";", batch[0].CommandText);
+		}
+
 		IReadOnlyList<MigrationCommand> Generate(IReadOnlyList<MigrationOperation> operations)
 		{
 			using (var db = GetDbContext<FbTestDbContext>())
