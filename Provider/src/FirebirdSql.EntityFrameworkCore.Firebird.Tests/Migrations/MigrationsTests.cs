@@ -287,7 +287,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 		}
 
 		[Test]
-		public void AlterColumnAddIdentity()
+		public void AlterColumnAddIdentityColumn()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -306,7 +306,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 		}
 
 		[Test]
-		public void AlterColumnAddSequence()
+		public void AlterColumnAddSequenceTrigger()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -324,6 +324,26 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER NOT NULL;", batch[1].CommandText);
 			StringAssert.Contains("rdb$generator_name = ", batch[2].CommandText);
 			StringAssert.StartsWith("CREATE TRIGGER ", batch[3].CommandText);
+		}
+
+		[Test]
+		public void AlterColumnRemoveSequenceTrigger()
+		{
+			var operation = new AlterColumnOperation()
+			{
+				Table = "People",
+				Name = "Col",
+				ClrType = typeof(int),
+				OldColumn = new ColumnOperation()
+				{
+					ClrType = typeof(int),
+					[FbAnnotationNames.ValueGenerationStrategy] = FbValueGenerationStrategy.SequenceTrigger,
+				},
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(3, batch.Count());
+			StringAssert.Contains("drop trigger", batch[0].CommandText);
+			Assert.AreEqual(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER NOT NULL;", batch[2].CommandText);
 		}
 
 		IReadOnlyList<MigrationCommand> Generate(IReadOnlyList<MigrationOperation> operations)

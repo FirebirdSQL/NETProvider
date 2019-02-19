@@ -79,7 +79,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 				//builder.Append(Dependencies.SqlGenerationHelper.StatementTerminator);
 				//EndStatement(builder);
 			}
-#warning Drop sequence (similar to identity)
+			if (oldValueGenerationStrategy == FbValueGenerationStrategy.SequenceTrigger && valueGenerationStrategy != FbValueGenerationStrategy.SequenceTrigger)
+			{
+				_behavior.DropSequenceTriggerForColumn(operation.Name, operation.Table, operation.Schema, builder);
+			}
 
 			// will be recreated, if needed, by next statement
 			builder.Append("ALTER TABLE ");
