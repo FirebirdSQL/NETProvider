@@ -24,6 +24,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 	{
 		readonly ISqlGenerationHelper _sqlHelper;
 
+#warning Proper termination (and maybe SET TERM, etc.)
+
 		public FbMigrationSqlGeneratorBehavior(ISqlGenerationHelper sqlHelper)
 		{
 			_sqlHelper = sqlHelper;
