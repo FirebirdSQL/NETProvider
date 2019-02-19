@@ -20,6 +20,7 @@ using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -59,6 +60,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 
 		protected override void Generate(DropTableOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> base.Generate(operation, model, builder);
+
+		protected override void Generate(AlterTableOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
+
 
 		protected override void Generate(AlterColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
 		{
@@ -150,6 +155,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			TerminateStatement(builder);
 		}
 
+
 		protected override void Generate(CreateIndexOperation operation, IModel model, MigrationCommandListBuilder builder)
 		{
 			builder.Append("CREATE ");
@@ -184,9 +190,28 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			=> throw new NotSupportedException("Renaming index is not supported by Firebird.");
 
 
+		protected override void Generate(CreateSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			builder.Append("CREATE SEQUENCE ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name, operation.Schema));
+			builder.Append(" START WITH ");
+			builder.Append(operation.StartValue);
+			builder.Append(" INCREMENT BY ");
+			builder.Append(operation.IncrementBy);
+			TerminateStatement(builder);
+		}
+
+		protected override void Generate(AlterSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			builder.Append("ALTER SEQUENCE ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name, operation.Schema));
+			builder.Append(" RESTART INCREMENT BY ");
+			builder.Append(operation.IncrementBy);
+			TerminateStatement(builder);
+		}
+
 		protected override void Generate(RenameSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> throw new NotSupportedException("Renaming sequence is not supported by Firebird.");
-
 
 		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)
 		{
@@ -221,7 +246,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			}
 		}
 
-		void TerminateStatement(MigrationCommandListBuilder builder)
+		protected virtual void TerminateStatement(MigrationCommandListBuilder builder)
 		{
 			builder.AppendLine(Dependencies.SqlGenerationHelper.StatementTerminator);
 			EndStatement(builder);

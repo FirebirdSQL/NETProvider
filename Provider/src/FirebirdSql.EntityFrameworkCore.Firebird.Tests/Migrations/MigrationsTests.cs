@@ -410,13 +410,38 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			{
 				Table = "People",
 				Name = "MyIndex",
-				Columns = new[] { "Foo" },
 				Filter = "xxx",
-				 
 			};
 			var batch = Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"CREATE INDEX ""MyIndex"" ON ""People"" COMPUTED BY (xxx);"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void CreateSequence()
+		{
+			var operation = new CreateSequenceOperation()
+			{
+				Name = "MySequence",
+				StartValue = 34,
+				IncrementBy = 56,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"CREATE SEQUENCE ""MySequence"" START WITH 34 INCREMENT BY 56;"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AlterSequence()
+		{
+			var operation = new AlterSequenceOperation()
+			{
+				Name = "MySequence",
+				IncrementBy = 12,
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER SEQUENCE ""MySequence"" RESTART INCREMENT BY 12;"), batch[0].CommandText);
 		}
 
 		IReadOnlyList<MigrationCommand> Generate(IReadOnlyList<MigrationOperation> operations)
