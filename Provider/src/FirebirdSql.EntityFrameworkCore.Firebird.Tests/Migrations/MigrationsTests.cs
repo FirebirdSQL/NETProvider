@@ -65,7 +65,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 							Name = "EmployerId",
 							Table = "People",
 							ClrType = typeof(int),
-							IsNullable = true
+							IsNullable = true,
 						},
 						new AddColumnOperation
 						{
@@ -73,19 +73,37 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 							Table = "People",
 							ClrType = typeof(string),
 							ColumnType = "char(11)",
-							IsNullable = true
-						}
+							IsNullable = true,
+						},
+						new AddColumnOperation
+						{
+							Name = "DEF_O",
+							Table = "People",
+							ClrType = typeof(string),
+							MaxLength = 20,
+							DefaultValue = "test",
+							IsNullable = true,
+						},
+						new AddColumnOperation
+						{
+							Name = "DEF_S",
+							Table = "People",
+							ClrType = typeof(string),
+							MaxLength = 20,
+							DefaultValueSql = "''",
+							IsNullable = true,
+						},
 				},
 				PrimaryKey = new AddPrimaryKeyOperation
 				{
-					Columns = new[] { "Id" }
+					Columns = new[] { "Id" },
 				},
 				UniqueConstraints =
 				{
 						new AddUniqueConstraintOperation
 						{
-							Columns = new[] { "SSN" }
-						}
+							Columns = new[] { "SSN" },
+						},
 				},
 				ForeignKeys =
 				{
@@ -93,9 +111,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 						{
 							Columns = new[] { "EmployerId" },
 							PrincipalTable = "Companies",
-							PrincipalColumns = new[] { "Id" }
-						}
-				}
+							PrincipalColumns = new[] { "Id" },
+						},
+				},
 			};
 			var expectedCreateTable = @"CREATE TABLE ""People"" (
     ""Id"" INTEGER NOT NULL,
@@ -103,6 +121,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
     ""Id_Sequence"" INTEGER NOT NULL,
     ""EmployerId"" INTEGER,
     ""SSN"" char(11),
+    ""DEF_O"" VARCHAR(20) DEFAULT _UTF8'test',
+    ""DEF_S"" VARCHAR(20) DEFAULT '',
     PRIMARY KEY (""Id""),
     UNIQUE (""SSN""),
     FOREIGN KEY (""EmployerId"") REFERENCES ""Companies"" (""Id"")
@@ -112,6 +132,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			StringAssert.StartsWith(expectedCreateTable, batch[0].CommandText);
 			StringAssert.Contains("rdb$generator_name = ", batch[1].CommandText);
 			StringAssert.StartsWith("CREATE TRIGGER ", batch[2].CommandText);
+		}
+
+		[Test]
+		public void DropTableOperation()
+		{
+			var operation = new DropTableOperation()
+			{
+				Name = "People",
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			StringAssert.StartsWith(@"DROP TABLE ""People""", batch[0].CommandText);
 		}
 
 		IReadOnlyList<MigrationCommand> Generate(IReadOnlyList<MigrationOperation> operations)
