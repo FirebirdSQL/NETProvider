@@ -89,7 +89,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			var oldValueGenerationStrategy = operation.OldColumn[FbAnnotationNames.ValueGenerationStrategy] as FbValueGenerationStrategy?;
 			if (oldValueGenerationStrategy == FbValueGenerationStrategy.IdentityColumn && valueGenerationStrategy != FbValueGenerationStrategy.IdentityColumn)
 			{
-				throw new InvalidOperationException("Cannot remove identity on < FB4.");
+				throw new InvalidOperationException("Cannot remove identity from column on < FB4.");
 
 				// will be recreated, if needed, by next statement
 				// supported only on FB4
