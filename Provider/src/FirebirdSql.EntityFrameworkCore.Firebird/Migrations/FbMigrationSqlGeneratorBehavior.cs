@@ -54,6 +54,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.AppendLine("end");
 			builder.DecrementIndent();
 			builder.Append("END");
+			builder.AppendLine();
 			builder.EndCommand();
 
 			builder.Append("CREATE TRIGGER ");
@@ -80,6 +81,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.AppendLine("end");
 			builder.DecrementIndent();
 			builder.Append("END");
+			builder.AppendLine();
 			builder.EndCommand();
 		}
 
@@ -106,6 +108,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.AppendLine("end");
 			builder.DecrementIndent();
 			builder.Append("END");
+			builder.AppendLine();
 			builder.EndCommand();
 		}
 
