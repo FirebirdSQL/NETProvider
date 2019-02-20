@@ -44,7 +44,7 @@ WHERE
 			}
 		}
 
-		protected override bool InterpretExistsResult(object value) => (long)value != 0;
+		protected override bool InterpretExistsResult(object value) => Convert.ToInt64(value) != 0;
 
 		public override string GetCreateIfNotExistsScript() => GetCreateScript();
 
