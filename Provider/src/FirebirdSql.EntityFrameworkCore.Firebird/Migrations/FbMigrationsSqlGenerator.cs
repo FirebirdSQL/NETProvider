@@ -163,7 +163,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			=> base.Generate(operation, model, builder);
 
 		protected override void Generate(DropColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
-			=> base.Generate(operation, model, builder);
+		{
+			builder.Append("ALTER TABLE ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Table, operation.Schema));
+			builder.Append(" DROP ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name));
+			TerminateStatement(builder);
+		}
 
 		protected override void Generate(RenameColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
 		{

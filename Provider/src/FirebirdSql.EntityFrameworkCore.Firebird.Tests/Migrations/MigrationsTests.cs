@@ -173,7 +173,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			};
 			var batch = Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
-			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP COLUMN ""DropMe"";"), batch[0].CommandText);
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP ""DropMe"";"), batch[0].CommandText);
 		}
 
 		[Test]
