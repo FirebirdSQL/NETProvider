@@ -173,8 +173,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 
 					CloseConnection();
-
-#warning Here
 					_xdrStream?.Dispose();
 				}
 				catch (IOException ex)
