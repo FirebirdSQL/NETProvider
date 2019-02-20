@@ -19,8 +19,6 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Globalization;
-using System.Text;
 
 using FirebirdSql.Data.Common;
 
@@ -44,7 +42,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (connection == null)
 				throw new ArgumentNullException(nameof(connection));
 
-			FbConnectionPoolManager.Instance.ClearPool(connection._options);
+			FbConnectionPoolManager.Instance.ClearPool(connection.ConnectionOptions);
+		}
+
+		public static void ClearPool(string connectionString)
+		{
+			if (connectionString == null)
+				throw new ArgumentNullException(nameof(connectionString));
+
+			FbConnectionPoolManager.Instance.ClearPool(new FbConnectionString(connectionString));
 		}
 
 		#endregion
