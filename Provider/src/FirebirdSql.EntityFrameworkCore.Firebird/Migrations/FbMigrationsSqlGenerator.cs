@@ -237,9 +237,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			=> base.Generate(operation, model, builder);
 
 		protected override void Generate(DropForeignKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
-		{
-			base.Generate(operation, model, builder);
-		}
+			=> base.Generate(operation, model, builder);
+
+
+		protected override void Generate(AddUniqueConstraintOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
+
+		protected override void Generate(DropUniqueConstraintOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
 
 
 		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)

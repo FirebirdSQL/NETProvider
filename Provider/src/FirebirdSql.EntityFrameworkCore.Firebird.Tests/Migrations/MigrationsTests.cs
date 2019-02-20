@@ -725,6 +725,60 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP CONSTRAINT ""FK_People_Principal"";"), batch[0].CommandText);
 		}
 
+		[Test]
+		public void AddUniqueConstraintOneColumn()
+		{
+			var operation = new AddUniqueConstraintOperation()
+			{
+				Table = "People",
+				Name = "UNQ_People_Foo",
+				Columns = new[] { "Foo" },
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""UNQ_People_Foo"" UNIQUE (""Foo"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddUniqueConstraintTwoColumns()
+		{
+			var operation = new AddUniqueConstraintOperation()
+			{
+				Table = "People",
+				Name = "UNQ_People_Foo_Bar",
+				Columns = new[] { "Foo", "Bar" },
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""UNQ_People_Foo_Bar"" UNIQUE (""Foo"", ""Bar"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void AddUniqueConstraintNoName()
+		{
+			var operation = new AddUniqueConstraintOperation()
+			{
+				Table = "People",
+				Columns = new[] { "Foo" },
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD UNIQUE (""Foo"");"), batch[0].CommandText);
+		}
+
+		[Test]
+		public void DropUniqueConstraint()
+		{
+			var operation = new DropUniqueConstraintOperation()
+			{
+				Table = "People",
+				Name = "UNQ_People_Foo",
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP CONSTRAINT ""UNQ_People_Foo"";"), batch[0].CommandText);
+		}
+
 		IReadOnlyList<MigrationCommand> Generate(IReadOnlyList<MigrationOperation> operations)
 		{
 			using (var db = GetDbContext<FbTestDbContext>())
