@@ -249,8 +249,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			=> base.Generate(operation, model, builder);
 
 
+		protected override void Generate(AlterDatabaseOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
+
+
 		protected override void Generate(SqlOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> base.Generate(operation, model, builder);
+
+
+		protected override void Generate(DropSchemaOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> throw new NotSupportedException("Schemas are not supported by Firebird.");
+
+		protected override void Generate(EnsureSchemaOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> throw new NotSupportedException("Schemas are not supported by Firebird.");
 
 
 		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)
