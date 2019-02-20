@@ -17,10 +17,11 @@
 
 using System;
 using System.Linq;
+using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
-using JetBrains.Annotations;
+using FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -39,6 +40,23 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			_behavior = behavior;
 			_options = options;
 		}
+
+		protected override void Generate(MigrationOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			switch (operation)
+			{
+				case FbCreateDatabaseOperation createDatabaseOperation:
+					Generate(createDatabaseOperation, model, builder);
+					break;
+				case FbDropDatabaseOperation dropDatabaseOperation:
+					Generate(dropDatabaseOperation, model, builder);
+					break;
+				default:
+					base.Generate(operation, model, builder);
+					break;
+			}
+		}
+
 
 		protected override void Generate(CreateTableOperation operation, IModel model, MigrationCommandListBuilder builder)
 		{
@@ -262,6 +280,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 
 		protected override void Generate(EnsureSchemaOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> throw new NotSupportedException("Schemas are not supported by Firebird.");
+
+
+		public virtual void Generate(FbCreateDatabaseOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			FbConnection.CreateDatabase(operation.ConnectionString);
+		}
+
+		public virtual void Generate(FbDropDatabaseOperation operation, IModel model, MigrationCommandListBuilder builder)
+		{
+			FbConnection.ClearPool(operation.ConnectionString);
+			FbConnection.DropDatabase(operation.ConnectionString);
+		}
 
 
 		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)
