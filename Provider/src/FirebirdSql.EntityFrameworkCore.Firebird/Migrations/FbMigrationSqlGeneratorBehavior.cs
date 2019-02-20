@@ -22,13 +22,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 {
 	public class FbMigrationSqlGeneratorBehavior : IFbMigrationSqlGeneratorBehavior
 	{
-		readonly ISqlGenerationHelper _sqlHelper;
+		readonly ISqlGenerationHelper _sqlGenerationHelper;
 
 #warning Proper termination (and maybe SET TERM, etc.)
 
-		public FbMigrationSqlGeneratorBehavior(ISqlGenerationHelper sqlHelper)
+		public FbMigrationSqlGeneratorBehavior(ISqlGenerationHelper sqlGenerationHelper)
 		{
-			_sqlHelper = sqlHelper;
+			_sqlGenerationHelper = sqlGenerationHelper;
 		}
 
 		public virtual void CreateSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationCommandListBuilder builder)
@@ -48,7 +48,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.Append("execute statement 'create sequence ");
 			builder.Append(identitySequenceName);
 			builder.Append("'");
-			builder.Append(_sqlHelper.StatementTerminator);
+			builder.Append(_sqlGenerationHelper.StatementTerminator);
 			builder.AppendLine();
 			builder.DecrementIndent();
 			builder.AppendLine("end");
@@ -58,24 +58,24 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.EndCommand();
 
 			builder.Append("CREATE TRIGGER ");
-			builder.Append(_sqlHelper.DelimitIdentifier(CreateSequenceTriggerName(columnName, tableName, schemaName)));
+			builder.Append(_sqlGenerationHelper.DelimitIdentifier(CreateSequenceTriggerName(columnName, tableName, schemaName)));
 			builder.Append(" ACTIVE BEFORE INSERT ON ");
-			builder.Append(_sqlHelper.DelimitIdentifier(tableName, schemaName));
+			builder.Append(_sqlGenerationHelper.DelimitIdentifier(tableName, schemaName));
 			builder.AppendLine();
 			builder.AppendLine("AS");
 			builder.AppendLine("BEGIN");
 			builder.IncrementIndent();
 			builder.Append("if (new.");
-			builder.Append(_sqlHelper.DelimitIdentifier(columnName));
+			builder.Append(_sqlGenerationHelper.DelimitIdentifier(columnName));
 			builder.Append(" is null) then");
 			builder.AppendLine();
 			builder.AppendLine("begin");
 			builder.IncrementIndent();
 			builder.Append("new.");
-			builder.Append(_sqlHelper.DelimitIdentifier(columnName));
+			builder.Append(_sqlGenerationHelper.DelimitIdentifier(columnName));
 			builder.Append(" = next value for ");
 			builder.Append(identitySequenceName);
-			builder.Append(_sqlHelper.StatementTerminator);
+			builder.Append(_sqlGenerationHelper.StatementTerminator);
 			builder.AppendLine();
 			builder.DecrementIndent();
 			builder.AppendLine("end");
@@ -100,9 +100,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.AppendLine("begin");
 			builder.IncrementIndent();
 			builder.Append("execute statement 'drop trigger ");
-			builder.Append(_sqlHelper.DelimitIdentifier(triggerName));
+			builder.Append(_sqlGenerationHelper.DelimitIdentifier(triggerName));
 			builder.Append("'");
-			builder.Append(_sqlHelper.StatementTerminator);
+			builder.Append(_sqlGenerationHelper.StatementTerminator);
 			builder.AppendLine();
 			builder.DecrementIndent();
 			builder.AppendLine("end");
