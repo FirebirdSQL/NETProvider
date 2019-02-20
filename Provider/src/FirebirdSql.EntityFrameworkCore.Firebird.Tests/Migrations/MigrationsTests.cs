@@ -458,6 +458,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 		}
 
 		[Test]
+		public void DropSequence()
+		{
+			var operation = new DropSequenceOperation()
+			{
+				Name = "MySequence",
+			};
+			var batch = Generate(new[] { operation });
+			Assert.AreEqual(1, batch.Count());
+			Assert.AreEqual(NewLineEnd(@"DROP SEQUENCE ""MySequence"";"), batch[0].CommandText);
+		}
+
+		[Test]
 		public void AddPrimaryKey()
 		{
 			var operation = new AddPrimaryKeyOperation()

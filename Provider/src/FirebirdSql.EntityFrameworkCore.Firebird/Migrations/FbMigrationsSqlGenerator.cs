@@ -225,6 +225,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 		protected override void Generate(RenameSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> throw new NotSupportedException("Renaming sequence is not supported by Firebird.");
 
+		protected override void Generate(DropSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
 
 		protected override void Generate(AddPrimaryKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> base.Generate(operation, model, builder);
