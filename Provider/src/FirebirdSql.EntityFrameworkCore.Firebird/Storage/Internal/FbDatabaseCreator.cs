@@ -68,6 +68,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		IRelationalCommand CreateHasTablesCommand()
 		   => _rawSqlCommandBuilder
-			   .Build("SELECT COUNT(*) FROM rdb$relations WHERE COALESCE(r.rdb$system_flag, 0) = 0 AND rdb$view_blr IS NULL");
+			   .Build("SELECT COUNT(*) FROM rdb$relations WHERE COALESCE(rdb$system_flag, 0) = 0 AND rdb$view_blr IS NULL");
 	}
 }
