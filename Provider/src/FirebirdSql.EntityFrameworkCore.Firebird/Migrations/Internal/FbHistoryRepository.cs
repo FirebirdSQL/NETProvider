@@ -32,15 +32,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Internal
 			get
 			{
 				var escapedTableName = Dependencies.TypeMappingSource.GetMapping(typeof(string)).GenerateSqlLiteral(TableName);
-				return $@"
-SELECT COUNT(*)
-FROM rdb$relations r
-WHERE
-	COALESCE(r.rdb$system_flag, 0) = 0
-	AND
-	rdb$view_blr IS NULL
-	AND
-	rdb$relation_name = '{escapedTableName}'";
+				return $@"SELECT COUNT(*) FROM rdb$relations WHERE COALESCE(rdb$system_flag, 0) = 0 AND rdb$view_blr IS NULL AND rdb$relation_name = '{escapedTableName}'";
 			}
 		}
 
