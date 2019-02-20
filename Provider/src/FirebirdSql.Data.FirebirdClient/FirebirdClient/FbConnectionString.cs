@@ -23,8 +23,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using FirebirdSql.Data.Common;
-
 namespace FirebirdSql.Data.FirebirdClient
 {
 	internal sealed class FbConnectionString
