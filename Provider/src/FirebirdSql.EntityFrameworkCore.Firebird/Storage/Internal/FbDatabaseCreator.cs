@@ -64,7 +64,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		}
 
 		protected override bool HasTables()
-			=> Dependencies.ExecutionStrategyFactory.Create().Execute(_connection, connection => Convert.ToInt32(CreateHasTablesCommand().ExecuteScalar(connection)) != 0);
+			=> Dependencies.ExecutionStrategyFactory.Create().Execute(_connection, connection => Convert.ToInt64(CreateHasTablesCommand().ExecuteScalar(connection)) != 0);
 
 		IRelationalCommand CreateHasTablesCommand()
 		   => _rawSqlCommandBuilder
