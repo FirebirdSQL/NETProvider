@@ -44,7 +44,7 @@ WHERE
 			}
 		}
 
-		protected override bool InterpretExistsResult(object value) => value != DBNull.Value;
+		protected override bool InterpretExistsResult(object value) => (long)value != 0;
 
 		public override string GetCreateIfNotExistsScript() => GetCreateScript();
 
