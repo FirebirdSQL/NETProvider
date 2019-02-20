@@ -144,6 +144,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 		protected override void Generate(AddColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> base.Generate(operation, model, builder);
 
+		protected override void Generate(DropColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
+
 		protected override void Generate(RenameColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
 		{
 			builder.Append("ALTER TABLE ");
