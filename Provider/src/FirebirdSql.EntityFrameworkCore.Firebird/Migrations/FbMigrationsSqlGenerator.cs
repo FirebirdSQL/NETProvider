@@ -249,6 +249,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			=> base.Generate(operation, model, builder);
 
 
+		protected override void Generate(SqlOperation operation, IModel model, MigrationCommandListBuilder builder)
+			=> base.Generate(operation, model, builder);
+
+
 		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)
 		{
 			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(name))
