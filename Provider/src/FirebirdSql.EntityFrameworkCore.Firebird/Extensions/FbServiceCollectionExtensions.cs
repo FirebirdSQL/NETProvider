@@ -49,7 +49,7 @@ namespace Microsoft.EntityFrameworkCore
 				.TryAdd<IConventionSetBuilder, FbConventionSetBuilder>()
 				.TryAdd<IUpdateSqlGenerator>(p => p.GetService<IFbUpdateSqlGenerator>())
 				.TryAdd<IModificationCommandBatchFactory, FbModificationCommandBatchFactory>()
-				.TryAdd<IRelationalConnection>(p => p.GetService<IFbConnection>())
+				.TryAdd<IRelationalConnection>(p => p.GetService<IFbRelationalConnection>())
 				.TryAdd<IMigrationsSqlGenerator, FbMigrationsSqlGenerator>()
 				.TryAdd<IHistoryRepository, FbHistoryRepository>()
 				.TryAdd<IMemberTranslator, FbCompositeMemberTranslator>()
@@ -60,7 +60,7 @@ namespace Microsoft.EntityFrameworkCore
 					.TryAddSingleton<IFbOptions, FbOptions>()
 					.TryAddScoped<IFbUpdateSqlGenerator, FbUpdateSqlGenerator>()
 					.TryAddScoped<IFbMigrationSqlGeneratorBehavior, FbMigrationSqlGeneratorBehavior>()
-					.TryAddScoped<IFbConnection, FbConnection>());
+					.TryAddScoped<IFbRelationalConnection, FbRelationalConnection>());
 
 			builder.TryAddCoreServices();
 

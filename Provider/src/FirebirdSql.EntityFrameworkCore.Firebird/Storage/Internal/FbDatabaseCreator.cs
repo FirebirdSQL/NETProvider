@@ -25,10 +25,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
 	public class FbDatabaseCreator : RelationalDatabaseCreator
 	{
-		readonly IFbConnection _connection;
+		readonly IFbRelationalConnection _connection;
 		readonly IRawSqlCommandBuilder _rawSqlCommandBuilder;
 
-		public FbDatabaseCreator(RelationalDatabaseCreatorDependencies dependencies, IFbConnection connection, IRawSqlCommandBuilder rawSqlCommandBuilder)
+		public FbDatabaseCreator(RelationalDatabaseCreatorDependencies dependencies, IFbRelationalConnection connection, IRawSqlCommandBuilder rawSqlCommandBuilder)
 			: base(dependencies)
 		{
 			_connection = connection;

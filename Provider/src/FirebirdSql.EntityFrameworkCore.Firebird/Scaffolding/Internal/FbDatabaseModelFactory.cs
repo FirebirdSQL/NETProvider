@@ -19,21 +19,21 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
-using FirebirdClientConnection = FirebirdSql.Data.FirebirdClient.FbConnection;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 {
 	public class FbDatabaseModelFactory : IDatabaseModelFactory
 	{
 		DatabaseModel _databaseModel;
-		FirebirdClientConnection _connection;
+		FbConnection _connection;
 		Version _serverVersion;
 
 		public DatabaseModel Create(string connectionString, IEnumerable<string> tables, IEnumerable<string> schemas)
 		{
-			using (var connection = new FirebirdClientConnection(connectionString))
+			using (var connection = new FbConnection(connectionString))
 			{
 				return Create(connection, tables, schemas);
 			}
@@ -43,7 +43,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 		{
 			ResetState();
 
-			_connection = (FirebirdClientConnection)connection;
+			_connection = (FbConnection)connection;
 
 			var connectionStartedOpen = _connection.State == ConnectionState.Open;
 			if (!connectionStartedOpen)

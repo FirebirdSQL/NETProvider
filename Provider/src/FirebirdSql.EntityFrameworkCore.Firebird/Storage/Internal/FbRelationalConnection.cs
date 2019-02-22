@@ -13,12 +13,23 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
-	public interface IFbConnection : IRelationalConnection
-	{ }
+	public class FbRelationalConnection : RelationalConnection, IFbRelationalConnection
+	{
+		public FbRelationalConnection(RelationalConnectionDependencies dependencies)
+			: base(dependencies)
+		{ }
+
+		public override bool IsMultipleActiveResultSetsEnabled => true;
+
+		protected override DbConnection CreateDbConnection()
+			=> new FbConnection(ConnectionString);
+	}
 }
