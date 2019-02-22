@@ -32,14 +32,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 		{ }
 
 		protected override void AppendIdentityWhereCondition(StringBuilder commandStringBuilder, ColumnModification columnModification)
-		{
-			throw new InvalidOperationException();
-		}
+			=> throw new InvalidOperationException();
 
 		protected override void AppendRowsAffectedWhereCondition(StringBuilder commandStringBuilder, int expectedRowsAffected)
-		{
-			throw new InvalidOperationException();
-		}
+			=> throw new InvalidOperationException();
 
 		public override ResultSetMapping AppendInsertOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
 		{
