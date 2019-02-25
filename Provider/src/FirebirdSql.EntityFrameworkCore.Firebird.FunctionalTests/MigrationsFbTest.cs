@@ -45,10 +45,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests2
 		}
 
 		[WaitingForFixMerge]
-		public override void Can_apply_one_migration()
-			=> base.Can_apply_one_migration();
-
-		[WaitingForFixMerge]
 		public override void Can_apply_all_migrations()
 			=> base.Can_apply_all_migrations();
 
