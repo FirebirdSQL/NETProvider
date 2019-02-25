@@ -106,11 +106,13 @@ function Tests-EF6() {
 function Tests-EFCore() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
-	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
-	Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All }
+	if ($FirebirdSelection -ne 'FB25_SC') {
+		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
+		Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All }
 
-	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
-	Check-ExitCode { dotnet test }
+		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
+		Check-ExitCode { dotnet test }
+	}
 
 	echo "=== END ==="
 }
