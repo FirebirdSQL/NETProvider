@@ -59,7 +59,7 @@ namespace Microsoft.EntityFrameworkCore
 				.TryAddProviderSpecificServices(b => b
 					.TryAddSingleton<IFbOptions, FbOptions>()
 					.TryAddSingleton<IFbMigrationSqlGeneratorBehavior, FbMigrationSqlGeneratorBehavior>()
-					.TryAddScoped<IFbUpdateSqlGenerator, FbUpdateSqlGenerator>()
+					.TryAddSingleton<IFbUpdateSqlGenerator, FbUpdateSqlGenerator>()
 					.TryAddScoped<IFbRelationalConnection, FbRelationalConnection>());
 
 			builder.TryAddCoreServices();
