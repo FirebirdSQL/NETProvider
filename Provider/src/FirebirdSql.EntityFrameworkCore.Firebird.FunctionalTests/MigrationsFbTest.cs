@@ -34,11 +34,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 		protected override Task GiveMeSomeTimeAsync(DbContext db)
 			=> Task.CompletedTask;
 
+		[Fact]
 		public override void Can_generate_idempotent_up_scripts()
 		{
 			Assert.Throws<NotSupportedException>(base.Can_generate_idempotent_up_scripts);
 		}
 
+		[Fact]
 		public override void Can_generate_idempotent_down_scripts()
 		{
 			Assert.Throws<NotSupportedException>(base.Can_generate_idempotent_down_scripts);
