@@ -18,7 +18,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests2
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 {
 	public class MigrationsFbFixture : MigrationsFixtureBase
 	{

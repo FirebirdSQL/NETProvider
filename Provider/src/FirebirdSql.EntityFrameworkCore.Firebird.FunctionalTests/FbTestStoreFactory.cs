@@ -20,7 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests2
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 {
 	public class FbTestStoreFactory : RelationalTestStoreFactory
 	{

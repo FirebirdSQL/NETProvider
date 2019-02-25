@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests2
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 {
 	public class MigrationsFbTest : MigrationsTestBase<MigrationsFbFixture>
 	{
