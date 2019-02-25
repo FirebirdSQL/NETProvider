@@ -87,9 +87,9 @@ function Tests-FirebirdClient() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd $testsNETDir
-	Check-ExitCode { .\FirebirdSql.Data.FirebirdClient.Tests.exe --result=tests.xml --labels=All }
+	Check-ExitCode { .\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All }
 	cd $testsCOREDir
-	Check-ExitCode { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --result=tests.xml --labels=All }
+	Check-ExitCode { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --labels=All }
 
 	echo "=== END ==="
 }
@@ -98,7 +98,7 @@ function Tests-EF6() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
-	Check-ExitCode { .\EntityFramework.Firebird.Tests.exe --result=tests.xml --labels=All }
+	Check-ExitCode { .\EntityFramework.Firebird.Tests.exe --labels=All }
 
 	echo "=== END ==="
 }
@@ -107,7 +107,7 @@ function Tests-EFCore() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
-	Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml --labels=All }
+	Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All }
 
 	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
 	Check-ExitCode { dotnet test }
