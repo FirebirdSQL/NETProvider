@@ -109,6 +109,9 @@ function Tests-EFCore() {
 	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
 	Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --result=tests.xml --labels=All }
 
+	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
+	Check-ExitCode { dotnet test }
+
 	echo "=== END ==="
 }
 
