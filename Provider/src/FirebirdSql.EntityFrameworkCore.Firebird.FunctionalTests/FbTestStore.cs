@@ -34,6 +34,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 				UserID = "sysdba",
 				Password = "masterkey",
 				Pooling = false,
+				Charset = "utf8"
 			};
 			ConnectionString = csb.ToString();
 			Connection = new FbConnection(ConnectionString);
