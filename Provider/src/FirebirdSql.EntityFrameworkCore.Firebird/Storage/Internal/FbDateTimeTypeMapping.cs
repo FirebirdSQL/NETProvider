@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Data.Common;
@@ -37,21 +37,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 			((FbParameter)parameter).FbDbType = _fbDbType;
 		}
 
-		protected override string SqlLiteralFormatString
+		protected override string GenerateNonNullSqlLiteral(object value)
 		{
-			get
+			switch (_fbDbType)
 			{
-				switch (_fbDbType)
-				{
-					case FbDbType.TimeStamp:
-						return "{0:yyyy-MM-dd HH:mm:ss}";
-					case FbDbType.Date:
-						return "{0:yyyy-MM-dd}";
-					case FbDbType.Time:
-						return "{0:HH:mm:ss}";
-					default:
-						throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
-				}
+				case FbDbType.TimeStamp:
+					return $"CAST('{value:yyyy-MM-dd HH:mm:ss}' AS TIMESTAMP)";
+				case FbDbType.Date:
+					return $"CAST('{value:yyyy-MM-dd}' AS DATE)";
+				case FbDbType.Time:
+					return $"CAST('{value:HH:mm:ss}' AS TIME)";
+				default:
+					throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
 			}
 		}
 	}
