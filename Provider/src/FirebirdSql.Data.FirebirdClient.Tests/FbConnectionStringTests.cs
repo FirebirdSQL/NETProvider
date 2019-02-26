@@ -101,9 +101,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingMultilineConnectionStringTest()
 		{
 			const string ConnectionString = @"DataSource=S05-04;
- User= SYSDBA;
- Password= masterkey;
- Role= ;
+ User=SYSDBA;
+ Password=masterkey;
+ Role=;
  Database=Termine;
  Port=3050;
  Dialect=3;
