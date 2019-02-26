@@ -60,18 +60,33 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 
 		protected override Expression VisitBinary(BinaryExpression binaryExpression)
 		{
-			if (binaryExpression.NodeType == ExpressionType.Add && binaryExpression.Left.Type == typeof(string) && binaryExpression.Right.Type == typeof(string))
+			if (binaryExpression.NodeType == ExpressionType.Modulo)
 			{
-				Sql.Append("(");
+				Sql.Append("MOD(");
 				Visit(binaryExpression.Left);
-				Sql.Append(" || ");
-				var exp = Visit(binaryExpression.Right);
+				Sql.Append(", ");
+				Visit(binaryExpression.Right);
 				Sql.Append(")");
-				return exp;
+				return binaryExpression;
 			}
 			else
 			{
 				return base.VisitBinary(binaryExpression);
+			}
+		}
+
+		protected override string GenerateOperator(Expression expression)
+		{
+			switch (expression.NodeType)
+			{
+				case ExpressionType.Add:
+					return " || ";
+				case ExpressionType.And:
+					return " AND ";
+				case ExpressionType.Or:
+					return " OR ";
+				default:
+					return base.GenerateOperator(expression);
 			}
 		}
 
