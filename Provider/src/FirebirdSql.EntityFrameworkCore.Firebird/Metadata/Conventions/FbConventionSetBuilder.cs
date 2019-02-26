@@ -32,7 +32,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 		{
 			var serviceProvider = new ServiceCollection()
 				.AddEntityFrameworkFirebird()
-				.AddDbContext<DbContext>(o => o.UseFirebird("database=localhost:_.fdb;user=sysdba;password=masterkey"))
+				.AddDbContext<DbContext>(o => o.UseFirebird("database=localhost:_.fdb;user=sysdba;password=masterkey;charset=utf8"))
 				.BuildServiceProvider();
 
 			using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
