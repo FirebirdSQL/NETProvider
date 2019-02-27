@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 	public class FbTestStoreFactory : RelationalTestStoreFactory
 	{
 		public static FbTestStoreFactory Instance { get; } = new FbTestStoreFactory();
+
+		static FbTestStoreFactory()
+		{
+			// see https://github.com/aspnet/EntityFrameworkCore/issues/14847
+			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+		}
 
 		public override TestStore Create(string storeName)
 			=> throw new NotImplementedException();
