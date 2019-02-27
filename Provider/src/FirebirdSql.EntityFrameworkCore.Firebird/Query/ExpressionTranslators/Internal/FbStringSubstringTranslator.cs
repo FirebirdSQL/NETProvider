@@ -32,8 +32,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!(methodCallExpression.Method.Equals(SubstringOnlyStartMethod) || methodCallExpression.Method.Equals(SubstringStartAndLengthMethod)))
 				return null;
 
-			var fromExpression = methodCallExpression.Arguments[0].NodeType == ExpressionType.Constant
-				? (Expression)Expression.Constant((int)((ConstantExpression)methodCallExpression.Arguments[0]).Value + 1)
+			var fromExpression = methodCallExpression.Arguments[0] is ConstantExpression constantExpression
+				? (Expression)Expression.Constant((int)constantExpression.Value + 1)
 				: Expression.Add(methodCallExpression.Arguments[0], Expression.Constant(1));
 
 			var forExpression = methodCallExpression.Arguments.Count == 2
