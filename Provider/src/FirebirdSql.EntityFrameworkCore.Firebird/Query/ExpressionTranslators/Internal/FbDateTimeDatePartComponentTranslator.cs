@@ -53,7 +53,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!MemberDatePartMapping.TryGetValue(memberExpression.Member, out var part))
 				return null;
 
-			return new FbExtractExpression(part, memberExpression.Expression);
+			var result = (Expression)new FbExtractExpression(part, memberExpression.Expression);
+			if (part == "YEARDAY")
+			{
+				result = Expression.Add(result, Expression.Constant(1));
+			}
+			return result;
 		}
 	}
 }
