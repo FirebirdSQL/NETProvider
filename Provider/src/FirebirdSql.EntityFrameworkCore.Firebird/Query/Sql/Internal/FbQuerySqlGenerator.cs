@@ -15,12 +15,10 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
 using Microsoft.EntityFrameworkCore.Query.Sql;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -77,17 +75,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 
 		protected override string GenerateOperator(Expression expression)
 		{
-			switch (expression.NodeType)
+			if (expression.NodeType == ExpressionType.Add && expression.Type == typeof(string))
 			{
-				case ExpressionType.Add:
-					return " || ";
-				case ExpressionType.And:
-					return " AND ";
-				case ExpressionType.Or:
-					return " OR ";
-				default:
-					return base.GenerateOperator(expression);
+				return " || ";
 			}
+			else if (expression.NodeType == ExpressionType.And && expression.Type == typeof(bool))
+			{
+				return " AND ";
+			}
+			else if (expression.NodeType == ExpressionType.Or && expression.Type == typeof(bool))
+			{
+				return " OR ";
+			}
+			return base.GenerateOperator(expression);
 		}
 
 		public virtual Expression VisitSubstring(FbSubstringExpression substringExpression)
