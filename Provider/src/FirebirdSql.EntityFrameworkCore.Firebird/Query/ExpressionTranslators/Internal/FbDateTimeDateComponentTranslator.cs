@@ -13,11 +13,11 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
 using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
@@ -26,13 +26,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 	{
 		public virtual Expression Translate(MemberExpression memberExpression)
 		{
-			if (memberExpression.Expression != null && (memberExpression.Expression.Type == typeof(DateTime) || memberExpression.Expression.Type == typeof(DateTimeOffset)) && memberExpression.Member.Name == nameof(DateTime.Date))
+			if (memberExpression.Expression != null && memberExpression.Expression.Type == typeof(DateTime) && memberExpression.Member.Name == nameof(DateTime.Date))
 			{
-				return new SqlFunctionExpression("CAST", memberExpression.Type, new[]
-				{
-					new SqlFragmentExpression("DATE"),
-					memberExpression.Expression,
-				});
+				return new FbDateTimeDateMemberExpression(memberExpression.Expression);
 			}
 			return null;
 		}

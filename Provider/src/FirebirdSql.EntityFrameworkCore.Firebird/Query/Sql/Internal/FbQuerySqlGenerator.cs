@@ -15,10 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
+using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
 using Microsoft.EntityFrameworkCore.Query.Sql;
@@ -32,9 +33,25 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			: base(dependencies, selectExpression)
 		{ }
 
-		protected override string TypedTrueLiteral => "TRUE";
+		protected override string TypedTrueLiteral => FbBoolTypeMapping.TrueLiteral;
+		protected override string TypedFalseLiteral => FbBoolTypeMapping.FalseLiteral;
 
-		protected override string TypedFalseLiteral => "FALSE";
+		protected override Expression VisitBinary(BinaryExpression binaryExpression)
+		{
+			if (binaryExpression.NodeType == ExpressionType.Modulo)
+			{
+				Sql.Append("MOD(");
+				Visit(binaryExpression.Left);
+				Sql.Append(", ");
+				Visit(binaryExpression.Right);
+				Sql.Append(")");
+				return binaryExpression;
+			}
+			else
+			{
+				return base.VisitBinary(binaryExpression);
+			}
+		}
 
 		protected override void GenerateTop(SelectExpression selectExpression)
 		{
@@ -56,23 +73,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 		protected override void GenerateLimitOffset(SelectExpression selectExpression)
 		{
 			// handled by GenerateTop
-		}
-
-		protected override Expression VisitBinary(BinaryExpression binaryExpression)
-		{
-			if (binaryExpression.NodeType == ExpressionType.Modulo)
-			{
-				Sql.Append("MOD(");
-				Visit(binaryExpression.Left);
-				Sql.Append(", ");
-				Visit(binaryExpression.Right);
-				Sql.Append(")");
-				return binaryExpression;
-			}
-			else
-			{
-				return base.VisitBinary(binaryExpression);
-			}
 		}
 
 		protected override string GenerateOperator(Expression expression)
@@ -113,6 +113,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			Visit(extractExpression.ValueExpression);
 			Sql.Append(")");
 			return extractExpression;
+		}
+
+		public virtual Expression VisitDateMember(FbDateTimeDateMemberExpression dateTimeDateMemberExpression)
+		{
+			Sql.Append("CAST(");
+			Visit(dateTimeDateMemberExpression.ValueExpression);
+			Sql.Append(" AS DATE)");
+			return dateTimeDateMemberExpression;
 		}
 
 		protected override void GeneratePseudoFromClause()

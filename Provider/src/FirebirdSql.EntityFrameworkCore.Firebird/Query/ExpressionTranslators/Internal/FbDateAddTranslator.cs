@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
@@ -53,7 +52,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			return new SqlFunctionExpression("DATEADD", methodCallExpression.Type, new[]
 			{
 				new SqlFragmentExpression(part),
-				methodCallExpression.Arguments.First(),
+				methodCallExpression.Arguments[0],
 				methodCallExpression.Object,
 			});
 		}

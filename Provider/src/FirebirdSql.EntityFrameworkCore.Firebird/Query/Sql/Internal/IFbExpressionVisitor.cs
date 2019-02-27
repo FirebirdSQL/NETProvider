@@ -24,5 +24,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 	{
 		Expression VisitSubstring(FbSubstringExpression substringExpression);
 		Expression VisitExtract(FbExtractExpression extractExpression);
+		Expression VisitDateMember(FbDateTimeDateMemberExpression dateTimeDateMemberExpression);
 	}
 }
