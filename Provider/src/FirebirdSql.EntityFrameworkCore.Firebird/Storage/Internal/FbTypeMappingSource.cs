@@ -88,7 +88,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				{ typeof(double), _double},
 				{ typeof(decimal), _decimal },
 				{ typeof(DateTime), _timeStamp },
-				{ typeof(TimeSpan), _time },
 				{ typeof(Guid), _guid },
 			};
 
