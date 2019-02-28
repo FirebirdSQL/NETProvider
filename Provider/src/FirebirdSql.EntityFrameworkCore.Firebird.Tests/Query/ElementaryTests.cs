@@ -57,8 +57,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 					.Take(3);
 				Assert.DoesNotThrow(() => query.Load());
 				var sql = query.ToSql();
-				StringAssert.Contains("FIRST 3", sql);
-				StringAssert.DoesNotContain("SKIP", sql);
+				StringAssert.Contains("ROWS (3)", sql);
+				StringAssert.DoesNotContain(" TO (", sql);
 			}
 		}
 
@@ -72,8 +72,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 					.Take(3);
 				Assert.DoesNotThrow(() => query.Load());
 				var sql = query.ToSql();
-				StringAssert.Contains("FIRST 3", sql);
-				StringAssert.Contains("SKIP 1", sql);
+				StringAssert.Contains("ROWS (1 + 1) TO (1 + 3)", sql);
 			}
 		}
 
@@ -86,8 +85,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 					.Skip(1);
 				Assert.DoesNotThrow(() => query.Load());
 				var sql = query.ToSql();
-				StringAssert.DoesNotContain("FIRST", sql);
-				StringAssert.Contains("SKIP 1", sql);
+				StringAssert.Contains("ROWS (1 + 1) TO (9223372036854775807)", sql);
 			}
 		}
 
