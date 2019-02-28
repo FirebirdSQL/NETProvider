@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
@@ -51,26 +52,50 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			}
 		}
 
+		protected override Expression VisitParameter(ParameterExpression parameterExpression)
+		{
+			Sql.Append("CAST(");
+			base.VisitParameter(parameterExpression);
+			Sql.Append(" AS ");
+			Sql.Append(Dependencies.TypeMappingSource.GetMapping(parameterExpression.Type).StoreType);
+			Sql.Append(")");
+			return parameterExpression;
+		}
+
 		protected override void GenerateTop(SelectExpression selectExpression)
 		{
-			if (selectExpression.Limit != null)
-			{
-				Sql.Append("FIRST ");
-				Visit(selectExpression.Limit);
-				Sql.Append(" ");
-			}
-
-			if (selectExpression.Offset != null)
-			{
-				Sql.Append("SKIP ");
-				Visit(selectExpression.Offset);
-				Sql.Append(" ");
-			}
+			// handled by GenerateLimitOffset
 		}
 
 		protected override void GenerateLimitOffset(SelectExpression selectExpression)
 		{
-			// handled by GenerateTop
+			if (selectExpression.Limit != null && selectExpression.Offset != null)
+			{
+				Sql.AppendLine();
+				Sql.Append("ROWS (");
+				Visit(selectExpression.Offset);
+				Sql.Append(" + 1) TO (");
+				Visit(selectExpression.Offset);
+				Sql.Append(" + ");
+				Visit(selectExpression.Limit);
+				Sql.Append(")");
+			}
+			else if (selectExpression.Limit != null && selectExpression.Offset == null)
+			{
+				Sql.AppendLine();
+				Sql.Append("ROWS (");
+				Visit(selectExpression.Limit);
+				Sql.Append(")");
+			}
+			else if (selectExpression.Limit == null && selectExpression.Offset != null)
+			{
+				Sql.AppendLine();
+				Sql.Append("ROWS (");
+				Visit(selectExpression.Offset);
+				Sql.Append(" + 1) TO (");
+				Sql.Append(long.MaxValue);
+				Sql.Append(")");
+			}
 		}
 
 		protected override string GenerateOperator(Expression expression)
