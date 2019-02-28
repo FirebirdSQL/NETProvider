@@ -90,7 +90,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 		{
 			public WaitingForFixMergeAttribute()
 			{
-				Skip = "Waiting for #14811 on EntityFrameworkCore to be merged.";
+				Skip = "See #14811 on EntityFrameworkCore.";
 			}
 		}
 	}

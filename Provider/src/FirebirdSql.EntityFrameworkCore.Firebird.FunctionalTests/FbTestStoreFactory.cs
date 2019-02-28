@@ -29,7 +29,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 
 		static FbTestStoreFactory()
 		{
-			// see https://github.com/aspnet/EntityFrameworkCore/issues/14847
+			// See #14847 on EntityFrameworkCore.
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 		}
 
