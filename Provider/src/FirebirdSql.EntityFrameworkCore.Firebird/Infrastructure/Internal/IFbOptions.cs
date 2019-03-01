@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -21,6 +21,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 {
 	public interface IFbOptions : ISingletonOptions
 	{
-		FbOptionsExtension FirebirdOptions { get; }
+		bool ExplicitParameterTypes { get; }
 	}
 }

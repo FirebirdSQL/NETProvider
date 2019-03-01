@@ -18,6 +18,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
@@ -28,9 +29,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 {
 	public class FbQuerySqlGenerator : DefaultQuerySqlGenerator, IFbExpressionVisitor
 	{
-		public FbQuerySqlGenerator(QuerySqlGeneratorDependencies dependencies, SelectExpression selectExpression)
+		readonly IFbOptions _fbOptions;
+
+		public FbQuerySqlGenerator(QuerySqlGeneratorDependencies dependencies, SelectExpression selectExpression, IFbOptions fbOptions)
 			: base(dependencies, selectExpression)
-		{ }
+		{
+			_fbOptions = fbOptions;
+		}
 
 		protected override string TypedTrueLiteral => FbBoolTypeMapping.TrueLiteral;
 		protected override string TypedFalseLiteral => FbBoolTypeMapping.FalseLiteral;
@@ -54,11 +59,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 
 		protected override Expression VisitParameter(ParameterExpression parameterExpression)
 		{
-			Sql.Append("CAST(");
+			if (_fbOptions.ExplicitParameterTypes)
+			{
+				Sql.Append("CAST(");
+			}
 			base.VisitParameter(parameterExpression);
-			Sql.Append(" AS ");
-			Sql.Append(Dependencies.TypeMappingSource.GetMapping(parameterExpression.Type).StoreType);
-			Sql.Append(")");
+			if (_fbOptions.ExplicitParameterTypes)
+			{
+				Sql.Append(" AS ");
+				Sql.Append(Dependencies.TypeMappingSource.GetMapping(parameterExpression.Type).StoreType);
+				Sql.Append(")");
+			}
 			return parameterExpression;
 		}
 

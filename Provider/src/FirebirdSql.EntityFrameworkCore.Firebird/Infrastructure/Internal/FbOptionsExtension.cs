@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -23,20 +23,43 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 {
 	public class FbOptionsExtension : RelationalOptionsExtension
 	{
+		private long? _serviceProviderHash;
+		private bool? _explicitParameterTypes;
+
 		public FbOptionsExtension()
 		{ }
 
 		public FbOptionsExtension(FbOptionsExtension copyFrom)
 			: base(copyFrom)
-		{ }
+		{
+			_explicitParameterTypes = copyFrom._explicitParameterTypes;
+		}
+
+		protected override RelationalOptionsExtension Clone()
+			=> new FbOptionsExtension(this);
+
+		public virtual bool? ExplicitParameterTypes => _explicitParameterTypes;
+
+		public virtual FbOptionsExtension WithExplicitParameterTypes(bool explicitParameterTypes)
+		{
+			var clone = (FbOptionsExtension)Clone();
+			clone._explicitParameterTypes = explicitParameterTypes;
+			return clone;
+		}
+
+		public override long GetServiceProviderHashCode()
+		{
+			if (_serviceProviderHash == null)
+			{
+				_serviceProviderHash = (base.GetServiceProviderHashCode() * 397) ^ (_explicitParameterTypes?.GetHashCode() ?? 0L);
+			}
+			return _serviceProviderHash.Value;
+		}
 
 		public override bool ApplyServices(IServiceCollection services)
 		{
 			services.AddEntityFrameworkFirebird();
 			return true;
 		}
-
-		protected override RelationalOptionsExtension Clone()
-			=> new FbOptionsExtension(this);
 	}
 }

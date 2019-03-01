@@ -13,28 +13,35 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Internal
 {
 	public class FbOptions : IFbOptions
 	{
-		public FbOptionsExtension FirebirdOptions { get; private set; }
-
-		public void Initialize(IDbContextOptions options)
+		public virtual void Initialize(IDbContextOptions options)
 		{
-			FirebirdOptions = GetOptions(options);
+			var fbOptions = options.FindExtension<FbOptionsExtension>() ?? new FbOptionsExtension();
+
+			ExplicitParameterTypes = fbOptions.ExplicitParameterTypes ?? true;
 		}
 
-		public void Validate(IDbContextOptions options)
+		public virtual void Validate(IDbContextOptions options)
 		{
-			FirebirdOptions = GetOptions(options);
+			var fbOptions = options.FindExtension<FbOptionsExtension>() ?? new FbOptionsExtension();
+
+			if (ExplicitParameterTypes != (fbOptions.ExplicitParameterTypes ?? true))
+			{
+				throw new InvalidOperationException($"A call was made to '{nameof(FbDbContextOptionsBuilder.WithExplicitParameterTypes)}' that changed an option that must be constant within a service provider, but Entity Framework is not building its own internal service provider. Either allow EF to build the service provider by removing the call to '{nameof(DbContextOptionsBuilder.UseInternalServiceProvider)}', or ensure that the configuration for '{nameof(FbDbContextOptionsBuilder.WithExplicitParameterTypes)}' does not change for all uses of a given service provider passed to '{nameof(DbContextOptionsBuilder.UseInternalServiceProvider)}'.");
+			}
 		}
 
-		static FbOptionsExtension GetOptions(IDbContextOptions options)
-			=> options.FindExtension<FbOptionsExtension>() ?? new FbOptionsExtension();
+		public virtual bool ExplicitParameterTypes { get; private set; }
 	}
 }

@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore;
@@ -26,5 +26,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure
 		public FbDbContextOptionsBuilder(DbContextOptionsBuilder optionsBuilder)
 			: base(optionsBuilder)
 		{ }
+
+		public virtual FbDbContextOptionsBuilder WithExplicitParameterTypes(bool explicitParameterTypes = true)
+			=> WithOption(e => e.WithExplicitParameterTypes(explicitParameterTypes));
 	}
 }

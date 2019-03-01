@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
 using Microsoft.EntityFrameworkCore.Query.Sql;
 
@@ -22,11 +23,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 {
 	public class FbQuerySqlGeneratorFactory : QuerySqlGeneratorFactoryBase
 	{
-		public FbQuerySqlGeneratorFactory(QuerySqlGeneratorDependencies dependencies)
+		readonly IFbOptions _fbOptions;
+
+		public FbQuerySqlGeneratorFactory(QuerySqlGeneratorDependencies dependencies, IFbOptions fbOptions)
 			: base(dependencies)
-		{ }
+		{
+			_fbOptions = fbOptions;
+		}
 
 		public override IQuerySqlGenerator CreateDefault(SelectExpression selectExpression)
-			=> new FbQuerySqlGenerator(Dependencies, selectExpression);
+			=> new FbQuerySqlGenerator(Dependencies, selectExpression, _fbOptions);
 	}
 }
