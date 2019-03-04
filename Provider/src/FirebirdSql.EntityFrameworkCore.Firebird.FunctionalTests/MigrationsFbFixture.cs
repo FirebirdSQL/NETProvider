@@ -23,15 +23,5 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 	public class MigrationsFbFixture : MigrationsFixtureBase
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-		public override MigrationsContext CreateContext()
-		{
-			var options = AddOptions(
-					new DbContextOptionsBuilder()
-						.UseFirebird(TestStore.ConnectionString))
-				.UseInternalServiceProvider(ServiceProvider)
-				.Options;
-			return new MigrationsContext(options);
-		}
 	}
 }
