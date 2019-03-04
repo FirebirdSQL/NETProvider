@@ -46,6 +46,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 					fk.Relational().Name = $"FK_{DateTime.UtcNow.Ticks}";
 				}
 
+				foreach (var ix in entityType.GetIndexes())
+				{
+					ix.Relational().Name = $"IX_{DateTime.UtcNow.Ticks}";
+				}
+
 				foreach (var c in entityType.GetProperties())
 				{
 					if (c.ClrType == typeof(string) && c.GetMaxLength() == null)
