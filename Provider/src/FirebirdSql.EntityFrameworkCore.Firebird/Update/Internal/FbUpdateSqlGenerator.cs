@@ -136,7 +136,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 				commandStringBuilder.AppendLine("IF (ROW_COUNT > 0) THEN");
 				commandStringBuilder.AppendLine("SUSPEND;");
 			}
-			commandStringBuilder.AppendLine("END");
+			commandStringBuilder.Append("END");
 			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
 			return ResultSetMapping.LastInResultSet;
 		}
@@ -175,7 +175,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			commandStringBuilder.AppendLine();
 			commandStringBuilder.AppendLine("ROWS_AFFECTED = ROW_COUNT;");
 			commandStringBuilder.AppendLine("SUSPEND;");
-			commandStringBuilder.AppendLine("END");
+			commandStringBuilder.Append("END");
 			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
 			return ResultSetMapping.LastInResultSet;
 		}
