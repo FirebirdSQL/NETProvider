@@ -1,4 +1,4 @@
-/*
+﻿/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -17,14 +17,12 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestModels.UpdatesModel;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 {
-	public class NorthwindQueryFbFixture<TModelCustomizer> : NorthwindQueryRelationalFixture<TModelCustomizer>
-		where TModelCustomizer : IModelCustomizer, new()
+	public class UpdatesFbFixture : UpdatesRelationalFixture
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
@@ -59,6 +57,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 					}
 				}
 			}
+
+			modelBuilder.Entity<LoginEntityTypeWithAnExtremelyLongAndOverlyConvolutedNameThatIsUsedToVerifyThatTheStoreIdentifierGenerationLengthLimitIsWorkingCorrectly>()
+				.ToTable("NotDone");
 		}
 	}
 }
