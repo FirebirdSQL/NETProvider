@@ -27,10 +27,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 	{
 		public SimpleQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture, ITestOutputHelper testOutputHelper)
 			: base(fixture)
-		{
-			Fixture.TestSqlLoggerFactory.Clear();
-			//Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
-		}
+		{ }
 
 		[Theory(Skip = "Different DECIMAL handling on Firebird.")]
 		[MemberData(nameof(IsAsyncData))]
