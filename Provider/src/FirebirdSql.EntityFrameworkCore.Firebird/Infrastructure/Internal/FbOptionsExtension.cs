@@ -51,7 +51,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 		{
 			if (_serviceProviderHash == null)
 			{
-				_serviceProviderHash = (base.GetServiceProviderHashCode() * 397) ^ (_explicitParameterTypes?.GetHashCode() ?? 0L);
+				_serviceProviderHash = (base.GetServiceProviderHashCode() * 397)
+					^ (_explicitParameterTypes?.GetHashCode() ?? 0L);
 			}
 			return _serviceProviderHash.Value;
 		}
