@@ -4,7 +4,7 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SkipSourceLink>true</SkipSourceLink>
-		<AssemblyName>FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTestss</AssemblyName>
+		<AssemblyName>FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests</AssemblyName>
 		<RootNamespace>FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests</RootNamespace>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.snk</AssemblyOriginatorKeyFile>
