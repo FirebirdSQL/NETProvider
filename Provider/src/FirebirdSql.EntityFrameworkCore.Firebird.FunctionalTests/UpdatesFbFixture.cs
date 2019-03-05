@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 

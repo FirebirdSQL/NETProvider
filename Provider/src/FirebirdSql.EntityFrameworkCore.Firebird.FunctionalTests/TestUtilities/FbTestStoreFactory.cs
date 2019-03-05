@@ -21,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 {
 	public class FbTestStoreFactory : RelationalTestStoreFactory
 	{
@@ -34,10 +34,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 		}
 
 		public override TestStore Create(string storeName)
-			=> throw new NotImplementedException();
+			=> FbTestStore.Create(storeName);
 
 		public override TestStore GetOrCreate(string storeName)
-			=> new FbTestStore(storeName);
+			=> FbTestStore.GetOrCreate(storeName);
 
 		public override IServiceCollection AddProviderServices(IServiceCollection serviceCollection)
 			=> serviceCollection.AddEntityFrameworkFirebird();

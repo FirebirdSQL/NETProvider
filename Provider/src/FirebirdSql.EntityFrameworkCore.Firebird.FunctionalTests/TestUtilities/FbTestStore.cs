@@ -16,16 +16,25 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 {
 	public class FbTestStore : RelationalTestStore
 	{
-		public FbTestStore(string name)
-			: base(name, false)
+		public static FbTestStore Create(string name)
+			=> new FbTestStore(name, shared: false);
+
+		public static FbTestStore GetOrCreate(string name)
+			=> new FbTestStore(name, shared: true);
+
+		static readonly Dictionary<string, int> DatabasesCounter = new Dictionary<string, int>();
+
+		public FbTestStore(string name, bool shared)
+			: base(name, shared)
 		{
 			var csb = new FbConnectionStringBuilder
 			{
@@ -37,8 +46,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 				Charset = "utf8"
 			};
 			ConnectionString = csb.ToString();
+			lock (DatabasesCounter)
+			{
+				if (DatabasesCounter.TryGetValue(Name, out var counter))
+				{
+					DatabasesCounter[Name] = counter + 1;
+				}
+				else
+				{
+					DatabasesCounter.Add(Name, 1);
+					FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
+				}
+			}
 			Connection = new FbConnection(ConnectionString);
-			FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
 			Connection.Open();
 		}
 
@@ -54,8 +74,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 		public override void Dispose()
 		{
 			Connection.Close();
-			FbConnection.DropDatabase(ConnectionString);
 			Connection.Dispose();
+			lock (DatabasesCounter)
+			{
+				var counter = DatabasesCounter[Name];
+				if (counter > 1)
+				{
+					DatabasesCounter[Name] = counter - 1;
+				}
+				else
+				{
+					DatabasesCounter.Remove(Name);
+					FbConnection.DropDatabase(ConnectionString);
+				}
+			}
 			base.Dispose();
 		}
 
