@@ -28,6 +28,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 			: base(dependencies)
 		{ }
 
+		public override ConventionSet AddConventions(ConventionSet conventionSet)
+		{
+			base.AddConventions(conventionSet);
+			conventionSet.ModelInitializedConventions.Add(new RelationalMaxIdentifierLengthConvention(31));
+			return conventionSet;
+		}
+
 		public static ConventionSet Build()
 		{
 			var serviceProvider = new ServiceCollection()
