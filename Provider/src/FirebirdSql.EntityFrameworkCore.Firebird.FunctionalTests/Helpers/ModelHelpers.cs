@@ -15,20 +15,25 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 {
-	public class UpdatesFbFixture : UpdatesRelationalFixture
+	public static class ModelHelpers
 	{
-		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+		public static void ConfigureModel(ModelBuilder modelBuilder, DbContext context)
 		{
-			base.OnModelCreating(modelBuilder, context);
-			ModelHelpers.ConfigureModel(modelBuilder, context);
+			// quick and dirty
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				foreach (var property in entityType.GetProperties())
+				{
+					if (property.ClrType == typeof(string) && property.GetMaxLength() == null)
+					{
+						property.SetMaxLength(500);
+					}
+				}
+			}
 		}
 	}
 }

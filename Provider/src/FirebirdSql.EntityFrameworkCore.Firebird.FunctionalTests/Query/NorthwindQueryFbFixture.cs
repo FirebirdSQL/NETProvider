@@ -15,7 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
@@ -31,34 +31,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 		{
 			base.OnModelCreating(modelBuilder, context);
-
-			// quick and dirty
-			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-			{
-				var pk = entityType.FindPrimaryKey();
-				if (pk != null)
-				{
-					pk.Relational().Name = $"PK_{DateTime.UtcNow.Ticks}";
-				}
-
-				foreach (var fk in entityType.GetForeignKeys())
-				{
-					fk.Relational().Name = $"FK_{DateTime.UtcNow.Ticks}";
-				}
-
-				foreach (var ix in entityType.GetIndexes())
-				{
-					ix.Relational().Name = $"IX_{DateTime.UtcNow.Ticks}";
-				}
-
-				foreach (var c in entityType.GetProperties())
-				{
-					if (c.ClrType == typeof(string) && c.GetMaxLength() == null)
-					{
-						c.SetMaxLength(500);
-					}
-				}
-			}
+			ModelHelpers.ConfigureModel(modelBuilder, context);
 		}
 	}
 }
