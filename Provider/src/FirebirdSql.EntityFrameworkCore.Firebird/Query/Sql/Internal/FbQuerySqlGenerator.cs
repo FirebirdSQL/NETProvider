@@ -51,6 +51,51 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 				Sql.Append(")");
 				return binaryExpression;
 			}
+			else if (binaryExpression.NodeType == ExpressionType.And && binaryExpression.Type != typeof(bool))
+			{
+				Sql.Append("BIN_AND(");
+				Visit(binaryExpression.Left);
+				Sql.Append(", ");
+				Visit(binaryExpression.Right);
+				Sql.Append(")");
+				return binaryExpression;
+			}
+			else if (binaryExpression.NodeType == ExpressionType.Or && binaryExpression.Type != typeof(bool))
+			{
+				Sql.Append("BIN_OR(");
+				Visit(binaryExpression.Left);
+				Sql.Append(", ");
+				Visit(binaryExpression.Right);
+				Sql.Append(")");
+				return binaryExpression;
+			}
+			else if (binaryExpression.NodeType == ExpressionType.ExclusiveOr)
+			{
+				Sql.Append("BIN_XOR(");
+				Visit(binaryExpression.Left);
+				Sql.Append(", ");
+				Visit(binaryExpression.Right);
+				Sql.Append(")");
+				return binaryExpression;
+			}
+			else if (binaryExpression.NodeType == ExpressionType.LeftShift)
+			{
+				Sql.Append("BIN_SHL(");
+				Visit(binaryExpression.Left);
+				Sql.Append(", ");
+				Visit(binaryExpression.Right);
+				Sql.Append(")");
+				return binaryExpression;
+			}
+			else if (binaryExpression.NodeType == ExpressionType.RightShift)
+			{
+				Sql.Append("BIN_SHR(");
+				Visit(binaryExpression.Left);
+				Sql.Append(", ");
+				Visit(binaryExpression.Right);
+				Sql.Append(")");
+				return binaryExpression;
+			}
 			else
 			{
 				return base.VisitBinary(binaryExpression);
