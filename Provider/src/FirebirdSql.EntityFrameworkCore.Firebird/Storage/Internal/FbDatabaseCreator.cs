@@ -19,7 +19,6 @@ using System;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using FirebirdClientConnection = FirebirdSql.Data.FirebirdClient.FbConnection;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
@@ -37,13 +36,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		public override void Create()
 		{
-			FirebirdClientConnection.CreateDatabase(_connection.ConnectionString);
+			FbConnection.CreateDatabase(_connection.ConnectionString);
 		}
 
 		public override void Delete()
 		{
-			FirebirdClientConnection.ClearPool((FirebirdClientConnection)_connection.DbConnection);
-			FirebirdClientConnection.DropDatabase(_connection.ConnectionString);
+			FbConnection.ClearPool((FbConnection)_connection.DbConnection);
+			FbConnection.DropDatabase(_connection.ConnectionString);
 		}
 
 		public override bool Exists()
