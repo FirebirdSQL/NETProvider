@@ -24,8 +24,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 	{
 		readonly ISqlGenerationHelper _sqlGenerationHelper;
 
-#warning Proper termination (and maybe SET TERM, etc.)
-
 		public FbMigrationSqlGeneratorBehavior(ISqlGenerationHelper sqlGenerationHelper)
 		{
 			_sqlGenerationHelper = sqlGenerationHelper;
@@ -55,6 +53,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.DecrementIndent();
 			builder.Append("END");
 			builder.AppendLine();
+			builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
 			builder.EndCommand();
 
 			builder.Append("CREATE TRIGGER ");
@@ -82,6 +81,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.DecrementIndent();
 			builder.Append("END");
 			builder.AppendLine();
+			builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
 			builder.EndCommand();
 		}
 
@@ -109,6 +109,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.DecrementIndent();
 			builder.Append("END");
 			builder.AppendLine();
+			builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
 			builder.EndCommand();
 		}
 
