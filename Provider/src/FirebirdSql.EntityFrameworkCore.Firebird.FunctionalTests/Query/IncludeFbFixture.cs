@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -15,21 +15,15 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
-	public class UpdatesFbFixture : UpdatesRelationalFixture
-	{
-		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-		{
-			base.OnModelCreating(modelBuilder, context);
-			ModelHelpers.SetStringLengths(modelBuilder, context);
-		}
-	}
+	public class IncludeFbFixture : NorthwindQueryFbFixture<NoopModelCustomizer>
+    {
+        public override DbContextOptionsBuilder AddOptions(DbContextOptionsBuilder builder)
+            => base.AddOptions(builder).ConfigureWarnings(c => c.Log(CoreEventId.IncludeIgnoredWarning));
+    }
 }

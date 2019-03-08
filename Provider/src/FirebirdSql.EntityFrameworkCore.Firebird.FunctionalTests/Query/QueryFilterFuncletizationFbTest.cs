@@ -15,7 +15,10 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit.Abstractions;
@@ -31,6 +34,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public class QueryFilterFuncletizationFbFixture : QueryFilterFuncletizationRelationalFixture
 		{
 			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+			protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+			{
+				base.OnModelCreating(modelBuilder, context);
+				ModelHelpers.SimpleTableNamesUnique(modelBuilder, context);
+				ModelHelpers.SetPrimaryKeyGeneration(modelBuilder, context, FbValueGenerationStrategy.IdentityColumn);
+			}
 		}
 	}
 }

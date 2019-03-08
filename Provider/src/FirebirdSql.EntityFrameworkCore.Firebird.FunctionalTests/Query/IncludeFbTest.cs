@@ -15,24 +15,15 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
-	public class NorthwindQueryFbFixture<TModelCustomizer> : NorthwindQueryRelationalFixture<TModelCustomizer>
-		where TModelCustomizer : IModelCustomizer, new()
+	public class IncludeFbTest : IncludeTestBase<IncludeFbFixture>
 	{
-		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-		{
-			base.OnModelCreating(modelBuilder, context);
-			ModelHelpers.SetStringLengths(modelBuilder, context);
-		}
+		public IncludeFbTest(IncludeFbFixture fixture, ITestOutputHelper testOutputHelper)
+			: base(fixture)
+		{ }
 	}
 }

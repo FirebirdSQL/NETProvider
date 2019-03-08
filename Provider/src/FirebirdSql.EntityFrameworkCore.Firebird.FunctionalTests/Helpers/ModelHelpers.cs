@@ -15,15 +15,19 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 {
 	public static class ModelHelpers
 	{
-		public static void ConfigureModel(ModelBuilder modelBuilder, DbContext context)
+		public static void SetStringLengths(ModelBuilder modelBuilder, DbContext context)
 		{
-			// quick and dirty
 			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 			{
 				foreach (var property in entityType.GetProperties())
@@ -31,6 +35,38 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 					if (property.ClrType == typeof(string) && property.GetMaxLength() == null)
 					{
 						property.SetMaxLength(500);
+					}
+				}
+			}
+		}
+
+		public static void SimpleTableNamesUnique(ModelBuilder modelBuilder, DbContext context)
+		{
+			var names = new HashSet<string>(StringComparer.InvariantCulture);
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				var name = new string(entityType.Relational().TableName.Where(char.IsUpper).ToArray());
+				var cnt = 1;
+				while (names.Contains(name))
+				{
+					name = name + cnt++;
+				}
+				names.Add(name);
+				entityType.Relational().TableName = name;
+			}
+		}
+
+		public static void SetPrimaryKeyGeneration(ModelBuilder modelBuilder, DbContext context, FbValueGenerationStrategy valueGenerationStrategy = FbValueGenerationStrategy.SequenceTrigger)
+		{
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				var properties = entityType.FindPrimaryKey().Properties;
+				if (properties.Count == 1)
+				{
+					var fbPropertyAnnotations = properties[0].Firebird();
+					if (fbPropertyAnnotations.ValueGenerationStrategy == null)
+					{
+						properties[0].Firebird().ValueGenerationStrategy = valueGenerationStrategy;
 					}
 				}
 			}
