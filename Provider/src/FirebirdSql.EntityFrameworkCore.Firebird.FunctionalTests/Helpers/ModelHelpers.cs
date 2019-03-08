@@ -60,14 +60,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 		{
 			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 			{
-				var properties = entityType.FindPrimaryKey().Properties;
-				if (properties.Count == 1)
+				var pk = entityType.FindPrimaryKey();
+				if (pk == null)
+					continue;
+				var properties = pk.Properties;
+				if (properties.Count() != 1)
+					continue;
+				var fbPropertyAnnotations = properties[0].Firebird();
+				if (fbPropertyAnnotations.ValueGenerationStrategy == null)
 				{
-					var fbPropertyAnnotations = properties[0].Firebird();
-					if (fbPropertyAnnotations.ValueGenerationStrategy == null)
-					{
-						properties[0].Firebird().ValueGenerationStrategy = valueGenerationStrategy;
-					}
+					properties[0].Firebird().ValueGenerationStrategy = valueGenerationStrategy;
 				}
 			}
 		}
