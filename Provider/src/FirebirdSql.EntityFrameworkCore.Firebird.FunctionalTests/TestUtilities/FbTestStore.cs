@@ -16,7 +16,6 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections.Generic;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
@@ -31,14 +30,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 		public static FbTestStore GetOrCreate(string name)
 			=> new FbTestStore(name, shared: true);
 
-		static readonly Dictionary<string, int> DatabasesCounter = new Dictionary<string, int>();
-
 		public FbTestStore(string name, bool shared)
 			: base(name, shared)
 		{
 			var csb = new FbConnectionStringBuilder
 			{
-				Database = name,
+				Database = $"EFCore_{name}.fdb",
 				DataSource = "localhost",
 				UserID = "sysdba",
 				Password = "masterkey",
@@ -46,26 +43,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 				Charset = "utf8"
 			};
 			ConnectionString = csb.ToString();
-			lock (DatabasesCounter)
-			{
-				if (DatabasesCounter.TryGetValue(Name, out var counter))
-				{
-					DatabasesCounter[Name] = counter + 1;
-				}
-				else
-				{
-					DatabasesCounter.Add(Name, 1);
-					FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
-				}
-			}
 			Connection = new FbConnection(ConnectionString);
-			Connection.Open();
 		}
 
 		protected override void Initialize(Func<DbContext> createContext, Action<DbContext> seed)
 		{
 			using (var context = createContext())
 			{
+				// create database explicitly to specify Page Size and Forced Writes
+				FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
 				context.Database.EnsureCreated();
 				seed(context);
 			}
@@ -73,21 +59,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 
 		public override void Dispose()
 		{
-			Connection.Close();
 			Connection.Dispose();
-			lock (DatabasesCounter)
-			{
-				var counter = DatabasesCounter[Name];
-				if (counter > 1)
-				{
-					DatabasesCounter[Name] = counter - 1;
-				}
-				else
-				{
-					DatabasesCounter.Remove(Name);
-					FbConnection.DropDatabase(ConnectionString);
-				}
-			}
 			base.Dispose();
 		}
 
