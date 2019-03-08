@@ -299,7 +299,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			FbConnection.DropDatabase(operation.ConnectionString);
 		}
 
-
 		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)
 		{
 			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(name))
