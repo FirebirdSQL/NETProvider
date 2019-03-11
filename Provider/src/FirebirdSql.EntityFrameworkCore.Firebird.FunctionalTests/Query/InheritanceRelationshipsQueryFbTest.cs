@@ -1,0 +1,68 @@
+/*
+ *    The contents of this file are subject to the Initial
+ *    Developer's Public License Version 1.0 (the "License");
+ *    you may not use this file except in compliance with the
+ *    License. You may obtain a copy of the License at
+ *    https://github.com/FirebirdSQL/NETProvider/blob/master/license.txt.
+ *
+ *    Software distributed under the License is distributed on
+ *    an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *    express or implied. See the License for the specific
+ *    language governing rights and limitations under the License.
+ *
+ *    All Rights Reserved.
+ */
+
+//$Authors = Jiri Cincura (jiri@cincura.net)
+
+using Microsoft.EntityFrameworkCore.Query;
+using Xunit;
+
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+{
+	public class InheritanceRelationshipsQueryFbTest : InheritanceRelationshipsQueryTestBase<InheritanceRelationshipsQueryFbFixture>
+	{
+		public InheritanceRelationshipsQueryFbTest(InheritanceRelationshipsQueryFbFixture fixture)
+			: base(fixture)
+		{ }
+
+		[GeneratedNameTooLong]
+		public override void Nested_include_with_inheritance_reference_collection1()
+		{
+			base.Nested_include_with_inheritance_reference_collection1();
+		}
+
+		[GeneratedNameTooLong]
+		public override void Nested_include_with_inheritance_reference_reference1()
+		{
+			base.Nested_include_with_inheritance_reference_reference1();
+		}
+
+		[GeneratedNameTooLong]
+		public override void Nested_include_with_inheritance_reference_collection3()
+		{
+			base.Nested_include_with_inheritance_reference_collection3();
+		}
+
+		[GeneratedNameTooLong]
+		public override void Nested_include_with_inheritance_reference_reference3()
+		{
+			base.Nested_include_with_inheritance_reference_reference3();
+		}
+
+		[GeneratedNameTooLong]
+		public override void Nested_include_with_inheritance_collection_collection1()
+		{
+			base.Nested_include_with_inheritance_collection_collection1();
+		}
+
+#warning Can I somehow handle it in SQL generation?
+		public class GeneratedNameTooLong : FactAttribute
+		{
+			public GeneratedNameTooLong()
+			{
+				Skip = "Generated name in the query is too long.";
+			}
+		}
+	}
+}
