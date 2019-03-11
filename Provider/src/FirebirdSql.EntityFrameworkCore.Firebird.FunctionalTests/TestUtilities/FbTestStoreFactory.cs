@@ -15,8 +15,8 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
 using System.Globalization;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +31,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 		{
 			// See #14847 on EntityFrameworkCore.
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 		}
 
 		public override TestStore Create(string storeName)
