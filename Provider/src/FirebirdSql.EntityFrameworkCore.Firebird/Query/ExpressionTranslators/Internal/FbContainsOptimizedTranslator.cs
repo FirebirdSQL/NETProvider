@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Linq.Expressions;
 using System.Reflection;
@@ -31,13 +31,23 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!methodCallExpression.Method.Equals(MethodInfo))
 				return null;
 
-			return Expression.GreaterThan(
+			var patternExpression = methodCallExpression.Arguments[0];
+
+			var positionExpression = Expression.GreaterThan(
 				new SqlFunctionExpression("POSITION", typeof(int), new[]
 				{
-					methodCallExpression.Arguments[0],
+					patternExpression,
 					methodCallExpression.Object,
 				}),
 				Expression.Constant(0));
+
+			return patternExpression is ConstantExpression patternConstantExpression
+				? ((string)patternConstantExpression.Value)?.Length == 0
+					? (Expression)Expression.Constant(true)
+					: positionExpression
+				: Expression.OrElse(
+					positionExpression,
+					Expression.Equal(patternExpression, Expression.Constant(string.Empty)));
 		}
 	}
 }
