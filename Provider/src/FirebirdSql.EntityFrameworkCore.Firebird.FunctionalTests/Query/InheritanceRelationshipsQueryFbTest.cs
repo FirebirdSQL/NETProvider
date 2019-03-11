@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Xunit;
 
@@ -54,15 +55,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override void Nested_include_with_inheritance_collection_collection1()
 		{
 			base.Nested_include_with_inheritance_collection_collection1();
-		}
-
-#warning Can I somehow handle it in SQL generation?
-		public class GeneratedNameTooLongAttribute : FactAttribute
-		{
-			public GeneratedNameTooLongAttribute()
-			{
-				Skip = "Generated name in the query is too long.";
-			}
 		}
 	}
 }

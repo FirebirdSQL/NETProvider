@@ -17,6 +17,7 @@
 
 using System;
 using System.Threading.Tasks;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -46,52 +47,44 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 			Assert.Throws<NotSupportedException>(base.Can_generate_idempotent_down_scripts);
 		}
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_apply_all_migrations()
 			=> base.Can_apply_all_migrations();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override Task Can_apply_all_migrations_async()
 			=> base.Can_apply_all_migrations_async();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_revert_one_migrations()
 			=> base.Can_revert_one_migrations();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_revert_all_migrations()
 			=> base.Can_revert_all_migrations();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_generate_up_scripts()
 			=> base.Can_generate_up_scripts();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_generate_up_script_using_names()
 			=> base.Can_generate_up_script_using_names();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_generate_one_up_script()
 			=> base.Can_generate_one_up_script();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_generate_one_down_script()
 			=> base.Can_generate_one_down_script();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_generate_down_scripts()
 			=> base.Can_generate_down_scripts();
 
-		[WaitingForFixMerge]
+		[WaitingFor14811FixMerge]
 		public override void Can_generate_down_script_using_names()
 			=> base.Can_generate_down_script_using_names();
-
-		public class WaitingForFixMergeAttribute : FactAttribute
-		{
-			public WaitingForFixMergeAttribute()
-			{
-				Skip = "See #14811 on EntityFrameworkCore.";
-			}
-		}
 	}
 }

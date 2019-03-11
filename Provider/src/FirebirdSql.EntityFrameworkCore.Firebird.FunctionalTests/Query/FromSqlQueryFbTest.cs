@@ -17,6 +17,7 @@
 
 using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
@@ -53,7 +54,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			base.Bad_data_error_handling_invalid_cast();
 		}
 
-		[Fact(Skip = "Missing column")]
+		[Fact(Skip = "Missing column.")]
 		public override void From_sql_queryable_simple_projection_composed()
 		{
 			base.From_sql_queryable_simple_projection_composed();
@@ -65,13 +66,5 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 				ParameterName = name,
 				Value = value
 			};
-
-		public class NotSupportedAttribute : FactAttribute
-		{
-			public NotSupportedAttribute()
-			{
-				Skip = "Not supported on Firebird.";
-			}
-		}
 	}
 }

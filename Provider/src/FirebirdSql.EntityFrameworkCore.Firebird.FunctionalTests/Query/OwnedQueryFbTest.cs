@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
@@ -158,14 +159,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override void Select_many_on_owned_collection()
 		{
 			base.Select_many_on_owned_collection();
-		}
-
-		public class HasDataInTheSameTransactionAsDDLAttribute : FactAttribute
-		{
-			public HasDataInTheSameTransactionAsDDLAttribute()
-			{
-				Skip = "HasData is called in the same transaction as DDL commands.";
-			}
 		}
 
 		public class OwnedQueryFbFixture : RelationalOwnedQueryFixture
