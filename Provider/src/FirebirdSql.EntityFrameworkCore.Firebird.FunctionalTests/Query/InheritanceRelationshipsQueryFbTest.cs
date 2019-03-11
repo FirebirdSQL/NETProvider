@@ -57,9 +57,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		}
 
 #warning Can I somehow handle it in SQL generation?
-		public class GeneratedNameTooLong : FactAttribute
+		public class GeneratedNameTooLongAttribute : FactAttribute
 		{
-			public GeneratedNameTooLong()
+			public GeneratedNameTooLongAttribute()
 			{
 				Skip = "Generated name in the query is too long.";
 			}

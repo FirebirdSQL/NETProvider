@@ -160,9 +160,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			base.Select_many_on_owned_collection();
 		}
 
-		public class HasDataInTheSameTransactionAsDDL : FactAttribute
+		public class HasDataInTheSameTransactionAsDDLAttribute : FactAttribute
 		{
-			public HasDataInTheSameTransactionAsDDL()
+			public HasDataInTheSameTransactionAsDDLAttribute()
 			{
 				Skip = "HasData is called in the same transaction as DDL commands.";
 			}
