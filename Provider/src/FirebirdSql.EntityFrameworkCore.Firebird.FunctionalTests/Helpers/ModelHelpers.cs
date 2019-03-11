@@ -39,7 +39,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 			}
 		}
 
-		public static void SimpleTableNamesUnique(ModelBuilder modelBuilder, DbContext context)
+		public static void SimpleTableNames(ModelBuilder modelBuilder, DbContext context)
 		{
 			var names = new HashSet<string>(StringComparer.InvariantCulture);
 			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
