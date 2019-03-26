@@ -15,12 +15,9 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.TestModels.GearsOfWarModel;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
