@@ -19,14 +19,6 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 {
-	public class WaitingFor14811FixMergeAttribute : FactAttribute
-	{
-		public WaitingFor14811FixMergeAttribute()
-		{
-			Skip = "See #14811 on EntityFrameworkCore.";
-		}
-	}
-
 	public class HasDataInTheSameTransactionAsDDLAttribute : FactAttribute
 	{
 		public HasDataInTheSameTransactionAsDDLAttribute()
@@ -51,9 +43,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 		}
 	}
 
-	public class NotSupportedAttribute : FactAttribute
+	public class NotSupportedOnFirebirdAttribute : FactAttribute
 	{
-		public NotSupportedAttribute()
+		public NotSupportedOnFirebirdAttribute()
+		{
+			Skip = "Not supported on Firebird.";
+		}
+	}
+	public class NotSupportedOnFirebirdTheoryAttribute : TheoryAttribute
+	{
+		public NotSupportedOnFirebirdTheoryAttribute()
 		{
 			Skip = "Not supported on Firebird.";
 		}

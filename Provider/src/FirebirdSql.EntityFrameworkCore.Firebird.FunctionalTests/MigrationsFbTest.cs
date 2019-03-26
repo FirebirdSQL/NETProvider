@@ -47,43 +47,43 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 			Assert.Throws<NotSupportedException>(base.Can_generate_idempotent_down_scripts);
 		}
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_apply_all_migrations()
 			=> base.Can_apply_all_migrations();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override Task Can_apply_all_migrations_async()
 			=> base.Can_apply_all_migrations_async();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_revert_one_migrations()
 			=> base.Can_revert_one_migrations();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_revert_all_migrations()
 			=> base.Can_revert_all_migrations();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_generate_up_scripts()
 			=> base.Can_generate_up_scripts();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_generate_up_script_using_names()
 			=> base.Can_generate_up_script_using_names();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_generate_one_up_script()
 			=> base.Can_generate_one_up_script();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_generate_one_down_script()
 			=> base.Can_generate_one_down_script();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_generate_down_scripts()
 			=> base.Can_generate_down_scripts();
 
-		[WaitingFor14811FixMerge]
+		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
 		public override void Can_generate_down_script_using_names()
 			=> base.Can_generate_down_script_using_names();
 	}

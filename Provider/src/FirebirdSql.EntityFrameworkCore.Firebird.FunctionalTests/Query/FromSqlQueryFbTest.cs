@@ -30,25 +30,25 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			: base(fixture)
 		{ }
 
-		[NotSupported]
+		[NotSupportedOnFirebird]
 		public override void Bad_data_error_handling_invalid_cast_key()
 		{
 			base.Bad_data_error_handling_invalid_cast_key();
 		}
 
-		[NotSupported]
+		[NotSupportedOnFirebird]
 		public override void Bad_data_error_handling_invalid_cast_no_tracking()
 		{
 			base.Bad_data_error_handling_invalid_cast_no_tracking();
 		}
 
-		[NotSupported]
+		[NotSupportedOnFirebird]
 		public override void Bad_data_error_handling_invalid_cast_projection()
 		{
 			base.Bad_data_error_handling_invalid_cast_projection();
 		}
 
-		[NotSupported]
+		[NotSupportedOnFirebird]
 		public override void Bad_data_error_handling_invalid_cast()
 		{
 			base.Bad_data_error_handling_invalid_cast();
