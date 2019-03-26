@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			typeof(int),
 			typeof(long),
 			typeof(DateTime),
-			typeof(Guid),
 			typeof(bool),
 			typeof(byte),
 			typeof(byte[]),
@@ -49,9 +48,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 
 		public virtual Expression Translate(MethodCallExpression methodCallExpression)
 		{
-			if (methodCallExpression.Method.Name == nameof(ToString) && methodCallExpression.Arguments.Count == 0 && methodCallExpression.Object != null && SupportedTypes.Contains(methodCallExpression.Object.Type.UnwrapNullableType().UnwrapEnumType()))
+			if (methodCallExpression.Method.Name == nameof(ToString) && methodCallExpression.Arguments.Count == 0 && methodCallExpression.Object != null)
 			{
-				return new ExplicitCastExpression(methodCallExpression.Object, typeof(string));
+				var type = methodCallExpression.Object.Type.UnwrapNullableType();
+				if (SupportedTypes.Contains(type))
+				{
+					return new ExplicitCastExpression(methodCallExpression.Object, typeof(string));
+				}
+				else if (type == typeof(Guid))
+				{
+					return new SqlFunctionExpression("UUID_TO_CHAR", typeof(string), new[] { methodCallExpression.Object });
+				}
 			}
 			return null;
 		}
