@@ -117,8 +117,8 @@ function Tests-EFCore() {
 	echo "=== END ==="
 }
 
-Prepare
 try {
+	Prepare
 	& $TestSuite
 }
 finally {
