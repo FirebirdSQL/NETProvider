@@ -38,9 +38,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		protected override string GenerateNonNullSqlLiteral(object value)
 		{
+			var svalue = (string)value;
+			if (svalue == string.Empty)
+				return "''";
 			return IsUnicode
-				? $"_UTF8'{EscapeSqlLiteral((string)value)}'"
-				: $"'{EscapeSqlLiteral((string)value)}'";
+				? $"CAST(_UTF8'{EscapeSqlLiteral(svalue)}' as VARCHAR({svalue.Length}) CHARACTER SET UTF8)"
+				: $"CAST('{EscapeSqlLiteral(svalue)}' as VARCHAR({svalue.Length}))";
 		}
 	}
 }
