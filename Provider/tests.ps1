@@ -111,7 +111,7 @@ function Tests-EFCore() {
 		Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All }
 
 		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
-		Check-ExitCode { dotnet test }
+		Check-ExitCode { dotnet test --no-build -c $Configuration }
 	}
 
 	echo "=== END ==="
