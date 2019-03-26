@@ -132,8 +132,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				if (clrType == typeof(float)
 					&& mappingInfo.Size != null
 					&& mappingInfo.Size <= 24
-					&& (storeTypeNameBase.Equals("float", StringComparison.OrdinalIgnoreCase)
-						|| storeTypeNameBase.Equals("double precision", StringComparison.OrdinalIgnoreCase)))
+					&& (storeTypeNameBase.Equals("FLOAT", StringComparison.OrdinalIgnoreCase)
+						|| storeTypeNameBase.Equals("DOUBLE PRECISION", StringComparison.OrdinalIgnoreCase)))
 				{
 					return _float;
 				}
