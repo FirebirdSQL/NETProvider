@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
@@ -30,6 +30,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		protected override void ConfigureParameter(DbParameter parameter)
 		{
 			((FbParameter)parameter).FbDbType = FbDbType.Guid;
+		}
+
+		protected override string GenerateNonNullSqlLiteral(object value)
+		{
+			return $"CHAR_TO_UUID('{value}')";
 		}
 	}
 }
