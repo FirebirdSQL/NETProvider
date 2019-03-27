@@ -22,5 +22,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 	public interface IFbOptions : ISingletonOptions
 	{
 		bool ExplicitParameterTypes { get; }
+		bool ExplicitStringLiteralTypes { get; }
 	}
 }

@@ -173,13 +173,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 		protected override Expression VisitConstant(ConstantExpression constantExpression)
 		{
 			var svalue = constantExpression.Value as string;
-			var isVarcharHack = constantExpression.Type == typeof(string) && svalue?.Length > 0;
-			if (isVarcharHack)
+			var explicitVarcharPossible = constantExpression.Type == typeof(string) && svalue?.Length > 0;
+			if (_fbOptions.ExplicitStringLiteralTypes && explicitVarcharPossible)
 			{
 				Sql.Append("CAST(");
 			}
 			base.VisitConstant(constantExpression);
-			if (isVarcharHack)
+			if (_fbOptions.ExplicitStringLiteralTypes && explicitVarcharPossible)
 			{
 				Sql.Append(" AS VARCHAR(");
 				Sql.Append(svalue.Length);
