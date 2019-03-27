@@ -22,10 +22,12 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Operations;
+using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 {
@@ -316,6 +318,21 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			if (!nullable)
 			{
 				builder.Append(" NOT NULL");
+			}
+		}
+
+		protected override void DefaultValue(object defaultValue, string defaultValueSql, MigrationCommandListBuilder builder)
+		{
+			if (defaultValueSql != null)
+			{
+				builder.Append(" DEFAULT ");
+				builder.Append(defaultValueSql);
+			}
+			else if (defaultValue != null)
+			{
+				builder.Append(" DEFAULT ");
+				var typeMapping = Dependencies.TypeMappingSource.GetMappingForValue(defaultValue);
+				builder.Append(typeMapping.GenerateSqlLiteral(defaultValue));
 			}
 		}
 
