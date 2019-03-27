@@ -28,31 +28,30 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 
 		public virtual Expression Translate(MethodCallExpression methodCallExpression)
 		{
-			if (methodCallExpression.Method.Equals(MethodInfo))
-			{
-				var patternExpression = methodCallExpression.Arguments[0];
+			if (!methodCallExpression.Method.Equals(MethodInfo))
+				return null;
 
-				var endsWithExpression = new NullCompensatedExpression(
-					Expression.Equal(
-						new SqlFunctionExpression(
-							"RIGHT",
-							methodCallExpression.Object.Type,
-							new[]
-							{
-								methodCallExpression.Object,
-								new SqlFunctionExpression("CHARACTER_LENGTH", typeof(int), new[] { patternExpression })
-							}),
-						patternExpression));
+			var patternExpression = methodCallExpression.Arguments[0];
 
-				return patternExpression is ConstantExpression patternConstantExpression
-					? (string)patternConstantExpression.Value == string.Empty
-						? (Expression)Expression.Constant(true)
-						: endsWithExpression
-					: Expression.OrElse(
-						endsWithExpression,
-						Expression.Equal(patternExpression, Expression.Constant(string.Empty)));
-			}
-			return null;
+			var endsWithExpression = new NullCompensatedExpression(
+				Expression.Equal(
+					new SqlFunctionExpression(
+						"RIGHT",
+						methodCallExpression.Object.Type,
+						new[]
+						{
+							methodCallExpression.Object,
+							new SqlFunctionExpression("CHARACTER_LENGTH", typeof(int), new[] { patternExpression })
+						}),
+					patternExpression));
+
+			return patternExpression is ConstantExpression patternConstantExpression
+				? (string)patternConstantExpression.Value == string.Empty
+					? (Expression)Expression.Constant(true)
+					: endsWithExpression
+				: Expression.OrElse(
+					endsWithExpression,
+					Expression.Equal(patternExpression, Expression.Constant(string.Empty)));
 		}
 	}
 }
