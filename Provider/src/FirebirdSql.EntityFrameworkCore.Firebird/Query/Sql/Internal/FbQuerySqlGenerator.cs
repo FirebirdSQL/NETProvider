@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Linq;
 using System.Linq.Expressions;
@@ -168,6 +168,24 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 				return " OR ";
 			}
 			return base.GenerateOperator(expression);
+		}
+
+		protected override Expression VisitConstant(ConstantExpression constantExpression)
+		{
+			var svalue = constantExpression.Value as string;
+			var isVarcharHack = constantExpression.Type == typeof(string) && svalue?.Length > 0;
+			if (isVarcharHack)
+			{
+				Sql.Append("CAST(");
+			}
+			base.VisitConstant(constantExpression);
+			if (isVarcharHack)
+			{
+				Sql.Append(" AS VARCHAR(");
+				Sql.Append(svalue.Length);
+				Sql.Append(") CHARACTER SET UTF8)");
+			}
+			return constantExpression;
 		}
 
 		public virtual Expression VisitSubstring(FbSubstringExpression substringExpression)

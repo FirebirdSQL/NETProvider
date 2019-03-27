@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
@@ -39,11 +39,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		protected override string GenerateNonNullSqlLiteral(object value)
 		{
 			var svalue = (string)value;
-			if (svalue == string.Empty)
-				return "''";
 			return IsUnicode
-				? $"CAST(_UTF8'{EscapeSqlLiteral(svalue)}' as VARCHAR({svalue.Length}) CHARACTER SET UTF8)"
-				: $"CAST('{EscapeSqlLiteral(svalue)}' as VARCHAR({svalue.Length}))";
+				? $"_UTF8'{EscapeSqlLiteral(svalue)}'"
+				: $"'{EscapeSqlLiteral(svalue)}'";
 		}
 	}
 }
