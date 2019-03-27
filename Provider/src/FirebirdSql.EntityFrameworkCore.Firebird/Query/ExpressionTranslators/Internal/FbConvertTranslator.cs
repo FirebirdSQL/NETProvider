@@ -39,7 +39,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			[nameof(Convert.ToString)] = $"VARCHAR({FbTypeMappingSource.VarcharMaxSize})"
 		};
 
-		static readonly HashSet<Type> SuportedTypes = new HashSet<Type>
+		static readonly HashSet<Type> SupportedTypes = new HashSet<Type>
 		{
 			typeof(bool),
 			typeof(byte),
@@ -55,7 +55,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 		static readonly IEnumerable<MethodInfo> SupportedMethods
 			= TypeMapping.Keys
 				.SelectMany(t => typeof(Convert).GetTypeInfo().GetDeclaredMethods(t)
-					.Where(m => m.GetParameters().Length == 1 && SuportedTypes.Contains(m.GetParameters().First().ParameterType)));
+					.Where(m => m.GetParameters().Length == 1 && SupportedTypes.Contains(m.GetParameters().First().ParameterType)));
 
 		public virtual Expression Translate(MethodCallExpression methodCallExpression)
 			=> SupportedMethods.Contains(methodCallExpression.Method)
