@@ -1,7 +1,6 @@
-# Entity Framework Core 2.0 and higher
+# Entity Framework Core 2.x
 
 * Install `FirebirdSql.EntityFrameworkCore.Firebird` from NuGet.
-* Add `using FirebirdSql.EntityFrameworkCore.Firebird.Extensions;`.
 * Create your `DbContext`.
 * Call `UseFirebird` in `OnConfiguring`.
 
