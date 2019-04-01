@@ -4,7 +4,7 @@
 		<NoWarn>IDE0017,IDE0028,IDE0044</NoWarn>
 	</PropertyGroup>
 	<PropertyGroup>
-		<VersionPrefix>6.5.0</VersionPrefix>
+		<VersionPrefix>6.6.0</VersionPrefix>
 		<VersionSuffix></VersionSuffix>
 		<Company>FirebirdSQL</Company>
 		<Product>NETProvider</Product>
