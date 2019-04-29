@@ -47,14 +47,14 @@ namespace FirebirdSql.Data.Common
 
 		static void HandleDomainUnload()
 		{
-			foreach (var item in _pools)
+			while (_pools.TryTake(out var item))
 				item();
 		}
 
 		static void HandleProcessShutdown()
 		{
 			HandleDomainUnload();
-			foreach (var item in _fbClients)
+			while (_fbClients.TryTake(out var item))
 				item();
 		}
 	}
