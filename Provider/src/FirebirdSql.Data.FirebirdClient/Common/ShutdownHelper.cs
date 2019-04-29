@@ -30,8 +30,8 @@ namespace FirebirdSql.Data.Common
 			_pools = new ConcurrentBag<Action>();
 			_fbClients = new ConcurrentBag<Action>();
 #if !NETSTANDARD1_6
-			AppDomain.CurrentDomain.DomainUnload += (sender, e) => HandleShutdown();
-			AppDomain.CurrentDomain.ProcessExit += (sender, e) => HandleShutdown();
+			AppDomain.CurrentDomain.DomainUnload += (sender, e) => HandleDomainUnload();
+			AppDomain.CurrentDomain.ProcessExit += (sender, e) => HandleProcessShutdown();
 #endif
 		}
 
@@ -45,10 +45,15 @@ namespace FirebirdSql.Data.Common
 			_fbClients.Add(item);
 		}
 
-		static void HandleShutdown()
+		static void HandleDomainUnload()
 		{
 			foreach (var item in _pools)
 				item();
+		}
+
+		static void HandleProcessShutdown()
+		{
+			HandleDomainUnload();
 			foreach (var item in _fbClients)
 				item();
 		}
