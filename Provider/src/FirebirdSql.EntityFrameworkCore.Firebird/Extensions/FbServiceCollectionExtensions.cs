@@ -28,6 +28,7 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
 using Microsoft.EntityFrameworkCore.Query.Sql;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -52,6 +53,7 @@ namespace Microsoft.EntityFrameworkCore
 				.TryAdd<IRelationalConnection>(p => p.GetService<IFbRelationalConnection>())
 				.TryAdd<IMigrationsSqlGenerator, FbMigrationsSqlGenerator>()
 				.TryAdd<IHistoryRepository, FbHistoryRepository>()
+				.TryAdd<IQueryCompilationContextFactory, FbQueryCompilationContextFactory>()
 				.TryAdd<IMemberTranslator, FbCompositeMemberTranslator>()
 				.TryAdd<ICompositeMethodCallTranslator, FbCompositeMethodCallTranslator>()
 				.TryAdd<IQuerySqlGeneratorFactory, FbQuerySqlGeneratorFactory>()
