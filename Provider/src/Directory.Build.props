@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
 		<NoWarn>IDE0017,IDE0028,IDE0044</NoWarn>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup>
 		<VersionPrefix>6.6.0</VersionPrefix>
@@ -15,8 +16,8 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<MinClientVersion>3.6</MinClientVersion>
-		<IncludeBuildOutput>true</IncludeBuildOutput>
-		<IncludeSymbols>false</IncludeSymbols>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageLicenseFile>license.txt</PackageLicenseFile>
 	</PropertyGroup>
 
@@ -24,7 +25,6 @@
 	<PropertyGroup Condition="'$(SkipSourceLink)' != 'true'">
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(SkipSourceLink)' != 'true'">
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
