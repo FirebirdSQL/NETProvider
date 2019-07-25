@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						value = string.Empty;
 					}
 
-					_options.Load(value);
+					_options = new FbConnectionString(value);
 					_options.Validate();
 					_connectionString = value;
 				}
@@ -264,17 +264,15 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Constructors
 
 		public FbConnection()
-			: this(null)
-		{
-		}
-
-		public FbConnection(string connectionString)
-			: base()
 		{
 			_options = new FbConnectionString();
 			_state = ConnectionState.Closed;
 			_connectionString = string.Empty;
+		}
 
+		public FbConnection(string connectionString)
+			: this()
+		{
 			if (!string.IsNullOrEmpty(connectionString))
 			{
 				ConnectionString = connectionString;

@@ -233,8 +233,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			SetDefaultOptions();
 		}
 
-#warning Could be only Load? (or vice versa)
 		public FbConnectionString(string connectionString)
+			: this()
 		{
 			Load(connectionString);
 		}
@@ -243,11 +243,43 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Methods
 
-		public void Load(string connectionString)
+		public void Validate()
+		{
+			if (
+				(string.IsNullOrEmpty(Database)) ||
+				(string.IsNullOrEmpty(DataSource) && ServerType != FbServerType.Embedded) ||
+				(string.IsNullOrEmpty(Charset)) ||
+				(Port <= 0) ||
+				(MinPoolSize > MaxPoolSize)
+			   )
+			{
+				throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
+			}
+			if (Dialect < 1 || Dialect > 3)
+			{
+				throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
+			}
+			if (PacketSize < 512 || PacketSize > 32767)
+			{
+				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", PacketSize, Environment.NewLine));
+			}
+			if (DbCachePages < 0)
+			{
+				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", DbCachePages, Environment.NewLine));
+			}
+			if (Pooling && NoDatabaseTriggers)
+			{
+				throw new ArgumentException("Cannot use Pooling and NoDatabaseTriggers together.");
+			}
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private void Load(string connectionString)
 		{
 			const string KeyPairsRegex = "(([\\w\\s\\d]*)\\s*?=\\s*?\"([^\"]*)\"|([\\w\\s\\d]*)\\s*?=\\s*?'([^']*)'|([\\w\\s\\d]*)\\s*?=\\s*?([^\"';][^;]*))";
-
-			SetDefaultOptions();
 
 			if (!string.IsNullOrEmpty(connectionString))
 			{
@@ -313,40 +345,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 		}
-
-		public void Validate()
-		{
-			if (
-				(string.IsNullOrEmpty(Database)) ||
-				(string.IsNullOrEmpty(DataSource) && ServerType != FbServerType.Embedded) ||
-				(string.IsNullOrEmpty(Charset)) ||
-				(Port <= 0) ||
-				(MinPoolSize > MaxPoolSize)
-			   )
-			{
-				throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
-			}
-			if (Dialect < 1 || Dialect > 3)
-			{
-				throw new ArgumentException("Incorrect database dialect it should be 1, 2, or 3.");
-			}
-			if (PacketSize < 512 || PacketSize > 32767)
-			{
-				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Packet Size' value of {0} is not valid.{1}The value should be an integer >= 512 and <= 32767.", PacketSize, Environment.NewLine));
-			}
-			if (DbCachePages < 0)
-			{
-				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Cache Pages' value of {0} is not valid.{1}The value should be an integer >= 0.", DbCachePages, Environment.NewLine));
-			}
-			if (Pooling && NoDatabaseTriggers)
-			{
-				throw new ArgumentException("Cannot use Pooling and NoDBTriggers together.");
-			}
-		}
-
-		#endregion
-
-		#region Private Methods
 
 		private void SetDefaultOptions()
 		{
