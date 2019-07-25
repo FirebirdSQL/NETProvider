@@ -406,8 +406,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("Database name is not valid.");
 			}
 
-			var cs = _connectionString;
-
+			var oldConnectionString = _connectionString;
 			try
 			{
 				var csb = new FbConnectionStringBuilder(_connectionString);
@@ -424,7 +423,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				ConnectionString = cs;
+				ConnectionString = oldConnectionString;
 				throw new FbException(ex.Message, ex);
 			}
 		}
