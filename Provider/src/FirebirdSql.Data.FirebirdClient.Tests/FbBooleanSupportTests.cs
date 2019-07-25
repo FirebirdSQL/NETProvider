@@ -23,15 +23,14 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[FbTestFixture(FbServerType.Default, false)]
-	[FbTestFixture(FbServerType.Default, true)]
-	[FbTestFixture(FbServerType.Embedded, default)]
+	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
+	[TestFixtureSource(typeof(FbEmbeddedServerTypeTestFixtureSource))]
 	public class FbBooleanSupportTests : FbTestsBase
 	{
 		private bool _shouldTearDown;
 
-		public FbBooleanSupportTests(FbServerType serverType, bool compression)
-			: base(serverType, compression)
+		public FbBooleanSupportTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+			: base(serverType, compression, wireCrypt)
 		{
 			_shouldTearDown = false;
 		}
@@ -41,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			base.SetUp();
 
-			if (!EnsureVersion(new Version("3.0.0.0")))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			_shouldTearDown = true;

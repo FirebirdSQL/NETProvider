@@ -23,15 +23,14 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[FbTestFixture(FbServerType.Default, false)]
-	[FbTestFixture(FbServerType.Default, true)]
-	[FbTestFixture(FbServerType.Embedded, default)]
+	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
+	[TestFixtureSource(typeof(FbEmbeddedServerTypeTestFixtureSource))]
 	public class TransactionScopeTests : FbTestsBase
 	{
 		#region Constructors
 
-		public TransactionScopeTests(FbServerType serverType, bool compression)
-			: base(serverType, compression)
+		public TransactionScopeTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+			: base(serverType, compression, wireCrypt)
 		{ }
 
 		#endregion
@@ -41,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SimpleSelectTest()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 
 			csb.Enlist = true;
 
@@ -69,7 +68,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertTest()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 
 			csb.Enlist = true;
 

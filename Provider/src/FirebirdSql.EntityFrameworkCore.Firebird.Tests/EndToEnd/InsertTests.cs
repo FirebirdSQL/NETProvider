@@ -82,7 +82,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		[Test]
 		public void IdentityInsert()
 		{
-			if (!EnsureVersion(new Version("3.0.0.0")))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			using (var db = GetDbContext<IdentityInsertContext>())
@@ -159,7 +159,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		[Test]
 		public void DefaultValuesInsert()
 		{
-			if (!EnsureVersion(new Version("3.0.0.0")))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			using (var db = GetDbContext<DefaultValuesInsertContext>())
@@ -204,7 +204,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		[Test]
 		public void TwoComputedInsert()
 		{
-			if (!EnsureVersion(new Version("3.0.0.0")))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			using (var db = GetDbContext<TwoComputedInsertContext>())

@@ -27,15 +27,14 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[FbTestFixture(FbServerType.Default, false)]
-	[FbTestFixture(FbServerType.Default, true)]
-	[FbTestFixture(FbServerType.Embedded, default)]
+	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
+	[TestFixtureSource(typeof(FbEmbeddedServerTypeTestFixtureSource))]
 	public class TrackerIssuesTests : FbTestsBase
 	{
 		#region Constructors
 
-		public TrackerIssuesTests(FbServerType serverType, bool compression)
-			: base(serverType, compression)
+		public TrackerIssuesTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+			: base(serverType, compression, wireCrypt)
 		{ }
 
 		#endregion
@@ -224,7 +223,7 @@ END
 			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
 
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			csb.MinPoolSize = 0;

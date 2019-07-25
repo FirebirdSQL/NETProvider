@@ -35,3 +35,4 @@ There are two ways you can report bugs:
 --------------
 
 For zlib compression the provider uses pieces from DotNetZip (http://dotnetzip.codeplex.com/) library.
+For RC4 encryption the provider uses pieces from Bouncy Castle (https://www.bouncycastle.org/csharp/index.html) library.

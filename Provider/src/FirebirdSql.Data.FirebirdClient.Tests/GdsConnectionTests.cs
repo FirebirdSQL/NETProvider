@@ -21,7 +21,6 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[TestFixture]
 	public class GdsConnectionTests
 	{
 		static IEnumerable<TestCaseData> NormalizeLoginTestSource()

@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueUserId)]
 		public string UserID
 		{
-			get { return GetString(FbConnectionString.DefaultKeyUserId, FbConnectionString.DefaultValueUserId); }
+			get { return FbConnectionString.GetString(GetKey(FbConnectionString.DefaultKeyUserId), TryGetValue, FbConnectionString.DefaultValueUserId); }
 			set { SetValue(FbConnectionString.DefaultKeyUserId, value); }
 		}
 
@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValuePassword)]
 		public string Password
 		{
-			get { return GetString(FbConnectionString.DefaultKeyPassword, FbConnectionString.DefaultValuePassword); }
+			get { return FbConnectionString.GetString(GetKey(FbConnectionString.DefaultKeyPassword), TryGetValue, FbConnectionString.DefaultValuePassword); }
 			set { SetValue(FbConnectionString.DefaultKeyPassword, value); }
 		}
 
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueDataSource)]
 		public string DataSource
 		{
-			get { return GetString(FbConnectionString.DefaultKeyDataSource, FbConnectionString.DefaultValueDataSource); }
+			get { return FbConnectionString.GetString(GetKey(FbConnectionString.DefaultKeyDataSource), TryGetValue, FbConnectionString.DefaultValueDataSource); }
 			set { SetValue(FbConnectionString.DefaultKeyDataSource, value); }
 		}
 
@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueCatalog)]
 		public string Database
 		{
-			get { return GetString(FbConnectionString.DefaultKeyCatalog, FbConnectionString.DefaultValueCatalog); }
+			get { return FbConnectionString.GetString(GetKey(FbConnectionString.DefaultKeyCatalog), TryGetValue, FbConnectionString.DefaultValueCatalog); }
 			set { SetValue(FbConnectionString.DefaultKeyCatalog, value); }
 		}
 
@@ -77,7 +77,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValuePortNumber)]
 		public int Port
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyPortNumber, FbConnectionString.DefaultValuePortNumber); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyPortNumber), TryGetValue, FbConnectionString.DefaultValuePortNumber); }
 			set { SetValue(FbConnectionString.DefaultKeyPortNumber, value); }
 		}
 
@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValuePacketSize)]
 		public int PacketSize
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyPacketSize, FbConnectionString.DefaultValuePacketSize); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyPacketSize), TryGetValue, FbConnectionString.DefaultValuePacketSize); }
 			set { SetValue(FbConnectionString.DefaultKeyPacketSize, value); }
 		}
 
@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueRoleName)]
 		public string Role
 		{
-			get { return GetString(FbConnectionString.DefaultKeyRoleName, FbConnectionString.DefaultValueRoleName); }
+			get { return FbConnectionString.GetString(GetKey(FbConnectionString.DefaultKeyRoleName), TryGetValue, FbConnectionString.DefaultValueRoleName); }
 			set { SetValue(FbConnectionString.DefaultKeyRoleName, value); }
 		}
 
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueDialect)]
 		public int Dialect
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyDialect, FbConnectionString.DefaultValueDialect); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyDialect), TryGetValue, FbConnectionString.DefaultValueDialect); }
 			set { SetValue(FbConnectionString.DefaultKeyDialect, value); }
 		}
 
@@ -117,7 +117,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueCharacterSet)]
 		public string Charset
 		{
-			get { return GetString(FbConnectionString.DefaultKeyCharacterSet, FbConnectionString.DefaultValueCharacterSet); }
+			get { return FbConnectionString.GetString(GetKey(FbConnectionString.DefaultKeyCharacterSet), TryGetValue, FbConnectionString.DefaultValueCharacterSet); }
 			set { SetValue(FbConnectionString.DefaultKeyCharacterSet, value); }
 		}
 
@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueConnectionTimeout)]
 		public int ConnectionTimeout
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyConnectionTimeout, FbConnectionString.DefaultValueConnectionTimeout); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyConnectionTimeout), TryGetValue, FbConnectionString.DefaultValueConnectionTimeout); }
 			set { SetValue(FbConnectionString.DefaultKeyConnectionTimeout, value); }
 		}
 
@@ -137,7 +137,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValuePooling)]
 		public bool Pooling
 		{
-			get { return GetBoolean(FbConnectionString.DefaultKeyPooling, FbConnectionString.DefaultValuePooling); }
+			get { return FbConnectionString.GetBoolean(GetKey(FbConnectionString.DefaultKeyPooling), TryGetValue, FbConnectionString.DefaultValuePooling); }
 			set { SetValue(FbConnectionString.DefaultKeyPooling, value); }
 		}
 
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueConnectionLifetime)]
 		public int ConnectionLifeTime
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyConnectionLifetime, FbConnectionString.DefaultValueConnectionLifetime); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyConnectionLifetime), TryGetValue, FbConnectionString.DefaultValueConnectionLifetime); }
 			set { SetValue(FbConnectionString.DefaultKeyConnectionLifetime, value); }
 		}
 
@@ -157,7 +157,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueMinPoolSize)]
 		public int MinPoolSize
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyMinPoolSize, FbConnectionString.DefaultValueMinPoolSize); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyMinPoolSize), TryGetValue, FbConnectionString.DefaultValueMinPoolSize); }
 			set { SetValue(FbConnectionString.DefaultKeyMinPoolSize, value); }
 		}
 
@@ -167,7 +167,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueMaxPoolSize)]
 		public int MaxPoolSize
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyMaxPoolSize, FbConnectionString.DefaultValueMaxPoolSize); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyMaxPoolSize), TryGetValue, FbConnectionString.DefaultValueMaxPoolSize); }
 			set { SetValue(FbConnectionString.DefaultKeyMaxPoolSize, value); }
 		}
 
@@ -177,7 +177,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueFetchSize)]
 		public int FetchSize
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyFetchSize, FbConnectionString.DefaultValueFetchSize); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyFetchSize), TryGetValue, FbConnectionString.DefaultValueFetchSize); }
 			set { SetValue(FbConnectionString.DefaultKeyFetchSize, value); }
 		}
 
@@ -207,7 +207,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueRecordsAffected)]
 		public bool ReturnRecordsAffected
 		{
-			get { return GetBoolean(FbConnectionString.DefaultKeyRecordsAffected, FbConnectionString.DefaultValueRecordsAffected); }
+			get { return FbConnectionString.GetBoolean(GetKey(FbConnectionString.DefaultKeyRecordsAffected), TryGetValue, FbConnectionString.DefaultValueRecordsAffected); }
 			set { SetValue(FbConnectionString.DefaultKeyRecordsAffected, value); }
 		}
 
@@ -217,7 +217,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValuePooling)]
 		public bool Enlist
 		{
-			get { return GetBoolean(FbConnectionString.DefaultKeyEnlist, FbConnectionString.DefaultValueEnlist); }
+			get { return FbConnectionString.GetBoolean(GetKey(FbConnectionString.DefaultKeyEnlist), TryGetValue, FbConnectionString.DefaultValueEnlist); }
 			set { SetValue(FbConnectionString.DefaultKeyEnlist, value); }
 		}
 
@@ -227,7 +227,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueClientLibrary)]
 		public string ClientLibrary
 		{
-			get { return GetString(FbConnectionString.DefaultKeyClientLibrary, FbConnectionString.DefaultValueClientLibrary); }
+			get { return FbConnectionString.GetString(GetKey(FbConnectionString.DefaultKeyClientLibrary), TryGetValue, FbConnectionString.DefaultValueClientLibrary); }
 			set { SetValue(FbConnectionString.DefaultKeyClientLibrary, value); }
 		}
 
@@ -237,7 +237,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueDbCachePages)]
 		public int DbCachePages
 		{
-			get { return GetInt32(FbConnectionString.DefaultKeyDbCachePages, FbConnectionString.DefaultValueDbCachePages); }
+			get { return FbConnectionString.GetInt32(GetKey(FbConnectionString.DefaultKeyDbCachePages), TryGetValue, FbConnectionString.DefaultValueDbCachePages); }
 			set { SetValue(FbConnectionString.DefaultKeyDbCachePages, value); }
 		}
 
@@ -247,7 +247,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueNoDbTriggers)]
 		public bool NoDatabaseTriggers
 		{
-			get { return GetBoolean(FbConnectionString.DefaultKeyNoDbTriggers, FbConnectionString.DefaultValueNoDbTriggers); }
+			get { return FbConnectionString.GetBoolean(GetKey(FbConnectionString.DefaultKeyNoDbTriggers), TryGetValue, FbConnectionString.DefaultValueNoDbTriggers); }
 			set { SetValue(FbConnectionString.DefaultKeyNoDbTriggers, value); }
 		}
 
@@ -257,7 +257,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueNoGarbageCollect)]
 		public bool NoGarbageCollect
 		{
-			get { return GetBoolean(FbConnectionString.DefaultKeyNoGarbageCollect, FbConnectionString.DefaultValueNoGarbageCollect); }
+			get { return FbConnectionString.GetBoolean(GetKey(FbConnectionString.DefaultKeyNoGarbageCollect), TryGetValue, FbConnectionString.DefaultValueNoGarbageCollect); }
 			set { SetValue(FbConnectionString.DefaultKeyNoGarbageCollect, value); }
 		}
 
@@ -267,7 +267,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[DefaultValue(FbConnectionString.DefaultValueCompression)]
 		public bool Compression
 		{
-			get { return GetBoolean(FbConnectionString.DefaultKeyCompression, FbConnectionString.DefaultValueCompression); }
+			get { return FbConnectionString.GetBoolean(GetKey(FbConnectionString.DefaultKeyCompression), TryGetValue, FbConnectionString.DefaultValueCompression); }
 			set { SetValue(FbConnectionString.DefaultKeyCompression, value); }
 		}
 
@@ -281,13 +281,22 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { SetValue(FbConnectionString.DefaultKeyCryptKey, value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("WireCrypt")]
+		[Description("Selection for wire encryption.")]
+		[DefaultValue(FbConnectionString.DefaultValueWireCrypt)]
+		public FbWireCrypt WireCrypt
+		{
+			get { return GetWireCrypt(FbConnectionString.DefaultKeyWireCrypt, FbConnectionString.DefaultValueWireCrypt); }
+			set { SetValue(FbConnectionString.DefaultKeyWireCrypt, value); }
+		}
+
 		#endregion
 
 		#region Constructors
 
 		public FbConnectionStringBuilder()
-		{
-		}
+		{ }
 
 		public FbConnectionStringBuilder(string connectionString)
 			: this()
@@ -299,70 +308,80 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Private methods
 
-		private int GetInt32(string keyword, int defaultValue)
-		{
-			return TryGetValue(GetKey(keyword), out var value)
-				? Convert.ToInt32(value)
-				: defaultValue;
-		}
-
 		private FbServerType GetServerType(string keyword, FbServerType defaultValue)
 		{
-			if (!TryGetValue(GetKey(keyword), out var value))
+			var key = GetKey(keyword);
+			if (!TryGetValue(key, out var value))
 				return defaultValue;
-
 			switch (value)
 			{
 				case FbServerType fbServerType:
 					return fbServerType;
-				case string s when s == "Default":
-					return FbServerType.Default;
-				case string s when s == "Embedded":
-					return FbServerType.Embedded;
+				case string s when Enum.TryParse<FbServerType>(s, true, out var enumResult):
+					return enumResult;
 				default:
-					return (FbServerType)GetInt32(keyword, (int)defaultValue);
+					return FbConnectionString.GetServerType(key, TryGetValue, defaultValue);
 			}
 		}
 
 		private IsolationLevel GetIsolationLevel(string keyword, IsolationLevel defaultValue)
 		{
-			if (!TryGetValue(GetKey(keyword), out var value))
+			var key = GetKey(keyword);
+			if (!TryGetValue(key, out var value))
 				return defaultValue;
-
-			return (IsolationLevel)GetInt32(keyword, (int)defaultValue);
+			switch (value)
+			{
+				case IsolationLevel isolationLevel:
+					return isolationLevel;
+				case string s when Enum.TryParse<IsolationLevel>(s, true, out var enumResult):
+					return enumResult;
+				default:
+					return FbConnectionString.GetIsolationLevel(key, TryGetValue, defaultValue);
+			}
 		}
 
-		private string GetString(string keyword, string defaultValue)
+		private FbWireCrypt GetWireCrypt(string keyword, FbWireCrypt defaultValue)
 		{
-			return TryGetValue(GetKey(keyword), out var value)
-				? Convert.ToString(value)
-				: defaultValue;
-		}
-
-		private bool GetBoolean(string keyword, bool defaultValue)
-		{
-			return TryGetValue(GetKey(keyword), out var value)
-				? Convert.ToBoolean(value)
-				: defaultValue;
+			var key = GetKey(keyword);
+			if (!TryGetValue(key, out var value))
+				return defaultValue;
+			switch (value)
+			{
+				case FbWireCrypt fbWireCrypt:
+					return fbWireCrypt;
+				case string s when Enum.TryParse<FbWireCrypt>(s, true, out var enumResult):
+					return enumResult;
+				default:
+					return FbConnectionString.GetWireCrypt(key, TryGetValue, defaultValue);
+			}
 		}
 
 		private byte[] GetBytes(string keyword, byte[] defaultValue)
 		{
-			return TryGetValue(GetKey(keyword), out var value)
-				? Convert.FromBase64String(value as string)
-				: defaultValue;
+			var key = GetKey(keyword);
+			if (!TryGetValue(key, out var value))
+				return defaultValue;
+			switch (value)
+			{
+				case byte[] bytes:
+					return bytes;
+				case string s:
+					return Convert.FromBase64String(s);
+				default:
+					return defaultValue;
+			}
 		}
 
 		private void SetValue<T>(string keyword, T value)
 		{
-			var index = GetKey(keyword);
-			if (typeof(T) == typeof(byte[]))
+			var key = GetKey(keyword);
+			if (value is byte[] bytes)
 			{
-				this[index] = Convert.ToBase64String(value as byte[]);
+				this[key] = Convert.ToBase64String(bytes);
 			}
 			else
 			{
-				this[index] = value;
+				this[key] = value;
 			}
 		}
 

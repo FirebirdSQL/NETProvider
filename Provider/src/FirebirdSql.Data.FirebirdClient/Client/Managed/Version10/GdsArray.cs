@@ -135,7 +135,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.Write(slice, 0, slice.Length);
 				_database.XdrStream.Flush();
 
-				var response = _database.ReadGenericResponse();
+				var response = _database.ReadResponse<GenericResponse>();
 
 				_handle = response.BlobId;
 			}

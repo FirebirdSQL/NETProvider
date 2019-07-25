@@ -21,7 +21,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	[Serializable]
 	[Flags]
-	public enum FbTransactionBehavior : int
+	public enum FbTransactionBehavior
 	{
 		Consistency = 1,
 		Concurrency = 2,
@@ -39,6 +39,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		RecVersion = 8192,
 		NoRecVersion = 16384,
 		RestartRequests = 32768,
-		NoAutoUndo = 65536
+		NoAutoUndo = 65536,
 	}
 }

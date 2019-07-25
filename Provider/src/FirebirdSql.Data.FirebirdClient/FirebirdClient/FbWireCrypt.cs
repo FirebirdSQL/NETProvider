@@ -15,16 +15,15 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.Data.FirebirdClient;
-using NUnit.Framework;
+using System;
 
-namespace FirebirdSql.Data.TestsBase
+namespace FirebirdSql.Data.FirebirdClient
 {
-	// prevents CLS warning because of `params` in `TestFixtureAttribute`
-	class FbTestFixtureAttribute : TestFixtureAttribute
+	[Serializable]
+	public enum FbWireCrypt
 	{
-		public FbTestFixtureAttribute(FbServerType serverType, bool compression)
-			: base(serverType, compression)
-		{ }
+		Disabled,
+		Enabled,
+		Required,
 	}
 }

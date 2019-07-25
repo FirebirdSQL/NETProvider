@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				SendAttachToBuffer(spb, service);
 				_database.XdrStream.Flush();
-				ProcessAttachResponse(_database.ReadGenericResponse());
+				ProcessAttachResponse(_database.ReadResponse<GenericResponse>());
 			}
 			catch (IOException ex)
 			{
@@ -174,7 +174,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				_database.XdrStream.Flush();
 
-				var response = _database.ReadGenericResponse();
+				var response = _database.ReadResponse<GenericResponse>();
 
 				var responseLength = bufferLength;
 

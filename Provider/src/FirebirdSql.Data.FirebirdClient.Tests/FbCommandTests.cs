@@ -26,15 +26,14 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[FbTestFixture(FbServerType.Default, false)]
-	[FbTestFixture(FbServerType.Default, true)]
-	[FbTestFixture(FbServerType.Embedded, default)]
+	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
+	[TestFixtureSource(typeof(FbEmbeddedServerTypeTestFixtureSource))]
 	public class FbCommandTests : FbTestsBase
 	{
 		#region Constructors
 
-		public FbCommandTests(FbServerType serverType, bool compression)
-			: base(serverType, compression)
+		public FbCommandTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+			: base(serverType, compression, wireCrypt)
 		{ }
 
 		#endregion
@@ -706,7 +705,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void CommandCancellationTest()
 		{
-			if (!EnsureVersion(new Version("2.5.0.0")))
+			if (!EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			var cancelled = false;

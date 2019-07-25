@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29025.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj", "{ADC34658-2605-4588-A056-5288EDE4F5DE}"
 EndProject
@@ -29,14 +29,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FirebirdSql.Data.Zlib", "FirebirdSql.Data.Zlib\FirebirdSql.Data.Zlib.shproj", "{8523BDF3-F378-487D-AFEE-89B5B0A6B9EC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests", "FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.csproj", "{2925DB97-5B39-4D9E-90CC-F7470F9AA8F3}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FirebirdSql.Data.External", "FirebirdSql.Data.External\FirebirdSql.Data.External.shproj", "{884EE120-B22E-4940-8C1C-626F13028376}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{2f67ff6e-a6fc-44f4-9687-9e5ca05c73a3}*SharedItemsImports = 13
-		FirebirdSql.Data.Zlib\FirebirdSql.Data.Zlib.projitems*{8523bdf3-f378-487d-afee-89b5b0a6b9ec}*SharedItemsImports = 13
+		FirebirdSql.Data.External\FirebirdSql.Data.External.projitems*{884ee120-b22e-4940-8c1c-626f13028376}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,8 +83,8 @@ Global
 		{E9E13E28-1E4A-4B99-B594-07A696B19BC8} = {AD392B88-6637-4744-BDF9-8FB9453C9042}
 		{E6849FF6-D309-433A-B3EE-0554F07E3B21} = {F2F0EE52-D89E-4AC0-B7CA-C19298700FA6}
 		{42A00B25-673E-449A-9B89-BE89344F96F0} = {AD392B88-6637-4744-BDF9-8FB9453C9042}
-		{8523BDF3-F378-487D-AFEE-89B5B0A6B9EC} = {C94B5B06-9023-43C1-9B0D-6BDD504F9A06}
 		{2925DB97-5B39-4D9E-90CC-F7470F9AA8F3} = {AD392B88-6637-4744-BDF9-8FB9453C9042}
+		{884EE120-B22E-4940-8C1C-626F13028376} = {C94B5B06-9023-43C1-9B0D-6BDD504F9A06}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D574B071-15C1-4024-BB37-78D690F61070}

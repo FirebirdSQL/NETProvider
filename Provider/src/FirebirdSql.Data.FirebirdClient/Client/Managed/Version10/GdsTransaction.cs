@@ -106,7 +106,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.WriteBuffer(tpb.ToArray());
 				_database.XdrStream.Flush();
 
-				response = _database.ReadGenericResponse();
+				response = _database.ReadResponse<GenericResponse>();
 
 				_database.TransactionCount++;
 

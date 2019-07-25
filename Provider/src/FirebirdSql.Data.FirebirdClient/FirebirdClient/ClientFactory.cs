@@ -17,6 +17,7 @@
 
 using System;
 using FirebirdSql.Data.Client.Managed;
+using FirebirdSql.Data.Client.Managed.Version13;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
@@ -29,10 +30,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				case FbServerType.Default:
 					return CreateManagedDatabase(options);
-
 				case FbServerType.Embedded:
 					return new Client.Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
-
 				default:
 					throw IncorrectServerTypeException();
 			}
@@ -44,10 +43,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				case FbServerType.Default:
 					return CreateManagedServiceManager(options);
-
 				case FbServerType.Embedded:
 					return new Client.Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset));
-
 				default:
 					throw IncorrectServerTypeException();
 			}
@@ -55,10 +52,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static IDatabase CreateManagedDatabase(FbConnectionString options)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression);
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			connection.Connect();
 			connection.Identify(options.Database);
-
 			switch (connection.ProtocolVersion)
 			{
 				case IscCodes.PROTOCOL_VERSION13:
@@ -76,10 +72,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static IServiceManager CreateManagedServiceManager(FbConnectionString options)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression);
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			connection.Connect();
 			connection.Identify(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty);
-
 			switch (connection.ProtocolVersion)
 			{
 				case IscCodes.PROTOCOL_VERSION13:
@@ -103,6 +98,21 @@ namespace FirebirdSql.Data.FirebirdClient
 		private static Exception IncorrectServerTypeException()
 		{
 			return new NotSupportedException("Specified server type is not correct.");
+		}
+
+		private static WireCryptOption FbWireCryptToWireCryptOption(FbWireCrypt wireCrypt)
+		{
+			switch (wireCrypt)
+			{
+				case FbWireCrypt.Disabled:
+					return WireCryptOption.Disabled;
+				case FbWireCrypt.Enabled:
+					return WireCryptOption.Enabled;
+				case FbWireCrypt.Required:
+					return WireCryptOption.Required;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(wireCrypt), $"{nameof(wireCrypt)}={wireCrypt}");
+			}
 		}
 	}
 }

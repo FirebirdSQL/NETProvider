@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.Write(DataSegment);
 				_database.XdrStream.Flush();
 
-				var response = _database.ReadGenericResponse();
+				var response = _database.ReadResponse<GenericResponse>();
 
 				RblRemoveValue(IscCodes.RBL_segment);
 				if (response.ObjectHandle == 1)
@@ -229,7 +229,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.Write(_blobId);
 				_database.XdrStream.Flush();
 
-				var response = _database.ReadGenericResponse();
+				var response = _database.ReadResponse<GenericResponse>();
 
 				_blobId = response.BlobId;
 				_blobHandle = response.ObjectHandle;

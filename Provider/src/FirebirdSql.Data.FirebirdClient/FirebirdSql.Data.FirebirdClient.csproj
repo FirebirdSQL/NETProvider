@@ -56,5 +56,5 @@
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
 		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
 	</ItemGroup>
-	<Import Project="..\FirebirdSql.Data.Zlib\FirebirdSql.Data.Zlib.projitems" Label="Shared" />
+	<Import Project="..\FirebirdSql.Data.External\FirebirdSql.Data.External.projitems" Label="Shared" />
 </Project>

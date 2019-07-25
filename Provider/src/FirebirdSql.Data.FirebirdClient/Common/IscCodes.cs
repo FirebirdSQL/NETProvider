@@ -79,6 +79,10 @@ namespace FirebirdSql.Data.Common
 
 		public const int pflag_compress = 0x100;
 
+		public const int WIRE_CRYPT_DISABLED = 0;
+		public const int WIRE_CRYPT_ENABLED = 1;
+		public const int WIRE_CRYPT_REQUIRED = 2;
+
 		#endregion
 
 		#region Statement Flags
@@ -801,25 +805,6 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region Facilities
-
-		public const int JRD = 0;
-		public const int GFIX = 3;
-		public const int DSQL = 7;
-		public const int DYN = 8;
-		public const int GBAK = 12;
-		public const int GDEC = 18;
-		public const int LICENSE = 19;
-		public const int GSTAT = 21;
-
-		#endregion
-
-		#region Error code generation
-
-		public const int ISC_MASK = 0x14000000; // Defines the code	as a valid ISC code
-
-		#endregion
-
 		#region ISC Error codes
 
 		public const int isc_facility = 20;
@@ -859,6 +844,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_arith_except = 335544321;
 		public const int isc_string_truncation = 335544914;
 		public const int isc_formatted_exception = 335545016;
+		public const int isc_wirecrypt_incompatible = 335545064;
 
 		#endregion
 
@@ -919,13 +905,16 @@ namespace FirebirdSql.Data.Common
 		#endregion
 
 		#region Cancel types
+
 		public const int fb_cancel_disable = 1;
 		public const int fb_cancel_enable = 2;
 		public const int fb_cancel_raise = 3;
 		public const int fb_cancel_abort = 4;
+
 		#endregion
 
 		#region User identification data
+
 		public const int CNCT_user = 1;
 		public const int CNCT_passwd = 2;
 		public const int CNCT_host = 4;
@@ -936,6 +925,7 @@ namespace FirebirdSql.Data.Common
 		public const int CNCT_login = 9;
 		public const int CNCT_plugin_list = 10;
 		public const int CNCT_client_crypt = 11;
+
 		#endregion
 	}
 }

@@ -38,6 +38,7 @@ namespace FirebirdSql.Data.TestsBase
 
 		public FbServerType FbServerType { get; }
 		public bool Compression { get; }
+		public FbWireCrypt WireCrypt { get; }
 
 		public FbConnection Connection
 		{
@@ -54,10 +55,11 @@ namespace FirebirdSql.Data.TestsBase
 
 		#region	Constructors
 
-		public FbTestsBase(FbServerType serverType, bool compression, bool insertTestData = true)
+		public FbTestsBase(FbServerType serverType, bool compression, FbWireCrypt wireCrypt, bool insertTestData = true)
 		{
 			FbServerType = serverType;
 			Compression = compression;
+			WireCrypt = wireCrypt;
 			_insertTestData = insertTestData;
 		}
 
@@ -68,9 +70,9 @@ namespace FirebirdSql.Data.TestsBase
 		[SetUp]
 		public virtual void SetUp()
 		{
-			FbTestsSetup.SetUp(FbServerType, Compression);
+			FbTestsSetup.SetUp(FbServerType, Compression, WireCrypt);
 
-			var cs = BuildConnectionString(FbServerType, Compression);
+			var cs = BuildConnectionString(FbServerType, Compression, WireCrypt);
 			if (_insertTestData)
 			{
 				InsertTestData(cs);
@@ -82,7 +84,7 @@ namespace FirebirdSql.Data.TestsBase
 		[TearDown]
 		public virtual void TearDown()
 		{
-			var cs = BuildConnectionString(FbServerType, Compression);
+			var cs = BuildConnectionString(FbServerType, Compression, WireCrypt);
 			_connection.Dispose();
 			if (_insertTestData)
 			{
@@ -181,17 +183,17 @@ end";
 
 		#region	ConnectionString Building methods
 
-		public static string BuildConnectionString(FbServerType serverType, bool compression)
+		public static string BuildConnectionString(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 		{
-			return BuildConnectionStringBuilder(serverType, compression).ToString();
+			return BuildConnectionStringBuilder(serverType, compression, wireCrypt).ToString();
 		}
 
-		public static string BuildServicesConnectionString(FbServerType serverType, bool compression, bool includeDatabase)
+		public static string BuildServicesConnectionString(FbServerType serverType, bool compression, FbWireCrypt wireCrypt, bool includeDatabase)
 		{
-			return BuildServicesConnectionStringBuilder(serverType, compression, includeDatabase).ToString();
+			return BuildServicesConnectionStringBuilder(serverType, compression, wireCrypt, includeDatabase).ToString();
 		}
 
-		public static FbConnectionStringBuilder BuildServicesConnectionStringBuilder(FbServerType serverType, bool compression, bool includeDatabase)
+		public static FbConnectionStringBuilder BuildServicesConnectionStringBuilder(FbServerType serverType, bool compression, FbWireCrypt wireCrypt, bool includeDatabase)
 		{
 			var builder = new FbConnectionStringBuilder();
 			builder.UserID = FbTestsSetup.UserID;
@@ -199,24 +201,25 @@ end";
 			builder.DataSource = FbTestsSetup.DataSource;
 			if (includeDatabase)
 			{
-				builder.Database = FbTestsSetup.Database(serverType, compression);
+				builder.Database = FbTestsSetup.Database(serverType, compression, wireCrypt);
 			}
 			builder.ServerType = serverType;
 			return builder;
 		}
 
-		public static FbConnectionStringBuilder BuildConnectionStringBuilder(FbServerType serverType, bool compression)
+		public static FbConnectionStringBuilder BuildConnectionStringBuilder(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 		{
 			var builder = new FbConnectionStringBuilder();
 			builder.UserID = FbTestsSetup.UserID;
 			builder.Password = FbTestsSetup.Password;
 			builder.DataSource = FbTestsSetup.DataSource;
-			builder.Database = FbTestsSetup.Database(serverType, compression);
+			builder.Database = FbTestsSetup.Database(serverType, compression, wireCrypt);
 			builder.Port = FbTestsSetup.Port;
 			builder.Charset = FbTestsSetup.Charset;
 			builder.Pooling = FbTestsSetup.Pooling;
-			builder.Compression = compression;
 			builder.ServerType = serverType;
+			builder.Compression = compression;
+			builder.WireCrypt = wireCrypt;
 			return builder;
 		}
 
@@ -226,7 +229,7 @@ end";
 
 		protected int GetActiveConnections()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = false;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
@@ -242,7 +245,7 @@ end";
 		protected Version GetServerVersion()
 		{
 			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, false);
+			server.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
 			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
 		}
 

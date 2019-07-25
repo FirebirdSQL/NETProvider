@@ -23,8 +23,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 {
 	public class FbParameterCollectionTests
 	{
-		#region Unit Tests
-
 		[Test]
 		public void AddTest()
 		{
@@ -128,7 +126,5 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			collection.Clear();
 			Assert.IsNull(parameter.Parent);
 		}
-
-		#endregion
 	}
 }

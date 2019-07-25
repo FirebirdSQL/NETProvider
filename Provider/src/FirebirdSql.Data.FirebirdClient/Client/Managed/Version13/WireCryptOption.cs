@@ -15,22 +15,12 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
-using FirebirdSql.Data.FirebirdClient;
-using FirebirdSql.Data.TestsBase;
-
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
+namespace FirebirdSql.Data.Client.Managed.Version13
 {
-	public abstract class EntityFrameworkCoreTestsBase : FbTestsBase
+	internal enum WireCryptOption
 	{
-		public EntityFrameworkCoreTestsBase()
-			: base(FbServerType.Default, false, FbWireCrypt.Enabled, false)
-		{ }
-
-		public TContext GetDbContext<TContext>() where TContext : FbTestDbContext
-		{
-			Connection.Close();
-			return (TContext)Activator.CreateInstance(typeof(TContext), Connection.ConnectionString);
-		}
+		Disabled,
+		Enabled,
+		Required,
 	}
 }

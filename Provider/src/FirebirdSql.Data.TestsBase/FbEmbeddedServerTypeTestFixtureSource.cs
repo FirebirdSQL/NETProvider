@@ -13,33 +13,18 @@
  *    All Rights Reserved.
  */
 
-//$Authors = @realic, Jiri Cincura (jiri@cincura.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
-using FirebirdSql.Data.Common;
+using System.Collections;
 using FirebirdSql.Data.FirebirdClient;
-using NUnit.Framework;
 
-namespace FirebirdSql.Data.UnitTests
+namespace FirebirdSql.Data.TestsBase
 {
-	public class ConnectionPoolLifetimeHelperTests
+	class FbEmbeddedServerTypeTestFixtureSource : IEnumerable
 	{
-		[Test]
-		public void IsAliveTrueIfLifetimeNotExceed()
+		public IEnumerator GetEnumerator()
 		{
-			var now = 1_000_000;
-			var timeAgo = now - (10 * 1000);
-			var isAlive = ConnectionPoolLifetimeHelper.IsAlive(20, timeAgo, now);
-			Assert.IsTrue(isAlive);
-		}
-
-		[Test]
-		public void IsAliveFalseIfLifetimeIsExceed()
-		{
-			var now = 1_000_000;
-			var timeAgo = now - (30 * 1000);
-			var isAlive = ConnectionPoolLifetimeHelper.IsAlive(20, timeAgo, now);
-			Assert.IsFalse(isAlive);
+			yield return new object[] { FbServerType.Embedded, default(bool), default(FbWireCrypt) };
 		}
 	}
 }

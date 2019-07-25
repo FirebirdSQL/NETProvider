@@ -65,12 +65,12 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					if (StatementType == DbStatementType.StoredProcedure)
 					{
 						numberOfResponses--;
-						sqlStoredProcedureResponse = _database.ReadSqlResponse();
+						sqlStoredProcedureResponse = _database.ReadResponse<SqlResponse>();
 						ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
 					}
 
 					numberOfResponses--;
-					var executeResponse = _database.ReadGenericResponse();
+					var executeResponse = _database.ReadResponse<GenericResponse>();
 					ProcessExecuteResponse(executeResponse);
 				}
 				finally
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					try
 					{
 						numberOfResponses--;
-						var rowsAffectedResponse = _database.ReadGenericResponse();
+						var rowsAffectedResponse = _database.ReadResponse<GenericResponse>();
 						RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(rowsAffectedResponse));
 					}
 					finally

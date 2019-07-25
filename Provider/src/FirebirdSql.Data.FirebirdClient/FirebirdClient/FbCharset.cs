@@ -20,7 +20,7 @@ using System;
 namespace FirebirdSql.Data.FirebirdClient
 {
 	[Serializable]
-	public enum FbCharset : int
+	public enum FbCharset
 	{
 		Default = -1,
 		None = 0,
@@ -59,6 +59,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		// Ukrainian KOI8U
 		Koi8U = 64,
 		// TIS-620 Thai character set, single byte (since Firebird 2.1)
-		TIS620 = 65
+		TIS620 = 65,
 	}
 }

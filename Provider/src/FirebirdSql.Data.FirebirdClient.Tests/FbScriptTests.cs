@@ -24,8 +24,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 {
 	public class FbScriptTests
 	{
-		#region Unit Tests
-
 		[Test]
 		public void NullScript()
 		{
@@ -299,7 +297,5 @@ foo
 			Assert.AreEqual(1, script.Results.Count());
 			Assert.AreEqual(SqlStatementType.Merge, script.Results[0].StatementType);
 		}
-
-		#endregion
 	}
 }

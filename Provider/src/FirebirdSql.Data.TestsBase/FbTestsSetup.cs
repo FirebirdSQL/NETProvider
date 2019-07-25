@@ -35,14 +35,14 @@ public class FbTestsSetup
 	internal const int PageSize = 16384;
 	internal const bool ForcedWrite = false;
 
-	private static HashSet<Tuple<FbServerType, bool>> _initalized = new HashSet<Tuple<FbServerType, bool>>();
+	private static HashSet<Tuple<FbServerType, bool, FbWireCrypt>> _initalized = new HashSet<Tuple<FbServerType, bool, FbWireCrypt>>();
 
-	public static void SetUp(FbServerType serverType, bool compression)
+	public static void SetUp(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 	{
-		var item = Tuple.Create(serverType, compression);
+		var item = Tuple.Create(serverType, compression, wireCrypt);
 		if (!_initalized.Contains(item))
 		{
-			var cs = FbTestsBase.BuildConnectionString(serverType, compression);
+			var cs = FbTestsBase.BuildConnectionString(serverType, compression, wireCrypt);
 			FbConnection.CreateDatabase(cs, PageSize, ForcedWrite, true);
 			CreateTables(cs);
 			CreateProcedures(cs);
@@ -51,9 +51,9 @@ public class FbTestsSetup
 		}
 	}
 
-	public static string Database(FbServerType serverType, bool compression)
+	public static string Database(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 	{
-		return $"{DatabaseBase}_{serverType}_{compression}.fdb";
+		return $"{DatabaseBase}_{serverType}_{compression}_{wireCrypt}.fdb";
 	}
 
 	[OneTimeTearDown]
@@ -62,7 +62,7 @@ public class FbTestsSetup
 		FbConnection.ClearAllPools();
 		foreach (var item in _initalized)
 		{
-			var cs = FbTestsBase.BuildConnectionString(item.Item1, item.Item2);
+			var cs = FbTestsBase.BuildConnectionString(item.Item1, item.Item2, item.Item3);
 			FbConnection.DropDatabase(cs);
 		}
 		_initalized.Clear();

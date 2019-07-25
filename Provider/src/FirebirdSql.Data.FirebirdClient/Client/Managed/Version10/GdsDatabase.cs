@@ -213,7 +213,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				SendAttachToBuffer(dpb, database);
 				XdrStream.Flush();
-				ProcessAttachResponse(ReadGenericResponse());
+				ProcessAttachResponse(ReadResponse<GenericResponse>());
 			}
 			catch (IscException)
 			{
@@ -281,7 +281,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				SendCreateToBuffer(dpb, database);
 				XdrStream.Flush();
-				ProcessCreateResponse(ReadGenericResponse());
+				ProcessCreateResponse(ReadResponse<GenericResponse>());
 			}
 			catch (IOException ex)
 			{
@@ -571,14 +571,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return response;
 		}
 
-		public virtual GenericResponse ReadGenericResponse()
+		public virtual TResponse ReadResponse<TResponse>() where TResponse : IResponse
 		{
-			return (GenericResponse)ReadResponse();
-		}
-
-		public virtual SqlResponse ReadSqlResponse()
-		{
-			return (SqlResponse)ReadResponse();
+			return (TResponse)ReadResponse();
 		}
 
 		public virtual void SetOperation(int operation)

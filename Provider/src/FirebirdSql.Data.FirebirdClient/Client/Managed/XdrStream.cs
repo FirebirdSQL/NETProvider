@@ -30,6 +30,12 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal class XdrStream : Stream
 	{
+		public Ionic.Zlib.ZlibCodec Deflate { private get; set; }
+		public Ionic.Zlib.ZlibCodec Inflate { private get; set; }
+
+		public Org.BouncyCastle.Crypto.Engines.RC4Engine CipherIn { private get; set; }
+		public Org.BouncyCastle.Crypto.Engines.RC4Engine CipherOut { private get; set; }
+
 		#region Constants
 
 		private const int PreferredBufferSize = 32 * 1024;
@@ -42,16 +48,13 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private Stream _innerStream;
 		private Charset _charset;
-		private bool _compression;
 		private bool _ownsStream;
 
 		private long _position;
-		private List<byte> _outputBuffer;
+		private Queue<byte> _outputBuffer;
 		private Queue<byte> _inputBuffer;
 		private byte[] _readBuffer;
 		private byte[] _smallBuffer;
-		private Ionic.Zlib.ZlibCodec _deflate;
-		private Ionic.Zlib.ZlibCodec _inflate;
 		private byte[] _compressionBuffer;
 
 		private bool _ioFailed;
@@ -105,32 +108,26 @@ namespace FirebirdSql.Data.Client.Managed
 		{ }
 
 		public XdrStream(Charset charset)
-			: this(new MemoryStream(), charset, false, true)
+			: this(new MemoryStream(), charset, true)
 		{ }
 
 		public XdrStream(byte[] buffer, Charset charset)
-			: this(new MemoryStream(buffer), charset, false, true)
+			: this(new MemoryStream(buffer), charset, true)
 		{ }
 
-		public XdrStream(Stream innerStream, Charset charset, bool compression, bool ownsStream)
+		public XdrStream(Stream innerStream, Charset charset, bool ownsStream)
 			: base()
 		{
 			_innerStream = innerStream;
 			_charset = charset;
-			_compression = compression;
 			_ownsStream = ownsStream;
 
 			_position = 0;
-			_outputBuffer = new List<byte>(PreferredBufferSize);
+			_outputBuffer = new Queue<byte>(PreferredBufferSize);
 			_inputBuffer = new Queue<byte>(PreferredBufferSize);
 			_readBuffer = new byte[PreferredBufferSize];
 			_smallBuffer = new byte[8];
-			if (_compression)
-			{
-				_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
-				_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
-				_compressionBuffer = new byte[CompressionBufferSize];
-			}
+			_compressionBuffer = new byte[CompressionBufferSize];
 
 			_ioFailed = false;
 			ResetOperation();
@@ -160,10 +157,14 @@ namespace FirebirdSql.Data.Client.Managed
 			var buffer = _outputBuffer.ToArray();
 			_outputBuffer.Clear();
 			var count = buffer.Length;
-			if (_compression)
+			if (Deflate != null)
 			{
 				count = HandleCompression(buffer, count);
 				buffer = _compressionBuffer;
+			}
+			if (CipherOut != null)
+			{
+				CipherOut.ProcessBytes(buffer, 0, count, buffer, 0);
 			}
 			try
 			{
@@ -219,7 +220,11 @@ namespace FirebirdSql.Data.Client.Managed
 				}
 				if (read != 0)
 				{
-					if (_compression)
+					if (CipherIn != null)
+					{
+						CipherIn.ProcessBytes(readBuffer, 0, read, readBuffer, 0);
+					}
+					if (Inflate != null)
 					{
 						read = HandleDecompression(readBuffer, read);
 						readBuffer = _compressionBuffer;
@@ -252,7 +257,11 @@ namespace FirebirdSql.Data.Client.Managed
 				}
 				if (read != 0)
 				{
-					if (_compression)
+					if (CipherIn != null)
+					{
+						CipherIn.ProcessBytes(readBuffer, 0, read, readBuffer, 0);
+					}
+					if (Inflate != null)
 					{
 						read = HandleDecompression(readBuffer, read);
 						readBuffer = _compressionBuffer;
@@ -270,7 +279,7 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureWritable();
 
-			_outputBuffer.Add(value);
+			_outputBuffer.Enqueue(value);
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
@@ -278,7 +287,10 @@ namespace FirebirdSql.Data.Client.Managed
 			CheckDisposed();
 			EnsureWritable();
 
-			_outputBuffer.AddRange(new ArraySegment<byte>(buffer, offset, count));
+			for (var i = offset; i < offset + count; i++)
+			{
+				_outputBuffer.Enqueue(buffer[i]);
+			}
 		}
 
 		public byte[] ToArray()
@@ -744,34 +756,34 @@ namespace FirebirdSql.Data.Client.Managed
 
 		private int HandleDecompression(byte[] buffer, int count)
 		{
-			_inflate.OutputBuffer = _compressionBuffer;
-			_inflate.AvailableBytesOut = _compressionBuffer.Length;
-			_inflate.NextOut = 0;
-			_inflate.InputBuffer = buffer;
-			_inflate.AvailableBytesIn = count;
-			_inflate.NextIn = 0;
-			var rc = _inflate.Inflate(Ionic.Zlib.FlushType.None);
+			Inflate.OutputBuffer = _compressionBuffer;
+			Inflate.AvailableBytesOut = _compressionBuffer.Length;
+			Inflate.NextOut = 0;
+			Inflate.InputBuffer = buffer;
+			Inflate.AvailableBytesIn = count;
+			Inflate.NextIn = 0;
+			var rc = Inflate.Inflate(Ionic.Zlib.FlushType.None);
 			if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
 				throw new IOException($"Error '{rc}' while decompressing the data.");
-			if (_inflate.AvailableBytesIn != 0)
+			if (Inflate.AvailableBytesIn != 0)
 				throw new IOException("Decompression buffer too small.");
-			return _inflate.NextOut;
+			return Inflate.NextOut;
 		}
 
 		private int HandleCompression(byte[] buffer, int count)
 		{
-			_deflate.OutputBuffer = _compressionBuffer;
-			_deflate.AvailableBytesOut = _compressionBuffer.Length;
-			_deflate.NextOut = 0;
-			_deflate.InputBuffer = buffer;
-			_deflate.AvailableBytesIn = count;
-			_deflate.NextIn = 0;
-			var rc = _deflate.Deflate(Ionic.Zlib.FlushType.Sync);
+			Deflate.OutputBuffer = _compressionBuffer;
+			Deflate.AvailableBytesOut = _compressionBuffer.Length;
+			Deflate.NextOut = 0;
+			Deflate.InputBuffer = buffer;
+			Deflate.AvailableBytesIn = count;
+			Deflate.NextIn = 0;
+			var rc = Deflate.Deflate(Ionic.Zlib.FlushType.Sync);
 			if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
 				throw new IOException($"Error '{rc}' while compressing the data.");
-			if (_deflate.AvailableBytesIn != 0)
+			if (Deflate.AvailableBytesIn != 0)
 				throw new IOException("Compression buffer too small.");
-			return _deflate.NextOut;
+			return Deflate.NextOut;
 		}
 
 		private readonly static byte[] PadArray = new byte[] { 0, 0, 0, 0 };

@@ -171,5 +171,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var cs = new FbConnectionString(ConnectionString);
 			Assert.AreEqual("aaa", cs.CryptKey);
 		}
+
+		[Test]
+		public void WireCryptMixedCase()
+		{
+			const string ConnectionString = "wire crYpt=reQUIREd";
+			var cs = new FbConnectionString(ConnectionString);
+			Assert.AreEqual(FbWireCrypt.Required, cs.WireCrypt);
+		}
 	}
 }

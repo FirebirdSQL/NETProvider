@@ -239,16 +239,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					SendAllocateToBuffer();
 					_database.XdrStream.Flush();
-					ProcessAllocateResponce(_database.ReadGenericResponse());
+					ProcessAllocateResponce(_database.ReadResponse<GenericResponse>());
 				}
 
 				SendPrepareToBuffer(commandText);
 				_database.XdrStream.Flush();
-				ProcessPrepareResponse(_database.ReadGenericResponse());
+				ProcessPrepareResponse(_database.ReadResponse<GenericResponse>());
 
 				SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 				_database.XdrStream.Flush();
-				_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
+				_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>()));
 
 
 				_state = StatementState.Prepared;
@@ -280,10 +280,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				if (_statementType == DbStatementType.StoredProcedure)
 				{
-					ProcessStoredProcedureExecuteResponse(_database.ReadSqlResponse());
+					ProcessStoredProcedureExecuteResponse(_database.ReadResponse<SqlResponse>());
 				}
 
-				var executeResponse = _database.ReadGenericResponse();
+				var executeResponse = _database.ReadResponse<GenericResponse>();
 				ProcessExecuteResponse(executeResponse);
 
 				if (ReturnRecordsAffected &&
@@ -294,7 +294,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 					_database.XdrStream.Flush();
-					RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(_database.ReadGenericResponse()));
+					RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>()));
 				}
 
 				_state = StatementState.Executed;
@@ -439,7 +439,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			DoInfoSqlPacket(items, bufferLength);
 			_database.XdrStream.Flush();
-			return ProcessInfoSqlResponse(_database.ReadGenericResponse());
+			return ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>());
 		}
 
 		protected void DoInfoSqlPacket(byte[] items, int bufferLength)

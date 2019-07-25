@@ -51,5 +51,20 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var b = new FbConnectionStringBuilder("CryptKey=dGVzdA==");
 			Assert.AreEqual("test", Encoding.ASCII.GetString(b.CryptKey));
 		}
+
+		[Test]
+		public void WireCryptSetter()
+		{
+			var b = new FbConnectionStringBuilder();
+			b.WireCrypt = FbWireCrypt.Disabled;
+			Assert.AreEqual("wire crypt=Disabled", b.ToString());
+		}
+
+		[Test]
+		public void WireCryptGetter()
+		{
+			var b = new FbConnectionStringBuilder("wire crypt=required");
+			Assert.AreEqual(FbWireCrypt.Required, b.WireCrypt);
+		}
 	}
 }

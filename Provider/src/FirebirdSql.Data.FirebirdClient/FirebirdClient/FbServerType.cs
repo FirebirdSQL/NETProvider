@@ -13,15 +13,16 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez
+//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	public enum FbServerType : int
+	[Serializable]
+	public enum FbServerType
 	{
-		Default		= 0,
-		Embedded    = 1,
+		Default = 0,
+		Embedded = 1,
 	}
 }

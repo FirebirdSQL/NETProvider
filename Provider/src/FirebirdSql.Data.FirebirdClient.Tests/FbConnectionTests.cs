@@ -26,15 +26,14 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[FbTestFixture(FbServerType.Default, false)]
-	[FbTestFixture(FbServerType.Default, true)]
-	[FbTestFixture(FbServerType.Embedded, default)]
+	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
+	[TestFixtureSource(typeof(FbEmbeddedServerTypeTestFixtureSource))]
 	public class FbConnectionTests : FbTestsBase
 	{
 		#region Constructors
 
-		public FbConnectionTests(FbServerType serverType, bool compression)
-			: base(serverType, compression)
+		public FbConnectionTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+			: base(serverType, compression, wireCrypt)
 		{ }
 
 		#endregion
@@ -74,7 +73,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void BeginTransactionNoWaitTimeoutTest()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression, WireCrypt)))
 			{
 				conn.Open();
 				var tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = null });
@@ -86,7 +85,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutTest()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression, WireCrypt)))
 			{
 				conn.Open();
 				var tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromSeconds(10) });
@@ -98,7 +97,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutInvalidValue1Test()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression, WireCrypt)))
 			{
 				conn.Open();
 				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromDays(9999) }));
@@ -108,7 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void BeginTransactionWithWaitTimeoutInvalidValue2Test()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression, WireCrypt)))
 			{
 				conn.Open();
 				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromMilliseconds(1) }));
@@ -127,7 +126,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ConnectionPoolingOnTest()
 		{
 			FbConnection.ClearAllPools();
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			var cs = csb.ToString();
@@ -151,7 +150,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ConnectionPoolingOffTest()
 		{
 			FbConnection.ClearAllPools();
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = false;
 			csb.ConnectionLifeTime = 5;
 			var cs = csb.ToString();
@@ -175,7 +174,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ConnectionPoolingLifetimeTest()
 		{
 			FbConnection.ClearAllPools();
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			var cs = csb.ToString();
@@ -200,7 +199,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ConnectionPoolingMaxPoolSizeTest()
 		{
 			FbConnection.ClearAllPools();
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 120;
 			csb.MaxPoolSize = 10;
@@ -232,7 +231,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void ConnectionPoolingMinPoolSizeTest()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			csb.MinPoolSize = 3;
@@ -262,7 +261,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void NoDatabaseTriggersWrongConnectionStringTest()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = true;
 			csb.NoDatabaseTriggers = true;
 			Assert.Throws<ArgumentException>(() => new FbConnection(csb.ToString()));
@@ -271,7 +270,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DatabaseTriggersTest()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = false;
 
 			int rows;
@@ -301,7 +300,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UserIDCorrectlyPassedToServer()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression, WireCrypt)))
 			{
 				conn.Open();
 				using (var command = conn.CreateCommand())
@@ -317,10 +316,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void UseTrustedAuth()
 		{
+			if (WireCrypt == FbWireCrypt.Required)
+				return;
 			if (!EnsureServerType(FbServerType.Default))
 				return;
 
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.UserID = string.Empty;
 			csb.Password = string.Empty;
 			using (var conn = new FbConnection(csb.ToString()))
@@ -329,16 +330,55 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
-		[TestCase(false)]
-		[TestCase(true)]
-		public void UseCompression(bool compression)
+		[Test]
+		public void CreateDropDatabaseUsingTrustedAuth()
 		{
-			if (!EnsureVersion(new Version("3.0.0.0")))
+			if (WireCrypt == FbWireCrypt.Required)
 				return;
 			if (!EnsureServerType(FbServerType.Default))
 				return;
 
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			if (GetServerVersion() >= new Version(3, 0, 0, 0))
+			{
+				using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = "create or alter global mapping admin_trusted_auth using plugin win_sspi from any user to role rdb$admin";
+					cmd.ExecuteNonQuery();
+				}
+			}
+			try
+			{
+				var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
+				csb.UserID = string.Empty;
+				csb.Password = string.Empty;
+				csb.Database = $"{Guid.NewGuid().ToString()}.fdb";
+				var cs = csb.ToString();
+				Assert.DoesNotThrow(() => FbConnection.CreateDatabase(cs, true));
+				Assert.DoesNotThrow(() => FbConnection.DropDatabase(cs));
+			}
+			finally
+			{
+				if (GetServerVersion() >= new Version(3, 0, 0, 0))
+				{
+					using (var cmd = Connection.CreateCommand())
+					{
+						cmd.CommandText = "drop global mapping admin_trusted_auth";
+						cmd.ExecuteNonQuery();
+					}
+				}
+			}
+		}
+
+		[TestCase(false)]
+		[TestCase(true)]
+		public void UseCompression(bool compression)
+		{
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+				return;
+			if (!EnsureServerType(FbServerType.Default))
+				return;
+
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Compression = compression;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
@@ -355,10 +395,37 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
+		[TestCase(FbWireCrypt.Disabled)]
+		[TestCase(FbWireCrypt.Enabled)]
+		[TestCase(FbWireCrypt.Required)]
+		public void UseWireCrypt(FbWireCrypt wireCrypt)
+		{
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+				return;
+			if (!EnsureServerType(FbServerType.Default))
+				return;
+
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
+			csb.WireCrypt = wireCrypt;
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				conn.Open();
+				const string Pattern = ":[^:]*C[^:]*$";
+				if (wireCrypt == FbWireCrypt.Enabled || wireCrypt == FbWireCrypt.Required)
+				{
+					StringAssert.IsMatch(Pattern, conn.ServerVersion);
+				}
+				else
+				{
+					StringAssert.DoesNotMatch(Pattern, conn.ServerVersion);
+				}
+			}
+		}
+
 		[Test, Explicit]
 		public void PassCryptKey()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Database = "enc.fdb";
 			void Test()
 			{
@@ -375,7 +442,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test, Explicit]
 		public void DoNotGoBackToPoolAfterBroken()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression);
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
 			csb.Pooling = true;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
@@ -404,10 +471,10 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void CaseSensitiveLogin()
 		{
-			if (!EnsureVersion(new Version("3.0.0.0")))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
-			var connectionString = BuildConnectionString(FbServerType, Compression);
+			var connectionString = BuildConnectionString(FbServerType, Compression, WireCrypt);
 			using (var conn = new FbConnection(connectionString))
 			{
 				conn.Open();
@@ -441,43 +508,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
-		[Test]
-		public void CreateDropDatabaseUsingTrustedAuth()
-		{
-			if (!EnsureServerType(FbServerType.Default))
-				return;
-
-			if (GetServerVersion() >= new Version("3.0.0.0"))
-			{
-				using (var cmd = Connection.CreateCommand())
-				{
-					cmd.CommandText = "create or alter global mapping admin_trusted_auth using plugin win_sspi from any user to role rdb$admin";
-					cmd.ExecuteNonQuery();
-				}
-			}
-			try
-			{
-				var csb = BuildConnectionStringBuilder(FbServerType, Compression);
-				csb.UserID = string.Empty;
-				csb.Password = string.Empty;
-				csb.Database = $"{Guid.NewGuid().ToString()}.fdb";
-				var cs = csb.ToString();
-				Assert.DoesNotThrow(() => FbConnection.CreateDatabase(cs, true));
-				Assert.DoesNotThrow(() => FbConnection.DropDatabase(cs));
-			}
-			finally
-			{
-				if (GetServerVersion() >= new Version("3.0.0.0"))
-				{
-					using (var cmd = Connection.CreateCommand())
-					{
-						cmd.CommandText = "drop global mapping admin_trusted_auth";
-						cmd.ExecuteNonQuery();
-					}
-				}
-			}
-		}
-
 		#endregion
 
 		#region Methods
@@ -496,7 +526,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 		private void BeginTransactionILTestsHelper(IsolationLevel level)
 		{
-			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression)))
+			using (var conn = new FbConnection(BuildConnectionString(FbServerType, Compression, WireCrypt)))
 			{
 				conn.Open();
 				var tx = conn.BeginTransaction(level);
