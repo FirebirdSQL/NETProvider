@@ -50,16 +50,12 @@ namespace FirebirdSql.Data.Common
 
 		public static Charset GetCharset(int charsetId)
 		{
-			if (charsetsById.TryGetValue(charsetId, out var value))
-				return value;
-			return null;
+			return charsetsById.TryGetValue(charsetId, out var value) ? value : null;
 		}
 
 		public static Charset GetCharset(string charsetName)
 		{
-			if (charsetsByName.TryGetValue(charsetName, out var value))
-				return value;
-			return null;
+			return charsetsByName.TryGetValue(charsetName, out var value) ? value : null;
 		}
 
 		private static List<Charset> GetSupportedCharsets()
