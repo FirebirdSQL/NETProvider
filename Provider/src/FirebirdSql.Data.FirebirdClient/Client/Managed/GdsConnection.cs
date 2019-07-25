@@ -331,7 +331,6 @@ namespace FirebirdSql.Data.Client.Managed
 			srp = null;
 			sspi = null;
 
-#warning Refactor to new XdrStream
 			using (var result = new MemoryStream())
 			{
 				var userString = Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER") ?? string.Empty;
