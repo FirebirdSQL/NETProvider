@@ -16,7 +16,7 @@ Read more:
 
 | Builds | Status |
 |--------|--------|
-| [TeamCity](https://teamcity.jetbrains.com/project.html?projectId=OpenSourceProjects_FirebirdClient) | ![TeamCity](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_ProviderFb30Default.svg) ![TeamCity](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_EFCoreFb30Default.svg) ![TeamCity](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_Ef6fb30Default.svg) ![TeamCity](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_ProviderFb25sc.svg) ![TeamCity](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_EFCoreFb25sc.svg) ![TeamCity](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_Ef6fb25sc.svg) |
+| [TeamCity](https://teamcity.jetbrains.com/project.html?projectId=OpenSourceProjects_FirebirdClient) | ![TeamCity](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/OpenSourceProjects_FirebirdClient_CiBuild.svg) |
 | [Azure Pipelines](https://dev.azure.com/FirebirdClient/CI/_build) | ![Azure Pipelines](https://img.shields.io/azure-devops/build/FirebirdClient/CI/8.svg) |
 | [AppVeyor](https://ci.appveyor.com/project/cincura_net/firebirdsql-data-firebirdclient/history) | ![AppVeyor](https://img.shields.io/appveyor/ci/cincura_net/firebirdsql-data-firebirdclient/master.svg) |
 
