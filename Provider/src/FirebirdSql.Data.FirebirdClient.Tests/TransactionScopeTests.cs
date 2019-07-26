@@ -17,7 +17,6 @@
 
 using System;
 using System.Transactions;
-using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 

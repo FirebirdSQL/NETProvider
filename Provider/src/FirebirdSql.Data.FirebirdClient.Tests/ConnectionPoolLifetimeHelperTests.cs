@@ -15,9 +15,7 @@
 
 //$Authors = @realic, Jiri Cincura (jiri@cincura.net)
 
-using System;
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.UnitTests

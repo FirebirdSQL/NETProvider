@@ -17,7 +17,6 @@
 
 using System.Globalization;
 using System.Threading;
-using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests

@@ -18,7 +18,6 @@
 using System;
 using System.Data;
 using System.Text;
-using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 

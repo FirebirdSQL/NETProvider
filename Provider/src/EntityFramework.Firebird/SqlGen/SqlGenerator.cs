@@ -17,13 +17,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using System.Data.Common;
-using System.Data.Entity.Core.Metadata.Edm;
-using System.Data.Entity.Core.Common.CommandTrees;
-using System.Data;
 using FirebirdSql.Data.Common;
 
 namespace EntityFramework.Firebird.SqlGen

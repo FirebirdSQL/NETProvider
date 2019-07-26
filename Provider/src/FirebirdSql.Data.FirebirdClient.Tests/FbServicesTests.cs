@@ -436,7 +436,7 @@ end";
 			validationSvc.TablesInclude = "_*";
 			validationSvc.TablesExclude = "X*";
 			validationSvc.IndicesInclude = "_*";
-			validationSvc.IndicesExclude= "X*";
+			validationSvc.IndicesExclude = "X*";
 			validationSvc.LockTimeout = 6;
 
 			validationSvc.ServiceOutput += ServiceOutput;

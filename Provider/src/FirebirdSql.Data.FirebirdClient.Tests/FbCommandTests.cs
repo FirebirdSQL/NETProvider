@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Threading;
-using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 

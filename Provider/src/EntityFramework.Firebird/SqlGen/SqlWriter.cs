@@ -26,8 +26,8 @@ namespace EntityFramework.Firebird.SqlGen
 		#region Fields
 
 		// We start at -1, since the first select statement will increment it to 0.
-		private int     _indent              = -1;
-		private bool    _atBeginningOfLine   = true;
+		private int _indent = -1;
+		private bool _atBeginningOfLine = true;
 
 		#endregion
 

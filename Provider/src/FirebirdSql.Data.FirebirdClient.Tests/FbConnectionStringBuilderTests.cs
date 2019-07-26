@@ -16,7 +16,6 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Text;
-using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests

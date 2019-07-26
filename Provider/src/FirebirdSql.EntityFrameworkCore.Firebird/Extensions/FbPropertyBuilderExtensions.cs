@@ -24,7 +24,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace Microsoft.EntityFrameworkCore
 {
 	public static class FbPropertyBuilderExtensions
-    {
+	{
 		public static PropertyBuilder UseFirebirdIdentityColumn(this PropertyBuilder propertyBuilder)
 		{
 			GetFbInternalBuilder(propertyBuilder).ValueGenerationStrategy(FbValueGenerationStrategy.IdentityColumn);

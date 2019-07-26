@@ -16,7 +16,6 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
@@ -38,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void DNET532_CheckCultureAwareIndexOf()
 		{
 			var curCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-            try
+			try
 			{
 				System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("tr-TR");
 				var command = new FbCommand();
@@ -52,7 +51,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			finally
 			{
 				System.Threading.Thread.CurrentThread.CurrentCulture = curCulture;
-            }
+			}
 		}
 
 		[Test]

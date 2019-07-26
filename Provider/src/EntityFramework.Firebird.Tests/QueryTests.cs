@@ -15,10 +15,8 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Core.Common;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;

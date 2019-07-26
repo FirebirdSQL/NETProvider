@@ -22,7 +22,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Operations;
-using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
