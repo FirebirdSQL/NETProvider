@@ -47,7 +47,6 @@ namespace FirebirdSql.Data.Client.Native
 		private Charset _charset;
 		private short _packetSize;
 		private short _dialect;
-		private bool _disposed;
 		private IntPtr[] _statusVector;
 
 		private IFbClient _fbClient;
@@ -122,27 +121,6 @@ namespace FirebirdSql.Data.Client.Native
 			_dialect = 3;
 			_packetSize = 8192;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-		}
-
-		#endregion
-
-		#region IDisposable methods
-
-		public void Dispose()
-		{
-			if (!_disposed)
-			{
-				_disposed = true;
-				Detach();
-				_warningMessage = null;
-				_charset = null;
-				_serverVersion = null;
-				_statusVector = null;
-				_transactionCount = 0;
-				_dialect = 0;
-				_handle.Dispose();
-				_packetSize = 0;
-			}
 		}
 
 		#endregion
@@ -251,6 +229,14 @@ namespace FirebirdSql.Data.Client.Native
 
 				_handle.Dispose();
 			}
+
+			_warningMessage = null;
+			_charset = null;
+			_serverVersion = null;
+			_statusVector = null;
+			_transactionCount = 0;
+			_dialect = 0;
+			_packetSize = 0;
 		}
 
 		#endregion

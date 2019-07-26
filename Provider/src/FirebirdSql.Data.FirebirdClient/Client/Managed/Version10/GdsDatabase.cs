@@ -58,7 +58,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected string _serverVersion;
 		private short _packetSize;
 		private short _dialect;
-		private bool _disposed;
 		private XdrStream _xdrStream;
 
 		#endregion
@@ -142,69 +141,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region IDisposable methods
-
-		public void Dispose()
-		{
-			if (!_disposed)
-			{
-				_disposed = true;
-
-				if (TransactionCount > 0)
-				{
-					throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
-				}
-
-				try
-				{
-					CloseEventManager();
-
-					var detach = _handle != -1;
-					if (detach)
-					{
-						XdrStream.Write(IscCodes.op_detach);
-						XdrStream.Write(_handle);
-					}
-					XdrStream.Write(IscCodes.op_disconnect);
-					XdrStream.Flush();
-					if (detach)
-					{
-						ReadResponse();
-					}
-
-					CloseConnection();
-					_xdrStream?.Dispose();
-				}
-				catch (IOException ex)
-				{
-					try
-					{
-						CloseConnection();
-					}
-					catch (IOException ex2)
-					{
-						throw IscException.ForErrorCode(IscCodes.isc_network_error, ex2);
-					}
-					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
-				}
-				finally
-				{
-					_xdrStream = null;
-					_connection = null;
-					_charset = null;
-					_eventManager = null;
-					_serverVersion = null;
-					_dialect = 0;
-					_handle = -1;
-					_packetSize = 0;
-					_warningMessage = null;
-					_transactionCount = 0;
-				}
-			}
-		}
-
-		#endregion
-
 		#region Attach/Detach Methods
 
 		public virtual void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
@@ -258,7 +194,56 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual void Detach()
 		{
-			Dispose();
+			if (TransactionCount > 0)
+			{
+				throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
+			}
+
+			try
+			{
+				CloseEventManager();
+
+				var detach = _handle != -1;
+				if (detach)
+				{
+					XdrStream.Write(IscCodes.op_detach);
+					XdrStream.Write(_handle);
+				}
+				XdrStream.Write(IscCodes.op_disconnect);
+				XdrStream.Flush();
+				if (detach)
+				{
+					ReadResponse();
+				}
+
+				CloseConnection();
+				_xdrStream?.Dispose();
+			}
+			catch (IOException ex)
+			{
+				try
+				{
+					CloseConnection();
+				}
+				catch (IOException ex2)
+				{
+					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex2);
+				}
+				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+			}
+			finally
+			{
+				_xdrStream = null;
+				_connection = null;
+				_charset = null;
+				_eventManager = null;
+				_serverVersion = null;
+				_dialect = 0;
+				_handle = -1;
+				_packetSize = 0;
+				_warningMessage = null;
+				_transactionCount = 0;
+			}
 		}
 
 		protected void SafelyDetach()

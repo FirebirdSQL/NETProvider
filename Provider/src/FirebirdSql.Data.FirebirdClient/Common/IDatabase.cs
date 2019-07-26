@@ -21,7 +21,7 @@ using System.Data;
 
 namespace FirebirdSql.Data.Common
 {
-	internal interface IDatabase : IDisposable
+	internal interface IDatabase
 	{
 		Action<IscException> WarningMessage { get; set; }
 
