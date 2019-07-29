@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			try
 			{
-				IPAddress = GetIPAddress(_dataSource, AddressFamily.InterNetwork);
+				IPAddress = GetIPAddress(_dataSource);
 				var endPoint = new IPEndPoint(IPAddress, _portNumber);
 
 				var socket = new Socket(IPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -302,7 +302,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Private Methods
 
-		private IPAddress GetIPAddress(string dataSource, AddressFamily addressFamily)
+		private IPAddress GetIPAddress(string dataSource)
 		{
 			if (IPAddress.TryParse(dataSource, out var ipaddress))
 			{
@@ -317,12 +317,12 @@ namespace FirebirdSql.Data.Client.Managed
 
 			foreach (var address in addresses)
 			{
-				if (address.AddressFamily == addressFamily)
+				// IPv4 priority
+				if (address.AddressFamily == AddressFamily.InterNetwork)
 				{
 					return address;
 				}
 			}
-
 			return addresses[0];
 		}
 
