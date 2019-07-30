@@ -25,10 +25,7 @@ using FirebirdSql.Data.Common;
 namespace FirebirdSql.Data.FirebirdClient
 {
 	[DefaultEvent("InfoMessage")]
-	public sealed class FbConnection : DbConnection
-#if !NETSTANDARD1_6
-		, ICloneable
-#endif
+	public sealed class FbConnection : DbConnection, ICloneable
 	{
 		#region Static Pool Handling Methods
 
@@ -154,9 +151,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Properties
 
 		[Category("Data")]
-#if !NETSTANDARD1_6
 		[SettingsBindable(true)]
-#endif
 		[RefreshProperties(RefreshProperties.All)]
 		[DefaultValue("")]
 		public override string ConnectionString
@@ -252,12 +247,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Protected Properties
 
-#if !NETSTANDARD1_6
 		protected override DbProviderFactory DbProviderFactory
 		{
 			get { return FirebirdClientFactory.Instance; }
 		}
-#endif
 
 		#endregion
 
@@ -302,11 +295,8 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 
 		#region ICloneable Methods
-#if NETSTANDARD1_6
-		internal object Clone()
-#else
+
 		object ICloneable.Clone()
-#endif
 		{
 			return new FbConnection(ConnectionString);
 		}
@@ -367,7 +357,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Database Schema Methods
 
-#if !NETSTANDARD1_6
 		public override DataTable GetSchema()
 		{
 			return GetSchema("MetaDataCollections");
@@ -384,7 +373,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return _innerConnection.GetSchema(collectionName, restrictions);
 		}
-#endif
 
 		#endregion
 
@@ -452,7 +440,6 @@ namespace FirebirdSql.Data.FirebirdClient
 					_innerConnection.Connect();
 				}
 
-#if !NETSTANDARD1_6
 				if (_options.Enlist)
 				{
 					try
@@ -481,7 +468,6 @@ namespace FirebirdSql.Data.FirebirdClient
 						throw;
 					}
 				}
-#endif
 
 				// Bind	Warning	messages event
 				_innerConnection.Database.WarningMessage = OnWarningMessage;

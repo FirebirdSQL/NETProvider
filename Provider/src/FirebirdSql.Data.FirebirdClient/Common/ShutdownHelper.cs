@@ -29,10 +29,8 @@ namespace FirebirdSql.Data.Common
 		{
 			_pools = new ConcurrentBag<Action>();
 			_fbClients = new ConcurrentBag<Action>();
-#if !NETSTANDARD1_6
 			AppDomain.CurrentDomain.DomainUnload += (sender, e) => HandleDomainUnload();
 			AppDomain.CurrentDomain.ProcessExit += (sender, e) => HandleProcessShutdown();
-#endif
 		}
 
 		internal static void RegisterPoolCleanup(Action item)

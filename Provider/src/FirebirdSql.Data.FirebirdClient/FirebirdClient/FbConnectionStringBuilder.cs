@@ -41,9 +41,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Category("Security")]
 		[DisplayName("Password")]
 		[Description("Indicates the password to be used when connecting to the data source.")]
-#if !NETSTANDARD1_6
 		[PasswordPropertyText(true)]
-#endif
 		[DefaultValue(Common.ConnectionString.DefaultValuePassword)]
 		public string Password
 		{

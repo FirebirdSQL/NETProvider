@@ -29,12 +29,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Properties
 
-#if !NETSTANDARD1_6
 		public override bool CanCreateDataSourceEnumerator
 		{
 			get { return false; }
 		}
-#endif
 
 		#endregion
 
@@ -53,12 +51,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbCommand();
 		}
 
-#if !NETSTANDARD1_6
 		public override DbCommandBuilder CreateCommandBuilder()
 		{
 			return new FbCommandBuilder();
 		}
-#endif
 
 		public override DbConnection CreateConnection()
 		{
@@ -70,12 +66,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbConnectionStringBuilder();
 		}
 
-#if !NETSTANDARD1_6
 		public override DbDataAdapter CreateDataAdapter()
 		{
 			return new FbDataAdapter();
 		}
-#endif
 
 		public override DbParameter CreateParameter()
 		{

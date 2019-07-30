@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net452;netstandard1.6;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
 		<AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
 		<RootNamespace>FirebirdSql.Data</RootNamespace>
 		<SignAssembly>true</SignAssembly>
@@ -37,21 +37,6 @@
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
 		<Reference Include="System.Transactions" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
-		<PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
-		<PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
-		<PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-		<PackageReference Include="System.Data.Common" Version="4.3.0" />
-		<PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
-		<PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
-		<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-		<PackageReference Include="System.IO.UnmanagedMemoryStream" Version="4.3.0" />
-		<PackageReference Include="System.Linq.Parallel" Version="4.3.0" />
-		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-		<PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
-		<PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
 		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />

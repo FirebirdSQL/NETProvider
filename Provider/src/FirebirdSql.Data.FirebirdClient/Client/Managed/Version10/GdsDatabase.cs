@@ -173,7 +173,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			XdrStream.WriteBuffer(Encoding2.Default.GetBytes(database));
+			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 
@@ -282,7 +282,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			XdrStream.WriteBuffer(Encoding2.Default.GetBytes(database));
+			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));
 			XdrStream.WriteBuffer(dpb.ToArray());
 		}
 

@@ -15,7 +15,6 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
-#if !NETSTANDARD1_6
 using System;
 using System.Data;
 using System.Globalization;
@@ -148,4 +147,3 @@ namespace FirebirdSql.Data.Schema
 		#endregion
 	}
 }
-#endif

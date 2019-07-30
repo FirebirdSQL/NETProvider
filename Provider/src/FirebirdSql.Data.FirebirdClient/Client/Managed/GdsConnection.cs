@@ -309,12 +309,7 @@ namespace FirebirdSql.Data.Client.Managed
 				return ipaddress;
 			}
 
-#if NETSTANDARD1_6
-			var addresses = Dns.GetHostEntryAsync(dataSource).GetAwaiter().GetResult().AddressList;
-#else
 			var addresses = Dns.GetHostEntry(dataSource).AddressList;
-#endif
-
 			foreach (var address in addresses)
 			{
 				// IPv4 priority

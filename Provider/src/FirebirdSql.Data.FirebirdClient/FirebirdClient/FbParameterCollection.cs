@@ -29,9 +29,7 @@ using System.Collections;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-#if !NETSTANDARD1_6
 	[ListBindable(false)]
-#endif
 	public sealed class FbParameterCollection : DbParameterCollection
 	{
 		#region Fields
@@ -70,26 +68,20 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _parameters.Count; }
 		}
 
-#if !NETSTANDARD1_6
 		public override bool IsFixedSize
 		{
 			get { return ((IList)_parameters).IsFixedSize; }
 		}
-#endif
 
-#if !NETSTANDARD1_6
 		public override bool IsReadOnly
 		{
 			get { return ((IList)_parameters).IsReadOnly; }
 		}
-#endif
 
-#if !NETSTANDARD1_6
 		public override bool IsSynchronized
 		{
 			get { return ((ICollection)_parameters).IsSynchronized; }
 		}
-#endif
 
 		public override object SyncRoot
 		{

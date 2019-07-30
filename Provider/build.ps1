@@ -30,7 +30,6 @@ function Build() {
 
 function Pack() {
 	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$version-net452.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net452\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net452\FirebirdSql.Data.FirebirdClient.pdb | Out-Null
-	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$version-netstandard1.6.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\netstandard1.6\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\netstandard1.6\FirebirdSql.Data.FirebirdClient.pdb | Out-Null
 	7z a -mx=9 $outDir\FirebirdSql.Data.FirebirdClient-$version-netstandard2.0.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\netstandard2.0\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\netstandard2.0\FirebirdSql.Data.FirebirdClient.pdb | Out-Null
 
 	7z a -mx=9 $outDir\EntityFramework.Firebird-$version-net452.7z $baseDir\src\EntityFramework.Firebird\bin\$Configuration\net452\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\$Configuration\net452\EntityFramework.Firebird.pdb | Out-Null

@@ -38,9 +38,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Fields
 
-#if !NETSTANDARD1_6
 		private DataTable _schemaTable;
-#endif
 		private FbCommand _command;
 		private FbConnection _connection;
 		private DbValue[] _row;
@@ -143,12 +141,10 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region DbDataReader overriden methods
 
-#if !NETSTANDARD1_6
 		public override void Close()
 		{
 			Dispose();
 		}
-#endif
 
 		protected override void Dispose(bool disposing)
 		{
@@ -177,9 +173,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					_command = null;
 					_connection = null;
 					_row = null;
-#if !NETSTANDARD1_6
 					_schemaTable = null;
-#endif
 					_fields = null;
 				}
 			}
@@ -218,7 +212,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			return retValue;
 		}
 
-#if !NETSTANDARD1_6
 		public override DataTable GetSchemaTable()
 		{
 			CheckState();
@@ -329,7 +322,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return _schemaTable;
 		}
-#endif
 
 		public override int GetOrdinal(string name)
 		{
@@ -739,7 +731,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			return false;
 		}
 
-#if !NETSTANDARD1_6
 		private static DataTable GetSchemaTableStructure()
 		{
 			var schema = new DataTable("Schema");
@@ -796,7 +787,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return sql;
 		}
-#endif
 
 		private static T CheckedGetValue<T>(Func<T> f)
 		{

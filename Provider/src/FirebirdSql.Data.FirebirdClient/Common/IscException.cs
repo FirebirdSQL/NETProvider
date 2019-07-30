@@ -22,9 +22,7 @@ using System.Text;
 using System.Reflection;
 using System.Resources;
 using System.Linq;
-#if !NETSTANDARD1_6
 using System.Runtime.Serialization;
-#endif
 
 namespace FirebirdSql.Data.Common
 {
@@ -113,14 +111,12 @@ namespace FirebirdSql.Data.Common
 			return result;
 		}
 
-#if !NETSTANDARD1_6
 		private IscException(SerializationInfo info, StreamingContext context)
 				: base(info, context)
 		{
 			Errors = (List<IscError>)info.GetValue(nameof(Errors), typeof(List<IscError>));
 			ErrorCode = info.GetInt32(nameof(ErrorCode));
 		}
-#endif
 
 		public void BuildExceptionData()
 		{
@@ -129,14 +125,12 @@ namespace FirebirdSql.Data.Common
 			BuildExceptionMessage();
 		}
 
-#if !NETSTANDARD1_6
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);
 			info.AddValue(nameof(Errors), Errors);
 			info.AddValue(nameof(ErrorCode), ErrorCode);
 		}
-#endif
 
 		public override string ToString() => _message;
 

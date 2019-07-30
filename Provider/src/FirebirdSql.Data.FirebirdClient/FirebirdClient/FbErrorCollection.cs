@@ -25,9 +25,7 @@ using System.Collections;
 namespace FirebirdSql.Data.FirebirdClient
 {
 	[Serializable]
-#if !NETSTANDARD1_6
 	[ListBindable(false)]
-#endif
 	public sealed class FbErrorCollection : ICollection<FbError>
 	{
 		#region Fields

@@ -18,9 +18,7 @@
 using System;
 using System.ComponentModel;
 using System.Data.Common;
-#if !NETSTANDARD1_6
 using System.Runtime.Serialization;
-#endif
 
 using FirebirdSql.Data.Common;
 
@@ -46,11 +44,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if NETSTANDARD1_6
-		public int ErrorCode
-#else
 		public override int ErrorCode
-#endif
 		{
 			get
 			{
@@ -89,26 +83,22 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#if !NETSTANDARD1_6
 		internal FbException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
 			_errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
 		}
-#endif
 
 		#endregion
 
 		#region Methods
 
-#if !NETSTANDARD1_6
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);
 
 			info.AddValue("errors", _errors);
 		}
-#endif
 
 		#endregion
 

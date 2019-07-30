@@ -548,19 +548,12 @@ namespace FirebirdSql.Data.Common
 		private static string ExpandDataDirectory(string s)
 		{
 			const string DataDirectoryKeyword = "|DataDirectory|";
-#if NETSTANDARD1_6
-			if (s.IndexOf(DataDirectoryKeyword, StringComparison.OrdinalIgnoreCase) != -1)
-				throw new NotSupportedException();
-
-			return s;
-#else
 			if (s == null)
 				return s;
 
 			var dataDirectoryLocation = (string)AppDomain.CurrentDomain.GetData("DataDirectory") ?? string.Empty;
 			var pattern = string.Format("{0}{1}?", Regex.Escape(DataDirectoryKeyword), Regex.Escape(Path.DirectorySeparatorChar.ToString()));
 			return Regex.Replace(s, pattern, dataDirectoryLocation + Path.DirectorySeparatorChar, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-#endif
 		}
 
 		private static T ParseEnum<T>(string value, string name) where T : struct

@@ -31,10 +31,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	public sealed class FbCommand : DbCommand
-#if !NETSTANDARD1_6
-		, ICloneable
-#endif
+	public sealed class FbCommand : DbCommand, ICloneable
 	{
 		#region Fields
 
@@ -380,11 +377,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region ICloneable Methods
 
-#if NETSTANDARD1_6
-		internal object Clone()
-#else
 		object ICloneable.Clone()
-#endif
 		{
 			var command = new FbCommand();
 
@@ -404,11 +397,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			for (var i = 0; i < Parameters.Count; i++)
 			{
-#if NETSTANDARD1_6
-				command.Parameters.Add(Parameters[i].Clone());
-#else
 				command.Parameters.Add(((ICloneable)Parameters[i]).Clone());
-#endif
 			}
 
 			return command;

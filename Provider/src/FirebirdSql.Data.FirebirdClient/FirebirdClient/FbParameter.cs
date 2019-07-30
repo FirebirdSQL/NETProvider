@@ -26,19 +26,14 @@ using System.Text;
 namespace FirebirdSql.Data.FirebirdClient
 {
 	[ParenthesizePropertyName(true)]
-	public sealed class FbParameter : DbParameter
-#if !NETSTANDARD1_6
-		, ICloneable
-#endif
+	public sealed class FbParameter : DbParameter, ICloneable
 	{
 		#region Fields
 
 		private FbParameterCollection _parent;
 		private FbDbType _fbDbType;
 		private ParameterDirection _direction;
-#if !NETSTANDARD1_6
 		private DataRowVersion _sourceVersion;
-#endif
 		private FbCharset _charset;
 		private bool _isNullable;
 		private bool _sourceColumnNullMapping;
@@ -118,7 +113,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { _sourceColumn = value; }
 		}
 
-#if !NETSTANDARD1_6
 		[Category("Data")]
 		[DefaultValue(DataRowVersion.Current)]
 		public override DataRowVersion SourceVersion
@@ -126,7 +120,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _sourceVersion; }
 			set { _sourceVersion = value; }
 		}
-#endif
 
 		[Browsable(false)]
 		[Category("Data")]
@@ -270,9 +263,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_fbDbType = FbDbType.VarChar;
 			_direction = ParameterDirection.Input;
-#if !NETSTANDARD1_6
 			_sourceVersion = DataRowVersion.Current;
-#endif
 			_sourceColumn = string.Empty;
 			_parameterName = string.Empty;
 			_charset = FbCharset.Default;
@@ -320,9 +311,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			byte precision,
 			byte scale,
 			string sourceColumn,
-#if !NETSTANDARD1_6
 			DataRowVersion sourceVersion,
-#endif
 			object value)
 		{
 			ParameterName = parameterName;
@@ -333,9 +322,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_precision = precision;
 			_scale = scale;
 			_sourceColumn = sourceColumn;
-#if !NETSTANDARD1_6
 			_sourceVersion = sourceVersion;
-#endif
 			Value = value;
 			_charset = FbCharset.Default;
 		}
@@ -343,11 +330,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 
 		#region ICloneable Methods
-#if NETSTANDARD1_6
-		internal object Clone()
-#else
 		object ICloneable.Clone()
-#endif
 		{
 			return new FbParameter(
 				_parameterName,
@@ -358,9 +341,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_precision,
 				_scale,
 				_sourceColumn,
-#if !NETSTANDARD1_6
 				_sourceVersion,
-#endif
 				_value)
 			{
 				Charset = _charset
@@ -400,9 +381,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					_fbDbType = FbDbType.Char;
 					break;
 
-#if !NETSTANDARD1_6
 				case TypeCode.DBNull:
-#endif
 				case TypeCode.String:
 					_fbDbType = FbDbType.VarChar;
 					break;

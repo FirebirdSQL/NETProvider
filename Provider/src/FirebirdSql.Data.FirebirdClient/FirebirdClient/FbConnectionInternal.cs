@@ -24,9 +24,7 @@ using System.IO;
 using System.Reflection;
 using FirebirdSql.Data.Common;
 using System.Linq;
-#if !NETSTANDARD1_6
 using FirebirdSql.Data.Schema;
-#endif
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -40,9 +38,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private ConnectionString _options;
 		private FbConnection _owningConnection;
 		private bool _disposed;
-#if !NETSTANDARD1_6
 		private FbEnlistmentNotification _enlistmentNotification;
-#endif
 
 		#endregion
 
@@ -75,11 +71,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-#if NETSTANDARD1_6
-				return false;
-#else
 				return _enlistmentNotification != null && !_enlistmentNotification.IsCompleted;
-#endif
 			}
 		}
 
@@ -288,7 +280,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Transaction Enlistement
 
-#if !NETSTANDARD1_6
 		public void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
 			if (_owningConnection != null)
@@ -342,18 +333,15 @@ namespace FirebirdSql.Data.FirebirdClient
 					return BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
 			}
 		}
-#endif
 
 		#endregion
 
 		#region Schema Methods
 
-#if !NETSTANDARD1_6
 		public DataTable GetSchema(string collectionName, string[] restrictions)
 		{
 			return FbSchemaFactory.GetSchema(_owningConnection, collectionName, restrictions);
 		}
-#endif
 
 		#endregion
 
@@ -454,7 +442,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private string GetSystemWebHostingPath()
 		{
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD2_0
 			return null;
 #else
 			var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.GetName().Name.Equals("System.Web", StringComparison.Ordinal)).FirstOrDefault();

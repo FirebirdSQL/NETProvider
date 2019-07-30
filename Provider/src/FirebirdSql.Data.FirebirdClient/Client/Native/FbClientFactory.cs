@@ -48,17 +48,10 @@ namespace FirebirdSql.Data.Client.Native
 		static FbClientFactory()
 		{
 			cache = new ConcurrentDictionary<string, IFbClient>();
-#if NETSTANDARD1_6
-			injectionTypes = new HashSet<Type>(typeof(FbClientFactory).GetTypeInfo().Assembly.GetTypes()
-				.Where(x => !x.GetTypeInfo().IsAbstract && !x.GetTypeInfo().IsInterface)
-				.Where(x => typeof(IFirebirdHandle).IsAssignableFrom(x))
-				.Select(x => x.MakeByRefType()));
-#else
 			injectionTypes = new HashSet<Type>(typeof(FbClientFactory).Assembly.GetTypes()
 				.Where(x => !x.IsAbstract && !x.IsInterface)
 				.Where(x => typeof(IFirebirdHandle).IsAssignableFrom(x))
 				.Select(x => x.MakeByRefType()));
-#endif
 		}
 
 		/// <summary>
@@ -243,7 +236,7 @@ namespace FirebirdSql.Data.Client.Native
 			var t = tb.CreateTypeInfo().AsType();
 
 #if DEBUG
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+#if !NETSTANDARD2_0
 			var ab = (AssemblyBuilder)tb.Assembly;
 			ab.Save("DynamicAssembly.dll");
 #endif
@@ -272,18 +265,14 @@ namespace FirebirdSql.Data.Client.Native
 			assemblyName.Name = baseName + "_Assembly";
 
 			// We create the dynamic assembly in our current AppDomain
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD2_0
 			var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 #else
 			var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
 #endif
 
 			// Generate the actual module (which is the DLL itself)
-#if NETSTANDARD1_6 || NETSTANDARD2_0
 			var moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module");
-#else
-			var moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module", baseName + ".dll");
-#endif
 
 			// Add our type to the module.
 			return moduleBuilder.DefineType(baseName + "_Class", TypeAttributes.Class);
@@ -315,11 +304,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				fbClient.fb_shutdown(0, 0);
 			}
-#if NETSTANDARD1_6
-			catch (Exception ex) when (ex.GetType().Name == "EntryPointNotFoundException")
-#else
 			catch (EntryPointNotFoundException)
-#endif
 			{ }
 		}
 	}

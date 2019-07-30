@@ -15,7 +15,6 @@
 
 //$Authors = Carlos Guzman Alvarez
 
-#if !NETSTANDARD1_6
 using System;
 using System.Data;
 using System.Data.Common;
@@ -47,4 +46,3 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 	}
 }
-#endif
