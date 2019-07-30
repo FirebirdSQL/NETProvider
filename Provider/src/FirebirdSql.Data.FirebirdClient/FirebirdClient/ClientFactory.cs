@@ -24,7 +24,7 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	internal static class ClientFactory
 	{
-		public static IDatabase CreateDatabase(FbConnectionString options)
+		public static IDatabase CreateDatabase(ConnectionString options)
 		{
 			switch (options.ServerType)
 			{
@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public static IServiceManager CreateServiceManager(FbConnectionString options)
+		public static IServiceManager CreateServiceManager(ConnectionString options)
 		{
 			switch (options.ServerType)
 			{
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		private static IDatabase CreateManagedDatabase(FbConnectionString options)
+		private static IDatabase CreateManagedDatabase(ConnectionString options)
 		{
 			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			connection.Connect();
@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		private static IServiceManager CreateManagedServiceManager(FbConnectionString options)
+		private static IServiceManager CreateManagedServiceManager(ConnectionString options)
 		{
 			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			connection.Connect();

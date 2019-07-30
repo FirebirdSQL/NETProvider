@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Services
 		private const string ServiceName = "service_mgr";
 
 		private IServiceManager _svc;
-		private FbConnectionString _csManager;
+		private ConnectionString _csManager;
 
 		internal ServiceParameterBuffer StartSpb;
 		internal ServiceParameterBuffer QuerySpb;
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Services
 					throw new InvalidOperationException("ConnectionString cannot be modified on active service instances.");
 				}
 
-				_csManager = new FbConnectionString(value);
+				_csManager = new ConnectionString(value);
 
 				if (value == null)
 				{

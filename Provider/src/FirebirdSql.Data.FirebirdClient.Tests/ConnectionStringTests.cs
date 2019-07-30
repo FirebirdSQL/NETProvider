@@ -17,17 +17,18 @@
 
 using System.Globalization;
 using System.Threading;
+using FirebirdSql.Data.Common;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	public class FbConnectionStringTests
+	public class ConnectionStringTests
 	{
 		[Test]
 		public void ParsingNormalConnectionStringTest()
 		{
 			const string ConnectionString = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("testserver", cs.DataSource);
 			Assert.AreEqual("testdb.fdb", cs.Database);
 			Assert.AreEqual("testuser", cs.UserID);
@@ -38,7 +39,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingFullDatabaseConnectionStringTest()
 		{
 			const string ConnectionString = "database=testserver/1234:testdb.fdb;user=testuser;password=testpwd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("testserver", cs.DataSource);
 			Assert.AreEqual("testdb.fdb", cs.Database);
 			Assert.AreEqual("testuser", cs.UserID);
@@ -50,7 +51,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingSingleQuotedConnectionStringTest()
 		{
 			const string ConnectionString = "datasource=testserver;database=testdb.fdb;user=testuser;password=test'pwd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("test'pwd", cs.Password);
 		}
 
@@ -58,7 +59,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDoubleQuotedConnectionStringTest()
 		{
 			const string ConnectionString = "datasource=testserver;database=testdb.fdb;user=testuser;password=test\"pwd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("test\"pwd", cs.Password);
 		}
 
@@ -66,7 +67,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingSpacesInKeyConnectionStringTest()
 		{
 			const string ConnectionString = "data source=testserver";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("testserver", cs.DataSource);
 		}
 
@@ -74,7 +75,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingOneCharValueConnectionStringTest()
 		{
 			const string ConnectionString = "connection lifetime=6";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual(6, cs.ConnectionLifetime);
 		}
 
@@ -82,7 +83,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingWithEndingSemicolonConnectionStringTest()
 		{
 			const string ConnectionString = "user=testuser;password=testpwd;";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("testuser", cs.UserID);
 			Assert.AreEqual("testpwd", cs.Password);
 		}
@@ -91,7 +92,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingWithoutEndingSemicolonConnectionStringTest()
 		{
 			const string ConnectionString = "user=testuser;password=testpwd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("testuser", cs.UserID);
 			Assert.AreEqual("testpwd", cs.Password);
 		}
@@ -111,7 +112,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
  Connection timeout=15;
  Pooling=True;
  Packet Size=8192;";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("Termine", cs.Database);
 			Assert.AreEqual("", cs.Role);
 		}
@@ -120,7 +121,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void NormalizedConnectionStringIgnoresCultureTest()
 		{
 			const string ConnectionString = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-GB");
 			var s1 = cs.NormalizedConnectionString;
 			Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("cs-CZ");
@@ -133,7 +134,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingWithEmptyKeyConnectionStringTest()
 		{
 			const string ConnectionString = "user=;password=testpwd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("", cs.UserID);
 			Assert.AreEqual("testpwd", cs.Password);
 		}
@@ -142,7 +143,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingWithWhiteSpacesKeyConnectionStringTest()
 		{
 			const string ConnectionString = "user= \t;password=testpwd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("", cs.UserID);
 			Assert.AreEqual("testpwd", cs.Password);
 		}
@@ -151,7 +152,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void CryptKeyWithBase64FullPadding()
 		{
 			const string ConnectionString = "user=u;cryptkey=dGVzdA==;password=p";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("test", cs.CryptKey);
 		}
 
@@ -159,7 +160,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void CryptKeyWithBase64SinglePadding()
 		{
 			const string ConnectionString = "user=u;cryptkey=YWE=;password=p";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("aa", cs.CryptKey);
 		}
 
@@ -167,7 +168,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void CryptKeyWithBase64NoPadding()
 		{
 			const string ConnectionString = "user=u;cryptkey=YWFh;password=p";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("aaa", cs.CryptKey);
 		}
 
@@ -175,7 +176,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void WireCryptMixedCase()
 		{
 			const string ConnectionString = "wire crYpt=reQUIREd";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual(FbWireCrypt.Required, cs.WireCrypt);
 		}
 
@@ -183,7 +184,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleHostnameWithoutPortWithoutPath()
 		{
 			const string ConnectionString = "database=//hostname/test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
 		}
@@ -192,7 +193,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleHostnameWithoutPortRootPath()
 		{
 			const string ConnectionString = "database=//hostname//test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
 		}
@@ -201,7 +202,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleHostnameWithoutPortDrivePath()
 		{
 			const string ConnectionString = "database=//hostname/C:\\test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
 		}
@@ -210,7 +211,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleIP4WithoutPortWithoutPath()
 		{
 			const string ConnectionString = "database=//127.0.0.1/test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
 		}
@@ -219,7 +220,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleIP4WithoutPortRootPath()
 		{
 			const string ConnectionString = "database=//127.0.0.1//test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
 		}
@@ -228,7 +229,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleIP4WithoutPortDrivePath()
 		{
 			const string ConnectionString = "database=//127.0.0.1/C:\\test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
 		}
@@ -237,7 +238,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleIP6WithoutPortWithoutPath()
 		{
 			const string ConnectionString = "database=//::1/test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
 		}
@@ -246,7 +247,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleIP6WithoutPortRootPath()
 		{
 			const string ConnectionString = "database=//::1//test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
 		}
@@ -255,7 +256,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseNewStyleIP6WithoutPortDrivePath()
 		{
 			const string ConnectionString = "database=//::1/C:\\test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
 		}
@@ -264,7 +265,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleHostnameWithoutPortWithoutPath()
 		{
 			const string ConnectionString = "database=hostname:test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
 		}
@@ -273,7 +274,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleHostnameWithoutPortRootPath()
 		{
 			const string ConnectionString = "database=hostname:/test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
 		}
@@ -282,7 +283,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleHostnameWithoutPortDrivePath()
 		{
 			const string ConnectionString = "database=hostname:C:\\test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
 		}
@@ -291,7 +292,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleIP4WithoutPortWithoutPath()
 		{
 			const string ConnectionString = "database=127.0.0.1:test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
 		}
@@ -300,7 +301,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleIP4WithoutPortRootPath()
 		{
 			const string ConnectionString = "database=127.0.0.1:/test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
 		}
@@ -309,7 +310,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleIP4WithoutPortDrivePath()
 		{
 			const string ConnectionString = "database=127.0.0.1:C:\\test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
 		}
@@ -318,7 +319,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleIP6WithoutPortWithoutPath()
 		{
 			const string ConnectionString = "database=::1:test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
 		}
@@ -327,7 +328,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleIP6WithoutPortRootPath()
 		{
 			const string ConnectionString = "database=::1:/test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
 		}
@@ -336,7 +337,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleIP6WithoutPortDrivePath()
 		{
 			const string ConnectionString = "database=::1:C:\\test.fdb";
-			var cs = new FbConnectionString(ConnectionString);
+			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
 		}

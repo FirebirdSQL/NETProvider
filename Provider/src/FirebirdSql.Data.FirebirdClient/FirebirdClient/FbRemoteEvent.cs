@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbRemoteEvent(string connectionString)
 		{
-			_connection = new FbConnectionInternal(new FbConnectionString(connectionString));
+			_connection = new FbConnectionInternal(new ConnectionString(connectionString));
 			_connection.Connect();
 			_revent = new RemoteEvent(_connection.Database);
 			_revent.EventCountsCallback = OnRemoteEventCounts;

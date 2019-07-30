@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private IDatabase _db;
 		private FbTransaction _activeTransaction;
 		private HashSet<FbCommand> _preparedCommands;
-		private FbConnectionString _options;
+		private ConnectionString _options;
 		private FbConnection _owningConnection;
 		private bool _disposed;
 #if !NETSTANDARD1_6
@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public FbConnectionString Options
+		public ConnectionString Options
 		{
 			get { return _options; }
 		}
@@ -94,7 +94,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Constructors
 
-		public FbConnectionInternal(FbConnectionString options)
+		public FbConnectionInternal(ConnectionString options)
 		{
 			_preparedCommands = new HashSet<FbCommand>();
 
@@ -410,7 +410,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Private Methods
 
-		private DatabaseParameterBuffer BuildDpb(IDatabase db, FbConnectionString options)
+		private DatabaseParameterBuffer BuildDpb(IDatabase db, ConnectionString options)
 		{
 			var dpb = new DatabaseParameterBuffer();
 

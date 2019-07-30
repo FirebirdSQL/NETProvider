@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Text;
+using FirebirdSql.Data.Common;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
@@ -33,7 +34,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void NoValueProvidedReturnsDefault()
 		{
 			var b = new FbConnectionStringBuilder();
-			Assert.AreEqual(b.MaxPoolSize, FbConnectionString.DefaultValueMaxPoolSize);
+			Assert.AreEqual(b.MaxPoolSize, ConnectionString.DefaultValueMaxPoolSize);
 		}
 
 		[Test]

@@ -22,10 +22,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.Common
 {
-	internal sealed class FbConnectionString
+	internal sealed class ConnectionString
 	{
 		#region Constants
 		internal const string DefaultValueDataSource = "";
@@ -228,12 +229,12 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Constructors
 
-		public FbConnectionString()
+		public ConnectionString()
 		{
 			SetDefaultOptions();
 		}
 
-		public FbConnectionString(string connectionString)
+		public ConnectionString(string connectionString)
 			: this()
 		{
 			Load(connectionString);

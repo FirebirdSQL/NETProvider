@@ -54,11 +54,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			bool _disposed;
 			object _syncRoot;
-			FbConnectionString _connectionString;
+			ConnectionString _connectionString;
 			Stack<Item> _available;
 			List<FbConnectionInternal> _busy;
 
-			public Pool(FbConnectionString connectionString)
+			public Pool(ConnectionString connectionString)
 			{
 				_syncRoot = new object();
 				_connectionString = connectionString;
@@ -139,7 +139,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
-			static FbConnectionInternal CreateNewConnection(FbConnectionString connectionString)
+			static FbConnectionInternal CreateNewConnection(ConnectionString connectionString)
 			{
 				var result = new FbConnectionInternal(connectionString);
 				result.Connect();
@@ -164,7 +164,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					throw new ObjectDisposedException(nameof(Pool));
 			}
 
-			FbConnectionInternal CreateNewConnectionIfPossibleImpl(FbConnectionString connectionString)
+			FbConnectionInternal CreateNewConnectionIfPossibleImpl(ConnectionString connectionString)
 			{
 				if (_busy.Count() + 1 > connectionString.MaxPoolSize)
 					throw new InvalidOperationException("Connection pool is full.");
@@ -191,7 +191,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_syncRootDisposeTimerCallback = new object();
 		}
 
-		internal FbConnectionInternal Get(FbConnectionString connectionString, FbConnection owner)
+		internal FbConnectionInternal Get(ConnectionString connectionString, FbConnection owner)
 		{
 			CheckDisposed();
 
@@ -212,7 +212,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_pools.Values.AsParallel().ForAll(p => p.ClearPool());
 		}
 
-		internal void ClearPool(FbConnectionString connectionString)
+		internal void ClearPool(ConnectionString connectionString)
 		{
 			CheckDisposed();
 

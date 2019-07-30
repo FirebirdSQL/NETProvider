@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (connectionString == null)
 				throw new ArgumentNullException(nameof(connectionString));
 
-			FbConnectionPoolManager.Instance.ClearPool(new FbConnectionString(connectionString));
+			FbConnectionPoolManager.Instance.ClearPool(new ConnectionString(connectionString));
 		}
 
 		#endregion
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static void CreateDatabaseImpl(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false)
 		{
-			var options = new FbConnectionString(connectionString);
+			var options = new ConnectionString(connectionString);
 			options.Validate();
 
 			try
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public static void DropDatabase(string connectionString)
 		{
-			var options = new FbConnectionString(connectionString);
+			var options = new ConnectionString(connectionString);
 			options.Validate();
 
 			try
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private FbConnectionInternal _innerConnection;
 		private ConnectionState _state;
-		private FbConnectionString _options;
+		private ConnectionString _options;
 		private bool _disposed;
 		private string _connectionString;
 
@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						value = string.Empty;
 					}
 
-					_options = new FbConnectionString(value);
+					_options = new ConnectionString(value);
 					_options.Validate();
 					_connectionString = value;
 				}
@@ -238,7 +238,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _innerConnection; }
 		}
 
-		internal FbConnectionString ConnectionOptions
+		internal ConnectionString ConnectionOptions
 		{
 			get { return _options; }
 		}
@@ -265,7 +265,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnection()
 		{
-			_options = new FbConnectionString();
+			_options = new ConnectionString();
 			_state = ConnectionState.Closed;
 			_connectionString = string.Empty;
 		}
