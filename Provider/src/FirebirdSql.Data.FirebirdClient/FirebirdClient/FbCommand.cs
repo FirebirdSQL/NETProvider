@@ -23,9 +23,6 @@ using System.Globalization;
 using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
-using System.Runtime.Remoting.Messaging;
-#endif
 
 using FirebirdSql.Data.Common;
 
@@ -465,17 +462,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return RecordsAffected;
 		}
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
-		public IAsyncResult BeginExecuteNonQuery(AsyncCallback callback, object objectState)
-		{
-			// BeginInvoke might be slow, but the query processing will make this irrelevant
-			return ((Func<int>)ExecuteNonQuery).BeginInvoke(callback, objectState);
-		}
-		public int EndExecuteNonQuery(IAsyncResult asyncResult)
-		{
-			return ((Func<int>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
-		}
-#endif
 
 		public new FbDataReader ExecuteReader()
 		{
@@ -504,29 +490,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return _activeReader;
 		}
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
-		public IAsyncResult BeginExecuteReader(AsyncCallback callback, object objectState)
-		{
-			// BeginInvoke might be slow, but the query processing will make this irrelevant
-			return ((Func<FbDataReader>)ExecuteReader).BeginInvoke(callback, objectState);
-		}
-		public IAsyncResult BeginExecuteReader(CommandBehavior behavior, AsyncCallback callback, object objectState)
-		{
-			// BeginInvoke might be slow, but the query processing will make this irrelevant
-			return ((Func<CommandBehavior, FbDataReader>)ExecuteReader).BeginInvoke(behavior, callback, objectState);
-		}
-		public FbDataReader EndExecuteReader(IAsyncResult asyncResult)
-		{
-			if ((asyncResult as AsyncResult).AsyncDelegate is Func<FbDataReader>)
-			{
-				return ((Func<FbDataReader>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
-			}
-			else
-			{
-				return ((Func<CommandBehavior, FbDataReader>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
-			}
-		}
-#endif
 
 		public override object ExecuteScalar()
 		{
@@ -572,17 +535,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return val;
 		}
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
-		public IAsyncResult BeginExecuteScalar(AsyncCallback callback, object objectState)
-		{
-			// BeginInvoke might be slow, but the query processing will make this irrelevant
-			return ((Func<object>)ExecuteScalar).BeginInvoke(callback, objectState);
-		}
-		public object EndExecuteScalar(IAsyncResult asyncResult)
-		{
-			return ((Func<object>)(asyncResult as AsyncResult).AsyncDelegate).EndInvoke(asyncResult);
-		}
-#endif
 
 		#endregion
 
