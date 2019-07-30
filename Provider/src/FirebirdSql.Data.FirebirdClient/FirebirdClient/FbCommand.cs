@@ -100,27 +100,13 @@ namespace FirebirdSql.Data.FirebirdClient
 		[Browsable(false)]
 		public string CommandPlan
 		{
-			get
-			{
-				if (_statement != null)
-				{
-					return _statement.GetExecutionPlan();
-				}
-				return null;
-			}
+			get { return _statement?.GetExecutionPlan(); }
 		}
 
 		[Browsable(false)]
 		public string CommandExplainedPlan
 		{
-			get
-			{
-				if (_statement != null)
-				{
-					return _statement.GetExecutionExplainedPlan();
-				}
-				return null;
-			}
+			get { return _statement?.GetExecutionExplainedPlan(); }
 		}
 
 		[Category("Behavior")]
