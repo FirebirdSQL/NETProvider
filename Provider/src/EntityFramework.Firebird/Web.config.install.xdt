@@ -1,0 +1,9 @@
+﻿<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+	<entityFramework>
+		<defaultConnectionFactory xdt:Transform="Remove" />
+		<defaultConnectionFactory type="EntityFramework.Firebird.FbConnectionFactory, EntityFramework.Firebird" xdt:Transform="Insert" />
+		<providers>
+			<provider invariantName="FirebirdSql.Data.FirebirdClient" type="EntityFramework.Firebird.FbProviderServices, EntityFramework.Firebird" xdt:Transform="InsertIfMissing" xdt:Locator="Match(invariantName)" />
+		</providers>
+	</entityFramework>
+</configuration>

@@ -39,7 +39,8 @@
 		<EmbeddedResource Include="Resources\StoreSchemaMappingVersion3.msl" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Update="install.ps1" Pack="true" PackagePath="tools" />
+		<None Update="App.config.install.xdt" Pack="true" PackagePath="content" />
+		<None Update="Web.config.install.xdt" Pack="true" PackagePath="content" />
 		<None Include="..\..\..\license.txt" Link="license.txt" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
