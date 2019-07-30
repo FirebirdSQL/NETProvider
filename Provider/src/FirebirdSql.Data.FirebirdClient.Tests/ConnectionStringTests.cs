@@ -181,87 +181,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseNewStyleHostnameWithoutPortWithoutPath()
-		{
-			const string ConnectionString = "database=//hostname/test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("hostname", cs.DataSource);
-			Assert.AreEqual("test.fdb", cs.Database);
-		}
-
-		[Test]
-		public void ParsingDatabaseNewStyleHostnameWithoutPortRootPath()
-		{
-			const string ConnectionString = "database=//hostname//test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("hostname", cs.DataSource);
-			Assert.AreEqual("/test.fdb", cs.Database);
-		}
-
-		[Test]
-		public void ParsingDatabaseNewStyleHostnameWithoutPortDrivePath()
-		{
-			const string ConnectionString = "database=//hostname/C:\\test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("hostname", cs.DataSource);
-			Assert.AreEqual("C:\\test.fdb", cs.Database);
-		}
-
-		[Test]
-		public void ParsingDatabaseNewStyleIP4WithoutPortWithoutPath()
-		{
-			const string ConnectionString = "database=//127.0.0.1/test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("127.0.0.1", cs.DataSource);
-			Assert.AreEqual("test.fdb", cs.Database);
-		}
-
-		[Test]
-		public void ParsingDatabaseNewStyleIP4WithoutPortRootPath()
-		{
-			const string ConnectionString = "database=//127.0.0.1//test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("127.0.0.1", cs.DataSource);
-			Assert.AreEqual("/test.fdb", cs.Database);
-		}
-
-		[Test]
-		public void ParsingDatabaseNewStyleIP4WithoutPortDrivePath()
-		{
-			const string ConnectionString = "database=//127.0.0.1/C:\\test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("127.0.0.1", cs.DataSource);
-			Assert.AreEqual("C:\\test.fdb", cs.Database);
-		}
-
-		[Test]
-		public void ParsingDatabaseNewStyleIP6WithoutPortWithoutPath()
-		{
-			const string ConnectionString = "database=//::1/test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("::1", cs.DataSource);
-			Assert.AreEqual("test.fdb", cs.Database);
-		}
-
-		[Test]
-		public void ParsingDatabaseNewStyleIP6WithoutPortRootPath()
-		{
-			const string ConnectionString = "database=//::1//test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("::1", cs.DataSource);
-			Assert.AreEqual("/test.fdb", cs.Database);
-		}
-
-		[Test]
-		public void ParsingDatabaseNewStyleIP6WithoutPortDrivePath()
-		{
-			const string ConnectionString = "database=//::1/C:\\test.fdb";
-			var cs = new ConnectionString(ConnectionString);
-			Assert.AreEqual("::1", cs.DataSource);
-			Assert.AreEqual("C:\\test.fdb", cs.Database);
-		}
-
-		[Test]
 		public void ParsingDatabaseOldStyleHostnameWithoutPortWithoutPath()
 		{
 			const string ConnectionString = "database=hostname:test.fdb";
@@ -337,6 +256,177 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void ParsingDatabaseOldStyleIP6WithoutPortDrivePath()
 		{
 			const string ConnectionString = "database=::1:C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleHostnameWithPortWithoutPath()
+		{
+			const string ConnectionString = "database=hostname/6666:test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleHostnameWithPortRootPath()
+		{
+			const string ConnectionString = "database=hostname/6666:/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleHostnameWithPortDrivePath()
+		{
+			const string ConnectionString = "database=hostname/6666:C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleIP4WithPortWithoutPath()
+		{
+			const string ConnectionString = "database=127.0.0.1/6666:test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleIP4WithPortRootPath()
+		{
+			const string ConnectionString = "database=127.0.0.1/6666:/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleIP4WithPortDrivePath()
+		{
+			const string ConnectionString = "database=127.0.0.1/6666:C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleIP6WithPortWithoutPath()
+		{
+			const string ConnectionString = "database=::1/6666:test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleIP6WithPortRootPath()
+		{
+			const string ConnectionString = "database=::1/6666:/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseOldStyleIP6WithPortDrivePath()
+		{
+			const string ConnectionString = "database=::1/6666:C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleHostnameWithoutPortWithoutPath()
+		{
+			const string ConnectionString = "database=//hostname/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleHostnameWithoutPortRootPath()
+		{
+			const string ConnectionString = "database=//hostname//test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleHostnameWithoutPortDrivePath()
+		{
+			const string ConnectionString = "database=//hostname/C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleIP4WithoutPortWithoutPath()
+		{
+			const string ConnectionString = "database=//127.0.0.1/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleIP4WithoutPortRootPath()
+		{
+			const string ConnectionString = "database=//127.0.0.1//test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleIP4WithoutPortDrivePath()
+		{
+			const string ConnectionString = "database=//127.0.0.1/C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleIP6WithoutPortWithoutPath()
+		{
+			const string ConnectionString = "database=//::1/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleIP6WithoutPortRootPath()
+		{
+			const string ConnectionString = "database=//::1//test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseNewStyleIP6WithoutPortDrivePath()
+		{
+			const string ConnectionString = "database=//::1/C:\\test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
@@ -433,9 +523,90 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleHostnameWithPortWithoutPath()
+		public void ParsingDatabaseURLStyleHostnameWithoutPortWithoutPath()
 		{
-			const string ConnectionString = "database=hostname/6666:test.fdb";
+			const string ConnectionString = "database=inet://hostname/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleHostnameWithoutPortRootPath()
+		{
+			const string ConnectionString = "database=inet://hostname//test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleHostnameWithoutPortDrivePath()
+		{
+			const string ConnectionString = "database=inet://hostname/C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("hostname", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleIP4WithoutPortWithoutPath()
+		{
+			const string ConnectionString = "database=inet://127.0.0.1/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleIP4WithoutPortRootPath()
+		{
+			const string ConnectionString = "database=inet://127.0.0.1//test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleIP4WithoutPortDrivePath()
+		{
+			const string ConnectionString = "database=inet://127.0.0.1/C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("127.0.0.1", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleIP6WithoutPortWithoutPath()
+		{
+			const string ConnectionString = "database=inet://::1/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleIP6WithoutPortRootPath()
+		{
+			const string ConnectionString = "database=inet://::1//test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleIP6WithoutPortDrivePath()
+		{
+			const string ConnectionString = "database=inet://::1/C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("::1", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleHostnameWithPortWithoutPath()
+		{
+			const string ConnectionString = "database=inet://hostname:6666/test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
@@ -443,9 +614,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleHostnameWithPortRootPath()
+		public void ParsingDatabaseURLStyleHostnameWithPortRootPath()
 		{
-			const string ConnectionString = "database=hostname/6666:/test.fdb";
+			const string ConnectionString = "database=inet://hostname:6666//test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
@@ -453,9 +624,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleHostnameWithPortDrivePath()
+		public void ParsingDatabaseURLStyleHostnameWithPortDrivePath()
 		{
-			const string ConnectionString = "database=hostname/6666:C:\\test.fdb";
+			const string ConnectionString = "database=inet://hostname:6666/C:\\test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("hostname", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
@@ -463,9 +634,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleIP4WithPortWithoutPath()
+		public void ParsingDatabaseURLStyleIP4WithPortWithoutPath()
 		{
-			const string ConnectionString = "database=127.0.0.1/6666:test.fdb";
+			const string ConnectionString = "database=inet://127.0.0.1:6666/test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
@@ -473,9 +644,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleIP4WithPortRootPath()
+		public void ParsingDatabaseURLStyleIP4WithPortRootPath()
 		{
-			const string ConnectionString = "database=127.0.0.1/6666:/test.fdb";
+			const string ConnectionString = "database=inet://127.0.0.1:6666//test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
@@ -483,9 +654,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleIP4WithPortDrivePath()
+		public void ParsingDatabaseURLStyleIP4WithPortDrivePath()
 		{
-			const string ConnectionString = "database=127.0.0.1/6666:C:\\test.fdb";
+			const string ConnectionString = "database=inet://127.0.0.1:6666/C:\\test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("127.0.0.1", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
@@ -493,9 +664,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleIP6WithPortWithoutPath()
+		public void ParsingDatabaseURLStyleIP6WithPortWithoutPath()
 		{
-			const string ConnectionString = "database=::1/6666:test.fdb";
+			const string ConnectionString = "database=inet://[::1]:6666/test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("test.fdb", cs.Database);
@@ -503,9 +674,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleIP6WithPortRootPath()
+		public void ParsingDatabaseURLStyleIP6WithPortRootPath()
 		{
-			const string ConnectionString = "database=::1/6666:/test.fdb";
+			const string ConnectionString = "database=inet://[::1]:6666//test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("/test.fdb", cs.Database);
@@ -513,13 +684,40 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParsingDatabaseOldStyleIP6WithPortDrivePath()
+		public void ParsingDatabaseURLStyleIP6WithPortDrivePath()
 		{
-			const string ConnectionString = "database=::1/6666:C:\\test.fdb";
+			const string ConnectionString = "database=inet://[::1]:6666/C:\\test.fdb";
 			var cs = new ConnectionString(ConnectionString);
 			Assert.AreEqual("::1", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
 			Assert.AreEqual(6666, cs.Port);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleWithoutHostnameWithoutPath()
+		{
+			const string ConnectionString = "database=inet:///test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("localhost", cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleWithoutHostnameRootPath()
+		{
+			const string ConnectionString = "database=inet:////test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("localhost", cs.DataSource);
+			Assert.AreEqual("/test.fdb", cs.Database);
+		}
+
+		[Test]
+		public void ParsingDatabaseURLStyleWithoutHostnameDrivePath()
+		{
+			const string ConnectionString = "database=inet:///C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("localhost", cs.DataSource);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
 		}
 	}
 }

@@ -352,75 +352,117 @@ namespace FirebirdSql.Data.Common
 			_options = new Dictionary<string, object>(DefaultValues);
 		}
 
-		private void ParseConnectionInfo(string connectInfo)
+		private void ParseConnectionInfo(string connectionInfo)
 		{
-			connectInfo = connectInfo.Trim();
+			connectionInfo = connectionInfo.Trim();
 
 			{
-				// new style //host:port/database
-				var match = Regex.Match(connectInfo, "^//(?<host>[A-Za-z0-9\\.]+):(?<port>\\d+)/(?<database>.+)$");
+				// URL style inet://host:port/database
+				var match = Regex.Match(connectionInfo, "^inet://(?<host>[A-Za-z0-9\\.]+):(?<port>\\d+)/(?<database>.+)$");
 				if (match.Success)
 				{
-					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					_options[DefaultKeyPortNumber] = int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture);
+					return;
+				}
+			}
+			{
+				// URL style inet://[hostv6]:port/database
+				var match = Regex.Match(connectionInfo, "^inet://\\[(?<host>[A-Za-z0-9:]+)\\]:(?<port>\\d+)/(?<database>.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					_options[DefaultKeyPortNumber] = int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture);
+					return;
+				}
+			}
+			{
+				// URL style inet://host/database
+				var match = Regex.Match(connectionInfo, "^inet://(?<host>[A-Za-z0-9\\.:]+)/(?<database>.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					return;
+				}
+			}
+			{
+				// URL style inet:///database
+				var match = Regex.Match(connectionInfo, "^inet:///(?<database>.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = "localhost";
+					return;
+				}
+			}
+			{
+				// new style //host:port/database
+				var match = Regex.Match(connectionInfo, "^//(?<host>[A-Za-z0-9\\.]+):(?<port>\\d+)/(?<database>.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyPortNumber] = int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture);
 					return;
 				}
 			}
 			{
 				// new style //[hostv6]:port/database
-				var match = Regex.Match(connectInfo, "^//\\[(?<host>[A-Za-z0-9:]+)\\]:(?<port>\\d+)/(?<database>.+)$");
+				var match = Regex.Match(connectionInfo, "^//\\[(?<host>[A-Za-z0-9:]+)\\]:(?<port>\\d+)/(?<database>.+)$");
 				if (match.Success)
 				{
-					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyPortNumber] = int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture);
 					return;
 				}
 			}
 			{
 				// new style //host/database
-				var match = Regex.Match(connectInfo, "^//(?<host>[A-Za-z0-9\\.:]+)/(?<database>.+)$");
+				var match = Regex.Match(connectionInfo, "^//(?<host>[A-Za-z0-9\\.:]+)/(?<database>.+)$");
 				if (match.Success)
 				{
-					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					return;
 				}
 			}
 			{
 				// old style host:X:\database
-				var match = Regex.Match(connectInfo, "^(?<host>[A-Za-z0-9\\.:]+):(?<database>[A-Za-z]:\\\\.+)$");
+				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:]+):(?<database>[A-Za-z]:\\\\.+)$");
 				if (match.Success)
 				{
-					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					return;
 				}
 			}
 			{
 				// old style host/port:database
-				var match = Regex.Match(connectInfo, "^(?<host>[A-Za-z0-9\\.:]+)/(?<port>\\d+):(?<database>.+)$");
+				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:]+)/(?<port>\\d+):(?<database>.+)$");
 				if (match.Success)
 				{
-					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyPortNumber] = int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture);
 					return;
 				}
 			}
 			{
 				// old style host:database
-				var match = Regex.Match(connectInfo, "^(?<host>[A-Za-z0-9\\.:]+):(?<database>.+)$");
+				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:]+):(?<database>.+)$");
 				if (match.Success)
 				{
-					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
 					return;
 				}
 			}
 
-			_options[DefaultKeyCatalog] = connectInfo;
+			_options[DefaultKeyCatalog] = connectionInfo;
 		}
 
 		#endregion
