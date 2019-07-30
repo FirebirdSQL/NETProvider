@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					SafeFinishFetching(ref numberOfResponses);
 				}
 
-				// we need to split this in two, to alloow server handle op_cancel properly
+				// we need to split this in two, to allow server handle op_cancel properly
 
 				if (ReturnRecordsAffected &&
 					(StatementType == DbStatementType.Insert ||
