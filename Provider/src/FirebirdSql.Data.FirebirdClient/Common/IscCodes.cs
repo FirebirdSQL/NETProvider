@@ -606,6 +606,8 @@ namespace FirebirdSql.Data.Common
 		public const int isc_info_sql_records = 23;
 		public const int isc_info_sql_batch_fetch = 24;
 		public const int isc_info_sql_relation_alias = 25;
+		public const int isc_info_sql_explain_plan = 26;
+		public const int isc_info_sql_stmt_flags = 27;
 
 		#endregion
 

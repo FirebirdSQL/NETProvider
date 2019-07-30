@@ -26,19 +26,21 @@ namespace FirebirdSql.Data.Common
 	{
 		#region Protected Static Fields
 
-		// Plan	information	items
 		protected static readonly byte[] DescribePlanInfoItems = new byte[]
 		{
-			IscCodes.isc_info_sql_get_plan
+			IscCodes.isc_info_sql_get_plan,
 		};
 
-		// Records affected	items
+		protected static readonly byte[] DescribeExplaindPlanInfoItems = new byte[]
+		{
+			IscCodes.isc_info_sql_explain_plan,
+		};
+
 		protected static readonly byte[] RowsAffectedInfoItems = new byte[]
 		{
-			IscCodes.isc_info_sql_records
+			IscCodes.isc_info_sql_records,
 		};
 
-		// Describe	information	items
 		protected static readonly byte[] DescribeInfoAndBindInfoItems = new byte[]
 		{
 			IscCodes.isc_info_sql_select,
@@ -65,12 +67,12 @@ namespace FirebirdSql.Data.Common
 			IscCodes.isc_info_sql_relation,
 			// IscCodes.isc_info_sql_owner,
 			IscCodes.isc_info_sql_alias,
-			IscCodes.isc_info_sql_describe_end
+			IscCodes.isc_info_sql_describe_end,
 		};
 
 		protected static readonly byte[] StatementTypeInfoItems = new byte[]
 		{
-			IscCodes.isc_info_sql_stmt_type
+			IscCodes.isc_info_sql_stmt_type,
 		};
 
 		#endregion
@@ -107,36 +109,12 @@ namespace FirebirdSql.Data.Common
 
 		public string GetExecutionPlan()
 		{
-			var count = 0;
-			var bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
-			var buffer = GetSqlInfo(DescribePlanInfoItems, bufferSize);
+			return GetPlanInfo(DescribePlanInfoItems);
+		}
 
-			if (buffer[0] == IscCodes.isc_info_end)
-			{
-				return string.Empty;
-			}
-
-			while (buffer[0] == IscCodes.isc_info_truncated && count < 4)
-			{
-				bufferSize *= 2;
-				buffer = GetSqlInfo(DescribePlanInfoItems, bufferSize);
-				count++;
-			}
-			if (count > 3)
-			{
-				return null;
-			}
-
-			int len = buffer[1];
-			len += buffer[2] << 8;
-			if (len > 0)
-			{
-				return Database.Charset.GetString(buffer, 4, --len);
-			}
-			else
-			{
-				return string.Empty;
-			}
+		public string GetExecutionExplainedPlan()
+		{
+			return GetPlanInfo(DescribeExplaindPlanInfoItems);
 		}
 
 		public virtual void Close()
@@ -325,6 +303,40 @@ namespace FirebirdSql.Data.Common
 						Fields[i].ArrayHandle = null;
 					}
 				}
+			}
+		}
+
+		protected string GetPlanInfo(byte[] planInfoItems)
+		{
+			var count = 0;
+			var bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
+			var buffer = GetSqlInfo(planInfoItems, bufferSize);
+
+			if (buffer[0] == IscCodes.isc_info_end)
+			{
+				return string.Empty;
+			}
+
+			while (buffer[0] == IscCodes.isc_info_truncated && count < 4)
+			{
+				bufferSize *= 2;
+				buffer = GetSqlInfo(planInfoItems, bufferSize);
+				count++;
+			}
+			if (count > 3)
+			{
+				return null;
+			}
+
+			int len = buffer[1];
+			len += buffer[2] << 8;
+			if (len > 0)
+			{
+				return Database.Charset.GetString(buffer, 4, --len);
+			}
+			else
+			{
+				return string.Empty;
 			}
 		}
 

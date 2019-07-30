@@ -739,6 +739,35 @@ end";
 		}
 
 		[Test]
+		public void CommandPlanTest()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select * from test";
+				cmd.Prepare();
+				var plan = default(string);
+				Assert.DoesNotThrow(() => { plan = cmd.CommandPlan; });
+				Assert.IsNotEmpty(plan);
+			}
+		}
+
+		[Test]
+		public void CommandExplainedPlanTest()
+		{
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+				return;
+
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select * from test";
+				cmd.Prepare();
+				var plan = default(string);
+				Assert.DoesNotThrow(() => { plan = cmd.CommandExplainedPlan; });
+				Assert.IsNotEmpty(plan);
+			}
+		}
+
+		[Test]
 		public void NoCommandPlanTest()
 		{
 			using (var cmd = Connection.CreateCommand())
@@ -747,6 +776,22 @@ end";
 				cmd.Prepare();
 				var plan = default(string);
 				Assert.DoesNotThrow(() => { plan = cmd.CommandPlan; });
+				Assert.IsEmpty(plan);
+			}
+		}
+
+		[Test]
+		public void NoCommandExplainedPlanTest()
+		{
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+				return;
+
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "recreate table NoCommandPlanTest (id int)";
+				cmd.Prepare();
+				var plan = default(string);
+				Assert.DoesNotThrow(() => { plan = cmd.CommandExplainedPlan; });
 				Assert.IsEmpty(plan);
 			}
 		}

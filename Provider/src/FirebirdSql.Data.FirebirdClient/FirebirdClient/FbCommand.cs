@@ -110,6 +110,19 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
+		[Browsable(false)]
+		public string CommandExplainedPlan
+		{
+			get
+			{
+				if (_statement != null)
+				{
+					return _statement.GetExecutionExplainedPlan();
+				}
+				return null;
+			}
+		}
+
 		[Category("Behavior")]
 		[DefaultValue(null)]
 		public new FbConnection Connection
