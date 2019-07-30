@@ -353,76 +353,73 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void ParseConnectionInfo(string connectInfo)
 		{
-			var database = (string)null;
-			var dataSource = (string)null;
-			var portNumber = -1;
-
-			// allows standard syntax //host:port/....
-			// and old fb syntax host/port:....
 			connectInfo = connectInfo.Trim();
-			char hostSepChar;
-			char portSepChar;
 
-			if (connectInfo.StartsWith("//"))
 			{
-				connectInfo = connectInfo.Substring(2);
-				hostSepChar = '/';
-				portSepChar = ':';
-			}
-			else
-			{
-				hostSepChar = ':';
-				portSepChar = '/';
-			}
-
-			var sep = connectInfo.IndexOf(hostSepChar);
-			if (sep == 0 || sep == connectInfo.Length - 1)
-			{
-				throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
-			}
-			else if (sep > 0)
-			{
-				dataSource = connectInfo.Substring(0, sep);
-				database = connectInfo.Substring(sep + 1);
-				var portSep = dataSource.IndexOf(portSepChar);
-
-				if (portSep == 0 || portSep == dataSource.Length - 1)
+				// new style //host:port/database
+				var match = Regex.Match(connectInfo, "^//(?<host>[A-Za-z0-9\\.]+):(?<port>\\d+)/(?<database>.+)$");
+				if (match.Success)
 				{
-					throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
-				}
-				else if (portSep > 0)
-				{
-					portNumber = Int32.Parse(dataSource.Substring(portSep + 1), CultureInfo.InvariantCulture);
-					dataSource = dataSource.Substring(0, portSep);
-				}
-				else if (portSep < 0 && dataSource.Length == 1)
-				{
-					if (string.IsNullOrEmpty(DataSource))
-					{
-						dataSource = "localhost";
-					}
-					else
-					{
-						dataSource = null;
-					}
-
-					database = connectInfo;
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyPortNumber] = int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture);
+					return;
 				}
 			}
-			else if (sep == -1)
 			{
-				database = connectInfo;
+				// new style //[hostv6]:port/database
+				var match = Regex.Match(connectInfo, "^//\\[(?<host>[A-Za-z0-9:]+)\\]:(?<port>\\d+)/(?<database>.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyPortNumber] = int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture);
+					return;
+				}
+			}
+			{
+				// new style //host/database
+				var match = Regex.Match(connectInfo, "^//(?<host>[A-Za-z0-9\\.:]+)/(?<database>.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					return;
+				}
+			}
+			{
+				// old style host:X:\database
+				var match = Regex.Match(connectInfo, "^(?<host>[A-Za-z0-9\\.:]+):(?<database>[A-Za-z]:\\\\.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					return;
+				}
+			}
+			{
+				// old style host/port:database
+				var match = Regex.Match(connectInfo, "^(?<host>[A-Za-z0-9\\.:]+)/(?<port>\\d+):(?<database>.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					_options[DefaultKeyPortNumber] = int.Parse(match.Groups["port"].Value, CultureInfo.InvariantCulture);
+					return;
+				}
+			}
+			{
+				// old style host:database
+				var match = Regex.Match(connectInfo, "^(?<host>[A-Za-z0-9\\.:]+):(?<database>.+)$");
+				if (match.Success)
+				{
+					_options[DefaultKeyDataSource] = match.Groups["host"].Value;
+					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
+					return;
+				}
 			}
 
-			_options[DefaultKeyCatalog] = database;
-			if (dataSource != null)
-			{
-				_options[DefaultKeyDataSource] = dataSource;
-			}
-			if (portNumber != -1)
-			{
-				_options[DefaultKeyPortNumber] = portNumber;
-			}
+			_options[DefaultKeyCatalog] = connectInfo;
 		}
 
 		#endregion
