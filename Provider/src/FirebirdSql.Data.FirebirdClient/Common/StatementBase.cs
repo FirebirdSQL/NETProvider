@@ -196,7 +196,6 @@ namespace FirebirdSql.Data.Common
 		protected int GetRecordsAffected()
 		{
 			var buffer = GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
-
 			return ProcessRecordsAffectedBuffer(buffer);
 		}
 
@@ -207,48 +206,38 @@ namespace FirebirdSql.Data.Common
 			var deleteCount = 0;
 			var selectCount = 0;
 			var pos = 0;
-			var length = 0;
-			var type = 0;
 
+			int type;
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
-				length = IscHelper.VaxInteger(buffer, pos, 2);
+				var length = IscHelper.VaxInteger(buffer, pos, 2);
 				pos += 2;
-
 				switch (type)
 				{
 					case IscCodes.isc_info_sql_records:
-						int l;
 						int t;
-
 						while ((t = buffer[pos++]) != IscCodes.isc_info_end)
 						{
-							l = IscHelper.VaxInteger(buffer, pos, 2);
+							var l = IscHelper.VaxInteger(buffer, pos, 2);
 							pos += 2;
-
 							switch (t)
 							{
 								case IscCodes.isc_info_req_insert_count:
 									insertCount = IscHelper.VaxInteger(buffer, pos, l);
 									break;
-
 								case IscCodes.isc_info_req_update_count:
 									updateCount = IscHelper.VaxInteger(buffer, pos, l);
 									break;
-
 								case IscCodes.isc_info_req_delete_count:
 									deleteCount = IscHelper.VaxInteger(buffer, pos, l);
 									break;
-
 								case IscCodes.isc_info_req_select_count:
 									selectCount = IscHelper.VaxInteger(buffer, pos, l);
 									break;
 							}
-
 							pos += l;
 						}
 						break;
-
 					default:
 						pos += length;
 						break;
