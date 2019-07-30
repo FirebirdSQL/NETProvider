@@ -96,6 +96,13 @@ namespace FirebirdSql.Data.Common
 		public abstract int FetchSize { get; set; }
 		public abstract bool ReturnRecordsAffected { get; set; }
 
+		public bool DoRecordsAffected => ReturnRecordsAffected
+			&& (StatementType == DbStatementType.Insert
+				|| StatementType == DbStatementType.Delete
+				|| StatementType == DbStatementType.Update
+				|| StatementType == DbStatementType.StoredProcedure
+				|| StatementType == DbStatementType.Select);
+
 		#endregion
 
 		#region IDisposable methods

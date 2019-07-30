@@ -620,11 +620,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void UpdateRecordsAffected()
 		{
-			if (ReturnRecordsAffected &&
-				(StatementType == DbStatementType.Insert ||
-				StatementType == DbStatementType.Delete ||
-				StatementType == DbStatementType.Update ||
-				StatementType == DbStatementType.StoredProcedure))
+			if (DoRecordsAffected)
 			{
 				_recordsAffected = GetRecordsAffected();
 			}

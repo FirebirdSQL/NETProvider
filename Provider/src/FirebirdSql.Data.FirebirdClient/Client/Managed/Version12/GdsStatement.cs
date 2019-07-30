@@ -80,12 +80,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 				// we need to split this in two, to allow server handle op_cancel properly
 
-				if (ReturnRecordsAffected &&
-					(StatementType == DbStatementType.Insert ||
-					StatementType == DbStatementType.Delete ||
-					StatementType == DbStatementType.Update ||
-					StatementType == DbStatementType.StoredProcedure ||
-					StatementType == DbStatementType.Select))
+				if (DoRecordsAffected)
 				{
 					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 

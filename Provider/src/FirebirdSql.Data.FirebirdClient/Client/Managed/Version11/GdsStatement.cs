@@ -115,12 +115,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				SendExecuteToBuffer();
 
 				var readRowsAffectedResponse = false;
-				if (ReturnRecordsAffected &&
-					(StatementType == DbStatementType.Insert ||
-					StatementType == DbStatementType.Delete ||
-					StatementType == DbStatementType.Update ||
-					StatementType == DbStatementType.StoredProcedure ||
-					StatementType == DbStatementType.Select))
+				if (DoRecordsAffected)
 				{
 					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 

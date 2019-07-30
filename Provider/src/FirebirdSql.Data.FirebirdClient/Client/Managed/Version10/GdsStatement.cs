@@ -286,11 +286,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				var executeResponse = _database.ReadResponse<GenericResponse>();
 				ProcessExecuteResponse(executeResponse);
 
-				if (ReturnRecordsAffected &&
-					(StatementType == DbStatementType.Insert ||
-					StatementType == DbStatementType.Delete ||
-					StatementType == DbStatementType.Update ||
-					StatementType == DbStatementType.StoredProcedure))
+				if (DoRecordsAffected)
 				{
 					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 					_database.XdrStream.Flush();
