@@ -16,6 +16,7 @@ stages:
       vmImage: windows-2019
     workspace:
       clean: all
+    timeoutInMinutes: 0
     strategy:
       matrix:
         Provider_NET_FB30:
