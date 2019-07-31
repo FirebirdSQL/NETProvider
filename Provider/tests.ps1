@@ -114,7 +114,7 @@ function Tests-EF6() {
 function Tests-EFCore() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
-	if ($FirebirdSelection -ne 'FB25_SC') {
+	if ($FirebirdSelection -ne 'FB25') {
 		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.0"
 		Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All }
 
