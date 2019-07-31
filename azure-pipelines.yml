@@ -52,7 +52,7 @@ stages:
        try {
          $env:PATH += ';C:\Program Files\7-Zip'
          $env:build_wix = 'C:\Program Files (x86)\WiX Toolset v3.11\bin'
-       
+
          .\Provider\build.ps1 -Configuration $env:CONFIGURATION
          exit $LASTEXITCODE
        }
@@ -66,7 +66,7 @@ stages:
        try {
          $env:PATH += ';C:\Program Files\7-Zip'
          $env:tests_firebird_dir = 'C:\firebird'
-       
+
          .\Provider\tests.ps1 -Configuration $env:CONFIGURATION -FirebirdSelection $env:FIREBIRD_SELECTION -TestSuite $env:TEST_SUITE
          exit $LASTEXITCODE
        }
