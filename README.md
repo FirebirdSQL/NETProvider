@@ -17,7 +17,7 @@ Read more:
 | Builds | Status |
 |--------|--------|
 | [TeamCity](https://teamcity.jetbrains.com/project.html?projectId=OpenSourceProjects_FirebirdClient) | ![TeamCity](https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:OpenSourceProjects_FirebirdClient_CiBuild)/statusIcon.svg) |
-| [Azure Pipelines](https://dev.azure.com/FirebirdClient/CI/_build) | ![Azure Pipelines](https://dev.azure.com/FirebirdClient/CI/_apis/build/status/CI%20Build) |
+| [Azure Pipelines](https://dev.azure.com/FirebirdClient/CI/_build) | ![Azure Pipelines](https://dev.azure.com/FirebirdClient/CI/_apis/build/status/CI%20Build?branchName=master) |
 
 | GitHub |  |
 |--------|--|
