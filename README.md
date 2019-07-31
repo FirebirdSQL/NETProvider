@@ -18,7 +18,6 @@ Read more:
 |--------|--------|
 | [TeamCity](https://teamcity.jetbrains.com/project.html?projectId=OpenSourceProjects_FirebirdClient) | ![TeamCity](https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:OpenSourceProjects_FirebirdClient_CiBuild)/statusIcon.svg) |
 | [Azure Pipelines](https://dev.azure.com/FirebirdClient/CI/_build) | ![Azure Pipelines](https://dev.azure.com/FirebirdClient/CI/_apis/build/status/CI%20Build) |
-| [AppVeyor](https://ci.appveyor.com/project/cincura_net/firebirdsql-data-firebirdclient/history) | ![AppVeyor](https://ci.appveyor.com/api/projects/status/1q6arda8smaokfvs?svg=true) |
 
 | GitHub |  |
 |--------|--|
