@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			try
 			{
 				var numberOfResponses = 0;
-				if (_state == StatementState.Deallocated)
+				if (State == StatementState.Deallocated)
 				{
 					SendAllocateToBuffer();
 					numberOfResponses++;
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				try
 				{
 					GenericResponse allocateResponse = null;
-					if (_state == StatementState.Deallocated)
+					if (State == StatementState.Deallocated)
 					{
 						numberOfResponses--;
 						allocateResponse = _database.ReadResponse<GenericResponse>();
@@ -82,26 +82,25 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 						ProcessAllocateResponce(allocateResponse);
 					}
 					ProcessPrepareResponse(prepareResponse);
-					_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(statementTypeResponse));
+					StatementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(statementTypeResponse));
 				}
 				finally
 				{
 					SafeFinishFetching(ref numberOfResponses);
 				}
 
-				_state = StatementState.Prepared;
+				State = StatementState.Prepared;
 			}
 			catch (IOException ex)
 			{
-				if (_state == StatementState.Allocated)
-					_state = StatementState.Error;
+				State = State == StatementState.Allocated ? StatementState.Error : State;
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
 
 		public override void Execute()
 		{
-			if (_state == StatementState.Deallocated)
+			if (State == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
@@ -124,8 +123,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 				_database.XdrStream.Flush();
 
-				var numberOfResponses =
-					(StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
+				var numberOfResponses = (StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
 				try
 				{
 					SqlResponse sqlStoredProcedureResponse = null;
@@ -155,11 +153,11 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					SafeFinishFetching(ref numberOfResponses);
 				}
 
-				_state = StatementState.Executed;
+				State = StatementState.Executed;
 			}
 			catch (IOException ex)
 			{
-				_state = StatementState.Error;
+				State = StatementState.Error;
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}

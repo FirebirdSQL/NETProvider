@@ -35,13 +35,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		private GdsTransaction _transaction;
 		protected Descriptor _parameters;
 		protected Descriptor _fields;
-		protected StatementState _state;
-		protected DbStatementType _statementType;
 		protected bool _allRowsFetched;
 		private Queue<DbValue[]> _rows;
 		private Queue<DbValue[]> _outputParams;
 		private int _fetchSize;
-		private bool _returnRecordsAffected;
 
 		#endregion
 
@@ -90,45 +87,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return _fields; }
 		}
 
-		public override int RecordsAffected { get; protected set; }
-
-		public override bool IsPrepared
-		{
-			get
-			{
-				if (_state == StatementState.Deallocated || _state == StatementState.Error)
-				{
-					return false;
-				}
-				else
-				{
-					return true;
-				}
-			}
-		}
-
-		public override DbStatementType StatementType
-		{
-			get { return _statementType; }
-			protected set { _statementType = value; }
-		}
-
-		public override StatementState State
-		{
-			get { return _state; }
-			protected set { _state = value; }
-		}
-
 		public override int FetchSize
 		{
 			get { return _fetchSize; }
 			set { _fetchSize = value; }
-		}
-
-		public override bool ReturnRecordsAffected
-		{
-			get { return _returnRecordsAffected; }
-			set { _returnRecordsAffected = value; }
 		}
 
 		#endregion
@@ -152,7 +114,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
 			_handle = IscCodes.INVALID_OBJECT;
-			RecordsAffected = -1;
 			_fetchSize = 200;
 			_rows = new Queue<DbValue[]>();
 			_outputParams = new Queue<DbValue[]>();
@@ -183,11 +144,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_parameters = null;
 				_transaction = null;
 				_allRowsFetched = false;
-				_state = StatementState.Deallocated;
-				_statementType = DbStatementType.None;
 				_handle = 0;
 				_fetchSize = 0;
-				RecordsAffected = 0;
 				base.Dispose();
 			}
 		}
@@ -235,7 +193,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				if (_state == StatementState.Deallocated)
+				if (State == StatementState.Deallocated)
 				{
 					SendAllocateToBuffer();
 					_database.XdrStream.Flush();
@@ -248,22 +206,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 				_database.XdrStream.Flush();
-				_statementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>()));
+				StatementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>()));
 
-
-				_state = StatementState.Prepared;
+				State = StatementState.Prepared;
 			}
 			catch (IOException ex)
 			{
-				if (_state == StatementState.Allocated)
-					_state = StatementState.Error;
+				State = State == StatementState.Allocated ? StatementState.Error : State;
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
 
 		public override void Execute()
 		{
-			if (_state == StatementState.Deallocated)
+			if (State == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
@@ -272,13 +228,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				RecordsAffected = -1;
-
 				SendExecuteToBuffer();
 
 				_database.XdrStream.Flush();
 
-				if (_statementType == DbStatementType.StoredProcedure)
+				if (StatementType == DbStatementType.StoredProcedure)
 				{
 					ProcessStoredProcedureExecuteResponse(_database.ReadResponse<SqlResponse>());
 				}
@@ -292,32 +246,36 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					_database.XdrStream.Flush();
 					RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>()));
 				}
+				else
+				{
+					RecordsAffected = -1;
+				}
 
-				_state = StatementState.Executed;
+				State = StatementState.Executed;
 			}
 			catch (IOException ex)
 			{
-				_state = StatementState.Error;
+				State = StatementState.Error;
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
 
 		public override DbValue[] Fetch()
 		{
-			if (_state == StatementState.Deallocated)
+			if (State == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
-			if (_statementType == DbStatementType.StoredProcedure && !_allRowsFetched)
+			if (StatementType == DbStatementType.StoredProcedure && !_allRowsFetched)
 			{
 				_allRowsFetched = true;
 				return GetOutputParameters();
 			}
-			else if (_statementType == DbStatementType.Insert && _allRowsFetched)
+			else if (StatementType == DbStatementType.Insert && _allRowsFetched)
 			{
 				return null;
 			}
-			else if (_statementType != DbStatementType.Select && _statementType != DbStatementType.SelectForUpdate)
+			else if (StatementType != DbStatementType.Select && StatementType != DbStatementType.SelectForUpdate)
 			{
 				return null;
 			}
@@ -478,8 +436,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected bool FreeNotNeeded(int option)
 		{
-			// Does not seem to be possible or necessary to close
-			// an execute procedure statement.
+			// does not seem to be possible or necessary to close an execute procedure statement
 			if (StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
 			{
 				return true;
@@ -509,7 +466,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				_state = StatementState.Error;
+				State = StatementState.Error;
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
@@ -531,8 +488,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			_handle = response.ObjectHandle;
 			_allRowsFetched = false;
-			_state = StatementState.Allocated;
-			_statementType = DbStatementType.None;
+			State = StatementState.Allocated;
+			StatementType = DbStatementType.None;
 		}
 		#endregion
 
@@ -542,7 +499,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			// this may throw error, so it needs to be before any writing
 			var descriptor = WriteParameters();
 
-			if (_statementType == DbStatementType.StoredProcedure)
+			if (StatementType == DbStatementType.StoredProcedure)
 			{
 				_database.XdrStream.Write(IscCodes.op_execute2);
 			}
@@ -568,7 +525,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.Write(0);
 			}
 
-			if (_statementType == DbStatementType.StoredProcedure)
+			if (StatementType == DbStatementType.StoredProcedure)
 			{
 				_database.XdrStream.WriteBuffer(_fields?.ToBlrArray());
 				_database.XdrStream.Write(0); // Output message number
@@ -603,7 +560,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				Transaction.Update -= TransactionUpdate;
 			}
 
-			_state = StatementState.Closed;
+			State = StatementState.Closed;
 			TransactionUpdate = null;
 			_allRowsFetched = false;
 		}

@@ -83,19 +83,21 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region Abstract Properties
+		#region Properties
 
 		public abstract IDatabase Database { get; }
 		public abstract TransactionBase Transaction { get; set; }
 		public abstract Descriptor Parameters { get; set; }
 		public abstract Descriptor Fields { get; }
-		public abstract int RecordsAffected { get; protected set; }
-		public abstract bool IsPrepared { get; }
-		public abstract DbStatementType StatementType { get; protected set; }
-		public abstract StatementState State { get; protected set; }
 		public abstract int FetchSize { get; set; }
-		public abstract bool ReturnRecordsAffected { get; set; }
 
+		public DbStatementType StatementType { get; protected set; } = DbStatementType.None;
+		public StatementState State { get; protected set; } = StatementState.Deallocated;
+		public int RecordsAffected { get; protected set; } = -1;
+
+		public bool ReturnRecordsAffected { get; set; }
+
+		public bool IsPrepared => !(State == StatementState.Deallocated || State == StatementState.Error);
 		public bool DoRecordsAffected => ReturnRecordsAffected
 			&& (StatementType == DbStatementType.Insert
 				|| StatementType == DbStatementType.Delete
@@ -257,7 +259,6 @@ namespace FirebirdSql.Data.Common
 		protected DbStatementType GetStatementType()
 		{
 			var buffer = GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
-
 			return ProcessStatementTypeInfoBuffer(buffer);
 		}
 

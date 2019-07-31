@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		public override void Execute()
 		{
-			if (_state == StatementState.Deallocated)
+			if (State == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
@@ -57,8 +57,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 				_database.XdrStream.Flush();
 
-				var numberOfResponses =
-					(StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
+				var numberOfResponses = (StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
 				try
 				{
 					SqlResponse sqlStoredProcedureResponse = null;
@@ -99,11 +98,11 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					}
 				}
 
-				_state = StatementState.Executed;
+				State = StatementState.Executed;
 			}
 			catch (IOException ex)
 			{
-				_state = StatementState.Error;
+				State = StatementState.Error;
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}

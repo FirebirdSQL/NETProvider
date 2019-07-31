@@ -35,12 +35,8 @@ namespace FirebirdSql.Data.Client.Native
 		private FesTransaction _transaction;
 		private Descriptor _parameters;
 		private Descriptor _fields;
-		private StatementState _state;
-		private DbStatementType _statementType;
 		private bool _allRowsFetched;
 		private Queue<DbValue[]> _outputParams;
-		private int _recordsAffected;
-		private bool _returnRecordsAffected;
 		private IntPtr[] _statusVector;
 		private IntPtr _fetchSqlDa;
 
@@ -91,49 +87,10 @@ namespace FirebirdSql.Data.Client.Native
 			get { return _fields; }
 		}
 
-		public override int RecordsAffected
-		{
-			get { return _recordsAffected; }
-			protected set { _recordsAffected = value; }
-		}
-
-		public override bool IsPrepared
-		{
-			get
-			{
-				if (_state == StatementState.Deallocated || _state == StatementState.Error)
-				{
-					return false;
-				}
-				else
-				{
-					return true;
-				}
-			}
-		}
-
-		public override DbStatementType StatementType
-		{
-			get { return _statementType; }
-			protected set { _statementType = value; }
-		}
-
-		public override StatementState State
-		{
-			get { return _state; }
-			protected set { _state = value; }
-		}
-
 		public override int FetchSize
 		{
 			get { return 200; }
 			set { }
-		}
-
-		public override bool ReturnRecordsAffected
-		{
-			get { return _returnRecordsAffected; }
-			set { _returnRecordsAffected = value; }
 		}
 
 		#endregion
@@ -152,7 +109,6 @@ namespace FirebirdSql.Data.Client.Native
 				throw new ArgumentException($"Specified argument is not of {nameof(FesDatabase)} type.");
 			}
 
-			_recordsAffected = -1;
 			_db = (FesDatabase)db;
 			_handle = new StatementHandle();
 			_outputParams = new Queue<DbValue[]>();
@@ -183,9 +139,6 @@ namespace FirebirdSql.Data.Client.Native
 				_outputParams = null;
 				_statusVector = null;
 				_allRowsFetched = false;
-				_state = StatementState.Deallocated;
-				_statementType = DbStatementType.None;
-				_recordsAffected = 0;
 				_handle.Dispose();
 				FetchSize = 0;
 				base.Dispose();
@@ -249,7 +202,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			ClearStatusVector();
 
-			if (_state == StatementState.Deallocated)
+			if (State == StatementState.Deallocated)
 			{
 				Allocate();
 			}
@@ -292,14 +245,14 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fields.ResetValues();
 
-			_statementType = GetStatementType();
+			StatementType = GetStatementType();
 
-			_state = StatementState.Prepared;
+			State = StatementState.Prepared;
 		}
 
 		public override void Execute()
 		{
-			if (_state == StatementState.Deallocated)
+			if (State == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statment is not correctly created.");
 			}
@@ -313,7 +266,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				inSqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _parameters);
 			}
-			if (_statementType == DbStatementType.StoredProcedure)
+			if (StatementType == DbStatementType.StoredProcedure)
 			{
 				Fields.ResetValues();
 				outSqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
@@ -348,29 +301,36 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			UpdateRecordsAffected();
+			if (DoRecordsAffected)
+			{
+				RecordsAffected = GetRecordsAffected();
+			}
+			else
+			{
+				RecordsAffected = -1;
+			}
 
-			_state = StatementState.Executed;
+			State = StatementState.Executed;
 		}
 
 		public override DbValue[] Fetch()
 		{
 			DbValue[] row = null;
 
-			if (_state == StatementState.Deallocated)
+			if (State == StatementState.Deallocated)
 			{
 				throw new InvalidOperationException("Statement is not correctly created.");
 			}
-			if (_statementType == DbStatementType.StoredProcedure && !_allRowsFetched)
+			if (StatementType == DbStatementType.StoredProcedure && !_allRowsFetched)
 			{
 				_allRowsFetched = true;
 				return GetOutputParameters();
 			}
-			else if (_statementType == DbStatementType.Insert && _allRowsFetched)
+			else if (StatementType == DbStatementType.Insert && _allRowsFetched)
 			{
 				return null;
 			}
-			else if (_statementType != DbStatementType.Select && _statementType != DbStatementType.SelectForUpdate)
+			else if (StatementType != DbStatementType.Select && StatementType != DbStatementType.SelectForUpdate)
 			{
 				return null;
 			}
@@ -614,20 +574,8 @@ namespace FirebirdSql.Data.Client.Native
 			_db.ProcessStatusVector(_statusVector);
 
 			_allRowsFetched = false;
-			_state = StatementState.Allocated;
-			_statementType = DbStatementType.None;
-		}
-
-		private void UpdateRecordsAffected()
-		{
-			if (DoRecordsAffected)
-			{
-				_recordsAffected = GetRecordsAffected();
-			}
-			else
-			{
-				_recordsAffected = -1;
-			}
+			State = StatementState.Allocated;
+			StatementType = DbStatementType.None;
 		}
 
 		#endregion
