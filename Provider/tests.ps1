@@ -6,12 +6,12 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $FirebirdConfiguration = @{
-	FB30_Default = @{
+	FB30 = @{
 		Download = 'https://www.dropbox.com/s/x46uy7e5zrtsnux/fb30.7z?dl=1';
 		Executable = '.\firebird.exe';
 		Args = @('-a');
 	};
-	FB25_SC = @{
+	FB25 = @{
 		Download = 'https://www.dropbox.com/s/ayzjnxjx20vb7s5/fb25.7z?dl=1';
 		Executable = '.\bin\fb_inet_server.exe';
 		Args = @('-a', '-m');
@@ -78,16 +78,24 @@ function Cleanup() {
 }
 
 function Tests-All() {
-	Tests-FirebirdClient
+	Tests-FirebirdClient-NET
+	Tests-FirebirdClient-Core
 	Tests-EF6
 	Tests-EFCore
 }
 
-function Tests-FirebirdClient() {
+function Tests-FirebirdClient-NET() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd $testsNETDir
 	Check-ExitCode { .\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All }
+
+	echo "=== END ==="
+}
+
+function Tests-FirebirdClient-Core() {
+	echo "=== $($MyInvocation.MyCommand.Name) ==="
+
 	cd $testsCOREDir
 	Check-ExitCode { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --labels=All }
 

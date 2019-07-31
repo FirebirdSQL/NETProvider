@@ -4,8 +4,8 @@ configuration:
   - Release
 environment:
   matrix:
-  - firebird_selection: FB30_Default
-  - firebird_selection: FB25_SC
+  - firebird_selection: FB30
+  - firebird_selection: FB25
 test: off
 init:
   - git config --global core.autocrlf true
