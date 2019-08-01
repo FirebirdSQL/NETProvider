@@ -69,6 +69,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 				backupSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 				backupSvc.Verbose = true;
+				backupSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
 
 				backupSvc.ServiceOutput += ServiceOutput;
 
@@ -82,6 +83,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
 				restoreSvc.PageSize = FbTestsSetup.PageSize;
 				restoreSvc.Verbose = true;
+				restoreSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
 				restoreSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 
 				restoreSvc.ServiceOutput += ServiceOutput;

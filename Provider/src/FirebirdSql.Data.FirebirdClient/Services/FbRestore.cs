@@ -42,6 +42,7 @@ namespace FirebirdSql.Data.Services
 		public bool ReadOnly { get; set; }
 		public string SkipData { get; set; }
 		public FbRestoreFlags Options { get; set; }
+		public FbBackupRestoreStatistics Statistics { get; set; }
 
 		public FbRestore(string connectionString = null)
 			: base(connectionString)
@@ -72,6 +73,7 @@ namespace FirebirdSql.Data.Services
 				if (!string.IsNullOrEmpty(SkipData))
 					StartSpb.Append(IscCodes.isc_spb_res_skip_data, SkipData);
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				StartSpb.Append(IscCodes.isc_spb_res_stat, Statistics.BuildConfiguration());
 
 				Open();
 				StartTask();

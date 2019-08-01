@@ -452,7 +452,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_bkp_factor = 6;
 		public const int isc_spb_bkp_length = 7;
 		public const int isc_spb_bkp_skip_data = 8;
-
+		public const int isc_spb_bkp_stat = 15;
 		public const int isc_spb_bkp_ignore_checksums = 0x01;
 		public const int isc_spb_bkp_ignore_limbo = 0x02;
 		public const int isc_spb_bkp_metadata_only = 0x04;
@@ -472,7 +472,9 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_res_page_size = 10;
 		public const int isc_spb_res_length = 11;
 		public const int isc_spb_res_access_mode = 12;
-
+		public const int isc_spb_res_fix_fss_data = 13;
+		public const int isc_spb_res_fix_fss_metadata = 14;
+		public const int isc_spb_res_stat = isc_spb_bkp_stat;
 		public const int isc_spb_res_metadata_only = isc_spb_bkp_metadata_only;
 		public const int isc_spb_res_deactivate_idx = 0x0100;
 		public const int isc_spb_res_no_shadow = 0x0200;

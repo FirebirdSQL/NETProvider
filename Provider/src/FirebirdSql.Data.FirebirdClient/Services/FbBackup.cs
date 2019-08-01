@@ -28,6 +28,7 @@ namespace FirebirdSql.Data.Services
 		public int Factor { get; set; }
 		public string SkipData { get; set; }
 		public FbBackupFlags Options { get; set; }
+		public FbBackupRestoreStatistics Statistics { get; set; }
 
 		public FbBackup(string connectionString = null)
 			: base(connectionString)
@@ -57,6 +58,7 @@ namespace FirebirdSql.Data.Services
 				if (!string.IsNullOrEmpty(SkipData))
 					StartSpb.Append(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				StartSpb.Append(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
 
 				Open();
 				StartTask();
