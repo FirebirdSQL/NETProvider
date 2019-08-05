@@ -329,6 +329,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_version1 = 1;
 		public const int isc_spb_current_version = 2;
 		public const int isc_spb_version = isc_spb_current_version;
+		public const int isc_spb_version3 = 3;
 		public const int isc_spb_user_name = isc_dpb_user_name;
 		public const int isc_spb_sys_user_name = isc_dpb_sys_user_name;
 		public const int isc_spb_sys_user_name_enc = isc_dpb_sys_user_name_enc;
@@ -338,7 +339,22 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_dbname = 106;
 		public const int isc_spb_verbose = 107;
 		public const int isc_spb_options = 108;
+		public const int isc_spb_address_path = 109;
+		public const int isc_spb_process_id = 110;
 		public const int isc_spb_trusted_auth = 111;
+		public const int isc_spb_process_name = 112;
+		public const int isc_spb_trusted_role = 113;
+		public const int isc_spb_verbint = 114;
+		public const int isc_spb_auth_block = 115;
+		public const int isc_spb_auth_plugin_name = 116;
+		public const int isc_spb_auth_plugin_list = 117;
+		public const int isc_spb_utf8_filename = 118;
+		public const int isc_spb_client_version = 119;
+		public const int isc_spb_remote_protocol = 120;
+		public const int isc_spb_host_name = 121;
+		public const int isc_spb_os_user = 122;
+		public const int isc_spb_config = 123;
+		public const int isc_spb_expected_db = 124;
 
 		public const int isc_spb_connect_timeout = isc_dpb_connect_timeout;
 		public const int isc_spb_dummy_packet_interval = isc_dpb_dummy_packet_interval;
