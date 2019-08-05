@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Services
 			{
 				if (_svc != null && State == FbServiceState.Open)
 				{
-					throw new InvalidOperationException("ConnectionString cannot be modified on active service instances.");
+					throw new InvalidOperationException("ConnectionString cannot be modified on open instances.");
 				}
 
 				_csManager = new ConnectionString(value);
