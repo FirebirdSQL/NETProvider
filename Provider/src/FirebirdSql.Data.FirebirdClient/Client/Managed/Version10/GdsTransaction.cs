@@ -100,13 +100,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				GenericResponse response;
 				_database.XdrStream.Write(IscCodes.op_transaction);
 				_database.XdrStream.Write(_database.Handle);
 				_database.XdrStream.WriteBuffer(tpb.ToArray());
 				_database.XdrStream.Flush();
 
-				response = _database.ReadResponse<GenericResponse>();
+				var response = _database.ReadResponse<GenericResponse>();
 
 				_database.TransactionCount++;
 
