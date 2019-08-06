@@ -35,12 +35,12 @@ namespace FirebirdSql.Data.Services
 		private const string ServiceName = "service_mgr";
 
 		private IServiceManager _svc;
-		private ConnectionString _csManager;
+		private ConnectionString _options;
 
 		internal ServiceParameterBuffer StartSpb;
 		internal ServiceParameterBuffer QuerySpb;
 
-		protected string Database => _csManager.Database;
+		protected string Database => _options.Database;
 
 		public FbServiceState State { get; private set; }
 		public int QueryBufferSize { get; set; }
@@ -56,7 +56,7 @@ namespace FirebirdSql.Data.Services
 					throw new InvalidOperationException("ConnectionString cannot be modified on open instances.");
 				}
 
-				_csManager = new ConnectionString(value);
+				_options = new ConnectionString(value);
 
 				if (value == null)
 				{
@@ -87,12 +87,12 @@ namespace FirebirdSql.Data.Services
 			}
 			else
 			{
-				spb.Append((byte)IscCodes.isc_spb_user_name, _csManager.UserID);
-				spb.Append((byte)IscCodes.isc_spb_password, _csManager.Password);
+				spb.Append((byte)IscCodes.isc_spb_user_name, _options.UserID);
+				spb.Append((byte)IscCodes.isc_spb_password, _options.Password);
 			}
 			spb.Append((byte)IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-			if ((_csManager?.Role.Length ?? 0) != 0)
-				spb.Append((byte)IscCodes.isc_spb_sql_role_name, _csManager.Role);
+			if ((_options?.Role.Length ?? 0) != 0)
+				spb.Append((byte)IscCodes.isc_spb_sql_role_name, _options.Role);
 			return spb;
 		}
 
@@ -100,18 +100,18 @@ namespace FirebirdSql.Data.Services
 		{
 			if (State != FbServiceState.Closed)
 				throw new InvalidOperationException("Service already Open.");
-			if (string.IsNullOrEmpty(_csManager.UserID))
+			if (string.IsNullOrEmpty(_options.UserID))
 				throw new InvalidOperationException("No user name was specified.");
-			if (string.IsNullOrEmpty(_csManager.Password))
+			if (string.IsNullOrEmpty(_options.Password))
 				throw new InvalidOperationException("No user password was specified.");
 
 			try
 			{
 				if (_svc == null)
 				{
-					_svc = ClientFactory.CreateServiceManager(_csManager);
+					_svc = ClientFactory.CreateServiceManager(_options);
 				}
-				_svc.Attach(BuildSpb(), _csManager.DataSource, _csManager.Port, ServiceName, _csManager.CryptKey);
+				_svc.Attach(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey);
 				_svc.WarningMessage = OnWarningMessage;
 				State = FbServiceState.Open;
 			}
