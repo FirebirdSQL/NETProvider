@@ -32,27 +32,26 @@ namespace FirebirdSql.Data.Services
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_add_user);
-			StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
-			StartSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
-			if ((user.FirstName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
-			if ((user.MiddleName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
-			if ((user.LastName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
-			if (user.UserID != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
-			if (user.GroupID != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
-			if ((user.GroupName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
-			if ((user.RoleName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_add_user);
+			startSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
+			startSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
+			if ((user.FirstName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
+			if ((user.MiddleName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
+			if ((user.LastName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
+			if (user.UserID != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
+			if (user.GroupID != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
+			if ((user.GroupName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
+			if ((user.RoleName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -61,14 +60,13 @@ namespace FirebirdSql.Data.Services
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_delete_user);
-			StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
-			if ((user.RoleName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_delete_user);
+			startSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
+			if ((user.RoleName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -77,58 +75,55 @@ namespace FirebirdSql.Data.Services
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_modify_user);
-			StartSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
-			if ((user.UserPassword?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
-			if ((user.FirstName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
-			if ((user.MiddleName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
-			if ((user.LastName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
-			StartSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
-			StartSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
-			if ((user.GroupName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
-			if ((user.RoleName?.Length ?? 0) != 0)
-				StartSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_modify_user);
+			startSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
+			if ((user.UserPassword?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_password, user.UserPassword);
+			if ((user.FirstName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_firstname, user.FirstName);
+			if ((user.MiddleName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_middlename, user.MiddleName);
+			if ((user.LastName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_lastname, user.LastName);
+			startSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
+			startSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
+			if ((user.GroupName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
+			if ((user.RoleName?.Length ?? 0) != 0)
+				startSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
+			StartTask(startSpb);
 			Close();
 		}
 
 		public FbUserData DisplayUser(string userName)
 		{
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_display_user);
-			StartSpb.Append(IscCodes.isc_spb_sec_username, userName);
-
 			Open();
-			StartTask();
-			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users });
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_display_user);
+			startSpb.Append(IscCodes.isc_spb_sec_username, userName);
+			StartTask(startSpb);
+			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users }, EmptySpb);
 			Close();
 			return ((FbUserData[])info.FirstOrDefault())?.FirstOrDefault();
 		}
 
 		public FbUserData[] DisplayUsers()
 		{
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_display_user);
-
 			Open();
-			StartTask();
-			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users });
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_display_user);
+			StartTask(startSpb);
+			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users }, EmptySpb);
 			Close();
 			return (FbUserData[])info.FirstOrDefault();
 		}
 
 		public string GetUsersDbPath()
 		{
-			var info = Query(new byte[] { IscCodes.isc_info_svc_user_dbpath });
-			return info.Count != 0 ? (string)info[0] : null;
+			var info = Query(new byte[] { IscCodes.isc_info_svc_user_dbpath }, EmptySpb);
+			return (string)info.FirstOrDefault();
 		}
 	}
 }

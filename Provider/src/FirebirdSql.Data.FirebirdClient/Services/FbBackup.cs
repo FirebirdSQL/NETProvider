@@ -42,29 +42,28 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_backup);
-				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+				Open();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_backup);
+				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 				foreach (var file in BackupFiles)
 				{
-					StartSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile);
+					startSpb.Append(IscCodes.isc_spb_bkp_file, file.BackupFile, SpbFilenameEncoding);
 					if (file.BackupLength.HasValue)
-						StartSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
+						startSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
 				}
 				if (Verbose)
-					StartSpb.Append(IscCodes.isc_spb_verbose);
+					startSpb.Append(IscCodes.isc_spb_verbose);
 				if (Factor > 0)
-					StartSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
+					startSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
 				if (!string.IsNullOrEmpty(SkipData))
-					StartSpb.Append(IscCodes.isc_spb_bkp_skip_data, SkipData);
-				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				StartSpb.Append(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
-
-				Open();
-				StartTask();
+					startSpb.Append(IscCodes.isc_spb_bkp_skip_data, SkipData);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				startSpb.Append(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
+				StartTask(startSpb);
 				if (Verbose)
 				{
-					ProcessServiceOutput();
+					ProcessServiceOutput(EmptySpb);
 				}
 			}
 			catch (Exception ex)

@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.Services
 
 		private IList<object> GetInfo(byte[] items)
 		{
-			return Query(items);
+			return Query(items, EmptySpb);
 		}
 
 		public static Version ParseServerVersion(string version)

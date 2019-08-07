@@ -31,13 +31,12 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -45,13 +44,12 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -59,13 +57,12 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -73,24 +70,23 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			Open();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			switch (mode)
 			{
 				case FbShutdownMode.Forced:
-					StartSpb.Append(IscCodes.isc_spb_prp_shutdown_db, seconds);
+					startSpb.Append(IscCodes.isc_spb_prp_shutdown_db, seconds);
 					break;
 				case FbShutdownMode.DenyTransaction:
-					StartSpb.Append(IscCodes.isc_spb_prp_deny_new_transactions, seconds);
+					startSpb.Append(IscCodes.isc_spb_prp_deny_new_transactions, seconds);
 					break;
 				case FbShutdownMode.DenyConnection:
-					StartSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
+					startSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
 					break;
 			}
-
-			Open();
-			StartTask();
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -98,25 +94,24 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
+			Open();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
 			switch (type)
 			{
 				case FbShutdownType.ForceShutdown:
-					StartSpb.Append(IscCodes.isc_spb_prp_force_shutdown, seconds);
+					startSpb.Append(IscCodes.isc_spb_prp_force_shutdown, seconds);
 					break;
 				case FbShutdownType.AttachmentsShutdown:
-					StartSpb.Append(IscCodes.isc_spb_prp_attachments_shutdown, seconds);
+					startSpb.Append(IscCodes.isc_spb_prp_attachments_shutdown, seconds);
 					break;
 				case FbShutdownType.TransactionsShutdown:
-					StartSpb.Append(IscCodes.isc_spb_prp_transactions_shutdown, seconds);
+					startSpb.Append(IscCodes.isc_spb_prp_transactions_shutdown, seconds);
 					break;
 			}
-
-			Open();
-			StartTask();
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -124,13 +119,12 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -138,13 +132,12 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -152,13 +145,12 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -166,20 +158,19 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			Open();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			if (forcedWrites)
 			{
-				StartSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
+				startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
 			}
 			else
 			{
-				StartSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_async);
+				startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_async);
 			}
-
-			Open();
-			StartTask();
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -187,20 +178,19 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+			Open();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			if (reserveSpace)
 			{
-				StartSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
+				startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
 			}
 			else
 			{
-				StartSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res_use_full);
+				startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res_use_full);
 			}
-
-			Open();
-			StartTask();
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -208,13 +198,12 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
+			StartTask(startSpb);
 			Close();
 		}
 
@@ -222,13 +211,12 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			StartSpb = new ServiceParameterBuffer();
-			StartSpb.Append(IscCodes.isc_action_svc_properties);
-			StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-			StartSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_nolinger);
-
 			Open();
-			StartTask();
+			var startSpb = new ServiceParameterBuffer();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_nolinger);
+			StartTask(startSpb);
 			Close();
 		}
 

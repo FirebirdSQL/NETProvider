@@ -49,17 +49,16 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_nbak);
-				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-				StartSpb.Append(IscCodes.isc_spb_nbk_level, _level);
-				StartSpb.Append(IscCodes.isc_spb_nbk_file, BackupFile);
-				StartSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
-				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
-
 				Open();
-				StartTask();
-				ProcessServiceOutput();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_nbak);
+				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				startSpb.Append(IscCodes.isc_spb_nbk_level, _level);
+				startSpb.Append(IscCodes.isc_spb_nbk_file, BackupFile, SpbFilenameEncoding);
+				startSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				StartTask(startSpb);
+				ProcessServiceOutput(EmptySpb);
 			}
 			catch (Exception ex)
 			{

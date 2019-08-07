@@ -17,8 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
 using System.Text;
 
 using FirebirdSql.Data.Common;
@@ -34,13 +32,14 @@ namespace FirebirdSql.Data.Services
 
 		private const string ServiceName = "service_mgr";
 
+		private protected static readonly ServiceParameterBuffer EmptySpb = new ServiceParameterBuffer();
+
 		private IServiceManager _svc;
 		private ConnectionString _options;
 
-		internal ServiceParameterBuffer StartSpb;
-		internal ServiceParameterBuffer QuerySpb;
+		private protected Encoding SpbFilenameEncoding;
 
-		protected string Database => _options.Database;
+		private protected string Database => _options.Database;
 
 		public FbServiceState State { get; private set; }
 		public int QueryBufferSize { get; set; }
@@ -69,7 +68,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		protected FbService(string connectionString = null)
+		private protected FbService(string connectionString = null)
 		{
 			State = FbServiceState.Closed;
 			QueryBufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
@@ -78,6 +77,7 @@ namespace FirebirdSql.Data.Services
 
 		private ServiceParameterBuffer BuildSpb()
 		{
+			SpbFilenameEncoding = Encoding.Default;
 			var spb = new ServiceParameterBuffer();
 			spb.Append(IscCodes.isc_spb_version);
 			spb.Append(IscCodes.isc_spb_current_version);
@@ -93,11 +93,20 @@ namespace FirebirdSql.Data.Services
 			spb.Append((byte)IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 			if ((_options?.Role.Length ?? 0) != 0)
 				spb.Append((byte)IscCodes.isc_spb_sql_role_name, _options.Role);
-			spb.Append((byte)IscCodes.isc_spb_expected_db, _options.Database);
+			if (_svc is Client.Managed.Version12.GdsServiceManager)
+			{
+				spb.Append((byte)IscCodes.isc_spb_utf8_filename, new byte[] { 0 });
+				SpbFilenameEncoding = Encoding.UTF8;
+				spb.Append((byte)IscCodes.isc_spb_expected_db, _options.Database, SpbFilenameEncoding);
+			}
+			else
+			{
+				spb.Append((byte)IscCodes.isc_spb_expected_db, _options.Database);
+			}
 			return spb;
 		}
 
-		protected void Open()
+		private protected void Open()
 		{
 			if (State != FbServiceState.Closed)
 				throw new InvalidOperationException("Service already Open.");
@@ -122,7 +131,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		protected void Close()
+		private protected void Close()
 		{
 			if (State != FbServiceState.Open)
 			{
@@ -140,14 +149,14 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		protected void StartTask()
+		private protected void StartTask(ServiceParameterBuffer spb)
 		{
 			if (State == FbServiceState.Closed)
 				throw new InvalidOperationException("Service is Closed.");
 
 			try
 			{
-				_svc.Start(StartSpb);
+				_svc.Start(spb);
 			}
 			catch (Exception ex)
 			{
@@ -155,10 +164,10 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		protected IList<object> Query(byte[] items)
+		private protected IList<object> Query(byte[] items, ServiceParameterBuffer spb)
 		{
 			var result = new List<object>();
-			Query(items, (truncated, item) =>
+			Query(items, spb, (truncated, item) =>
 			{
 				if (item is string stringItem)
 				{
@@ -195,52 +204,52 @@ namespace FirebirdSql.Data.Services
 			return result;
 		}
 
-		protected void Query(byte[] items, Action<bool, object> resultAction)
+		private protected void Query(byte[] items, ServiceParameterBuffer spb, Action<bool, object> resultAction)
 		{
-			ProcessQuery(items, resultAction);
+			ProcessQuery(items, spb, resultAction);
 		}
 
-		protected void ProcessServiceOutput()
+		private protected void ProcessServiceOutput(ServiceParameterBuffer spb)
 		{
 			string line;
-			while ((line = GetNextLine()) != null)
+			while ((line = GetNextLine(spb)) != null)
 			{
 				OnServiceOutput(line);
 			}
 		}
 
-		protected string GetNextLine()
+		private protected string GetNextLine(ServiceParameterBuffer spb)
 		{
-			var info = Query(new byte[] { IscCodes.isc_info_svc_line });
+			var info = Query(new byte[] { IscCodes.isc_info_svc_line }, spb);
 			if (info.Count == 0)
 				return null;
 			return info[0] as string;
 		}
 
-		protected void OnServiceOutput(string message)
+		private protected void OnServiceOutput(string message)
 		{
 			ServiceOutput?.Invoke(this, new ServiceOutputEventArgs(message));
 		}
 
-		protected void EnsureDatabase()
+		private protected void EnsureDatabase()
 		{
 			if (string.IsNullOrEmpty(Database))
 				throw new FbException("Action should be executed against a specific database.");
 		}
 
-		private void ProcessQuery(byte[] items, Action<bool, object> queryResponseAction)
+		private void ProcessQuery(byte[] items, ServiceParameterBuffer spb, Action<bool, object> queryResponseAction)
 		{
 			var pos = 0;
 			var truncated = false;
 			var type = default(int);
 
-			var buffer = QueryService(items);
+			var buffer = QueryService(items, spb);
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
 				if (type == IscCodes.isc_info_truncated)
 				{
-					buffer = QueryService(items);
+					buffer = QueryService(items, spb);
 					pos = 0;
 					truncated = true;
 					continue;
@@ -339,7 +348,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private byte[] QueryService(byte[] items)
+		private byte[] QueryService(byte[] items, ServiceParameterBuffer spb)
 		{
 			var shouldClose = false;
 			if (State == FbServiceState.Closed)
@@ -347,14 +356,10 @@ namespace FirebirdSql.Data.Services
 				Open();
 				shouldClose = true;
 			}
-			if (QuerySpb == null)
-			{
-				QuerySpb = new ServiceParameterBuffer();
-			}
 			try
 			{
 				var buffer = new byte[QueryBufferSize];
-				_svc.Query(QuerySpb, items.Length, items, buffer.Length, buffer);
+				_svc.Query(spb, items.Length, items, buffer.Length, buffer);
 				return buffer;
 			}
 			finally

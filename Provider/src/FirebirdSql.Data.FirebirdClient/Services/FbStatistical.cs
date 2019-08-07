@@ -36,14 +36,13 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_db_stats);
-				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
-
 				Open();
-				StartTask();
-				ProcessServiceOutput();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_db_stats);
+				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				StartTask(startSpb);
+				ProcessServiceOutput(EmptySpb);
 			}
 			catch (Exception ex)
 			{

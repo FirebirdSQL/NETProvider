@@ -38,18 +38,17 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_nrest);
-				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+				Open();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_nrest);
+				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 				foreach (var file in BackupFiles)
 				{
-					StartSpb.Append(IscCodes.isc_spb_nbk_file, file);
+					startSpb.Append(IscCodes.isc_spb_nbk_file, file, SpbFilenameEncoding);
 				}
-				StartSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
-
-				Open();
-				StartTask();
-				ProcessServiceOutput();
+				startSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
+				StartTask(startSpb);
+				ProcessServiceOutput(EmptySpb);
 			}
 			catch (Exception ex)
 			{

@@ -41,23 +41,22 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_validate);
-				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
-				if (!string.IsNullOrEmpty(TablesInclude))
-					StartSpb.Append(IscCodes.isc_spb_val_tab_incl, TablesInclude);
-				if (!string.IsNullOrEmpty(TablesExclude))
-					StartSpb.Append(IscCodes.isc_spb_val_tab_excl, TablesExclude);
-				if (!string.IsNullOrEmpty(IndicesInclude))
-					StartSpb.Append(IscCodes.isc_spb_val_idx_incl, IndicesInclude);
-				if (!string.IsNullOrEmpty(IndicesExclude))
-					StartSpb.Append(IscCodes.isc_spb_val_idx_excl, IndicesExclude);
-				if (LockTimeout.HasValue)
-					StartSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
-
 				Open();
-				StartTask();
-				ProcessServiceOutput();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_validate);
+				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				if (!string.IsNullOrEmpty(TablesInclude))
+					startSpb.Append(IscCodes.isc_spb_val_tab_incl, TablesInclude);
+				if (!string.IsNullOrEmpty(TablesExclude))
+					startSpb.Append(IscCodes.isc_spb_val_tab_excl, TablesExclude);
+				if (!string.IsNullOrEmpty(IndicesInclude))
+					startSpb.Append(IscCodes.isc_spb_val_idx_incl, IndicesInclude);
+				if (!string.IsNullOrEmpty(IndicesExclude))
+					startSpb.Append(IscCodes.isc_spb_val_idx_excl, IndicesExclude);
+				if (LockTimeout.HasValue)
+					startSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
+				StartTask(startSpb);
+				ProcessServiceOutput(EmptySpb);
 			}
 			catch (Exception ex)
 			{

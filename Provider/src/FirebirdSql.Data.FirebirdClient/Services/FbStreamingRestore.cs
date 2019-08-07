@@ -60,25 +60,24 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_restore);
-				StartSpb.Append(IscCodes.isc_spb_bkp_file, "stdin");
-				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+				Open();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_restore);
+				startSpb.Append(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
+				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 				if (Verbose)
 				{
-					StartSpb.Append(IscCodes.isc_spb_verbose);
+					startSpb.Append(IscCodes.isc_spb_verbose);
 				}
 				if (PageBuffers.HasValue)
-					StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
+					startSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
 				if (_pageSize.HasValue)
-					StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
-				StartSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
+					startSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
+				startSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
 				if (!string.IsNullOrEmpty(SkipData))
-					StartSpb.Append(IscCodes.isc_spb_res_skip_data, SkipData);
-				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
-
-				Open();
-				StartTask();
+					startSpb.Append(IscCodes.isc_spb_res_skip_data, SkipData);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				StartTask(startSpb);
 				ReadInput();
 			}
 			catch (Exception ex)
@@ -94,7 +93,8 @@ namespace FirebirdSql.Data.Services
 		void ReadInput()
 		{
 			var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
-			var response = Query(items);
+			var spb = EmptySpb;
+			var response = Query(items, spb);
 			var requestedLength = GetLength(response);
 			while (true)
 			{
@@ -105,12 +105,12 @@ namespace FirebirdSql.Data.Services
 					if (read > 0)
 					{
 						Array.Resize(ref data, read);
-						var spb = new ServiceParameterBuffer();
-						spb.Append(IscCodes.isc_info_svc_line, data);
-						QuerySpb = spb;
+						var dataSpb = new ServiceParameterBuffer();
+						dataSpb.Append(IscCodes.isc_info_svc_line, data);
+						spb = dataSpb;
 					}
 				}
-				response = Query(items);
+				response = Query(items, spb);
 				if (response.Count == 1)
 				{
 					break;
@@ -120,7 +120,7 @@ namespace FirebirdSql.Data.Services
 					OnServiceOutput(message);
 				}
 				requestedLength = GetLength(response);
-				QuerySpb = null;
+				spb = EmptySpb;
 			}
 		}
 

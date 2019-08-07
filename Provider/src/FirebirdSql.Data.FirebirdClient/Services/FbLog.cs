@@ -32,12 +32,11 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_get_ib_log);
-
 				Open();
-				StartTask();
-				ProcessServiceOutput();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_get_ib_log);
+				StartTask(startSpb);
+				ProcessServiceOutput(EmptySpb);
 			}
 			catch (Exception ex)
 			{

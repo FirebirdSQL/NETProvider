@@ -47,15 +47,14 @@ namespace FirebirdSql.Data.Services
 			{
 				var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_trace_start);
-				if (!string.IsNullOrEmpty(sessionName))
-					StartSpb.Append(IscCodes.isc_spb_trc_name, sessionName);
-				StartSpb.Append(IscCodes.isc_spb_trc_cfg, config);
-
 				Open();
-				StartTask();
-				ProcessServiceOutput();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_trace_start);
+				if (!string.IsNullOrEmpty(sessionName))
+					startSpb.Append(IscCodes.isc_spb_trc_name, sessionName);
+				startSpb.Append(IscCodes.isc_spb_trc_cfg, config);
+				StartTask(startSpb);
+				ProcessServiceOutput(EmptySpb);
 			}
 			catch (Exception ex)
 			{
@@ -91,14 +90,13 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(action);
-				if (sessionID.HasValue)
-					StartSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
-
 				Open();
-				StartTask();
-				ProcessServiceOutput();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(action);
+				if (sessionID.HasValue)
+					startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
+				StartTask(startSpb);
+				ProcessServiceOutput(EmptySpb);
 			}
 			catch (Exception ex)
 			{

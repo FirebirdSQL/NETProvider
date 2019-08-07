@@ -56,30 +56,29 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				StartSpb = new ServiceParameterBuffer();
-				StartSpb.Append(IscCodes.isc_action_svc_restore);
+				Open();
+				var startSpb = new ServiceParameterBuffer();
+				startSpb.Append(IscCodes.isc_action_svc_restore);
 				foreach (var bkpFile in BackupFiles)
 				{
-					StartSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
+					startSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile, SpbFilenameEncoding);
 				}
-				StartSpb.Append(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 				if (Verbose)
-					StartSpb.Append(IscCodes.isc_spb_verbose);
+					startSpb.Append(IscCodes.isc_spb_verbose);
 				if (PageBuffers.HasValue)
-					StartSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
+					startSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
 				if (_pageSize.HasValue)
-					StartSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
-				StartSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
+					startSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
+				startSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
 				if (!string.IsNullOrEmpty(SkipData))
-					StartSpb.Append(IscCodes.isc_spb_res_skip_data, SkipData);
-				StartSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				StartSpb.Append(IscCodes.isc_spb_res_stat, Statistics.BuildConfiguration());
-
-				Open();
-				StartTask();
+					startSpb.Append(IscCodes.isc_spb_res_skip_data, SkipData);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				startSpb.Append(IscCodes.isc_spb_res_stat, Statistics.BuildConfiguration());
+				StartTask(startSpb);
 				if (Verbose)
 				{
-					ProcessServiceOutput();
+					ProcessServiceOutput(EmptySpb);
 				}
 			}
 			catch (Exception ex)

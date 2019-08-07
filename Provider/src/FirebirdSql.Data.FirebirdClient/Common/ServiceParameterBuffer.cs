@@ -16,7 +16,6 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.IO;
 using System.Text;
 
 namespace FirebirdSql.Data.Common
@@ -39,14 +38,16 @@ namespace FirebirdSql.Data.Common
 			Write(value);
 		}
 
-		public void Append(int type, string value)
+		public void Append(int type, string value) => Append(type, value, Encoding.Default);
+		public void Append(int type, string value, Encoding encoding)
 		{
-			Append(type, Encoding.Default.GetBytes(value));
+			Append(type, encoding.GetBytes(value));
 		}
 
-		public void Append(byte type, string value)
+		public void Append(byte type, string value) => Append(type, value, Encoding.Default);
+		public void Append(byte type, string value, Encoding encoding)
 		{
-			Append(type, Encoding.Default.GetBytes(value));
+			Append(type, encoding.GetBytes(value));
 		}
 
 		public void Append(int type, byte[] value)
