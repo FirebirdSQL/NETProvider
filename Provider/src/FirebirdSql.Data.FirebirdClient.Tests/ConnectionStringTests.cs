@@ -719,5 +719,44 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			Assert.AreEqual("localhost", cs.DataSource);
 			Assert.AreEqual("C:\\test.fdb", cs.Database);
 		}
+
+		[Test]
+		public void ParsingDatabaseNoStyleWithoutPath()
+		{
+			const string ConnectionString = "database=test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("test.fdb", cs.Database);
+			Assert.AreEqual(string.Empty, cs.DataSource);
+		}
+
+		[Test]
+		public void ParsingDatabaseNoStyleRootPath()
+		{
+			const string ConnectionString = "database=/test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("/test.fdb", cs.Database);
+			Assert.AreEqual(string.Empty, cs.DataSource);
+		}
+
+		[Test]
+		public void ParsingDatabaseNoStyleDrivePath()
+		{
+			const string ConnectionString = "database=C:\\test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual("C:\\test.fdb", cs.Database);
+			Assert.AreEqual(string.Empty, cs.DataSource);
+		}
+
+		[TestCase("test")]
+		[TestCase("test12")]
+		[TestCase("32test")]
+		[TestCase("test-12")]
+		public void ParsingDatabaseHostnames(string hostname)
+		{
+			var ConnectionString = $"database={hostname}:test.fdb";
+			var cs = new ConnectionString(ConnectionString);
+			Assert.AreEqual(hostname, cs.DataSource);
+			Assert.AreEqual("test.fdb", cs.Database);
+		}
 	}
 }

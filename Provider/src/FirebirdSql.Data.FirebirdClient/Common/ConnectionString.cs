@@ -352,13 +352,14 @@ namespace FirebirdSql.Data.Common
 			_options = new Dictionary<string, object>(DefaultValues);
 		}
 
+		// it is expected the hostname do be at least 2 characters to prevent possible ambiguity (DNET-892)
 		private void ParseConnectionInfo(string connectionInfo)
 		{
 			connectionInfo = connectionInfo.Trim();
 
 			{
-				// URL style inet://host:port/database
-				var match = Regex.Match(connectionInfo, "^inet://(?<host>[A-Za-z0-9\\.]+):(?<port>\\d+)/(?<database>.+)$");
+				// URL style inet://[hostv6]:port/database
+				var match = Regex.Match(connectionInfo, "^inet://\\[(?<host>[A-Za-z0-9:]{2,})\\]:(?<port>\\d+)/(?<database>.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
@@ -368,8 +369,8 @@ namespace FirebirdSql.Data.Common
 				}
 			}
 			{
-				// URL style inet://[hostv6]:port/database
-				var match = Regex.Match(connectionInfo, "^inet://\\[(?<host>[A-Za-z0-9:]+)\\]:(?<port>\\d+)/(?<database>.+)$");
+				// URL style inet://host:port/database
+				var match = Regex.Match(connectionInfo, "^inet://(?<host>[A-Za-z0-9\\.-]{2,}):(?<port>\\d+)/(?<database>.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
@@ -380,7 +381,7 @@ namespace FirebirdSql.Data.Common
 			}
 			{
 				// URL style inet://host/database
-				var match = Regex.Match(connectionInfo, "^inet://(?<host>[A-Za-z0-9\\.:]+)/(?<database>.+)$");
+				var match = Regex.Match(connectionInfo, "^inet://(?<host>[A-Za-z0-9\\.:-]{2,})/(?<database>.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
@@ -399,8 +400,8 @@ namespace FirebirdSql.Data.Common
 				}
 			}
 			{
-				// new style //host:port/database
-				var match = Regex.Match(connectionInfo, "^//(?<host>[A-Za-z0-9\\.]+):(?<port>\\d+)/(?<database>.+)$");
+				// new style //[hostv6]:port/database
+				var match = Regex.Match(connectionInfo, "^//\\[(?<host>[A-Za-z0-9:]{2,})\\]:(?<port>\\d+)/(?<database>.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
@@ -410,8 +411,8 @@ namespace FirebirdSql.Data.Common
 				}
 			}
 			{
-				// new style //[hostv6]:port/database
-				var match = Regex.Match(connectionInfo, "^//\\[(?<host>[A-Za-z0-9:]+)\\]:(?<port>\\d+)/(?<database>.+)$");
+				// new style //host:port/database
+				var match = Regex.Match(connectionInfo, "^//(?<host>[A-Za-z0-9\\.-]{2,}):(?<port>\\d+)/(?<database>.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
@@ -422,7 +423,7 @@ namespace FirebirdSql.Data.Common
 			}
 			{
 				// new style //host/database
-				var match = Regex.Match(connectionInfo, "^//(?<host>[A-Za-z0-9\\.:]+)/(?<database>.+)$");
+				var match = Regex.Match(connectionInfo, "^//(?<host>[A-Za-z0-9\\.:-]{2,})/(?<database>.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
@@ -432,7 +433,7 @@ namespace FirebirdSql.Data.Common
 			}
 			{
 				// old style host:X:\database
-				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:]+):(?<database>[A-Za-z]:\\\\.+)$");
+				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:-]{2,}):(?<database>[A-Za-z]:\\\\.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
@@ -442,7 +443,7 @@ namespace FirebirdSql.Data.Common
 			}
 			{
 				// old style host/port:database
-				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:]+)/(?<port>\\d+):(?<database>.+)$");
+				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:-]{2,})/(?<port>\\d+):(?<database>.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
@@ -453,7 +454,7 @@ namespace FirebirdSql.Data.Common
 			}
 			{
 				// old style host:database
-				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:]+):(?<database>.+)$");
+				var match = Regex.Match(connectionInfo, "^(?<host>[A-Za-z0-9\\.:-]{2,}):(?<database>.+)$");
 				if (match.Success)
 				{
 					_options[DefaultKeyCatalog] = match.Groups["database"].Value;
