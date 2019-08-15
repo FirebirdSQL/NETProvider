@@ -4,7 +4,7 @@ Read more:
 
 * [Providers](Provider/readme.txt)
 	* [ADO.NET provider](Provider/docs/ado-net.md)
-	* [Entity Framnework 6 provider](Provider/docs/entity-framework-6.md)
+	* [Entity Framework 6 provider](Provider/docs/entity-framework-6.md)
 	* [Entity Framework Core provider](Provider/docs/entity-framework-core.md)
 * [DDEX provider](DDEX/readme.txt)
 
