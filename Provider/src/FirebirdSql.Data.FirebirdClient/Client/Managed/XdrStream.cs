@@ -248,7 +248,7 @@ namespace FirebirdSql.Data.Client.Managed
 				var read = default(int);
 				try
 				{
-					read = await _innerStream.ReadAsync(readBuffer, 0, readBuffer.Length).ConfigureAwait(false);
+					read = await _innerStream.ReadAsync(readBuffer, 0, readBuffer.Length, cancellationToken).ConfigureAwait(false);
 				}
 				catch (IOException)
 				{
