@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected string _serverVersion;
 		private short _packetSize;
 		private short _dialect;
-		private XdrStream _xdrStream;
+		private IXdrStream _xdrStream;
 
 		#endregion
 
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return true; }
 		}
 
-		public XdrStream XdrStream
+		public IXdrStream XdrStream
 		{
 			get { return _xdrStream; }
 		}

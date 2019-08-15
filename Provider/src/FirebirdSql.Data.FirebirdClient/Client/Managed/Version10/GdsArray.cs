@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.WriteBuffer(sdl);
 				_database.XdrStream.Write(string.Empty);
 				_database.XdrStream.Write(sliceLength);
-				_database.XdrStream.Write(slice, 0, slice.Length);
+				_database.XdrStream.WriteBytes(slice, slice.Length);
 				_database.XdrStream.Flush();
 
 				var response = _database.ReadResponse<GenericResponse>();

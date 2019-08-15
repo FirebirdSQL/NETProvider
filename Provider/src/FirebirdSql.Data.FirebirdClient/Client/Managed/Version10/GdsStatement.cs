@@ -516,7 +516,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.XdrStream.WriteBuffer(_parameters.ToBlrArray());
 				_database.XdrStream.Write(0); // Message number
 				_database.XdrStream.Write(1); // Number of messages
-				_database.XdrStream.Write(descriptor, 0, descriptor.Length);
+				_database.XdrStream.WriteBytes(descriptor, descriptor.Length);
 			}
 			else
 			{
@@ -707,7 +707,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected void WriteRawParameter(XdrStream xdr, DbField field)
+		protected void WriteRawParameter(IXdrStream xdr, DbField field)
 		{
 			if (field.DbDataType != DbDataType.Null)
 			{

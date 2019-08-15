@@ -281,7 +281,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public XdrStream CreateXdrStream()
+		public IXdrStream CreateXdrStream()
 		{
 			return new XdrStream(_networkStream, _characterSet, false)
 			{
@@ -394,7 +394,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Static Methods
 
-		public static IResponse ProcessOperation(int operation, XdrStream xdr)
+		public static IResponse ProcessOperation(int operation, IXdrStream xdr)
 		{
 			switch (operation)
 			{

@@ -18,8 +18,6 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Text;
-using System.Globalization;
 using System.Linq;
 using FirebirdSql.Data.Common;
 using System.Collections.Generic;
@@ -28,7 +26,7 @@ using System.Threading;
 
 namespace FirebirdSql.Data.Client.Managed
 {
-	internal class XdrStream : Stream
+	internal class XdrStream : Stream, IXdrStream
 	{
 		public Ionic.Zlib.ZlibCodec Deflate { private get; set; }
 		public Ionic.Zlib.ZlibCodec Inflate { private get; set; }
@@ -568,6 +566,11 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region XDR Write Methods
 
+		public void WriteBytes(byte[] buffer, int count)
+		{
+			Write(buffer, 0, count);
+		}
+
 		public void WriteOpaque(byte[] buffer)
 		{
 			WriteOpaque(buffer, buffer.Length);
@@ -721,7 +724,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private void CheckDisposed()
 		{
 			if (_innerStream == null)
-				throw new ObjectDisposedException($"The {nameof(XdrStream)} is closed.");
+				throw new ObjectDisposedException($"The {nameof(IXdrStream)} is closed.");
 		}
 
 		private void EnsureWritable()
