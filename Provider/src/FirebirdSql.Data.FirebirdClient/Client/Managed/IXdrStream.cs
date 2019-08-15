@@ -23,15 +23,12 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal interface IXdrStream : IDisposable
 	{
-		Ionic.Zlib.ZlibCodec Deflate { set; }
-		Ionic.Zlib.ZlibCodec Inflate { set; }
-
-		Org.BouncyCastle.Crypto.Engines.RC4Engine CipherIn { set; }
-		Org.BouncyCastle.Crypto.Engines.RC4Engine CipherOut { set; }
-
 		long Position { get; }
 		long Length { get; }
 		bool IOFailed { get; }
+
+		void SetCompression(Ionic.Zlib.ZlibCodec compressor, Ionic.Zlib.ZlibCodec decompressor);
+		void SetEncryption(Org.BouncyCastle.Crypto.Engines.RC4Engine encryptor, Org.BouncyCastle.Crypto.Engines.RC4Engine decryptor);
 
 		void Flush();
 

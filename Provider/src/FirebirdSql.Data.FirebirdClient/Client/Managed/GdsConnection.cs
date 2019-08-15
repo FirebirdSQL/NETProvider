@@ -48,10 +48,10 @@ namespace FirebirdSql.Data.Client.Managed
 		private int _protocolMinimunType;
 		private byte[] _authData;
 
-		private Ionic.Zlib.ZlibCodec _deflate;
-		private Ionic.Zlib.ZlibCodec _inflate;
-		private Org.BouncyCastle.Crypto.Engines.RC4Engine _cipherIn;
-		private Org.BouncyCastle.Crypto.Engines.RC4Engine _cipherOut;
+		private Ionic.Zlib.ZlibCodec _compressor;
+		private Ionic.Zlib.ZlibCodec _decompressor;
+		private Org.BouncyCastle.Crypto.Engines.RC4Engine _encryptor;
+		private Org.BouncyCastle.Crypto.Engines.RC4Engine _decryptor;
 
 		#endregion
 
@@ -209,11 +209,10 @@ namespace FirebirdSql.Data.Client.Managed
 
 								if (_compression)
 								{
-									_deflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
-									_inflate = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
+									_compressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
+									_decompressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
 									// set after reading before writing
-									xdrStream.Deflate = _deflate;
-									xdrStream.Inflate = _inflate;
+									xdrStream.SetCompression(_compressor, _decompressor);
 								}
 
 								if (operation == IscCodes.op_cond_accept)
@@ -235,11 +234,10 @@ namespace FirebirdSql.Data.Client.Managed
 										xdrStream.Write("symmetric");
 										xdrStream.Flush();
 
-										_cipherIn = CreateCipher(srp.SessionKey);
-										_cipherOut = CreateCipher(srp.SessionKey);
+										_encryptor = CreateCipher(srp.SessionKey);
+										_decryptor = CreateCipher(srp.SessionKey);
 										// set after writing before reading
-										xdrStream.CipherIn = _cipherIn;
-										xdrStream.CipherOut = _cipherOut;
+										xdrStream.SetEncryption(_encryptor, _decryptor);
 
 										ProcessOperation(xdrStream.ReadOperation(), xdrStream);
 
@@ -283,13 +281,10 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public IXdrStream CreateXdrStream()
 		{
-			return new XdrStream(_networkStream, _characterSet, false)
-			{
-				CipherIn = _cipherIn,
-				CipherOut = _cipherOut,
-				Deflate = _deflate,
-				Inflate = _inflate,
-			};
+			var result = new XdrStream(_networkStream, _characterSet, false);
+			result.SetCompression(_compressor, _decompressor);
+			result.SetEncryption(_encryptor, _decryptor);
+			return result;
 		}
 
 		public void Disconnect()
