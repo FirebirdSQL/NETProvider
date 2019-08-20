@@ -361,7 +361,7 @@ namespace FirebirdSql.Data.Client.Managed
 				{
 					toRead -= (currentlyRead = Read(buffer, count - toRead, toRead));
 				}
-				if (toRead == count)
+				if (toRead > 0)
 				{
 					_ioFailed = true;
 					throw new IOException();
@@ -379,7 +379,7 @@ namespace FirebirdSql.Data.Client.Managed
 				{
 					toRead -= (currentlyRead = await ReadAsync(buffer, count - toRead, toRead).ConfigureAwait(false));
 				}
-				if (toRead == count)
+				if (toRead > 0)
 				{
 					_ioFailed = true;
 					throw new IOException();
