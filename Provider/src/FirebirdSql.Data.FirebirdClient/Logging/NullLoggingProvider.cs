@@ -16,32 +16,22 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Diagnostics;
-using System.Linq;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Logging
 {
-	internal static class TraceHelper
+	sealed class NullLoggingProvider : IFbLoggingProvider
 	{
-		public const string Name = "FirebirdSql.Data.FirebirdClient";
-		public const string ConditionalSymbol = "TRACE";
+		public IFbLogger CreateLogger(string name) => NullLogger.Instance;
 
-		static TraceSource _instance;
-
-		static TraceHelper()
+		sealed class NullLogger : IFbLogger
 		{
-			_instance = new TraceSource(Name, SourceLevels.All);
-		}
+			internal static NullLogger Instance = new NullLogger();
 
-		public static void Trace(TraceEventType eventType, string message)
-		{
-			_instance.TraceEvent(eventType, default, message);
-			_instance.Flush();
-		}
+			NullLogger() { }
 
-		public static bool HasListeners
-		{
-			get { return _instance.Listeners.Count > 0; }
+			public bool IsEnabled(FbLogLevel level) => false;
+
+			public void Log(FbLogLevel level, string msg, Exception exception = null) { }
 		}
 	}
 }

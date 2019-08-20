@@ -25,11 +25,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbCommand : DbCommand, ICloneable
 	{
+		static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbCommand));
+
 		#region Fields
 
 		private CommandType _commandType;
@@ -463,10 +466,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return RecordsAffected;
 		}
 
-		public new FbDataReader ExecuteReader()
-		{
-			return ExecuteReader(CommandBehavior.Default);
-		}
+		public new FbDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
 		public new FbDataReader ExecuteReader(CommandBehavior behavior)
 		{
 			CheckCommand();
@@ -1002,8 +1002,6 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private void Prepare(bool returnsSet)
 		{
-			LogCommand();
-
 			var innerConn = _connection.InnerConnection;
 
 			// Check if	we have	a valid	transaction
@@ -1071,14 +1069,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		private void ExecuteCommand(CommandBehavior behavior)
-		{
-			ExecuteCommand(behavior, false);
-		}
-
+		private void ExecuteCommand(CommandBehavior behavior) => ExecuteCommand(behavior, false);
 		private void ExecuteCommand(CommandBehavior behavior, bool returnsSet)
 		{
-			// Prepare statement
+			LogCommandExecutionIfEnabled();
+
 			Prepare(returnsSet);
 
 			if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
@@ -1257,27 +1252,29 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		[Conditional(TraceHelper.ConditionalSymbol)]
-		private void LogCommand()
+		private void LogCommandExecutionIfEnabled()
 		{
-			if (TraceHelper.HasListeners)
+			if (Log.IsEnabled(FbLogLevel.Debug))
 			{
-				var message = new StringBuilder();
-				message.AppendLine("Command:");
-				message.AppendLine(_commandText);
-				message.AppendLine("Parameters:");
-				if (_parameters != null)
+				var sb = new StringBuilder();
+				sb.AppendLine("Executing command:");
+				sb.AppendLine(_commandText);
+				if (FbLogManager.IsParameterLoggingEnabled)
 				{
-					foreach (FbParameter item in _parameters)
+					sb.AppendLine("Parameters:");
+					if (_parameters?.Count > 0)
 					{
-						message.AppendLine(string.Format("Name:{0}\tType:{1}\tUsed Value:{2}", item.ParameterName, item.FbDbType, (!IsNullParameterValue(item.InternalValue) ? item.InternalValue : "<null>")));
+						foreach (FbParameter item in _parameters)
+						{
+							sb.AppendLine(string.Format("Name:{0}\tType:{1}\tUsed Value:{2}", item.ParameterName, item.FbDbType, (!IsNullParameterValue(item.InternalValue) ? item.InternalValue : "<null>")));
+						}
+					}
+					else
+					{
+						sb.AppendLine("<no parameters>");
 					}
 				}
-				else
-				{
-					message.AppendLine("<no parameters>");
-				}
-				TraceHelper.Trace(TraceEventType.Information, message.ToString());
+				Log.Debug(sb.ToString());
 			}
 		}
 
