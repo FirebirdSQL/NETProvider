@@ -141,7 +141,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				while (srcpos < buffer.Length)
 				{
-					len = IscHelper.VaxInteger(buffer, srcpos, 2);
+					len = (int)IscHelper.VaxInteger(buffer, srcpos, 2);
 					srcpos += 2;
 
 					Buffer.BlockCopy(buffer, srcpos, buffer, destpos, len);

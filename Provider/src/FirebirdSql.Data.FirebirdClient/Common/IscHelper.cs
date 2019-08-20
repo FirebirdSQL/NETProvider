@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Common
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
-				length = VaxInteger(buffer, pos, 2);
+				length = (int)VaxInteger(buffer, pos, 2);
 				pos += 2;
 
 				switch (type)
@@ -308,21 +308,17 @@ namespace FirebirdSql.Data.Common
 			return info;
 		}
 
-		public static int VaxInteger(byte[] buffer, int index, int length)
+		public static long VaxInteger(byte[] buffer, int index, int length)
 		{
-			int newValue;
-			int shift;
-
-			newValue = shift = 0;
-
+			var value = 0L;
+			var shift = 0;
 			var i = index;
 			while (--length >= 0)
 			{
-				newValue += (buffer[i++] & 0xff) << shift;
+				value += (buffer[i++] & 0xffL) << shift;
 				shift += 8;
 			}
-
-			return newValue;
+			return value;
 		}
 	}
 }

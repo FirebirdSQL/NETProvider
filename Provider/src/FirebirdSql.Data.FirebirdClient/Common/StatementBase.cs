@@ -219,7 +219,7 @@ namespace FirebirdSql.Data.Common
 			int type;
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
-				var length = IscHelper.VaxInteger(buffer, pos, 2);
+				var length = (int)IscHelper.VaxInteger(buffer, pos, 2);
 				pos += 2;
 				switch (type)
 				{
@@ -227,21 +227,21 @@ namespace FirebirdSql.Data.Common
 						int t;
 						while ((t = buffer[pos++]) != IscCodes.isc_info_end)
 						{
-							var l = IscHelper.VaxInteger(buffer, pos, 2);
+							var l = (int)IscHelper.VaxInteger(buffer, pos, 2);
 							pos += 2;
 							switch (t)
 							{
 								case IscCodes.isc_info_req_insert_count:
-									insertCount = IscHelper.VaxInteger(buffer, pos, l);
+									insertCount = (int)IscHelper.VaxInteger(buffer, pos, l);
 									break;
 								case IscCodes.isc_info_req_update_count:
-									updateCount = IscHelper.VaxInteger(buffer, pos, l);
+									updateCount = (int)IscHelper.VaxInteger(buffer, pos, l);
 									break;
 								case IscCodes.isc_info_req_delete_count:
-									deleteCount = IscHelper.VaxInteger(buffer, pos, l);
+									deleteCount = (int)IscHelper.VaxInteger(buffer, pos, l);
 									break;
 								case IscCodes.isc_info_req_select_count:
-									selectCount = IscHelper.VaxInteger(buffer, pos, l);
+									selectCount = (int)IscHelper.VaxInteger(buffer, pos, l);
 									break;
 							}
 							pos += l;
@@ -271,7 +271,7 @@ namespace FirebirdSql.Data.Common
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
-				length = IscHelper.VaxInteger(buffer, pos, 2);
+				length = (int)IscHelper.VaxInteger(buffer, pos, 2);
 				pos += 2;
 				switch (type)
 				{

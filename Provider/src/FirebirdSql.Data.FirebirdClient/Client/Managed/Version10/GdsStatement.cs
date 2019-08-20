@@ -619,7 +619,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								break;
 
 							currentPosition++;
-							var len = IscHelper.VaxInteger(info, currentPosition, 2);
+							var len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							if (rowDescs[currentDescriptorIndex] == null)
 							{
@@ -635,63 +635,63 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							break;
 
 						case IscCodes.isc_info_sql_sqlda_seq:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
-							currentItemIndex = IscHelper.VaxInteger(info, currentPosition, len);
+							currentItemIndex = (int)IscHelper.VaxInteger(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_type:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							rowDescs[currentDescriptorIndex][currentItemIndex - 1].DataType = (short)IscHelper.VaxInteger(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_sub_type:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							rowDescs[currentDescriptorIndex][currentItemIndex - 1].SubType = (short)IscHelper.VaxInteger(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_scale:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							rowDescs[currentDescriptorIndex][currentItemIndex - 1].NumericScale = (short)IscHelper.VaxInteger(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_length:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Length = (short)IscHelper.VaxInteger(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_field:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Name = _database.Charset.GetString(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_relation:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Relation = _database.Charset.GetString(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_owner:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Owner = _database.Charset.GetString(info, currentPosition, len);
 							currentPosition += len;
 							break;
 
 						case IscCodes.isc_info_sql_alias:
-							len = IscHelper.VaxInteger(info, currentPosition, 2);
+							len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 							currentPosition += 2;
 							rowDescs[currentDescriptorIndex][currentItemIndex - 1].Alias = _database.Charset.GetString(info, currentPosition, len);
 							currentPosition += len;

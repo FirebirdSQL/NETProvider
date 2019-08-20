@@ -386,7 +386,7 @@ namespace FirebirdSql.Data.Services
 				pos++;
 
 				int key = buffer[pos - 1];
-				var keyValue = IscHelper.VaxInteger(buffer, pos, 4);
+				var keyValue = (int)IscHelper.VaxInteger(buffer, pos, 4);
 
 				pos += 4;
 
@@ -488,7 +488,7 @@ namespace FirebirdSql.Data.Services
 				switch (type)
 				{
 					case IscCodes.isc_spb_num_att:
-						dbInfo.ConnectionCount = IscHelper.VaxInteger(buffer, pos, 4);
+						dbInfo.ConnectionCount = (int)IscHelper.VaxInteger(buffer, pos, 4);
 						pos += 4;
 						break;
 
@@ -497,7 +497,7 @@ namespace FirebirdSql.Data.Services
 						break;
 
 					case IscCodes.isc_spb_dbname:
-						length = IscHelper.VaxInteger(buffer, pos, 2);
+						length = (int)IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
 						dbInfo.AddDatabase(Encoding.Default.GetString(buffer, pos, length));
 						pos += length;
@@ -523,7 +523,7 @@ namespace FirebirdSql.Data.Services
 				{
 					case IscCodes.isc_spb_sec_username:
 						{
-							length = IscHelper.VaxInteger(buffer, pos, 2);
+							length = (int)IscHelper.VaxInteger(buffer, pos, 2);
 							pos += 2;
 							currentUser = new FbUserData();
 							currentUser.UserName = Encoding.Default.GetString(buffer, pos, length);
@@ -534,33 +534,33 @@ namespace FirebirdSql.Data.Services
 						break;
 
 					case IscCodes.isc_spb_sec_firstname:
-						length = IscHelper.VaxInteger(buffer, pos, 2);
+						length = (int)IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
 						currentUser.FirstName = Encoding.Default.GetString(buffer, pos, length);
 						pos += length;
 						break;
 
 					case IscCodes.isc_spb_sec_middlename:
-						length = IscHelper.VaxInteger(buffer, pos, 2);
+						length = (int)IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
 						currentUser.MiddleName = Encoding.Default.GetString(buffer, pos, length);
 						pos += length;
 						break;
 
 					case IscCodes.isc_spb_sec_lastname:
-						length = IscHelper.VaxInteger(buffer, pos, 2);
+						length = (int)IscHelper.VaxInteger(buffer, pos, 2);
 						pos += 2;
 						currentUser.LastName = Encoding.Default.GetString(buffer, pos, length);
 						pos += length;
 						break;
 
 					case IscCodes.isc_spb_sec_userid:
-						currentUser.UserID = IscHelper.VaxInteger(buffer, pos, 4);
+						currentUser.UserID = (int)IscHelper.VaxInteger(buffer, pos, 4);
 						pos += 4;
 						break;
 
 					case IscCodes.isc_spb_sec_groupid:
-						currentUser.GroupID = IscHelper.VaxInteger(buffer, pos, 4);
+						currentUser.GroupID = (int)IscHelper.VaxInteger(buffer, pos, 4);
 						pos += 4;
 						break;
 				}
@@ -573,7 +573,7 @@ namespace FirebirdSql.Data.Services
 
 		private static int GetLength(byte[] buffer, int size, ref int pos)
 		{
-			var result = IscHelper.VaxInteger(buffer, pos, size);
+			var result = (int)IscHelper.VaxInteger(buffer, pos, size);
 			pos += size;
 			return result;
 		}
