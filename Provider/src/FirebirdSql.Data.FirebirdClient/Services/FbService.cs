@@ -265,7 +265,7 @@ namespace FirebirdSql.Data.Services
 							var length = GetLength(buffer, 2, ref pos);
 							if (length == 0)
 								continue;
-							queryResponseAction(truncated, IscHelper.VaxInteger(buffer, pos, 4));
+							queryResponseAction(truncated, (int)IscHelper.VaxInteger(buffer, pos, 4));
 							pos += length;
 							truncated = false;
 							break;
