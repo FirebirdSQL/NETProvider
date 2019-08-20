@@ -434,20 +434,17 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public int ReadInt32()
 		{
-			Array.Clear(_smallBuffer, 0, 4);
 			ReadBytes(_smallBuffer, 4);
 			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(_smallBuffer, 0));
 		}
 		public async Task<int> ReadInt32Async()
 		{
-			Array.Clear(_smallBuffer, 0, 4);
 			await ReadBytesAsync(_smallBuffer, 4).ConfigureAwait(false);
 			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(_smallBuffer, 0));
 		}
 
 		public long ReadInt64()
 		{
-			Array.Clear(_smallBuffer, 0, 8);
 			ReadBytes(_smallBuffer, 8);
 			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(_smallBuffer, 0));
 		}
