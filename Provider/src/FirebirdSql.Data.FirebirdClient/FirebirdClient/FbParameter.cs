@@ -234,19 +234,17 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				var svalue = (_value as string);
-				if (svalue != null)
+				switch (_value)
 				{
-					return svalue.Substring(0, Math.Min(Size, svalue.Length));
+					case string svalue:
+						return svalue.Substring(0, Math.Min(Size, svalue.Length));
+					case byte[] bvalue:
+						var result = new byte[Math.Min(Size, bvalue.Length)];
+						Array.Copy(bvalue, result, result.Length);
+						return result;
+					default:
+						return _value;
 				}
-				var bvalue = (_value as byte[]);
-				if (bvalue != null)
-				{
-					var result = new byte[Math.Min(Size, bvalue.Length)];
-					Array.Copy(bvalue, result, result.Length);
-					return result;
-				}
-				return _value;
 			}
 		}
 
