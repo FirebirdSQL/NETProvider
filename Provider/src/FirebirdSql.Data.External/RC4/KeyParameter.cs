@@ -4,7 +4,7 @@ using Org.BouncyCastle.Crypto;
 
 namespace Org.BouncyCastle.Crypto.Parameters
 {
-    public class KeyParameter
+    internal class KeyParameter
 		: ICipherParameters
     {
         private readonly byte[] key;
