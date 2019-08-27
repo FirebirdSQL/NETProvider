@@ -404,7 +404,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].Value);
+			return CheckedGetValue(x => _row[x].Value, i);
 		}
 
 		public override int GetValues(object[] values)
@@ -415,7 +415,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			var count = Math.Min(_fields.Count, values.Length);
 			for (var i = 0; i < count; i++)
 			{
-				values[i] = CheckedGetValue(() => GetValue(i));
+				values[i] = CheckedGetValue(x => GetValue(x), i);
 			}
 			return count;
 		}
@@ -425,7 +425,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetBoolean());
+			return CheckedGetValue(x => _row[x].GetBoolean(), i);
 		}
 
 		public override byte GetByte(int i)
@@ -433,15 +433,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetByte());
+			return CheckedGetValue(x => _row[x].GetByte(), i);
 		}
 
-		public override long GetBytes(
-			int i,
-			long dataIndex,
-			byte[] buffer,
-			int bufferIndex,
-			int length)
+		public override long GetBytes(int i, long dataIndex, byte[] buffer, int bufferIndex, int length)
 		{
 			CheckPosition();
 			CheckIndex(i);
@@ -457,12 +452,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return CheckedGetValue(() => _row[i].GetBinary()).Length;
+					return CheckedGetValue(x => _row[x].GetBinary(), i).Length;
 				}
 			}
 			else
 			{
-				var byteArray = CheckedGetValue(() => _row[i].GetBinary());
+				var byteArray = CheckedGetValue(x => _row[x].GetBinary(), i);
 
 				if (length > (byteArray.Length - dataIndex))
 				{
@@ -490,15 +485,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetChar());
+			return CheckedGetValue(x => _row[x].GetChar(), i);
 		}
 
-		public override long GetChars(
-			int i,
-			long dataIndex,
-			char[] buffer,
-			int bufferIndex,
-			int length)
+		public override long GetChars(int i, long dataIndex, char[] buffer, int bufferIndex, int length)
 		{
 			CheckPosition();
 			CheckIndex(i);
@@ -511,13 +501,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return (CheckedGetValue(() => (string)GetValue(i))).ToCharArray().Length;
+					return CheckedGetValue(x => (string)GetValue(x), i).ToCharArray().Length;
 				}
 			}
 			else
 			{
 
-				var charArray = (CheckedGetValue(() => (string)GetValue(i))).ToCharArray();
+				var charArray = CheckedGetValue(x => (string)GetValue(x), i).ToCharArray();
 
 				var charsRead = 0;
 				var realLength = length;
@@ -548,7 +538,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetGuid());
+			return CheckedGetValue(x => _row[x].GetGuid(), i);
 		}
 
 		public override Int16 GetInt16(int i)
@@ -556,7 +546,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetInt16());
+			return CheckedGetValue(x => _row[x].GetInt16(), i);
 		}
 
 		public override Int32 GetInt32(int i)
@@ -564,7 +554,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetInt32());
+			return CheckedGetValue(x => _row[x].GetInt32(), i);
 		}
 
 		public override Int64 GetInt64(int i)
@@ -572,7 +562,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetInt64());
+			return CheckedGetValue(x => _row[x].GetInt64(), i);
 		}
 
 		public override float GetFloat(int i)
@@ -580,7 +570,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetFloat());
+			return CheckedGetValue(x => _row[x].GetFloat(), i);
 		}
 
 		public override double GetDouble(int i)
@@ -588,7 +578,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetDouble());
+			return CheckedGetValue(x => _row[x].GetDouble(), i);
 		}
 
 		public override string GetString(int i)
@@ -596,7 +586,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetString());
+			return CheckedGetValue(x => _row[x].GetString(), i);
 		}
 
 		public override Decimal GetDecimal(int i)
@@ -604,7 +594,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetDecimal());
+			return CheckedGetValue(x => _row[x].GetDecimal(), i);
 		}
 
 		public override DateTime GetDateTime(int i)
@@ -612,7 +602,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(() => _row[i].GetDateTime());
+			return CheckedGetValue(x => _row[x].GetDateTime(), i);
 		}
 
 		public override bool IsDBNull(int i)
@@ -640,25 +630,19 @@ namespace FirebirdSql.Data.FirebirdClient
 		private void CheckPosition()
 		{
 			if (_eof || _position == StartPosition)
-			{
 				throw new InvalidOperationException("There are no data to read.");
-			}
 		}
 
 		private void CheckState()
 		{
 			if (IsClosed)
-			{
 				throw new InvalidOperationException("Invalid attempt of read when the reader is closed.");
-			}
 		}
 
 		private void CheckIndex(int i)
 		{
 			if (i < 0 || i >= FieldCount)
-			{
 				throw new IndexOutOfRangeException("Could not find specified column in results.");
-			}
 		}
 
 		private FbDbType GetProviderType(int i)
@@ -788,11 +772,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			return sql;
 		}
 
-		private static T CheckedGetValue<T>(Func<T> f)
+		private static T CheckedGetValue<T>(Func<int, T> f, int index)
 		{
 			try
 			{
-				return f();
+				return f(index);
 			}
 			catch (IscException ex)
 			{
