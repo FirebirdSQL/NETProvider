@@ -38,6 +38,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		Text,
 		Time,
 		TimeStamp,
-		VarChar
+		VarChar,
 	}
 }
