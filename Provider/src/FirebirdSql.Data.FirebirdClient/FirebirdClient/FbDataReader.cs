@@ -412,12 +412,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckState();
 			CheckPosition();
 
-			for (var i = 0; i < _fields.Count; i++)
+			var count = Math.Min(_fields.Count, values.Length);
+			for (var i = 0; i < count; i++)
 			{
 				values[i] = CheckedGetValue(() => GetValue(i));
 			}
-
-			return values.Length;
+			return count;
 		}
 
 		public override bool GetBoolean(int i)
