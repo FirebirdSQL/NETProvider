@@ -24,6 +24,7 @@ using System.Net;
 using System.Collections.Generic;
 
 using FirebirdSql.Data.Common;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Client.Managed.Version11
 {
@@ -67,7 +68,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					var authData = sspiHelper.InitializeClientSecurity();
 					SendTrustedAuthToBuffer(dpb, authData);
 					SendAttachToBuffer(dpb, database);
-					XdrStream.Flush();
+					Xdr.Flush();
 
 					var response = ReadResponse();
 					ProcessTrustedAuthResponse(sspiHelper, ref response);
@@ -98,9 +99,9 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			while (response is AuthResponse)
 			{
 				var authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
-				XdrStream.Write(IscCodes.op_trusted_auth);
-				XdrStream.WriteBuffer(authData);
-				XdrStream.Flush();
+				Xdr.Write(IscCodes.op_trusted_auth);
+				Xdr.WriteBuffer(authData);
+				Xdr.Flush();
 				response = ReadResponse();
 			}
 		}
@@ -112,7 +113,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				var authData = sspiHelper.InitializeClientSecurity();
 				SendTrustedAuthToBuffer(dpb, authData);
 				SendCreateToBuffer(dpb, database);
-				XdrStream.Flush();
+				Xdr.Flush();
 
 				var response = ReadResponse();
 				ProcessTrustedAuthResponse(sspiHelper, ref response);
@@ -140,11 +141,10 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			ProcessDeferredPackets();
 			return base.ReadOperation();
 		}
-
-		public override int NextOperation()
+		public override Task<int> ReadOperationAsync()
 		{
 			ProcessDeferredPackets();
-			return base.NextOperation();
+			return base.ReadOperationAsync();
 		}
 		#endregion
 

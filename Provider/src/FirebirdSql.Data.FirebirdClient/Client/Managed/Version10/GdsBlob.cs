@@ -109,11 +109,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_get_segment);
-				_database.XdrStream.Write(_blobHandle);
-				_database.XdrStream.Write(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12);
-				_database.XdrStream.Write(DataSegment);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_get_segment);
+				_database.Xdr.Write(_blobHandle);
+				_database.Xdr.Write(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12);
+				_database.Xdr.Write(DataSegment);
+				_database.Xdr.Flush();
 
 				var response = _database.ReadResponse<GenericResponse>();
 
@@ -164,10 +164,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_batch_segments);
-				_database.XdrStream.Write(_blobHandle);
-				_database.XdrStream.WriteBlobBuffer(buffer);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_batch_segments);
+				_database.Xdr.Write(_blobHandle);
+				_database.Xdr.WriteBlobBuffer(buffer);
+				_database.Xdr.Flush();
 
 				_database.ReadResponse();
 			}
@@ -181,11 +181,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_seek_blob);
-				_database.XdrStream.Write(_blobHandle);
-				_database.XdrStream.Write(SeekMode);
-				_database.XdrStream.Write(position);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_seek_blob);
+				_database.Xdr.Write(_blobHandle);
+				_database.Xdr.Write(SeekMode);
+				_database.Xdr.Write(position);
+				_database.Xdr.Flush();
 
 				var response = (GenericResponse)_database.ReadResponse();
 
@@ -220,14 +220,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				_database.XdrStream.Write(op);
+				_database.Xdr.Write(op);
 				if (bpb != null)
 				{
-					_database.XdrStream.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
+					_database.Xdr.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
 				}
-				_database.XdrStream.Write(_transaction.Handle);
-				_database.XdrStream.Write(_blobId);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(_transaction.Handle);
+				_database.Xdr.Write(_blobId);
+				_database.Xdr.Flush();
 
 				var response = _database.ReadResponse<GenericResponse>();
 

@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			try
 			{
 				SendAttachToBuffer(spb, service);
-				Database.XdrStream.Flush();
+				Database.Xdr.Flush();
 				var response = Database.ReadResponse();
 				response = (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
 				ProcessAttachResponse(response as GenericResponse);

@@ -10,7 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)RC4\ICipherParameters.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RC4\IStreamCipher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RC4\KeyParameter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RC4\RC4Engine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)zlib\Deflate.cs" />

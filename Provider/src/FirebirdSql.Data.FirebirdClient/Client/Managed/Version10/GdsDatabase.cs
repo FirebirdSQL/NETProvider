@@ -58,7 +58,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected string _serverVersion;
 		private short _packetSize;
 		private short _dialect;
-		private IXdrStream _xdrStream;
 
 		#endregion
 
@@ -105,9 +104,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return true; }
 		}
 
-		public IXdrStream XdrStream
+		public XdrReaderWriter Xdr
 		{
-			get { return _xdrStream; }
+			get { return _connection.Xdr; }
 		}
 
 		public string Password
@@ -122,7 +121,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public bool ConnectionBroken
 		{
-			get { return _xdrStream.IOFailed; }
+			get { return _connection.ConnectionBroken; }
 		}
 
 		#endregion
@@ -136,7 +135,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_dialect = 3;
 			_handle = -1;
 			_packetSize = 8192;
-			_xdrStream = _connection.CreateXdrStream();
 		}
 
 		#endregion
@@ -148,7 +146,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			try
 			{
 				SendAttachToBuffer(dpb, database);
-				XdrStream.Flush();
+				Xdr.Flush();
 				ProcessAttachResponse(ReadResponse<GenericResponse>());
 			}
 			catch (IscException)
@@ -167,14 +165,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			XdrStream.Write(IscCodes.op_attach);
-			XdrStream.Write(0);
+			Xdr.Write(IscCodes.op_attach);
+			Xdr.Write(0);
 			if (!string.IsNullOrEmpty(Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));
-			XdrStream.WriteBuffer(dpb.ToArray());
+			Xdr.WriteBuffer(Encoding.Default.GetBytes(database));
+			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
 		protected virtual void ProcessAttachResponse(GenericResponse response)
@@ -206,18 +204,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				var detach = _handle != -1;
 				if (detach)
 				{
-					XdrStream.Write(IscCodes.op_detach);
-					XdrStream.Write(_handle);
+					Xdr.Write(IscCodes.op_detach);
+					Xdr.Write(_handle);
 				}
-				XdrStream.Write(IscCodes.op_disconnect);
-				XdrStream.Flush();
+				Xdr.Write(IscCodes.op_disconnect);
+				Xdr.Flush();
 				if (detach)
 				{
 					ReadResponse();
 				}
 
 				CloseConnection();
-				_xdrStream?.Dispose();
 			}
 			catch (IOException ex)
 			{
@@ -233,7 +230,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			finally
 			{
-				_xdrStream = null;
 				_connection = null;
 				_charset = null;
 				_eventManager = null;
@@ -265,7 +261,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			try
 			{
 				SendCreateToBuffer(dpb, database);
-				XdrStream.Flush();
+				Xdr.Flush();
 				ProcessCreateResponse(ReadResponse<GenericResponse>());
 			}
 			catch (IOException ex)
@@ -276,14 +272,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			XdrStream.Write(IscCodes.op_create);
-			XdrStream.Write(DatabaseObjectId);
+			Xdr.Write(IscCodes.op_create);
+			Xdr.Write(DatabaseObjectId);
 			if (!string.IsNullOrEmpty(Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			XdrStream.WriteBuffer(Encoding.Default.GetBytes(database));
-			XdrStream.WriteBuffer(dpb.ToArray());
+			Xdr.WriteBuffer(Encoding.Default.GetBytes(database));
+			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
 		protected void ProcessCreateResponse(GenericResponse response)
@@ -300,9 +296,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				XdrStream.Write(IscCodes.op_drop_database);
-				XdrStream.Write(_handle);
-				XdrStream.Flush();
+				Xdr.Write(IscCodes.op_drop_database);
+				Xdr.Write(_handle);
+				Xdr.Flush();
 
 				ReadResponse();
 
@@ -322,29 +318,29 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				XdrStream.Write(IscCodes.op_connect_request);
-				XdrStream.Write(IscCodes.P_REQ_async);
-				XdrStream.Write(_handle);
-				XdrStream.Write(PartnerIdentification);
+				Xdr.Write(IscCodes.op_connect_request);
+				Xdr.Write(IscCodes.P_REQ_async);
+				Xdr.Write(_handle);
+				Xdr.Write(PartnerIdentification);
 
-				XdrStream.Flush();
+				Xdr.Flush();
 
 				ReadOperation();
 
-				auxHandle = XdrStream.ReadInt32();
+				auxHandle = Xdr.ReadInt32();
 
 				var garbage1 = new byte[8];
-				XdrStream.ReadBytes(garbage1, 8);
+				Xdr.ReadBytes(garbage1, 8);
 
-				var respLen = XdrStream.ReadInt32();
+				var respLen = Xdr.ReadInt32();
 				respLen += respLen % 4;
 
 				var sin_family = new byte[2];
-				XdrStream.ReadBytes(sin_family, 2);
+				Xdr.ReadBytes(sin_family, 2);
 				respLen -= 2;
 
 				var sin_port = new byte[2];
-				XdrStream.ReadBytes(sin_port, 2);
+				Xdr.ReadBytes(sin_port, 2);
 				portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sin_port, 0));
 				respLen -= 2;
 
@@ -352,7 +348,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				// * so we must use the address that was used to connect the main socket, not the
 				// * address reported by the server.
 				var sin_addr = new byte[4];
-				XdrStream.ReadBytes(sin_addr, 4);
+				Xdr.ReadBytes(sin_addr, 4);
 				//ipAddress = string.Format(
 				//    CultureInfo.InvariantCulture,
 				//    "{0}.{1}.{2}.{3}",
@@ -361,9 +357,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				respLen -= 4;
 
 				var garbage2 = new byte[respLen];
-				XdrStream.ReadBytes(garbage2, respLen);
+				Xdr.ReadBytes(garbage2, respLen);
 
-				XdrStream.ReadStatusVector();
+				Xdr.ReadStatusVector();
 			}
 			catch (IOException ex)
 			{
@@ -409,14 +405,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				var epb = remoteEvent.BuildEpb();
 				var epbData = epb.ToArray();
 
-				XdrStream.Write(IscCodes.op_que_events);
-				XdrStream.Write(_handle);
-				XdrStream.WriteBuffer(epbData);
-				XdrStream.Write(AddressOfAstRoutine);
-				XdrStream.Write(ArgumentToAstRoutine);
-				XdrStream.Write(remoteEvent.LocalId);
+				Xdr.Write(IscCodes.op_que_events);
+				Xdr.Write(_handle);
+				Xdr.WriteBuffer(epbData);
+				Xdr.Write(AddressOfAstRoutine);
+				Xdr.Write(ArgumentToAstRoutine);
+				Xdr.Write(remoteEvent.LocalId);
 
-				XdrStream.Flush();
+				Xdr.Flush();
 
 				var response = (GenericResponse)ReadResponse();
 
@@ -432,11 +428,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				XdrStream.Write(IscCodes.op_cancel_events);
-				XdrStream.Write(_handle);
-				XdrStream.Write(events.LocalId);
+				Xdr.Write(IscCodes.op_cancel_events);
+				Xdr.Write(_handle);
+				Xdr.Write(events.LocalId);
 
-				XdrStream.Flush();
+				Xdr.Flush();
 
 				ReadResponse();
 			}
@@ -537,33 +533,27 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public virtual int ReadOperation()
 		{
-			return _xdrStream.ReadOperation();
+			return Xdr.ReadOperation();
+		}
+		public virtual Task<int> ReadOperationAsync()
+		{
+			return Xdr.ReadOperationAsync();
 		}
 
-		public virtual int NextOperation()
-		{
-			return _xdrStream.ReadNextOperation();
-		}
-		public virtual Task<int> NextOperationAsync()
-		{
-			return _xdrStream.ReadNextOperationAsync();
-		}
-
-		public virtual IResponse ReadResponse()
+		public IResponse ReadResponse() => ReadResponse<IResponse>();
+		public virtual TResponse ReadResponse<TResponse>() where TResponse : IResponse
 		{
 			var response = ReadSingleResponse();
 			ProcessResponse(response);
-			return response;
+			return (TResponse)response;
 		}
 
-		public virtual TResponse ReadResponse<TResponse>() where TResponse : IResponse
+		public IResponse ReadResponse(int operation) => ReadResponse<IResponse>(operation);
+		public virtual TResponse ReadResponse<TResponse>(int operation) where TResponse : IResponse
 		{
-			return (TResponse)ReadResponse();
-		}
-
-		public virtual void SetOperation(int operation)
-		{
-			_xdrStream.SetOperation(operation);
+			var response = ReadSingleResponse(operation);
+			ProcessResponse(response);
+			return (TResponse)response;
 		}
 
 		public virtual void ReleaseObject(int op, int id)
@@ -571,7 +561,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			try
 			{
 				DoReleaseObjectPacket(op, id);
-				XdrStream.Flush();
+				Xdr.Flush();
 				ProcessReleaseObjectResponse(ReadResponse());
 			}
 			catch (IOException ex)
@@ -584,10 +574,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Protected Methods
 
-		protected virtual IResponse ReadSingleResponse()
+		protected IResponse ReadSingleResponse() => ReadSingleResponse(ReadOperation());
+		protected virtual IResponse ReadSingleResponse(int operation)
 		{
-			var operation = ReadOperation();
-			var response = GdsConnection.ProcessOperation(operation, XdrStream);
+			var response = GdsConnection.ProcessOperation(operation, Xdr);
 			ProcessResponseWarnings(response);
 			return response;
 		}
@@ -596,13 +586,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				XdrStream.Write(IscCodes.op_info_database);
-				XdrStream.Write(_handle);
-				XdrStream.Write(Incarnation);
-				XdrStream.WriteBuffer(items, items.Length);
-				XdrStream.Write(bufferLength);
+				Xdr.Write(IscCodes.op_info_database);
+				Xdr.Write(_handle);
+				Xdr.Write(Incarnation);
+				Xdr.WriteBuffer(items, items.Length);
+				Xdr.Write(bufferLength);
 
-				XdrStream.Flush();
+				Xdr.Flush();
 
 				var response = (GenericResponse)ReadResponse();
 
@@ -623,8 +613,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected void DoReleaseObjectPacket(int op, int id)
 		{
-			XdrStream.Write(op);
-			XdrStream.Write(id);
+			Xdr.Write(op);
+			Xdr.Write(id);
 		}
 
 		protected void ProcessReleaseObjectResponse(IResponse response)

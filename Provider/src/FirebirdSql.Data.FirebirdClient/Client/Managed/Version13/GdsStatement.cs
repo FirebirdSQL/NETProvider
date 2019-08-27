@@ -45,11 +45,12 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 		{
 			if (_parameters == null)
 				return null;
-
-			using (var xdr = new XdrStream(_database.Charset))
+			using (var ms = new MemoryStream())
 			{
 				try
 				{
+					var xdr = new XdrReaderWriter(ms, _database.Charset);
+
 					var bits = new BitArray(_parameters.Count);
 					for (var i = 0; i < _parameters.Count; i++)
 					{
@@ -75,13 +76,13 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						WriteRawParameter(xdr, field);
 					}
 
-					return xdr.ToArray();
+					xdr.Flush();
+					return ms.ToArray();
 				}
 				catch (IOException ex)
 				{
 					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 				}
-
 			}
 		}
 
@@ -90,7 +91,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			var row = new DbValue[_fields.Count];
 			try
 			{
-				var nullBytes = _database.XdrStream.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
+				var nullBytes = _database.Xdr.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
 				var nullBits = new BitArray(nullBytes);
 				for (var i = 0; i < _fields.Count; i++)
 				{

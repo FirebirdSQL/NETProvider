@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			try
 			{
 				SendAttachToBuffer(dpb, database);
-				XdrStream.Flush();
+				Xdr.Flush();
 				var response = ReadResponse();
 				response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
 				ProcessAttachResponse(response as GenericResponse);
@@ -59,15 +59,15 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			XdrStream.Write(IscCodes.op_attach);
-			XdrStream.Write(0);
+			Xdr.Write(IscCodes.op_attach);
+			Xdr.Write(0);
 			if (AuthData != null)
 			{
 				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			XdrStream.WriteBuffer(dpb.ToArray());
+			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
 		public override void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			try
 			{
 				SendCreateToBuffer(dpb, database);
-				XdrStream.Flush();
+				Xdr.Flush();
 				var response = ReadResponse();
 				response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
 				ProcessCreateResponse(response as GenericResponse);
@@ -88,15 +88,15 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			XdrStream.Write(IscCodes.op_create);
-			XdrStream.Write(0);
+			Xdr.Write(IscCodes.op_create);
+			Xdr.Write(0);
 			if (AuthData != null)
 			{
 				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			XdrStream.WriteBuffer(dpb.ToArray());
+			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
 		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
@@ -113,9 +113,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 		{
 			while (response is CryptKeyCallbackResponse cryptResponse)
 			{
-				XdrStream.Write(IscCodes.op_crypt_key_callback);
-				XdrStream.WriteBuffer(cryptKey);
-				XdrStream.Flush();
+				Xdr.Write(IscCodes.op_crypt_key_callback);
+				Xdr.WriteBuffer(cryptKey);
+				Xdr.Flush();
 				response = ReadResponse();
 			}
 			return response;

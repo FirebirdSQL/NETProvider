@@ -100,10 +100,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_transaction);
-				_database.XdrStream.Write(_database.Handle);
-				_database.XdrStream.WriteBuffer(tpb.ToArray());
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_transaction);
+				_database.Xdr.Write(_database.Handle);
+				_database.Xdr.WriteBuffer(tpb.ToArray());
+				_database.Xdr.Flush();
 
 				var response = _database.ReadResponse<GenericResponse>();
 
@@ -124,9 +124,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_commit);
-				_database.XdrStream.Write(_handle);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_commit);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
 				_database.ReadResponse();
 
@@ -148,9 +148,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_rollback);
-				_database.XdrStream.Write(_handle);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_rollback);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
 				_database.ReadResponse();
 
@@ -172,9 +172,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_commit_retaining);
-				_database.XdrStream.Write(_handle);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_commit_retaining);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
 				_database.ReadResponse();
 
@@ -192,9 +192,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_rollback_retaining);
-				_database.XdrStream.Write(_handle);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_rollback_retaining);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
 				_database.ReadResponse();
 
@@ -218,9 +218,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				_state = TransactionState.NoTransaction;
 
-				_database.XdrStream.Write(IscCodes.op_prepare);
-				_database.XdrStream.Write(_handle);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_prepare);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
 				_database.ReadResponse();
 
@@ -240,10 +240,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				_state = TransactionState.NoTransaction;
 
-				_database.XdrStream.Write(IscCodes.op_prepare2);
-				_database.XdrStream.Write(_handle);
-				_database.XdrStream.WriteBuffer(buffer, buffer.Length);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_prepare2);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.WriteBuffer(buffer, buffer.Length);
+				_database.Xdr.Flush();
 
 				_database.ReadResponse();
 

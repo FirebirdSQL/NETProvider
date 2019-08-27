@@ -98,5 +98,15 @@ namespace FirebirdSql.Data.Common
 			var d = new[] { value[8], value[9], value[10], value[11], value[12], value[13], value[14], value[15] };
 			return new Guid(a, b, c, d);
 		}
+
+		public static int DecodeInt32(byte[] value)
+		{
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value, 0));
+		}
+
+		public static long DecodeInt64(byte[] value)
+		{
+			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(value, 0));
+		}
 	}
 }

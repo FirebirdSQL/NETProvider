@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			try
 			{
 				SendAttachToBuffer(spb, service);
-				_database.XdrStream.Flush();
+				_database.Xdr.Flush();
 				ProcessAttachResponse(_database.ReadResponse<GenericResponse>());
 			}
 			catch (IOException ex)
@@ -92,10 +92,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual void SendAttachToBuffer(ServiceParameterBuffer spb, string service)
 		{
-			_database.XdrStream.Write(IscCodes.op_service_attach);
-			_database.XdrStream.Write(0);
-			_database.XdrStream.Write(service);
-			_database.XdrStream.WriteBuffer(spb.ToArray());
+			_database.Xdr.Write(IscCodes.op_service_attach);
+			_database.Xdr.Write(0);
+			_database.Xdr.Write(service);
+			_database.Xdr.WriteBuffer(spb.ToArray());
 		}
 
 		protected virtual void ProcessAttachResponse(GenericResponse response)
@@ -107,10 +107,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_service_detach);
-				_database.XdrStream.Write(Handle);
-				_database.XdrStream.Write(IscCodes.op_disconnect);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_service_detach);
+				_database.Xdr.Write(Handle);
+				_database.Xdr.Write(IscCodes.op_disconnect);
+				_database.Xdr.Flush();
 
 				_handle = 0;
 			}
@@ -140,11 +140,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_service_start);
-				_database.XdrStream.Write(Handle);
-				_database.XdrStream.Write(0);
-				_database.XdrStream.WriteBuffer(spb.ToArray(), spb.Length);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_service_start);
+				_database.Xdr.Write(Handle);
+				_database.Xdr.Write(0);
+				_database.Xdr.WriteBuffer(spb.ToArray(), spb.Length);
+				_database.Xdr.Flush();
 
 				try
 				{
@@ -165,14 +165,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			try
 			{
-				_database.XdrStream.Write(IscCodes.op_service_info);
-				_database.XdrStream.Write(Handle);
-				_database.XdrStream.Write(GdsDatabase.Incarnation);
-				_database.XdrStream.WriteBuffer(spb.ToArray(), spb.Length);
-				_database.XdrStream.WriteBuffer(requestBuffer, requestLength);
-				_database.XdrStream.Write(bufferLength);
+				_database.Xdr.Write(IscCodes.op_service_info);
+				_database.Xdr.Write(Handle);
+				_database.Xdr.Write(GdsDatabase.Incarnation);
+				_database.Xdr.WriteBuffer(spb.ToArray(), spb.Length);
+				_database.Xdr.WriteBuffer(requestBuffer, requestLength);
+				_database.Xdr.Write(bufferLength);
 
-				_database.XdrStream.Flush();
+				_database.Xdr.Flush();
 
 				var response = _database.ReadResponse<GenericResponse>();
 

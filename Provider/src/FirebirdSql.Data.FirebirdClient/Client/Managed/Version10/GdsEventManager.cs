@@ -49,16 +49,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					var operation = await _database.NextOperationAsync().ConfigureAwait(false);
+					var operation = await _database.ReadOperationAsync().ConfigureAwait(false);
 
 					switch (operation)
 					{
 						case IscCodes.op_event:
-							var dbHandle = _database.XdrStream.ReadInt32();
-							var buffer = _database.XdrStream.ReadBuffer();
+							var dbHandle = _database.Xdr.ReadInt32();
+							var buffer = _database.Xdr.ReadBuffer();
 							var ast = new byte[8];
-							_database.XdrStream.ReadBytes(ast, 8);
-							var eventId = _database.XdrStream.ReadInt32();
+							_database.Xdr.ReadBytes(ast, 8);
+							var eventId = _database.Xdr.ReadInt32();
 
 							remoteEvent.EventCounts(buffer);
 

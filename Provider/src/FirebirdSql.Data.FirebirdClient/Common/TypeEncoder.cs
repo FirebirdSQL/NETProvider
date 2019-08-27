@@ -101,5 +101,15 @@ namespace FirebirdSql.Data.Common
 				data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]
 			};
 		}
+
+		public static byte[] EncodeInt32(int value)
+		{
+			return BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
+		}
+
+		public static byte[] EncodeInt64(long value)
+		{
+			return BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
+		}
 	}
 }

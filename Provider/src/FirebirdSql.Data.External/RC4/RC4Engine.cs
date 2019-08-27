@@ -6,7 +6,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 namespace Org.BouncyCastle.Crypto.Engines
 {
     internal class RC4Engine
-		: IStreamCipher
+		//: IStreamCipher
     {
         private readonly static int STATE_LENGTH = 256;
 

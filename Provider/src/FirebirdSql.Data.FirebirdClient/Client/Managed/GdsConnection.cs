@@ -34,55 +34,28 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Fields
 
-		private NetworkStream _networkStream;
+		private FirebirdNetworkStream  _firebirdNetworkStream;
 		private string _userID;
-		private string _password;
 		private string _dataSource;
 		private int _portNumber;
 		private int _packetSize;
-		private Charset _characterSet;
+		private Charset _charset;
 		private bool _compression;
 		private WireCryptOption _wireCrypt;
-		private int _protocolVersion;
-		private int _protocolArchitecture;
-		private int _protocolMinimunType;
-		private byte[] _authData;
-
-		private Ionic.Zlib.ZlibCodec _compressor;
-		private Ionic.Zlib.ZlibCodec _decompressor;
-		private Org.BouncyCastle.Crypto.Engines.RC4Engine _encryptor;
-		private Org.BouncyCastle.Crypto.Engines.RC4Engine _decryptor;
 
 		#endregion
 
 		#region Properties
 
-		public int ProtocolVersion
-		{
-			get { return _protocolVersion; }
-		}
-
-		public int ProtocolArchitecture
-		{
-			get { return _protocolArchitecture; }
-		}
-
-		public int ProtocolMinimunType
-		{
-			get { return _protocolMinimunType; }
-		}
-
-		public string Password
-		{
-			get { return _password; }
-		}
-
-		public byte[] AuthData
-		{
-			get { return _authData; }
-		}
+		public int ProtocolVersion { get; private set; }
+		public int ProtocolArchitecture { get; private set; }
+		public int ProtocolMinimunType { get; private set; }
+		public string Password { get; private set; }
+		public byte[] AuthData { get; private set; }
+		public bool ConnectionBroken => _firebirdNetworkStream?.IOFailed ?? false;
 
 		internal IPAddress IPAddress { get; private set; }
+		internal XdrReaderWriter Xdr { get; private set; }
 
 		#endregion
 
@@ -92,14 +65,14 @@ namespace FirebirdSql.Data.Client.Managed
 			: this(null, null, dataSource, port, 8192, Charset.DefaultCharset, false, WireCryptOption.Enabled)
 		{ }
 
-		public GdsConnection(string userID, string password, string dataSource, int portNumber, int packetSize, Charset characterSet, bool compression, WireCryptOption wireCrypt)
+		public GdsConnection(string userID, string password, string dataSource, int portNumber, int packetSize, Charset charset, bool compression, WireCryptOption wireCrypt)
 		{
 			_userID = userID;
-			_password = password;
+			Password = password;
 			_dataSource = dataSource;
 			_portNumber = portNumber;
 			_packetSize = packetSize;
-			_characterSet = characterSet;
+			_charset = charset;
 			_compression = compression;
 			_wireCrypt = wireCrypt;
 		}
@@ -123,7 +96,8 @@ namespace FirebirdSql.Data.Client.Managed
 				socket.TryEnableLoopbackFastPath();
 				socket.Connect(endPoint);
 
-				_networkStream = new NetworkStream(socket, true);
+				_firebirdNetworkStream = new FirebirdNetworkStream(new NetworkStream(socket, true));
+				Xdr = new XdrReaderWriter(_firebirdNetworkStream, _charset);
 			}
 			catch (SocketException ex)
 			{
@@ -133,164 +107,153 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void Identify(string database)
 		{
-			using (var xdrStream = CreateXdrStream())
+			try
 			{
-				try
-				{
-					xdrStream.Write(IscCodes.op_connect);
-					xdrStream.Write(IscCodes.op_attach);
-					xdrStream.Write(IscCodes.CONNECT_VERSION3);
-					xdrStream.Write(IscCodes.GenericAchitectureClient);
+				Xdr.Write(IscCodes.op_connect);
+				Xdr.Write(IscCodes.op_attach);
+				Xdr.Write(IscCodes.CONNECT_VERSION3);
+				Xdr.Write(IscCodes.GenericAchitectureClient);
 
-					xdrStream.Write(database);
+				Xdr.Write(database);
 
-					var protocols = ProtocolsSupported.Get(_compression);
-					xdrStream.Write(protocols.Count());
+				var protocols = ProtocolsSupported.Get(_compression);
+				Xdr.Write(protocols.Count());
 
 #warning These out params are ugly, refactor
-					var userIdentificationData = UserIdentificationData(out var srp, out var sspi);
-					using (sspi)
+				var userIdentificationData = UserIdentificationData(out var srp, out var sspi);
+				using (sspi)
+				{
+					Xdr.WriteBuffer(userIdentificationData);
+
+					var priority = 0;
+					foreach (var protocol in protocols)
 					{
-						xdrStream.WriteBuffer(userIdentificationData);
+						Xdr.Write(protocol.Version);
+						Xdr.Write(IscCodes.GenericAchitectureClient);
+						Xdr.Write(protocol.MinPType);
+						Xdr.Write(protocol.MaxPType);
+						Xdr.Write(priority);
 
-						var priority = 0;
-						foreach (var protocol in protocols)
+						priority++;
+					}
+
+					Xdr.Flush();
+
+					var operation = Xdr.ReadOperation();
+					if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
+					{
+						var wireCryptInitialized = false;
+
+						ProtocolVersion = Xdr.ReadInt32();
+						ProtocolArchitecture = Xdr.ReadInt32();
+						ProtocolMinimunType = Xdr.ReadInt32();
+
+						if (ProtocolVersion < 0)
 						{
-							xdrStream.Write(protocol.Version);
-							xdrStream.Write(IscCodes.GenericAchitectureClient);
-							xdrStream.Write(protocol.MinPType);
-							xdrStream.Write(protocol.MaxPType);
-							xdrStream.Write(priority);
-
-							priority++;
+							ProtocolVersion = (ushort)(ProtocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
 						}
 
-						xdrStream.Flush();
-
-						var operation = xdrStream.ReadOperation();
-						if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
+						if (_compression && !((ProtocolMinimunType & IscCodes.pflag_compress) != 0))
 						{
-							var wireCryptInitialized = false;
+							_compression = false;
+						}
 
-							_protocolVersion = xdrStream.ReadInt32();
-							_protocolArchitecture = xdrStream.ReadInt32();
-							_protocolMinimunType = xdrStream.ReadInt32();
-
-							if (_protocolVersion < 0)
+						if (operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
+						{
+							var serverData = Xdr.ReadBuffer();
+							var acceptPluginName = Xdr.ReadString();
+							var isAuthenticated = Xdr.ReadBoolean();
+							var serverKeys = Xdr.ReadBuffer();
+							if (!isAuthenticated)
 							{
-								_protocolVersion = (ushort)(_protocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
-							}
-
-							if (_compression && !((_protocolMinimunType & IscCodes.pflag_compress) != 0))
-							{
-								_compression = false;
-							}
-
-							if (operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
-							{
-								var serverData = xdrStream.ReadBuffer();
-								var acceptPluginName = xdrStream.ReadString();
-								var isAuthenticated = xdrStream.ReadBoolean();
-								var serverKeys = xdrStream.ReadBuffer();
-								if (!isAuthenticated)
+								switch (acceptPluginName)
 								{
-									switch (acceptPluginName)
-									{
-										case SrpClient.PluginName:
-											_authData = Encoding.ASCII.GetBytes(srp.ClientProof(NormalizeLogin(_userID), _password, serverData).ToHexString());
-											break;
-										case SspiHelper.PluginName:
-											_authData = sspi.GetClientSecurity(serverData);
-											break;
-										default:
-											throw new ArgumentOutOfRangeException(nameof(acceptPluginName), $"{nameof(acceptPluginName)}={acceptPluginName}");
-									}
-								}
-
-								if (_compression)
-								{
-									_compressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
-									_decompressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
-									// set after reading before writing
-									xdrStream.SetCompression(_compressor, _decompressor);
-								}
-
-								if (operation == IscCodes.op_cond_accept)
-								{
-									xdrStream.Write(IscCodes.op_cont_auth);
-									xdrStream.WriteBuffer(_authData);
-									xdrStream.Write(acceptPluginName); // like CNCT_plugin_name
-									xdrStream.Write(acceptPluginName); // like CNCT_plugin_list
-									xdrStream.WriteBuffer(serverKeys);
-									xdrStream.Flush();
-									var response = (GenericResponse)ProcessOperation(xdrStream.ReadOperation(), xdrStream);
-									serverKeys = response.Data;
-									isAuthenticated = true;
-
-									if (_wireCrypt != WireCryptOption.Disabled)
-									{
-										xdrStream.Write(IscCodes.op_crypt);
-										xdrStream.Write("ARC4");
-										xdrStream.Write("symmetric");
-										xdrStream.Flush();
-
-										_encryptor = CreateCipher(srp.SessionKey);
-										_decryptor = CreateCipher(srp.SessionKey);
-										// set after writing before reading
-										xdrStream.SetEncryption(_encryptor, _decryptor);
-
-										ProcessOperation(xdrStream.ReadOperation(), xdrStream);
-
-										wireCryptInitialized = true;
-									}
+									case SrpClient.PluginName:
+										AuthData = Encoding.ASCII.GetBytes(srp.ClientProof(NormalizeLogin(_userID), Password, serverData).ToHexString());
+										break;
+									case SspiHelper.PluginName:
+										AuthData = sspi.GetClientSecurity(serverData);
+										break;
+									default:
+										throw new ArgumentOutOfRangeException(nameof(acceptPluginName), $"{nameof(acceptPluginName)}={acceptPluginName}");
 								}
 							}
 
-							// fbclient does not care about wirecrypt in older protocols either
-							if (_protocolVersion == IscCodes.PROTOCOL_VERSION13 && _wireCrypt == WireCryptOption.Required && !wireCryptInitialized)
+							if (_compression)
 							{
-								throw IscException.ForErrorCode(IscCodes.isc_wirecrypt_incompatible);
+								var compressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
+								var decompressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
+								// after reading before writing
+								_firebirdNetworkStream.StartCompression(compressor, decompressor);
+							}
+
+							if (operation == IscCodes.op_cond_accept)
+							{
+								Xdr.Write(IscCodes.op_cont_auth);
+								Xdr.WriteBuffer(AuthData);
+								Xdr.Write(acceptPluginName); // like CNCT_plugin_name
+								Xdr.Write(acceptPluginName); // like CNCT_plugin_list
+								Xdr.WriteBuffer(serverKeys);
+								Xdr.Flush();
+								var response = (GenericResponse)ProcessOperation(Xdr.ReadOperation(), Xdr);
+								serverKeys = response.Data;
+								isAuthenticated = true;
+
+								if (_wireCrypt != WireCryptOption.Disabled)
+								{
+									Xdr.Write(IscCodes.op_crypt);
+									Xdr.Write("ARC4");
+									Xdr.Write("symmetric");
+									Xdr.Flush();
+
+									var encryptor = CreateCipher(srp.SessionKey);
+									var decryptor = CreateCipher(srp.SessionKey);
+									// after writing before reading
+									_firebirdNetworkStream.StartEncryption(encryptor, decryptor);
+
+									ProcessOperation(Xdr.ReadOperation(), Xdr);
+
+									wireCryptInitialized = true;
+								}
 							}
 						}
-						else if (operation == IscCodes.op_response)
+
+						// fbclient does not care about wirecrypt in older protocols either
+						if (ProtocolVersion == IscCodes.PROTOCOL_VERSION13 && _wireCrypt == WireCryptOption.Required && !wireCryptInitialized)
 						{
-							var response = (GenericResponse)ProcessOperation(operation, xdrStream);
-							throw response.Exception;
+							throw IscException.ForErrorCode(IscCodes.isc_wirecrypt_incompatible);
 						}
-						else
+					}
+					else if (operation == IscCodes.op_response)
+					{
+						var response = (GenericResponse)ProcessOperation(operation, Xdr);
+						throw response.Exception;
+					}
+					else
+					{
+						try
 						{
-							try
-							{
-								Disconnect();
-							}
-							catch
-							{ }
-							finally
-							{
-								throw IscException.ForErrorCode(IscCodes.isc_connect_reject);
-							}
+							Disconnect();
+						}
+						catch
+						{ }
+						finally
+						{
+							throw IscException.ForErrorCode(IscCodes.isc_connect_reject);
 						}
 					}
 				}
-				catch (IOException ex)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
-				}
 			}
-		}
-
-		public IXdrStream CreateXdrStream()
-		{
-			var result = new XdrStream(_networkStream, _characterSet, false);
-			result.SetCompression(_compressor, _decompressor);
-			result.SetEncryption(_encryptor, _decryptor);
-			return result;
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+			}
 		}
 
 		public void Disconnect()
 		{
-			_networkStream?.Dispose();
-			_networkStream = null;
+			_firebirdNetworkStream?.Dispose();
+			_firebirdNetworkStream = null;
 		}
 
 		#endregion
@@ -359,7 +322,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 					result.WriteByte(IscCodes.CNCT_client_crypt);
 					result.WriteByte(4);
-					result.Write(BitConverter.GetBytes(IPAddress.NetworkToHostOrder(WireCryptOptionValue(_wireCrypt))), 0, 4);
+					result.Write(TypeEncoder.EncodeInt32(WireCryptOptionValue(_wireCrypt)), 0, 4);
 				}
 				else
 				{
@@ -378,7 +341,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 					result.WriteByte(IscCodes.CNCT_client_crypt);
 					result.WriteByte(4);
-					result.Write(BitConverter.GetBytes(IPAddress.NetworkToHostOrder(IscCodes.WIRE_CRYPT_DISABLED)), 0, 4);
+					result.Write(TypeEncoder.EncodeInt32(IscCodes.WIRE_CRYPT_DISABLED), 0, 4);
 				}
 
 				return result.ToArray();
@@ -389,7 +352,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Static Methods
 
-		public static IResponse ProcessOperation(int operation, IXdrStream xdr)
+		public static IResponse ProcessOperation(int operation, IXdrReader xdr)
 		{
 			switch (operation)
 			{

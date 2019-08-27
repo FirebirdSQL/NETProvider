@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Common
 		{
 			if (!IsLittleEndian)
 			{
-				value = (short)IPAddress.NetworkToHostOrder(value);
+				value = IPAddress.NetworkToHostOrder(value);
 			}
 
 			var buffer = BitConverter.GetBytes(value);
@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.Common
 		{
 			if (!IsLittleEndian)
 			{
-				value = (int)IPAddress.NetworkToHostOrder(value);
+				value = IPAddress.NetworkToHostOrder(value);
 			}
 
 			var buffer = BitConverter.GetBytes(value);

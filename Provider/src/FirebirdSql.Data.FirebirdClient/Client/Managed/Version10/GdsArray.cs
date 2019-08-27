@@ -20,9 +20,9 @@ using System.Net;
 using System.Text;
 using System.IO;
 using System.Globalization;
+using System.Reflection;
 
 using FirebirdSql.Data.Common;
-using System.Reflection;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
@@ -101,14 +101,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				var sdl = GenerateSDL(Descriptor);
 
-				_database.XdrStream.Write(IscCodes.op_get_slice);
-				_database.XdrStream.Write(_transaction.Handle);
-				_database.XdrStream.Write(_handle);
-				_database.XdrStream.Write(sliceLength);
-				_database.XdrStream.WriteBuffer(sdl);
-				_database.XdrStream.Write(string.Empty);
-				_database.XdrStream.Write(0);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_get_slice);
+				_database.Xdr.Write(_transaction.Handle);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Write(sliceLength);
+				_database.Xdr.WriteBuffer(sdl);
+				_database.Xdr.Write(string.Empty);
+				_database.Xdr.Write(0);
+				_database.Xdr.Flush();
 
 				return ReceiveSliceResponse(Descriptor);
 			}
@@ -125,15 +125,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				var sdl = GenerateSDL(Descriptor);
 				var slice = EncodeSliceArray(sourceArray);
 
-				_database.XdrStream.Write(IscCodes.op_put_slice);
-				_database.XdrStream.Write(_transaction.Handle);
-				_database.XdrStream.Write(ArrayHandle);
-				_database.XdrStream.Write(sliceLength);
-				_database.XdrStream.WriteBuffer(sdl);
-				_database.XdrStream.Write(string.Empty);
-				_database.XdrStream.Write(sliceLength);
-				_database.XdrStream.WriteBytes(slice, slice.Length);
-				_database.XdrStream.Flush();
+				_database.Xdr.Write(IscCodes.op_put_slice);
+				_database.Xdr.Write(_transaction.Handle);
+				_database.Xdr.Write(ArrayHandle);
+				_database.Xdr.Write(sliceLength);
+				_database.Xdr.WriteBuffer(sdl);
+				_database.Xdr.Write(string.Empty);
+				_database.Xdr.Write(sliceLength);
+				_database.Xdr.WriteBytes(slice, slice.Length);
+				_database.Xdr.Flush();
 
 				var response = _database.ReadResponse<GenericResponse>();
 
@@ -177,9 +177,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
-			using (var xdr = new XdrStream(slice, _database.Charset))
+			using (var ms = new MemoryStream(slice))
 			{
-				while (xdr.Position < xdr.Length)
+				var xdr = new XdrReaderWriter(ms, _database.Charset);
+				while (ms.Position < ms.Length)
 				{
 					switch (dbType)
 					{
@@ -255,14 +256,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			try
 			{
 				var operation = _database.ReadOperation();
-
 				if (operation == IscCodes.op_slice)
 				{
 					var isVariying = false;
 					var elements = 0;
-					var length = _database.XdrStream.ReadInt32();
+					var length = _database.Xdr.ReadInt32();
 
-					length = _database.XdrStream.ReadInt32();
+					length = _database.Xdr.ReadInt32();
 
 					switch (desc.DataType)
 					{
@@ -287,28 +287,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 					if (isVariying)
 					{
-						using (var xdr = new XdrStream())
+						using (var ms = new MemoryStream())
 						{
+							var xdr = new XdrReaderWriter(ms);
 							for (var i = 0; i < elements; i++)
 							{
-								var buffer = _database.XdrStream.ReadOpaque(_database.XdrStream.ReadInt32());
-
+								var buffer = _database.Xdr.ReadOpaque(_database.Xdr.ReadInt32());
 								xdr.WriteBuffer(buffer, buffer.Length);
 							}
-
-							return xdr.ToArray();
+							xdr.Flush();
+							return ms.ToArray();
 						}
 					}
 					else
 					{
-						return _database.XdrStream.ReadOpaque(length);
+						return _database.Xdr.ReadOpaque(length);
 					}
 				}
 				else
 				{
-					_database.SetOperation(operation);
-					_database.ReadResponse();
-
+					_database.ReadResponse(operation);
 					return null;
 				}
 			}
@@ -325,8 +323,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			var subType = (Descriptor.Scale < 0) ? 2 : 0;
 			var type = 0;
 
-			using (var xdr = new XdrStream(_database.Charset))
+			using (var ms = new MemoryStream())
 			{
+				var xdr = new XdrReaderWriter(ms, _database.Charset);
+
 				type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 				dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
@@ -385,7 +385,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 				}
 
-				return xdr.ToArray();
+				xdr.Flush();
+				return ms.ToArray();
 			}
 		}
 

@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 				numberOfResponses++;
 
-				_database.XdrStream.Flush();
+				_database.Xdr.Flush();
 
 				try
 				{
@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					readRowsAffectedResponse = true;
 				}
 
-				_database.XdrStream.Flush();
+				_database.Xdr.Flush();
 
 				var numberOfResponses = (StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
 				try

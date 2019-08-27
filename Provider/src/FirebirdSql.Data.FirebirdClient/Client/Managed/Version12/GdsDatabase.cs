@@ -35,28 +35,28 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			XdrStream.Write(IscCodes.op_attach);
-			XdrStream.Write(0);
+			Xdr.Write(IscCodes.op_attach);
+			Xdr.Write(0);
 			if (!string.IsNullOrEmpty(Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			XdrStream.WriteBuffer(dpb.ToArray());
+			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
 		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
 		{
-			XdrStream.Write(IscCodes.op_create);
-			XdrStream.Write(0);
+			Xdr.Write(IscCodes.op_create);
+			Xdr.Write(0);
 			if (!string.IsNullOrEmpty(Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			XdrStream.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			XdrStream.WriteBuffer(dpb.ToArray());
+			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
 		#region Override Statement Creation Methods
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			try
 			{
 				SendCancelOperationToBuffer(kind);
-				XdrStream.Flush();
+				Xdr.Flush();
 				// no response, this is async
 			}
 			catch (IOException ex)
@@ -91,8 +91,8 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		protected void SendCancelOperationToBuffer(int kind)
 		{
-			XdrStream.Write(IscCodes.op_cancel);
-			XdrStream.Write(kind);
+			Xdr.Write(IscCodes.op_cancel);
+			Xdr.Write(kind);
 		}
 
 		#endregion

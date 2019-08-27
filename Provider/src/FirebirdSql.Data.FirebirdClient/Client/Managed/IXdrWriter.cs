@@ -16,46 +16,13 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Threading.Tasks;
-using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
-	internal interface IXdrStream : IDisposable
+	interface IXdrWriter
 	{
-		long Position { get; }
-		long Length { get; }
-		bool IOFailed { get; }
-
-		void SetCompression(Ionic.Zlib.ZlibCodec compressor, Ionic.Zlib.ZlibCodec decompressor);
-		void SetEncryption(Org.BouncyCastle.Crypto.Engines.RC4Engine encryptor, Org.BouncyCastle.Crypto.Engines.RC4Engine decryptor);
-
 		void Flush();
-
-		byte[] ReadBytes(byte[] buffer, int count);
-		Task<byte[]> ReadBytesAsync(byte[] buffer, int count);
-		byte[] ReadOpaque(int length);
-		byte[] ReadBuffer();
-		string ReadString();
-		string ReadString(int length);
-		string ReadString(Charset charset);
-		string ReadString(Charset charset, int length);
-		short ReadInt16();
-		int ReadInt32();
-		Task<int> ReadInt32Async();
-		long ReadInt64();
-		Guid ReadGuid();
-		float ReadSingle();
-		double ReadDouble();
-		DateTime ReadDateTime();
-		DateTime ReadDate();
-		TimeSpan ReadTime();
-		decimal ReadDecimal(int type, int scale);
-		bool ReadBoolean();
-		IscException ReadStatusVector();
-
 		void WriteBytes(byte[] buffer, int count);
-		//Task WriteBytesAsync(byte[] buffer, int count);
 		void WriteOpaque(byte[] buffer);
 		void WriteOpaque(byte[] buffer, int length);
 		void WriteBuffer(byte[] buffer);
@@ -74,10 +41,5 @@ namespace FirebirdSql.Data.Client.Managed
 		void Write(Guid value);
 		void WriteDate(DateTime value);
 		void WriteTime(TimeSpan value);
-
-		int ReadOperation();
-		int ReadNextOperation();
-		Task<int> ReadNextOperationAsync();
-		void SetOperation(int operation);
 	}
 }

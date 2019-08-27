@@ -94,13 +94,13 @@ using Interop=System.Runtime.InteropServices;
 namespace Ionic.Zlib
 {
 
-    /// <summary>
-    /// Describes how to flush the current deflate operation.
-    /// </summary>
-    /// <remarks>
-    /// The different FlushType values are useful when using a Deflate in a streaming application.
-    /// </remarks>
-    internal enum FlushType
+	/// <summary>
+	/// Describes how to flush the current deflate operation.
+	/// </summary>
+	/// <remarks>
+	/// The different FlushType values are useful when using a Deflate in a streaming application.
+	/// </remarks>
+	internal enum FlushType
     {
         /// <summary>No flush at all.</summary>
         None = 0,
@@ -137,10 +137,10 @@ namespace Ionic.Zlib
     }
 
 
-    /// <summary>
-    /// The compression level to be used when using a DeflateStream or ZlibStream with CompressionMode.Compress.
-    /// </summary>
-    internal enum CompressionLevel
+	/// <summary>
+	/// The compression level to be used when using a DeflateStream or ZlibStream with CompressionMode.Compress.
+	/// </summary>
+	internal enum CompressionLevel
     {
         /// <summary>
         /// None means that the data will be simply stored, with no change at all.
@@ -214,12 +214,12 @@ namespace Ionic.Zlib
         Level9 = 9,
     }
 
-    /// <summary>
-    /// Describes options for how the compression algorithm is executed.  Different strategies
-    /// work better on different sorts of data.  The strategy parameter can affect the compression
-    /// ratio and the speed of compression but not the correctness of the compresssion.
-    /// </summary>
-    internal enum CompressionStrategy
+	/// <summary>
+	/// Describes options for how the compression algorithm is executed.  Different strategies
+	/// work better on different sorts of data.  The strategy parameter can affect the compression
+	/// ratio and the speed of compression but not the correctness of the compresssion.
+	/// </summary>
+	internal enum CompressionStrategy
     {
         /// <summary>
         /// The default strategy is probably the best for normal data.
@@ -243,10 +243,10 @@ namespace Ionic.Zlib
     }
 
 
-    /// <summary>
-    /// An enum to specify the direction of transcoding - whether to compress or decompress.
-    /// </summary>
-    internal enum CompressionMode
+	/// <summary>
+	/// An enum to specify the direction of transcoding - whether to compress or decompress.
+	/// </summary>
+	internal enum CompressionMode
     {
         /// <summary>
         /// Used to specify that the stream should compress the data.
@@ -263,7 +263,7 @@ namespace Ionic.Zlib
     /// A general purpose exception class for exceptions in the Zlib library.
     /// </summary>
     [Interop.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d0000E")]
-    internal class ZlibException : System.Exception
+	internal class ZlibException : System.Exception
     {
         /// <summary>
         /// The ZlibException class captures exception information generated
@@ -331,13 +331,13 @@ namespace Ionic.Zlib
             // Returns 0 bytes if not enough space in target
             if (target.Length == 0) return 0;
 
-            var charArray = new char[target.Length];
-            var bytesRead = sourceTextReader.Read(charArray, start, count);
+            char[] charArray = new char[target.Length];
+            int bytesRead = sourceTextReader.Read(charArray, start, count);
 
             // Returns -1 if EOF
             if (bytesRead == 0) return -1;
 
-            for (var index = start; index < start + bytesRead; index++)
+            for (int index = start; index < start + bytesRead; index++)
                 target[index] = (byte)charArray[index];
 
             return bytesRead;
@@ -346,13 +346,13 @@ namespace Ionic.Zlib
 
         internal static byte[] ToByteArray(System.String sourceString)
         {
-            return System.Text.Encoding.UTF8.GetBytes(sourceString);
+            return System.Text.UTF8Encoding.UTF8.GetBytes(sourceString);
         }
 
 
         internal static char[] ToCharArray(byte[] byteArray)
         {
-            return System.Text.Encoding.UTF8.GetChars(byteArray);
+            return System.Text.UTF8Encoding.UTF8.GetChars(byteArray);
         }
     }
 
@@ -454,18 +454,18 @@ namespace Ionic.Zlib
 
 
 
-    /// <summary>
-    /// Computes an Adler-32 checksum.
-    /// </summary>
-    /// <remarks>
-    /// The Adler checksum is similar to a CRC checksum, but faster to compute, though less
-    /// reliable.  It is used in producing RFC1950 compressed streams.  The Adler checksum
-    /// is a required part of the "ZLIB" standard.  Applications will almost never need to
-    /// use this class directly.
-    /// </remarks>
-    ///
-    /// <exclude/>
-    internal sealed class Adler
+	/// <summary>
+	/// Computes an Adler-32 checksum.
+	/// </summary>
+	/// <remarks>
+	/// The Adler checksum is similar to a CRC checksum, but faster to compute, though less
+	/// reliable.  It is used in producing RFC1950 compressed streams.  The Adler checksum
+	/// is a required part of the "ZLIB" standard.  Applications will almost never need to
+	/// use this class directly.
+	/// </remarks>
+	///
+	/// <exclude/>
+	internal sealed class Adler
     {
         // largest prime smaller than 65536
         private static readonly uint BASE = 65521;
@@ -496,12 +496,12 @@ namespace Ionic.Zlib
             if (buf == null)
                 return 1;
 
-            var s1 = (uint) (adler & 0xffff);
-            var s2 = (uint) ((adler >> 16) & 0xffff);
+            uint s1 = (uint) (adler & 0xffff);
+            uint s2 = (uint) ((adler >> 16) & 0xffff);
 
             while (len > 0)
             {
-                var k = len < NMAX ? len : NMAX;
+                int k = len < NMAX ? len : NMAX;
                 len -= k;
                 while (k >= 16)
                 {
