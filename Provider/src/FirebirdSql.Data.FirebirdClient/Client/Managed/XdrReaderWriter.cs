@@ -101,21 +101,9 @@ namespace FirebirdSql.Data.Client.Managed
 			return ReadOpaque((ushort)ReadInt32());
 		}
 
-		public string ReadString()
-		{
-			return ReadString(_charset);
-		}
-
-		public string ReadString(int length)
-		{
-			return ReadString(_charset, length);
-		}
-
-		public string ReadString(Charset charset)
-		{
-			return ReadString(charset, ReadInt32());
-		}
-
+		public string ReadString() => ReadString(_charset);
+		public string ReadString(int length) => ReadString(_charset, length);
+		public string ReadString(Charset charset) => ReadString(charset, ReadInt32());
 		public string ReadString(Charset charset, int length)
 		{
 			var buffer = ReadOpaque(length);
@@ -258,11 +246,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_stream.Write(buffer, 0, count);
 		}
 
-		public void WriteOpaque(byte[] buffer)
-		{
-			WriteOpaque(buffer, buffer.Length);
-		}
-
+		public void WriteOpaque(byte[] buffer) => WriteOpaque(buffer, buffer.Length);
 		public void WriteOpaque(byte[] buffer, int length)
 		{
 			if (buffer != null && length > 0)
@@ -273,11 +257,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public void WriteBuffer(byte[] buffer)
-		{
-			WriteBuffer(buffer, buffer?.Length ?? 0);
-		}
-
+		public void WriteBuffer(byte[] buffer) => WriteBuffer(buffer, buffer?.Length ?? 0);
 		public void WriteBuffer(byte[] buffer, int length)
 		{
 			Write(length);
