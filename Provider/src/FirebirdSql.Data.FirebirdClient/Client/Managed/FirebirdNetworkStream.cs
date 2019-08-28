@@ -34,10 +34,11 @@ namespace FirebirdSql.Data.Client.Managed
 		Queue<byte> _outputBuffer;
 		Queue<byte> _inputBuffer;
 		byte[] _readBuffer;
-		byte[] _compressionBuffer;
 
+		byte[] _compressionBuffer;
 		Ionic.Zlib.ZlibCodec _compressor;
 		Ionic.Zlib.ZlibCodec _decompressor;
+
 		Org.BouncyCastle.Crypto.Engines.RC4Engine _decryptor;
 		Org.BouncyCastle.Crypto.Engines.RC4Engine _encryptor;
 
@@ -48,7 +49,6 @@ namespace FirebirdSql.Data.Client.Managed
 			_outputBuffer = new Queue<byte>(PreferredBufferSize);
 			_inputBuffer = new Queue<byte>(PreferredBufferSize);
 			_readBuffer = new byte[PreferredBufferSize];
-			_compressionBuffer = new byte[CompressionBufferSize];
 		}
 
 		public bool IOFailed { get; set; }
@@ -157,6 +157,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void StartCompression(Ionic.Zlib.ZlibCodec compressor, Ionic.Zlib.ZlibCodec decompressor)
 		{
+			_compressionBuffer = new byte[CompressionBufferSize];
 			_compressor = compressor;
 			_decompressor = decompressor;
 		}
