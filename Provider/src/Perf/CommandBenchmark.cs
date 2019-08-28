@@ -26,13 +26,13 @@ using FirebirdSql.Data.FirebirdClient;
 namespace Perf
 {
 	[Config(typeof(Config))]
-	public partial class Benchmark
+	public partial class CommandBenchmark
 	{
 		class Config : ManualConfig
 		{
 			public Config()
 			{
-				var baseJob = Job.ShortRun
+				var baseJob = Job.Default
 					.With(CsProjCoreToolchain.Current.Value)
 					.With(Platform.X64)
 					.With(Jit.RyuJit)

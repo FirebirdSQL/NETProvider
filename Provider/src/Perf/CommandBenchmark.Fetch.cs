@@ -20,7 +20,7 @@ using FirebirdSql.Data.FirebirdClient;
 
 namespace Perf
 {
-	partial class Benchmark
+	partial class CommandBenchmark
 	{
 		[GlobalSetup(Target = nameof(Fetch))]
 		public void FetchGlobalSetup()
