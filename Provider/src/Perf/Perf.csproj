@@ -8,6 +8,12 @@
 		<PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Update="CommandBenchmark.*.cs">
+			<DependentUpon>CommandBenchmark.cs</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
 	<ItemGroup Condition="!$(Configuration.EndsWith('NuGet'))">
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
 	</ItemGroup>

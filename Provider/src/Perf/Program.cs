@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Reflection;
 using BenchmarkDotNet.Running;
 
 namespace Perf
@@ -23,7 +24,7 @@ namespace Perf
 	{
 		static void Main(string[] args)
 		{
-			BenchmarkRunner.Run<FetchBenchmark>();
+			BenchmarkRunner.Run(Assembly.GetExecutingAssembly());
 		}
 	}
 }

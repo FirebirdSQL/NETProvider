@@ -16,42 +16,16 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
 using FirebirdSql.Data.FirebirdClient;
 
 namespace Perf
 {
-	[Config(typeof(Config))]
-	public class FetchBenchmark
+	partial class Benchmark
 	{
-		class Config : ManualConfig
+		[GlobalSetup(Target = nameof(Fetch))]
+		public void FetchGlobalSetup()
 		{
-			public Config()
-			{
-				var baseJob = Job.Default
-					.With(CsProjCoreToolchain.Current.Value)
-					.With(Platform.X64)
-					.With(Jit.RyuJit)
-					.With(Runtime.Core);
-				Add(MemoryDiagnoser.Default);
-				Add(baseJob.WithCustomBuildConfiguration("Release").WithId("Project"));
-				Add(baseJob.WithCustomBuildConfiguration("ReleaseNuGet").WithId("NuGet"));
-			}
-		}
-
-		const string ConnectionString = "database=localhost:benchmark.fdb;user=sysdba;password=masterkey";
-
-		[Params("int", "bigint", "varchar(10) character set utf8")]
-		public string DataType { get; set; }
-
-		[GlobalSetup(Target = nameof(Fetch200k))]
-		public void Fetch200kSetup()
-		{
-			FbConnection.CreateDatabase(ConnectionString, true);
+			GlobalSetupBase();
 			using (var conn = new FbConnection(ConnectionString))
 			{
 				conn.Open();
@@ -62,7 +36,7 @@ namespace Perf
 				}
 				using (var cmd = conn.CreateCommand())
 				{
-					cmd.CommandText = @"execute block as
+					cmd.CommandText = $@"execute block as
 declare cnt int;
 begin
 	cnt = 200000;
@@ -78,7 +52,7 @@ end";
 		}
 
 		[Benchmark]
-		public void Fetch200k()
+		public void Fetch()
 		{
 			using (var conn = new FbConnection(ConnectionString))
 			{
@@ -95,13 +69,6 @@ end";
 					}
 				}
 			}
-		}
-
-		[GlobalCleanup(Target = nameof(Fetch200k))]
-		public void Fetch200kCleanup()
-		{
-			FbConnection.ClearAllPools();
-			FbConnection.DropDatabase(ConnectionString);
 		}
 	}
 }
