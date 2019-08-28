@@ -31,9 +31,9 @@ namespace FirebirdSql.Data.Client.Managed
 
 		readonly NetworkStream _networkStream;
 
-		Queue<byte> _outputBuffer;
-		Queue<byte> _inputBuffer;
-		byte[] _readBuffer;
+		readonly Queue<byte> _outputBuffer;
+		readonly Queue<byte> _inputBuffer;
+		readonly byte[] _readBuffer;
 
 		byte[] _compressionBuffer;
 		Ionic.Zlib.ZlibCodec _compressor;
