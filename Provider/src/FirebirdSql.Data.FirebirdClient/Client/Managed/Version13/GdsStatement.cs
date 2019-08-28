@@ -91,27 +91,29 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			var row = new DbValue[_fields.Count];
 			try
 			{
-				var nullBytes = _database.Xdr.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
-				var nullBits = new BitArray(nullBytes);
-				for (var i = 0; i < _fields.Count; i++)
+				if (_fields.Count > 0)
 				{
-					if (nullBits.Get(i))
+					var nullBytes = _database.Xdr.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
+					var nullBits = new BitArray(nullBytes);
+					for (var i = 0; i < _fields.Count; i++)
 					{
-						row[i] = new DbValue(this, _fields[i], null);
-					}
-					else
-					{
-						var value = ReadRawValue(_fields[i]);
-						row[i] = new DbValue(this, _fields[i], value);
+						if (nullBits.Get(i))
+						{
+							row[i] = new DbValue(this, _fields[i], null);
+						}
+						else
+						{
+							var value = ReadRawValue(_fields[i]);
+							row[i] = new DbValue(this, _fields[i], value);
+						}
 					}
 				}
-
-				return row;
 			}
 			catch (IOException ex)
 			{
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
+			return row;
 		}
 
 		#endregion
