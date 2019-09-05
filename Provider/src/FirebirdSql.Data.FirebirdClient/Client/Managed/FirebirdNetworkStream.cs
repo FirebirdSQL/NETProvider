@@ -26,6 +26,9 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	class FirebirdNetworkStream : Stream, ITracksIOFailure
 	{
+		public const string CompressionName = "zlib";
+		public const string EncryptionName = "Arc4";
+
 		const int PreferredBufferSize = 32 * 1024;
 		const int CompressionBufferSize = 1 * 1024 * 1024;
 

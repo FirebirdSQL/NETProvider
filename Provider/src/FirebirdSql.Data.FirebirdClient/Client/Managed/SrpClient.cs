@@ -31,6 +31,7 @@ namespace FirebirdSql.Data.Client.Managed
 	internal sealed class SrpClient
 	{
 		public const string PluginName = "Srp";
+		public const string SessionKeyName = "Symmetric";
 
 		private const int SRP_KEY_SIZE = 128;
 		private const int SRP_SALT_SIZE = 32;

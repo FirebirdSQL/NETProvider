@@ -202,8 +202,8 @@ namespace FirebirdSql.Data.Client.Managed
 								if (_wireCrypt != WireCryptOption.Disabled)
 								{
 									Xdr.Write(IscCodes.op_crypt);
-									Xdr.Write("ARC4");
-									Xdr.Write("symmetric");
+									Xdr.Write(FirebirdNetworkStream.EncryptionName);
+									Xdr.Write(SrpClient.SessionKeyName);
 									Xdr.Flush();
 
 									var encryptor = CreateCipher(srp.SessionKey);
