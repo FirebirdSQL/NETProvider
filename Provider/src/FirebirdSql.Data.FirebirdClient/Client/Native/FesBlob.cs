@@ -118,50 +118,43 @@ namespace FirebirdSql.Data.Client.Native
 			_db.ProcessStatusVector(_statusVector);
 		}
 
-		protected override byte[] GetSegment()
+		protected override void GetSegment(Stream stream)
 		{
 			var requested = (short)SegmentSize;
 			short segmentLength = 0;
 
 			ClearStatusVector();
 
-			using (var segment = new MemoryStream())
+			var tmp = new byte[requested];
+
+			var status = _db.FbClient.isc_get_segment(
+				_statusVector,
+				ref _blobHandle,
+				ref segmentLength,
+				requested,
+				tmp);
+
+
+			RblRemoveValue(IscCodes.RBL_segment);
+
+			if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
 			{
-				var tmp = new byte[requested];
-
-				var status = _db.FbClient.isc_get_segment(
-					_statusVector,
-					ref _blobHandle,
-					ref segmentLength,
-					requested,
-					tmp);
-
-				if (segmentLength > 0)
+				RblAddValue(IscCodes.RBL_eof_pending);
+				return;
+			}
+			else
+			{
+				if (status == IntPtr.Zero || _statusVector[1] == new IntPtr(IscCodes.isc_segment))
 				{
-					segment.Write(tmp, 0, segmentLength);
-				}
-
-				RblRemoveValue(IscCodes.RBL_segment);
-
-				if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
-				{
-					segment.SetLength(0);
-					RblAddValue(IscCodes.RBL_eof_pending);
+					RblAddValue(IscCodes.RBL_segment);
 				}
 				else
 				{
-					if (status == IntPtr.Zero || _statusVector[1] == new IntPtr(IscCodes.isc_segment))
-					{
-						RblAddValue(IscCodes.RBL_segment);
-					}
-					else
-					{
-						_db.ProcessStatusVector(_statusVector);
-					}
+					_db.ProcessStatusVector(_statusVector);
 				}
-
-				return segment.ToArray();
 			}
+
+			stream.Write(tmp, 0, segmentLength);
 		}
 
 		protected override void PutSegment(byte[] buffer)

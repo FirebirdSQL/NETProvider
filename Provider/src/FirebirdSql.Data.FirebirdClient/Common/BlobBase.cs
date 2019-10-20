@@ -62,8 +62,7 @@ namespace FirebirdSql.Data.Common
 
 					while (!EOF)
 					{
-						var segment = GetSegment();
-						ms.Write(segment, 0, segment.Length);
+						GetSegment(ms);
 					}
 
 					Close();
@@ -130,7 +129,7 @@ namespace FirebirdSql.Data.Common
 
 		protected abstract void Create();
 		protected abstract void Open();
-		protected abstract byte[] GetSegment();
+		protected abstract void GetSegment(Stream stream);
 		protected abstract void PutSegment(byte[] buffer);
 		protected abstract void Seek(int position);
 		protected abstract void GetBlobInfo();
