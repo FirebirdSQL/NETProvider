@@ -45,8 +45,8 @@ stages:
           TEST_SUITE: Tests-EF6
     steps:
     - script: |
-       choco install 7zip --yes --force
-       choco install wixtoolset --version 3.11.1 --yes --force
+       choco install 7zip --yes --force --no-progress
+       choco install wixtoolset --version 3.11.1 --yes --force --no-progress
       displayName: Chocolatey
 
     - powershell: |
