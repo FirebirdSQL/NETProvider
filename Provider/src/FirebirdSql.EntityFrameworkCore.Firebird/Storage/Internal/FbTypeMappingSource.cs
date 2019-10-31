@@ -165,7 +165,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 					if (size == null)
 					{
-						return _clob;
+						return new FbStringTypeMapping($"VARCHAR({VarcharMaxSize})", FbDbType.VarChar, VarcharMaxSize);
 					}
 					else
 					{
