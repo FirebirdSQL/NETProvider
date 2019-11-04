@@ -49,7 +49,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		readonly FbDateTimeTypeMapping _timeStamp = new FbDateTimeTypeMapping("TIMESTAMP", FbDbType.TimeStamp);
 		readonly FbDateTimeTypeMapping _date = new FbDateTimeTypeMapping("DATE", FbDbType.Date);
-		readonly FbDateTimeTypeMapping _time = new FbDateTimeTypeMapping("TIME", FbDbType.Time);
+
+		readonly FbTimeSpanTypeMapping _time = new FbTimeSpanTypeMapping("TIME", FbDbType.Time);
 
 		readonly FbGuidTypeMapping _guid = new FbGuidTypeMapping();
 
@@ -88,6 +89,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				{ typeof(double), _double},
 				{ typeof(decimal), _decimal },
 				{ typeof(DateTime), _timeStamp },
+				{ typeof(TimeSpan), _time },
 				{ typeof(Guid), _guid },
 			};
 
