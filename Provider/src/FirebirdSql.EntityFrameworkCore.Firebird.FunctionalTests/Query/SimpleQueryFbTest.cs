@@ -48,5 +48,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.Where_subquery_correlated_client_eval(isAsync);
 		}
+
+		[Theory(Skip = "Not handled directly into TimeSpan.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Projection_containing_DateTime_subtraction(bool isAsync)
+		{
+			return base.Projection_containing_DateTime_subtraction(isAsync);
+		}
 	}
 }
