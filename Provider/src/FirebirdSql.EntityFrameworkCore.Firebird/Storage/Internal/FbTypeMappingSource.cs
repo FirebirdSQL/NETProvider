@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -30,6 +31,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		public const int VarcharMaxSize = 32765 / 4;
 		public const int DefaultDecimalPrecision = 18;
 		public const int DefaultDecimalScale = 2;
+
+		readonly IFbOptions _fbOptions;
 
 		readonly FbBoolTypeMapping _boolean = new FbBoolTypeMapping();
 
@@ -57,9 +60,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		readonly Dictionary<Type, RelationalTypeMapping> _clrTypeMappings;
 		readonly HashSet<string> _disallowedMappings;
 
-		public FbTypeMappingSource(TypeMappingSourceDependencies dependencies, RelationalTypeMappingSourceDependencies relationalDependencies)
+		public FbTypeMappingSource(TypeMappingSourceDependencies dependencies, RelationalTypeMappingSourceDependencies relationalDependencies, IFbOptions fbOptions)
 			: base(dependencies, relationalDependencies)
 		{
+			_fbOptions = fbOptions;
+
 			_storeTypeMappings = new Dictionary<string, RelationalTypeMapping>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "BOOLEAN", _boolean },
@@ -165,7 +170,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 					if (size == null)
 					{
-						return new FbStringTypeMapping($"VARCHAR({VarcharMaxSize})", FbDbType.VarChar, VarcharMaxSize);
+						if (_fbOptions.UseVarcharForStringParameterTypes)
+						{
+							return new FbStringTypeMapping($"VARCHAR({VarcharMaxSize})", FbDbType.VarChar, VarcharMaxSize);
+						}
+						else
+						{
+							return _clob;
+						}
 					}
 					else
 					{

@@ -23,5 +23,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 	{
 		bool ExplicitParameterTypes { get; }
 		bool ExplicitStringLiteralTypes { get; }
+		bool UseVarcharForStringParameterTypes { get; }
 	}
 }

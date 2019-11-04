@@ -26,6 +26,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 		private long? _serviceProviderHash;
 		private bool? _explicitParameterTypes;
 		private bool? _explicitStringLiteralTypes;
+		private bool? _useVarcharForStringParameterTypes;
 
 		public FbOptionsExtension()
 		{ }
@@ -35,6 +36,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 		{
 			_explicitParameterTypes = copyFrom._explicitParameterTypes;
 			_explicitStringLiteralTypes = copyFrom._explicitStringLiteralTypes;
+			_useVarcharForStringParameterTypes = copyFrom._useVarcharForStringParameterTypes;
 		}
 
 		protected override RelationalOptionsExtension Clone()
@@ -42,6 +44,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 
 		public virtual bool? ExplicitParameterTypes => _explicitParameterTypes;
 		public virtual bool? ExplicitStringLiteralTypes => _explicitStringLiteralTypes;
+		public virtual bool? UseVarcharForStringParameterTypes => _useVarcharForStringParameterTypes;
 
 		public virtual FbOptionsExtension WithExplicitParameterTypes(bool explicitParameterTypes)
 		{
@@ -57,13 +60,21 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 			return clone;
 		}
 
+		public virtual FbOptionsExtension WithUseVarcharForStringParameterTypes(bool useVarcharForStringParameterTypes)
+		{
+			var clone = (FbOptionsExtension)Clone();
+			clone._useVarcharForStringParameterTypes = useVarcharForStringParameterTypes;
+			return clone;
+		}
+
 		public override long GetServiceProviderHashCode()
 		{
 			if (_serviceProviderHash == null)
 			{
 				_serviceProviderHash = (base.GetServiceProviderHashCode() * 397)
 					^ (_explicitParameterTypes?.GetHashCode() ?? 0L)
-					^ (_explicitStringLiteralTypes?.GetHashCode() ?? 0L);
+					^ (_explicitStringLiteralTypes?.GetHashCode() ?? 0L)
+					^ (_useVarcharForStringParameterTypes?.GetHashCode() ?? 0L);
 			}
 			return _serviceProviderHash.Value;
 		}

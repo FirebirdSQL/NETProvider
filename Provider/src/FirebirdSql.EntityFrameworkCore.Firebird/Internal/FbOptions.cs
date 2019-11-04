@@ -31,6 +31,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Internal
 
 			ExplicitParameterTypes = fbOptions.ExplicitParameterTypes ?? true;
 			ExplicitStringLiteralTypes = fbOptions.ExplicitStringLiteralTypes ?? true;
+			UseVarcharForStringParameterTypes = fbOptions.UseVarcharForStringParameterTypes ?? false;
 		}
 
 		public virtual void Validate(IDbContextOptions options)
@@ -49,5 +50,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Internal
 
 		public virtual bool ExplicitParameterTypes { get; private set; }
 		public virtual bool ExplicitStringLiteralTypes { get; private set; }
+		public virtual bool UseVarcharForStringParameterTypes { get; private set; }
 	}
 }
