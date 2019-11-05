@@ -47,7 +47,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		readonly DoubleTypeMapping _double = new DoubleTypeMapping("DOUBLE PRECISION");
 		readonly DecimalTypeMapping _decimal = new DecimalTypeMapping($"DECIMAL({DefaultDecimalPrecision},{DefaultDecimalScale})");
 
-		readonly FbDateTimeTypeMapping _timeStamp = new FbDateTimeTypeMapping("TIMESTAMP", FbDbType.TimeStamp);
+		readonly FbDateTimeTypeMapping _timestamp = new FbDateTimeTypeMapping("TIMESTAMP", FbDbType.TimeStamp);
 		readonly FbDateTimeTypeMapping _date = new FbDateTimeTypeMapping("DATE", FbDbType.Date);
 
 		readonly FbTimeSpanTypeMapping _time = new FbTimeSpanTypeMapping("TIME", FbDbType.Time);
@@ -73,7 +73,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				{ "FLOAT", _float },
 				{ "DOUBLE PRECISION", _double },
 				{ "DECIMAL", _decimal },
-				{ "TIMESTAMP", _timeStamp },
+				{ "TIMESTAMP", _timestamp },
 				{ "DATE", _date },
 				{ "TIME", _time },
 				{ "CHAR(16) CHARACTER SET OCTETS", _guid },
@@ -88,7 +88,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				{ typeof(float), _float },
 				{ typeof(double), _double},
 				{ typeof(decimal), _decimal },
-				{ typeof(DateTime), _timeStamp },
+				{ typeof(DateTime), _timestamp },
 				{ typeof(TimeSpan), _time },
 				{ typeof(Guid), _guid },
 			};
