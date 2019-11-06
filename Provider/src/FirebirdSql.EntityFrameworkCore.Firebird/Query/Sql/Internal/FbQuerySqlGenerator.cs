@@ -111,7 +111,22 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 			if (_fbOptions.ExplicitParameterTypes)
 			{
 				Sql.Append(" AS ");
-				Sql.Append(Dependencies.TypeMappingSource.GetMapping(parameterExpression.Type).StoreType);
+				if (parameterExpression.Type == typeof(string))
+				{
+					if (ParameterValues.TryGetValue(parameterExpression.Name, out var parameterValue))
+					{
+						Sql.Append(((IFbTypeMappingSource)Dependencies.TypeMappingSource).StringParameterQueryType((string)parameterValue));
+						IsCacheable = false;
+					}
+					else
+					{
+						Sql.Append(((IFbTypeMappingSource)Dependencies.TypeMappingSource).StringParameterQueryType());
+					}
+				}
+				else
+				{
+					Sql.Append(Dependencies.TypeMappingSource.GetMapping(parameterExpression.Type).StoreType);
+				}
 				Sql.Append(")");
 			}
 			return parameterExpression;
@@ -173,17 +188,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
 		protected override Expression VisitConstant(ConstantExpression constantExpression)
 		{
 			var svalue = constantExpression.Value as string;
-			var explicitVarcharPossible = constantExpression.Type == typeof(string) && svalue?.Length > 0;
-			if (_fbOptions.ExplicitStringLiteralTypes && explicitVarcharPossible)
+			if (_fbOptions.ExplicitStringLiteralTypes && constantExpression.Type == typeof(string))
 			{
 				Sql.Append("CAST(");
 			}
 			base.VisitConstant(constantExpression);
-			if (_fbOptions.ExplicitStringLiteralTypes && explicitVarcharPossible)
+			if (_fbOptions.ExplicitStringLiteralTypes && constantExpression.Type == typeof(string))
 			{
-				Sql.Append(" AS VARCHAR(");
-				Sql.Append(svalue.Length);
-				Sql.Append(") CHARACTER SET UTF8)");
+				Sql.Append(" AS ");
+				Sql.Append(((IFbTypeMappingSource)Dependencies.TypeMappingSource).StringLiteralQueryType(svalue));
+				Sql.Append(")");
 			}
 			return constantExpression;
 		}
