@@ -6,6 +6,9 @@ Read more:
 	* [ADO.NET provider](Provider/docs/ado-net.md)
 	* [Entity Framework 6 provider](Provider/docs/entity-framework-6.md)
 	* [Entity Framework Core provider](Provider/docs/entity-framework-core.md)
+	* [Services - Backup](Provider/docs/services-backup.md)
+	* [Events](Provider/docs/events.md)
+	* [ADO.NET - Schema](Provider/docs/ado-net-schema.md)
 * [DDEX provider](DDEX/readme.txt)
 
 | NuGets | Version | Downloads |
