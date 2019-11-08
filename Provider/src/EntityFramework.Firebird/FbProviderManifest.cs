@@ -159,14 +159,14 @@ namespace EntityFramework.Firebird
 				case "varchar":
 					newPrimitiveTypeKind = PrimitiveTypeKind.String;
 					isUnbounded = !TypeHelpers.TryGetMaxLength(storeType, out maxLength);
-					isUnicode = true; //TODO: hardcoded
+					isUnicode = true; //hardcoded
 					isFixedLen = false;
 					break;
 
 				case "char":
 					newPrimitiveTypeKind = PrimitiveTypeKind.String;
 					isUnbounded = !TypeHelpers.TryGetMaxLength(storeType, out maxLength);
-					isUnicode = true; //TODO: hardcoded
+					isUnicode = true; //hardcoded
 					isFixedLen = true;
 					break;
 
@@ -186,7 +186,7 @@ namespace EntityFramework.Firebird
 				case "clob":
 					newPrimitiveTypeKind = PrimitiveTypeKind.String;
 					isUnbounded = true;
-					isUnicode = true; //TODO: hardcoded
+					isUnicode = true; //hardcoded
 					isFixedLen = false;
 					break;
 
