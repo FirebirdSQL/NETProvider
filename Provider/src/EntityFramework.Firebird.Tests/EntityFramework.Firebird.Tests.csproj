@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net452</TargetFramework>
+		<TargetFrameworks>net452;netcoreapp3.0</TargetFrameworks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SkipSourceLink>true</SkipSourceLink>
@@ -11,6 +11,9 @@
 		<OutputType>Exe</OutputType>
 		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+		<None Remove="app.config" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="NUnit" Version="3.10.1" />
 		<PackageReference Include="NUnitLite" Version="3.10.1" />

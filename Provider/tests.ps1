@@ -108,6 +108,9 @@ function Tests-EF6() {
 	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
 	Check-ExitCode { .\EntityFramework.Firebird.Tests.exe --labels=All }
 
+	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\netcoreapp3.0"
+	Check-ExitCode { dotnet EntityFramework.Firebird.Tests.dll --labels=All }
+
 	echo "=== END ==="
 }
 

@@ -22,6 +22,14 @@ namespace EntityFramework.Firebird.Tests
 {
 	public class FbTestDbContext : DbContext
 	{
+		public class Conf : DbConfiguration
+		{
+			public Conf()
+			{
+				SetProviderServices(FbProviderServices.ProviderInvariantName, FbProviderServices.Instance);
+			}
+		}
+
 		public FbTestDbContext(FbConnection conn)
 			: base(conn, false)
 		{ }

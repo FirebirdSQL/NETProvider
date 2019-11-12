@@ -25,6 +25,14 @@ namespace EntityFramework.Firebird.Tests
 {
 	public abstract class EntityFrameworkTestsBase : FbTestsBase
 	{
+		static EntityFrameworkTestsBase()
+		{
+#if NETCOREAPP3_0
+			System.Data.Common.DbProviderFactories.RegisterFactory(FbProviderServices.ProviderInvariantName, FirebirdClientFactory.Instance);
+#endif
+			DbConfiguration.SetConfiguration(new FbTestDbContext.Conf());
+		}
+
 		public EntityFrameworkTestsBase()
 			: base(FbServerType.Default, false, FbWireCrypt.Enabled, false)
 		{ }
