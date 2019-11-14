@@ -21,7 +21,7 @@ $FirebirdConfiguration = @{
 $baseDir = Split-Path -Parent $PSCommandPath
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
 $testsNETDir = "$testsBaseDir\bin\$Configuration\net452"
-$testsCOREDir = "$testsBaseDir\bin\$Configuration\netcoreapp2.2"
+$testsCOREDir = "$testsBaseDir\bin\$Configuration\netcoreapp3.0"
 
 $startDir = $null
 $firebirdProcess = $null
@@ -118,7 +118,7 @@ function Tests-EFCore() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	if ($FirebirdSelection -ne 'FB25') {
-		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp2.2"
+		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp3.0"
 		Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All }
 
 		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
