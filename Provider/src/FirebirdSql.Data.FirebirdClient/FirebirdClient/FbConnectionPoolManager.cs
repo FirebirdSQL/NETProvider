@@ -92,14 +92,14 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
-			public void ReleaseConnection(FbConnectionInternal connection)
+			public void ReleaseConnection(FbConnectionInternal connection, bool returnToAvailable)
 			{
 				lock (_syncRoot)
 				{
 					CheckDisposedImpl();
 
 					var removed = _busy.Remove(connection);
-					if (removed)
+					if (removed && returnToAvailable)
 					{
 						_available.Push(new Item(GetTicks(), connection));
 					}
@@ -196,11 +196,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			return _pools.GetOrAdd(connectionString.NormalizedConnectionString, _ => new Pool(connectionString)).GetConnection(owner);
 		}
 
-		internal void Release(FbConnectionInternal connection)
+		internal void Release(FbConnectionInternal connection, bool returnToAvailable)
 		{
 			CheckDisposed();
 
-			_pools.GetOrAdd(connection.Options.NormalizedConnectionString, _ => new Pool(connection.Options)).ReleaseConnection(connection);
+			_pools.GetOrAdd(connection.Options.NormalizedConnectionString, _ => new Pool(connection.Options)).ReleaseConnection(connection, returnToAvailable);
 		}
 
 		internal void ClearAllPools()

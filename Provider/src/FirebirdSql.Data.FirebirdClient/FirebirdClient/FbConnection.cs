@@ -457,7 +457,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 						if (_options.Pooling)
 						{
-							FbConnectionPoolManager.Instance.Release(_innerConnection);
+							FbConnectionPoolManager.Instance.Release(_innerConnection, true);
 						}
 						else
 						{
@@ -511,26 +511,16 @@ namespace FirebirdSql.Data.FirebirdClient
 							_innerConnection.EnableCancel();
 						}
 
-						if (!_innerConnection.Database.ConnectionBroken)
+						var broken = _innerConnection.Database.ConnectionBroken;
+						FbConnectionPoolManager.Instance.Release(_innerConnection, !broken);
+						if (broken)
 						{
-							FbConnectionPoolManager.Instance.Release(_innerConnection);
-						}
-						else
-						{
-							if (!_innerConnection.IsEnlisted)
-							{
-								_innerConnection.Dispose();
-							}
-							_innerConnection = null;
+							EnlistedHelper();
 						}
 					}
 					else
 					{
-						if (!_innerConnection.IsEnlisted)
-						{
-							_innerConnection.Dispose();
-						}
-						_innerConnection = null;
+						EnlistedHelper();
 					}
 				}
 				catch
@@ -539,6 +529,15 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					OnStateChange(_state, ConnectionState.Closed);
 				}
+			}
+
+			void EnlistedHelper()
+			{
+				if (!_innerConnection.IsEnlisted)
+				{
+					_innerConnection.Dispose();
+				}
+				_innerConnection = null;
 			}
 		}
 
