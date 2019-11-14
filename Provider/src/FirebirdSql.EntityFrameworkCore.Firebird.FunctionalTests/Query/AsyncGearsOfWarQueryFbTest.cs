@@ -15,7 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
@@ -25,5 +29,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public AsyncGearsOfWarQueryFbTest(GearsOfWarQueryFbFixture fixture, ITestOutputHelper testOutputHelper)
 			: base(fixture)
 		{ }
+
+		// the original implementation has wrong assert
+		public override async Task GroupBy_Select_sum()
+		{
+			using var ctx = CreateContext();
+			var result = await ctx.Missions.GroupBy(m => m.CodeName).Select(g => g.Sum(m => m.Rating)).ToListAsync();
+			Assert.Equal(6.3, result.Sum() ?? double.NaN, precision: 1);
+		}
 	}
 }
