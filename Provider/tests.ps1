@@ -43,6 +43,8 @@ function Check-ExitCode($command) {
 }
 
 function Prepare() {
+	echo "=== $($MyInvocation.MyCommand.Name) ==="
+
 	$script:startDir = $pwd
 	$selectedConfiguration = $FirebirdConfiguration[$FirebirdSelection]
 	$fbDownload = $selectedConfiguration.Download
@@ -67,14 +69,20 @@ function Prepare() {
 
 	echo "Starting Firebird"
 	$script:firebirdProcess = Start-Process -FilePath $selectedConfiguration.Executable -ArgumentList $selectedConfiguration.Args -PassThru
+
+	echo "=== END ==="
 }
 
 function Cleanup() {
+	echo "=== $($MyInvocation.MyCommand.Name) ==="
+
 	cd $script:startDir
 	$process = $script:firebirdProcess
 	$process.Kill()
 	$process.WaitForExit()
 	rm -Force -Recurse $firebirdDir
+
+	echo "=== END ==="
 }
 
 function Tests-All() {
