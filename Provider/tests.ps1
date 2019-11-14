@@ -57,7 +57,7 @@ function Prepare() {
 	echo "Downloading $fbDownload"
 	(New-Object System.Net.WebClient).DownloadFile($fbDownload, (Join-Path (pwd) $fbDownloadName))
 	echo "Extracting $fbDownloadName"
-	7z x $fbDownloadName | Out-Null
+	7z x -bsp0 -bso0 $fbDownloadName
 	cp -Recurse -Force .\embedded\* $testsNETDir
 	cp -Recurse -Force .\embedded\* $testsCOREDir
 	rmdir -Recurse .\embedded
