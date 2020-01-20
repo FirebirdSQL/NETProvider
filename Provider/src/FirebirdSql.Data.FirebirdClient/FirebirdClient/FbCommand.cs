@@ -463,7 +463,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw;
 			}
 
-			return RecordsAffected;
+			return _statement.StatementType switch
+			{
+				DbStatementType.Insert => RecordsAffected,
+				DbStatementType.Update => RecordsAffected,
+				DbStatementType.Delete => RecordsAffected,
+				_ => -1,
+			};
 		}
 
 		public new FbDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);

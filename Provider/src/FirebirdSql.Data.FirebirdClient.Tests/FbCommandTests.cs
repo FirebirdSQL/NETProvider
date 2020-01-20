@@ -844,6 +844,17 @@ end";
 			}
 		}
 
+		[Test]
+		public void ExecuteNonQueryReturnsMinusOneOnNonInsertUpdateDelete()
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select 1 from rdb$database";
+				var ra = cmd.ExecuteNonQuery();
+				Assert.AreEqual(-1, ra);
+			}
+		}
+
 		#endregion
 	}
 }
