@@ -1,4 +1,4 @@
-# Entity Framework Core 2.x
+# Entity Framework Core 3.x
 
 * Install `FirebirdSql.EntityFrameworkCore.Firebird` from NuGet.
 * Create your `DbContext`.
@@ -9,12 +9,10 @@
 ```csharp
 class Program
 {
-    static void Main(string[] args)
-    {
+	static void Main(string[] args)
+	{
 		using (var db = new MyContext("database=localhost:demo.fdb;user=sysdba;password=masterkey"))
 		{
-			db.GetService<ILoggerFactory>().AddConsole();
-
 			db.Demos.ToList();
 		}
 	}
@@ -22,6 +20,8 @@ class Program
 
 class MyContext : DbContext
 {
+	static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+
 	readonly string _connectionString;
 
 	public MyContext(string connectionString)
@@ -35,7 +35,9 @@ class MyContext : DbContext
 	{
 		base.OnConfiguring(optionsBuilder);
 
-		optionsBuilder.UseFirebird(_connectionString);
+		optionsBuilder
+			.UseLoggerFactory(MyLoggerFactory)
+			.UseFirebird(_connectionString);
 	}
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
