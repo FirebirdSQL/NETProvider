@@ -50,16 +50,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		{
 			using (var db = GetDbContext<DeleteContext>())
 			{
-				db.Database.ExecuteSqlCommand("create table test_delete (id int primary key, name varchar(20))");
-				db.Database.ExecuteSqlCommand("insert into test_delete values (65, 'test')");
-				db.Database.ExecuteSqlCommand("insert into test_delete values (66, 'test')");
-				db.Database.ExecuteSqlCommand("insert into test_delete values (67, 'test')");
+				db.Database.ExecuteSqlRaw("create table test_delete (id int primary key, name varchar(20))");
+				db.Database.ExecuteSqlRaw("insert into test_delete values (65, 'test')");
+				db.Database.ExecuteSqlRaw("insert into test_delete values (66, 'test')");
+				db.Database.ExecuteSqlRaw("insert into test_delete values (67, 'test')");
 				var entity = new DeleteEntity() { Id = 66 };
 				var entry = db.Attach(entity);
 				entry.State = EntityState.Deleted;
 				db.SaveChanges();
 				var values = db.Set<DeleteEntity>()
-					 .FromSql("select * from test_delete")
+					 .FromSqlRaw("select * from test_delete")
 					 .AsNoTracking()
 					 .OrderBy(x => x.Id)
 					 .ToList();
@@ -99,10 +99,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		{
 			using (var db = GetDbContext<ConcurrencyDeleteContext>())
 			{
-				db.Database.ExecuteSqlCommand("create table test_delete_concurrency (id int primary key, name varchar(20), stamp timestamp)");
-				db.Database.ExecuteSqlCommand("insert into test_delete_concurrency values (65, 'test', current_timestamp)");
-				db.Database.ExecuteSqlCommand("insert into test_delete_concurrency values (66, 'test', current_timestamp)");
-				db.Database.ExecuteSqlCommand("insert into test_delete_concurrency values (67, 'test', current_timestamp)");
+				db.Database.ExecuteSqlRaw("create table test_delete_concurrency (id int primary key, name varchar(20), stamp timestamp)");
+				db.Database.ExecuteSqlRaw("insert into test_delete_concurrency values (65, 'test', current_timestamp)");
+				db.Database.ExecuteSqlRaw("insert into test_delete_concurrency values (66, 'test', current_timestamp)");
+				db.Database.ExecuteSqlRaw("insert into test_delete_concurrency values (67, 'test', current_timestamp)");
 				var entity = new ConcurrencyDeleteEntity() { Id = 66, Stamp = new DateTime(1970, 1, 1) };
 				var entry = db.Attach(entity);
 				entry.State = EntityState.Deleted;

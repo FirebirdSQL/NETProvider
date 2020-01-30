@@ -15,9 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.Diagnostics.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +30,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Design.Internal
 	{
 		public void ConfigureDesignTimeServices(IServiceCollection serviceCollection)
 			=> serviceCollection
+				.AddSingleton<LoggingDefinitions, FbLoggingDefinitions>()
 				.AddSingleton<IRelationalTypeMappingSource, FbTypeMappingSource>()
 				.AddSingleton<IDatabaseModelFactory, FbDatabaseModelFactory>()
 				.AddSingleton<IProviderConfigurationCodeGenerator, FbProviderConfigurationCodeGenerator>()

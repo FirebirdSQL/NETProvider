@@ -77,12 +77,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.Complex_SelectMany_with_nested_navigations_and_explicit_DefaultIfEmpty_with_other_query_operators_composed_on_top(isAsync);
 		}
 
-		[GeneratedNameTooLong]
-		public override void Data_reader_is_closed_correct_number_of_times_for_include_queries_on_optional_navigations()
-		{
-			base.Data_reader_is_closed_correct_number_of_times_for_include_queries_on_optional_navigations();
-		}
-
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task Include_after_multiple_SelectMany_and_reference_navigation(bool isAsync)
@@ -137,20 +131,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Join_navigation_in_outer_selector_translated_to_extra_join_nested2(bool isAsync)
 		{
 			return base.Join_navigation_in_outer_selector_translated_to_extra_join_nested2(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Join_navigation_translated_to_subquery_deeply_nested_non_key_join(bool isAsync)
-		{
-			return base.Join_navigation_translated_to_subquery_deeply_nested_non_key_join(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Join_navigation_translated_to_subquery_deeply_nested_required(bool isAsync)
-		{
-			return base.Join_navigation_translated_to_subquery_deeply_nested_required(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -298,12 +278,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Multi_level_include_one_to_many_optional_and_one_to_many_optional_produces_valid_sql(bool isAsync)
 		{
 			return base.Multi_level_include_one_to_many_optional_and_one_to_many_optional_produces_valid_sql(isAsync);
-		}
-
-		[GeneratedNameTooLong]
-		public override void Multi_level_include_reads_key_values_from_data_reader_rather_than_incorrect_reader_deep_into_the_stack()
-		{
-			base.Multi_level_include_reads_key_values_from_data_reader_rather_than_incorrect_reader_deep_into_the_stack();
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -488,10 +462,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.SelectMany_navigation_property_with_another_navigation_in_subquery(isAsync);
 		}
 
-		[GeneratedNameTooLong]
-		public override void SelectMany_navigation_property_with_include_and_followed_by_select_collection_navigation()
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task SelectMany_navigation_property_with_include_and_followed_by_select_collection_navigation(bool isAsync)
 		{
-			base.SelectMany_navigation_property_with_include_and_followed_by_select_collection_navigation();
+			return base.SelectMany_navigation_property_with_include_and_followed_by_select_collection_navigation(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -536,10 +511,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.SelectMany_with_Include_ThenInclude(isAsync);
 		}
 
-		[GeneratedNameTooLong]
-		public override void SelectMany_with_nested_navigations_and_additional_joins_outside_of_SelectMany()
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task SelectMany_with_nested_navigations_and_additional_joins_outside_of_SelectMany(bool isAsync)
 		{
-			base.SelectMany_with_nested_navigations_and_additional_joins_outside_of_SelectMany();
+			return base.SelectMany_with_nested_navigations_and_additional_joins_outside_of_SelectMany(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -813,6 +789,234 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Where_on_multilevel_reference_in_subquery_with_outer_projection(bool isAsync)
 		{
 			return base.Where_on_multilevel_reference_in_subquery_with_outer_projection(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_subquery_doesnt_project_unnecessary_columns_in_top_level_join(bool isAsync)
+		{
+			return base.Correlated_subquery_doesnt_project_unnecessary_columns_in_top_level_join(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task GroupJoin_with_complex_subquery_with_joins_does_not_get_flattened(bool isAsync)
+		{
+			return base.GroupJoin_with_complex_subquery_with_joins_does_not_get_flattened(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task GroupJoin_with_complex_subquery_with_joins_does_not_get_flattened2(bool isAsync)
+		{
+			return base.GroupJoin_with_complex_subquery_with_joins_does_not_get_flattened2(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task GroupJoin_with_complex_subquery_with_joins_does_not_get_flattened3(bool isAsync)
+		{
+			return base.GroupJoin_with_complex_subquery_with_joins_does_not_get_flattened3(isAsync);
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void Include18()
+		{
+			base.Include18();
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Include18_1_1(bool isAsync)
+		{
+			return base.Include18_1_1(isAsync);
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void Include19()
+		{
+			base.Include19();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection2()
+		{
+			base.IncludeCollection2();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection5()
+		{
+			base.IncludeCollection6();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection6()
+		{
+			base.IncludeCollection6();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection6_1()
+		{
+			base.IncludeCollection6_1();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection6_2()
+		{
+			base.IncludeCollection6_2();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection6_3()
+		{
+			base.IncludeCollection6_3();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection6_4()
+		{
+			base.IncludeCollection6_4();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection7()
+		{
+			base.IncludeCollection7();
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task IncludeCollection8(bool isAsync)
+		{
+			return base.IncludeCollection8(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Include_inside_subquery(bool isAsync)
+		{
+			return base.Include_inside_subquery(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_deeply_nested_non_key_join(bool isAsync)
+		{
+			return base.Join_navigation_deeply_nested_non_key_join(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_deeply_nested_required(bool isAsync)
+		{
+			return base.Join_navigation_deeply_nested_required(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_in_inner_selector(bool isAsync)
+		{
+			return base.Join_navigation_in_inner_selector(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_key_access_optional(bool isAsync)
+		{
+			return base.Join_navigation_key_access_optional(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_key_access_required(bool isAsync)
+		{
+			return base.Join_navigation_key_access_required(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_nested(bool isAsync)
+		{
+			return base.Join_navigation_nested(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_nested2(bool isAsync)
+		{
+			return base.Join_navigation_nested2(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_non_key_join(bool isAsync)
+		{
+			return base.Join_navigation_non_key_join(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_self_ref(bool isAsync)
+		{
+			return base.Join_navigation_self_ref(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigations_in_inner_selector_translated_without_collision(bool isAsync)
+		{
+			return base.Join_navigations_in_inner_selector_translated_without_collision(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_with_orderby_on_inner_sequence_navigation_non_key_join(bool isAsync)
+		{
+			return base.Join_with_orderby_on_inner_sequence_navigation_non_key_join(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Null_reference_protection_complex(bool isAsync)
+		{
+			return base.Null_reference_protection_complex(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Null_reference_protection_complex_client_eval(bool isAsync)
+		{
+			return base.Null_reference_protection_complex_client_eval(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Null_reference_protection_complex_materialization(bool isAsync)
+		{
+			return base.Null_reference_protection_complex_materialization(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Optional_navigation_propagates_nullability_to_manually_created_left_join2(bool isAsync)
+		{
+			return base.Optional_navigation_propagates_nullability_to_manually_created_left_join2(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Project_collection_navigation_nested_with_take(bool isAsync)
+		{
+			return base.Project_collection_navigation_nested_with_take(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Union_over_entities_with_different_nullability(bool isAsync)
+		{
+			return base.Union_over_entities_with_different_nullability(isAsync);
 		}
 	}
 }

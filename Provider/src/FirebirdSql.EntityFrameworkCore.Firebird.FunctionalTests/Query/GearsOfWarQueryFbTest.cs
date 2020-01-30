@@ -154,16 +154,81 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.Where_datetimeoffset_year_component(isAsync);
 		}
 
-		[GeneratedNameTooLong]
-		public override void Project_collection_navigation_with_inheritance1()
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collections_inner_subquery_predicate_references_outer_qsre(bool isAsync)
 		{
-			base.Project_collection_navigation_with_inheritance1();
+			return base.Correlated_collections_inner_subquery_predicate_references_outer_qsre(isAsync);
 		}
 
-		[Fact(Skip = "See #15164 on EntityFrameworkCore.")]
-		public override void Correlated_collection_with_top_level_FirstOrDefault()
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collections_inner_subquery_selector_references_outer_qsre(bool isAsync)
 		{
-			base.Correlated_collection_with_top_level_FirstOrDefault();
+			return base.Correlated_collections_inner_subquery_selector_references_outer_qsre(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collections_nested_inner_subquery_references_outer_qsre_one_level_up(bool isAsync)
+		{
+			return base.Correlated_collections_nested_inner_subquery_references_outer_qsre_one_level_up(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collections_nested_inner_subquery_references_outer_qsre_two_levels_up(bool isAsync)
+		{
+			return base.Correlated_collections_nested_inner_subquery_references_outer_qsre_two_levels_up(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task DateTimeOffset_Contains_Less_than_Greater_than(bool isAsync)
+		{
+			return base.DateTimeOffset_Contains_Less_than_Greater_than(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Outer_parameter_in_group_join_with_DefaultIfEmpty(bool isAsync)
+		{
+			return base.Outer_parameter_in_group_join_with_DefaultIfEmpty(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Outer_parameter_in_join_key(bool isAsync)
+		{
+			return base.Outer_parameter_in_join_key(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Outer_parameter_in_join_key_inner_and_outer(bool isAsync)
+		{
+			return base.Outer_parameter_in_join_key_inner_and_outer(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Project_collection_navigation_nested_with_take_composite_key(bool isAsync)
+		{
+			return base.Project_collection_navigation_nested_with_take_composite_key(isAsync);
+		}
+
+		[Theory(Skip = "Different implicit ordering on Firebird.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Take_without_orderby_followed_by_orderBy_is_pushed_down1(bool isAsync)
+		{
+			return base.Take_without_orderby_followed_by_orderBy_is_pushed_down1(isAsync);
+		}
+
+		[Theory(Skip = "Different implicit ordering on Firebird.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Take_without_orderby_followed_by_orderBy_is_pushed_down2(bool isAsync)
+		{
+			return base.Take_without_orderby_followed_by_orderBy_is_pushed_down2(isAsync);
 		}
 	}
 }

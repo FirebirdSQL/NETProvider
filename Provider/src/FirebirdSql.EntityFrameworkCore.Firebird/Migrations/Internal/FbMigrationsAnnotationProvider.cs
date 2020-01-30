@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
 using System.Collections.Generic;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -32,9 +33,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Internal
 
 		public override IEnumerable<IAnnotation> For(IProperty property)
 		{
-			if (property.Firebird().ValueGenerationStrategy != null)
+			var valueGenerationStrategy = property.GetValueGenerationStrategy();
+			if (valueGenerationStrategy != FbValueGenerationStrategy.None)
 			{
-				yield return new Annotation(FbAnnotationNames.ValueGenerationStrategy, property.Firebird().ValueGenerationStrategy);
+				yield return new Annotation(FbAnnotationNames.ValueGenerationStrategy, valueGenerationStrategy);
 			}
 		}
 	}

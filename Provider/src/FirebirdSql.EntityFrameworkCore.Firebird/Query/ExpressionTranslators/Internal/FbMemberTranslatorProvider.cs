@@ -15,16 +15,22 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FirebirdSql.EntityFrameworkCore.Firebird.Utilities;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.TestUtilities;
-using Xunit.Abstractions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
-	public class AsyncGroupByQueryFbTest : AsyncGroupByQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+	public class FbMemberTranslatorProvider : RelationalMemberTranslatorProvider
 	{
-		public AsyncGroupByQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture, ITestOutputHelper testOutputHelper)
-			: base(fixture)
-		{ }
+		static readonly List<Type> Translators = TranslatorsHelper.GetTranslators<IMemberTranslator>().ToList();
+
+		public FbMemberTranslatorProvider(RelationalMemberTranslatorProviderDependencies dependencies)
+			: base(dependencies)
+		{
+			AddTranslators(Translators.Select(t => (IMemberTranslator)Activator.CreateInstance(t, dependencies.SqlExpressionFactory)));
+		}
 	}
 }

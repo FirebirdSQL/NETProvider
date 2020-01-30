@@ -85,12 +85,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.Correlated_nested_two_levels_up_subquery_doesnt_project_unnecessary_columns_in_top_level(isAsync);
 		}
 
-		[GeneratedNameTooLong]
-		public override void Data_reader_is_closed_correct_number_of_times_for_include_queries_on_optional_navigations()
-		{
-			base.Data_reader_is_closed_correct_number_of_times_for_include_queries_on_optional_navigations();
-		}
-
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task Include_after_SelectMany_and_reference_navigation(bool isAsync)
@@ -156,13 +150,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Join_navigations_in_inner_selector_translated_to_multiple_subquery_without_collision(bool isAsync)
-		{
-			return base.Join_navigations_in_inner_selector_translated_to_multiple_subquery_without_collision(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
 		public override Task Join_navigation_in_outer_selector_translated_to_extra_join_nested(bool isAsync)
 		{
 			return base.Join_navigation_in_outer_selector_translated_to_extra_join_nested(isAsync);
@@ -173,27 +160,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Join_navigation_in_outer_selector_translated_to_extra_join_nested2(bool isAsync)
 		{
 			return base.Join_navigation_in_outer_selector_translated_to_extra_join_nested2(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Join_navigation_translated_to_subquery_deeply_nested_non_key_join(bool isAsync)
-		{
-			return base.Join_navigation_translated_to_subquery_deeply_nested_non_key_join(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Join_navigation_translated_to_subquery_deeply_nested_required(bool isAsync)
-		{
-			return base.Join_navigation_translated_to_subquery_deeply_nested_required(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Join_navigation_translated_to_subquery_nested(bool isAsync)
-		{
-			return base.Join_navigation_translated_to_subquery_nested(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -630,12 +596,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.SelectMany_navigation_property_with_another_navigation_in_subquery(isAsync);
 		}
 
-		[GeneratedNameTooLong]
-		public override void SelectMany_navigation_property_with_include_and_followed_by_select_collection_navigation()
-		{
-			base.SelectMany_navigation_property_with_include_and_followed_by_select_collection_navigation();
-		}
-
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task SelectMany_nested_navigation_property_optional_and_projection(bool isAsync)
@@ -935,6 +895,45 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Where_on_multilevel_reference_in_subquery_with_outer_projection(bool isAsync)
 		{
 			return base.Where_on_multilevel_reference_in_subquery_with_outer_projection(isAsync);
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void Include19()
+		{
+			base.Include19();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection6_2()
+		{
+			base.IncludeCollection6_2();
+		}
+
+		[GeneratedNameTooLongFact]
+		public override void IncludeCollection6_3()
+		{
+			base.IncludeCollection6_3();
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigation_deeply_nested_required(bool isAsync)
+		{
+			return base.Join_navigation_deeply_nested_required(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_navigations_in_inner_selector_translated_without_collision(bool isAsync)
+		{
+			return base.Join_navigations_in_inner_selector_translated_without_collision(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Project_collection_navigation_nested_with_take(bool isAsync)
+		{
+			return base.Project_collection_navigation_nested_with_take(isAsync);
 		}
 	}
 }

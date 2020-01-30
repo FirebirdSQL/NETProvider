@@ -13,12 +13,13 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
@@ -26,21 +27,25 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 	{
 		static readonly MethodInfo IsNullOrWhiteSpaceMethod = typeof(string).GetRuntimeMethod(nameof(string.IsNullOrWhiteSpace), new[] { typeof(string) });
 
-		public Expression Translate(MethodCallExpression methodCallExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbStringIsNullOrWhiteSpaceTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (!methodCallExpression.Method.Equals(IsNullOrWhiteSpaceMethod))
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (!method.Equals(IsNullOrWhiteSpaceMethod))
 				return null;
 
-			var argument = methodCallExpression.Arguments[0];
-			return Expression.MakeBinary(
-				ExpressionType.OrElse,
-				new IsNullExpression(argument),
-				Expression.Equal(
-					new SqlFunctionExpression(
-						"TRIM",
-						typeof(string),
-						new[] { argument }),
-					Expression.Constant(string.Empty, typeof(string))));
+			var argument = arguments[0];
+			return _fbSqlExpressionFactory.OrElse(
+				_fbSqlExpressionFactory.IsNull(argument),
+				_fbSqlExpressionFactory.Equal(
+					_fbSqlExpressionFactory.Function("TRIM", new[] { argument }, typeof(string)),
+					_fbSqlExpressionFactory.Constant(string.Empty))
+				);
 		}
 	}
 }

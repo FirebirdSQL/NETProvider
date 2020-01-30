@@ -15,6 +15,8 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,9 +25,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 {
 	public class FbOptionsExtension : RelationalOptionsExtension
 	{
-		private long? _serviceProviderHash;
-		private bool? _explicitParameterTypes;
-		private bool? _explicitStringLiteralTypes;
+		DbContextOptionsExtensionInfo _info;
+		bool? _explicitParameterTypes;
+		bool? _explicitStringLiteralTypes;
 
 		public FbOptionsExtension()
 		{ }
@@ -40,6 +42,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 		protected override RelationalOptionsExtension Clone()
 			=> new FbOptionsExtension(this);
 
+		public override void ApplyServices(IServiceCollection services)
+			=> services.AddEntityFrameworkFirebird();
+
+		public override DbContextOptionsExtensionInfo Info => _info ??= new ExtensionInfo(this);
 		public virtual bool? ExplicitParameterTypes => _explicitParameterTypes;
 		public virtual bool? ExplicitStringLiteralTypes => _explicitStringLiteralTypes;
 
@@ -57,21 +63,23 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 			return clone;
 		}
 
-		public override long GetServiceProviderHashCode()
+		sealed class ExtensionInfo : RelationalExtensionInfo
 		{
-			if (_serviceProviderHash == null)
-			{
-				_serviceProviderHash = (base.GetServiceProviderHashCode() * 397)
-					^ (_explicitParameterTypes?.GetHashCode() ?? 0L)
-					^ (_explicitStringLiteralTypes?.GetHashCode() ?? 0L);
-			}
-			return _serviceProviderHash.Value;
-		}
+			long? _serviceProviderHash;
 
-		public override bool ApplyServices(IServiceCollection services)
-		{
-			services.AddEntityFrameworkFirebird();
-			return true;
+			public ExtensionInfo(IDbContextOptionsExtension extension)
+				: base(extension)
+			{ }
+
+			new FbOptionsExtension Extension => (FbOptionsExtension)base.Extension;
+
+			public override long GetServiceProviderHashCode()
+			{
+				return _serviceProviderHash ??= HashCode.Combine(base.GetServiceProviderHashCode(), Extension._explicitParameterTypes, Extension._explicitStringLiteralTypes);
+			}
+
+			public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
+			{ }
 		}
 	}
 }

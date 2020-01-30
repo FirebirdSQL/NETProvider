@@ -15,8 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
@@ -26,5 +29,21 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public GroupByQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture, ITestOutputHelper testOutputHelper)
 			: base(fixture)
 		{ }
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task GroupBy_Property_Select_Count_with_predicate(bool async)
+		{
+			return Assert.ThrowsAsync<InvalidOperationException>(
+				() => base.GroupBy_Property_Select_Count_with_predicate(async));
+		}
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task GroupBy_Property_Select_LongCount_with_predicate(bool async)
+		{
+			return Assert.ThrowsAsync<InvalidOperationException>(
+				() => base.GroupBy_Property_Select_LongCount_with_predicate(async));
+		}
 	}
 }

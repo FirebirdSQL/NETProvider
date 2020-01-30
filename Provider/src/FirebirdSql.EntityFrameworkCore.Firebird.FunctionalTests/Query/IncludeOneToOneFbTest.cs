@@ -36,7 +36,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 			{
 				base.OnModelCreating(modelBuilder, context);
-				ModelHelpers.SetPrimaryKeyGeneration(modelBuilder, context);
+				ModelHelpers.SetPrimaryKeyGeneration(modelBuilder);
 			}
 		}
 	}

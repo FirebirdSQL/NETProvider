@@ -13,13 +13,14 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
@@ -27,15 +28,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 	{
 		static readonly MethodInfo ReplaceMethod = typeof(string).GetRuntimeMethod(nameof(string.Replace), new[] { typeof(string), typeof(string) });
 
-		public virtual Expression Translate(MethodCallExpression methodCallExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbStringReplaceTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (!methodCallExpression.Method.Equals(ReplaceMethod))
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (!method.Equals(ReplaceMethod))
 				return null;
 
-			return new SqlFunctionExpression(
-				"REPLACE",
-				methodCallExpression.Type,
-				new[] { methodCallExpression.Object }.Concat(methodCallExpression.Arguments));
+			return _fbSqlExpressionFactory.Function("REPLACE", new[] { instance }.Concat(arguments), instance.Type);
 		}
 	}
 }

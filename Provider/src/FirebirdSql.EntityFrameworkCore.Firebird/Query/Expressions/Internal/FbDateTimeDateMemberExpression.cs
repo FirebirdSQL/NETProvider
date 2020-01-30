@@ -17,64 +17,58 @@
 
 using System;
 using System.Linq.Expressions;
-using FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 {
-	public class FbDateTimeDateMemberExpression : Expression
+	public class FbDateTimeDateMemberExpression : SqlFunctionExpression, IEquatable<FbDateTimeDateMemberExpression>
 	{
-		public virtual Expression ValueExpression { get; }
+		public virtual SqlExpression ValueExpression { get; }
 
-		public FbDateTimeDateMemberExpression(Expression valueExpression)
+		public FbDateTimeDateMemberExpression(SqlExpression valueExpression, RelationalTypeMapping typeMapping)
+			: base(default, default, default, default, default, default, typeof(DateTime), typeMapping)
 		{
 			ValueExpression = valueExpression;
 		}
 
-		public override ExpressionType NodeType => ExpressionType.Extension;
-		public override bool CanReduce => false;
-		public override Type Type => typeof(DateTime);
-
 		protected override Expression Accept(ExpressionVisitor visitor)
-		{
-			if (visitor is IFbExpressionVisitor specificVisitor)
-			{
-				return specificVisitor.VisitDateMember(this);
-			}
-			else
-			{
-				return base.Accept(visitor);
-			}
-		}
+			=> visitor is FbQuerySqlGenerator fbQuerySqlGenerator
+				? fbQuerySqlGenerator.VisitDateTimeDateMember(this)
+				: base.Accept(visitor);
 
 		protected override Expression VisitChildren(ExpressionVisitor visitor)
 		{
-			var newValueExpression = visitor.Visit(ValueExpression);
+			var newValueExpression = (SqlExpression)visitor.Visit(ValueExpression);
 
 			return newValueExpression != ValueExpression
-				? new FbDateTimeDateMemberExpression(newValueExpression)
+				? new FbDateTimeDateMemberExpression(newValueExpression, TypeMapping)
 				: this;
+		}
+
+		public override void Print(ExpressionPrinter expressionPrinter)
+		{
+			expressionPrinter.Append("CAST(");
+			expressionPrinter.Visit(ValueExpression);
+			expressionPrinter.Append(" AS DATE)");
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (obj is null)
-			{
-				return false;
-			}
-			if (ReferenceEquals(this, obj))
-			{
-				return true;
-			}
-			return obj.GetType() == GetType() && Equals((FbDateTimeDateMemberExpression)obj);
+			return obj != null
+				&& (ReferenceEquals(this, obj)
+					|| obj is FbDateTimeDateMemberExpression fbDateTimeDateMemberExpression
+					&& Equals(fbDateTimeDateMemberExpression));
 		}
 
-		public override int GetHashCode()
+		public bool Equals(FbDateTimeDateMemberExpression other)
 		{
-			unchecked
-			{
-				var hashCode = ValueExpression.GetHashCode();
-				return hashCode;
-			}
+			return base.Equals(other)
+				&& ValueExpression.Equals(other.ValueExpression);
 		}
+
+		public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), ValueExpression);
 	}
 }

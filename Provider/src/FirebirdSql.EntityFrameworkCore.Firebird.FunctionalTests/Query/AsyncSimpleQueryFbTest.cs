@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Threading.Tasks;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
@@ -32,6 +33,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Query_backed_by_database_view()
 		{
 			return base.Query_backed_by_database_view();
+		}
+
+		[NotSupportedOnFirebirdFact]
+		public override Task Intersect_non_entity()
+		{
+			return base.Intersect_non_entity();
+		}
+
+		[NotSupportedOnFirebirdFact]
+		public override Task Except_non_entity()
+		{
+			return base.Except_non_entity();
 		}
 	}
 }

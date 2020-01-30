@@ -16,14 +16,30 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using System.Collections.Generic;
+using System.Reflection;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
-	public class FbNewGuidTranslator : SingleOverloadStaticMethodCallTranslator
+	public class FbNewGuidTranslator : IMethodCallTranslator
 	{
-		public FbNewGuidTranslator()
-			: base(typeof(Guid), nameof(Guid.NewGuid), "GEN_UUID")
-		{ }
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbNewGuidTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+		{
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (method.DeclaringType == typeof(Guid) && method.Name == nameof(Guid.NewGuid))
+			{
+				return _fbSqlExpressionFactory.Function("GEN_UUID", new[] { instance }, typeof(Guid));
+			}
+			return null;
+		}
 	}
 }

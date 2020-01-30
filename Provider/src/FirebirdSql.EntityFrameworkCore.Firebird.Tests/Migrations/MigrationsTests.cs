@@ -27,6 +27,7 @@ using NUnit.Framework;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 {
+#pragma warning disable EF1001
 	public class MigrationsTests : EntityFrameworkCoreTestsBase
 	{
 		[Test]
@@ -802,4 +803,5 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 
 		static string NewLineEnd(string s) => s + Environment.NewLine;
 	}
+#pragma warning restore EF1001
 }

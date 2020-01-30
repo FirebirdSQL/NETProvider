@@ -25,7 +25,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 {
 	public static class ModelHelpers
 	{
-		public static void SetStringLengths(ModelBuilder modelBuilder, DbContext context)
+		public static void SetStringLengths(ModelBuilder modelBuilder)
 		{
 			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 			{
@@ -39,23 +39,25 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 			}
 		}
 
-		public static void SimpleTableNames(ModelBuilder modelBuilder, DbContext context)
+		public static void SimpleTableNames(ModelBuilder modelBuilder)
 		{
 			var names = new HashSet<string>(StringComparer.InvariantCulture);
 			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 			{
-				var name = new string(entityType.Relational().TableName.Where(char.IsUpper).ToArray());
+				if (entityType.BaseType != null)
+					continue;
+				var name = new string(entityType.GetTableName().Where(char.IsUpper).ToArray());
 				var cnt = 1;
 				while (names.Contains(name))
 				{
-					name = name + cnt++;
+					name += cnt++;
 				}
 				names.Add(name);
-				entityType.Relational().TableName = name;
+				entityType.SetTableName(name);
 			}
 		}
 
-		public static void SetPrimaryKeyGeneration(ModelBuilder modelBuilder, DbContext context, FbValueGenerationStrategy valueGenerationStrategy = FbValueGenerationStrategy.SequenceTrigger)
+		public static void SetPrimaryKeyGeneration(ModelBuilder modelBuilder, FbValueGenerationStrategy valueGenerationStrategy = FbValueGenerationStrategy.SequenceTrigger)
 		{
 			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 			{
@@ -65,10 +67,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 				var properties = pk.Properties;
 				if (properties.Count() != 1)
 					continue;
-				var fbPropertyAnnotations = properties[0].Firebird();
-				if (fbPropertyAnnotations.ValueGenerationStrategy == null)
+				var property = properties[0];
+				if (property.GetValueGenerationStrategy() == FbValueGenerationStrategy.None)
 				{
-					properties[0].Firebird().ValueGenerationStrategy = valueGenerationStrategy;
+					property.SetValueGenerationStrategy(valueGenerationStrategy);
 				}
 			}
 		}

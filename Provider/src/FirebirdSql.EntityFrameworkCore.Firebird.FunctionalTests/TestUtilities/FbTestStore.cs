@@ -46,14 +46,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 			Connection = new FbConnection(ConnectionString);
 		}
 
-		protected override void Initialize(Func<DbContext> createContext, Action<DbContext> seed)
+		protected override void Initialize(Func<DbContext> createContext, Action<DbContext> seed, Action<DbContext> clean)
 		{
 			using (var context = createContext())
 			{
 				// create database explicitly to specify Page Size and Forced Writes
 				FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
 				context.Database.EnsureCreated();
-				seed(context);
+				clean?.Invoke(context);
+				Clean(context);
+				seed?.Invoke(context);
 			}
 		}
 

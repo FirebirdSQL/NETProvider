@@ -19,18 +19,25 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 {
-	public class HasDataInTheSameTransactionAsDDLAttribute : FactAttribute
+	public class HasDataInTheSameTransactionAsDDLFactAttribute : FactAttribute
 	{
-		public HasDataInTheSameTransactionAsDDLAttribute()
+		public HasDataInTheSameTransactionAsDDLFactAttribute()
+		{
+			Skip = "HasData is called in the same transaction as DDL commands.";
+		}
+	}
+	public class HasDataInTheSameTransactionAsDDLTheoryAttribute : TheoryAttribute
+	{
+		public HasDataInTheSameTransactionAsDDLTheoryAttribute()
 		{
 			Skip = "HasData is called in the same transaction as DDL commands.";
 		}
 	}
 
 #warning Can I somehow handle it in SQL generation?
-	public class GeneratedNameTooLongAttribute : FactAttribute
+	public class GeneratedNameTooLongFactAttribute : FactAttribute
 	{
-		public GeneratedNameTooLongAttribute()
+		public GeneratedNameTooLongFactAttribute()
 		{
 			Skip = "Generated name in the query is too long.";
 		}
@@ -43,9 +50,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 		}
 	}
 
-	public class NotSupportedOnFirebirdAttribute : FactAttribute
+	public class NotSupportedOnFirebirdFactAttribute : FactAttribute
 	{
-		public NotSupportedOnFirebirdAttribute()
+		public NotSupportedOnFirebirdFactAttribute()
 		{
 			Skip = "Not supported on Firebird.";
 		}
@@ -55,6 +62,21 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 		public NotSupportedOnFirebirdTheoryAttribute()
 		{
 			Skip = "Not supported on Firebird.";
+		}
+	}
+
+	public class DoesNotHaveTheDataFactAttribute : FactAttribute
+	{
+		public DoesNotHaveTheDataFactAttribute()
+		{
+			Skip = "Does not have the data.";
+		}
+	}
+	public class DoesNotHaveTheDataTheoryAttribute : TheoryAttribute
+	{
+		public DoesNotHaveTheDataTheoryAttribute()
+		{
+			Skip = "Does not have the data.";
 		}
 	}
 }

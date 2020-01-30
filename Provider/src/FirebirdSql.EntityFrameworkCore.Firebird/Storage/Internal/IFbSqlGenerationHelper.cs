@@ -22,5 +22,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 	public interface IFbSqlGenerationHelper : ISqlGenerationHelper
 	{
 		string ParameterNameMarker { get; set; }
+		string StringLiteralQueryType(string s);
+		string StringParameterQueryType();
 	}
 }

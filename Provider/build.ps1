@@ -4,6 +4,9 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $baseDir = Split-Path -Parent $PSCommandPath
+
+. "$baseDir\include.ps1"
+
 $outDir = "$baseDir\out"
 $version = ''
 
@@ -22,9 +25,13 @@ function Clean() {
 }
 
 function Build() {
-	$solutionFile = "$baseDir\src\NETProvider.sln"
-	dotnet restore $solutionFile
-	dotnet msbuild /t:'Clean,Build' /p:Configuration=$Configuration $solutionFile /v:m /m
+	function b($target) {
+		dotnet msbuild /t:$target /p:Configuration=$Configuration "$baseDir\src\NETProvider.sln" /v:m /m
+		Check-ExitCode
+	}
+	b 'Clean'
+	b 'Restore'
+	b 'Build'
 	$script:version = (Get-Item $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net452\FirebirdSql.Data.FirebirdClient.dll).VersionInfo.ProductVersion -replace '(\d+)\.(\d+)\.(\d+)(-[a-z0-9]+)?(.*)','$1.$2.$3$4'
 }
 

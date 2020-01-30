@@ -13,19 +13,20 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Reflection;
-using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
 	public class FbDateTimeDatePartComponentTranslator : IMemberTranslator
 	{
+		const string YearDayPart = "YEARDAY";
 		static readonly Dictionary<MemberInfo, string> MemberDatePartMapping = new Dictionary<MemberInfo, string>
 		{
 			{  typeof(DateTime).GetProperty(nameof(DateTime.Year)), "YEAR" },
@@ -35,28 +36,26 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			{  typeof(DateTime).GetProperty(nameof(DateTime.Minute)), "MINUTE" },
 			{  typeof(DateTime).GetProperty(nameof(DateTime.Second)), "SECOND" },
 			{  typeof(DateTime).GetProperty(nameof(DateTime.Millisecond)), "MILLISECOND" },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.DayOfYear)), "YEARDAY" },
+			{  typeof(DateTime).GetProperty(nameof(DateTime.DayOfYear)), YearDayPart },
 			{  typeof(DateTime).GetProperty(nameof(DateTime.DayOfWeek)), "WEEKDAY" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.Year)), "YEAR" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.Month)), "MONTH" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.Day)), "DAY" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.Hour)), "HOUR" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.Minute)), "MINUTE" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.Second)), "SECOND" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.Millisecond)), "MILLISECOND" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.DayOfYear)), "YEARDAY" },
-			{  typeof(DateTimeOffset).GetProperty(nameof(DateTimeOffset.DayOfWeek)), "WEEKDAY" },
 		};
 
-		public virtual Expression Translate(MemberExpression memberExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbDateTimeDatePartComponentTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (!MemberDatePartMapping.TryGetValue(memberExpression.Member, out var part))
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
+		{
+			if (!MemberDatePartMapping.TryGetValue(member, out var part))
 				return null;
 
-			var result = (Expression)new FbExtractExpression(part, memberExpression.Expression);
-			if (part == "YEARDAY")
+			var result = (SqlExpression)_fbSqlExpressionFactory.Extract(part, instance);
+			if (part == YearDayPart)
 			{
-				result = Expression.Add(result, Expression.Constant(1));
+				result = _fbSqlExpressionFactory.Add(result, _fbSqlExpressionFactory.Constant(1));
 			}
 			return result;
 		}

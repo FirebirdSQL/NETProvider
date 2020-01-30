@@ -15,9 +15,9 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using System;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestModels.Northwind;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
@@ -28,11 +28,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		where TModelCustomizer : IModelCustomizer, new()
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-		{
-			base.OnModelCreating(modelBuilder, context);
-			ModelHelpers.SetStringLengths(modelBuilder, context);
-		}
+		protected override Type ContextType => typeof(NorthwindFbContext);
 	}
 }

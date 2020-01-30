@@ -29,7 +29,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 		{
 			base.OnModelCreating(modelBuilder, context);
-			ModelHelpers.SetStringLengths(modelBuilder, context);
+			ModelHelpers.SetStringLengths(modelBuilder);
 		}
 	}
 }

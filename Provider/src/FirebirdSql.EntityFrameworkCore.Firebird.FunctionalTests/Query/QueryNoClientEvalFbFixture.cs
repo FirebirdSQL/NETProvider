@@ -15,15 +15,10 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
 	public class QueryNoClientEvalFbFixture : NorthwindQueryFbFixture<NoopModelCustomizer>
-    {
-        public override DbContextOptionsBuilder AddOptions(DbContextOptionsBuilder builder)
-            => base.AddOptions(builder).ConfigureWarnings(c => c.Throw(RelationalEventId.QueryClientEvaluationWarning));
-    }
+	{ }
 }

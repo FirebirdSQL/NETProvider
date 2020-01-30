@@ -13,76 +13,77 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Linq.Expressions;
-using FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 {
-	public class FbSubstringExpression : Expression
+	public class FbSubstringExpression : SqlFunctionExpression, IEquatable<FbSubstringExpression>
 	{
-		public virtual Expression ValueExpression { get; }
-		public virtual Expression FromExpression { get; }
-		public virtual Expression ForExpression { get; }
+		public virtual SqlExpression ValueExpression { get; }
+		public virtual SqlExpression FromExpression { get; }
+		public virtual SqlExpression ForExpression { get; }
 
-		public FbSubstringExpression(Expression valueExpression, Expression fromExpression, Expression forExpression)
+		public FbSubstringExpression(SqlExpression valueExpression, SqlExpression fromExpression, SqlExpression forExpression, RelationalTypeMapping typeMapping)
+			: base(default, default, default, default, default, default, typeof(string), typeMapping)
 		{
 			ValueExpression = valueExpression;
 			FromExpression = fromExpression;
 			ForExpression = forExpression;
 		}
 
-		public override ExpressionType NodeType => ExpressionType.Extension;
-		public override bool CanReduce => false;
-		public override Type Type => typeof(string);
-
 		protected override Expression Accept(ExpressionVisitor visitor)
-		{
-			if (visitor is IFbExpressionVisitor specificVisitor)
-			{
-				return specificVisitor.VisitSubstring(this);
-			}
-			else
-			{
-				return base.Accept(visitor);
-			}
-		}
+			=> visitor is FbQuerySqlGenerator fbQuerySqlGenerator
+				? fbQuerySqlGenerator.VisitSubstring(this)
+				: base.Accept(visitor);
 
 		protected override Expression VisitChildren(ExpressionVisitor visitor)
 		{
-			var newValueExpression = visitor.Visit(ValueExpression);
-			var newFromExpression = visitor.Visit(FromExpression);
-			var newForExpression = visitor.Visit(ForExpression);
+			var newValueExpression = (SqlExpression)visitor.Visit(ValueExpression);
+			var newFromExpression = (SqlExpression)visitor.Visit(FromExpression);
+			var newForExpression = (SqlExpression)visitor.Visit(ForExpression);
 
 			return newValueExpression != ValueExpression || newFromExpression != FromExpression || newForExpression != ForExpression
-				? new FbSubstringExpression(newValueExpression, newFromExpression, newForExpression)
+				? new FbSubstringExpression(newValueExpression, newFromExpression, newForExpression, TypeMapping)
 				: this;
+		}
+
+		public override void Print(ExpressionPrinter expressionPrinter)
+		{
+			expressionPrinter.Append("SUBSTRING(");
+			expressionPrinter.Visit(ValueExpression);
+			expressionPrinter.Append(" FROM ");
+			expressionPrinter.Visit(FromExpression);
+			if (ForExpression != null)
+			{
+				expressionPrinter.Append(" FOR ");
+				expressionPrinter.Visit(ForExpression);
+			}
+			expressionPrinter.Append(")");
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (obj is null)
-			{
-				return false;
-			}
-			if (ReferenceEquals(this, obj))
-			{
-				return true;
-			}
-			return obj.GetType() == GetType() && Equals((FbSubstringExpression)obj);
+			return obj != null
+				&& (ReferenceEquals(this, obj)
+					|| obj is FbSubstringExpression fbSubstringExpression
+					&& Equals(fbSubstringExpression));
 		}
 
-		public override int GetHashCode()
+		public bool Equals(FbSubstringExpression other)
 		{
-			unchecked
-			{
-				var hashCode = ValueExpression.GetHashCode();
-				hashCode = (hashCode * 397) ^ FromExpression.GetHashCode();
-				hashCode = (hashCode * 397) ^ ForExpression.GetHashCode();
-				return hashCode;
-			}
+			return base.Equals(other)
+			   && ValueExpression.Equals(other.ValueExpression)
+			   && FromExpression.Equals(other.FromExpression)
+			   && (ForExpression == null ? other.ForExpression == null : ForExpression.Equals(other.ForExpression));
 		}
+
+		public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), ValueExpression, FromExpression, ForExpression);
 	}
 }

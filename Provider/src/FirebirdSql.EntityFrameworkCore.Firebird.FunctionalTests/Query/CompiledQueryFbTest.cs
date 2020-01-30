@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -13,17 +13,19 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq.Expressions;
-using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
-	public interface IFbExpressionVisitor
+	public class CompiledQueryFbTest : CompiledQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 	{
-		Expression VisitSubstring(FbSubstringExpression substringExpression);
-		Expression VisitExtract(FbExtractExpression extractExpression);
-		Expression VisitDateMember(FbDateTimeDateMemberExpression dateTimeDateMemberExpression);
+		public CompiledQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
+			: base(fixture)
+		{ }
 	}
 }

@@ -15,11 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
-using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
@@ -29,25 +29,25 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			: base(fixture)
 		{ }
 
-		[Fact(Skip = "Does not have the data.")]
+		[DoesNotHaveTheDataFact]
 		public override void All_customers()
 		{
 			base.All_customers();
 		}
 
-		[Fact(Skip = "Does not have the data.")]
+		[DoesNotHaveTheDataFact]
 		public override void All_employees()
 		{
 			base.All_employees();
 		}
 
-		[Fact(Skip = "Does not have the data.")]
+		[DoesNotHaveTheDataFact]
 		public override void All_orders()
 		{
 			base.All_orders();
 		}
 
-		[Fact(Skip = "Does not have the data.")]
+		[DoesNotHaveTheDataFact]
 		public override void Project_nullable_enum()
 		{
 			base.Project_nullable_enum();
@@ -66,8 +66,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 				modelBuilder.Entity<MappedCustomer>(
 					e =>
 					{
-						e.Property(c => c.CompanyName2).Metadata.Relational().ColumnName = "CompanyName";
-						e.Metadata.Relational().TableName = "Customers";
+						e.Property(c => c.CompanyName2).Metadata.SetColumnName("CompanyName");
+						e.Metadata.SetTableName("Customers");
 					});
 			}
 		}

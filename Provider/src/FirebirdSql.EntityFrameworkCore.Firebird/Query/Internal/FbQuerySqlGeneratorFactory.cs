@@ -15,17 +15,23 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 {
-	class FbQueryCompilationContext : RelationalQueryCompilationContext
+	public class FbQuerySqlGeneratorFactory : IQuerySqlGeneratorFactory
 	{
-		public FbQueryCompilationContext(QueryCompilationContextDependencies dependencies, ILinqOperatorProvider linqOperatorProvider, IQueryMethodProvider queryMethodProvider, bool trackQueryResults)
-			: base(dependencies, linqOperatorProvider, queryMethodProvider, trackQueryResults)
-		{ }
+		readonly QuerySqlGeneratorDependencies _dependencies;
+		readonly IFbOptions _fbOptions;
 
-		public override int MaxTableAliasLength => 31;
+		public FbQuerySqlGeneratorFactory(QuerySqlGeneratorDependencies dependencies, IFbOptions fbOptions)
+		{
+			_dependencies = dependencies;
+			_fbOptions = fbOptions;
+		}
+
+		public QuerySqlGenerator Create()
+			  => new FbQuerySqlGenerator(_dependencies, _fbOptions);
 	}
 }

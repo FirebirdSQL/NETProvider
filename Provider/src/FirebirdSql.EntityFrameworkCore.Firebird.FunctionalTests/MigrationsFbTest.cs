@@ -17,7 +17,6 @@
 
 using System;
 using System.Threading.Tasks;
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -47,44 +46,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 			Assert.Throws<NotSupportedException>(base.Can_generate_idempotent_down_scripts);
 		}
 
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_apply_all_migrations()
-			=> base.Can_apply_all_migrations();
+		[Fact(Skip = "")]
+		public override void Can_diff_against_2_2_model()
+		{ }
 
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override Task Can_apply_all_migrations_async()
-			=> base.Can_apply_all_migrations_async();
+		[Fact(Skip = "")]
+		public override void Can_diff_against_3_0_ASP_NET_Identity_model()
+		{ }
 
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_revert_one_migrations()
-			=> base.Can_revert_one_migrations();
+		[Fact(Skip = "")]
+		public override void Can_diff_against_2_2_ASP_NET_Identity_model()
+		{ }
 
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_revert_all_migrations()
-			=> base.Can_revert_all_migrations();
-
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_generate_up_scripts()
-			=> base.Can_generate_up_scripts();
-
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_generate_up_script_using_names()
-			=> base.Can_generate_up_script_using_names();
-
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_generate_one_up_script()
-			=> base.Can_generate_one_up_script();
-
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_generate_one_down_script()
-			=> base.Can_generate_one_down_script();
-
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_generate_down_scripts()
-			=> base.Can_generate_down_scripts();
-
-		[Fact(Skip = "See #14811 on EntityFrameworkCore.")]
-		public override void Can_generate_down_script_using_names()
-			=> base.Can_generate_down_script_using_names();
+		[Fact(Skip = "")]
+		public override void Can_diff_against_2_1_ASP_NET_Identity_model()
+		{ }
 	}
 }

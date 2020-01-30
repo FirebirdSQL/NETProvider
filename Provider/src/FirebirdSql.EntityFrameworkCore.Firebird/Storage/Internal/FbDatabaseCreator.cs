@@ -16,6 +16,8 @@
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -62,8 +64,31 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 			}
 		}
 
-		protected override bool HasTables()
-			=> Dependencies.ExecutionStrategyFactory.Create().Execute(_connection, connection => Convert.ToInt64(CreateHasTablesCommand().ExecuteScalar(connection)) != 0);
+		public override bool HasTables()
+			=> Dependencies.ExecutionStrategyFactory.Create().Execute(
+				_connection,
+				connection => Convert.ToInt64(CreateHasTablesCommand().ExecuteScalar(
+					new RelationalCommandParameterObject(
+						connection,
+						null,
+						null,
+						Dependencies.CurrentContext.Context,
+						Dependencies.CommandLogger)))
+					!= 0);
+
+		public override Task<bool> HasTablesAsync(CancellationToken cancellationToken = default)
+			=> Dependencies.ExecutionStrategyFactory.Create().ExecuteAsync(
+				_connection,
+				async (connection, ct) => Convert.ToInt64(await CreateHasTablesCommand().ExecuteScalarAsync(
+					new RelationalCommandParameterObject(
+						connection,
+						null,
+						null,
+						Dependencies.CurrentContext.Context,
+						Dependencies.CommandLogger),
+					ct))
+					!= 0,
+				cancellationToken);
 
 		IRelationalCommand CreateHasTablesCommand()
 		   => _rawSqlCommandBuilder

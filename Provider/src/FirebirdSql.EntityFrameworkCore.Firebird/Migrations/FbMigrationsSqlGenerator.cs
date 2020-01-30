@@ -22,7 +22,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Operations;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -58,10 +57,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			}
 		}
 
-
-		protected override void Generate(CreateTableOperation operation, IModel model, MigrationCommandListBuilder builder)
+		protected override void Generate(CreateTableOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
 		{
-			base.Generate(operation, model, builder);
+			base.Generate(operation, model, builder, true);
 
 			var columns = operation.Columns.Where(p => !p.IsNullable && string.IsNullOrWhiteSpace(p.DefaultValueSql) && p.DefaultValue == null);
 			foreach (var column in columns)
@@ -77,8 +75,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 		protected override void Generate(RenameTableOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> throw new NotSupportedException("Renaming table is not supported by Firebird.");
 
-		protected override void Generate(DropTableOperation operation, IModel model, MigrationCommandListBuilder builder)
-			=> base.Generate(operation, model, builder);
+		protected override void Generate(DropTableOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
+			=> base.Generate(operation, model, builder, terminate);
 
 		protected override void Generate(AlterTableOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> base.Generate(operation, model, builder);
@@ -125,7 +123,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			}
 			else
 			{
-				var type = GetColumnType(operation.Schema, operation.Table, operation.Name, operation.ClrType, operation.IsUnicode, operation.MaxLength, operation.IsFixedLength, operation.IsRowVersion, model);
+				var type = GetColumnType(operation.Schema, operation.Table, operation.Name, operation, model);
 				builder.Append(type);
 			}
 			if (valueGenerationStrategy == FbValueGenerationStrategy.IdentityColumn)
@@ -144,13 +142,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 				builder.Append(" DROP DEFAULT");
 				TerminateStatement(builder);
 
-
 				builder.Append("ALTER TABLE ");
 				builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Table, operation.Schema));
 				builder.Append(" ALTER COLUMN ");
 				builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name));
 				builder.Append(" SET");
-				DefaultValue(operation.DefaultValue, operation.DefaultValueSql, builder);
+				DefaultValue(operation.DefaultValue, operation.DefaultValueSql, operation.ColumnType, builder);
 				TerminateStatement(builder);
 			}
 
@@ -160,16 +157,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			}
 		}
 
-		protected override void Generate(AddColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
-			=> base.Generate(operation, model, builder);
+		protected override void Generate(AddColumnOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
+			=> base.Generate(operation, model, builder, terminate);
 
-		protected override void Generate(DropColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
+		protected override void Generate(DropColumnOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
 		{
 			builder.Append("ALTER TABLE ");
 			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Table, operation.Schema));
 			builder.Append(" DROP ");
 			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name));
-			TerminateStatement(builder);
+			if (terminate)
+				TerminateStatement(builder);
 		}
 
 		protected override void Generate(RenameColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
@@ -184,7 +182,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 		}
 
 
-		protected override void Generate(CreateIndexOperation operation, IModel model, MigrationCommandListBuilder builder)
+		protected override void Generate(CreateIndexOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
 		{
 			builder.Append("CREATE ");
 			if (operation.IsUnique)
@@ -208,11 +206,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 				builder.Append(ColumnList(operation.Columns));
 				builder.Append(")");
 			}
-			TerminateStatement(builder);
+			if (terminate)
+				TerminateStatement(builder);
 		}
 
-		protected override void Generate(DropIndexOperation operation, IModel model, MigrationCommandListBuilder builder)
-			=> base.Generate(operation, model, builder);
+		protected override void Generate(DropIndexOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
+			=> base.Generate(operation, model, builder, terminate);
 
 		protected override void Generate(RenameIndexOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> throw new NotSupportedException("Renaming index is not supported by Firebird.");
@@ -253,18 +252,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 		protected override void Generate(DropSequenceOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> base.Generate(operation, model, builder);
 
-		protected override void Generate(AddPrimaryKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
-			=> base.Generate(operation, model, builder);
+		protected override void Generate(AddPrimaryKeyOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
+			=> base.Generate(operation, model, builder, terminate);
 
-		protected override void Generate(DropPrimaryKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
-			=> base.Generate(operation, model, builder);
+		protected override void Generate(DropPrimaryKeyOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
+			=> base.Generate(operation, model, builder, terminate);
 
 
-		protected override void Generate(AddForeignKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
-			=> base.Generate(operation, model, builder);
+		protected override void Generate(AddForeignKeyOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
+			=> base.Generate(operation, model, builder, terminate);
 
-		protected override void Generate(DropForeignKeyOperation operation, IModel model, MigrationCommandListBuilder builder)
-			=> base.Generate(operation, model, builder);
+		protected override void Generate(DropForeignKeyOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
+			=> base.Generate(operation, model, builder, terminate);
 
 
 		protected override void Generate(AddUniqueConstraintOperation operation, IModel model, MigrationCommandListBuilder builder)
@@ -300,27 +299,27 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			FbConnection.DropDatabase(operation.ConnectionString);
 		}
 
-		protected override void ColumnDefinition(string schema, string table, string name, Type clrType, string type, bool? unicode, int? maxLength, bool? fixedLength, bool rowVersion, bool nullable, object defaultValue, string defaultValueSql, string computedColumnSql, IAnnotatable annotatable, IModel model, MigrationCommandListBuilder builder)
+		protected override void ColumnDefinition(string schema, string table, string name, ColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
 		{
 			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(name))
 				   .Append(" ")
-				   .Append(type ?? GetColumnType(schema, table, name, clrType, unicode, maxLength, fixedLength, rowVersion, model));
+				   .Append(operation.ColumnType ?? GetColumnType(schema, table, name, operation, model));
 
-			var valueGenerationStrategy = annotatable[FbAnnotationNames.ValueGenerationStrategy] as FbValueGenerationStrategy?;
+			var valueGenerationStrategy = operation[FbAnnotationNames.ValueGenerationStrategy] as FbValueGenerationStrategy?;
 			if (valueGenerationStrategy == FbValueGenerationStrategy.IdentityColumn)
 			{
 				builder.Append(" GENERATED BY DEFAULT AS IDENTITY");
 			}
 
-			DefaultValue(defaultValue, defaultValueSql, builder);
+			DefaultValue(operation.DefaultValue, operation.DefaultValueSql, operation.ColumnType, builder);
 
-			if (!nullable)
+			if (!operation.IsNullable)
 			{
 				builder.Append(" NOT NULL");
 			}
 		}
 
-		protected override void DefaultValue(object defaultValue, string defaultValueSql, MigrationCommandListBuilder builder)
+		protected override void DefaultValue(object defaultValue, string defaultValueSql, string columnType, MigrationCommandListBuilder builder)
 		{
 			if (defaultValueSql != null)
 			{

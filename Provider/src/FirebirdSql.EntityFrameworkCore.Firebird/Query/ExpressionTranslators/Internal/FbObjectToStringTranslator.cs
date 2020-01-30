@@ -17,9 +17,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using System.Reflection;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
@@ -34,7 +35,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			typeof(byte),
 			typeof(byte[]),
 			typeof(double),
-			typeof(DateTimeOffset),
 			typeof(char),
 			typeof(short),
 			typeof(float),
@@ -46,18 +46,25 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			typeof(sbyte),
 		};
 
-		public virtual Expression Translate(MethodCallExpression methodCallExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbObjectToStringTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (methodCallExpression.Method.Name == nameof(ToString) && methodCallExpression.Arguments.Count == 0 && methodCallExpression.Object != null)
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (method.Name == nameof(ToString) && method.GetParameters().Length == 0)
 			{
-				var type = methodCallExpression.Object.Type.UnwrapNullableType();
+				var type = instance.Type.UnwrapNullableType();
 				if (SupportedTypes.Contains(type))
 				{
-					return new ExplicitCastExpression(methodCallExpression.Object, typeof(string));
+					return _fbSqlExpressionFactory.Convert(instance, typeof(string));
 				}
 				else if (type == typeof(Guid))
 				{
-					return new SqlFunctionExpression("UUID_TO_CHAR", typeof(string), new[] { methodCallExpression.Object });
+					return _fbSqlExpressionFactory.Function("UUID_TO_CHAR", new[] { instance }, typeof(string));
 				}
 			}
 			return null;

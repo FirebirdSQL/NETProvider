@@ -13,16 +13,32 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using System.Collections.Generic;
+using System.Reflection;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
-	public class FbStringToLowerTranslator : ParameterlessInstanceMethodCallTranslator
+	public class FbStringToLowerTranslator : IMethodCallTranslator
 	{
-		public FbStringToLowerTranslator()
-			: base(typeof(string), nameof(string.ToLower), "LOWER")
-		{ }
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbStringToLowerTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+		{
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (method.DeclaringType == typeof(string) && method.Name == nameof(string.ToLower))
+			{
+				return _fbSqlExpressionFactory.Function("LOWER", new[] { instance }, typeof(string));
+			}
+			return null;
+		}
 	}
 }

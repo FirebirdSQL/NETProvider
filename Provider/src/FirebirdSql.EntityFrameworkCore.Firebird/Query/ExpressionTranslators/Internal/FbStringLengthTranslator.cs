@@ -13,23 +13,30 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using System;
+using System.Reflection;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
 	public class FbStringLengthTranslator : IMemberTranslator
 	{
-		public virtual Expression Translate(MemberExpression memberExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbStringLengthTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (memberExpression.Expression != null && memberExpression.Expression.Type == typeof(string) && memberExpression.Member.Name == nameof(string.Length))
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
+		{
+			if (member.DeclaringType == typeof(string) && member.Name == nameof(string.Length))
 			{
-				return new ExplicitCastExpression(
-					new SqlFunctionExpression("CHARACTER_LENGTH", memberExpression.Type, new[] { memberExpression.Expression }),
-					typeof(int));
+				return _fbSqlExpressionFactory.Function("CHARACTER_LENGTH", new[] { instance }, typeof(int));
 			}
 			return null;
 		}

@@ -17,21 +17,40 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 {
 	public class FbConventionSetBuilder : RelationalConventionSetBuilder
 	{
-		public FbConventionSetBuilder(RelationalConventionSetBuilderDependencies dependencies)
-			: base(dependencies)
+		public FbConventionSetBuilder(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
+			: base(dependencies, relationalDependencies)
 		{ }
 
-		public override ConventionSet AddConventions(ConventionSet conventionSet)
+		public override ConventionSet CreateConventionSet()
 		{
-			base.AddConventions(conventionSet);
-			conventionSet.ModelInitializedConventions.Add(new RelationalMaxIdentifierLengthConvention(31));
+			var conventionSet = base.CreateConventionSet();
+			var valueGenerationStrategyConvention = new FbValueGenerationStrategyConvention(Dependencies, RelationalDependencies);
+			conventionSet.ModelInitializedConventions.Add(valueGenerationStrategyConvention);
+			conventionSet.ModelInitializedConventions.Add(new RelationalMaxIdentifierLengthConvention(31, Dependencies, RelationalDependencies));
+
+			var valueGenerationConvention = new FbValueGenerationConvention(Dependencies, RelationalDependencies);
+
+			ReplaceConvention(conventionSet.EntityTypeBaseTypeChangedConventions, valueGenerationConvention);
+			ReplaceConvention(conventionSet.EntityTypePrimaryKeyChangedConventions, valueGenerationConvention);
+			ReplaceConvention(conventionSet.ForeignKeyAddedConventions, valueGenerationConvention);
+			ReplaceConvention(conventionSet.ForeignKeyRemovedConventions, valueGenerationConvention);
+
+			ConventionSet.AddBefore(conventionSet.ModelFinalizedConventions, valueGenerationStrategyConvention, typeof(ValidatingConvention));
+
+			var storeGenerationConvention = new FbStoreGenerationConvention(Dependencies, RelationalDependencies);
+
+			ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, storeGenerationConvention);
+			ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, (RelationalValueGenerationConvention)valueGenerationConvention);
+
+			ReplaceConvention(conventionSet.ModelFinalizedConventions, storeGenerationConvention);
+
 			return conventionSet;
 		}
 

@@ -13,10 +13,9 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
@@ -31,15 +30,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 		FbConnection _connection;
 		Version _serverVersion;
 
-		public DatabaseModel Create(string connectionString, IEnumerable<string> tables, IEnumerable<string> schemas)
+		public DatabaseModel Create(string connectionString, DatabaseModelFactoryOptions options)
 		{
 			using (var connection = new FbConnection(connectionString))
 			{
-				return Create(connection, tables, schemas);
+				return Create(connection, options);
 			}
 		}
 
-		public DatabaseModel Create(DbConnection connection, IEnumerable<string> tables, IEnumerable<string> schemas)
+		public DatabaseModel Create(DbConnection connection, DatabaseModelFactoryOptions options)
 		{
 			ResetState();
 

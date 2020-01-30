@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net452;netcoreapp3.0</TargetFrameworks>
+		<TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SkipSourceLink>true</SkipSourceLink>
@@ -22,7 +22,7 @@
 	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
 		<Reference Include="System.Transactions" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
 	</ItemGroup>
 	<ItemGroup>
 	  <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />

@@ -15,36 +15,22 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 {
 	public class FbModificationCommandBatchFactory : IModificationCommandBatchFactory
 	{
-		readonly IRelationalCommandBuilderFactory _commandBuilderFactory;
-		readonly ISqlGenerationHelper _sqlGenerationHelper;
-		readonly IUpdateSqlGenerator _updateSqlGenerator;
-		readonly IRelationalValueBufferFactoryFactory _valueBufferFactoryFactory;
-		readonly IDbContextOptions _options;
+		readonly ModificationCommandBatchFactoryDependencies _dependencies;
 
-		public FbModificationCommandBatchFactory(IRelationalCommandBuilderFactory commandBuilderFactory, ISqlGenerationHelper sqlGenerationHelper, IUpdateSqlGenerator updateSqlGenerator, IRelationalValueBufferFactoryFactory valueBufferFactoryFactory, IDbContextOptions options)
+		public FbModificationCommandBatchFactory(ModificationCommandBatchFactoryDependencies dependencies)
 		{
-			_commandBuilderFactory = commandBuilderFactory;
-			_sqlGenerationHelper = sqlGenerationHelper;
-			_updateSqlGenerator = updateSqlGenerator;
-			_valueBufferFactoryFactory = valueBufferFactoryFactory;
-			_options = options;
+			_dependencies = dependencies;
 		}
 
 		public ModificationCommandBatch Create()
 		{
-			return new SingularModificationCommandBatch(
-				_commandBuilderFactory,
-				_sqlGenerationHelper,
-				_updateSqlGenerator,
-				_valueBufferFactoryFactory);
+			return new SingularModificationCommandBatch(_dependencies);
 		}
 	}
 }

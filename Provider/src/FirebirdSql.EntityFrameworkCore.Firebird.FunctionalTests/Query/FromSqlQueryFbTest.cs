@@ -16,9 +16,14 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Data.Common;
+using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
@@ -30,34 +35,34 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			: base(fixture)
 		{ }
 
-		[NotSupportedOnFirebird]
+		[NotSupportedOnFirebirdFact]
 		public override void Bad_data_error_handling_invalid_cast_key()
 		{
 			base.Bad_data_error_handling_invalid_cast_key();
 		}
 
-		[NotSupportedOnFirebird]
+		[NotSupportedOnFirebirdFact]
 		public override void Bad_data_error_handling_invalid_cast_no_tracking()
 		{
 			base.Bad_data_error_handling_invalid_cast_no_tracking();
 		}
 
-		[NotSupportedOnFirebird]
+		[NotSupportedOnFirebirdFact]
 		public override void Bad_data_error_handling_invalid_cast_projection()
 		{
 			base.Bad_data_error_handling_invalid_cast_projection();
 		}
 
-		[NotSupportedOnFirebird]
+		[NotSupportedOnFirebirdFact]
 		public override void Bad_data_error_handling_invalid_cast()
 		{
 			base.Bad_data_error_handling_invalid_cast();
 		}
 
-		[Fact(Skip = "Missing column.")]
-		public override void From_sql_queryable_simple_projection_composed()
+		[DoesNotHaveTheDataFact]
+		public override void FromSqlRaw_queryable_simple_projection_composed()
 		{
-			base.From_sql_queryable_simple_projection_composed();
+			base.FromSqlRaw_queryable_simple_projection_composed();
 		}
 
 		protected override DbParameter CreateDbParameter(string name, object value)

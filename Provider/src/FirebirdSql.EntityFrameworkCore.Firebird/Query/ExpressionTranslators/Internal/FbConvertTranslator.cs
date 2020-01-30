@@ -13,22 +13,22 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
 	public class FbConvertTranslator : IMethodCallTranslator
 	{
-		static readonly Dictionary<string, string> TypeMapping = new Dictionary<string, string>
+		static readonly Dictionary<string, string> TypeMappings = new Dictionary<string, string>
 		{
 			[nameof(Convert.ToByte)] = "SMALLINT",
 			[nameof(Convert.ToDecimal)] = $"DECIMAL({FbTypeMappingSource.DefaultDecimalPrecision},{FbTypeMappingSource.DefaultDecimalScale})",
@@ -49,17 +49,28 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			typeof(int),
 			typeof(long),
 			typeof(short),
-			typeof(string)
+			typeof(string),
+			typeof(DateTime),
 		};
 
 		static readonly IEnumerable<MethodInfo> SupportedMethods
-			= TypeMapping.Keys
+			= TypeMappings.Keys
 				.SelectMany(t => typeof(Convert).GetTypeInfo().GetDeclaredMethods(t)
 					.Where(m => m.GetParameters().Length == 1 && SupportedTypes.Contains(m.GetParameters().First().ParameterType)));
 
-		public virtual Expression Translate(MethodCallExpression methodCallExpression)
-			=> SupportedMethods.Contains(methodCallExpression.Method)
-				? new ExplicitCastExpression(methodCallExpression.Arguments[0], methodCallExpression.Type)
-				: null;
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbConvertTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+		{
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (!SupportedMethods.Contains(method))
+				return null;
+
+			return _fbSqlExpressionFactory.Convert(arguments[0], method.ReturnType);
+		}
 	}
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -15,15 +15,10 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Diagnostics.Internal
 {
-	public class IncludeFbFixture : NorthwindQueryFbFixture<NoopModelCustomizer>
-    {
-        public override DbContextOptionsBuilder AddOptions(DbContextOptionsBuilder builder)
-            => base.AddOptions(builder).ConfigureWarnings(c => c.Log(CoreEventId.IncludeIgnoredWarning));
-    }
+	public class FbLoggingDefinitions : RelationalLoggingDefinitions
+	{ }
 }

@@ -5,6 +5,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+$baseDir = Split-Path -Parent $PSCommandPath
+
+. "$baseDir\include.ps1"
+
 $FirebirdConfiguration = @{
 	FB30 = @{
 		Download = 'https://www.dropbox.com/s/x46uy7e5zrtsnux/fb30.7z?dl=1';
@@ -18,10 +22,9 @@ $FirebirdConfiguration = @{
 	};
 }
 
-$baseDir = Split-Path -Parent $PSCommandPath
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
 $testsNETDir = "$testsBaseDir\bin\$Configuration\net452"
-$testsCOREDir = "$testsBaseDir\bin\$Configuration\netcoreapp3.0"
+$testsCOREDir = "$testsBaseDir\bin\$Configuration\netcoreapp3.1"
 
 $startDir = $null
 $firebirdProcess = $null
@@ -31,15 +34,6 @@ if ($env:tests_firebird_dir) {
 }
 else {
 	$firebirdDir = 'I:\Downloads\fb_tests'
-}
-
-function Check-ExitCode($command) {
-	& $command
-	$exitCode = $LASTEXITCODE
-	if ($exitCode -ne 0) {
-		echo "Non-zero ($exitCode) exit code. Exiting..."
-		exit $exitCode
-	}
 }
 
 function Prepare() {
@@ -96,7 +90,8 @@ function Tests-FirebirdClient-NET() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd $testsNETDir
-	Check-ExitCode { .\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All }
+	.\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All
+	Check-ExitCode
 
 	echo "=== END ==="
 }
@@ -105,7 +100,8 @@ function Tests-FirebirdClient-Core() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd $testsCOREDir
-	Check-ExitCode { dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --labels=All }
+	dotnet FirebirdSql.Data.FirebirdClient.Tests.dll --labels=All
+	Check-ExitCode
 
 	echo "=== END ==="
 }
@@ -114,10 +110,12 @@ function Tests-EF6() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\net452"
-	Check-ExitCode { .\EntityFramework.Firebird.Tests.exe --labels=All }
+	.\EntityFramework.Firebird.Tests.exe --labels=All
+	Check-ExitCode
 
-	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\netcoreapp3.0"
-	Check-ExitCode { dotnet EntityFramework.Firebird.Tests.dll --labels=All }
+	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\netcoreapp3.1"
+	dotnet EntityFramework.Firebird.Tests.dll --labels=All
+	Check-ExitCode
 
 	echo "=== END ==="
 }
@@ -125,13 +123,17 @@ function Tests-EF6() {
 function Tests-EFCore() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
-	if ($FirebirdSelection -ne 'FB25') {
-		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp3.0"
-		Check-ExitCode { dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All }
-
-		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
-		Check-ExitCode { dotnet test --no-build -c $Configuration }
+	if ($FirebirdSelection -eq 'FB25') {
+		return
 	}
+
+	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp3.1"
+	dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All
+	Check-ExitCode
+
+	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
+	dotnet test --no-build -c $Configuration
+	Check-ExitCode
 
 	echo "=== END ==="
 }

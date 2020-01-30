@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Data.Common;
@@ -23,7 +23,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Microsoft.EntityFrameworkCore
 {
-	public static class FbDbContextOptionsExtensions
+	public static class FbDbContextOptionsBuilderExtensions
 	{
 		public static DbContextOptionsBuilder UseFirebird(this DbContextOptionsBuilder optionsBuilder, string connectionString, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
 		{
@@ -54,11 +54,7 @@ namespace Microsoft.EntityFrameworkCore
 		}
 
 		static FbOptionsExtension GetOrCreateExtension(DbContextOptionsBuilder optionsBuilder)
-		{
-			var existsExtension = optionsBuilder.Options.FindExtension<FbOptionsExtension>();
-			return existsExtension != null
-				? new FbOptionsExtension(existsExtension)
-				: new FbOptionsExtension();
-		}
+			=> optionsBuilder.Options.FindExtension<FbOptionsExtension>()
+				?? new FbOptionsExtension();
 	}
 }

@@ -35,16 +35,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 				var entityType = context.Model.FindEntityType(typeof(LoginEntityTypeWithAnExtremelyLongAndOverlyConvolutedNameThatIsUsedToVerifyThatTheStoreIdentifierGenerationLengthLimitIsWorkingCorrectly));
 				Assert.Equal(
 					"LoginEntityTypeWithAnExtremely~",
-					entityType.Relational().TableName);
+					entityType.GetTableName());
 				Assert.Equal(
 					"PK_LoginEntityTypeWithAnExtrem~",
-					entityType.GetKeys().Single().Relational().Name);
+					entityType.GetKeys().Single().GetName());
 				Assert.Equal(
 					"FK_LoginEntityTypeWithAnExtrem~",
-					entityType.GetForeignKeys().Single().Relational().Name);
+					entityType.GetForeignKeys().Single().GetConstraintName());
 				Assert.Equal(
 					"IX_LoginEntityTypeWithAnExtrem~",
-					entityType.GetIndexes().Single().Relational().Name);
+					entityType.GetIndexes().Single().GetName());
 			}
 		}
 	}

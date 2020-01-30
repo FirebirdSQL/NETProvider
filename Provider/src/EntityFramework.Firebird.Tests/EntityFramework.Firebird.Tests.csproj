@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net452;netcoreapp3.0</TargetFrameworks>
+		<TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SkipSourceLink>true</SkipSourceLink>
@@ -11,7 +11,7 @@
 		<OutputType>Exe</OutputType>
 		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
 		<None Remove="app.config" />
 	</ItemGroup>
 	<ItemGroup>

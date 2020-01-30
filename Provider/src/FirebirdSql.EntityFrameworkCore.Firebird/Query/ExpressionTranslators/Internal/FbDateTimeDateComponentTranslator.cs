@@ -16,19 +16,27 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Linq.Expressions;
-using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using System.Reflection;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
 	public class FbDateTimeDateComponentTranslator : IMemberTranslator
 	{
-		public virtual Expression Translate(MemberExpression memberExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbDateTimeDateComponentTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (memberExpression.Expression != null && memberExpression.Expression.Type == typeof(DateTime) && memberExpression.Member.Name == nameof(DateTime.Date))
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
+		{
+			if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Date))
 			{
-				return new FbDateTimeDateMemberExpression(memberExpression.Expression);
+				return _fbSqlExpressionFactory.DateTimeDateMember(instance);
 			}
 			return null;
 		}

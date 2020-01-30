@@ -27,31 +27,31 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			: base(fixture)
 		{ }
 
-		[GeneratedNameTooLong]
+		[GeneratedNameTooLongFact]
 		public override void Nested_include_with_inheritance_reference_collection1()
 		{
 			base.Nested_include_with_inheritance_reference_collection1();
 		}
 
-		[GeneratedNameTooLong]
+		[GeneratedNameTooLongFact]
 		public override void Nested_include_with_inheritance_reference_reference1()
 		{
 			base.Nested_include_with_inheritance_reference_reference1();
 		}
 
-		[GeneratedNameTooLong]
+		[GeneratedNameTooLongFact]
 		public override void Nested_include_with_inheritance_reference_collection3()
 		{
 			base.Nested_include_with_inheritance_reference_collection3();
 		}
 
-		[GeneratedNameTooLong]
+		[GeneratedNameTooLongFact]
 		public override void Nested_include_with_inheritance_reference_reference3()
 		{
 			base.Nested_include_with_inheritance_reference_reference3();
 		}
 
-		[GeneratedNameTooLong]
+		[GeneratedNameTooLongFact]
 		public override void Nested_include_with_inheritance_collection_collection1()
 		{
 			base.Nested_include_with_inheritance_collection_collection1();

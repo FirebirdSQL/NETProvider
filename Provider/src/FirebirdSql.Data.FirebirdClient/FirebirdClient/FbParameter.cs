@@ -482,7 +482,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal static bool IsNonAsciiParameterName(string parameterName)
 		{
-			return Encoding.UTF8.GetByteCount(parameterName) != parameterName.Length;
+			return string.IsNullOrEmpty(parameterName) || Encoding.UTF8.GetByteCount(parameterName) != parameterName.Length;
 		}
 
 		#endregion

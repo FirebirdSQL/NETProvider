@@ -28,8 +28,8 @@
 		<None Include="..\..\..\license.txt" Link="license.txt" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.1" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />

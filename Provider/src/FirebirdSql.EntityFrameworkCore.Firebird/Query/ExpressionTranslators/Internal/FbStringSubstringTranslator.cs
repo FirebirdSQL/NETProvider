@@ -13,12 +13,13 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using System.Reflection;
-using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
@@ -27,23 +28,21 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 		static readonly MethodInfo SubstringOnlyStartMethod = typeof(string).GetRuntimeMethod(nameof(string.Substring), new[] { typeof(int) });
 		static readonly MethodInfo SubstringStartAndLengthMethod = typeof(string).GetRuntimeMethod(nameof(string.Substring), new[] { typeof(int), typeof(int) });
 
-		public virtual Expression Translate(MethodCallExpression methodCallExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbStringSubstringTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (!(methodCallExpression.Method.Equals(SubstringOnlyStartMethod) || methodCallExpression.Method.Equals(SubstringStartAndLengthMethod)))
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (!(method.Equals(SubstringOnlyStartMethod) || method.Equals(SubstringStartAndLengthMethod)))
 				return null;
 
-			var fromExpression = methodCallExpression.Arguments[0] is ConstantExpression constantExpression
-				? (Expression)Expression.Constant((int)constantExpression.Value + 1)
-				: Expression.Add(methodCallExpression.Arguments[0], Expression.Constant(1));
-
-			var forExpression = methodCallExpression.Arguments.Count == 2
-				? methodCallExpression.Arguments[1]
-				: null;
-
-			return new FbSubstringExpression(
-				methodCallExpression.Object,
-				fromExpression,
-				forExpression);
+			var fromExpression = _fbSqlExpressionFactory.Add(arguments[0], _fbSqlExpressionFactory.Constant(1));
+			var forExpression = arguments.Count == 2 ? arguments[1] : null;
+			return _fbSqlExpressionFactory.Substring(instance, fromExpression, forExpression);
 		}
 	}
 }

@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -31,9 +32,35 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		}
 
 		public override string GenerateParameterName(string name)
-			=> ParameterNameMarker + name;
+			=> name.StartsWith(ParameterNameMarker, StringComparison.Ordinal) ? name : ParameterNameMarker + name;
 
 		public override void GenerateParameterName(StringBuilder builder, string name)
-			=> builder.Append(ParameterNameMarker).Append(name);
+			=> builder.Append(name.StartsWith(ParameterNameMarker, StringComparison.Ordinal) ? string.Empty : ParameterNameMarker).Append(name);
+
+		public virtual string StringLiteralQueryType(string s)
+		{
+			var length = MinimumStringQueryTypeLength(s);
+			EnsureStringQueryTypeLength(length);
+			return $"VARCHAR({length}) CHARACTER SET UTF8";
+		}
+
+		public virtual string StringParameterQueryType()
+		{
+			return $"VARCHAR({FbTypeMappingSource.VarcharMaxSize})";
+		}
+
+		static int MinimumStringQueryTypeLength(string s)
+		{
+			var length = s?.Length ?? 0;
+			if (length == 0)
+				length = 1;
+			return length;
+		}
+
+		static void EnsureStringQueryTypeLength(int length)
+		{
+			if (length > FbTypeMappingSource.VarcharMaxSize)
+				throw new ArgumentOutOfRangeException(nameof(length));
+		}
 	}
 }

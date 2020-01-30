@@ -13,50 +13,58 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
 	public class FbStartsWithOptimizedTranslator : IMethodCallTranslator
 	{
 		static readonly MethodInfo StartsWithMethod = typeof(string).GetRuntimeMethod(nameof(string.StartsWith), new[] { typeof(string) });
-		static readonly MethodInfo ConcatMethod = typeof(string).GetRuntimeMethod(nameof(string.Concat), new[] { typeof(string), typeof(string) });
 
-		public virtual Expression Translate(MethodCallExpression methodCallExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbStartsWithOptimizedTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (!methodCallExpression.Method.Equals(StartsWithMethod))
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (!method.Equals(StartsWithMethod))
 				return null;
 
-			var patternExpression = methodCallExpression.Arguments[0];
+			var patternExpression = arguments[0];
 
-			var startsWithExpression = Expression.AndAlso(
-				   new LikeExpression(
-					   methodCallExpression.Object,
-					   Expression.Add(methodCallExpression.Arguments[0], Expression.Constant("%", typeof(string)), ConcatMethod)),
-				   new NullCompensatedExpression(
-						Expression.Equal(
-							new SqlFunctionExpression(
-								"LEFT",
-								methodCallExpression.Object.Type,
-								new[]
-								{
-									methodCallExpression.Object,
-									new SqlFunctionExpression("CHARACTER_LENGTH", typeof(int), new[] { patternExpression })
-								}),
-							patternExpression)));
-
-			return patternExpression is ConstantExpression patternConstantExpression
-				? (string)patternConstantExpression.Value == string.Empty
-					? (Expression)Expression.Constant(true)
+			var startsWithExpression = _fbSqlExpressionFactory.AndAlso(
+				_fbSqlExpressionFactory.Like(
+					instance,
+					_fbSqlExpressionFactory.Add(patternExpression, _fbSqlExpressionFactory.Constant("%"))),
+				_fbSqlExpressionFactory.Equal(
+					_fbSqlExpressionFactory.Function(
+						"LEFT",
+						new[] {
+							instance,
+							_fbSqlExpressionFactory.Function(
+								"CHARACTER_LENGTH",
+								new[] { patternExpression },
+								typeof(int)) },
+						instance.Type),
+					patternExpression));
+			return patternExpression is SqlConstantExpression sqlConstantExpression
+				? (string)sqlConstantExpression.Value == string.Empty
+					? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
 					: startsWithExpression
-				: Expression.OrElse(
+				: _fbSqlExpressionFactory.OrElse(
 					startsWithExpression,
-					Expression.Equal(patternExpression, Expression.Constant(string.Empty)));
+					_fbSqlExpressionFactory.Equal(
+						patternExpression,
+						_fbSqlExpressionFactory.Constant(string.Empty)));
 		}
 	}
 }

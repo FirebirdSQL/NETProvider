@@ -30,7 +30,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 		public override MethodCallCodeFragment GenerateUseProvider(string connectionString, MethodCallCodeFragment providerOptions)
 		{
 			return new MethodCallCodeFragment(
-				nameof(FbDbContextOptionsExtensions.UseFirebird),
+				nameof(FbDbContextOptionsBuilderExtensions.UseFirebird),
 				providerOptions == null
 					? new object[] { connectionString }
 					: new object[] { connectionString, new NestedClosureCodeFragment("x", providerOptions) });

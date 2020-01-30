@@ -15,10 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
@@ -26,28 +27,34 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 	{
 		static readonly MethodInfo MethodInfo = typeof(string).GetRuntimeMethod(nameof(string.Contains), new[] { typeof(string) });
 
-		public virtual Expression Translate(MethodCallExpression methodCallExpression)
+		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+		public FbContainsOptimizedTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
-			if (!methodCallExpression.Method.Equals(MethodInfo))
+			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+		}
+
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		{
+			if (!method.Equals(MethodInfo))
 				return null;
 
-			var patternExpression = methodCallExpression.Arguments[0];
-
-			var positionExpression = Expression.GreaterThan(
-				new SqlFunctionExpression("POSITION", typeof(int), new[]
-				{
-					patternExpression,
-					methodCallExpression.Object,
-				}),
-				Expression.Constant(0));
-
-			return patternExpression is ConstantExpression patternConstantExpression
-				? ((string)patternConstantExpression.Value)?.Length == 0
-					? (Expression)Expression.Constant(true)
+			var patternExpression = arguments[0];
+			var positionExpression = _fbSqlExpressionFactory.GreaterThan(
+				_fbSqlExpressionFactory.Function(
+					"POSITION",
+					new[] { patternExpression, instance },
+					typeof(int)),
+				_fbSqlExpressionFactory.Constant(0));
+			return patternExpression is SqlConstantExpression sqlConstantExpression
+				? ((string)sqlConstantExpression.Value)?.Length == 0
+					? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
 					: positionExpression
-				: Expression.OrElse(
+				: _fbSqlExpressionFactory.OrElse(
 					positionExpression,
-					Expression.Equal(patternExpression, Expression.Constant(string.Empty)));
+					_fbSqlExpressionFactory.Equal(
+						patternExpression,
+						_fbSqlExpressionFactory.Constant(string.Empty)));
 		}
 	}
 }

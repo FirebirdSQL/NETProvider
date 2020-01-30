@@ -52,14 +52,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		{
 			using (var db = GetDbContext<UpdateContext>())
 			{
-				db.Database.ExecuteSqlCommand("create table test_update (id int primary key, foo varchar(20), bar varchar(20))");
-				db.Database.ExecuteSqlCommand("update or insert into test_update values (66, 'foo', 'bar')");
+				db.Database.ExecuteSqlRaw("create table test_update (id int primary key, foo varchar(20), bar varchar(20))");
+				db.Database.ExecuteSqlRaw("update or insert into test_update values (66, 'foo', 'bar')");
 				var entity = new UpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
 				db.SaveChanges();
 				var value = db.Set<UpdateEntity>()
-					.FromSql("select * from test_update where id = 66")
+					.FromSqlRaw("select * from test_update where id = 66")
 					.AsNoTracking()
 					.First();
 				Assert.AreEqual("test", value.Foo);
@@ -98,8 +98,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		{
 			using (var db = GetDbContext<ComputedUpdateContext>())
 			{
-				db.Database.ExecuteSqlCommand("create table test_update_computed (id int primary key, foo varchar(20), bar varchar(20), computed generated always as (foo || bar))");
-				db.Database.ExecuteSqlCommand("update or insert into test_update_computed values (66, 'foo', 'bar')");
+				db.Database.ExecuteSqlRaw("create table test_update_computed (id int primary key, foo varchar(20), bar varchar(20), computed generated always as (foo || bar))");
+				db.Database.ExecuteSqlRaw("update or insert into test_update_computed values (66, 'foo', 'bar')");
 				var entity = new ComputedUpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
@@ -138,8 +138,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		{
 			using (var db = GetDbContext<ConcurrencyUpdateContext>())
 			{
-				db.Database.ExecuteSqlCommand("create table test_update_concurrency (id int primary key, foo varchar(20), stamp timestamp)");
-				db.Database.ExecuteSqlCommand("update or insert into test_update_concurrency values (66, 'foo', current_timestamp)");
+				db.Database.ExecuteSqlRaw("create table test_update_concurrency (id int primary key, foo varchar(20), stamp timestamp)");
+				db.Database.ExecuteSqlRaw("update or insert into test_update_concurrency values (66, 'foo', current_timestamp)");
 				var entity = new ConcurrencyUpdateEntity() { Id = 66, Foo = "test", Stamp = new DateTime(1970, 1, 1) };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
@@ -176,8 +176,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		{
 			using (var db = GetDbContext<ConcurrencyUpdateNoGeneratedContext>())
 			{
-				db.Database.ExecuteSqlCommand("create table test_update_concurrency_ng (id int primary key, foo varchar(20), stamp timestamp)");
-				db.Database.ExecuteSqlCommand("update or insert into test_update_concurrency_ng values (66, 'foo', current_timestamp)");
+				db.Database.ExecuteSqlRaw("create table test_update_concurrency_ng (id int primary key, foo varchar(20), stamp timestamp)");
+				db.Database.ExecuteSqlRaw("update or insert into test_update_concurrency_ng values (66, 'foo', current_timestamp)");
 				var entity = new ConcurrencyUpdateNoGeneratedEntity() { Id = 66, Foo = "test", Stamp = new DateTime(1970, 1, 1) };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
@@ -220,8 +220,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		{
 			using (var db = GetDbContext<TwoComputedUpdateContext>())
 			{
-				db.Database.ExecuteSqlCommand("create table test_update_2computed (id int primary key, foo varchar(20), bar varchar(20), computed1 generated always as (foo || bar), computed2 generated always as (bar || bar))");
-				db.Database.ExecuteSqlCommand("update or insert into test_update_2computed values (66, 'foo', 'bar')");
+				db.Database.ExecuteSqlRaw("create table test_update_2computed (id int primary key, foo varchar(20), bar varchar(20), computed1 generated always as (foo || bar), computed2 generated always as (bar || bar))");
+				db.Database.ExecuteSqlRaw("update or insert into test_update_2computed values (66, 'foo', 'bar')");
 				var entity = new TwoComputedUpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;

@@ -27,6 +27,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 			: base("CHAR(16) CHARACTER SET OCTETS")
 		{ }
 
+		protected FbGuidTypeMapping(RelationalTypeMappingParameters parameters)
+			: base(parameters)
+		{ }
+
 		protected override void ConfigureParameter(DbParameter parameter)
 		{
 			((FbParameter)parameter).FbDbType = FbDbType.Guid;
@@ -36,5 +40,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		{
 			return $"CHAR_TO_UUID('{value}')";
 		}
+
+		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+			=> new FbGuidTypeMapping(parameters);
 	}
 }

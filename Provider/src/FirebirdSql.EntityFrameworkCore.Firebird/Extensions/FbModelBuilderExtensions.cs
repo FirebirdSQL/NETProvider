@@ -13,26 +13,44 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Microsoft.EntityFrameworkCore
 {
 	public static class FbModelBuilderExtensions
 	{
-		public static ModelBuilder ForFirebirdUseIdentityColumns(this ModelBuilder modelBuilder)
+		public static ModelBuilder UseIdentityColumns(this ModelBuilder modelBuilder)
 		{
-			var property = modelBuilder.Model;
-			property.Firebird().ValueGenerationStrategy = FbValueGenerationStrategy.IdentityColumn;
+			var model = modelBuilder.Model;
+			model.SetValueGenerationStrategy(FbValueGenerationStrategy.IdentityColumn);
 			return modelBuilder;
 		}
 
-		public static ModelBuilder ForFirebirdUseSequenceTriggers(this ModelBuilder modelBuilder)
+		public static ModelBuilder UseSequenceTriggers(this ModelBuilder modelBuilder)
 		{
-			var property = modelBuilder.Model;
-			property.Firebird().ValueGenerationStrategy = FbValueGenerationStrategy.SequenceTrigger;
+			var model = modelBuilder.Model;
+			model.SetValueGenerationStrategy(FbValueGenerationStrategy.SequenceTrigger);
 			return modelBuilder;
+		}
+
+		public static IConventionModelBuilder HasValueGenerationStrategy(this IConventionModelBuilder modelBuilder, FbValueGenerationStrategy? valueGenerationStrategy, bool fromDataAnnotation = false)
+		{
+			if (modelBuilder.CanSetAnnotation(FbAnnotationNames.ValueGenerationStrategy, valueGenerationStrategy, fromDataAnnotation))
+			{
+				modelBuilder.Metadata.SetValueGenerationStrategy(valueGenerationStrategy, fromDataAnnotation);
+				if (valueGenerationStrategy != FbValueGenerationStrategy.IdentityColumn)
+				{
+				}
+				if (valueGenerationStrategy != FbValueGenerationStrategy.SequenceTrigger)
+				{
+				}
+				return modelBuilder;
+			}
+			return null;
 		}
 	}
 }

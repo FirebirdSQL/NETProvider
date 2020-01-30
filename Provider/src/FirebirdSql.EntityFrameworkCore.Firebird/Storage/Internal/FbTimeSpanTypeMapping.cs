@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Siegfried Pammer (siegfried.pammer@gmail.com)
+//$Authors = Siegfried Pammer (siegfried.pammer@gmail.com), Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Data.Common;
@@ -28,6 +28,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		public FbTimeSpanTypeMapping(string storeType, FbDbType fbDbType)
 			: base(storeType)
+		{
+			_fbDbType = fbDbType;
+		}
+
+		protected FbTimeSpanTypeMapping(RelationalTypeMappingParameters parameters, FbDbType fbDbType)
+			: base(parameters)
 		{
 			_fbDbType = fbDbType;
 		}
@@ -47,5 +53,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 					throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
 			}
 		}
+
+		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+			=> new FbTimeSpanTypeMapping(parameters, _fbDbType);
 	}
 }

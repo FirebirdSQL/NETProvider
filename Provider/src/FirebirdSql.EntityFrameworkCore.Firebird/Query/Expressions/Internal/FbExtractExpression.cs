@@ -17,67 +17,63 @@
 
 using System;
 using System.Linq.Expressions;
-using FirebirdSql.EntityFrameworkCore.Firebird.Query.Sql.Internal;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 {
-	public class FbExtractExpression : Expression
+	public class FbExtractExpression : SqlFunctionExpression, IEquatable<FbExtractExpression>
 	{
 		public virtual string Part { get; }
-		public virtual Expression ValueExpression { get; }
+		public virtual SqlExpression ValueExpression { get; }
 
-		public FbExtractExpression(string part, Expression valueExpression)
+		public FbExtractExpression(string part, SqlExpression valueExpression, RelationalTypeMapping typeMapping)
+			: base(default, default, default, default, default, default, typeof(int), typeMapping)
 		{
 			Part = part;
 			ValueExpression = valueExpression;
 		}
 
-		public override ExpressionType NodeType => ExpressionType.Extension;
-		public override bool CanReduce => false;
-		public override Type Type => typeof(int);
-
 		protected override Expression Accept(ExpressionVisitor visitor)
-		{
-			if (visitor is IFbExpressionVisitor specificVisitor)
-			{
-				return specificVisitor.VisitExtract(this);
-			}
-			else
-			{
-				return base.Accept(visitor);
-			}
-		}
+			=> visitor is FbQuerySqlGenerator fbQuerySqlGenerator
+				? fbQuerySqlGenerator.VisitExtract(this)
+				: base.Accept(visitor);
 
 		protected override Expression VisitChildren(ExpressionVisitor visitor)
 		{
-			var newValueExpression = visitor.Visit(ValueExpression);
+			var newValueExpression = (SqlExpression)visitor.Visit(ValueExpression);
 
 			return newValueExpression != ValueExpression
-				? new FbExtractExpression(Part, newValueExpression)
+				? new FbExtractExpression(Part, newValueExpression, TypeMapping)
 				: this;
+		}
+
+		public override void Print(ExpressionPrinter expressionPrinter)
+		{
+			expressionPrinter.Append("EXTRACT(");
+			expressionPrinter.Append(Part);
+			expressionPrinter.Append(" FROM ");
+			expressionPrinter.Visit(ValueExpression);
+			expressionPrinter.Append(")");
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (obj is null)
-			{
-				return false;
-			}
-			if (ReferenceEquals(this, obj))
-			{
-				return true;
-			}
-			return obj.GetType() == GetType() && Equals((FbExtractExpression)obj);
+			return obj != null
+				&& (ReferenceEquals(this, obj)
+					|| obj is FbExtractExpression fbExtractExpression
+					&& Equals(fbExtractExpression));
 		}
 
-		public override int GetHashCode()
+		public bool Equals(FbExtractExpression other)
 		{
-			unchecked
-			{
-				var hashCode = Part.GetHashCode();
-				hashCode = (hashCode * 397) ^ ValueExpression.GetHashCode();
-				return hashCode;
-			}
+			return base.Equals(other)
+			   && ValueExpression.Equals(other.ValueExpression)
+			   && Part.Equals(other.Part);
 		}
+
+		public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Part, ValueExpression);
 	}
 }

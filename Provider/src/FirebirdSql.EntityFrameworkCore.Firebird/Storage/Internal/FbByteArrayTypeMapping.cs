@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using FirebirdSql.Data.Common;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -26,10 +26,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 			: base("BLOB SUB_TYPE BINARY", System.Data.DbType.Binary)
 		{ }
 
+		protected FbByteArrayTypeMapping(RelationalTypeMappingParameters parameters)
+			: base(parameters)
+		{ }
+
 		protected override string GenerateNonNullSqlLiteral(object value)
 		{
 			var hex = ((byte[])value).ToHexString();
 			return $"x'{hex}'";
 		}
+
+		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+			=> new FbByteArrayTypeMapping(parameters);
 	}
 }
