@@ -277,5 +277,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return AssertTranslationFailed(() => base.Member_binding_after_ctor_arguments_fails_with_client_eval(isAsync));
 		}
+
+		[Theory(Skip = "Temp free space")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Handle_materialization_properly_when_more_than_two_query_sources_are_involved(bool isAsync)
+		{
+			return base.Handle_materialization_properly_when_more_than_two_query_sources_are_involved(isAsync);
+		}
 	}
 }
