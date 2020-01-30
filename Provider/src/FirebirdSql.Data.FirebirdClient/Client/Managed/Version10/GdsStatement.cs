@@ -416,10 +416,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_database.Xdr.Write(bufferLength);
 		}
 
-		protected byte[] ProcessInfoSqlResponse(GenericResponse respose)
+		protected byte[] ProcessInfoSqlResponse(GenericResponse response)
 		{
-			Debug.Assert(respose.Data != null && respose.Data.Length > 0);
-			return respose.Data;
+			Debug.Assert(response.Data != null && response.Data.Length > 0);
+			return response.Data;
 		}
 		#endregion
 
