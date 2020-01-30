@@ -25,11 +25,15 @@ function Clean() {
 }
 
 function Build() {
-	function b($target) {
+	function b($target, $check=$True) {
 		dotnet msbuild /t:$target /p:Configuration=$Configuration "$baseDir\src\NETProvider.sln" /v:m /m
-		Check-ExitCode
+		if ($check) {
+			Check-ExitCode
+		}
 	}
 	b 'Clean'
+	# this sometimes fails on CI
+	b 'Restore' $False
 	b 'Restore'
 	b 'Build'
 	$script:version = (Get-Item $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net452\FirebirdSql.Data.FirebirdClient.dll).VersionInfo.ProductVersion -replace '(\d+)\.(\d+)\.(\d+)(-[a-z0-9]+)?(.*)','$1.$2.$3$4'
