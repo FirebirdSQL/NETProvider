@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 {
+	using System;
+
 	/// <summary>
 	///		FirebirdSQL specific extension methods for <see cref="DatabaseFacade"/>.
 	/// </summary>
@@ -28,6 +30,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 		///		True if FirebirdSQL is being used; false otherwise.
 		/// </returns>
 		public static bool IsFirebirdSql(this DatabaseFacade database)
-			=> database.ProviderName == typeof(FbOptionsExtension).GetTypeInfo().Assembly.GetName().Name;
+			=> database.ProviderName.Equals(typeof(FbOptionsExtension).GetTypeInfo().Assembly.GetName().Name, StringComparison.Ordinal);
 	}
 }
