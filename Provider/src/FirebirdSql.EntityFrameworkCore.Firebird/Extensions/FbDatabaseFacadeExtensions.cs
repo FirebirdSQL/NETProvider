@@ -29,7 +29,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Extensions
 		/// <returns>
 		///		True if FirebirdSQL is being used; false otherwise.
 		/// </returns>
-		public static bool IsFirebirdSql(this DatabaseFacade database)
+		public static bool IsFirebird(this DatabaseFacade database)
 			=> database.ProviderName.Equals(typeof(FbOptionsExtension).GetTypeInfo().Assembly.GetName().Name, StringComparison.Ordinal);
 	}
 }
