@@ -62,7 +62,9 @@ function Prepare() {
 	ni firebird.log -ItemType File | Out-Null
 
 	echo "Starting Firebird"
-	$script:firebirdProcess = Start-Process -FilePath $selectedConfiguration.Executable -ArgumentList $selectedConfiguration.Args -PassThru
+	$process = Start-Process -FilePath $selectedConfiguration.Executable -ArgumentList $selectedConfiguration.Args -PassThru
+	echo "Version: $($process.MainModule.FileVersionInfo.FileVersion)"
+	$script:firebirdProcess = $process
 
 	echo "=== END ==="
 }
