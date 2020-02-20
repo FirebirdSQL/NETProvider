@@ -41,7 +41,8 @@
 	<ItemGroup>
 		<None Update="App.config.install.xdt" Pack="true" PackagePath="content" />
 		<None Update="Web.config.install.xdt" Pack="true" PackagePath="content" />
-		<None Include="..\..\..\license.txt" Link="license.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\..\license.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="EntityFramework" Version="6.4.0" />

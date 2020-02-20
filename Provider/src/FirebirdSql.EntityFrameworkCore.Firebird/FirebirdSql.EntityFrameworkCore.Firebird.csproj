@@ -25,7 +25,8 @@
 		<DefineConstants>EFCORE;DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="..\..\..\license.txt" Link="license.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\..\license.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />

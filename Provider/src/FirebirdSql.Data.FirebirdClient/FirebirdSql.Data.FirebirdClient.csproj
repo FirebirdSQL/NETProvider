@@ -32,8 +32,9 @@
 		<EmbeddedResource Include="Schema\FbMetaData.xml" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="..\..\readme.txt" Link="readme.txt" Pack="true" PackagePath="" />
-		<None Include="..\..\..\license.txt" Link="license.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\readme.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\..\license.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
 		<Reference Include="System.Transactions" />

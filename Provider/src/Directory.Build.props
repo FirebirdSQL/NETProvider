@@ -11,7 +11,8 @@
 		<Product>NETProvider</Product>
 		<Authors>FirebirdSQL</Authors>
 		<PackageProjectUrl>http://www.firebirdsql.org/en/net-provider/</PackageProjectUrl>
-		<PackageIconUrl>http://www.firebirdsql.org/file/about/ds-firebird-logo-64.png</PackageIconUrl>
+		<PackageIconUrl>https://raw.githubusercontent.com/FirebirdSQL/NETProvider/master/firebird-logo.png</PackageIconUrl>
+		<PackageIcon>firebird-logo.png</PackageIcon>
 		<RepositoryUrl>https://github.com/FirebirdSQL/NETProvider</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
