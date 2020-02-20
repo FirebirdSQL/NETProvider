@@ -719,16 +719,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						{
 							xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
 						}
-						else
+						else if (field.Charset.IsNoneCharset)
 						{
-							var svalue = field.DbValue.GetString();
-
-							if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-								svalue.Length > field.CharCount)
+							var bvalue = field.Charset.GetBytes(field.DbValue.GetString());
+							if (bvalue.Length > field.Length)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
-
+							xdr.WriteOpaque(bvalue, field.Length);
+						}
+						else
+						{
+							var svalue = field.DbValue.GetString();
+							if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
 							xdr.WriteOpaque(field.Charset.GetBytes(svalue), field.Length);
 						}
 						break;
@@ -738,16 +744,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						{
 							xdr.WriteBuffer(field.DbValue.GetBinary());
 						}
-						else
+						else if (field.Charset.IsNoneCharset)
 						{
-							var svalue = field.DbValue.GetString();
-
-							if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-								svalue.Length > field.CharCount)
+							var bvalue = field.Charset.GetBytes(field.DbValue.GetString());
+							if (bvalue.Length > field.Length)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
-
+							xdr.WriteBuffer(bvalue);
+						}
+						else
+						{
+							var svalue = field.DbValue.GetString();
+							if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
 							xdr.WriteBuffer(field.Charset.GetBytes(svalue));
 						}
 						break;

@@ -228,16 +228,22 @@ namespace FirebirdSql.Data.Common
 						{
 							bytes = GetBinary();
 						}
-						else
+						else if (Field.Charset.IsNoneCharset)
 						{
-							var svalue = GetString();
-
-							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
-								svalue.Length > Field.CharCount)
+							var bvalue = Field.Charset.GetBytes(GetString());
+							if (bvalue.Length > Field.Length)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
-
+							bytes = bvalue;
+						}
+						else
+						{
+							var svalue = GetString();
+							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
 							bytes = Field.Charset.GetBytes(svalue);
 						}
 
@@ -258,16 +264,22 @@ namespace FirebirdSql.Data.Common
 						{
 							bytes = GetBinary();
 						}
-						else
+						else if (Field.Charset.IsNoneCharset)
 						{
-							var svalue = GetString();
-
-							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 &&
-								svalue.Length > Field.CharCount)
+							var bvalue = Field.Charset.GetBytes(GetString());
+							if (bvalue.Length > Field.Length)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
-
+							bytes = bvalue;
+						}
+						else
+						{
+							var svalue = GetString();
+							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
 							bytes = Field.Charset.GetBytes(svalue);
 						}
 
