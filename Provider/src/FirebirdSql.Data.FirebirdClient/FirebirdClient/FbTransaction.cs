@@ -289,15 +289,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			tpb.Append(IscCodes.isc_tpb_version3);
 
-			if ((options.TransactionBehavior & FbTransactionBehavior.Consistency) == FbTransactionBehavior.Consistency)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.Consistency))
 			{
 				tpb.Append(IscCodes.isc_tpb_consistency);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.Concurrency) == FbTransactionBehavior.Concurrency)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.Concurrency))
 			{
 				tpb.Append(IscCodes.isc_tpb_concurrency);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.Wait) == FbTransactionBehavior.Wait)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.Wait))
 			{
 				tpb.Append(IscCodes.isc_tpb_wait);
 				if (options.WaitTimeoutTPBValue.HasValue)
@@ -305,26 +305,26 @@ namespace FirebirdSql.Data.FirebirdClient
 					tpb.Append(IscCodes.isc_tpb_lock_timeout, (short)options.WaitTimeoutTPBValue);
 				}
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.NoWait) == FbTransactionBehavior.NoWait)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.NoWait))
 			{
 				tpb.Append(IscCodes.isc_tpb_nowait);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.Read) == FbTransactionBehavior.Read)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.Read))
 			{
 				tpb.Append(IscCodes.isc_tpb_read);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.Write) == FbTransactionBehavior.Write)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.Write))
 			{
 				tpb.Append(IscCodes.isc_tpb_write);
 			}
 			foreach (var table in options.LockTables)
 			{
 				int lockType;
-				if ((table.Value & FbTransactionBehavior.LockRead) == FbTransactionBehavior.LockRead)
+				if (table.Value.HasFlag(FbTransactionBehavior.LockRead))
 				{
 					lockType = IscCodes.isc_tpb_lock_read;
 				}
-				else if ((table.Value & FbTransactionBehavior.LockWrite) == FbTransactionBehavior.LockWrite)
+				else if (table.Value.HasFlag(FbTransactionBehavior.LockWrite))
 				{
 					lockType = IscCodes.isc_tpb_lock_write;
 				}
@@ -335,42 +335,42 @@ namespace FirebirdSql.Data.FirebirdClient
 				tpb.Append(lockType, table.Key);
 
 				int? lockBehavior = null;
-				if ((table.Value & FbTransactionBehavior.Exclusive) == FbTransactionBehavior.Exclusive)
+				if (table.Value.HasFlag(FbTransactionBehavior.Exclusive))
 				{
 					lockBehavior = IscCodes.isc_tpb_exclusive;
 				}
-				else if ((table.Value & FbTransactionBehavior.Protected) == FbTransactionBehavior.Protected)
+				else if (table.Value.HasFlag(FbTransactionBehavior.Protected))
 				{
 					lockBehavior = IscCodes.isc_tpb_protected;
 				}
-				else if ((table.Value & FbTransactionBehavior.Shared) == FbTransactionBehavior.Shared)
+				else if (table.Value.HasFlag(FbTransactionBehavior.Shared))
 				{
 					lockBehavior = IscCodes.isc_tpb_shared;
 				}
 				if (lockBehavior.HasValue)
 					tpb.Append((int)lockBehavior);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.ReadCommitted) == FbTransactionBehavior.ReadCommitted)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.ReadCommitted))
 			{
 				tpb.Append(IscCodes.isc_tpb_read_committed);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.Autocommit) == FbTransactionBehavior.Autocommit)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.Autocommit))
 			{
 				tpb.Append(IscCodes.isc_tpb_autocommit);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.RecVersion) == FbTransactionBehavior.RecVersion)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.RecVersion))
 			{
 				tpb.Append(IscCodes.isc_tpb_rec_version);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.NoRecVersion) == FbTransactionBehavior.NoRecVersion)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.NoRecVersion))
 			{
 				tpb.Append(IscCodes.isc_tpb_no_rec_version);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.RestartRequests) == FbTransactionBehavior.RestartRequests)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.RestartRequests))
 			{
 				tpb.Append(IscCodes.isc_tpb_restart_requests);
 			}
-			if ((options.TransactionBehavior & FbTransactionBehavior.NoAutoUndo) == FbTransactionBehavior.NoAutoUndo)
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.NoAutoUndo))
 			{
 				tpb.Append(IscCodes.isc_tpb_no_auto_undo);
 			}
