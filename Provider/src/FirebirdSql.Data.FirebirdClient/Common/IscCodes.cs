@@ -321,6 +321,8 @@ namespace FirebirdSql.Data.Common
 		public const int isc_tpb_restart_requests = 19;
 		public const int isc_tpb_no_auto_undo = 20;
 		public const int isc_tpb_lock_timeout = 21;
+		public const int isc_tpb_read_consistency = 22;
+		public const int isc_tpb_at_snapshot_number = 23;
 
 		#endregion
 
