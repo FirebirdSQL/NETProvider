@@ -3143,18 +3143,18 @@ namespace EntityFramework.Firebird.SqlGen
 		internal static string FormatDateTime(DateTime value)
 		{
 			var result = new StringBuilder();
-			result.Append("'");
+			result.Append("CAST('");
 			result.Append(value.ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture));
-			result.Append("'");
+			result.Append("' AS TIMESTAMP)");
 			return result.ToString();
 		}
 
 		internal static string FormatTime(DateTime value)
 		{
 			var result = new StringBuilder();
-			result.Append("'");
+			result.Append("CAST('");
 			result.Append(value.ToString("HH:mm:ss.ffff", CultureInfo.InvariantCulture));
-			result.Append("'");
+			result.Append("' AS TIME)");
 			return result.ToString();
 		}
 		internal static string FormatTime(TimeSpan value)
