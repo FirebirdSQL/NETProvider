@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -135,6 +136,65 @@ namespace EntityFramework.Firebird.Tests
 			{
 				var q = c.Bars.Where(x => x.BarString == "TEST");
 				StringAssert.Contains("CAST(_UTF8'TEST' AS VARCHAR(8191))", q.ToString());
+
+			}
+		}
+
+		class DbFunctionsContext : FbTestDbContext
+		{
+			public DbFunctionsContext(FbConnection conn)
+				: base(conn)
+			{ }
+
+			protected override void OnModelCreating(DbModelBuilder modelBuilder)
+			{
+				base.OnModelCreating(modelBuilder);
+			}
+
+			public IDbSet<Qux> Quxs { get; set; }
+		}
+		[Test]
+		public void QueryTestDbFunctionsCreateDateTime1()
+		{
+			using (var c = GetDbContext<DbFunctionsContext>())
+			{
+				var q = c.Quxs
+					.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(2020, 3, 19, 14, 12, 0))
+					.ToString();
+				StringAssert.Contains("CAST('2020-3-19 14:12:00' AS TIMESTAMP)", q.ToString());
+			}
+		}
+		[Test]
+		public void QueryTestDbFunctionsCreateDateTime2()
+		{
+			using (var c = GetDbContext<DbFunctionsContext>())
+			{
+				var q = c.Quxs
+					.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(2020, 3, 19, 14, 12, 36))
+					.ToString();
+				StringAssert.Contains("DATEADD(SECOND, CAST(36 AS DOUBLE PRECISION), CAST('2020-3-19 14:12:00' AS TIMESTAMP))", q.ToString());
+			}
+		}
+		[Test]
+		public void QueryTestDbFunctionsCreateDateTime3()
+		{
+			using (var c = GetDbContext<DbFunctionsContext>())
+			{
+				var q = c.Quxs
+					.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(null, null, null, null, null, null))
+					.ToString();
+				StringAssert.Contains("DATEADD(DAY, -1, DATEADD(MONTH, -1, DATEADD(YEAR, -1, CAST('0001-01-01 00:00:00' AS TIMESTAMP))))", q.ToString());
+			}
+		}
+		[Test]
+		public void QueryTestDbFunctionsCreateDateTime4()
+		{
+			using (var c = GetDbContext<DbFunctionsContext>())
+			{
+				var q = c.Quxs
+					.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(x.QuxYear, x.QuxMonth, x.QuxDay, null, null, null))
+					.ToString();
+				StringAssert.Contains("DATEADD(DAY, -1, DATEADD(MONTH, -1, DATEADD(YEAR, -1, DATEADD(DAY, \"B\".\"QuxDay\", DATEADD(MONTH, \"B\".\"QuxMonth\", DATEADD(YEAR, \"B\".\"QuxYear\", CAST('0001-01-01 00:00:00' AS TIMESTAMP)))))))", q.ToString());
 			}
 		}
 	}
@@ -163,5 +223,13 @@ namespace EntityFramework.Firebird.Tests
 		public int ID { get; set; }
 		public string BazString { get; set; }
 		public ICollection<Foo> Foos { get; set; }
+	}
+	class Qux
+	{
+		public int ID { get; set; }
+		public DateTime QuxDateTime { get; set; }
+		public int QuxYear { get; set; }
+		public int QuxMonth { get; set; }
+		public int QuxDay { get; set; }
 	}
 }

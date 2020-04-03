@@ -2650,19 +2650,56 @@ namespace EntityFramework.Firebird.SqlGen
 		private static ISqlFragment HandleCanonicalFunctionCreateDateTime(SqlGenerator sqlgen, DbFunctionExpression e)
 		{
 			var result = new SqlBuilder();
+
 			result.Append("CAST('");
-			result.Append(e.Arguments[0].Accept(sqlgen));
+			result.Append((e.Arguments[0].ExpressionKind == DbExpressionKind.Constant) ? e.Arguments[0].Accept(sqlgen) : (object)"0001"); // year
 			result.Append("-");
-			result.Append(e.Arguments[1].Accept(sqlgen));
+			result.Append((e.Arguments[1].ExpressionKind == DbExpressionKind.Constant) ? e.Arguments[1].Accept(sqlgen) : (object)"01"); // month
 			result.Append("-");
-			result.Append(e.Arguments[2].Accept(sqlgen));
+			result.Append((e.Arguments[2].ExpressionKind == DbExpressionKind.Constant) ? e.Arguments[2].Accept(sqlgen) : (object)"01"); // day
 			result.Append(" ");
-			result.Append(e.Arguments[3].Accept(sqlgen));
+			result.Append((e.Arguments[3].ExpressionKind == DbExpressionKind.Constant) ? e.Arguments[3].Accept(sqlgen) : (object)"00"); // hour
 			result.Append(":");
-			result.Append(e.Arguments[4].Accept(sqlgen));
+			result.Append((e.Arguments[4].ExpressionKind == DbExpressionKind.Constant) ? e.Arguments[4].Accept(sqlgen) : (object)"00"); // minute
 			result.Append(":");
-			result.Append(e.Arguments[5].Accept(sqlgen));
+			result.Append("00"); // second is typeof(double?), would result in CAST SqlFragment
 			result.Append("' AS TIMESTAMP)");
+
+			// in case a date part is not constant, generate additional DATEADD fragments
+			if (e.Arguments[0].ExpressionKind != DbExpressionKind.Constant && e.Arguments[0].ExpressionKind != DbExpressionKind.Null)
+				result = HandleDateAdd("YEAR", e.Arguments[0].Accept(sqlgen), result);
+			if (e.Arguments[1].ExpressionKind != DbExpressionKind.Constant && e.Arguments[1].ExpressionKind != DbExpressionKind.Null)
+				result = HandleDateAdd("MONTH", e.Arguments[1].Accept(sqlgen), result);
+			if (e.Arguments[2].ExpressionKind != DbExpressionKind.Constant && e.Arguments[2].ExpressionKind != DbExpressionKind.Null)
+				result = HandleDateAdd("DAY", e.Arguments[2].Accept(sqlgen), result);
+			if (e.Arguments[3].ExpressionKind != DbExpressionKind.Constant && e.Arguments[3].ExpressionKind != DbExpressionKind.Null)
+				result = HandleDateAdd("HOUR", e.Arguments[3].Accept(sqlgen), result);
+			if (e.Arguments[4].ExpressionKind != DbExpressionKind.Constant && e.Arguments[4].ExpressionKind != DbExpressionKind.Null)
+				result = HandleDateAdd("MINUTE", e.Arguments[4].Accept(sqlgen), result);
+			if ((e.Arguments[5].ExpressionKind != DbExpressionKind.Constant || (((DbConstantExpression)e.Arguments[5]).Value as double?) != 0) && e.Arguments[5].ExpressionKind != DbExpressionKind.Null)
+				result = HandleDateAdd("SECOND", e.Arguments[5].Accept(sqlgen), result);
+
+			// in case a default value was used for the year/month/day part, remove it afterwards
+			if (e.Arguments[0].ExpressionKind != DbExpressionKind.Constant)
+				result = HandleDateAdd("YEAR", DbExpression.FromInt32(-1).Accept(sqlgen), result);
+			if (e.Arguments[1].ExpressionKind != DbExpressionKind.Constant)
+				result = HandleDateAdd("MONTH", DbExpression.FromInt32(-1).Accept(sqlgen), result);
+			if (e.Arguments[2].ExpressionKind != DbExpressionKind.Constant)
+				result = HandleDateAdd("DAY", DbExpression.FromInt32(-1).Accept(sqlgen), result);
+
+			return result;
+		}
+
+		private static SqlBuilder HandleDateAdd(string datePart, ISqlFragment value, ISqlFragment dateTime)
+		{
+			SqlBuilder result = new SqlBuilder();
+			result.Append("DATEADD(");
+			result.Append(datePart);
+			result.Append(", ");
+			result.Append(value);
+			result.Append(", ");
+			result.Append(dateTime);
+			result.Append(")");
 			return result;
 		}
 
