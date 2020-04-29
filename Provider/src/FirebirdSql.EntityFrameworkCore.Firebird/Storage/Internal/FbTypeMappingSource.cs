@@ -66,7 +66,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				{ "BOOLEAN", _boolean },
 				{ "SMALLINT", _smallint },
 				{ "INTEGER", _integer },
-				{ "BIGINT", _binary },
+				{ "BIGINT", _bigint },
 				{ "CHAR", _char },
 				{ "VARCHAR", _varchar },
 				{ "BLOB SUB_TYPE TEXT", _clob },
