@@ -10,6 +10,11 @@ $baseDir = Split-Path -Parent $PSCommandPath
 . "$baseDir\include.ps1"
 
 $FirebirdConfiguration = @{
+	FB40 = @{
+		Download = 'https://www.dropbox.com/s/72j823pvdfdrvww/fb40.7z?dl=1';
+		Executable = '.\firebird.exe';
+		Args = @('-a');
+	};
 	FB30 = @{
 		Download = 'https://www.dropbox.com/s/x46uy7e5zrtsnux/fb30.7z?dl=1';
 		Executable = '.\firebird.exe';
