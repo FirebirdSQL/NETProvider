@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez
+//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
 
@@ -23,22 +23,23 @@ namespace FirebirdSql.Data.FirebirdClient
 	[Flags]
 	public enum FbTransactionBehavior
 	{
-		Consistency = 1,
-		Concurrency = 2,
-		Shared = 4,
-		Protected = 8,
-		Exclusive = 16,
-		Wait = 32,
-		NoWait = 64,
-		Read = 128,
-		Write = 256,
-		LockRead = 512,
-		LockWrite = 1024,
-		ReadCommitted = 2048,
-		Autocommit = 4096,
-		RecVersion = 8192,
-		NoRecVersion = 16384,
-		RestartRequests = 32768,
-		NoAutoUndo = 65536,
+		Consistency = 1 << 0,
+		Concurrency = 1 << 1,
+		Shared = 1 << 2,
+		Protected = 1 << 3,
+		Exclusive = 1 << 4,
+		Wait = 1 << 5,
+		NoWait = 1 << 6,
+		Read = 1 << 7,
+		Write = 1 << 8,
+		LockRead = 1 << 9,
+		LockWrite = 1 << 10,
+		ReadCommitted = 1 << 11,
+		Autocommit = 1 << 12,
+		RecVersion = 1 << 13,
+		NoRecVersion = 1 << 14,
+		RestartRequests = 1 << 15,
+		NoAutoUndo = 1 << 16,
+		ReadConsistency = 1 << 17,
 	}
 }

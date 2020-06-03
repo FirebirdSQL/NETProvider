@@ -374,6 +374,10 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				tpb.Append(IscCodes.isc_tpb_no_auto_undo);
 			}
+			if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.ReadConsistency))
+			{
+				tpb.Append(IscCodes.isc_tpb_read_consistency);
+			}
 
 			return tpb;
 		}

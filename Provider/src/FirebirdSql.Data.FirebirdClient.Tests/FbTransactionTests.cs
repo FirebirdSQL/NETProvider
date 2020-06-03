@@ -52,28 +52,28 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SavePointTest()
 		{
-			var command = new FbCommand();
+			using (var command = new FbCommand())
+			{
+				Transaction = Connection.BeginTransaction("InitialSavePoint");
 
-			Transaction = Connection.BeginTransaction("InitialSavePoint");
+				command.Connection = Connection;
+				command.Transaction = Transaction;
 
-			command.Connection = Connection;
-			command.Transaction = Transaction;
+				command.CommandText = "insert into TEST (INT_FIELD) values (200) ";
+				command.ExecuteNonQuery();
 
-			command.CommandText = "insert into TEST (INT_FIELD) values (200) ";
-			command.ExecuteNonQuery();
+				Transaction.Save("FirstSavePoint");
 
-			Transaction.Save("FirstSavePoint");
+				command.CommandText = "insert into TEST (INT_FIELD) values (201) ";
+				command.ExecuteNonQuery();
+				Transaction.Save("SecondSavePoint");
 
-			command.CommandText = "insert into TEST (INT_FIELD) values (201) ";
-			command.ExecuteNonQuery();
-			Transaction.Save("SecondSavePoint");
+				command.CommandText = "insert into TEST (INT_FIELD) values (202) ";
+				command.ExecuteNonQuery();
+				Transaction.Rollback("InitialSavePoint");
 
-			command.CommandText = "insert into TEST (INT_FIELD) values (202) ";
-			command.ExecuteNonQuery();
-			Transaction.Rollback("InitialSavePoint");
-
-			Transaction.Commit();
-			command.Dispose();
+				Transaction.Commit();
+			}
 		}
 
 		[Test]
@@ -104,6 +104,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					command.Dispose();
 				}
 			}
+		}
+
+		[Test]
+		public void ReadCommittedReadConsistency()
+		{
+			if (!EnsureVersion(new Version(4, 0, 0, 0)))
+				return;
+
+			Transaction = Connection.BeginTransaction(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.ReadConsistency });
+			Transaction.Dispose();
 		}
 
 		#endregion
