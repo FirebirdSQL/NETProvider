@@ -19,6 +19,12 @@ stages:
     timeoutInMinutes: 120
     strategy:
       matrix:
+        Provider_NET_FB40:
+          FIREBIRD_SELECTION: FB40
+          TEST_SUITE: Tests-FirebirdClient-NET
+        Provider_Core_FB40:
+          FIREBIRD_SELECTION: FB40
+          TEST_SUITE: Tests-FirebirdClient-Core
         Provider_NET_FB30:
           FIREBIRD_SELECTION: FB30
           TEST_SUITE: Tests-FirebirdClient-NET
@@ -31,12 +37,20 @@ stages:
         Provider_Core_FB25:
           FIREBIRD_SELECTION: FB25
           TEST_SUITE: Tests-FirebirdClient-Core
+
+        EFCore_FB40:
+          FIREBIRD_SELECTION: FB40
+          TEST_SUITE: Tests-EFCore
         EFCore_FB30:
           FIREBIRD_SELECTION: FB30
           TEST_SUITE: Tests-EFCore
         EFCore_FB25:
           FIREBIRD_SELECTION: FB25
           TEST_SUITE: Tests-EFCore
+
+        EF6_FB40:
+          FIREBIRD_SELECTION: FB40
+          TEST_SUITE: Tests-EF6
         EF6_FB30:
           FIREBIRD_SELECTION: FB30
           TEST_SUITE: Tests-EF6
