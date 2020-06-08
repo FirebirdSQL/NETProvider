@@ -211,8 +211,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 		}
 
 		protected override void Generate(DropIndexOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
-			=> base.Generate(operation, model, builder, terminate);
-
+		{
+			builder.Append("DROP ");
+			IndexTraits(operation, model, builder);
+			builder.Append("INDEX ");
+			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name));
+			if (terminate)
+				TerminateStatement(builder);
+		}
 		protected override void Generate(RenameIndexOperation operation, IModel model, MigrationCommandListBuilder builder)
 			=> throw new NotSupportedException("Renaming index is not supported by Firebird.");
 
