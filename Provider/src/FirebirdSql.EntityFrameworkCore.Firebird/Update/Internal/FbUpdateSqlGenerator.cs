@@ -200,5 +200,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 				}
 			}
 		}
+
+		public override string GenerateNextSequenceValueOperation(string name, string schema)
+		{
+			var builder = new StringBuilder();
+			builder.Append("SELECT NEXT VALUE FOR ");
+			builder.Append(SqlGenerationHelper.DelimitIdentifier(name));
+			builder.Append(" FROM RDB$DATABASE");
+			return builder.ToString();
+		}
 	}
 }
