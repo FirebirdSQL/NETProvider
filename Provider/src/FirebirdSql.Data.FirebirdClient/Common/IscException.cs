@@ -132,8 +132,6 @@ namespace FirebirdSql.Data.Common
 			info.AddValue(nameof(ErrorCode), ErrorCode);
 		}
 
-		public override string ToString() => _message;
-
 		private void BuildErrorCode()
 		{
 			ErrorCode = (Errors.Count != 0 ? Errors[0].ErrorCode : 0);
