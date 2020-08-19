@@ -25,4 +25,3 @@ Read more:
 | GitHub |  |
 |--------|--|
 | Downloads | ![Downloads](https://img.shields.io/github/downloads/firebirdsql/netprovider/total.svg) |
-| Code size | ![Code size](https://img.shields.io/github/languages/code-size/firebirdsql/netprovider.svg) |
