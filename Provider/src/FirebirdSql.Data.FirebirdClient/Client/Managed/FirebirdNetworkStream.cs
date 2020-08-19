@@ -30,7 +30,6 @@ namespace FirebirdSql.Data.Client.Managed
 		public const string EncryptionName = "Arc4";
 
 		const int PreferredBufferSize = 32 * 1024;
-		const int CompressionBufferSize = 1 * 1024 * 1024;
 
 		readonly NetworkStream _networkStream;
 
@@ -160,7 +159,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void StartCompression(Ionic.Zlib.ZlibCodec compressor, Ionic.Zlib.ZlibCodec decompressor)
 		{
-			_compressionBuffer = new byte[CompressionBufferSize];
+			_compressionBuffer = new byte[PreferredBufferSize];
 			_compressor = compressor;
 			_decompressor = decompressor;
 		}
@@ -197,34 +196,67 @@ namespace FirebirdSql.Data.Client.Managed
 
 		int HandleDecompression(byte[] buffer, int count)
 		{
-			_decompressor.OutputBuffer = _compressionBuffer;
-			_decompressor.AvailableBytesOut = _compressionBuffer.Length;
-			_decompressor.NextOut = 0;
 			_decompressor.InputBuffer = buffer;
-			_decompressor.AvailableBytesIn = count;
+			_decompressor.NextOut = 0;
 			_decompressor.NextIn = 0;
-			var rc = _decompressor.Inflate(Ionic.Zlib.FlushType.None);
-			if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
-				throw new IOException($"Error '{rc}' while decompressing the data.");
-			if (_decompressor.AvailableBytesIn != 0)
-				throw new IOException("Decompression buffer too small.");
+			_decompressor.AvailableBytesIn = count;
+			while (true)
+			{
+				_decompressor.OutputBuffer = _compressionBuffer;
+				_decompressor.AvailableBytesOut = _compressionBuffer.Length - _decompressor.NextOut;
+				var rc = _decompressor.Inflate(Ionic.Zlib.FlushType.None);
+				if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+					throw new IOException($"Error '{rc}' while decompressing the data.");
+				if (_decompressor.AvailableBytesIn > 0 || _decompressor.AvailableBytesOut == 0)
+				{
+					ResizeBuffer(ref _compressionBuffer);
+					continue;
+				}
+				break;
+			}
 			return _decompressor.NextOut;
 		}
 
 		int HandleCompression(byte[] buffer, int count)
 		{
-			_compressor.OutputBuffer = _compressionBuffer;
-			_compressor.AvailableBytesOut = _compressionBuffer.Length;
-			_compressor.NextOut = 0;
 			_compressor.InputBuffer = buffer;
-			_compressor.AvailableBytesIn = count;
+			_compressor.NextOut = 0;
 			_compressor.NextIn = 0;
-			var rc = _compressor.Deflate(Ionic.Zlib.FlushType.Sync);
-			if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
-				throw new IOException($"Error '{rc}' while compressing the data.");
-			if (_compressor.AvailableBytesIn != 0)
-				throw new IOException("Compression buffer too small.");
+			_compressor.AvailableBytesIn = count;
+			while (true)
+			{
+				_compressor.OutputBuffer = _compressionBuffer;
+				_compressor.AvailableBytesOut = _compressionBuffer.Length - _compressor.NextOut;
+				var rc = _compressor.Deflate(Ionic.Zlib.FlushType.None);
+				if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+					throw new IOException($"Error '{rc}' while compressing the data.");
+				if (_compressor.AvailableBytesIn > 0 || _compressor.AvailableBytesOut == 0)
+				{
+					ResizeBuffer(ref _compressionBuffer);
+					continue;
+				}
+				break;
+			}
+			while (true)
+			{
+				_compressor.OutputBuffer = _compressionBuffer;
+				_compressor.AvailableBytesOut = _compressionBuffer.Length - _compressor.NextOut;
+				var rc = _compressor.Deflate(Ionic.Zlib.FlushType.Sync);
+				if (rc != Ionic.Zlib.ZlibConstants.Z_OK)
+					throw new IOException($"Error '{rc}' while compressing the data.");
+				if (_compressor.AvailableBytesIn > 0 || _compressor.AvailableBytesOut == 0)
+				{
+					ResizeBuffer(ref _compressionBuffer);
+					continue;
+				}
+				break;
+			}
 			return _compressor.NextOut;
+		}
+
+		static void ResizeBuffer(ref byte[] buffer)
+		{
+			Array.Resize(ref buffer, buffer.Length * 2);
 		}
 
 		public override bool CanRead => throw new NotSupportedException();
