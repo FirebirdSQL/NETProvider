@@ -157,17 +157,17 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public void StartCompression(Ionic.Zlib.ZlibCodec compressor, Ionic.Zlib.ZlibCodec decompressor)
+		public void StartCompression()
 		{
 			_compressionBuffer = new byte[PreferredBufferSize];
-			_compressor = compressor;
-			_decompressor = decompressor;
+			_compressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
+			_decompressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
 		}
 
-		public void StartEncryption(Org.BouncyCastle.Crypto.Engines.RC4Engine encryptor, Org.BouncyCastle.Crypto.Engines.RC4Engine decryptor)
+		public void StartEncryption(byte[] key)
 		{
-			_encryptor = encryptor;
-			_decryptor = decryptor;
+			_encryptor = CreateCipher(key);
+			_decryptor = CreateCipher(key);
 		}
 
 		protected override void Dispose(bool disposing)
@@ -257,6 +257,13 @@ namespace FirebirdSql.Data.Client.Managed
 		static void ResizeBuffer(ref byte[] buffer)
 		{
 			Array.Resize(ref buffer, buffer.Length * 2);
+		}
+
+		static Org.BouncyCastle.Crypto.Engines.RC4Engine CreateCipher(byte[] key)
+		{
+			var cipher = new Org.BouncyCastle.Crypto.Engines.RC4Engine();
+			cipher.Init(default, new Org.BouncyCastle.Crypto.Parameters.KeyParameter(key));
+			return cipher;
 		}
 
 		public override bool CanRead => throw new NotSupportedException();

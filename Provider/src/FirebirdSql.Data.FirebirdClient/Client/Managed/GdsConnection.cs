@@ -181,10 +181,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 							if (_compression)
 							{
-								var compressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
-								var decompressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
 								// after reading before writing
-								_firebirdNetworkStream.StartCompression(compressor, decompressor);
+								_firebirdNetworkStream.StartCompression();
 							}
 
 							if (operation == IscCodes.op_cond_accept)
@@ -206,10 +204,8 @@ namespace FirebirdSql.Data.Client.Managed
 									Xdr.Write(SrpClient.SessionKeyName);
 									Xdr.Flush();
 
-									var encryptor = CreateCipher(srp.SessionKey);
-									var decryptor = CreateCipher(srp.SessionKey);
 									// after writing before reading
-									_firebirdNetworkStream.StartEncryption(encryptor, decryptor);
+									_firebirdNetworkStream.StartEncryption(srp.SessionKey);
 
 									ProcessOperation(Xdr.ReadOperation(), Xdr);
 
@@ -448,13 +444,6 @@ namespace FirebirdSql.Data.Client.Managed
 				default:
 					throw new ArgumentOutOfRangeException(nameof(wireCrypt), $"{nameof(wireCrypt)}={wireCrypt}");
 			}
-		}
-
-		private static Org.BouncyCastle.Crypto.Engines.RC4Engine CreateCipher(byte[] key)
-		{
-			var cipher = new Org.BouncyCastle.Crypto.Engines.RC4Engine();
-			cipher.Init(default, new Org.BouncyCastle.Crypto.Parameters.KeyParameter(key));
-			return cipher;
 		}
 
 		#endregion
