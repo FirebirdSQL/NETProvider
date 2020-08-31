@@ -25,7 +25,8 @@ namespace FirebirdSql.Data.Common
 				|| value == 2048
 				|| value == 4096
 				|| value == 8192
-				|| value == 16384;
+				|| value == 16384
+				|| value == 32768;
 		}
 	}
 }

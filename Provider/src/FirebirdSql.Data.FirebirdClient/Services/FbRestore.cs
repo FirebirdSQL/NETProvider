@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Services
 			get { return _pageSize; }
 			set
 			{
-				if (value.HasValue && !PageSizeHelper.IsValidPageSize((int)value))
+				if (value is int v && !PageSizeHelper.IsValidPageSize(v))
 					throw new InvalidOperationException("Invalid page size.");
 
 				_pageSize = value;
