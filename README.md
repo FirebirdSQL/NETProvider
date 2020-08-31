@@ -9,6 +9,7 @@
 	* [Services - Backup](Provider/docs/services-backup.md)
 	* [Events](Provider/docs/events.md)
 	* [ADO.NET - Schema](Provider/docs/ado-net-schema.md)
+	* [Time zones](Provider/docs/time-zones.md)
 * [DDEX provider](DDEX/readme.txt)
 
 ## Packages
