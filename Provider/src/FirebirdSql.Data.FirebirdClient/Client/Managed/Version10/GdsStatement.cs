@@ -17,11 +17,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 using System.Diagnostics;
-
+using System.IO;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
@@ -700,8 +699,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							throw IscException.ForErrorCode(IscCodes.isc_dsql_sqlda_err);
 					}
 				}
-				// just to get out of the loop
-				Break:
+			// just to get out of the loop
+			Break:
 				{ }
 			}
 		}
@@ -813,6 +812,36 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						xdr.Write(field.DbValue.GetBoolean());
 						break;
 
+					case DbDataType.TimeStampTZ:
+						xdr.Write(field.DbValue.GetDate());
+						xdr.Write(field.DbValue.GetTime());
+						xdr.Write(field.DbValue.GetTimeZoneId());
+						break;
+
+					case DbDataType.TimeStampTZEx:
+						xdr.Write(field.DbValue.GetDate());
+						xdr.Write(field.DbValue.GetTime());
+						xdr.Write(field.DbValue.GetTimeZoneId());
+						xdr.Write((short)0);
+						break;
+
+					case DbDataType.TimeTZ:
+						xdr.Write(field.DbValue.GetTime());
+						xdr.Write(field.DbValue.GetTimeZoneId());
+						break;
+
+					case DbDataType.TimeTZEx:
+						xdr.Write(field.DbValue.GetTime());
+						xdr.Write(field.DbValue.GetTimeZoneId());
+						xdr.Write((short)0);
+						break;
+
+					case DbDataType.Dec16:
+					case DbDataType.Dec34:
+					case DbDataType.Int128:
+#warning DECFLOAT
+						break;
+
 					default:
 						throw IscException.ForStrParam($"Unknown SQL data type: {field.DataType}.");
 				}
@@ -890,6 +919,23 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				case DbDataType.Boolean:
 					return _database.Xdr.ReadBoolean();
+
+				case DbDataType.TimeStampTZ:
+					return _database.Xdr.ReadZonedDateTime(false);
+
+				case DbDataType.TimeStampTZEx:
+					return _database.Xdr.ReadZonedDateTime(true);
+
+				case DbDataType.TimeTZ:
+					return _database.Xdr.ReadZonedTime(false);
+
+				case DbDataType.TimeTZEx:
+					return _database.Xdr.ReadZonedTime(true);
+
+				case DbDataType.Dec16:
+				case DbDataType.Dec34:
+				case DbDataType.Int128:
+					return default;
 
 				default:
 					throw TypeHelper.InvalidDataType((int)field.DbDataType);

@@ -13,38 +13,15 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Types
 {
-	internal enum DbDataType
+	public readonly struct FbDecFloat
 	{
-		Array,
-		BigInt,
-		Binary,
-		Boolean,
-		Char,
-		Date,
-		Decimal,
-		Double,
-		Float,
-		Guid,
-		Integer,
-		Numeric,
-		SmallInt,
-		Text,
-		Time,
-		TimeStamp,
-		VarChar,
-		TimeStampTZ,
-		TimeStampTZEx,
-		TimeTZ,
-		TimeTZEx,
-		Dec16,
-		Dec34,
-		Int128,
-		Null,
+		public FbDecFloat(int value)
+		{ }
 	}
 }

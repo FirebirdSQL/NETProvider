@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Client.Managed
 {
@@ -186,6 +187,18 @@ namespace FirebirdSql.Data.Client.Managed
 		public bool ReadBoolean()
 		{
 			return TypeDecoder.DecodeBoolean(ReadOpaque(1));
+		}
+
+		public FbZonedDateTime ReadZonedDateTime(bool isExtended)
+		{
+			var dt = ReadDateTime();
+			dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+			return TypeHelper.CreateZonedDateTime(dt, (ushort)ReadInt16(), isExtended ? ReadInt16() : (short?)null);
+		}
+
+		public FbZonedTime ReadZonedTime(bool isExtended)
+		{
+			return TypeHelper.CreateZonedTime(ReadTime(), (ushort)ReadInt16(), isExtended ? ReadInt16() : (short?)null);
 		}
 
 		public IscException ReadStatusVector()

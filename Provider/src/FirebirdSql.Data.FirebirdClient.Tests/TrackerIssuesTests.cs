@@ -43,6 +43,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DNET217_ReadingALotOfFields()
 		{
+			var timestampExpression = GetServerVersion() >= new Version(4, 0, 0, 0) ? "localtimestamp" : "current_timestamp";
+
 			var cols = new StringBuilder();
 			var separator = string.Empty;
 			for (var i = 0; i < 1235; i++)
@@ -56,7 +58,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 			using (var cmd = Connection.CreateCommand())
 			{
-				cmd.CommandText = "select " + cols.ToString() + " from rdb$database where 'x' = @x or 'x' = @x and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y and current_timestamp = @y";
+				cmd.CommandText = $"select {cols} from rdb$database where 'x' = @x or 'x' = @x and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y";
 				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "z" });
 				cmd.Parameters.Add(new FbParameter() { ParameterName = "@y", Value = DateTime.Now });
 				using (var reader = cmd.ExecuteReader())

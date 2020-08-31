@@ -18,7 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using FirebirdSql.Data.Client;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 

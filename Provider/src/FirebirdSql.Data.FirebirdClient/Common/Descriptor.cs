@@ -191,6 +191,35 @@ namespace FirebirdSql.Data.Common
 							blr.WriteByte(IscCodes.blr_bool);
 							break;
 
+						case IscCodes.SQL_TIMESTAMP_TZ_EX:
+							blr.WriteByte(IscCodes.blr_ex_timestamp_tz);
+							break;
+
+						case IscCodes.SQL_TIMESTAMP_TZ:
+							blr.WriteByte(IscCodes.blr_timestamp_tz);
+							break;
+
+						case IscCodes.SQL_TIME_TZ:
+							blr.WriteByte(IscCodes.blr_sql_time_tz);
+							break;
+
+						case IscCodes.SQL_TIME_TZ_EX:
+							blr.WriteByte(IscCodes.blr_ex_time_tz);
+							break;
+
+						case IscCodes.SQL_DEC16:
+							blr.WriteByte(IscCodes.blr_dec64);
+							break;
+
+						case IscCodes.SQL_DEC34:
+							blr.WriteByte(IscCodes.blr_dec128);
+							break;
+
+						case IscCodes.SQL_INT128:
+							blr.WriteByte(IscCodes.blr_int128);
+							blr.WriteByte((byte)_fields[i].NumericScale);
+							break;
+
 						case IscCodes.SQL_NULL:
 							blr.WriteByte(IscCodes.blr_text);
 							blr.WriteByte((byte)(len & 255));

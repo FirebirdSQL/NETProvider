@@ -18,6 +18,7 @@
 using System;
 using System.Data;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Common
 {
@@ -49,13 +50,22 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.BigInt:
 				case DbDataType.Double:
 				case DbDataType.TimeStamp:
+				case DbDataType.Dec16:
+				case DbDataType.TimeTZ:
 					return 8;
 
 				case DbDataType.Guid:
+				case DbDataType.TimeStampTZEx:
+				case DbDataType.Dec34:
+				case DbDataType.Int128:
 					return 16;
 
 				case DbDataType.Boolean:
 					return 1;
+
+				case DbDataType.TimeStampTZ:
+				case DbDataType.TimeTZEx:
+					return 12;
 
 				default:
 					return null;
@@ -125,6 +135,35 @@ namespace FirebirdSql.Data.Common
 					sqltype = IscCodes.SQL_BOOLEAN;
 					break;
 
+				case DbDataType.TimeStampTZ:
+					sqltype = IscCodes.SQL_TIMESTAMP_TZ;
+					break;
+
+				case DbDataType.TimeStampTZEx:
+					sqltype = IscCodes.SQL_TIMESTAMP_TZ_EX;
+					break;
+
+				case DbDataType.TimeTZ:
+					sqltype = IscCodes.SQL_TIME_TZ;
+					break;
+
+				case DbDataType.TimeTZEx:
+					sqltype = IscCodes.SQL_TIME_TZ_EX;
+					break;
+
+				case DbDataType.Dec16:
+					sqltype = IscCodes.SQL_DEC16;
+					break;
+
+				case DbDataType.Dec34:
+					sqltype = IscCodes.SQL_DEC34;
+					break;
+
+				case DbDataType.Int128:
+					sqltype = IscCodes.SQL_INT128;
+					break;
+
+
 				default:
 					throw InvalidDataType((int)type);
 			}
@@ -188,6 +227,27 @@ namespace FirebirdSql.Data.Common
 				case IscCodes.blr_bool:
 					return IscCodes.SQL_BOOLEAN;
 
+				case IscCodes.blr_ex_timestamp_tz:
+					return IscCodes.SQL_TIMESTAMP_TZ_EX;
+
+				case IscCodes.blr_timestamp_tz:
+					return IscCodes.SQL_TIMESTAMP_TZ;
+
+				case IscCodes.blr_sql_time_tz:
+					return IscCodes.SQL_TIME_TZ;
+
+				case IscCodes.blr_ex_time_tz:
+					return IscCodes.SQL_TIME_TZ_EX;
+
+				case IscCodes.blr_dec64:
+					return IscCodes.SQL_DEC16;
+
+				case IscCodes.blr_dec128:
+					return IscCodes.SQL_DEC34;
+
+				case IscCodes.blr_int128:
+					return IscCodes.SQL_INT128;
+
 				default:
 					throw InvalidDataType(type);
 			}
@@ -246,6 +306,21 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.Boolean:
 					return "BOOLEAN";
 
+				case DbDataType.TimeStampTZ:
+				case DbDataType.TimeStampTZEx:
+					return "TIMESTAMP WITH TIME ZONE";
+
+				case DbDataType.TimeTZ:
+				case DbDataType.TimeTZEx:
+					return "TIME WITH TIME ZONE";
+
+				case DbDataType.Dec16:
+				case DbDataType.Dec34:
+					return "DECFLOAT";
+
+				case DbDataType.Int128:
+					return "INT128";
+
 				default:
 					throw InvalidDataType((int)type);
 			}
@@ -298,8 +373,99 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.Boolean:
 					return typeof(System.Boolean);
 
+				case DbDataType.TimeStampTZ:
+				case DbDataType.TimeStampTZEx:
+					return typeof(FbZonedDateTime);
+
+				case DbDataType.TimeTZ:
+				case DbDataType.TimeTZEx:
+					return typeof(FbZonedTime);
+
+				case DbDataType.Dec16:
+				case DbDataType.Dec34:
+					return typeof(FbDecFloat);
+
+				case DbDataType.Int128:
+					return typeof(System.Numerics.BigInteger);
+
 				default:
 					throw InvalidDataType((int)type);
+			}
+		}
+
+		public static FbDbType GetFbDataTypeFromType(Type type)
+		{
+			if (type == typeof(System.String) || type == typeof(System.DBNull))
+			{
+				return FbDbType.VarChar;
+			}
+			else if (type == typeof(System.Char))
+			{
+				return FbDbType.Char;
+			}
+			else if (type == typeof(System.Boolean))
+			{
+				return FbDbType.Boolean;
+			}
+			else if (type == typeof(System.Byte) || type == typeof(System.SByte) || type == typeof(System.Int16) || type == typeof(System.UInt16))
+			{
+				return FbDbType.SmallInt;
+			}
+			else if (type == typeof(System.Int32) || type == typeof(System.UInt32))
+			{
+				return FbDbType.Integer;
+			}
+			else if (type == typeof(System.Int64) || type == typeof(System.UInt64))
+			{
+				return FbDbType.BigInt;
+			}
+			else if (type == typeof(System.Single))
+			{
+				return FbDbType.Float;
+			}
+			else if (type == typeof(System.Double))
+			{
+				return FbDbType.Double;
+			}
+			else if (type == typeof(System.Decimal))
+			{
+				return FbDbType.Decimal;
+			}
+			else if (type == typeof(System.DateTime))
+			{
+				return FbDbType.TimeStamp;
+			}
+			else if (type == typeof(System.TimeSpan))
+			{
+				return FbDbType.Time;
+			}
+			else if (type == typeof(System.Guid))
+			{
+				return FbDbType.Guid;
+			}
+			else if (type == typeof(FbZonedDateTime))
+			{
+				return FbDbType.TimeStampTZ;
+			}
+			else if (type == typeof(FbZonedTime))
+			{
+				return FbDbType.TimeTZ;
+			}
+			else if (type == typeof(FbDecFloat))
+			{
+				return FbDbType.Dec34;
+			}
+			else if (type == typeof(System.Numerics.BigInteger))
+			{
+				return FbDbType.Int128;
+			}
+			else if (type == typeof(System.Byte[]))
+			{
+				return FbDbType.Binary;
+			}
+			else
+			{
+				throw new ArgumentException($"Unknown type: {type}.");
 			}
 		}
 
@@ -354,6 +520,16 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.Boolean:
 					return DbType.Boolean;
+
+				case DbDataType.TimeStampTZ:
+				case DbDataType.TimeStampTZEx:
+				case DbDataType.TimeTZ:
+				case DbDataType.TimeTZEx:
+				case DbDataType.Dec16:
+				case DbDataType.Dec34:
+				case DbDataType.Int128:
+					// nothing better at the moment
+					return DbType.Object;
 
 				default:
 					throw InvalidDataType((int)type);
@@ -545,6 +721,42 @@ namespace FirebirdSql.Data.Common
 				case IscCodes.SQL_BOOLEAN:
 					return DbDataType.Boolean;
 
+				case IscCodes.SQL_TIMESTAMP_TZ:
+					return DbDataType.TimeStampTZ;
+
+				case IscCodes.SQL_TIMESTAMP_TZ_EX:
+					return DbDataType.TimeStampTZEx;
+
+				case IscCodes.SQL_TIME_TZ:
+					return DbDataType.TimeTZ;
+
+				case IscCodes.SQL_TIME_TZ_EX:
+					return DbDataType.TimeTZEx;
+
+				case IscCodes.SQL_DEC16:
+					return DbDataType.Dec16;
+
+				case IscCodes.SQL_DEC34:
+					return DbDataType.Dec34;
+
+				case IscCodes.SQL_INT128:
+					if (subType == 2)
+					{
+						return DbDataType.Decimal;
+					}
+					else if (subType == 1)
+					{
+						return DbDataType.Numeric;
+					}
+					else if (scale < 0)
+					{
+						return DbDataType.Decimal;
+					}
+					else
+					{
+						return DbDataType.Int128;
+					}
+
 				default:
 					throw InvalidDataType(type);
 			}
@@ -559,6 +771,24 @@ namespace FirebirdSql.Data.Common
 		public static TimeSpan DateTimeToTimeSpan(DateTime d)
 		{
 			return TimeSpan.FromTicks(d.Subtract(d.Date).Ticks);
+		}
+
+		public static FbZonedDateTime CreateZonedDateTime(DateTime dateTime, ushort tzId, short? offset)
+		{
+			if (!TimeZoneMapping.TryGetById(tzId, out var tz))
+			{
+				throw new ArgumentException("Unknown time zone ID.");
+			}
+			return new FbZonedDateTime(dateTime, tz, offset != null ? TimeSpan.FromMinutes((short)offset) : (TimeSpan?)null);
+		}
+
+		public static FbZonedTime CreateZonedTime(TimeSpan time, ushort tzId, short? offset)
+		{
+			if (!TimeZoneMapping.TryGetById(tzId, out var tz))
+			{
+				throw new ArgumentException("Unknown time zone ID.");
+			}
+			return new FbZonedTime(time, tz, offset != null ? TimeSpan.FromMinutes((short)offset) : (TimeSpan?)null);
 		}
 
 		public static Exception InvalidDataType(int type)

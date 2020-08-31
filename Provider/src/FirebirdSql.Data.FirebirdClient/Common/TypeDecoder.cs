@@ -46,29 +46,29 @@ namespace FirebirdSql.Data.Common
 			return returnValue;
 		}
 
-		public static TimeSpan DecodeTime(int sql_time)
+		public static TimeSpan DecodeTime(int sqlTime)
 		{
-			return TimeSpan.FromTicks(sql_time * 1000L);
+			return TimeSpan.FromTicks(sqlTime * 1000L);
 		}
 
-		public static DateTime DecodeDate(int sql_date)
+		public static DateTime DecodeDate(int sqlDate)
 		{
 			int year, month, day, century;
 
-			sql_date -= 1721119 - 2400001;
-			century = (4 * sql_date - 1) / 146097;
-			sql_date = 4 * sql_date - 1 - 146097 * century;
-			day = sql_date / 4;
+			sqlDate -= 1721119 - 2400001;
+			century = (4 * sqlDate - 1) / 146097;
+			sqlDate = 4 * sqlDate - 1 - 146097 * century;
+			day = sqlDate / 4;
 
-			sql_date = (4 * day + 3) / 1461;
-			day = 4 * day + 3 - 1461 * sql_date;
+			sqlDate = (4 * day + 3) / 1461;
+			day = 4 * day + 3 - 1461 * sqlDate;
 			day = (day + 4) / 4;
 
 			month = (5 * day - 3) / 153;
 			day = 5 * day - 3 - 153 * month;
 			day = (day + 5) / 5;
 
-			year = 100 * century + sql_date;
+			year = 100 * century + sqlDate;
 
 			if (month < 10)
 			{

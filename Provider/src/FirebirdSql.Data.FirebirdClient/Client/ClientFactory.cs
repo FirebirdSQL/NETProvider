@@ -19,8 +19,9 @@ using System;
 using FirebirdSql.Data.Client.Managed;
 using FirebirdSql.Data.Client.Managed.Version13;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.Client
 {
 	internal static class ClientFactory
 	{
@@ -31,7 +32,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				case FbServerType.Default:
 					return CreateManagedDatabase(options);
 				case FbServerType.Embedded:
-					return new Client.Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
+					return new Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset));
 				default:
 					throw IncorrectServerTypeException();
 			}
@@ -44,7 +45,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				case FbServerType.Default:
 					return CreateManagedServiceManager(options);
 				case FbServerType.Embedded:
-					return new Client.Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset));
+					return new Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset));
 				default:
 					throw IncorrectServerTypeException();
 			}
@@ -58,13 +59,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			switch (connection.ProtocolVersion)
 			{
 				case IscCodes.PROTOCOL_VERSION13:
-					return new Client.Managed.Version13.GdsDatabase(connection);
+					return new GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION12:
-					return new Client.Managed.Version12.GdsDatabase(connection);
+					return new Managed.Version12.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION11:
-					return new Client.Managed.Version11.GdsDatabase(connection);
+					return new Managed.Version11.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION10:
-					return new Client.Managed.Version10.GdsDatabase(connection);
+					return new Managed.Version10.GdsDatabase(connection);
 				default:
 					throw UnsupportedProtocolException();
 			}
@@ -78,13 +79,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			switch (connection.ProtocolVersion)
 			{
 				case IscCodes.PROTOCOL_VERSION13:
-					return new Client.Managed.Version13.GdsServiceManager(connection);
+					return new GdsServiceManager(connection);
 				case IscCodes.PROTOCOL_VERSION12:
-					return new Client.Managed.Version12.GdsServiceManager(connection);
+					return new Managed.Version12.GdsServiceManager(connection);
 				case IscCodes.PROTOCOL_VERSION11:
-					return new Client.Managed.Version11.GdsServiceManager(connection);
+					return new Managed.Version11.GdsServiceManager(connection);
 				case IscCodes.PROTOCOL_VERSION10:
-					return new Client.Managed.Version10.GdsServiceManager(connection);
+					return new Managed.Version10.GdsServiceManager(connection);
 				default:
 					throw UnsupportedProtocolException();
 			}

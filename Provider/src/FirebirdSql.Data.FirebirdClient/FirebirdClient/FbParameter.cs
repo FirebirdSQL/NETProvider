@@ -370,73 +370,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				value = DBNull.Value;
 			}
-
-			var code = Type.GetTypeCode(value.GetType());
-
-			switch (code)
-			{
-				case TypeCode.Char:
-					_fbDbType = FbDbType.Char;
-					break;
-
-				case TypeCode.DBNull:
-				case TypeCode.String:
-					_fbDbType = FbDbType.VarChar;
-					break;
-
-				case TypeCode.Boolean:
-					_fbDbType = FbDbType.Boolean;
-					break;
-
-				case TypeCode.Byte:
-				case TypeCode.SByte:
-				case TypeCode.Int16:
-				case TypeCode.UInt16:
-					_fbDbType = FbDbType.SmallInt;
-					break;
-
-				case TypeCode.Int32:
-				case TypeCode.UInt32:
-					_fbDbType = FbDbType.Integer;
-					break;
-
-				case TypeCode.Int64:
-				case TypeCode.UInt64:
-					_fbDbType = FbDbType.BigInt;
-					break;
-
-				case TypeCode.Single:
-					_fbDbType = FbDbType.Float;
-					break;
-
-				case TypeCode.Double:
-					_fbDbType = FbDbType.Double;
-					break;
-
-				case TypeCode.Decimal:
-					_fbDbType = FbDbType.Decimal;
-					break;
-
-				case TypeCode.DateTime:
-					_fbDbType = FbDbType.TimeStamp;
-					break;
-
-				case TypeCode.Empty:
-				default:
-					if (value is Guid)
-					{
-						_fbDbType = FbDbType.Guid;
-					}
-					else if (code == TypeCode.Object)
-					{
-						_fbDbType = FbDbType.Binary;
-					}
-					else
-					{
-						throw new ArgumentException("Parameter type is unknown.");
-					}
-					break;
-			}
+			_fbDbType = TypeHelper.GetFbDataTypeFromType(value.GetType());
 		}
 
 		#endregion

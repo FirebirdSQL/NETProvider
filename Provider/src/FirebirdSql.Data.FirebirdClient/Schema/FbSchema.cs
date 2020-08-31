@@ -27,6 +27,8 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Schema
 {
+#warning New datatypes
+
 	internal abstract class FbSchema
 	{
 		#region Constructors

@@ -380,6 +380,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 							xdr.Write(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
 							break;
 
+#warning New datatypes
+
 						default:
 							throw TypeHelper.InvalidDataType((int)dbType);
 					}

@@ -119,7 +119,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				using (var reader = cmd.ExecuteReader())
 				{
 					var schema = reader.GetSchemaTable();
-					Assert.AreEqual("BOOL", schema.Rows[1].ItemArray[0]);
 					Assert.AreEqual(typeof(bool), schema.Rows[1].ItemArray[5]);
 				}
 			}

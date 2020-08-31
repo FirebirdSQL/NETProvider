@@ -18,12 +18,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using FirebirdSql.Data.Common;
 using System.Linq;
+using System.Reflection;
+using FirebirdSql.Data.Client;
+using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Schema;
 
 namespace FirebirdSql.Data.FirebirdClient
