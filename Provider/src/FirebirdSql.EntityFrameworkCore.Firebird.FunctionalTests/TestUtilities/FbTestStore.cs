@@ -16,7 +16,9 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
@@ -59,10 +61,38 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 			}
 		}
 
-		public override void Dispose()
+		public override void OpenConnection()
 		{
-			Connection.Dispose();
-			base.Dispose();
+			base.OpenConnection();
+			if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
+			{
+				using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = "set bind of decfloat to legacy";
+					cmd.ExecuteNonQuery();
+					cmd.CommandText = "set bind of int128 to legacy";
+					cmd.ExecuteNonQuery();
+					cmd.CommandText = "set bind of time zone to legacy";
+					cmd.ExecuteNonQuery();
+				}
+			}
+		}
+
+		public override async Task OpenConnectionAsync()
+		{
+			await base.OpenConnectionAsync();
+			if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
+			{
+				using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = "set bind of decfloat to legacy";
+					await cmd.ExecuteNonQueryAsync();
+					cmd.CommandText = "set bind of int128 to legacy";
+					await cmd.ExecuteNonQueryAsync();
+					cmd.CommandText = "set bind of time zone to legacy";
+					await cmd.ExecuteNonQueryAsync();
+				}
+			}
 		}
 
 		public override DbContextOptionsBuilder AddProviderOptions(DbContextOptionsBuilder builder)

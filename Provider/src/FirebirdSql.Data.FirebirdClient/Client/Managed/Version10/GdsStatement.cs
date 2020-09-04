@@ -935,6 +935,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				case DbDataType.Dec16:
 				case DbDataType.Dec34:
 				case DbDataType.Int128:
+#warning DECFLOAT
 					return default;
 
 				default:
