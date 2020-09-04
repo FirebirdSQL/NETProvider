@@ -122,7 +122,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				var result = (FbZonedTime)cmd.ExecuteScalar();
 				Assert.AreEqual(new TimeSpan(14, 00, 00), result.Time);
 				Assert.AreEqual("Europe/Prague", result.TimeZone);
-				Assert.AreEqual(isExtended ? TimeSpan.FromMinutes(120) : (TimeSpan?)null, result.Offset);
+				Assert.AreEqual(isExtended ? TimeSpan.FromMinutes(60) : (TimeSpan?)null, result.Offset);
 			}
 		}
 
