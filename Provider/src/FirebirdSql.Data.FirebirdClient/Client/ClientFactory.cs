@@ -17,9 +17,9 @@
 
 using System;
 using FirebirdSql.Data.Client.Managed;
-using FirebirdSql.Data.Client.Managed.Version13;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
+using WireCryptOption = FirebirdSql.Data.Client.Managed.Version13.WireCryptOption;
 
 namespace FirebirdSql.Data.Client
 {
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Client
 			switch (connection.ProtocolVersion)
 			{
 				case IscCodes.PROTOCOL_VERSION13:
-					return new GdsDatabase(connection);
+					return new Managed.Version13.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION12:
 					return new Managed.Version12.GdsDatabase(connection);
 				case IscCodes.PROTOCOL_VERSION11:
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.Client
 			switch (connection.ProtocolVersion)
 			{
 				case IscCodes.PROTOCOL_VERSION13:
-					return new GdsServiceManager(connection);
+					return new Managed.Version13.GdsServiceManager(connection);
 				case IscCodes.PROTOCOL_VERSION12:
 					return new Managed.Version12.GdsServiceManager(connection);
 				case IscCodes.PROTOCOL_VERSION11:
