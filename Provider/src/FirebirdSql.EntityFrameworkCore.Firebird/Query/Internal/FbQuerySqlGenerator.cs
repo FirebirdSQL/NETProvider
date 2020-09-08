@@ -102,13 +102,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 
 		protected override Expression VisitSqlParameter(SqlParameterExpression sqlParameterExpression)
 		{
-			var shouldExplicitParamterTypes = _fbOptions.ExplicitParameterTypes;
-			if (shouldExplicitParamterTypes)
+			var shouldExplicitParameterTypes = _fbOptions.ExplicitParameterTypes;
+			if (shouldExplicitParameterTypes)
 			{
 				Sql.Append("CAST(");
 			}
 			base.VisitSqlParameter(sqlParameterExpression);
-			if (shouldExplicitParamterTypes)
+			if (shouldExplicitParameterTypes)
 			{
 				Sql.Append(" AS ");
 				if (sqlParameterExpression.Type == typeof(string))
