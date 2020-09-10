@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Common
 	{
 		private MemoryStream _stream;
 
-		public short Length => (short)ToArray().Length;
+		public short Length => (short)_stream.Length;
 		protected bool IsLittleEndian { get; }
 
 		protected ParameterBuffer(bool isLittleEndian)
