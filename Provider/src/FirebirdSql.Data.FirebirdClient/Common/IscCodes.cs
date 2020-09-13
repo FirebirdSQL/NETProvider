@@ -224,6 +224,8 @@ namespace FirebirdSql.Data.Common
 		#region Database Parameter Block
 
 		public const int isc_dpb_version1 = 1;
+		public const int isc_dpb_version2 = 2;
+
 		public const int isc_dpb_cdd_pathname = 1;
 		public const int isc_dpb_allocation = 2;
 		public const int isc_dpb_journal = 3;

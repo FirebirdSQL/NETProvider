@@ -30,21 +30,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 {
 	internal class GdsDatabase : Version10.GdsDatabase
 	{
-		#region Constructors
-
 		public GdsDatabase(GdsConnection connection)
 			: base(connection)
 		{
 			DeferredPackets = new Queue<Action<IResponse>>();
 		}
 
-		#endregion
-
-		#region Properties
 		public Queue<Action<IResponse>> DeferredPackets { get; private set; }
-		#endregion
-
-		#region Override Statement Creation Methods
 
 		public override StatementBase CreateStatement()
 		{
@@ -56,10 +48,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return new GdsStatement(this, transaction);
 		}
 
-		#endregion
-
-		#region Trusted Auth
-		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			try
 			{
@@ -89,7 +78,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			AfterAttachActions();
 		}
 
-		protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBuffer dpb, byte[] authData)
+		protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBufferBase dpb, byte[] authData)
 		{
 			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
 		}
@@ -106,7 +95,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			using (var sspiHelper = new SspiHelper())
 			{
@@ -120,9 +109,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				ProcessCreateResponse((GenericResponse)response);
 			}
 		}
-		#endregion
 
-		#region Public methods
 		public override void ReleaseObject(int op, int id)
 		{
 			try
@@ -146,9 +133,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			ProcessDeferredPackets();
 			return base.ReadOperationAsync();
 		}
-		#endregion
 
-		#region Private methods
 		private void ProcessDeferredPackets()
 		{
 			if (DeferredPackets.Count > 0)
@@ -162,6 +147,5 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				}
 			}
 		}
-		#endregion
 	}
 }

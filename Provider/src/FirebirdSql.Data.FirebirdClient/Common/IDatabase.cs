@@ -33,18 +33,20 @@ namespace FirebirdSql.Data.Common
 		bool HasRemoteEventSupport { get; }
 		bool ConnectionBroken { get; }
 
-		void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
-		void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
+		void Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey);
+		void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey);
 		void Detach();
 
-		void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
-		void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey);
+		void CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey);
+		void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey);
 		void DropDatabase();
 
 		TransactionBase BeginTransaction(TransactionParameterBuffer tpb);
 
 		StatementBase CreateStatement();
 		StatementBase CreateStatement(TransactionBase transaction);
+
+		DatabaseParameterBufferBase CreateDatabaseParameterBuffer();
 
 		List<object> GetDatabaseInfo(byte[] items);
 		List<object> GetDatabaseInfo(byte[] items, int bufferLength);

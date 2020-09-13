@@ -24,7 +24,6 @@ namespace FirebirdSql.Data.Common
 	internal sealed class EventParameterBuffer : ParameterBuffer
 	{
 		public EventParameterBuffer()
-			: base(BitConverter.IsLittleEndian)
 		{ }
 
 		public void Append(string content, int actualCount)

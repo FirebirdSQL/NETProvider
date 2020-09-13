@@ -141,7 +141,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Attach/Detach Methods
 
-		public virtual void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public virtual void Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			try
 			{
@@ -163,7 +163,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			AfterAttachActions();
 		}
 
-		protected virtual void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
+		protected virtual void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
 		{
 			Xdr.Write(IscCodes.op_attach);
 			Xdr.Write(0);
@@ -185,7 +185,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_serverVersion = GetServerVersion();
 		}
 
-		public virtual void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public virtual void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
@@ -256,7 +256,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Methods
 
-		public virtual void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public virtual void CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			try
 			{
@@ -270,7 +270,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected virtual void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
+		protected virtual void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
 		{
 			Xdr.Write(IscCodes.op_create);
 			Xdr.Write(DatabaseObjectId);
@@ -287,7 +287,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_handle = response.ObjectHandle;
 		}
 
-		public virtual void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public virtual void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
@@ -476,6 +476,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public virtual StatementBase CreateStatement(TransactionBase transaction)
 		{
 			return new GdsStatement(this, transaction);
+		}
+
+		#endregion
+
+		#region DPB
+
+		public virtual DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
+		{
+			return new DatabaseParameterBuffer1();
 		}
 
 		#endregion

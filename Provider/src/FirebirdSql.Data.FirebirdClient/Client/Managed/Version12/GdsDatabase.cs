@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			: base(connection)
 		{ }
 
-		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
+		protected override void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
 		{
 			Xdr.Write(IscCodes.op_attach);
 			Xdr.Write(0);
@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
-		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
+		protected override void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
 		{
 			Xdr.Write(IscCodes.op_create);
 			Xdr.Write(0);
@@ -59,8 +59,6 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
-		#region Override Statement Creation Methods
-
 		public override StatementBase CreateStatement()
 		{
 			return new GdsStatement(this);
@@ -70,10 +68,6 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		{
 			return new GdsStatement(this, transaction);
 		}
-
-		#endregion
-
-		#region Cancel Methods
 
 		public override void CancelOperation(int kind)
 		{
@@ -94,7 +88,5 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			Xdr.Write(IscCodes.op_cancel);
 			Xdr.Write(kind);
 		}
-
-		#endregion
 	}
 }

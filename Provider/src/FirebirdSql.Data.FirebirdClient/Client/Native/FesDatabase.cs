@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Methods
 
-		public void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public void CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.Client.Native
 			ProcessStatusVector(_statusVector);
 		}
 
-		public void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
@@ -186,7 +186,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public void Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -207,7 +207,7 @@ namespace FirebirdSql.Data.Client.Native
 			_serverVersion = GetServerVersion();
 		}
 
-		public void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
@@ -276,6 +276,15 @@ namespace FirebirdSql.Data.Client.Native
 		public StatementBase CreateStatement(TransactionBase transaction)
 		{
 			return new FesStatement(this, transaction as FesTransaction);
+		}
+
+		#endregion
+
+		#region DPB
+
+		public DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
+		{
+			return new DatabaseParameterBuffer1();
 		}
 
 		#endregion

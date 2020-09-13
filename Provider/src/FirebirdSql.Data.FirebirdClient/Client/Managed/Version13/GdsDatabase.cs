@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			: base(connection)
 		{ }
 
-		public override void Attach(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override void Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			try
 			{
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			AfterAttachActions();
 		}
 
-		protected override void SendAttachToBuffer(DatabaseParameterBuffer dpb, string database)
+		protected override void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
 		{
 			Xdr.Write(IscCodes.op_attach);
 			Xdr.Write(0);
@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
-		public override void CreateDatabase(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override void CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			try
 			{
@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 		}
 
-		protected override void SendCreateToBuffer(DatabaseParameterBuffer dpb, string database)
+		protected override void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
 		{
 			Xdr.Write(IscCodes.op_create);
 			Xdr.Write(0);
@@ -99,12 +99,12 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			Xdr.WriteBuffer(dpb.ToArray());
 		}
 
-		public override void AttachWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			Attach(dpb, dataSource, port, database, cryptKey);
 		}
 
-		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBuffer dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
 		{
 			CreateDatabase(dpb, dataSource, port, database, cryptKey);
 		}
@@ -121,8 +121,6 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			return response;
 		}
 
-		#region Override Statement Creation Methods
-
 		public override StatementBase CreateStatement()
 		{
 			return new GdsStatement(this);
@@ -133,6 +131,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			return new GdsStatement(this, transaction);
 		}
 
-		#endregion
+		public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
+		{
+			return new DatabaseParameterBuffer2();
+		}
 	}
 }

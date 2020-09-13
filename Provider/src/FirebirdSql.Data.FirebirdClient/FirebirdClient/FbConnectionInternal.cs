@@ -110,9 +110,37 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Create and Drop database methods
 
-		public void CreateDatabase(DatabaseParameterBuffer dpb)
+		public void CreateDatabase(int pageSize, bool forcedWrites, bool overwrite)
 		{
 			var db = ClientFactory.CreateDatabase(_options);
+
+			var dpb = db.CreateDatabaseParameterBuffer();
+
+			dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
+			dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { _options.Dialect, 0, 0, 0 });
+			if (!string.IsNullOrEmpty(_options.UserID))
+			{
+				dpb.Append(IscCodes.isc_dpb_user_name, _options.UserID);
+			}
+			if (_options.Charset.Length > 0)
+			{
+				var charset = Charset.GetCharset(_options.Charset);
+				if (charset == null)
+				{
+					throw new ArgumentException("Character set is not valid.");
+				}
+				else
+				{
+					dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
+				}
+			}
+			dpb.Append(IscCodes.isc_dpb_force_write, (short)(forcedWrites ? 1 : 0));
+			dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
+			if (pageSize > 0)
+			{
+				dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
+			}
+
 			try
 			{
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
@@ -398,11 +426,16 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Private Methods
 
-		private DatabaseParameterBuffer BuildDpb(IDatabase db, ConnectionString options)
+		private void EnsureActiveTransaction()
 		{
-			var dpb = new DatabaseParameterBuffer();
+			if (HasActiveTransaction)
+				throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
+		}
 
-			dpb.Append(IscCodes.isc_dpb_version1);
+		private static DatabaseParameterBufferBase BuildDpb(IDatabase db, ConnectionString options)
+		{
+			var dpb = db.CreateDatabaseParameterBuffer();
+
 			dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 			dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { options.Dialect, 0, 0, 0 });
 			dpb.Append(IscCodes.isc_dpb_lc_ctype, options.Charset);
@@ -434,13 +467,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			return dpb;
 		}
 
-		private string GetProcessName()
+		private static string GetProcessName()
 		{
 			return GetSystemWebHostingPath() ?? GetRealProcessName() ?? string.Empty;
 		}
 
 
-		private string GetSystemWebHostingPath()
+		private static string GetSystemWebHostingPath()
 		{
 #if NETSTANDARD2_0
 			return null;
@@ -454,9 +487,9 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
 		}
 
-		private string GetRealProcessName()
+		private static string GetRealProcessName()
 		{
-			string FromProcess()
+			static string FromProcess()
 			{
 				try
 				{
@@ -470,7 +503,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return Assembly.GetEntryAssembly()?.Location ?? FromProcess();
 		}
 
-		private int GetProcessId()
+		private static int GetProcessId()
 		{
 			try
 			{
@@ -482,15 +515,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		private string GetClientVersion()
+		private static string GetClientVersion()
 		{
-			return GetType().GetTypeInfo().Assembly.GetName().Version.ToString();
-		}
-
-		private void EnsureActiveTransaction()
-		{
-			if (HasActiveTransaction)
-				throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
+			return typeof(FbConnectionInternal).GetTypeInfo().Assembly.GetName().Version.ToString();
 		}
 		#endregion
 

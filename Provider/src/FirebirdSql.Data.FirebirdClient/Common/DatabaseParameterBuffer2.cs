@@ -13,51 +13,41 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
-
-using System;
-using System.IO;
-using System.Text;
-using System.Net;
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class DatabaseParameterBuffer : ParameterBuffer
+	internal sealed class DatabaseParameterBuffer2 : DatabaseParameterBufferBase
 	{
-		public DatabaseParameterBuffer()
-			: base(BitConverter.IsLittleEndian)
+		public DatabaseParameterBuffer2()
+			: base(IscCodes.isc_dpb_version2)
 		{ }
 
-		public void Append(int type, byte value)
+		public override void Append(int type, byte value)
 		{
 			WriteByte(type);
-			WriteByte(1);
+			Write(1);
 			Write(value);
 		}
 
-		public void Append(int type, short value)
+		public override void Append(int type, short value)
 		{
 			WriteByte(type);
-			WriteByte(2);
+			Write(2);
 			Write(value);
 		}
 
-		public void Append(int type, int value)
+		public override void Append(int type, int value)
 		{
 			WriteByte(type);
-			WriteByte((byte)4);
+			Write(4);
 			Write(value);
 		}
 
-		public void Append(int type, string content)
-		{
-			Append(type, Encoding.Default.GetBytes(content));
-		}
-
-		public void Append(int type, byte[] buffer)
+		public override void Append(int type, byte[] buffer)
 		{
 			WriteByte(type);
-			WriteByte(buffer.Length);
+			Write(buffer.Length);
 			Write(buffer);
 		}
 	}

@@ -17,7 +17,6 @@
 
 using System;
 using System.IO;
-using System.Text;
 using System.Net;
 
 namespace FirebirdSql.Data.Common
@@ -27,12 +26,10 @@ namespace FirebirdSql.Data.Common
 		private MemoryStream _stream;
 
 		public short Length => (short)_stream.Length;
-		protected bool IsLittleEndian { get; }
 
-		protected ParameterBuffer(bool isLittleEndian)
+		protected ParameterBuffer()
 		{
 			_stream = new MemoryStream();
-			IsLittleEndian = isLittleEndian;
 		}
 
 		public virtual void Append(int type)
@@ -62,7 +59,7 @@ namespace FirebirdSql.Data.Common
 
 		protected void Write(short value)
 		{
-			if (!IsLittleEndian)
+			if (!BitConverter.IsLittleEndian)
 			{
 				value = IPAddress.NetworkToHostOrder(value);
 			}
@@ -74,7 +71,7 @@ namespace FirebirdSql.Data.Common
 
 		protected void Write(int value)
 		{
-			if (!IsLittleEndian)
+			if (!BitConverter.IsLittleEndian)
 			{
 				value = IPAddress.NetworkToHostOrder(value);
 			}

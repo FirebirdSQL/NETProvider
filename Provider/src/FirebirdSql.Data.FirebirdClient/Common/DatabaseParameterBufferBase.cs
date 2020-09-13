@@ -13,15 +13,24 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
+using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class BlobParameterBuffer : ParameterBuffer
+	internal abstract class DatabaseParameterBufferBase : ParameterBuffer
 	{
-		public BlobParameterBuffer()
-		{ }
+		public DatabaseParameterBufferBase(int version)
+		{
+			Append(version);
+		}
+
+		public abstract void Append(int type, byte value);
+		public abstract void Append(int type, short value);
+		public abstract void Append(int type, int value);
+		public abstract void Append(int type, byte[] buffer);
+
+		public void Append(int type, string content) => Append(type, Encoding.Default.GetBytes(content));
 	}
 }

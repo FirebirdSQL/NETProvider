@@ -15,7 +15,6 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
-using System;
 using System.Text;
 
 namespace FirebirdSql.Data.Common
@@ -23,7 +22,6 @@ namespace FirebirdSql.Data.Common
 	internal sealed class ServiceParameterBuffer : ParameterBuffer
 	{
 		public ServiceParameterBuffer()
-			: base(BitConverter.IsLittleEndian)
 		{ }
 
 		public void Append(int type, byte value)
