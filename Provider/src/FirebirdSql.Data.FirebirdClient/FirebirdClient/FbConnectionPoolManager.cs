@@ -20,6 +20,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
@@ -123,7 +124,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						keep = keep.Concat(available.Except(keep).OrderByDescending(x => x.Created).Take(_connectionString.MinPoolSize - keepCount)).ToList();
 					}
 					var release = available.Except(keep).ToList();
-					release.AsParallel().ForAll(x => x.Dispose());
+					Parallel.ForEach(release, p => p.Dispose());
 					_available = new Stack<Item>(keep);
 				}
 			}
@@ -207,7 +208,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckDisposed();
 
-			_pools.Values.AsParallel().ForAll(p => p.ClearPool());
+			Parallel.ForEach(_pools.Values, p => p.ClearPool());
 		}
 
 		internal void ClearPool(ConnectionString connectionString)
@@ -229,12 +230,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				_cleanupTimer.Dispose(mre);
 				mre.WaitOne();
 			}
-			_pools.Values.AsParallel().ForAll(x => x.Dispose());
+			Parallel.ForEach(_pools.Values, p => p.Dispose());
 		}
 
 		void CleanupCallback(object o)
 		{
-			_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
+			Parallel.ForEach(_pools.Values, p => p.CleanupPool());
 		}
 
 		void CheckDisposed()
