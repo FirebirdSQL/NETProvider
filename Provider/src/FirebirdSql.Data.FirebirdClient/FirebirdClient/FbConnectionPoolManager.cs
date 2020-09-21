@@ -140,19 +140,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 			}
 
-			static FbConnectionInternal CreateNewConnection(ConnectionString connectionString)
-			{
-				var result = new FbConnectionInternal(connectionString);
-				result.Connect();
-				return result;
-			}
-
-			static long GetTicks()
-			{
-				var ticks = Environment.TickCount;
-				return ticks + -(long)int.MinValue;
-			}
-
 			void CleanConnectionsImpl()
 			{
 				foreach (var item in _available)
@@ -170,6 +157,19 @@ namespace FirebirdSql.Data.FirebirdClient
 				if (_busy.Count() + 1 > connectionString.MaxPoolSize)
 					throw new InvalidOperationException("Connection pool is full.");
 				return CreateNewConnection(connectionString);
+			}
+
+			static FbConnectionInternal CreateNewConnection(ConnectionString connectionString)
+			{
+				var result = new FbConnectionInternal(connectionString);
+				result.Connect();
+				return result;
+			}
+
+			static long GetTicks()
+			{
+				var ticks = Environment.TickCount;
+				return ticks + -(long)int.MinValue;
 			}
 		}
 
