@@ -45,7 +45,7 @@
 		<None Include="..\..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="EntityFramework" Version="6.4.0" />
+		<PackageReference Include="EntityFramework" Version="6.4.4" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
 		<Reference Include="System.Configuration" />
