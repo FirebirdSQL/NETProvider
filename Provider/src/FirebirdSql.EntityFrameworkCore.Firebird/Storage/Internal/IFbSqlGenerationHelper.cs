@@ -15,14 +15,15 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Text;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
 	public interface IFbSqlGenerationHelper : ISqlGenerationHelper
 	{
-		string ParameterNameMarker { get; set; }
 		string StringLiteralQueryType(string s);
 		string StringParameterQueryType();
+		void GenerateBlockParameterName(StringBuilder builder, string name);
 	}
 }

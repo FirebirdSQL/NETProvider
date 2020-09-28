@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 
@@ -64,7 +65,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 
 		public override ResultSetMapping AppendUpdateOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
 		{
-			var sqlGenerationHelper = (IFbSqlGenerationHelper)SqlGenerationHelper;
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
 			var writeOperations = operations.Where(o => o.IsWrite).ToList();
@@ -99,17 +99,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			commandStringBuilder.AppendLine(")");
 			commandStringBuilder.AppendLine("AS");
 			commandStringBuilder.AppendLine("BEGIN");
-			var oldParameterNameMarker = sqlGenerationHelper.ParameterNameMarker;
-			sqlGenerationHelper.ParameterNameMarker = ":";
-			try
-			{
-				AppendUpdateCommandHeader(commandStringBuilder, name, null, writeOperations);
-				AppendWhereClause(commandStringBuilder, conditionOperations);
-			}
-			finally
-			{
-				sqlGenerationHelper.ParameterNameMarker = oldParameterNameMarker;
-			}
+			AppendUpdateCommandHeader(commandStringBuilder, name, null, writeOperations);
+			AppendWhereClause(commandStringBuilder, conditionOperations);
 			if (anyRead)
 			{
 				commandStringBuilder.AppendLine();
@@ -143,7 +134,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 
 		public override ResultSetMapping AppendDeleteOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
 		{
-			var sqlGenerationHelper = (IFbSqlGenerationHelper)SqlGenerationHelper;
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
 			var conditionOperations = operations.Where(o => o.IsCondition).ToList();
@@ -160,17 +150,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			commandStringBuilder.AppendLine("RETURNS (ROWS_AFFECTED INT)");
 			commandStringBuilder.AppendLine("AS");
 			commandStringBuilder.AppendLine("BEGIN");
-			var oldParameterNameMarker = sqlGenerationHelper.ParameterNameMarker;
-			sqlGenerationHelper.ParameterNameMarker = ":";
-			try
-			{
-				AppendDeleteCommandHeader(commandStringBuilder, name, null);
-				AppendWhereClause(commandStringBuilder, conditionOperations);
-			}
-			finally
-			{
-				sqlGenerationHelper.ParameterNameMarker = oldParameterNameMarker;
-			}
+			AppendDeleteCommandHeader(commandStringBuilder, name, null);
+			AppendWhereClause(commandStringBuilder, conditionOperations);
 			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
 			commandStringBuilder.AppendLine();
 			commandStringBuilder.AppendLine("ROWS_AFFECTED = ROW_COUNT;");
@@ -178,6 +159,51 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			commandStringBuilder.Append("END");
 			commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
 			return ResultSetMapping.LastInResultSet;
+		}
+
+		// workaround for GenerateBlockParameterName
+		protected override void AppendUpdateCommandHeader(StringBuilder commandStringBuilder, string name, string schema, IReadOnlyList<ColumnModification> operations)
+		{
+			commandStringBuilder.Append("UPDATE ");
+			SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, name, schema);
+			commandStringBuilder.Append(" SET ")
+				.AppendJoin(
+					operations,
+					SqlGenerationHelper,
+					(sb, o, helper) =>
+					{
+						helper.DelimitIdentifier(sb, o.ColumnName);
+						sb.Append(" = ");
+						if (!o.UseCurrentValueParameter)
+						{
+							AppendSqlLiteral(sb, o.Value, o.Property);
+						}
+						else
+						{
+							((IFbSqlGenerationHelper)helper).GenerateBlockParameterName(sb, o.ParameterName);
+						}
+					});
+		}
+
+		// workaround for GenerateBlockParameterName
+		protected override void AppendWhereCondition(StringBuilder commandStringBuilder, ColumnModification columnModification, bool useOriginalValue)
+		{
+			SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, columnModification.ColumnName);
+			if ((useOriginalValue ? columnModification.OriginalValue : columnModification.Value) == null)
+			{
+				commandStringBuilder.Append(" IS NULL");
+				return;
+			}
+
+			commandStringBuilder.Append(" = ");
+			if (!columnModification.UseCurrentValueParameter && !columnModification.UseOriginalValueParameter)
+			{
+				AppendSqlLiteral(commandStringBuilder, columnModification.Value, columnModification.Property);
+			}
+			else
+			{
+				((IFbSqlGenerationHelper)SqlGenerationHelper).GenerateBlockParameterName(commandStringBuilder, useOriginalValue ? columnModification.OriginalParameterName : columnModification.ParameterName);
+			}
 		}
 
 		string GetColumnType(ColumnModification column)
@@ -208,6 +234,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			builder.Append(SqlGenerationHelper.DelimitIdentifier(name));
 			builder.Append(" FROM RDB$DATABASE");
 			return builder.ToString();
+		}
+
+		/*override*/ void AppendSqlLiteral(StringBuilder commandStringBuilder, object value, IProperty property)
+		{
+			var mapping = property != null
+				? Dependencies.TypeMappingSource.FindMapping(property)
+				: null;
+			mapping ??= Dependencies.TypeMappingSource.GetMappingForValue(value);
+			commandStringBuilder.Append(mapping.GenerateProviderValueSqlLiteral(value));
 		}
 	}
 }

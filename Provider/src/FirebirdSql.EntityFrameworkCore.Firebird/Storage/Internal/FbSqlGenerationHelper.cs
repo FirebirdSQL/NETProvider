@@ -23,19 +23,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
 	public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenerationHelper
 	{
-		public string ParameterNameMarker { get; set; }
-
 		public FbSqlGenerationHelper(RelationalSqlGenerationHelperDependencies dependencies)
 			: base(dependencies)
-		{
-			ParameterNameMarker = "@";
-		}
-
-		public override string GenerateParameterName(string name)
-			=> name.StartsWith(ParameterNameMarker, StringComparison.Ordinal) ? name : ParameterNameMarker + name;
-
-		public override void GenerateParameterName(StringBuilder builder, string name)
-			=> builder.Append(name.StartsWith(ParameterNameMarker, StringComparison.Ordinal) ? string.Empty : ParameterNameMarker).Append(name);
+		{ }
 
 		public virtual string StringLiteralQueryType(string s)
 		{
@@ -47,6 +37,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		public virtual string StringParameterQueryType()
 		{
 			return $"VARCHAR({FbTypeMappingSource.VarcharMaxSize})";
+		}
+
+		public virtual void GenerateBlockParameterName(StringBuilder builder, string name)
+		{
+			builder.Append(":").Append(name);
 		}
 
 		static int MinimumStringQueryTypeLength(string s)
