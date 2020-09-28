@@ -33,13 +33,12 @@ namespace Perf
 			public Config()
 			{
 				var baseJob = Job.Default
-					.With(CsProjCoreToolchain.Current.Value)
-					.With(Platform.X64)
-					.With(Jit.RyuJit)
-					.With(Runtime.Core);
-				Add(MemoryDiagnoser.Default);
-				Add(baseJob.WithCustomBuildConfiguration("Release").WithId("Project"));
-				Add(baseJob.WithCustomBuildConfiguration("ReleaseNuGet").WithId("NuGet").AsBaseline());
+					.WithToolchain(CsProjCoreToolchain.NetCoreApp31)
+					.WithPlatform(Platform.X64)
+					.WithJit(Jit.RyuJit);
+				AddDiagnoser(MemoryDiagnoser.Default);
+				AddJob(baseJob.WithCustomBuildConfiguration("Release").WithId("Project"));
+				AddJob(baseJob.WithCustomBuildConfiguration("ReleaseNuGet").WithId("NuGet").AsBaseline());
 			}
 		}
 
