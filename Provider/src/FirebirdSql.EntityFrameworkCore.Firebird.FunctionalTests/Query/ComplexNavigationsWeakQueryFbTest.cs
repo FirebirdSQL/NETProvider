@@ -935,5 +935,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.Project_collection_navigation_nested_with_take(isAsync);
 		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task SelectMany_with_outside_reference_to_joined_table_correctly_translated_to_apply(bool isAsync)
+		{
+			return base.SelectMany_with_outside_reference_to_joined_table_correctly_translated_to_apply(isAsync);
+		}
 	}
 }
