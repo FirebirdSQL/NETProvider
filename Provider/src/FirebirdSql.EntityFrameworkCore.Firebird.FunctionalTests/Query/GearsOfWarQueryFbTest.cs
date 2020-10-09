@@ -230,5 +230,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.Take_without_orderby_followed_by_orderBy_is_pushed_down2(isAsync);
 		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task DateTimeOffset_Date_returns_datetime(bool isAsync)
+		{
+			return base.DateTimeOffset_Date_returns_datetime(isAsync);
+		}
 	}
 }
