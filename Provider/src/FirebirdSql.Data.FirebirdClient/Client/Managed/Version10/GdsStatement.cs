@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
@@ -296,7 +295,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						var hasOperation = true;
 						while (!_allRowsFetched)
 						{
-#warning Possible refactoring to have smoother code for ReadResponse
 							var response = hasOperation ? _database.ReadResponse(operation) : _database.ReadResponse();
 							hasOperation = false;
 							if (response is FetchResponse fetchResponse)
@@ -837,9 +835,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						break;
 
 					case DbDataType.Dec16:
+						xdr.Write(field.DbValue.GetDec16(), 16);
+						break;
+
 					case DbDataType.Dec34:
+						xdr.Write(field.DbValue.GetDec34(), 34);
+						break;
+
 					case DbDataType.Int128:
-#warning DECFLOAT
+						xdr.Write(field.DbValue.GetInt128());
 						break;
 
 					default:
@@ -848,7 +852,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected object ReadRawValue(DbField field)
+		protected object ReadRawValue(IXdrReader xdr, DbField field)
 		{
 			var innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
 
@@ -857,11 +861,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				case DbDataType.Char:
 					if (field.Charset.IsOctetsCharset)
 					{
-						return _database.Xdr.ReadOpaque(field.Length);
+						return xdr.ReadOpaque(field.Length);
 					}
 					else
 					{
-						var s = _database.Xdr.ReadString(innerCharset, field.Length);
+						var s = xdr.ReadString(innerCharset, field.Length);
 						if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
 							s.Length > field.CharCount)
 						{
@@ -876,67 +880,70 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				case DbDataType.VarChar:
 					if (field.Charset.IsOctetsCharset)
 					{
-						return _database.Xdr.ReadBuffer();
+						return xdr.ReadBuffer();
 					}
 					else
 					{
-						return _database.Xdr.ReadString(innerCharset);
+						return xdr.ReadString(innerCharset);
 					}
 
 				case DbDataType.SmallInt:
-					return _database.Xdr.ReadInt16();
+					return xdr.ReadInt16();
 
 				case DbDataType.Integer:
-					return _database.Xdr.ReadInt32();
+					return xdr.ReadInt32();
 
 				case DbDataType.Array:
 				case DbDataType.Binary:
 				case DbDataType.Text:
 				case DbDataType.BigInt:
-					return _database.Xdr.ReadInt64();
+					return xdr.ReadInt64();
 
 				case DbDataType.Decimal:
 				case DbDataType.Numeric:
-					return _database.Xdr.ReadDecimal(field.DataType, field.NumericScale);
+					return xdr.ReadDecimal(field.DataType, field.NumericScale);
 
 				case DbDataType.Float:
-					return _database.Xdr.ReadSingle();
+					return xdr.ReadSingle();
 
 				case DbDataType.Guid:
-					return _database.Xdr.ReadGuid();
+					return xdr.ReadGuid();
 
 				case DbDataType.Double:
-					return _database.Xdr.ReadDouble();
+					return xdr.ReadDouble();
 
 				case DbDataType.Date:
-					return _database.Xdr.ReadDate();
+					return xdr.ReadDate();
 
 				case DbDataType.Time:
-					return _database.Xdr.ReadTime();
+					return xdr.ReadTime();
 
 				case DbDataType.TimeStamp:
-					return _database.Xdr.ReadDateTime();
+					return xdr.ReadDateTime();
 
 				case DbDataType.Boolean:
-					return _database.Xdr.ReadBoolean();
+					return xdr.ReadBoolean();
 
 				case DbDataType.TimeStampTZ:
-					return _database.Xdr.ReadZonedDateTime(false);
+					return xdr.ReadZonedDateTime(false);
 
 				case DbDataType.TimeStampTZEx:
-					return _database.Xdr.ReadZonedDateTime(true);
+					return xdr.ReadZonedDateTime(true);
 
 				case DbDataType.TimeTZ:
-					return _database.Xdr.ReadZonedTime(false);
+					return xdr.ReadZonedTime(false);
 
 				case DbDataType.TimeTZEx:
-					return _database.Xdr.ReadZonedTime(true);
+					return xdr.ReadZonedTime(true);
 
 				case DbDataType.Dec16:
+					return xdr.ReadDec16();
+
 				case DbDataType.Dec34:
+					return xdr.ReadDec34();
+
 				case DbDataType.Int128:
-#warning DECFLOAT
-					return default;
+					return xdr.ReadInt128();
 
 				default:
 					throw TypeHelper.InvalidDataType((int)field.DbDataType);
@@ -998,7 +1005,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				for (var i = 0; i < _fields.Count; i++)
 				{
-					var value = ReadRawValue(_fields[i]);
+					var value = ReadRawValue(_database.Xdr, _fields[i]);
 					var sqlInd = _database.Xdr.ReadInt32();
 					if (sqlInd == -1)
 					{

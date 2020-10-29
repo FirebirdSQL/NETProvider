@@ -18,6 +18,8 @@
 using System;
 using System.Globalization;
 using System.Net;
+using System.Numerics;
+using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Common
 {
@@ -107,6 +109,33 @@ namespace FirebirdSql.Data.Common
 		public static long DecodeInt64(byte[] value)
 		{
 			return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(value, 0));
+		}
+
+		public static FbDecFloat DecodeDec16(byte[] value)
+		{
+			if (BitConverter.IsLittleEndian)
+			{
+				Array.Reverse(value);
+			}
+			return DecimalCodec.DecFloat16.ParseBytes(value);
+		}
+
+		public static FbDecFloat DecodeDec34(byte[] value)
+		{
+			if (BitConverter.IsLittleEndian)
+			{
+				Array.Reverse(value);
+			}
+			return DecimalCodec.DecFloat34.ParseBytes(value);
+		}
+
+		public static BigInteger DecodeInt128(byte[] value)
+		{
+			if (BitConverter.IsLittleEndian)
+			{
+				Array.Reverse(value);
+			}
+			return Int128Helper.GetInt128(value);
 		}
 	}
 }

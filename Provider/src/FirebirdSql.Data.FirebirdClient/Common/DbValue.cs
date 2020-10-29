@@ -17,6 +17,7 @@
 
 using System;
 using System.Globalization;
+using System.Numerics;
 using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Common
@@ -198,6 +199,21 @@ namespace FirebirdSql.Data.Common
 				}
 			}
 			throw new InvalidOperationException($"Incorrect time zone value.");
+		}
+
+		public FbDecFloat GetDec16()
+		{
+			return (FbDecFloat)_value;
+		}
+
+		public FbDecFloat GetDec34()
+		{
+			return (FbDecFloat)_value;
+		}
+
+		public BigInteger GetInt128()
+		{
+			return (BigInteger)_value;
 		}
 
 		public byte[] GetBytes()
@@ -388,10 +404,13 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case DbDataType.Dec16:
+					return DecimalCodec.DecFloat16.EncodeDecimal(GetDec16());
+
 				case DbDataType.Dec34:
+					return DecimalCodec.DecFloat34.EncodeDecimal(GetDec34());
+
 				case DbDataType.Int128:
-#warning DECFLOAT
-					return default;
+					return Int128Helper.GetBytes(GetInt128());
 
 				default:
 					throw TypeHelper.InvalidDataType((int)Field.DbDataType);

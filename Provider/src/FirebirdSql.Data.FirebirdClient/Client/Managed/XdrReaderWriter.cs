@@ -19,6 +19,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Types;
@@ -199,6 +200,21 @@ namespace FirebirdSql.Data.Client.Managed
 		public FbZonedTime ReadZonedTime(bool isExtended)
 		{
 			return TypeHelper.CreateZonedTime(ReadTime(), (ushort)ReadInt16(), isExtended ? ReadInt16() : (short?)null);
+		}
+
+		public FbDecFloat ReadDec16()
+		{
+			return TypeDecoder.DecodeDec16(ReadOpaque(8));
+		}
+
+		public FbDecFloat ReadDec34()
+		{
+			return TypeDecoder.DecodeDec34(ReadOpaque(16));
+		}
+
+		public BigInteger ReadInt128()
+		{
+			return TypeDecoder.DecodeInt128(ReadOpaque(16));
 		}
 
 		public IscException ReadStatusVector()
@@ -384,6 +400,21 @@ namespace FirebirdSql.Data.Client.Managed
 		public void Write(Guid value)
 		{
 			WriteOpaque(TypeEncoder.EncodeGuid(value));
+		}
+
+		public void Write(FbDecFloat value, int size)
+		{
+			WriteOpaque(size switch
+			{
+				16 => TypeEncoder.EncodeDec16(value),
+				34 => TypeEncoder.EncodeDec34(value),
+				_ => throw new ArgumentOutOfRangeException(),
+			});
+		}
+
+		public void Write(BigInteger value)
+		{
+			WriteOpaque(TypeEncoder.EncodeInt128(value));
 		}
 
 		public void WriteDate(DateTime value)

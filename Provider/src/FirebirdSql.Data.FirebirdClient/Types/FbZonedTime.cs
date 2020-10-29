@@ -71,19 +71,10 @@ namespace FirebirdSql.Data.Types
 			}
 		}
 
-		public bool Equals(FbZonedTime other)
-		{
-			return Time.Equals(other.Time) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
-		}
+		public bool Equals(FbZonedTime other) => Time.Equals(other.Time) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
 
-		public static bool operator ==(FbZonedTime lhs, FbZonedTime rhs)
-		{
-			return lhs.Equals(rhs);
-		}
+		public static bool operator ==(FbZonedTime lhs, FbZonedTime rhs) => lhs.Equals(rhs);
 
-		public static bool operator !=(FbZonedTime lhs, FbZonedTime rhs)
-		{
-			return lhs.Equals(rhs);
-		}
+		public static bool operator !=(FbZonedTime lhs, FbZonedTime rhs) => lhs.Equals(rhs);
 	}
 }

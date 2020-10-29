@@ -248,7 +248,9 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 				case IscCodes.SQL_TIMESTAMP_TZ_EX:
 				case IscCodes.SQL_TIME_TZ:
 				case IscCodes.SQL_TIME_TZ_EX:
-#warning More types (DEFLOAT)
+				case IscCodes.SQL_DEC16:
+				case IscCodes.SQL_DEC34:
+				case IscCodes.SQL_INT128:
 					{
 						var buffer = new byte[xsqlvar.sqllen];
 						Marshal.Copy(xsqlvar.sqldata, buffer, 0, buffer.Length);

@@ -16,6 +16,8 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Numerics;
+using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Client.Managed
 {
@@ -39,6 +41,8 @@ namespace FirebirdSql.Data.Client.Managed
 		void Write(bool value);
 		void Write(DateTime value);
 		void Write(Guid value);
+		void Write(FbDecFloat value, int size);
+		void Write(BigInteger value);
 		void WriteDate(DateTime value);
 		void WriteTime(TimeSpan value);
 	}

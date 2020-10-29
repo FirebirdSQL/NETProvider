@@ -446,7 +446,7 @@ namespace FirebirdSql.Data.Common
 						{
 							var time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 0));
 							var tzId = BitConverter.ToUInt16(buffer, 4);
-							Value =  TypeHelper.CreateZonedTime(time, tzId, null);
+							Value = TypeHelper.CreateZonedTime(time, tzId, null);
 							break;
 						}
 
@@ -460,9 +460,15 @@ namespace FirebirdSql.Data.Common
 						}
 
 					case IscCodes.SQL_DEC16:
+						Value = DecimalCodec.DecFloat16.ParseBytes(buffer);
+						break;
+
 					case IscCodes.SQL_DEC34:
+						Value = DecimalCodec.DecFloat34.ParseBytes(buffer);
+						break;
+
 					case IscCodes.SQL_INT128:
-#warning DECFLOAT
+						Value = Int128Helper.GetInt128(buffer);
 						break;
 
 					default:
@@ -539,7 +545,7 @@ namespace FirebirdSql.Data.Common
 
 					case DbDataType.Dec16:
 					case DbDataType.Dec34:
-						Value = new FbDecFloat(0);
+						Value = new FbDecFloat(0, 0);
 						break;
 
 					case DbDataType.Int128:

@@ -16,8 +16,10 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Client.Managed
 {
@@ -43,6 +45,11 @@ namespace FirebirdSql.Data.Client.Managed
 		TimeSpan ReadTime();
 		decimal ReadDecimal(int type, int scale);
 		bool ReadBoolean();
+		FbZonedDateTime ReadZonedDateTime(bool isExtended);
+		FbZonedTime ReadZonedTime(bool isExtended);
+		FbDecFloat ReadDec16();
+		FbDecFloat ReadDec34();
+		BigInteger ReadInt128();
 		IscException ReadStatusVector();
 		int ReadOperation();
 		Task<int> ReadOperationAsync();

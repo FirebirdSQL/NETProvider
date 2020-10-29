@@ -103,7 +103,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						}
 						else
 						{
-							var value = ReadRawValue(_fields[i]);
+							var value = ReadRawValue(_database.Xdr, _fields[i]);
 							row[i] = new DbValue(this, _fields[i], value);
 						}
 					}
