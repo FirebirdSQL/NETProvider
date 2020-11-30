@@ -35,6 +35,7 @@ namespace FirebirdSql.Data.Schema
 
 		public FbSchema()
 		{
+			this.MajorVersionNumber = 0;
 		}
 
 		#endregion
@@ -74,6 +75,7 @@ namespace FirebirdSql.Data.Schema
 
 		protected FbCommand BuildCommand(FbConnection connection, string collectionName, string[] restrictions)
 		{
+			SetMajorVersionNumber(connection);
 			var filter = string.Format("CollectionName='{0}'", collectionName);
 			var builder = GetCommandText(restrictions);
 			var restriction = connection.GetSchema(DbMetaDataCollectionNames.Restrictions).Select(filter);
@@ -103,6 +105,7 @@ namespace FirebirdSql.Data.Schema
 			return command;
 		}
 
+
 		protected virtual DataTable ProcessResult(DataTable schema)
 		{
 			return schema;
@@ -114,6 +117,25 @@ namespace FirebirdSql.Data.Schema
 		}
 
 		#endregion
+
+		#region Private Methods
+		/// <summary>
+		/// Determines the major version number from the Serverversion on the inner connection.
+		/// </summary>
+		/// <param name="connection">an open connection, which is used to determine the version number of the connected database server</param>
+		private void SetMajorVersionNumber(FbConnection connection)
+		{
+			var versionAsString = connection?.InnerConnection?.Database?.ServerVersion ?? string.Empty;
+			if(string.IsNullOrEmpty(versionAsString))
+			{
+				return;
+			}
+
+			var fragments = versionAsString.Split('.');
+			this.MajorVersionNumber = Convert.ToInt32(fragments[0]);
+		}
+		#endregion
+
 
 		#region Private Static Methods
 
@@ -137,6 +159,13 @@ namespace FirebirdSql.Data.Schema
 			schema.AcceptChanges();
 		}
 
+		#endregion
+
+		#region Properties
+		/// <summary>
+		/// The major version of the connected Firebird server
+		/// </summary>
+		protected int MajorVersionNumber { get; set; }
 		#endregion
 	}
 }
