@@ -36,7 +36,6 @@ namespace FirebirdSql.Data.Schema
 
 		public FbSchema()
 		{
-			MajorVersionNumber = 0;
 		}
 
 		#endregion

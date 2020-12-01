@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Schema
 			var where = new StringBuilder();
 
 			sql.Append(
-					@"SELECT
+				@"SELECT
 					null AS TABLE_CATALOG,
 					null AS TABLE_SCHEMA,
 					rfr.rdb$relation_name AS TABLE_NAME,
@@ -123,7 +123,7 @@ namespace FirebirdSql.Data.Schema
 			schema.BeginLoadData();
 			schema.Columns.Add("IS_NULLABLE", typeof(bool));
 			schema.Columns.Add("IS_ARRAY", typeof(bool));
-			if(MajorVersionNumber >= 3)
+			if (MajorVersionNumber >= 3)
 			{
 				schema.Columns.Add("IS_IDENTITY", typeof(bool));
 			}
