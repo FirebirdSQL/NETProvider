@@ -32,14 +32,6 @@ namespace FirebirdSql.Data.Schema
 
 	internal abstract class FbSchema
 	{
-		#region Constructors
-
-		public FbSchema()
-		{
-		}
-
-		#endregion
-
 		#region Abstract Methods
 
 		protected abstract StringBuilder GetCommandText(string[] restrictions);
