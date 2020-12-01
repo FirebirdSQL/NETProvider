@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Services;
 
 namespace FirebirdSql.Data.Schema
 {
@@ -35,7 +36,7 @@ namespace FirebirdSql.Data.Schema
 
 		public FbSchema()
 		{
-			this.MajorVersionNumber = 0;
+			MajorVersionNumber = 0;
 		}
 
 		#endregion
@@ -125,14 +126,8 @@ namespace FirebirdSql.Data.Schema
 		/// <param name="connection">an open connection, which is used to determine the version number of the connected database server</param>
 		private void SetMajorVersionNumber(FbConnection connection)
 		{
-			var versionAsString = connection?.InnerConnection?.Database?.ServerVersion ?? string.Empty;
-			if(string.IsNullOrEmpty(versionAsString))
-			{
-				return;
-			}
-
-			var fragments = versionAsString.Split('.');
-			this.MajorVersionNumber = Convert.ToInt32(fragments[0]);
+			var serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
+			MajorVersionNumber = serverVersion.Major;
 		}
 		#endregion
 
@@ -165,7 +160,7 @@ namespace FirebirdSql.Data.Schema
 		/// <summary>
 		/// The major version of the connected Firebird server
 		/// </summary>
-		protected int MajorVersionNumber { get; set; }
+		protected int MajorVersionNumber { get; private set; }
 		#endregion
 	}
 }
