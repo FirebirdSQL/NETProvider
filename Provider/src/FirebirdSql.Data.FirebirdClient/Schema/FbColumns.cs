@@ -64,7 +64,13 @@ namespace FirebirdSql.Data.Schema
 					null AS COLLATION_CATALOG,
 					null AS COLLATION_SCHEMA,
 					coll.rdb$collation_name AS COLLATION_NAME,
-					rfr.rdb$description AS DESCRIPTION
+					rfr.rdb$description AS DESCRIPTION");
+			if (MajorVersionNumber >= 3)
+			{
+				sql.Append(@",
+					rfr.rdb$identity_type as IDENTITY_TYPE");
+			}
+			sql.Append(@"
 				FROM rdb$relation_fields rfr
 				    LEFT JOIN rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name
 				    LEFT JOIN rdb$character_sets cs ON cs.rdb$character_set_id = fld.rdb$character_set_id
@@ -117,6 +123,10 @@ namespace FirebirdSql.Data.Schema
 			schema.BeginLoadData();
 			schema.Columns.Add("IS_NULLABLE", typeof(bool));
 			schema.Columns.Add("IS_ARRAY", typeof(bool));
+			if (MajorVersionNumber >= 3)
+			{
+				schema.Columns.Add("IS_IDENTITY", typeof(bool));
+			}
 
 			foreach (DataRow row in schema.Rows)
 			{
@@ -175,6 +185,11 @@ namespace FirebirdSql.Data.Schema
 				{
 					row["DOMAIN_NAME"] = null;
 				}
+
+				if (MajorVersionNumber >= 3)
+				{
+					row["IS_IDENTITY"] = (row["IDENTITY_TYPE"] != DBNull.Value);
+				}
 			}
 
 			schema.EndLoadData();
@@ -185,6 +200,10 @@ namespace FirebirdSql.Data.Schema
 			schema.Columns.Remove("COLUMN_ARRAY");
 			schema.Columns.Remove("FIELD_TYPE");
 			schema.Columns.Remove("CHARACTER_MAX_LENGTH");
+			if (MajorVersionNumber >= 3)
+			{
+				schema.Columns.Remove("IDENTITY_TYPE");
+			}
 
 			return schema;
 		}
