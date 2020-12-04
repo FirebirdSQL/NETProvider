@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Fields
 
-		private FirebirdNetworkStream  _firebirdNetworkStream;
+		private FirebirdNetworkStream _firebirdNetworkStream;
 		private string _userID;
 		private string _dataSource;
 		private int _portNumber;
@@ -42,6 +42,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private Charset _charset;
 		private bool _compression;
 		private WireCryptOption _wireCrypt;
+		private int _timeout;
 
 		#endregion
 
@@ -65,7 +66,7 @@ namespace FirebirdSql.Data.Client.Managed
 			: this(null, null, dataSource, port, 8192, Charset.DefaultCharset, false, WireCryptOption.Enabled)
 		{ }
 
-		public GdsConnection(string userID, string password, string dataSource, int portNumber, int packetSize, Charset charset, bool compression, WireCryptOption wireCrypt)
+		public GdsConnection(string userID, string password, string dataSource, int portNumber, int packetSize, Charset charset, bool compression, WireCryptOption wireCrypt, int timeout = 15)
 		{
 			_userID = userID;
 			Password = password;
@@ -75,6 +76,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_charset = charset;
 			_compression = compression;
 			_wireCrypt = wireCrypt;
+			_timeout = timeout;
 		}
 
 		#endregion
@@ -94,10 +96,26 @@ namespace FirebirdSql.Data.Client.Managed
 				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
 				socket.TrySetKeepAlive(KeepAliveTime, KeepAliveInterval);
 				socket.TryEnableLoopbackFastPath();
-				socket.Connect(endPoint);
 
-				_firebirdNetworkStream = new FirebirdNetworkStream(new NetworkStream(socket, true));
-				Xdr = new XdrReaderWriter(_firebirdNetworkStream, _charset);
+#if NETSTANDARD1_6
+				socket.Connect(endPoint);
+#else
+				IAsyncResult result = socket.BeginConnect(endPoint, null, null);
+
+				result.AsyncWaitHandle.WaitOne(_timeout * 1000, true);
+
+				if (socket.Connected)
+				{
+					socket.EndConnect(result);
+					_firebirdNetworkStream = new FirebirdNetworkStream(new NetworkStream(socket, true));
+					Xdr = new XdrReaderWriter(_firebirdNetworkStream, _charset);
+				}
+				else
+				{
+					socket.Close();
+					throw IscException.ForTypeErrorCodeStrParam(IscCodes.isc_arg_gds, IscCodes.isc_network_error, _dataSource);
+				}
+#endif
 			}
 			catch (SocketException ex)
 			{

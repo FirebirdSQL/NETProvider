@@ -53,7 +53,7 @@ namespace FirebirdSql.Data.Client
 
 		private static IDatabase CreateManagedDatabase(ConnectionString options)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt), options.ConnectionTimeout);
 			connection.Connect();
 			connection.Identify(options.Database);
 			switch (connection.ProtocolVersion)
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Client
 
 		private static IServiceManager CreateManagedServiceManager(ConnectionString options)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt), options.ConnectionTimeout);
 			connection.Connect();
 			connection.Identify(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty);
 			switch (connection.ProtocolVersion)
