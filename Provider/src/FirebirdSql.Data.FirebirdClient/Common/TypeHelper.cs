@@ -404,6 +404,7 @@ namespace FirebirdSql.Data.Common
 			{
 				return FbDbType.VarChar;
 			}
+
 			if (type == typeof(System.String))
 			{
 				return FbDbType.VarChar;
