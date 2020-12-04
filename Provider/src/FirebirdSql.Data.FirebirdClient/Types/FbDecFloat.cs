@@ -137,13 +137,13 @@ namespace FirebirdSql.Data.Types
 			{
 				var difference = other.Exponent - Exponent;
 				var value = other.Coefficient * BigInteger.Pow(10, difference);
-				return value == Coefficient;
+				return value.Equals(Coefficient);
 			}
 			if (Exponent > other.Exponent)
 			{
 				var difference = Exponent - other.Exponent;
 				var value = Coefficient * BigInteger.Pow(10, difference);
-				return value == other.Coefficient;
+				return value.Equals(other.Coefficient);
 			}
 			return false;
 		}
