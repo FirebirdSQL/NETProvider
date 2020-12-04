@@ -22,7 +22,6 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Types
 {
-#warning explicit operators *to* int/double/...?
 	public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 	{
 		internal DecimalType Type { get; }
