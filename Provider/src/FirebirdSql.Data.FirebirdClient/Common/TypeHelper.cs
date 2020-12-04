@@ -395,6 +395,11 @@ namespace FirebirdSql.Data.Common
 
 		public static FbDbType GetFbDataTypeFromType(Type type)
 		{
+			if (type.IsEnum)
+			{
+				return GetFbDataTypeFromType(Enum.GetUnderlyingType(type));
+			}
+
 			if (type == typeof(System.String) || type == typeof(System.DBNull))
 			{
 				return FbDbType.VarChar;
