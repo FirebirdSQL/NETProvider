@@ -400,7 +400,11 @@ namespace FirebirdSql.Data.Common
 				return GetFbDataTypeFromType(Enum.GetUnderlyingType(type));
 			}
 
-			if (type == typeof(System.String) || type == typeof(System.DBNull))
+			if (type == typeof(System.DBNull))
+			{
+				return FbDbType.VarChar;
+			}
+			if (type == typeof(System.String))
 			{
 				return FbDbType.VarChar;
 			}
