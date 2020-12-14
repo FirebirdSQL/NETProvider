@@ -18,7 +18,7 @@
 using FirebirdSql.Data.Common;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.UnitTests
+namespace FirebirdSql.Data.FirebirdClient.Tests
 {
 	public class ConnectionPoolLifetimeHelperTests
 	{
