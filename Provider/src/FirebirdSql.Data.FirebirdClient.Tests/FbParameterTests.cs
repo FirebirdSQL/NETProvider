@@ -17,25 +17,12 @@
 
 using System;
 using System.Data;
-using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
-	[TestFixtureSource(typeof(FbEmbeddedServerTypeTestFixtureSource))]
-	public class FbParameterTests : FbTestsBase
+	public class FbParameterTests
 	{
-		#region Constructors
-
-		public FbParameterTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
-
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
 		public void ConstructorsTest()
 		{
@@ -87,6 +74,20 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			Assert.AreEqual(p1.Value, p.Value);
 		}
 
-		#endregion
+		[Test]
+		public void FbDbTypeFromEnumAsValueTest()
+		{
+			var p = new FbParameter();
+			p.Value = FbServerType.Embedded;
+			Assert.AreEqual(FbDbType.Integer, p.FbDbType);
+		}
+
+		[Test]
+		public void FbDbTypeFromDBNullAsValueTest()
+		{
+			var p = new FbParameter();
+			p.Value = DBNull.Value;
+			Assert.AreEqual(FbDbType.VarChar, p.FbDbType);
+		}
 	}
 }
