@@ -21,7 +21,7 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	public class FbDecFloatTests
+	public class FbDecFloatTypeTests
 	{
 		static readonly object[] SimpleEqualityTrueSource = new object[]
 		{

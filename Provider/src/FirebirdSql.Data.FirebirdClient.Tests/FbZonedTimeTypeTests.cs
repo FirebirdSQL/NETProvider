@@ -21,7 +21,7 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	public class FbZonedTimeTests
+	public class FbZonedTimeTypeTests
 	{
 		static readonly object[] SimpleEqualityTrueSource = new object[]
 		{
