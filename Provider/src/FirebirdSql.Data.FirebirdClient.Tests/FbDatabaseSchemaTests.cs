@@ -193,7 +193,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			tables = Connection.GetSchema("Tables", new string[] { null, null, null, "TABLE" });
 
-			Assert.AreEqual(4, tables.Rows.Count);
+			Assert.AreEqual(3, tables.Rows.Count);
 		}
 
 		[Test]

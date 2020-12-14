@@ -143,49 +143,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void PrepareTest()
-		{
-			var command = new FbCommand("insert into PrepareTest(test_field) values(@test_field);", Connection);
-
-			command.Parameters.Add("@test_field", FbDbType.VarChar).Value = DBNull.Value;
-			command.Prepare();
-
-			for (var i = 0; i < 5; i++)
-			{
-				if (i < 1)
-				{
-					command.Parameters[0].Value = DBNull.Value;
-				}
-				else
-				{
-					command.Parameters[0].Value = i.ToString();
-				}
-				command.ExecuteNonQuery();
-			}
-
-			command.Dispose();
-
-			var select = new FbCommand("select * from	PrepareTest", Connection);
-			var reader = select.ExecuteReader();
-			var count = 0;
-			while (reader.Read())
-			{
-				if (count == 0)
-				{
-					Assert.AreEqual(DBNull.Value, reader[0], "Invalid value.");
-				}
-				else
-				{
-					Assert.AreEqual(count, reader.GetInt32(0), "Invalid	value.");
-				}
-
-				count++;
-			}
-			reader.Close();
-			select.Dispose();
-		}
-
-		[Test]
 		public void NamedParametersTest()
 		{
 			var command = Connection.CreateCommand();

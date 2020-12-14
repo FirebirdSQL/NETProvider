@@ -112,11 +112,6 @@ public class FbTestsSetup
 				command.ExecuteNonQuery();
 			}
 
-			using (var command = new FbCommand("recreate table PrepareTest(test_field varchar(20));", connection))
-			{
-				command.ExecuteNonQuery();
-			}
-
 			using (var command = new FbCommand("recreate table log(occured timestamp, text varchar(20));", connection))
 			{
 				command.ExecuteNonQuery();
