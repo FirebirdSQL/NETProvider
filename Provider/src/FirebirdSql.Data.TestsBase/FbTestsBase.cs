@@ -135,7 +135,7 @@ values(@int_field, @char_field, @varchar_field, @bigint_field, @smallint_field, 
 							command.Parameters["@bigint_field"].Value = i;
 							command.Parameters["@smallint_field"].Value = i;
 							command.Parameters["@float_field"].Value = (float)(i + 10) / 5;
-							command.Parameters["@double_field"].Value = Math.Log(i, 10);
+							command.Parameters["@double_field"].Value = (double)(i + 10) / 5;
 							command.Parameters["@numeric_field"].Value = (decimal)(i + 10) / 5;
 							command.Parameters["@date_field"].Value = DateTime.Now;
 							command.Parameters["@time_field"].Value = DateTime.Now;
