@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Globalization;
 using System.Numerics;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
@@ -55,7 +56,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			using (var cmd = Connection.CreateCommand())
 			{
-				cmd.CommandText = $"select cast({value} as int128) from rdb$database";
+				var svalue = value.ToString(CultureInfo.InvariantCulture);
+				cmd.CommandText = $"select cast({svalue} as int128) from rdb$database";
 				var result = (BigInteger)cmd.ExecuteScalar();
 				Assert.AreEqual(value, result);
 			}
