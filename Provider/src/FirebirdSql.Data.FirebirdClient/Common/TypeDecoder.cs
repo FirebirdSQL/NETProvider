@@ -16,7 +16,6 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Globalization;
 using System.Net;
 using System.Numerics;
 using FirebirdSql.Data.Types;
@@ -27,25 +26,30 @@ namespace FirebirdSql.Data.Common
 	{
 		public static decimal DecodeDecimal(object value, int scale, int sqltype)
 		{
-			long divisor = 1;
-			var returnValue = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
-
-			if (scale < 0)
-			{
-				divisor = (long)Math.Pow(10, -scale);
-			}
+			var shift = scale < 0 ? -scale : 1;
 
 			switch (sqltype & ~1)
 			{
 				case IscCodes.SQL_SHORT:
+					return DecimalShiftHelper.ShiftDecimalLeft((decimal)(short)value, shift);
+
 				case IscCodes.SQL_LONG:
+					return DecimalShiftHelper.ShiftDecimalLeft((decimal)(int)value, shift);
+
 				case IscCodes.SQL_QUAD:
 				case IscCodes.SQL_INT64:
-					returnValue = returnValue / divisor;
-					break;
-			}
+					return DecimalShiftHelper.ShiftDecimalLeft((decimal)(long)value, shift);
 
-			return returnValue;
+				case IscCodes.SQL_DOUBLE:
+				case IscCodes.SQL_D_FLOAT:
+					return (decimal)(double)value;
+
+				case IscCodes.SQL_INT128:
+					return DecimalShiftHelper.ShiftDecimalLeft((decimal)(BigInteger)value, shift);
+
+				default:
+					throw new ArgumentOutOfRangeException(nameof(sqltype), $"{nameof(sqltype)}={sqltype}");
+			}
 		}
 
 		public static TimeSpan DecodeTime(int sqlTime)

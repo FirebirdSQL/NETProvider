@@ -362,7 +362,7 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					case IscCodes.SQL_LONG:
-						if (NumericScale < 0)
+						if (_numericScale < 0)
 						{
 							Value = TypeDecoder.DecodeDecimal(
 								BitConverter.ToInt32(buffer, 0),
@@ -388,7 +388,7 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.SQL_INT64:
 					case IscCodes.SQL_BLOB:
 					case IscCodes.SQL_ARRAY:
-						if (NumericScale < 0)
+						if (_numericScale < 0)
 						{
 							Value = TypeDecoder.DecodeDecimal(
 								BitConverter.ToInt64(buffer, 0),
@@ -468,7 +468,17 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					case IscCodes.SQL_INT128:
-						Value = Int128Helper.GetInt128(buffer);
+						if (_numericScale < 0)
+						{
+							Value = TypeDecoder.DecodeDecimal(
+								Int128Helper.GetInt128(buffer),
+								_numericScale,
+								_dataType);
+						}
+						else
+						{
+							Value = Int128Helper.GetInt128(buffer);
+						}
 						break;
 
 					default:

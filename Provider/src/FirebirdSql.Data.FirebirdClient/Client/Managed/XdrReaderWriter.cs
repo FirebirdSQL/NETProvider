@@ -179,7 +179,9 @@ namespace FirebirdSql.Data.Client.Managed
 					return TypeDecoder.DecodeDecimal(ReadInt64(), scale, type);
 				case IscCodes.SQL_DOUBLE:
 				case IscCodes.SQL_D_FLOAT:
-					return Convert.ToDecimal(ReadDouble());
+					return TypeDecoder.DecodeDecimal(ReadDouble(), scale, type);
+				case IscCodes.SQL_INT128:
+					return TypeDecoder.DecodeDecimal(ReadInt128(), scale, type);
 				default:
 					throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
 			}
@@ -379,7 +381,10 @@ namespace FirebirdSql.Data.Client.Managed
 					break;
 				case IscCodes.SQL_DOUBLE:
 				case IscCodes.SQL_D_FLOAT:
-					Write((double)value);
+					Write((double)numeric);
+					break;
+				case IscCodes.SQL_INT128:
+					Write((BigInteger)numeric);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");

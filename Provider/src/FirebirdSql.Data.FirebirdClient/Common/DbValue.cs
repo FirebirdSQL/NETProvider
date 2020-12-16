@@ -430,12 +430,16 @@ namespace FirebirdSql.Data.Common
 				case IscCodes.SQL_LONG:
 					return BitConverter.GetBytes((int)numeric);
 
-				case IscCodes.SQL_INT64:
 				case IscCodes.SQL_QUAD:
+				case IscCodes.SQL_INT64:
 					return BitConverter.GetBytes((long)numeric);
 
 				case IscCodes.SQL_DOUBLE:
-					return BitConverter.GetBytes(GetDouble());
+				case IscCodes.SQL_D_FLOAT:
+					return BitConverter.GetBytes((double)numeric);
+
+				case IscCodes.SQL_INT128:
+					return Int128Helper.GetBytes((BigInteger)numeric);
 
 				default:
 					return null;

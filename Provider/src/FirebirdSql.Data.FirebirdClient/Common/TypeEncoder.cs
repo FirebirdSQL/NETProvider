@@ -27,28 +27,29 @@ namespace FirebirdSql.Data.Common
 	{
 		public static object EncodeDecimal(decimal d, int scale, int sqltype)
 		{
-			long multiplier = 1;
-
-			if (scale < 0)
-			{
-				multiplier = (long)Math.Pow(10, -scale);
-			}
+			var shift = scale < 0 ? -scale : 1;
 
 			switch (sqltype & ~1)
 			{
 				case IscCodes.SQL_SHORT:
-					return (short)(d * multiplier);
+					return (short)DecimalShiftHelper.ShiftDecimalRight(d, shift);
 
 				case IscCodes.SQL_LONG:
-					return (int)(d * multiplier);
+					return (int)DecimalShiftHelper.ShiftDecimalRight(d, shift);
 
 				case IscCodes.SQL_QUAD:
 				case IscCodes.SQL_INT64:
-					return (long)(d * multiplier);
+					return (long)DecimalShiftHelper.ShiftDecimalRight(d, shift);
 
 				case IscCodes.SQL_DOUBLE:
+				case IscCodes.SQL_D_FLOAT:
+					return (double)d;
+
+				case IscCodes.SQL_INT128:
+					return (BigInteger)DecimalShiftHelper.ShiftDecimalRight(d, shift);
+
 				default:
-					return d;
+					throw new ArgumentOutOfRangeException(nameof(sqltype), $"{nameof(sqltype)}={sqltype}");
 			}
 		}
 
