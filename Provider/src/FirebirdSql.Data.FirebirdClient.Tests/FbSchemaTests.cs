@@ -23,11 +23,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 {
 	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
 	[TestFixtureSource(typeof(FbEmbeddedServerTypeTestFixtureSource))]
-	public class FbDatabaseSchemaTests : FbTestsBase
+	public class FbSchemaTests : FbTestsBase
 	{
 		#region Constructors
 
-		public FbDatabaseSchemaTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		public FbSchemaTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
