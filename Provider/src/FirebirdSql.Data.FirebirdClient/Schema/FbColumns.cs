@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Schema
 			if (MajorVersionNumber >= 3)
 			{
 				sql.Append(@",
-					rfr.rdb$identity_type as IDENTITY_TYPE");
+					rfr.rdb$identity_type AS IDENTITY_TYPE");
 			}
 			sql.Append(@"
 				FROM rdb$relation_fields rfr
