@@ -104,118 +104,36 @@ namespace FirebirdSql.Data.Schema
 
 		private static DataTable PrepareCollection(FbConnection connection, string collectionName, string[] restrictions)
 		{
-			FbSchema returnSchema = null;
-
-			switch (collectionName.ToUpperInvariant())
+			FbSchema returnSchema = collectionName.ToUpperInvariant() switch
 			{
-				case "CHARACTERSETS":
-					returnSchema = new FbCharacterSets();
-					break;
-
-				case "CHECKCONSTRAINTS":
-					returnSchema = new FbCheckConstraints();
-					break;
-
-				case "CHECKCONSTRAINTSBYTABLE":
-					returnSchema = new FbChecksByTable();
-					break;
-
-				case "COLLATIONS":
-					returnSchema = new FbCollations();
-					break;
-
-				case "COLUMNS":
-					returnSchema = new FbColumns();
-					break;
-
-				case "COLUMNPRIVILEGES":
-					returnSchema = new FbColumnPrivileges();
-					break;
-
-				case "DOMAINS":
-					returnSchema = new FbDomains();
-					break;
-
-				case "FOREIGNKEYCOLUMNS":
-					returnSchema = new FbForeignKeyColumns();
-					break;
-
-				case "FOREIGNKEYS":
-					returnSchema = new FbForeignKeys();
-					break;
-
-				case "FUNCTIONS":
-					returnSchema = new FbFunctions();
-					break;
-
-				case "GENERATORS":
-					returnSchema = new FbGenerators();
-					break;
-
-				case "INDEXCOLUMNS":
-					returnSchema = new FbIndexColumns();
-					break;
-
-				case "INDEXES":
-					returnSchema = new FbIndexes();
-					break;
-
-				case "PRIMARYKEYS":
-					returnSchema = new FbPrimaryKeys();
-					break;
-
-				case "PROCEDURES":
-					returnSchema = new FbProcedures();
-					break;
-
-				case "PROCEDUREPARAMETERS":
-					returnSchema = new FbProcedureParameters();
-					break;
-
-				case "PROCEDUREPRIVILEGES":
-					returnSchema = new FbProcedurePrivilegesSchema();
-					break;
-
-				case "ROLES":
-					returnSchema = new FbRoles();
-					break;
-
-				case "TABLES":
-					returnSchema = new FbTables();
-					break;
-
-				case "TABLECONSTRAINTS":
-					returnSchema = new FbTableConstraints();
-					break;
-
-				case "TABLEPRIVILEGES":
-					returnSchema = new FbTablePrivileges();
-					break;
-
-				case "TRIGGERS":
-					returnSchema = new FbTriggers();
-					break;
-
-				case "UNIQUEKEYS":
-					returnSchema = new FbUniqueKeys();
-					break;
-
-				case "VIEWCOLUMNS":
-					returnSchema = new FbViewColumns();
-					break;
-
-				case "VIEWS":
-					returnSchema = new FbViews();
-					break;
-
-				case "VIEWPRIVILEGES":
-					returnSchema = new FbViewPrivileges();
-					break;
-
-				default:
-					throw new NotSupportedException("The specified metadata collection is not supported.");
-			}
-
+				"CHARACTERSETS" => new FbCharacterSets(),
+				"CHECKCONSTRAINTS" => new FbCheckConstraints(),
+				"CHECKCONSTRAINTSBYTABLE" => new FbChecksByTable(),
+				"COLLATIONS" => new FbCollations(),
+				"COLUMNS" => new FbColumns(),
+				"COLUMNPRIVILEGES" => new FbColumnPrivileges(),
+				"DOMAINS" => new FbDomains(),
+				"FOREIGNKEYCOLUMNS" => new FbForeignKeyColumns(),
+				"FOREIGNKEYS" => new FbForeignKeys(),
+				"FUNCTIONS" => new FbFunctions(),
+				"GENERATORS" => new FbGenerators(),
+				"INDEXCOLUMNS" => new FbIndexColumns(),
+				"INDEXES" => new FbIndexes(),
+				"PRIMARYKEYS" => new FbPrimaryKeys(),
+				"PROCEDURES" => new FbProcedures(),
+				"PROCEDUREPARAMETERS" => new FbProcedureParameters(),
+				"PROCEDUREPRIVILEGES" => new FbProcedurePrivilegesSchema(),
+				"ROLES" => new FbRoles(),
+				"TABLES" => new FbTables(),
+				"TABLECONSTRAINTS" => new FbTableConstraints(),
+				"TABLEPRIVILEGES" => new FbTablePrivileges(),
+				"TRIGGERS" => new FbTriggers(),
+				"UNIQUEKEYS" => new FbUniqueKeys(),
+				"VIEWCOLUMNS" => new FbViewColumns(),
+				"VIEWS" => new FbViews(),
+				"VIEWPRIVILEGES" => new FbViewPrivileges(),
+				_ => throw new NotSupportedException("The specified metadata collection is not supported."),
+			};
 			return returnSchema.GetSchema(connection, collectionName, restrictions);
 		}
 
