@@ -81,6 +81,8 @@ function Cleanup() {
 	$process = $script:firebirdProcess
 	$process.Kill()
 	$process.WaitForExit()
+	# give OS time to release all files
+	sleep -Milliseconds 100
 	rm -Force -Recurse $firebirdDir
 
 	echo "=== END ==="
