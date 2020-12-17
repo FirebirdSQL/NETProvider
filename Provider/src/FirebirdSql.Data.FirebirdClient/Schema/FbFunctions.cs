@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Schema
 			var sql = new StringBuilder();
 			var where = new StringBuilder();
 
-			sql.Append(
+			sql.AppendFormat(
 				@"SELECT
 					null AS FUNCTION_CATALOG,
 					null AS FUNCTION_SCHEMA,
@@ -42,8 +42,10 @@ namespace FirebirdSql.Data.Schema
 					rdb$module_name AS FUNCTION_MODULE_NAME,
 					rdb$entrypoint AS FUNCTION_ENTRY_POINT,
 					rdb$return_argument AS RETURN_ARGUMENT,
-					rdb$description AS DESCRIPTION
-				FROM rdb$functions");
+					rdb$description AS DESCRIPTION,
+					{0} AS PACKAGE_NAME
+				FROM rdb$functions",
+				MajorVersionNumber >= 3 ? "rdb$package_name" : "null");
 
 			if (restrictions != null)
 			{
@@ -82,7 +84,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY FUNCTION_NAME");
+			sql.Append(" ORDER BY PACKAGE_NAME, FUNCTION_NAME");
 
 			return sql;
 		}

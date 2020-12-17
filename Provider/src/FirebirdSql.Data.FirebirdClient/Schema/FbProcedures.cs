@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Schema
 			var sql = new StringBuilder();
 			var where = new StringBuilder();
 
-			sql.Append(
+			sql.AppendFormat(
 				@"SELECT
 					null AS PROCEDURE_CATALOG,
 					null AS PROCEDURE_SCHEMA,
@@ -40,8 +40,10 @@ namespace FirebirdSql.Data.Schema
 					rdb$procedure_outputs AS OUTPUTS,
 					rdb$system_flag AS IS_SYSTEM_PROCEDURE,
 					rdb$procedure_source AS SOURCE,
-					rdb$description AS DESCRIPTION
-				FROM rdb$procedures");
+					rdb$description AS DESCRIPTION,
+					{0} AS PACKAGE_NAME
+				FROM rdb$procedures",
+				MajorVersionNumber >= 3 ? "rdb$package_name" : "null");
 
 			if (restrictions != null)
 			{
@@ -69,7 +71,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY PROCEDURE_NAME");
+			sql.Append(" ORDER BY PACKAGE_NAME, PROCEDURE_NAME");
 
 			return sql;
 		}

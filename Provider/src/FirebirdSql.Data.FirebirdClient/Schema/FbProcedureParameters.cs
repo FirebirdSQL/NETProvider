@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Schema
 			var sql = new StringBuilder();
 			var where = new StringBuilder();
 
-			sql.Append(
+			sql.AppendFormat(
 				@"SELECT
 					null AS PROCEDURE_CATALOG,
 					null AS PROCEDURE_SCHEMA,
@@ -59,11 +59,13 @@ namespace FirebirdSql.Data.Schema
 					null AS COLLATION_CATALOG,
 					null AS COLLATION_SCHEMA,
 					pp.rdb$description AS DESCRIPTION,
-					fld.rdb$field_type AS FIELD_TYPE
+					fld.rdb$field_type AS FIELD_TYPE,
+					{0} AS PACKAGE_NAME
 				FROM rdb$procedure_parameters pp
 					LEFT JOIN rdb$fields fld ON pp.rdb$field_source = fld.rdb$field_name
 					LEFT JOIN rdb$character_sets cs ON cs.rdb$character_set_id = fld.rdb$character_set_id
-					LEFT JOIN rdb$collations coll ON (coll.rdb$collation_id = fld.rdb$collation_id AND coll.rdb$character_set_id = fld.rdb$character_set_id)");
+					LEFT JOIN rdb$collations coll ON (coll.rdb$collation_id = fld.rdb$collation_id AND coll.rdb$character_set_id = fld.rdb$character_set_id)",
+				MajorVersionNumber >= 3 ? "pp.rdb$package_name" : "null");
 
 			if (restrictions != null)
 			{
@@ -102,7 +104,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY PROCEDURE_NAME, PARAMETER_DIRECTION, ORDINAL_POSITION");
+			sql.Append(" ORDER BY PACKAGE_NAME, PROCEDURE_NAME, PARAMETER_DIRECTION, ORDINAL_POSITION");
 
 			return sql;
 		}
