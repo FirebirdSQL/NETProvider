@@ -10,6 +10,7 @@ stages:
 - stage:
   variables:
     CONFIGURATION: Release
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   jobs:
   - job:
     pool:
