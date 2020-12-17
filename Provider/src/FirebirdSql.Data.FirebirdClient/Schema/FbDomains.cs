@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY rdb$field_name");
+			sql.Append(" ORDER BY DOMAIN_NAME");
 
 			return sql;
 		}

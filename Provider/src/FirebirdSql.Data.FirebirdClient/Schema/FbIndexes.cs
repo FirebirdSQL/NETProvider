@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY idx.rdb$relation_name, idx.rdb$index_name");
+			sql.Append(" ORDER BY TABLE_NAME, INDEX_NAME");
 
 			return sql;
 		}

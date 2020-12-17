@@ -94,7 +94,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY rdb$system_flag, rdb$owner_name, rdb$relation_name");
+			sql.Append(" ORDER BY IS_SYSTEM_TABLE, OWNER_NAME, TABLE_NAME");
 
 			return sql;
 		}

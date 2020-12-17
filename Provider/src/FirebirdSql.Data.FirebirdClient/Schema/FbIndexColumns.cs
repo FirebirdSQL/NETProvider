@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY idx.rdb$relation_name, idx.rdb$index_name, seg.rdb$field_position");
+			sql.Append(" ORDER BY TABLE_NAME, INDEX_NAME, ORDINAL_POSITION");
 
 			return sql;
 		}

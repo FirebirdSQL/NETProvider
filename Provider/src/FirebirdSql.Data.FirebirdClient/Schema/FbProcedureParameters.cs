@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY pp.rdb$procedure_name, pp.rdb$parameter_type, pp.rdb$parameter_number");
+			sql.Append(" ORDER BY PROCEDURE_NAME, PARAMETER_DIRECTION, ORDINAL_POSITION");
 
 			return sql;
 		}

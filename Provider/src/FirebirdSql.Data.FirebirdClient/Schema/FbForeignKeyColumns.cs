@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY co.rdb$constraint_name, coidxseg.rdb$field_position");
+			sql.Append(" ORDER BY CONSTRAINT_NAME, ORDINAL_POSITION");
 
 			return sql;
 		}

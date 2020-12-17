@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY chktb.rdb$relation_name, chktb.rdb$constraint_name");
+			sql.Append(" ORDER BY TABLE_NAME, CONSTRAINT_NAME");
 
 			return sql;
 		}

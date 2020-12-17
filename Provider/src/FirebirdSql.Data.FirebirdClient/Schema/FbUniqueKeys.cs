@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY rel.rdb$relation_name, rel.rdb$constraint_name, seg.rdb$field_position");
+			sql.Append(" ORDER BY TABLE_NAME, UK_NAME, ORDINAL_POSITION");
 
 			return sql;
 		}

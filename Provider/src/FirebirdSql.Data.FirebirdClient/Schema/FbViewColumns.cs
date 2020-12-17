@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY rel.rdb$relation_name, rfr.rdb$field_position");
+			sql.Append(" ORDER BY VIEW_NAME, ORDINAL_POSITION");
 
 			return sql;
 		}

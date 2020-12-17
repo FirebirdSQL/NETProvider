@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY rel.rdb$relation_name");
+			sql.Append(" ORDER BY VIEW_NAME");
 
 			return sql;
 		}

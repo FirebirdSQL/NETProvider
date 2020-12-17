@@ -77,7 +77,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY rdb$generator_name");
+			sql.Append(" ORDER BY GENERATOR_NAME");
 
 			return sql;
 		}

@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.Schema
 				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY rdb$character_set_name");
+			sql.Append(" ORDER BY CHARACTER_SET_NAME");
 
 			return sql;
 		}
