@@ -91,6 +91,6 @@ stages:
       displayName: Tests
 
     - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact'
+      displayName: Publish Artifacts
       inputs:
         PathtoPublish: '.\\Provider\\out\\'
