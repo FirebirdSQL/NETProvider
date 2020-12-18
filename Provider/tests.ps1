@@ -133,16 +133,17 @@ function Tests-EFCore() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
 	if ($FirebirdSelection -eq 'FB25') {
-		return
+		# nothing for 2.5
+	} 
+	else {
+		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp3.1"
+		dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All
+		Check-ExitCode
+	
+		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
+		dotnet test --no-build -c $Configuration
+		Check-ExitCode
 	}
-
-	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\netcoreapp3.1"
-	dotnet FirebirdSql.EntityFrameworkCore.Firebird.Tests.dll --labels=All
-	Check-ExitCode
-
-	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
-	dotnet test --no-build -c $Configuration
-	Check-ExitCode
 
 	echo "=== END ==="
 }
