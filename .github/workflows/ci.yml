@@ -18,15 +18,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Chocolatey
-        run: |
-          choco install 7zip --version 19.0 --yes --force --no-progress
-          choco install wixtoolset --version 3.11.1 --yes --force --no-progress
-
       - name: Build
         run: |
           try {
-            $env:PATH += ';C:\Program Files\7-Zip'
             $env:build_wix = 'C:\Program Files (x86)\WiX Toolset v3.11\bin'
 
             .\Provider\build.ps1 -Configuration ${{ env.CONFIGURATION }}
@@ -41,7 +35,6 @@ jobs:
       - name: Tests
         run: |
           try {
-            $env:PATH += ';C:\Program Files\7-Zip'
             $env:tests_firebird_dir = 'C:\firebird'
 
             .\Provider\tests.ps1 -Configuration ${{ env.CONFIGURATION }} -FirebirdSelection ${{ matrix.FIREBIRD_SELECTION }} -TestSuite ${{ matrix.TEST_SUITE }}

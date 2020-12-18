@@ -59,14 +59,8 @@ stages:
           FIREBIRD_SELECTION: FB25
           TEST_SUITE: Tests-EF6
     steps:
-    - script: |
-       choco install 7zip --version 19.0 --yes --force --no-progress
-       choco install wixtoolset --version 3.11.1 --yes --force --no-progress
-      displayName: Chocolatey
-
     - powershell: |
        try {
-         $env:PATH += ';C:\Program Files\7-Zip'
          $env:build_wix = 'C:\Program Files (x86)\WiX Toolset v3.11\bin'
 
          .\Provider\build.ps1 -Configuration $env:CONFIGURATION
@@ -80,7 +74,6 @@ stages:
 
     - powershell: |
        try {
-         $env:PATH += ';C:\Program Files\7-Zip'
          $env:tests_firebird_dir = 'C:\firebird'
 
          .\Provider\tests.ps1 -Configuration $env:CONFIGURATION -FirebirdSelection $env:FIREBIRD_SELECTION -TestSuite $env:TEST_SUITE
