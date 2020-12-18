@@ -39,16 +39,6 @@ function Build() {
 	$script:version = (Get-Item $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net452\FirebirdSql.Data.FirebirdClient.dll).VersionInfo.ProductVersion -replace '(\d+)\.(\d+)\.(\d+)(-[a-z0-9]+)?(.*)','$1.$2.$3$4'
 }
 
-function Pack() {
-	7z a -mx=9 -bsp0 $outDir\FirebirdSql.Data.FirebirdClient-$version-net452.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net452\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net452\FirebirdSql.Data.FirebirdClient.pdb
-	7z a -mx=9 -bsp0 $outDir\FirebirdSql.Data.FirebirdClient-$version-netstandard2.0.7z $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\netstandard2.0\FirebirdSql.Data.FirebirdClient.dll $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\netstandard2.0\FirebirdSql.Data.FirebirdClient.pdb
-
-	7z a -mx=9 -bsp0 $outDir\EntityFramework.Firebird-$version-net452.7z $baseDir\src\EntityFramework.Firebird\bin\$Configuration\net452\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\$Configuration\net452\EntityFramework.Firebird.pdb
-	7z a -mx=9 -bsp0 $outDir\EntityFramework.Firebird-$version-netstandard2.1.7z $baseDir\src\EntityFramework.Firebird\bin\$Configuration\netstandard2.1\EntityFramework.Firebird.dll $baseDir\src\EntityFramework.Firebird\bin\$Configuration\netstandard2.1\EntityFramework.Firebird.pdb
-
-	7z a -mx=9 -bsp0 $outDir\FirebirdSql.EntityFrameworkCore.Firebird-$version-netstandard2.0.7z $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.dll $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\netstandard2.0\FirebirdSql.EntityFrameworkCore.Firebird.pdb
-}
-
 function NuGets() {
 	cp $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\FirebirdSql.Data.FirebirdClient.$version.nupkg $outDir
 	cp $baseDir\src\EntityFramework.Firebird\bin\$Configuration\EntityFramework.Firebird.$version.nupkg $outDir
@@ -69,6 +59,5 @@ function WiX() {
 
 Clean
 Build
-Pack
 NuGets
 WiX

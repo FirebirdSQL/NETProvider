@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
+		<TargetFramework>net5.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SkipSourceLink>true</SkipSourceLink>
@@ -19,11 +19,6 @@
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
 	</ItemGroup>
 	<Import Project="..\FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems" Label="Shared" />
-	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
-		<Reference Include="System.Transactions" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-	</ItemGroup>
 	<ItemGroup>
 	  <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
 	</ItemGroup>

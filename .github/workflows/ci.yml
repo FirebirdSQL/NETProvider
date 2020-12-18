@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         FIREBIRD_SELECTION: [FB25, FB30, FB40]
-        TEST_SUITE: [Tests-FirebirdClient-NET, Tests-FirebirdClient-Core, Tests-EFCore, Tests-EF6]
+        TEST_SUITE: [Tests-FirebirdClient, Tests-EFCore, Tests-EF6]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -41,6 +41,7 @@ jobs:
             exit $LASTEXITCODE
           }
           catch {
+            echo $_
             exit 1
           }
         shell: powershell

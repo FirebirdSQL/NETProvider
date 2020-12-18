@@ -27,7 +27,7 @@ namespace EntityFramework.Firebird.Tests
 	{
 		static EntityFrameworkTestsBase()
 		{
-#if NETCOREAPP3_1
+#if NET5_0
 			System.Data.Common.DbProviderFactories.RegisterFactory(FbProviderServices.ProviderInvariantName, FirebirdClientFactory.Instance);
 #endif
 			DbConfiguration.SetConfiguration(new FbTestDbContext.Conf());

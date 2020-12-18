@@ -236,7 +236,7 @@ namespace FirebirdSql.Data.Client.Native
 			var t = tb.CreateTypeInfo().AsType();
 
 #if DEBUG
-#if !NETSTANDARD2_0
+#if !(NETSTANDARD2_0 || NET5_0)
 			var ab = (AssemblyBuilder)tb.Assembly;
 			ab.Save("DynamicAssembly.dll");
 #endif
@@ -265,7 +265,7 @@ namespace FirebirdSql.Data.Client.Native
 			assemblyName.Name = baseName + "_Assembly";
 
 			// We create the dynamic assembly in our current AppDomain
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NET5_0
 			var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 #else
 			var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);

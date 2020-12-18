@@ -20,24 +20,15 @@ stages:
     timeoutInMinutes: 120
     strategy:
       matrix:
-        Provider_NET_FB40:
+        Provider_FB40:
           FIREBIRD_SELECTION: FB40
-          TEST_SUITE: Tests-FirebirdClient-NET
-        Provider_Core_FB40:
-          FIREBIRD_SELECTION: FB40
-          TEST_SUITE: Tests-FirebirdClient-Core
-        Provider_NET_FB30:
+          TEST_SUITE: Tests-FirebirdClient
+        Provider_FB30:
           FIREBIRD_SELECTION: FB30
-          TEST_SUITE: Tests-FirebirdClient-NET
-        Provider_Core_FB30:
-          FIREBIRD_SELECTION: FB30
-          TEST_SUITE: Tests-FirebirdClient-Core
-        Provider_NET_FB25:
+          TEST_SUITE: Tests-FirebirdClient
+        Provider_FB25:
           FIREBIRD_SELECTION: FB25
-          TEST_SUITE: Tests-FirebirdClient-NET
-        Provider_Core_FB25:
-          FIREBIRD_SELECTION: FB25
-          TEST_SUITE: Tests-FirebirdClient-Core
+          TEST_SUITE: Tests-FirebirdClient
 
         EFCore_FB40:
           FIREBIRD_SELECTION: FB40
@@ -80,6 +71,7 @@ stages:
          exit $LASTEXITCODE
        }
        catch {
+         echo $_
          exit 1
        }
       displayName: Tests
