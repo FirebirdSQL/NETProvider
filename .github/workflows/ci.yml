@@ -1,0 +1,58 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  CONFIGURATION: Release
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  build:
+    runs-on: windows-2019
+    strategy:
+      fail-fast: false
+      matrix:
+        FIREBIRD_SELECTION: [FB25, FB30, FB40]
+        TEST_SUITE: [Tests-FirebirdClient-NET, Tests-FirebirdClient-Core, Tests-EFCore, Tests-EF6]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Chocolatey
+        run: |
+          choco install 7zip --version 19.0 --yes --force --no-progress
+          choco install wixtoolset --version 3.11.1 --yes --force --no-progress
+
+      - name: Build
+        run: |
+          try {
+            $env:PATH += ';C:\Program Files\7-Zip'
+            $env:build_wix = 'C:\Program Files (x86)\WiX Toolset v3.11\bin'
+
+            .\Provider\build.ps1 -Configuration ${{ env.CONFIGURATION }}
+            exit $LASTEXITCODE
+          }
+          catch {
+            echo $_
+            exit 1
+          }
+        shell: powershell
+
+      - name: Tests
+        run: |
+          try {
+            $env:PATH += ';C:\Program Files\7-Zip'
+            $env:tests_firebird_dir = 'C:\firebird'
+
+            .\Provider\tests.ps1 -Configuration ${{ env.CONFIGURATION }} -FirebirdSelection ${{ matrix.FIREBIRD_SELECTION }} -TestSuite ${{ matrix.TEST_SUITE }}
+            exit $LASTEXITCODE
+          }
+          catch {
+            exit 1
+          }
+        shell: powershell
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: '.\\Provider\\out\\'
