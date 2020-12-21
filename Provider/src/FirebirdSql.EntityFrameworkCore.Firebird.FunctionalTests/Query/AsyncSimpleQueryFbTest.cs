@@ -46,5 +46,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.Except_non_entity();
 		}
+
+		[Fact(Skip = "Cancellation leaves the connection in undefined state for later.")]
+		// See #23925 on EntityFrameworkCore.
+		public override Task ToListAsync_can_be_canceled()
+		{
+			return base.ToListAsync_can_be_canceled();
+		}
 	}
 }

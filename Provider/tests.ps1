@@ -28,7 +28,7 @@ $FirebirdConfiguration = @{
 }
 
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
-$testsProviderDir = "$testsBaseDir\bin\$Configuration\net5.0"
+$testsProviderDir = "$testsBaseDir\bin\$Configuration\$(Get-UsedTargetFramework)"
 
 $startDir = $null
 $firebirdProcess = $null
@@ -105,7 +105,7 @@ function Tests-FirebirdClient() {
 function Tests-EF6() {
 	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
-	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\net5.0"
+	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
 	.\EntityFramework.Firebird.Tests.exe --labels=All
 	Check-ExitCode
 
@@ -119,7 +119,7 @@ function Tests-EFCore() {
 		# nothing for 2.5
 	} 
 	else {
-		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\net5.0"
+		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
 		.\FirebirdSql.EntityFrameworkCore.Firebird.Tests.exe --labels=All
 		Check-ExitCode
 	

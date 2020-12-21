@@ -308,7 +308,10 @@ end";
 
 			serverProp.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
 
-			foreach (var m in serverProp.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly).Where(x => !x.IsSpecialName))
+			foreach (var m in serverProp.GetType()
+				.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+				.Where(x => !x.IsSpecialName)
+				.Where(x => !x.Name.EndsWith("Async")))
 			{
 				Assert.DoesNotThrow(() => m.Invoke(serverProp, null), m.Name);
 			}

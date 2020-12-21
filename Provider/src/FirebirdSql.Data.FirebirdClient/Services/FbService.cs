@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Client;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
@@ -106,7 +107,7 @@ namespace FirebirdSql.Data.Services
 			return spb;
 		}
 
-		private protected void Open()
+		private protected async Task Open(AsyncWrappingCommonArgs async)
 		{
 			if (State != FbServiceState.Closed)
 				throw new InvalidOperationException("Service already Open.");
@@ -119,9 +120,9 @@ namespace FirebirdSql.Data.Services
 			{
 				if (_svc == null)
 				{
-					_svc = ClientFactory.CreateServiceManager(_options);
+					_svc = await ClientFactory.CreateServiceManager(_options, async).ConfigureAwait(false);
 				}
-				_svc.Attach(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey);
+				await _svc.Attach(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey, async).ConfigureAwait(false);
 				_svc.WarningMessage = OnWarningMessage;
 				State = FbServiceState.Open;
 			}
@@ -131,7 +132,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected void Close()
+		private protected async Task Close(AsyncWrappingCommonArgs async)
 		{
 			if (State != FbServiceState.Open)
 			{
@@ -139,7 +140,7 @@ namespace FirebirdSql.Data.Services
 			}
 			try
 			{
-				_svc.Detach();
+				await _svc.Detach(async).ConfigureAwait(false);
 				_svc = null;
 				State = FbServiceState.Closed;
 			}
@@ -149,14 +150,14 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected void StartTask(ServiceParameterBuffer spb)
+		private protected async Task StartTask(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
 		{
 			if (State == FbServiceState.Closed)
 				throw new InvalidOperationException("Service is Closed.");
 
 			try
 			{
-				_svc.Start(spb);
+				await _svc.Start(spb, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -164,10 +165,10 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected IList<object> Query(byte[] items, ServiceParameterBuffer spb)
+		private protected async Task<List<object>> Query(byte[] items, ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
 		{
 			var result = new List<object>();
-			Query(items, spb, (truncated, item) =>
+			await Query(items, spb, (truncated, item) =>
 			{
 				if (item is string stringItem)
 				{
@@ -200,56 +201,23 @@ namespace FirebirdSql.Data.Services
 				}
 
 				result.Add(item);
-			});
+			}, async).ConfigureAwait(false);
 			return result;
 		}
 
-		private protected void Query(byte[] items, ServiceParameterBuffer spb, Action<bool, object> resultAction)
-		{
-			ProcessQuery(items, spb, resultAction);
-		}
-
-		private protected void ProcessServiceOutput(ServiceParameterBuffer spb)
-		{
-			string line;
-			while ((line = GetNextLine(spb)) != null)
-			{
-				OnServiceOutput(line);
-			}
-		}
-
-		private protected string GetNextLine(ServiceParameterBuffer spb)
-		{
-			var info = Query(new byte[] { IscCodes.isc_info_svc_line }, spb);
-			if (info.Count == 0)
-				return null;
-			return info[0] as string;
-		}
-
-		private protected void OnServiceOutput(string message)
-		{
-			ServiceOutput?.Invoke(this, new ServiceOutputEventArgs(message));
-		}
-
-		private protected void EnsureDatabase()
-		{
-			if (string.IsNullOrEmpty(Database))
-				throw new FbException("Action should be executed against a specific database.");
-		}
-
-		private void ProcessQuery(byte[] items, ServiceParameterBuffer spb, Action<bool, object> queryResponseAction)
+		private protected async Task Query(byte[] items, ServiceParameterBuffer spb, Action<bool, object> queryResponseAction, AsyncWrappingCommonArgs async)
 		{
 			var pos = 0;
 			var truncated = false;
 			var type = default(int);
 
-			var buffer = QueryService(items, spb);
+			var buffer = await QueryService(items, spb, async).ConfigureAwait(false);
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
 				if (type == IscCodes.isc_info_truncated)
 				{
-					buffer = QueryService(items, spb);
+					buffer = await QueryService(items, spb, async).ConfigureAwait(false);
 					pos = 0;
 					truncated = true;
 					continue;
@@ -348,25 +316,53 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private byte[] QueryService(byte[] items, ServiceParameterBuffer spb)
+		private protected async Task ProcessServiceOutput(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		{
+			string line;
+			while ((line = await GetNextLine(spb, async).ConfigureAwait(false)) != null)
+			{
+				OnServiceOutput(line);
+			}
+		}
+
+		private protected async Task<string> GetNextLine(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		{
+			var info = await Query(new byte[] { IscCodes.isc_info_svc_line }, spb, async).ConfigureAwait(false);
+			if (info.Count == 0)
+				return null;
+			return info[0] as string;
+		}
+
+		private protected void OnServiceOutput(string message)
+		{
+			ServiceOutput?.Invoke(this, new ServiceOutputEventArgs(message));
+		}
+
+		private protected void EnsureDatabase()
+		{
+			if (string.IsNullOrEmpty(Database))
+				throw new FbException("Action should be executed against a specific database.");
+		}
+
+		private async Task<byte[]> QueryService(byte[] items, ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
 		{
 			var shouldClose = false;
 			if (State == FbServiceState.Closed)
 			{
-				Open();
+				await Open(async).ConfigureAwait(false);
 				shouldClose = true;
 			}
 			try
 			{
 				var buffer = new byte[QueryBufferSize];
-				_svc.Query(spb, items.Length, items, buffer.Length, buffer);
+				await _svc.Query(spb, items.Length, items, buffer.Length, buffer, async).ConfigureAwait(false);
 				return buffer;
 			}
 			finally
 			{
 				if (shouldClose)
 				{
-					Close();
+					await Close(async).ConfigureAwait(false);
 				}
 			}
 		}

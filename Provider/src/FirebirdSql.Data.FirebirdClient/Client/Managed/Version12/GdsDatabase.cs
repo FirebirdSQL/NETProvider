@@ -24,6 +24,7 @@ using System.Net;
 using System.Collections.Generic;
 
 using FirebirdSql.Data.Common;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Client.Managed.Version12
 {
@@ -33,30 +34,30 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			: base(connection)
 		{ }
 
-		protected override void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
+		protected override async Task SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
-			Xdr.Write(IscCodes.op_attach);
-			Xdr.Write(0);
+			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
+			await Xdr.Write(0, async).ConfigureAwait(false);
 			if (!string.IsNullOrEmpty(Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			Xdr.WriteBuffer(dpb.ToArray());
+			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		protected override void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
+		protected override async Task SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
-			Xdr.Write(IscCodes.op_create);
-			Xdr.Write(0);
+			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
+			await Xdr.Write(0, async).ConfigureAwait(false);
 			if (!string.IsNullOrEmpty(Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			Xdr.WriteBuffer(dpb.ToArray());
+			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
 		public override StatementBase CreateStatement()
@@ -69,12 +70,12 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			return new GdsStatement(this, transaction);
 		}
 
-		public override void CancelOperation(int kind)
+		public override async Task CancelOperation(int kind, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				SendCancelOperationToBuffer(kind);
-				Xdr.Flush();
+				await SendCancelOperationToBuffer(kind, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
 				// no response, this is async
 			}
 			catch (IOException ex)
@@ -83,10 +84,10 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			}
 		}
 
-		protected void SendCancelOperationToBuffer(int kind)
+		protected async Task SendCancelOperationToBuffer(int kind, AsyncWrappingCommonArgs async)
 		{
-			Xdr.Write(IscCodes.op_cancel);
-			Xdr.Write(kind);
+			await Xdr.Write(IscCodes.op_cancel, async).ConfigureAwait(false);
+			await Xdr.Write(kind, async).ConfigureAwait(false);
 		}
 	}
 }

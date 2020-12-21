@@ -93,7 +93,7 @@ namespace FirebirdSql.Data.Schema
 			return sql;
 		}
 
-		protected override DataTable ProcessResult(DataTable schema)
+		protected override void ProcessResult(DataTable schema)
 		{
 			schema.BeginLoadData();
 			schema.Columns.Add("IS_NULLABLE", typeof(bool));
@@ -157,8 +157,6 @@ namespace FirebirdSql.Data.Schema
 			schema.Columns.Remove("COLUMN_ARRAY");
 			schema.Columns.Remove("FIELD_TYPE");
 			schema.Columns.Remove("CHARACTER_MAX_LENGTH");
-
-			return schema;
 		}
 
 		#endregion

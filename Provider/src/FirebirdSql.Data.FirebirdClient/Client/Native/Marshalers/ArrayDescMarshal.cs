@@ -15,18 +15,13 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
-using System;
 using System.Runtime.InteropServices;
-
-using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct ArrayDescMarshal
 	{
-		#region Fields
-
 		public byte DataType;
 		public byte Scale;
 		public short Length;
@@ -37,15 +32,9 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 		public short Dimensions;
 		public short Flags;
 
-		#endregion
-
-		#region Static Methods
-
 		public static int ComputeLength(int n)
 		{
 			return Marshal.SizeOf<ArrayDescMarshal>() + n * Marshal.SizeOf<ArrayBoundMarshal>();
 		}
-
-		#endregion
 	}
 }

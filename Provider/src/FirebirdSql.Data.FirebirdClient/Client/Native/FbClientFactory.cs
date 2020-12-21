@@ -236,7 +236,7 @@ namespace FirebirdSql.Data.Client.Native
 			var t = tb.CreateTypeInfo().AsType();
 
 #if DEBUG
-#if !(NETSTANDARD2_0 || NET5_0)
+#if NET48
 			var ab = (AssemblyBuilder)tb.Assembly;
 			ab.Save("DynamicAssembly.dll");
 #endif
@@ -265,11 +265,13 @@ namespace FirebirdSql.Data.Client.Native
 			assemblyName.Name = baseName + "_Assembly";
 
 			// We create the dynamic assembly in our current AppDomain
-#if NETSTANDARD2_0 || NET5_0
-			var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+			var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName,
+#if NET48
+				AssemblyBuilderAccess.RunAndSave
 #else
-			var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
+				AssemblyBuilderAccess.Run
 #endif
+			);
 
 			// Generate the actual module (which is the DLL itself)
 			var moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module");

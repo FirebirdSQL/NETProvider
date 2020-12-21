@@ -16,12 +16,10 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-
-using FirebirdSql.Data.Common;
 using System.Collections;
+using System.IO;
+using System.Threading.Tasks;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version13
 {
@@ -41,10 +39,11 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		#region Overriden Methods
 
-		protected override byte[] WriteParameters()
+		protected override async Task<byte[]> WriteParameters(AsyncWrappingCommonArgs async)
 		{
 			if (_parameters == null)
 				return null;
+
 			using (var ms = new MemoryStream())
 			{
 				try
@@ -55,7 +54,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					for (var i = 0; i < _parameters.Count; i++)
 					{
 						var field = _parameters[i];
-						bits.Set(i, field.DbValue.IsDBNull());
+						bits.Set(i, await field.DbValue.IsDBNull(async).ConfigureAwait(false));
 					}
 					var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
 					for (var i = 0; i < buffer.Length * 8; i++)
@@ -64,19 +63,19 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						// LSB
 						buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
 					}
-					xdr.WriteOpaque(buffer);
+					await xdr.WriteOpaque(buffer, async).ConfigureAwait(false);
 
 					for (var i = 0; i < _parameters.Count; i++)
 					{
 						var field = _parameters[i];
-						if (field.DbValue.IsDBNull())
+						if (await field.DbValue.IsDBNull(async).ConfigureAwait(false))
 						{
 							continue;
 						}
-						WriteRawParameter(xdr, field);
+						await WriteRawParameter(xdr, field, async).ConfigureAwait(false);
 					}
 
-					xdr.Flush();
+					await xdr.Flush(async).ConfigureAwait(false);
 					return ms.ToArray();
 				}
 				catch (IOException ex)
@@ -86,14 +85,14 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 		}
 
-		protected override DbValue[] ReadRow()
+		protected override async Task<DbValue[]> ReadRow(AsyncWrappingCommonArgs async)
 		{
 			var row = new DbValue[_fields.Count];
 			try
 			{
 				if (_fields.Count > 0)
 				{
-					var nullBytes = _database.Xdr.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
+					var nullBytes = await _database.Xdr.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d), async).ConfigureAwait(false);
 					var nullBits = new BitArray(nullBytes);
 					for (var i = 0; i < _fields.Count; i++)
 					{
@@ -103,7 +102,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						}
 						else
 						{
-							var value = ReadRawValue(_database.Xdr, _fields[i]);
+							var value = await ReadRawValue(_database.Xdr, _fields[i], async).ConfigureAwait(false);
 							row[i] = new DbValue(this, _fields[i], value);
 						}
 					}

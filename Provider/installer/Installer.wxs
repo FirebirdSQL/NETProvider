@@ -30,7 +30,7 @@
 					<Component Id="FirebirdClientAssemblyComponent" Guid="5FC7B74A-949A-448E-9E5A-1893C3CE9184">
 						<File Id="FirebirdSql.Data.FirebirdClient.dll"
 									Name="FirebirdSql.Data.FirebirdClient.dll"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\$(var.Configuration)\net452\FirebirdSql.Data.FirebirdClient.dll" />
+									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\$(var.Configuration)\net48\FirebirdSql.Data.FirebirdClient.dll" />
 					</Component>
 					<Component Id="OtherFilesComponent" Guid="348EA22F-390E-4BA6-9C93-3879581E9297">
 						<File Id="readme.txt"
@@ -41,7 +41,7 @@
 									Source="$(var.BaseDir)\..\license.txt" />
 						<File Id="FirebirdSql.Data.FirebirdClient.pdb"
 									Name="FirebirdSql.Data.FirebirdClient.pdb"
-									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\$(var.Configuration)\net452\FirebirdSql.Data.FirebirdClient.pdb" />
+									Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\$(var.Configuration)\net48\FirebirdSql.Data.FirebirdClient.pdb" />
 					</Component>
 				</Directory>
 			</Directory>
@@ -51,7 +51,7 @@
 							Name="FirebirdSql.Data.FirebirdClient.dll"
 							Assembly=".net"
 							KeyPath="yes"
-							Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\$(var.Configuration)\net452\FirebirdSql.Data.FirebirdClient.dll" />
+							Source="$(var.BaseDir)\src\FirebirdSql.Data.FirebirdClient\bin\$(var.Configuration)\net48\FirebirdSql.Data.FirebirdClient.dll" />
 			</Component>
 			<Component Id="FirebirdClientMachineConfig32Component" Guid="CBA6E615-0521-4D14-8576-351EEF79DD1D">
 				<util:XmlConfig Id="MachineConfig32DbProviderFactories"

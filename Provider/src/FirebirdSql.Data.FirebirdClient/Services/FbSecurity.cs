@@ -17,6 +17,8 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
@@ -27,12 +29,14 @@ namespace FirebirdSql.Data.Services
 			: base(connectionString)
 		{ }
 
-		public void AddUser(FbUserData user)
+		public void AddUser(FbUserData user) => AddUserImpl(user, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task AddUserAsync(FbUserData user, CancellationToken cancellationToken = default) => AddUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task AddUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
 		{
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			Open();
+			await Open(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer();
 			startSpb.Append(IscCodes.isc_action_svc_add_user);
 			startSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
@@ -51,31 +55,35 @@ namespace FirebirdSql.Data.Services
 				startSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
 			if ((user.RoleName?.Length ?? 0) != 0)
 				startSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			StartTask(startSpb);
-			Close();
+			await StartTask(startSpb, async).ConfigureAwait(false);
+			await Close(async).ConfigureAwait(false);
 		}
 
-		public void DeleteUser(FbUserData user)
+		public void DeleteUser(FbUserData user) => DeleteUserImpl(user, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task DeleteUserAsync(FbUserData user, CancellationToken cancellationToken = default) => DeleteUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task DeleteUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
 		{
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			Open();
+			await Open(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer();
 			startSpb.Append(IscCodes.isc_action_svc_delete_user);
 			startSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
 			if ((user.RoleName?.Length ?? 0) != 0)
 				startSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			StartTask(startSpb);
-			Close();
+			await StartTask(startSpb, async).ConfigureAwait(false);
+			await Close(async).ConfigureAwait(false);
 		}
 
-		public void ModifyUser(FbUserData user)
+		public void ModifyUser(FbUserData user) => ModifyUserImpl(user, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task ModifyUserAsync(FbUserData user, CancellationToken cancellationToken = default) => ModifyUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task ModifyUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
 		{
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			Open();
+			await Open(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer();
 			startSpb.Append(IscCodes.isc_action_svc_modify_user);
 			startSpb.Append(IscCodes.isc_spb_sec_username, user.UserName);
@@ -93,36 +101,42 @@ namespace FirebirdSql.Data.Services
 				startSpb.Append(IscCodes.isc_spb_sec_groupname, user.GroupName);
 			if ((user.RoleName?.Length ?? 0) != 0)
 				startSpb.Append(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			StartTask(startSpb);
-			Close();
+			await StartTask(startSpb, async).ConfigureAwait(false);
+			await Close(async).ConfigureAwait(false);
 		}
 
-		public FbUserData DisplayUser(string userName)
+		public FbUserData DisplayUser(string userName) => DisplayUserImpl(userName, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task<FbUserData> DisplayUserAsync(string userName, CancellationToken cancellationToken = default) => DisplayUserImpl(userName, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task<FbUserData> DisplayUserImpl(string userName, AsyncWrappingCommonArgs async)
 		{
-			Open();
+			await Open(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer();
 			startSpb.Append(IscCodes.isc_action_svc_display_user);
 			startSpb.Append(IscCodes.isc_spb_sec_username, userName);
-			StartTask(startSpb);
-			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users }, EmptySpb);
-			Close();
+			await StartTask(startSpb, async).ConfigureAwait(false);
+			var info = await Query(new byte[] { IscCodes.isc_info_svc_get_users }, EmptySpb, async).ConfigureAwait(false);
+			await Close(async).ConfigureAwait(false);
 			return ((FbUserData[])info.FirstOrDefault())?.FirstOrDefault();
 		}
 
-		public FbUserData[] DisplayUsers()
+		public FbUserData[] DisplayUsers() => DisplayUsersImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task<FbUserData[]> DisplayUsersAsync(CancellationToken cancellationToken = default) => DisplayUsersImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task<FbUserData[]> DisplayUsersImpl(AsyncWrappingCommonArgs async)
 		{
-			Open();
+			await Open(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer();
 			startSpb.Append(IscCodes.isc_action_svc_display_user);
-			StartTask(startSpb);
-			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users }, EmptySpb);
-			Close();
+			await StartTask(startSpb, async).ConfigureAwait(false);
+			var info = await Query(new byte[] { IscCodes.isc_info_svc_get_users }, EmptySpb, async).ConfigureAwait(false);
+			await Close(async).ConfigureAwait(false);
 			return (FbUserData[])info.FirstOrDefault();
 		}
 
-		public string GetUsersDbPath()
+		public string GetUsersDbPath() => GetUsersDbPathImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task<string> GetUsersDbPathAsync(CancellationToken cancellationToken = default) => GetUsersDbPathImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task<string> GetUsersDbPathImpl(AsyncWrappingCommonArgs async)
 		{
-			var info = Query(new byte[] { IscCodes.isc_info_svc_user_dbpath }, EmptySpb);
+			var info = await Query(new byte[] { IscCodes.isc_info_svc_user_dbpath }, EmptySpb, async).ConfigureAwait(false);
 			return (string)info.FirstOrDefault();
 		}
 	}

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net452;netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>net48;netstandard2.1</TargetFrameworks>
 		<AssemblyName>EntityFramework.Firebird</AssemblyName>
 		<RootNamespace>EntityFramework.Firebird</RootNamespace>
 		<SignAssembly>true</SignAssembly>
@@ -47,7 +47,7 @@
 	<ItemGroup>
 		<PackageReference Include="EntityFramework" Version="6.4.4" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net48'">
 		<Reference Include="System.Configuration" />
 		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>

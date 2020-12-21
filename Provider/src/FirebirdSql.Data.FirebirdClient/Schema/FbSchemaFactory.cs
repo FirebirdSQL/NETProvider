@@ -22,7 +22,8 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-
+using System.Threading.Tasks;
+using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Schema
@@ -45,7 +46,7 @@ namespace FirebirdSql.Data.Schema
 
 		#region Methods
 
-		public static DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
+		public static Task<DataTable> GetSchema(FbConnection connection, string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
 		{
 			var filter = string.Format("CollectionName = '{0}'", collectionName);
 			var ds = new DataSet();
@@ -85,13 +86,13 @@ namespace FirebirdSql.Data.Schema
 			switch (collection[0]["PopulationMechanism"].ToString())
 			{
 				case "PrepareCollection":
-					return PrepareCollection(connection, collectionName, restrictions);
+					return PrepareCollection(connection, collectionName, restrictions, async);
 
 				case "DataTable":
-					return ds.Tables[collection[0]["PopulationString"].ToString()].Copy();
+					return Task.FromResult(ds.Tables[collection[0]["PopulationString"].ToString()].Copy());
 
 				case "SQLCommand":
-					return SqlCommandSchema(connection, collectionName, restrictions);
+					return SqlCommandSchema(connection, collectionName, restrictions, async);
 
 				default:
 					throw new NotSupportedException("Unsupported population mechanism");
@@ -102,7 +103,7 @@ namespace FirebirdSql.Data.Schema
 
 		#region Private Methods
 
-		private static DataTable PrepareCollection(FbConnection connection, string collectionName, string[] restrictions)
+		private static Task<DataTable> PrepareCollection(FbConnection connection, string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
 		{
 			FbSchema returnSchema = collectionName.ToUpperInvariant() switch
 			{
@@ -134,10 +135,10 @@ namespace FirebirdSql.Data.Schema
 				"VIEWPRIVILEGES" => new FbViewPrivileges(),
 				_ => throw new NotSupportedException("The specified metadata collection is not supported."),
 			};
-			return returnSchema.GetSchema(connection, collectionName, restrictions);
+			return returnSchema.GetSchema(connection, collectionName, restrictions, async);
 		}
 
-		private static DataTable SqlCommandSchema(FbConnection connection, string collectionName, string[] restrictions)
+		private static Task<DataTable> SqlCommandSchema(FbConnection connection, string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
 		{
 			throw new NotImplementedException();
 		}

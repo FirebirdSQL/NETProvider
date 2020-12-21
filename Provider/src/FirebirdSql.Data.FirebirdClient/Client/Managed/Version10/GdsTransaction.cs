@@ -16,9 +16,8 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Data;
 using System.IO;
-
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
@@ -69,21 +68,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region IDisposable methods
+		#region Dispose2
 
-		public override void Dispose()
+		public override async Task Dispose2(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
 				if (_state != TransactionState.NoTransaction)
 				{
-					Rollback();
+					await Rollback(async).ConfigureAwait(false);
 				}
 				_database = null;
 				_handle = 0;
 				_state = TransactionState.NoTransaction;
-				base.Dispose();
+				await base.Dispose2(async).ConfigureAwait(false);
 			}
 		}
 
@@ -91,7 +90,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public override void BeginTransaction(TransactionParameterBuffer tpb)
+		public override async Task BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			if (_state != TransactionState.NoTransaction)
 			{
@@ -100,12 +99,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_transaction);
-				_database.Xdr.Write(_database.Handle);
-				_database.Xdr.WriteBuffer(tpb.ToArray());
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_transaction, async).ConfigureAwait(false);
+				await _database.Xdr.Write(_database.Handle, async).ConfigureAwait(false);
+				await _database.Xdr.WriteBuffer(tpb.ToArray(), async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				var response = _database.ReadResponse<GenericResponse>();
+				var response = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
 
 				_database.TransactionCount++;
 
@@ -118,17 +117,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override void Commit()
+		public override async Task Commit(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_commit);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_commit, async).ConfigureAwait(false);
+				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				_database.ReadResponse();
+				await _database.ReadResponse(async).ConfigureAwait(false);
 
 				_database.TransactionCount--;
 
@@ -142,17 +141,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override void Rollback()
+		public override async Task Rollback(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_rollback);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_rollback, async).ConfigureAwait(false);
+				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				_database.ReadResponse();
+				await _database.ReadResponse(async).ConfigureAwait(false);
 
 				_database.TransactionCount--;
 
@@ -166,17 +165,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override void CommitRetaining()
+		public override async Task CommitRetaining(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_commit_retaining);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_commit_retaining, async).ConfigureAwait(false);
+				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				_database.ReadResponse();
+				await _database.ReadResponse(async).ConfigureAwait(false);
 
 				_state = TransactionState.Active;
 			}
@@ -186,17 +185,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override void RollbackRetaining()
+		public override async Task RollbackRetaining(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_rollback_retaining);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_rollback_retaining, async).ConfigureAwait(false);
+				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				_database.ReadResponse();
+				await _database.ReadResponse(async).ConfigureAwait(false);
 
 				_state = TransactionState.Active;
 			}
@@ -210,7 +209,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Two Phase Commit Methods
 
-		public override void Prepare()
+		public override async Task Prepare(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -218,11 +217,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				_state = TransactionState.NoTransaction;
 
-				_database.Xdr.Write(IscCodes.op_prepare);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_prepare, async).ConfigureAwait(false);
+				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				_database.ReadResponse();
+				await _database.ReadResponse(async).ConfigureAwait(false);
 
 				_state = TransactionState.Prepared;
 			}
@@ -232,7 +231,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override void Prepare(byte[] buffer)
+		public override async Task Prepare(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -240,12 +239,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				_state = TransactionState.NoTransaction;
 
-				_database.Xdr.Write(IscCodes.op_prepare2);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.WriteBuffer(buffer, buffer.Length);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_prepare2, async).ConfigureAwait(false);
+				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+				await _database.Xdr.WriteBuffer(buffer, buffer.Length, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				_database.ReadResponse();
+				await _database.ReadResponse(async).ConfigureAwait(false);
 
 				_state = TransactionState.Prepared;
 			}

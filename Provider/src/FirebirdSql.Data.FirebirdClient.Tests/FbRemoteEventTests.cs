@@ -44,6 +44,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					triggered = e.Name == "test" && e.Counts == 1;
 				};
+				@event.Open();
 				@event.QueueEvents("test");
 				using (var cmd = Connection.CreateCommand())
 				{
@@ -71,6 +72,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					triggered = e.Name == "test" && e.Counts == 5;
 				};
+				@event.Open();
 				@event.QueueEvents("test");
 				using (var cmd = Connection.CreateCommand())
 				{
@@ -107,6 +109,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 							break;
 					}
 				};
+				@event.Open();
 				@event.QueueEvents("a", "b");
 				using (var cmd = Connection.CreateCommand())
 				{
@@ -146,6 +149,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 							break;
 					}
 				};
+				@event.Open();
 				@event.QueueEvents("a", "b");
 				using (var cmd = Connection.CreateCommand())
 				{
@@ -174,6 +178,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					triggered++;
 				};
+				@event.Open();
 				@event.QueueEvents("test");
 				using (var cmd = Connection.CreateCommand())
 				{
@@ -198,6 +203,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
+				@event.Open();
 				Assert.DoesNotThrow(() => @event.QueueEvents("test"));
 				Assert.Throws<InvalidOperationException>(() => @event.QueueEvents("test"));
 			}
@@ -213,6 +219,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					triggered++;
 				};
+				@event.Open();
 				@event.QueueEvents("test");
 				Thread.Sleep(2000);
 			}
@@ -236,6 +243,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					exception = e.Error;
 				};
+				@event.Open();
 				@event.QueueEvents("test");
 				Thread.Sleep(2000);
 			}

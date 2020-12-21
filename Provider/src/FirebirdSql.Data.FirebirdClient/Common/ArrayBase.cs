@@ -18,6 +18,7 @@
 using System;
 using System.Text;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
 {
@@ -66,17 +67,21 @@ namespace FirebirdSql.Data.Common
 
 		#region Methods
 
-		public Array Read()
+		public Task Initialize(AsyncWrappingCommonArgs async)
 		{
-			var slice = GetSlice(GetSliceLength(true));
-
-			return DecodeSlice(slice);
+			return LookupBounds(async);
 		}
 
-		public void Write(Array sourceArray)
+		public async Task<Array> Read(AsyncWrappingCommonArgs async)
+		{
+			var slice = await GetSlice(GetSliceLength(true), async).ConfigureAwait(false);
+			return await DecodeSlice(slice, async).ConfigureAwait(false);
+		}
+
+		public async Task Write(Array sourceArray, AsyncWrappingCommonArgs async)
 		{
 			SetDesc(sourceArray);
-			PutSlice(sourceArray, GetSliceLength(false));
+			await PutSlice(sourceArray, GetSliceLength(false), async).ConfigureAwait(false);
 		}
 
 		public void SetDesc(Array sourceArray)
@@ -92,53 +97,63 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public void LookupBounds()
+		private async Task LookupBounds(AsyncWrappingCommonArgs async)
 		{
-			LookupDesc();
+			await LookupDesc(async).ConfigureAwait(false);
 
-			using (var lookup = Database.CreateStatement(Transaction))
+			var lookup = Database.CreateStatement(Transaction);
+			try
 			{
-				lookup.Prepare(GetArrayBounds());
-				lookup.Execute();
+				await lookup.Prepare(GetArrayBounds(), async).ConfigureAwait(false);
+				await lookup.Execute(async).ConfigureAwait(false);
 
 				_descriptor.Bounds = new ArrayBound[16];
 				DbValue[] values;
 				var i = 0;
-				while ((values = lookup.Fetch()) != null)
+				while ((values = await lookup.Fetch(async).ConfigureAwait(false)) != null)
 				{
-					_descriptor.Bounds[i].LowerBound = values[0].GetInt32();
-					_descriptor.Bounds[i].UpperBound = values[1].GetInt32();
+					_descriptor.Bounds[i].LowerBound = await values[0].GetInt32(async).ConfigureAwait(false);
+					_descriptor.Bounds[i].UpperBound = await values[1].GetInt32(async).ConfigureAwait(false);
 
 					i++;
 				}
 			}
+			finally
+			{
+				await lookup.Dispose2(async).ConfigureAwait(false);
+			}
 		}
 
-		public void LookupDesc()
+		private async Task LookupDesc(AsyncWrappingCommonArgs async)
 		{
-			using (var lookup = Database.CreateStatement(Transaction))
+			var lookup = Database.CreateStatement(Transaction);
+			try
 			{
-				lookup.Prepare(GetArrayDesc());
-				lookup.Execute();
+				await lookup.Prepare(GetArrayDesc(), async).ConfigureAwait(false);
+				await lookup.Execute(async).ConfigureAwait(false);
 
 				_descriptor = new ArrayDesc();
-				var values = lookup.Fetch();
+				var values = await lookup.Fetch(async).ConfigureAwait(false);
 				if (values != null && values.Length > 0)
 				{
 					_descriptor.RelationName = _tableName;
 					_descriptor.FieldName = _fieldName;
-					_descriptor.DataType = values[0].GetByte();
-					_descriptor.Scale = values[1].GetInt16();
-					_descriptor.Length = values[2].GetInt16();
-					_descriptor.Dimensions = values[3].GetInt16();
+					_descriptor.DataType = await values[0].GetByte(async).ConfigureAwait(false);
+					_descriptor.Scale = await values[1].GetInt16(async).ConfigureAwait(false);
+					_descriptor.Length = await values[2].GetInt16(async).ConfigureAwait(false);
+					_descriptor.Dimensions = await values[3].GetInt16(async).ConfigureAwait(false);
 					_descriptor.Flags = 0;
 
-					_rdbFieldName = values[4].GetString().Trim();
+					_rdbFieldName = (await values[4].GetString(async).ConfigureAwait(false)).Trim();
 				}
 				else
 				{
 					throw new InvalidOperationException();
 				}
+			}
+			finally
+			{
+				await lookup.Dispose2(async).ConfigureAwait(false);
 			}
 		}
 
@@ -177,14 +192,14 @@ namespace FirebirdSql.Data.Common
 
 		#region Abstract Methods
 
-		public abstract byte[] GetSlice(int slice_length);
-		public abstract void PutSlice(Array source_array, int slice_length);
+		public abstract Task<byte[]> GetSlice(int slice_length, AsyncWrappingCommonArgs async);
+		public abstract Task PutSlice(Array source_array, int slice_length, AsyncWrappingCommonArgs async);
 
 		#endregion
 
 		#region Protected Abstract Methods
 
-		protected abstract Array DecodeSlice(byte[] slice);
+		protected abstract Task<Array> DecodeSlice(byte[] slice, AsyncWrappingCommonArgs async);
 
 		#endregion
 

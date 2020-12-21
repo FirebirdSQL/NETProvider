@@ -17,9 +17,9 @@
 
 using System;
 using System.IO;
-
-using FirebirdSql.Data.Common;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Native.Handle;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override void Create()
+		protected override Task Create(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -97,9 +97,10 @@ namespace FirebirdSql.Data.Client.Native
 			_db.ProcessStatusVector(_statusVector);
 
 			RblAddValue(IscCodes.RBL_create);
+			return Task.CompletedTask;
 		}
 
-		protected override void Open()
+		protected override Task Open(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -116,9 +117,11 @@ namespace FirebirdSql.Data.Client.Native
 				new byte[0]);
 
 			_db.ProcessStatusVector(_statusVector);
+
+			return Task.CompletedTask;
 		}
 
-		protected override void GetSegment(Stream stream)
+		protected override Task GetSegment(Stream stream, AsyncWrappingCommonArgs async)
 		{
 			var requested = (short)SegmentSize;
 			short segmentLength = 0;
@@ -140,7 +143,7 @@ namespace FirebirdSql.Data.Client.Native
 			if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
 			{
 				RblAddValue(IscCodes.RBL_eof_pending);
-				return;
+				return Task.CompletedTask;
 			}
 			else
 			{
@@ -155,9 +158,11 @@ namespace FirebirdSql.Data.Client.Native
 			}
 
 			stream.Write(tmp, 0, segmentLength);
+
+			return Task.CompletedTask;
 		}
 
-		protected override void PutSegment(byte[] buffer)
+		protected override Task PutSegment(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -168,34 +173,35 @@ namespace FirebirdSql.Data.Client.Native
 				buffer);
 
 			_db.ProcessStatusVector(_statusVector);
+
+			return Task.CompletedTask;
 		}
 
-		protected override void Seek(int position)
+		protected override Task Seek(int position, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
 
-		protected override void GetBlobInfo()
-		{
-			throw new NotSupportedException();
-		}
-
-		protected override void Close()
+		protected override Task Close(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
 			_db.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
 
 			_db.ProcessStatusVector(_statusVector);
+
+			return Task.CompletedTask;
 		}
 
-		protected override void Cancel()
+		protected override Task Cancel(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
 			_db.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
 
 			_db.ProcessStatusVector(_statusVector);
+
+			return Task.CompletedTask;
 		}
 
 		#endregion

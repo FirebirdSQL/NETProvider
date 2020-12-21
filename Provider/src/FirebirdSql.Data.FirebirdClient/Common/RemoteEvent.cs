@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
 {
@@ -54,7 +55,7 @@ namespace FirebirdSql.Data.Common
 			_db = db;
 		}
 
-		public void QueueEvents(ICollection<string> events)
+		public Task QueueEvents(ICollection<string> events, AsyncWrappingCommonArgs async)
 		{
 			if (Interlocked.Exchange(ref _running, 1) == 1)
 				throw new InvalidOperationException("Events are already running.");
@@ -67,27 +68,27 @@ namespace FirebirdSql.Data.Common
 			if (BuildEpb(events.ToList(), _ => default).ToArray().Length > MaxEpbLength)
 				throw new ArgumentOutOfRangeException(nameof(events), $"Whole events buffer is bigger than {MaxEpbLength}.");
 			_events.AddRange(events);
-			QueueEventsImpl();
+			return QueueEventsImpl(async);
 		}
 
-		public void CancelEvents()
+		public async Task CancelEvents(AsyncWrappingCommonArgs async)
 		{
-			_db.CancelEvents(this);
+			await _db.CancelEvents(this, async).ConfigureAwait(false);
 			_currentCounts = null;
 			_previousCounts = null;
 			_events.Clear();
 			Volatile.Write(ref _running, 0);
 		}
 
-		void QueueEventsImpl()
+		Task QueueEventsImpl(AsyncWrappingCommonArgs async)
 		{
-			_db.QueueEvents(this);
+			return _db.QueueEvents(this, async);
 		}
 
-		internal void EventCounts(byte[] buffer)
+		internal Task EventCounts(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			if (Volatile.Read(ref _running) == 0)
-				return;
+				return Task.CompletedTask;
 
 			_previousCounts = _currentCounts;
 			_currentCounts = new int[_events.Count];
@@ -115,7 +116,7 @@ namespace FirebirdSql.Data.Common
 				EventCountsCallback(_events[i], count);
 			}
 
-			QueueEventsImpl();
+			return QueueEventsImpl(async);
 		}
 
 		internal void EventError(Exception error)

@@ -19,6 +19,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.IO;
 using FirebirdSql.Data.Common;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Client.Native.Marshalers
 {
@@ -63,7 +64,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 			}
 		}
 
-		public static IntPtr MarshalManagedToNative(Charset charset, Descriptor descriptor)
+		public static async ValueTask<IntPtr> MarshalManagedToNative(Charset charset, Descriptor descriptor, AsyncWrappingCommonArgs async)
 		{
 			var xsqlda = new XSQLDA
 			{
@@ -87,7 +88,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 				if (descriptor[i].HasDataType() && descriptor[i].DbDataType != DbDataType.Null)
 				{
-					var buffer = descriptor[i].DbValue.GetBytes();
+					var buffer = await descriptor[i].DbValue.GetBytes(async).ConfigureAwait(false);
 					xsqlvar[i].sqldata = Marshal.AllocHGlobal(buffer.Length);
 					Marshal.Copy(buffer, 0, xsqlvar[i].sqldata, buffer.Length);
 				}

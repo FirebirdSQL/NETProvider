@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Client.Native.Handle;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -91,22 +92,22 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region IDisposable methods
+		#region Dispose2
 
-		public override void Dispose()
+		public override async Task Dispose2(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
 				if (_state != TransactionState.NoTransaction)
 				{
-					Rollback();
+					await Rollback(async).ConfigureAwait(false);
 				}
 				_db = null;
 				_handle.Dispose();
 				_state = TransactionState.NoTransaction;
 				_statusVector = null;
-				base.Dispose();
+				await base.Dispose2(async).ConfigureAwait(false);
 			}
 		}
 
@@ -114,7 +115,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override void BeginTransaction(TransactionParameterBuffer tpb)
+		public override Task BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			if (_state != TransactionState.NoTransaction)
 			{
@@ -169,9 +170,11 @@ namespace FirebirdSql.Data.Client.Native
 					Marshal.FreeHGlobal(tebData);
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
-		public override void Commit()
+		public override Task Commit(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -186,9 +189,11 @@ namespace FirebirdSql.Data.Client.Native
 			Update?.Invoke(this, new EventArgs());
 
 			_state = TransactionState.NoTransaction;
+
+			return Task.CompletedTask;
 		}
 
-		public override void Rollback()
+		public override Task Rollback(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -203,9 +208,11 @@ namespace FirebirdSql.Data.Client.Native
 			Update?.Invoke(this, new EventArgs());
 
 			_state = TransactionState.NoTransaction;
+
+			return Task.CompletedTask;
 		}
 
-		public override void CommitRetaining()
+		public override Task CommitRetaining(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -216,9 +223,11 @@ namespace FirebirdSql.Data.Client.Native
 			_db.ProcessStatusVector(_statusVector);
 
 			_state = TransactionState.Active;
+
+			return Task.CompletedTask;
 		}
 
-		public override void RollbackRetaining()
+		public override Task RollbackRetaining(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -229,17 +238,23 @@ namespace FirebirdSql.Data.Client.Native
 			_db.ProcessStatusVector(_statusVector);
 
 			_state = TransactionState.Active;
+
+			return Task.CompletedTask;
 		}
 
 		#endregion
 
 		#region Two Phase Commit Methods
 
-		public override void Prepare()
-		{ }
+		public override Task Prepare(AsyncWrappingCommonArgs async)
+		{
+			return Task.CompletedTask;
+		}
 
-		public override void Prepare(byte[] buffer)
-		{ }
+		public override Task Prepare(byte[] buffer, AsyncWrappingCommonArgs async)
+		{
+			return Task.CompletedTask;
+		}
 
 		#endregion
 

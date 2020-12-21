@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.Schema
 			return sql;
 		}
 
-		protected override DataTable ProcessResult(DataTable schema)
+		protected override void ProcessResult(DataTable schema)
 		{
 			schema.BeginLoadData();
 			schema.Columns.Add("IS_PRIMARY", typeof(bool));
@@ -110,8 +110,6 @@ namespace FirebirdSql.Data.Schema
 			schema.AcceptChanges();
 
 			schema.Columns.Remove("PRIMARY_KEY");
-
-			return schema;
 		}
 
 		#endregion

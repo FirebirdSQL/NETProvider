@@ -15,14 +15,9 @@
 
 //$Authors = Hajime Nakagami, Jiri Cincura (jiri@cincura.net)
 
-using System;
-using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Net;
-using System.Collections.Generic;
-
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version13
@@ -33,52 +28,53 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			: base(connection)
 		{ }
 
-		public override void Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override async Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				SendAttachToBuffer(dpb, database);
-				Xdr.Flush();
-				var response = ReadResponse();
-				response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
-				ProcessAttachResponse(response as GenericResponse);
+				await SendAttachToBuffer(dpb, database, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
+				var response = await ReadResponse(async).ConfigureAwait(false);
+				response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
+				await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
 			}
 			catch (IscException)
 			{
-				SafelyDetach();
+				await SafelyDetach(async).ConfigureAwait(false);
 				throw;
 			}
 			catch (IOException ex)
 			{
-				SafelyDetach();
+				await SafelyDetach(async).ConfigureAwait(false);
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 
-			AfterAttachActions();
+			await AfterAttachActions(async).ConfigureAwait(false);
 		}
 
-		protected override void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
+		protected override async Task SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
-			Xdr.Write(IscCodes.op_attach);
-			Xdr.Write(0);
+			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
+			await Xdr.Write(0, async).ConfigureAwait(false);
 			if (AuthData != null)
 			{
 				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			Xdr.WriteBuffer(dpb.ToArray());
+			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		public override void CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
+
 			try
 			{
-				SendCreateToBuffer(dpb, database);
-				Xdr.Flush();
-				var response = ReadResponse();
-				response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
-				ProcessCreateResponse(response as GenericResponse);
+				await SendCreateToBuffer(dpb, database, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
+				var response = await ReadResponse(async).ConfigureAwait(false);
+				response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
+				await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
 			}
 			catch (IOException ex)
 			{
@@ -86,37 +82,37 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 		}
 
-		protected override void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
+		protected override async Task SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
-			Xdr.Write(IscCodes.op_create);
-			Xdr.Write(0);
+			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
+			await Xdr.Write(0, async).ConfigureAwait(false);
 			if (AuthData != null)
 			{
 				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			Xdr.WriteBuffer(dpb.ToArray());
+			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
-			Attach(dpb, dataSource, port, database, cryptKey);
+			return Attach(dpb, dataSource, port, database, cryptKey, async);
 		}
 
-		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
-			CreateDatabase(dpb, dataSource, port, database, cryptKey);
+			return CreateDatabase(dpb, dataSource, port, database, cryptKey, async);
 		}
 
-		public IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
+		internal async Task<IResponse> ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			while (response is CryptKeyCallbackResponse cryptResponse)
 			{
-				Xdr.Write(IscCodes.op_crypt_key_callback);
-				Xdr.WriteBuffer(cryptKey);
-				Xdr.Flush();
-				response = ReadResponse();
+				await Xdr.Write(IscCodes.op_crypt_key_callback, async).ConfigureAwait(false);
+				await Xdr.WriteBuffer(cryptKey, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
+				response = await ReadResponse(async).ConfigureAwait(false);
 			}
 			return response;
 		}

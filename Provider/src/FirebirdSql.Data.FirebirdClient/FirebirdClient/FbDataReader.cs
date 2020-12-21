@@ -21,9 +21,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Globalization;
 using System.Linq;
-
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
@@ -71,13 +72,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal FbDataReader()
 			: base()
-		{
-		}
+		{ }
 
-		internal FbDataReader(
-			FbCommand command,
-			FbConnection connection,
-			CommandBehavior commandBehavior)
+		internal FbDataReader(FbCommand command, FbConnection connection, CommandBehavior commandBehavior)
 		{
 			_position = StartPosition;
 			_command = command;
@@ -141,45 +138,61 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region DbDataReader overriden methods
 
-		public override void Close()
+		public override void Close() => CloseImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+#if NET48 || NETSTANDARD2_0
+		public Task CloseAsync()
+#else
+		public override Task CloseAsync()
+#endif
+			=> CloseImpl(new AsyncWrappingCommonArgs(true));
+		private async Task CloseImpl(AsyncWrappingCommonArgs async)
 		{
-			Dispose();
+			if (!IsClosed)
+			{
+				_isClosed = true;
+				if (_command != null && !_command.IsDisposed)
+				{
+					if (_command.CommandType == CommandType.StoredProcedure)
+					{
+						await _command.SetOutputParameters(async).ConfigureAwait(false);
+					}
+					if (_command.HasImplicitTransaction)
+					{
+						await _command.CommitImplicitTransaction(async).ConfigureAwait(false);
+					}
+					_command.ActiveReader = null;
+				}
+				if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
+				{
+					await _connection.CloseImpl(async).ConfigureAwait(false);
+				}
+				_position = StartPosition;
+				_command = null;
+				_connection = null;
+				_row = null;
+				_schemaTable = null;
+				_fields = null;
+			}
 		}
 
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing)
 			{
-				if (!IsClosed)
-				{
-					_isClosed = true;
-					if (_command != null && !_command.IsDisposed)
-					{
-						if (_command.CommandType == CommandType.StoredProcedure)
-						{
-							_command.SetOutputParameters();
-						}
-						if (_command.HasImplicitTransaction)
-						{
-							_command.CommitImplicitTransaction();
-						}
-						_command.ActiveReader = null;
-					}
-					if (_connection != null && IsCommandBehavior(CommandBehavior.CloseConnection))
-					{
-						_connection.Close();
-					}
-					_position = StartPosition;
-					_command = null;
-					_connection = null;
-					_row = null;
-					_schemaTable = null;
-					_fields = null;
-				}
+				Close();
 			}
 		}
+#if !(NET48 || NETSTANDARD2_0)
+		public override async ValueTask DisposeAsync()
+		{
+			await CloseAsync().ConfigureAwait(false);
+			await base.DisposeAsync().ConfigureAwait(false);
+		}
+#endif
 
-		public override bool Read()
+		public override bool Read() => ReadImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public override Task<bool> ReadAsync(CancellationToken cancellationToken) => ReadImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task<bool> ReadImpl(AsyncWrappingCommonArgs async)
 		{
 			CheckState();
 
@@ -195,7 +208,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					_row = _command.Fetch();
+					_row = await _command.Fetch(async).ConfigureAwait(false);
 
 					if (_row != null)
 					{
@@ -212,7 +225,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			return retValue;
 		}
 
-		public override DataTable GetSchemaTable()
+		public override DataTable GetSchemaTable() => GetSchemaTableImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+		public Task<DataTable> GetSchemaTableAsync(CancellationToken cancellationToken = default)
+#else
+		public override Task<DataTable> GetSchemaTableAsync(CancellationToken cancellationToken = default)
+#endif
+			=> GetSchemaTableImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task<DataTable> GetSchemaTableImpl(AsyncWrappingCommonArgs async)
 		{
 			CheckState();
 
@@ -228,97 +248,109 @@ namespace FirebirdSql.Data.FirebirdClient
 			_schemaTable = GetSchemaTableStructure();
 
 			/* Prepare statement for schema fields information	*/
-			var schemaCmd = new FbCommand(
-				GetSchemaCommandText(),
-				_command.Connection,
-				_command.Connection.InnerConnection.ActiveTransaction);
-
-			schemaCmd.Parameters.Add("@TABLE_NAME", FbDbType.Char, 31);
-			schemaCmd.Parameters.Add("@COLUMN_NAME", FbDbType.Char, 31);
-			schemaCmd.Prepare();
-
-			_schemaTable.BeginLoadData();
-
-			for (var i = 0; i < _fields.Count; i++)
+			var schemaCmd = new FbCommand(GetSchemaCommandText(), _command.Connection, _command.Connection.InnerConnection.ActiveTransaction);
+			try
 			{
-				var isKeyColumn = false;
-				var isUnique = false;
-				var isReadOnly = false;
-				var precision = 0;
-				var isExpression = false;
+				schemaCmd.Parameters.Add("@TABLE_NAME", FbDbType.Char, 31);
+				schemaCmd.Parameters.Add("@COLUMN_NAME", FbDbType.Char, 31);
+				await schemaCmd.PrepareImpl(async).ConfigureAwait(false);
 
-				/* Get Schema data for the field	*/
-				schemaCmd.Parameters[0].Value = _fields[i].Relation;
-				schemaCmd.Parameters[1].Value = _fields[i].Name;
+				_schemaTable.BeginLoadData();
 
-				using (var r = schemaCmd.ExecuteReader())
+				for (var i = 0; i < _fields.Count; i++)
 				{
-					if (r.Read())
+					var isKeyColumn = false;
+					var isUnique = false;
+					var isReadOnly = false;
+					var precision = 0;
+					var isExpression = false;
+
+					/* Get Schema data for the field	*/
+					schemaCmd.Parameters[0].Value = _fields[i].Relation;
+					schemaCmd.Parameters[1].Value = _fields[i].Name;
+
+					var reader = await schemaCmd.ExecuteReaderImpl(CommandBehavior.Default, async).ConfigureAwait(false);
+					try
 					{
-						isReadOnly = (IsReadOnly(r) || IsExpression(r)) ? true : false;
-						isKeyColumn = (r.GetInt32(2) == 1) ? true : false;
-						isUnique = (r.GetInt32(3) == 1) ? true : false;
-						precision = r.IsDBNull(4) ? -1 : r.GetInt32(4);
-						isExpression = IsExpression(r);
+						if (await reader.ReadImpl(async).ConfigureAwait(false))
+						{
+							isReadOnly = (IsReadOnly(reader) || IsExpression(reader)) ? true : false;
+							isKeyColumn = (reader.GetInt32(2) == 1) ? true : false;
+							isUnique = (reader.GetInt32(3) == 1) ? true : false;
+							precision = reader.IsDBNull(4) ? -1 : reader.GetInt32(4);
+							isExpression = IsExpression(reader);
+						}
+					}
+					finally
+					{
+#if NET48 || NETSTANDARD2_0
+						reader.Dispose();
+#else
+						await async.AsyncSyncCallNoCancellation(reader.DisposeAsync, reader.Dispose).ConfigureAwait(false);
+#endif
+					}
+
+					/* Create new row for the Schema Table	*/
+					schemaRow = _schemaTable.NewRow();
+
+					schemaRow["ColumnName"] = GetName(i);
+					schemaRow["ColumnOrdinal"] = i;
+					schemaRow["ColumnSize"] = _fields[i].GetSize();
+					if (_fields[i].IsDecimal())
+					{
+						schemaRow["NumericPrecision"] = schemaRow["ColumnSize"];
+						if (precision > 0)
+						{
+							schemaRow["NumericPrecision"] = precision;
+						}
+						schemaRow["NumericScale"] = _fields[i].NumericScale * (-1);
+					}
+					schemaRow["DataType"] = GetFieldType(i);
+					schemaRow["ProviderType"] = GetProviderType(i);
+					schemaRow["IsLong"] = _fields[i].IsLong();
+					schemaRow["AllowDBNull"] = _fields[i].AllowDBNull();
+					schemaRow["IsRowVersion"] = false;
+					schemaRow["IsAutoIncrement"] = false;
+					schemaRow["IsReadOnly"] = isReadOnly;
+					schemaRow["IsKey"] = isKeyColumn;
+					schemaRow["IsUnique"] = isUnique;
+					schemaRow["IsAliased"] = _fields[i].IsAliased();
+					schemaRow["IsExpression"] = isExpression;
+					schemaRow["BaseSchemaName"] = DBNull.Value;
+					schemaRow["BaseCatalogName"] = DBNull.Value;
+					schemaRow["BaseTableName"] = _fields[i].Relation;
+					schemaRow["BaseColumnName"] = _fields[i].Name;
+
+					_schemaTable.Rows.Add(schemaRow);
+
+					if (!string.IsNullOrEmpty(_fields[i].Relation) && currentTable != _fields[i].Relation)
+					{
+						tableCount++;
+						currentTable = _fields[i].Relation;
+					}
+
+					await schemaCmd.Close(async).ConfigureAwait(false);
+				}
+
+				if (tableCount > 1)
+				{
+					foreach (DataRow row in _schemaTable.Rows)
+					{
+						row["IsKey"] = false;
+						row["IsUnique"] = false;
 					}
 				}
 
-				/* Create new row for the Schema Table	*/
-				schemaRow = _schemaTable.NewRow();
-
-				schemaRow["ColumnName"] = GetName(i);
-				schemaRow["ColumnOrdinal"] = i;
-				schemaRow["ColumnSize"] = _fields[i].GetSize();
-				if (_fields[i].IsDecimal())
-				{
-					schemaRow["NumericPrecision"] = schemaRow["ColumnSize"];
-					if (precision > 0)
-					{
-						schemaRow["NumericPrecision"] = precision;
-					}
-					schemaRow["NumericScale"] = _fields[i].NumericScale * (-1);
-				}
-				schemaRow["DataType"] = GetFieldType(i);
-				schemaRow["ProviderType"] = GetProviderType(i);
-				schemaRow["IsLong"] = _fields[i].IsLong();
-				schemaRow["AllowDBNull"] = _fields[i].AllowDBNull();
-				schemaRow["IsRowVersion"] = false;
-				schemaRow["IsAutoIncrement"] = false;
-				schemaRow["IsReadOnly"] = isReadOnly;
-				schemaRow["IsKey"] = isKeyColumn;
-				schemaRow["IsUnique"] = isUnique;
-				schemaRow["IsAliased"] = _fields[i].IsAliased();
-				schemaRow["IsExpression"] = isExpression;
-				schemaRow["BaseSchemaName"] = DBNull.Value;
-				schemaRow["BaseCatalogName"] = DBNull.Value;
-				schemaRow["BaseTableName"] = _fields[i].Relation;
-				schemaRow["BaseColumnName"] = _fields[i].Name;
-
-				_schemaTable.Rows.Add(schemaRow);
-
-				if (!string.IsNullOrEmpty(_fields[i].Relation) && currentTable != _fields[i].Relation)
-				{
-					tableCount++;
-					currentTable = _fields[i].Relation;
-				}
-
-				/* Close statement	*/
-				schemaCmd.Close();
+				_schemaTable.EndLoadData();
 			}
-
-			if (tableCount > 1)
+			finally
 			{
-				foreach (DataRow row in _schemaTable.Rows)
-				{
-					row["IsKey"] = false;
-					row["IsUnique"] = false;
-				}
+#if NET48 || NETSTANDARD2_0
+				schemaCmd.Dispose();
+#else
+				await async.AsyncSyncCallNoCancellation(schemaCmd.DisposeAsync, schemaCmd.Dispose).ConfigureAwait(false);
+#endif
 			}
-
-			_schemaTable.EndLoadData();
-
-			/* Dispose command	*/
-			schemaCmd.Dispose();
 
 			return _schemaTable;
 		}
@@ -404,7 +436,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].Value, i);
+			return CheckedGetValue(_row[i].GetValue);
 		}
 
 		public override int GetValues(object[] values)
@@ -415,7 +447,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			var count = Math.Min(_fields.Count, values.Length);
 			for (var i = 0; i < count; i++)
 			{
-				values[i] = CheckedGetValue(x => GetValue(x), i);
+				values[i] = GetValue(i);
 			}
 			return count;
 		}
@@ -425,7 +457,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetBoolean(), i);
+			return CheckedGetValue(_row[i].GetBoolean);
 		}
 
 		public override byte GetByte(int i)
@@ -433,7 +465,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetByte(), i);
+			return CheckedGetValue(_row[i].GetByte);
 		}
 
 		public override long GetBytes(int i, long dataIndex, byte[] buffer, int bufferIndex, int length)
@@ -452,12 +484,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return CheckedGetValue(x => _row[x].GetBinary(), i).Length;
+					return CheckedGetValue(_row[i].GetBinary).Length;
 				}
 			}
 			else
 			{
-				var byteArray = CheckedGetValue(x => _row[x].GetBinary(), i);
+				var byteArray = CheckedGetValue(_row[i].GetBinary);
 
 				if (length > (byteArray.Length - dataIndex))
 				{
@@ -485,7 +517,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetChar(), i);
+			return CheckedGetValue(_row[i].GetChar);
 		}
 
 		public override long GetChars(int i, long dataIndex, char[] buffer, int bufferIndex, int length)
@@ -501,13 +533,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return CheckedGetValue(x => (string)GetValue(x), i).ToCharArray().Length;
+					return ((string)GetValue(i)).ToCharArray().Length;
 				}
 			}
 			else
 			{
 
-				var charArray = CheckedGetValue(x => (string)GetValue(x), i).ToCharArray();
+				var charArray = ((string)GetValue(i)).ToCharArray();
 
 				var charsRead = 0;
 				var realLength = length;
@@ -538,7 +570,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetGuid(), i);
+			return CheckedGetValue(_row[i].GetGuid);
 		}
 
 		public override Int16 GetInt16(int i)
@@ -546,7 +578,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetInt16(), i);
+			return CheckedGetValue(_row[i].GetInt16);
 		}
 
 		public override Int32 GetInt32(int i)
@@ -554,7 +586,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetInt32(), i);
+			return CheckedGetValue(_row[i].GetInt32);
 		}
 
 		public override Int64 GetInt64(int i)
@@ -562,7 +594,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetInt64(), i);
+			return CheckedGetValue(_row[i].GetInt64);
 		}
 
 		public override float GetFloat(int i)
@@ -570,7 +602,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetFloat(), i);
+			return CheckedGetValue(_row[i].GetFloat);
 		}
 
 		public override double GetDouble(int i)
@@ -578,7 +610,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetDouble(), i);
+			return CheckedGetValue(_row[i].GetDouble);
 		}
 
 		public override string GetString(int i)
@@ -586,7 +618,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetString(), i);
+			return CheckedGetValue(_row[i].GetString);
 		}
 
 		public override Decimal GetDecimal(int i)
@@ -594,7 +626,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetDecimal(), i);
+			return CheckedGetValue(_row[i].GetDecimal);
 		}
 
 		public override DateTime GetDateTime(int i)
@@ -602,15 +634,17 @@ namespace FirebirdSql.Data.FirebirdClient
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(x => _row[x].GetDateTime(), i);
+			return CheckedGetValue(_row[i].GetDateTime);
 		}
 
-		public override bool IsDBNull(int i)
+		public override bool IsDBNull(int i) => IsDBNullImpl(i, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public override Task<bool> IsDBNullAsync(int i, CancellationToken cancellationToken) => IsDBNullImpl(i, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task<bool> IsDBNullImpl(int i, AsyncWrappingCommonArgs async)
 		{
 			CheckPosition();
 			CheckIndex(i);
 
-			return _row[i].IsDBNull();
+			return await _row[i].IsDBNull(async).ConfigureAwait(false);
 		}
 
 		public override IEnumerator GetEnumerator()
@@ -618,14 +652,16 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new DbEnumerator(this, IsCommandBehavior(CommandBehavior.CloseConnection));
 		}
 
-		public override bool NextResult()
+		public override bool NextResult() => NextResultImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public override Task<bool> NextResultAsync(CancellationToken cancellationToken) => NextResultImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		private Task<bool> NextResultImpl(AsyncWrappingCommonArgs async)
 		{
-			return false;
+			return Task.FromResult(false);
 		}
 
-		#endregion
+#endregion
 
-		#region Private Methods
+#region Private Methods
 
 		private void CheckPosition()
 		{
@@ -693,9 +729,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return index;
 		}
 
-		#endregion
+#endregion
 
-		#region Static Methods
+#region Static Methods
 
 		private static bool IsReadOnly(FbDataReader r)
 		{
@@ -772,11 +808,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			return sql;
 		}
 
-		private static T CheckedGetValue<T>(Func<int, T> f, int index)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static T CheckedGetValue<T>(Func<AsyncWrappingCommonArgs, ValueTask<T>> getter)
 		{
 			try
 			{
-				return f(index);
+				return getter(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
 			}
 			catch (IscException ex)
 			{
@@ -784,6 +821,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 	}
 }

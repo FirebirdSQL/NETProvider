@@ -16,10 +16,8 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
-
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version12
@@ -40,12 +38,9 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		#region Overriden Methods
 
-		public override void Execute()
+		public override async Task Execute(AsyncWrappingCommonArgs async)
 		{
-			if (State == StatementState.Deallocated)
-			{
-				throw new InvalidOperationException("Statement is not correctly created.");
-			}
+			EnsureNotDeallocated();
 
 			Clear();
 
@@ -53,9 +48,9 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			{
 				RecordsAffected = -1;
 
-				SendExecuteToBuffer();
+				await SendExecuteToBuffer(async).ConfigureAwait(false);
 
-				_database.Xdr.Flush();
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
 				var numberOfResponses = (StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1;
 				try
@@ -64,37 +59,37 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					if (StatementType == DbStatementType.StoredProcedure)
 					{
 						numberOfResponses--;
-						sqlStoredProcedureResponse = _database.ReadResponse<SqlResponse>();
-						ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
+						sqlStoredProcedureResponse = (SqlResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+						await ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse, async).ConfigureAwait(false);
 					}
 
 					numberOfResponses--;
-					var executeResponse = _database.ReadResponse<GenericResponse>();
-					ProcessExecuteResponse(executeResponse);
+					var executeResponse = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+					await ProcessExecuteResponse(executeResponse, async).ConfigureAwait(false);
 				}
 				finally
 				{
-					SafeFinishFetching(ref numberOfResponses);
+					numberOfResponses = await SafeFinishFetching(numberOfResponses, async).ConfigureAwait(false);
 				}
 
 				// we need to split this in two, to allow server handle op_cancel properly
 
 				if (DoRecordsAffected)
 				{
-					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+					await SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, async).ConfigureAwait(false);
 
-					_database.Xdr.Flush();
+					await _database.Xdr.Flush(async).ConfigureAwait(false);
 
 					numberOfResponses = 1;
 					try
 					{
 						numberOfResponses--;
-						var rowsAffectedResponse = _database.ReadResponse<GenericResponse>();
-						RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(rowsAffectedResponse));
+						var rowsAffectedResponse = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+						RecordsAffected = ProcessRecordsAffectedBuffer(await ProcessInfoSqlResponse(rowsAffectedResponse, async).ConfigureAwait(false));
 					}
 					finally
 					{
-						SafeFinishFetching(ref numberOfResponses);
+						numberOfResponses = await SafeFinishFetching(numberOfResponses, async).ConfigureAwait(false);
 					}
 				}
 

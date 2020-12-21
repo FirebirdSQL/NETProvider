@@ -18,7 +18,8 @@
 using System;
 using System.Data;
 using System.Data.Common;
-
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
@@ -58,6 +59,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _connection; }
 		}
 
+#if !(NET48 || NETSTANDARD2_0 || NETSTANDARD2_1)
+		public override bool SupportsSavepoints
+		{
+			get { return true; }
+		}
+#endif
+
 		#endregion
 
 		#region Constructors
@@ -74,66 +82,42 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region IDisposable methods
+		#region IDisposable, IAsyncDisposable methods
 
 		protected override void Dispose(bool disposing)
 		{
-			if (disposing)
-			{
-				if (!_disposed)
-				{
-					_disposed = true;
-					if (_transaction != null)
-					{
-						if (!_isCompleted)
-						{
-							try
-							{
-								_transaction.Dispose();
-							}
-							catch (IscException ex)
-							{
-								throw new FbException(ex.Message, ex);
-							}
-						}
-					}
-					_connection = null;
-					_transaction = null;
-					_isCompleted = true;
-				}
-			}
+			DisposeHelper(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
 			base.Dispose(disposing);
 		}
-
-		#endregion
-
-		#region DbTransaction Methods
-
-		public override void Commit()
+#if !(NET48 || NETSTANDARD2_0)
+		public override async ValueTask DisposeAsync()
 		{
-			EnsureCompleted();
-			try
-			{
-				_transaction.Commit();
-				CompleteTransaction();
-			}
-			catch (IscException ex)
-			{
-				throw new FbException(ex.Message, ex);
-			}
+			await DisposeHelper(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
+			await base.DisposeAsync().ConfigureAwait(false);
 		}
-
-		public override void Rollback()
+#endif
+		private async Task DisposeHelper(AsyncWrappingCommonArgs async)
 		{
-			EnsureCompleted();
-			try
+			if (!_disposed)
 			{
-				_transaction.Rollback();
-				CompleteTransaction();
-			}
-			catch (IscException ex)
-			{
-				throw new FbException(ex.Message, ex);
+				_disposed = true;
+				if (_transaction != null)
+				{
+					if (!_isCompleted)
+					{
+						try
+						{
+							await _transaction.Dispose2(async).ConfigureAwait(false);
+						}
+						catch (IscException ex)
+						{
+							throw new FbException(ex.Message, ex);
+						}
+					}
+				}
+				_connection = null;
+				_transaction = null;
+				_isCompleted = true;
 			}
 		}
 
@@ -141,15 +125,74 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Methods
 
+		public override void Commit() => CommitImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+#if NET48 || NETSTANDARD2_0
+		public Task CommitAsync(CancellationToken cancellationToken = default)
+#else
+		public override Task CommitAsync(CancellationToken cancellationToken = default)
+#endif
+			=> CommitImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		internal async Task CommitImpl(AsyncWrappingCommonArgs async)
+		{
+			EnsureCompleted();
+			try
+			{
+				await _transaction.Commit(async).ConfigureAwait(false);
+				await CompleteTransaction(async).ConfigureAwait(false);
+			}
+			catch (IscException ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+		}
+
+		public override void Rollback() => RollbackImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+#if NET48 || NETSTANDARD2_0
+		public Task RollbackAsync(CancellationToken cancellationToken = default)
+#else
+		public override Task RollbackAsync(CancellationToken cancellationToken = default)
+#endif
+			=> RollbackImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		internal async Task RollbackImpl(AsyncWrappingCommonArgs async)
+		{
+			EnsureCompleted();
+			try
+			{
+				await _transaction.Rollback(async).ConfigureAwait(false);
+				await CompleteTransaction(async).ConfigureAwait(false);
+			}
+			catch (IscException ex)
+			{
+				throw new FbException(ex.Message, ex);
+			}
+		}
+
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 		public void Save(string savePointName)
+#else
+		public override void Save(string savePointName)
+#endif
+			=> SaveImpl(savePointName, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+		public Task SaveAsync(string savePointName, CancellationToken cancellationToken = default)
+#else
+		public override Task SaveAsync(string savePointName, CancellationToken cancellationToken = default)
+#endif
+			=> SaveImpl(savePointName, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task SaveImpl(string savePointName, AsyncWrappingCommonArgs async)
 		{
 			EnsureSavePointName(savePointName);
 			EnsureCompleted();
 			try
 			{
-				using (var command = new FbCommand($"SAVEPOINT {savePointName}", _connection, this))
+				var command = new FbCommand($"SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
+				using (command)
+#else
+				await using (command)
+#endif
 				{
-					command.ExecuteNonQuery();
+					await async.AsyncSyncCall(command.ExecuteNonQueryAsync, command.ExecuteNonQuery).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
@@ -158,15 +201,32 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public void Commit(string savePointName)
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+		public void Release(string savePointName)
+#else
+		public override void Release(string savePointName)
+#endif
+			=> ReleaseImpl(savePointName, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+		public Task ReleaseAsync(string savePointName, CancellationToken cancellationToken = default)
+#else
+		public override Task ReleaseAsync(string savePointName, CancellationToken cancellationToken = default)
+#endif
+			=> ReleaseImpl(savePointName, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task ReleaseImpl(string savePointName, AsyncWrappingCommonArgs async)
 		{
 			EnsureSavePointName(savePointName);
 			EnsureCompleted();
 			try
 			{
-				using (var command = new FbCommand($"RELEASE SAVEPOINT {savePointName}", _connection, this))
+				var command = new FbCommand($"RELEASE SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
+				using (command)
+#else
+				await using (command)
+#endif
 				{
-					command.ExecuteNonQuery();
+					await async.AsyncSyncCall(command.ExecuteNonQueryAsync, command.ExecuteNonQuery).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
@@ -175,15 +235,32 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 		public void Rollback(string savePointName)
+#else
+		public override void Rollback(string savePointName)
+#endif
+			=> RollbackImpl(savePointName, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+		public Task RollbackAsync(string savePointName, CancellationToken cancellationToken = default)
+#else
+		public override Task RollbackAsync(string savePointName, CancellationToken cancellationToken = default)
+#endif
+			=> RollbackImpl(savePointName, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task RollbackImpl(string savePointName, AsyncWrappingCommonArgs async)
 		{
 			EnsureSavePointName(savePointName);
 			EnsureCompleted();
 			try
 			{
-				using (var command = new FbCommand($"ROLLBACK WORK TO SAVEPOINT {savePointName}", _connection, this))
+				var command = new FbCommand($"ROLLBACK WORK TO SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
+				using (command)
+#else
+				await using (command)
+#endif
 				{
-					command.ExecuteNonQuery();
+					await async.AsyncSyncCall(command.ExecuteNonQueryAsync, command.ExecuteNonQuery).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
@@ -192,12 +269,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public void CommitRetaining()
+		public void CommitRetaining() => CommitRetainingImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task CommitRetainingAsync(CancellationToken cancellationToken = default) => CommitRetainingImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task CommitRetainingImpl(AsyncWrappingCommonArgs async)
 		{
 			EnsureCompleted();
 			try
 			{
-				_transaction.CommitRetaining();
+				await _transaction.CommitRetaining(async).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -205,12 +284,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public void RollbackRetaining()
+		public void RollbackRetaining() => RollbackRetainingImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task RollbackRetainingAsync(CancellationToken cancellationToken = default) => RollbackRetainingImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task RollbackRetainingImpl(AsyncWrappingCommonArgs async)
 		{
 			EnsureCompleted();
 			try
 			{
-				_transaction.RollbackRetaining();
+				await _transaction.RollbackRetaining(async).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -222,25 +303,29 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Internal Methods
 
-		internal void BeginTransaction()
+		internal async Task BeginTransaction(AsyncWrappingCommonArgs async)
 		{
-			_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb());
+			_transaction = await _connection.InnerConnection.Database.BeginTransaction(BuildTpb(), async).ConfigureAwait(false);
 		}
 
-		internal void BeginTransaction(FbTransactionOptions options)
+		internal async Task BeginTransaction(FbTransactionOptions options, AsyncWrappingCommonArgs async)
 		{
-			_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb(options));
+			_transaction = await _connection.InnerConnection.Database.BeginTransaction(BuildTpb(options), async).ConfigureAwait(false);
 		}
 
 		#endregion
 
 		#region Private Methods
 
-		private void CompleteTransaction()
+		private async Task CompleteTransaction(AsyncWrappingCommonArgs async)
 		{
-			_connection?.InnerConnection?.TransactionCompleted();
+			var innerConnection = _connection?.InnerConnection;
+			if (innerConnection != null)
+			{
+				await innerConnection.TransactionCompleted(async).ConfigureAwait(false);
+			}
 			_connection = null;
-			_transaction.Dispose();
+			await _transaction.Dispose2(async).ConfigureAwait(false);
 			_transaction = null;
 			_isCompleted = true;
 		}

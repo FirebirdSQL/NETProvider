@@ -17,13 +17,11 @@
 
 using System;
 using System.Data;
-using System.Linq;
-using System.Globalization;
-
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Isql
 {
+#warning Async support
 	public class FbBatchExecution
 	{
 		/// <summary>

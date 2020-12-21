@@ -16,13 +16,11 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Text;
-using System.Data;
-using FirebirdSql.Data.Client.Managed;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
 {
-	internal abstract class StatementBase : IDisposable
+	internal abstract class StatementBase
 	{
 		#region Protected Static Fields
 
@@ -107,26 +105,25 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region IDisposable methods
+		#region Release
 
-		public virtual void Dispose()
-		{ }
+		public virtual Task Dispose2(AsyncWrappingCommonArgs async) => Task.CompletedTask;
 
 		#endregion
 
 		#region Methods
 
-		public string GetExecutionPlan()
+		public Task<string> GetExecutionPlan(AsyncWrappingCommonArgs async)
 		{
-			return GetPlanInfo(DescribePlanInfoItems);
+			return GetPlanInfo(DescribePlanInfoItems, async);
 		}
 
-		public string GetExecutionExplainedPlan()
+		public Task<string> GetExecutionExplainedPlan(AsyncWrappingCommonArgs async)
 		{
-			return GetPlanInfo(DescribeExplaindPlanInfoItems);
+			return GetPlanInfo(DescribeExplaindPlanInfoItems, async);
 		}
 
-		public virtual void Close()
+		public virtual async Task Close(AsyncWrappingCommonArgs async)
 		{
 			if (State == StatementState.Executed ||
 				State == StatementState.Error)
@@ -141,7 +138,7 @@ namespace FirebirdSql.Data.Common
 					{
 						try
 						{
-							Free(IscCodes.DSQL_close);
+							await Free(IscCodes.DSQL_close, async).ConfigureAwait(false);
 						}
 						catch
 						{ }
@@ -152,7 +149,7 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public virtual void Release()
+		public virtual async Task Release(AsyncWrappingCommonArgs async)
 		{
 			if (Transaction != null && TransactionUpdate != null)
 			{
@@ -160,7 +157,7 @@ namespace FirebirdSql.Data.Common
 				TransactionUpdate = null;
 			}
 
-			Free(IscCodes.DSQL_drop);
+			await Free(IscCodes.DSQL_drop, async).ConfigureAwait(false);
 
 			ClearArrayHandles();
 			State = StatementState.Deallocated;
@@ -171,40 +168,41 @@ namespace FirebirdSql.Data.Common
 
 		#region Abstract Methods
 
-		public abstract void Describe();
-		public abstract void DescribeParameters();
-		public abstract void Prepare(string commandText);
-		public abstract void Execute();
-		public abstract DbValue[] Fetch();
+		public abstract Task Describe(AsyncWrappingCommonArgs async);
+		public abstract Task DescribeParameters(AsyncWrappingCommonArgs async);
+		public abstract Task Prepare(string commandText, AsyncWrappingCommonArgs async);
+		public abstract Task Execute(AsyncWrappingCommonArgs async);
+		public abstract Task<DbValue[]> Fetch(AsyncWrappingCommonArgs async);
+#warning Same implementation in Gds and Fes, can it be pulled up?
 		public abstract DbValue[] GetOutputParameters();
 
 		public abstract BlobBase CreateBlob();
 		public abstract BlobBase CreateBlob(long handle);
 
-		public abstract ArrayBase CreateArray(ArrayDesc descriptor);
-		public abstract ArrayBase CreateArray(string tableName, string fieldName);
-		public abstract ArrayBase CreateArray(long handle, string tableName, string fieldName);
+		public abstract Task<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async);
+		public abstract Task<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async);
+		public abstract Task<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async);
 
 		#endregion
 
 		#region Protected Abstract Methods
 
 		protected abstract void TransactionUpdated(object sender, EventArgs e);
-		protected abstract byte[] GetSqlInfo(byte[] items, int bufferLength);
-		protected abstract void Free(int option);
+		protected abstract Task<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
+		protected abstract Task Free(int option, AsyncWrappingCommonArgs async);
 
 		#endregion
 
 		#region Protected Methods
 
-		protected byte[] GetSqlInfo(byte[] items)
+		protected Task<byte[]> GetSqlInfo(byte[] items, AsyncWrappingCommonArgs async)
 		{
-			return GetSqlInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+			return GetSqlInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
 		}
 
-		protected int GetRecordsAffected()
+		protected async Task<int> GetRecordsAffected(AsyncWrappingCommonArgs async)
 		{
-			var buffer = GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+			var buffer = await GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, async).ConfigureAwait(false);
 			return ProcessRecordsAffectedBuffer(buffer);
 		}
 
@@ -256,9 +254,9 @@ namespace FirebirdSql.Data.Common
 			return insertCount + updateCount + deleteCount;
 		}
 
-		protected DbStatementType GetStatementType()
+		protected async Task<DbStatementType> GetStatementType(AsyncWrappingCommonArgs async)
 		{
-			var buffer = GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+			var buffer = await GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, async).ConfigureAwait(false);
 			return ProcessStatementTypeInfoBuffer(buffer);
 		}
 
@@ -303,11 +301,11 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		protected string GetPlanInfo(byte[] planInfoItems)
+		protected async Task<string> GetPlanInfo(byte[] planInfoItems, AsyncWrappingCommonArgs async)
 		{
 			var count = 0;
 			var bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
-			var buffer = GetSqlInfo(planInfoItems, bufferSize);
+			var buffer = await GetSqlInfo(planInfoItems, bufferSize, async).ConfigureAwait(false);
 
 			if (buffer[0] == IscCodes.isc_info_end)
 			{
@@ -317,7 +315,7 @@ namespace FirebirdSql.Data.Common
 			while (buffer[0] == IscCodes.isc_info_truncated && count < 4)
 			{
 				bufferSize *= 2;
-				buffer = GetSqlInfo(planInfoItems, bufferSize);
+				buffer = await GetSqlInfo(planInfoItems, bufferSize, async).ConfigureAwait(false);
 				count++;
 			}
 			if (count > 3)
@@ -334,6 +332,14 @@ namespace FirebirdSql.Data.Common
 			else
 			{
 				return string.Empty;
+			}
+		}
+
+		protected void EnsureNotDeallocated()
+		{
+			if (State == StatementState.Deallocated)
+			{
+				throw new InvalidOperationException("Statement is not correctly created.");
 			}
 		}
 

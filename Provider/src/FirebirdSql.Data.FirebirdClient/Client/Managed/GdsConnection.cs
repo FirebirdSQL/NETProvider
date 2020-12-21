@@ -21,6 +21,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Managed.Version11;
 using FirebirdSql.Data.Client.Managed.Version13;
 using FirebirdSql.Data.Common;
@@ -81,11 +83,11 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Methods
 
-		public void Connect()
+		public async Task Connect(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				IPAddress = GetIPAddress(_dataSource);
+				IPAddress = await GetIPAddress(_dataSource, async).ConfigureAwait(false);
 				var endPoint = new IPEndPoint(IPAddress, _portNumber);
 
 				var socket = new Socket(IPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -94,7 +96,12 @@ namespace FirebirdSql.Data.Client.Managed
 				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
 				socket.TrySetKeepAlive(KeepAliveTime, KeepAliveInterval);
 				socket.TryEnableLoopbackFastPath();
-				socket.Connect(endPoint);
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+				static Func<IPEndPoint, CancellationToken, Task> ConnectHelper(Socket socket) => (e, ct) => Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, e, null);
+#else
+				static Func<IPEndPoint, CancellationToken, Task> ConnectHelper(Socket socket) => (e, ct) => SocketTaskExtensions.ConnectAsync(socket, e, ct).AsTask();
+#endif
+				await async.AsyncSyncCall(ConnectHelper(socket), socket.Connect, endPoint).ConfigureAwait(false);
 
 				_firebirdNetworkStream = new FirebirdNetworkStream(new NetworkStream(socket, true));
 				Xdr = new XdrReaderWriter(_firebirdNetworkStream, _charset);
@@ -105,48 +112,47 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public void Identify(string database)
+		public async Task Identify(string database, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				Xdr.Write(IscCodes.op_connect);
-				Xdr.Write(IscCodes.op_attach);
-				Xdr.Write(IscCodes.CONNECT_VERSION3);
-				Xdr.Write(IscCodes.GenericAchitectureClient);
+				await Xdr.Write(IscCodes.op_connect, async).ConfigureAwait(false);
+				await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
+				await Xdr.Write(IscCodes.CONNECT_VERSION3, async).ConfigureAwait(false);
+				await Xdr.Write(IscCodes.GenericAchitectureClient, async).ConfigureAwait(false);
 
-				Xdr.Write(database);
+				await Xdr.Write(database, async).ConfigureAwait(false);
 
 				var protocols = ProtocolsSupported.Get(_compression);
-				Xdr.Write(protocols.Count());
+				await Xdr.Write(protocols.Count(), async).ConfigureAwait(false);
 
-#warning These out params are ugly, refactor
-				var userIdentificationData = UserIdentificationData(out var srp, out var sspi);
+				var (userIdentificationData, srp, sspi) = UserIdentificationData();
 				using (sspi)
 				{
-					Xdr.WriteBuffer(userIdentificationData);
+					await Xdr.WriteBuffer(userIdentificationData, async).ConfigureAwait(false);
 
 					var priority = 0;
 					foreach (var protocol in protocols)
 					{
-						Xdr.Write(protocol.Version);
-						Xdr.Write(IscCodes.GenericAchitectureClient);
-						Xdr.Write(protocol.MinPType);
-						Xdr.Write(protocol.MaxPType);
-						Xdr.Write(priority);
+						await Xdr.Write(protocol.Version, async).ConfigureAwait(false);
+						await Xdr.Write(IscCodes.GenericAchitectureClient, async).ConfigureAwait(false);
+						await Xdr.Write(protocol.MinPType, async).ConfigureAwait(false);
+						await Xdr.Write(protocol.MaxPType, async).ConfigureAwait(false);
+						await Xdr.Write(priority, async).ConfigureAwait(false);
 
 						priority++;
 					}
 
-					Xdr.Flush();
+					await Xdr.Flush(async).ConfigureAwait(false);
 
-					var operation = Xdr.ReadOperation();
+					var operation = await Xdr.ReadOperation(async).ConfigureAwait(false);
 					if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
 					{
 						var wireCryptInitialized = false;
 
-						ProtocolVersion = Xdr.ReadInt32();
-						ProtocolArchitecture = Xdr.ReadInt32();
-						ProtocolMinimunType = Xdr.ReadInt32();
+						ProtocolVersion = await Xdr.ReadInt32(async).ConfigureAwait(false);
+						ProtocolArchitecture = await Xdr.ReadInt32(async).ConfigureAwait(false);
+						ProtocolMinimunType = await Xdr.ReadInt32(async).ConfigureAwait(false);
 
 						if (ProtocolVersion < 0)
 						{
@@ -160,10 +166,10 @@ namespace FirebirdSql.Data.Client.Managed
 
 						if (operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
 						{
-							var serverData = Xdr.ReadBuffer();
-							var acceptPluginName = Xdr.ReadString();
-							var isAuthenticated = Xdr.ReadBoolean();
-							var serverKeys = Xdr.ReadBuffer();
+							var serverData = await Xdr.ReadBuffer(async).ConfigureAwait(false);
+							var acceptPluginName = await Xdr.ReadString(async).ConfigureAwait(false);
+							var isAuthenticated = await Xdr.ReadBoolean(async).ConfigureAwait(false);
+							var serverKeys = await Xdr.ReadBuffer(async).ConfigureAwait(false);
 							if (!isAuthenticated)
 							{
 								switch (acceptPluginName)
@@ -187,27 +193,27 @@ namespace FirebirdSql.Data.Client.Managed
 
 							if (operation == IscCodes.op_cond_accept)
 							{
-								Xdr.Write(IscCodes.op_cont_auth);
-								Xdr.WriteBuffer(AuthData);
-								Xdr.Write(acceptPluginName); // like CNCT_plugin_name
-								Xdr.Write(acceptPluginName); // like CNCT_plugin_list
-								Xdr.WriteBuffer(serverKeys);
-								Xdr.Flush();
-								var response = (GenericResponse)ProcessOperation(Xdr.ReadOperation(), Xdr);
+								await Xdr.Write(IscCodes.op_cont_auth, async).ConfigureAwait(false);
+								await Xdr.WriteBuffer(AuthData, async).ConfigureAwait(false);
+								await Xdr.Write(acceptPluginName, async).ConfigureAwait(false); // like CNCT_plugin_name
+								await Xdr.Write(acceptPluginName, async).ConfigureAwait(false); // like CNCT_plugin_list
+								await Xdr.WriteBuffer(serverKeys, async).ConfigureAwait(false);
+								await Xdr.Flush(async).ConfigureAwait(false);
+								var response = (GenericResponse)await ProcessOperation(await Xdr.ReadOperation(async).ConfigureAwait(false), Xdr, async).ConfigureAwait(false);
 								serverKeys = response.Data;
 								isAuthenticated = true;
 
 								if (_wireCrypt != WireCryptOption.Disabled)
 								{
-									Xdr.Write(IscCodes.op_crypt);
-									Xdr.Write(FirebirdNetworkStream.EncryptionName);
-									Xdr.Write(SrpClient.SessionKeyName);
-									Xdr.Flush();
+									await Xdr.Write(IscCodes.op_crypt, async).ConfigureAwait(false);
+									await Xdr.Write(FirebirdNetworkStream.EncryptionName, async).ConfigureAwait(false);
+									await Xdr.Write(SrpClient.SessionKeyName, async).ConfigureAwait(false);
+									await Xdr.Flush(async).ConfigureAwait(false);
 
 									// after writing before reading
 									_firebirdNetworkStream.StartEncryption(srp.SessionKey);
 
-									ProcessOperation(Xdr.ReadOperation(), Xdr);
+									await ProcessOperation(await Xdr.ReadOperation(async).ConfigureAwait(false), Xdr, async).ConfigureAwait(false);
 
 									wireCryptInitialized = true;
 								}
@@ -222,14 +228,14 @@ namespace FirebirdSql.Data.Client.Managed
 					}
 					else if (operation == IscCodes.op_response)
 					{
-						var response = (GenericResponse)ProcessOperation(operation, Xdr);
+						var response = (GenericResponse)await ProcessOperation(operation, Xdr, async).ConfigureAwait(false);
 						throw response.Exception;
 					}
 					else
 					{
 						try
 						{
-							Disconnect();
+							await Disconnect(async).ConfigureAwait(false);
 						}
 						catch
 						{ }
@@ -246,24 +252,32 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public void Disconnect()
+		public async Task Disconnect(AsyncWrappingCommonArgs async)
 		{
-			_firebirdNetworkStream?.Dispose();
-			_firebirdNetworkStream = null;
+			if (_firebirdNetworkStream != null)
+			{
+#if NET48 || NETSTANDARD2_0
+				_firebirdNetworkStream.Dispose();
+				await Task.CompletedTask.ConfigureAwait(false);
+#else
+				await async.AsyncSyncCallNoCancellation(_firebirdNetworkStream.DisposeAsync, _firebirdNetworkStream.Dispose).ConfigureAwait(false);
+#endif
+				_firebirdNetworkStream = null;
+			}
 		}
 
-		#endregion
+#endregion
 
-		#region Private Methods
+#region Private Methods
 
-		private IPAddress GetIPAddress(string dataSource)
+		private async Task<IPAddress> GetIPAddress(string dataSource, AsyncWrappingCommonArgs async)
 		{
 			if (IPAddress.TryParse(dataSource, out var ipaddress))
 			{
 				return ipaddress;
 			}
 
-			var addresses = Dns.GetHostEntry(dataSource).AddressList;
+			var addresses = (await async.AsyncSyncCallNoCancellation(Dns.GetHostEntryAsync, Dns.GetHostEntry, dataSource).ConfigureAwait(false)).AddressList;
 			foreach (var address in addresses)
 			{
 				// IPv4 priority
@@ -275,10 +289,10 @@ namespace FirebirdSql.Data.Client.Managed
 			return addresses[0];
 		}
 
-		private byte[] UserIdentificationData(out SrpClient srp, out SspiHelper sspi)
+		private (byte[], SrpClient, SspiHelper) UserIdentificationData()
 		{
-			srp = null;
-			sspi = null;
+			var srp = default(SrpClient);
+			var sspi = default(SspiHelper);
 
 			using (var result = new MemoryStream())
 			{
@@ -340,36 +354,36 @@ namespace FirebirdSql.Data.Client.Managed
 					result.Write(TypeEncoder.EncodeInt32(IscCodes.WIRE_CRYPT_DISABLED), 0, 4);
 				}
 
-				return result.ToArray();
+				return (result.ToArray(), srp, sspi);
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Static Methods
+#region Static Methods
 
-		public static IResponse ProcessOperation(int operation, IXdrReader xdr)
+		public static async Task<IResponse> ProcessOperation(int operation, IXdrReader xdr, AsyncWrappingCommonArgs async)
 		{
 			switch (operation)
 			{
 				case IscCodes.op_response:
 					return new GenericResponse(
-						xdr.ReadInt32(),
-						xdr.ReadInt64(),
-						xdr.ReadBuffer(),
-						xdr.ReadStatusVector());
+						await xdr.ReadInt32(async).ConfigureAwait(false),
+						await xdr.ReadInt64(async).ConfigureAwait(false),
+						await xdr.ReadBuffer(async).ConfigureAwait(false),
+						await xdr.ReadStatusVector(async).ConfigureAwait(false));
 
 				case IscCodes.op_fetch_response:
-					return new FetchResponse(xdr.ReadInt32(), xdr.ReadInt32());
+					return new FetchResponse(await xdr.ReadInt32(async).ConfigureAwait(false), await xdr.ReadInt32(async).ConfigureAwait(false));
 
 				case IscCodes.op_sql_response:
-					return new SqlResponse(xdr.ReadInt32());
+					return new SqlResponse(await xdr.ReadInt32(async).ConfigureAwait(false));
 
 				case IscCodes.op_trusted_auth:
-					return new AuthResponse(xdr.ReadBuffer());
+					return new AuthResponse(await xdr.ReadBuffer(async).ConfigureAwait(false));
 
 				case IscCodes.op_crypt_key_callback:
-					return new CryptKeyCallbackResponse(xdr.ReadBuffer());
+					return new CryptKeyCallbackResponse(await xdr.ReadBuffer(async).ConfigureAwait(false));
 
 				default:
 					throw new ArgumentOutOfRangeException(nameof(operation), $"{nameof(operation)}={operation}");
@@ -446,6 +460,6 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		#endregion
+#endregion
 	}
 }

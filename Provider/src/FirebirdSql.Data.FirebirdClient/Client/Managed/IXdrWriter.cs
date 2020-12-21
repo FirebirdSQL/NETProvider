@@ -17,33 +17,35 @@
 
 using System;
 using System.Numerics;
+using System.Threading.Tasks;
+using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Client.Managed
 {
 	interface IXdrWriter
 	{
-		void Flush();
-		void WriteBytes(byte[] buffer, int count);
-		void WriteOpaque(byte[] buffer);
-		void WriteOpaque(byte[] buffer, int length);
-		void WriteBuffer(byte[] buffer);
-		void WriteBuffer(byte[] buffer, int length);
-		void WriteBlobBuffer(byte[] buffer);
-		void WriteTyped(int type, byte[] buffer);
-		void Write(string value);
-		void Write(short value);
-		void Write(int value);
-		void Write(long value);
-		void Write(float value);
-		void Write(double value);
-		void Write(decimal value, int type, int scale);
-		void Write(bool value);
-		void Write(DateTime value);
-		void Write(Guid value);
-		void Write(FbDecFloat value, int size);
-		void Write(BigInteger value);
-		void WriteDate(DateTime value);
-		void WriteTime(TimeSpan value);
+		Task Flush(AsyncWrappingCommonArgs async);
+		Task WriteBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async);
+		Task WriteOpaque(byte[] buffer, AsyncWrappingCommonArgs async);
+		Task WriteOpaque(byte[] buffer, int length, AsyncWrappingCommonArgs async);
+		Task WriteBuffer(byte[] buffer, AsyncWrappingCommonArgs async);
+		Task WriteBuffer(byte[] buffer, int length, AsyncWrappingCommonArgs async);
+		Task WriteBlobBuffer(byte[] buffer, AsyncWrappingCommonArgs async);
+		Task WriteTyped(int type, byte[] buffer, AsyncWrappingCommonArgs async);
+		Task Write(string value, AsyncWrappingCommonArgs async);
+		Task Write(short value, AsyncWrappingCommonArgs async);
+		Task Write(int value, AsyncWrappingCommonArgs async);
+		Task Write(long value, AsyncWrappingCommonArgs async);
+		Task Write(float value, AsyncWrappingCommonArgs async);
+		Task Write(double value, AsyncWrappingCommonArgs async);
+		Task Write(decimal value, int type, int scale, AsyncWrappingCommonArgs async);
+		Task Write(bool value, AsyncWrappingCommonArgs async);
+		Task Write(DateTime value, AsyncWrappingCommonArgs async);
+		Task Write(Guid value, AsyncWrappingCommonArgs async);
+		Task Write(FbDecFloat value, int size, AsyncWrappingCommonArgs async);
+		Task Write(BigInteger value, AsyncWrappingCommonArgs async);
+		Task WriteDate(DateTime value, AsyncWrappingCommonArgs async);
+		Task WriteTime(TimeSpan value, AsyncWrappingCommonArgs async);
 	}
 }

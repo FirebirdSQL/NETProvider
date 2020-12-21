@@ -99,7 +99,7 @@ namespace FirebirdSql.Data.Schema
 			return sql;
 		}
 
-		protected override DataTable ProcessResult(DataTable schema)
+		protected override void ProcessResult(DataTable schema)
 		{
 			schema.BeginLoadData();
 
@@ -127,8 +127,6 @@ namespace FirebirdSql.Data.Schema
 			schema.AcceptChanges();
 
 			schema.Columns.Remove("VIEW_SOURCE");
-
-			return schema;
 		}
 
 		#endregion

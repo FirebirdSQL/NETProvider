@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
@@ -126,14 +127,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
-		#region IDisposable methods
+		#region Dispose2
 
-		public override void Dispose()
+		public override async Task Dispose2(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
-				Release();
+				await Release(async).ConfigureAwait(false);
 				Clear();
 				_rows = null;
 				_outputParams = null;
@@ -144,7 +145,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_allRowsFetched = false;
 				_handle = 0;
 				_fetchSize = 0;
-				base.Dispose();
+				await base.Dispose2(async).ConfigureAwait(false);
 			}
 		}
 
@@ -166,26 +167,31 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Array Creation Methods
 
-		public override ArrayBase CreateArray(ArrayDesc descriptor)
+		public override Task<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async)
 		{
-			return new GdsArray(descriptor);
+			var array = new GdsArray(descriptor);
+			return Task.FromResult((ArrayBase)array);
 		}
 
-		public override ArrayBase CreateArray(string tableName, string fieldName)
+		public override async Task<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async)
 		{
-			return new GdsArray(_database, _transaction, tableName, fieldName);
+			var array = new GdsArray(_database, _transaction, tableName, fieldName);
+			await array.Initialize(async).ConfigureAwait(false);
+			return array;
 		}
 
-		public override ArrayBase CreateArray(long handle, string tableName, string fieldName)
+		public override async Task<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async)
 		{
-			return new GdsArray(_database, _transaction, handle, tableName, fieldName);
+			var array = new GdsArray(_database, _transaction, handle, tableName, fieldName);
+			await array.Initialize(async).ConfigureAwait(false);
+			return array;
 		}
 
 		#endregion
 
 		#region Methods
 
-		public override void Prepare(string commandText)
+		public override async Task Prepare(string commandText, AsyncWrappingCommonArgs async)
 		{
 			ClearAll();
 
@@ -193,18 +199,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (State == StatementState.Deallocated)
 				{
-					SendAllocateToBuffer();
-					_database.Xdr.Flush();
-					ProcessAllocateResponce(_database.ReadResponse<GenericResponse>());
+					await SendAllocateToBuffer(async).ConfigureAwait(false);
+					await _database.Xdr.Flush(async).ConfigureAwait(false);
+					await ProcessAllocateResponse((GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 				}
 
-				SendPrepareToBuffer(commandText);
-				_database.Xdr.Flush();
-				ProcessPrepareResponse(_database.ReadResponse<GenericResponse>());
+				await SendPrepareToBuffer(commandText, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				await ProcessPrepareResponse((GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 
-				SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
-				_database.Xdr.Flush();
-				StatementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>()));
+				await SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				StatementType = ProcessStatementTypeInfoBuffer(await ProcessInfoSqlResponse((GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false));
 
 				State = StatementState.Prepared;
 			}
@@ -215,34 +221,31 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override void Execute()
+		public override async Task Execute(AsyncWrappingCommonArgs async)
 		{
-			if (State == StatementState.Deallocated)
-			{
-				throw new InvalidOperationException("Statement is not correctly created.");
-			}
+			EnsureNotDeallocated();
 
 			Clear();
 
 			try
 			{
-				SendExecuteToBuffer();
+				await SendExecuteToBuffer(async).ConfigureAwait(false);
 
-				_database.Xdr.Flush();
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
 				if (StatementType == DbStatementType.StoredProcedure)
 				{
-					ProcessStoredProcedureExecuteResponse(_database.ReadResponse<SqlResponse>());
+					await ProcessStoredProcedureExecuteResponse((SqlResponse)await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 				}
 
-				var executeResponse = _database.ReadResponse<GenericResponse>();
-				ProcessExecuteResponse(executeResponse);
+				var executeResponse = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+				await ProcessExecuteResponse(executeResponse, async).ConfigureAwait(false);
 
 				if (DoRecordsAffected)
 				{
-					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
-					_database.Xdr.Flush();
-					RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>()));
+					await SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, async).ConfigureAwait(false);
+					await _database.Xdr.Flush(async).ConfigureAwait(false);
+					RecordsAffected = ProcessRecordsAffectedBuffer(await ProcessInfoSqlResponse((GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false));
 				}
 				else
 				{
@@ -258,12 +261,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override DbValue[] Fetch()
+		public override async Task<DbValue[]> Fetch(AsyncWrappingCommonArgs async)
 		{
-			if (State == StatementState.Deallocated)
-			{
-				throw new InvalidOperationException("Statement is not correctly created.");
-			}
+			EnsureNotDeallocated();
+
 			if (StatementType == DbStatementType.StoredProcedure && !_allRowsFetched)
 			{
 				_allRowsFetched = true;
@@ -282,26 +283,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_database.Xdr.Write(IscCodes.op_fetch);
-					_database.Xdr.Write(_handle);
-					_database.Xdr.WriteBuffer(_fields.ToBlrArray());
-					_database.Xdr.Write(0); // p_sqldata_message_number
-					_database.Xdr.Write(_fetchSize); // p_sqldata_messages
-					_database.Xdr.Flush();
+					await _database.Xdr.Write(IscCodes.op_fetch, async).ConfigureAwait(false);
+					await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+					await _database.Xdr.WriteBuffer(_fields.ToBlrArray(), async).ConfigureAwait(false);
+					await _database.Xdr.Write(0, async).ConfigureAwait(false); // p_sqldata_message_number
+					await _database.Xdr.Write(_fetchSize, async).ConfigureAwait(false); // p_sqldata_messages
+					await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-					var operation = _database.ReadOperation();
+					var operation = await _database.ReadOperation(async).ConfigureAwait(false);
 					if (operation == IscCodes.op_fetch_response)
 					{
 						var hasOperation = true;
 						while (!_allRowsFetched)
 						{
-							var response = hasOperation ? _database.ReadResponse(operation) : _database.ReadResponse();
+							var response = hasOperation
+								? await _database.ReadResponse(operation, async).ConfigureAwait(false)
+								: await _database.ReadResponse(async).ConfigureAwait(false);
 							hasOperation = false;
 							if (response is FetchResponse fetchResponse)
 							{
 								if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 								{
-									_rows.Enqueue(ReadRow());
+									_rows.Enqueue(await ReadRow(async).ConfigureAwait(false));
 								}
 								else if (fetchResponse.Status == 100)
 								{
@@ -320,7 +323,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					}
 					else
 					{
-						_database.ReadResponse(operation);
+						await _database.ReadResponse(operation, async).ConfigureAwait(false);
 					}
 				}
 				catch (IOException ex)
@@ -349,14 +352,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return null;
 		}
 
-		public override void Describe()
+		public override Task Describe(AsyncWrappingCommonArgs async)
 		{
-			Debug.Assert(false, "Nothing for Gds, because it's pre-fetched in Prepare.");
+			// Nothing for Gds, because it's pre-fetched in Prepare.
+			return Task.CompletedTask;
 		}
 
-		public override void DescribeParameters()
+		public override Task DescribeParameters(AsyncWrappingCommonArgs async)
 		{
-			Debug.Assert(false, "Nothing for Gds, because it's pre-fetched in Prepare.");
+			// Nothing for Gds, because it's pre-fetched in Prepare.
+			return Task.CompletedTask;
 		}
 
 		#endregion
@@ -364,39 +369,38 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region Protected Methods
 
 		#region op_prepare methods
-		protected void SendPrepareToBuffer(string commandText)
+		protected async Task SendPrepareToBuffer(string commandText, AsyncWrappingCommonArgs async)
 		{
-			_database.Xdr.Write(IscCodes.op_prepare_statement);
-			_database.Xdr.Write(_transaction.Handle);
-			_database.Xdr.Write(_handle);
-			_database.Xdr.Write((int)_database.Dialect);
-			_database.Xdr.Write(commandText);
-			_database.Xdr.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
-			_database.Xdr.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE);
+			await _database.Xdr.Write(IscCodes.op_prepare_statement, async).ConfigureAwait(false);
+			await _database.Xdr.Write(_transaction.Handle, async).ConfigureAwait(false);
+			await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+			await _database.Xdr.Write((int)_database.Dialect, async).ConfigureAwait(false);
+			await _database.Xdr.Write(commandText, async).ConfigureAwait(false);
+			await _database.Xdr.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length, async).ConfigureAwait(false);
+			await _database.Xdr.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE, async).ConfigureAwait(false);
 		}
 
-		protected void ProcessPrepareResponse(GenericResponse response)
+		protected async Task ProcessPrepareResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
-			var descriptors = new Descriptor[] { null, null };
-			ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, ref descriptors);
+			var descriptors = await ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, new Descriptor[] { null, null }, async).ConfigureAwait(false);
 			_fields = descriptors[0];
 			_parameters = descriptors[1];
 		}
 		#endregion
 
 		#region op_info_sql methods
-		protected override byte[] GetSqlInfo(byte[] items, int bufferLength)
+		protected override async Task<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
-			DoInfoSqlPacket(items, bufferLength);
-			_database.Xdr.Flush();
-			return ProcessInfoSqlResponse(_database.ReadResponse<GenericResponse>());
+			await DoInfoSqlPacket(items, bufferLength, async).ConfigureAwait(false);
+			await _database.Xdr.Flush(async).ConfigureAwait(false);
+			return await ProcessInfoSqlResponse((GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 		}
 
-		protected void DoInfoSqlPacket(byte[] items, int bufferLength)
+		protected async Task DoInfoSqlPacket(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				SendInfoSqlToBuffer(items, bufferLength);
+				await SendInfoSqlToBuffer(items, bufferLength, async).ConfigureAwait(false);
 			}
 			catch (IOException ex)
 			{
@@ -404,30 +408,31 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected void SendInfoSqlToBuffer(byte[] items, int bufferLength)
+		protected async Task SendInfoSqlToBuffer(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
-			_database.Xdr.Write(IscCodes.op_info_sql);
-			_database.Xdr.Write(_handle);
-			_database.Xdr.Write(0);
-			_database.Xdr.WriteBuffer(items, items.Length);
-			_database.Xdr.Write(bufferLength);
+			await _database.Xdr.Write(IscCodes.op_info_sql, async).ConfigureAwait(false);
+			await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+			await _database.Xdr.Write(0, async).ConfigureAwait(false);
+			await _database.Xdr.WriteBuffer(items, items.Length, async).ConfigureAwait(false);
+			await _database.Xdr.Write(bufferLength, async).ConfigureAwait(false);
 		}
 
-		protected byte[] ProcessInfoSqlResponse(GenericResponse response)
+		protected Task<byte[]> ProcessInfoSqlResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			Debug.Assert(response.Data != null && response.Data.Length > 0);
-			return response.Data;
+
+			return Task.FromResult(response.Data);
 		}
 		#endregion
 
 		#region op_free_statement methods
-		protected override void Free(int option)
+		protected override async Task Free(int option, AsyncWrappingCommonArgs async)
 		{
 			if (FreeNotNeeded(option))
 				return;
 
-			DoFreePacket(option);
-			ProcessFreeResponse(_database.ReadResponse());
+			await DoFreePacket(option, async).ConfigureAwait(false);
+			await ProcessFreeResponse(await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 		}
 
 		protected bool FreeNotNeeded(int option)
@@ -443,14 +448,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected void DoFreePacket(int option)
+		protected async Task DoFreePacket(int option, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_free_statement);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Write(option);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_free_statement, async).ConfigureAwait(false);
+				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+				await _database.Xdr.Write(option, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
 				if (option == IscCodes.DSQL_drop)
 				{
@@ -467,79 +472,81 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected void ProcessFreeResponse(IResponse response)
+		protected Task ProcessFreeResponse(IResponse response, AsyncWrappingCommonArgs async)
 		{
-
+			return Task.CompletedTask;
 		}
 		#endregion
 
 		#region op_allocate_statement methods
-		protected void SendAllocateToBuffer()
+		protected async Task SendAllocateToBuffer(AsyncWrappingCommonArgs async)
 		{
-			_database.Xdr.Write(IscCodes.op_allocate_statement);
-			_database.Xdr.Write(_database.Handle);
+			await _database.Xdr.Write(IscCodes.op_allocate_statement, async).ConfigureAwait(false);
+			await _database.Xdr.Write(_database.Handle, async).ConfigureAwait(false);
 		}
 
-		protected void ProcessAllocateResponce(GenericResponse response)
+		protected Task ProcessAllocateResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			_handle = response.ObjectHandle;
 			_allRowsFetched = false;
 			State = StatementState.Allocated;
 			StatementType = DbStatementType.None;
+			return Task.CompletedTask;
 		}
 		#endregion
 
 		#region op_execute/op_execute2 methods
-		protected void SendExecuteToBuffer()
+		protected async Task SendExecuteToBuffer(AsyncWrappingCommonArgs async)
 		{
 			// this may throw error, so it needs to be before any writing
-			var descriptor = WriteParameters();
+			var descriptor = await WriteParameters(async).ConfigureAwait(false);
 
 			if (StatementType == DbStatementType.StoredProcedure)
 			{
-				_database.Xdr.Write(IscCodes.op_execute2);
+				await _database.Xdr.Write(IscCodes.op_execute2, async).ConfigureAwait(false);
 			}
 			else
 			{
-				_database.Xdr.Write(IscCodes.op_execute);
+				await _database.Xdr.Write(IscCodes.op_execute, async).ConfigureAwait(false);
 			}
 
-			_database.Xdr.Write(_handle);
-			_database.Xdr.Write(_transaction.Handle);
+			await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
+			await _database.Xdr.Write(_transaction.Handle, async).ConfigureAwait(false);
 
 			if (_parameters != null)
 			{
-				_database.Xdr.WriteBuffer(_parameters.ToBlrArray());
-				_database.Xdr.Write(0); // Message number
-				_database.Xdr.Write(1); // Number of messages
-				_database.Xdr.WriteBytes(descriptor, descriptor.Length);
+				await _database.Xdr.WriteBuffer(_parameters.ToBlrArray(), async).ConfigureAwait(false);
+				await _database.Xdr.Write(0, async).ConfigureAwait(false); // Message number
+				await _database.Xdr.Write(1, async).ConfigureAwait(false); // Number of messages
+				await _database.Xdr.WriteBytes(descriptor, descriptor.Length, async).ConfigureAwait(false);
 			}
 			else
 			{
-				_database.Xdr.WriteBuffer(null);
-				_database.Xdr.Write(0);
-				_database.Xdr.Write(0);
+				await _database.Xdr.WriteBuffer(null, async).ConfigureAwait(false);
+				await _database.Xdr.Write(0, async).ConfigureAwait(false);
+				await _database.Xdr.Write(0, async).ConfigureAwait(false);
 			}
 
 			if (StatementType == DbStatementType.StoredProcedure)
 			{
-				_database.Xdr.WriteBuffer(_fields?.ToBlrArray());
-				_database.Xdr.Write(0); // Output message number
+				await _database.Xdr.WriteBuffer(_fields?.ToBlrArray(), async).ConfigureAwait(false);
+				await _database.Xdr.Write(0, async).ConfigureAwait(false); // Output message number
 			}
 		}
 
-		protected void ProcessExecuteResponse(GenericResponse response)
+		protected Task ProcessExecuteResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			// nothing to do here
+			return Task.CompletedTask;
 		}
 
-		protected void ProcessStoredProcedureExecuteResponse(SqlResponse response)
+		protected async Task ProcessStoredProcedureExecuteResponse(SqlResponse response, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
 				if (response.Count > 0)
 				{
-					_outputParams.Enqueue(ReadRow());
+					_outputParams.Enqueue(await ReadRow(async).ConfigureAwait(false));
 				}
 			}
 			catch (IOException ex)
@@ -561,12 +568,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_allRowsFetched = false;
 		}
 
-		protected void ParseSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
+		protected Task<Descriptor[]> ParseSqlInfo(byte[] info, byte[] items, Descriptor[] rowDescs, AsyncWrappingCommonArgs async)
 		{
-			ParseTruncSqlInfo(info, items, ref rowDescs);
+			return ParseTruncSqlInfo(info, items, rowDescs, async);
 		}
 
-		protected void ParseTruncSqlInfo(byte[] info, byte[] items, ref Descriptor[] rowDescs)
+		protected async Task<Descriptor[]> ParseTruncSqlInfo(byte[] info, byte[] items, Descriptor[] rowDescs, AsyncWrappingCommonArgs async)
 		{
 			var currentPosition = 0;
 			var currentDescriptorIndex = -1;
@@ -601,7 +608,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 								newItems.Add(items[i]);
 							}
 
-							info = GetSqlInfo(newItems.ToArray(), info.Length);
+							info = await GetSqlInfo(newItems.ToArray(), info.Length, async).ConfigureAwait(false);
 
 							currentPosition = 0;
 							currentDescriptorIndex = -1;
@@ -701,149 +708,150 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			Break:
 				{ }
 			}
+			return rowDescs;
 		}
 
-		protected void WriteRawParameter(IXdrWriter xdr, DbField field)
+		protected async Task WriteRawParameter(IXdrWriter xdr, DbField field, AsyncWrappingCommonArgs async)
 		{
 			if (field.DbDataType != DbDataType.Null)
 			{
-				field.FixNull();
+				await field.FixNull(async).ConfigureAwait(false);
 
 				switch (field.DbDataType)
 				{
 					case DbDataType.Char:
 						if (field.Charset.IsOctetsCharset)
 						{
-							xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
+							await xdr.WriteOpaque(await field.DbValue.GetBinary(async).ConfigureAwait(false), field.Length, async).ConfigureAwait(false);
 						}
 						else if (field.Charset.IsNoneCharset)
 						{
-							var bvalue = field.Charset.GetBytes(field.DbValue.GetString());
+							var bvalue = field.Charset.GetBytes(await field.DbValue.GetString(async).ConfigureAwait(false));
 							if (bvalue.Length > field.Length)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
-							xdr.WriteOpaque(bvalue, field.Length);
+							await xdr.WriteOpaque(bvalue, field.Length, async).ConfigureAwait(false);
 						}
 						else
 						{
-							var svalue = field.DbValue.GetString();
+							var svalue = await field.DbValue.GetString(async).ConfigureAwait(false);
 							if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
-							xdr.WriteOpaque(field.Charset.GetBytes(svalue), field.Length);
+							await xdr.WriteOpaque(field.Charset.GetBytes(svalue), field.Length, async).ConfigureAwait(false);
 						}
 						break;
 
 					case DbDataType.VarChar:
 						if (field.Charset.IsOctetsCharset)
 						{
-							xdr.WriteBuffer(field.DbValue.GetBinary());
+							await xdr.WriteBuffer(await field.DbValue.GetBinary(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						}
 						else if (field.Charset.IsNoneCharset)
 						{
-							var bvalue = field.Charset.GetBytes(field.DbValue.GetString());
+							var bvalue = field.Charset.GetBytes(await field.DbValue.GetString(async).ConfigureAwait(false));
 							if (bvalue.Length > field.Length)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
-							xdr.WriteBuffer(bvalue);
+							await xdr.WriteBuffer(bvalue, async).ConfigureAwait(false);
 						}
 						else
 						{
-							var svalue = field.DbValue.GetString();
+							var svalue = await field.DbValue.GetString(async).ConfigureAwait(false);
 							if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 							}
-							xdr.WriteBuffer(field.Charset.GetBytes(svalue));
+							await xdr.WriteBuffer(field.Charset.GetBytes(svalue), async).ConfigureAwait(false);
 						}
 						break;
 
 					case DbDataType.SmallInt:
-						xdr.Write(field.DbValue.GetInt16());
+						await xdr.Write(await field.DbValue.GetInt16(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Integer:
-						xdr.Write(field.DbValue.GetInt32());
+						await xdr.Write(await field.DbValue.GetInt32(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.BigInt:
 					case DbDataType.Array:
 					case DbDataType.Binary:
 					case DbDataType.Text:
-						xdr.Write(field.DbValue.GetInt64());
+						await xdr.Write(await field.DbValue.GetInt64(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Decimal:
 					case DbDataType.Numeric:
-						xdr.Write(field.DbValue.GetDecimal(), field.DataType, field.NumericScale);
+						await xdr.Write(await field.DbValue.GetDecimal(async).ConfigureAwait(false), field.DataType, field.NumericScale, async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Float:
-						xdr.Write(field.DbValue.GetFloat());
+						await xdr.Write(await field.DbValue.GetFloat(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Guid:
-						xdr.Write(field.DbValue.GetGuid());
+						await xdr.Write(await field.DbValue.GetGuid(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Double:
-						xdr.Write(field.DbValue.GetDouble());
+						await xdr.Write(await field.DbValue.GetDouble(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Date:
-						xdr.Write(field.DbValue.GetDate());
+						await xdr.Write(await field.DbValue.GetDate(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Time:
-						xdr.Write(field.DbValue.GetTime());
+						await xdr.Write(await field.DbValue.GetTime(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.TimeStamp:
-						xdr.Write(field.DbValue.GetDate());
-						xdr.Write(field.DbValue.GetTime());
+						await xdr.Write(await field.DbValue.GetDate(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write(await field.DbValue.GetTime(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Boolean:
-						xdr.Write(field.DbValue.GetBoolean());
+						await xdr.Write(await field.DbValue.GetBoolean(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.TimeStampTZ:
-						xdr.Write(field.DbValue.GetDate());
-						xdr.Write(field.DbValue.GetTime());
-						xdr.Write(field.DbValue.GetTimeZoneId());
+						await xdr.Write(await field.DbValue.GetDate(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write(await field.DbValue.GetTime(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write(await field.DbValue.GetTimeZoneId(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.TimeStampTZEx:
-						xdr.Write(field.DbValue.GetDate());
-						xdr.Write(field.DbValue.GetTime());
-						xdr.Write(field.DbValue.GetTimeZoneId());
-						xdr.Write((short)0);
+						await xdr.Write(await field.DbValue.GetDate(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write(await field.DbValue.GetTime(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write(await field.DbValue.GetTimeZoneId(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write((short)0, async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.TimeTZ:
-						xdr.Write(field.DbValue.GetTime());
-						xdr.Write(field.DbValue.GetTimeZoneId());
+						await xdr.Write(await field.DbValue.GetTime(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write(await field.DbValue.GetTimeZoneId(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.TimeTZEx:
-						xdr.Write(field.DbValue.GetTime());
-						xdr.Write(field.DbValue.GetTimeZoneId());
-						xdr.Write((short)0);
+						await xdr.Write(await field.DbValue.GetTime(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write(await field.DbValue.GetTimeZoneId(async).ConfigureAwait(false), async).ConfigureAwait(false);
+						await xdr.Write((short)0, async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Dec16:
-						xdr.Write(field.DbValue.GetDec16(), 16);
+						await xdr.Write(await field.DbValue.GetDec16(async).ConfigureAwait(false), 16, async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Dec34:
-						xdr.Write(field.DbValue.GetDec34(), 34);
+						await xdr.Write(await field.DbValue.GetDec34(async).ConfigureAwait(false), 34, async).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Int128:
-						xdr.Write(field.DbValue.GetInt128());
+						await xdr.Write(await field.DbValue.GetInt128(async).ConfigureAwait(false), async).ConfigureAwait(false);
 						break;
 
 					default:
@@ -852,7 +860,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected object ReadRawValue(IXdrReader xdr, DbField field)
+		protected async Task<object> ReadRawValue(IXdrReader xdr, DbField field, AsyncWrappingCommonArgs async)
 		{
 			var innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
 
@@ -861,11 +869,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				case DbDataType.Char:
 					if (field.Charset.IsOctetsCharset)
 					{
-						return xdr.ReadOpaque(field.Length);
+						return await xdr.ReadOpaque(field.Length, async).ConfigureAwait(false);
 					}
 					else
 					{
-						var s = xdr.ReadString(innerCharset, field.Length);
+						var s = await xdr.ReadString(innerCharset, field.Length, async).ConfigureAwait(false);
 						if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
 							s.Length > field.CharCount)
 						{
@@ -880,70 +888,70 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				case DbDataType.VarChar:
 					if (field.Charset.IsOctetsCharset)
 					{
-						return xdr.ReadBuffer();
+						return await xdr.ReadBuffer(async).ConfigureAwait(false);
 					}
 					else
 					{
-						return xdr.ReadString(innerCharset);
+						return await xdr.ReadString(innerCharset, async).ConfigureAwait(false);
 					}
 
 				case DbDataType.SmallInt:
-					return xdr.ReadInt16();
+					return await xdr.ReadInt16(async).ConfigureAwait(false);
 
 				case DbDataType.Integer:
-					return xdr.ReadInt32();
+					return await xdr.ReadInt32(async).ConfigureAwait(false);
 
 				case DbDataType.Array:
 				case DbDataType.Binary:
 				case DbDataType.Text:
 				case DbDataType.BigInt:
-					return xdr.ReadInt64();
+					return await xdr.ReadInt64(async).ConfigureAwait(false);
 
 				case DbDataType.Decimal:
 				case DbDataType.Numeric:
-					return xdr.ReadDecimal(field.DataType, field.NumericScale);
+					return await xdr.ReadDecimal(field.DataType, field.NumericScale, async).ConfigureAwait(false);
 
 				case DbDataType.Float:
-					return xdr.ReadSingle();
+					return await xdr.ReadSingle(async).ConfigureAwait(false);
 
 				case DbDataType.Guid:
-					return xdr.ReadGuid();
+					return await xdr.ReadGuid(async).ConfigureAwait(false);
 
 				case DbDataType.Double:
-					return xdr.ReadDouble();
+					return await xdr.ReadDouble(async).ConfigureAwait(false);
 
 				case DbDataType.Date:
-					return xdr.ReadDate();
+					return await xdr.ReadDate(async).ConfigureAwait(false);
 
 				case DbDataType.Time:
-					return xdr.ReadTime();
+					return await xdr.ReadTime(async).ConfigureAwait(false);
 
 				case DbDataType.TimeStamp:
-					return xdr.ReadDateTime();
+					return await xdr.ReadDateTime(async).ConfigureAwait(false);
 
 				case DbDataType.Boolean:
-					return xdr.ReadBoolean();
+					return await xdr.ReadBoolean(async).ConfigureAwait(false);
 
 				case DbDataType.TimeStampTZ:
-					return xdr.ReadZonedDateTime(false);
+					return await xdr.ReadZonedDateTime(false, async).ConfigureAwait(false);
 
 				case DbDataType.TimeStampTZEx:
-					return xdr.ReadZonedDateTime(true);
+					return await xdr.ReadZonedDateTime(true, async).ConfigureAwait(false);
 
 				case DbDataType.TimeTZ:
-					return xdr.ReadZonedTime(false);
+					return await xdr.ReadZonedTime(false, async).ConfigureAwait(false);
 
 				case DbDataType.TimeTZEx:
-					return xdr.ReadZonedTime(true);
+					return await xdr.ReadZonedTime(true, async).ConfigureAwait(false);
 
 				case DbDataType.Dec16:
-					return xdr.ReadDec16();
+					return await xdr.ReadDec16(async).ConfigureAwait(false);
 
 				case DbDataType.Dec34:
-					return xdr.ReadDec34();
+					return await xdr.ReadDec34(async).ConfigureAwait(false);
 
 				case DbDataType.Int128:
-					return xdr.ReadInt128();
+					return await xdr.ReadInt128(async).ConfigureAwait(false);
 
 				default:
 					throw TypeHelper.InvalidDataType((int)field.DbDataType);
@@ -972,7 +980,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_fields = null;
 		}
 
-		protected virtual byte[] WriteParameters()
+		protected virtual async Task<byte[]> WriteParameters(AsyncWrappingCommonArgs async)
 		{
 			if (_parameters == null)
 				return null;
@@ -985,28 +993,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					var field = _parameters[i];
 					try
 					{
-						WriteRawParameter(xdr, field);
-						xdr.Write(field.NullFlag);
+						await WriteRawParameter(xdr, field, async).ConfigureAwait(false);
+						await xdr.Write(field.NullFlag, async).ConfigureAwait(false);
 					}
 					catch (IOException ex)
 					{
 						throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 					}
 				}
-				xdr.Flush();
+				await xdr.Flush(async).ConfigureAwait(false);
 				return ms.ToArray();
 			}
 		}
 
-		protected virtual DbValue[] ReadRow()
+		protected virtual async Task<DbValue[]> ReadRow(AsyncWrappingCommonArgs async)
 		{
 			var row = new DbValue[_fields.Count];
 			try
 			{
 				for (var i = 0; i < _fields.Count; i++)
 				{
-					var value = ReadRawValue(_database.Xdr, _fields[i]);
-					var sqlInd = _database.Xdr.ReadInt32();
+					var value = await ReadRawValue(_database.Xdr, _fields[i], async).ConfigureAwait(false);
+					var sqlInd = await _database.Xdr.ReadInt32(async).ConfigureAwait(false);
 					if (sqlInd == -1)
 					{
 						row[i] = new DbValue(this, _fields[i], null);

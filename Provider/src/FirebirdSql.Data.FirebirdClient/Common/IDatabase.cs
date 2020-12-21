@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
 {
@@ -33,28 +34,28 @@ namespace FirebirdSql.Data.Common
 		bool HasRemoteEventSupport { get; }
 		bool ConnectionBroken { get; }
 
-		void Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey);
-		void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey);
-		void Detach();
+		Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		Task Detach(AsyncWrappingCommonArgs async);
 
-		void CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey);
-		void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey);
-		void DropDatabase();
+		Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		Task DropDatabase(AsyncWrappingCommonArgs async);
 
-		TransactionBase BeginTransaction(TransactionParameterBuffer tpb);
+		Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
 
 		StatementBase CreateStatement();
 		StatementBase CreateStatement(TransactionBase transaction);
 
 		DatabaseParameterBufferBase CreateDatabaseParameterBuffer();
 
-		List<object> GetDatabaseInfo(byte[] items);
-		List<object> GetDatabaseInfo(byte[] items, int bufferLength);
+		Task<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async);
+		Task<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
 
-		void CloseEventManager();
-		void QueueEvents(RemoteEvent events);
-		void CancelEvents(RemoteEvent events);
+		Task CloseEventManager(AsyncWrappingCommonArgs async);
+		Task QueueEvents(RemoteEvent events, AsyncWrappingCommonArgs async);
+		Task CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async);
 
-		void CancelOperation(int kind);
+		Task CancelOperation(int kind, AsyncWrappingCommonArgs async);
 	}
 }

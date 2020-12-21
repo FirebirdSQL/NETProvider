@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net452;netstandard2.0;net5.0</TargetFrameworks>
+		<TargetFrameworks>net48;netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
 		<AssemblyName>FirebirdSql.Data.FirebirdClient</AssemblyName>
 		<RootNamespace>FirebirdSql.Data</RootNamespace>
 		<SignAssembly>true</SignAssembly>
@@ -36,13 +36,22 @@
 		<None Include="..\..\..\license.txt" Pack="true" PackagePath="" />
 		<None Include="..\..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net452'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net48'">
 		<Reference Include="System.Transactions" />
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
 		<PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net5.0'">
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="ConfigureAwaitChecker.Analyzer" Version="4.0.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	</ItemGroup>
 	<Import Project="..\FirebirdSql.Data.External\FirebirdSql.Data.External.projitems" Label="Shared" />
 </Project>

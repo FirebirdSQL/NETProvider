@@ -696,20 +696,20 @@ end";
 		}
 
 		[Test]
-		public void CommandPlanTest()
+		public void GetCommandPlanTest()
 		{
 			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select * from test";
 				cmd.Prepare();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan = cmd.CommandPlan; });
+				Assert.DoesNotThrow(() => { plan = cmd.GetCommandPlan(); });
 				Assert.IsNotEmpty(plan);
 			}
 		}
 
 		[Test]
-		public void CommandExplainedPlanTest()
+		public void GetCommandExplainedPlanTest()
 		{
 			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
@@ -719,36 +719,36 @@ end";
 				cmd.CommandText = "select * from test";
 				cmd.Prepare();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan = cmd.CommandExplainedPlan; });
+				Assert.DoesNotThrow(() => { plan = cmd.GetCommandExplainedPlan(); });
 				Assert.IsNotEmpty(plan);
 			}
 		}
 
 		[Test]
-		public void NoCommandPlanTest()
+		public void GetCommandPlanNoPlanTest()
 		{
 			using (var cmd = Connection.CreateCommand())
 			{
-				cmd.CommandText = "recreate table NoCommandPlanTest (id int)";
+				cmd.CommandText = "recreate table NoPlan (id int)";
 				cmd.Prepare();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan = cmd.CommandPlan; });
+				Assert.DoesNotThrow(() => { plan = cmd.GetCommandPlan(); });
 				Assert.IsEmpty(plan);
 			}
 		}
 
 		[Test]
-		public void NoCommandExplainedPlanTest()
+		public void GetCommandExplainedPlanNoPlanTest()
 		{
 			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			using (var cmd = Connection.CreateCommand())
 			{
-				cmd.CommandText = "recreate table NoCommandPlanTest (id int)";
+				cmd.CommandText = "recreate table NoPaln (id int)";
 				cmd.Prepare();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan = cmd.CommandExplainedPlan; });
+				Assert.DoesNotThrow(() => { plan = cmd.GetCommandExplainedPlan(); });
 				Assert.IsEmpty(plan);
 			}
 		}

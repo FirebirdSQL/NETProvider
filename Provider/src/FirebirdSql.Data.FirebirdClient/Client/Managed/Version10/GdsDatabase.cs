@@ -141,56 +141,57 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Attach/Detach Methods
 
-		public virtual void Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public virtual async Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				SendAttachToBuffer(dpb, database);
-				Xdr.Flush();
-				ProcessAttachResponse(ReadResponse<GenericResponse>());
+				await SendAttachToBuffer(dpb, database, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
+				await ProcessAttachResponse((GenericResponse)await ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 			}
 			catch (IscException)
 			{
-				SafelyDetach();
+				await SafelyDetach(async).ConfigureAwait(false);
 				throw;
 			}
 			catch (IOException ex)
 			{
-				SafelyDetach();
+				await SafelyDetach(async).ConfigureAwait(false);
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 
-			AfterAttachActions();
+			await AfterAttachActions(async).ConfigureAwait(false);
 		}
 
-		protected virtual void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
+		protected virtual async Task SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
-			Xdr.Write(IscCodes.op_attach);
-			Xdr.Write(0);
+			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
+			await Xdr.Write(0, async).ConfigureAwait(false);
 			if (!string.IsNullOrEmpty(Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			Xdr.WriteBuffer(Encoding.Default.GetBytes(database));
-			Xdr.WriteBuffer(dpb.ToArray());
+			await Xdr.WriteBuffer(Encoding.Default.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		protected virtual void ProcessAttachResponse(GenericResponse response)
+		protected virtual Task ProcessAttachResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			_handle = response.ObjectHandle;
+			return Task.CompletedTask;
 		}
 
-		protected void AfterAttachActions()
+		protected async Task AfterAttachActions(AsyncWrappingCommonArgs async)
 		{
-			_serverVersion = GetServerVersion();
+			_serverVersion = await GetServerVersion(async).ConfigureAwait(false);
 		}
 
-		public virtual void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public virtual Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
 
-		public virtual void Detach()
+		public virtual async Task Detach(AsyncWrappingCommonArgs async)
 		{
 			if (TransactionCount > 0)
 			{
@@ -199,28 +200,28 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				CloseEventManager();
+				await CloseEventManager(async).ConfigureAwait(false);
 
 				var detach = _handle != -1;
 				if (detach)
 				{
-					Xdr.Write(IscCodes.op_detach);
-					Xdr.Write(_handle);
+					await Xdr.Write(IscCodes.op_detach, async).ConfigureAwait(false);
+					await Xdr.Write(_handle, async).ConfigureAwait(false);
 				}
-				Xdr.Write(IscCodes.op_disconnect);
-				Xdr.Flush();
+				await Xdr.Write(IscCodes.op_disconnect, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
 				if (detach)
 				{
-					ReadResponse();
+					await ReadResponse(async).ConfigureAwait(false);
 				}
 
-				CloseConnection();
+				await CloseConnection(async).ConfigureAwait(false);
 			}
 			catch (IOException ex)
 			{
 				try
 				{
-					CloseConnection();
+					await CloseConnection(async).ConfigureAwait(false);
 				}
 				catch (IOException ex2)
 				{
@@ -242,11 +243,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected void SafelyDetach()
+		protected async Task SafelyDetach(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				Detach();
+				await Detach(async).ConfigureAwait(false);
 			}
 			catch
 			{ }
@@ -256,13 +257,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Methods
 
-		public virtual void CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public virtual async Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				SendCreateToBuffer(dpb, database);
-				Xdr.Flush();
-				ProcessCreateResponse(ReadResponse<GenericResponse>());
+				await SendCreateToBuffer(dpb, database, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
+				await ProcessCreateResponse((GenericResponse)await ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 			}
 			catch (IOException ex)
 			{
@@ -270,37 +271,38 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected virtual void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
+		protected virtual async Task SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
-			Xdr.Write(IscCodes.op_create);
-			Xdr.Write(DatabaseObjectId);
+			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
+			await Xdr.Write(DatabaseObjectId, async).ConfigureAwait(false);
 			if (!string.IsNullOrEmpty(Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			Xdr.WriteBuffer(Encoding.Default.GetBytes(database));
-			Xdr.WriteBuffer(dpb.ToArray());
+			await Xdr.WriteBuffer(Encoding.Default.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		protected void ProcessCreateResponse(GenericResponse response)
+		protected Task ProcessCreateResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			_handle = response.ObjectHandle;
+			return Task.CompletedTask;
 		}
 
-		public virtual void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey)
+		public virtual Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
 
-		public virtual void DropDatabase()
+		public virtual async Task DropDatabase(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				Xdr.Write(IscCodes.op_drop_database);
-				Xdr.Write(_handle);
-				Xdr.Flush();
+				await Xdr.Write(IscCodes.op_drop_database, async).ConfigureAwait(false);
+				await Xdr.Write(_handle, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
 
-				ReadResponse();
+				await ReadResponse(async).ConfigureAwait(false);
 
 				_handle = -1;
 			}
@@ -314,52 +316,50 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Auxiliary Connection Methods
 
-		public virtual void ConnectionRequest(out int auxHandle, out string ipAddress, out int portNumber)
+		public virtual async Task<(int auxHandle, string ipAddress, int portNumber)> ConnectionRequest(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				Xdr.Write(IscCodes.op_connect_request);
-				Xdr.Write(IscCodes.P_REQ_async);
-				Xdr.Write(_handle);
-				Xdr.Write(PartnerIdentification);
+				await Xdr.Write(IscCodes.op_connect_request, async).ConfigureAwait(false);
+				await Xdr.Write(IscCodes.P_REQ_async, async).ConfigureAwait(false);
+				await Xdr.Write(_handle, async).ConfigureAwait(false);
+				await Xdr.Write(PartnerIdentification, async).ConfigureAwait(false);
 
-				Xdr.Flush();
+				await Xdr.Flush(async).ConfigureAwait(false);
 
-				ReadOperation();
+				await ReadOperation(async).ConfigureAwait(false);
 
-				auxHandle = Xdr.ReadInt32();
+				var auxHandle = await Xdr.ReadInt32(async).ConfigureAwait(false);
 
 				var garbage1 = new byte[8];
-				Xdr.ReadBytes(garbage1, 8);
+				await Xdr.ReadBytes(garbage1, 8, async).ConfigureAwait(false);
 
-				var respLen = Xdr.ReadInt32();
+				var respLen = await Xdr.ReadInt32(async).ConfigureAwait(false);
 				respLen += respLen % 4;
 
 				var sin_family = new byte[2];
-				Xdr.ReadBytes(sin_family, 2);
+				await Xdr.ReadBytes(sin_family, 2, async).ConfigureAwait(false);
 				respLen -= 2;
 
 				var sin_port = new byte[2];
-				Xdr.ReadBytes(sin_port, 2);
-				portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sin_port, 0));
+				await Xdr.ReadBytes(sin_port, 2, async).ConfigureAwait(false);
+				var portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sin_port, 0));
 				respLen -= 2;
 
 				// * The address returned by the server may be incorrect if it is behind a NAT box
 				// * so we must use the address that was used to connect the main socket, not the
 				// * address reported by the server.
 				var sin_addr = new byte[4];
-				Xdr.ReadBytes(sin_addr, 4);
-				//ipAddress = string.Format(
-				//    CultureInfo.InvariantCulture,
-				//    "{0}.{1}.{2}.{3}",
-				//    buffer[0], buffer[1], buffer[2], buffer[3]);
-				ipAddress = _connection.IPAddress.ToString();
+				await Xdr.ReadBytes(sin_addr, 4, async).ConfigureAwait(false);
+				var ipAddress = _connection.IPAddress.ToString();
 				respLen -= 4;
 
 				var garbage2 = new byte[respLen];
-				Xdr.ReadBytes(garbage2, respLen);
+				await Xdr.ReadBytes(garbage2, respLen, async).ConfigureAwait(false);
 
-				Xdr.ReadStatusVector();
+				await Xdr.ReadStatusVector(async).ConfigureAwait(false);
+
+				return (auxHandle, ipAddress, portNumber);
 			}
 			catch (IOException ex)
 			{
@@ -371,33 +371,34 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Connection Methods
 
-		public void CloseConnection()
+		public Task CloseConnection(AsyncWrappingCommonArgs async)
 		{
-			_connection.Disconnect();
+			return _connection.Disconnect(async);
 		}
 
 		#endregion
 
 		#region Remote Events Methods
 
-		public void CloseEventManager()
+		public async Task CloseEventManager(AsyncWrappingCommonArgs async)
 		{
 			if (_eventManager != null)
 			{
-				_eventManager.Dispose();
+				await _eventManager.Close(async).ConfigureAwait(false);
 				_eventManager = null;
 			}
 		}
 
-		public void QueueEvents(RemoteEvent remoteEvent)
+		public async Task QueueEvents(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
 				if (_eventManager == null)
 				{
-					ConnectionRequest(out var auxHandle, out var ipAddress, out var portNumber);
+					var (auxHandle, ipAddress, portNumber) = await ConnectionRequest(async).ConfigureAwait(false);
 					_eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
-					var dummy = _eventManager.WaitForEventsAsync(remoteEvent);
+					await _eventManager.Open(async).ConfigureAwait(false);
+					var dummy = _eventManager.WaitForEvents(remoteEvent, new AsyncWrappingCommonArgs(true));
 				}
 
 				remoteEvent.LocalId++;
@@ -405,16 +406,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				var epb = remoteEvent.BuildEpb();
 				var epbData = epb.ToArray();
 
-				Xdr.Write(IscCodes.op_que_events);
-				Xdr.Write(_handle);
-				Xdr.WriteBuffer(epbData);
-				Xdr.Write(AddressOfAstRoutine);
-				Xdr.Write(ArgumentToAstRoutine);
-				Xdr.Write(remoteEvent.LocalId);
+				await Xdr.Write(IscCodes.op_que_events, async).ConfigureAwait(false);
+				await Xdr.Write(_handle, async).ConfigureAwait(false);
+				await Xdr.WriteBuffer(epbData, async).ConfigureAwait(false);
+				await Xdr.Write(AddressOfAstRoutine, async).ConfigureAwait(false);
+				await Xdr.Write(ArgumentToAstRoutine, async).ConfigureAwait(false);
+				await Xdr.Write(remoteEvent.LocalId, async).ConfigureAwait(false);
 
-				Xdr.Flush();
+				await Xdr.Flush(async).ConfigureAwait(false);
 
-				var response = (GenericResponse)ReadResponse();
+				var response = (GenericResponse)await ReadResponse(async).ConfigureAwait(false);
 
 				remoteEvent.RemoteId = response.ObjectHandle;
 			}
@@ -424,17 +425,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public void CancelEvents(RemoteEvent events)
+		public async Task CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				Xdr.Write(IscCodes.op_cancel_events);
-				Xdr.Write(_handle);
-				Xdr.Write(events.LocalId);
+				await Xdr.Write(IscCodes.op_cancel_events, async).ConfigureAwait(false);
+				await Xdr.Write(_handle, async).ConfigureAwait(false);
+				await Xdr.Write(events.LocalId, async).ConfigureAwait(false);
 
-				Xdr.Flush();
+				await Xdr.Flush(async).ConfigureAwait(false);
 
-				ReadResponse();
+				await ReadResponse(async).ConfigureAwait(false);
 			}
 			catch (IOException ex)
 			{
@@ -446,11 +447,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Transaction Methods
 
-		public virtual TransactionBase BeginTransaction(TransactionParameterBuffer tpb)
+		public virtual async Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			var transaction = new GdsTransaction(this);
 
-			transaction.BeginTransaction(tpb);
+			await transaction.BeginTransaction(tpb, async).ConfigureAwait(false);
 
 			return transaction;
 		}
@@ -459,7 +460,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Cancel Methods
 
-		public virtual void CancelOperation(int kind)
+		public virtual Task CancelOperation(int kind, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Cancel Operation isn't supported on < FB2.5.");
 		}
@@ -491,27 +492,56 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Information Methods
 
-		public virtual string GetServerVersion()
+		public virtual async Task<string> GetServerVersion(AsyncWrappingCommonArgs async)
 		{
 			var items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
-			var info = GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256);
+			var info = await GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256, async).ConfigureAwait(false);
 			return (string)info[info.Count - 1];
 		}
 
-		public virtual List<object> GetDatabaseInfo(byte[] items)
+		public virtual Task<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async)
 		{
-			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
 		}
 
-		public virtual List<object> GetDatabaseInfo(byte[] items, int bufferLength)
+		public virtual async Task<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			var buffer = new byte[bufferLength];
-			DatabaseInfo(items, buffer, buffer.Length);
+			await DatabaseInfo(items, buffer, buffer.Length, async).ConfigureAwait(false);
 			return IscHelper.ParseDatabaseInfo(buffer);
+		}
+
+		#endregion
+
+		#region Release Object
+
+		public virtual async Task ReleaseObject(int op, int id, AsyncWrappingCommonArgs async)
+		{
+			try
+			{
+				await SendReleaseObjectToBuffer(op, id, async).ConfigureAwait(false);
+				await Xdr.Flush(async).ConfigureAwait(false);
+				await ProcessReleaseObjectResponse(await ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+			}
+		}
+
+		protected virtual async Task SendReleaseObjectToBuffer(int op, int id, AsyncWrappingCommonArgs async)
+		{
+			await Xdr.Write(op, async).ConfigureAwait(false);
+			await Xdr.Write(id, async).ConfigureAwait(false);
+		}
+
+		protected virtual Task ProcessReleaseObjectResponse(IResponse response, AsyncWrappingCommonArgs async)
+		{
+			return Task.CompletedTask;
 		}
 
 		#endregion
@@ -540,70 +570,50 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public virtual int ReadOperation()
+		public virtual Task<int> ReadOperation(AsyncWrappingCommonArgs async)
 		{
-			return Xdr.ReadOperation();
-		}
-		public virtual Task<int> ReadOperationAsync()
-		{
-			return Xdr.ReadOperationAsync();
+			return Xdr.ReadOperation(async);
 		}
 
-		public IResponse ReadResponse() => ReadResponse<IResponse>();
-		public virtual TResponse ReadResponse<TResponse>() where TResponse : IResponse
+		public virtual async Task<IResponse> ReadResponse(AsyncWrappingCommonArgs async)
 		{
-			var response = ReadSingleResponse();
+			var response = await ReadSingleResponse(async).ConfigureAwait(false);
 			ProcessResponse(response);
-			return (TResponse)response;
+			return response;
 		}
 
-		public IResponse ReadResponse(int operation) => ReadResponse<IResponse>(operation);
-		public virtual TResponse ReadResponse<TResponse>(int operation) where TResponse : IResponse
+		public virtual async Task<IResponse> ReadResponse(int operation, AsyncWrappingCommonArgs async)
 		{
-			var response = ReadSingleResponse(operation);
+			var response = await ReadSingleResponse(operation, async).ConfigureAwait(false);
 			ProcessResponse(response);
-			return (TResponse)response;
-		}
-
-		public virtual void ReleaseObject(int op, int id)
-		{
-			try
-			{
-				DoReleaseObjectPacket(op, id);
-				Xdr.Flush();
-				ProcessReleaseObjectResponse(ReadResponse());
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
-			}
+			return response;
 		}
 
 		#endregion
 
 		#region Protected Methods
 
-		protected IResponse ReadSingleResponse() => ReadSingleResponse(ReadOperation());
-		protected virtual IResponse ReadSingleResponse(int operation)
+		protected async Task<IResponse> ReadSingleResponse(AsyncWrappingCommonArgs async) => await ReadSingleResponse(await ReadOperation(async).ConfigureAwait(false), async).ConfigureAwait(false);
+		protected virtual async Task<IResponse> ReadSingleResponse(int operation, AsyncWrappingCommonArgs async)
 		{
-			var response = GdsConnection.ProcessOperation(operation, Xdr);
+			var response = await GdsConnection.ProcessOperation(operation, Xdr, async).ConfigureAwait(false);
 			ProcessResponseWarnings(response);
 			return response;
 		}
 
-		private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
+		private async Task DatabaseInfo(byte[] items, byte[] buffer, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				Xdr.Write(IscCodes.op_info_database);
-				Xdr.Write(_handle);
-				Xdr.Write(Incarnation);
-				Xdr.WriteBuffer(items, items.Length);
-				Xdr.Write(bufferLength);
+				await Xdr.Write(IscCodes.op_info_database, async).ConfigureAwait(false);
+				await Xdr.Write(_handle, async).ConfigureAwait(false);
+				await Xdr.Write(Incarnation, async).ConfigureAwait(false);
+				await Xdr.WriteBuffer(items, items.Length, async).ConfigureAwait(false);
+				await Xdr.Write(bufferLength, async).ConfigureAwait(false);
 
-				Xdr.Flush();
+				await Xdr.Flush(async).ConfigureAwait(false);
 
-				var response = (GenericResponse)ReadResponse();
+				var response = (GenericResponse)await ReadResponse(async).ConfigureAwait(false);
 
 				var responseLength = bufferLength;
 
@@ -619,15 +629,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
-
-		protected void DoReleaseObjectPacket(int op, int id)
-		{
-			Xdr.Write(op);
-			Xdr.Write(id);
-		}
-
-		protected void ProcessReleaseObjectResponse(IResponse response)
-		{ }
 
 		#endregion
 	}

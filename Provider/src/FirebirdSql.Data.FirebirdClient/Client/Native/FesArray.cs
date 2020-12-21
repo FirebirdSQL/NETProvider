@@ -18,14 +18,10 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
-
-using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Client.Native.Handle;
-using FirebirdSql.Data.Client.Native.Marshalers;
 using System.Reflection;
+using System.Threading.Tasks;
+using FirebirdSql.Data.Client.Native.Marshalers;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -70,21 +66,11 @@ namespace FirebirdSql.Data.Client.Native
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
-		public FesArray(
-			IDatabase db,
-			TransactionBase transaction,
-			string tableName,
-			string fieldName)
+		public FesArray(IDatabase db, TransactionBase transaction, string tableName, string fieldName)
 			: this(db, transaction, -1, tableName, fieldName)
-		{
-		}
+		{ }
 
-		public FesArray(
-			IDatabase db,
-			TransactionBase transaction,
-			long handle,
-			string tableName,
-			string fieldName)
+		public FesArray(IDatabase db, TransactionBase transaction, long handle, string tableName, string fieldName)
 			: base(tableName, fieldName)
 		{
 			if (!(db is FesDatabase))
@@ -99,15 +85,13 @@ namespace FirebirdSql.Data.Client.Native
 			_transaction = (FesTransaction)transaction;
 			_handle = handle;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-
-			LookupBounds();
 		}
 
 		#endregion
 
 		#region Methods
 
-		public override byte[] GetSlice(int sliceLength)
+		public override Task<byte[]> GetSlice(int sliceLength, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -131,10 +115,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			return buffer;
+			return Task.FromResult(buffer);
 		}
 
-		public override void PutSlice(Array sourceArray, int sliceLength)
+		public override Task PutSlice(Array sourceArray, int sliceLength, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -167,13 +151,15 @@ namespace FirebirdSql.Data.Client.Native
 			ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
 			_db.ProcessStatusVector(_statusVector);
+
+			return Task.CompletedTask;
 		}
 
 		#endregion
 
 		#region Protected Methods
 
-		protected override Array DecodeSlice(byte[] slice)
+		protected override Task<Array> DecodeSlice(byte[] slice, AsyncWrappingCommonArgs async)
 		{
 			Array sliceData = null;
 			var slicePosition = 0;
@@ -326,7 +312,7 @@ namespace FirebirdSql.Data.Client.Native
 				sliceData = tempData;
 			}
 
-			return sliceData;
+			return Task.FromResult(sliceData);
 		}
 
 		#endregion
@@ -340,117 +326,123 @@ namespace FirebirdSql.Data.Client.Native
 
 		private byte[] EncodeSlice(ArrayDesc desc, Array sourceArray, int length)
 		{
-			var writer = new BinaryWriter(new MemoryStream());
-			var charset = _db.Charset;
-			var dbType = DbDataType.Array;
-			var subType = (Descriptor.Scale < 0) ? 2 : 0;
-			var type = 0;
-
-			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
-			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
-
-			foreach (var source in sourceArray)
+			using (var ms = new MemoryStream())
 			{
-				switch (dbType)
+				using (var writer = new BinaryWriter(ms))
 				{
-					case DbDataType.Char:
+					var charset = _db.Charset;
+					var dbType = DbDataType.Array;
+					var subType = (Descriptor.Scale < 0) ? 2 : 0;
+					var type = 0;
+
+					type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
+					dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
+
+					foreach (var source in sourceArray)
+					{
+						switch (dbType)
 						{
-							var value = source != null ? (string)source : string.Empty;
-							var buffer = charset.GetBytes(value);
-
-							writer.Write(buffer);
-
-							if (desc.Length > buffer.Length)
-							{
-								for (var j = buffer.Length; j < desc.Length; j++)
+							case DbDataType.Char:
 								{
-									writer.Write((byte)32);
+									var value = source != null ? (string)source : string.Empty;
+									var buffer = charset.GetBytes(value);
+
+									writer.Write(buffer);
+
+									if (desc.Length > buffer.Length)
+									{
+										for (var j = buffer.Length; j < desc.Length; j++)
+										{
+											writer.Write((byte)32);
+										}
+									}
 								}
-							}
-						}
-						break;
+								break;
 
-					case DbDataType.VarChar:
-						{
-							var value = source != null ? (string)source : string.Empty;
-
-							var buffer = charset.GetBytes(value);
-							writer.Write(buffer);
-
-							if (desc.Length > buffer.Length)
-							{
-								for (var j = buffer.Length; j < desc.Length; j++)
+							case DbDataType.VarChar:
 								{
-									writer.Write((byte)0);
+									var value = source != null ? (string)source : string.Empty;
+
+									var buffer = charset.GetBytes(value);
+									writer.Write(buffer);
+
+									if (desc.Length > buffer.Length)
+									{
+										for (var j = buffer.Length; j < desc.Length; j++)
+										{
+											writer.Write((byte)0);
+										}
+									}
+									writer.Write((short)0);
 								}
-							}
-							writer.Write((short)0);
+								break;
+
+							case DbDataType.SmallInt:
+								writer.Write((short)source);
+								break;
+
+							case DbDataType.Integer:
+								writer.Write((int)source);
+								break;
+
+							case DbDataType.BigInt:
+								writer.Write((long)source);
+								break;
+
+							case DbDataType.Float:
+								writer.Write((float)source);
+								break;
+
+							case DbDataType.Double:
+								writer.Write((double)source);
+								break;
+
+							case DbDataType.Numeric:
+							case DbDataType.Decimal:
+								{
+									var numeric = TypeEncoder.EncodeDecimal((decimal)source, desc.Scale, type);
+
+									switch (type)
+									{
+										case IscCodes.SQL_SHORT:
+											writer.Write((short)numeric);
+											break;
+
+										case IscCodes.SQL_LONG:
+											writer.Write((int)numeric);
+											break;
+
+										case IscCodes.SQL_QUAD:
+										case IscCodes.SQL_INT64:
+											writer.Write((long)numeric);
+											break;
+									}
+								}
+								break;
+
+							case DbDataType.Date:
+								writer.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
+								break;
+
+							case DbDataType.Time:
+								writer.Write(TypeEncoder.EncodeTime((TimeSpan)source));
+								break;
+
+							case DbDataType.TimeStamp:
+								var dt = Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat);
+								writer.Write(TypeEncoder.EncodeDate(dt));
+								writer.Write(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+								break;
+
+							default:
+								throw TypeHelper.InvalidDataType((int)dbType);
 						}
-						break;
+					}
 
-					case DbDataType.SmallInt:
-						writer.Write((short)source);
-						break;
-
-					case DbDataType.Integer:
-						writer.Write((int)source);
-						break;
-
-					case DbDataType.BigInt:
-						writer.Write((long)source);
-						break;
-
-					case DbDataType.Float:
-						writer.Write((float)source);
-						break;
-
-					case DbDataType.Double:
-						writer.Write((double)source);
-						break;
-
-					case DbDataType.Numeric:
-					case DbDataType.Decimal:
-						{
-							var numeric = TypeEncoder.EncodeDecimal((decimal)source, desc.Scale, type);
-
-							switch (type)
-							{
-								case IscCodes.SQL_SHORT:
-									writer.Write((short)numeric);
-									break;
-
-								case IscCodes.SQL_LONG:
-									writer.Write((int)numeric);
-									break;
-
-								case IscCodes.SQL_QUAD:
-								case IscCodes.SQL_INT64:
-									writer.Write((long)numeric);
-									break;
-							}
-						}
-						break;
-
-					case DbDataType.Date:
-						writer.Write(TypeEncoder.EncodeDate(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat)));
-						break;
-
-					case DbDataType.Time:
-						writer.Write(TypeEncoder.EncodeTime((TimeSpan)source));
-						break;
-
-					case DbDataType.TimeStamp:
-						var dt = Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat);
-						writer.Write(TypeEncoder.EncodeDate(dt));
-						writer.Write(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
-						break;
-
-					default:
-						throw TypeHelper.InvalidDataType((int)dbType);
+					writer.Flush();
+					return ms.ToArray();
 				}
 			}
-
-			return ((MemoryStream)writer.BaseStream).ToArray();
 		}
 
 		#endregion

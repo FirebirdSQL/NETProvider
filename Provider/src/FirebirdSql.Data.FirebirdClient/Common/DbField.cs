@@ -18,6 +18,7 @@
 using System;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Common
@@ -160,12 +161,6 @@ namespace FirebirdSql.Data.Common
 		public DbValue DbValue
 		{
 			get { return _dbValue; }
-		}
-
-		public object Value
-		{
-			get { return _dbValue.Value; }
-			set { _dbValue.Value = value; }
 		}
 
 		#endregion
@@ -314,7 +309,7 @@ namespace FirebirdSql.Data.Common
 		{
 			if (buffer == null || NullFlag == -1)
 			{
-				Value = DBNull.Value;
+				DbValue.SetValue(DBNull.Value);
 			}
 			else
 			{
@@ -324,13 +319,13 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.SQL_VARYING:
 						if (DbDataType == DbDataType.Guid)
 						{
-							Value = TypeDecoder.DecodeGuid(buffer);
+							DbValue.SetValue(TypeDecoder.DecodeGuid(buffer));
 						}
 						else
 						{
 							if (Charset.IsOctetsCharset)
 							{
-								Value = buffer;
+								DbValue.SetValue(buffer);
 							}
 							else
 							{
@@ -342,7 +337,7 @@ namespace FirebirdSql.Data.Common
 									s = s.Substring(0, CharCount);
 								}
 
-								Value = s;
+								DbValue.SetValue(s);
 							}
 						}
 						break;
@@ -350,38 +345,32 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.SQL_SHORT:
 						if (_numericScale < 0)
 						{
-							Value = TypeDecoder.DecodeDecimal(
-								BitConverter.ToInt16(buffer, 0),
-								_numericScale,
-								_dataType);
+							DbValue.SetValue(TypeDecoder.DecodeDecimal(BitConverter.ToInt16(buffer, 0), _numericScale, _dataType));
 						}
 						else
 						{
-							Value = BitConverter.ToInt16(buffer, 0);
+							DbValue.SetValue(BitConverter.ToInt16(buffer, 0));
 						}
 						break;
 
 					case IscCodes.SQL_LONG:
 						if (_numericScale < 0)
 						{
-							Value = TypeDecoder.DecodeDecimal(
-								BitConverter.ToInt32(buffer, 0),
-								_numericScale,
-								_dataType);
+							DbValue.SetValue(TypeDecoder.DecodeDecimal(BitConverter.ToInt32(buffer, 0), _numericScale, _dataType));
 						}
 						else
 						{
-							Value = BitConverter.ToInt32(buffer, 0);
+							DbValue.SetValue(BitConverter.ToInt32(buffer, 0));
 						}
 						break;
 
 					case IscCodes.SQL_FLOAT:
-						Value = BitConverter.ToSingle(buffer, 0);
+						DbValue.SetValue(BitConverter.ToSingle(buffer, 0));
 						break;
 
 					case IscCodes.SQL_DOUBLE:
 					case IscCodes.SQL_D_FLOAT:
-						Value = BitConverter.ToDouble(buffer, 0);
+						DbValue.SetValue(BitConverter.ToDouble(buffer, 0));
 						break;
 
 					case IscCodes.SQL_QUAD:
@@ -390,14 +379,11 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.SQL_ARRAY:
 						if (_numericScale < 0)
 						{
-							Value = TypeDecoder.DecodeDecimal(
-								BitConverter.ToInt64(buffer, 0),
-								_numericScale,
-								_dataType);
+							DbValue.SetValue(TypeDecoder.DecodeDecimal(BitConverter.ToInt64(buffer, 0), _numericScale, _dataType));
 						}
 						else
 						{
-							Value = BitConverter.ToInt64(buffer, 0);
+							DbValue.SetValue(BitConverter.ToInt64(buffer, 0));
 						}
 						break;
 
@@ -405,20 +391,20 @@ namespace FirebirdSql.Data.Common
 						{
 							var date = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
 							var time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 4));
-							Value = date.Add(time);
+							DbValue.SetValue(date.Add(time));
 							break;
 						}
 
 					case IscCodes.SQL_TYPE_TIME:
-						Value = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 0));
+						DbValue.SetValue(TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 0)));
 						break;
 
 					case IscCodes.SQL_TYPE_DATE:
-						Value = TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0));
+						DbValue.SetValue(TypeDecoder.DecodeDate(BitConverter.ToInt32(buffer, 0)));
 						break;
 
 					case IscCodes.SQL_BOOLEAN:
-						Value = TypeDecoder.DecodeBoolean(buffer);
+						DbValue.SetValue(TypeDecoder.DecodeBoolean(buffer));
 						break;
 
 					case IscCodes.SQL_TIMESTAMP_TZ:
@@ -427,7 +413,7 @@ namespace FirebirdSql.Data.Common
 							var time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 4));
 							var tzId = BitConverter.ToUInt16(buffer, 8);
 							var dt = DateTime.SpecifyKind(date.Add(time), DateTimeKind.Utc);
-							Value = TypeHelper.CreateZonedDateTime(dt, tzId, null);
+							DbValue.SetValue(TypeHelper.CreateZonedDateTime(dt, tzId, null));
 							break;
 						}
 
@@ -438,7 +424,7 @@ namespace FirebirdSql.Data.Common
 							var tzId = BitConverter.ToUInt16(buffer, 8);
 							var offset = BitConverter.ToInt16(buffer, 10);
 							var dt = DateTime.SpecifyKind(date.Add(time), DateTimeKind.Utc);
-							Value = TypeHelper.CreateZonedDateTime(dt, tzId, offset);
+							DbValue.SetValue(TypeHelper.CreateZonedDateTime(dt, tzId, offset));
 							break;
 						}
 
@@ -446,7 +432,7 @@ namespace FirebirdSql.Data.Common
 						{
 							var time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 0));
 							var tzId = BitConverter.ToUInt16(buffer, 4);
-							Value = TypeHelper.CreateZonedTime(time, tzId, null);
+							DbValue.SetValue(TypeHelper.CreateZonedTime(time, tzId, null));
 							break;
 						}
 
@@ -455,29 +441,26 @@ namespace FirebirdSql.Data.Common
 							var time = TypeDecoder.DecodeTime(BitConverter.ToInt32(buffer, 0));
 							var tzId = BitConverter.ToUInt16(buffer, 4);
 							var offset = BitConverter.ToInt16(buffer, 6);
-							Value = TypeHelper.CreateZonedTime(time, tzId, offset);
+							DbValue.SetValue(TypeHelper.CreateZonedTime(time, tzId, offset));
 							break;
 						}
 
 					case IscCodes.SQL_DEC16:
-						Value = DecimalCodec.DecFloat16.ParseBytes(buffer);
+						DbValue.SetValue(DecimalCodec.DecFloat16.ParseBytes(buffer));
 						break;
 
 					case IscCodes.SQL_DEC34:
-						Value = DecimalCodec.DecFloat34.ParseBytes(buffer);
+						DbValue.SetValue(DecimalCodec.DecFloat34.ParseBytes(buffer));
 						break;
 
 					case IscCodes.SQL_INT128:
 						if (_numericScale < 0)
 						{
-							Value = TypeDecoder.DecodeDecimal(
-								Int128Helper.GetInt128(buffer),
-								_numericScale,
-								_dataType);
+							DbValue.SetValue(TypeDecoder.DecodeDecimal(Int128Helper.GetInt128(buffer), _numericScale, _dataType));
 						}
 						else
 						{
-							Value = Int128Helper.GetInt128(buffer);
+							DbValue.SetValue(Int128Helper.GetInt128(buffer));
 						}
 						break;
 
@@ -487,79 +470,79 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public void FixNull()
+		public async Task FixNull(AsyncWrappingCommonArgs async)
 		{
-			if (NullFlag == -1 && _dbValue.IsDBNull())
+			if (NullFlag == -1 && await _dbValue.IsDBNull(async).ConfigureAwait(false))
 			{
 				switch (DbDataType)
 				{
 					case DbDataType.Char:
 					case DbDataType.VarChar:
-						Value = string.Empty;
+						DbValue.SetValue(string.Empty);
 						break;
 
 					case DbDataType.Guid:
-						Value = Guid.Empty;
+						DbValue.SetValue(Guid.Empty);
 						break;
 
 					case DbDataType.SmallInt:
-						Value = (short)0;
+						DbValue.SetValue((short)0);
 						break;
 
 					case DbDataType.Integer:
-						Value = (int)0;
+						DbValue.SetValue((int)0);
 						break;
 
 					case DbDataType.BigInt:
 					case DbDataType.Binary:
 					case DbDataType.Array:
 					case DbDataType.Text:
-						Value = (long)0;
+						DbValue.SetValue((long)0);
 						break;
 
 					case DbDataType.Numeric:
 					case DbDataType.Decimal:
-						Value = (decimal)0;
+						DbValue.SetValue((decimal)0);
 						break;
 
 					case DbDataType.Float:
-						Value = (float)0;
+						DbValue.SetValue((float)0);
 						break;
 
 					case DbDataType.Double:
-						Value = (double)0;
+						DbValue.SetValue((double)0);
 						break;
 
 					case DbDataType.Date:
 					case DbDataType.TimeStamp:
-						Value = new DateTime(0 * 10000L + 621355968000000000);
+						DbValue.SetValue(new DateTime(0 * 10000L + 621355968000000000));
 						break;
 
 					case DbDataType.Time:
-						Value = TimeSpan.Zero;
+						DbValue.SetValue(TimeSpan.Zero);
 						break;
 
 					case DbDataType.Boolean:
-						Value = false;
+						DbValue.SetValue(false);
 						break;
 
 					case DbDataType.TimeStampTZ:
 					case DbDataType.TimeStampTZEx:
-						Value = new FbZonedDateTime(new DateTime(0 * 10000L + 621355968000000000), TimeZoneMapping.DefaultTimeZoneName);
+						DbValue.SetValue(new FbZonedDateTime(new DateTime(0 * 10000L + 621355968000000000), TimeZoneMapping.DefaultTimeZoneName));
 						break;
 
 					case DbDataType.TimeTZ:
 					case DbDataType.TimeTZEx:
-						Value = new FbZonedTime(TimeSpan.Zero, TimeZoneMapping.DefaultTimeZoneName);
+						DbValue.SetValue(new FbZonedTime(TimeSpan.Zero, TimeZoneMapping.DefaultTimeZoneName));
 						break;
 
 					case DbDataType.Dec16:
 					case DbDataType.Dec34:
-						Value = new FbDecFloat(0, 0);
+						DbValue.SetValue(new FbDecFloat(0, 0));
 						break;
 
 					case DbDataType.Int128:
-						Value = (BigInteger)0;
+						DbValue.SetValue((BigInteger)0);
 						break;
 
 					default:

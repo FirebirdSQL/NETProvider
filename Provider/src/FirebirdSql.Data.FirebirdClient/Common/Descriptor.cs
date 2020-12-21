@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.Common
 		{
 			for (var i = 0; i < _fields.Length; i++)
 			{
-				_fields[i].Value = null;
+				_fields[i].SetValue(null);
 			}
 		}
 

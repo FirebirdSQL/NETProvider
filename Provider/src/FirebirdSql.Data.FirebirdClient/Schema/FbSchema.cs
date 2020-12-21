@@ -18,12 +18,10 @@
 using System;
 using System.Data;
 using System.Data.Common;
-using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
-
-using FirebirdSql.Data.FirebirdClient;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Services;
 
 namespace FirebirdSql.Data.Schema
@@ -40,10 +38,11 @@ namespace FirebirdSql.Data.Schema
 
 		#region Methods
 
-		public DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
+		public async Task<DataTable> GetSchema(FbConnection connection, string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
 		{
 			var dataTable = new DataTable(collectionName);
-			using (var command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions)))
+			var command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions));
+			try
 			{
 				using (var adapter = new FbDataAdapter(command))
 				{
@@ -57,8 +56,18 @@ namespace FirebirdSql.Data.Schema
 					}
 				}
 			}
+			finally
+			{
+#if NET48 || NETSTANDARD2_0
+				command.Dispose();
+				await Task.CompletedTask.ConfigureAwait(false);
+#else
+				await async.AsyncSyncCallNoCancellation(command.DisposeAsync, command.Dispose).ConfigureAwait(false);
+#endif
+			}
 			TrimStringFields(dataTable);
-			return ProcessResult(dataTable);
+			ProcessResult(dataTable);
+			return dataTable;
 		}
 
 		#endregion
@@ -98,10 +107,8 @@ namespace FirebirdSql.Data.Schema
 		}
 
 
-		protected virtual DataTable ProcessResult(DataTable schema)
-		{
-			return schema;
-		}
+		protected virtual void ProcessResult(DataTable schema)
+		{ }
 
 		protected virtual string[] ParseRestrictions(string[] restrictions)
 		{
@@ -121,7 +128,6 @@ namespace FirebirdSql.Data.Schema
 			MajorVersionNumber = serverVersion.Major;
 		}
 		#endregion
-
 
 		#region Private Static Methods
 

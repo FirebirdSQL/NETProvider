@@ -13,9 +13,8 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez
+//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
-using System;
 using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Client.Native.Marshalers

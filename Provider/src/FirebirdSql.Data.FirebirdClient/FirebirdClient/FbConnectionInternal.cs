@@ -22,13 +22,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Client;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Schema;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	internal class FbConnectionInternal : IDisposable
+	internal class FbConnectionInternal
 	{
 		#region Fields
 
@@ -37,7 +38,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		private HashSet<FbCommand> _preparedCommands;
 		private ConnectionString _options;
 		private FbConnection _owningConnection;
-		private bool _disposed;
 		private FbEnlistmentNotification _enlistmentNotification;
 
 		#endregion
@@ -80,7 +80,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _options; }
 		}
 
-		public bool CancelDisabled { get; set; }
+		public bool CancelDisabled { get; private set; }
 
 		#endregion
 
@@ -95,24 +95,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region IDisposable Methods
-
-		public void Dispose()
-		{
-			if (!_disposed)
-			{
-				_disposed = true;
-				Disconnect();
-			}
-		}
-
-		#endregion
-
 		#region Create and Drop database methods
 
-		public void CreateDatabase(int pageSize, bool forcedWrites, bool overwrite)
+		public async Task CreateDatabase(int pageSize, bool forcedWrites, bool overwrite, AsyncWrappingCommonArgs async)
 		{
-			var db = ClientFactory.CreateDatabase(_options);
+			var db = await ClientFactory.CreateDatabase(_options, async).ConfigureAwait(false);
 
 			var dpb = db.CreateDatabaseParameterBuffer();
 
@@ -145,37 +132,37 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
-					db.CreateDatabaseWithTrustedAuth(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+					await db.CreateDatabaseWithTrustedAuth(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 				else
 				{
-					db.CreateDatabase(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+					await db.CreateDatabase(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 			}
 			finally
 			{
-				db.Detach();
+				await db.Detach(async).ConfigureAwait(false);
 			}
 		}
 
-		public void DropDatabase()
+		public async Task DropDatabase(AsyncWrappingCommonArgs async)
 		{
-			var db = ClientFactory.CreateDatabase(_options);
+			var db = await ClientFactory.CreateDatabase(_options, async).ConfigureAwait(false);
 			try
 			{
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
-					db.AttachWithTrustedAuth(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+					await db.AttachWithTrustedAuth(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 				else
 				{
-					db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+					await db.Attach(BuildDpb(db, _options), _options.DataSource, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
-				db.DropDatabase();
+				await db.DropDatabase(async).ConfigureAwait(false);
 			}
 			finally
 			{
-				db.Detach();
+				await db.Detach(async).ConfigureAwait(false);
 			}
 		}
 
@@ -183,7 +170,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Connect and Disconnect methods
 
-		public void Connect()
+		public async Task Connect(AsyncWrappingCommonArgs async)
 		{
 			if (Charset.GetCharset(_options.Charset) == null)
 			{
@@ -192,7 +179,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			try
 			{
-				_db = ClientFactory.CreateDatabase(_options);
+				_db = await ClientFactory.CreateDatabase(_options, async).ConfigureAwait(false);
 				_db.Charset = Charset.GetCharset(_options.Charset);
 				_db.Dialect = _options.Dialect;
 				_db.PacketSize = _options.PacketSize;
@@ -201,11 +188,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
-					_db.AttachWithTrustedAuth(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+					await _db.AttachWithTrustedAuth(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 				else
 				{
-					_db.Attach(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey);
+					await _db.Attach(dpb, _options.DataSource, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
@@ -214,13 +201,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public void Disconnect()
+		public async Task Disconnect(AsyncWrappingCommonArgs async)
 		{
 			if (_db != null)
 			{
 				try
 				{
-					_db.Detach();
+					await _db.Detach(async).ConfigureAwait(false);
 				}
 				catch
 				{ }
@@ -237,14 +224,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Transaction Handling Methods
 
-		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
+		public async Task<FbTransaction> BeginTransaction(IsolationLevel level, string transactionName, AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransaction();
 
 			try
 			{
 				_activeTransaction = new FbTransaction(_owningConnection, level);
-				_activeTransaction.BeginTransaction();
+				await _activeTransaction.BeginTransaction(async).ConfigureAwait(false);
 
 				if (transactionName != null)
 				{
@@ -253,21 +240,21 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				DisposeTransaction();
+				await DisposeTransaction(async).ConfigureAwait(false);
 				throw new FbException(ex.Message, ex);
 			}
 
 			return _activeTransaction;
 		}
 
-		public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
+		public async Task<FbTransaction> BeginTransaction(FbTransactionOptions options, string transactionName, AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransaction();
 
 			try
 			{
 				_activeTransaction = new FbTransaction(_owningConnection, IsolationLevel.Unspecified);
-				_activeTransaction.BeginTransaction(options);
+				await _activeTransaction.BeginTransaction(options, async).ConfigureAwait(false);
 
 				if (transactionName != null)
 				{
@@ -276,37 +263,42 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				DisposeTransaction();
+				await DisposeTransaction(async).ConfigureAwait(false);
 				throw new FbException(ex.Message, ex);
 			}
 
 			return _activeTransaction;
 		}
 
-		public void DisposeTransaction()
+		public async Task DisposeTransaction(AsyncWrappingCommonArgs async)
 		{
 			if (_activeTransaction != null && !IsEnlisted)
 			{
+#if NET48 || NETSTANDARD2_0
 				_activeTransaction.Dispose();
+				await Task.CompletedTask.ConfigureAwait(false);
+#else
+				await async.AsyncSyncCallNoCancellation(_activeTransaction.DisposeAsync, _activeTransaction.Dispose).ConfigureAwait(false);
+#endif
 				_activeTransaction = null;
 			}
 		}
 
-		public void TransactionCompleted()
+		public async Task TransactionCompleted(AsyncWrappingCommonArgs async)
 		{
 			foreach (var command in _preparedCommands)
 			{
 				if (command.Transaction != null)
 				{
-					command.DisposeReader();
+					await command.DisposeReader(async).ConfigureAwait(false);
 					command.Transaction = null;
 				}
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Transaction Enlistement
+#region Transaction Enlistment
 
 		public void EnlistTransaction(System.Transactions.Transaction transaction)
 		{
@@ -334,46 +326,33 @@ namespace FirebirdSql.Data.FirebirdClient
 			_enlistmentNotification = null;
 		}
 
-		public FbTransaction BeginTransaction(System.Transactions.IsolationLevel isolationLevel)
+		public Task<FbTransaction> BeginTransaction(System.Transactions.IsolationLevel isolationLevel, AsyncWrappingCommonArgs async)
 		{
-			switch (isolationLevel)
+			var il = isolationLevel switch
 			{
-				case System.Transactions.IsolationLevel.Chaos:
-					return BeginTransaction(System.Data.IsolationLevel.Chaos, null);
-
-				case System.Transactions.IsolationLevel.ReadUncommitted:
-					return BeginTransaction(System.Data.IsolationLevel.ReadUncommitted, null);
-
-				case System.Transactions.IsolationLevel.RepeatableRead:
-					return BeginTransaction(System.Data.IsolationLevel.RepeatableRead, null);
-
-				case System.Transactions.IsolationLevel.Serializable:
-					return BeginTransaction(System.Data.IsolationLevel.Serializable, null);
-
-				case System.Transactions.IsolationLevel.Snapshot:
-					return BeginTransaction(System.Data.IsolationLevel.Snapshot, null);
-
-				case System.Transactions.IsolationLevel.Unspecified:
-					return BeginTransaction(System.Data.IsolationLevel.Unspecified, null);
-
-				case System.Transactions.IsolationLevel.ReadCommitted:
-				default:
-					return BeginTransaction(System.Data.IsolationLevel.ReadCommitted, null);
-			}
+				System.Transactions.IsolationLevel.Chaos => IsolationLevel.Chaos,
+				System.Transactions.IsolationLevel.ReadUncommitted => IsolationLevel.ReadUncommitted,
+				System.Transactions.IsolationLevel.RepeatableRead => IsolationLevel.RepeatableRead,
+				System.Transactions.IsolationLevel.Serializable => IsolationLevel.Serializable,
+				System.Transactions.IsolationLevel.Snapshot => IsolationLevel.Snapshot,
+				System.Transactions.IsolationLevel.Unspecified => IsolationLevel.Unspecified,
+				_ => IsolationLevel.ReadCommitted,
+			};
+			return BeginTransaction(il, null, async);
 		}
 
-		#endregion
+#endregion
 
-		#region Schema Methods
+#region Schema Methods
 
-		public DataTable GetSchema(string collectionName, string[] restrictions)
+		public Task<DataTable> GetSchema(string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
 		{
-			return FbSchemaFactory.GetSchema(_owningConnection, collectionName, restrictions);
+			return FbSchemaFactory.GetSchema(_owningConnection, collectionName, restrictions, async);
 		}
 
-		#endregion
+#endregion
 
-		#region Prepared Commands Methods
+#region Prepared Commands Methods
 
 		public void AddPreparedCommand(FbCommand command)
 		{
@@ -387,7 +366,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_preparedCommands.Remove(command);
 		}
 
-		public void ReleasePreparedCommands()
+		public async Task ReleasePreparedCommands(AsyncWrappingCommonArgs async)
 		{
 			// copy the data because the collection will be modified via RemovePreparedCommand from Release
 			var data = _preparedCommands.ToList();
@@ -395,7 +374,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				try
 				{
-					item.Release();
+					await item.Release(async).ConfigureAwait(false);
 				}
 				catch (IOException)
 				{
@@ -410,21 +389,22 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Firebird Events Methods
+#region Firebird Events Methods
 
-		public void CloseEventManager()
+		public Task CloseEventManager(AsyncWrappingCommonArgs async)
 		{
 			if (_db != null && _db.HasRemoteEventSupport)
 			{
-				_db.CloseEventManager();
+				return _db.CloseEventManager(async);
 			}
+			return Task.CompletedTask;
 		}
 
-		#endregion
+#endregion
 
-		#region Private Methods
+#region Private Methods
 
 		private void EnsureActiveTransaction()
 		{
@@ -519,33 +499,33 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			return typeof(FbConnectionInternal).GetTypeInfo().Assembly.GetName().Version.ToString();
 		}
-		#endregion
+#endregion
 
-		#region Cancelation
-		public void EnableCancel()
+#region Cancelation
+		public async Task EnableCancel(AsyncWrappingCommonArgs async)
 		{
-			_db.CancelOperation(IscCodes.fb_cancel_enable);
+			await _db.CancelOperation(IscCodes.fb_cancel_enable, async).ConfigureAwait(false);
 			CancelDisabled = false;
 		}
 
-		public void DisableCancel()
+		public async Task DisableCancel(AsyncWrappingCommonArgs async)
 		{
-			_db.CancelOperation(IscCodes.fb_cancel_disable);
+			await _db.CancelOperation(IscCodes.fb_cancel_disable, async).ConfigureAwait(false);
 			CancelDisabled = true;
 		}
 
-		public void CancelCommand()
+		public Task CancelCommand(AsyncWrappingCommonArgs async)
 		{
-			_db.CancelOperation(IscCodes.fb_cancel_raise);
+			return _db.CancelOperation(IscCodes.fb_cancel_raise, async);
 		}
-		#endregion
+#endregion
 
-		#region Infrastructure
+#region Infrastructure
 		public FbConnectionInternal SetOwningConnection(FbConnection owningConnection)
 		{
 			_owningConnection = owningConnection;
 			return this;
 		}
-		#endregion
+#endregion
 	}
 }

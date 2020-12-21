@@ -16,7 +16,8 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
@@ -30,19 +31,21 @@ namespace FirebirdSql.Data.Services
 			: base(connectionString)
 		{ }
 
-		public void Execute()
+		public void Execute() => ExecuteImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task ExecuteAsync(CancellationToken cancellationToken = default) => ExecuteImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task ExecuteImpl(AsyncWrappingCommonArgs async)
 		{
 			EnsureDatabase();
 
 			try
 			{
-				Open();
+				await Open(async).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer();
 				startSpb.Append(IscCodes.isc_action_svc_repair);
 				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				StartTask(startSpb);
-				ProcessServiceOutput(EmptySpb);
+				await StartTask(startSpb, async).ConfigureAwait(false);
+				await ProcessServiceOutput(EmptySpb, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -50,7 +53,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				Close();
+				await Close(async).ConfigureAwait(false);
 			}
 		}
 	}

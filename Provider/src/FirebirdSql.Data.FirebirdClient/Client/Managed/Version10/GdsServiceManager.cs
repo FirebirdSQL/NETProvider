@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
@@ -75,42 +76,43 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public virtual void Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey)
+		public virtual async Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				SendAttachToBuffer(spb, service);
-				_database.Xdr.Flush();
-				ProcessAttachResponse(_database.ReadResponse<GenericResponse>());
+				await SendAttachToBuffer(spb, service, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				await ProcessAttachResponse((GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 			}
 			catch (IOException ex)
 			{
-				_database.Detach();
+				await _database.Detach(async).ConfigureAwait(false);
 				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
 			}
 		}
 
-		protected virtual void SendAttachToBuffer(ServiceParameterBuffer spb, string service)
+		protected virtual async Task SendAttachToBuffer(ServiceParameterBuffer spb, string service, AsyncWrappingCommonArgs async)
 		{
-			_database.Xdr.Write(IscCodes.op_service_attach);
-			_database.Xdr.Write(0);
-			_database.Xdr.Write(service);
-			_database.Xdr.WriteBuffer(spb.ToArray());
+			await _database.Xdr.Write(IscCodes.op_service_attach, async).ConfigureAwait(false);
+			await _database.Xdr.Write(0, async).ConfigureAwait(false);
+			await _database.Xdr.Write(service, async).ConfigureAwait(false);
+			await _database.Xdr.WriteBuffer(spb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		protected virtual void ProcessAttachResponse(GenericResponse response)
+		protected virtual Task ProcessAttachResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			_handle = response.ObjectHandle;
+			return Task.CompletedTask;
 		}
 
-		public virtual void Detach()
+		public virtual async Task Detach(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_service_detach);
-				_database.Xdr.Write(Handle);
-				_database.Xdr.Write(IscCodes.op_disconnect);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_service_detach, async).ConfigureAwait(false);
+				await _database.Xdr.Write(Handle, async).ConfigureAwait(false);
+				await _database.Xdr.Write(IscCodes.op_disconnect, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
 				_handle = 0;
 			}
@@ -122,7 +124,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				try
 				{
-					_connection.Disconnect();
+					await _connection.Disconnect(async).ConfigureAwait(false);
 				}
 				catch (IOException ex)
 				{
@@ -136,19 +138,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public virtual void Start(ServiceParameterBuffer spb)
+		public virtual async Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_service_start);
-				_database.Xdr.Write(Handle);
-				_database.Xdr.Write(0);
-				_database.Xdr.WriteBuffer(spb.ToArray(), spb.Length);
-				_database.Xdr.Flush();
+				await _database.Xdr.Write(IscCodes.op_service_start, async).ConfigureAwait(false);
+				await _database.Xdr.Write(Handle, async).ConfigureAwait(false);
+				await _database.Xdr.Write(0, async).ConfigureAwait(false);
+				await _database.Xdr.WriteBuffer(spb.ToArray(), spb.Length, async).ConfigureAwait(false);
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
 				try
 				{
-					_database.ReadResponse();
+					await _database.ReadResponse(async).ConfigureAwait(false);
 				}
 				catch (IscException)
 				{
@@ -161,20 +163,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public virtual void Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer)
+		public virtual async Task Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_service_info);
-				_database.Xdr.Write(Handle);
-				_database.Xdr.Write(GdsDatabase.Incarnation);
-				_database.Xdr.WriteBuffer(spb.ToArray(), spb.Length);
-				_database.Xdr.WriteBuffer(requestBuffer, requestLength);
-				_database.Xdr.Write(bufferLength);
+				await _database.Xdr.Write(IscCodes.op_service_info, async).ConfigureAwait(false);
+				await _database.Xdr.Write(Handle, async).ConfigureAwait(false);
+				await _database.Xdr.Write(GdsDatabase.Incarnation, async).ConfigureAwait(false);
+				await _database.Xdr.WriteBuffer(spb.ToArray(), spb.Length, async).ConfigureAwait(false);
+				await _database.Xdr.WriteBuffer(requestBuffer, requestLength, async).ConfigureAwait(false);
+				await _database.Xdr.Write(bufferLength, async).ConfigureAwait(false);
 
-				_database.Xdr.Flush();
+				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				var response = _database.ReadResponse<GenericResponse>();
+				var response = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
 
 				var responseLength = bufferLength;
 

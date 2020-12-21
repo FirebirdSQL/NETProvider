@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Read
 
-		public byte[] ReadBytes(byte[] buffer, int count)
+		public async Task<byte[]> ReadBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async)
 		{
 			if (count > 0)
 			{
@@ -55,28 +55,7 @@ namespace FirebirdSql.Data.Client.Managed
 				var currentlyRead = -1;
 				while (toRead > 0 && currentlyRead != 0)
 				{
-					toRead -= (currentlyRead = _stream.Read(buffer, count - toRead, toRead));
-				}
-				if (currentlyRead == 0)
-				{
-					if (_stream is ITracksIOFailure tracksIOFailure)
-					{
-						tracksIOFailure.IOFailed = true;
-					}
-					throw new IOException();
-				}
-			}
-			return buffer;
-		}
-		public async Task<byte[]> ReadBytesAsync(byte[] buffer, int count)
-		{
-			if (count > 0)
-			{
-				var toRead = count;
-				var currentlyRead = -1;
-				while (toRead > 0 && currentlyRead != 0)
-				{
-					toRead -= (currentlyRead = await _stream.ReadAsync(buffer, count - toRead, toRead).ConfigureAwait(false));
+					toRead -= (currentlyRead = await async.AsyncSyncCall(_stream.ReadAsync, _stream.Read, buffer, count - toRead, toRead).ConfigureAwait(false));
 				}
 				if (currentlyRead == 0)
 				{
@@ -90,149 +69,144 @@ namespace FirebirdSql.Data.Client.Managed
 			return buffer;
 		}
 
-		public byte[] ReadOpaque(int length)
+		public async Task<byte[]> ReadOpaque(int length, AsyncWrappingCommonArgs async)
 		{
 			var buffer = new byte[length];
-			ReadBytes(buffer, length);
-			ReadPad((4 - length) & 3);
+			await ReadBytes(buffer, length, async).ConfigureAwait(false);
+			await ReadPad((4 - length) & 3, async).ConfigureAwait(false);
 			return buffer;
 		}
 
-		public byte[] ReadBuffer()
+		public async Task<byte[]> ReadBuffer(AsyncWrappingCommonArgs async)
 		{
-			return ReadOpaque((ushort)ReadInt32());
+			return await ReadOpaque((ushort)await ReadInt32(async).ConfigureAwait(false), async).ConfigureAwait(false);
 		}
 
-		public string ReadString() => ReadString(_charset);
-		public string ReadString(int length) => ReadString(_charset, length);
-		public string ReadString(Charset charset) => ReadString(charset, ReadInt32());
-		public string ReadString(Charset charset, int length)
+		public Task<string> ReadString(AsyncWrappingCommonArgs async) => ReadString(_charset, async);
+		public Task<string> ReadString(int length, AsyncWrappingCommonArgs async) => ReadString(_charset, length, async);
+		public async Task<string> ReadString(Charset charset, AsyncWrappingCommonArgs async) => await ReadString(charset, await ReadInt32(async).ConfigureAwait(false), async).ConfigureAwait(false);
+		public async Task<string> ReadString(Charset charset, int length, AsyncWrappingCommonArgs async)
 		{
-			var buffer = ReadOpaque(length);
+			var buffer = await ReadOpaque(length, async).ConfigureAwait(false);
 			return charset.GetString(buffer, 0, buffer.Length);
 		}
 
-		public short ReadInt16()
+		public async Task<short> ReadInt16(AsyncWrappingCommonArgs async)
 		{
-			return Convert.ToInt16(ReadInt32());
+			return Convert.ToInt16(await ReadInt32(async).ConfigureAwait(false));
 		}
 
-		public int ReadInt32()
+		public async Task<int> ReadInt32(AsyncWrappingCommonArgs async)
 		{
-			ReadBytes(_smallBuffer, 4);
-			return TypeDecoder.DecodeInt32(_smallBuffer);
-		}
-		public async Task<int> ReadInt32Async()
-		{
-			await ReadBytesAsync(_smallBuffer, 4).ConfigureAwait(false);
+			await ReadBytes(_smallBuffer, 4, async).ConfigureAwait(false);
 			return TypeDecoder.DecodeInt32(_smallBuffer);
 		}
 
-		public long ReadInt64()
+		public async Task<long> ReadInt64(AsyncWrappingCommonArgs async)
 		{
-			ReadBytes(_smallBuffer, 8);
+			await ReadBytes(_smallBuffer, 8, async).ConfigureAwait(false);
 			return TypeDecoder.DecodeInt64(_smallBuffer);
 		}
 
-		public Guid ReadGuid()
+		public async Task<Guid> ReadGuid(AsyncWrappingCommonArgs async)
 		{
-			return TypeDecoder.DecodeGuid(ReadOpaque(16));
+			return TypeDecoder.DecodeGuid(await ReadOpaque(16, async).ConfigureAwait(false));
 		}
 
-		public float ReadSingle()
+		public async Task<float> ReadSingle(AsyncWrappingCommonArgs async)
 		{
-			return BitConverter.ToSingle(BitConverter.GetBytes(ReadInt32()), 0);
+			return BitConverter.ToSingle(BitConverter.GetBytes(await ReadInt32(async).ConfigureAwait(false)), 0);
 		}
 
-		public double ReadDouble()
+		public async Task<double> ReadDouble(AsyncWrappingCommonArgs async)
 		{
-			return BitConverter.ToDouble(BitConverter.GetBytes(ReadInt64()), 0);
+			return BitConverter.ToDouble(BitConverter.GetBytes(await ReadInt64(async).ConfigureAwait(false)), 0);
 		}
 
-		public DateTime ReadDateTime()
+		public async Task<DateTime> ReadDateTime(AsyncWrappingCommonArgs async)
 		{
-			var date = ReadDate();
-			var time = ReadTime();
+			var date = await ReadDate(async).ConfigureAwait(false);
+			var time = await ReadTime(async).ConfigureAwait(false);
 			return date.Add(time);
 		}
 
-		public DateTime ReadDate()
+		public async Task<DateTime> ReadDate(AsyncWrappingCommonArgs async)
 		{
-			return TypeDecoder.DecodeDate(ReadInt32());
+			return TypeDecoder.DecodeDate(await ReadInt32(async).ConfigureAwait(false));
 		}
 
-		public TimeSpan ReadTime()
+		public async Task<TimeSpan> ReadTime(AsyncWrappingCommonArgs async)
 		{
-			return TypeDecoder.DecodeTime(ReadInt32());
+			return TypeDecoder.DecodeTime(await ReadInt32(async).ConfigureAwait(false));
 		}
 
-		public decimal ReadDecimal(int type, int scale)
+		public async Task<decimal> ReadDecimal(int type, int scale, AsyncWrappingCommonArgs async)
 		{
 			switch (type & ~1)
 			{
 				case IscCodes.SQL_SHORT:
-					return TypeDecoder.DecodeDecimal(ReadInt16(), scale, type);
+					return TypeDecoder.DecodeDecimal(await ReadInt16(async).ConfigureAwait(false), scale, type);
 				case IscCodes.SQL_LONG:
-					return TypeDecoder.DecodeDecimal(ReadInt32(), scale, type);
+					return TypeDecoder.DecodeDecimal(await ReadInt32(async).ConfigureAwait(false), scale, type);
 				case IscCodes.SQL_QUAD:
 				case IscCodes.SQL_INT64:
-					return TypeDecoder.DecodeDecimal(ReadInt64(), scale, type);
+					return TypeDecoder.DecodeDecimal(await ReadInt64(async).ConfigureAwait(false), scale, type);
 				case IscCodes.SQL_DOUBLE:
 				case IscCodes.SQL_D_FLOAT:
-					return TypeDecoder.DecodeDecimal(ReadDouble(), scale, type);
+					return TypeDecoder.DecodeDecimal(await ReadDouble(async).ConfigureAwait(false), scale, type);
 				case IscCodes.SQL_INT128:
-					return TypeDecoder.DecodeDecimal(ReadInt128(), scale, type);
+					return TypeDecoder.DecodeDecimal(await ReadInt128(async).ConfigureAwait(false), scale, type);
 				default:
 					throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
 			}
 		}
 
-		public bool ReadBoolean()
+		public async Task<bool> ReadBoolean(AsyncWrappingCommonArgs async)
 		{
-			return TypeDecoder.DecodeBoolean(ReadOpaque(1));
+			return TypeDecoder.DecodeBoolean(await ReadOpaque(1, async).ConfigureAwait(false));
 		}
 
-		public FbZonedDateTime ReadZonedDateTime(bool isExtended)
+		public async Task<FbZonedDateTime> ReadZonedDateTime(bool isExtended, AsyncWrappingCommonArgs async)
 		{
-			var dt = ReadDateTime();
+			var dt = await ReadDateTime(async).ConfigureAwait(false);
 			dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
-			return TypeHelper.CreateZonedDateTime(dt, (ushort)ReadInt16(), isExtended ? ReadInt16() : (short?)null);
+			return TypeHelper.CreateZonedDateTime(dt, (ushort)await ReadInt16(async).ConfigureAwait(false), isExtended ? await ReadInt16(async).ConfigureAwait(false) : (short?)null);
 		}
 
-		public FbZonedTime ReadZonedTime(bool isExtended)
+		public async Task<FbZonedTime> ReadZonedTime(bool isExtended, AsyncWrappingCommonArgs async)
 		{
-			return TypeHelper.CreateZonedTime(ReadTime(), (ushort)ReadInt16(), isExtended ? ReadInt16() : (short?)null);
+			return TypeHelper.CreateZonedTime(await ReadTime(async).ConfigureAwait(false), (ushort)await ReadInt16(async).ConfigureAwait(false), isExtended ? await ReadInt16(async).ConfigureAwait(false) : (short?)null);
 		}
 
-		public FbDecFloat ReadDec16()
+		public async Task<FbDecFloat> ReadDec16(AsyncWrappingCommonArgs async)
 		{
-			return TypeDecoder.DecodeDec16(ReadOpaque(8));
+			return TypeDecoder.DecodeDec16(await ReadOpaque(8, async).ConfigureAwait(false));
 		}
 
-		public FbDecFloat ReadDec34()
+		public async Task<FbDecFloat> ReadDec34(AsyncWrappingCommonArgs async)
 		{
-			return TypeDecoder.DecodeDec34(ReadOpaque(16));
+			return TypeDecoder.DecodeDec34(await ReadOpaque(16, async).ConfigureAwait(false));
 		}
 
-		public BigInteger ReadInt128()
+		public async Task<BigInteger> ReadInt128(AsyncWrappingCommonArgs async)
 		{
-			return TypeDecoder.DecodeInt128(ReadOpaque(16));
+			return TypeDecoder.DecodeInt128(await ReadOpaque(16, async).ConfigureAwait(false));
 		}
 
-		public IscException ReadStatusVector()
+		public async Task<IscException> ReadStatusVector(AsyncWrappingCommonArgs async)
 		{
 			IscException exception = null;
 			var eof = false;
 
 			while (!eof)
 			{
-				var arg = ReadInt32();
+				var arg = await ReadInt32(async).ConfigureAwait(false);
 
 				switch (arg)
 				{
 					case IscCodes.isc_arg_gds:
 					default:
-						var er = ReadInt32();
+						var er = await ReadInt32(async).ConfigureAwait(false);
 						if (er != 0)
 						{
 							if (exception == null)
@@ -251,11 +225,11 @@ namespace FirebirdSql.Data.Client.Managed
 					case IscCodes.isc_arg_interpreted:
 					case IscCodes.isc_arg_string:
 					case IscCodes.isc_arg_sql_state:
-						exception.Errors.Add(new IscError(arg, ReadString()));
+						exception.Errors.Add(new IscError(arg, await ReadString(async).ConfigureAwait(false)));
 						break;
 
 					case IscCodes.isc_arg_number:
-						exception.Errors.Add(new IscError(arg, ReadInt32()));
+						exception.Errors.Add(new IscError(arg, await ReadInt32(async).ConfigureAwait(false)));
 						break;
 				}
 			}
@@ -263,202 +237,183 @@ namespace FirebirdSql.Data.Client.Managed
 			return exception;
 		}
 
-		#endregion
-
-		#region Write
-
-		public void Flush()
-		{
-			_stream.Flush();
-		}
-
-		public void WriteBytes(byte[] buffer, int count)
-		{
-			_stream.Write(buffer, 0, count);
-		}
-
-		public void WriteOpaque(byte[] buffer) => WriteOpaque(buffer, buffer.Length);
-		public void WriteOpaque(byte[] buffer, int length)
-		{
-			if (buffer != null && length > 0)
-			{
-				_stream.Write(buffer, 0, buffer.Length);
-				WriteFill(length - buffer.Length);
-				WritePad((4 - length) & 3);
-			}
-		}
-
-		public void WriteBuffer(byte[] buffer) => WriteBuffer(buffer, buffer?.Length ?? 0);
-		public void WriteBuffer(byte[] buffer, int length)
-		{
-			Write(length);
-			if (buffer != null && length > 0)
-			{
-				_stream.Write(buffer, 0, length);
-				WritePad((4 - length) & 3);
-			}
-		}
-
-		public void WriteBlobBuffer(byte[] buffer)
-		{
-			var length = buffer.Length; // 2 for short for buffer length
-			if (length > short.MaxValue)
-				throw new IOException("Blob buffer too big.");
-			Write(length + 2);
-			Write(length + 2);  //bizarre but true! three copies of the length
-			_stream.WriteByte((byte)((length >> 0) & 0xff));
-			_stream.WriteByte((byte)((length >> 8) & 0xff));
-			_stream.Write(buffer, 0, length);
-			WritePad((4 - length + 2) & 3);
-		}
-
-		public void WriteTyped(int type, byte[] buffer)
-		{
-			int length;
-			if (buffer == null)
-			{
-				Write(1);
-				_stream.WriteByte((byte)type);
-				length = 1;
-			}
-			else
-			{
-				length = buffer.Length + 1;
-				Write(length);
-				_stream.WriteByte((byte)type);
-				_stream.Write(buffer, 0, buffer.Length);
-			}
-			WritePad((4 - length) & 3);
-		}
-
-		public void Write(string value)
-		{
-			var buffer = _charset.GetBytes(value);
-			WriteBuffer(buffer, buffer.Length);
-		}
-
-		public void Write(short value)
-		{
-			Write((int)value);
-		}
-
-		public void Write(int value)
-		{
-			_stream.Write(TypeEncoder.EncodeInt32(value), 0, 4);
-		}
-
-		public void Write(long value)
-		{
-			_stream.Write(TypeEncoder.EncodeInt64(value), 0, 8);
-		}
-
-		public void Write(float value)
-		{
-			var buffer = BitConverter.GetBytes(value);
-			Write(BitConverter.ToInt32(buffer, 0));
-		}
-
-		public void Write(double value)
-		{
-			var buffer = BitConverter.GetBytes(value);
-			Write(BitConverter.ToInt64(buffer, 0));
-		}
-
-		public void Write(decimal value, int type, int scale)
-		{
-			var numeric = TypeEncoder.EncodeDecimal(value, scale, type);
-			switch (type & ~1)
-			{
-				case IscCodes.SQL_SHORT:
-					Write((short)numeric);
-					break;
-				case IscCodes.SQL_LONG:
-					Write((int)numeric);
-					break;
-				case IscCodes.SQL_QUAD:
-				case IscCodes.SQL_INT64:
-					Write((long)numeric);
-					break;
-				case IscCodes.SQL_DOUBLE:
-				case IscCodes.SQL_D_FLOAT:
-					Write((double)numeric);
-					break;
-				case IscCodes.SQL_INT128:
-					Write((BigInteger)numeric);
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
-			}
-		}
-
-		public void Write(bool value)
-		{
-			WriteOpaque(TypeEncoder.EncodeBoolean(value));
-		}
-
-		public void Write(DateTime value)
-		{
-			WriteDate(value);
-			WriteTime(TypeHelper.DateTimeToTimeSpan(value));
-		}
-
-		public void Write(Guid value)
-		{
-			WriteOpaque(TypeEncoder.EncodeGuid(value));
-		}
-
-		public void Write(FbDecFloat value, int size)
-		{
-			WriteOpaque(size switch
-			{
-				16 => TypeEncoder.EncodeDec16(value),
-				34 => TypeEncoder.EncodeDec34(value),
-				_ => throw new ArgumentOutOfRangeException(),
-			});
-		}
-
-		public void Write(BigInteger value)
-		{
-			WriteOpaque(TypeEncoder.EncodeInt128(value));
-		}
-
-		public void WriteDate(DateTime value)
-		{
-			Write(TypeEncoder.EncodeDate(Convert.ToDateTime(value)));
-		}
-
-		public void WriteTime(TimeSpan value)
-		{
-			Write(TypeEncoder.EncodeTime(value));
-		}
-
-		#endregion
-
-		#region Operation
-
 		/* loop	as long	as we are receiving	dummy packets, just
 		 * throwing	them away--note	that if	we are a server	we won't
 		 * be receiving	them, but it is	better to check	for	them at
 		 * this	level rather than try to catch them	in all places where
 		 * this	routine	is called
 		 */
-		public int ReadOperation()
+		public async Task<int> ReadOperation(AsyncWrappingCommonArgs async)
 		{
 			int operation;
 			do
 			{
-				operation = ReadInt32();
+				operation = await ReadInt32(async).ConfigureAwait(false);
 			} while (operation == IscCodes.op_dummy);
 			return operation;
 		}
-		public async Task<int> ReadOperationAsync()
+
+		#endregion
+
+		#region Write
+
+		public Task Flush(AsyncWrappingCommonArgs async)
 		{
-			int operation;
-			do
+			return async.AsyncSyncCall(_stream.FlushAsync, _stream.Flush);
+		}
+
+		public Task WriteBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async)
+		{
+			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, count);
+		}
+
+		public Task WriteOpaque(byte[] buffer, AsyncWrappingCommonArgs async) => WriteOpaque(buffer, buffer.Length, async);
+		public async Task WriteOpaque(byte[] buffer, int length, AsyncWrappingCommonArgs async)
+		{
+			if (buffer != null && length > 0)
 			{
-				operation = await ReadInt32Async().ConfigureAwait(false);
-			} while (operation == IscCodes.op_dummy);
-			return operation;
+				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, buffer.Length).ConfigureAwait(false);
+				await WriteFill(length - buffer.Length, async).ConfigureAwait(false);
+				await WritePad((4 - length) & 3, async).ConfigureAwait(false);
+			}
+		}
+
+		public Task WriteBuffer(byte[] buffer, AsyncWrappingCommonArgs async) => WriteBuffer(buffer, buffer?.Length ?? 0, async);
+		public async Task WriteBuffer(byte[] buffer, int length, AsyncWrappingCommonArgs async)
+		{
+			await Write(length, async).ConfigureAwait(false);
+			if (buffer != null && length > 0)
+			{
+				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, length).ConfigureAwait(false);
+				await WritePad((4 - length) & 3, async).ConfigureAwait(false);
+			}
+		}
+
+		public async Task WriteBlobBuffer(byte[] buffer, AsyncWrappingCommonArgs async)
+		{
+			var length = buffer.Length; // 2 for short for buffer length
+			if (length > short.MaxValue)
+				throw new IOException("Blob buffer too big.");
+			await Write(length + 2, async).ConfigureAwait(false);
+			await Write(length + 2, async).ConfigureAwait(false);  //bizarre but true! three copies of the length
+			await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, new[] { (byte)((length >> 0) & 0xff), (byte)((length >> 8) & 0xff) }, 0, 2).ConfigureAwait(false);
+			await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, length).ConfigureAwait(false);
+			await WritePad((4 - length + 2) & 3, async).ConfigureAwait(false);
+		}
+
+		public async Task WriteTyped(int type, byte[] buffer, AsyncWrappingCommonArgs async)
+		{
+			int length;
+			if (buffer == null)
+			{
+				await Write(1, async).ConfigureAwait(false);
+				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, new[] { (byte)type }, 0, 1).ConfigureAwait(false);
+				length = 1;
+			}
+			else
+			{
+				length = buffer.Length + 1;
+				await Write(length, async).ConfigureAwait(false);
+				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, new[] { (byte)type }, 0, 1).ConfigureAwait(false);
+				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, buffer.Length).ConfigureAwait(false);
+			}
+			await WritePad((4 - length) & 3, async).ConfigureAwait(false);
+		}
+
+		public Task Write(string value, AsyncWrappingCommonArgs async)
+		{
+			var buffer = _charset.GetBytes(value);
+			return WriteBuffer(buffer, buffer.Length, async);
+		}
+
+		public Task Write(short value, AsyncWrappingCommonArgs async)
+		{
+			return Write((int)value, async);
+		}
+
+		public Task Write(int value, AsyncWrappingCommonArgs async)
+		{
+			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, TypeEncoder.EncodeInt32(value), 0, 4);
+		}
+
+		public Task Write(long value, AsyncWrappingCommonArgs async)
+		{
+			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, TypeEncoder.EncodeInt64(value), 0, 8);
+		}
+
+		public Task Write(float value, AsyncWrappingCommonArgs async)
+		{
+			var buffer = BitConverter.GetBytes(value);
+			return Write(BitConverter.ToInt32(buffer, 0), async);
+		}
+
+		public Task Write(double value, AsyncWrappingCommonArgs async)
+		{
+			var buffer = BitConverter.GetBytes(value);
+			return Write(BitConverter.ToInt64(buffer, 0), async);
+		}
+
+		public Task Write(decimal value, int type, int scale, AsyncWrappingCommonArgs async)
+		{
+			var numeric = TypeEncoder.EncodeDecimal(value, scale, type);
+			switch (type & ~1)
+			{
+				case IscCodes.SQL_SHORT:
+					return Write((short)numeric, async);
+				case IscCodes.SQL_LONG:
+					return Write((int)numeric, async);
+				case IscCodes.SQL_QUAD:
+				case IscCodes.SQL_INT64:
+					return Write((long)numeric, async);
+				case IscCodes.SQL_DOUBLE:
+				case IscCodes.SQL_D_FLOAT:
+					return Write((double)numeric, async);
+				case IscCodes.SQL_INT128:
+					return Write((BigInteger)numeric, async);
+				default:
+					throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
+			}
+		}
+
+		public Task Write(bool value, AsyncWrappingCommonArgs async)
+		{
+			return WriteOpaque(TypeEncoder.EncodeBoolean(value), async);
+		}
+
+		public async Task Write(DateTime value, AsyncWrappingCommonArgs async)
+		{
+			await WriteDate(value, async).ConfigureAwait(false);
+			await WriteTime(TypeHelper.DateTimeToTimeSpan(value), async).ConfigureAwait(false);
+		}
+
+		public Task Write(Guid value, AsyncWrappingCommonArgs async)
+		{
+			return WriteOpaque(TypeEncoder.EncodeGuid(value), async);
+		}
+
+		public Task Write(FbDecFloat value, int size, AsyncWrappingCommonArgs async)
+		{
+			return WriteOpaque(size switch
+			{
+				16 => TypeEncoder.EncodeDec16(value),
+				34 => TypeEncoder.EncodeDec34(value),
+				_ => throw new ArgumentOutOfRangeException(),
+			}, async);
+		}
+
+		public Task Write(BigInteger value, AsyncWrappingCommonArgs async)
+		{
+			return WriteOpaque(TypeEncoder.EncodeInt128(value), async);
+		}
+
+		public Task WriteDate(DateTime value, AsyncWrappingCommonArgs async)
+		{
+			return Write(TypeEncoder.EncodeDate(Convert.ToDateTime(value)), async);
+		}
+
+		public Task WriteTime(TimeSpan value, AsyncWrappingCommonArgs async)
+		{
+			return Write(TypeEncoder.EncodeTime(value), async);
 		}
 
 		#endregion
@@ -466,22 +421,21 @@ namespace FirebirdSql.Data.Client.Managed
 		#region Pad + Fill
 
 		readonly static byte[] PadArray = new byte[] { 0, 0, 0, 0 };
-		void WritePad(int length)
+		Task WritePad(int length, AsyncWrappingCommonArgs async)
 		{
-			_stream.Write(PadArray, 0, length);
+			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, PadArray, 0, length);
 		}
 
-
-		void ReadPad(int length)
+		Task ReadPad(int length, AsyncWrappingCommonArgs async)
 		{
 			Debug.Assert(length < _smallBuffer.Length);
-			ReadBytes(_smallBuffer, length);
+			return ReadBytes(_smallBuffer, length, async);
 		}
 
 		readonly static byte[] FillArray = Enumerable.Repeat((byte)32, 32767).ToArray();
-		void WriteFill(int length)
+		Task WriteFill(int length, AsyncWrappingCommonArgs async)
 		{
-			_stream.Write(FillArray, 0, length);
+			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, FillArray, 0, length);
 		}
 
 		#endregion

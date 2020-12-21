@@ -13,22 +13,26 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
 using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
 {
-	internal interface IServiceManager
+	public static class ValueTask2
 	{
-		Action<IscException> WarningMessage { get; set; }
+		public static ValueTask<TResult> FromResult<TResult>(TResult result) =>
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+			new ValueTask<TResult>(result);
+#else
+			ValueTask.FromResult(result);
+#endif
 
-		int Handle { get; }
-
-		Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		Task Detach(AsyncWrappingCommonArgs async);
-		Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async);
-		Task Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async);
+		public static ValueTask CompletedTask =>
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+			default;
+#else
+			ValueTask.CompletedTask;
+#endif
 	}
 }

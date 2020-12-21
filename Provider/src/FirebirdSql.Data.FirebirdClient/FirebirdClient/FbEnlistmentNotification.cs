@@ -16,7 +16,9 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading;
 using System.Transactions;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -55,7 +57,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public FbEnlistmentNotification(FbConnectionInternal connection, Transaction systemTransaction)
 		{
 			_connection = connection;
-			_transaction = connection.BeginTransaction(systemTransaction.IsolationLevel);
+			_transaction = connection.BeginTransaction(systemTransaction.IsolationLevel, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
 			_systemTransaction = systemTransaction;
 
 			_systemTransaction.EnlistVolatile(this, EnlistmentOptions.None);
@@ -78,7 +80,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					if (!_connection.Options.Pooling && (_connection.OwningConnection == null || _connection.OwningConnection.IsClosed))
 					{
-						_connection.Disconnect();
+						_connection.Disconnect(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
 					}
 				}
 				_connection = null;
@@ -112,7 +114,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					if (!_connection.Options.Pooling && (_connection.OwningConnection == null || _connection.OwningConnection.IsClosed))
 					{
-						_connection.Disconnect();
+						_connection.Disconnect(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
 					}
 				}
 				_connection = null;
