@@ -108,10 +108,7 @@ namespace FirebirdSql.Data.Types
 
 		public override bool Equals(object obj)
 		{
-			return obj != null
-				&& (ReferenceEquals(this, obj)
-					|| obj is FbDecFloat fbDecFloat
-					&& Equals(fbDecFloat));
+			return obj is FbDecFloat fbDecFloat && Equals(fbDecFloat);
 		}
 
 		public override int GetHashCode()

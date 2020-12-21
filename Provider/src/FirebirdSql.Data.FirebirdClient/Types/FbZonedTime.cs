@@ -52,10 +52,7 @@ namespace FirebirdSql.Data.Types
 
 		public override bool Equals(object obj)
 		{
-			return obj != null
-				&& (ReferenceEquals(this, obj)
-					|| obj is FbZonedTime fbZonedTime
-					&& Equals(fbZonedTime));
+			return obj is FbZonedTime fbZonedTime && Equals(fbZonedTime);
 		}
 
 		public override int GetHashCode()
