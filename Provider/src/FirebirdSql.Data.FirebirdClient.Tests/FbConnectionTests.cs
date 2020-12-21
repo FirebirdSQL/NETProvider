@@ -352,7 +352,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				csb.Password = string.Empty;
 				csb.Database = $"{Guid.NewGuid().ToString()}.fdb";
 				var cs = csb.ToString();
-				Assert.DoesNotThrow(() => FbConnection.CreateDatabase(cs, true));
+				Assert.DoesNotThrow(() => FbConnection.CreateDatabase(cs, overwrite: true));
 				Assert.DoesNotThrow(() => FbConnection.DropDatabase(cs));
 			}
 			finally
