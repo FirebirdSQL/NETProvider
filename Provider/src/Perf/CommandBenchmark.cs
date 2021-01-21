@@ -33,7 +33,7 @@ namespace Perf
 			public Config()
 			{
 				var baseJob = Job.Default
-					.WithToolchain(CsProjCoreToolchain.NetCoreApp31)
+					.WithToolchain(CsProjCoreToolchain.NetCoreApp50)
 					.WithPlatform(Platform.X64)
 					.WithJit(Jit.RyuJit);
 				AddDiagnoser(MemoryDiagnoser.Default);
