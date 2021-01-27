@@ -1,7 +1,6 @@
 <Project>
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
-		<NoWarn>IDE0017,IDE0028,IDE0044</NoWarn>
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup>
