@@ -48,7 +48,7 @@ namespace Perf
 					cmd.CommandText = @"insert into foobar values (@cnt)";
 					var p = new FbParameter() { ParameterName = "@cnt" };
 					cmd.Parameters.Add(p);
-					for (int i = 0; i < 1000; i++)
+					for (var i = 0; i < Count; i++)
 					{
 						p.Value = i;
 						cmd.ExecuteNonQuery();

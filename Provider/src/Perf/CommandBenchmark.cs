@@ -47,6 +47,9 @@ namespace Perf
 		[Params("bigint", "varchar(10) character set utf8")]
 		public string DataType { get; set; }
 
+		[Params(100)]
+		public int Count { get; set; }
+
 		void GlobalSetupBase()
 		{
 			FbConnection.CreateDatabase(ConnectionString, 16 * 1024, false, true);

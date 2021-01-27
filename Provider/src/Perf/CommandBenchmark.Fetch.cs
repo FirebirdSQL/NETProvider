@@ -39,7 +39,7 @@ namespace Perf
 					cmd.CommandText = $@"execute block as
 declare cnt int;
 begin
-	cnt = 200000;
+	cnt = {Count};
 	while (cnt > 0) do
 	begin
 		insert into foobar values (:cnt);
