@@ -456,7 +456,18 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				if (createdNew)
 				{
-					await _innerConnection.Connect(async).ConfigureAwait(false);
+					try
+					{
+						await _innerConnection.Connect(async).ConfigureAwait(false);
+					}
+					catch
+					{
+						if (_options.Pooling)
+						{
+							FbConnectionPoolManager.Instance.Release(_innerConnection, false);
+						}
+						throw;
+					}
 				}
 				_innerConnection.SetOwningConnection(this);
 

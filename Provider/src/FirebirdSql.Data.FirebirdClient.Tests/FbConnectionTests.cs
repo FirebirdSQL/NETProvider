@@ -258,6 +258,44 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
+		public void ConnectionPoolingFailedNewConnectionIsNotBlockingPool()
+		{
+			const int Size = 2;
+
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
+			csb.Pooling = true;
+			csb.ConnectionLifeTime = 100;
+			csb.MaxPoolSize = Size;
+			csb.Database = "invalid";
+			var cs = csb.ToString();
+
+			var retries = 0;
+			while (true)
+			{
+				using (var connection = new FbConnection(cs))
+				{
+					try
+					{
+						connection.Open();
+					}
+					catch (FbException)
+					{
+						if (retries++ >= Size)
+						{
+							Assert.Pass();
+							return;
+						}
+						else
+						{
+							continue;
+						}
+					}
+					Assert.Fail();
+				}
+			}
+		}
+
+		[Test]
 		public void NoDatabaseTriggersWrongConnectionStringTest()
 		{
 			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
