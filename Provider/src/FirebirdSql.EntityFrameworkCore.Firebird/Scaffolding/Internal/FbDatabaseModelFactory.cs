@@ -21,8 +21,6 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Scaffolding;
@@ -33,8 +31,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 {
 	public class FbDatabaseModelFactory : DatabaseModelFactory
 	{
-		private readonly IDiagnosticsLogger<DbLoggerCategory.Scaffolding> _logger;
-
 		public override DatabaseModel Create(string connectionString, DatabaseModelFactoryOptions options)
 		{
 			using (var connection = new FbConnection(connectionString))
@@ -276,23 +272,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 						DatabasePrimaryKey index = null;
 						while (reader.Read())
 						{
-							try
+							if (index == null)
 							{
-								if (index == null)
+								index = new DatabasePrimaryKey
 								{
-									index = new DatabasePrimaryKey
-									{
-										Table = x,
-										Name = reader.GetString(0).Trim()
-									};
-								}
-								index.Columns.Add(x.Columns.Single(y => y.Name == reader.GetString(1).Trim()));
-
+									Table = x,
+									Name = reader.GetString(0).Trim()
+								};
 							}
-							catch (Exception ex)
-							{
-								_logger.Logger.LogError(ex, "Error assigning primary key for {table}.", x.Name);
-							}
+							index.Columns.Add(x.Columns.Single(y => y.Name == reader.GetString(1).Trim()));
 							x.PrimaryKey = index;
 						}
 					}
@@ -329,27 +317,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 					{
 						while (reader.Read())
 						{
-							try
+							var index = new DatabaseIndex
 							{
-								var index = new DatabaseIndex
-								{
-									Table = table,
-									Name = reader.GetString(0).Trim(),
-									IsUnique = !reader.GetBoolean(1),
-								};
+								Table = table,
+								Name = reader.GetString(0).Trim(),
+								IsUnique = !reader.GetBoolean(1),
+							};
 
-								foreach (var column in reader.GetString(2).Split(','))
-								{
-									index.Columns.Add(table.Columns.Single(y => y.Name == column.Trim()));
-								}
-
-
-								table.Indexes.Add(index);
-							}
-							catch (Exception ex)
+							foreach (var column in reader.GetString(2).Split(','))
 							{
-								_logger.Logger.LogError(ex, "Error assigning index for {table}.", table.Name);
+								index.Columns.Add(table.Columns.Single(y => y.Name == column.Trim()));
 							}
+
+							table.Indexes.Add(index);
 						}
 					}
 				}
@@ -388,24 +368,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 						while (reader.Read())
 						{
 							var referencedTableName = reader.GetString(2);
-							var referencedTable = tables.FirstOrDefault(t => t.Name == referencedTableName);
-							if (referencedTable != null)
+							var referencedTable = tables.First(t => t.Name == referencedTableName);
+							var fkInfo = new DatabaseForeignKey { Name = reader.GetString(0), OnDelete = ConvertToReferentialAction(reader.GetString(4)), Table = table, PrincipalTable = referencedTable };
+							foreach (var pair in reader.GetString(3).Split(','))
 							{
-								var fkInfo = new DatabaseForeignKey { Name = reader.GetString(0), OnDelete = ConvertToReferentialAction(reader.GetString(4)), Table = table, PrincipalTable = referencedTable };
-								foreach (var pair in reader.GetString(3).Split(','))
-								{
-									fkInfo.Columns.Add(table.Columns.Single(y =>
-										string.Equals(y.Name, pair.Split('|')[0], StringComparison.OrdinalIgnoreCase)));
-									fkInfo.PrincipalColumns.Add(fkInfo.PrincipalTable.Columns.Single(y =>
-										string.Equals(y.Name, pair.Split('|')[1], StringComparison.OrdinalIgnoreCase)));
-								}
+								fkInfo.Columns.Add(table.Columns.Single(y =>
+									string.Equals(y.Name, pair.Split('|')[0], StringComparison.OrdinalIgnoreCase)));
+								fkInfo.PrincipalColumns.Add(fkInfo.PrincipalTable.Columns.Single(y =>
+									string.Equals(y.Name, pair.Split('|')[1], StringComparison.OrdinalIgnoreCase)));
+							}
 
-								table.ForeignKeys.Add(fkInfo);
-							}
-							else
-							{
-								_logger.Logger.LogWarning($"Referenced table `{referencedTableName}` is not in dictionary.");
-							}
+							table.ForeignKeys.Add(fkInfo);
 						}
 					}
 				}

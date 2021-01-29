@@ -27,8 +27,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Scaffolding
 		[Test]
 		public void JustCanRun()
 		{
-			var databaseModelFactory = new FbDatabaseModelFactory();
-			Assert.DoesNotThrow(() => databaseModelFactory.Create(Connection, new DatabaseModelFactoryOptions()));
+			var modelFactory = GetModelFactory();
+			Assert.DoesNotThrow(() => modelFactory.Create(Connection, new DatabaseModelFactoryOptions()));
+		}
+
+		static IDatabaseModelFactory GetModelFactory()
+		{
+			return new FbDatabaseModelFactory();
 		}
 	}
 #pragma warning restore EF1001
