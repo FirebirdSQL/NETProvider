@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Client.Managed
 					{
 						tracksIOFailure.IOFailed = true;
 					}
-					throw new IOException();
+					throw new IOException($"Missing {toRead} bytes to fill total {count}.");
 				}
 			}
 			return buffer;
