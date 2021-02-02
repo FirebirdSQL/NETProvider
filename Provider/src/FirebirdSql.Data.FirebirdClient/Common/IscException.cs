@@ -23,6 +23,7 @@ using System.Reflection;
 using System.Resources;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.IO;
 
 namespace FirebirdSql.Data.Common
 {
@@ -109,6 +110,11 @@ namespace FirebirdSql.Data.Common
 			result.Errors.Add(new IscError(IscCodes.isc_arg_string, strParam));
 			result.BuildExceptionData();
 			return result;
+		}
+
+		public static IscException ForIOException(IOException exception)
+		{
+			return IscException.ForErrorCodes(new[] { IscCodes.isc_net_write_err, IscCodes.isc_net_read_err }, exception);
 		}
 
 		private IscException(SerializationInfo info, StreamingContext context)

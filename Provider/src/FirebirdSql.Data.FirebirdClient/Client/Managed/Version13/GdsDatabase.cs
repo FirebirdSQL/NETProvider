@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			catch (IOException ex)
 			{
 				await SafelyDetach(async).ConfigureAwait(false);
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 
 			await AfterAttachActions(async).ConfigureAwait(false);
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 

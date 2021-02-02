@@ -91,7 +91,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			catch (IOException ex)
 			{
 				State = State == StatementState.Allocated ? StatementState.Error : State;
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 
@@ -154,7 +154,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			catch (IOException ex)
 			{
 				State = StatementState.Error;
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 

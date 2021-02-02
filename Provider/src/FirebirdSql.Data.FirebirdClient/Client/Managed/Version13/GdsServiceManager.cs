@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			catch (IOException ex)
 			{
 				await Database.Detach(async).ConfigureAwait(false);
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 

@@ -154,7 +154,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			catch (IOException ex)
 			{
 				await SafelyDetach(async).ConfigureAwait(false);
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 
 			await AfterAttachActions(async).ConfigureAwait(false);
@@ -220,11 +220,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					await CloseConnection(async).ConfigureAwait(false);
 				}
-				catch (IOException ex2)
-				{
-					throw IscException.ForErrorCode(IscCodes.isc_network_error, ex2);
-				}
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				catch (IOException)
+				{ }
+				throw IscException.ForIOException(ex);
 			}
 			finally
 			{
@@ -264,7 +262,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 
@@ -305,7 +303,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 
@@ -360,7 +358,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 
@@ -418,7 +416,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 
@@ -436,7 +434,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 
@@ -526,7 +524,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 
@@ -601,7 +599,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 			catch (IOException ex)
 			{
-				throw IscException.ForErrorCode(IscCodes.isc_network_error, ex);
+				throw IscException.ForIOException(ex);
 			}
 		}
 
