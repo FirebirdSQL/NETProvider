@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			{
 				await SendCancelOperationToBuffer(kind, async).ConfigureAwait(false);
 				await Xdr.Flush(async).ConfigureAwait(false);
-				// no response, this is async
+				// no response, this is out-of-band
 			}
 			catch (IOException ex)
 			{
