@@ -17,12 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
@@ -548,28 +545,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Response Methods
 
-		protected void ProcessResponse(IResponse response)
-		{
-			if (response is GenericResponse genericResponse)
-			{
-				if (genericResponse.Exception != null && !genericResponse.Exception.IsWarning)
-				{
-					throw genericResponse.Exception;
-				}
-			}
-		}
-
-		protected void ProcessResponseWarnings(IResponse response)
-		{
-			if (response is GenericResponse genericResponse)
-			{
-				if (genericResponse.Exception != null && genericResponse.Exception.IsWarning)
-				{
-					_warningMessage?.Invoke(genericResponse.Exception);
-				}
-			}
-		}
-
 		public virtual Task<int> ReadOperation(AsyncWrappingCommonArgs async)
 		{
 			return Xdr.ReadOperation(async);
@@ -578,14 +553,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public virtual async Task<IResponse> ReadResponse(AsyncWrappingCommonArgs async)
 		{
 			var response = await ReadSingleResponse(async).ConfigureAwait(false);
-			ProcessResponse(response);
+			GdsConnection.ProcessResponse(response);
 			return response;
 		}
 
 		public virtual async Task<IResponse> ReadResponse(int operation, AsyncWrappingCommonArgs async)
 		{
 			var response = await ReadSingleResponse(operation, async).ConfigureAwait(false);
-			ProcessResponse(response);
+			GdsConnection.ProcessResponse(response);
 			return response;
 		}
 
@@ -597,7 +572,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected virtual async Task<IResponse> ReadSingleResponse(int operation, AsyncWrappingCommonArgs async)
 		{
 			var response = await GdsConnection.ProcessOperation(operation, Xdr, async).ConfigureAwait(false);
-			ProcessResponseWarnings(response);
+			GdsConnection.ProcessResponseWarnings(response, _warningMessage);
 			return response;
 		}
 

@@ -545,6 +545,29 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
+		[Test]
+		public void InvalidCredentialsGiveProperError()
+		{
+			if (!EnsureServerType(FbServerType.Default))
+				return;
+
+			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
+			csb.Password = string.Empty;
+			using (var conn = new FbConnection(csb.ToString()))
+			{
+				try
+				{
+					conn.Open();
+					Assert.Fail();
+				}
+				catch (FbException ex) when (ex.ErrorCode == 335544472)
+				{
+					Assert.Pass();
+					return;
+				}
+			}
+		}
+
 		#endregion
 
 		#region Methods

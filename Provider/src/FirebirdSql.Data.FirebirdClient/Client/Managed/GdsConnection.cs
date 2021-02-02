@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Fields
 
-		private FirebirdNetworkStream  _firebirdNetworkStream;
+		private FirebirdNetworkStream _firebirdNetworkStream;
 		private string _userID;
 		private string _dataSource;
 		private int _portNumber;
@@ -200,6 +200,7 @@ namespace FirebirdSql.Data.Client.Managed
 								await Xdr.WriteBuffer(serverKeys, async).ConfigureAwait(false);
 								await Xdr.Flush(async).ConfigureAwait(false);
 								var response = (GenericResponse)await ProcessOperation(await Xdr.ReadOperation(async).ConfigureAwait(false), Xdr, async).ConfigureAwait(false);
+								ProcessResponse(response);
 								serverKeys = response.Data;
 								isAuthenticated = true;
 
@@ -213,7 +214,8 @@ namespace FirebirdSql.Data.Client.Managed
 									// after writing before reading
 									_firebirdNetworkStream.StartEncryption(srp.SessionKey);
 
-									await ProcessOperation(await Xdr.ReadOperation(async).ConfigureAwait(false), Xdr, async).ConfigureAwait(false);
+									var response2 = await ProcessOperation(await Xdr.ReadOperation(async).ConfigureAwait(false), Xdr, async).ConfigureAwait(false);
+									ProcessResponse(response2);
 
 									wireCryptInitialized = true;
 								}
@@ -229,7 +231,7 @@ namespace FirebirdSql.Data.Client.Managed
 					else if (operation == IscCodes.op_response)
 					{
 						var response = (GenericResponse)await ProcessOperation(operation, Xdr, async).ConfigureAwait(false);
-						throw response.Exception;
+						ProcessResponse(response);
 					}
 					else
 					{
@@ -266,9 +268,9 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-#endregion
+		#endregion
 
-#region Private Methods
+		#region Private Methods
 
 		private async Task<IPAddress> GetIPAddress(string dataSource, AsyncWrappingCommonArgs async)
 		{
@@ -358,9 +360,9 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-#endregion
+		#endregion
 
-#region Static Methods
+		#region Static Methods
 
 		public static async Task<IResponse> ProcessOperation(int operation, IXdrReader xdr, AsyncWrappingCommonArgs async)
 		{
@@ -387,6 +389,28 @@ namespace FirebirdSql.Data.Client.Managed
 
 				default:
 					throw new ArgumentOutOfRangeException(nameof(operation), $"{nameof(operation)}={operation}");
+			}
+		}
+
+		public static void ProcessResponse(IResponse response)
+		{
+			if (response is GenericResponse genericResponse)
+			{
+				if (genericResponse.Exception != null && !genericResponse.Exception.IsWarning)
+				{
+					throw genericResponse.Exception;
+				}
+			}
+		}
+
+		public static void ProcessResponseWarnings(IResponse response, Action<IscException> onWarning)
+		{
+			if (response is GenericResponse genericResponse)
+			{
+				if (genericResponse.Exception != null && genericResponse.Exception.IsWarning)
+				{
+					onWarning?.Invoke(genericResponse.Exception);
+				}
 			}
 		}
 
@@ -460,6 +484,6 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-#endregion
+		#endregion
 	}
 }
