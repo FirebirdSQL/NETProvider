@@ -22,7 +22,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal abstract class TransactionBase
 	{
-#warning These do not have to be abstract, probably
+#warning This does not have to be abstract, needs generics rework
 		public abstract int Handle { get; }
 
 		public TransactionState State { get; protected set; }
