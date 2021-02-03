@@ -62,22 +62,14 @@ namespace FirebirdSql.Data.Common
 				inValue[i * BytesPerLong + 1] = (byte)(input[i] >> ((BytesPerLong - 3) * BitsPerByte) & 0xFF);
 				inValue[i * BytesPerLong + 0] = (byte)(input[i] >> ((BytesPerLong - 4) * BitsPerByte) & 0xFF);
 			}
-			var outValue = BitConverter.GetBytes(0);
+			var outValue = new byte[4];
 
 			return TrySocketAction(() =>
 			{
+#pragma warning disable CA1416
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, turnOn ? 1 : 0);
 				socket.IOControl(IOControlCode.KeepAliveValues, inValue, outValue);
-			});
-		}
-
-		public static bool TryEnableLoopbackFastPath(this Socket socket)
-		{
-			const int SIOLoopbackFastPath = -1744830448; //0x98000010;
-			var inValue = BitConverter.GetBytes(1);
-			return TrySocketAction(() =>
-			{
-				socket.IOControl(SIOLoopbackFastPath, inValue, null);
+#pragma warning restore CA1416
 			});
 		}
 

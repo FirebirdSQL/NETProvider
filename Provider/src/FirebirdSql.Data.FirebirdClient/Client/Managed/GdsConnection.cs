@@ -96,7 +96,6 @@ namespace FirebirdSql.Data.Client.Managed
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, _packetSize);
 				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
 				socket.TrySetKeepAlive(KeepAliveTime, KeepAliveInterval);
-				socket.TryEnableLoopbackFastPath();
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 				static Func<IPEndPoint, CancellationToken, Task> ConnectHelper(Socket socket) => (e, ct) => Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, e, null);
 #else
