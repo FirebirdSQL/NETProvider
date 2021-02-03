@@ -25,54 +25,6 @@ namespace FirebirdSql.Data.Common
 {
 	internal static class Extensions
 	{
-		static bool TrySocketAction(Action action)
-		{
-			try
-			{
-				action();
-				return true;
-			}
-			catch (SocketException)
-			{
-				return false;
-			}
-			catch (PlatformNotSupportedException)
-			{
-				return false;
-			}
-		}
-
-		public static bool TrySetKeepAlive(this Socket socket, ulong time, ulong interval)
-		{
-			const int BytesPerLong = 4;
-			const int BitsPerByte = 8;
-			var turnOn = time != 0 && interval != 0;
-			var input = new[]
-				{
-					turnOn ? (ulong)1 : (ulong)0,
-					time,
-					interval
-				};
-			// tcp_keepalive struct
-			var inValue = new byte[3 * BytesPerLong];
-			for (var i = 0; i < input.Length; i++)
-			{
-				inValue[i * BytesPerLong + 3] = (byte)(input[i] >> ((BytesPerLong - 1) * BitsPerByte) & 0xFF);
-				inValue[i * BytesPerLong + 2] = (byte)(input[i] >> ((BytesPerLong - 2) * BitsPerByte) & 0xFF);
-				inValue[i * BytesPerLong + 1] = (byte)(input[i] >> ((BytesPerLong - 3) * BitsPerByte) & 0xFF);
-				inValue[i * BytesPerLong + 0] = (byte)(input[i] >> ((BytesPerLong - 4) * BitsPerByte) & 0xFF);
-			}
-			var outValue = new byte[4];
-
-			return TrySocketAction(() =>
-			{
-#pragma warning disable CA1416
-				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, turnOn ? 1 : 0);
-				socket.IOControl(IOControlCode.KeepAliveValues, inValue, outValue);
-#pragma warning restore CA1416
-			});
-		}
-
 		public static int AsInt(this IntPtr ptr)
 		{
 			return (int)ptr.ToInt64();

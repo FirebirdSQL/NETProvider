@@ -31,9 +31,6 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal sealed class GdsConnection
 	{
-		const ulong KeepAliveTime = 1800000; // 30min
-		const ulong KeepAliveInterval = 1800000; // 30min
-
 		#region Fields
 
 		private NetworkStream _networkStream;
@@ -95,7 +92,7 @@ namespace FirebirdSql.Data.Client.Managed
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, _packetSize);
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, _packetSize);
 				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
-				socket.TrySetKeepAlive(KeepAliveTime, KeepAliveInterval);
+				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, 1);
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 				static Func<IPEndPoint, CancellationToken, Task> ConnectHelper(Socket socket) => (e, ct) => Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, e, null);
 #else
