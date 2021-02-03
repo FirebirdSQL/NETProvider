@@ -36,7 +36,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected Descriptor _fields;
 		protected bool _allRowsFetched;
 		private Queue<DbValue[]> _rows;
-		private Queue<DbValue[]> _outputParams;
 		private int _fetchSize;
 
 		#endregion
@@ -115,7 +114,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_handle = IscCodes.INVALID_OBJECT;
 			_fetchSize = 200;
 			_rows = new Queue<DbValue[]>();
-			_outputParams = new Queue<DbValue[]>();
+			OutputParameters = new Queue<DbValue[]>();
 
 			_database = (GdsDatabase)db;
 
@@ -137,7 +136,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				await Release(async).ConfigureAwait(false);
 				Clear();
 				_rows = null;
-				_outputParams = null;
+				OutputParameters = null;
 				_database = null;
 				_fields = null;
 				_parameters = null;
@@ -343,15 +342,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override DbValue[] GetOutputParameters()
-		{
-			if (_outputParams.Count > 0)
-			{
-				return _outputParams.Dequeue();
-			}
-			return null;
-		}
-
 		public override Task Describe(AsyncWrappingCommonArgs async)
 		{
 			// Nothing for Gds, because it's pre-fetched in Prepare.
@@ -546,7 +536,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (response.Count > 0)
 				{
-					_outputParams.Enqueue(await ReadRow(async).ConfigureAwait(false));
+					OutputParameters.Enqueue(await ReadRow(async).ConfigureAwait(false));
 				}
 			}
 			catch (IOException ex)
@@ -964,9 +954,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				_rows.Clear();
 			}
-			if (_outputParams != null && _outputParams.Count > 0)
+			if (OutputParameters != null && OutputParameters.Count > 0)
 			{
-				_outputParams.Clear();
+				OutputParameters.Clear();
 			}
 
 			_allRowsFetched = false;

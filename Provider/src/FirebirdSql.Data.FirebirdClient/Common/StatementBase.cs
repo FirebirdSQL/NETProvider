@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
@@ -88,6 +89,8 @@ namespace FirebirdSql.Data.Common
 		public abstract Descriptor Parameters { get; set; }
 		public abstract Descriptor Fields { get; }
 		public abstract int FetchSize { get; set; }
+
+		protected Queue<DbValue[]> OutputParameters { get; set; }
 
 		public DbStatementType StatementType { get; protected set; } = DbStatementType.None;
 		public StatementState State { get; protected set; } = StatementState.Deallocated;
@@ -173,8 +176,6 @@ namespace FirebirdSql.Data.Common
 		public abstract Task Prepare(string commandText, AsyncWrappingCommonArgs async);
 		public abstract Task Execute(AsyncWrappingCommonArgs async);
 		public abstract Task<DbValue[]> Fetch(AsyncWrappingCommonArgs async);
-#warning Same implementation in Gds and Fes, can it be pulled up?
-		public abstract DbValue[] GetOutputParameters();
 
 		public abstract BlobBase CreateBlob();
 		public abstract BlobBase CreateBlob(long handle);
@@ -194,6 +195,15 @@ namespace FirebirdSql.Data.Common
 		#endregion
 
 		#region Protected Methods
+
+		public DbValue[] GetOutputParameters()
+		{
+			if (OutputParameters != null && OutputParameters.Count > 0)
+			{
+				return OutputParameters.Dequeue();
+			}
+			return null;
+		}
 
 		protected Task<byte[]> GetSqlInfo(byte[] items, AsyncWrappingCommonArgs async)
 		{

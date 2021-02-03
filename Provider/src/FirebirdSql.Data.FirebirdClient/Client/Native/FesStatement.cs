@@ -35,7 +35,6 @@ namespace FirebirdSql.Data.Client.Native
 		private Descriptor _parameters;
 		private Descriptor _fields;
 		private bool _allRowsFetched;
-		private Queue<DbValue[]> _outputParams;
 		private IntPtr[] _statusVector;
 		private IntPtr _fetchSqlDa;
 
@@ -110,7 +109,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db = (FesDatabase)db;
 			_handle = new StatementHandle();
-			_outputParams = new Queue<DbValue[]>();
+			OutputParameters = new Queue<DbValue[]>();
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 			_fetchSqlDa = IntPtr.Zero;
 
@@ -135,7 +134,7 @@ namespace FirebirdSql.Data.Client.Native
 				_fields = null;
 				_parameters = null;
 				_transaction = null;
-				_outputParams = null;
+				OutputParameters = null;
 				_statusVector = null;
 				_allRowsFetched = false;
 				_handle.Dispose();
@@ -296,7 +295,7 @@ namespace FirebirdSql.Data.Client.Native
 					values[i] = new DbValue(this, d, value);
 				}
 
-				_outputParams.Enqueue(values);
+				OutputParameters.Enqueue(values);
 			}
 
 			XsqldaMarshaler.CleanUpNativeData(ref inSqlda);
@@ -383,15 +382,6 @@ namespace FirebirdSql.Data.Client.Native
 				}
 			}
 			return row;
-		}
-
-		public override DbValue[] GetOutputParameters()
-		{
-			if (_outputParams != null && _outputParams.Count > 0)
-			{
-				return _outputParams.Dequeue();
-			}
-			return null;
 		}
 
 		public override async Task Describe(AsyncWrappingCommonArgs async)
@@ -550,7 +540,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		private void Clear()
 		{
-			_outputParams?.Clear();
+			OutputParameters?.Clear();
 		}
 
 		private void ClearAll()
