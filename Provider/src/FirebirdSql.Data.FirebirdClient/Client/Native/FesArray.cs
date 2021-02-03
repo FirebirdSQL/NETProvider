@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Client.Native
 			set { _handle = value; }
 		}
 
-		public override IDatabase Database
+		public override DatabaseBase Database
 		{
 			get { return _db; }
 			set { _db = (FesDatabase)value; }
@@ -66,11 +66,11 @@ namespace FirebirdSql.Data.Client.Native
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
-		public FesArray(IDatabase db, TransactionBase transaction, string tableName, string fieldName)
+		public FesArray(DatabaseBase db, TransactionBase transaction, string tableName, string fieldName)
 			: this(db, transaction, -1, tableName, fieldName)
 		{ }
 
-		public FesArray(IDatabase db, TransactionBase transaction, long handle, string tableName, string fieldName)
+		public FesArray(DatabaseBase db, TransactionBase transaction, long handle, string tableName, string fieldName)
 			: base(tableName, fieldName)
 		{
 			if (!(db is FesDatabase))

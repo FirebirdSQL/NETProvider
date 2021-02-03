@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			set { _handle = value; }
 		}
 
-		public override IDatabase Database
+		public override DatabaseBase Database
 		{
 			get { return _database; }
 			set { _database = (GdsDatabase)value; }
@@ -64,11 +64,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			: base(descriptor)
 		{ }
 
-		public GdsArray(IDatabase db, TransactionBase transaction, string tableName, string fieldName)
+		public GdsArray(DatabaseBase db, TransactionBase transaction, string tableName, string fieldName)
 			: this(db, transaction, -1, tableName, fieldName)
 		{ }
 
-		public GdsArray(IDatabase db, TransactionBase transaction, long handle, string tableName, string fieldName)
+		public GdsArray(DatabaseBase db, TransactionBase transaction, long handle, string tableName, string fieldName)
 			: base(tableName, fieldName)
 		{
 			if (!(db is GdsDatabase))

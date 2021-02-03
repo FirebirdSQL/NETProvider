@@ -37,9 +37,9 @@ namespace FirebirdSql.Data.Common
 
 		protected int SegmentSize => _segmentSize;
 
-		public abstract IDatabase Database { get; }
+		public abstract DatabaseBase Database { get; }
 
-		protected BlobBase(IDatabase db)
+		protected BlobBase(DatabaseBase db)
 		{
 			_segmentSize = db.PacketSize;
 			_charset = db.Charset;

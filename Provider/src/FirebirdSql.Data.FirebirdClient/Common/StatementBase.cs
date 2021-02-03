@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.Common
 
 		#region Properties
 
-		public abstract IDatabase Database { get; }
+		public abstract DatabaseBase Database { get; }
 		public abstract TransactionBase Transaction { get; set; }
 		public abstract Descriptor Parameters { get; set; }
 		public abstract Descriptor Fields { get; }

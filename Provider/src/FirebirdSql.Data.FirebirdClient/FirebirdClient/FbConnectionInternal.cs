@@ -33,7 +33,7 @@ namespace FirebirdSql.Data.FirebirdClient
 	{
 		#region Fields
 
-		private IDatabase _db;
+		private DatabaseBase _db;
 		private FbTransaction _activeTransaction;
 		private HashSet<FbCommand> _preparedCommands;
 		private ConnectionString _options;
@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Properties
 
-		public IDatabase Database
+		public DatabaseBase Database
 		{
 			get { return _db; }
 		}
@@ -412,7 +412,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
 		}
 
-		private static DatabaseParameterBufferBase BuildDpb(IDatabase db, ConnectionString options)
+		private static DatabaseParameterBufferBase BuildDpb(DatabaseBase db, ConnectionString options)
 		{
 			var dpb = db.CreateDatabaseParameterBuffer();
 

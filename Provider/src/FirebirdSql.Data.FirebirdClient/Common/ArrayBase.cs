@@ -42,7 +42,7 @@ namespace FirebirdSql.Data.Common
 		#region Abstract Properties
 
 		public abstract long Handle { get; set; }
-		public abstract IDatabase Database { get; set; }
+		public abstract DatabaseBase Database { get; set; }
 		public abstract TransactionBase Transaction { get; set; }
 
 		#endregion

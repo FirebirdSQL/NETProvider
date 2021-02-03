@@ -65,7 +65,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Constructors
 
-		public FesTransaction(IDatabase db)
+		public FesTransaction(DatabaseBase db)
 		{
 			if (!(db is FesDatabase))
 			{

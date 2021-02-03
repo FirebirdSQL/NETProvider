@@ -25,7 +25,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-	internal class GdsDatabase : IDatabase
+	internal class GdsDatabase : DatabaseBase
 	{
 		const int DatabaseObjectId = 0;
 		const int PartnerIdentification = 0;
@@ -33,72 +33,29 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		const int ArgumentToAstRoutine = 0;
 		internal const int Incarnation = 0;
 
-		#region Callbacks
-
-		public Action<IscException> WarningMessage
-		{
-			get { return _warningMessage; }
-			set { _warningMessage = value; }
-		}
-
-		#endregion
-
 		#region Fields
-
-		protected Action<IscException> _warningMessage;
 
 		private GdsConnection _connection;
 		private GdsEventManager _eventManager;
-		private Charset _charset;
 		protected int _handle;
-		private int _transactionCount;
-		protected string _serverVersion;
-		private short _packetSize;
-		private short _dialect;
 
 		#endregion
 
 		#region Properties
 
-		public int Handle
+		public override int Handle
 		{
 			get { return _handle; }
-			protected set { _handle = value; }
 		}
 
-		public int TransactionCount
-		{
-			get { return _transactionCount; }
-			set { _transactionCount = value; }
-		}
-
-		public string ServerVersion
-		{
-			get { return _serverVersion; }
-			protected set { _serverVersion = value; }
-		}
-
-		public Charset Charset
-		{
-			get { return _charset; }
-			set { _charset = value; }
-		}
-
-		public short PacketSize
-		{
-			get { return _packetSize; }
-			set { _packetSize = value; }
-		}
-
-		public short Dialect
-		{
-			get { return _dialect; }
-			set { _dialect = value; }
-		}
-
-		public bool HasRemoteEventSupport
+		public override bool HasRemoteEventSupport
 		{
 			get { return true; }
+		}
+
+		public override bool ConnectionBroken
+		{
+			get { return _connection.ConnectionBroken; }
 		}
 
 		public XdrReaderWriter Xdr
@@ -116,11 +73,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return _connection.AuthData; }
 		}
 
-		public bool ConnectionBroken
-		{
-			get { return _connection.ConnectionBroken; }
-		}
-
 		#endregion
 
 		#region Constructors
@@ -128,17 +80,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public GdsDatabase(GdsConnection connection)
 		{
 			_connection = connection;
-			_charset = Charset.DefaultCharset;
-			_dialect = 3;
 			_handle = -1;
-			_packetSize = 8192;
+			Charset = Charset.DefaultCharset;
+			Dialect = 3;
+			PacketSize = 8192;
 		}
 
 		#endregion
 
 		#region Attach/Detach Methods
 
-		public virtual async Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -180,15 +132,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected async Task AfterAttachActions(AsyncWrappingCommonArgs async)
 		{
-			_serverVersion = await GetServerVersion(async).ConfigureAwait(false);
+			ServerVersion = await GetServerVersion(async).ConfigureAwait(false);
 		}
 
-		public virtual Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
 
-		public virtual async Task Detach(AsyncWrappingCommonArgs async)
+		public override async Task Detach(AsyncWrappingCommonArgs async)
 		{
 			if (TransactionCount > 0)
 			{
@@ -227,14 +179,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			finally
 			{
 				_connection = null;
-				_charset = null;
+				Charset = null;
 				_eventManager = null;
-				_serverVersion = null;
-				_dialect = 0;
+				ServerVersion = null;
+				Dialect = 0;
 				_handle = -1;
-				_packetSize = 0;
-				_warningMessage = null;
-				_transactionCount = 0;
+				PacketSize = 0;
+				WarningMessage = null;
+				TransactionCount = 0;
 			}
 		}
 
@@ -252,7 +204,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Methods
 
-		public virtual async Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -284,12 +236,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return Task.CompletedTask;
 		}
 
-		public virtual Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
 
-		public virtual async Task DropDatabase(AsyncWrappingCommonArgs async)
+		public override async Task DropDatabase(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -375,7 +327,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Remote Events Methods
 
-		public async Task CloseEventManager(AsyncWrappingCommonArgs async)
+		public override async Task CloseEventManager(AsyncWrappingCommonArgs async)
 		{
 			if (_eventManager != null)
 			{
@@ -384,7 +336,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public async Task QueueEvents(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
+		public override async Task QueueEvents(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -420,7 +372,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public async Task CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
+		public override async Task CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -442,7 +394,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Transaction Methods
 
-		public virtual async Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override async Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			var transaction = new GdsTransaction(this);
 
@@ -455,7 +407,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Cancel Methods
 
-		public virtual Task CancelOperation(int kind, AsyncWrappingCommonArgs async)
+		public override Task CancelOperation(int kind, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Cancel Operation isn't supported on < FB2.5.");
 		}
@@ -464,12 +416,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Statement Creation Methods
 
-		public virtual StatementBase CreateStatement()
+		public override StatementBase CreateStatement()
 		{
 			return new GdsStatement(this);
 		}
 
-		public virtual StatementBase CreateStatement(TransactionBase transaction)
+		public override StatementBase CreateStatement(TransactionBase transaction)
 		{
 			return new GdsStatement(this, transaction);
 		}
@@ -478,7 +430,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region DPB
 
-		public virtual DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
+		public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
 		{
 			return new DatabaseParameterBuffer1();
 		}
@@ -487,23 +439,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Information Methods
 
-		public virtual async Task<string> GetServerVersion(AsyncWrappingCommonArgs async)
-		{
-			var items = new byte[]
-			{
-				IscCodes.isc_info_firebird_version,
-				IscCodes.isc_info_end
-			};
-			var info = await GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256, async).ConfigureAwait(false);
-			return (string)info[info.Count - 1];
-		}
-
-		public virtual Task<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async)
+		public override Task<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async)
 		{
 			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
 		}
 
-		public virtual async Task<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		public override async Task<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			var buffer = new byte[bufferLength];
 			await DatabaseInfo(items, buffer, buffer.Length, async).ConfigureAwait(false);
@@ -570,7 +511,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		protected virtual async Task<IResponse> ReadSingleResponse(int operation, AsyncWrappingCommonArgs async)
 		{
 			var response = await GdsConnection.ProcessOperation(operation, Xdr, async).ConfigureAwait(false);
-			GdsConnection.ProcessResponseWarnings(response, _warningMessage);
+			GdsConnection.ProcessResponseWarnings(response, WarningMessage);
 			return response;
 		}
 

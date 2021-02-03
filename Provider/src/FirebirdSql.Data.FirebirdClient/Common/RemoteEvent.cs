@@ -31,7 +31,7 @@ namespace FirebirdSql.Data.Common
 
 		List<string> _events;
 		Charset _charset;
-		IDatabase _db;
+		DatabaseBase _db;
 		int[] _previousCounts;
 		int[] _currentCounts;
 		int _running;
@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Common
 			get { return _events; }
 		}
 
-		public RemoteEvent(IDatabase db)
+		public RemoteEvent(DatabaseBase db)
 		{
 			LocalId = 0;
 			RemoteId = 0;

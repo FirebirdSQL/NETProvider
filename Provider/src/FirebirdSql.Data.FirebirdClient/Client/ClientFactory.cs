@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Client
 {
 	internal static class ClientFactory
 	{
-		public static async Task<IDatabase> CreateDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
+		public static async Task<DatabaseBase> CreateDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			return options.ServerType switch
 			{
@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Client
 			};
 		}
 
-		private static async Task<IDatabase> CreateManagedDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
+		private static async Task<DatabaseBase> CreateManagedDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			await connection.Connect(async).ConfigureAwait(false);

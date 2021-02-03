@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Constructors
 
-		public GdsTransaction(IDatabase db)
+		public GdsTransaction(DatabaseBase db)
 		{
 			if (!(db is GdsDatabase))
 			{

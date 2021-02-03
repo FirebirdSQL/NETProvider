@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Properties
 
-		public override IDatabase Database
+		public override DatabaseBase Database
 		{
 			get { return _db; }
 		}
@@ -96,12 +96,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Constructors
 
-		public FesStatement(IDatabase db)
+		public FesStatement(DatabaseBase db)
 			: this(db, null)
 		{
 		}
 
-		public FesStatement(IDatabase db, TransactionBase transaction)
+		public FesStatement(DatabaseBase db, TransactionBase transaction)
 		{
 			if (!(db is FesDatabase))
 			{

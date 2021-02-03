@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Properties
 
-		public override IDatabase Database
+		public override DatabaseBase Database
 		{
 			get { return _database; }
 		}
@@ -96,12 +96,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Constructors
 
-		public GdsStatement(IDatabase db)
+		public GdsStatement(DatabaseBase db)
 			: this(db, null)
 		{
 		}
 
-		public GdsStatement(IDatabase db, TransactionBase transaction)
+		public GdsStatement(DatabaseBase db, TransactionBase transaction)
 		{
 			if (!(db is GdsDatabase))
 			{

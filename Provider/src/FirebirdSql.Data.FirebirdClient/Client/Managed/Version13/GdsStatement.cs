@@ -27,11 +27,11 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 	{
 		#region Constructors
 
-		public GdsStatement(IDatabase db)
+		public GdsStatement(DatabaseBase db)
 			: base(db)
 		{ }
 
-		public GdsStatement(IDatabase db, TransactionBase transaction)
+		public GdsStatement(DatabaseBase db, TransactionBase transaction)
 			: base(db, transaction)
 		{ }
 

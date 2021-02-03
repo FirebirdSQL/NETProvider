@@ -16,47 +16,27 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Threading;
-using System.Text;
-
-using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Client.Native.Handle;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
+using FirebirdSql.Data.Client.Native.Handle;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-	internal sealed class FesDatabase : IDatabase
+	internal sealed class FesDatabase : DatabaseBase
 	{
-		#region Callbacks
-
-		public Action<IscException> WarningMessage
-		{
-			get { return _warningMessage; }
-			set { _warningMessage = value; }
-		}
-
-		#endregion
-
 		#region Fields
 
-		private Action<IscException> _warningMessage;
-
 		private DatabaseHandle _handle;
-		private int _transactionCount;
-		private string _serverVersion;
-		private Charset _charset;
-		private short _packetSize;
-		private short _dialect;
 		private IntPtr[] _statusVector;
-
 		private IFbClient _fbClient;
 
 		#endregion
 
 		#region Properties
 
-		public int Handle
+		public override int Handle
 		{
 			get { return _handle.DangerousGetHandle().AsInt(); }
 		}
@@ -66,36 +46,12 @@ namespace FirebirdSql.Data.Client.Native
 			get { return _handle; }
 		}
 
-		public int TransactionCount
+		public override bool HasRemoteEventSupport
 		{
-			get { return _transactionCount; }
-			set { _transactionCount = value; }
+			get { return false; }
 		}
 
-		public string ServerVersion
-		{
-			get { return _serverVersion; }
-		}
-
-		public Charset Charset
-		{
-			get { return _charset; }
-			set { _charset = value; }
-		}
-
-		public short PacketSize
-		{
-			get { return _packetSize; }
-			set { _packetSize = value; }
-		}
-
-		public short Dialect
-		{
-			get { return _dialect; }
-			set { _dialect = value; }
-		}
-
-		public bool HasRemoteEventSupport
+		public override bool ConnectionBroken
 		{
 			get { return false; }
 		}
@@ -103,11 +59,6 @@ namespace FirebirdSql.Data.Client.Native
 		public IFbClient FbClient
 		{
 			get { return _fbClient; }
-		}
-
-		public bool ConnectionBroken
-		{
-			get { return false; }
 		}
 
 		#endregion
@@ -118,9 +69,9 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			_fbClient = FbClientFactory.Create(dllName);
 			_handle = new DatabaseHandle();
-			_charset = charset ?? Charset.DefaultCharset;
-			_dialect = 3;
-			_packetSize = 8192;
+			Charset = charset ?? Charset.DefaultCharset;
+			Dialect = 3;
+			PacketSize = 8192;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
@@ -128,7 +79,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Methods
 
-		public Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -150,12 +101,12 @@ namespace FirebirdSql.Data.Client.Native
 			return Task.CompletedTask;
 		}
 
-		public Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
 
-		public Task DropDatabase(AsyncWrappingCommonArgs async)
+		public override Task DropDatabase(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -172,17 +123,17 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Remote Events Methods
 
-		public Task CloseEventManager(AsyncWrappingCommonArgs async)
+		public override Task CloseEventManager(AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
 
-		public Task QueueEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
+		public override Task QueueEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
 
-		public Task CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
+		public override Task CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
@@ -191,7 +142,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public async Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -209,15 +160,15 @@ namespace FirebirdSql.Data.Client.Native
 
 			ProcessStatusVector(_statusVector);
 
-			_serverVersion = await GetServerVersion(async).ConfigureAwait(false);
+			ServerVersion = await GetServerVersion(async).ConfigureAwait(false);
 		}
 
-		public Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
 
-		public Task Detach(AsyncWrappingCommonArgs async)
+		public override Task Detach(AsyncWrappingCommonArgs async)
 		{
 			if (TransactionCount > 0)
 			{
@@ -235,13 +186,13 @@ namespace FirebirdSql.Data.Client.Native
 				_handle.Dispose();
 			}
 
-			_warningMessage = null;
-			_charset = null;
-			_serverVersion = null;
+			WarningMessage = null;
+			Charset = null;
+			ServerVersion = null;
 			_statusVector = null;
-			_transactionCount = 0;
-			_dialect = 0;
-			_packetSize = 0;
+			TransactionCount = 0;
+			Dialect = 0;
+			PacketSize = 0;
 
 			return Task.CompletedTask;
 		}
@@ -250,7 +201,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Transaction Methods
 
-		public async Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override async Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			var transaction = new FesTransaction(this);
 			await transaction.BeginTransaction(tpb, async).ConfigureAwait(false);
@@ -261,7 +212,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Cancel Methods
 
-		public Task CancelOperation(int kind, AsyncWrappingCommonArgs async)
+		public override Task CancelOperation(int kind, AsyncWrappingCommonArgs async)
 		{
 			var localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
@@ -276,12 +227,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Statement Creation Methods
 
-		public StatementBase CreateStatement()
+		public override StatementBase CreateStatement()
 		{
 			return new FesStatement(this);
 		}
 
-		public StatementBase CreateStatement(TransactionBase transaction)
+		public override StatementBase CreateStatement(TransactionBase transaction)
 		{
 			return new FesStatement(this, transaction as FesTransaction);
 		}
@@ -290,7 +241,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region DPB
 
-		public DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
+		public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
 		{
 			return new DatabaseParameterBuffer1();
 		}
@@ -299,24 +250,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Information Methods
 
-		public async Task<string> GetServerVersion(AsyncWrappingCommonArgs async)
-		{
-#warning This method is duplicate of what is in GdsDatabase
-			var items = new byte[]
-			{
-				IscCodes.isc_info_firebird_version,
-				IscCodes.isc_info_end
-			};
-
-			return (await GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_128, async).ConfigureAwait(false))[0].ToString();
-		}
-
-		public Task<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async)
+		public override Task<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async)
 		{
 			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
 		}
 
-		public Task<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		public override Task<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			var buffer = new byte[bufferLength];
 
@@ -331,13 +270,13 @@ namespace FirebirdSql.Data.Client.Native
 
 		internal void ProcessStatusVector(IntPtr[] statusVector)
 		{
-			var ex = FesConnection.ParseStatusVector(statusVector, _charset);
+			var ex = FesConnection.ParseStatusVector(statusVector, Charset);
 
 			if (ex != null)
 			{
 				if (ex.IsWarning)
 				{
-					_warningMessage?.Invoke(ex);
+					WarningMessage?.Invoke(ex);
 				}
 				else
 				{
