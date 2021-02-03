@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			{
 				try
 				{
-					var xdr = new XdrReaderWriter(ms, _database.Charset);
+					var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 
 					var bits = new BitArray(_parameters.Count);
 					for (var i = 0; i < _parameters.Count; i++)

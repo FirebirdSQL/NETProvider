@@ -36,7 +36,8 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Fields
 
-		private FirebirdNetworkStream _firebirdNetworkStream;
+		private NetworkStream _networkStream;
+		private FirebirdNetworkHandlingWrapper _firebirdNetworkHandlingWrapper;
 		private string _userID;
 		private string _dataSource;
 		private int _portNumber;
@@ -54,7 +55,7 @@ namespace FirebirdSql.Data.Client.Managed
 		public int ProtocolMinimunType { get; private set; }
 		public string Password { get; private set; }
 		public byte[] AuthData { get; private set; }
-		public bool ConnectionBroken => _firebirdNetworkStream?.IOFailed ?? false;
+		public bool ConnectionBroken => _firebirdNetworkHandlingWrapper?.IOFailed ?? false;
 
 		internal IPAddress IPAddress { get; private set; }
 		internal XdrReaderWriter Xdr { get; private set; }
@@ -103,8 +104,9 @@ namespace FirebirdSql.Data.Client.Managed
 #endif
 				await async.AsyncSyncCall(ConnectHelper(socket), socket.Connect, endPoint).ConfigureAwait(false);
 
-				_firebirdNetworkStream = new FirebirdNetworkStream(new NetworkStream(socket, true));
-				Xdr = new XdrReaderWriter(_firebirdNetworkStream, _charset);
+				_networkStream = new NetworkStream(socket, true);
+				_firebirdNetworkHandlingWrapper = new FirebirdNetworkHandlingWrapper(new DataProviderStreamWrapper(_networkStream));
+				Xdr = new XdrReaderWriter(_firebirdNetworkHandlingWrapper, _charset);
 			}
 			catch (SocketException ex)
 			{
@@ -188,7 +190,7 @@ namespace FirebirdSql.Data.Client.Managed
 							if (_compression)
 							{
 								// after reading before writing
-								_firebirdNetworkStream.StartCompression();
+								_firebirdNetworkHandlingWrapper.StartCompression();
 							}
 
 							if (operation == IscCodes.op_cond_accept)
@@ -207,12 +209,12 @@ namespace FirebirdSql.Data.Client.Managed
 								if (_wireCrypt != WireCryptOption.Disabled)
 								{
 									await Xdr.Write(IscCodes.op_crypt, async).ConfigureAwait(false);
-									await Xdr.Write(FirebirdNetworkStream.EncryptionName, async).ConfigureAwait(false);
+									await Xdr.Write(FirebirdNetworkHandlingWrapper.EncryptionName, async).ConfigureAwait(false);
 									await Xdr.Write(SrpClient.SessionKeyName, async).ConfigureAwait(false);
 									await Xdr.Flush(async).ConfigureAwait(false);
 
 									// after writing before reading
-									_firebirdNetworkStream.StartEncryption(srp.SessionKey);
+									_firebirdNetworkHandlingWrapper.StartEncryption(srp.SessionKey);
 
 									var response2 = await ProcessOperation(await Xdr.ReadOperation(async).ConfigureAwait(false), Xdr, async).ConfigureAwait(false);
 									ProcessResponse(response2);
@@ -256,15 +258,15 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public async Task Disconnect(AsyncWrappingCommonArgs async)
 		{
-			if (_firebirdNetworkStream != null)
+			if (_networkStream != null)
 			{
 #if NET48 || NETSTANDARD2_0
-				_firebirdNetworkStream.Dispose();
+				_networkStream.Dispose();
 				await Task.CompletedTask.ConfigureAwait(false);
 #else
-				await async.AsyncSyncCallNoCancellation(_firebirdNetworkStream.DisposeAsync, _firebirdNetworkStream.Dispose).ConfigureAwait(false);
+				await async.AsyncSyncCallNoCancellation(_networkStream.DisposeAsync, _networkStream.Dispose).ConfigureAwait(false);
 #endif
-				_firebirdNetworkStream = null;
+				_networkStream = null;
 			}
 		}
 

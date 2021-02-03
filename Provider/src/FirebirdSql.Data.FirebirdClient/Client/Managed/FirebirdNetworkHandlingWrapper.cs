@@ -18,21 +18,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
-	sealed class FirebirdNetworkStream : Stream, ITracksIOFailure
+	sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 	{
 		public const string CompressionName = "zlib";
 		public const string EncryptionName = "Arc4";
 
 		const int PreferredBufferSize = 32 * 1024;
 
-		readonly NetworkStream _networkStream;
+		readonly IDataProvider _dataProvider;
 
 		readonly Queue<byte> _outputBuffer;
 		readonly Queue<byte> _inputBuffer;
@@ -45,9 +43,9 @@ namespace FirebirdSql.Data.Client.Managed
 		Org.BouncyCastle.Crypto.Engines.RC4Engine _decryptor;
 		Org.BouncyCastle.Crypto.Engines.RC4Engine _encryptor;
 
-		public FirebirdNetworkStream(NetworkStream networkStream)
+		public FirebirdNetworkHandlingWrapper(IDataProvider dataProvider)
 		{
-			_networkStream = networkStream;
+			_dataProvider = dataProvider;
 
 			_outputBuffer = new Queue<byte>(PreferredBufferSize);
 			_inputBuffer = new Queue<byte>(PreferredBufferSize);
@@ -56,9 +54,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public bool IOFailed { get; set; }
 
-		public override int Read(byte[] buffer, int offset, int count) => ReadImpl(buffer, offset, count, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
-		public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) => ReadImpl(buffer, offset, count, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task<int> ReadImpl(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
+		public async Task<int> Read(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
 		{
 			if (_inputBuffer.Count < count)
 			{
@@ -66,7 +62,7 @@ namespace FirebirdSql.Data.Client.Managed
 				int read;
 				try
 				{
-					read = await async.AsyncSyncCall(_networkStream.ReadAsync, _networkStream.Read, readBuffer, 0, readBuffer.Length).ConfigureAwait(false);
+					read = await _dataProvider.Read(readBuffer, 0, readBuffer.Length, async).ConfigureAwait(false);
 				}
 				catch (IOException)
 				{
@@ -91,18 +87,14 @@ namespace FirebirdSql.Data.Client.Managed
 			return dataLength;
 		}
 
-		public override void Write(byte[] buffer, int offset, int count) => WriteImpl(buffer, offset, count, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
-		public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) => WriteImpl(buffer, offset, count, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task WriteImpl(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
+		public Task Write(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
 		{
 			for (var i = offset; i < count; i++)
 				_outputBuffer.Enqueue(buffer[offset + i]);
 			return Task.CompletedTask;
 		}
 
-		public override void Flush() => FlushImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
-		public override Task FlushAsync(CancellationToken cancellationToken) => FlushImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task FlushImpl(AsyncWrappingCommonArgs async)
+		public async Task Flush(AsyncWrappingCommonArgs async)
 		{
 			var buffer = _outputBuffer.ToArray();
 			_outputBuffer.Clear();
@@ -118,8 +110,8 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			try
 			{
-				await async.AsyncSyncCall(_networkStream.WriteAsync, _networkStream.Write, buffer, 0, count).ConfigureAwait(false);
-				await async.AsyncSyncCall(_networkStream.FlushAsync, _networkStream.Flush).ConfigureAwait(false);
+				await _dataProvider.Write(buffer, 0, count, async).ConfigureAwait(false);
+				await _dataProvider.Flush(async).ConfigureAwait(false);
 			}
 			catch (IOException)
 			{
@@ -140,19 +132,6 @@ namespace FirebirdSql.Data.Client.Managed
 			_encryptor = CreateCipher(key);
 			_decryptor = CreateCipher(key);
 		}
-
-		protected override void Dispose(bool disposing)
-		{
-			_networkStream.Dispose();
-			base.Dispose(disposing);
-		}
-#if !(NET48 || NETSTANDARD2_0)
-		public override async ValueTask DisposeAsync()
-		{
-			await _networkStream.DisposeAsync().ConfigureAwait(false);
-			await base.DisposeAsync().ConfigureAwait(false);
-		}
-#endif
 
 		int ReadFromInputBuffer(byte[] buffer, int offset, int count)
 		{
@@ -243,14 +222,5 @@ namespace FirebirdSql.Data.Client.Managed
 			cipher.Init(default, new Org.BouncyCastle.Crypto.Parameters.KeyParameter(key));
 			return cipher;
 		}
-
-		public override bool CanRead => throw new NotSupportedException();
-		public override bool CanSeek => throw new NotSupportedException();
-		public override bool CanWrite => throw new NotSupportedException();
-		public override long Length => throw new NotSupportedException();
-		public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
-
-		public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-		public override void SetLength(long value) => throw new NotSupportedException();
 	}
 }

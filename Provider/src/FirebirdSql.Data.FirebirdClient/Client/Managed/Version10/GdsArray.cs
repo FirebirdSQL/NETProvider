@@ -174,7 +174,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			using (var ms = new MemoryStream(slice))
 			{
-				var xdr = new XdrReaderWriter(ms, _database.Charset);
+				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 				while (ms.Position < ms.Length)
 				{
 					switch (dbType)
@@ -284,7 +284,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 					{
 						using (var ms = new MemoryStream())
 						{
-							var xdr = new XdrReaderWriter(ms);
+							var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms));
 							for (var i = 0; i < elements; i++)
 							{
 								var buffer = await _database.Xdr.ReadOpaque(await _database.Xdr.ReadInt32(async).ConfigureAwait(false), async).ConfigureAwait(false);
@@ -320,7 +320,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			using (var ms = new MemoryStream())
 			{
-				var xdr = new XdrReaderWriter(ms, _database.Charset);
+				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 
 				type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 				dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);

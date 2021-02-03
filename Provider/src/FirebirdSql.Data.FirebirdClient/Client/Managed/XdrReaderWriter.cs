@@ -28,21 +28,21 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	{
-		readonly Stream _stream;
+		readonly IDataProvider _datProvider;
 		readonly Charset _charset;
 
 		byte[] _smallBuffer;
 
-		public XdrReaderWriter(Stream stream, Charset charset)
+		public XdrReaderWriter(IDataProvider dataProvider, Charset charset)
 		{
-			_stream = stream;
+			_datProvider = dataProvider;
 			_charset = charset;
 
 			_smallBuffer = new byte[8];
 		}
 
-		public XdrReaderWriter(Stream stream)
-			: this(stream, Charset.DefaultCharset)
+		public XdrReaderWriter(IDataProvider dataprovider)
+			: this(dataprovider, Charset.DefaultCharset)
 		{ }
 
 		#region Read
@@ -55,11 +55,11 @@ namespace FirebirdSql.Data.Client.Managed
 				var currentlyRead = -1;
 				while (toRead > 0 && currentlyRead != 0)
 				{
-					toRead -= (currentlyRead = await async.AsyncSyncCall(_stream.ReadAsync, _stream.Read, buffer, count - toRead, toRead).ConfigureAwait(false));
+					toRead -= (currentlyRead = await _datProvider.Read(buffer, count - toRead, toRead, async).ConfigureAwait(false));
 				}
 				if (currentlyRead == 0)
 				{
-					if (_stream is ITracksIOFailure tracksIOFailure)
+					if (_datProvider is ITracksIOFailure tracksIOFailure)
 					{
 						tracksIOFailure.IOFailed = true;
 					}
@@ -257,22 +257,16 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Write
 
-		public Task Flush(AsyncWrappingCommonArgs async)
-		{
-			return async.AsyncSyncCall(_stream.FlushAsync, _stream.Flush);
-		}
+		public Task Flush(AsyncWrappingCommonArgs async) => _datProvider.Flush(async);
 
-		public Task WriteBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async)
-		{
-			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, count);
-		}
+		public Task WriteBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async) => _datProvider.Write(buffer, 0, count, async);
 
 		public Task WriteOpaque(byte[] buffer, AsyncWrappingCommonArgs async) => WriteOpaque(buffer, buffer.Length, async);
 		public async Task WriteOpaque(byte[] buffer, int length, AsyncWrappingCommonArgs async)
 		{
 			if (buffer != null && length > 0)
 			{
-				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, buffer.Length).ConfigureAwait(false);
+				await _datProvider.Write(buffer, 0, buffer.Length, async).ConfigureAwait(false);
 				await WriteFill(length - buffer.Length, async).ConfigureAwait(false);
 				await WritePad((4 - length) & 3, async).ConfigureAwait(false);
 			}
@@ -284,7 +278,7 @@ namespace FirebirdSql.Data.Client.Managed
 			await Write(length, async).ConfigureAwait(false);
 			if (buffer != null && length > 0)
 			{
-				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, length).ConfigureAwait(false);
+				await _datProvider.Write(buffer, 0, length, async).ConfigureAwait(false);
 				await WritePad((4 - length) & 3, async).ConfigureAwait(false);
 			}
 		}
@@ -296,8 +290,8 @@ namespace FirebirdSql.Data.Client.Managed
 				throw new IOException("Blob buffer too big.");
 			await Write(length + 2, async).ConfigureAwait(false);
 			await Write(length + 2, async).ConfigureAwait(false);  //bizarre but true! three copies of the length
-			await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, new[] { (byte)((length >> 0) & 0xff), (byte)((length >> 8) & 0xff) }, 0, 2).ConfigureAwait(false);
-			await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, length).ConfigureAwait(false);
+			await _datProvider.Write(new[] { (byte)((length >> 0) & 0xff), (byte)((length >> 8) & 0xff) }, 0, 2, async).ConfigureAwait(false);
+			await _datProvider.Write(buffer, 0, length, async).ConfigureAwait(false);
 			await WritePad((4 - length + 2) & 3, async).ConfigureAwait(false);
 		}
 
@@ -307,15 +301,15 @@ namespace FirebirdSql.Data.Client.Managed
 			if (buffer == null)
 			{
 				await Write(1, async).ConfigureAwait(false);
-				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, new[] { (byte)type }, 0, 1).ConfigureAwait(false);
+				await _datProvider.Write(new[] { (byte)type }, 0, 1, async).ConfigureAwait(false);
 				length = 1;
 			}
 			else
 			{
 				length = buffer.Length + 1;
 				await Write(length, async).ConfigureAwait(false);
-				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, new[] { (byte)type }, 0, 1).ConfigureAwait(false);
-				await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, 0, buffer.Length).ConfigureAwait(false);
+				await _datProvider.Write(new[] { (byte)type }, 0, 1, async).ConfigureAwait(false);
+				await _datProvider.Write(buffer, 0, buffer.Length, async).ConfigureAwait(false);
 			}
 			await WritePad((4 - length) & 3, async).ConfigureAwait(false);
 		}
@@ -333,12 +327,12 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public Task Write(int value, AsyncWrappingCommonArgs async)
 		{
-			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, TypeEncoder.EncodeInt32(value), 0, 4);
+			return _datProvider.Write(TypeEncoder.EncodeInt32(value), 0, 4, async);
 		}
 
 		public Task Write(long value, AsyncWrappingCommonArgs async)
 		{
-			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, TypeEncoder.EncodeInt64(value), 0, 8);
+			return _datProvider.Write(TypeEncoder.EncodeInt64(value), 0, 8, async);
 		}
 
 		public Task Write(float value, AsyncWrappingCommonArgs async)
@@ -423,7 +417,7 @@ namespace FirebirdSql.Data.Client.Managed
 		readonly static byte[] PadArray = new byte[] { 0, 0, 0, 0 };
 		Task WritePad(int length, AsyncWrappingCommonArgs async)
 		{
-			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, PadArray, 0, length);
+			return _datProvider.Write(PadArray, 0, length, async);
 		}
 
 		Task ReadPad(int length, AsyncWrappingCommonArgs async)
@@ -435,7 +429,7 @@ namespace FirebirdSql.Data.Client.Managed
 		readonly static byte[] FillArray = Enumerable.Repeat((byte)32, 32767).ToArray();
 		Task WriteFill(int length, AsyncWrappingCommonArgs async)
 		{
-			return async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, FillArray, 0, length);
+			return _datProvider.Write(FillArray, 0, length, async);
 		}
 
 		#endregion

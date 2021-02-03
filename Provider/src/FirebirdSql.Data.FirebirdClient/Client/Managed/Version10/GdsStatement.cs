@@ -987,7 +987,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			using (var ms = new MemoryStream())
 			{
-				var xdr = new XdrReaderWriter(ms, _database.Charset);
+				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 				for (var i = 0; i < _parameters.Count; i++)
 				{
 					var field = _parameters[i];
