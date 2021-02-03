@@ -202,7 +202,6 @@ namespace FirebirdSql.Data.Isql
 
 						case SqlStatementType.ExecuteBlock:
 						case SqlStatementType.Select:
-#warning Who's disposing this?
 							ProvideCommand().CommandText = statement.Text;
 
 							OnCommandExecuting(_sqlCommand, statement.StatementType);
@@ -308,6 +307,7 @@ namespace FirebirdSql.Data.Isql
 				}
 				catch (Exception ex)
 				{
+					DisposeCommand();
 					RollbackTransaction();
 					CloseConnection();
 
@@ -319,6 +319,7 @@ namespace FirebirdSql.Data.Isql
 				}
 			}
 
+			DisposeCommand();
 			CommitTransaction();
 			CloseConnection();
 		}
@@ -585,6 +586,7 @@ namespace FirebirdSql.Data.Isql
 			if (_sqlTransaction != null)
 			{
 				_sqlTransaction.Commit();
+				_sqlTransaction.Dispose();
 				_sqlTransaction = null;
 			}
 		}
@@ -594,6 +596,7 @@ namespace FirebirdSql.Data.Isql
 			if (_sqlTransaction != null)
 			{
 				_sqlTransaction.Rollback();
+				_sqlTransaction.Dispose();
 				_sqlTransaction = null;
 			}
 		}
@@ -603,6 +606,14 @@ namespace FirebirdSql.Data.Isql
 			if (_shouldClose)
 			{
 				_sqlConnection.Close();
+			}
+		}
+
+		protected void DisposeCommand()
+		{
+			if (_sqlCommand != null)
+			{
+				_sqlCommand.Dispose();
 			}
 		}
 
