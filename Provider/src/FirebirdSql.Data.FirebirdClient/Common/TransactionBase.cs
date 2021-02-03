@@ -22,20 +22,11 @@ namespace FirebirdSql.Data.Common
 {
 	internal abstract class TransactionBase
 	{
-		protected void EnsureActiveTransactionState()
-		{
-			if (State != TransactionState.Active)
-			{
-				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, Handle, "no valid");
-			}
-		}
-
 #warning These do not have to be abstract, probably
 		public abstract int Handle { get; }
-		public abstract TransactionState State { get; }
 
-#warning This does not have to be abstract, probably
-		public abstract event EventHandler Update;
+		public TransactionState State { get; protected set; }
+		public event EventHandler Update;
 
 		public abstract Task BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
 		public abstract Task Commit(AsyncWrappingCommonArgs async);
@@ -47,5 +38,18 @@ namespace FirebirdSql.Data.Common
 
 #warning Find better name
 		public virtual Task Dispose2(AsyncWrappingCommonArgs async) => Task.CompletedTask;
+
+		protected void EnsureActiveTransactionState()
+		{
+			if (State != TransactionState.Active)
+			{
+				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, Handle, "no valid");
+			}
+		}
+
+		protected void OnUpdate(EventArgs e)
+		{
+			Update?.Invoke(this, e);
+		}
 	}
 }

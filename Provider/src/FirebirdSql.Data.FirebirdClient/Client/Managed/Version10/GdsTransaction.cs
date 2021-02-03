@@ -24,18 +24,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 {
 	internal class GdsTransaction : TransactionBase
 	{
-		#region Events
-
-		public override event EventHandler Update;
-
-		#endregion
-
 		#region Fields
 
 		private int _handle;
 		private bool _disposed;
 		private GdsDatabase _database;
-		private TransactionState _state;
 
 		#endregion
 
@@ -44,11 +37,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public override int Handle
 		{
 			get { return _handle; }
-		}
-
-		public override TransactionState State
-		{
-			get { return _state; }
 		}
 
 		#endregion
@@ -63,7 +51,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 
 			_database = (GdsDatabase)db;
-			_state = TransactionState.NoTransaction;
+			State = TransactionState.NoTransaction;
 		}
 
 		#endregion
@@ -75,13 +63,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			if (!_disposed)
 			{
 				_disposed = true;
-				if (_state != TransactionState.NoTransaction)
+				if (State != TransactionState.NoTransaction)
 				{
 					await Rollback(async).ConfigureAwait(false);
 				}
 				_database = null;
 				_handle = 0;
-				_state = TransactionState.NoTransaction;
+				State = TransactionState.NoTransaction;
 				await base.Dispose2(async).ConfigureAwait(false);
 			}
 		}
@@ -92,7 +80,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		public override async Task BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
-			if (_state != TransactionState.NoTransaction)
+			if (State != TransactionState.NoTransaction)
 			{
 				throw new InvalidOperationException();
 			}
@@ -109,7 +97,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.TransactionCount++;
 
 				_handle = response.ObjectHandle;
-				_state = TransactionState.Active;
+				State = TransactionState.Active;
 			}
 			catch (IOException ex)
 			{
@@ -131,9 +119,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				_database.TransactionCount--;
 
-				Update?.Invoke(this, new EventArgs());
+				OnUpdate(EventArgs.Empty);
 
-				_state = TransactionState.NoTransaction;
+				State = TransactionState.NoTransaction;
 			}
 			catch (IOException ex)
 			{
@@ -155,9 +143,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				_database.TransactionCount--;
 
-				Update?.Invoke(this, new EventArgs());
+				OnUpdate(EventArgs.Empty);
 
-				_state = TransactionState.NoTransaction;
+				State = TransactionState.NoTransaction;
 			}
 			catch (IOException ex)
 			{
@@ -177,7 +165,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				await _database.ReadResponse(async).ConfigureAwait(false);
 
-				_state = TransactionState.Active;
+				State = TransactionState.Active;
 			}
 			catch (IOException ex)
 			{
@@ -197,7 +185,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				await _database.ReadResponse(async).ConfigureAwait(false);
 
-				_state = TransactionState.Active;
+				State = TransactionState.Active;
 			}
 			catch (IOException ex)
 			{
@@ -215,7 +203,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_state = TransactionState.NoTransaction;
+				State = TransactionState.NoTransaction;
 
 				await _database.Xdr.Write(IscCodes.op_prepare, async).ConfigureAwait(false);
 				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
@@ -223,7 +211,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				await _database.ReadResponse(async).ConfigureAwait(false);
 
-				_state = TransactionState.Prepared;
+				State = TransactionState.Prepared;
 			}
 			catch (IOException ex)
 			{
@@ -237,7 +225,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				_state = TransactionState.NoTransaction;
+				State = TransactionState.NoTransaction;
 
 				await _database.Xdr.Write(IscCodes.op_prepare2, async).ConfigureAwait(false);
 				await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
@@ -246,7 +234,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				await _database.ReadResponse(async).ConfigureAwait(false);
 
-				_state = TransactionState.Prepared;
+				State = TransactionState.Prepared;
 			}
 			catch (IOException ex)
 			{

@@ -40,17 +40,10 @@ namespace FirebirdSql.Data.Client.Native
 
 		#endregion
 
-		#region Events
-
-		public override event EventHandler Update;
-
-		#endregion
-
 		#region Fields
 
 		private TransactionHandle _handle;
 		private FesDatabase _db;
-		private TransactionState _state;
 		private bool _disposed;
 		private IntPtr[] _statusVector;
 
@@ -68,11 +61,6 @@ namespace FirebirdSql.Data.Client.Native
 			get { return _handle; }
 		}
 
-		public override TransactionState State
-		{
-			get { return _state; }
-		}
-
 		#endregion
 
 		#region Constructors
@@ -86,7 +74,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db = (FesDatabase)db;
 			_handle = new TransactionHandle();
-			_state = TransactionState.NoTransaction;
+			State = TransactionState.NoTransaction;
 			_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		}
 
@@ -99,13 +87,13 @@ namespace FirebirdSql.Data.Client.Native
 			if (!_disposed)
 			{
 				_disposed = true;
-				if (_state != TransactionState.NoTransaction)
+				if (State != TransactionState.NoTransaction)
 				{
 					await Rollback(async).ConfigureAwait(false);
 				}
 				_db = null;
 				_handle.Dispose();
-				_state = TransactionState.NoTransaction;
+				State = TransactionState.NoTransaction;
 				_statusVector = null;
 				await base.Dispose2(async).ConfigureAwait(false);
 			}
@@ -117,7 +105,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		public override Task BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
-			if (_state != TransactionState.NoTransaction)
+			if (State != TransactionState.NoTransaction)
 			{
 				throw new InvalidOperationException();
 			}
@@ -150,7 +138,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.ProcessStatusVector(_statusVector);
 
-				_state = TransactionState.Active;
+				State = TransactionState.Active;
 
 				_db.TransactionCount++;
 			}
@@ -186,9 +174,9 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.TransactionCount--;
 
-			Update?.Invoke(this, new EventArgs());
+			OnUpdate(EventArgs.Empty);
 
-			_state = TransactionState.NoTransaction;
+			State = TransactionState.NoTransaction;
 
 			return Task.CompletedTask;
 		}
@@ -205,9 +193,9 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.TransactionCount--;
 
-			Update?.Invoke(this, new EventArgs());
+			OnUpdate(EventArgs.Empty);
 
-			_state = TransactionState.NoTransaction;
+			State = TransactionState.NoTransaction;
 
 			return Task.CompletedTask;
 		}
@@ -222,7 +210,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			_state = TransactionState.Active;
+			State = TransactionState.Active;
 
 			return Task.CompletedTask;
 		}
@@ -237,7 +225,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			_state = TransactionState.Active;
+			State = TransactionState.Active;
 
 			return Task.CompletedTask;
 		}
