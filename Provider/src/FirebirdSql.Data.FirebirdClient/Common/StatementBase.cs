@@ -108,7 +108,7 @@ namespace FirebirdSql.Data.Common
 
 		#endregion
 
-		#region Release
+		#region Dispose2
 
 		public virtual Task Dispose2(AsyncWrappingCommonArgs async) => Task.CompletedTask;
 

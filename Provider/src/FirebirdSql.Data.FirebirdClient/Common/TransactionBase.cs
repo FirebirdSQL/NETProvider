@@ -22,7 +22,6 @@ namespace FirebirdSql.Data.Common
 {
 	internal abstract class TransactionBase
 	{
-#warning This does not have to be abstract, needs generics rework
 		public abstract int Handle { get; }
 
 		public TransactionState State { get; protected set; }
@@ -36,7 +35,6 @@ namespace FirebirdSql.Data.Common
 		public abstract Task Prepare(AsyncWrappingCommonArgs async);
 		public abstract Task Prepare(byte[] buffer, AsyncWrappingCommonArgs async);
 
-#warning Find better name
 		public virtual Task Dispose2(AsyncWrappingCommonArgs async) => Task.CompletedTask;
 
 		protected void EnsureActiveTransactionState()
