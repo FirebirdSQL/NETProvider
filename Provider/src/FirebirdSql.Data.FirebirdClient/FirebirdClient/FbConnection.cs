@@ -293,13 +293,13 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Transaction Handling Methods
 
-		public new FbTransaction BeginTransaction() => BeginTransaction(IsolationLevel.ReadCommitted, null);
+		public new FbTransaction BeginTransaction() => BeginTransaction(FbTransaction.DefaultIsolationLevel, null);
 #if NET48 || NETSTANDARD2_0
 		public Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
 #else
 		public new Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
 #endif
-			=> BeginTransactionAsync(IsolationLevel.ReadCommitted, null, cancellationToken);
+			=> BeginTransactionAsync(FbTransaction.DefaultIsolationLevel, null, cancellationToken);
 		public new FbTransaction BeginTransaction(IsolationLevel level) => BeginTransaction(level, null);
 #if NET48 || NETSTANDARD2_0
 		public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
@@ -307,11 +307,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		public new Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
 #endif
 			=> BeginTransactionAsync(level, null, cancellationToken);
-		public FbTransaction BeginTransaction(string transactionName) => BeginTransaction(IsolationLevel.ReadCommitted, transactionName);
-		public Task<FbTransaction> BeginTransactionAsync(string transactionName, CancellationToken cancellationToken = default) => BeginTransactionAsync(IsolationLevel.ReadCommitted, transactionName, cancellationToken);
+		public FbTransaction BeginTransaction(string transactionName) => BeginTransaction(FbTransaction.DefaultIsolationLevel, transactionName);
+		public Task<FbTransaction> BeginTransactionAsync(string transactionName, CancellationToken cancellationToken = default) => BeginTransactionAsync(FbTransaction.DefaultIsolationLevel, transactionName, cancellationToken);
 		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName) => BeginTransactionImpl(level, transactionName, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
 		public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, string transactionName, CancellationToken cancellationToken = default) => BeginTransactionImpl(level, transactionName, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<FbTransaction> BeginTransactionImpl(IsolationLevel level, string transactionName, AsyncWrappingCommonArgs async)
+		internal Task<FbTransaction> BeginTransactionImpl(IsolationLevel level, string transactionName, AsyncWrappingCommonArgs async)
 		{
 			CheckClosed();
 
@@ -322,7 +322,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, CancellationToken cancellationToken = default) => BeginTransactionAsync(options, null, cancellationToken);
 		public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName) => BeginTransactionImpl(options, transactionName, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
 		public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, string transactionName, CancellationToken cancellationToken = default) => BeginTransactionImpl(options, transactionName, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<FbTransaction> BeginTransactionImpl(FbTransactionOptions options, string transactionName, AsyncWrappingCommonArgs async)
+		internal Task<FbTransaction> BeginTransactionImpl(FbTransactionOptions options, string transactionName, AsyncWrappingCommonArgs async)
 		{
 			CheckClosed();
 
@@ -429,7 +429,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override void Open() => OpenImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
 		public override Task OpenAsync(CancellationToken cancellationToken) => OpenImpl(new AsyncWrappingCommonArgs(false, cancellationToken));
-		private async Task OpenImpl(AsyncWrappingCommonArgs async)
+		internal async Task OpenImpl(AsyncWrappingCommonArgs async)
 		{
 			if (string.IsNullOrEmpty(_connectionString))
 			{

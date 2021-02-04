@@ -17,13 +17,17 @@
 
 using System;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
+using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Isql
 {
-#warning Async support
-	public class FbBatchExecution
+	public sealed class FbBatchExecution
 	{
+		private static readonly string[] StandardParseTokens = new[] { " ", "\r\n", "\n", "\r" };
+
 		/// <summary>
 		/// The event trigged before a SQL statement goes for execution.
 		/// </summary>
@@ -85,7 +89,13 @@ namespace FirebirdSql.Data.Isql
 		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
 		/// </summary>
 		/// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
-		public void Execute(bool autoCommit = true)
+		public void Execute(bool autoCommit = true) => ExecuteImpl(autoCommit, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		/// <summary>
+		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
+		/// </summary>
+		/// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
+		public Task ExecuteAsync(bool autoCommit = true, CancellationToken cancellationToken = default) => ExecuteImpl(autoCommit, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task ExecuteImpl(bool autoCommit, AsyncWrappingCommonArgs async)
 		{
 			if ((_statements?.Count ?? 0) == 0)
 			{
@@ -105,11 +115,11 @@ namespace FirebirdSql.Data.Isql
 					statement.StatementType == SqlStatementType.SetNames ||
 					statement.StatementType == SqlStatementType.SetSQLDialect))
 				{
-					ProvideCommand();
+					await ProvideCommand(async).ConfigureAwait(false);
 					_sqlCommand.CommandText = statement.Text;
 					if (_sqlTransaction == null && !(statement.StatementType == SqlStatementType.Commit || statement.StatementType == SqlStatementType.Rollback))
 					{
-						_sqlTransaction = _sqlConnection.BeginTransaction();
+						_sqlTransaction = await _sqlConnection.BeginTransactionImpl(FbTransaction.DefaultIsolationLevel, null, async).ConfigureAwait(false);
 					}
 					_sqlCommand.Transaction = _sqlTransaction;
 				}
@@ -194,7 +204,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Whenever:
 							OnCommandExecuting(_sqlCommand, statement.StatementType);
 
-							var rowsAffected = ExecuteCommand(autoCommit);
+							var rowsAffected = await ExecuteCommand(autoCommit, async).ConfigureAwait(false);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, rowsAffected);
@@ -202,22 +212,31 @@ namespace FirebirdSql.Data.Isql
 
 						case SqlStatementType.ExecuteBlock:
 						case SqlStatementType.Select:
-							ProvideCommand().CommandText = statement.Text;
+							(await ProvideCommand(async).ConfigureAwait(false)).CommandText = statement.Text;
 
 							OnCommandExecuting(_sqlCommand, statement.StatementType);
 
-							using (var dataReader = _sqlCommand.ExecuteReader())
+							var dataReader = await _sqlCommand.ExecuteReaderImpl(CommandBehavior.Default, async).ConfigureAwait(false);
+							try
 							{
 								_requiresNewConnection = false;
 
 								OnCommandExecuted(dataReader, statement.Text, statement.StatementType, -1);
+							}
+							finally
+							{
+#if NET48 || NETSTANDARD2_0
+								dataReader.Dispose();
+#else
+								await async.AsyncSyncCallNoCancellation(dataReader.DisposeAsync, dataReader.Dispose).ConfigureAwait(false);
+#endif
 							}
 							break;
 
 						case SqlStatementType.Commit:
 							OnCommandExecuting(null, statement.StatementType);
 
-							CommitTransaction();
+							await CommitTransaction(async).ConfigureAwait(false);
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
@@ -225,7 +244,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Rollback:
 							OnCommandExecuting(null, statement.StatementType);
 
-							RollbackTransaction();
+							await RollbackTransaction(async).ConfigureAwait(false);
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
@@ -233,7 +252,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.CreateDatabase:
 							OnCommandExecuting(null, statement.StatementType);
 
-							CreateDatabase(statement.CleanText);
+							await CreateDatabase(statement.CleanText, async).ConfigureAwait(false);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
@@ -242,7 +261,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.DropDatabase:
 							OnCommandExecuting(null, statement.StatementType);
 
-							FbConnection.DropDatabase(_connectionString.ToString());
+							await async.AsyncSyncCall(FbConnection.DropDatabaseAsync, FbConnection.DropDatabase, _connectionString.ToString()).ConfigureAwait(false);
 							_requiresNewConnection = true;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
@@ -251,7 +270,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Connect:
 							OnCommandExecuting(null, statement.StatementType);
 
-							ConnectToDatabase(statement.CleanText);
+							await ConnectToDatabase(statement.CleanText, async).ConfigureAwait(false);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
@@ -260,7 +279,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Disconnect:
 							OnCommandExecuting(null, statement.StatementType);
 
-							_sqlConnection.Close();
+							await _sqlConnection.CloseImpl(async).ConfigureAwait(false);
 							FbConnection.ClearPool(_sqlConnection);
 							_requiresNewConnection = false;
 
@@ -307,9 +326,9 @@ namespace FirebirdSql.Data.Isql
 				}
 				catch (Exception ex)
 				{
-					DisposeCommand();
-					RollbackTransaction();
-					CloseConnection();
+					await DisposeCommand(async).ConfigureAwait(false);
+					await RollbackTransaction(async).ConfigureAwait(false);
+					await CloseConnection(async).ConfigureAwait(false);
 
 					throw new FbException(string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
 							Environment.NewLine,
@@ -319,9 +338,9 @@ namespace FirebirdSql.Data.Isql
 				}
 			}
 
-			DisposeCommand();
-			CommitTransaction();
-			CloseConnection();
+			await DisposeCommand(async).ConfigureAwait(false);
+			await CommitTransaction(async).ConfigureAwait(false);
+			await CloseConnection(async).ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -329,7 +348,7 @@ namespace FirebirdSql.Data.Isql
 		/// to the database.
 		/// </summary>
 		/// <param name="connectDbStatement"></param>
-		protected void ConnectToDatabase(string connectDbStatement)
+		private async Task ConnectToDatabase(string connectDbStatement, AsyncWrappingCommonArgs async)
 		{
 			// CONNECT 'filespec'
 			// [USER 'username']
@@ -337,7 +356,7 @@ namespace FirebirdSql.Data.Isql
 			// [CACHE int]
 			// [ROLE 'rolename']
 			var parser = new SqlStringParser(connectDbStatement);
-			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.Tokens = StandardParseTokens;
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
@@ -377,14 +396,14 @@ namespace FirebirdSql.Data.Isql
 				}
 			}
 			_requiresNewConnection = true;
-			ProvideConnection();
+			await ProvideConnection(async).ConfigureAwait(false);
 		}
 
 		/// <summary>
 		/// Parses the isql statement CREATE DATABASE and creates the database and opens a connection to the recently created database.
 		/// </summary>
 		/// <param name="createDatabaseStatement">The create database statement.</param>
-		protected void CreateDatabase(string createDatabaseStatement)
+		private async Task CreateDatabase(string createDatabaseStatement, AsyncWrappingCommonArgs async)
 		{
 			// CREATE {DATABASE | SCHEMA} 'filespec'
 			// [USER 'username' [PASSWORD 'password']]
@@ -394,7 +413,7 @@ namespace FirebirdSql.Data.Isql
 			// [<secondary_file>];
 			var pageSize = 0;
 			var parser = new SqlStringParser(createDatabaseStatement);
-			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.Tokens = StandardParseTokens;
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
@@ -441,20 +460,20 @@ namespace FirebirdSql.Data.Isql
 					}
 				}
 			}
-			FbConnection.CreateDatabase(_connectionString.ToString(), pageSize, true, false);
+			await async.AsyncSyncCall((cs, ps, ct) => FbConnection.CreateDatabaseAsync(cs, pageSize: ps, cancellationToken: ct), (cs, ps) => FbConnection.CreateDatabase(cs, pageSize: ps), _connectionString.ToString(), pageSize).ConfigureAwait(false);
 			_requiresNewConnection = true;
-			ProvideConnection();
+			await ProvideConnection(async).ConfigureAwait(false);
 		}
 
 		/// <summary>
 		/// Parses the isql statement SET AUTODDL and sets the character set to current connection string.
 		/// </summary>
 		/// <param name="setAutoDdlStatement">The set names statement.</param>
-		protected void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
+		private void SetAutoDdl(string setAutoDdlStatement, ref bool autoCommit)
 		{
 			// SET AUTODDL [ON | OFF]
 			var parser = new SqlStringParser(setAutoDdlStatement);
-			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.Tokens = StandardParseTokens;
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
@@ -490,11 +509,11 @@ namespace FirebirdSql.Data.Isql
 		/// Parses the isql statement SET NAMES and sets the character set to current connection string.
 		/// </summary>
 		/// <param name="setNamesStatement">The set names statement.</param>
-		protected void SetNames(string setNamesStatement)
+		private void SetNames(string setNamesStatement)
 		{
 			// SET NAMES charset
 			var parser = new SqlStringParser(setNamesStatement);
-			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.Tokens = StandardParseTokens;
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
@@ -512,11 +531,11 @@ namespace FirebirdSql.Data.Isql
 		/// Parses the isql statement SET SQL DIALECT and sets the dialect set to current connection string.
 		/// </summary>
 		/// <param name="setSqlDialectStatement">The set sql dialect statement.</param>
-		protected void SetSqlDialect(string setSqlDialectStatement)
+		private void SetSqlDialect(string setSqlDialectStatement)
 		{
 			// SET SQL DIALECT dialect
 			var parser = new SqlStringParser(setSqlDialectStatement);
-			parser.Tokens = new[] { " ", "\r\n", "\n", "\r" };
+			parser.Tokens = StandardParseTokens;
 			using (var enumerator = parser.Parse().GetEnumerator())
 			{
 				enumerator.MoveNext();
@@ -532,88 +551,94 @@ namespace FirebirdSql.Data.Isql
 			}
 		}
 
-		protected FbCommand ProvideCommand()
+		private async Task<FbCommand> ProvideCommand(AsyncWrappingCommonArgs async)
 		{
 			if (_sqlCommand == null)
 			{
 				_sqlCommand = new FbCommand();
 			}
 
-			_sqlCommand.Connection = ProvideConnection();
+			_sqlCommand.Connection = await ProvideConnection(async).ConfigureAwait(false);
 
 			return _sqlCommand;
 		}
 
-		protected FbConnection ProvideConnection()
+		private async Task<FbConnection> ProvideConnection(AsyncWrappingCommonArgs async)
 		{
 			if (_requiresNewConnection)
 			{
 				if (_sqlConnection != null && _sqlConnection.State != ConnectionState.Closed)
 				{
-					CloseConnection();
+					await CloseConnection(async).ConfigureAwait(false);
 				}
 				_sqlConnection = new FbConnection(_connectionString.ToString());
 			}
 
 			if (_sqlConnection.State == ConnectionState.Closed)
 			{
-				_sqlConnection.Open();
+				await _sqlConnection.OpenImpl(async).ConfigureAwait(false);
 				_shouldClose = true;
 			}
 
 			return _sqlConnection;
 		}
 
-		/// <summary>
-		/// Executes a command and optionally commits the transaction.
-		/// </summary>
-		/// <param name="command">Command to execute.</param>
-		/// <param name="autocommit">true to commit the transaction after execution; or false if not.</param>
-		/// <returns>The number of rows affected by the query execution.</returns>
-		protected int ExecuteCommand(bool autoCommit)
+		private async Task<int> ExecuteCommand(bool autoCommit, AsyncWrappingCommonArgs async)
 		{
-			var rowsAffected = _sqlCommand.ExecuteNonQuery();
+			var rowsAffected = await _sqlCommand.ExecuteNonQueryImpl(async).ConfigureAwait(false);
 			if (autoCommit && _sqlCommand.IsDDLCommand)
 			{
-				CommitTransaction();
+				await CommitTransaction(async).ConfigureAwait(false);
 			}
-
 			return rowsAffected;
 		}
 
-		protected void CommitTransaction()
+		private async Task CommitTransaction(AsyncWrappingCommonArgs async)
 		{
 			if (_sqlTransaction != null)
 			{
-				_sqlTransaction.Commit();
+				await _sqlTransaction.CommitImpl(async).ConfigureAwait(false);
+#if NET48 || NETSTANDARD2_0
 				_sqlTransaction.Dispose();
+#else
+				await async.AsyncSyncCallNoCancellation(_sqlTransaction.DisposeAsync, _sqlTransaction.Dispose).ConfigureAwait(false);
+#endif
 				_sqlTransaction = null;
 			}
 		}
 
-		protected void RollbackTransaction()
+		private async Task RollbackTransaction(AsyncWrappingCommonArgs async)
 		{
 			if (_sqlTransaction != null)
 			{
-				_sqlTransaction.Rollback();
+				await _sqlTransaction.RollbackImpl(async).ConfigureAwait(false);
+#if NET48 || NETSTANDARD2_0
 				_sqlTransaction.Dispose();
+#else
+				await async.AsyncSyncCallNoCancellation(_sqlTransaction.DisposeAsync, _sqlTransaction.Dispose).ConfigureAwait(false);
+#endif
 				_sqlTransaction = null;
 			}
 		}
 
-		protected void CloseConnection()
+		private async Task CloseConnection(AsyncWrappingCommonArgs async)
 		{
 			if (_shouldClose)
 			{
-				_sqlConnection.Close();
+				await _sqlConnection.CloseImpl(async).ConfigureAwait(false);
 			}
 		}
 
-		protected void DisposeCommand()
+		private async Task DisposeCommand(AsyncWrappingCommonArgs async)
 		{
 			if (_sqlCommand != null)
 			{
+#if NET48 || NETSTANDARD2_0
 				_sqlCommand.Dispose();
+				await Task.CompletedTask.ConfigureAwait(false);
+#else
+				await async.AsyncSyncCallNoCancellation(_sqlCommand.DisposeAsync, _sqlCommand.Dispose).ConfigureAwait(false);
+#endif
 			}
 		}
 
@@ -621,7 +646,7 @@ namespace FirebirdSql.Data.Isql
 		/// The trigger function for <see cref="CommandExecuting"/>	event.
 		/// </summary>
 		/// <param name="sqlCommand">The SQL command that is going for execution.</param>
-		protected void OnCommandExecuting(FbCommand sqlCommand, SqlStatementType statementType)
+		private void OnCommandExecuting(FbCommand sqlCommand, SqlStatementType statementType)
 		{
 			CommandExecuting?.Invoke(this, new CommandExecutingEventArgs(sqlCommand, statementType));
 		}
@@ -636,7 +661,7 @@ namespace FirebirdSql.Data.Isql
 		/// <param name="rowsAffected">The rows that were affected by the executed SQL command. If the executed
 		/// command is not meant to return this kind of information (ex: SELECT) this parameter must
 		/// be setled to <b>-1</b>.</param>
-		protected void OnCommandExecuted(FbDataReader dataReader, string commandText, SqlStatementType statementType, int rowsAffected)
+		private void OnCommandExecuted(FbDataReader dataReader, string commandText, SqlStatementType statementType, int rowsAffected)
 		{
 			CommandExecuted?.Invoke(this, new CommandExecutedEventArgs(dataReader, commandText, statementType, rowsAffected));
 		}

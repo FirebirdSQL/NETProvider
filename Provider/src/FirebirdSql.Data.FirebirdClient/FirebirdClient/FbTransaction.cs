@@ -26,6 +26,8 @@ namespace FirebirdSql.Data.FirebirdClient
 {
 	public sealed class FbTransaction : DbTransaction
 	{
+		internal const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
+
 		#region Fields
 
 		private FbConnection _connection;
