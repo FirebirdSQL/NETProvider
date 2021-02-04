@@ -22,34 +22,16 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version10
 {
-	internal class GdsServiceManager : IServiceManager
+	internal class GdsServiceManager : ServiceManagerBase
 	{
-		#region Callbacks
-
-		public Action<IscException> WarningMessage
-		{
-			get { return _warningMessage; }
-			set { _warningMessage = value; }
-		}
-
-		#endregion
-
 		#region Fields
 
-		private Action<IscException> _warningMessage;
-
-		private int _handle;
 		private GdsConnection _connection;
 		private GdsDatabase _database;
 
 		#endregion
 
 		#region Properties
-
-		public int Handle
-		{
-			get { return _handle; }
-		}
 
 		public byte[] AuthData
 		{
@@ -76,7 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public virtual async Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -101,11 +83,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual Task ProcessAttachResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
-			_handle = response.ObjectHandle;
+			Handle = response.ObjectHandle;
 			return Task.CompletedTask;
 		}
 
-		public virtual async Task Detach(AsyncWrappingCommonArgs async)
+		public override async Task Detach(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -114,7 +96,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				await _database.Xdr.Write(IscCodes.op_disconnect, async).ConfigureAwait(false);
 				await _database.Xdr.Flush(async).ConfigureAwait(false);
 
-				_handle = 0;
+				Handle = 0;
 			}
 			catch (IOException ex)
 			{
@@ -138,7 +120,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public virtual async Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		public override async Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -163,7 +145,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public virtual async Task Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
+		public override async Task Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -200,7 +182,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		private void RewireWarningMessage()
 		{
-			_database.WarningMessage = ex => _warningMessage?.Invoke(ex);
+			_database.WarningMessage = ex => WarningMessage?.Invoke(ex);
 		}
 
 		#endregion

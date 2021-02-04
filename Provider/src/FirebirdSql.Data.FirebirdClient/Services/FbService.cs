@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.Services
 
 		private protected static readonly ServiceParameterBuffer EmptySpb = new ServiceParameterBuffer();
 
-		private IServiceManager _svc;
+		private ServiceManagerBase _svc;
 		private ConnectionString _options;
 
 		private protected Encoding SpbFilenameEncoding;

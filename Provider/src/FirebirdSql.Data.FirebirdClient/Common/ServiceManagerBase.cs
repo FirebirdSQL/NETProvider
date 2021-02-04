@@ -13,22 +13,22 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
 {
-	internal interface IServiceManager
+	internal abstract class ServiceManagerBase
 	{
-		Action<IscException> WarningMessage { get; set; }
+		public Action<IscException> WarningMessage { get; set; }
 
-		int Handle { get; }
+		public int Handle { get; protected set; }
 
-		Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		Task Detach(AsyncWrappingCommonArgs async);
-		Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async);
-		Task Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async);
+		public abstract Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract Task Detach(AsyncWrappingCommonArgs async);
+		public abstract Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async);
+		public abstract Task Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async);
 	}
 }

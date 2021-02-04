@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Client
 			};
 		}
 
-		public static async Task<IServiceManager> CreateServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
+		public static async Task<ServiceManagerBase> CreateServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			return options.ServerType switch
 			{
@@ -61,7 +61,7 @@ namespace FirebirdSql.Data.Client
 			};
 		}
 
-		private static async Task<IServiceManager> CreateManagedServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
+		private static async Task<ServiceManagerBase> CreateManagedServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			await connection.Connect(async).ConfigureAwait(false);

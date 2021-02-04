@@ -16,41 +16,22 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native
 {
-	internal sealed class FesServiceManager : IServiceManager
+	internal sealed class FesServiceManager : ServiceManagerBase
 	{
-		#region Callbacks
-
-		public Action<IscException> WarningMessage
-		{
-			get { return _warningMessage; }
-			set { _warningMessage = value; }
-		}
-
-		#endregion
-
 		#region Fields
 
-		private Action<IscException> _warningMessage;
-
 		private IFbClient _fbClient;
-		private int _handle;
 		private IntPtr[] _statusVector;
 		private Charset _charset;
 
 		#endregion
 
 		#region Properties
-
-		public int Handle
-		{
-			get { return _handle; }
-		}
 
 		public Charset Charset
 		{
@@ -73,7 +54,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			FesDatabase.CheckCryptKeyForSupport(cryptKey);
 
@@ -91,12 +72,12 @@ namespace FirebirdSql.Data.Client.Native
 
 			ProcessStatusVector(_statusVector);
 
-			_handle = svcHandle;
+			Handle = svcHandle;
 
 			return Task.CompletedTask;
 		}
 
-		public Task Detach(AsyncWrappingCommonArgs async)
+		public override Task Detach(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -106,12 +87,12 @@ namespace FirebirdSql.Data.Client.Native
 
 			ProcessStatusVector(_statusVector);
 
-			_handle = svcHandle;
+			Handle = svcHandle;
 
 			return Task.CompletedTask;
 		}
 
-		public Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		public override Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -130,7 +111,7 @@ namespace FirebirdSql.Data.Client.Native
 			return Task.CompletedTask;
 		}
 
-		public Task Query(
+		public override Task Query(
 			ServiceParameterBuffer spb,
 			int requestLength,
 			byte[] requestBuffer,
@@ -171,7 +152,7 @@ namespace FirebirdSql.Data.Client.Native
 			{
 				if (ex.IsWarning)
 				{
-					_warningMessage?.Invoke(ex);
+					WarningMessage?.Invoke(ex);
 				}
 				else
 				{
