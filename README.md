@@ -30,5 +30,4 @@
 ## Builds
 
 [![TeamCity](https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:OpenSourceProjects_FirebirdClient_CiBuild)/statusIcon.svg)](https://teamcity.jetbrains.com/project.html?projectId=OpenSourceProjects_FirebirdClient)
-[![Azure Pipelines](https://dev.azure.com/FirebirdClient/CI/_apis/build/status/CI%20Build?branchName=master)](https://dev.azure.com/FirebirdClient/CI/_build)
 [![GitHub Actions](https://github.com/cincuranet/FirebirdSql.Data.FirebirdClient/workflows/CI/badge.svg)](https://github.com/cincuranet/FirebirdSql.Data.FirebirdClient/actions)
