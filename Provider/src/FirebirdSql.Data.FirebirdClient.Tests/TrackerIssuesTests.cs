@@ -224,7 +224,7 @@ END
 			FbConnection.ClearAllPools();
 			const int NumberOfThreads = 15;
 
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
+			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Pooling = true;
 			csb.ConnectionLifeTime = 5;
 			csb.MinPoolSize = 0;

@@ -65,7 +65,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				var backupSvc = new FbBackup();
 
-				backupSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+				backupSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 				backupSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 				backupSvc.Verbose = true;
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			{
 				var restoreSvc = new FbRestore();
 
-				restoreSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+				restoreSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 				restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
 				restoreSvc.PageSize = FbTestsSetup.PageSize;
 				restoreSvc.Verbose = true;
@@ -149,7 +149,7 @@ end";
 		{
 			var backupSvc = new FbStreamingBackup();
 
-			backupSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			backupSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 			backupSvc.OutputStream = buffer;
 
@@ -161,7 +161,7 @@ end";
 		{
 			var restoreSvc = new FbStreamingRestore();
 
-			restoreSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			restoreSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
 			restoreSvc.PageSize = FbTestsSetup.PageSize;
 			restoreSvc.Verbose = verbose;
@@ -177,7 +177,7 @@ end";
 		{
 			var validationSvc = new FbValidation();
 
-			validationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			validationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			validationSvc.Options = FbValidationFlags.ValidateDatabase;
 
 			validationSvc.ServiceOutput += ServiceOutput;
@@ -190,7 +190,7 @@ end";
 		{
 			var validationSvc = new FbValidation();
 
-			validationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			validationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			validationSvc.Options = FbValidationFlags.SweepDatabase;
 
 			validationSvc.ServiceOutput += ServiceOutput;
@@ -203,7 +203,7 @@ end";
 		{
 			var configurationSvc = new FbConfiguration();
 
-			configurationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			configurationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 
 			configurationSvc.SetSweepInterval(1000);
 			configurationSvc.SetReserveSpace(true);
@@ -215,7 +215,7 @@ end";
 		{
 			var configurationSvc = new FbConfiguration();
 
-			configurationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			configurationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 
 			configurationSvc.DatabaseShutdown(FbShutdownMode.Forced, 10);
 			configurationSvc.DatabaseOnline();
@@ -229,7 +229,7 @@ end";
 
 			var configurationSvc = new FbConfiguration();
 
-			configurationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			configurationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 
 			configurationSvc.DatabaseShutdown2(FbShutdownOnlineMode.Full, FbShutdownType.ForceShutdown, 10);
 			configurationSvc.DatabaseOnline2(FbShutdownOnlineMode.Normal);
@@ -240,7 +240,7 @@ end";
 		{
 			var statisticalSvc = new FbStatistical();
 
-			statisticalSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			statisticalSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			statisticalSvc.Options = FbStatisticalFlags.SystemTablesRelations;
 
 			statisticalSvc.ServiceOutput += ServiceOutput;
@@ -253,7 +253,7 @@ end";
 		{
 			var logSvc = new FbLog();
 
-			logSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
+			logSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
 
 			logSvc.ServiceOutput += ServiceOutput;
 
@@ -265,7 +265,7 @@ end";
 		{
 			var securitySvc = new FbSecurity();
 
-			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
+			securitySvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
 
 			{
 				var user = new FbUserData();
@@ -286,7 +286,7 @@ end";
 		{
 			var securitySvc = new FbSecurity();
 
-			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
+			securitySvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
 
 			var user = securitySvc.DisplayUser("SYSDBA");
 		}
@@ -296,7 +296,7 @@ end";
 		{
 			var securitySvc = new FbSecurity();
 
-			securitySvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
+			securitySvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
 
 			var users = securitySvc.DisplayUsers();
 		}
@@ -306,7 +306,7 @@ end";
 		{
 			var serverProp = new FbServerProperties();
 
-			serverProp.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
+			serverProp.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
 
 			foreach (var m in serverProp.GetType()
 				.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
@@ -331,7 +331,7 @@ end";
 				{
 					var nbak = new FbNBackup();
 
-					nbak.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+					nbak.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 					nbak.Level = level;
 					nbak.BackupFile = backupName + level.ToString();
 					nbak.DirectIO = true;
@@ -348,11 +348,11 @@ end";
 			}
 			void RestorePart()
 			{
-				FbConnection.DropDatabase(BuildConnectionString(FbServerType, Compression, WireCrypt));
+				FbConnection.DropDatabase(BuildConnectionString(ServerType, Compression, WireCrypt));
 
 				var nrest = new FbNRestore();
 
-				nrest.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+				nrest.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 				nrest.BackupFiles = Enumerable.Range(0, Levels).Select(l => backupName + l.ToString());
 				nrest.DirectIO = true;
 
@@ -368,7 +368,7 @@ end";
 		public void TraceTest()
 		{
 			var trace = new FbTrace();
-			trace.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
+			trace.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
 			trace.DatabasesConfigurations.Add(new FbDatabaseTraceConfiguration()
 			{
 				Enabled = true,
@@ -393,7 +393,7 @@ end";
 			ThreadPool.QueueUserWorkItem(_ =>
 			{
 				Thread.Sleep(2000);
-				new FbTrace(connectionString: BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false)).Stop(sessionId);
+				new FbTrace(connectionString: BuildServicesConnectionString(ServerType, Compression, WireCrypt, false)).Stop(sessionId);
 			});
 			trace.Start("test");
 
@@ -408,7 +408,7 @@ end";
 
 			var configurationSvc = new FbConfiguration();
 
-			configurationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			configurationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 
 			configurationSvc.NoLinger();
 		}
@@ -416,7 +416,7 @@ end";
 		[Test, Explicit]
 		public void StatisticsWithEncryptedTest()
 		{
-			var csb = BuildServicesConnectionStringBuilder(FbServerType, Compression, WireCrypt, true);
+			var csb = BuildServicesConnectionStringBuilder(ServerType, Compression, WireCrypt, true);
 			csb.Database = "enc.fdb";
 			void Test()
 			{
@@ -437,7 +437,7 @@ end";
 
 			var validationSvc = new FbValidation2();
 
-			validationSvc.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, true);
+			validationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			validationSvc.TablesInclude = "_*";
 			validationSvc.TablesExclude = "X*";
 			validationSvc.IndicesInclude = "_*";

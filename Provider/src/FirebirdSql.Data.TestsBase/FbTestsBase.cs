@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.TestsBase
 
 		#region	Properties
 
-		public FbServerType FbServerType { get; }
+		public FbServerType ServerType { get; }
 		public bool Compression { get; }
 		public FbWireCrypt WireCrypt { get; }
 
@@ -57,7 +57,7 @@ namespace FirebirdSql.Data.TestsBase
 
 		public FbTestsBase(FbServerType serverType, bool compression, FbWireCrypt wireCrypt, bool insertTestData = true)
 		{
-			FbServerType = serverType;
+			ServerType = serverType;
 			Compression = compression;
 			WireCrypt = wireCrypt;
 			_insertTestData = insertTestData;
@@ -70,9 +70,9 @@ namespace FirebirdSql.Data.TestsBase
 		[SetUp]
 		public virtual void SetUp()
 		{
-			FbTestsSetup.SetUp(FbServerType, Compression, WireCrypt);
+			FbTestsSetup.SetUp(ServerType, Compression, WireCrypt);
 
-			var cs = BuildConnectionString(FbServerType, Compression, WireCrypt);
+			var cs = BuildConnectionString(ServerType, Compression, WireCrypt);
 			if (_insertTestData)
 			{
 				InsertTestData(cs);
@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.TestsBase
 		[TearDown]
 		public virtual void TearDown()
 		{
-			var cs = BuildConnectionString(FbServerType, Compression, WireCrypt);
+			var cs = BuildConnectionString(ServerType, Compression, WireCrypt);
 			_connection.Dispose();
 			if (_insertTestData)
 			{
@@ -229,7 +229,7 @@ end";
 
 		protected int GetActiveConnections()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
+			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Pooling = false;
 			using (var conn = new FbConnection(csb.ToString()))
 			{
@@ -245,7 +245,7 @@ end";
 		protected Version GetServerVersion()
 		{
 			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(FbServerType, Compression, WireCrypt, false);
+			server.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
 			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
 		}
 
@@ -257,11 +257,19 @@ end";
 			return false;
 		}
 
-		protected bool EnsureServerType(FbServerType type)
+		protected bool EnsureServerType(FbServerType serverType)
 		{
-			if (FbServerType == type)
+			if (ServerType == serverType)
 				return true;
-			Assert.Inconclusive("Not supported on this server type.");
+			Assert.Inconclusive($"Not supported on this {nameof(FbServerType)}.");
+			return false;
+		}
+
+		protected bool EnsureWireCrypt(FbWireCrypt wireCrypt)
+		{
+			if (WireCrypt == wireCrypt)
+				return true;
+			Assert.Inconclusive($"Not supported with this {nameof(FbWireCrypt)}.");
 			return false;
 		}
 

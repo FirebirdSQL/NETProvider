@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void SimpleSelectTest()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
+			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 
 			csb.Enlist = true;
 
@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void InsertTest()
 		{
-			var csb = BuildConnectionStringBuilder(FbServerType, Compression, WireCrypt);
+			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 
 			csb.Enlist = true;
 
