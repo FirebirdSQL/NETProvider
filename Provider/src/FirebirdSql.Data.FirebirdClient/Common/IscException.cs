@@ -154,7 +154,9 @@ namespace FirebirdSql.Data.Common
 			// step #2, see if we can find a mapping.
 			else
 			{
-				SQLSTATE = GetValueOrDefault(SqlStateMapping.Values, ErrorCode, _ => string.Empty);
+				SQLSTATE = SqlStateMapping.TryGet(ErrorCode, out var value)
+					? value
+					: string.Empty;
 			}
 		}
 
@@ -167,7 +169,9 @@ namespace FirebirdSql.Data.Common
 				if (Errors[i].Type == IscCodes.isc_arg_gds || Errors[i].Type == IscCodes.isc_arg_warning)
 				{
 					var code = Errors[i].ErrorCode;
-					var message = GetValueOrDefault(IscErrorMessages.Values, code, BuildDefaultErrorMessage);
+					var message = IscErrorMessages.TryGet(code, out var value)
+						? value
+						: BuildDefaultErrorMessage(code);
 
 					var args = new List<string>();
 					var index = i + 1;
@@ -220,15 +224,6 @@ namespace FirebirdSql.Data.Common
 		private string BuildDefaultErrorMessage(int code)
 		{
 			return string.Format(CultureInfo.CurrentCulture, "No message for error code {0} found.", code);
-		}
-
-		private static string GetValueOrDefault(IDictionary<int, string> dictionary, int key, Func<int, string> defaultValueFactory)
-		{
-			if (!dictionary.TryGetValue(key, out var result))
-			{
-				result = defaultValueFactory(key);
-			}
-			return result;
 		}
 
 		private static void AppendMessage(StringBuilder builder, string message, List<string> args)
