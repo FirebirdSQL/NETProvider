@@ -9,8 +9,8 @@
     <Import_RootNamespace>FirebirdSql.Data.TestsBase</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)FbEmbeddedServerTypeTestFixtureSource.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FbDefaultServerTypeTestFixtureSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NoServerCategoryAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FbServerTypeTestFixtureSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FbTestsBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FbTestsSetup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Program.cs" />

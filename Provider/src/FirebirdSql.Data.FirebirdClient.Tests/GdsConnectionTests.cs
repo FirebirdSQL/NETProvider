@@ -17,10 +17,12 @@
 
 using System.Collections.Generic;
 using FirebirdSql.Data.Client.Managed;
+using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
+	[NoServerCategory]
 	public class GdsConnectionTests
 	{
 		static IEnumerable<TestCaseData> NormalizeLoginTestSource()

@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   CONFIGURATION: Release
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         FIREBIRD_SELECTION: [FB25, FB30, FB40]
-        TEST_SUITE: [Tests-FirebirdClient, Tests-EFCore, Tests-EF6]
+        TEST_SUITE: [Tests-FirebirdClient-Default, Tests-FirebirdClient-Embedded, Tests-EFCore, Tests-EF6]
     steps:
       - name: Checkout
         uses: actions/checkout@v2

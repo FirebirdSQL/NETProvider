@@ -17,10 +17,12 @@
 
 using System;
 using System.Data;
+using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
+	[NoServerCategory]
 	public class FbParameterTests
 	{
 		[Test]

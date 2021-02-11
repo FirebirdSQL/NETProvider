@@ -22,7 +22,7 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
+	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
 	public class FbRemoteEventTests : FbTestsBase
 	{
 		public FbRemoteEventTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)

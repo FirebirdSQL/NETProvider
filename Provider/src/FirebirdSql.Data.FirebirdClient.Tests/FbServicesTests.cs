@@ -29,7 +29,7 @@ using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
-	[TestFixtureSource(typeof(FbDefaultServerTypeTestFixtureSource))]
+	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
 	public class FbServicesTests : FbTestsBase
 	{
 		#region Constructors

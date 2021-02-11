@@ -16,10 +16,12 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
+	[NoServerCategory]
 	public class FbParameterCollectionTests
 	{
 		[Test]

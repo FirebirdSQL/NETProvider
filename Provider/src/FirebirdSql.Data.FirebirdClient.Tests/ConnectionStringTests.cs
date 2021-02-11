@@ -18,10 +18,12 @@
 using System.Globalization;
 using System.Threading;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
+	[NoServerCategory]
 	public class ConnectionStringTests
 	{
 		[Test]

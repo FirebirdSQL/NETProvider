@@ -87,48 +87,44 @@ function Cleanup() {
 }
 
 function Tests-All() {
-	Tests-FirebirdClient
+	Tests-FirebirdClient-Default
+	Tests-FirebirdClient-Embedded
 	Tests-EF6
 	Tests-EFCore
 }
 
-function Tests-FirebirdClient() {
-	echo "=== $($MyInvocation.MyCommand.Name) ==="
-
+function Tests-FirebirdClient-Default() {
+	Tests-FirebirdClient 'Default'
+}
+function Tests-FirebirdClient-Embedded() {
+	Tests-FirebirdClient 'Embedded'
+}
+function Tests-FirebirdClient($serverType) {
 	cd $testsProviderDir
-	.\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All
+	.\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All "--where=Category==Server$serverType || Category==NoServer"
 	Check-ExitCode
-
-	echo "=== END ==="
 }
 
-function Tests-EF6() {
-	echo "=== $($MyInvocation.MyCommand.Name) ==="
 
+function Tests-EF6() {
 	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
 	.\EntityFramework.Firebird.Tests.exe --labels=All
 	Check-ExitCode
-
-	echo "=== END ==="
 }
 
 function Tests-EFCore() {
-	echo "=== $($MyInvocation.MyCommand.Name) ==="
-
+	# nothing for 2.5
 	if ($FirebirdSelection -eq 'FB25') {
-		# nothing for 2.5
-	} 
-	else {
-		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
-		.\FirebirdSql.EntityFrameworkCore.Firebird.Tests.exe --labels=All
-		Check-ExitCode
-	
-		cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
-		dotnet test --no-build -c $Configuration
-		Check-ExitCode
+		return
 	}
+ 
+	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
+	.\FirebirdSql.EntityFrameworkCore.Firebird.Tests.exe --labels=All
+	Check-ExitCode
 
-	echo "=== END ==="
+	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
+	dotnet test --no-build -c $Configuration
+	Check-ExitCode
 }
 
 try {

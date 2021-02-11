@@ -16,10 +16,12 @@
 //$Authors = @realic, Jiri Cincura (jiri@cincura.net)
 
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
+	[NoServerCategory]
 	public class ConnectionPoolLifetimeHelperTests
 	{
 		[Test]

@@ -15,16 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Collections;
-using FirebirdSql.Data.FirebirdClient;
+using NUnit.Framework;
 
 namespace FirebirdSql.Data.TestsBase
 {
-	class FbEmbeddedServerTypeTestFixtureSource : IEnumerable
+	class NoServerCategoryAttribute : CategoryAttribute
 	{
-		public IEnumerator GetEnumerator()
-		{
-			yield return new object[] { FbServerType.Embedded, default(bool), default(FbWireCrypt) };
-		}
+		public NoServerCategoryAttribute()
+			: base("NoServer")
+		{ }
 	}
 }

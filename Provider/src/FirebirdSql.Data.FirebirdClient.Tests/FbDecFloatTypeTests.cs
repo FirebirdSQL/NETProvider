@@ -16,11 +16,13 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Numerics;
+using FirebirdSql.Data.TestsBase;
 using FirebirdSql.Data.Types;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
+	[NoServerCategory]
 	public class FbDecFloatTypeTests
 	{
 		static readonly object[] SimpleEqualityTrueSource = new object[]

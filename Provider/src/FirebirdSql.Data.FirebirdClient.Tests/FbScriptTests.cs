@@ -18,10 +18,12 @@
 using System;
 using System.Linq;
 using FirebirdSql.Data.Isql;
+using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
+	[NoServerCategory]
 	public class FbScriptTests
 	{
 		[Test]
