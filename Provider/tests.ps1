@@ -87,24 +87,36 @@ function Cleanup() {
 }
 
 function Tests-All() {
-	Tests-FirebirdClient-Default
+	Tests-FirebirdClient-Default-C-R
+	Tests-FirebirdClient-Default-NC-R
+	Tests-FirebirdClient-Default-C-D
+	Tests-FirebirdClient-Default-NC-D
 	Tests-FirebirdClient-Embedded
 	Tests-EF6
 	Tests-EFCore
+	Tests-EFCore-Functional
 }
 
-function Tests-FirebirdClient-Default() {
-	Tests-FirebirdClient 'Default'
+function Tests-FirebirdClient-Default-C-R() {
+	Tests-FirebirdClient 'Default' $True 'Required'
+}
+function Tests-FirebirdClient-Default-NC-R() {
+	Tests-FirebirdClient 'Default' $False 'Required'
+}
+function Tests-FirebirdClient-Default-C-D() {
+	Tests-FirebirdClient 'Default' $True 'Disabled'
+}
+function Tests-FirebirdClient-Default-NC-D() {
+	Tests-FirebirdClient 'Default' $False 'Disabled'
 }
 function Tests-FirebirdClient-Embedded() {
-	Tests-FirebirdClient 'Embedded'
+	Tests-FirebirdClient 'Embedded' $False 'Disabled'
 }
-function Tests-FirebirdClient($serverType) {
+function Tests-FirebirdClient($serverType, $compression, $wireCrypt) {
 	cd $testsProviderDir
-	.\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All "--where=Category==Server$serverType || Category==NoServer"
+	.\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All "--where=(ServerType==$serverType && Compression==$compression && WireCrypt==$wireCrypt) || Category==NoServer"
 	Check-ExitCode
 }
-
 
 function Tests-EF6() {
 	cd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
@@ -117,10 +129,16 @@ function Tests-EFCore() {
 	if ($FirebirdSelection -eq 'FB25') {
 		return
 	}
- 
+
 	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
 	.\FirebirdSql.EntityFrameworkCore.Firebird.Tests.exe --labels=All
 	Check-ExitCode
+}
+function Tests-EFCore-Functional() {
+	# nothing for 2.5
+	if ($FirebirdSelection -eq 'FB25') {
+		return
+	}
 
 	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
 	dotnet test --no-build -c $Configuration

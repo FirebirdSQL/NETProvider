@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Collections;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
@@ -26,22 +27,24 @@ namespace FirebirdSql.Data.TestsBase
 	{
 		public static IEnumerable Default()
 		{
-			yield return CreateTestFixtureData(nameof(FbServerType.Default), FbServerType.Default, false, FbWireCrypt.Disabled);
-			yield return CreateTestFixtureData(nameof(FbServerType.Default), FbServerType.Default, false, FbWireCrypt.Required);
-			yield return CreateTestFixtureData(nameof(FbServerType.Default), FbServerType.Default, true, FbWireCrypt.Disabled);
-			yield return CreateTestFixtureData(nameof(FbServerType.Default), FbServerType.Default, true, FbWireCrypt.Required);
+			yield return CreateTestFixtureData(FbServerType.Default, false, FbWireCrypt.Disabled);
+			yield return CreateTestFixtureData(FbServerType.Default, false, FbWireCrypt.Required);
+			yield return CreateTestFixtureData(FbServerType.Default, true, FbWireCrypt.Disabled);
+			yield return CreateTestFixtureData(FbServerType.Default, true, FbWireCrypt.Required);
 
 		}
 
 		public static IEnumerable Embedded()
 		{
-			yield return CreateTestFixtureData(nameof(FbServerType.Embedded), FbServerType.Embedded, default(bool), default(FbWireCrypt));
+			yield return CreateTestFixtureData(FbServerType.Embedded, false, FbWireCrypt.Disabled);
 		}
 
-		static TestFixtureData CreateTestFixtureData(string category, params object[] args)
+		static TestFixtureData CreateTestFixtureData(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 		{
-			var result = new TestFixtureData(args);
-			result.Properties.Set(PropertyNames.Category, $"Server{category}");
+			var result = new TestFixtureData(serverType, compression, wireCrypt);
+			result.Properties.Set(nameof(FbTestsBase.ServerType), serverType.ToString());
+			result.Properties.Set(nameof(FbTestsBase.Compression), compression.ToString());
+			result.Properties.Set(nameof(FbTestsBase.WireCrypt), wireCrypt.ToString());
 			return result;
 		}
 	}
