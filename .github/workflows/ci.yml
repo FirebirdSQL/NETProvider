@@ -7,7 +7,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
 
 jobs:
-  build:
+  ci:
     runs-on: windows-2019
     strategy:
       fail-fast: false
