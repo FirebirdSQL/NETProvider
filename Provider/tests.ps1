@@ -92,9 +92,9 @@ function Tests-All() {
 	Tests-FirebirdClient-Default-C-D
 	Tests-FirebirdClient-Default-NC-D
 	Tests-FirebirdClient-Embedded
-	Tests-EF6
 	Tests-EFCore
 	Tests-EFCore-Functional
+	Tests-EF6
 }
 
 function Tests-FirebirdClient-Default-C-R() {
