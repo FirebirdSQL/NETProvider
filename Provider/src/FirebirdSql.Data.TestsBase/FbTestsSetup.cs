@@ -35,11 +35,11 @@ public class FbTestsSetup
 	internal const int PageSize = 16384;
 	internal const bool ForcedWrite = false;
 
-	private static HashSet<Tuple<FbServerType, bool, FbWireCrypt>> _initalized = new HashSet<Tuple<FbServerType, bool, FbWireCrypt>>();
+	private static HashSet<(FbServerType, bool, FbWireCrypt)> _initalized = new HashSet<(FbServerType, bool, FbWireCrypt)>();
 
 	public static void SetUp(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 	{
-		var item = Tuple.Create(serverType, compression, wireCrypt);
+		var item = (serverType, compression, wireCrypt);
 		if (!_initalized.Contains(item))
 		{
 			var cs = FbTestsBase.BuildConnectionString(serverType, compression, wireCrypt);

@@ -589,7 +589,7 @@ namespace EntityFramework.Firebird
 			}
 		}
 
-		protected Tuple<string, IEnumerable<string>> Generate(ColumnModel column, string tableName)
+		protected (string, IEnumerable<string>) Generate(ColumnModel column, string tableName)
 		{
 			var builder = new StringBuilder();
 			var additionalCommands = new List<string>();
@@ -631,7 +631,7 @@ namespace EntityFramework.Firebird
 				additionalCommands.AddRange(identity.Where(x => !string.IsNullOrWhiteSpace(x)));
 			}
 
-			return Tuple.Create(builder.ToString(), additionalCommands.AsEnumerable());
+			return (builder.ToString(), additionalCommands);
 		}
 
 		protected string Generate(ParameterModel parameter)

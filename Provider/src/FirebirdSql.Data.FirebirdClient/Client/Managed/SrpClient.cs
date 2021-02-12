@@ -84,14 +84,14 @@ namespace FirebirdSql.Data.Client.Managed
 			return ClientProof(user, password, salt, serverPublicKey);
 		}
 
-		public Tuple<BigInteger, BigInteger> ServerSeed(string user, string password, byte[] salt)
+		public (BigInteger, BigInteger) ServerSeed(string user, string password, byte[] salt)
 		{
 			var v = BigInteger.ModPow(g, GetUserHash(user, password, salt), N);
 			var b = GetSecret();
 			var gb = BigInteger.ModPow(g, b, N);
 			BigInteger.DivRem(k * v, N, out var kv);
 			BigInteger.DivRem(BigInteger.Add(kv, gb), N, out var B);
-			return Tuple.Create(B, b);
+			return (B, b);
 		}
 
 		public byte[] GetServerSessionKey(string user, string password, byte[] salt, BigInteger A, BigInteger B, BigInteger b)
