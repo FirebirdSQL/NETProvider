@@ -16,6 +16,7 @@
 //$Authors = Hennadii Zabula
 
 using System;
+using System.Diagnostics.Contracts;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native.Handle
@@ -25,6 +26,8 @@ namespace FirebirdSql.Data.Client.Native.Handle
 	{
 		protected override bool ReleaseHandle()
 		{
+			Contract.Requires(FbClient != null);
+
 			if (IsClosed)
 			{
 				return true;
