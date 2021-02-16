@@ -23,6 +23,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Services;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
@@ -32,85 +33,90 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
 	public class FbServicesTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbServicesTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Setup Method
-
 		[SetUp]
-		public override void SetUp()
+		public override async Task SetUp()
 		{
-			base.SetUp();
+			await base.SetUp();
 
 			if (Connection != null && Connection.State == ConnectionState.Open)
 			{
-				Connection.Close();
+				await Connection.CloseAsync();
 			}
 		}
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void BackupRestoreTest()
+		public async Task BackupRestoreTest()
 		{
-			var backupName = $"{Guid.NewGuid().ToString()}.bak";
-			void BackupPart()
+			var backupName = $"{Guid.NewGuid()}.bak";
+			Task BackupPart()
 			{
 				var backupSvc = new FbBackup();
-
 				backupSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 				backupSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 				backupSvc.Verbose = true;
 				backupSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
-
 				backupSvc.ServiceOutput += ServiceOutput;
-
-				backupSvc.Execute();
+				return backupSvc.ExecuteAsync();
 			}
-			void RestorePart()
+			Task RestorePart()
 			{
 				var restoreSvc = new FbRestore();
-
 				restoreSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 				restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
 				restoreSvc.PageSize = FbTestsSetup.PageSize;
 				restoreSvc.Verbose = true;
 				restoreSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
 				restoreSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
-
 				restoreSvc.ServiceOutput += ServiceOutput;
-
-				restoreSvc.Execute();
+				return restoreSvc.ExecuteAsync();
 			}
-			BackupPart();
-			RestorePart();
+			await BackupPart();
+			await RestorePart();
 			// test the database was actually restored fine
-			Connection.Open();
-			Connection.Close();
+			await Connection.OpenAsync();
+			await Connection.CloseAsync();
 		}
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void StreamingBackupRestoreTest(bool verbose)
+		public async Task StreamingBackupRestoreTest(bool verbose)
 		{
-			if (!EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
-			Connection.Open();
-			using (var cmd = Connection.CreateCommand())
+			Task BackupPart(MemoryStream buffer)
+			{
+				var backupSvc = new FbStreamingBackup();
+				backupSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
+				backupSvc.Options = FbBackupFlags.IgnoreLimbo;
+				backupSvc.OutputStream = buffer;
+				backupSvc.ServiceOutput += ServiceOutput;
+				return backupSvc.ExecuteAsync();
+			}
+			Task RestorePart(MemoryStream buffer, bool verbose)
+			{
+				var restoreSvc = new FbStreamingRestore();
+				restoreSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
+				restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
+				restoreSvc.PageSize = FbTestsSetup.PageSize;
+				restoreSvc.Verbose = verbose;
+				restoreSvc.InputStream = buffer;
+				restoreSvc.ServiceOutput += ServiceOutput;
+				return restoreSvc.ExecuteAsync();
+			}
+
+			await Connection.OpenAsync();
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "create table dummy_data (foo varchar(1000) primary key)";
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync();
 			}
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = @"execute block
 as
@@ -123,249 +129,189 @@ begin
 		cnt = cnt - 1;
 	end
 end";
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync();
 			}
-			Connection.Close();
+			await Connection.CloseAsync();
 
 			using (var ms = new MemoryStream())
 			{
-				StreamingBackupRestoreTest_BackupPart(ms);
+				await BackupPart(ms);
 				ms.Position = 0;
-				StreamingBackupRestoreTest_RestorePart(ms, verbose);
+				await RestorePart(ms, verbose);
 				// test the database was actually restored fine
-				Connection.Open();
-				Connection.Close();
+				await Connection.OpenAsync();
+				await Connection.CloseAsync();
 			}
 
-			Connection.Open();
+			await Connection.OpenAsync();
 			using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "drop table dummy_data";
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync();
 			}
-			Connection.Close();
-		}
-		private void StreamingBackupRestoreTest_BackupPart(MemoryStream buffer)
-		{
-			var backupSvc = new FbStreamingBackup();
-
-			backupSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
-			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
-			backupSvc.OutputStream = buffer;
-
-			backupSvc.ServiceOutput += ServiceOutput;
-
-			backupSvc.Execute();
-		}
-		private void StreamingBackupRestoreTest_RestorePart(MemoryStream buffer, bool verbose)
-		{
-			var restoreSvc = new FbStreamingRestore();
-
-			restoreSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
-			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
-			restoreSvc.PageSize = FbTestsSetup.PageSize;
-			restoreSvc.Verbose = verbose;
-			restoreSvc.InputStream = buffer;
-
-			restoreSvc.ServiceOutput += ServiceOutput;
-
-			restoreSvc.Execute();
+			await Connection.CloseAsync();
 		}
 
 		[Test]
-		public void ValidationTest()
+		public async Task ValidationTest()
 		{
 			var validationSvc = new FbValidation();
-
 			validationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			validationSvc.Options = FbValidationFlags.ValidateDatabase;
-
 			validationSvc.ServiceOutput += ServiceOutput;
-
-			validationSvc.Execute();
+			await validationSvc.ExecuteAsync();
 		}
 
 		[Test]
-		public void SweepTest()
+		public async Task SweepTest()
 		{
 			var validationSvc = new FbValidation();
-
 			validationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			validationSvc.Options = FbValidationFlags.SweepDatabase;
-
 			validationSvc.ServiceOutput += ServiceOutput;
-
-			validationSvc.Execute();
+			await validationSvc.ExecuteAsync();
 		}
 
 		[Test]
-		public void SetPropertiesTest()
+		public async Task SetPropertiesTest()
 		{
 			var configurationSvc = new FbConfiguration();
-
 			configurationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
-
-			configurationSvc.SetSweepInterval(1000);
-			configurationSvc.SetReserveSpace(true);
-			configurationSvc.SetForcedWrites(true);
+			await configurationSvc.SetSweepIntervalAsync(1000);
+			await configurationSvc.SetReserveSpaceAsync(true);
+			await configurationSvc.SetForcedWritesAsync(true);
 		}
 
 		[Test]
-		public void ShutdownOnlineTest()
+		public async Task ShutdownOnlineTest()
 		{
 			var configurationSvc = new FbConfiguration();
-
 			configurationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
-
-			configurationSvc.DatabaseShutdown(FbShutdownMode.Forced, 10);
-			configurationSvc.DatabaseOnline();
+			await configurationSvc.DatabaseShutdownAsync(FbShutdownMode.Forced, 10);
+			await configurationSvc.DatabaseOnlineAsync();
 		}
 
 		[Test]
-		public void ShutdownOnline2Test()
+		public async Task ShutdownOnline2Test()
 		{
-			if (!EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			var configurationSvc = new FbConfiguration();
-
 			configurationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
-
-			configurationSvc.DatabaseShutdown2(FbShutdownOnlineMode.Full, FbShutdownType.ForceShutdown, 10);
-			configurationSvc.DatabaseOnline2(FbShutdownOnlineMode.Normal);
+			await configurationSvc.DatabaseShutdown2Async(FbShutdownOnlineMode.Full, FbShutdownType.ForceShutdown, 10);
+			await configurationSvc.DatabaseOnline2Async(FbShutdownOnlineMode.Normal);
 		}
 
 		[Test]
-		public void StatisticsTest()
+		public async Task StatisticsTest()
 		{
 			var statisticalSvc = new FbStatistical();
-
 			statisticalSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			statisticalSvc.Options = FbStatisticalFlags.SystemTablesRelations;
-
 			statisticalSvc.ServiceOutput += ServiceOutput;
-
-			statisticalSvc.Execute();
+			await statisticalSvc.ExecuteAsync();
 		}
 
 		[Test]
-		public void FbLogTest()
+		public async Task FbLogTest()
 		{
 			var logSvc = new FbLog();
-
 			logSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
-
 			logSvc.ServiceOutput += ServiceOutput;
-
-			logSvc.Execute();
+			await logSvc.ExecuteAsync();
 		}
 
 		[Test]
-		public void AddDeleteUserTest()
+		public async Task AddDeleteUserTest()
 		{
 			var securitySvc = new FbSecurity();
-
 			securitySvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
-
 			{
 				var user = new FbUserData();
 				user.UserName = "new_user";
 				user.UserPassword = "1";
-				securitySvc.AddUser(user);
+				await securitySvc.AddUserAsync(user);
 			}
-
 			{
 				var user = new FbUserData();
 				user.UserName = "new_user";
-				securitySvc.DeleteUser(user);
+				await securitySvc.DeleteUserAsync(user);
 			}
 		}
 
 		[Test]
-		public void DisplayUser()
+		public async Task DisplayUser()
 		{
 			var securitySvc = new FbSecurity();
-
 			securitySvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
-
-			var user = securitySvc.DisplayUser("SYSDBA");
+			var user = await securitySvc.DisplayUserAsync("SYSDBA");
 		}
 
 		[Test]
-		public void DisplayUsers()
+		public async Task DisplayUsers()
 		{
 			var securitySvc = new FbSecurity();
-
 			securitySvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
-
-			var users = securitySvc.DisplayUsers();
+			var users = await securitySvc.DisplayUsersAsync();
 		}
 
 		[Test]
 		public void ServerPropertiesTest()
 		{
 			var serverProp = new FbServerProperties();
-
 			serverProp.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
-
 			foreach (var m in serverProp.GetType()
 				.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
 				.Where(x => !x.IsSpecialName)
-				.Where(x => !x.Name.EndsWith("Async")))
+				.Where(x => x.Name.EndsWith("Async")))
 			{
-				Assert.DoesNotThrow(() => m.Invoke(serverProp, null), m.Name);
+				Assert.DoesNotThrowAsync(() => (Task)m.Invoke(serverProp, new object[] { CancellationToken.None }), m.Name);
 			}
 		}
 
 		[Test]
-		public void NBackupBackupRestoreTest()
+		public async Task NBackupBackupRestoreTest()
 		{
-			if (!EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			const int Levels = 2;
-			var backupName = $"{Guid.NewGuid().ToString()}.nbak";
-			void BackupPart()
+			var backupName = $"{Guid.NewGuid()}.nbak";
+			async Task BackupPart()
 			{
-				void DoLevel(int level)
+				Task DoLevel(int level)
 				{
 					var nbak = new FbNBackup();
-
 					nbak.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 					nbak.Level = level;
 					nbak.BackupFile = backupName + level.ToString();
 					nbak.DirectIO = true;
 					nbak.Options = FbNBackupFlags.NoDatabaseTriggers;
-
 					nbak.ServiceOutput += ServiceOutput;
-
-					nbak.Execute();
+					return nbak.ExecuteAsync();
 				}
 				for (var i = 0; i < Levels; i++)
 				{
-					DoLevel(i);
+					await DoLevel(i);
 				}
 			}
-			void RestorePart()
+			Task RestorePart()
 			{
 				FbConnection.DropDatabase(BuildConnectionString(ServerType, Compression, WireCrypt));
-
 				var nrest = new FbNRestore();
-
 				nrest.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 				nrest.BackupFiles = Enumerable.Range(0, Levels).Select(l => backupName + l.ToString());
 				nrest.DirectIO = true;
-
 				nrest.ServiceOutput += ServiceOutput;
-
-				nrest.Execute();
+				return nrest.ExecuteAsync();
 			}
-			BackupPart();
-			RestorePart();
+			await BackupPart();
+			await RestorePart();
 		}
 
 		[Test]
-		public void TraceTest()
+		public async Task TraceTest()
 		{
 			var trace = new FbTrace();
 			trace.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
@@ -390,27 +336,28 @@ end";
 				ServiceOutput(sender, e);
 			};
 
-			ThreadPool.QueueUserWorkItem(_ =>
+			async Task Stop()
 			{
-				Thread.Sleep(2000);
-				new FbTrace(connectionString: BuildServicesConnectionString(ServerType, Compression, WireCrypt, false)).Stop(sessionId);
-			});
-			trace.Start("test");
+				await Task.Delay(2000);
+				await new FbTrace(connectionString: BuildServicesConnectionString(ServerType, Compression, WireCrypt, false))
+					.StopAsync(sessionId);
+			}
+			var stopTask = Stop();
+			await trace.StartAsync("test");
+			await stopTask;
 
 			Assert.AreNotEqual(-1, sessionId);
 		}
 
 		[Test]
-		public void NoLingerTest()
+		public async Task NoLingerTest()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			var configurationSvc = new FbConfiguration();
-
 			configurationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
-
-			configurationSvc.NoLinger();
+			await configurationSvc.NoLingerAsync();
 		}
 
 		[Test, Explicit]
@@ -418,46 +365,37 @@ end";
 		{
 			var csb = BuildServicesConnectionStringBuilder(ServerType, Compression, WireCrypt, true);
 			csb.Database = "enc.fdb";
-			void Test()
+			Task Test()
 			{
 				var statisticalSvc = new FbStatistical(csb.ToString());
 				statisticalSvc.ServiceOutput += ServiceOutput;
-				statisticalSvc.Execute();
+				return statisticalSvc.ExecuteAsync();
 			}
-			Assert.Throws<FbException>(Test);
+			Assert.ThrowsAsync<FbException>(Test);
 			csb.CryptKey = Encoding.ASCII.GetBytes("1234567890123456");
-			Assert.DoesNotThrow(Test);
+			Assert.DoesNotThrowAsync(Test);
 		}
 
 		[Test]
-		public void Validation2Test()
+		public async Task Validation2Test()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			var validationSvc = new FbValidation2();
-
 			validationSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
 			validationSvc.TablesInclude = "_*";
 			validationSvc.TablesExclude = "X*";
 			validationSvc.IndicesInclude = "_*";
 			validationSvc.IndicesExclude = "X*";
 			validationSvc.LockTimeout = 6;
-
 			validationSvc.ServiceOutput += ServiceOutput;
-
-			validationSvc.Execute();
+			await validationSvc.ExecuteAsync();
 		}
-
-		#endregion
-
-		#region Methods
 
 		static void ServiceOutput(object sender, ServiceOutputEventArgs e)
 		{
 			var dummy = e.Message;
 		}
-
-		#endregion
 	}
 }

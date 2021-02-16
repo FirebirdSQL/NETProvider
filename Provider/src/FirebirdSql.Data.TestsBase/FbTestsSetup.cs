@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
@@ -37,16 +38,16 @@ public class FbTestsSetup
 
 	private static HashSet<(FbServerType, bool, FbWireCrypt)> _initalized = new HashSet<(FbServerType, bool, FbWireCrypt)>();
 
-	public static void SetUp(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+	public static async Task SetUp(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 	{
 		var item = (serverType, compression, wireCrypt);
 		if (!_initalized.Contains(item))
 		{
 			var cs = FbTestsBase.BuildConnectionString(serverType, compression, wireCrypt);
-			FbConnection.CreateDatabase(cs, PageSize, ForcedWrite, true);
-			CreateTables(cs);
-			CreateProcedures(cs);
-			CreateTriggers(cs);
+			await FbConnection.CreateDatabaseAsync(cs, PageSize, ForcedWrite, true);
+			await CreateTables(cs);
+			await CreateProcedures(cs);
+			await CreateTriggers(cs);
 			_initalized.Add(item);
 		}
 	}
@@ -57,22 +58,22 @@ public class FbTestsSetup
 	}
 
 	[OneTimeTearDown]
-	public void TearDown()
+	public async Task TearDown()
 	{
 		FbConnection.ClearAllPools();
 		foreach (var item in _initalized)
 		{
 			var cs = FbTestsBase.BuildConnectionString(item.Item1, item.Item2, item.Item3);
-			FbConnection.DropDatabase(cs);
+			await FbConnection.DropDatabaseAsync(cs);
 		}
 		_initalized.Clear();
 	}
 
-	private static void CreateTables(string connectionString)
+	private static async Task CreateTables(string connectionString)
 	{
-		using (var connection = new FbConnection(connectionString))
+		await using (var connection = new FbConnection(connectionString))
 		{
-			connection.Open();
+			await connection.OpenAsync();
 
 			var commandText = new StringBuilder();
 
@@ -107,28 +108,28 @@ public class FbTestsSetup
 			commandText.Append("CS_FIELD		 CHAR(1) CHARACTER SET UNICODE_FSS,");
 			commandText.Append("UCCHAR_ARRAY	 CHAR(10) [1:10] CHARACTER SET UNICODE_FSS);");
 
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
-			using (var command = new FbCommand("recreate table log(occured timestamp, text varchar(20));", connection))
+			await using (var command = new FbCommand("recreate table log(occured timestamp, text varchar(20));", connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
-			using (var command = new FbCommand("RECREATE TABLE GUID_TEST (INT_FIELD INTEGER, GUID_FIELD CHAR(16) CHARACTER SET OCTETS)", connection))
+			await using (var command = new FbCommand("RECREATE TABLE GUID_TEST (INT_FIELD INTEGER, GUID_FIELD CHAR(16) CHARACTER SET OCTETS)", connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 		}
 	}
 
-	private static void CreateProcedures(string connectionString)
+	private static async Task CreateProcedures(string connectionString)
 	{
-		using (var connection = new FbConnection(connectionString))
+		await using (var connection = new FbConnection(connectionString))
 		{
-			connection.Open();
+			await connection.OpenAsync();
 
 			var commandText = new StringBuilder();
 
@@ -144,9 +145,9 @@ public class FbTestsSetup
 			commandText.Append("DO \r\n");
 			commandText.Append("SUSPEND; \r\n");
 			commandText.Append("end;");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
 			commandText.Clear();
@@ -159,9 +160,9 @@ public class FbTestsSetup
 			commandText.Append("do \r\n");
 			commandText.Append("suspend; \r\n");
 			commandText.Append("end\r\n");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
 			commandText.Clear();
@@ -175,9 +176,9 @@ public class FbTestsSetup
 			commandText.Append("do\r\n");
 			commandText.Append("suspend;\r\n");
 			commandText.Append("end\r\n");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
 			commandText.Clear();
@@ -191,9 +192,9 @@ public class FbTestsSetup
 			commandText.Append("do\r\n");
 			commandText.Append("suspend;\r\n");
 			commandText.Append("end\r\n");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
 			commandText.Clear();
@@ -205,9 +206,9 @@ public class FbTestsSetup
 			commandText.Append("content	= 'test';\r\n");
 			commandText.Append("suspend;\r\n");
 			commandText.Append("end\r\n");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
 			commandText.Clear();
@@ -216,18 +217,18 @@ public class FbTestsSetup
 			commandText.Append("begin\r\n");
 			commandText.Append("result = 1000;\r\n");
 			commandText.Append("end \r\n");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 		}
 	}
 
-	private static void CreateTriggers(string connectionString)
+	private static async Task CreateTriggers(string connectionString)
 	{
-		using (var connection = new FbConnection(connectionString))
+		await using (var connection = new FbConnection(connectionString))
 		{
-			connection.Open();
+			await connection.OpenAsync();
 
 			var commandText = new StringBuilder();
 
@@ -238,9 +239,9 @@ public class FbTestsSetup
 			commandText.Append("BEGIN\r\n");
 			commandText.Append("POST_EVENT 'new	row';\r\n");
 			commandText.Append("END");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
 			commandText.Clear();
@@ -250,9 +251,9 @@ public class FbTestsSetup
 			commandText.Append("BEGIN\r\n");
 			commandText.Append("POST_EVENT 'updated	row';\r\n");
 			commandText.Append("END");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 
 			commandText.Clear();
@@ -261,9 +262,9 @@ public class FbTestsSetup
 			commandText.Append("begin\r\n");
 			commandText.Append("insert into log (occured, text) values (current_timestamp, 'on connect');\r\n");
 			commandText.Append("end");
-			using (var command = new FbCommand(commandText.ToString(), connection))
+			await using (var command = new FbCommand(commandText.ToString(), connection))
 			{
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 			}
 		}
 	}

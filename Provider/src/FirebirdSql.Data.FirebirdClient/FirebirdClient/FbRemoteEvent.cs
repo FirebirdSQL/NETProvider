@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -65,9 +66,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return _connection.Disconnect(async);
 		}
 
-		public void QueueEvents(params string[] events) => QueueEventsImpl(events, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
-		public Task QueueEventsAsync(string[] events, CancellationToken cancellationToken = default) => QueueEventsImpl(events, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task QueueEventsImpl(string[] events, AsyncWrappingCommonArgs async)
+		public void QueueEvents(ICollection<string> events) => QueueEventsImpl(events, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public Task QueueEventsAsync(ICollection<string> events, CancellationToken cancellationToken = default) => QueueEventsImpl(events, new AsyncWrappingCommonArgs(true, cancellationToken));
+		private async Task QueueEventsImpl(ICollection<string> events, AsyncWrappingCommonArgs async)
 		{
 			if (_revent == null)
 				throw new InvalidOperationException($"{nameof(FbRemoteEvent)} must be opened.");
@@ -83,7 +84,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		public void CancelEvents() => CancelEventsImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
-		public Task CancelEventsAsync(CancellationToken cancellationToken) => CancelEventsImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		public Task CancelEventsAsync(CancellationToken cancellationToken = default) => CancelEventsImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task CancelEventsImpl(AsyncWrappingCommonArgs async)
 		{
 			try

@@ -17,6 +17,7 @@
 
 using System;
 using System.Data;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -26,676 +27,678 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class FbDataAdapterTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbDataAdapterTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void FillTest()
+		public async Task FillTest()
 		{
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand("select * from TEST", Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
-
-			var builder = new FbCommandBuilder(adapter);
-
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
-
-			Assert.AreEqual(100, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-			transaction.Commit();
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+						using (var ds = new DataSet())
+						{
+							adapter.Fill(ds, "TEST");
+							Assert.AreEqual(100, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void FillMultipleTest()
+		public async Task FillMultipleTest()
 		{
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand("select * from TEST", Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+						using (var ds1 = new DataSet())
+						using (var ds2 = new DataSet())
+						{
+							adapter.Fill(ds1, "TEST");
+							adapter.Fill(ds2, "TEST");
 
-			var builder = new FbCommandBuilder(adapter);
-
-			var ds1 = new DataSet();
-			var ds2 = new DataSet();
-
-			adapter.Fill(ds1, "TEST");
-			adapter.Fill(ds2, "TEST");
-
-			Assert.AreEqual(100, ds1.Tables["TEST"].Rows.Count, "Incorrect row count (ds1)");
-			Assert.AreEqual(100, ds2.Tables["TEST"].Rows.Count, "Incorrect row count (ds2)");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-			transaction.Commit();
+							Assert.AreEqual(100, ds1.Tables["TEST"].Rows.Count, "Incorrect row count (ds1)");
+							Assert.AreEqual(100, ds2.Tables["TEST"].Rows.Count, "Incorrect row count (ds2)");
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void FillMultipleWithImplicitTransactionTest()
+		public async Task FillMultipleWithImplicitTransactionTest()
 		{
-			var command = new FbCommand("select * from TEST", Connection);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var command = new FbCommand("select * from TEST", Connection))
+			{
+				using (var adapter = new FbDataAdapter(command))
+				{
+					adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+					using (var ds1 = new DataSet())
+					using (var ds2 = new DataSet())
+					{
+						adapter.Fill(ds1, "TEST");
+						adapter.Fill(ds2, "TEST");
 
-			var builder = new FbCommandBuilder(adapter);
-
-			var ds1 = new DataSet();
-			var ds2 = new DataSet();
-
-			adapter.Fill(ds1, "TEST");
-			adapter.Fill(ds2, "TEST");
-
-			Assert.AreEqual(100, ds1.Tables["TEST"].Rows.Count, "Incorrect row count (ds1)");
-			Assert.AreEqual(100, ds2.Tables["TEST"].Rows.Count, "Incorrect row count (ds2)");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
+						Assert.AreEqual(100, ds1.Tables["TEST"].Rows.Count, "Incorrect row count (ds1)");
+						Assert.AreEqual(100, ds2.Tables["TEST"].Rows.Count, "Incorrect row count (ds2)");
+					}
+				}
+			}
 		}
 
 		[Test]
-		public void InsertTest()
+		public async Task InsertTest()
 		{
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand("select * from TEST", Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			var builder = new FbCommandBuilder(adapter);
+								Assert.AreEqual(100, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								var newRow = ds.Tables["TEST"].NewRow();
 
-			Assert.AreEqual(100, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
+								newRow["int_field"] = 101;
+								newRow["CHAR_FIELD"] = "ONE THOUSAND";
+								newRow["VARCHAR_FIELD"] = ":;,.{}`+^*[]\\!|@#$%&/()?_-<>";
+								newRow["BIGint_field"] = 100000;
+								newRow["SMALLint_field"] = 100;
+								newRow["DOUBLE_FIELD"] = 100.01;
+								newRow["NUMERIC_FIELD"] = 100.01;
+								newRow["DECIMAL_FIELD"] = 100.01;
+								newRow["DATE_FIELD"] = new DateTime(100, 10, 10);
+								newRow["TIME_FIELD"] = new TimeSpan(10, 10, 10);
+								newRow["TIMESTAMP_FIELD"] = new DateTime(100, 10, 10, 10, 10, 10, 10);
+								newRow["CLOB_FIELD"] = "ONE THOUSAND";
 
-			var newRow = ds.Tables["TEST"].NewRow();
+								ds.Tables["TEST"].Rows.Add(newRow);
 
-			newRow["int_field"] = 101;
-			newRow["CHAR_FIELD"] = "ONE THOUSAND";
-			newRow["VARCHAR_FIELD"] = ":;,.{}`+^*[]\\!|@#$%&/()?_-<>";
-			newRow["BIGint_field"] = 100000;
-			newRow["SMALLint_field"] = 100;
-			newRow["DOUBLE_FIELD"] = 100.01;
-			newRow["NUMERIC_FIELD"] = 100.01;
-			newRow["DECIMAL_FIELD"] = 100.01;
-			newRow["DATE_FIELD"] = new DateTime(100, 10, 10);
-			newRow["TIME_FIELD"] = new TimeSpan(10, 10, 10);
-			newRow["TIMESTAMP_FIELD"] = new DateTime(100, 10, 10, 10, 10, 10, 10);
-			newRow["CLOB_FIELD"] = "ONE THOUSAND";
-
-			ds.Tables["TEST"].Rows.Add(newRow);
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-			transaction.Commit();
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateCharTest()
+		public async Task UpdateCharTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["CHAR_FIELD"] = "ONE THOUSAND";
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["CHAR_FIELD"] = "ONE THOUSAND";
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-
-			transaction.Commit();
-
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT char_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (string)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual("ONE THOUSAND", val.Trim(), "char_field has not correct value");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT char_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (string)await command.ExecuteScalarAsync();
+					Assert.AreEqual("ONE THOUSAND", val.Trim(), "char_field has not correct value");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateVarCharTest()
+		public async Task UpdateVarCharTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["VARCHAR_FIELD"] = "ONE VAR THOUSAND";
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["VARCHAR_FIELD"] = "ONE VAR THOUSAND";
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-
-			transaction.Commit();
-
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT varchar_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (string)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual("ONE VAR THOUSAND", val.Trim(), "varchar_field has not correct value");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT varchar_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (string)await command.ExecuteScalarAsync();
+					Assert.AreEqual("ONE VAR THOUSAND", val.Trim(), "varchar_field has not correct value");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateSmallIntTest()
+		public async Task UpdateSmallIntTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["SMALLint_field"] = short.MaxValue;
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["SMALLint_field"] = System.Int16.MaxValue;
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-
-			transaction.Commit();
-
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT smallint_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (short)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual(System.Int16.MaxValue, val, "smallint_field has not correct value");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT smallint_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (short)await command.ExecuteScalarAsync();
+					Assert.AreEqual(short.MaxValue, val, "smallint_field has not correct value");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateBigIntTest()
+		public async Task UpdateBigIntTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = Connection.BeginTransaction())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["BIGINT_FIELD"] = int.MaxValue;
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				transaction.Commit();
+			}
 
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["BIGINT_FIELD"] = System.Int32.MaxValue;
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-
-			transaction.Commit();
-
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT bigint_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (long)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual(System.Int32.MaxValue, val, "bigint_field has not correct value");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT bigint_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (long)await command.ExecuteScalarAsync();
+					Assert.AreEqual(int.MaxValue, val, "bigint_field has not correct value");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateDoubleTest()
+		public async Task UpdateDoubleTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["DOUBLE_FIELD"] = int.MaxValue;
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["DOUBLE_FIELD"] = System.Int32.MaxValue;
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-
-			transaction.Commit();
-
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT double_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (double)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual(System.Int32.MaxValue, val, "double_field has not correct value");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT double_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (double)await command.ExecuteScalarAsync();
+					Assert.AreEqual(int.MaxValue, val, "double_field has not correct value");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateFloatTest()
+		public async Task UpdateFloatTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["FLOAT_FIELD"] = (float)100.20;
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["FLOAT_FIELD"] = (float)100.20;
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-
-			transaction.Commit();
-
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT float_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (float)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual((float)100.20, val, "double_field has not correct value");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT float_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (float)await command.ExecuteScalarAsync();
+					Assert.AreEqual((float)100.20, val, "double_field has not correct value");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateNumericTest()
+		public async Task UpdateNumericTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["NUMERIC_FIELD"] = int.MaxValue;
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["NUMERIC_FIELD"] = System.Int32.MaxValue;
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-
-			transaction.Commit();
-
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT numeric_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (decimal)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual(System.Int32.MaxValue, val, "numeric_field has not correct value");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT numeric_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (decimal)await command.ExecuteScalarAsync();
+					Assert.AreEqual(int.MaxValue, val, "numeric_field has not correct value");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateDecimalTest()
+		public async Task UpdateDecimalTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["DECIMAL_FIELD"] = int.MaxValue;
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["DECIMAL_FIELD"] = System.Int32.MaxValue;
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-
-			transaction.Commit();
-
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT decimal_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (decimal)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual(System.Int32.MaxValue, val, "decimal_field has not correct value");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT decimal_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (decimal)await command.ExecuteScalarAsync();
+					Assert.AreEqual(int.MaxValue, val, "decimal_field has not correct value");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateDateTest()
+		public async Task UpdateDateTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
-
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var builder = new FbCommandBuilder(adapter);
-
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
-
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
 			var dtValue = DateTime.Now;
 
-			ds.Tables["TEST"].Rows[0]["DATE_FIELD"] = dtValue;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.Update(ds, "TEST");
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
 
-			transaction.Commit();
+								ds.Tables["TEST"].Rows[0]["DATE_FIELD"] = dtValue;
 
-			transaction = Connection.BeginTransaction();
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			sql = "SELECT date_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (DateTime)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual(dtValue.Day, val.Day, "date_field has not correct day");
-			Assert.AreEqual(dtValue.Month, val.Month, "date_field has not correct month");
-			Assert.AreEqual(dtValue.Year, val.Year, "date_field has not correct year");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT date_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (DateTime)await command.ExecuteScalarAsync();
+					Assert.AreEqual(dtValue.Day, val.Day, "date_field has not correct day");
+					Assert.AreEqual(dtValue.Month, val.Month, "date_field has not correct month");
+					Assert.AreEqual(dtValue.Year, val.Year, "date_field has not correct year");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateTimeTest()
+		public async Task UpdateTimeTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
-
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var builder = new FbCommandBuilder(adapter);
-
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
-
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
 			var dtValue = new TimeSpan(5, 6, 7);
 
-			ds.Tables["TEST"].Rows[0]["TIME_FIELD"] = dtValue;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.Update(ds, "TEST");
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
 
-			transaction.Commit();
+								ds.Tables["TEST"].Rows[0]["TIME_FIELD"] = dtValue;
 
-			transaction = Connection.BeginTransaction();
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			sql = "SELECT time_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (TimeSpan)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual(dtValue.Hours, val.Hours, "time_field has not correct hour");
-			Assert.AreEqual(dtValue.Minutes, val.Minutes, "time_field has not correct minute");
-			Assert.AreEqual(dtValue.Seconds, val.Seconds, "time_field has not correct second");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT time_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (TimeSpan)await command.ExecuteScalarAsync();
+					Assert.AreEqual(dtValue.Hours, val.Hours, "time_field has not correct hour");
+					Assert.AreEqual(dtValue.Minutes, val.Minutes, "time_field has not correct minute");
+					Assert.AreEqual(dtValue.Seconds, val.Seconds, "time_field has not correct second");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateTimeStampTest()
+		public async Task UpdateTimeStampTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
-
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var builder = new FbCommandBuilder(adapter);
-
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
-
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
 			var dtValue = DateTime.Now;
 
-			ds.Tables["TEST"].Rows[0]["TIMESTAMP_FIELD"] = dtValue;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.Update(ds, "TEST");
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
+								ds.Tables["TEST"].Rows[0]["TIMESTAMP_FIELD"] = dtValue;
 
-			transaction.Commit();
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 
-			transaction = Connection.BeginTransaction();
-
-			sql = "SELECT timestamp_field FROM TEST WHERE int_field = @int_field";
-			command = new FbCommand(sql, Connection, transaction);
-			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-
-			var val = (DateTime)command.ExecuteScalar();
-
-			transaction.Commit();
-
-			Assert.AreEqual(dtValue.Day, val.Day, "timestamp_field has not correct day");
-			Assert.AreEqual(dtValue.Month, val.Month, "timestamp_field has not correct month");
-			Assert.AreEqual(dtValue.Year, val.Year, "timestamp_field has not correct year");
-			Assert.AreEqual(dtValue.Hour, val.Hour, "timestamp_field has not correct hour");
-			Assert.AreEqual(dtValue.Minute, val.Minute, "timestamp_field has not correct minute");
-			Assert.AreEqual(dtValue.Second, val.Second, "timestamp_field has not correct second");
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("SELECT timestamp_field FROM TEST WHERE int_field = @int_field", Connection, transaction))
+				{
+					command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+					var val = (DateTime)await command.ExecuteScalarAsync();
+					Assert.AreEqual(dtValue.Day, val.Day, "timestamp_field has not correct day");
+					Assert.AreEqual(dtValue.Month, val.Month, "timestamp_field has not correct month");
+					Assert.AreEqual(dtValue.Year, val.Year, "timestamp_field has not correct year");
+					Assert.AreEqual(dtValue.Hour, val.Hour, "timestamp_field has not correct hour");
+					Assert.AreEqual(dtValue.Minute, val.Minute, "timestamp_field has not correct minute");
+					Assert.AreEqual(dtValue.Second, val.Second, "timestamp_field has not correct second");
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void UpdateClobTest()
+		public async Task UpdateClobTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0]["CLOB_FIELD"] = "ONE THOUSAND";
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
-
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0]["CLOB_FIELD"] = "ONE THOUSAND";
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-			transaction.Commit();
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void DeleteTest()
+		public async Task DeleteTest()
 		{
-			var sql = "select * from TEST where int_field = @int_field";
-			var transaction = Connection.BeginTransaction();
-			var command = new FbCommand(sql, Connection, transaction);
-			var adapter = new FbDataAdapter(command);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST where int_field = @int_field", Connection, transaction))
+				{
+					using (var adapter = new FbDataAdapter(command))
+					{
+						using (var builder = new FbCommandBuilder(adapter))
+						{
+							adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+							adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 10;
+							using (var ds = new DataSet())
+							{
+								adapter.Fill(ds, "TEST");
 
-			adapter.SelectCommand.Parameters.Add("@int_field", FbDbType.Integer).Value = 10;
+								Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
 
-			var builder = new FbCommandBuilder(adapter);
+								ds.Tables["TEST"].Rows[0].Delete();
 
-			var ds = new DataSet();
-			adapter.Fill(ds, "TEST");
-
-			Assert.AreEqual(1, ds.Tables["TEST"].Rows.Count, "Incorrect row count");
-
-			ds.Tables["TEST"].Rows[0].Delete();
-
-			adapter.Update(ds, "TEST");
-
-			adapter.Dispose();
-			builder.Dispose();
-			command.Dispose();
-			transaction.Commit();
+								adapter.Update(ds, "TEST");
+							}
+						}
+					}
+				}
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
-		public void SubsequentDeletes()
+		public async Task SubsequentDeletes()
 		{
-			var selectSql = "SELECT * FROM test";
-			var deleteSql = "DELETE FROM test WHERE int_field = @id";
+			await using (var select = new FbCommand("SELECT * FROM test", Connection))
+			{
+				await using (var delete = new FbCommand("DELETE FROM test WHERE int_field = @id", Connection))
+				{
+					delete.Parameters.Add("@id", FbDbType.Integer);
+					delete.Parameters[0].SourceColumn = "INT_FIELD";
+					using (var adapter = new FbDataAdapter(select))
+					{
+						adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+						adapter.DeleteCommand = delete;
+						using (var ds = new DataSet())
+						{
+							adapter.Fill(ds);
 
-			var connection = new FbConnection(Connection.ConnectionString);
-			var select = new FbCommand(selectSql, connection);
-			var delete = new FbCommand(deleteSql, connection);
-			delete.Parameters.Add("@id", FbDbType.Integer);
-			delete.Parameters[0].SourceColumn = "INT_FIELD";
+							ds.Tables[0].Rows[0].Delete();
+							adapter.Update(ds);
 
-			var adapter = new FbDataAdapter(select);
-			adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
-			adapter.DeleteCommand = delete;
+							ds.Tables[0].Rows[0].Delete();
+							adapter.Update(ds);
 
-			var ds = new DataSet();
-			adapter.Fill(ds);
-
-			ds.Tables[0].Rows[0].Delete();
-			adapter.Update(ds);
-
-			ds.Tables[0].Rows[0].Delete();
-			adapter.Update(ds);
-
-			ds.Tables[0].Rows[0].Delete();
-			adapter.Update(ds);
+							ds.Tables[0].Rows[0].Delete();
+							adapter.Update(ds);
+						}
+					}
+				}
+			}
 		}
-
-		#endregion
 	}
 }

@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -35,18 +36,18 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[SetUp]
-		public override void SetUp()
+		public override async Task SetUp()
 		{
-			base.SetUp();
+			await base.SetUp();
 
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			_shouldTearDown = true;
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "CREATE TABLE withboolean (id INTEGER, bool BOOLEAN)";
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync();
 			}
 			var data = new Dictionary<int, string>()
 			{
@@ -56,50 +57,50 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			};
 			foreach (var item in data)
 			{
-				using (var cmd = Connection.CreateCommand())
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = $"INSERT INTO withboolean (id, bool) VALUES ({item.Key}, {item.Value})";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
 			}
 		}
 
 		[TearDown]
-		public override void TearDown()
+		public override async Task TearDown()
 		{
 			if (_shouldTearDown)
 			{
-				using (var cmd = Connection.CreateCommand())
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "DROP TABLE withboolean";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
 			}
-			base.TearDown();
+			await base.TearDown();
 		}
 
 		[Test]
-		public void SimpleSelectTest()
+		public async Task SimpleSelectTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "SELECT id, bool FROM withboolean";
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					while (reader.Read())
+					while (await reader.ReadAsync())
 					{
 						switch (reader.GetInt32(0))
 						{
 							case 0:
 								Assert.IsFalse(reader.GetBoolean(1), "Column with value FALSE should have value false.");
-								Assert.IsFalse(reader.IsDBNull(1), "Column with value FALSE should not be null.");
+								Assert.IsFalse(await reader.IsDBNullAsync(1), "Column with value FALSE should not be null.");
 								break;
 							case 1:
 								Assert.IsTrue(reader.GetBoolean(1), "Column with value TRUE should have value true.");
-								Assert.IsFalse(reader.IsDBNull(1), "Column with value TRUE should not be null.");
+								Assert.IsFalse(await reader.IsDBNullAsync(1), "Column with value TRUE should not be null.");
 								break;
 							case 2:
-								Assert.IsTrue(reader.IsDBNull(1), "Column with value UNKNOWN should be null.");
+								Assert.IsTrue(await reader.IsDBNullAsync(1), "Column with value UNKNOWN should be null.");
 								break;
 							default:
 								Assert.Fail("Unexpected row in result set.");
@@ -111,14 +112,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void SimpleSelectSchemaTableTest()
+		public async Task SimpleSelectSchemaTableTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "SELECT id, bool FROM withboolean";
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					var schema = reader.GetSchemaTable();
+					var schema = await reader.GetSchemaTableAsync();
 					Assert.AreEqual(typeof(bool), schema.Rows[1].ItemArray[5]);
 				}
 			}
@@ -127,33 +128,33 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[TestCase(false, 0)]
 		[TestCase(true, 1)]
 		[TestCase(null, 2)]
-		public void SimpleSelectWithBoolConditionTest(bool? value, int id)
+		public async Task SimpleSelectWithBoolConditionTest(bool? value, int id)
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = $"SELECT id FROM withboolean WHERE bool IS NOT DISTINCT FROM @bool";
 				cmd.Parameters.Add(new FbParameter("bool", value));
-				Assert.AreEqual(id, cmd.ExecuteScalar());
+				Assert.AreEqual(id, await cmd.ExecuteScalarAsync());
 			}
 		}
 
 		[TestCase(3, false)]
 		[TestCase(4, true)]
 		[TestCase(5, null)]
-		public void ParametrizedInsertTest(int id, bool? value)
+		public async Task ParametrizedInsertTest(int id, bool? value)
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "INSERT INTO withboolean (id, bool) VALUES (@id, @bool)";
 				cmd.Parameters.Add("id", id);
 				cmd.Parameters.Add("bool", value);
-				Assert.DoesNotThrow(() => cmd.ExecuteNonQuery());
+				Assert.DoesNotThrowAsync(() => cmd.ExecuteNonQueryAsync());
 			}
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = $"SELECT bool FROM withboolean WHERE id = @id";
 				cmd.Parameters.Add("id", id);
-				Assert.AreEqual(value ?? (object)DBNull.Value, cmd.ExecuteScalar());
+				Assert.AreEqual(value ?? (object)DBNull.Value, await cmd.ExecuteScalarAsync());
 			}
 		}
 	}

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -29,302 +30,244 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class FbCommandTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbCommandTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void ExecuteNonQueryTest()
+		public async Task ExecuteNonQueryTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
-			var command = Connection.CreateCommand();
-
-			command.Transaction = Transaction;
-			command.CommandText = "insert into TEST	(INT_FIELD)	values (?) ";
-
-			command.Parameters.Add("@INT_FIELD", 100);
-
-			var affectedRows = command.ExecuteNonQuery();
-
-			Assert.AreEqual(affectedRows, 1);
-
-			Transaction.Rollback();
-
-			command.Dispose();
-		}
-
-		[Test]
-		public void ExecuteReaderTest()
-		{
-			var command = Connection.CreateCommand();
-
-			command.CommandText = "select *	from TEST";
-
-			var reader = command.ExecuteReader();
-			reader.Close();
-
-			command.Dispose();
-		}
-
-		[Test]
-		public void ExecuteMultipleReaderTest()
-		{
-			var command1 = Connection.CreateCommand();
-			var command2 = Connection.CreateCommand();
-
-			command1.CommandText = "select * from test where int_field = 1";
-			command2.CommandText = "select * from test where int_field = 2";
-
-			var r1 = command1.ExecuteReader();
-			var r2 = command2.ExecuteReader();
-
-			r2.Close();
-
-			try
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				// Try to call ExecuteReader in	command1
-				// it should throw an exception
-				r2 = command1.ExecuteReader();
-
-				throw new InvalidProgramException();
-			}
-			catch
-			{
-				r1.Close();
-			}
-		}
-
-		[Test]
-		public void ExecuteReaderWithBehaviorTest()
-		{
-			var command = new FbCommand("select *	from TEST", Connection);
-
-			var reader = command.ExecuteReader(CommandBehavior.CloseConnection);
-			reader.Close();
-
-			command.Dispose();
-		}
-
-		[Test]
-		public void ExecuteScalarTest()
-		{
-			var command = Connection.CreateCommand();
-
-			command.CommandText = "select CHAR_FIELD from TEST where INT_FIELD = ?";
-			command.Parameters.Add("@INT_FIELD", 2);
-
-			var charFieldValue = command.ExecuteScalar().ToString();
-
-			Assert.AreEqual("IRow 2", charFieldValue.TrimEnd(' '));
-
-			command.Dispose();
-		}
-
-		[Test]
-		public void ExecuteScalarWithStoredProcedureTest()
-		{
-			var command = Connection.CreateCommand();
-
-			command.CommandText = "SimpleSP";
-			command.CommandType = CommandType.StoredProcedure;
-
-			var result = (int)command.ExecuteScalar();
-
-			Assert.AreEqual(1000, result);
-
-			command.Dispose();
-		}
-
-		[Test]
-		public void NamedParametersTest()
-		{
-			var command = Connection.CreateCommand();
-
-			command.CommandText = "select CHAR_FIELD from TEST where INT_FIELD = @int_field	or CHAR_FIELD =	@char_field";
-
-			command.Parameters.Add("@int_field", 2);
-			command.Parameters.Add("@char_field", "TWO");
-
-			var reader = command.ExecuteReader();
-
-			var count = 0;
-
-			while (reader.Read())
-			{
-				count++;
-			}
-
-			Assert.AreEqual(1, count, "Invalid number of records fetched.");
-
-			reader.Close();
-			command.Dispose();
-		}
-
-		[Test]
-		public void NamedParametersAndLiterals()
-		{
-			var sql = "update test set char_field = 'carlos@firebird.org', bigint_field = @bigint, varchar_field	= 'carlos@ado.net' where int_field = @integer";
-
-			var command = new FbCommand(sql, Connection);
-			command.Parameters.Add("@bigint", FbDbType.BigInt).Value = 200;
-			command.Parameters.Add("@integer", FbDbType.Integer).Value = 1;
-
-			var recordsAffected = command.ExecuteNonQuery();
-
-			command.Dispose();
-
-			Assert.AreEqual(recordsAffected, 1, "Invalid number	of records affected.");
-		}
-
-		[Test]
-		public void NamedParametersReuseTest()
-		{
-			var sql = "select * from	test where int_field >=	@lang and int_field	<= @lang";
-
-			var command = new FbCommand(sql, Connection);
-			command.Parameters.Add("@lang", FbDbType.Integer).Value = 10;
-
-			var reader = command.ExecuteReader();
-
-			var count = 0;
-			var intValue = 0;
-
-			while (reader.Read())
-			{
-				if (count == 0)
+				await using (var command = Connection.CreateCommand())
 				{
-					intValue = reader.GetInt32(0);
+					command.Transaction = Transaction;
+					command.CommandText = "insert into TEST (INT_FIELD) values (?)";
+					command.Parameters.Add("@INT_FIELD", 100);
+					var affectedRows = await command.ExecuteNonQueryAsync();
+					Assert.AreEqual(affectedRows, 1);
+					await Transaction.RollbackAsync();
 				}
-				count++;
 			}
-
-			Assert.AreEqual(1, count, "Invalid number of records fetched.");
-			Assert.AreEqual(10, intValue, "Invalid record fetched.");
-
-			reader.Close();
-			command.Dispose();
 		}
 
 		[Test]
-		public void ExecuteStoredProcTest()
+		public async Task ExecuteReaderTest()
 		{
-			var command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection);
-
-			command.CommandType = CommandType.StoredProcedure;
-
-			command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
-			command.Parameters.Add("@VARCHAR_FIELD", FbDbType.VarChar).Direction = ParameterDirection.Output;
-
-			command.Parameters[0].Value = 1;
-
-			command.ExecuteNonQuery();
-
-			Assert.AreEqual("IRow Number 1", command.Parameters[1].Value);
-		}
-
-		[Test]
-		public void RecordAffectedTest()
-		{
-			var sql = "insert into test (int_field) values (100000)";
-
-			var command = new FbCommand(sql, Connection);
-
-			var reader = command.ExecuteReader();
-
-			Assert.AreEqual(1, reader.RecordsAffected);
-
-			while (reader.Read())
+			await using (var command = Connection.CreateCommand())
 			{
+				command.CommandText = "select * from TEST";
+				await using (var reader = await command.ExecuteReaderAsync())
+				{ }
 			}
-
-			reader.Close();
-
-			Assert.AreEqual(1, reader.RecordsAffected);
 		}
 
 		[Test]
-		public void ExecuteNonQueryWithOutputParameters()
+		public async Task ExecuteMultipleReaderTest()
 		{
-			var command = new FbCommand("EXECUTE PROCEDURE GETASCIIBLOB(?)", Connection);
-
-			command.CommandType = CommandType.StoredProcedure;
-
-			command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
-			command.Parameters.Add("@CLOB_FIELD", FbDbType.Text).Direction = ParameterDirection.Output;
-
-			command.Parameters[0].Value = 1;
-
-			command.ExecuteNonQuery();
-
-			Assert.AreEqual("IRow Number 1", command.Parameters[1].Value, "Output parameter value is not valid");
-
-			command.Dispose();
-		}
-
-		[Test]
-		public void InvalidParameterFormat()
-		{
-			var sql = "update test set timestamp_field =	@timestamp where int_field = @integer";
-
-			var transaction = Connection.BeginTransaction();
-			try
+			await using (FbCommand
+				command1 = Connection.CreateCommand(),
+				command2 = Connection.CreateCommand())
 			{
-				var command = new FbCommand(sql, Connection, transaction);
-				command.Parameters.Add("@timestamp", FbDbType.TimeStamp).Value = 1;
+				command1.CommandText = "select * from test where int_field = 1";
+				command2.CommandText = "select * from test where int_field = 2";
+
+				await using (var r1 = await command1.ExecuteReaderAsync())
+				{
+					await using (var r2 = await command2.ExecuteReaderAsync())
+					{ }
+
+					// Try to call ExecuteReader in	command1
+					// it should throw an exception
+					Assert.ThrowsAsync<InvalidOperationException>(() => command1.ExecuteReaderAsync());
+				}
+			}
+		}
+
+		[Test]
+		public async Task ExecuteReaderWithBehaviorTest()
+		{
+			await using (var command = new FbCommand("select * from TEST", Connection))
+			{
+				await using (var reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
+				{ }
+			}
+		}
+
+		[Test]
+		public async Task ExecuteScalarTest()
+		{
+			await using (var command = Connection.CreateCommand())
+			{
+				command.CommandText = "select CHAR_FIELD from TEST where INT_FIELD = ?";
+				command.Parameters.Add("@INT_FIELD", 2);
+				var charFieldValue = (await command.ExecuteScalarAsync()).ToString();
+				Assert.AreEqual("IRow 2", charFieldValue.TrimEnd(' '));
+			}
+		}
+
+		[Test]
+		public async Task ExecuteScalarWithStoredProcedureTest()
+		{
+			await using (var command = Connection.CreateCommand())
+			{
+				command.CommandText = "SimpleSP";
+				command.CommandType = CommandType.StoredProcedure;
+				var result = (int)await command.ExecuteScalarAsync();
+				Assert.AreEqual(1000, result);
+			}
+		}
+
+		[Test]
+		public async Task NamedParametersTest()
+		{
+			await using (var command = Connection.CreateCommand())
+			{
+				command.CommandText = "select CHAR_FIELD from TEST where INT_FIELD = @int_field or CHAR_FIELD = @char_field";
+				command.Parameters.Add("@int_field", 2);
+				command.Parameters.Add("@char_field", "TWO");
+				await using (var reader = await command.ExecuteReaderAsync())
+				{
+					var count = 0;
+
+					while (await reader.ReadAsync())
+					{
+						count++;
+					}
+					Assert.AreEqual(1, count, "Invalid number of records fetched.");
+				}
+			}
+		}
+
+		[Test]
+		public async Task NamedParametersAndLiterals()
+		{
+			await using (var command = new FbCommand("update test set char_field = 'carlos@firebird.org', bigint_field = @bigint, varchar_field = 'carlos@ado.net' where int_field = @integer", Connection))
+			{
+				command.Parameters.Add("@bigint", FbDbType.BigInt).Value = 200;
 				command.Parameters.Add("@integer", FbDbType.Integer).Value = 1;
-
-				command.ExecuteNonQuery();
-
-				command.Dispose();
-
-				transaction.Commit();
-			}
-			catch
-			{
-				transaction.Rollback();
+				var recordsAffected = await command.ExecuteNonQueryAsync();
+				Assert.AreEqual(recordsAffected, 1, "Invalid number of records affected.");
 			}
 		}
 
 		[Test]
-		public void UnicodeTest()
+		public async Task NamedParametersReuseTest()
+		{
+			await using (var command = new FbCommand("select * from test where int_field >= @lang and int_field <= @lang", Connection))
+			{
+				command.Parameters.Add("@lang", FbDbType.Integer).Value = 10;
+				await using (var reader = await command.ExecuteReaderAsync())
+				{
+					var count = 0;
+					var intValue = 0;
+					while (await reader.ReadAsync())
+					{
+						if (count == 0)
+						{
+							intValue = reader.GetInt32(0);
+						}
+						count++;
+					}
+					Assert.AreEqual(1, count, "Invalid number of records fetched.");
+					Assert.AreEqual(10, intValue, "Invalid record fetched.");
+				}
+			}
+		}
+
+		[Test]
+		public async Task ExecuteStoredProcTest()
+		{
+			await using (var command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection))
+			{
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
+				command.Parameters.Add("@VARCHAR_FIELD", FbDbType.VarChar).Direction = ParameterDirection.Output;
+				command.Parameters[0].Value = 1;
+				await command.ExecuteNonQueryAsync();
+				Assert.AreEqual("IRow Number 1", command.Parameters[1].Value);
+			}
+		}
+
+		[Test]
+		public async Task RecordAffectedTest()
+		{
+			await using (var command = new FbCommand("insert into test (int_field) values (100000)", Connection))
+			{
+				await using (var reader = await command.ExecuteReaderAsync())
+				{
+					Assert.AreEqual(1, reader.RecordsAffected);
+					while (await reader.ReadAsync())
+					{ }
+					Assert.AreEqual(1, reader.RecordsAffected);
+				}
+			}
+		}
+
+		[Test]
+		public async Task ExecuteNonQueryWithOutputParameters()
+		{
+			await using (var command = new FbCommand("EXECUTE PROCEDURE GETASCIIBLOB(?)", Connection))
+			{
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
+				command.Parameters.Add("@CLOB_FIELD", FbDbType.Text).Direction = ParameterDirection.Output;
+				command.Parameters[0].Value = 1;
+				await command.ExecuteNonQueryAsync();
+				Assert.AreEqual("IRow Number 1", command.Parameters[1].Value, "Output parameter value is not valid");
+			}
+		}
+
+		[Test]
+		public async Task InvalidParameterFormat()
+		{
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				try
+				{
+					await using (var command = new FbCommand("update test set timestamp_field = @timestamp where int_field = @integer", Connection, transaction))
+					{
+						command.Parameters.Add("@timestamp", FbDbType.TimeStamp).Value = 1;
+						command.Parameters.Add("@integer", FbDbType.Integer).Value = 1;
+						await command.ExecuteNonQueryAsync();
+					}
+					await transaction.CommitAsync();
+				}
+				catch
+				{
+					await transaction.RollbackAsync();
+				}
+			}
+		}
+
+		[Test]
+		public async Task UnicodeTest()
 		{
 			try
 			{
-				using (var create = new FbCommand("CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10))", Connection))
+				await using (var create = new FbCommand("CREATE TABLE VARCHARTEST (VARCHAR_FIELD  VARCHAR(10))", Connection))
 				{
-					create.ExecuteNonQuery();
+					await create.ExecuteNonQueryAsync();
 				}
-
-				var l = new List<string>
+				var statements = new[]
 				{
 					"INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1')",
 					"INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('11')",
 					"INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('111')",
 					"INSERT INTO VARCHARTEST (VARCHAR_FIELD) VALUES ('1111')"
 				};
-
-				foreach (string statement in l)
+				foreach (string statement in statements)
 				{
-					using (var insert = new FbCommand(statement, Connection))
+					await using (var insert = new FbCommand(statement, Connection))
 					{
-						insert.ExecuteNonQuery();
+						await insert.ExecuteNonQueryAsync();
 					}
 				}
-
-				var sql = "select * from	varchartest";
-
-				using (var cmd = new FbCommand(sql, Connection))
+				await using (var cmd = new FbCommand("select * from varchartest", Connection))
 				{
-					using (var r = cmd.ExecuteReader())
+					await using (var r = await cmd.ExecuteReaderAsync())
 					{
-						while (r.Read())
+						while (await r.ReadAsync())
 						{
 							var dummy = r[0];
 						}
@@ -333,39 +276,37 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 			finally
 			{
-				using (var drop = new FbCommand("DROP TABLE VARCHARTEST", Connection))
+				await using (var drop = new FbCommand("DROP TABLE VARCHARTEST", Connection))
 				{
-					drop.ExecuteNonQuery();
+					await drop.ExecuteNonQueryAsync();
 				}
 			}
 		}
 
 		[Test]
-		public void SimplifiedChineseTest()
+		public async Task SimplifiedChineseTest()
 		{
 			const string Value = "中文";
 			try
 			{
-				using (var cmd = new FbCommand("CREATE TABLE TABLE1 (FIELD1 varchar(20))", Connection))
+				await using (var cmd = new FbCommand("CREATE TABLE TABLE1 (FIELD1 varchar(20))", Connection))
 				{
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
-
-				using (var cmd = new FbCommand("INSERT INTO TABLE1 VALUES (@value)", Connection))
+				await using (var cmd = new FbCommand("INSERT INTO TABLE1 VALUES (@value)", Connection))
 				{
 					cmd.Parameters.Add("@value", FbDbType.VarChar).Value = Value;
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
-				using (var cmd = new FbCommand($"INSERT INTO TABLE1 VALUES ('{Value}')", Connection))
+				await using (var cmd = new FbCommand($"INSERT INTO TABLE1 VALUES ('{Value}')", Connection))
 				{
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
-
-				using (var cmd = new FbCommand("SELECT * FROM TABLE1", Connection))
+				await using (var cmd = new FbCommand("SELECT * FROM TABLE1", Connection))
 				{
-					using (var reader = cmd.ExecuteReader())
+					await using (var reader = await cmd.ExecuteReaderAsync())
 					{
-						while (reader.Read())
+						while (await reader.ReadAsync())
 						{
 							Assert.AreEqual(Value, reader[0]);
 						}
@@ -374,112 +315,99 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 			finally
 			{
-				using (var cmd = new FbCommand("DROP TABLE TABLE1", Connection))
+				await using (var cmd = new FbCommand("DROP TABLE TABLE1", Connection))
 				{
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
 			}
 		}
 
 		[Test]
-		public void InsertDateTest()
+		public async Task InsertDateTest()
 		{
-			var sql = "insert into TEST (int_field, date_field) values (1002, @date)";
-
-			var command = new FbCommand(sql, Connection);
-
-			command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
-
-			var ra = command.ExecuteNonQuery();
-
-			Assert.AreEqual(ra, 1);
-		}
-
-		[Test]
-		public void InsertNullTest()
-		{
-			var sql = "insert into TEST (int_field) values (@value)";
-
-			var command = new FbCommand(sql, Connection);
-			command.Parameters.Add("@value", FbDbType.Integer).Value = null;
-
-			try
+			await using (var command = new FbCommand("insert into TEST (int_field, date_field) values (1002, @date)", Connection))
 			{
-				command.ExecuteNonQuery();
-				Assert.Fail("The command was executed without throwing an exception");
+				command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
+				var ra = await command.ExecuteNonQueryAsync();
+				Assert.AreEqual(ra, 1);
 			}
-			catch
-			{ }
 		}
 
 		[Test]
-		public void InsertDateTimeTest()
+		public async Task InsertNullTest()
+		{
+			await using (var command = new FbCommand("insert into TEST (int_field) values (@value)", Connection))
+			{
+				command.Parameters.Add("@value", FbDbType.Integer).Value = null;
+				try
+				{
+					await command.ExecuteNonQueryAsync();
+					Assert.Fail("The command was executed without throwing an exception.");
+				}
+				catch
+				{ }
+			}
+		}
+
+		[Test]
+		public async Task InsertDateTimeTest()
 		{
 			var value = DateTime.Now;
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (int_field, timestamp_field) values (1002, @dt)";
 				cmd.Parameters.Add("@dt", FbDbType.TimeStamp).Value = value;
-
-				var ra = cmd.ExecuteNonQuery();
-
+				var ra = await cmd.ExecuteNonQueryAsync();
 				Assert.AreEqual(ra, 1);
 			}
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select timestamp_field from test where int_field = 1002";
-				var result = (DateTime)cmd.ExecuteScalar();
-
+				var result = (DateTime)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value.ToString(), result.ToString());
 			}
 		}
 
 		[Test]
-		public void InsertTimeStampTest()
+		public async Task InsertTimeStampTest()
 		{
 			var value = DateTime.Now.ToString();
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (int_field, timestamp_field) values (1002, @ts)";
 				cmd.Parameters.Add("@ts", FbDbType.TimeStamp).Value = value;
-
-				var ra = cmd.ExecuteNonQuery();
-
+				var ra = await cmd.ExecuteNonQueryAsync();
 				Assert.AreEqual(ra, 1);
 			}
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select timestamp_field from test where int_field = 1002";
-				var result = (DateTime)cmd.ExecuteScalar();
-
+				var result = (DateTime)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result.ToString());
 			}
 		}
 
 		[Test]
-		public void InsertTimeTest()
+		public async Task InsertTimeTest()
 		{
 			var t = new TimeSpan(0, 5, 6, 7, 231);
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (int_field, time_field) values (2245, @t)";
 				cmd.Parameters.Add("@t", FbDbType.Time).Value = t;
-
-				var ra = cmd.ExecuteNonQuery();
-
+				var ra = await cmd.ExecuteNonQueryAsync();
 				Assert.AreEqual(ra, 1);
 			}
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select time_field from test where int_field = 2245";
-				var result = (TimeSpan)cmd.ExecuteScalar();
-
+				var result = (TimeSpan)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(t.Hours, result.Hours, "hours are not same");
 				Assert.AreEqual(t.Minutes, result.Minutes, "minutes are not same");
 				Assert.AreEqual(t.Seconds, result.Seconds, "seconds are not same");
@@ -488,7 +416,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void InsertTimeOldTest()
+		public async Task InsertTimeOldTest()
 		{
 			var t = DateTime.Today;
 			t = t.AddHours(5);
@@ -496,21 +424,18 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			t = t.AddSeconds(7);
 			t = t.AddMilliseconds(231);
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "insert into test (int_field, time_field) values (2245, @t)";
 				cmd.Parameters.Add("@t", FbDbType.Time).Value = t;
-
-				var ra = cmd.ExecuteNonQuery();
-
+				var ra = await cmd.ExecuteNonQueryAsync();
 				Assert.AreEqual(ra, 1);
 			}
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select time_field from test where int_field = 2245";
-				var result = (TimeSpan)cmd.ExecuteScalar();
-
+				var result = (TimeSpan)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(t.Hour, result.Hours, "hours are not same");
 				Assert.AreEqual(t.Minute, result.Minutes, "minutes are not same");
 				Assert.AreEqual(t.Second, result.Seconds, "seconds are not same");
@@ -519,94 +444,70 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ParameterDescribeTest()
+		public async Task ParameterDescribeTest()
 		{
-			var sql = "insert into TEST (int_field) values (@value)";
-
-			var command = new FbCommand(sql, Connection);
-			command.Prepare();
-			command.Parameters.Add("@value", FbDbType.Integer).Value = 100000;
-
-			command.ExecuteNonQuery();
-
-			command.Dispose();
+			await using (var command = new FbCommand("insert into TEST (int_field) values (@value)", Connection))
+			{
+				await command.PrepareAsync();
+				command.Parameters.Add("@value", FbDbType.Integer).Value = 100000;
+				await command.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void ReadOnlyTransactionTest()
+		public async Task ReadOnlyTransactionTest()
 		{
-			using (IDbCommand command = Connection.CreateCommand())
+			await using (var command = Connection.CreateCommand())
 			{
-				using (IDbTransaction transaction = Connection.BeginTransaction(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Read, WaitTimeout = null }))
+				await using (var transaction = await Connection.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Read, WaitTimeout = null }))
 				{
-					try
-					{
-						command.Transaction = transaction;
-						command.CommandType = System.Data.CommandType.Text;
-						command.CommandText = "CREATE TABLE	X_TABLE_1(FIELD	VARCHAR(50));";
-						command.ExecuteNonQuery();
-						transaction.Commit();
-					}
-					catch (FbException)
-					{
-					}
+					command.Transaction = transaction;
+					command.CommandType = CommandType.Text;
+					command.CommandText = "CREATE TABLE X_TABLE_1(FIELD VARCHAR(50));";
+					Assert.ThrowsAsync<FbException>(() => command.ExecuteNonQueryAsync());
+					await transaction.CommitAsync();
 				}
 			}
 		}
 
 		[Test]
-		public void DisposeTest()
-		{
-			var tables = Connection.GetSchema("Tables", new string[] { null, null, null, null });
-
-			var selectSql = "SELECT * FROM TEST";
-
-			var c1 = new FbCommand(selectSql, Connection);
-			IDataReader r = c1.ExecuteReader();
-
-			while (r.Read())
-			{
-			}
-		}
-
-		[Test]
-		public void ReturningClauseParameterTest()
+		public async Task ReturningClauseParameterTest()
 		{
 			const int ColumnValue = 1234;
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync();
 				var returningValue = cmd.Parameters[0].Value;
 				Assert.AreEqual(ColumnValue, returningValue);
 			}
 		}
 
 		[Test]
-		public void ReturningClauseScalarTest()
+		public async Task ReturningClauseScalarTest()
 		{
 			const int ColumnValue = 1234;
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
-				var returningValue = (int)cmd.ExecuteScalar();
+				var returningValue = (int)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(ColumnValue, returningValue);
 			}
 		}
 
 		[Test]
-		public void ReturningClauseReaderTest()
+		public async Task ReturningClauseReaderTest()
 		{
 			const int ColumnValue = 1234;
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
 				cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					Assert.IsTrue(reader.Read());
+					Assert.IsTrue(await reader.ReadAsync());
 					var returningValue = (int)reader[0];
 					Assert.AreEqual(ColumnValue, returningValue);
 				}
@@ -614,17 +515,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ReadingVarcharOctetsTest()
+		public async Task ReadingVarcharOctetsTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				const string data = "1234";
 				byte[] read = null;
 
 				cmd.CommandText = string.Format("select cast('{0}' as varchar(10) character set octets) from rdb$database", data);
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					if (reader.Read())
+					if (await reader.ReadAsync())
 					{
 						read = (byte[])reader[0];
 					}
@@ -636,17 +537,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ReadingCharOctetsTest()
+		public async Task ReadingCharOctetsTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				const string data = "1234";
 				byte[] read = null;
 
 				cmd.CommandText = string.Format("select cast('{0}' as char(10) character set octets) from rdb$database", data);
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					if (reader.Read())
+					if (await reader.ReadAsync())
 					{
 						read = (byte[])reader[0];
 					}
@@ -659,14 +560,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void CommandCancellationTest()
+		public async Task CommandCancellationTest()
 		{
-			if (!EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			var cancelled = false;
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText =
 @"execute block as
@@ -677,141 +578,142 @@ begin
   begin
   end
 end";
-				ThreadPool.QueueUserWorkItem(_ =>
+				async Task Execute()
 				{
+					await Task.Yield();
 					try
 					{
-						cmd.ExecuteNonQuery();
+						await cmd.ExecuteNonQueryAsync();
 					}
 					catch (FbException ex)
 					{
 						cancelled = "HY008" == ex.SQLSTATE;
 					}
-				});
+				}
+				var executeTask = Execute();
 				Thread.Sleep(2000);
 				cmd.Cancel();
 				Thread.Sleep(2000);
+				await executeTask;
 				Assert.IsTrue(cancelled);
 			}
 		}
 
 		[Test]
-		public void GetCommandPlanTest()
+		public async Task GetCommandPlanTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select * from test";
-				cmd.Prepare();
+				await cmd.PrepareAsync();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan = cmd.GetCommandPlan(); });
+				Assert.DoesNotThrowAsync(async () => { plan = await cmd.GetCommandPlanAsync(); });
 				Assert.IsNotEmpty(plan);
 			}
 		}
 
 		[Test]
-		public void GetCommandExplainedPlanTest()
+		public async Task GetCommandExplainedPlanTest()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select * from test";
-				cmd.Prepare();
+				await cmd.PrepareAsync();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan = cmd.GetCommandExplainedPlan(); });
+				Assert.DoesNotThrowAsync(async () => { plan = await cmd.GetCommandExplainedPlanAsync(); });
 				Assert.IsNotEmpty(plan);
 			}
 		}
 
 		[Test]
-		public void GetCommandPlanNoPlanTest()
+		public async Task GetCommandPlanNoPlanTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "recreate table NoPlan (id int)";
-				cmd.Prepare();
+				await cmd.PrepareAsync();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan = cmd.GetCommandPlan(); });
+				Assert.DoesNotThrowAsync(async () => { plan = await cmd.GetCommandPlanAsync(); });
 				Assert.IsEmpty(plan);
 			}
 		}
 
 		[Test]
-		public void GetCommandExplainedPlanNoPlanTest()
+		public async Task GetCommandExplainedPlanNoPlanTest()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "recreate table NoPaln (id int)";
-				cmd.Prepare();
+				await cmd.PrepareAsync();
 				var plan = default(string);
-				Assert.DoesNotThrow(() => { plan = cmd.GetCommandExplainedPlan(); });
+				Assert.DoesNotThrowAsync(async () => { plan = await cmd.GetCommandExplainedPlanAsync(); });
 				Assert.IsEmpty(plan);
 			}
 		}
 
 		[Test]
-		public void ReadsTimeWithProperPrecision()
+		public async Task ReadsTimeWithProperPrecision()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast('00:00:01.4321' as time) from rdb$database";
-				var result = (TimeSpan)cmd.ExecuteScalar();
+				var result = (TimeSpan)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(TimeSpan.FromTicks(14321000), result);
 			}
 		}
 
 		[Test]
-		public void PassesTimeSpanWithProperPrecision()
+		public async Task PassesTimeSpanWithProperPrecision()
 		{
 			var ts = TimeSpan.FromTicks(14321000);
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as time) from rdb$database";
 				cmd.Parameters.Add("value", ts);
-				var result = (TimeSpan)cmd.ExecuteScalar();
+				var result = (TimeSpan)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(ts, result);
 			}
 		}
 
 		[Test]
-		public void ReadsDateTimeWithProperPrecision()
+		public async Task ReadsDateTimeWithProperPrecision()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast('1.2.2015 05:06:01.4321' as timestamp) from rdb$database";
-				var result = (DateTime)cmd.ExecuteScalar();
+				var result = (DateTime)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(new DateTime(635583639614321000), result);
 			}
 		}
 
 		[Test]
-		public void PassesDateTimeWithProperPrecision()
+		public async Task PassesDateTimeWithProperPrecision()
 		{
 			var dt = new DateTime(635583639614321000);
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as timestamp) from rdb$database";
 				cmd.Parameters.Add("value", dt);
-				var result = (DateTime)cmd.ExecuteScalar();
+				var result = (DateTime)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(dt, result);
 			}
 		}
 
 		[Test]
-		public void ExecuteNonQueryReturnsMinusOneOnNonInsertUpdateDelete()
+		public async Task ExecuteNonQueryReturnsMinusOneOnNonInsertUpdateDelete()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select 1 from rdb$database";
-				var ra = cmd.ExecuteNonQuery();
+				var ra = await cmd.ExecuteNonQueryAsync();
 				Assert.AreEqual(-1, ra);
 			}
 		}
-
-		#endregion
 	}
 }

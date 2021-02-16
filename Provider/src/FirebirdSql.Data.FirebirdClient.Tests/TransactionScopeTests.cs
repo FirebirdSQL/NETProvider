@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading.Tasks;
 using System.Transactions;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
@@ -26,34 +27,28 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class TransactionScopeTests : FbTestsBase
 	{
-		#region Constructors
-
 		public TransactionScopeTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void SimpleSelectTest()
+		public async Task SimpleSelectTest()
 		{
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 
 			csb.Enlist = true;
 
-			using (var scope = new TransactionScope())
+			using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
 			{
-				using (var c = new FbConnection(csb.ToString()))
+				await using (var c = new FbConnection(csb.ToString()))
 				{
 					c.Open();
 
-					using (var command = new FbCommand("select * from TEST where (0=1)", c))
+					await using (var command = new FbCommand("select * from TEST where (0=1)", c))
 					{
-						using (var r = command.ExecuteReader())
+						await using (var r = await command.ExecuteReaderAsync())
 						{
-							while (r.Read())
+							while (await r.ReadAsync())
 							{
 							}
 						}
@@ -65,25 +60,25 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void InsertTest()
+		public async Task InsertTest()
 		{
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 
 			csb.Enlist = true;
 
-			using (var scope = new TransactionScope())
+			using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
 			{
-				using (var c = new FbConnection(csb.ToString()))
+				await using (var c = new FbConnection(csb.ToString()))
 				{
-					c.Open();
+					await c.OpenAsync();
 
 					var sql = "insert into TEST (int_field, date_field) values (1002, @date)";
 
-					using (var command = new FbCommand(sql, c))
+					await using (var command = new FbCommand(sql, c))
 					{
 						command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
 
-						var ra = command.ExecuteNonQuery();
+						var ra = await command.ExecuteNonQueryAsync();
 
 						Assert.AreEqual(ra, 1);
 					}
@@ -92,8 +87,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				scope.Complete();
 			}
 		}
-
-		#endregion
 	}
 }
 

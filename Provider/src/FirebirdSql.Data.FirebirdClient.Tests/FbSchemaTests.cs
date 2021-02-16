@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System.Data;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -25,109 +26,103 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class FbSchemaTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbSchemaTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void CharacterSets()
+		public async Task CharacterSets()
 		{
-			Connection.GetSchema("CharacterSets");
+			await Connection.GetSchemaAsync("CharacterSets");
 		}
 
 		[Test]
-		public void CheckConstraints()
+		public async Task CheckConstraints()
 		{
-			Connection.GetSchema("CheckConstraints");
+			await Connection.GetSchemaAsync("CheckConstraints");
 		}
 
 		[Test]
-		public void CheckConstraintsByTable()
+		public async Task CheckConstraintsByTable()
 		{
-			Connection.GetSchema("CheckConstraintsByTable");
+			await Connection.GetSchemaAsync("CheckConstraintsByTable");
 		}
 
 		[Test]
-		public void Collations()
+		public async Task Collations()
 		{
-			Connection.GetSchema("Collations");
+			await Connection.GetSchemaAsync("Collations");
 		}
 
 		[Test]
-		public void Columns()
+		public async Task Columns()
 		{
-			var columns = Connection.GetSchema("Columns");
+			var columns = await Connection.GetSchemaAsync("Columns");
 
-			columns = Connection.GetSchema("Columns", new string[] { null, null, "TEST", "INT_FIELD" });
+			columns = await Connection.GetSchemaAsync("Columns", new string[] { null, null, "TEST", "INT_FIELD" });
 
 			Assert.AreEqual(1, columns.Rows.Count);
 		}
 
 		[Test]
-		public void ColumnPrivileges()
+		public async Task ColumnPrivileges()
 		{
-			Connection.GetSchema("ColumnPrivileges");
+			await Connection.GetSchemaAsync("ColumnPrivileges");
 		}
 
 		[Test]
-		public void Domains()
+		public async Task Domains()
 		{
-			Connection.GetSchema("Domains");
+			await Connection.GetSchemaAsync("Domains");
 		}
 
 		[Test]
-		public void ForeignKeys()
+		public async Task ForeignKeys()
 		{
-			Connection.GetSchema("ForeignKeys");
+			await Connection.GetSchemaAsync("ForeignKeys");
 		}
 
 		[Test]
-		public void ForeignKeyColumns()
+		public async Task ForeignKeyColumns()
 		{
-			var foreignKeys = Connection.GetSchema("ForeignKeys");
+			var foreignKeys = await Connection.GetSchemaAsync("ForeignKeys");
 
 			foreach (DataRow row in foreignKeys.Rows)
 			{
-				var foreignKeyColumns = Connection.GetSchema(
+				var foreignKeyColumns = await Connection.GetSchemaAsync(
 					"ForeignKeyColumns",
 					new string[] { (string)row["TABLE_CATALOG"], (string)row["TABLE_SCHEMA"], (string)row["TABLE_NAME"], (string)row["CONSTRAINT_NAME"] });
 			}
 		}
 
 		[Test]
-		public void Functions()
+		public async Task Functions()
 		{
-			Connection.GetSchema("Functions");
+			await Connection.GetSchemaAsync("Functions");
 		}
 
 		[Test]
-		public void Generators()
+		public async Task Generators()
 		{
-			Connection.GetSchema("Generators");
+			await Connection.GetSchemaAsync("Generators");
 		}
 
 		[Test]
-		public void Indexes()
+		public async Task Indexes()
 		{
-			Connection.GetSchema("Indexes");
+			await Connection.GetSchemaAsync("Indexes");
 		}
 
 		[Test]
-		public void IndexColumns()
+		public async Task IndexColumns()
 		{
-			Connection.GetSchema("IndexColumns");
+			await Connection.GetSchemaAsync("IndexColumns");
 		}
 
 		[Test]
-		public void PrimaryKeys()
+		public async Task PrimaryKeys()
 		{
-			var primaryKeys = Connection.GetSchema("PrimaryKeys");
+			var primaryKeys = await Connection.GetSchemaAsync("PrimaryKeys");
 
 			primaryKeys = Connection.GetSchema("PrimaryKeys", new string[] { null, null, "TEST" });
 
@@ -135,9 +130,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ProcedureParameters()
+		public async Task ProcedureParameters()
 		{
-			var procedureParameters = Connection.GetSchema("ProcedureParameters");
+			var procedureParameters = await Connection.GetSchemaAsync("ProcedureParameters");
 
 			procedureParameters = Connection.GetSchema("ProcedureParameters", new string[] { null, null, "SELECT_DATA" });
 
@@ -145,15 +140,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ProcedurePrivileges()
+		public async Task ProcedurePrivileges()
 		{
-			Connection.GetSchema("ProcedurePrivileges");
+			await Connection.GetSchemaAsync("ProcedurePrivileges");
 		}
 
 		[Test]
-		public void Procedures()
+		public async Task Procedures()
 		{
-			var procedures = Connection.GetSchema("Procedures");
+			var procedures = await Connection.GetSchemaAsync("Procedures");
 
 			procedures = Connection.GetSchema("Procedures", new string[] { null, null, "SELECT_DATA" });
 
@@ -161,9 +156,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void Procedures_ShouldSkipSchemaAndProperlyUseParametersForProcedureName()
+		public async Task Procedures_ShouldSkipSchemaAndProperlyUseParametersForProcedureName()
 		{
-			var procedures = Connection.GetSchema("Procedures");
+			var procedures = await Connection.GetSchemaAsync("Procedures");
 
 			procedures = Connection.GetSchema("Procedures", new string[] { null, "DUMMY_SCHEMA", "SELECT_DATA" });
 
@@ -171,73 +166,71 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void DataTypes()
+		public async Task DataTypes()
 		{
-			Connection.GetSchema("DataTypes");
+			await Connection.GetSchemaAsync("DataTypes");
 		}
 
 		[Test]
-		public void Roles()
+		public async Task Roles()
 		{
-			Connection.GetSchema("Roles");
+			await Connection.GetSchemaAsync("Roles");
 		}
 
 		[Test]
-		public void Tables()
+		public async Task Tables()
 		{
-			var tables = Connection.GetSchema("Tables");
+			var tables = await Connection.GetSchemaAsync("Tables");
 
-			tables = Connection.GetSchema("Tables", new string[] { null, null, "TEST" });
+			tables = await Connection.GetSchemaAsync("Tables", new string[] { null, null, "TEST" });
 
 			Assert.AreEqual(1, tables.Rows.Count);
 
-			tables = Connection.GetSchema("Tables", new string[] { null, null, null, "TABLE" });
+			tables = await Connection.GetSchemaAsync("Tables", new string[] { null, null, null, "TABLE" });
 
 			Assert.AreEqual(3, tables.Rows.Count);
 		}
 
 		[Test]
-		public void TableConstraints()
+		public async Task TableConstraints()
 		{
-			Connection.GetSchema("TableConstraints");
+			await Connection.GetSchemaAsync("TableConstraints");
 		}
 
 		[Test]
-		public void TablePrivileges()
+		public async Task TablePrivileges()
 		{
-			Connection.GetSchema("TablePrivileges");
+			await Connection.GetSchemaAsync("TablePrivileges");
 		}
 
 		[Test]
-		public void Triggers()
+		public async Task Triggers()
 		{
-			Connection.GetSchema("Triggers");
+			await Connection.GetSchemaAsync("Triggers");
 		}
 
 		[Test]
-		public void UniqueKeys()
+		public async Task UniqueKeys()
 		{
-			Connection.GetSchema("UniqueKeys");
+			await Connection.GetSchemaAsync("UniqueKeys");
 		}
 
 		[Test]
-		public void ViewColumns()
+		public async Task ViewColumns()
 		{
-			Connection.GetSchema("ViewColumns");
+			await Connection.GetSchemaAsync("ViewColumns");
 		}
 
 		[Test]
-		public void Views()
+		public async Task Views()
 		{
-			Connection.GetSchema("Views");
+			await Connection.GetSchemaAsync("Views");
 		}
 
 		[Test]
-		public void ViewPrivileges()
+		public async Task ViewPrivileges()
 		{
-			Connection.GetSchema("ViewPrivileges");
+			await Connection.GetSchemaAsync("ViewPrivileges");
 		}
-
-		#endregion
 	}
 }

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -29,100 +30,84 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class FbConnectionTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbConnectionTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
+		[Test]
+		public Task BeginTransactionILUnspecifiedTest() => BeginTransactionILTestsHelper(IsolationLevel.Unspecified);
 
 		[Test]
-		public void BeginTransactionILUnspecifiedTest()
-		{
-			BeginTransactionILTestsHelper(IsolationLevel.Unspecified);
-		}
+		public Task BeginTransactionILReadCommittedTest() => BeginTransactionILTestsHelper(IsolationLevel.ReadCommitted);
 
 		[Test]
-		public void BeginTransactionILReadCommittedTest()
-		{
-			BeginTransactionILTestsHelper(IsolationLevel.ReadCommitted);
-		}
+		public Task BeginTransactionILReadUncommittedTest() => BeginTransactionILTestsHelper(IsolationLevel.ReadUncommitted);
 
 		[Test]
-		public void BeginTransactionILReadUncommittedTest()
-		{
-			BeginTransactionILTestsHelper(IsolationLevel.ReadUncommitted);
-		}
+		public Task BeginTransactionILRepeatableReadTest() => BeginTransactionILTestsHelper(IsolationLevel.RepeatableRead);
 
 		[Test]
-		public void BeginTransactionILRepeatableReadTest()
-		{
-			BeginTransactionILTestsHelper(IsolationLevel.RepeatableRead);
-		}
+		public Task BeginTransactionILSerializableTest() => BeginTransactionILTestsHelper(IsolationLevel.Serializable);
 
 		[Test]
-		public void BeginTransactionILSerializableTest()
+		public async Task BeginTransactionNoWaitTimeoutTest()
 		{
-			BeginTransactionILTestsHelper(IsolationLevel.Serializable);
-		}
-
-		[Test]
-		public void BeginTransactionNoWaitTimeoutTest()
-		{
-			using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
+			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
 			{
-				conn.Open();
-				var tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = null });
-				Assert.NotNull(tx);
-				tx.Rollback();
+				await conn.OpenAsync();
+				await using (var tx = await conn.BeginTransactionAsync(new FbTransactionOptions() { WaitTimeout = null }))
+				{
+					Assert.NotNull(tx);
+					await tx.RollbackAsync();
+				}
 			}
 		}
 
 		[Test]
-		public void BeginTransactionWithWaitTimeoutTest()
+		public async Task BeginTransactionWithWaitTimeoutTest()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
+			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
 			{
-				conn.Open();
-				var tx = conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromSeconds(10) });
-				Assert.NotNull(tx);
-				tx.Rollback();
+				await conn.OpenAsync();
+				await using (var tx = await conn.BeginTransactionAsync(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromSeconds(10) }))
+				{
+					Assert.NotNull(tx);
+					await tx.RollbackAsync();
+				}
 			}
 		}
 
 		[Test]
-		public void BeginTransactionWithWaitTimeoutInvalidValue1Test()
+		public async Task BeginTransactionWithWaitTimeoutInvalidValue1Test()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
+			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
 			{
-				conn.Open();
-				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromDays(9999) }));
+				await conn.OpenAsync();
+				Assert.ThrowsAsync<ArgumentException>(() => conn.BeginTransactionAsync(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromDays(9999) }));
 			}
 		}
 
 		[Test]
-		public void BeginTransactionWithWaitTimeoutInvalidValue2Test()
+		public async Task BeginTransactionWithWaitTimeoutInvalidValue2Test()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
+			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
 			{
-				conn.Open();
-				Assert.Throws<ArgumentException>(() => conn.BeginTransaction(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromMilliseconds(1) }));
+				await conn.OpenAsync();
+				Assert.ThrowsAsync<ArgumentException>(() => conn.BeginTransactionAsync(new FbTransactionOptions() { WaitTimeout = TimeSpan.FromMilliseconds(1) }));
 			}
 		}
 
 		[Test]
-		public void CreateCommandTest()
+		public async Task CreateCommandTest()
 		{
-			var command = Connection.CreateCommand();
-
-			Assert.AreEqual(command.Connection, Connection);
+			await using (var command = Connection.CreateCommand())
+			{
+				Assert.AreEqual(command.Connection, Connection);
+			}
 		}
 
 		[Test]
-		public void ConnectionPoolingOnTest()
+		public async Task ConnectionPoolingOnTest()
 		{
 			FbConnection.ClearAllPools();
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
@@ -130,23 +115,23 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			csb.ConnectionLifeTime = 5;
 			var cs = csb.ToString();
 
-			var active = GetActiveConnections();
+			var active = await GetActiveConnections();
 
-			using (FbConnection
+			await using (FbConnection
 				myConnection1 = new FbConnection(cs),
 				myConnection2 = new FbConnection(cs))
 			{
-				myConnection1.Open();
-				myConnection2.Open();
+				await myConnection1.OpenAsync();
+				await myConnection2.OpenAsync();
 
-				Assert.AreEqual(active + 2, GetActiveConnections());
+				Assert.AreEqual(active + 2, await GetActiveConnections());
 			}
 
-			Assert.AreEqual(active + 2, GetActiveConnections());
+			Assert.AreEqual(active + 2, await GetActiveConnections());
 		}
 
 		[Test]
-		public void ConnectionPoolingOffTest()
+		public async Task ConnectionPoolingOffTest()
 		{
 			FbConnection.ClearAllPools();
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
@@ -154,23 +139,23 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			csb.ConnectionLifeTime = 5;
 			var cs = csb.ToString();
 
-			var active = GetActiveConnections();
+			var active = await GetActiveConnections();
 
-			using (FbConnection
+			await using (FbConnection
 				myConnection1 = new FbConnection(cs),
 				myConnection2 = new FbConnection(cs))
 			{
-				myConnection1.Open();
-				myConnection2.Open();
+				await myConnection1.OpenAsync();
+				await myConnection2.OpenAsync();
 
-				Assert.AreEqual(active + 2, GetActiveConnections());
+				Assert.AreEqual(active + 2, await GetActiveConnections());
 			}
 
-			Assert.AreEqual(active, GetActiveConnections());
+			Assert.AreEqual(active, await GetActiveConnections());
 		}
 
 		[Test]
-		public void ConnectionPoolingLifetimeTest()
+		public async Task ConnectionPoolingLifetimeTest()
 		{
 			FbConnection.ClearAllPools();
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
@@ -178,24 +163,24 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			csb.ConnectionLifeTime = 5;
 			var cs = csb.ToString();
 
-			var active = GetActiveConnections();
+			var active = await GetActiveConnections();
 
-			using (FbConnection
+			await using (FbConnection
 				myConnection1 = new FbConnection(cs),
 				myConnection2 = new FbConnection(cs))
 			{
-				myConnection1.Open();
-				myConnection2.Open();
+				await myConnection1.OpenAsync();
+				await myConnection2.OpenAsync();
 
-				Assert.AreEqual(active + 2, GetActiveConnections());
+				Assert.AreEqual(active + 2, await GetActiveConnections());
 			}
 
 			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
-			Assert.AreEqual(active, GetActiveConnections());
+			Assert.AreEqual(active, await GetActiveConnections());
 		}
 
 		[Test]
-		public void ConnectionPoolingMaxPoolSizeTest()
+		public async Task ConnectionPoolingMaxPoolSizeTest()
 		{
 			FbConnection.ClearAllPools();
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
@@ -213,22 +198,23 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					connections.Add(connection);
 					if (i == csb.MaxPoolSize)
 					{
-						Assert.Throws<InvalidOperationException>(() => connection.Open());
+						Assert.ThrowsAsync<InvalidOperationException>(() => connection.OpenAsync());
 					}
 					else
 					{
-						Assert.DoesNotThrow(() => connection.Open());
+						Assert.DoesNotThrowAsync(() => connection.OpenAsync());
 					}
 				}
 			}
 			finally
 			{
-				connections.ForEach(x => x.Dispose());
+				foreach (var c in connections)
+					await c.DisposeAsync();
 			}
 		}
 
 		[Test]
-		public void ConnectionPoolingMinPoolSizeTest()
+		public async Task ConnectionPoolingMinPoolSizeTest()
 		{
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Pooling = true;
@@ -236,7 +222,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			csb.MinPoolSize = 3;
 			var cs = csb.ToString();
 
-			var active = GetActiveConnections();
+			var active = await GetActiveConnections();
 
 			var connections = new List<FbConnection>();
 			try
@@ -245,20 +231,21 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					var connection = new FbConnection(cs);
 					connections.Add(connection);
-					Assert.DoesNotThrow(() => connection.Open());
+					Assert.DoesNotThrowAsync(() => connection.OpenAsync());
 				}
 			}
 			finally
 			{
-				connections.ForEach(x => x.Dispose());
+				foreach (var c in connections)
+					await c.DisposeAsync();
 			}
 
 			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
-			Assert.AreEqual(active + csb.MinPoolSize, GetActiveConnections());
+			Assert.AreEqual(active + csb.MinPoolSize, await GetActiveConnections());
 		}
 
 		[Test]
-		public void ConnectionPoolingFailedNewConnectionIsNotBlockingPool()
+		public async Task ConnectionPoolingFailedNewConnectionIsNotBlockingPool()
 		{
 			const int Size = 2;
 
@@ -272,11 +259,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var retries = 0;
 			while (true)
 			{
-				using (var connection = new FbConnection(cs))
+				await using (var connection = new FbConnection(cs))
 				{
 					try
 					{
-						connection.Open();
+						await connection.OpenAsync();
 					}
 					catch (FbException)
 					{
@@ -305,7 +292,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void DatabaseTriggersTest()
+		public async Task DatabaseTriggersTest()
 		{
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Pooling = false;
@@ -313,37 +300,37 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			int rows;
 
 			csb.NoDatabaseTriggers = false;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				conn.Open();
-				rows = GetLogRowsCount(conn);
+				await conn.OpenAsync();
+				rows = await GetLogRowsCount(conn);
 			}
 
 			csb.NoDatabaseTriggers = true;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				conn.Open();
-				Assert.AreEqual(rows, GetLogRowsCount(conn));
+				await conn.OpenAsync();
+				Assert.AreEqual(rows, await GetLogRowsCount(conn));
 			}
 
 			csb.NoDatabaseTriggers = false;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				conn.Open();
-				Assert.AreEqual(rows + 1, GetLogRowsCount(conn));
+				await conn.OpenAsync();
+				Assert.AreEqual(rows + 1, await GetLogRowsCount(conn));
 			}
 		}
 
 		[Test]
-		public void UserIDCorrectlyPassedToServer()
+		public async Task UserIDCorrectlyPassedToServer()
 		{
-			using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
+			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
 			{
-				conn.Open();
-				using (var command = conn.CreateCommand())
+				await conn.OpenAsync();
+				await using (var command = conn.CreateCommand())
 				{
 					command.CommandText = "select CURRENT_USER from RDB$DATABASE";
-					var loggedUser = (string)command.ExecuteScalar();
+					var loggedUser = (string)await command.ExecuteScalarAsync();
 					Assert.AreEqual(FbTestsSetup.UserID, loggedUser);
 				}
 			}
@@ -351,7 +338,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void UseTrustedAuth()
+		public async Task UseTrustedAuth()
 		{
 			if (!EnsureWireCrypt(FbWireCrypt.Disabled))
 				return;
@@ -361,26 +348,26 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.UserID = string.Empty;
 			csb.Password = string.Empty;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				Assert.DoesNotThrow(conn.Open);
+				Assert.DoesNotThrowAsync(conn.OpenAsync);
 			}
 		}
 
 		[Test]
-		public void CreateDropDatabaseUsingTrustedAuth()
+		public async Task CreateDropDatabaseUsingTrustedAuth()
 		{
 			if (!EnsureWireCrypt(FbWireCrypt.Disabled))
 				return;
 			if (!EnsureServerType(FbServerType.Default))
 				return;
 
-			if (GetServerVersion() >= new Version(3, 0, 0, 0))
+			if (await GetServerVersion() >= new Version(3, 0, 0, 0))
 			{
-				using (var cmd = Connection.CreateCommand())
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "create or alter global mapping admin_trusted_auth using plugin win_sspi from any user to role rdb$admin";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
 			}
 			try
@@ -388,19 +375,19 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 				csb.UserID = string.Empty;
 				csb.Password = string.Empty;
-				csb.Database = $"{Guid.NewGuid().ToString()}.fdb";
+				csb.Database = $"{Guid.NewGuid()}.fdb";
 				var cs = csb.ToString();
-				Assert.DoesNotThrow(() => FbConnection.CreateDatabase(cs, overwrite: true));
-				Assert.DoesNotThrow(() => FbConnection.DropDatabase(cs));
+				Assert.DoesNotThrowAsync(() => FbConnection.CreateDatabaseAsync(cs, overwrite: true));
+				Assert.DoesNotThrowAsync(() => FbConnection.DropDatabaseAsync(cs));
 			}
 			finally
 			{
-				if (GetServerVersion() >= new Version(3, 0, 0, 0))
+				if (await GetServerVersion() >= new Version(3, 0, 0, 0))
 				{
-					using (var cmd = Connection.CreateCommand())
+					await using (var cmd = Connection.CreateCommand())
 					{
 						cmd.CommandText = "drop global mapping admin_trusted_auth";
-						cmd.ExecuteNonQuery();
+						await cmd.ExecuteNonQueryAsync();
 					}
 				}
 			}
@@ -408,18 +395,18 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 		[TestCase(false)]
 		[TestCase(true)]
-		public void UseCompression(bool compression)
+		public async Task UseCompression(bool compression)
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 			if (!EnsureServerType(FbServerType.Default))
 				return;
 
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Compression = compression;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				conn.Open();
+				await conn.OpenAsync();
 				const string Pattern = ":[^:]*Z[^:]*$";
 				if (compression)
 				{
@@ -435,18 +422,18 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[TestCase(FbWireCrypt.Disabled)]
 		[TestCase(FbWireCrypt.Enabled)]
 		[TestCase(FbWireCrypt.Required)]
-		public void UseWireCrypt(FbWireCrypt wireCrypt)
+		public async Task UseWireCrypt(FbWireCrypt wireCrypt)
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 			if (!EnsureServerType(FbServerType.Default))
 				return;
 
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.WireCrypt = wireCrypt;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				conn.Open();
+				await conn.OpenAsync();
 				const string Pattern = ":[^:]*C[^:]*$";
 				if (wireCrypt == FbWireCrypt.Enabled || wireCrypt == FbWireCrypt.Required)
 				{
@@ -464,38 +451,38 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Database = "enc.fdb";
-			void Test()
+			async Task Test()
 			{
-				using (var conn = new FbConnection(csb.ToString()))
+				await using (var conn = new FbConnection(csb.ToString()))
 				{
-					conn.Open();
+					await conn.OpenAsync();
 				}
 			}
-			Assert.Throws<FbException>(Test);
+			Assert.ThrowsAsync<FbException>(Test);
 			csb.CryptKey = Encoding.ASCII.GetBytes("1234567890123456");
-			Assert.DoesNotThrow(Test);
+			Assert.DoesNotThrowAsync(Test);
 		}
 
 		[Test, Explicit]
-		public void DoNotGoBackToPoolAfterBroken()
+		public async Task DoNotGoBackToPoolAfterBroken()
 		{
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Pooling = true;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				conn.Open();
+				await conn.OpenAsync();
 			}
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				conn.Open();
+				await conn.OpenAsync();
 				try
 				{
-					using (var cmd = conn.CreateCommand())
+					await using (var cmd = conn.CreateCommand())
 					{
 						cmd.CommandText = "select * from mon$statements union all select * from mon$statements";
-						using (var reader = cmd.ExecuteReader())
+						await using (var reader = await cmd.ExecuteReaderAsync())
 						{
-							while (reader.Read())
+							while (await reader.ReadAsync())
 							{ }
 						}
 					}
@@ -506,19 +493,19 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void CaseSensitiveLogin()
+		public async Task CaseSensitiveLogin()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			var connectionString = BuildConnectionString(ServerType, Compression, WireCrypt);
-			using (var conn = new FbConnection(connectionString))
+			await using (var conn = new FbConnection(connectionString))
 			{
-				conn.Open();
-				using (var cmd = conn.CreateCommand())
+				await conn.OpenAsync();
+				await using (var cmd = conn.CreateCommand())
 				{
 					cmd.CommandText = "create or alter user \"CaseSensitive\" password 'password' using plugin Srp";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
 
 				var csBuilder = new FbConnectionStringBuilder(connectionString)
@@ -529,35 +516,35 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				};
 				try
 				{
-					using (var conn2 = new FbConnection(csBuilder.ToString()))
+					await using (var conn2 = new FbConnection(csBuilder.ToString()))
 					{
-						conn2.Open();
+						await conn2.OpenAsync();
 					}
 				}
 				finally
 				{
-					using (var cmd = conn.CreateCommand())
+					await using (var cmd = conn.CreateCommand())
 					{
 						cmd.CommandText = "drop user \"CaseSensitive\" using plugin Srp";
-						cmd.ExecuteNonQuery();
+						await cmd.ExecuteNonQueryAsync();
 					}
 				}
 			}
 		}
 
 		[Test]
-		public void InvalidCredentialsGiveProperError()
+		public async Task InvalidCredentialsGiveProperError()
 		{
 			if (!EnsureServerType(FbServerType.Default))
 				return;
 
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Password = string.Empty;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
 				try
 				{
-					conn.Open();
+					await conn.OpenAsync();
 					Assert.Fail();
 				}
 				catch (FbException ex) when (ex.ErrorCode == 335544472)
@@ -568,42 +555,26 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
-		#endregion
-
-		#region Methods
-
-		public FbTransaction BeginTransaction(IsolationLevel level)
+		private async Task BeginTransactionILTestsHelper(IsolationLevel level)
 		{
-			switch (level)
+			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
 			{
-				case IsolationLevel.Unspecified:
-					return Connection.BeginTransaction();
-
-				default:
-					return Connection.BeginTransaction(level);
+				await conn.OpenAsync();
+				await using (var tx = await conn.BeginTransactionAsync(level))
+				{
+					Assert.NotNull(tx);
+					await tx.RollbackAsync();
+				}
 			}
 		}
 
-		private void BeginTransactionILTestsHelper(IsolationLevel level)
+		private static async Task<int> GetLogRowsCount(FbConnection conn)
 		{
-			using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
-			{
-				conn.Open();
-				var tx = conn.BeginTransaction(level);
-				Assert.NotNull(tx);
-				tx.Rollback();
-			}
-		}
-
-		private int GetLogRowsCount(FbConnection conn)
-		{
-			using (var cmd = conn.CreateCommand())
+			await using (var cmd = conn.CreateCommand())
 			{
 				cmd.CommandText = "select count(*) from log where text = 'on connect'";
-				return Convert.ToInt32(cmd.ExecuteScalar());
+				return Convert.ToInt32(await cmd.ExecuteScalarAsync());
 			}
 		}
-
-		#endregion
 	}
 }

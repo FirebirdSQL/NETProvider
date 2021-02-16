@@ -564,7 +564,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		public string GetCommandExplainedPlan() => GetCommandExplainedPlanImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
-		public Task<string> GetCommanExplaineddPlanAsync(CancellationToken cancellationToken = default) => GetCommandExplainedPlanImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
+		public Task<string> GetCommandExplainedPlanAsync(CancellationToken cancellationToken = default) => GetCommandExplainedPlanImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task<string> GetCommandExplainedPlanImpl(AsyncWrappingCommonArgs async)
 		{
 			if (_statement == null)

@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -25,35 +26,30 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class GuidTests : FbTestsBase
 	{
-		#region Constructors
-
 		public GuidTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void InsertGuidTest()
+		public async Task InsertGuidTest()
 		{
 			var newGuid = Guid.Empty;
 			var guidValue = Guid.NewGuid();
 
-			// Insert the Guid
-			var insert = new FbCommand("INSERT INTO GUID_TEST (GUID_FIELD) VALUES (@GuidValue)", Connection);
-			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = guidValue;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			// Select the value
-			using (var select = new FbCommand("SELECT * FROM GUID_TEST", Connection))
-			using (var r = select.ExecuteReader())
+			await using (var insert = new FbCommand("INSERT INTO GUID_TEST (GUID_FIELD) VALUES (@GuidValue)", Connection))
 			{
-				if (r.Read())
+				insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = guidValue;
+				await insert.ExecuteNonQueryAsync();
+			}
+
+			await using (var select = new FbCommand("SELECT * FROM GUID_TEST", Connection))
+			{
+				await using (var r = await select.ExecuteReaderAsync())
 				{
-					newGuid = r.GetGuid(1);
+					if (await r.ReadAsync())
+					{
+						newGuid = r.GetGuid(1);
+					}
 				}
 			}
 
@@ -61,25 +57,25 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void InsertNullGuidTest()
+		public async Task InsertNullGuidTest()
 		{
-			// Insert the Guid
 			var id = GetId();
-			var insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection);
-			insert.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
-			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = DBNull.Value;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
 
-			// Select the value
-			using (var select = new FbCommand("SELECT * FROM GUID_TEST WHERE INT_FIELD = @IntField", Connection))
+			await using (var insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection))
+			{
+				insert.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
+				insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = DBNull.Value;
+				await insert.ExecuteNonQueryAsync();
+			}
+
+			await using (var select = new FbCommand("SELECT * FROM GUID_TEST WHERE INT_FIELD = @IntField", Connection))
 			{
 				select.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
-				using (var r = select.ExecuteReader())
+				await using (var r = await select.ExecuteReaderAsync())
 				{
-					if (r.Read())
+					if (await r.ReadAsync())
 					{
-						if (!r.IsDBNull(1))
+						if (!await r.IsDBNullAsync(1))
 						{
 							Assert.Fail();
 						}
@@ -87,7 +83,5 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				}
 			}
 		}
-
-		#endregion
 	}
 }

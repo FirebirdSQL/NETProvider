@@ -18,6 +18,7 @@
 using System;
 using System.Globalization;
 using System.Numerics;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -32,11 +33,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{ }
 
 		[SetUp]
-		public override void SetUp()
+		public override async Task SetUp()
 		{
-			base.SetUp();
+			await base.SetUp();
 
-			if (!EnsureVersion(new Version(4, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(4, 0, 0, 0)))
 				return;
 		}
 
@@ -52,61 +53,61 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		};
 
 		[TestCaseSource(nameof(TestValues))]
-		public void ReadsValueCorrectly(BigInteger value)
+		public async Task ReadsValueCorrectly(BigInteger value)
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				var svalue = value.ToString(CultureInfo.InvariantCulture);
 				cmd.CommandText = $"select cast({svalue} as int128) from rdb$database";
-				var result = (BigInteger)cmd.ExecuteScalar();
+				var result = (BigInteger)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result);
 			}
 		}
 
 		[TestCaseSource(nameof(TestValues))]
-		public void PassesValueCorrectly(BigInteger value)
+		public async Task PassesValueCorrectly(BigInteger value)
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as int128) from rdb$database";
 				cmd.Parameters.AddWithValue("value", value);
-				var result = (BigInteger)cmd.ExecuteScalar();
+				var result = (BigInteger)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result);
 			}
 		}
 
 		[Test]
-		public void ReadsValueNullCorrectly()
+		public async Task ReadsValueNullCorrectly()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(null as int128) from rdb$database";
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[Test]
-		public void PassesValueNullCorrectly()
+		public async Task PassesValueNullCorrectly()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as int128) from rdb$database";
 				cmd.Parameters.AddWithValue("value", DBNull.Value);
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[Test]
-		public void SimpleSelectSchemaTableTest()
+		public async Task SimpleSelectSchemaTableTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(null as int128) from rdb$database";
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					var schema = reader.GetSchemaTable();
+					var schema = await reader.GetSchemaTableAsync();
 					Assert.AreEqual(typeof(BigInteger), schema.Rows[0].ItemArray[5]);
 				}
 			}

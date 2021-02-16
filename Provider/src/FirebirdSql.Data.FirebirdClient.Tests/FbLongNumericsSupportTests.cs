@@ -17,6 +17,7 @@
 
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -31,11 +32,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{ }
 
 		[SetUp]
-		public override void SetUp()
+		public override async Task SetUp()
 		{
-			base.SetUp();
+			await base.SetUp();
 
-			if (!EnsureVersion(new Version(4, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(4, 0, 0, 0)))
 				return;
 		}
 
@@ -46,61 +47,61 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		};
 
 		[TestCaseSource(nameof(TestValues))]
-		public void ReadsValueCorrectly(decimal value, int scale)
+		public async Task ReadsValueCorrectly(decimal value, int scale)
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				var svalue = value.ToString(CultureInfo.InvariantCulture);
 				cmd.CommandText = $"select cast({svalue} as decimal(20, {scale})) from rdb$database";
-				var result = (decimal)cmd.ExecuteScalar();
+				var result = (decimal)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result);
 			}
 		}
 
 		[TestCaseSource(nameof(TestValues))]
-		public void PassesValueCorrectly(decimal value, int scale)
+		public async Task PassesValueCorrectly(decimal value, int scale)
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = $"select cast(@value as decimal(20, {scale})) from rdb$database";
 				cmd.Parameters.AddWithValue("value", value);
-				var result = (decimal)cmd.ExecuteScalar();
+				var result = (decimal)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result);
 			}
 		}
 
 		[Test]
-		public void ReadsValueNullCorrectly()
+		public async Task ReadsValueNullCorrectly()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(null as decimal(20, 6)) from rdb$database";
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[Test]
-		public void PassesValueNullCorrectly()
+		public async Task PassesValueNullCorrectly()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as decimal(20, 6)) from rdb$database";
 				cmd.Parameters.AddWithValue("value", DBNull.Value);
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[Test]
-		public void SimpleSelectSchemaTableTest()
+		public async Task SimpleSelectSchemaTableTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(null as decimal(20, 6)) from rdb$database";
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					var schema = reader.GetSchemaTable();
+					var schema = await reader.GetSchemaTableAsync();
 					Assert.AreEqual(typeof(decimal), schema.Rows[0].ItemArray[5]);
 				}
 			}

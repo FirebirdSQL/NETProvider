@@ -17,6 +17,8 @@
 
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -26,27 +28,21 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class FbDatabaseInfoTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbDatabaseInfoTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
-
-		#endregion
-
-		#region Unit Tests
 
 		[Test]
 		public void DatabaseInfoTest()
 		{
 			var dbInfo = new FbDatabaseInfo(Connection);
-
-			foreach (var p in dbInfo.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly).Where(x => !x.IsSpecialName))
+			foreach (var m in dbInfo.GetType()
+				.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+				.Where(x => !x.IsSpecialName)
+				.Where(x => x.Name.EndsWith("Async")))
 			{
-				Assert.DoesNotThrow(() => p.GetValue(dbInfo), p.Name);
+				Assert.DoesNotThrowAsync(() => (Task)m.Invoke(dbInfo, new object[] { CancellationToken.None }), m.Name);
 			}
 		}
-
-		#endregion
 	}
 }

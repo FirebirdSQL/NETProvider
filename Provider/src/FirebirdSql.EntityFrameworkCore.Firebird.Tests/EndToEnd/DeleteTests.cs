@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
@@ -46,23 +47,23 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 			public string Name { get; set; }
 		}
 		[Test]
-		public void Delete()
+		public async Task Delete()
 		{
-			using (var db = GetDbContext<DeleteContext>())
+			await using (var db = await GetDbContext<DeleteContext>())
 			{
-				db.Database.ExecuteSqlRaw("create table test_delete (id int primary key, name varchar(20))");
-				db.Database.ExecuteSqlRaw("insert into test_delete values (65, 'test')");
-				db.Database.ExecuteSqlRaw("insert into test_delete values (66, 'test')");
-				db.Database.ExecuteSqlRaw("insert into test_delete values (67, 'test')");
+				await db.Database.ExecuteSqlRawAsync("create table test_delete (id int primary key, name varchar(20))");
+				await db.Database.ExecuteSqlRawAsync("insert into test_delete values (65, 'test')");
+				await db.Database.ExecuteSqlRawAsync("insert into test_delete values (66, 'test')");
+				await db.Database.ExecuteSqlRawAsync("insert into test_delete values (67, 'test')");
 				var entity = new DeleteEntity() { Id = 66 };
 				var entry = db.Attach(entity);
 				entry.State = EntityState.Deleted;
-				db.SaveChanges();
-				var values = db.Set<DeleteEntity>()
+				await db.SaveChangesAsync();
+				var values = await db.Set<DeleteEntity>()
 					 .FromSqlRaw("select * from test_delete")
 					 .AsNoTracking()
 					 .OrderBy(x => x.Id)
-					 .ToList();
+					 .ToListAsync();
 				Assert.AreEqual(2, values.Count());
 				Assert.AreEqual(65, values[0].Id);
 				Assert.AreEqual(67, values[1].Id);
@@ -95,18 +96,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 			public DateTime Stamp { get; set; }
 		}
 		[Test]
-		public void ConcurrencyDelete()
+		public async Task ConcurrencyDelete()
 		{
-			using (var db = GetDbContext<ConcurrencyDeleteContext>())
+			await using (var db = await GetDbContext<ConcurrencyDeleteContext>())
 			{
-				db.Database.ExecuteSqlRaw("create table test_delete_concurrency (id int primary key, name varchar(20), stamp timestamp)");
-				db.Database.ExecuteSqlRaw("insert into test_delete_concurrency values (65, 'test', current_timestamp)");
-				db.Database.ExecuteSqlRaw("insert into test_delete_concurrency values (66, 'test', current_timestamp)");
-				db.Database.ExecuteSqlRaw("insert into test_delete_concurrency values (67, 'test', current_timestamp)");
+				await db.Database.ExecuteSqlRawAsync("create table test_delete_concurrency (id int primary key, name varchar(20), stamp timestamp)");
+				await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (65, 'test', current_timestamp)");
+				await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (66, 'test', current_timestamp)");
+				await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (67, 'test', current_timestamp)");
 				var entity = new ConcurrencyDeleteEntity() { Id = 66, Stamp = new DateTime(1970, 1, 1) };
 				var entry = db.Attach(entity);
 				entry.State = EntityState.Deleted;
-				Assert.Throws<DbUpdateConcurrencyException>(() => db.SaveChanges());
+				Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => db.SaveChangesAsync());
 			}
 		}
 	}

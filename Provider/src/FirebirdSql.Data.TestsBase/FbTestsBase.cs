@@ -18,6 +18,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Services;
 using NUnit.Framework;
@@ -68,27 +69,27 @@ namespace FirebirdSql.Data.TestsBase
 		#region	SetUp and TearDown Methods
 
 		[SetUp]
-		public virtual void SetUp()
+		public virtual async Task SetUp()
 		{
-			FbTestsSetup.SetUp(ServerType, Compression, WireCrypt);
+			await FbTestsSetup.SetUp(ServerType, Compression, WireCrypt);
 
 			var cs = BuildConnectionString(ServerType, Compression, WireCrypt);
 			if (_insertTestData)
 			{
-				InsertTestData(cs);
+				await InsertTestData(cs);
 			}
 			_connection = new FbConnection(cs);
-			_connection.Open();
+			await _connection.OpenAsync();
 		}
 
 		[TearDown]
-		public virtual void TearDown()
+		public virtual async Task TearDown()
 		{
 			var cs = BuildConnectionString(ServerType, Compression, WireCrypt);
 			_connection.Dispose();
 			if (_insertTestData)
 			{
-				DeleteAllData(cs);
+				await DeleteAllData(cs);
 			}
 			FbConnection.ClearAllPools();
 		}
@@ -97,19 +98,19 @@ namespace FirebirdSql.Data.TestsBase
 
 		#region	Database Creation Methods
 
-		private static void InsertTestData(string connectionString)
+		private static async Task InsertTestData(string connectionString)
 		{
-			using (var connection = new FbConnection(connectionString))
+			await using (var connection = new FbConnection(connectionString))
 			{
-				connection.Open();
+				await connection.OpenAsync();
 
 				var commandText = @"
 insert into test (int_field, char_field, varchar_field, bigint_field, smallint_field, float_field, double_field, numeric_field, date_field, time_field, timestamp_field, clob_field, blob_field)
 values(@int_field, @char_field, @varchar_field, @bigint_field, @smallint_field, @float_field, @double_field, @numeric_field, @date_field, @time_field, @timestamp_field, @clob_field, @blob_field)";
 
-				using (var transaction = connection.BeginTransaction())
+				await using (var transaction = await connection.BeginTransactionAsync())
 				{
-					using (var command = new FbCommand(commandText, connection, transaction))
+					await using (var command = new FbCommand(commandText, connection, transaction))
 					{
 						command.Parameters.Add("@int_field", FbDbType.Integer);
 						command.Parameters.Add("@char_field", FbDbType.Char);
@@ -125,7 +126,7 @@ values(@int_field, @char_field, @varchar_field, @bigint_field, @smallint_field, 
 						command.Parameters.Add("@clob_field", FbDbType.Text);
 						command.Parameters.Add("@blob_field", FbDbType.Binary);
 
-						command.Prepare();
+						await command.PrepareAsync();
 
 						for (var i = 0; i < 100; i++)
 						{
@@ -143,20 +144,20 @@ values(@int_field, @char_field, @varchar_field, @bigint_field, @smallint_field, 
 							command.Parameters["@clob_field"].Value = "IRow Number " + i.ToString();
 							command.Parameters["@blob_field"].Value = Encoding.UTF8.GetBytes("IRow Number " + i.ToString());
 
-							command.ExecuteNonQuery();
+							await command.ExecuteNonQueryAsync();
 						}
 
-						transaction.Commit();
+						await transaction.CommitAsync();
 					}
 				}
 			}
 		}
 
-		private static void DeleteAllData(string connectionString)
+		private static async Task DeleteAllData(string connectionString)
 		{
-			using (var connection = new FbConnection(connectionString))
+			await using (var connection = new FbConnection(connectionString))
 			{
-				connection.Open();
+				await connection.OpenAsync();
 
 				var commandText = @"
 execute block as
@@ -168,13 +169,13 @@ begin
     end
 end";
 
-				using (var transaction = connection.BeginTransaction())
+				await using (var transaction = await connection.BeginTransactionAsync())
 				{
-					using (var command = new FbCommand(commandText, connection, transaction))
+					await using (var command = new FbCommand(commandText, connection, transaction))
 					{
-						command.ExecuteNonQuery();
+						await command.ExecuteNonQueryAsync();
 					}
-					transaction.Commit();
+					await transaction.CommitAsync();
 				}
 			}
 		}
@@ -227,31 +228,31 @@ end";
 
 		#region	Methods
 
-		protected int GetActiveConnections()
+		protected async Task<int> GetActiveConnections()
 		{
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.Pooling = false;
-			using (var conn = new FbConnection(csb.ToString()))
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
-				conn.Open();
-				using (var cmd = conn.CreateCommand())
+				await conn.OpenAsync();
+				await using (var cmd = conn.CreateCommand())
 				{
 					cmd.CommandText = "select count(*) from mon$attachments where mon$attachment_id <> current_connection";
-					return Convert.ToInt32(cmd.ExecuteScalar());
+					return Convert.ToInt32(await cmd.ExecuteScalarAsync());
 				}
 			}
 		}
 
-		protected Version GetServerVersion()
+		protected async Task<Version> GetServerVersion()
 		{
 			var server = new FbServerProperties();
 			server.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
-			return FbServerProperties.ParseServerVersion(server.GetServerVersion());
+			return FbServerProperties.ParseServerVersion(await server.GetServerVersionAsync());
 		}
 
-		protected bool EnsureVersion(Version version)
+		protected async Task<bool> EnsureVersion(Version version)
 		{
-			if (GetServerVersion() >= version)
+			if (await GetServerVersion() >= version)
 				return true;
 			Assert.Inconclusive("Not supported on this version.");
 			return false;

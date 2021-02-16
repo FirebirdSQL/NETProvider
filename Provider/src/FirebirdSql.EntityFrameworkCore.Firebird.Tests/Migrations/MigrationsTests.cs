@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -31,7 +32,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 	public class MigrationsTests : EntityFrameworkCoreTestsBase
 	{
 		[Test]
-		public void CreateTable()
+		public async Task CreateTable()
 		{
 			var operation = new CreateTableOperation
 			{
@@ -129,7 +130,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
     UNIQUE (""SSN""),
     FOREIGN KEY (""EmployerId"") REFERENCES ""Companies"" (""Id"") ON UPDATE NO ACTION ON DELETE NO ACTION
 );";
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(3, batch.Count());
 			Assert.AreEqual(NewLineEnd(expectedCreateTable), batch[0].CommandText);
 			StringAssert.Contains("rdb$generator_name = ", batch[1].CommandText);
@@ -137,19 +138,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 		}
 
 		[Test]
-		public void DropTable()
+		public async Task DropTable()
 		{
 			var operation = new DropTableOperation()
 			{
 				Name = "People",
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"DROP TABLE ""People"";"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddColumn()
+		public async Task AddColumn()
 		{
 			var operation = new AddColumnOperation()
 			{
@@ -159,26 +160,26 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Schema = "schema",
 				IsNullable = false,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""schema"".""People"" ADD ""NewColumn"" DECIMAL(18,2) NOT NULL;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void DropColumn()
+		public async Task DropColumn()
 		{
 			var operation = new DropColumnOperation()
 			{
 				Table = "People",
 				Name = "DropMe",
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP ""DropMe"";"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AlterColumnLength()
+		public async Task AlterColumnLength()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -194,13 +195,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 					MaxLength = 100,
 				},
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(2, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE VARCHAR(200);"), batch[1].CommandText);
 		}
 
 		[Test]
-		public void AlterColumnNullableToNotNull()
+		public async Task AlterColumnNullableToNotNull()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -216,14 +217,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 					MaxLength = 100,
 				},
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(2, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" DROP NOT NULL;"), batch[0].CommandText);
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE VARCHAR(100) NOT NULL;"), batch[1].CommandText);
 		}
 
 		[Test]
-		public void AlterColumnNotNullToNullable()
+		public async Task AlterColumnNotNullToNullable()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -239,14 +240,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 					MaxLength = 100,
 				},
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(2, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" DROP NOT NULL;"), batch[0].CommandText);
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE VARCHAR(100);"), batch[1].CommandText);
 		}
 
 		[Test]
-		public void AlterColumnType()
+		public async Task AlterColumnType()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -260,13 +261,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 					IsNullable = false,
 				},
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(2, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE BIGINT NOT NULL;"), batch[1].CommandText);
 		}
 
 		[Test]
-		public void AlterColumnDefault()
+		public async Task AlterColumnDefault()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -280,7 +281,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 					DefaultValue = 10,
 				},
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(4, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER NOT NULL;"), batch[1].CommandText);
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" DROP DEFAULT;"), batch[2].CommandText);
@@ -288,7 +289,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 		}
 
 		[Test]
-		public void AlterColumnAddIdentityColumn()
+		public async Task AlterColumnAddIdentityColumn()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -301,13 +302,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 					ClrType = typeof(int),
 				},
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(2, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER GENERATED BY DEFAULT AS IDENTITY NOT NULL;"), batch[1].CommandText);
 		}
 
 		[Test]
-		public void AlterColumnAddSequenceTrigger()
+		public async Task AlterColumnAddSequenceTrigger()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -320,7 +321,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 					ClrType = typeof(int),
 				},
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(4, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER NOT NULL;"), batch[1].CommandText);
 			StringAssert.Contains("rdb$generator_name = ", batch[2].CommandText);
@@ -328,7 +329,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 		}
 
 		[Test]
-		public void AlterColumnRemoveSequenceTrigger()
+		public async Task AlterColumnRemoveSequenceTrigger()
 		{
 			var operation = new AlterColumnOperation()
 			{
@@ -341,14 +342,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 					[FbAnnotationNames.ValueGenerationStrategy] = FbValueGenerationStrategy.SequenceTrigger,
 				},
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(3, batch.Count());
 			StringAssert.Contains("drop trigger", batch[0].CommandText);
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER NOT NULL;"), batch[2].CommandText);
 		}
 
 		[Test]
-		public void RenameColumn()
+		public async Task RenameColumn()
 		{
 			var operation = new RenameColumnOperation()
 			{
@@ -356,13 +357,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "OldCol",
 				NewName = "NewCol",
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""OldCol"" TO ""NewCol"";"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void CreateIndexOneColumn()
+		public async Task CreateIndexOneColumn()
 		{
 			var operation = new CreateIndexOperation()
 			{
@@ -370,13 +371,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "MyIndex",
 				Columns = new[] { "Foo" },
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"CREATE INDEX ""MyIndex"" ON ""People"" (""Foo"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void CreateIndexThreeColumn()
+		public async Task CreateIndexThreeColumn()
 		{
 			var operation = new CreateIndexOperation()
 			{
@@ -384,13 +385,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "MyIndex",
 				Columns = new[] { "Foo", "Bar", "Baz" },
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"CREATE INDEX ""MyIndex"" ON ""People"" (""Foo"", ""Bar"", ""Baz"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void CreateIndexUnique()
+		public async Task CreateIndexUnique()
 		{
 			var operation = new CreateIndexOperation()
 			{
@@ -399,13 +400,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Columns = new[] { "Foo" },
 				IsUnique = true,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"CREATE UNIQUE INDEX ""MyIndex"" ON ""People"" (""Foo"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void CreateIndexFilter()
+		public async Task CreateIndexFilter()
 		{
 			var operation = new CreateIndexOperation()
 			{
@@ -413,13 +414,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "MyIndex",
 				Filter = "xxx",
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"CREATE INDEX ""MyIndex"" ON ""People"" COMPUTED BY (xxx);"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void CreateSequence()
+		public async Task CreateSequence()
 		{
 			var operation = new CreateSequenceOperation()
 			{
@@ -427,51 +428,51 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				StartValue = 34,
 				IncrementBy = 56,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"CREATE SEQUENCE ""MySequence"" START WITH 34 INCREMENT BY 56;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AlterSequence()
+		public async Task AlterSequence()
 		{
 			var operation = new AlterSequenceOperation()
 			{
 				Name = "MySequence",
 				IncrementBy = 12,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER SEQUENCE ""MySequence"" RESTART INCREMENT BY 12;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void RestartSequence()
+		public async Task RestartSequence()
 		{
 			var operation = new RestartSequenceOperation()
 			{
 				Name = "MySequence",
 				StartValue = 23,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER SEQUENCE ""MySequence"" START WITH 23;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void DropSequence()
+		public async Task DropSequence()
 		{
 			var operation = new DropSequenceOperation()
 			{
 				Name = "MySequence",
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"DROP SEQUENCE ""MySequence"";"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddPrimaryKey()
+		public async Task AddPrimaryKey()
 		{
 			var operation = new AddPrimaryKeyOperation()
 			{
@@ -479,39 +480,39 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "PK_People",
 				Columns = new[] { "Foo" },
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""PK_People"" PRIMARY KEY (""Foo"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddPrimaryKeyNoName()
+		public async Task AddPrimaryKeyNoName()
 		{
 			var operation = new AddPrimaryKeyOperation()
 			{
 				Table = "People",
 				Columns = new[] { "Foo" },
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD PRIMARY KEY (""Foo"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void DropPrimaryKey()
+		public async Task DropPrimaryKey()
 		{
 			var operation = new DropPrimaryKeyOperation()
 			{
 				Table = "People",
 				Name = "PK_People",
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP CONSTRAINT ""PK_People"";"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKey()
+		public async Task AddForeignKey()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -523,13 +524,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Restrict,
 				OnUpdate = ReferentialAction.Restrict,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyNoName()
+		public async Task AddForeignKeyNoName()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -540,13 +541,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Restrict,
 				OnUpdate = ReferentialAction.Restrict,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyDeleteCascade()
+		public async Task AddForeignKeyDeleteCascade()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -558,13 +559,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Cascade,
 				OnUpdate = ReferentialAction.Restrict,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON DELETE CASCADE;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyDeleteNoAction()
+		public async Task AddForeignKeyDeleteNoAction()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -576,13 +577,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.NoAction,
 				OnUpdate = ReferentialAction.Restrict,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON DELETE NO ACTION;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyDeleteRestrict()
+		public async Task AddForeignKeyDeleteRestrict()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -594,13 +595,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Restrict,
 				OnUpdate = ReferentialAction.Restrict,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyDeleteSetDefault()
+		public async Task AddForeignKeyDeleteSetDefault()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -612,13 +613,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.SetDefault,
 				OnUpdate = ReferentialAction.Restrict,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON DELETE SET DEFAULT;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyDeleteSetNull()
+		public async Task AddForeignKeyDeleteSetNull()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -630,13 +631,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.SetNull,
 				OnUpdate = ReferentialAction.Restrict,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON DELETE SET NULL;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyUpdateCascade()
+		public async Task AddForeignKeyUpdateCascade()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -648,13 +649,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Restrict,
 				OnUpdate = ReferentialAction.Cascade,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON UPDATE CASCADE;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyUpdateNoAction()
+		public async Task AddForeignKeyUpdateNoAction()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -666,13 +667,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Restrict,
 				OnUpdate = ReferentialAction.NoAction,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON UPDATE NO ACTION;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyUpdateRestrict()
+		public async Task AddForeignKeyUpdateRestrict()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -684,13 +685,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Restrict,
 				OnUpdate = ReferentialAction.Restrict,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyUpdateSetDefault()
+		public async Task AddForeignKeyUpdateSetDefault()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -702,13 +703,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Restrict,
 				OnUpdate = ReferentialAction.SetDefault,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON UPDATE SET DEFAULT;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddForeignKeyUpdateSetNull()
+		public async Task AddForeignKeyUpdateSetNull()
 		{
 			var operation = new AddForeignKeyOperation()
 			{
@@ -720,26 +721,26 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				OnDelete = ReferentialAction.Restrict,
 				OnUpdate = ReferentialAction.SetNull,
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""FK_People_Principal"" FOREIGN KEY (""Foo"") REFERENCES ""Principal"" (""Bar"") ON UPDATE SET NULL;"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void DropForeignKey()
+		public async Task DropForeignKey()
 		{
 			var operation = new DropForeignKeyOperation()
 			{
 				Table = "People",
 				Name = "FK_People_Principal",
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP CONSTRAINT ""FK_People_Principal"";"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddUniqueConstraintOneColumn()
+		public async Task AddUniqueConstraintOneColumn()
 		{
 			var operation = new AddUniqueConstraintOperation()
 			{
@@ -747,13 +748,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "UNQ_People_Foo",
 				Columns = new[] { "Foo" },
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""UNQ_People_Foo"" UNIQUE (""Foo"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddUniqueConstraintTwoColumns()
+		public async Task AddUniqueConstraintTwoColumns()
 		{
 			var operation = new AddUniqueConstraintOperation()
 			{
@@ -761,40 +762,40 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "UNQ_People_Foo_Bar",
 				Columns = new[] { "Foo", "Bar" },
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD CONSTRAINT ""UNQ_People_Foo_Bar"" UNIQUE (""Foo"", ""Bar"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void AddUniqueConstraintNoName()
+		public async Task AddUniqueConstraintNoName()
 		{
 			var operation = new AddUniqueConstraintOperation()
 			{
 				Table = "People",
 				Columns = new[] { "Foo" },
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD UNIQUE (""Foo"");"), batch[0].CommandText);
 		}
 
 		[Test]
-		public void DropUniqueConstraint()
+		public async Task DropUniqueConstraint()
 		{
 			var operation = new DropUniqueConstraintOperation()
 			{
 				Table = "People",
 				Name = "UNQ_People_Foo",
 			};
-			var batch = Generate(new[] { operation });
+			var batch = await Generate(new[] { operation });
 			Assert.AreEqual(1, batch.Count());
 			Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" DROP CONSTRAINT ""UNQ_People_Foo"";"), batch[0].CommandText);
 		}
 
-		IReadOnlyList<MigrationCommand> Generate(IReadOnlyList<MigrationOperation> operations)
+		async Task<IReadOnlyList<MigrationCommand>> Generate(IReadOnlyList<MigrationOperation> operations)
 		{
-			using (var db = GetDbContext<FbTestDbContext>())
+			await using (var db = await GetDbContext<FbTestDbContext>())
 			{
 				var generator = db.GetService<IMigrationsSqlGenerator>();
 				return generator.Generate(operations, db.Model);

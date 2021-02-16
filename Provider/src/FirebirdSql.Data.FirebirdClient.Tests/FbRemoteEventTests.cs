@@ -17,6 +17,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -30,11 +31,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{ }
 
 		[Test]
-		public void EventSimplyComesBackTest()
+		public async Task EventSimplyComesBackTest()
 		{
 			var exception = (Exception)null;
 			var triggered = false;
-			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
+			await using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
 				@event.RemoteEventError += (sender, e) =>
 				{
@@ -44,12 +45,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					triggered = e.Name == "test" && e.Counts == 1;
 				};
-				@event.Open();
-				@event.QueueEvents("test");
-				using (var cmd = Connection.CreateCommand())
+				await @event.OpenAsync();
+				await @event.QueueEventsAsync(new[] { "test" });
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "execute block as begin post_event 'test'; end";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
@@ -58,11 +59,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void ProperCountsSingleTest()
+		public async Task ProperCountsSingleTest()
 		{
 			var exception = (Exception)null;
 			var triggered = false;
-			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
+			await using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
 				@event.RemoteEventError += (sender, e) =>
 				{
@@ -72,12 +73,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					triggered = e.Name == "test" && e.Counts == 5;
 				};
-				@event.Open();
-				@event.QueueEvents("test");
-				using (var cmd = Connection.CreateCommand())
+				await @event.OpenAsync();
+				await @event.QueueEventsAsync(new[] { "test" });
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "execute block as begin post_event 'test'; post_event 'test'; post_event 'test'; post_event 'test'; post_event 'test'; end";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
@@ -86,12 +87,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void EventNameSeparateSelectionTest()
+		public async Task EventNameSeparateSelectionTest()
 		{
 			var exception = (Exception)null;
 			var triggeredA = false;
 			var triggeredB = false;
-			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
+			await using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
 				@event.RemoteEventError += (sender, e) =>
 				{
@@ -109,14 +110,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 							break;
 					}
 				};
-				@event.Open();
-				@event.QueueEvents("a", "b");
-				using (var cmd = Connection.CreateCommand())
+				await @event.OpenAsync();
+				await @event.QueueEventsAsync(new[] { "a", "b" });
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "execute block as begin post_event 'b'; end";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 					cmd.CommandText = "execute block as begin post_event 'a'; end";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
@@ -126,12 +127,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void EventNameTogetherSelectionTest()
+		public async Task EventNameTogetherSelectionTest()
 		{
 			var exception = (Exception)null;
 			var triggeredA = false;
 			var triggeredB = false;
-			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
+			await using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
 				@event.RemoteEventError += (sender, e) =>
 				{
@@ -149,12 +150,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 							break;
 					}
 				};
-				@event.Open();
-				@event.QueueEvents("a", "b");
-				using (var cmd = Connection.CreateCommand())
+				await @event.OpenAsync();
+				await @event.QueueEventsAsync(new[] { "a", "b" });
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "execute block as begin post_event 'b'; post_event 'a'; end";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
@@ -164,11 +165,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void CancelTest()
+		public async Task CancelTest()
 		{
 			var exception = (Exception)null;
 			var triggered = 0;
-			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
+			await using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
 				@event.RemoteEventError += (sender, e) =>
 				{
@@ -178,19 +179,19 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				{
 					triggered++;
 				};
-				@event.Open();
-				@event.QueueEvents("test");
-				using (var cmd = Connection.CreateCommand())
+				await @event.OpenAsync();
+				await @event.QueueEventsAsync(new[] { "test" });
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "execute block as begin post_event 'test'; end";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 					Thread.Sleep(2000);
 				}
-				@event.CancelEvents();
-				using (var cmd = Connection.CreateCommand())
+				await @event.CancelEventsAsync();
+				await using (var cmd = Connection.CreateCommand())
 				{
 					cmd.CommandText = "execute block as begin post_event 'test'; end";
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 					Thread.Sleep(2000);
 				}
 				Assert.IsNull(exception);
@@ -199,52 +200,52 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public void DoubleQueueingTest()
+		public async Task DoubleQueueingTest()
 		{
-			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
+			await using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
-				@event.Open();
-				Assert.DoesNotThrow(() => @event.QueueEvents("test"));
-				Assert.Throws<InvalidOperationException>(() => @event.QueueEvents("test"));
+				await @event.OpenAsync();
+				Assert.DoesNotThrowAsync(() => @event.QueueEventsAsync(new[] { "test" }));
+				Assert.ThrowsAsync<InvalidOperationException>(() => @event.QueueEventsAsync(new[] { "test" }));
 			}
 		}
 
 		[Test]
-		public void NoEventsAfterDispose()
+		public async Task NoEventsAfterDispose()
 		{
 			var triggered = 0;
-			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
+			await using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
 				@event.RemoteEventCounts += (sender, e) =>
 				{
 					triggered++;
 				};
-				@event.Open();
-				@event.QueueEvents("test");
+				await @event.OpenAsync();
+				await @event.QueueEventsAsync(new[] { "test" });
 				Thread.Sleep(2000);
 			}
 			Thread.Sleep(2000);
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "execute block as begin post_event 'test'; end";
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync();
 				Thread.Sleep(2000);
 			}
 			Assert.AreEqual(0, triggered);
 		}
 
 		[Test]
-		public void NoExceptionWithDispose()
+		public async Task NoExceptionWithDispose()
 		{
 			var exception = (Exception)null;
-			using (var @event = new FbRemoteEvent(Connection.ConnectionString))
+			await using (var @event = new FbRemoteEvent(Connection.ConnectionString))
 			{
 				@event.RemoteEventError += (sender, e) =>
 				{
 					exception = e.Error;
 				};
-				@event.Open();
-				@event.QueueEvents("test");
+				await @event.OpenAsync();
+				await @event.QueueEventsAsync(new[] { "test" });
 				Thread.Sleep(2000);
 			}
 			Thread.Sleep(2000);

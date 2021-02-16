@@ -17,6 +17,7 @@
 
 using System;
 using System.Numerics;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using FirebirdSql.Data.Types;
 using NUnit.Framework;
@@ -32,11 +33,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{ }
 
 		[SetUp]
-		public override void SetUp()
+		public override async Task SetUp()
 		{
-			base.SetUp();
+			await base.SetUp();
 
-			if (!EnsureVersion(new Version(4, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(4, 0, 0, 0)))
 				return;
 		}
 
@@ -65,60 +66,60 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		};
 
 		[TestCaseSource(nameof(TestValues))]
-		public void ReadsValueCorrectly(FbDecFloat value, string castValue)
+		public async Task ReadsValueCorrectly(FbDecFloat value, string castValue)
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = $"select cast('{castValue}' as decfloat(34)) from rdb$database";
-				var result = (FbDecFloat)cmd.ExecuteScalar();
+				var result = (FbDecFloat)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result);
 			}
 		}
 
 		[TestCaseSource(nameof(TestValues))]
-		public void PassesValueCorrectly(FbDecFloat value, string dummy)
+		public async Task PassesValueCorrectly(FbDecFloat value, string dummy)
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as decfloat(34)) from rdb$database";
 				cmd.Parameters.AddWithValue("value", value);
-				var result = (FbDecFloat)cmd.ExecuteScalar();
+				var result = (FbDecFloat)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result);
 			}
 		}
 
 		[Test]
-		public void ReadsValueNullCorrectly()
+		public async Task ReadsValueNullCorrectly()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(null as decfloat(34)) from rdb$database";
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[Test]
-		public void PassesValueNullCorrectly()
+		public async Task PassesValueNullCorrectly()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as decfloat(34)) from rdb$database";
 				cmd.Parameters.AddWithValue("value", DBNull.Value);
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[Test]
-		public void SimpleSelectSchemaTableTest()
+		public async Task SimpleSelectSchemaTableTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(null as decfloat(34)) from rdb$database";
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					var schema = reader.GetSchemaTable();
+					var schema = await reader.GetSchemaTableAsync();
 					Assert.AreEqual(typeof(FbDecFloat), schema.Rows[0].ItemArray[5]);
 				}
 			}

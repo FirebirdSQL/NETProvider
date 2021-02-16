@@ -18,6 +18,7 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -27,753 +28,599 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class FbArrayTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbArrayTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void IntegerArrayTest()
+		public async Task IntegerArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new int[] { 10, 20, 30, 40 };
 
-			var selectText = "SELECT	iarray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, iarray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new int[4];
-
-			insert_values[0] = 10;
-			insert_values[1] = 20;
-			insert_values[2] = 30;
-			insert_values[3] = 40;
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, iarray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new int[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT iarray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new int[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void ShortArrayTest()
+		public async Task ShortArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new short[] { 50, 60, 70, 80 };
 
-			var selectText = "SELECT	sarray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, sarray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new short[4];
-
-			insert_values[0] = 50;
-			insert_values[1] = 60;
-			insert_values[2] = 70;
-			insert_values[3] = 80;
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, sarray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new short[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT sarray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new short[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void BigIntArrayTest()
+		public async Task BigIntArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new long[] { 50, 60, 70, 80 };
 
-			var selectText = "SELECT	larray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, larray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new long[4];
-
-			insert_values[0] = 50;
-			insert_values[1] = 60;
-			insert_values[2] = 70;
-			insert_values[3] = 80;
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, larray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new long[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT larray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new long[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void FloatArrayTest()
+		public async Task FloatArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new float[] { 130.10F, 140.20F, 150.30F, 160.40F };
 
-			var selectText = "SELECT	farray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, farray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new float[4];
-
-			insert_values[0] = 130.10F;
-			insert_values[1] = 140.20F;
-			insert_values[2] = 150.30F;
-			insert_values[3] = 160.40F;
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, farray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new float[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT farray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new float[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void DoubleArrayTest()
+		public async Task DoubleArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new double[] { 170.10, 180.20, 190.30, 200.40 };
 
-			var selectText = "SELECT	barray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, barray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new double[4];
-
-			insert_values[0] = 170.10;
-			insert_values[1] = 180.20;
-			insert_values[2] = 190.30;
-			insert_values[3] = 200.40;
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, barray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new double[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT barray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new double[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void NumericArrayTest()
+		public async Task NumericArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new decimal[] { 210.10M, 220.20M, 230.30M, 240.40M };
 
-			var selectText = "SELECT	narray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, narray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new decimal[4];
-
-			insert_values[0] = 210.10M;
-			insert_values[1] = 220.20M;
-			insert_values[2] = 230.30M;
-			insert_values[3] = 240.40M;
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, narray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new decimal[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT narray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new decimal[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void DateArrayTest()
+		public async Task DateArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new DateTime[] { DateTime.Today.AddDays(10), DateTime.Today.AddDays(20), DateTime.Today.AddDays(30), DateTime.Today.AddDays(40) };
 
-			var selectText = "SELECT	darray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, darray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new DateTime[4];
-
-			insert_values[0] = DateTime.Today.AddDays(10);
-			insert_values[1] = DateTime.Today.AddDays(20);
-			insert_values[2] = DateTime.Today.AddDays(30);
-			insert_values[3] = DateTime.Today.AddDays(40);
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, darray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new DateTime[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT darray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new DateTime[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void TimeArrayTest()
+		public async Task TimeArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new TimeSpan[] { new TimeSpan(3, 9, 10), new TimeSpan(4, 11, 12), new TimeSpan(6, 13, 14), new TimeSpan(8, 15, 16) };
 
-			var selectText = "SELECT	tarray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, tarray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new TimeSpan[4];
-
-			insert_values[0] = new TimeSpan(3, 9, 10);
-			insert_values[1] = new TimeSpan(4, 11, 12);
-			insert_values[2] = new TimeSpan(6, 13, 14);
-			insert_values[3] = new TimeSpan(8, 15, 16);
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, tarray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new TimeSpan[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT tarray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new TimeSpan[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void TimeStampArrayTest()
+		public async Task TimeStampArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new DateTime[] { DateTime.Now.AddSeconds(10), DateTime.Now.AddSeconds(20), DateTime.Now.AddSeconds(30), DateTime.Now.AddSeconds(40) };
 
-			var selectText = "SELECT	tsarray_field FROM TEST	WHERE int_field	= " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, tsarray_field) values(@int_field,	@array_field)";
-
-			var insert_values = new DateTime[4];
-
-			insert_values[0] = DateTime.Now.AddSeconds(10);
-			insert_values[1] = DateTime.Now.AddSeconds(20);
-			insert_values[2] = DateTime.Now.AddSeconds(30);
-			insert_values[3] = DateTime.Now.AddSeconds(40);
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, tsarray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new DateTime[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					insert_values = insert_values.Select(x => new DateTime(x.Ticks / 1000 * 1000)).ToArray();
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT tsarray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new DateTime[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							insert_values = insert_values.Select(x => new DateTime(x.Ticks / 1000 * 1000)).ToArray();
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void CharArrayTest()
+		public async Task CharArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new string[] { "abc", "abcdef", "abcdefghi", "abcdefghijkl" };
 
-			var selectText = "SELECT	carray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, carray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new string[4];
-
-			insert_values[0] = "abc";
-			insert_values[1] = "abcdef";
-			insert_values[2] = "abcdefghi";
-			insert_values[3] = "abcdefghijkl";
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, carray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new string[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					select_values = select_values.Select(x => x.TrimEnd(' ')).ToArray();
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT carray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new string[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							select_values = select_values.Select(x => x.TrimEnd(' ')).ToArray();
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void VarCharArrayTest()
+		public async Task VarCharArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
+			var insert_values = new string[] { "abc", "abcdef", "abcdefghi", "abcdefghijkl" };
 
-			var selectText = "SELECT	varray_field FROM TEST WHERE int_field = " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, varray_field)	values(@int_field, @array_field)";
-
-			var insert_values = new string[4];
-
-			insert_values[0] = "abc";
-			insert_values[1] = "abcdef";
-			insert_values[2] = "abcdefghi";
-			insert_values[3] = "abcdefghijkl";
-
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, varray_field) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new string[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+				await Transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT varray_field FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new string[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
 				}
 			}
-			reader.Close();
-			select.Dispose();
 		}
 
 		[Test]
-		public void IntegerArrayPartialUpdateTest()
+		public async Task IntegerArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set iarray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new int[] { 100, 200 };
 
-			var new_values = new int[2];
-
-			new_values[0] = 100;
-			new_values[1] = 200;
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set iarray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void ShortArrayPartialUpdateTest()
+		public async Task ShortArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set sarray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new short[] { 500, 600 };
 
-			var new_values = new short[3];
-
-			new_values[0] = 500;
-			new_values[1] = 600;
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set sarray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void BigIntArrayPartialUpdateTest()
+		public async Task BigIntArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set larray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new long[] { 900, 1000, 1100, 1200 };
 
-			var new_values = new long[4];
-
-			new_values[0] = 900;
-			new_values[1] = 1000;
-			new_values[2] = 1100;
-			new_values[3] = 1200;
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set larray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void FloatArrayPartialUpdateTest()
+		public async Task FloatArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set farray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new float[] { 1300.10F, 1400.20F };
 
-			var new_values = new float[4];
-
-			new_values[0] = 1300.10F;
-			new_values[1] = 1400.20F;
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set farray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void DoubleArrayPartialUpdateTest()
+		public async Task DoubleArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set barray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new double[] { 1700.10, 1800.20 };
 
-			var new_values = new double[2];
-
-			new_values[0] = 1700.10;
-			new_values[1] = 1800.20;
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set barray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void NumericArrayPartialUpdateTest()
+		public async Task NumericArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set narray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new decimal[] { 2100.10M, 2200.20M };
 
-			var new_values = new decimal[2];
-
-			new_values[0] = 2100.10M;
-			new_values[1] = 2200.20M;
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set narray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void DateArrayPartialUpdateTest()
+		public async Task DateArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set darray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new DateTime[] { DateTime.Now.AddDays(100), DateTime.Now.AddDays(200) };
 
-			var new_values = new DateTime[4];
-
-			new_values[0] = DateTime.Now.AddDays(100);
-			new_values[1] = DateTime.Now.AddDays(200);
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set darray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void TimeArrayPartialUpdateTest()
+		public async Task TimeArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set tarray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new TimeSpan[] { new TimeSpan(11, 13, 14), new TimeSpan(12, 15, 16) };
 
-			var new_values = new TimeSpan[2];
-
-			new_values[0] = new TimeSpan(11, 13, 14);
-			new_values[1] = new TimeSpan(12, 15, 16);
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set tarray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void TimeStampArrayPartialUpdateTest()
+		public async Task TimeStampArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set tsarray_field = @array_field " +
-								"WHERE int_field = 1";
+			var new_values = new DateTime[] { DateTime.Now.AddSeconds(100), DateTime.Now.AddSeconds(200) };
 
-			var new_values = new DateTime[2];
-
-			new_values[0] = DateTime.Now.AddSeconds(100);
-			new_values[1] = DateTime.Now.AddSeconds(200);
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set tsarray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void CharArrayPartialUpdateTest()
+		public async Task CharArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set carray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new string[] { "abc", "abcdef" };
 
-			var new_values = new string[2];
-
-			new_values[0] = "abc";
-			new_values[1] = "abcdef";
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set carray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void VarCharArrayPartialUpdateTest()
+		public async Task VarCharArrayPartialUpdateTest()
 		{
-			var updateText = "update	TEST set varray_field =	@array_field " +
-								"WHERE int_field = 1";
+			var new_values = new string[] { "abc", "abcdef" };
 
-			var new_values = new string[2];
-
-			new_values[0] = "abc";
-			new_values[1] = "abcdef";
-
-			var update = new FbCommand(updateText, Connection);
-
-			update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
-
-			update.ExecuteNonQuery();
-			update.Dispose();
+			await using (var update = new FbCommand("update TEST set varray_field = @array_field WHERE int_field = 1", Connection))
+			{
+				update.Parameters.Add("@array_field", FbDbType.Array).Value = new_values;
+				await update.ExecuteNonQueryAsync();
+			}
 		}
 
 		[Test]
-		public void BigArrayTest()
+		public async Task BigArrayTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
 			int elements = short.MaxValue;
-
-			var selectText = "SELECT	big_array FROM TEST	WHERE int_field	= " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, big_array) values(@int_field,	@array_field)";
-
 			var bytes = new byte[elements * 4];
-			var rng = new RNGCryptoServiceProvider();
-			rng.GetBytes(bytes);
-
+			using (var rng = new RNGCryptoServiceProvider())
+			{
+				rng.GetBytes(bytes);
+			}
 			var insert_values = new int[elements];
 			Buffer.BlockCopy(bytes, 0, insert_values, 0, bytes.Length);
 
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, big_array) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new int[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
 				}
+				await Transaction.CommitAsync();
 			}
 
-			reader.Close();
-			select.Dispose();
+			await using (var select = new FbCommand($"SELECT big_array FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new int[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
+				}
+			}
 		}
 
 		[Test]
-		public void PartialUpdatesTest()
+		public async Task PartialUpdatesTest()
 		{
-			Transaction = Connection.BeginTransaction();
-
 			var id_value = GetId();
 			var elements = 16384;
-
-			var selectText = "SELECT	big_array FROM TEST	WHERE int_field	= " + id_value.ToString();
-			var insertText = "INSERT	INTO TEST (int_field, big_array) values(@int_field,	@array_field)";
-
 			var bytes = new byte[elements * 4];
-			var rng = new RNGCryptoServiceProvider();
-			rng.GetBytes(bytes);
-
+			using (var rng = new RNGCryptoServiceProvider())
+			{
+				rng.GetBytes(bytes);
+			}
 			var insert_values = new int[elements];
 			Buffer.BlockCopy(bytes, 0, insert_values, 0, bytes.Length);
 
-			var insert = new FbCommand(insertText, Connection, Transaction);
-			insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-			insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
-			insert.ExecuteNonQuery();
-			insert.Dispose();
-
-			Transaction.Commit();
-
-			var select = new FbCommand(selectText, Connection);
-			var reader = select.ExecuteReader();
-			if (reader.Read())
+			await using (Transaction = await Connection.BeginTransactionAsync())
 			{
-				if (!reader.IsDBNull(0))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, big_array) values(@int_field, @array_field)", Connection, Transaction))
 				{
-					var select_values = new int[insert_values.Length];
-					Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
-					CollectionAssert.AreEqual(insert_values, select_values);
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
 				}
+				await Transaction.CommitAsync();
 			}
 
-			reader.Close();
-			select.Dispose();
+			await using (var select = new FbCommand($"SELECT big_array FROM TEST WHERE int_field = {id_value}", Connection))
+			{
+				await using (var reader = await select.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						if (!await reader.IsDBNullAsync(0))
+						{
+							var select_values = new int[insert_values.Length];
+							Array.Copy((Array)reader.GetValue(0), select_values, select_values.Length);
+							CollectionAssert.AreEqual(insert_values, select_values);
+						}
+					}
+				}
+			}
 		}
-
-		#endregion
 	}
 }

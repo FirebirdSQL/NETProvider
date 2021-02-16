@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
 
@@ -27,9 +28,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
 			: base(FbServerType.Default, false, FbWireCrypt.Enabled, false)
 		{ }
 
-		public TContext GetDbContext<TContext>() where TContext : FbTestDbContext
+		public async Task<TContext> GetDbContext<TContext>() where TContext : FbTestDbContext
 		{
-			Connection.Close();
+			await Connection.CloseAsync();
 			return (TContext)Activator.CreateInstance(typeof(TContext), Connection.ConnectionString);
 		}
 	}

@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -24,25 +25,19 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	class FbExceptionTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbExceptionTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void SQLSTATETest()
+		public async Task SQLSTATETest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "drop exception nonexisting";
 				try
 				{
-					cmd.ExecuteNonQuery();
+					await cmd.ExecuteNonQueryAsync();
 				}
 				catch (FbException ex)
 				{
@@ -50,7 +45,5 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				}
 			}
 		}
-
-		#endregion
 	}
 }

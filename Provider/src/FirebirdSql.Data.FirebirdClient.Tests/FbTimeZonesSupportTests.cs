@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using FirebirdSql.Data.Types;
 using NUnit.Framework;
@@ -31,26 +32,26 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{ }
 
 		[SetUp]
-		public override void SetUp()
+		public override async Task SetUp()
 		{
-			base.SetUp();
+			await base.SetUp();
 
-			if (!EnsureVersion(new Version(4, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(4, 0, 0, 0)))
 				return;
 		}
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void ReadsZonedDateTimeCorrectly(bool isExtended)
+		public async Task ReadsZonedDateTimeCorrectly(bool isExtended)
 		{
 			if (isExtended)
 			{
-				SetExtended();
+				await SetExtended();
 			}
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast('2020-08-27 10:00 Europe/Prague' as timestamp with time zone) from rdb$database";
-				var result = (FbZonedDateTime)cmd.ExecuteScalar();
+				var result = (FbZonedDateTime)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(new DateTime(2020, 08, 27, 08, 00, 00, DateTimeKind.Utc), result.DateTime);
 				Assert.AreEqual("Europe/Prague", result.TimeZone);
 				Assert.AreEqual(isExtended ? TimeSpan.FromMinutes(120) : (TimeSpan?)null, result.Offset);
@@ -59,67 +60,67 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void ReadsZonedDateTimeNullCorrectly(bool isExtended)
+		public async Task ReadsZonedDateTimeNullCorrectly(bool isExtended)
 		{
 			if (isExtended)
 			{
-				SetExtended();
+				await SetExtended();
 			}
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(null as timestamp with time zone) from rdb$database";
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void PassesZonedDateTimeCorrectly(bool isExtended)
+		public async Task PassesZonedDateTimeCorrectly(bool isExtended)
 		{
 			if (isExtended)
 			{
-				SetExtended();
+				await SetExtended();
 			}
 			var value = new FbZonedDateTime(new DateTime(2020, 08, 27, 08, 00, 00, DateTimeKind.Utc), "Europe/Prague");
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as timestamp with time zone) from rdb$database";
 				cmd.Parameters.AddWithValue("value", value);
-				var result = (FbZonedDateTime)cmd.ExecuteScalar();
+				var result = (FbZonedDateTime)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result);
 			}
 		}
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void PassesZonedDateTimeNullCorrectly(bool isExtended)
+		public async Task PassesZonedDateTimeNullCorrectly(bool isExtended)
 		{
 			if (isExtended)
 			{
-				SetExtended();
+				await SetExtended();
 			}
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as timestamp with time zone) from rdb$database";
 				cmd.Parameters.AddWithValue("value", DBNull.Value);
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void ReadsZonedTimeCorrectly(bool isExtended)
+		public async Task ReadsZonedTimeCorrectly(bool isExtended)
 		{
 			if (isExtended)
 			{
-				SetExtended();
+				await SetExtended();
 			}
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast('15:00 Europe/Prague' as time with time zone) from rdb$database";
-				var result = (FbZonedTime)cmd.ExecuteScalar();
+				var result = (FbZonedTime)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(new TimeSpan(14, 00, 00), result.Time);
 				Assert.AreEqual("Europe/Prague", result.TimeZone);
 				Assert.AreEqual(isExtended ? TimeSpan.FromMinutes(60) : (TimeSpan?)null, result.Offset);
@@ -128,76 +129,76 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void ReadsZonedTimeNullCorrectly(bool isExtended)
+		public async Task ReadsZonedTimeNullCorrectly(bool isExtended)
 		{
 			if (isExtended)
 			{
-				SetExtended();
+				await SetExtended();
 			}
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(null as time with time zone) from rdb$database";
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void PassesZonedTimeCorrectly(bool isExtended)
+		public async Task PassesZonedTimeCorrectly(bool isExtended)
 		{
 			if (isExtended)
 			{
-				SetExtended();
+				await SetExtended();
 			}
 			var value = new FbZonedTime(new TimeSpan(14, 00, 00), "Europe/Prague");
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as time with time zone) from rdb$database";
 				cmd.Parameters.AddWithValue("value", value);
-				var result = (FbZonedTime)cmd.ExecuteScalar();
+				var result = (FbZonedTime)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(value, result);
 			}
 		}
 
 		[TestCase(true)]
 		[TestCase(false)]
-		public void PassesZonedTimeNullCorrectly(bool isExtended)
+		public async Task PassesZonedTimeNullCorrectly(bool isExtended)
 		{
 			if (isExtended)
 			{
-				SetExtended();
+				await SetExtended();
 			}
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select cast(@value as time with time zone) from rdb$database";
 				cmd.Parameters.AddWithValue("value", DBNull.Value);
-				var result = (DBNull)cmd.ExecuteScalar();
+				var result = (DBNull)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(DBNull.Value, result);
 			}
 		}
 
 		[Test]
-		public void SimpleSelectSchemaTableTest()
+		public async Task SimpleSelectSchemaTableTest()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "select current_timestamp, current_time from rdb$database";
-				using (var reader = cmd.ExecuteReader())
+				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					var schema = reader.GetSchemaTable();
+					var schema = await reader.GetSchemaTableAsync();
 					Assert.AreEqual(typeof(FbZonedDateTime), schema.Rows[0].ItemArray[5]);
 					Assert.AreEqual(typeof(FbZonedTime), schema.Rows[1].ItemArray[5]);
 				}
 			}
 		}
 
-		void SetExtended()
+		async Task SetExtended()
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "set bind of time zone to extended";
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync();
 			}
 		}
 	}

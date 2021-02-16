@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
@@ -48,20 +49,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 			public string Bar { get; set; }
 		}
 		[Test]
-		public void Update()
+		public async Task Update()
 		{
-			using (var db = GetDbContext<UpdateContext>())
+			await using (var db = await GetDbContext<UpdateContext>())
 			{
-				db.Database.ExecuteSqlRaw("create table test_update (id int primary key, foo varchar(20), bar varchar(20))");
-				db.Database.ExecuteSqlRaw("update or insert into test_update values (66, 'foo', 'bar')");
+				await db.Database.ExecuteSqlRawAsync("create table test_update (id int primary key, foo varchar(20), bar varchar(20))");
+				await db.Database.ExecuteSqlRawAsync("update or insert into test_update values (66, 'foo', 'bar')");
 				var entity = new UpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
-				db.SaveChanges();
-				var value = db.Set<UpdateEntity>()
+				await db.SaveChangesAsync();
+				var value = await db.Set<UpdateEntity>()
 					.FromSqlRaw("select * from test_update where id = 66")
 					.AsNoTracking()
-					.First();
+					.FirstAsync();
 				Assert.AreEqual("test", value.Foo);
 				Assert.AreNotEqual("test", value.Bar);
 			}
@@ -94,16 +95,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 			public string Computed { get; set; }
 		}
 		[Test]
-		public void ComputedUpdate()
+		public async Task ComputedUpdate()
 		{
-			using (var db = GetDbContext<ComputedUpdateContext>())
+			await using (var db = await GetDbContext<ComputedUpdateContext>())
 			{
-				db.Database.ExecuteSqlRaw("create table test_update_computed (id int primary key, foo varchar(20), bar varchar(20), computed generated always as (foo || bar))");
-				db.Database.ExecuteSqlRaw("update or insert into test_update_computed values (66, 'foo', 'bar')");
+				await db.Database.ExecuteSqlRawAsync("create table test_update_computed (id int primary key, foo varchar(20), bar varchar(20), computed generated always as (foo || bar))");
+				await db.Database.ExecuteSqlRawAsync("update or insert into test_update_computed values (66, 'foo', 'bar')");
 				var entity = new ComputedUpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
-				db.SaveChanges();
+				await db.SaveChangesAsync();
 				Assert.AreEqual("testbar", entity.Computed);
 			}
 		}
@@ -134,16 +135,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 			public DateTime Stamp { get; set; }
 		}
 		[Test]
-		public void ConcurrencyUpdate()
+		public async Task ConcurrencyUpdate()
 		{
-			using (var db = GetDbContext<ConcurrencyUpdateContext>())
+			await using (var db = await GetDbContext<ConcurrencyUpdateContext>())
 			{
-				db.Database.ExecuteSqlRaw("create table test_update_concurrency (id int primary key, foo varchar(20), stamp timestamp)");
-				db.Database.ExecuteSqlRaw("update or insert into test_update_concurrency values (66, 'foo', current_timestamp)");
+				await db.Database.ExecuteSqlRawAsync("create table test_update_concurrency (id int primary key, foo varchar(20), stamp timestamp)");
+				await db.Database.ExecuteSqlRawAsync("update or insert into test_update_concurrency values (66, 'foo', current_timestamp)");
 				var entity = new ConcurrencyUpdateEntity() { Id = 66, Foo = "test", Stamp = new DateTime(1970, 1, 1) };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
-				Assert.Throws<DbUpdateConcurrencyException>(() => db.SaveChanges());
+				Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => db.SaveChangesAsync());
 			}
 		}
 
@@ -172,17 +173,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 			public DateTime Stamp { get; set; }
 		}
 		[Test]
-		public void ConcurrencyUpdateNoGenerated()
+		public async Task ConcurrencyUpdateNoGenerated()
 		{
-			using (var db = GetDbContext<ConcurrencyUpdateNoGeneratedContext>())
+			await using (var db = await GetDbContext<ConcurrencyUpdateNoGeneratedContext>())
 			{
-				db.Database.ExecuteSqlRaw("create table test_update_concurrency_ng (id int primary key, foo varchar(20), stamp timestamp)");
-				db.Database.ExecuteSqlRaw("update or insert into test_update_concurrency_ng values (66, 'foo', current_timestamp)");
+				await db.Database.ExecuteSqlRawAsync("create table test_update_concurrency_ng (id int primary key, foo varchar(20), stamp timestamp)");
+				await db.Database.ExecuteSqlRawAsync("update or insert into test_update_concurrency_ng values (66, 'foo', current_timestamp)");
 				var entity = new ConcurrencyUpdateNoGeneratedEntity() { Id = 66, Foo = "test", Stamp = new DateTime(1970, 1, 1) };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
 				entry.Property(x => x.Stamp).IsModified = true;
-				Assert.Throws<DbUpdateConcurrencyException>(() => db.SaveChanges());
+				Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => db.SaveChangesAsync());
 			}
 		}
 
@@ -216,16 +217,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 			public string Computed2 { get; set; }
 		}
 		[Test]
-		public void TwoComputedUpdate()
+		public async Task TwoComputedUpdate()
 		{
-			using (var db = GetDbContext<TwoComputedUpdateContext>())
+			await using (var db = await GetDbContext<TwoComputedUpdateContext>())
 			{
-				db.Database.ExecuteSqlRaw("create table test_update_2computed (id int primary key, foo varchar(20), bar varchar(20), computed1 generated always as (foo || bar), computed2 generated always as (bar || bar))");
-				db.Database.ExecuteSqlRaw("update or insert into test_update_2computed values (66, 'foo', 'bar')");
+				await db.Database.ExecuteSqlRawAsync("create table test_update_2computed (id int primary key, foo varchar(20), bar varchar(20), computed1 generated always as (foo || bar), computed2 generated always as (bar || bar))");
+				await db.Database.ExecuteSqlRawAsync("update or insert into test_update_2computed values (66, 'foo', 'bar')");
 				var entity = new TwoComputedUpdateEntity() { Id = 66, Foo = "test", Bar = "test" };
 				var entry = db.Attach(entity);
 				entry.Property(x => x.Foo).IsModified = true;
-				db.SaveChanges();
+				await db.SaveChangesAsync();
 				Assert.AreEqual("testbar", entity.Computed1);
 				Assert.AreEqual("barbar", entity.Computed2);
 			}

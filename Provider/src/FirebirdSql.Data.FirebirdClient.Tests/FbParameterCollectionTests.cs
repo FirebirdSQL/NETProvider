@@ -16,6 +16,8 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Globalization;
+using System.Threading;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -28,7 +30,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public void AddTest()
 		{
 			var command = new FbCommand();
-
 			command.Parameters.Add(new FbParameter("@p292", 10000));
 			command.Parameters.Add("@p01", FbDbType.Integer);
 			command.Parameters.Add("@p02", 289273);
@@ -38,12 +39,11 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public void DNET532_CheckCultureAwareIndexOf()
 		{
-			var curCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+			var curCulture = Thread.CurrentThread.CurrentCulture;
 			try
 			{
-				System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("tr-TR");
+				Thread.CurrentThread.CurrentCulture = new CultureInfo("tr-TR");
 				var command = new FbCommand();
-
 				// \u0131 is turkish symbol "i without dot" that uppercases to "I" symbol.
 				// see https://msdn.microsoft.com/en-us/library/ms973919.aspx#stringsinnet20_topic5 for more information
 				var parameterName = "Turkish\u0131Parameter";
@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 			finally
 			{
-				System.Threading.Thread.CurrentThread.CurrentCulture = curCulture;
+				Thread.CurrentThread.CurrentCulture = curCulture;
 			}
 		}
 

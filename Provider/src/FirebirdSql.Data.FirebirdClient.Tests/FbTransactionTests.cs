@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -25,97 +26,89 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class FbTransactionTests : FbTestsBase
 	{
-		#region Constructors
-
 		public FbTransactionTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
 
-		#endregion
-
-		#region Unit Tests
-
 		[Test]
-		public void CommitTest()
+		public async Task CommitTest()
 		{
-			Transaction = Connection.BeginTransaction();
-			Transaction.Commit();
+			Transaction = await Connection.BeginTransactionAsync();
+			await Transaction.CommitAsync();
 		}
 
 		[Test]
-		public void RollbackTest()
+		public async Task RollbackTest()
 		{
-			Transaction = Connection.BeginTransaction();
-			Transaction.Rollback();
+			Transaction = await Connection.BeginTransactionAsync();
+			await Transaction.RollbackAsync();
 		}
 
 		[Test]
-		public void SavePointTest()
+		public async Task SavePointTest()
 		{
-			using (var command = new FbCommand())
+			await using (var command = new FbCommand())
 			{
-				Transaction = Connection.BeginTransaction("InitialSavePoint");
+				Transaction = await Connection.BeginTransactionAsync("InitialSavePoint");
 
 				command.Connection = Connection;
 				command.Transaction = Transaction;
 
-				command.CommandText = "insert into TEST (INT_FIELD) values (200) ";
-				command.ExecuteNonQuery();
+				command.CommandText = "insert into TEST (INT_FIELD) values (200)";
+				await command.ExecuteNonQueryAsync();
 
-				Transaction.Save("FirstSavePoint");
+				await Transaction.SaveAsync("FirstSavePoint");
 
-				command.CommandText = "insert into TEST (INT_FIELD) values (201) ";
-				command.ExecuteNonQuery();
-				Transaction.Save("SecondSavePoint");
+				command.CommandText = "insert into TEST (INT_FIELD) values (201)";
+				await command.ExecuteNonQueryAsync();
+				await Transaction.SaveAsync("SecondSavePoint");
 
-				command.CommandText = "insert into TEST (INT_FIELD) values (202) ";
-				command.ExecuteNonQuery();
-				Transaction.Rollback("InitialSavePoint");
+				command.CommandText = "insert into TEST (INT_FIELD) values (202)";
+				await command.ExecuteNonQueryAsync();
+				await Transaction.RollbackAsync("InitialSavePoint");
 
-				Transaction.Commit();
+				await Transaction.CommitAsync();
 			}
 		}
 
 		[Test]
-		public void AbortTransaction()
+		public async Task AbortTransaction()
 		{
 			FbTransaction transaction = null;
 			FbCommand command = null;
 
 			try
 			{
-				transaction = Connection.BeginTransaction();
+				transaction = await Connection.BeginTransactionAsync();
 
 				command = new FbCommand("ALTER TABLE \"TEST\" drop \"INT_FIELD\"", Connection, transaction);
-				command.ExecuteNonQuery();
+				await command.ExecuteNonQueryAsync();
 
-				transaction.Commit();
+				await transaction.CommitAsync();
 				transaction = null;
 			}
 			catch (Exception)
 			{
-				transaction.Rollback();
+				await transaction.RollbackAsync();
 				transaction = null;
 			}
 			finally
 			{
 				if (command != null)
 				{
-					command.Dispose();
+					await command.DisposeAsync();
 				}
 			}
 		}
 
 		[Test]
-		public void ReadCommittedReadConsistency()
+		public async Task ReadCommittedReadConsistency()
 		{
-			if (!EnsureVersion(new Version(4, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(4, 0, 0, 0)))
 				return;
 
-			Transaction = Connection.BeginTransaction(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.ReadConsistency });
-			Transaction.Dispose();
+			Transaction = await Connection.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.ReadConsistency });
+			await Transaction.DisposeAsync();
 		}
-
-		#endregion
 	}
 }

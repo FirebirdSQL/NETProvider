@@ -30,72 +30,72 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 	public class ElementaryTests : EntityFrameworkCoreTestsBase
 	{
 		[Test]
-		public void SimpleSelect()
+		public async Task SimpleSelect()
 		{
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
-				var data = db.Set<MonAttachment>().ToList();
+				var data = await db.Set<MonAttachment>().ToListAsync();
 				Assert.IsNotEmpty(data);
 			}
 		}
 
 		[Test]
-		public void SelectWithWhere()
+		public async Task SelectWithWhere()
 		{
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
 				var query = db.Set<MonAttachment>()
 					.Where(x => x.AttachmentName.Trim() != string.Empty);
-				Assert.DoesNotThrow(() => query.Load());
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
 				var sql = db.LastCommandText;
 				StringAssert.Contains("TRIM(", sql);
 			}
 		}
 
 		[Test]
-		public void SelectWithWhereExtract()
+		public async Task SelectWithWhereExtract()
 		{
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
 				var query = db.Set<MonAttachment>()
 					.Where(x => x.Timestamp.Second > -1 && x.Timestamp.DayOfYear == 1);
-				Assert.DoesNotThrow(() => query.Load());
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
 				var sql = db.LastCommandText;
 			}
 		}
 
 		[Test]
-		public void SelectWithWhereSubstring()
+		public async Task SelectWithWhereSubstring()
 		{
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
 				var query = db.Set<MonAttachment>()
 					.Where(x => x.AttachmentName.Substring(1) == string.Empty && x.AttachmentName.Substring(1, 1) == string.Empty || x.AttachmentName.Substring(x.AttachmentId) != string.Empty || x.AttachmentName.Substring(x.AttachmentId, x.AttachmentId) != string.Empty);
-				Assert.DoesNotThrow(() => query.Load());
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
 				var sql = db.LastCommandText;
 			}
 		}
 
 		[Test]
-		public void SelectWithWhereDateMember()
+		public async Task SelectWithWhereDateMember()
 		{
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
 				var query = db.Set<MonAttachment>()
 					.Where(x => x.Timestamp.Date == DateTime.Now.Date);
-				Assert.DoesNotThrow(() => query.Load());
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
 				var sql = db.LastCommandText;
 			}
 		}
 
 		[Test]
-		public void SelectTake()
+		public async Task SelectTake()
 		{
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
 				var query = db.Set<MonAttachment>()
 					.Take(3);
-				Assert.DoesNotThrow(() => query.Load());
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
 				var sql = db.LastCommandText;
 				StringAssert.IsMatch(@"ROWS \(.+\)", sql);
 				StringAssert.DoesNotMatch(@" TO \(", sql);
@@ -103,41 +103,41 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 		}
 
 		[Test]
-		public void SelectSkipTake()
+		public async Task SelectSkipTake()
 		{
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
 				var query = db.Set<MonAttachment>()
 					.Skip(1)
 					.Take(3);
-				Assert.DoesNotThrow(() => query.Load());
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
 				var sql = db.LastCommandText;
 				StringAssert.IsMatch(@"ROWS \((.+) \+ 1\) TO \(\1 \+ .+\)", sql);
 			}
 		}
 
 		[Test]
-		public void SelectSkip()
+		public async Task SelectSkip()
 		{
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
 				var query = db.Set<MonAttachment>()
 					.Skip(1);
-				Assert.DoesNotThrow(() => query.Load());
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
 				var sql = db.LastCommandText;
 				StringAssert.IsMatch(@"ROWS \(.+ \+ 1\) TO \(9223372036854775807\)", sql);
 			}
 		}
 
 		[Test]
-		public void SelectTopLevelAny()
+		public async Task SelectTopLevelAny()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
-			using (var db = GetDbContext<SelectContext>())
+			await using (var db = await GetDbContext<SelectContext>())
 			{
-				Assert.DoesNotThrow(() => db.Set<MonAttachment>().Any(x => x.AttachmentId != 0));
+				Assert.DoesNotThrowAsync(() => db.Set<MonAttachment>().AnyAsync(x => x.AttachmentId != 0));
 			}
 		}
 	}
