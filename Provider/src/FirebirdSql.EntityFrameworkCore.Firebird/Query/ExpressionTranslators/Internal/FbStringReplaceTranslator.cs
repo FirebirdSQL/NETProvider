@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
@@ -35,12 +37,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			_fbSqlExpressionFactory = fbSqlExpressionFactory;
 		}
 
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
 		{
 			if (!method.Equals(ReplaceMethod))
 				return null;
 
-			return _fbSqlExpressionFactory.Function("REPLACE", new[] { instance }.Concat(arguments), instance.Type);
+			var args = new[] { instance }.Concat(arguments);
+			return _fbSqlExpressionFactory.Function("REPLACE", args, true, args.Select(_ => true), instance.Type);
 		}
 	}
 }

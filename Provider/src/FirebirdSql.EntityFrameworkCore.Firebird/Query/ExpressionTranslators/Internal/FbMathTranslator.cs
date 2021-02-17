@@ -17,8 +17,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
@@ -121,26 +124,34 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			_fbSqlExpressionFactory = fbSqlExpressionFactory;
 		}
 
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
 		{
 			if (SupportedMethodTranslations.TryGetValue(method, out var sqlFunctionName))
 			{
-				return _fbSqlExpressionFactory.Function(sqlFunctionName, arguments, method.ReturnType);
+				return _fbSqlExpressionFactory.Function(sqlFunctionName, arguments, true, arguments.Select(_ => true), method.ReturnType);
 			}
 			if (TruncateMethodInfos.Contains(method))
 			{
 				return _fbSqlExpressionFactory.Function(
 					"TRUNC",
 					new[] { arguments[0], _fbSqlExpressionFactory.Constant(0) },
+					true,
+					new[] { true, default },
 					method.ReturnType);
 			}
 			if (RoundMethodInfos.Contains(method))
 			{
+				var args = arguments.Count == 1
+					? new[] { arguments[0], _fbSqlExpressionFactory.Constant(0) }
+					: new[] { arguments[0], arguments[1] };
+				var argsNullability = arguments.Count == 1
+					? new[] { true, default }
+					: new[] { true, true };
 				return _fbSqlExpressionFactory.Function(
 					"ROUND",
-					arguments.Count == 1
-						? new[] { arguments[0], _fbSqlExpressionFactory.Constant(0) }
-						: new[] { arguments[0], arguments[1] },
+					args,
+					true,
+					argsNullability,
 					method.ReturnType);
 			}
 			return null;

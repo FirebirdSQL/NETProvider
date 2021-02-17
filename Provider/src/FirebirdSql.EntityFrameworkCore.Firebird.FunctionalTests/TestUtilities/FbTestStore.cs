@@ -96,7 +96,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 		}
 
 		public override DbContextOptionsBuilder AddProviderOptions(DbContextOptionsBuilder builder)
-			=> builder.UseFirebird(Connection);
+			=> builder.UseFirebird(Connection,
+				x => x.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery));
 
 		public override void Clean(DbContext context)
 		{ }

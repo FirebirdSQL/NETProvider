@@ -20,13 +20,12 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
 	public class AsyncGearsOfWarQueryFbTest : AsyncGearsOfWarQueryTestBase<GearsOfWarQueryFbFixture>
 	{
-		public AsyncGearsOfWarQueryFbTest(GearsOfWarQueryFbFixture fixture, ITestOutputHelper testOutputHelper)
+		public AsyncGearsOfWarQueryFbTest(GearsOfWarQueryFbFixture fixture)
 			: base(fixture)
 		{ }
 

@@ -18,6 +18,8 @@
 using System;
 using System.Reflection;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
@@ -32,11 +34,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			_fbSqlExpressionFactory = fbSqlExpressionFactory;
 		}
 
-		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
+		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
 		{
 			if (member.DeclaringType == typeof(string) && member.Name == nameof(string.Length))
 			{
-				return _fbSqlExpressionFactory.Function("CHARACTER_LENGTH", new[] { instance }, typeof(int));
+				return _fbSqlExpressionFactory.Function("CHAR_LENGTH", new[] { instance }, true, new[] { true }, typeof(int));
 			}
 			return null;
 		}

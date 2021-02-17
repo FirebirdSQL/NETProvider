@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
@@ -172,12 +173,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 				Sql.Append("ROWS (");
 				Visit(selectExpression.Offset);
 				Sql.Append(" + 1) TO (");
-				Sql.Append(long.MaxValue);
+				Sql.Append(long.MaxValue.ToString(CultureInfo.InvariantCulture));
 				Sql.Append(")");
 			}
 		}
 
-		protected override string GenerateOperator(SqlBinaryExpression binaryExpression)
+		protected override string GetOperator(SqlBinaryExpression binaryExpression)
 		{
 			if (binaryExpression.OperatorType == ExpressionType.Add && binaryExpression.TypeMapping.ClrType == typeof(string))
 			{
@@ -191,7 +192,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 			{
 				return " OR ";
 			}
-			return base.GenerateOperator(binaryExpression);
+			return base.GetOperator(binaryExpression);
 		}
 
 		// https://github.com/aspnet/EntityFrameworkCore/issues/19031
@@ -217,96 +218,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 			}
 		}
 
-		protected /*override*/ void GeneratePseudoFromClause()
+		protected override void GeneratePseudoFromClause()
 		{
 			Sql.Append(" FROM RDB$DATABASE");
-		}
-
-		// GeneratePseudoFromClause workaround
-		protected override Expression VisitSelect(SelectExpression selectExpression)
-		{
-			//if (IsNonComposedSetOperation(selectExpression))
-			//{
-			//	// Naked set operation
-			//	GenerateSetOperation((SetOperationBase)selectExpression.Tables[0]);
-
-			//	return selectExpression;
-			//}
-
-			if (selectExpression.Alias != null)
-			{
-				Sql.AppendLine("(");
-				Sql.IncrementIndent();
-			}
-
-			Sql.Append("SELECT ");
-
-			if (selectExpression.IsDistinct)
-			{
-				Sql.Append("DISTINCT ");
-			}
-
-			GenerateTop(selectExpression);
-
-			if (selectExpression.Projection.Any())
-			{
-				GenerateList(selectExpression.Projection, e => Visit(e));
-			}
-			else
-			{
-				Sql.Append("1");
-			}
-
-			if (selectExpression.Tables.Any())
-			{
-				Sql.AppendLine().Append("FROM ");
-
-				GenerateList(selectExpression.Tables, e => Visit(e), sql => sql.AppendLine());
-			}
-			else
-			{
-				GeneratePseudoFromClause();
-			}
-
-			if (selectExpression.Predicate != null)
-			{
-				Sql.AppendLine().Append("WHERE ");
-
-				Visit(selectExpression.Predicate);
-			}
-
-			if (selectExpression.GroupBy.Count > 0)
-			{
-				Sql.AppendLine().Append("GROUP BY ");
-
-				GenerateList(selectExpression.GroupBy, e => Visit(e));
-			}
-
-			if (selectExpression.Having != null)
-			{
-				Sql.AppendLine().Append("HAVING ");
-
-				Visit(selectExpression.Having);
-			}
-
-			GenerateOrderings(selectExpression);
-			GenerateLimitOffset(selectExpression);
-
-			if (selectExpression.Alias != null)
-			{
-				Sql.DecrementIndent();
-
-				Sql.AppendLine()
-					.Append(")" + AliasSeparator + Dependencies.SqlGenerationHelper.DelimitIdentifier(selectExpression.Alias));
-			}
-
-			return selectExpression;
 		}
 
 		protected override Expression VisitOrdering(OrderingExpression orderingExpression)
 		{
 			if (orderingExpression.Expression is SqlConstantExpression
-				|| orderingExpression.Expression is SqlParameterExpression)
+				|| orderingExpression.Expression is SqlParameterExpression
+				|| (orderingExpression.Expression is SqlFragmentExpression sqlFragment && sqlFragment.Sql.Equals("(SELECT 1)", StringComparison.Ordinal)))
 			{
 				Sql.Append("(SELECT 1");
 				GeneratePseudoFromClause();
@@ -316,12 +237,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 			{
 				Visit(orderingExpression.Expression);
 			}
-
 			if (!orderingExpression.IsAscending)
 			{
 				Sql.Append(" DESC");
 			}
-
 			return orderingExpression;
 		}
 

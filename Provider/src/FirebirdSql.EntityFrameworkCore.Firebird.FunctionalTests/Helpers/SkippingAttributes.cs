@@ -34,7 +34,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 		}
 	}
 
-#warning Can I somehow handle it in SQL generation?
 	public class GeneratedNameTooLongFactAttribute : FactAttribute
 	{
 		public GeneratedNameTooLongFactAttribute()

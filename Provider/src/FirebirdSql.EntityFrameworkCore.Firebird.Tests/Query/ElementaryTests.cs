@@ -154,7 +154,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 				return base.NonQueryExecuted(command, eventData, result);
 			}
 
-			public override Task<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
+			public override ValueTask<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
 			{
 				LastCommandText = command.CommandText;
 				return base.NonQueryExecutedAsync(command, eventData, result, cancellationToken);
@@ -166,7 +166,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 				return base.ReaderExecuted(command, eventData, result);
 			}
 
-			public override Task<DbDataReader> ReaderExecutedAsync(DbCommand command, CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
+			public override ValueTask<DbDataReader> ReaderExecutedAsync(DbCommand command, CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
 			{
 				LastCommandText = command.CommandText;
 				return base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
@@ -178,7 +178,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 				return base.ScalarExecuted(command, eventData, result);
 			}
 
-			public override Task<object> ScalarExecutedAsync(DbCommand command, CommandExecutedEventData eventData, object result, CancellationToken cancellationToken = default)
+			public override ValueTask<object> ScalarExecutedAsync(DbCommand command, CommandExecutedEventData eventData, object result, CancellationToken cancellationToken = default)
 			{
 				LastCommandText = command.CommandText;
 				return base.ScalarExecutedAsync(command, eventData, result, cancellationToken);

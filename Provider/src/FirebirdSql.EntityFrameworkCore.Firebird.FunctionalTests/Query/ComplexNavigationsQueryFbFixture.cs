@@ -31,6 +31,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			base.OnModelCreating(modelBuilder, context);
 			ModelHelpers.SimpleTableNames(modelBuilder);
+			ModelHelpers.SetStringLengths(modelBuilder);
 		}
 	}
 }

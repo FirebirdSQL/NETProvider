@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Linq.Expressions;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
@@ -24,9 +25,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 {
 	public class FbSqlExpressionFactory : SqlExpressionFactory
 	{
+		readonly IRelationalTypeMappingSource _typeMappingSource;
+
 		public FbSqlExpressionFactory(SqlExpressionFactoryDependencies dependencies)
 			: base(dependencies)
-		{ }
+		{
+			_typeMappingSource = dependencies.TypeMappingSource;
+		}
 
 		public FbSubstringExpression Substring(SqlExpression valueExpression, SqlExpression fromExpression, SqlExpression forExpression)
 			=> (FbSubstringExpression)ApplyDefaultTypeMapping(new FbSubstringExpression(valueExpression, fromExpression, forExpression, null));
@@ -58,7 +63,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 				ApplyDefaultTypeMapping(expression.ValueExpression),
 				ApplyDefaultTypeMapping(expression.FromExpression),
 				ApplyDefaultTypeMapping(expression.ForExpression),
-				expression.TypeMapping ?? FindMapping(expression.Type));
+				expression.TypeMapping ?? _typeMappingSource.FindMapping(expression.Type));
 		}
 
 		SqlExpression ApplyTypeMappingOnExtract(FbExtractExpression expression)
@@ -66,14 +71,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 			return new FbExtractExpression(
 				expression.Part,
 				ApplyDefaultTypeMapping(expression.ValueExpression),
-				expression.TypeMapping ?? FindMapping(expression.Type));
+				expression.TypeMapping ?? _typeMappingSource.FindMapping(expression.Type));
 		}
 
 		SqlExpression ApplyTypeMappingOnDateTimeDateMember(FbDateTimeDateMemberExpression expression)
 		{
 			return new FbDateTimeDateMemberExpression(
 				ApplyDefaultTypeMapping(expression.ValueExpression),
-				expression.TypeMapping ?? FindMapping(expression.Type));
+				expression.TypeMapping ?? _typeMappingSource.FindMapping(expression.Type));
 		}
 
 		SqlExpression ApplyTypeMappingOnTrim(FbTrimExpression expression)
@@ -82,7 +87,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 				expression.Where,
 				ApplyDefaultTypeMapping(expression.WhatExpression),
 				ApplyDefaultTypeMapping(expression.ValueExpression),
-				expression.TypeMapping ?? FindMapping(expression.Type));
+				expression.TypeMapping ?? _typeMappingSource.FindMapping(expression.Type));
 		}
 	}
 }

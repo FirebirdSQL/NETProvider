@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Globalization;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
@@ -228,9 +229,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.Append("CREATE SEQUENCE ");
 			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name, operation.Schema));
 			builder.Append(" START WITH ");
-			builder.Append(operation.StartValue);
+			builder.Append(operation.StartValue.ToString(CultureInfo.InvariantCulture));
 			builder.Append(" INCREMENT BY ");
-			builder.Append(operation.IncrementBy);
+			builder.Append(operation.IncrementBy.ToString(CultureInfo.InvariantCulture));
 			TerminateStatement(builder);
 		}
 
@@ -239,7 +240,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.Append("ALTER SEQUENCE ");
 			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name, operation.Schema));
 			builder.Append(" RESTART INCREMENT BY ");
-			builder.Append(operation.IncrementBy);
+			builder.Append(operation.IncrementBy.ToString(CultureInfo.InvariantCulture));
 			TerminateStatement(builder);
 		}
 
@@ -248,7 +249,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.Append("ALTER SEQUENCE ");
 			builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name, operation.Schema));
 			builder.Append(" START WITH ");
-			builder.Append(operation.StartValue);
+			builder.Append(operation.StartValue.ToString(CultureInfo.InvariantCulture));
 			TerminateStatement(builder);
 		}
 

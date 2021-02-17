@@ -20,6 +20,7 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Diagnostics.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Migrations;
 using FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
@@ -28,6 +29,7 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Query;
@@ -47,11 +49,12 @@ namespace Microsoft.EntityFrameworkCore
 				.TryAdd<IRelationalDatabaseCreator, FbDatabaseCreator>()
 				.TryAdd<IRelationalTypeMappingSource, FbTypeMappingSource>()
 				.TryAdd<ISqlGenerationHelper, FbSqlGenerationHelper>()
-				.TryAdd<IMigrationsAnnotationProvider, FbMigrationsAnnotationProvider>()
+				.TryAdd<IRelationalAnnotationProvider, FbRelationalAnnotationProvider>()
 				.TryAdd<IProviderConventionSetBuilder, FbConventionSetBuilder>()
 				.TryAdd<IUpdateSqlGenerator>(p => p.GetService<IFbUpdateSqlGenerator>())
 				.TryAdd<IModificationCommandBatchFactory, FbModificationCommandBatchFactory>()
 				.TryAdd<IRelationalConnection>(p => p.GetService<IFbRelationalConnection>())
+				.TryAdd<IRelationalTransactionFactory, FbTransactionFactory>()
 				.TryAdd<IMigrationsSqlGenerator, FbMigrationsSqlGenerator>()
 				.TryAdd<IHistoryRepository, FbHistoryRepository>()
 				.TryAdd<IMemberTranslatorProvider, FbMemberTranslatorProvider>()
@@ -59,11 +62,13 @@ namespace Microsoft.EntityFrameworkCore
 				.TryAdd<IQuerySqlGeneratorFactory, FbQuerySqlGeneratorFactory>()
 				.TryAdd<ISqlExpressionFactory, FbSqlExpressionFactory>()
 				.TryAdd<ISingletonOptions, IFbOptions>(p => p.GetService<IFbOptions>())
+				.TryAdd<IRelationalSqlTranslatingExpressionVisitorFactory, FbSqlTranslatingExpressionVisitorFactory>()
 				.TryAddProviderSpecificServices(b => b
 					.TryAddSingleton<IFbOptions, FbOptions>()
 					.TryAddSingleton<IFbMigrationSqlGeneratorBehavior, FbMigrationSqlGeneratorBehavior>()
 					.TryAddSingleton<IFbUpdateSqlGenerator, FbUpdateSqlGenerator>()
-					.TryAddScoped<IFbRelationalConnection, FbRelationalConnection>());
+					.TryAddScoped<IFbRelationalConnection, FbRelationalConnection>()
+					.TryAddScoped<IFbRelationalTransaction, FbRelationalTransaction>());
 
 			builder.TryAddCoreServices();
 

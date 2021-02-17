@@ -188,7 +188,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				ClrType = typeof(string),
 				IsNullable = true,
 				MaxLength = 200,
-				OldColumn = new ColumnOperation()
+				OldColumn = new AddColumnOperation()
 				{
 					ClrType = typeof(string),
 					IsNullable = true,
@@ -210,7 +210,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				ClrType = typeof(string),
 				IsNullable = false,
 				MaxLength = 100,
-				OldColumn = new ColumnOperation()
+				OldColumn = new AddColumnOperation()
 				{
 					ClrType = typeof(string),
 					IsNullable = true,
@@ -233,7 +233,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				ClrType = typeof(string),
 				IsNullable = true,
 				MaxLength = 100,
-				OldColumn = new ColumnOperation()
+				OldColumn = new AddColumnOperation()
 				{
 					ClrType = typeof(string),
 					IsNullable = false,
@@ -255,7 +255,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "Col",
 				ClrType = typeof(long),
 				IsNullable = false,
-				OldColumn = new ColumnOperation()
+				OldColumn = new AddColumnOperation()
 				{
 					ClrType = typeof(int),
 					IsNullable = false,
@@ -275,7 +275,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "Col",
 				ClrType = typeof(int),
 				DefaultValue = 20,
-				OldColumn = new ColumnOperation()
+				OldColumn = new AddColumnOperation()
 				{
 					ClrType = typeof(int),
 					DefaultValue = 10,
@@ -297,7 +297,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "Col",
 				ClrType = typeof(int),
 				[FbAnnotationNames.ValueGenerationStrategy] = FbValueGenerationStrategy.IdentityColumn,
-				OldColumn = new ColumnOperation()
+				OldColumn = new AddColumnOperation()
 				{
 					ClrType = typeof(int),
 				},
@@ -316,7 +316,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Name = "Col",
 				ClrType = typeof(int),
 				[FbAnnotationNames.ValueGenerationStrategy] = FbValueGenerationStrategy.SequenceTrigger,
-				OldColumn = new ColumnOperation()
+				OldColumn = new AddColumnOperation()
 				{
 					ClrType = typeof(int),
 				},
@@ -336,7 +336,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Migrations
 				Table = "People",
 				Name = "Col",
 				ClrType = typeof(int),
-				OldColumn = new ColumnOperation()
+				OldColumn = new AddColumnOperation()
 				{
 					ClrType = typeof(int),
 					[FbAnnotationNames.ValueGenerationStrategy] = FbValueGenerationStrategy.SequenceTrigger,

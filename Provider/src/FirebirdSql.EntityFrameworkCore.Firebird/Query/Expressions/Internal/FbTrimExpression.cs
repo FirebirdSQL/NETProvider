@@ -31,7 +31,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 		public virtual SqlExpression ValueExpression { get; }
 
 		public FbTrimExpression(string where, SqlExpression whatExpression, SqlExpression valueExpression, RelationalTypeMapping typeMapping)
-			: base(default, default, default, default, default, default, typeof(string), typeMapping)
+			: base("TRIM", Array.Empty<SqlExpression>(), true, Array.Empty<bool>(), typeof(string), typeMapping)
 		{
 			Where = where;
 			WhatExpression = whatExpression;
@@ -52,7 +52,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 				: this;
 		}
 
-		public override void Print(ExpressionPrinter expressionPrinter)
+		protected override void Print(ExpressionPrinter expressionPrinter)
 		{
 			expressionPrinter.Append("TRIM(");
 			expressionPrinter.Append(Where);

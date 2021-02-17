@@ -87,10 +87,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 			base.ProcessPropertyAnnotationChanged(propertyBuilder, name, annotation, oldAnnotation, context);
 		}
 
-		protected override void Validate(IConventionProperty property)
+		protected override void Validate(IConventionProperty property, in StoreObjectIdentifier storeObject)
 		{
 			if (property.GetValueGenerationStrategyConfigurationSource() != null
-				&& property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None)
+				   && property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None)
 			{
 				if (property.GetDefaultValue() != null)
 				{
@@ -113,8 +113,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 							nameof(FbValueGenerationStrategy), property.Name, "ComputedColumnSql"));
 				}
 			}
-
-			base.Validate(property);
+			base.Validate(property, storeObject);
 		}
 	}
 }

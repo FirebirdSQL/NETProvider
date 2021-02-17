@@ -30,7 +30,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 		public virtual SqlExpression ValueExpression { get; }
 
 		public FbExtractExpression(string part, SqlExpression valueExpression, RelationalTypeMapping typeMapping)
-			: base(default, default, default, default, default, default, typeof(int), typeMapping)
+			: base("EXTRACT", Array.Empty<SqlExpression>(), true, Array.Empty<bool>(), typeof(int), typeMapping)
 		{
 			Part = part;
 			ValueExpression = valueExpression;
@@ -50,7 +50,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 				: this;
 		}
 
-		public override void Print(ExpressionPrinter expressionPrinter)
+		protected override void Print(ExpressionPrinter expressionPrinter)
 		{
 			expressionPrinter.Append("EXTRACT(");
 			expressionPrinter.Append(Part);

@@ -16,8 +16,12 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Threading.Tasks;
+using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestModels.ComplexNavigationsModel;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
@@ -285,13 +289,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Multi_level_navigation_with_same_navigation_compared_to_null(bool isAsync)
 		{
 			return base.Multi_level_navigation_with_same_navigation_compared_to_null(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Navigation_filter_navigation_grouping_ordering_by_group_key(bool isAsync)
-		{
-			return base.Navigation_filter_navigation_grouping_ordering_by_group_key(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -1024,6 +1021,76 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task SelectMany_with_outside_reference_to_joined_table_correctly_translated_to_apply(bool isAsync)
 		{
 			return base.SelectMany_with_outside_reference_to_joined_table_correctly_translated_to_apply(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Let_let_contains_from_outer_let(bool async)
+		{
+			return base.Let_let_contains_from_outer_let(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_complex_three_level_with_middle_having_filter1(bool async)
+		{
+			return base.Filtered_include_complex_three_level_with_middle_having_filter1(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_multiple_multi_level_includes_with_first_level_using_filter_include_on_one_of_the_chains_only(bool async)
+		{
+			return base.Filtered_include_multiple_multi_level_includes_with_first_level_using_filter_include_on_one_of_the_chains_only(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_ThenInclude_OrderBy(bool async)
+		{
+			return base.Filtered_ThenInclude_OrderBy(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_complex_three_level_with_middle_having_filter2(bool async)
+		{
+			return base.Filtered_include_complex_three_level_with_middle_having_filter2(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_ThenInclude_OrderBy(bool async)
+		{
+			return base.Filtered_include_ThenInclude_OrderBy(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_same_filter_set_on_same_navigation_twice_followed_by_ThenIncludes(bool async)
+		{
+			return base.Filtered_include_same_filter_set_on_same_navigation_twice_followed_by_ThenIncludes(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_after_different_filtered_include_different_level(bool async)
+		{
+			return base.Filtered_include_after_different_filtered_include_different_level(async);
+		}
+
+		[GeneratedNameTooLongFact]
+		[MemberData(nameof(IsAsyncData))]
+		public override void Filtered_include_outer_parameter_used_inside_filter()
+		{
+			base.Filtered_include_outer_parameter_used_inside_filter();
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_and_non_filtered_include_followed_by_then_include_on_same_navigation(bool async)
+		{
+			return base.Filtered_include_and_non_filtered_include_followed_by_then_include_on_same_navigation(async);
 		}
 	}
 }

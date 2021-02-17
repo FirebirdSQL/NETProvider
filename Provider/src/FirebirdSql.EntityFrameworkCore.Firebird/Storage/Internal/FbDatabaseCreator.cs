@@ -40,11 +40,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		{
 			FbConnection.CreateDatabase(_connection.ConnectionString);
 		}
+		public override Task CreateAsync(CancellationToken cancellationToken = default)
+		{
+			return FbConnection.CreateDatabaseAsync(_connection.ConnectionString, cancellationToken: cancellationToken);
+		}
 
 		public override void Delete()
 		{
 			FbConnection.ClearPool((FbConnection)_connection.DbConnection);
 			FbConnection.DropDatabase(_connection.ConnectionString);
+		}
+		public override Task DeleteAsync(CancellationToken cancellationToken = default)
+		{
+			FbConnection.ClearPool((FbConnection)_connection.DbConnection);
+			return FbConnection.DropDatabaseAsync(_connection.ConnectionString, cancellationToken);
 		}
 
 		public override bool Exists()
@@ -63,9 +72,26 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				_connection.Close();
 			}
 		}
+		public override async Task<bool> ExistsAsync(CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await _connection.OpenAsync(cancellationToken);
+				return true;
+			}
+			catch (FbException)
+			{
+				return false;
+			}
+			finally
+			{
+				await _connection.CloseAsync();
+			}
+		}
 
 		public override bool HasTables()
-			=> Dependencies.ExecutionStrategyFactory.Create().Execute(
+		{
+			return Dependencies.ExecutionStrategyFactory.Create().Execute(
 				_connection,
 				connection => Convert.ToInt64(CreateHasTablesCommand().ExecuteScalar(
 					new RelationalCommandParameterObject(
@@ -75,9 +101,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 						Dependencies.CurrentContext.Context,
 						Dependencies.CommandLogger)))
 					!= 0);
-
+		}
 		public override Task<bool> HasTablesAsync(CancellationToken cancellationToken = default)
-			=> Dependencies.ExecutionStrategyFactory.Create().ExecuteAsync(
+		{
+			return Dependencies.ExecutionStrategyFactory.Create().ExecuteAsync(
 				_connection,
 				async (connection, ct) => Convert.ToInt64(await CreateHasTablesCommand().ExecuteScalarAsync(
 					new RelationalCommandParameterObject(
@@ -89,6 +116,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 					ct))
 					!= 0,
 				cancellationToken);
+		}
 
 		IRelationalCommand CreateHasTablesCommand()
 		   => _rawSqlCommandBuilder

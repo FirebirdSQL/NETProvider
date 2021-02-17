@@ -21,13 +21,12 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
 	public class QueryFilterFuncletizationFbTest : QueryFilterFuncletizationTestBase<QueryFilterFuncletizationFbTest.QueryFilterFuncletizationFbFixture>
 	{
-		public QueryFilterFuncletizationFbTest(QueryFilterFuncletizationFbFixture fixture, ITestOutputHelper testOutputHelper)
+		public QueryFilterFuncletizationFbTest(QueryFilterFuncletizationFbFixture fixture)
 			: base(fixture)
 		{ }
 

@@ -18,6 +18,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
@@ -34,7 +36,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			_fbSqlExpressionFactory = fbSqlExpressionFactory;
 		}
 
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
 		{
 			if (!method.Equals(IsNullOrWhiteSpaceMethod))
 				return null;
@@ -43,7 +45,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			return _fbSqlExpressionFactory.OrElse(
 				_fbSqlExpressionFactory.IsNull(argument),
 				_fbSqlExpressionFactory.Equal(
-					_fbSqlExpressionFactory.Function("TRIM", new[] { argument }, typeof(string)),
+					_fbSqlExpressionFactory.Function("TRIM", new[] { argument }, true, new[] { true }, typeof(string)),
 					_fbSqlExpressionFactory.Constant(string.Empty))
 				);
 		}

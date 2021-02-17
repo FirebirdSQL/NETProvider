@@ -19,13 +19,12 @@ using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
 	public class ComplexNavigationsWeakQueryFbTest : ComplexNavigationsWeakQueryTestBase<ComplexNavigationsWeakQueryFbFixture>
 	{
-		public ComplexNavigationsWeakQueryFbTest(ComplexNavigationsWeakQueryFbFixture fixture, ITestOutputHelper testOutputHelper)
+		public ComplexNavigationsWeakQueryFbTest(ComplexNavigationsWeakQueryFbFixture fixture)
 			: base(fixture)
 		{ }
 
@@ -941,6 +940,62 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task SelectMany_with_outside_reference_to_joined_table_correctly_translated_to_apply(bool isAsync)
 		{
 			return base.SelectMany_with_outside_reference_to_joined_table_correctly_translated_to_apply(isAsync);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_multiple_multi_level_includes_with_first_level_using_filter_include_on_one_of_the_chains_only(bool async)
+		{
+			return base.Filtered_include_multiple_multi_level_includes_with_first_level_using_filter_include_on_one_of_the_chains_only(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_and_non_filtered_include_followed_by_then_include_on_same_navigation(bool async)
+		{
+			return base.Filtered_include_and_non_filtered_include_followed_by_then_include_on_same_navigation(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_complex_three_level_with_middle_having_filter2(bool async)
+		{
+			return base.Filtered_include_complex_three_level_with_middle_having_filter2(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Let_let_contains_from_outer_let(bool async)
+		{
+			return base.Let_let_contains_from_outer_let(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_complex_three_level_with_middle_having_filter1(bool async)
+		{
+			return base.Filtered_include_complex_three_level_with_middle_having_filter1(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_same_filter_set_on_same_navigation_twice_followed_by_ThenIncludes(bool async)
+		{
+			return base.Filtered_include_same_filter_set_on_same_navigation_twice_followed_by_ThenIncludes(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filtered_include_after_different_filtered_include_different_level(bool async)
+		{
+			return base.Filtered_include_after_different_filtered_include_different_level(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Select_subquery_with_client_eval_and_multi_level_navigation(bool async)
+		{
+			return base.Select_subquery_with_client_eval_and_multi_level_navigation(async);
 		}
 	}
 }

@@ -19,6 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
@@ -53,7 +55,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			_fbSqlExpressionFactory = fbSqlExpressionFactory;
 		}
 
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments)
+		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
 		{
 			if (method.Name == nameof(ToString) && method.GetParameters().Length == 0)
 			{
@@ -64,7 +66,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 				}
 				else if (type == typeof(Guid))
 				{
-					return _fbSqlExpressionFactory.Function("UUID_TO_CHAR", new[] { instance }, typeof(string));
+					return _fbSqlExpressionFactory.Function("UUID_TO_CHAR", new[] { instance }, true, new[] { true }, typeof(string));
 				}
 			}
 			return null;

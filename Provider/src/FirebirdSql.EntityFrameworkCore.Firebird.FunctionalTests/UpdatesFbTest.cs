@@ -44,7 +44,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 					entityType.GetForeignKeys().Single().GetConstraintName());
 				Assert.Equal(
 					"IX_LoginEntityTypeWithAnExtrem~",
-					entityType.GetIndexes().Single().GetName());
+					entityType.GetIndexes().Single().GetDatabaseName());
 			}
 		}
 	}

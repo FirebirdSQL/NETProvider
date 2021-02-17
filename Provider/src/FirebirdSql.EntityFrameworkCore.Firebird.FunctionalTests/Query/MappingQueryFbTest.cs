@@ -55,7 +55,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		public class MappingQueryFbFixture : MappingQueryFixtureBase
 		{
-			protected override ITestStoreFactory TestStoreFactory => /*FbNorthwindTestStoreFactory*/FbTestStoreFactory.Instance;
+			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
 			protected override string DatabaseSchema { get; } = null;
 

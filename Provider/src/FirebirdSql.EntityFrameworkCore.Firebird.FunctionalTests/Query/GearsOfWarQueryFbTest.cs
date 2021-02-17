@@ -19,6 +19,8 @@ using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Xunit;
+using System.Linq;
+using Microsoft.EntityFrameworkCore.TestModels.GearsOfWarModel;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
@@ -27,6 +29,27 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public GearsOfWarQueryFbTest(GearsOfWarQueryFbFixture fixture)
 			: base(fixture)
 		{ }
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Byte_array_contains_parameter(bool async)
+		{
+			return base.Byte_array_contains_parameter(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Byte_array_contains_literal(bool async)
+		{
+			return base.Byte_array_contains_literal(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Contains_on_byte_array_property_using_byte_column(bool async)
+		{
+			return base.Contains_on_byte_array_property_using_byte_column(async);
+		}
 
 		[NotSupportedOnFirebirdTheory]
 		[MemberData(nameof(IsAsyncData))]
@@ -236,6 +259,41 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task DateTimeOffset_Date_returns_datetime(bool isAsync)
 		{
 			return base.DateTimeOffset_Date_returns_datetime(isAsync);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Subquery_projecting_non_nullable_scalar_contains_non_nullable_value_doesnt_need_null_expansion(bool async)
+		{
+			return base.Subquery_projecting_non_nullable_scalar_contains_non_nullable_value_doesnt_need_null_expansion(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Subquery_projecting_non_nullable_scalar_contains_non_nullable_value_doesnt_need_null_expansion_negated(bool async)
+		{
+			return base.Subquery_projecting_non_nullable_scalar_contains_non_nullable_value_doesnt_need_null_expansion_negated(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Subquery_projecting_nullable_scalar_contains_nullable_value_needs_null_expansion_negated(bool async)
+		{
+			return base.Subquery_projecting_nullable_scalar_contains_nullable_value_needs_null_expansion_negated(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task SelectMany_predicate_with_non_equality_comparison_with_Take_doesnt_convert_to_join(bool async)
+		{
+			return base.SelectMany_predicate_with_non_equality_comparison_with_Take_doesnt_convert_to_join(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Subquery_projecting_nullable_scalar_contains_nullable_value_needs_null_expansion(bool async)
+		{
+			return base.Subquery_projecting_nullable_scalar_contains_nullable_value_needs_null_expansion(async);
 		}
 	}
 }

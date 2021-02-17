@@ -29,7 +29,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 		public virtual SqlExpression ValueExpression { get; }
 
 		public FbDateTimeDateMemberExpression(SqlExpression valueExpression, RelationalTypeMapping typeMapping)
-			: base(default, default, default, default, default, default, typeof(DateTime), typeMapping)
+			: base("CAST_DATE", Array.Empty<SqlExpression>(), true, Array.Empty<bool>(), typeof(DateTime), typeMapping)
 		{
 			ValueExpression = valueExpression;
 		}
@@ -48,7 +48,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 				: this;
 		}
 
-		public override void Print(ExpressionPrinter expressionPrinter)
+		protected override void Print(ExpressionPrinter expressionPrinter)
 		{
 			expressionPrinter.Append("CAST(");
 			expressionPrinter.Visit(ValueExpression);

@@ -32,9 +32,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestModels.No
 			base.OnModelCreating(modelBuilder);
 			ModelHelpers.SetStringLengths(modelBuilder);
 
-			modelBuilder.Entity<CustomerView>().HasNoKey().ToQuery(
-				() => CustomerQueries.FromSqlInterpolated($@"SELECT ""c"".""CustomerID"" || {_empty} as ""CustomerID"", ""c"".""Address"", ""c"".""City"", ""c"".""CompanyName"", ""c"".""ContactName"", ""c"".""ContactTitle"", ""c"".""Country"", ""c"".""Fax"", ""c"".""Phone"", ""c"".""PostalCode"", ""c"".""Region"" FROM ""Customers"" AS ""c"""
-				));
+			modelBuilder.Entity<CustomerQuery>().ToSqlQuery(
+				@"SELECT ""c"".""CustomerID"", ""c"".""Address"", ""c"".""City"", ""c"".""CompanyName"", ""c"".""ContactName"", ""c"".""ContactTitle"", ""c"".""Country"", ""c"".""Fax"", ""c"".""Phone"", ""c"".""PostalCode"", ""c"".""Region"" FROM ""Customers"" AS ""c""");
 		}
 	}
 }

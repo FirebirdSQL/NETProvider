@@ -15,51 +15,290 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
 using System.Threading.Tasks;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Scaffolding;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 {
-	public class MigrationsFbTest : MigrationsTestBase<MigrationsFbFixture>
+	public class MigrationsFbTest : MigrationsTestBase<MigrationsFbTest.MigrationsFbFixture>
 	{
+		const string SkipReason = "Assumptions in model differ too much between base tests and Firebird.";
+
 		public MigrationsFbTest(MigrationsFbFixture fixture)
 			: base(fixture)
 		{ }
 
-		protected override void GiveMeSomeTime(DbContext db)
-		{ }
+		protected override string NonDefaultCollation => "WIN1250";
 
-		protected override Task GiveMeSomeTimeAsync(DbContext db)
-			=> Task.CompletedTask;
+		[Fact(Skip = SkipReason)]
+		public override Task Create_table() => base.Create_table();
 
-		[Fact]
-		public override void Can_generate_idempotent_up_scripts()
+		[Fact(Skip = SkipReason)]
+		public override Task Create_table_all_settings() => base.Create_table_all_settings();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_table_no_key() => base.Create_table_no_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_table_with_comments() => base.Create_table_with_comments();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_table_with_multiline_comments() => base.Create_table_with_multiline_comments();
+
+		[Theory(Skip = SkipReason)]
+		[InlineData(true)]
+		[InlineData(false)]
+		[InlineData(null)]
+		public override Task Create_table_with_computed_column(bool? stored) => base.Create_table_with_computed_column(stored);
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_table_add_comment() => base.Alter_table_add_comment();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_table_add_comment_non_default_schema() => base.Alter_table_add_comment_non_default_schema();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_table_change_comment() => base.Alter_table_change_comment();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_table_remove_comment() => base.Alter_table_remove_comment();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_table() => base.Drop_table();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Rename_table() => base.Rename_table();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Rename_table_with_primary_key() => base.Rename_table_with_primary_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Move_table() => base.Move_table();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_schema() => base.Create_schema();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_defaultValue_string() => base.Add_column_with_defaultValue_string();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_defaultValue_datetime() => base.Add_column_with_defaultValue_datetime();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_defaultValueSql() => base.Add_column_with_defaultValueSql();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_defaultValueSql_unspecified() => base.Add_column_with_defaultValueSql_unspecified();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_defaultValue_unspecified() => base.Add_column_with_defaultValue_unspecified();
+
+		[Theory(Skip = SkipReason)]
+		[InlineData(true)]
+		[InlineData(false)]
+		[InlineData(null)]
+		public override Task Add_column_with_computedSql(bool? stored) => base.Add_column_with_computedSql(stored);
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_computedSql_unspecified() => base.Add_column_with_computedSql_unspecified();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_required() => base.Add_column_with_required();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_ansi() => base.Add_column_with_ansi();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_max_length() => base.Add_column_with_max_length();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_max_length_on_derived() => base.Add_column_with_max_length_on_derived();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_fixed_length() => base.Add_column_with_fixed_length();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_comment() => base.Add_column_with_comment();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_collation() => base.Add_column_with_collation();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_computed_with_collation() => base.Add_column_computed_with_collation();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_shared() => base.Add_column_shared();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_column_with_check_constraint() => base.Add_column_with_check_constraint();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_change_type() => base.Alter_column_change_type();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_make_required() => base.Alter_column_make_required();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_make_required_with_index() => base.Alter_column_make_required_with_index();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_make_required_with_composite_index() => base.Alter_column_make_required_with_composite_index();
+
+		[Theory(Skip = SkipReason)]
+		[InlineData(true)]
+		[InlineData(false)]
+		[InlineData(null)]
+		public override Task Alter_column_make_computed(bool? stored) => base.Alter_column_make_computed(stored);
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_change_computed() => base.Alter_column_change_computed();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_change_computed_type() => base.Alter_column_change_computed_type();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_add_comment() => base.Alter_column_add_comment();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_change_comment() => base.Alter_column_change_comment();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_remove_comment() => base.Alter_column_remove_comment();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_set_collation() => base.Alter_column_set_collation();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_reset_collation() => base.Alter_column_reset_collation();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_column() => base.Drop_column();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_column_primary_key() => base.Drop_column_primary_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Rename_column() => base.Rename_column();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_index() => base.Create_index();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_index_unique() => base.Create_index_unique();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_index_with_filter() => base.Create_index_with_filter();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_unique_index_with_filter() => base.Create_unique_index_with_filter();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_index() => base.Drop_index();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Rename_index() => base.Rename_index();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_primary_key() => base.Add_primary_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_primary_key_with_name() => base.Add_primary_key_with_name();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_primary_key_composite_with_name() => base.Add_primary_key_composite_with_name();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_primary_key() => base.Drop_primary_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_foreign_key() => base.Add_foreign_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_foreign_key_with_name() => base.Add_foreign_key_with_name();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_foreign_key() => base.Drop_foreign_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_unique_constraint() => base.Add_unique_constraint();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_unique_constraint_composite_with_name() => base.Add_unique_constraint_composite_with_name();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_unique_constraint() => base.Drop_unique_constraint();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Add_check_constraint_with_name() => base.Add_check_constraint_with_name();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_check_constraint() => base.Alter_check_constraint();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_check_constraint() => base.Drop_check_constraint();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_sequence() => base.Create_sequence();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Create_sequence_all_settings() => base.Create_sequence_all_settings();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_sequence_all_settings() => base.Alter_sequence_all_settings();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_sequence_increment_by() => base.Alter_sequence_increment_by();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_sequence() => base.Drop_sequence();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Rename_sequence() => base.Rename_sequence();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Move_sequence() => base.Move_sequence();
+
+		[Fact(Skip = SkipReason)]
+		public override Task InsertDataOperation() => base.InsertDataOperation();
+
+		[Fact(Skip = SkipReason)]
+		public override Task DeleteDataOperation_simple_key() => base.DeleteDataOperation_simple_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task DeleteDataOperation_composite_key() => base.DeleteDataOperation_composite_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task UpdateDataOperation_simple_key() => base.UpdateDataOperation_simple_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task UpdateDataOperation_composite_key() => base.UpdateDataOperation_composite_key();
+
+		[Fact(Skip = SkipReason)]
+		public override Task UpdateDataOperation_multiple_columns() => base.UpdateDataOperation_multiple_columns();
+
+		[Fact(Skip = SkipReason)]
+		public override Task SqlOperation() => base.SqlOperation();
+
+		public class MigrationsFbFixture : MigrationsFixtureBase
 		{
-			Assert.Throws<NotSupportedException>(base.Can_generate_idempotent_up_scripts);
+			protected override string StoreName => nameof(MigrationsFbTest);
+
+			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+			public override TestHelpers TestHelpers => FbTestHelpers.Instance;
+
+			protected override IServiceCollection AddServices(IServiceCollection serviceCollection)
+#pragma warning disable EF1001
+				 => base.AddServices(serviceCollection)
+					.AddScoped<IDatabaseModelFactory, FbDatabaseModelFactory>();
+#pragma warning restore EF1001
 		}
-
-		[Fact]
-		public override void Can_generate_idempotent_down_scripts()
-		{
-			Assert.Throws<NotSupportedException>(base.Can_generate_idempotent_down_scripts);
-		}
-
-		[Fact(Skip = "")]
-		public override void Can_diff_against_2_2_model()
-		{ }
-
-		[Fact(Skip = "")]
-		public override void Can_diff_against_3_0_ASP_NET_Identity_model()
-		{ }
-
-		[Fact(Skip = "")]
-		public override void Can_diff_against_2_2_ASP_NET_Identity_model()
-		{ }
-
-		[Fact(Skip = "")]
-		public override void Can_diff_against_2_1_ASP_NET_Identity_model()
-		{ }
 	}
 }

@@ -42,14 +42,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 			ReplaceConvention(conventionSet.ForeignKeyAddedConventions, valueGenerationConvention);
 			ReplaceConvention(conventionSet.ForeignKeyRemovedConventions, valueGenerationConvention);
 
-			ConventionSet.AddBefore(conventionSet.ModelFinalizedConventions, valueGenerationStrategyConvention, typeof(ValidatingConvention));
+			ConventionSet.AddBefore(conventionSet.ModelFinalizingConventions, valueGenerationStrategyConvention, typeof(ValidatingConvention));
 
 			var storeGenerationConvention = new FbStoreGenerationConvention(Dependencies, RelationalDependencies);
 
 			ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, storeGenerationConvention);
 			ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, (RelationalValueGenerationConvention)valueGenerationConvention);
 
-			ReplaceConvention(conventionSet.ModelFinalizedConventions, storeGenerationConvention);
+			ReplaceConvention(conventionSet.ModelFinalizingConventions, storeGenerationConvention);
 
 			return conventionSet;
 		}

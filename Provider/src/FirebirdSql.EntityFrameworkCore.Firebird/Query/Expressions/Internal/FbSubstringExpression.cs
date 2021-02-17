@@ -31,7 +31,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 		public virtual SqlExpression ForExpression { get; }
 
 		public FbSubstringExpression(SqlExpression valueExpression, SqlExpression fromExpression, SqlExpression forExpression, RelationalTypeMapping typeMapping)
-			: base(default, default, default, default, default, default, typeof(string), typeMapping)
+			: base("SUBSTRING", Array.Empty<SqlExpression>(), true, Array.Empty<bool>(), typeof(string), typeMapping)
 		{
 			ValueExpression = valueExpression;
 			FromExpression = fromExpression;
@@ -54,7 +54,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
 				: this;
 		}
 
-		public override void Print(ExpressionPrinter expressionPrinter)
+		protected override void Print(ExpressionPrinter expressionPrinter)
 		{
 			expressionPrinter.Append("SUBSTRING(");
 			expressionPrinter.Visit(ValueExpression);

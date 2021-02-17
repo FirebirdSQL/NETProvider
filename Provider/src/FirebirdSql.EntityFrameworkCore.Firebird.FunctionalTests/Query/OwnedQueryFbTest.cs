@@ -24,7 +24,7 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
-	public class OwnedQueryFbTest : RelationalOwnedQueryTestBase<OwnedQueryFbTest.OwnedQueryFbFixture>
+	public class OwnedQueryFbTest : OwnedQueryRelationalTestBase<OwnedQueryFbTest.OwnedQueryFbFixture>
 	{
 		public OwnedQueryFbTest(OwnedQueryFbFixture fixture)
 			: base(fixture)
@@ -77,10 +77,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		[HasDataInTheSameTransactionAsDDLTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task Query_for_leaf_type_loads_all_owned_navs(bool isAsync) => base.Query_for_leaf_type_loads_all_owned_navs(isAsync);
-
-		[HasDataInTheSameTransactionAsDDLTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Query_when_group_by(bool isAsync) => base.Query_when_group_by(isAsync);
 
 		[HasDataInTheSameTransactionAsDDLTheory]
 		[MemberData(nameof(IsAsyncData))]
@@ -169,6 +165,202 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		[HasDataInTheSameTransactionAsDDLTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task Unmapped_property_projection_loads_owned_navigations(bool isAsync) => base.Unmapped_property_projection_loads_owned_navigations(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Client_method_take_loads_owned_navigations_variation_2(bool isAsync) => base.Client_method_take_loads_owned_navigations_variation_2(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Trying_to_access_non_existent_indexer_property_throws_meaningful_exception(bool isAsync) => base.Trying_to_access_non_existent_indexer_property_throws_meaningful_exception(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Client_method_skip_loads_owned_navigations(bool isAsync) => base.Client_method_skip_loads_owned_navigations(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Indexer_property_is_pushdown_into_subquery(bool isAsync) => base.Indexer_property_is_pushdown_into_subquery(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Query_with_OfType_eagerly_loads_correct_owned_navigations_split(bool isAsync) => base.Query_with_OfType_eagerly_loads_correct_owned_navigations_split(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_OrderBy_owned_indexer_properties(bool isAsync) => base.Can_OrderBy_owned_indexer_properties(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_query_on_indexer_property_when_property_name_from_closure(bool isAsync) => base.Can_query_on_indexer_property_when_property_name_from_closure(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_group_by_converted_indexer_property(bool isAsync) => base.Can_group_by_converted_indexer_property(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_collection_navigation_AsEnumerable_Count(bool isAsync) => base.Where_collection_navigation_AsEnumerable_Count(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Owned_entity_without_owner_does_not_throw_for_identity_resolution(bool isAsync) => base.Owned_entity_without_owner_does_not_throw_for_identity_resolution(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_project_owned_indexer_properties_converted(bool isAsync) => base.Can_project_owned_indexer_properties_converted(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_group_by_owned_indexer_property(bool isAsync) => base.Can_group_by_owned_indexer_property(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Project_multiple_owned_navigations_split(bool isAsync) => base.Project_multiple_owned_navigations_split(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_project_owned_indexer_properties(bool isAsync) => base.Can_project_owned_indexer_properties(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task NoTracking_Include_with_cycles_throws(bool isAsync) => base.NoTracking_Include_with_cycles_throws(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Projecting_indexer_property_ignores_include(bool isAsync) => base.Projecting_indexer_property_ignores_include(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task GroupBy_with_multiple_aggregates_on_owned_navigation_properties(bool isAsync) => base.GroupBy_with_multiple_aggregates_on_owned_navigation_properties(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task NoTracking_Include_with_cycles_does_not_throw_when_performing_identity_resolution(bool isAsync) => base.NoTracking_Include_with_cycles_does_not_throw_when_performing_identity_resolution(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Using_from_sql_on_owner_generates_join_with_table_for_owned_shared_dependents(bool isAsync) => base.Using_from_sql_on_owner_generates_join_with_table_for_owned_shared_dependents(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Query_when_subquery_split(bool isAsync) => base.Query_when_subquery_split(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_group_by_converted_owned_indexer_property(bool isAsync) => base.Can_group_by_converted_owned_indexer_property(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_project_indexer_properties_converted(bool isAsync) => base.Can_project_indexer_properties_converted(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Query_for_base_type_loads_all_owned_navs_split(bool isAsync) => base.Query_for_base_type_loads_all_owned_navs_split(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_query_on_indexer_properties(bool isAsync) => base.Can_query_on_indexer_properties(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Non_nullable_property_through_optional_navigation(bool isAsync) => base.Non_nullable_property_through_optional_navigation(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_collection_navigation_ToArray_Count(bool isAsync) => base.Where_collection_navigation_ToArray_Count(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_OrderBy_indexer_properties_converted(bool isAsync) => base.Can_OrderBy_indexer_properties_converted(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_join_on_indexer_property_on_query(bool isAsync) => base.Can_join_on_indexer_property_on_query(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_OrderBy_owened_indexer_properties_converted(bool isAsync) => base.Can_OrderBy_owened_indexer_properties_converted(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_collection_navigation_ToList_Count_member(bool isAsync) => base.Where_collection_navigation_ToList_Count_member(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_query_on_owned_indexer_properties(bool isAsync) => base.Can_query_on_owned_indexer_properties(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Projecting_indexer_property_ignores_include_converted(bool isAsync) => base.Projecting_indexer_property_ignores_include_converted(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Client_method_skip_loads_owned_navigations_variation_2(bool isAsync) => base.Client_method_skip_loads_owned_navigations_variation_2(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Client_method_skip_take_loads_owned_navigations_variation_2(bool isAsync) => base.Client_method_skip_take_loads_owned_navigations_variation_2(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Projecting_collection_correlated_with_keyless_entity_after_navigation_works_using_parent_identifiers(bool isAsync) => base.Projecting_collection_correlated_with_keyless_entity_after_navigation_works_using_parent_identifiers(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_query_on_indexer_properties_split(bool isAsync) => base.Can_query_on_indexer_properties_split(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Navigation_rewrite_on_owned_reference_followed_by_regular_entity_and_collection_split(bool isAsync) => base.Navigation_rewrite_on_owned_reference_followed_by_regular_entity_and_collection_split(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_collection_navigation_ToArray_Length_member(bool isAsync) => base.Where_collection_navigation_ToArray_Length_member(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_OrderBy_indexer_properties(bool isAsync) => base.Can_OrderBy_indexer_properties(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_owned_collection_navigation_ToList_Count(bool isAsync) => base.Where_owned_collection_navigation_ToList_Count(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Query_on_collection_entry_works_for_owned_collection(bool isAsync) => base.Query_on_collection_entry_works_for_owned_collection(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Client_method_take_loads_owned_navigations(bool isAsync) => base.Client_method_take_loads_owned_navigations(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_group_by_indexer_property(bool isAsync) => base.Can_group_by_indexer_property(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Query_for_branch_type_loads_all_owned_navs_split(bool isAsync) => base.Query_for_branch_type_loads_all_owned_navs_split(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_query_indexer_property_on_owned_collection(bool isAsync) => base.Can_query_indexer_property_on_owned_collection(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Client_method_skip_take_loads_owned_navigations(bool isAsync) => base.Client_method_skip_take_loads_owned_navigations(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Unmapped_property_projection_loads_owned_navigations_split(bool isAsync) => base.Unmapped_property_projection_loads_owned_navigations_split(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Can_project_indexer_properties(bool isAsync) => base.Can_project_indexer_properties(isAsync);
+
+		[DoesNotHaveTheDataTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Ordering_by_identifying_projection(bool isAsync) => base.Ordering_by_identifying_projection(isAsync);
 
 		public class OwnedQueryFbFixture : RelationalOwnedQueryFixture
 		{
