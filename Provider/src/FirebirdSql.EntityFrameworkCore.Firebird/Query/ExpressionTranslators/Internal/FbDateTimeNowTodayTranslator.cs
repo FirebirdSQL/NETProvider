@@ -38,8 +38,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 		{
 			if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Now))
 			{
-				// LOCALTIMESTAMP
-				return _fbSqlExpressionFactory.NiladicFunction("CURRENT_TIMESTAMP", false, typeof(DateTime));
+				return _fbSqlExpressionFactory.NiladicFunction("LOCALTIMESTAMP", false, typeof(DateTime));
 			}
 			if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Today))
 			{
