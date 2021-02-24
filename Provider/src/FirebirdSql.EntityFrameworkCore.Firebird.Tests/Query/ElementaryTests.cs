@@ -132,12 +132,43 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 		[Test]
 		public async Task SelectTopLevelAny()
 		{
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
-				return;
-
 			await using (var db = await GetDbContext<SelectContext>())
 			{
 				Assert.DoesNotThrowAsync(() => db.Set<MonAttachment>().AnyAsync(x => x.AttachmentId != 0));
+			}
+		}
+
+		[Test]
+		public async Task SelectableProcedureSimple()
+		{
+			await using (var db = await GetDbContext<SelectContext>())
+			{
+				db.CreateProcedures();
+				var query = db.Set<SelectableProcedure>();
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
+			}
+		}
+
+		[Test]
+		public async Task SelectableProcedureWithTable()
+		{
+			await using (var db = await GetDbContext<SelectContext>())
+			{
+				db.CreateProcedures();
+				var query = db.Set<MonAttachment>()
+					.Where(x => db.Set<SelectableProcedure>().Select(y => y.Value).Contains(x.AttachmentId));
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
+			}
+		}
+
+		[Test]
+		public async Task SelectableProcedureWithParam()
+		{
+			await using (var db = await GetDbContext<SelectContext>())
+			{
+				db.CreateProcedures();
+				var query = db.SelectableProcedureWithParam(10).Where(x => x.Value > 10);
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
 			}
 		}
 	}
@@ -203,6 +234,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 			monAttachmentConf.Property(x => x.AttachmentName).HasColumnName("MON$ATTACHMENT_NAME");
 			monAttachmentConf.Property(x => x.Timestamp).HasColumnName("MON$TIMESTAMP");
 			monAttachmentConf.ToTable("MON$ATTACHMENTS");
+
+			var selectableProcedureConf = modelBuilder.Entity<SelectableProcedure>();
+			selectableProcedureConf.HasNoKey();
+			selectableProcedureConf.Property(x => x.Value).HasColumnName("VAL");
+			selectableProcedureConf.ToFunction("SELECTABLE_PROCEDURE");
+
+			var selectableProcedureWithParamConf = modelBuilder.Entity<SelectableProcedureWithParam>();
+			selectableProcedureWithParamConf.HasNoKey();
+			selectableProcedureWithParamConf.Property(x => x.Value).HasColumnName("VAL");
+			modelBuilder.HasDbFunction(typeof(SelectContext).GetMethod(nameof(SelectableProcedureWithParam)),
+				c => c.HasName("SELECTABLE_PROCEDURE"));
+
 		}
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -214,6 +257,22 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 		}
 
 		public string LastCommandText => _lastCommandTextInterceptor.LastCommandText;
+
+		public IQueryable<SelectableProcedureWithParam> SelectableProcedureWithParam(int i) => FromExpression(() => SelectableProcedureWithParam(i));
+
+		public void CreateProcedures()
+		{
+			Database.ExecuteSqlRaw(
+@"recreate procedure selectable_procedure (i int = 6)
+returns (val int)
+as
+begin
+	val = i;
+	suspend;
+	val = i + 1;
+	suspend;
+end");
+		}
 	}
 
 	class MonAttachment
@@ -221,5 +280,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 		public int AttachmentId { get; set; }
 		public string AttachmentName { get; set; }
 		public DateTime Timestamp { get; set; }
+	}
+
+	class SelectableProcedure
+	{
+		public int Value { get; set; }
+	}
+	class SelectableProcedureWithParam
+	{
+		public int Value { get; set; }
 	}
 }

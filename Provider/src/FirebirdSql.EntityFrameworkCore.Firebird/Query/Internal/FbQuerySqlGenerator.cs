@@ -244,6 +244,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 			return orderingExpression;
 		}
 
+		protected override Expression VisitTableValuedFunction(TableValuedFunctionExpression tableValuedFunctionExpression)
+		{
+			Sql.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(tableValuedFunctionExpression.StoreFunction.Name));
+			if (tableValuedFunctionExpression.Arguments.Any())
+			{
+				Sql.Append("(");
+				GenerateList(tableValuedFunctionExpression.Arguments, e => Visit(e));
+				Sql.Append(")");
+			}
+			Sql.Append(AliasSeparator);
+			Sql.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(tableValuedFunctionExpression.Alias));
+			return tableValuedFunctionExpression;
+		}
+
 		public virtual Expression VisitSubstring(FbSubstringExpression substringExpression)
 		{
 			Sql.Append("SUBSTRING(");
