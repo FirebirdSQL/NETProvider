@@ -19,8 +19,6 @@ using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Xunit;
-using System.Linq;
-using Microsoft.EntityFrameworkCore.TestModels.GearsOfWarModel;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
@@ -29,27 +27,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public GearsOfWarQueryFbTest(GearsOfWarQueryFbFixture fixture)
 			: base(fixture)
 		{ }
-
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Byte_array_contains_parameter(bool async)
-		{
-			return base.Byte_array_contains_parameter(async);
-		}
-
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Byte_array_contains_literal(bool async)
-		{
-			return base.Byte_array_contains_literal(async);
-		}
-
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Contains_on_byte_array_property_using_byte_column(bool async)
-		{
-			return base.Contains_on_byte_array_property_using_byte_column(async);
-		}
 
 		[NotSupportedOnFirebirdTheory]
 		[MemberData(nameof(IsAsyncData))]

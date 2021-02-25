@@ -36,30 +36,24 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 
 		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
 		{
-			// POSITION works only with text blobs at the moment
+			if (method.IsGenericMethod
+				&& method.GetGenericMethodDefinition().Equals(EnumerableMethods.Contains)
+				&& arguments[0].Type == typeof(byte[]))
+			{
+				var value = arguments[1] is SqlConstantExpression constantValue
+					? _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Constant((byte)constantValue.Value) }, false, new[] { false }, typeof(string))
+					: _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Convert(arguments[1], typeof(byte)) }, true, new[] { true }, typeof(string));
+
+				return _fbSqlExpressionFactory.GreaterThan(
+					_fbSqlExpressionFactory.Function(
+						"POSITION",
+						new[] { value, arguments[0] },
+						true,
+						new[] { true, true },
+						typeof(int)),
+					_fbSqlExpressionFactory.Constant(0));
+			}
 			return null;
-
-			//if (method.IsGenericMethod
-			//	&& method.GetGenericMethodDefinition().Equals(EnumerableMethods.Contains)
-			//	&& arguments[0].Type == typeof(byte[]))
-			//{
-			//	var source = arguments[0];
-			//	var sourceTypeMapping = source.TypeMapping;
-
-			//	var value = arguments[1] is SqlConstantExpression constantValue
-			//		? (SqlExpression)_fbSqlExpressionFactory.Constant(new[] { (byte)constantValue.Value }, sourceTypeMapping)
-			//		: _fbSqlExpressionFactory.Convert(arguments[1], typeof(byte[]), sourceTypeMapping);
-
-			//	return _fbSqlExpressionFactory.GreaterThan(
-			//		_fbSqlExpressionFactory.Function(
-			//			"POSITION",
-			//			new[] { value, source },
-			//			true,
-			//			new[] { true, true },
-			//			typeof(int)),
-			//		_fbSqlExpressionFactory.Constant(0));
-			//}
-			//return null;
 		}
 	}
 }
