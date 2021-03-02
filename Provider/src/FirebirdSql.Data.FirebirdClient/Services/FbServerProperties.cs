@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Services
 		}
 
 		public FbServerConfig GetServerConfig() => GetServerConfigImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
-		public Task<FbServerConfig> GetServerConfigAsync(CancellationToken cancellationToken = default) => GetServerConfigImpl(new AsyncWrappingCommonArgs(false, cancellationToken));
+		public Task<FbServerConfig> GetServerConfigAsync(CancellationToken cancellationToken = default) => GetServerConfigImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<FbServerConfig> GetServerConfigImpl(AsyncWrappingCommonArgs async)
 		{
 			return (FbServerConfig)(await GetInfo(IscCodes.isc_info_svc_get_config, async).ConfigureAwait(false)).FirstOrDefault() ?? new FbServerConfig();

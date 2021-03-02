@@ -428,7 +428,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		public override void Open() => OpenImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
-		public override Task OpenAsync(CancellationToken cancellationToken) => OpenImpl(new AsyncWrappingCommonArgs(false, cancellationToken));
+		public override Task OpenAsync(CancellationToken cancellationToken) => OpenImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		internal async Task OpenImpl(AsyncWrappingCommonArgs async)
 		{
 			if (string.IsNullOrEmpty(_connectionString))
