@@ -16,9 +16,11 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Types
 {
+	[StructLayout(LayoutKind.Auto)]
 	public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>
 	{
 		public DateTime DateTime { get; }

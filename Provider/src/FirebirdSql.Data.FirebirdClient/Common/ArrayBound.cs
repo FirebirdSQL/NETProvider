@@ -16,9 +16,11 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Common
 {
+	[StructLayout(LayoutKind.Auto)]
 	internal struct ArrayBound
 	{
 		public int LowerBound { get; set; }

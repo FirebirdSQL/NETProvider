@@ -20,6 +20,7 @@ using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Common
 {
+	[StructLayout(LayoutKind.Auto)]
 	internal struct ArrayDesc
 	{
 		public byte DataType { get; set; }

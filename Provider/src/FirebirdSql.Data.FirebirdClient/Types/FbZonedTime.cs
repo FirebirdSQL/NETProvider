@@ -16,9 +16,11 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace FirebirdSql.Data.Types
 {
+	[StructLayout(LayoutKind.Auto)]
 	public readonly struct FbZonedTime : IEquatable<FbZonedTime>
 	{
 		public TimeSpan Time { get; }

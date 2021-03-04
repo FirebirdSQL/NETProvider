@@ -18,10 +18,12 @@
 using System;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Types
 {
+	[StructLayout(LayoutKind.Auto)]
 	public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 	{
 		internal DecimalType Type { get; }
