@@ -191,7 +191,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #if NET48 || NETSTANDARD2_0
 				using (command)
 #else
-				await using (command)
+				await using (command.ConfigureAwait(false))
 #endif
 				{
 					await async.AsyncSyncCall(command.ExecuteNonQueryAsync, command.ExecuteNonQuery).ConfigureAwait(false);
@@ -225,7 +225,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #if NET48 || NETSTANDARD2_0
 				using (command)
 #else
-				await using (command)
+				await using (command.ConfigureAwait(false))
 #endif
 				{
 					await async.AsyncSyncCall(command.ExecuteNonQueryAsync, command.ExecuteNonQuery).ConfigureAwait(false);
@@ -259,7 +259,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #if NET48 || NETSTANDARD2_0
 				using (command)
 #else
-				await using (command)
+				await using (command.ConfigureAwait(false))
 #endif
 				{
 					await async.AsyncSyncCall(command.ExecuteNonQueryAsync, command.ExecuteNonQuery).ConfigureAwait(false);
