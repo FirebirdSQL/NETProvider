@@ -36,29 +36,11 @@ namespace FirebirdSql.Data.FirebirdClient
 		#region Properties
 
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-		public FbErrorCollection Errors
-		{
-			get
-			{
-				return _errors ??= new FbErrorCollection();
-			}
-		}
+		public FbErrorCollection Errors => _errors ??= new FbErrorCollection();
 
-		public override int ErrorCode
-		{
-			get
-			{
-				return (InnerException as IscException)?.ErrorCode ?? 0;
-			}
-		}
+		public override int ErrorCode => (InnerException as IscException)?.ErrorCode ?? 0;
 
-		public string SQLSTATE
-		{
-			get
-			{
-				return (InnerException as IscException)?.SQLSTATE;
-			}
-		}
+		public string SQLSTATE => (InnerException as IscException)?.SQLSTATE;
 
 		#endregion
 
