@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			get
 			{
-				return _errors ?? (_errors = new FbErrorCollection());
+				return _errors ??= new FbErrorCollection();
 			}
 		}
 
@@ -66,20 +66,18 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		internal FbException()
 			: base()
-		{
-		}
+		{ }
 
 		internal FbException(string message)
 			: base(message)
-		{
-		}
+		{ }
 
 		internal FbException(string message, Exception innerException)
 			: base(message, innerException)
 		{
-			if (innerException is IscException)
+			if (innerException is IscException iscException)
 			{
-				ProcessIscExceptionErrors((IscException)innerException);
+				ProcessIscExceptionErrors(iscException);
 			}
 		}
 
@@ -102,9 +100,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
-		#region Internal Methods
+		#region Private Methods
 
-		internal void ProcessIscExceptionErrors(IscException innerException)
+		private void ProcessIscExceptionErrors(IscException innerException)
 		{
 			foreach (var error in innerException.Errors)
 			{
