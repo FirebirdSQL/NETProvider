@@ -566,7 +566,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				return;
 
 			var cancelled = false;
-
 			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText =
@@ -595,8 +594,8 @@ end";
 				cmd.Cancel();
 				Thread.Sleep(2000);
 				await executeTask;
-				Assert.IsTrue(cancelled);
 			}
+			Assert.IsTrue(cancelled);
 		}
 
 		[Test]
