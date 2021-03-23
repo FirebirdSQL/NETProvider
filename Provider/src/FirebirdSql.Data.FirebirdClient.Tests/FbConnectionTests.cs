@@ -555,6 +555,26 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
+		[Test]
+		public async Task InfoMessageTest()
+		{
+			var messageReceived = false;
+			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
+			{
+				conn.InfoMessage += (object sender, FbInfoMessageEventArgs e) =>
+				{
+					messageReceived = e.Message.Contains("jiri", StringComparison.OrdinalIgnoreCase);
+				};
+				await conn.OpenAsync();
+				await using (var cmd = conn.CreateCommand())
+				{
+					cmd.CommandText = "revoke select on table test from jiri";
+					await cmd.ExecuteNonQueryAsync();
+				}
+			}
+			Assert.IsTrue(messageReceived);
+		}
+
 		private async Task BeginTransactionILTestsHelper(IsolationLevel level)
 		{
 			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
