@@ -21,6 +21,7 @@ using System.Data;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FirebirdSql.Data.Common;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
@@ -30,6 +31,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
 	public class FbCommandTests : FbTestsBase
 	{
+		const string FiniteInfiniteLoopCommand =
+@"execute block as
+declare variable start_time timestamp;
+begin
+  start_time = cast('now' as timestamp);
+  while (datediff(second from start_time to cast('now' as timestamp)) <= 10) do
+  begin
+  end
+end";
+
 		public FbCommandTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 			: base(serverType, compression, wireCrypt)
 		{ }
@@ -560,45 +571,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
-		public async Task CommandCancellationTest()
-		{
-			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
-				return;
-
-			var cancelled = false;
-			await using (var cmd = Connection.CreateCommand())
-			{
-				cmd.CommandText =
-@"execute block as
-declare variable start_time timestamp;
-begin
-  start_time = cast('now' as timestamp);
-  while (datediff(second from start_time to cast('now' as timestamp)) <= 10) do
-  begin
-  end
-end";
-				async Task Execute()
-				{
-					await Task.Yield();
-					try
-					{
-						await cmd.ExecuteNonQueryAsync();
-					}
-					catch (FbException ex)
-					{
-						cancelled = "HY008" == ex.SQLSTATE;
-					}
-				}
-				var executeTask = Execute();
-				Thread.Sleep(2000);
-				cmd.Cancel();
-				Thread.Sleep(2000);
-				await executeTask;
-			}
-			Assert.IsTrue(cancelled);
-		}
-
-		[Test]
 		public async Task GetCommandPlanTest()
 		{
 			await using (var cmd = Connection.CreateCommand())
@@ -712,6 +684,93 @@ end";
 				cmd.CommandText = "select 1 from rdb$database";
 				var ra = await cmd.ExecuteNonQueryAsync();
 				Assert.AreEqual(-1, ra);
+			}
+		}
+
+		[Test]
+		public async Task CommandCancellationDirectTest()
+		{
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+				return;
+
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = FiniteInfiniteLoopCommand;
+				async Task Execute()
+				{
+					await Task.Yield();
+					await cmd.ExecuteNonQueryAsync();
+				}
+				var executeTask = Execute();
+				Thread.Sleep(2000);
+				cmd.Cancel();
+				Thread.Sleep(2000);
+				Assert.ThrowsAsync<OperationCanceledException>(async () => await executeTask);
+			}
+		}
+
+		[Test]
+		public async Task CommandCancellationCancellationTokenTest()
+		{
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+				return;
+
+			using (var cts = new CancellationTokenSource())
+			{
+				await using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = FiniteInfiniteLoopCommand;
+					async Task Execute(CancellationToken cancellationToken)
+					{
+						await Task.Yield();
+						await cmd.ExecuteNonQueryAsync(cancellationToken);
+					}
+					var executeTask = Execute(cts.Token);
+					Thread.Sleep(2000);
+					cts.Cancel();
+					Thread.Sleep(2000);
+					Assert.ThrowsAsync<OperationCanceledException>(async () => await executeTask);
+				}
+			}
+		}
+
+		[Test]
+		public async Task CommandUsableAfterCancellationTest()
+		{
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+				return;
+
+			using (var cts = new CancellationTokenSource())
+			{
+				await using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = FiniteInfiniteLoopCommand;
+					async Task Execute(CancellationToken cancellationToken)
+					{
+						await Task.Yield();
+						await cmd.ExecuteNonQueryAsync(cancellationToken);
+					}
+					var executeTask = Execute(cts.Token);
+					Thread.Sleep(2000);
+					cts.Cancel();
+					Thread.Sleep(2000);
+					try
+					{
+						await executeTask;
+					}
+					catch (OperationCanceledException)
+					{ }
+					cmd.CommandText = "select 1 from rdb$database union all select 6 from rdb$database";
+					await using (var reader = await cmd.ExecuteReaderAsync())
+					{
+						var result = new List<int>();
+						while (await reader.ReadAsync())
+						{
+							result.Add(reader.GetInt32(0));
+						}
+						CollectionAssert.AreEqual(new[] { 1, 6 }, result);
+					}
+				}
 			}
 		}
 	}

@@ -17,6 +17,7 @@
 
 using System;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
@@ -449,6 +450,49 @@ end";
 				{
 					while (await reader.ReadAsync())
 					{ }
+				}
+			}
+		}
+
+		[Test]
+		public async Task ReadCancellation()
+		{
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+				return;
+
+			using (var cts = new CancellationTokenSource())
+			{
+				await using (var cmd = Connection.CreateCommand())
+				{
+					cmd.FetchSize = 1;
+					cmd.CommandText =
+@"execute block
+returns (i int)
+as
+declare variable start_time timestamp;
+begin
+	i = 0;
+	while (i < 100) do
+	begin
+		i = i + 1;
+		suspend;
+
+		start_time = cast('now' as timestamp);
+		while (datediff(second from start_time to cast('now' as timestamp)) <= 2) do
+		begin
+		end
+	end
+end";
+					await using (var reader = await cmd.ExecuteReaderAsync())
+					{
+						await reader.ReadAsync(cts.Token);
+						cts.CancelAfter(100);
+						Assert.ThrowsAsync<OperationCanceledException>(async () =>
+						{
+							while (await reader.ReadAsync(cts.Token))
+							{ }
+						});
+					}
 				}
 			}
 		}

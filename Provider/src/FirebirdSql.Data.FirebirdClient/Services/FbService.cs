@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.Services
 			}
 			catch (Exception ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -146,7 +146,7 @@ namespace FirebirdSql.Data.Services
 			}
 			catch (Exception ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -161,7 +161,7 @@ namespace FirebirdSql.Data.Services
 			}
 			catch (Exception ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -341,7 +341,7 @@ namespace FirebirdSql.Data.Services
 		private protected void EnsureDatabase()
 		{
 			if (string.IsNullOrEmpty(Database))
-				throw new FbException("Action should be executed against a specific database.");
+				throw FbException.Create("Action should be executed against a specific database.");
 		}
 
 		private async Task<byte[]> QueryService(byte[] items, ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)

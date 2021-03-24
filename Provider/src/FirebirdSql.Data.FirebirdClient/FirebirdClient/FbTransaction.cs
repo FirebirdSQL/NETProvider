@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						}
 						catch (IscException ex)
 						{
-							throw new FbException(ex.Message, ex);
+							throw FbException.Create(ex);
 						}
 					}
 				}
@@ -144,7 +144,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -165,7 +165,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -233,7 +233,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -267,7 +267,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -282,7 +282,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -297,7 +297,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 

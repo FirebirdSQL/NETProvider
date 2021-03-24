@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.Common
 
 		public static IscException ForIOException(IOException exception)
 		{
-			return IscException.ForErrorCodes(new[] { IscCodes.isc_net_write_err, IscCodes.isc_net_read_err }, exception);
+			return ForErrorCodes(new[] { IscCodes.isc_net_write_err, IscCodes.isc_net_read_err }, exception);
 		}
 
 		private IscException(SerializationInfo info, StreamingContext context)
@@ -140,7 +140,7 @@ namespace FirebirdSql.Data.Common
 
 		private void BuildErrorCode()
 		{
-			ErrorCode = (Errors.Count != 0 ? Errors[0].ErrorCode : 0);
+			ErrorCode = Errors.Count != 0 ? Errors[0].ErrorCode : 0;
 		}
 
 		private void BuildSqlState()

@@ -174,7 +174,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (Charset.GetCharset(_options.Charset) == null)
 			{
-				throw new FbException("Invalid character set specified");
+				throw FbException.Create("Invalid character set specified");
 			}
 
 			try
@@ -197,7 +197,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 
@@ -241,7 +241,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			catch (IscException ex)
 			{
 				await DisposeTransaction(async).ConfigureAwait(false);
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 
 			return _activeTransaction;
@@ -264,7 +264,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			catch (IscException ex)
 			{
 				await DisposeTransaction(async).ConfigureAwait(false);
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 
 			return _activeTransaction;

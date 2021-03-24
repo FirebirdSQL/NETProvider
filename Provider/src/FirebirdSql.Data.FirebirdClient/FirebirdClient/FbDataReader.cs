@@ -208,16 +208,19 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					_row = await _command.Fetch(async).ConfigureAwait(false);
+					using (async.EnterExplicitCancel(_command.Cancel))
+					{
+						_row = await _command.Fetch(async).ConfigureAwait(false);
 
-					if (_row != null)
-					{
-						_position++;
-						retValue = true;
-					}
-					else
-					{
-						_eof = true;
+						if (_row != null)
+						{
+							_position++;
+							retValue = true;
+						}
+						else
+						{
+							_eof = true;
+						}
 					}
 				}
 			}
@@ -817,7 +820,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			catch (IscException ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 		}
 

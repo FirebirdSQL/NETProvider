@@ -869,6 +869,8 @@ namespace FirebirdSql.Data.Common
 		public const int isc_string_truncation = 335544914;
 		public const int isc_formatted_exception = 335545016;
 		public const int isc_wirecrypt_incompatible = 335545064;
+		public const int isc_cancelled = 335544794;
+		public const int isc_nothing_to_cancel = 335544933;
 
 		#endregion
 

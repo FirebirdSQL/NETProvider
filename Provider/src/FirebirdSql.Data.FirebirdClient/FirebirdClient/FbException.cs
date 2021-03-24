@@ -46,24 +46,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Constructors
 
-		internal FbException()
-			: base()
-		{ }
-
-		internal FbException(string message)
-			: base(message)
-		{ }
-
-		internal FbException(string message, Exception innerException)
+		private FbException(string message, Exception innerException)
 			: base(message, innerException)
-		{
-			if (innerException is IscException iscException)
-			{
-				ProcessIscExceptionErrors(iscException);
-			}
-		}
+		{ }
 
-		internal FbException(SerializationInfo info, StreamingContext context)
+		private FbException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
 			_errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
@@ -93,5 +80,29 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		#endregion
+
+		internal static Exception Create(string message) => Create(message, null);
+		internal static Exception Create(Exception innerException) => Create(null, innerException);
+		internal static Exception Create(string message, Exception innerException)
+		{
+			message ??= innerException?.Message;
+			if (innerException is IscException iscException)
+			{
+				if (iscException.ErrorCode == IscCodes.isc_cancelled)
+				{
+					return new OperationCanceledException(message, innerException);
+				}
+				else
+				{
+					var result = new FbException(message, innerException);
+					result.ProcessIscExceptionErrors(iscException);
+					return result;
+				}
+			}
+			else
+			{
+				return new FbException(message, innerException);
+			}
+		}
 	}
 }

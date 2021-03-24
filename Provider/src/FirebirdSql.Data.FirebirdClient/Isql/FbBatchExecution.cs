@@ -330,11 +330,11 @@ namespace FirebirdSql.Data.Isql
 					await RollbackTransaction(async).ConfigureAwait(false);
 					await CloseConnection(async).ConfigureAwait(false);
 
-					throw new FbException(string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
-							Environment.NewLine,
-							statement.Text,
-							ex.Message),
-						ex);
+					var message = string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
+						Environment.NewLine,
+						statement.Text,
+						ex.Message);
+					throw FbException.Create(message, ex);
 				}
 			}
 

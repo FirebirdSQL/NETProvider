@@ -424,12 +424,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			try
 			{
-				await Prepare(false, async).ConfigureAwait(false);
+				using (async.EnterExplicitCancel(Cancel))
+				{
+					await Prepare(false, async).ConfigureAwait(false);
+				}
 			}
 			catch (IscException ex)
 			{
 				await RollbackImplicitTransaction(async).ConfigureAwait(false);
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 			catch
 			{
@@ -446,19 +449,22 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			try
 			{
-				await ExecuteCommand(CommandBehavior.Default, false, async).ConfigureAwait(false);
-
-				if (_statement.StatementType == DbStatementType.StoredProcedure)
+				using (async.EnterExplicitCancel(Cancel))
 				{
-					await SetOutputParameters(async).ConfigureAwait(false);
-				}
+					await ExecuteCommand(CommandBehavior.Default, false, async).ConfigureAwait(false);
 
-				await CommitImplicitTransaction(async).ConfigureAwait(false);
+					if (_statement.StatementType == DbStatementType.StoredProcedure)
+					{
+						await SetOutputParameters(async).ConfigureAwait(false);
+					}
+
+					await CommitImplicitTransaction(async).ConfigureAwait(false);
+				}
 			}
 			catch (IscException ex)
 			{
 				await RollbackImplicitTransaction(async).ConfigureAwait(false);
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 			catch
 			{
@@ -487,12 +493,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			try
 			{
-				await ExecuteCommand(behavior, true, async).ConfigureAwait(false);
+				using (async.EnterExplicitCancel(Cancel))
+				{
+					await ExecuteCommand(behavior, true, async).ConfigureAwait(false);
+				}
 			}
 			catch (IscException ex)
 			{
 				await RollbackImplicitTransaction(async).ConfigureAwait(false);
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 			catch
 			{
@@ -516,32 +525,35 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			try
 			{
-				await ExecuteCommand(CommandBehavior.Default, false, async).ConfigureAwait(false);
-
-				// Gets	only the values	of the first row or
-				// the output parameters values if command is an Stored Procedure
-				if (_statement.StatementType == DbStatementType.StoredProcedure)
+				using (async.EnterExplicitCancel(Cancel))
 				{
-					values = _statement.GetOutputParameters();
-					await SetOutputParameters(values, async).ConfigureAwait(false);
-				}
-				else
-				{
-					values = await _statement.Fetch(async).ConfigureAwait(false);
-				}
+					await ExecuteCommand(CommandBehavior.Default, false, async).ConfigureAwait(false);
 
-				// Get the return value
-				if (values != null && values.Length > 0)
-				{
-					val = await values[0].GetValue(async).ConfigureAwait(false);
-				}
+					// Gets	only the values	of the first row or
+					// the output parameters values if command is an Stored Procedure
+					if (_statement.StatementType == DbStatementType.StoredProcedure)
+					{
+						values = _statement.GetOutputParameters();
+						await SetOutputParameters(values, async).ConfigureAwait(false);
+					}
+					else
+					{
+						values = await _statement.Fetch(async).ConfigureAwait(false);
+					}
 
-				await CommitImplicitTransaction(async).ConfigureAwait(false);
+					// Get the return value
+					if (values != null && values.Length > 0)
+					{
+						val = await values[0].GetValue(async).ConfigureAwait(false);
+					}
+
+					await CommitImplicitTransaction(async).ConfigureAwait(false);
+				}
 			}
 			catch (IscException ex)
 			{
 				await RollbackImplicitTransaction(async).ConfigureAwait(false);
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 			catch
 			{
@@ -622,7 +634,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				catch (IscException ex)
 				{
-					throw new FbException(ex.Message, ex);
+					throw FbException.Create(ex);
 				}
 			}
 			return null;
@@ -820,7 +832,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				var parametersIndex = Parameters.IndexOf(_namedParameters[i], i);
 				if (parametersIndex == -1)
 				{
-					throw new FbException(string.Format("Must declare the variable '{0}'", _namedParameters[i]));
+					throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
 				}
 
 				var parameter = Parameters[parametersIndex];
@@ -971,7 +983,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					index = Parameters.IndexOf(_namedParameters[i], i);
 					if (index == -1)
 					{
-						throw new FbException(string.Format("Must declare the variable '{0}'", _namedParameters[i]));
+						throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
 					}
 				}
 
@@ -1147,7 +1159,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				// Validate input parameter count
 				if (_namedParameters.Count > 0 && Parameters.Count == 0)
 				{
-					throw new FbException("Must declare command parameters.");
+					throw FbException.Create("Must declare command parameters.");
 				}
 
 				// Update input parameter values

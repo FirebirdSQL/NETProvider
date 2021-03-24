@@ -218,7 +218,12 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, kind);
 
-			ProcessStatusVector(localStatusVector);
+			try
+			{
+				ProcessStatusVector(localStatusVector);
+			}
+			catch (IscException ex) when (ex.ErrorCode == IscCodes.isc_nothing_to_cancel)
+			{ }
 
 			return Task.CompletedTask;
 		}

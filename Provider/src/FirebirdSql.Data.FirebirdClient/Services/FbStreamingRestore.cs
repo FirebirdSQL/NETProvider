@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.Services
 			}
 			catch (Exception ex)
 			{
-				throw new FbException(ex.Message, ex);
+				throw FbException.Create(ex);
 			}
 			finally
 			{

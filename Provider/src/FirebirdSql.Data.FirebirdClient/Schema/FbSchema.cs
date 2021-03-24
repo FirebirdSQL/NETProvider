@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Schema
 					}
 					catch (Exception ex)
 					{
-						throw new FbException(ex.Message);
+						throw FbException.Create(ex);
 					}
 				}
 			}
