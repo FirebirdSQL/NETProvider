@@ -29,7 +29,8 @@ namespace FirebirdSql.Data.Common
 		readonly bool _isAsync;
 		readonly CancellationToken _cancellationTokenRaw;
 		int _explicitCancel;
-		readonly CancellationToken CancellationToken => _explicitCancel > 0 ? CancellationToken.None : _cancellationTokenRaw;
+		public readonly bool IsAsync => _isAsync;
+		public readonly CancellationToken CancellationToken => _explicitCancel > 0 ? CancellationToken.None : _cancellationTokenRaw;
 
 		public AsyncWrappingCommonArgs(bool isAsync, CancellationToken cancellationToken = default)
 		{

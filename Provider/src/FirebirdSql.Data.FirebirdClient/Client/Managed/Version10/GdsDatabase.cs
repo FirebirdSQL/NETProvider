@@ -263,7 +263,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Auxiliary Connection Methods
 
-		public virtual async Task<(int auxHandle, string ipAddress, int portNumber)> ConnectionRequest(AsyncWrappingCommonArgs async)
+		public virtual async Task<(int auxHandle, string ipAddress, int portNumber, int timeout)> ConnectionRequest(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -306,7 +306,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 				await Xdr.ReadStatusVector(async).ConfigureAwait(false);
 
-				return (auxHandle, ipAddress, portNumber);
+				return (auxHandle, ipAddress, portNumber, _connection.Timeout);
 			}
 			catch (IOException ex)
 			{
@@ -342,8 +342,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				if (_eventManager == null)
 				{
-					var (auxHandle, ipAddress, portNumber) = await ConnectionRequest(async).ConfigureAwait(false);
-					_eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber);
+					var (auxHandle, ipAddress, portNumber, timeout) = await ConnectionRequest(async).ConfigureAwait(false);
+					_eventManager = new GdsEventManager(auxHandle, ipAddress, portNumber, timeout);
 					await _eventManager.Open(async).ConfigureAwait(false);
 					var dummy = _eventManager.WaitForEvents(remoteEvent, new AsyncWrappingCommonArgs(true));
 				}

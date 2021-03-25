@@ -48,7 +48,7 @@ namespace FirebirdSql.Data.Client
 
 		private static async Task<DatabaseBase> CreateManagedDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			await connection.Connect(async).ConfigureAwait(false);
 			await connection.Identify(options.Database, async).ConfigureAwait(false);
 			return connection.ProtocolVersion switch
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.Client
 
 		private static async Task<ServiceManagerBase> CreateManagedServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			await connection.Connect(async).ConfigureAwait(false);
 			await connection.Identify(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty, async).ConfigureAwait(false);
 			return connection.ProtocolVersion switch

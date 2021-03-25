@@ -550,7 +550,6 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				catch (FbException ex) when (ex.ErrorCode == 335544472)
 				{
 					Assert.Pass();
-					return;
 				}
 			}
 		}
@@ -573,6 +572,54 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				}
 			}
 			Assert.IsTrue(messageReceived);
+		}
+
+		[Test]
+		public async Task ConnectionTimeoutUsingTimeout()
+		{
+			if (!EnsureServerType(FbServerType.Default))
+				return;
+
+			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+			csb.ConnectionTimeout = 1;
+			csb.DataSource = "10.0.0.0"; // intentionally wrong address
+			await using (var conn = new FbConnection(csb.ToString()))
+			{
+				try
+				{
+					await conn.OpenAsync();
+					Assert.Fail();
+				}
+				catch (TimeoutException)
+				{
+					Assert.Pass();
+				}
+			}
+		}
+
+		[Test]
+		public async Task ConnectionTimeoutUsingCancellationToken()
+		{
+			if (!EnsureServerType(FbServerType.Default))
+				return;
+
+			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+			csb.DataSource = "10.0.0.0"; // intentionally wrong address
+			await using (var conn = new FbConnection(csb.ToString()))
+			{
+				try
+				{
+					using (var cts = new CancellationTokenSource(100))
+					{
+						await conn.OpenAsync(cts.Token);
+					}
+					Assert.Fail();
+				}
+				catch (OperationCanceledException)
+				{
+					Assert.Pass();
+				}
+			}
 		}
 
 		private async Task BeginTransactionILTestsHelper(IsolationLevel level)

@@ -30,19 +30,21 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		int _handle;
 		string _ipAddress;
 		int _portNumber;
+		int _timeout;
 		GdsDatabase _database;
 
-		public GdsEventManager(int handle, string ipAddress, int portNumber)
+		public GdsEventManager(int handle, string ipAddress, int portNumber, int timeout)
 		{
 			_closing = false;
 			_handle = handle;
 			_ipAddress = ipAddress;
 			_portNumber = portNumber;
+			_timeout = timeout;
 		}
 
 		public async Task Open(AsyncWrappingCommonArgs async)
 		{
-			var connection = new GdsConnection(_ipAddress, _portNumber);
+			var connection = new GdsConnection(_ipAddress, _portNumber, _timeout);
 			await connection.Connect(async).ConfigureAwait(false);
 			_database = new GdsDatabase(connection);
 		}

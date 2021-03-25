@@ -460,6 +460,11 @@ namespace FirebirdSql.Data.FirebirdClient
 					{
 						await _innerConnection.Connect(async).ConfigureAwait(false);
 					}
+					catch (OperationCanceledException ex)
+					{
+						async.CancellationToken.ThrowIfCancellationRequested();
+						throw new TimeoutException("Timeout while connecting.", ex);
+					}
 					catch
 					{
 						if (_options.Pooling)

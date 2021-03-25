@@ -38,6 +38,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private string _userID;
 		private string _dataSource;
 		private int _portNumber;
+		private int _timeout;
 		private int _packetSize;
 		private Charset _charset;
 		private bool _compression;
@@ -55,22 +56,24 @@ namespace FirebirdSql.Data.Client.Managed
 		public bool ConnectionBroken => _firebirdNetworkHandlingWrapper?.IOFailed ?? false;
 
 		internal IPAddress IPAddress { get; private set; }
+		internal int Timeout => _timeout;
 		internal XdrReaderWriter Xdr { get; private set; }
 
 		#endregion
 
 		#region Constructors
 
-		public GdsConnection(string dataSource, int port)
-			: this(null, null, dataSource, port, 8192, Charset.DefaultCharset, false, WireCryptOption.Enabled)
+		public GdsConnection(string dataSource, int port, int timeout)
+			: this(null, null, dataSource, port, timeout, 8192, Charset.DefaultCharset, false, WireCryptOption.Enabled)
 		{ }
 
-		public GdsConnection(string userID, string password, string dataSource, int portNumber, int packetSize, Charset charset, bool compression, WireCryptOption wireCrypt)
+		public GdsConnection(string userID, string password, string dataSource, int portNumber, int timeout, int packetSize, Charset charset, bool compression, WireCryptOption wireCrypt)
 		{
 			_userID = userID;
 			Password = password;
 			_dataSource = dataSource;
 			_portNumber = portNumber;
+			_timeout = timeout;
 			_packetSize = packetSize;
 			_charset = charset;
 			_compression = compression;
@@ -93,12 +96,26 @@ namespace FirebirdSql.Data.Client.Managed
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, _packetSize);
 				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, 1);
+
+				if (async.IsAsync)
+				{
+					using (var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_timeout)))
+					{
+						using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, async.CancellationToken))
+						{
+							await ConnectAsyncHelper(socket)(endPoint, combinedCts.Token).ConfigureAwait(false);
+						}
+					}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
-				static Func<IPEndPoint, CancellationToken, Task> ConnectHelper(Socket socket) => (e, ct) => Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, e, null);
+					static Func<IPEndPoint, CancellationToken, Task> ConnectAsyncHelper(Socket socket) => (e, ct) => Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, e, null);
 #else
-				static Func<IPEndPoint, CancellationToken, Task> ConnectHelper(Socket socket) => (e, ct) => SocketTaskExtensions.ConnectAsync(socket, e, ct).AsTask();
+					static Func<IPEndPoint, CancellationToken, Task> ConnectAsyncHelper(Socket socket) => (e, ct) => SocketTaskExtensions.ConnectAsync(socket, e, ct).AsTask();
 #endif
-				await async.AsyncSyncCall(ConnectHelper(socket), socket.Connect, endPoint).ConfigureAwait(false);
+				}
+				else
+				{
+					socket.Connect(endPoint);
+				}
 
 				_networkStream = new NetworkStream(socket, true);
 				_firebirdNetworkHandlingWrapper = new FirebirdNetworkHandlingWrapper(new DataProviderStreamWrapper(_networkStream));
