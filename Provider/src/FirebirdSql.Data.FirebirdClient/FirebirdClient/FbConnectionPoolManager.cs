@@ -197,7 +197,10 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckDisposed();
 
-			_pools.GetOrAdd(connection.Options.NormalizedConnectionString, _ => new Pool(connection.Options)).ReleaseConnection(connection, returnToAvailable);
+			if (_pools.TryGetValue(connection.Options.NormalizedConnectionString, out var pool))
+			{
+				pool.ReleaseConnection(connection, returnToAvailable);
+			}
 		}
 
 		internal void ClearAllPools()
