@@ -20,11 +20,19 @@ using System.Text;
 
 namespace FirebirdSql.Data.Logging
 {
-	public class ConsoleLoggerProvider : IFbLoggingProvider
+	[Obsolete("Use ConsoleLoggingProvider instead.")]
+	public class ConsoleLoggerProvider : ConsoleLoggingProvider
+	{
+		public ConsoleLoggerProvider(FbLogLevel minimumLevel = FbLogLevel.Info)
+			: base(minimumLevel)
+		{ }
+	}
+
+	public class ConsoleLoggingProvider : IFbLoggingProvider
 	{
 		readonly FbLogLevel _minimumLevel;
 
-		public ConsoleLoggerProvider(FbLogLevel minimumLevel = FbLogLevel.Info)
+		public ConsoleLoggingProvider(FbLogLevel minimumLevel = FbLogLevel.Info)
 		{
 			_minimumLevel = minimumLevel;
 		}
