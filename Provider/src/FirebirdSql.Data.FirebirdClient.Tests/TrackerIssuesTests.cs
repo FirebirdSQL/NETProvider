@@ -355,5 +355,75 @@ CREATE TABLE TABMAT (
 				}
 			}
 		}
+
+		[Test]
+		public async Task DNET1036_ReadNumericScaleZero()
+		{
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select cast(3 as numeric(18,0)) from rdb$database", Connection, transaction))
+				{
+					await using (var reader = await command.ExecuteReaderAsync())
+					{
+						await reader.ReadAsync();
+						Assert.AreEqual(3m, reader[0]);
+					}
+				}
+				await transaction.RollbackAsync();
+			}
+		}
+
+		[Test]
+		public async Task DNET1036_ReadDecimalScaleZero()
+		{
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select cast(3 as decimal(18,0)) from rdb$database", Connection, transaction))
+				{
+					await using (var reader = await command.ExecuteReaderAsync())
+					{
+						await reader.ReadAsync();
+						Assert.AreEqual(3m, reader[0]);
+					}
+				}
+				await transaction.RollbackAsync();
+			}
+		}
+
+		[Test]
+		public async Task DNET1036_WriteNumericScaleZero()
+		{
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select cast(@value as numeric(18,0)) from rdb$database", Connection, transaction))
+				{
+					command.Parameters.AddWithValue("value", 3m);
+					await using (var reader = await command.ExecuteReaderAsync())
+					{
+						await reader.ReadAsync();
+						Assert.AreEqual(3m, reader[0]);
+					}
+				}
+				await transaction.RollbackAsync();
+			}
+		}
+
+		[Test]
+		public async Task DNET1036_WriteDecimalScaleZero()
+		{
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select cast(@value as decimal(18,0)) from rdb$database", Connection, transaction))
+				{
+					command.Parameters.AddWithValue("value", 3m);
+					await using (var reader = await command.ExecuteReaderAsync())
+					{
+						await reader.ReadAsync();
+						Assert.AreEqual(3m, reader[0]);
+					}
+				}
+				await transaction.RollbackAsync();
+			}
+		}
 	}
 }
