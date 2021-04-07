@@ -27,7 +27,7 @@ namespace FirebirdSql.Data.Common
 	{
 		public static object EncodeDecimal(decimal d, int scale, int sqltype)
 		{
-			var shift = scale < 0 ? -scale : 1;
+			var shift = scale < 0 ? -scale : scale;
 
 			switch (sqltype & ~1)
 			{
