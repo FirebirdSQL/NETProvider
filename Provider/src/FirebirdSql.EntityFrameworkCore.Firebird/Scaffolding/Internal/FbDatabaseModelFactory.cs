@@ -168,7 +168,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 				WHEN 37 THEN 'VARCHAR(' || (TRUNC(F.RDB$FIELD_LENGTH / CH.RDB$BYTES_PER_CHARACTER)) || ')'
 				WHEN 40 THEN 'CSTRING' || (TRUNC(F.RDB$FIELD_LENGTH / CH.RDB$BYTES_PER_CHARACTER)) || ')'
 				WHEN 45 THEN 'BLOB_ID'
-				WHEN 261 THEN 'BLOB SUB_TYPE ' || F.RDB$FIELD_SUB_TYPE 
+				WHEN 261 THEN 'BLOB SUB_TYPE ' || F.RDB$FIELD_SUB_TYPE
 				ELSE 'RDB$FIELD_TYPE: ' || F.RDB$FIELD_TYPE || '?'
 			   END as STORE_TYPE,
                F.rdb$description as COLUMN_COMMENT,
@@ -252,8 +252,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
            trim(sg.rdb$field_name) as FIELD_NAME
           FROM
            RDB$INDICES i
-           LEFT JOIN rdb$index_segments sg on i.rdb$index_name = sg.rdb$index_name 
-           LEFT JOIN rdb$relation_constraints rc on rc.rdb$index_name = I.rdb$index_name 
+           LEFT JOIN rdb$index_segments sg on i.rdb$index_name = sg.rdb$index_name
+           LEFT JOIN rdb$relation_constraints rc on rc.rdb$index_name = I.rdb$index_name
           WHERE
            rc.rdb$constraint_type = 'PRIMARY KEY'
            AND trim(i.rdb$relation_name) = '{0}'
@@ -291,7 +291,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 		private const string GetIndexesQuery =
 			@"SELECT
                trim(I.rdb$index_name) as INDEX_NAME,
-               COALESCE(I.rdb$unique_flag, 0) as NON_UNIQUE,
+               COALESCE(I.rdb$unique_flag, 0) as IS_UNIQUE,
                list(trim(sg.RDB$FIELD_NAME)) as COLUMNS
               FROM
                RDB$INDICES i
@@ -300,7 +300,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
               WHERE
                trim(i.rdb$relation_name) = '{0}'
               GROUP BY
-               INDEX_NAME, NON_UNIQUE ;";
+               INDEX_NAME, IS_UNIQUE ;";
 
 		/// <remarks>
 		/// Primary keys are handled as in <see cref="GetConstraints"/>, not here
@@ -321,7 +321,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 							{
 								Table = table,
 								Name = reader.GetString(0).Trim(),
-								IsUnique = !reader.GetBoolean(1),
+								IsUnique = reader.GetBoolean(1),
 							};
 
 							foreach (var column in reader.GetString(2).Split(','))
@@ -341,7 +341,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
                trim(drs.rdb$constraint_name) as CONSTRAINT_NAME,
                trim(drs.RDB$RELATION_NAME) as TABLE_NAME,
                trim(mrc.rdb$relation_name) AS REFERENCED_TABLE_NAME,
-               (select list(trim(di.rdb$field_name)||'|'||trim(mi.rdb$field_name)) 
+               (select list(trim(di.rdb$field_name)||'|'||trim(mi.rdb$field_name))
                 from
                  rdb$index_segments di
                  join rdb$index_segments mi on mi.RDB$FIELD_POSITION=di.RDB$FIELD_POSITION and mi.rdb$index_name = mrc.rdb$index_name
