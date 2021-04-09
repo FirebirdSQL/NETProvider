@@ -347,7 +347,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
                  join rdb$index_segments mi on mi.RDB$FIELD_POSITION=di.RDB$FIELD_POSITION and mi.rdb$index_name = mrc.rdb$index_name
                 where
                  di.rdb$index_name = drs.rdb$index_name) as PAIRED_COLUMNS,
-               rc.RDB$DELETE_RULE as DELETE_RULE
+               trim(rc.RDB$DELETE_RULE) as DELETE_RULE
               FROM
                rdb$relation_constraints drs
                left JOIN rdb$ref_constraints rc ON drs.rdb$constraint_name = rc.rdb$constraint_name
