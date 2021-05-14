@@ -94,16 +94,12 @@ namespace FirebirdSql.Data.Services
 			spb.Append((byte)IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 			if ((_options?.Role.Length ?? 0) != 0)
 				spb.Append((byte)IscCodes.isc_spb_sql_role_name, _options.Role);
-			if (_svc is Client.Managed.Version12.GdsServiceManager)
+			if (_svc is Client.Managed.Version13.GdsServiceManager)
 			{
 				spb.Append((byte)IscCodes.isc_spb_utf8_filename, new byte[] { 0 });
 				SpbFilenameEncoding = Encoding.UTF8;
-				spb.Append((byte)IscCodes.isc_spb_expected_db, _options.Database, SpbFilenameEncoding);
 			}
-			else
-			{
-				spb.Append((byte)IscCodes.isc_spb_expected_db, _options.Database);
-			}
+			spb.Append((byte)IscCodes.isc_spb_expected_db, _options.Database, SpbFilenameEncoding);
 			return spb;
 		}
 
