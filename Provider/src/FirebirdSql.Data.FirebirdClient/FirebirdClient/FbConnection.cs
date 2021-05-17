@@ -336,6 +336,20 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#endregion
 
+		#region Transaction Enlistement
+
+		public override void EnlistTransaction(System.Transactions.Transaction transaction)
+		{
+			CheckClosed();
+
+			if (transaction == null)
+				return;
+
+			_innerConnection.EnlistTransaction(transaction);
+		}
+
+		#endregion
+
 		#region Database Schema Methods
 
 		public override DataTable GetSchema() => GetSchemaImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
@@ -480,11 +494,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					try
 					{
-						var transaction = System.Transactions.Transaction.Current;
-						if (transaction != null)
-						{
-							_innerConnection.EnlistTransaction(transaction);
-						}
+						EnlistTransaction(System.Transactions.Transaction.Current);
 					}
 					catch
 					{
