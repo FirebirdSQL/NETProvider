@@ -2,7 +2,7 @@
 
 Thanks for considering contributing. Here are some items to consider before starting (in no particular order).
 
-* Check [tracker](http://tracker.firebirdsql.org/browse/DNET) if you want to start on something.
+* Check [tracker](https://github.com/FirebirdSQL/NETProvider/issues) if you want to start on something.
 * Before you start working on something announce your intention on the mailing list (or in comment in tracker).
 * Issue only complete PRs (no WIPs).
 * Make sure your PR doesn't contain unneccessary changes (whitespaces, new lines, ...).

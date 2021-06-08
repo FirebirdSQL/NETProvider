@@ -24,8 +24,8 @@
 
 ## Resources
 
-* [Downloads](https://firebirdsql.org/en/net-provider/)
-* [Issue tracker](http://tracker.firebirdsql.org/browse/DNET)
+* [Downloads](https://github.com/FirebirdSQL/NETProvider/releases)
+* [Issue tracker](https://github.com/FirebirdSQL/NETProvider/issues)
 
 ## Builds
 

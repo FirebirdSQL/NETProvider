@@ -18,7 +18,7 @@ You can subscribe to the developement list at:
 
 You can access the lastest developement sources at:
 
-	http://www.firebirdsql.org/en/devel-net-provider/
+	https://github.com/FirebirdSQL/NETProvider
 
 
 Reporting Bugs
@@ -27,9 +27,7 @@ Reporting Bugs
 There are two ways you can report bugs:
 
 1. Sending it to the developement list.
-2. Through the Firebird Project tracker (category DNET):
-
-	http://tracker.firebirdsql.org/DNET
+2. Through the https://github.com/FirebirdSQL/NETProvider/issues.
 
 3rd party code
 --------------
