@@ -11,12 +11,12 @@ $baseDir = Split-Path -Parent $PSCommandPath
 
 $FirebirdConfiguration = @{
 	FB40 = @{
-		Download = 'https://www.dropbox.com/s/72j823pvdfdrvww/fb40.7z?dl=1';
+		Download = 'https://github.com/FirebirdSQL/NETProvider-tests-infrastructure/raw/master/fb40.7z';
 		Executable = '.\firebird.exe';
 		Args = @('-a');
 	};
 	FB30 = @{
-		Download = 'https://www.dropbox.com/s/x46uy7e5zrtsnux/fb30.7z?dl=1';
+		Download = 'https://github.com/FirebirdSQL/NETProvider-tests-infrastructure/raw/master/fb30.7z';
 		Executable = '.\firebird.exe';
 		Args = @('-a');
 	};
@@ -41,21 +41,18 @@ function Prepare() {
 	$script:startDir = $pwd
 	$selectedConfiguration = $FirebirdConfiguration[$FirebirdSelection]
 	$fbDownload = $selectedConfiguration.Download
-	$fbDownloadName = $fbDownload -Replace '.+/([^/]+)\?dl=1','$1'
+	$fbDownloadName = $fbDownload -Replace '.+/(.+)$','$1'
 	if (Test-Path $firebirdDir) {
 		rm -Force -Recurse $firebirdDir
 	}
 	mkdir $firebirdDir | Out-Null
 	cd $firebirdDir
 	echo "Downloading $fbDownload"
-	(New-Object System.Net.WebClient).DownloadFile($fbDownload, (Join-Path (pwd) $fbDownloadName))
+	Invoke-RestMethod -Uri $fbDownload -OutFile $fbDownloadName 
 	echo "Extracting $fbDownloadName"
 	7z x -bsp0 -bso0 $fbDownloadName
-	cp -Recurse -Force .\embedded\* $testsProviderDir
-	rmdir -Recurse .\embedded
 	rm $fbDownloadName
-	mv .\server\* .
-	rmdir .\server
+	cp -Recurse -Force .\* $testsProviderDir
 
 	ni firebird.log -ItemType File | Out-Null
 
