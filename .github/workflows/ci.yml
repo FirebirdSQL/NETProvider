@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        FIREBIRD_SELECTION: [FB25, FB30, FB40]
+        FIREBIRD_SELECTION: [FB30, FB40]
         TEST_SUITE: [Tests-FirebirdClient-Default-C-R, Tests-FirebirdClient-Default-NC-R, Tests-FirebirdClient-Default-C-D, Tests-FirebirdClient-Default-NC-D, Tests-FirebirdClient-Embedded, Tests-EFCore, Tests-EFCore-Functional, Tests-EF6]
     steps:
       - name: Checkout

@@ -20,11 +20,6 @@ $FirebirdConfiguration = @{
 		Executable = '.\firebird.exe';
 		Args = @('-a');
 	};
-	FB25 = @{
-		Download = 'https://www.dropbox.com/s/ayzjnxjx20vb7s5/fb25.7z?dl=1';
-		Executable = '.\bin\fb_inet_server.exe';
-		Args = @('-a', '-m');
-	};
 }
 
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
@@ -98,24 +93,12 @@ function Tests-All() {
 }
 
 function Tests-FirebirdClient-Default-C-R() {
-	# nothing for 2.5
-	if ($FirebirdSelection -eq 'FB25') {
-		return
-	}
 	Tests-FirebirdClient 'Default' $True 'Required'
 }
 function Tests-FirebirdClient-Default-NC-R() {
-	# nothing for 2.5
-	if ($FirebirdSelection -eq 'FB25') {
-		return
-	}
 	Tests-FirebirdClient 'Default' $False 'Required'
 }
 function Tests-FirebirdClient-Default-C-D() {
-	# nothing for 2.5
-	if ($FirebirdSelection -eq 'FB25') {
-		return
-	}
 	Tests-FirebirdClient 'Default' $True 'Disabled'
 }
 function Tests-FirebirdClient-Default-NC-D() {
@@ -137,19 +120,11 @@ function Tests-EF6() {
 }
 
 function Tests-EFCore() {
-	# nothing for 2.5
-	if ($FirebirdSelection -eq 'FB25') {
-		return
-	}
 	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
 	.\FirebirdSql.EntityFrameworkCore.Firebird.Tests.exe --labels=All
 	Check-ExitCode
 }
 function Tests-EFCore-Functional() {
-	# nothing for 2.5
-	if ($FirebirdSelection -eq 'FB25') {
-		return
-	}
 	cd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests"
 	dotnet test --no-build -c $Configuration
 	Check-ExitCode
