@@ -79,26 +79,26 @@ function Cleanup() {
 }
 
 function Tests-All() {
-	Tests-FirebirdClient-Default-C-R
-	Tests-FirebirdClient-Default-NC-R
-	Tests-FirebirdClient-Default-C-D
-	Tests-FirebirdClient-Default-NC-D
+	Tests-FirebirdClient-Default-Compression-CryptRequired
+	Tests-FirebirdClient-Default-NoCompression-CryptRequired
+	Tests-FirebirdClient-Default-Compression-CryptDisabled
+	Tests-FirebirdClient-Default-NoCompression-CryptDisabled
 	Tests-FirebirdClient-Embedded
 	Tests-EFCore
 	Tests-EFCore-Functional
 	Tests-EF6
 }
 
-function Tests-FirebirdClient-Default-C-R() {
+function Tests-FirebirdClient-Default-Compression-CryptRequired() {
 	Tests-FirebirdClient 'Default' $True 'Required'
 }
-function Tests-FirebirdClient-Default-NC-R() {
+function Tests-FirebirdClient-Default-NoCompression-CryptRequired() {
 	Tests-FirebirdClient 'Default' $False 'Required'
 }
-function Tests-FirebirdClient-Default-C-D() {
+function Tests-FirebirdClient-Default-Compression-CryptDisabled() {
 	Tests-FirebirdClient 'Default' $True 'Disabled'
 }
-function Tests-FirebirdClient-Default-NC-D() {
+function Tests-FirebirdClient-Default-NoCompression-CryptDisabled() {
 	Tests-FirebirdClient 'Default' $False 'Disabled'
 }
 function Tests-FirebirdClient-Embedded() {
