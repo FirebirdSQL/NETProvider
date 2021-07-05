@@ -51,13 +51,13 @@ namespace FirebirdSql.Data.Services
 				var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
 				await Open(async).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer();
+				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_trace_start);
 				if (!string.IsNullOrEmpty(sessionName))
-					startSpb.Append(IscCodes.isc_spb_trc_name, sessionName);
-				startSpb.Append(IscCodes.isc_spb_trc_cfg, config);
+					startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
+				startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
 				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutput(EmptySpb, async).ConfigureAwait(false);
+				await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -102,12 +102,12 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				await Open(async).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer();
+				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(action);
 				if (sessionID.HasValue)
 					startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
 				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutput(EmptySpb, async).ConfigureAwait(false);
+				await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{

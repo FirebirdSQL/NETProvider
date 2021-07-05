@@ -35,8 +35,8 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Fields
 
-		private GdsConnection _connection;
-		private GdsEventManager _eventManager;
+		protected GdsConnection _connection;
+		protected GdsEventManager _eventManager;
 		protected int _handle;
 
 		#endregion
@@ -63,14 +63,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			get { return _connection.Xdr; }
 		}
 
-		public string Password
+		public AuthBlock AuthBlock
 		{
-			get { return _connection.Password; }
-		}
-
-		public byte[] AuthData
-		{
-			get { return _connection.AuthData; }
+			get { return _connection.AuthBlock; }
 		}
 
 		#endregion
@@ -116,9 +111,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
-			if (!string.IsNullOrEmpty(Password))
+			if (!string.IsNullOrEmpty(AuthBlock.Password))
 			{
-				dpb.Append(IscCodes.isc_dpb_password, Password);
+				dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 			}
 			await Xdr.WriteBuffer(Encoding2.Default.GetBytes(database), async).ConfigureAwait(false);
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
@@ -190,7 +185,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected async Task SafelyDetach(AsyncWrappingCommonArgs async)
+		protected internal async Task SafelyDetach(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -222,9 +217,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		{
 			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
 			await Xdr.Write(DatabaseObjectId, async).ConfigureAwait(false);
-			if (!string.IsNullOrEmpty(Password))
+			if (!string.IsNullOrEmpty(AuthBlock.Password))
 			{
-				dpb.Append(IscCodes.isc_dpb_password, Password);
+				dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 			}
 			await Xdr.WriteBuffer(Encoding2.Default.GetBytes(database), async).ConfigureAwait(false);
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);

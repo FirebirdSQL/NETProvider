@@ -27,21 +27,51 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			: base(connection)
 		{ }
 
-		public override async Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
 				await SendAttachToBuffer(spb, service, async).ConfigureAwait(false);
 				await Database.Xdr.Flush(async).ConfigureAwait(false);
 				var response = await Database.ReadResponse(async).ConfigureAwait(false);
-				response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
-				await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+				if (response is ContAuthResponse)
+				{
+					while (response is ContAuthResponse contAuthResponse)
+					{
+						Connection.AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
+
+						await Connection.AuthBlock.SendContAuthToBuffer(Database.Xdr, async).ConfigureAwait(false);
+						await Database.Xdr.Flush(async).ConfigureAwait(false);
+						response = await Connection.AuthBlock.ProcessContAuthResponse(Database.Xdr, async).ConfigureAwait(false);
+					}
+#warning ProcessCryptCallbackResponseIfNeeded
+					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+
+					await Connection.AuthBlock.SendWireCryptToBuffer(Database.Xdr, async).ConfigureAwait(false);
+					await Database.Xdr.Flush(async).ConfigureAwait(false);
+					await Connection.AuthBlock.ProcessWireCryptResponse(Database.Xdr, Connection, async).ConfigureAwait(false);
+				}
+				else
+				{
+					response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
+					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+				}
+			}
+			catch (IscException)
+			{
+				await Database.SafelyDetach(async).ConfigureAwait(false);
+				throw;
 			}
 			catch (IOException ex)
 			{
-				await Database.Detach(async).ConfigureAwait(false);
+				await Database.SafelyDetach(async).ConfigureAwait(false);
 				throw IscException.ForIOException(ex);
 			}
+		}
+
+		public override ServiceParameterBufferBase CreateServiceParameterBuffer()
+		{
+			return new ServiceParameterBuffer3();
 		}
 
 		protected override Version10.GdsDatabase CreateDatabase(GdsConnection connection)

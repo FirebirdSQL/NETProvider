@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.Services
 
 		private Task<List<object>> GetInfo(byte[] items, AsyncWrappingCommonArgs async)
 		{
-			return Query(items, EmptySpb, async);
+			return Query(items, ServiceParameterBufferBase.Empty, async);
 		}
 
 		public static Version ParseServerVersion(string version)

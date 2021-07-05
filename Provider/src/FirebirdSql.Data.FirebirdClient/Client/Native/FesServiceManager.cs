@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			FesDatabase.CheckCryptKeyForSupport(cryptKey);
 
@@ -66,7 +66,7 @@ namespace FirebirdSql.Data.Client.Native
 				_statusVector,
 				(short)service.Length,
 				service,
-				ref	svcHandle,
+				ref svcHandle,
 				spb.Length,
 				spb.ToArray());
 
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.Client.Native
 			return Task.CompletedTask;
 		}
 
-		public override Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		public override Task Start(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -101,8 +101,8 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fbClient.isc_service_start(
 				_statusVector,
-				ref	svcHandle,
-				ref	reserved,
+				ref svcHandle,
+				ref reserved,
 				spb.Length,
 				spb.ToArray());
 
@@ -111,13 +111,7 @@ namespace FirebirdSql.Data.Client.Native
 			return Task.CompletedTask;
 		}
 
-		public override Task Query(
-			ServiceParameterBuffer spb,
-			int requestLength,
-			byte[] requestBuffer,
-			int bufferLength,
-			byte[] buffer,
-			AsyncWrappingCommonArgs async)
+		public override Task Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -126,8 +120,8 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fbClient.isc_service_query(
 				_statusVector,
-				ref	svcHandle,
-				ref	reserved,
+				ref svcHandle,
+				ref reserved,
 				spb.Length,
 				spb.ToArray(),
 				(short)requestLength,
@@ -138,6 +132,11 @@ namespace FirebirdSql.Data.Client.Native
 			ProcessStatusVector(_statusVector);
 
 			return Task.CompletedTask;
+		}
+
+		public override ServiceParameterBufferBase CreateServiceParameterBuffer()
+		{
+			return new ServiceParameterBuffer2();
 		}
 
 		#endregion

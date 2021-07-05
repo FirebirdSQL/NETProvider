@@ -15,21 +15,23 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq;
-using System.Security.Cryptography;
+using System;
 
-namespace FirebirdSql.Data.Client.Managed
+namespace FirebirdSql.Data.Client.Managed.Version13
 {
-	internal sealed class SrpClient : SrpClientBase
+	internal class ContAuthResponse : IResponse
 	{
-		public override string Name => "Srp";
+		public byte[] ServerData { get; }
+		public string AcceptPluginName { get; }
+		public bool IsAuthenticated { get; }
+		public byte[] ServerKeys { get; }
 
-		protected override byte[] ComputeHash(params byte[][] ba)
+		public ContAuthResponse(byte[] serverData, string acceptPluginName, bool isAuthenticated, byte[] serverKeys)
 		{
-			using (var hash = SHA1.Create())
-			{
-				return hash.ComputeHash(ba.SelectMany(x => x).ToArray());
-			}
+			ServerData = serverData;
+			AcceptPluginName = acceptPluginName;
+			IsAuthenticated = isAuthenticated;
+			ServerKeys = serverKeys;
 		}
 	}
 }

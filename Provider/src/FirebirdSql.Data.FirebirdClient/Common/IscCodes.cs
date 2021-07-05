@@ -295,6 +295,12 @@ namespace FirebirdSql.Data.Common
 		public const int isc_dpb_utf8_filename = 77;
 		public const int isc_dpb_client_version = 80;
 		public const int isc_dpb_specific_auth_data = 84;
+		public const int isc_dpb_auth_plugin_list = 85;
+		public const int isc_dpb_auth_plugin_name = 86;
+		public const int isc_dpb_config = 87;
+		public const int isc_dpb_nolinger = 88;
+		public const int isc_dpb_reset_icu = 89;
+		public const int isc_dpb_map_attach = 90;
 
 		#endregion
 
@@ -385,6 +391,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_action_svc_remove_license = 10;    /* Removes a license from the license file */
 		public const int isc_action_svc_db_stats = 11;  /* Retrieves database statistics */
 		public const int isc_action_svc_get_ib_log = 12;    /* Retrieves the InterBase log file	from the server	*/
+		public const int isc_action_svc_get_fb_log = 12;	/* Retrieves the Firebird log file from the server */
 		public const int isc_action_svc_nbak = 20;  /* Incremental nbackup */
 		public const int isc_action_svc_nrest = 21; /* Incremental database restore */
 		public const int isc_action_svc_trace_start = 22;   // Start trace session

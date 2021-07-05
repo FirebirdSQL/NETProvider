@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client;
@@ -32,8 +33,6 @@ namespace FirebirdSql.Data.Services
 		public event EventHandler<FbInfoMessageEventArgs> InfoMessage;
 
 		private const string ServiceName = "service_mgr";
-
-		private protected static readonly ServiceParameterBuffer EmptySpb = new ServiceParameterBuffer();
 
 		private ServiceManagerBase _svc;
 		private ConnectionString _options;
@@ -76,32 +75,39 @@ namespace FirebirdSql.Data.Services
 			ConnectionString = connectionString;
 		}
 
-		private ServiceParameterBuffer BuildSpb()
+		private ServiceParameterBufferBase BuildSpb()
 		{
 			SpbFilenameEncoding = Encoding2.Default;
-			var spb = new ServiceParameterBuffer();
-			spb.Append(IscCodes.isc_spb_version);
-			spb.Append(IscCodes.isc_spb_current_version);
-			if (_svc is Client.Managed.Version10.GdsServiceManager gdsSvc && gdsSvc.AuthData != null)
+			var spb = _svc.CreateServiceParameterBuffer();
+			spb.AppendPreamble();
+			if (_svc is Client.Managed.Version10.GdsServiceManager gdsSvc && gdsSvc.Connection.AuthBlock != null)
 			{
-				spb.Append((byte)IscCodes.isc_spb_specific_auth_data, gdsSvc.AuthData);
+				if (!gdsSvc.Connection.AuthBlock.HasClientData)
+				{
+					spb.Append1(IscCodes.isc_spb_auth_plugin_name, gdsSvc.Connection.AuthBlock.AcceptPluginName);
+					spb.Append1(IscCodes.isc_spb_specific_auth_data, gdsSvc.Connection.AuthBlock.PublicClientData);
+				}
+				else
+				{
+					spb.Append1(IscCodes.isc_spb_specific_auth_data, gdsSvc.Connection.AuthBlock.ClientData);
+				}
 			}
 			else
 			{
-				spb.Append((byte)IscCodes.isc_spb_user_name, _options.UserID);
-				spb.Append((byte)IscCodes.isc_spb_password, _options.Password);
+				spb.Append1(IscCodes.isc_spb_user_name, _options.UserID);
+				spb.Append1(IscCodes.isc_spb_password, _options.Password);
 			}
-			spb.Append((byte)IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
+			spb.Append1(IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 			if ((_options?.Role.Length ?? 0) != 0)
 			{
-				spb.Append((byte)IscCodes.isc_spb_sql_role_name, _options.Role);
+				spb.Append1(IscCodes.isc_spb_sql_role_name, _options.Role);
 			}
 			if (_svc is Client.Managed.Version13.GdsServiceManager)
 			{
-				spb.Append((byte)IscCodes.isc_spb_utf8_filename, new byte[] { 0 });
+				spb.Append1(IscCodes.isc_spb_utf8_filename, new byte[] { 0 });
 				SpbFilenameEncoding = Encoding.UTF8;
 			}
-			spb.Append((byte)IscCodes.isc_spb_expected_db, _options.Database, SpbFilenameEncoding);
+			spb.Append1(IscCodes.isc_spb_expected_db, _options.Database, SpbFilenameEncoding);
 			return spb;
 		}
 
@@ -148,7 +154,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected async Task StartTask(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		private protected async Task StartTask(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			if (State == FbServiceState.Closed)
 				throw new InvalidOperationException("Service is Closed.");
@@ -163,7 +169,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected async Task<List<object>> Query(byte[] items, ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		private protected async Task<List<object>> Query(byte[] items, ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			var result = new List<object>();
 			await Query(items, spb, (truncated, item) =>
@@ -203,7 +209,7 @@ namespace FirebirdSql.Data.Services
 			return result;
 		}
 
-		private protected async Task Query(byte[] items, ServiceParameterBuffer spb, Action<bool, object> queryResponseAction, AsyncWrappingCommonArgs async)
+		private protected async Task Query(byte[] items, ServiceParameterBufferBase spb, Action<bool, object> queryResponseAction, AsyncWrappingCommonArgs async)
 		{
 			var pos = 0;
 			var truncated = false;
@@ -314,7 +320,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected async Task ProcessServiceOutput(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		private protected async Task ProcessServiceOutput(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			string line;
 			while ((line = await GetNextLine(spb, async).ConfigureAwait(false)) != null)
@@ -323,7 +329,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected async Task<string> GetNextLine(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		private protected async Task<string> GetNextLine(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			var info = await Query(new byte[] { IscCodes.isc_info_svc_line }, spb, async).ConfigureAwait(false);
 			if (info.Count == 0)
@@ -342,7 +348,7 @@ namespace FirebirdSql.Data.Services
 				throw FbException.Create("Action should be executed against a specific database.");
 		}
 
-		private async Task<byte[]> QueryService(byte[] items, ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		private async Task<byte[]> QueryService(byte[] items, ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			var shouldClose = false;
 			if (State == FbServiceState.Closed)

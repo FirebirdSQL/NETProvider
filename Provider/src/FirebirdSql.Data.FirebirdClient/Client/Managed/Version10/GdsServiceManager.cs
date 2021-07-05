@@ -33,9 +33,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Properties
 
-		public byte[] AuthData
+		public GdsConnection Connection
 		{
-			get { return _connection.AuthData; }
+			get { return _connection; }
 		}
 
 		public GdsDatabase Database
@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public override async Task Attach(ServiceParameterBuffer spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected virtual async Task SendAttachToBuffer(ServiceParameterBuffer spb, string service, AsyncWrappingCommonArgs async)
+		protected virtual async Task SendAttachToBuffer(ServiceParameterBufferBase spb, string service, AsyncWrappingCommonArgs async)
 		{
 			await _database.Xdr.Write(IscCodes.op_service_attach, async).ConfigureAwait(false);
 			await _database.Xdr.Write(0, async).ConfigureAwait(false);
@@ -120,7 +120,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task Start(ServiceParameterBuffer spb, AsyncWrappingCommonArgs async)
+		public override async Task Start(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task Query(ServiceParameterBuffer spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
+		public override async Task Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -173,6 +173,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				throw IscException.ForIOException(ex);
 			}
+		}
+
+		public override ServiceParameterBufferBase CreateServiceParameterBuffer()
+		{
+			return new ServiceParameterBuffer2();
 		}
 
 		protected virtual GdsDatabase CreateDatabase(GdsConnection connection)

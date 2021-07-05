@@ -45,12 +45,12 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				await Open(async).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer();
+				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_backup);
-				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				startSpb.Append(IscCodes.isc_spb_bkp_file, "stdout", SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout", SpbFilenameEncoding);
 				if (!string.IsNullOrEmpty(SkipData))
-					startSpb.Append(IscCodes.isc_spb_bkp_skip_data, SkipData);
+					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 				await StartTask(startSpb, async).ConfigureAwait(false);
 				await ReadOutput(async).ConfigureAwait(false);
@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.Services
 
 		Task ReadOutput(AsyncWrappingCommonArgs async)
 		{
-			return Query(new byte[] { IscCodes.isc_info_svc_to_eof }, EmptySpb, (_, x) =>
+			return Query(new byte[] { IscCodes.isc_info_svc_to_eof }, ServiceParameterBufferBase.Empty, (_, x) =>
 			{
 				var buffer = x as byte[];
 				OutputStream.Write(buffer, 0, buffer.Length);

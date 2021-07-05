@@ -23,7 +23,7 @@ using NUnit.Framework;
 namespace FirebirdSql.Data.FirebirdClient.Tests
 {
 	[NoServerCategory]
-	public class GdsConnectionTests
+	public class AuthBlockTests
 	{
 		static IEnumerable<TestCaseData> NormalizeLoginTestSource()
 		{
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[TestCaseSource(nameof(NormalizeLoginTestSource))]
 		public string NormalizeLoginTest(string login)
 		{
-			return GdsConnection.NormalizeLogin(login);
+			return AuthBlock.NormalizeLogin(login);
 		}
 	}
 }

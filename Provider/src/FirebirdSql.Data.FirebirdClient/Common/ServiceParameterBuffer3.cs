@@ -15,21 +15,41 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq;
-using System.Security.Cryptography;
+using System;
 
-namespace FirebirdSql.Data.Client.Managed
+namespace FirebirdSql.Data.Common
 {
-	internal sealed class SrpClient : SrpClientBase
+	internal sealed class ServiceParameterBuffer3 : ServiceParameterBufferBase
 	{
-		public override string Name => "Srp";
-
-		protected override byte[] ComputeHash(params byte[][] ba)
+		public override void AppendPreamble()
 		{
-			using (var hash = SHA1.Create())
-			{
-				return hash.ComputeHash(ba.SelectMany(x => x).ToArray());
-			}
+			Append(IscCodes.isc_spb_version3);
+		}
+
+		public override void Append1(int type, byte[] value)
+		{
+			WriteByte(type);
+			Write(value.Length);
+			Write(value);
+		}
+
+		public override void Append2(int type, byte[] value)
+		{
+			WriteByte(type);
+			Write(value.Length);
+			Write(value);
+		}
+
+		public void Append(int type, byte value)
+		{
+			WriteByte(type);
+			WriteByte(value);
+		}
+
+		public void Append(int type, int value)
+		{
+			WriteByte(type);
+			Write(value);
 		}
 	}
 }

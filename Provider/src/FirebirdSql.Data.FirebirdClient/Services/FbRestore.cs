@@ -61,13 +61,13 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				await Open(async).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer();
+				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_restore);
 				foreach (var bkpFile in BackupFiles)
 				{
-					startSpb.Append(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile, SpbFilenameEncoding);
+					startSpb.Append2(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile, SpbFilenameEncoding);
 				}
-				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 				if (Verbose)
 					startSpb.Append(IscCodes.isc_spb_verbose);
 				if (PageBuffers.HasValue)
@@ -76,13 +76,13 @@ namespace FirebirdSql.Data.Services
 					startSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
 				startSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
 				if (!string.IsNullOrEmpty(SkipData))
-					startSpb.Append(IscCodes.isc_spb_res_skip_data, SkipData);
+					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				startSpb.Append(IscCodes.isc_spb_res_stat, Statistics.BuildConfiguration());
+				startSpb.Append2(IscCodes.isc_spb_res_stat, Statistics.BuildConfiguration());
 				await StartTask(startSpb, async).ConfigureAwait(false);
 				if (Verbose)
 				{
-					await ProcessServiceOutput(EmptySpb, async).ConfigureAwait(false);
+					await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 				}
 			}
 			catch (Exception ex)

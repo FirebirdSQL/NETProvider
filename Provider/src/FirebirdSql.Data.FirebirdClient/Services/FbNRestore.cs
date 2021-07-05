@@ -42,16 +42,16 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				await Open(async).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer();
+				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_nrest);
-				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 				foreach (var file in BackupFiles)
 				{
-					startSpb.Append(IscCodes.isc_spb_nbk_file, file, SpbFilenameEncoding);
+					startSpb.Append2(IscCodes.isc_spb_nbk_file, file, SpbFilenameEncoding);
 				}
-				startSpb.Append(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
+				startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutput(EmptySpb, async).ConfigureAwait(false);
+				await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{

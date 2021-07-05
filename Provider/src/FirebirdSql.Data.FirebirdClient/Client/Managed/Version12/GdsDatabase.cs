@@ -38,9 +38,9 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		{
 			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
-			if (!string.IsNullOrEmpty(Password))
+			if (!string.IsNullOrEmpty(AuthBlock.Password))
 			{
-				dpb.Append(IscCodes.isc_dpb_password, Password);
+				dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
@@ -51,9 +51,9 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 		{
 			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
-			if (!string.IsNullOrEmpty(Password))
+			if (!string.IsNullOrEmpty(AuthBlock.Password))
 			{
-				dpb.Append(IscCodes.isc_dpb_password, Password);
+				dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);

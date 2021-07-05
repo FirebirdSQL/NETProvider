@@ -35,9 +35,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
 			await StartTask(startSpb, async).ConfigureAwait(false);
 			await Close(async).ConfigureAwait(false);
@@ -50,9 +50,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
 			await StartTask(startSpb, async).ConfigureAwait(false);
 			await Close(async).ConfigureAwait(false);
@@ -65,9 +65,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
 			await StartTask(startSpb, async).ConfigureAwait(false);
 			await Close(async).ConfigureAwait(false);
@@ -80,9 +80,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			switch (mode)
 			{
 				case FbShutdownMode.Forced:
@@ -106,9 +106,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
 			switch (type)
 			{
@@ -133,9 +133,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
 			await StartTask(startSpb, async).ConfigureAwait(false);
 			await Close(async).ConfigureAwait(false);
@@ -148,9 +148,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
 			await StartTask(startSpb, async).ConfigureAwait(false);
 			await Close(async).ConfigureAwait(false);
@@ -163,9 +163,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
 			await StartTask(startSpb, async).ConfigureAwait(false);
 			await Close(async).ConfigureAwait(false);
@@ -178,9 +178,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			if (forcedWrites)
 			{
 				startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
@@ -200,9 +200,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			if (reserveSpace)
 			{
 				startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
@@ -222,9 +222,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
 			await StartTask(startSpb, async).ConfigureAwait(false);
 			await Close(async).ConfigureAwait(false);
@@ -237,9 +237,9 @@ namespace FirebirdSql.Data.Services
 			EnsureDatabase();
 
 			await Open(async).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer();
+			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
-			startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_nolinger);
 			await StartTask(startSpb, async).ConfigureAwait(false);
 			await Close(async).ConfigureAwait(false);

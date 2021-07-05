@@ -44,21 +44,21 @@ namespace FirebirdSql.Data.Services
 			try
 			{
 				await Open(async).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer();
+				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_validate);
-				startSpb.Append(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 				if (!string.IsNullOrEmpty(TablesInclude))
-					startSpb.Append(IscCodes.isc_spb_val_tab_incl, TablesInclude);
+					startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
 				if (!string.IsNullOrEmpty(TablesExclude))
-					startSpb.Append(IscCodes.isc_spb_val_tab_excl, TablesExclude);
+					startSpb.Append2(IscCodes.isc_spb_val_tab_excl, TablesExclude);
 				if (!string.IsNullOrEmpty(IndicesInclude))
-					startSpb.Append(IscCodes.isc_spb_val_idx_incl, IndicesInclude);
+					startSpb.Append2(IscCodes.isc_spb_val_idx_incl, IndicesInclude);
 				if (!string.IsNullOrEmpty(IndicesExclude))
-					startSpb.Append(IscCodes.isc_spb_val_idx_excl, IndicesExclude);
+					startSpb.Append2(IscCodes.isc_spb_val_idx_excl, IndicesExclude);
 				if (LockTimeout.HasValue)
 					startSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
 				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutput(EmptySpb, async).ConfigureAwait(false);
+				await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{

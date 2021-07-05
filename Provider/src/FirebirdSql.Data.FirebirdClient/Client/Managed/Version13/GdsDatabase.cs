@@ -35,8 +35,29 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				await SendAttachToBuffer(dpb, database, async).ConfigureAwait(false);
 				await Xdr.Flush(async).ConfigureAwait(false);
 				var response = await ReadResponse(async).ConfigureAwait(false);
-				response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
-				await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+				if (response is ContAuthResponse)
+				{
+					while (response is ContAuthResponse contAuthResponse)
+					{
+						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
+
+						await AuthBlock.SendContAuthToBuffer(Xdr, async).ConfigureAwait(false);
+						await Xdr.Flush(async).ConfigureAwait(false);
+						response = await AuthBlock.ProcessContAuthResponse(Xdr, async).ConfigureAwait(false);
+					}
+#warning ProcessCryptCallbackResponseIfNeeded
+					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+
+					await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
+					await Xdr.Flush(async).ConfigureAwait(false);
+					await AuthBlock.ProcessWireCryptResponse(Xdr, _connection, async).ConfigureAwait(false);
+				}
+				else
+				{
+					response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
+					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+				}
+				AuthBlock.WireCryptValidate(IscCodes.PROTOCOL_VERSION13);
 			}
 			catch (IscException)
 			{
@@ -56,9 +77,14 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 		{
 			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
-			if (AuthData != null)
+			if (!AuthBlock.HasClientData)
 			{
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthData);
+				dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
+				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
+			}
+			else
+			{
+				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
@@ -67,14 +93,33 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
-
 			try
 			{
 				await SendCreateToBuffer(dpb, database, async).ConfigureAwait(false);
 				await Xdr.Flush(async).ConfigureAwait(false);
 				var response = await ReadResponse(async).ConfigureAwait(false);
-				response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
-				await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
+				if (response is ContAuthResponse)
+				{
+					while (response is ContAuthResponse contAuthResponse)
+					{
+						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
+
+						await AuthBlock.SendContAuthToBuffer(Xdr, async).ConfigureAwait(false);
+						await Xdr.Flush(async).ConfigureAwait(false);
+						response = await AuthBlock.ProcessContAuthResponse(Xdr, async).ConfigureAwait(false);
+					}
+#warning ProcessCryptCallbackResponseIfNeeded
+					await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
+
+					await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
+					await Xdr.Flush(async).ConfigureAwait(false);
+					await AuthBlock.ProcessWireCryptResponse(Xdr, _connection, async).ConfigureAwait(false);
+				}
+				else
+				{
+					response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
+					await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
+				}
 			}
 			catch (IOException ex)
 			{
@@ -86,9 +131,14 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 		{
 			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
-			if (AuthData != null)
+			if (!AuthBlock.HasClientData)
 			{
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthData);
+				dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
+				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
+			}
+			else
+			{
+				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);

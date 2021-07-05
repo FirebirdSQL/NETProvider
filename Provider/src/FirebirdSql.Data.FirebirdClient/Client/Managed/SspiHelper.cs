@@ -18,16 +18,13 @@
 // Adapted from pinvoke.net
 
 using System;
-using System.Text;
 using System.Runtime.InteropServices;
-
-using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
 	internal sealed class SspiHelper : IDisposable
 	{
-		public const string PluginName = "Win_Sspi";
+		public string Name { get; } = "Win_Sspi";
 
 		private enum SecBufferType
 		{
