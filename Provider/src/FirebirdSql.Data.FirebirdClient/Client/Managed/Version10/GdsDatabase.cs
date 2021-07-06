@@ -120,7 +120,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			await Xdr.WriteBuffer(Encoding.Default.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBuffer(Encoding2.Default.GetBytes(database), async).ConfigureAwait(false);
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
@@ -226,7 +226,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				dpb.Append(IscCodes.isc_dpb_password, Password);
 			}
-			await Xdr.WriteBuffer(Encoding.Default.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBuffer(Encoding2.Default.GetBytes(database), async).ConfigureAwait(false);
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 

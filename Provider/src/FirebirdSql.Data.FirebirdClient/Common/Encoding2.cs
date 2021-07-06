@@ -13,35 +13,28 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace FirebirdSql.Data.Common
 {
-	internal sealed class TransactionParameterBuffer : ParameterBuffer
+	internal static class Encoding2
 	{
-		public TransactionParameterBuffer()
-		{ }
+		public static Encoding Default { get; } = GetANSIEncoding();
 
-		public void Append(int type, short value)
+		private static Encoding GetANSIEncoding()
 		{
-			WriteByte(type);
-			WriteByte(2);
-			Write(value);
-		}
-
-		public void Append(int type, string content)
-		{
-			Append(type, Encoding2.Default.GetBytes(content));
-		}
-
-		public void Append(int type, byte[] buffer)
-		{
-			WriteByte(type);
-			WriteByte(buffer.Length);
-			Write(buffer);
+			try
+			{
+				return Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.ANSICodePage);
+			}
+			catch (Exception)
+			{
+				return Encoding.Default;
+			}
 		}
 	}
 }

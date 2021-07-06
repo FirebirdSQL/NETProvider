@@ -83,7 +83,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
-			var databaseBuffer = Encoding.Default.GetBytes(database);
+			var databaseBuffer = Encoding2.Default.GetBytes(database);
 
 			ClearStatusVector();
 
@@ -146,7 +146,7 @@ namespace FirebirdSql.Data.Client.Native
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
-			var databaseBuffer = Encoding.Default.GetBytes(database);
+			var databaseBuffer = Encoding2.Default.GetBytes(database);
 
 			ClearStatusVector();
 

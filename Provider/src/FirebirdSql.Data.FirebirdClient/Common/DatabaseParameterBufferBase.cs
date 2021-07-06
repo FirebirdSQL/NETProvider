@@ -31,6 +31,6 @@ namespace FirebirdSql.Data.Common
 		public abstract void Append(int type, int value);
 		public abstract void Append(int type, byte[] buffer);
 
-		public void Append(int type, string content) => Append(type, Encoding.Default.GetBytes(content));
+		public void Append(int type, string content) => Append(type, Encoding2.Default.GetBytes(content));
 	}
 }

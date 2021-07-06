@@ -36,13 +36,13 @@ namespace FirebirdSql.Data.Common
 			Write(value);
 		}
 
-		public void Append(int type, string value) => Append(type, value, Encoding.Default);
+		public void Append(int type, string value) => Append(type, value, Encoding2.Default);
 		public void Append(int type, string value, Encoding encoding)
 		{
 			Append(type, encoding.GetBytes(value));
 		}
 
-		public void Append(byte type, string value) => Append(type, value, Encoding.Default);
+		public void Append(byte type, string value) => Append(type, value, Encoding2.Default);
 		public void Append(byte type, string value, Encoding encoding)
 		{
 			Append(type, encoding.GetBytes(value));

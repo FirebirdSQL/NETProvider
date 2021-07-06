@@ -101,7 +101,6 @@ namespace FirebirdSql.Data.Common
 
 		private static void TryAddCharset(List<Charset> charsets, Func<Charset> charsetCreator)
 		{
-			// mainly because of Mono dropping supported charsets
 			try
 			{
 				charsets.Add(charsetCreator());
@@ -166,7 +165,7 @@ namespace FirebirdSql.Data.Common
 			switch (_systemName)
 			{
 				case None:
-					_encoding = Encoding.Default;
+					_encoding = Encoding2.Default;
 					_isNone = true;
 					break;
 				case Octets:
