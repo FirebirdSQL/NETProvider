@@ -25,7 +25,6 @@ namespace FirebirdSql.Data.Services
 {
 	public sealed class FbValidation2 : FbService
 	{
-
 		public string TablesInclude { get; set; }
 		public string TablesExclude { get; set; }
 		public string IndicesInclude { get; set; }
