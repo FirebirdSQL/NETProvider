@@ -16,18 +16,19 @@
 //$Authors = Carlos Guzman Alvarez
 
 using System;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Services
 {
 	[Flags]
 	public enum FbValidationFlags
 	{
-		ValidateDatabase = 0x01,
-		SweepDatabase = 0x02,
-		MendDatabase = 0x04,
-		CheckDatabase = 0x10,
-		IgnoreChecksum = 0x20,
-		KillShadows = 0x40,
-		Full = 0x80
+		ValidateDatabase = IscCodes.isc_spb_rpr_validate_db,
+		SweepDatabase = IscCodes.isc_spb_rpr_sweep_db,
+		MendDatabase = IscCodes.isc_spb_rpr_mend_db,
+		CheckDatabase = IscCodes.isc_spb_rpr_check_db,
+		IgnoreChecksum = IscCodes.isc_spb_rpr_ignore_checksum,
+		KillShadows = IscCodes.isc_spb_rpr_kill_shadows,
+		Full = IscCodes.isc_spb_rpr_full,
 	}
 }

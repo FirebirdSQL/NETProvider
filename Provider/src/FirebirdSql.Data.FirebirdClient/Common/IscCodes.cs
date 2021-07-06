@@ -537,6 +537,22 @@ namespace FirebirdSql.Data.Common
 		public const int isc_spb_tra_advise_commit = 30;
 		public const int isc_spb_tra_advise_rollback = 31;
 		public const int isc_spb_tra_advise_unknown = 33;
+		public const int isc_spb_tra_id_64 = 46;
+		public const int isc_spb_single_tra_id_64 = 47;
+		public const int isc_spb_multi_tra_id_64 = 48;
+		public const int isc_spb_rpr_commit_trans_64 = 49;
+		public const int isc_spb_rpr_rollback_trans_64 = 50;
+		public const int isc_spb_rpr_recover_two_phase_64 = 51;
+
+		public const int isc_spb_rpr_validate_db = 0x01;
+		public const int isc_spb_rpr_sweep_db = 0x02;
+		public const int isc_spb_rpr_mend_db = 0x04;
+		public const int isc_spb_rpr_list_limbo_trans = 0x08;
+		public const int isc_spb_rpr_check_db = 0x10;
+		public const int isc_spb_rpr_ignore_checksum = 0x20;
+		public const int isc_spb_rpr_kill_shadows = 0x40;
+		public const int isc_spb_rpr_full = 0x80;
+		public const int isc_spb_rpr_icu = 0x0800;
 
 		#endregion
 
