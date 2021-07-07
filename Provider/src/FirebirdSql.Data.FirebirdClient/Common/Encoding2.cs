@@ -27,6 +27,9 @@ namespace FirebirdSql.Data.Common
 
 		private static Encoding GetANSIEncoding()
 		{
+#if NET48
+			return Encoding.Default;
+#else
 			try
 			{
 				return Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.ANSICodePage);
@@ -35,6 +38,7 @@ namespace FirebirdSql.Data.Common
 			{
 				return Encoding.Default;
 			}
+#endif
 		}
 	}
 }
