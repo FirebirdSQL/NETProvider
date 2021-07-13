@@ -68,7 +68,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 				var valueGenerationStrategy = column[FbAnnotationNames.ValueGenerationStrategy] as FbValueGenerationStrategy?;
 				if (valueGenerationStrategy == FbValueGenerationStrategy.SequenceTrigger)
 				{
-					_behavior.CreateSequenceTriggerForColumn(column.Name, column.Table, column.Schema, builder);
+					_behavior.CreateSequenceTriggerForColumn(column.Name, column.Table, column.Schema, Options, builder);
 				}
 			}
 		}
@@ -102,7 +102,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			}
 			if (oldValueGenerationStrategy == FbValueGenerationStrategy.SequenceTrigger && valueGenerationStrategy != FbValueGenerationStrategy.SequenceTrigger)
 			{
-				_behavior.DropSequenceTriggerForColumn(operation.Name, operation.Table, operation.Schema, builder);
+				_behavior.DropSequenceTriggerForColumn(operation.Name, operation.Table, operation.Schema, Options, builder);
 			}
 
 			// will be recreated, if needed, by next statement
@@ -154,7 +154,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 
 			if (valueGenerationStrategy == FbValueGenerationStrategy.SequenceTrigger)
 			{
-				_behavior.CreateSequenceTriggerForColumn(operation.Name, operation.Table, operation.Schema, builder);
+				_behavior.CreateSequenceTriggerForColumn(operation.Name, operation.Table, operation.Schema, Options, builder);
 			}
 		}
 
@@ -297,11 +297,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 
 		public virtual void Generate(FbCreateDatabaseOperation operation, IModel model, MigrationCommandListBuilder builder)
 		{
+			if (Options.HasFlag(MigrationsSqlGenerationOptions.Script))
+				throw new NotSupportedException("Creating database from script is not supported.");
+
 			FbConnection.CreateDatabase(operation.ConnectionString);
 		}
 
 		public virtual void Generate(FbDropDatabaseOperation operation, IModel model, MigrationCommandListBuilder builder)
 		{
+			if (Options.HasFlag(MigrationsSqlGenerationOptions.Script))
+				throw new NotSupportedException("Dropping database from script is not supported.");
+
 			FbConnection.ClearPool(operation.ConnectionString);
 			FbConnection.DropDatabase(operation.ConnectionString);
 		}

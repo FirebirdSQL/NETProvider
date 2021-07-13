@@ -114,7 +114,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 				Sql.Append(" AS ");
 				if (sqlParameterExpression.Type == typeof(string))
 				{
-					Sql.Append((Dependencies.SqlGenerationHelper as IFbSqlGenerationHelper).StringParameterQueryType());
+					Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringParameterQueryType());
 				}
 				else
 				{
@@ -136,7 +136,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 			if (shouldExplicitStringLiteralTypes)
 			{
 				Sql.Append(" AS ");
-				Sql.Append((Dependencies.SqlGenerationHelper as IFbSqlGenerationHelper).StringLiteralQueryType(sqlConstantExpression.Value as string));
+				Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringLiteralQueryType(sqlConstantExpression.Value as string));
 				Sql.Append(")");
 			}
 			return sqlConstantExpression;

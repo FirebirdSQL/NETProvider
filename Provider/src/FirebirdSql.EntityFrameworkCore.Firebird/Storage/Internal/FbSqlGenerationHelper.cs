@@ -44,6 +44,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 			builder.Append(":").Append(name);
 		}
 
+		public string AlternativeStatementTerminator => "~";
+
 		static int MinimumStringQueryTypeLength(string s)
 		{
 			var length = s?.Length ?? 0;

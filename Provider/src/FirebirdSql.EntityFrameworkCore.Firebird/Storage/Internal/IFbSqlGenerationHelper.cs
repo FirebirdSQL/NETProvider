@@ -25,5 +25,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		string StringLiteralQueryType(string s);
 		string StringParameterQueryType();
 		void GenerateBlockParameterName(StringBuilder builder, string name);
+		string AlternativeStatementTerminator { get; }
 	}
 }

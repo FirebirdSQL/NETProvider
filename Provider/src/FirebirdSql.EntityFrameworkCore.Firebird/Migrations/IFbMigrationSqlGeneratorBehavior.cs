@@ -21,7 +21,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird
 {
 	public interface IFbMigrationSqlGeneratorBehavior
 	{
-		void CreateSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationCommandListBuilder builder);
-		void DropSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationCommandListBuilder builder);
+		void CreateSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationsSqlGenerationOptions options, MigrationCommandListBuilder builder);
+		void DropSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationsSqlGenerationOptions options, MigrationCommandListBuilder builder);
 	}
 }

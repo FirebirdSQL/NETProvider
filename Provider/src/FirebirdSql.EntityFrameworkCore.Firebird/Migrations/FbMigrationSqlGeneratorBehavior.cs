@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -29,9 +30,17 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			_sqlGenerationHelper = sqlGenerationHelper;
 		}
 
-		public virtual void CreateSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationCommandListBuilder builder)
+		public virtual void CreateSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationsSqlGenerationOptions options, MigrationCommandListBuilder builder)
 		{
 			var identitySequenceName = CreateSequenceTriggerSequenceName(columnName, tableName, schemaName);
+
+			if (options.HasFlag(MigrationsSqlGenerationOptions.Script))
+			{
+				builder.Append("SET TERM ");
+				builder.Append(((IFbSqlGenerationHelper)_sqlGenerationHelper).AlternativeStatementTerminator);
+				builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
+				builder.EndCommand();
+			}
 
 			builder.AppendLine("EXECUTE BLOCK");
 			builder.AppendLine("AS");
@@ -53,7 +62,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.DecrementIndent();
 			builder.Append("END");
 			builder.AppendLine();
-			builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
+			if (options.HasFlag(MigrationsSqlGenerationOptions.Script))
+			{
+				builder.AppendLine(((IFbSqlGenerationHelper)_sqlGenerationHelper).AlternativeStatementTerminator);
+			}
+			else
+			{
+				builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
+			}
 			builder.EndCommand();
 
 			builder.Append("CREATE TRIGGER ");
@@ -81,13 +97,36 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.DecrementIndent();
 			builder.Append("END");
 			builder.AppendLine();
-			builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
+			if (options.HasFlag(MigrationsSqlGenerationOptions.Script))
+			{
+				builder.AppendLine(((IFbSqlGenerationHelper)_sqlGenerationHelper).AlternativeStatementTerminator);
+			}
+			else
+			{
+				builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
+			}
 			builder.EndCommand();
+
+			if (options.HasFlag(MigrationsSqlGenerationOptions.Script))
+			{
+				builder.Append("SET TERM ");
+				builder.Append(_sqlGenerationHelper.StatementTerminator);
+				builder.AppendLine(((IFbSqlGenerationHelper)_sqlGenerationHelper).AlternativeStatementTerminator);
+				builder.EndCommand();
+			}
 		}
 
-		public virtual void DropSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationCommandListBuilder builder)
+		public virtual void DropSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationsSqlGenerationOptions options, MigrationCommandListBuilder builder)
 		{
 			var triggerName = CreateSequenceTriggerName(columnName, tableName, schemaName);
+
+			if (options.HasFlag(MigrationsSqlGenerationOptions.Script))
+			{
+				builder.Append("SET TERM ");
+				builder.Append(((IFbSqlGenerationHelper)_sqlGenerationHelper).AlternativeStatementTerminator);
+				builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
+				builder.EndCommand();
+			}
 
 			builder.AppendLine("EXECUTE BLOCK");
 			builder.AppendLine("AS");
@@ -109,8 +148,23 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations
 			builder.DecrementIndent();
 			builder.Append("END");
 			builder.AppendLine();
-			builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
+			if (options.HasFlag(MigrationsSqlGenerationOptions.Script))
+			{
+				builder.AppendLine(((IFbSqlGenerationHelper)_sqlGenerationHelper).AlternativeStatementTerminator);
+			}
+			else
+			{
+				builder.AppendLine(_sqlGenerationHelper.StatementTerminator);
+			}
 			builder.EndCommand();
+
+			if (options.HasFlag(MigrationsSqlGenerationOptions.Script))
+			{
+				builder.Append("SET TERM ");
+				builder.Append(_sqlGenerationHelper.StatementTerminator);
+				builder.AppendLine(((IFbSqlGenerationHelper)_sqlGenerationHelper).AlternativeStatementTerminator);
+				builder.EndCommand();
+			}
 		}
 
 		protected virtual string CreateSequenceTriggerName(string columnName, string tableName, string schemaName)
