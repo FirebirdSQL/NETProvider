@@ -455,15 +455,15 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private static string GetSystemWebHostingPath()
 		{
-#if NETSTANDARD2_0 || NET5_0
-			return null;
-#else
+#if NET48
 			var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.GetName().Name.Equals("System.Web", StringComparison.Ordinal)).FirstOrDefault();
 			if (assembly == null)
 				return null;
 			// showing ApplicationPhysicalPath may be wrong because of connection pooling
 			// better idea?
 			return (string)assembly.GetType("System.Web.Hosting.HostingEnvironment").GetProperty("ApplicationPhysicalPath").GetValue(null, null);
+#else
+			return null;
 #endif
 		}
 
