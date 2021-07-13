@@ -198,6 +198,11 @@ namespace FirebirdSql.Data.Common
 
 		public IDisposable EnterExplicitCancel(Action explicitCancel)
 		{
+			if (_cancellationTokenRaw.IsCancellationRequested)
+			{
+				explicitCancel();
+				throw new OperationCanceledException(_cancellationTokenRaw);
+			}
 			_explicitCancel += 1;
 			var ctr = _cancellationTokenRaw.Register(explicitCancel);
 			return new ExitHolder(this, ctr);

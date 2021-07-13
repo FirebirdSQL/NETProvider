@@ -496,5 +496,22 @@ end";
 				}
 			}
 		}
+
+		[Test]
+		public async Task ReadOnAlreadyCancelledToken()
+		{
+			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+				return;
+
+			using (var cts = new CancellationTokenSource())
+			{
+				cts.Cancel();
+				await using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText ="select 1 from rdb$database";
+					Assert.ThrowsAsync<OperationCanceledException>(() => cmd.ExecuteReaderAsync(cts.Token));
+				}
+			}
+		}
 	}
 }
