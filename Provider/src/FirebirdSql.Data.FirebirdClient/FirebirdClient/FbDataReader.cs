@@ -457,6 +457,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override bool GetBoolean(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -465,6 +466,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override byte GetByte(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -473,6 +475,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override long GetBytes(int i, long dataIndex, byte[] buffer, int bufferIndex, int length)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -514,9 +517,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		[EditorBrowsable(EditorBrowsableState.Never)]
 		public override char GetChar(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -525,6 +528,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override long GetChars(int i, long dataIndex, char[] buffer, int bufferIndex, int length)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -570,6 +574,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override Guid GetGuid(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -578,6 +583,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override Int16 GetInt16(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -586,6 +592,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override Int32 GetInt32(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -594,6 +601,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override Int64 GetInt64(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -602,6 +610,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override float GetFloat(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -610,6 +619,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override double GetDouble(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -618,6 +628,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override string GetString(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -626,6 +637,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override Decimal GetDecimal(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -634,6 +646,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override DateTime GetDateTime(int i)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
@@ -644,6 +657,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public override Task<bool> IsDBNullAsync(int i, CancellationToken cancellationToken) => IsDBNullImpl(i, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<bool> IsDBNullImpl(int i, AsyncWrappingCommonArgs async)
 		{
+			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
