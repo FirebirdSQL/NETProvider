@@ -349,7 +349,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (!_disposed)
 			{
 				_disposed = true;
-				await Release(async).ConfigureAwait(false);
+				try
+				{
+					await Release(async).ConfigureAwait(false);
+				}
+				catch (IscException ex)
+				{
+					throw FbException.Create(ex);
+				}
 				_commandTimeout = 0;
 				_fetchSize = 0;
 				_implicitTransaction = false;
