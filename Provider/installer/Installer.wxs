@@ -91,7 +91,9 @@
 									 File="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\Config\machine.config"
 									 Action="delete"
 									 On="uninstall"
-									 ElementPath="//configuration/system.data/DbProviderFactories/add[\[]@invariant='FirebirdSql.Data.FirebirdClient'[\]]"
+									 ElementPath="//configuration/system.data/DbProviderFactories"
+									 Node="element"
+									 VerifyPath="//configuration/system.data/DbProviderFactories/add[\[]@invariant='FirebirdSql.Data.FirebirdClient'[\]]"
 									 Sequence="1" />
 			</Component>
 			<Component Id="FirebirdClientMachineConfig64Component" Guid="BEFFCC7B-0EE0-47DD-BB9F-8AD8838D789C">
@@ -133,7 +135,9 @@
 									 File="[WindowsFolder]Microsoft.NET\Framework64\v4.0.30319\Config\machine.config"
 									 Action="delete"
 									 On="uninstall"
-									 ElementPath="//configuration/system.data/DbProviderFactories/add[\[]@invariant='FirebirdSql.Data.FirebirdClient'[\]]"
+									 ElementPath="//configuration/system.data/DbProviderFactories"
+									 Node="element"
+									 VerifyPath="//configuration/system.data/DbProviderFactories/add[\[]@invariant='FirebirdSql.Data.FirebirdClient'[\]]"
 									 Sequence="1" />
 			</Component>
 		</Directory>
