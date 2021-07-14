@@ -498,8 +498,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
-			var connectionString = BuildConnectionString(ServerType, Compression, WireCrypt);
-			await using (var conn = new FbConnection(connectionString))
+			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+			await using (var conn = new FbConnection(csb.ToString()))
 			{
 				await conn.OpenAsync();
 				await using (var cmd = conn.CreateCommand())
@@ -508,17 +508,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 					await cmd.ExecuteNonQueryAsync();
 				}
 
-				var csBuilder = new FbConnectionStringBuilder(connectionString)
-				{
-					Pooling = false,
-					UserID = "\"CaseSensitive\"",
-					Password = "password"
-				};
+				csb.Pooling = false;
+				csb.UserID = "\"CaseSensitive\"";
+				csb.Password = "password";
 				try
 				{
-					await using (var conn2 = new FbConnection(csBuilder.ToString()))
+					await using (var conn2 = new FbConnection(csb.ToString()))
 					{
-						await conn2.OpenAsync();
+						Assert.DoesNotThrowAsync(() => conn2.OpenAsync());
 					}
 				}
 				finally
@@ -618,6 +615,37 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				catch (OperationCanceledException)
 				{
 					Assert.Pass();
+				}
+			}
+		}
+
+		[Test]
+		public async Task SrpWithLeadingZeros()
+		{
+			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+				return;
+
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "create user DAVIDS password 'test' using plugin Srp";
+				await cmd.ExecuteNonQueryAsync();
+			}
+			try
+			{
+				var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+				csb.UserID = "DAVIDS";
+				csb.Password = "test";
+				await using (var conn = new FbConnection(csb.ToString()))
+				{
+					Assert.DoesNotThrowAsync(() => conn.OpenAsync());
+				}
+			}
+			finally
+			{
+				await using (var cmd = Connection.CreateCommand())
+				{
+					cmd.CommandText = "drop user DAVIDS using plugin Srp";
+					await cmd.ExecuteNonQueryAsync();
 				}
 			}
 		}
