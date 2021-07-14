@@ -4,3 +4,9 @@ root = true
 indent_style = tab
 indent_size = 4
 trim_trailing_whitespace = true
+
+[*.cs]
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+csharp_style_implicit_object_creation_when_type_is_apparent = false
+csharp_prefer_simple_using_statement = false
