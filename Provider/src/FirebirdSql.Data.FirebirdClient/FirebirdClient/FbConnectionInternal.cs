@@ -433,7 +433,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 			dpb.Append(IscCodes.isc_dpb_connect_timeout, options.ConnectionTimeout);
 			dpb.Append(IscCodes.isc_dpb_process_id, GetProcessId());
-			dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName());
+			dpb.Append(IscCodes.isc_dpb_process_name, GetProcessName(options));
 			dpb.Append(IscCodes.isc_dpb_client_version, GetClientVersion());
 			if (options.NoDatabaseTriggers)
 			{
@@ -447,8 +447,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			return dpb;
 		}
 
-		private static string GetProcessName()
+		private static string GetProcessName(ConnectionString options)
 		{
+			if (!string.IsNullOrEmpty(options.ApplicationName))
+			{
+				return options.ApplicationName;
+			}
 			return GetSystemWebHostingPath() ?? GetRealProcessName() ?? string.Empty;
 		}
 

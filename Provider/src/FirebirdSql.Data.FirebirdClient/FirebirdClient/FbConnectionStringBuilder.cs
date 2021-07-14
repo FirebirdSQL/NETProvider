@@ -270,7 +270,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		[Category("Advanced")]
-		[DisplayName("CryptKey")]
+		[DisplayName("Crypt Key")]
 		[Description("Key used for database decryption.")]
 		[DefaultValue(Common.ConnectionString.DefaultValueCryptKey)]
 		public byte[] CryptKey
@@ -280,13 +280,23 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		[Category("Advanced")]
-		[DisplayName("WireCrypt")]
+		[DisplayName("Wire Crypt")]
 		[Description("Selection for wire encryption.")]
 		[DefaultValue(Common.ConnectionString.DefaultValueWireCrypt)]
 		public FbWireCrypt WireCrypt
 		{
 			get { return GetWireCrypt(Common.ConnectionString.DefaultKeyWireCrypt, Common.ConnectionString.DefaultValueWireCrypt); }
 			set { SetValue(Common.ConnectionString.DefaultKeyWireCrypt, value); }
+		}
+
+		[Category("Advanced")]
+		[DisplayName("Application Name")]
+		[Description("The name of the application making the connection.")]
+		[DefaultValue(Common.ConnectionString.DefaultValueApplicationName)]
+		public string ApplicationName
+		{
+			get { return Common.ConnectionString.GetString(GetKey(Common.ConnectionString.DefaultKeyApplicationName), base.TryGetValue, Common.ConnectionString.DefaultValueApplicationName); }
+			set { SetValue(Common.ConnectionString.DefaultKeyApplicationName, value); }
 		}
 
 		#endregion

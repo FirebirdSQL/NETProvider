@@ -650,6 +650,24 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
+		[Test]
+		public async Task ApplicationNameCorrectlyPassedToServer()
+		{
+			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+			csb.ApplicationName = "aPP NaME";
+			await using (var conn = new FbConnection(csb.ToString()))
+			{
+				await conn.OpenAsync();
+				await using (var command = conn.CreateCommand())
+				{
+					command.CommandText = "select MON$REMOTE_PROCESS from MON$ATTACHMENTS";
+					var applicationName = (string)await command.ExecuteScalarAsync();
+					Assert.AreEqual(csb.ApplicationName, applicationName);
+				}
+			}
+
+		}
+
 		private async Task BeginTransactionILTestsHelper(IsolationLevel level)
 		{
 			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
