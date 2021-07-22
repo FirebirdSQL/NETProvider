@@ -44,8 +44,8 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						await AuthBlock.SendContAuthToBuffer(Xdr, async).ConfigureAwait(false);
 						await Xdr.Flush(async).ConfigureAwait(false);
 						response = await AuthBlock.ProcessContAuthResponse(Xdr, async).ConfigureAwait(false);
+						response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					}
-#warning ProcessCryptCallbackResponseIfNeeded
 					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
 
 					await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
@@ -107,8 +107,8 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						await AuthBlock.SendContAuthToBuffer(Xdr, async).ConfigureAwait(false);
 						await Xdr.Flush(async).ConfigureAwait(false);
 						response = await AuthBlock.ProcessContAuthResponse(Xdr, async).ConfigureAwait(false);
+						response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					}
-#warning ProcessCryptCallbackResponseIfNeeded
 					await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
 
 					await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);

@@ -137,9 +137,13 @@ namespace FirebirdSql.Data.Client.Managed
 			var operation = await xdr.ReadOperation(async).ConfigureAwait(false);
 			var response = await GdsConnection.ProcessOperation(operation, xdr, async).ConfigureAwait(false);
 			GdsConnection.ProcessResponse(response);
-			if (response is ContAuthResponse contAuthResponse)
+			if (response is ContAuthResponse)
 			{
-				return contAuthResponse;
+				return response;
+			}
+			else if (response is CryptKeyCallbackResponse)
+			{
+				return response;
 			}
 			else if (response is GenericResponse genericResponse)
 			{
@@ -149,7 +153,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			else
 			{
-				throw new InvalidOperationException($"Unexpected response ('{operation}').");
+				throw new InvalidOperationException($"Unexpected response ({operation}).");
 			}
 			return response;
 		}

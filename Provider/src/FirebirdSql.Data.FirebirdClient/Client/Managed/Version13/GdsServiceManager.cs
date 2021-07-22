@@ -43,8 +43,8 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						await Connection.AuthBlock.SendContAuthToBuffer(Database.Xdr, async).ConfigureAwait(false);
 						await Database.Xdr.Flush(async).ConfigureAwait(false);
 						response = await Connection.AuthBlock.ProcessContAuthResponse(Database.Xdr, async).ConfigureAwait(false);
+						response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					}
-#warning ProcessCryptCallbackResponseIfNeeded
 					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
 
 					await Connection.AuthBlock.SendWireCryptToBuffer(Database.Xdr, async).ConfigureAwait(false);
