@@ -34,12 +34,12 @@ namespace FirebirdSql.Data.Common
 		public abstract bool HasRemoteEventSupport { get; }
 		public abstract bool ConnectionBroken { get; }
 
-		public abstract Task Attach(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract Task Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
 		public abstract Task Detach(AsyncWrappingCommonArgs async);
 
-		public abstract Task CreateDatabase(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract Task CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
 		public abstract Task DropDatabase(AsyncWrappingCommonArgs async);
 
 		public abstract Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);

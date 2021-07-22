@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return new GdsStatement(this, transaction);
 		}
 
-		public override async Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return response;
 		}
 
-		public override async Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			using (var sspiHelper = new SspiHelper())
 			{

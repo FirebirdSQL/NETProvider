@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Methods
 
-		public override Task CreateDatabase(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -101,7 +101,7 @@ namespace FirebirdSql.Data.Client.Native
 			return Task.CompletedTask;
 		}
 
-		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
@@ -142,7 +142,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override async Task Attach(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -163,7 +163,7 @@ namespace FirebirdSql.Data.Client.Native
 			ServerVersion = await GetServerVersion(async).ConfigureAwait(false);
 		}
 
-		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}

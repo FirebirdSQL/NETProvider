@@ -132,11 +132,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
-					await db.CreateDatabaseWithTrustedAuth(dpb, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
+					await db.CreateDatabaseWithTrustedAuth(dpb, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 				else
 				{
-					await db.CreateDatabase(dpb, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
+					await db.CreateDatabase(dpb, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 			}
 			finally
@@ -152,11 +152,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
-					await db.AttachWithTrustedAuth(BuildDpb(db, _options), _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
+					await db.AttachWithTrustedAuth(BuildDpb(db, _options), _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 				else
 				{
-					await db.Attach(BuildDpb(db, _options), _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
+					await db.Attach(BuildDpb(db, _options), _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 				await db.DropDatabase(async).ConfigureAwait(false);
 			}
@@ -188,11 +188,11 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 				{
-					await _db.AttachWithTrustedAuth(dpb, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
+					await _db.AttachWithTrustedAuth(dpb, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 				else
 				{
-					await _db.Attach(dpb, _options.Port, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
+					await _db.Attach(dpb, _options.Database, _options.CryptKey, async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
