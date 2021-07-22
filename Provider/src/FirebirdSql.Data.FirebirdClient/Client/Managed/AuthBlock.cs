@@ -132,6 +132,7 @@ namespace FirebirdSql.Data.Client.Managed
 			await xdr.WriteBuffer(ServerKeys, async).ConfigureAwait(false); // p_keys
 		}
 
+		// TODO: maybe more logic can be pulled up here
 		public async Task<IResponse> ProcessContAuthResponse(IXdrReader xdr, AsyncWrappingCommonArgs async)
 		{
 			var operation = await xdr.ReadOperation(async).ConfigureAwait(false);
