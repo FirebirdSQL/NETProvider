@@ -228,7 +228,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			else
 			{
-				throw new ArgumentOutOfRangeException(nameof(AcceptPluginName), $"{nameof(AcceptPluginName)}={AcceptPluginName}");
+				throw new NotSupportedException($"Not supported plugin '{AcceptPluginName}'.");
 			}
 		}
 
