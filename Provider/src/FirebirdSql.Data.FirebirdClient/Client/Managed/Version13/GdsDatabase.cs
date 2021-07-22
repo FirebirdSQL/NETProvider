@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			: base(connection)
 		{ }
 
-		public override async Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task Attach(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -91,7 +91,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -145,14 +145,14 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
-			return Attach(dpb, dataSource, port, database, cryptKey, async);
+			return Attach(dpb, port, database, cryptKey, async);
 		}
 
-		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
-			return CreateDatabase(dpb, dataSource, port, database, cryptKey, async);
+			return CreateDatabase(dpb, port, database, cryptKey, async);
 		}
 
 		internal async Task<IResponse> ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey, AsyncWrappingCommonArgs async)

@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Attach/Detach Methods
 
-		public override async Task Attach(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task Attach(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -130,7 +130,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			ServerVersion = await GetServerVersion(async).ConfigureAwait(false);
 		}
 
-		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Methods
 
-		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -231,7 +231,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return Task.CompletedTask;
 		}
 
-		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string dataSource, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, int port, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
