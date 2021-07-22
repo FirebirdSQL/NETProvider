@@ -86,7 +86,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[TestCase(false)]
 		public async Task StreamingBackupRestoreTest(bool verbose)
 		{
-			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			Task BackupPart(MemoryStream buffer)
@@ -194,7 +194,7 @@ end";
 		[Test]
 		public async Task ShutdownOnline2Test()
 		{
-			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			var configurationSvc = new FbConfiguration();
@@ -273,7 +273,7 @@ end";
 		[Test]
 		public async Task NBackupBackupRestoreTest()
 		{
-			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			const int Levels = 2;
@@ -352,7 +352,7 @@ end";
 		[Test]
 		public async Task NoLingerTest()
 		{
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			var configurationSvc = new FbConfiguration();
@@ -379,7 +379,7 @@ end";
 		[Test]
 		public async Task Validation2Test()
 		{
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			var validationSvc = new FbValidation2();

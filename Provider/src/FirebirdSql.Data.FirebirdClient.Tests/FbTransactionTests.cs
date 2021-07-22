@@ -33,15 +33,19 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task CommitTest()
 		{
-			Transaction = await Connection.BeginTransactionAsync();
-			await Transaction.CommitAsync();
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await transaction.CommitAsync();
+			}
 		}
 
 		[Test]
 		public async Task RollbackTest()
 		{
-			Transaction = await Connection.BeginTransactionAsync();
-			await Transaction.RollbackAsync();
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await transaction.RollbackAsync();
+			}
 		}
 
 		[Test]
@@ -49,25 +53,26 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			await using (var command = new FbCommand())
 			{
-				Transaction = await Connection.BeginTransactionAsync("InitialSavePoint");
+				await using (var transaction = await Connection.BeginTransactionAsync("InitialSavePoint"))
+				{
+					command.Connection = Connection;
+					command.Transaction = transaction;
 
-				command.Connection = Connection;
-				command.Transaction = Transaction;
+					command.CommandText = "insert into TEST (INT_FIELD) values (200)";
+					await command.ExecuteNonQueryAsync();
 
-				command.CommandText = "insert into TEST (INT_FIELD) values (200)";
-				await command.ExecuteNonQueryAsync();
+					await transaction.SaveAsync("FirstSavePoint");
 
-				await Transaction.SaveAsync("FirstSavePoint");
+					command.CommandText = "insert into TEST (INT_FIELD) values (201)";
+					await command.ExecuteNonQueryAsync();
+					await transaction.SaveAsync("SecondSavePoint");
 
-				command.CommandText = "insert into TEST (INT_FIELD) values (201)";
-				await command.ExecuteNonQueryAsync();
-				await Transaction.SaveAsync("SecondSavePoint");
+					command.CommandText = "insert into TEST (INT_FIELD) values (202)";
+					await command.ExecuteNonQueryAsync();
+					await transaction.RollbackAsync("InitialSavePoint");
 
-				command.CommandText = "insert into TEST (INT_FIELD) values (202)";
-				await command.ExecuteNonQueryAsync();
-				await Transaction.RollbackAsync("InitialSavePoint");
-
-				await Transaction.CommitAsync();
+					await transaction.CommitAsync();
+				}
 			}
 		}
 
@@ -85,16 +90,18 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				await command.ExecuteNonQueryAsync();
 
 				await transaction.CommitAsync();
-				transaction = null;
 			}
 			catch (Exception)
 			{
 				await transaction.RollbackAsync();
-				transaction = null;
 			}
 			finally
 			{
-				if (command != null)
+				if (transaction != null)
+				{
+					await command.DisposeAsync();
+				}
+				if (transaction != null)
 				{
 					await command.DisposeAsync();
 				}
@@ -104,11 +111,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task ReadCommittedReadConsistency()
 		{
-			if (!await EnsureVersion(new Version(4, 0, 0, 0)))
+			if (!EnsureVersion(new Version(4, 0, 0, 0)))
 				return;
 
-			Transaction = await Connection.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.ReadConsistency });
-			await Transaction.DisposeAsync();
+			await using (var transaction = await Connection.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.ReadConsistency }))
+			{
+				await transaction.DisposeAsync();
+			}
 		}
 	}
 }

@@ -48,16 +48,16 @@ end";
 		[Test]
 		public async Task ExecuteNonQueryTest()
 		{
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
 				await using (var command = Connection.CreateCommand())
 				{
-					command.Transaction = Transaction;
+					command.Transaction = transaction;
 					command.CommandText = "insert into TEST (INT_FIELD) values (?)";
 					command.Parameters.Add("@INT_FIELD", 100);
 					var affectedRows = await command.ExecuteNonQueryAsync();
 					Assert.AreEqual(affectedRows, 1);
-					await Transaction.RollbackAsync();
+					await transaction.RollbackAsync();
 				}
 			}
 		}
@@ -586,7 +586,7 @@ end";
 		[Test]
 		public async Task GetCommandExplainedPlanTest()
 		{
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			await using (var cmd = Connection.CreateCommand())
@@ -615,7 +615,7 @@ end";
 		[Test]
 		public async Task GetCommandExplainedPlanNoPlanTest()
 		{
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			await using (var cmd = Connection.CreateCommand())
@@ -690,7 +690,7 @@ end";
 		[Test]
 		public async Task CommandCancellationDirectTest()
 		{
-			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			await using (var cmd = Connection.CreateCommand())
@@ -712,7 +712,7 @@ end";
 		[Test]
 		public async Task CommandCancellationCancellationTokenTest()
 		{
-			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			using (var cts = new CancellationTokenSource())
@@ -737,7 +737,7 @@ end";
 		[Test]
 		public async Task CommandUsableAfterCancellationTest()
 		{
-			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			using (var cts = new CancellationTokenSource())
@@ -777,7 +777,7 @@ end";
 		[Test]
 		public async Task ExecuteNonQueryOnAlreadyCancelledToken()
 		{
-			if (!await EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			using (var cts = new CancellationTokenSource())

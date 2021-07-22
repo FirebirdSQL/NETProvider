@@ -38,15 +38,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new int[] { 10, 20, 30, 40 };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, iarray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, iarray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT iarray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -72,16 +72,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new short[] { 50, 60, 70, 80 };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, sarray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, sarray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
 
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT sarray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -107,15 +107,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new long[] { 50, 60, 70, 80 };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, larray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, larray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT larray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -141,15 +141,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new float[] { 130.10F, 140.20F, 150.30F, 160.40F };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, farray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, farray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT farray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -175,15 +175,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new double[] { 170.10, 180.20, 190.30, 200.40 };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, barray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, barray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT barray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -209,15 +209,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new decimal[] { 210.10M, 220.20M, 230.30M, 240.40M };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, narray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, narray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT narray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -243,15 +243,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new DateTime[] { DateTime.Today.AddDays(10), DateTime.Today.AddDays(20), DateTime.Today.AddDays(30), DateTime.Today.AddDays(40) };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, darray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, darray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT darray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -277,15 +277,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new TimeSpan[] { new TimeSpan(3, 9, 10), new TimeSpan(4, 11, 12), new TimeSpan(6, 13, 14), new TimeSpan(8, 15, 16) };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, tarray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, tarray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT tarray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -311,15 +311,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new DateTime[] { DateTime.Now.AddSeconds(10), DateTime.Now.AddSeconds(20), DateTime.Now.AddSeconds(30), DateTime.Now.AddSeconds(40) };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, tsarray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, tsarray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT tsarray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -346,15 +346,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new string[] { "abc", "abcdef", "abcdefghi", "abcdefghijkl" };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, carray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, carray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT carray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -381,15 +381,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var id_value = GetId();
 			var insert_values = new string[] { "abc", "abcdef", "abcdefghi", "abcdefghijkl" };
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, varray_field) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, varray_field) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT varray_field FROM TEST WHERE int_field = {id_value}", Connection))
@@ -554,15 +554,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var insert_values = new int[elements];
 			Buffer.BlockCopy(bytes, 0, insert_values, 0, bytes.Length);
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, big_array) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, big_array) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT big_array FROM TEST WHERE int_field = {id_value}", Connection))
@@ -595,15 +595,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			var insert_values = new int[elements];
 			Buffer.BlockCopy(bytes, 0, insert_values, 0, bytes.Length);
 
-			await using (Transaction = await Connection.BeginTransactionAsync())
+			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, big_array) values(@int_field, @array_field)", Connection, Transaction))
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, big_array) values(@int_field, @array_field)", Connection, transaction))
 				{
 					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
 					insert.Parameters.Add("@array_field", FbDbType.Array).Value = insert_values;
 					await insert.ExecuteNonQueryAsync();
 				}
-				await Transaction.CommitAsync();
+				await transaction.CommitAsync();
 			}
 
 			await using (var select = new FbCommand($"SELECT big_array FROM TEST WHERE int_field = {id_value}", Connection))

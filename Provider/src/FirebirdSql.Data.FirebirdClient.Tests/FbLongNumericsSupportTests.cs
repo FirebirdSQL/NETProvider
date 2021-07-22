@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			await base.SetUp();
 
-			if (!await EnsureVersion(new Version(4, 0, 0, 0)))
+			if (!EnsureVersion(new Version(4, 0, 0, 0)))
 				return;
 		}
 

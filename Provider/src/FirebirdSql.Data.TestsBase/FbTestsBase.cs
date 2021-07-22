@@ -30,8 +30,6 @@ namespace FirebirdSql.Data.TestsBase
 		#region	Fields
 
 		private readonly bool _insertTestData;
-		private FbConnection _connection;
-		private FbTransaction _transaction;
 
 		#endregion
 
@@ -41,16 +39,8 @@ namespace FirebirdSql.Data.TestsBase
 		public bool Compression { get; }
 		public FbWireCrypt WireCrypt { get; }
 
-		public FbConnection Connection
-		{
-			get { return _connection; }
-		}
-
-		public FbTransaction Transaction
-		{
-			get { return _transaction; }
-			set { _transaction = value; }
-		}
+		public FbConnection Connection { get; private set; }
+		public Version ServerVersion { get; private set; }
 
 		#endregion
 
@@ -78,15 +68,16 @@ namespace FirebirdSql.Data.TestsBase
 			{
 				await InsertTestData(cs);
 			}
-			_connection = new FbConnection(cs);
-			await _connection.OpenAsync();
+			Connection = new FbConnection(cs);
+			await Connection.OpenAsync();
+			ServerVersion = FbServerProperties.ParseServerVersion(Connection.ServerVersion);
 		}
 
 		[TearDown]
 		public virtual async Task TearDown()
 		{
 			var cs = BuildConnectionString(ServerType, Compression, WireCrypt);
-			_connection.Dispose();
+			Connection.Dispose();
 			if (_insertTestData)
 			{
 				await DeleteAllData(cs);
@@ -243,16 +234,9 @@ end";
 			}
 		}
 
-		protected async Task<Version> GetServerVersion()
+		protected bool EnsureVersion(Version version)
 		{
-			var server = new FbServerProperties();
-			server.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, false);
-			return FbServerProperties.ParseServerVersion(await server.GetServerVersionAsync());
-		}
-
-		protected async Task<bool> EnsureVersion(Version version)
-		{
-			if (await GetServerVersion() >= version)
+			if (ServerVersion >= version)
 				return true;
 			Assert.Inconclusive("Not supported on this version.");
 			return false;

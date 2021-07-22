@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task DNET217_ReadingALotOfFields()
 		{
-			var timestampExpression = await GetServerVersion() >= new Version(4, 0, 0, 0) ? "localtimestamp" : "current_timestamp";
+			var timestampExpression = ServerVersion >= new Version(4, 0, 0, 0) ? "localtimestamp" : "current_timestamp";
 
 			var cols = new StringBuilder();
 			var separator = string.Empty;

@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			await base.SetUp();
 
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			_shouldTearDown = true;

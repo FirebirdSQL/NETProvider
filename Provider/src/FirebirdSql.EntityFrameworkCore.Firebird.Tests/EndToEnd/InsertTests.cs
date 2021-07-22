@@ -83,10 +83,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		[Test]
 		public async Task IdentityInsert()
 		{
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
-			var id = await GetServerVersion() >= new Version(4, 0, 0, 0) ? 26 : 27;
+			var id = ServerVersion >= new Version(4, 0, 0, 0) ? 26 : 27;
 
 			await using (var db = await GetDbContext<IdentityInsertContext>())
 			{
@@ -123,7 +123,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		[Test]
 		public async Task SequenceInsert()
 		{
-			var id = await GetServerVersion() >= new Version(4, 0, 0, 0) ? 30 : 31;
+			var id = ServerVersion >= new Version(4, 0, 0, 0) ? 30 : 31;
 
 			await using (var db = await GetDbContext<SequenceInsertContext>())
 			{
@@ -164,10 +164,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		[Test]
 		public async Task DefaultValuesInsert()
 		{
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
-			var id = await GetServerVersion() >= new Version(4, 0, 0, 0) ? 26 : 27;
+			var id = ServerVersion >= new Version(4, 0, 0, 0) ? 26 : 27;
 
 			await using (var db = await GetDbContext<DefaultValuesInsertContext>())
 			{
@@ -211,7 +211,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
 		[Test]
 		public async Task TwoComputedInsert()
 		{
-			if (!await EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			await using (var db = await GetDbContext<TwoComputedInsertContext>())
