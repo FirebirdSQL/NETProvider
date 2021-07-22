@@ -157,7 +157,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		internal async Task<IResponse> ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
-			while (response is CryptKeyCallbackResponse cryptResponse)
+			while (response is CryptKeyCallbackResponse)
 			{
 				await Xdr.Write(IscCodes.op_crypt_key_callback, async).ConfigureAwait(false);
 				await Xdr.WriteBuffer(cryptKey, async).ConfigureAwait(false);
