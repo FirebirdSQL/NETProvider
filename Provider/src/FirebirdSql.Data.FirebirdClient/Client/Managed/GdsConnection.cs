@@ -31,14 +31,8 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	internal sealed class GdsConnection
 	{
-		#region Fields
-
 		private NetworkStream _networkStream;
 		private FirebirdNetworkHandlingWrapper _firebirdNetworkHandlingWrapper;
-
-		#endregion
-
-		#region Properties
 
 		public string User { get; private set; }
 		public string Password { get; private set; }
@@ -60,10 +54,6 @@ namespace FirebirdSql.Data.Client.Managed
 
 		internal AuthBlock AuthBlock { get; private set; }
 
-		#endregion
-
-		#region Constructors
-
 		public GdsConnection(string dataSource, int port, int timeout)
 			: this(null, null, dataSource, port, timeout, 8192, Charset.DefaultCharset, false, WireCryptOption.Enabled)
 		{ }
@@ -80,10 +70,6 @@ namespace FirebirdSql.Data.Client.Managed
 			Compression = compression;
 			WireCrypt = wireCrypt;
 		}
-
-		#endregion
-
-		#region Methods
 
 		public async Task Connect(AsyncWrappingCommonArgs async)
 		{
@@ -244,10 +230,6 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		#endregion
-
-		#region Internal Methods
-
 		internal void StartCompression()
 		{
 			_firebirdNetworkHandlingWrapper.StartCompression();
@@ -258,11 +240,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_firebirdNetworkHandlingWrapper.StartEncryption(AuthBlock.SessionKey);
 		}
 
-		#endregion
-
-		#region Private Methods
-
-		private async Task<IPAddress> GetIPAddress(string dataSource, AsyncWrappingCommonArgs async)
+		private static async Task<IPAddress> GetIPAddress(string dataSource, AsyncWrappingCommonArgs async)
 		{
 			if (IPAddress.TryParse(dataSource, out var ipaddress))
 			{
@@ -280,10 +258,6 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			return addresses[0];
 		}
-
-		#endregion
-
-		#region Static Methods
 
 		public static async Task<IResponse> ProcessOperation(int operation, IXdrReader xdr, AsyncWrappingCommonArgs async)
 		{
@@ -346,7 +320,5 @@ namespace FirebirdSql.Data.Client.Managed
 				}
 			}
 		}
-
-		#endregion
 	}
 }
