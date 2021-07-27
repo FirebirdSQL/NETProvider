@@ -16,6 +16,7 @@
 //$Authors = Hajime Nakagami, Jiri Cincura (jiri@cincura.net)
 
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -46,16 +47,21 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						response = await AuthBlock.ProcessContAuthResponse(Xdr, async).ConfigureAwait(false);
 						response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					}
-					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+					var genericResponse = (GenericResponse)response;
+					await base.ProcessAttachResponse(genericResponse, async).ConfigureAwait(false);
 
-					await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
-					await Xdr.Flush(async).ConfigureAwait(false);
-					await AuthBlock.ProcessWireCryptResponse(Xdr, _connection, async).ConfigureAwait(false);
+					if (genericResponse.Data.Any())
+					{
+						await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
+						await Xdr.Flush(async).ConfigureAwait(false);
+						await AuthBlock.ProcessWireCryptResponse(Xdr, _connection, async).ConfigureAwait(false);
+					}
 				}
 				else
 				{
 					response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+					AuthBlock.Complete();
 				}
 				AuthBlock.WireCryptValidate(IscCodes.PROTOCOL_VERSION13);
 			}
@@ -109,16 +115,21 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						response = await AuthBlock.ProcessContAuthResponse(Xdr, async).ConfigureAwait(false);
 						response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					}
-					await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
+					var genericResponse = (GenericResponse)response;
+					await ProcessCreateResponse(genericResponse, async).ConfigureAwait(false);
 
-					await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
-					await Xdr.Flush(async).ConfigureAwait(false);
-					await AuthBlock.ProcessWireCryptResponse(Xdr, _connection, async).ConfigureAwait(false);
+					if (genericResponse.Data.Any())
+					{
+						await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
+						await Xdr.Flush(async).ConfigureAwait(false);
+						await AuthBlock.ProcessWireCryptResponse(Xdr, _connection, async).ConfigureAwait(false);
+					}
 				}
 				else
 				{
 					response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
+					AuthBlock.Complete();
 				}
 			}
 			catch (IOException ex)

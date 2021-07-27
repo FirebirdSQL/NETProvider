@@ -192,9 +192,12 @@ namespace FirebirdSql.Data.Client.Managed
 								break;
 							}
 
-							await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
-							await Xdr.Flush(async).ConfigureAwait(false);
-							await AuthBlock.ProcessWireCryptResponse(Xdr, this, async).ConfigureAwait(false);
+							if (AuthBlock.ServerKeys.Any())
+							{
+								await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
+								await Xdr.Flush(async).ConfigureAwait(false);
+								await AuthBlock.ProcessWireCryptResponse(Xdr, this, async).ConfigureAwait(false);
+							}
 						}
 					}
 

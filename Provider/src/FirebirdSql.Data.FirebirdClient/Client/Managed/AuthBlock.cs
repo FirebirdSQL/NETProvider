@@ -149,7 +149,6 @@ namespace FirebirdSql.Data.Client.Managed
 			else if (response is GenericResponse genericResponse)
 			{
 				ServerKeys = genericResponse.Data;
-				IsAuthenticated = true;
 				Complete();
 			}
 			else
@@ -232,11 +231,17 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		void Complete()
+		public void Complete()
+		{
+			IsAuthenticated = true;
+			ReleaseAuth();
+		}
+
+		void ReleaseAuth()
 		{
 			_srp256 = null;
 			_srp = null;
-			_sspi.Dispose();
+			_sspi?.Dispose();
 			_sspi = null;
 		}
 

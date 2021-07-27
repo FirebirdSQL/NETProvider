@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
@@ -45,16 +46,25 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						response = await Connection.AuthBlock.ProcessContAuthResponse(Database.Xdr, async).ConfigureAwait(false);
 						response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					}
-					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+					var genericResponse = (GenericResponse)response;
+					await base.ProcessAttachResponse(genericResponse, async).ConfigureAwait(false);
 
 					await Connection.AuthBlock.SendWireCryptToBuffer(Database.Xdr, async).ConfigureAwait(false);
 					await Database.Xdr.Flush(async).ConfigureAwait(false);
 					await Connection.AuthBlock.ProcessWireCryptResponse(Database.Xdr, Connection, async).ConfigureAwait(false);
+
+					if (genericResponse.Data.Any())
+					{
+						await Database.AuthBlock.SendWireCryptToBuffer(Database.Xdr, async).ConfigureAwait(false);
+						await Database.Xdr.Flush(async).ConfigureAwait(false);
+						await Database.AuthBlock.ProcessWireCryptResponse(Database.Xdr, Connection, async).ConfigureAwait(false);
+					}
 				}
 				else
 				{
 					response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
 					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+					Database.AuthBlock.Complete();
 				}
 			}
 			catch (IscException)
