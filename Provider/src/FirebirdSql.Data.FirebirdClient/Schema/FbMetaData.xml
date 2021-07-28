@@ -165,6 +165,12 @@
 		<PopulationMechanism>PrepareCollection</PopulationMechanism>
 	</MetaDataCollections>
 	<MetaDataCollections>
+		<CollectionName>FunctionArguments</CollectionName>
+		<NumberOfRestrictions>4</NumberOfRestrictions>
+		<NumberOfIdentifierParts>0</NumberOfIdentifierParts>
+		<PopulationMechanism>PrepareCollection</PopulationMechanism>
+	</MetaDataCollections>
+	<MetaDataCollections>
 		<CollectionName>FunctionPrivileges</CollectionName>
 		<NumberOfRestrictions>5</NumberOfRestrictions>
 		<NumberOfIdentifierParts>0</NumberOfIdentifierParts>
@@ -498,21 +504,45 @@
 		<RestrictionNumber>5</RestrictionNumber>
 	</Restrictions>
 	<Restrictions>
+		<CollectionName>FunctionArguments</CollectionName>
+		<RestrictionName>FunctionCatalog</RestrictionName>
+		<RestrictionDefault>function_catalog</RestrictionDefault>
+		<RestrictionNumber>1</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
+		<CollectionName>FunctionArguments</CollectionName>
+		<RestrictionName>FunctionSchema</RestrictionName>
+		<RestrictionDefault>function_schema</RestrictionDefault>
+		<RestrictionNumber>2</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
+		<CollectionName>FunctionArguments</CollectionName>
+		<RestrictionName>FunctionName</RestrictionName>
+		<RestrictionDefault>function_name</RestrictionDefault>
+		<RestrictionNumber>3</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
+		<CollectionName>FunctionArguments</CollectionName>
+		<RestrictionName>Name</RestrictionName>
+		<RestrictionDefault>function_argument</RestrictionDefault>
+		<RestrictionNumber>4</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
 		<CollectionName>FunctionPrivileges</CollectionName>
-		<RestrictionName>ProcedureCatalog</RestrictionName>
-		<RestrictionDefault>procedure_catalog</RestrictionDefault>
+		<RestrictionName>FunctionCatalog</RestrictionName>
+		<RestrictionDefault>function_catalog</RestrictionDefault>
 		<RestrictionNumber>1</RestrictionNumber>
 	</Restrictions>
 	<Restrictions>
 		<CollectionName>FunctionPrivileges</CollectionName>
-		<RestrictionName>ProcedureSchema</RestrictionName>
-		<RestrictionDefault>procedure_schema</RestrictionDefault>
+		<RestrictionName>FunctionSchema</RestrictionName>
+		<RestrictionDefault>function_schema</RestrictionDefault>
 		<RestrictionNumber>2</RestrictionNumber>
 	</Restrictions>
 	<Restrictions>
 		<CollectionName>FunctionPrivileges</CollectionName>
-		<RestrictionName>ProcedureName</RestrictionName>
-		<RestrictionDefault>procedure_name</RestrictionDefault>
+		<RestrictionName>FunctionName</RestrictionName>
+		<RestrictionDefault>function_name</RestrictionDefault>
 		<RestrictionNumber>3</RestrictionNumber>
 	</Restrictions>
 	<Restrictions>

@@ -97,6 +97,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
+		public async Task FunctionArguments()
+		{
+			await Connection.GetSchemaAsync("FunctionArguments");
+
+			var procedureParameters = Connection.GetSchema("FunctionArguments", new string[] { null, null, "TEST_FUNC" });
+			Assert.AreEqual(2, procedureParameters.Rows.Count);
+		}
+
+		[Test]
 		public async Task FunctionPrivileges()
 		{
 			await Connection.GetSchemaAsync("FunctionPrivileges");

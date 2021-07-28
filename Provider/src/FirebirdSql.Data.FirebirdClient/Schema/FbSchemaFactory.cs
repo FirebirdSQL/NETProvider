@@ -117,6 +117,7 @@ namespace FirebirdSql.Data.Schema
 				"FOREIGNKEYCOLUMNS" => new FbForeignKeyColumns(),
 				"FOREIGNKEYS" => new FbForeignKeys(),
 				"FUNCTIONS" => new FbFunctions(),
+				"FUNCTIONARGUMENTS" => new FbFunctionArguments(),
 				"FUNCTIONPRIVILEGES" => new FbFunctionPrivileges(),
 				"GENERATORS" => new FbGenerators(),
 				"INDEXCOLUMNS" => new FbIndexColumns(),
