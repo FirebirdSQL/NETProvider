@@ -58,10 +58,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task Columns()
 		{
-			var columns = await Connection.GetSchemaAsync("Columns");
+			await Connection.GetSchemaAsync("Columns");
 
-			columns = await Connection.GetSchemaAsync("Columns", new string[] { null, null, "TEST", "INT_FIELD" });
-
+			var columns = await Connection.GetSchemaAsync("Columns", new string[] { null, null, "TEST", "INT_FIELD" });
 			Assert.AreEqual(1, columns.Rows.Count);
 		}
 
@@ -90,9 +89,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			foreach (DataRow row in foreignKeys.Rows)
 			{
-				var foreignKeyColumns = await Connection.GetSchemaAsync(
-					"ForeignKeyColumns",
-					new string[] { (string)row["TABLE_CATALOG"], (string)row["TABLE_SCHEMA"], (string)row["TABLE_NAME"], (string)row["CONSTRAINT_NAME"] });
+				await Connection.GetSchemaAsync("ForeignKeyColumns", new string[] { (string)row["TABLE_CATALOG"], (string)row["TABLE_SCHEMA"], (string)row["TABLE_NAME"], (string)row["CONSTRAINT_NAME"] });
 			}
 		}
 
@@ -101,7 +98,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			await Connection.GetSchemaAsync("FunctionArguments");
 
-			var procedureParameters = Connection.GetSchema("FunctionArguments", new string[] { null, null, "TEST_FUNC" });
+			var procedureParameters = await Connection.GetSchemaAsync("FunctionArguments", new string[] { null, null, "TEST_FUNC" });
 			Assert.AreEqual(2, procedureParameters.Rows.Count);
 		}
 
@@ -118,9 +115,16 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 
 			if (ServerVersion >= new Version(3, 0, 0, 0))
 			{
-				var functions = Connection.GetSchema("Functions", new string[] { null, null, "TEST_FUNC" });
+				var functions = await Connection.GetSchemaAsync("Functions", new string[] { null, null, "TEST_FUNC" });
 				Assert.AreEqual(1, functions.Rows.Count);
 			}
+		}
+
+		[Test]
+		public async Task Function_ShouldSkipSchemaAndProperlyUseParametersForProcedureName()
+		{
+			var functions = await Connection.GetSchemaAsync("Functions", new string[] { null, "DUMMY_SCHEMA", "TEST_FUNC" });
+			Assert.AreEqual(1, functions.Rows.Count);
 		}
 
 		[Test]
@@ -144,10 +148,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task PrimaryKeys()
 		{
-			var primaryKeys = await Connection.GetSchemaAsync("PrimaryKeys");
+			await Connection.GetSchemaAsync("PrimaryKeys");
 
-			primaryKeys = Connection.GetSchema("PrimaryKeys", new string[] { null, null, "TEST" });
-
+			var primaryKeys = await Connection.GetSchemaAsync("PrimaryKeys", new string[] { null, null, "TEST" });
 			Assert.AreEqual(1, primaryKeys.Rows.Count);
 		}
 
@@ -156,7 +159,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			await Connection.GetSchemaAsync("ProcedureParameters");
 
-			var procedureParameters = Connection.GetSchema("ProcedureParameters", new string[] { null, null, "SELECT_DATA" });
+			var procedureParameters = await Connection.GetSchemaAsync("ProcedureParameters", new string[] { null, null, "SELECT_DATA" });
 			Assert.AreEqual(3, procedureParameters.Rows.Count);
 		}
 
@@ -171,17 +174,14 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{
 			await Connection.GetSchemaAsync("Procedures");
 
-			var procedures = Connection.GetSchema("Procedures", new string[] { null, null, "SELECT_DATA" });
+			var procedures = await Connection.GetSchemaAsync("Procedures", new string[] { null, null, "SELECT_DATA" });
 			Assert.AreEqual(1, procedures.Rows.Count);
 		}
 
 		[Test]
 		public async Task Procedures_ShouldSkipSchemaAndProperlyUseParametersForProcedureName()
 		{
-			var procedures = await Connection.GetSchemaAsync("Procedures");
-
-			procedures = Connection.GetSchema("Procedures", new string[] { null, "DUMMY_SCHEMA", "SELECT_DATA" });
-
+			var procedures = await Connection.GetSchemaAsync("Procedures", new string[] { null, "DUMMY_SCHEMA", "SELECT_DATA" });
 			Assert.AreEqual(1, procedures.Rows.Count);
 		}
 
@@ -200,15 +200,13 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task Tables()
 		{
-			var tables = await Connection.GetSchemaAsync("Tables");
+			await Connection.GetSchemaAsync("Tables");
 
-			tables = await Connection.GetSchemaAsync("Tables", new string[] { null, null, "TEST" });
+			var tables1 = await Connection.GetSchemaAsync("Tables", new string[] { null, null, "TEST" });
+			Assert.AreEqual(1, tables1.Rows.Count);
 
-			Assert.AreEqual(1, tables.Rows.Count);
-
-			tables = await Connection.GetSchemaAsync("Tables", new string[] { null, null, null, "TABLE" });
-
-			Assert.AreEqual(3, tables.Rows.Count);
+			var tables2 = await Connection.GetSchemaAsync("Tables", new string[] { null, null, null, "TABLE" });
+			Assert.AreEqual(3, tables2.Rows.Count);
 		}
 
 		[Test]
