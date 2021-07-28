@@ -397,7 +397,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[TestCase(true)]
 		public async Task UseCompression(bool compression)
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
 				return;
 			if (!EnsureServerType(FbServerType.Default))
 				return;
@@ -424,7 +424,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[TestCase(FbWireCrypt.Required)]
 		public async Task UseWireCrypt(FbWireCrypt wireCrypt)
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
 				return;
 			if (!EnsureServerType(FbServerType.Default))
 				return;
@@ -495,7 +495,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task CaseSensitiveLogin()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
@@ -622,7 +622,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task SrpWithLeadingZeros()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			await using (var cmd = Connection.CreateCommand())

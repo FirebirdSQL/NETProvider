@@ -586,7 +586,7 @@ end";
 		[Test]
 		public async Task GetCommandExplainedPlanTest()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			await using (var cmd = Connection.CreateCommand())
@@ -615,7 +615,7 @@ end";
 		[Test]
 		public async Task GetCommandExplainedPlanNoPlanTest()
 		{
-			if (!EnsureVersion(new Version(3, 0, 0, 0)))
+			if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
 				return;
 
 			await using (var cmd = Connection.CreateCommand())
@@ -690,7 +690,7 @@ end";
 		[Test]
 		public async Task CommandCancellationDirectTest()
 		{
-			if (!EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			await using (var cmd = Connection.CreateCommand())
@@ -712,7 +712,7 @@ end";
 		[Test]
 		public async Task CommandCancellationCancellationTokenTest()
 		{
-			if (!EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			using (var cts = new CancellationTokenSource())
@@ -737,7 +737,7 @@ end";
 		[Test]
 		public async Task CommandUsableAfterCancellationTest()
 		{
-			if (!EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			using (var cts = new CancellationTokenSource())
@@ -777,7 +777,7 @@ end";
 		[Test]
 		public async Task ExecuteNonQueryOnAlreadyCancelledToken()
 		{
-			if (!EnsureVersion(new Version(2, 5, 0, 0)))
+			if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
 				return;
 
 			using (var cts = new CancellationTokenSource())

@@ -111,7 +111,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task ReadCommittedReadConsistency()
 		{
-			if (!EnsureVersion(new Version(4, 0, 0, 0)))
+			if (!EnsureServerVersion(new Version(4, 0, 0, 0)))
 				return;
 
 			await using (var transaction = await Connection.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.ReadConsistency }))

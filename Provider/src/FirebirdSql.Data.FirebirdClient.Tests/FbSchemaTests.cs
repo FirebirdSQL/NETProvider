@@ -15,6 +15,7 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Data;
 using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
@@ -99,6 +100,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		public async Task Functions()
 		{
 			await Connection.GetSchemaAsync("Functions");
+
+			if (ServerVersion >= new Version(3, 0, 0, 0))
+			{
+				var functions = Connection.GetSchema("Functions", new string[] { null, null, "TEST_FUNC" });
+				Assert.AreEqual(1, functions.Rows.Count);
+			}
 		}
 
 		[Test]
@@ -132,10 +139,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task ProcedureParameters()
 		{
-			var procedureParameters = await Connection.GetSchemaAsync("ProcedureParameters");
+			await Connection.GetSchemaAsync("ProcedureParameters");
 
-			procedureParameters = Connection.GetSchema("ProcedureParameters", new string[] { null, null, "SELECT_DATA" });
-
+			var procedureParameters = Connection.GetSchema("ProcedureParameters", new string[] { null, null, "SELECT_DATA" });
 			Assert.AreEqual(3, procedureParameters.Rows.Count);
 		}
 
@@ -148,10 +154,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task Procedures()
 		{
-			var procedures = await Connection.GetSchemaAsync("Procedures");
+			await Connection.GetSchemaAsync("Procedures");
 
-			procedures = Connection.GetSchema("Procedures", new string[] { null, null, "SELECT_DATA" });
-
+			var procedures = Connection.GetSchema("Procedures", new string[] { null, null, "SELECT_DATA" });
 			Assert.AreEqual(1, procedures.Rows.Count);
 		}
 

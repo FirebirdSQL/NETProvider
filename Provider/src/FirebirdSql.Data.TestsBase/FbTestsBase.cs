@@ -234,9 +234,9 @@ end";
 			}
 		}
 
-		protected bool EnsureVersion(Version version)
+		protected bool EnsureServerVersion(Version serverVersion)
 		{
-			if (ServerVersion >= version)
+			if (FbTestsSetup.ServerVersionAtLeast(ServerVersion, serverVersion))
 				return true;
 			Assert.Inconclusive("Not supported on this version.");
 			return false;
