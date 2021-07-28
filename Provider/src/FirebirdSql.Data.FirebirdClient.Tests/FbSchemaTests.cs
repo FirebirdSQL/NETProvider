@@ -97,6 +97,12 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
+		public async Task FunctionPrivileges()
+		{
+			await Connection.GetSchemaAsync("FunctionPrivileges");
+		}
+
+		[Test]
 		public async Task Functions()
 		{
 			await Connection.GetSchemaAsync("Functions");
