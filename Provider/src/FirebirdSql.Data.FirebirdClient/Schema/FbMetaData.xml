@@ -498,6 +498,36 @@
 		<RestrictionNumber>5</RestrictionNumber>
 	</Restrictions>
 	<Restrictions>
+		<CollectionName>FunctionPrivileges</CollectionName>
+		<RestrictionName>ProcedureCatalog</RestrictionName>
+		<RestrictionDefault>procedure_catalog</RestrictionDefault>
+		<RestrictionNumber>1</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
+		<CollectionName>FunctionPrivileges</CollectionName>
+		<RestrictionName>ProcedureSchema</RestrictionName>
+		<RestrictionDefault>procedure_schema</RestrictionDefault>
+		<RestrictionNumber>2</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
+		<CollectionName>FunctionPrivileges</CollectionName>
+		<RestrictionName>ProcedureName</RestrictionName>
+		<RestrictionDefault>procedure_name</RestrictionDefault>
+		<RestrictionNumber>3</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
+		<CollectionName>FunctionPrivileges</CollectionName>
+		<RestrictionName>Grantor</RestrictionName>
+		<RestrictionDefault>grantor</RestrictionDefault>
+		<RestrictionNumber>4</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
+		<CollectionName>FunctionPrivileges</CollectionName>
+		<RestrictionName>Grantee</RestrictionName>
+		<RestrictionDefault>grantee</RestrictionDefault>
+		<RestrictionNumber>5</RestrictionNumber>
+	</Restrictions>
+	<Restrictions>
 		<CollectionName>Functions</CollectionName>
 		<RestrictionName>Catalog</RestrictionName>
 		<RestrictionDefault>function_catalog</RestrictionDefault>
