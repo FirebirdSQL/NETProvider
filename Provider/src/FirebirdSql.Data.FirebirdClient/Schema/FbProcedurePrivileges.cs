@@ -22,7 +22,7 @@ using System.Text;
 
 namespace FirebirdSql.Data.Schema
 {
-	internal class FbProcedurePrivilegesSchema : FbSchema
+	internal class FbProcedurePrivileges : FbSchema
 	{
 		#region Protected Methods
 

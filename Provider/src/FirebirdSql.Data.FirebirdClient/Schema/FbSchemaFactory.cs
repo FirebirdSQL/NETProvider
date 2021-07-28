@@ -123,7 +123,7 @@ namespace FirebirdSql.Data.Schema
 				"PRIMARYKEYS" => new FbPrimaryKeys(),
 				"PROCEDURES" => new FbProcedures(),
 				"PROCEDUREPARAMETERS" => new FbProcedureParameters(),
-				"PROCEDUREPRIVILEGES" => new FbProcedurePrivilegesSchema(),
+				"PROCEDUREPRIVILEGES" => new FbProcedurePrivileges(),
 				"ROLES" => new FbRoles(),
 				"TABLES" => new FbTables(),
 				"TABLECONSTRAINTS" => new FbTableConstraints(),
