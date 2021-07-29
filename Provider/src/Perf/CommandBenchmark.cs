@@ -33,6 +33,7 @@ namespace Perf
 			public Config()
 			{
 				var baseJob = Job.Default
+					.WithWarmupCount(3)
 					.WithToolchain(CsProjCoreToolchain.NetCoreApp50)
 					.WithPlatform(Platform.X64)
 					.WithJit(Jit.RyuJit);
