@@ -41,8 +41,8 @@ namespace FirebirdSql.Data.Client.Managed
 			_smallBuffer = new byte[8];
 		}
 
-		public XdrReaderWriter(IDataProvider dataprovider)
-			: this(dataprovider, Charset.DefaultCharset)
+		public XdrReaderWriter(IDataProvider dataProvider)
+			: this(dataProvider, Charset.DefaultCharset)
 		{ }
 
 		#region Read
