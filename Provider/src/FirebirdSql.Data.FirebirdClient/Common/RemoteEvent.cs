@@ -55,7 +55,7 @@ namespace FirebirdSql.Data.Common
 			_db = db;
 		}
 
-		public Task QueueEvents(ICollection<string> events, AsyncWrappingCommonArgs async)
+		public ValueTask QueueEvents(ICollection<string> events, AsyncWrappingCommonArgs async)
 		{
 			if (Interlocked.Exchange(ref _running, 1) == 1)
 				throw new InvalidOperationException("Events are already running.");
@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.Common
 			return QueueEventsImpl(async);
 		}
 
-		public async Task CancelEvents(AsyncWrappingCommonArgs async)
+		public async ValueTask CancelEvents(AsyncWrappingCommonArgs async)
 		{
 			await _db.CancelEvents(this, async).ConfigureAwait(false);
 			_currentCounts = null;
@@ -80,15 +80,15 @@ namespace FirebirdSql.Data.Common
 			Volatile.Write(ref _running, 0);
 		}
 
-		Task QueueEventsImpl(AsyncWrappingCommonArgs async)
+		ValueTask QueueEventsImpl(AsyncWrappingCommonArgs async)
 		{
 			return _db.QueueEvents(this, async);
 		}
 
-		internal Task EventCounts(byte[] buffer, AsyncWrappingCommonArgs async)
+		internal ValueTask EventCounts(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			if (Volatile.Read(ref _running) == 0)
-				return Task.CompletedTask;
+				return ValueTask2.CompletedTask;
 
 			_previousCounts = _currentCounts;
 			_currentCounts = new int[_events.Count];

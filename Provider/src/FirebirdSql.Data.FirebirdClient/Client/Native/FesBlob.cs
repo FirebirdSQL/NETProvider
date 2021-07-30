@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override Task Create(AsyncWrappingCommonArgs async)
+		protected override ValueTask Create(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -97,10 +97,10 @@ namespace FirebirdSql.Data.Client.Native
 			_db.ProcessStatusVector(_statusVector);
 
 			RblAddValue(IscCodes.RBL_create);
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		protected override Task Open(AsyncWrappingCommonArgs async)
+		protected override ValueTask Open(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -118,10 +118,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		protected override Task GetSegment(Stream stream, AsyncWrappingCommonArgs async)
+		protected override ValueTask GetSegment(Stream stream, AsyncWrappingCommonArgs async)
 		{
 			var requested = (short)SegmentSize;
 			short segmentLength = 0;
@@ -143,7 +143,7 @@ namespace FirebirdSql.Data.Client.Native
 			if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
 			{
 				RblAddValue(IscCodes.RBL_eof_pending);
-				return Task.CompletedTask;
+				return ValueTask2.CompletedTask;
 			}
 			else
 			{
@@ -159,10 +159,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			stream.Write(tmp, 0, segmentLength);
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		protected override Task PutSegment(byte[] buffer, AsyncWrappingCommonArgs async)
+		protected override ValueTask PutSegment(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -174,15 +174,15 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		protected override Task Seek(int position, AsyncWrappingCommonArgs async)
+		protected override ValueTask Seek(int position, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
 
-		protected override Task Close(AsyncWrappingCommonArgs async)
+		protected override ValueTask Close(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -190,10 +190,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		protected override Task Cancel(AsyncWrappingCommonArgs async)
+		protected override ValueTask Cancel(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -201,7 +201,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
 		#endregion

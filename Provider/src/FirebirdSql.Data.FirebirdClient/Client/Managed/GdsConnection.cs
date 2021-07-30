@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.Client.Managed
 			WireCrypt = wireCrypt;
 		}
 
-		public async Task Connect(AsyncWrappingCommonArgs async)
+		public async ValueTask Connect(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public async Task Identify(string database, AsyncWrappingCommonArgs async)
+		public async ValueTask Identify(string database, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -219,13 +219,13 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public async Task Disconnect(AsyncWrappingCommonArgs async)
+		public async ValueTask Disconnect(AsyncWrappingCommonArgs async)
 		{
 			if (_networkStream != null)
 			{
 #if NET48 || NETSTANDARD2_0
 				_networkStream.Dispose();
-				await Task.CompletedTask.ConfigureAwait(false);
+				await ValueTask2.CompletedTask.ConfigureAwait(false);
 #else
 				await async.AsyncSyncCallNoCancellation(_networkStream.DisposeAsync, _networkStream.Dispose).ConfigureAwait(false);
 #endif
@@ -243,7 +243,7 @@ namespace FirebirdSql.Data.Client.Managed
 			_firebirdNetworkHandlingWrapper.StartEncryption(AuthBlock.SessionKey);
 		}
 
-		private static async Task<IPAddress> GetIPAddress(string dataSource, AsyncWrappingCommonArgs async)
+		private static async ValueTask<IPAddress> GetIPAddress(string dataSource, AsyncWrappingCommonArgs async)
 		{
 			if (IPAddress.TryParse(dataSource, out var ipaddress))
 			{
@@ -262,7 +262,7 @@ namespace FirebirdSql.Data.Client.Managed
 			return addresses[0];
 		}
 
-		public static async Task<IResponse> ProcessOperation(int operation, IXdrReader xdr, AsyncWrappingCommonArgs async)
+		public static async ValueTask<IResponse> ProcessOperation(int operation, IXdrReader xdr, AsyncWrappingCommonArgs async)
 		{
 			switch (operation)
 			{

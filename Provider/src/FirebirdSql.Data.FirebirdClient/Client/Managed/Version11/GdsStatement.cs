@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		#region Overriden Methods
 
-		public override async Task Prepare(string commandText, AsyncWrappingCommonArgs async)
+		public override async ValueTask Prepare(string commandText, AsyncWrappingCommonArgs async)
 		{
 			ClearAll();
 
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override async Task Execute(AsyncWrappingCommonArgs async)
+		public override async ValueTask Execute(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 
@@ -161,7 +161,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#endregion
 
 		#region Protected methods
-		protected async Task<int> SafeFinishFetching(int numberOfResponses, AsyncWrappingCommonArgs async)
+		protected async ValueTask<int> SafeFinishFetching(int numberOfResponses, AsyncWrappingCommonArgs async)
 		{
 			while (numberOfResponses > 0)
 			{
@@ -176,7 +176,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return numberOfResponses;
 		}
 
-		protected override async Task Free(int option, AsyncWrappingCommonArgs async)
+		protected override async ValueTask Free(int option, AsyncWrappingCommonArgs async)
 		{
 			if (FreeNotNeeded(option))
 				return;

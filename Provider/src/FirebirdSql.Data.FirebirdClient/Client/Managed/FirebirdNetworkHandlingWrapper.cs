@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public bool IOFailed { get; set; }
 
-		public async Task<int> Read(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
+		public async ValueTask<int> Read(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
 		{
 			if (_inputBuffer.Count < count)
 			{
@@ -87,14 +87,14 @@ namespace FirebirdSql.Data.Client.Managed
 			return dataLength;
 		}
 
-		public Task Write(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
+		public ValueTask Write(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
 		{
 			for (var i = offset; i < count; i++)
 				_outputBuffer.Enqueue(buffer[offset + i]);
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public async Task Flush(AsyncWrappingCommonArgs async)
+		public async ValueTask Flush(AsyncWrappingCommonArgs async)
 		{
 			var buffer = _outputBuffer.ToArray();
 			_outputBuffer.Clear();

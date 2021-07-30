@@ -45,13 +45,13 @@ namespace FirebirdSql.Data.Common
 			_charset = db.Charset;
 		}
 
-		public async Task<string> ReadString(AsyncWrappingCommonArgs async)
+		public async ValueTask<string> ReadString(AsyncWrappingCommonArgs async)
 		{
 			var buffer = await Read(async).ConfigureAwait(false);
 			return _charset.GetString(buffer, 0, buffer.Length);
 		}
 
-		public async Task<byte[]> Read(AsyncWrappingCommonArgs async)
+		public async ValueTask<byte[]> Read(AsyncWrappingCommonArgs async)
 		{
 			using (var ms = new MemoryStream())
 			{
@@ -78,17 +78,17 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public Task Write(string data, AsyncWrappingCommonArgs async)
+		public ValueTask Write(string data, AsyncWrappingCommonArgs async)
 		{
 			return Write(_charset.GetBytes(data), async);
 		}
 
-		public Task Write(byte[] buffer, AsyncWrappingCommonArgs async)
+		public ValueTask Write(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			return Write(buffer, 0, buffer.Length, async);
 		}
 
-		public async Task Write(byte[] buffer, int index, int count, AsyncWrappingCommonArgs async)
+		public async ValueTask Write(byte[] buffer, int index, int count, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -126,13 +126,13 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		protected abstract Task Create(AsyncWrappingCommonArgs async);
-		protected abstract Task Open(AsyncWrappingCommonArgs async);
-		protected abstract Task GetSegment(Stream stream, AsyncWrappingCommonArgs async);
-		protected abstract Task PutSegment(byte[] buffer, AsyncWrappingCommonArgs async);
-		protected abstract Task Seek(int position, AsyncWrappingCommonArgs async);
-		protected abstract Task Close(AsyncWrappingCommonArgs async);
-		protected abstract Task Cancel(AsyncWrappingCommonArgs async);
+		protected abstract ValueTask Create(AsyncWrappingCommonArgs async);
+		protected abstract ValueTask Open(AsyncWrappingCommonArgs async);
+		protected abstract ValueTask GetSegment(Stream stream, AsyncWrappingCommonArgs async);
+		protected abstract ValueTask PutSegment(byte[] buffer, AsyncWrappingCommonArgs async);
+		protected abstract ValueTask Seek(int position, AsyncWrappingCommonArgs async);
+		protected abstract ValueTask Close(AsyncWrappingCommonArgs async);
+		protected abstract ValueTask Cancel(AsyncWrappingCommonArgs async);
 
 		protected void RblAddValue(int rblValue)
 		{

@@ -38,7 +38,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		#region Overriden Methods
 
-		public override async Task Execute(AsyncWrappingCommonArgs async)
+		public override async ValueTask Execute(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 

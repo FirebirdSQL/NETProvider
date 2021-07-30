@@ -483,21 +483,21 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		private Task<string> GetClobData(long blobId, AsyncWrappingCommonArgs async)
+		private ValueTask<string> GetClobData(long blobId, AsyncWrappingCommonArgs async)
 		{
 			var clob = _statement.CreateBlob(blobId);
 
 			return clob.ReadString(async);
 		}
 
-		private Task<byte[]> GetBlobData(long blobId, AsyncWrappingCommonArgs async)
+		private ValueTask<byte[]> GetBlobData(long blobId, AsyncWrappingCommonArgs async)
 		{
 			var blob = _statement.CreateBlob(blobId);
 
 			return blob.Read(async);
 		}
 
-		private async Task<Array> GetArrayData(long handle, AsyncWrappingCommonArgs async)
+		private async ValueTask<Array> GetArrayData(long handle, AsyncWrappingCommonArgs async)
 		{
 			if (_field.ArrayHandle == null)
 			{

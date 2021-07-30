@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			: base(connection)
 		{ }
 
-		public override async Task Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			await AfterAttachActions(async).ConfigureAwait(false);
 		}
 
-		protected override async Task SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected override async ValueTask SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
 			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 		}
 
-		protected override async Task SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected override async ValueTask SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
 			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
@@ -156,17 +156,17 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			return Attach(dpb, database, cryptKey, async);
 		}
 
-		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			return CreateDatabase(dpb, database, cryptKey, async);
 		}
 
-		internal async Task<IResponse> ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		internal async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			while (response is CryptKeyCallbackResponse)
 			{

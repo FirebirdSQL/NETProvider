@@ -579,7 +579,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				return Task.FromResult<string>(null);
 			}
-			return _statement.GetExecutionPlan(async);
+			return _statement.GetExecutionPlan(async).AsTask();
 		}
 
 		public string GetCommandExplainedPlan() => GetCommandExplainedPlanImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
@@ -590,7 +590,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				return Task.FromResult<string>(null);
 			}
-			return _statement.GetExecutionExplainedPlan(async);
+			return _statement.GetExecutionExplainedPlan(async).AsTask();
 		}
 
 		#endregion
@@ -766,7 +766,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (_statement != null)
 			{
-				return _statement.Close(async);
+				return _statement.Close(async).AsTask();
 			}
 			return Task.CompletedTask;
 		}

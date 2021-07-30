@@ -77,7 +77,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Protected Methods
 
-		protected override async Task Create(AsyncWrappingCommonArgs async)
+		protected override async ValueTask Create(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async Task Open(AsyncWrappingCommonArgs async)
+		protected override async ValueTask Open(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async Task GetSegment(Stream stream, AsyncWrappingCommonArgs async)
+		protected override async ValueTask GetSegment(Stream stream, AsyncWrappingCommonArgs async)
 		{
 			var requested = SegmentSize;
 
@@ -152,7 +152,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async Task PutSegment(byte[] buffer, AsyncWrappingCommonArgs async)
+		protected override async ValueTask PutSegment(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -169,7 +169,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async Task Seek(int position, AsyncWrappingCommonArgs async)
+		protected override async ValueTask Seek(int position, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -189,12 +189,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override Task Close(AsyncWrappingCommonArgs async)
+		protected override ValueTask Close(AsyncWrappingCommonArgs async)
 		{
 			return _database.ReleaseObject(IscCodes.op_close_blob, _blobHandle, async);
 		}
 
-		protected override Task Cancel(AsyncWrappingCommonArgs async)
+		protected override ValueTask Cancel(AsyncWrappingCommonArgs async)
 		{
 			return _database.ReleaseObject(IscCodes.op_cancel_blob, _blobHandle, async);
 		}
@@ -203,7 +203,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Private API Methods
 
-		private async Task CreateOrOpen(int op, BlobParameterBuffer bpb, AsyncWrappingCommonArgs async)
+		private async ValueTask CreateOrOpen(int op, BlobParameterBuffer bpb, AsyncWrappingCommonArgs async)
 		{
 			try
 			{

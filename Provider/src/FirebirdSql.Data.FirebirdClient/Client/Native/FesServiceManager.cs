@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override Task Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			FesDatabase.CheckCryptKeyForSupport(cryptKey);
 
@@ -74,10 +74,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			Handle = svcHandle;
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task Detach(AsyncWrappingCommonArgs async)
+		public override ValueTask Detach(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -89,10 +89,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			Handle = svcHandle;
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task Start(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
+		public override ValueTask Start(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -108,10 +108,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			ProcessStatusVector(_statusVector);
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
+		public override ValueTask Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -131,7 +131,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			ProcessStatusVector(_statusVector);
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
 		public override ServiceParameterBufferBase CreateServiceParameterBuffer()

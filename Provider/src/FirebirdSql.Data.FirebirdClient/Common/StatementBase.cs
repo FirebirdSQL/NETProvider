@@ -110,23 +110,23 @@ namespace FirebirdSql.Data.Common
 
 		#region Dispose2
 
-		public virtual Task Dispose2(AsyncWrappingCommonArgs async) => Task.CompletedTask;
+		public virtual ValueTask Dispose2(AsyncWrappingCommonArgs async) => ValueTask2.CompletedTask;
 
 		#endregion
 
 		#region Methods
 
-		public Task<string> GetExecutionPlan(AsyncWrappingCommonArgs async)
+		public ValueTask<string> GetExecutionPlan(AsyncWrappingCommonArgs async)
 		{
 			return GetPlanInfo(DescribePlanInfoItems, async);
 		}
 
-		public Task<string> GetExecutionExplainedPlan(AsyncWrappingCommonArgs async)
+		public ValueTask<string> GetExecutionExplainedPlan(AsyncWrappingCommonArgs async)
 		{
 			return GetPlanInfo(DescribeExplaindPlanInfoItems, async);
 		}
 
-		public virtual async Task Close(AsyncWrappingCommonArgs async)
+		public virtual async ValueTask Close(AsyncWrappingCommonArgs async)
 		{
 			if (State == StatementState.Executed ||
 				State == StatementState.Error)
@@ -152,7 +152,7 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public virtual async Task Release(AsyncWrappingCommonArgs async)
+		public virtual async ValueTask Release(AsyncWrappingCommonArgs async)
 		{
 			if (Transaction != null && TransactionUpdate != null)
 			{
@@ -171,26 +171,26 @@ namespace FirebirdSql.Data.Common
 
 		#region Abstract Methods
 
-		public abstract Task Describe(AsyncWrappingCommonArgs async);
-		public abstract Task DescribeParameters(AsyncWrappingCommonArgs async);
-		public abstract Task Prepare(string commandText, AsyncWrappingCommonArgs async);
-		public abstract Task Execute(AsyncWrappingCommonArgs async);
-		public abstract Task<DbValue[]> Fetch(AsyncWrappingCommonArgs async);
+		public abstract ValueTask Describe(AsyncWrappingCommonArgs async);
+		public abstract ValueTask DescribeParameters(AsyncWrappingCommonArgs async);
+		public abstract ValueTask Prepare(string commandText, AsyncWrappingCommonArgs async);
+		public abstract ValueTask Execute(AsyncWrappingCommonArgs async);
+		public abstract ValueTask<DbValue[]> Fetch(AsyncWrappingCommonArgs async);
 
 		public abstract BlobBase CreateBlob();
 		public abstract BlobBase CreateBlob(long handle);
 
-		public abstract Task<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async);
-		public abstract Task<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async);
-		public abstract Task<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async);
 
 		#endregion
 
 		#region Protected Abstract Methods
 
 		protected abstract void TransactionUpdated(object sender, EventArgs e);
-		protected abstract Task<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
-		protected abstract Task Free(int option, AsyncWrappingCommonArgs async);
+		protected abstract ValueTask<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
+		protected abstract ValueTask Free(int option, AsyncWrappingCommonArgs async);
 
 		#endregion
 
@@ -205,12 +205,12 @@ namespace FirebirdSql.Data.Common
 			return null;
 		}
 
-		protected Task<byte[]> GetSqlInfo(byte[] items, AsyncWrappingCommonArgs async)
+		protected ValueTask<byte[]> GetSqlInfo(byte[] items, AsyncWrappingCommonArgs async)
 		{
 			return GetSqlInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
 		}
 
-		protected async Task<int> GetRecordsAffected(AsyncWrappingCommonArgs async)
+		protected async ValueTask<int> GetRecordsAffected(AsyncWrappingCommonArgs async)
 		{
 			var buffer = await GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, async).ConfigureAwait(false);
 			return ProcessRecordsAffectedBuffer(buffer);
@@ -264,7 +264,7 @@ namespace FirebirdSql.Data.Common
 			return insertCount + updateCount + deleteCount;
 		}
 
-		protected async Task<DbStatementType> GetStatementType(AsyncWrappingCommonArgs async)
+		protected async ValueTask<DbStatementType> GetStatementType(AsyncWrappingCommonArgs async)
 		{
 			var buffer = await GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, async).ConfigureAwait(false);
 			return ProcessStatementTypeInfoBuffer(buffer);
@@ -311,7 +311,7 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		protected async Task<string> GetPlanInfo(byte[] planInfoItems, AsyncWrappingCommonArgs async)
+		protected async ValueTask<string> GetPlanInfo(byte[] planInfoItems, AsyncWrappingCommonArgs async)
 		{
 			var count = 0;
 			var bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;

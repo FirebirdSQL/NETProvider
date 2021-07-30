@@ -26,7 +26,7 @@ namespace FirebirdSql.Data.Client
 {
 	internal static class ClientFactory
 	{
-		public static async Task<DatabaseBase> CreateDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
+		public static async ValueTask<DatabaseBase> CreateDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			return options.ServerType switch
 			{
@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Client
 			};
 		}
 
-		public static async Task<ServiceManagerBase> CreateServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
+		public static async ValueTask<ServiceManagerBase> CreateServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			return options.ServerType switch
 			{
@@ -46,7 +46,7 @@ namespace FirebirdSql.Data.Client
 			};
 		}
 
-		private static async Task<DatabaseBase> CreateManagedDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
+		private static async ValueTask<DatabaseBase> CreateManagedDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			await connection.Connect(async).ConfigureAwait(false);
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Client
 			};
 		}
 
-		private static async Task<ServiceManagerBase> CreateManagedServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
+		private static async ValueTask<ServiceManagerBase> CreateManagedServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
 			await connection.Connect(async).ConfigureAwait(false);

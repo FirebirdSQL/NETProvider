@@ -123,7 +123,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Dispose2
 
-		public override async Task Dispose2(AsyncWrappingCommonArgs async)
+		public override async ValueTask Dispose2(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
@@ -161,20 +161,20 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Array Creation Methods
 
-		public override Task<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async)
+		public override ValueTask<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async)
 		{
 			var array = new FesArray(descriptor);
-			return Task.FromResult((ArrayBase)array);
+			return ValueTask2.FromResult((ArrayBase)array);
 		}
 
-		public override async Task<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async)
+		public override async ValueTask<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async)
 		{
 			var array = new FesArray(_db, _transaction, tableName, fieldName);
 			await array.Initialize(async).ConfigureAwait(false);
 			return array;
 		}
 
-		public override async Task<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async)
+		public override async ValueTask<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async)
 		{
 			var array = new FesArray(_db, _transaction, handle, tableName, fieldName);
 			await array.Initialize(async).ConfigureAwait(false);
@@ -185,21 +185,21 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override Task Release(AsyncWrappingCommonArgs async)
+		public override ValueTask Release(AsyncWrappingCommonArgs async)
 		{
 			XsqldaMarshaler.CleanUpNativeData(ref _fetchSqlDa);
 
 			return base.Release(async);
 		}
 
-		public override Task Close(AsyncWrappingCommonArgs async)
+		public override ValueTask Close(AsyncWrappingCommonArgs async)
 		{
 			XsqldaMarshaler.CleanUpNativeData(ref _fetchSqlDa);
 
 			return base.Close(async);
 		}
 
-		public override async Task Prepare(string commandText, AsyncWrappingCommonArgs async)
+		public override async ValueTask Prepare(string commandText, AsyncWrappingCommonArgs async)
 		{
 			ClearAll();
 
@@ -253,7 +253,7 @@ namespace FirebirdSql.Data.Client.Native
 			State = StatementState.Prepared;
 		}
 
-		public override async Task Execute(AsyncWrappingCommonArgs async)
+		public override async ValueTask Execute(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 
@@ -315,7 +315,7 @@ namespace FirebirdSql.Data.Client.Native
 			State = StatementState.Executed;
 		}
 
-		public override async Task<DbValue[]> Fetch(AsyncWrappingCommonArgs async)
+		public override async ValueTask<DbValue[]> Fetch(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 
@@ -384,7 +384,7 @@ namespace FirebirdSql.Data.Client.Native
 			return row;
 		}
 
-		public override async Task Describe(AsyncWrappingCommonArgs async)
+		public override async ValueTask Describe(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -408,7 +408,7 @@ namespace FirebirdSql.Data.Client.Native
 			_fields = descriptor;
 		}
 
-		public override async Task DescribeParameters(AsyncWrappingCommonArgs async)
+		public override async ValueTask DescribeParameters(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -468,13 +468,13 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override Task Free(int option, AsyncWrappingCommonArgs async)
+		protected override ValueTask Free(int option, AsyncWrappingCommonArgs async)
 		{
 			// Does	not	seem to	be possible	or necessary to	close
 			// an execute procedure	statement.
 			if (StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
 			{
-				return Task.CompletedTask;
+				return ValueTask2.CompletedTask;
 			}
 
 			ClearStatusVector();
@@ -495,7 +495,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
 		protected override void TransactionUpdated(object sender, EventArgs e)
@@ -510,7 +510,7 @@ namespace FirebirdSql.Data.Client.Native
 			_allRowsFetched = false;
 		}
 
-		protected override Task<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		protected override ValueTask<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -526,7 +526,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_db.ProcessStatusVector(_statusVector);
 
-			return Task.FromResult(buffer);
+			return ValueTask2.FromResult(buffer);
 		}
 
 		#endregion

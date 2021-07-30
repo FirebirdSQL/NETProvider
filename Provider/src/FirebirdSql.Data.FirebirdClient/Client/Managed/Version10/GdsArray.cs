@@ -90,7 +90,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public override async Task<byte[]> GetSlice(int sliceLength, AsyncWrappingCommonArgs async)
+		public override async ValueTask<byte[]> GetSlice(int sliceLength, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task PutSlice(Array sourceArray, int sliceLength, AsyncWrappingCommonArgs async)
+		public override async ValueTask PutSlice(Array sourceArray, int sliceLength, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -144,7 +144,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Protected Methods
 
-		protected override async Task<Array> DecodeSlice(byte[] slice, AsyncWrappingCommonArgs async)
+		protected override async ValueTask<Array> DecodeSlice(byte[] slice, AsyncWrappingCommonArgs async)
 		{
 			var dbType = DbDataType.Array;
 			Array sliceData = null;
@@ -246,7 +246,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Private Methods
 
-		private async Task<byte[]> ReceiveSliceResponse(ArrayDesc desc, AsyncWrappingCommonArgs async)
+		private async ValueTask<byte[]> ReceiveSliceResponse(ArrayDesc desc, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -311,7 +311,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		private async Task<byte[]> EncodeSliceArray(Array sourceArray, AsyncWrappingCommonArgs async)
+		private async ValueTask<byte[]> EncodeSliceArray(Array sourceArray, AsyncWrappingCommonArgs async)
 		{
 			var dbType = DbDataType.Array;
 			var charset = _database.Charset;

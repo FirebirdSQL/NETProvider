@@ -67,18 +67,18 @@ namespace FirebirdSql.Data.Common
 
 		#region Methods
 
-		public Task Initialize(AsyncWrappingCommonArgs async)
+		public ValueTask Initialize(AsyncWrappingCommonArgs async)
 		{
 			return LookupBounds(async);
 		}
 
-		public async Task<Array> Read(AsyncWrappingCommonArgs async)
+		public async ValueTask<Array> Read(AsyncWrappingCommonArgs async)
 		{
 			var slice = await GetSlice(GetSliceLength(true), async).ConfigureAwait(false);
 			return await DecodeSlice(slice, async).ConfigureAwait(false);
 		}
 
-		public async Task Write(Array sourceArray, AsyncWrappingCommonArgs async)
+		public async ValueTask Write(Array sourceArray, AsyncWrappingCommonArgs async)
 		{
 			SetDesc(sourceArray);
 			await PutSlice(sourceArray, GetSliceLength(false), async).ConfigureAwait(false);
@@ -97,7 +97,7 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		private async Task LookupBounds(AsyncWrappingCommonArgs async)
+		private async ValueTask LookupBounds(AsyncWrappingCommonArgs async)
 		{
 			await LookupDesc(async).ConfigureAwait(false);
 
@@ -124,7 +124,7 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		private async Task LookupDesc(AsyncWrappingCommonArgs async)
+		private async ValueTask LookupDesc(AsyncWrappingCommonArgs async)
 		{
 			var lookup = Database.CreateStatement(Transaction);
 			try
@@ -192,14 +192,14 @@ namespace FirebirdSql.Data.Common
 
 		#region Abstract Methods
 
-		public abstract Task<byte[]> GetSlice(int slice_length, AsyncWrappingCommonArgs async);
-		public abstract Task PutSlice(Array source_array, int slice_length, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<byte[]> GetSlice(int slice_length, AsyncWrappingCommonArgs async);
+		public abstract ValueTask PutSlice(Array source_array, int slice_length, AsyncWrappingCommonArgs async);
 
 		#endregion
 
 		#region Protected Abstract Methods
 
-		protected abstract Task<Array> DecodeSlice(byte[] slice, AsyncWrappingCommonArgs async);
+		protected abstract ValueTask<Array> DecodeSlice(byte[] slice, AsyncWrappingCommonArgs async);
 
 		#endregion
 

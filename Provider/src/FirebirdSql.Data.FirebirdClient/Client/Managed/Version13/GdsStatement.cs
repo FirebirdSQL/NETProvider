@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		#region Overriden Methods
 
-		protected override async Task<byte[]> WriteParameters(AsyncWrappingCommonArgs async)
+		protected override async ValueTask<byte[]> WriteParameters(AsyncWrappingCommonArgs async)
 		{
 			if (_parameters == null)
 				return null;
@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 		}
 
-		protected override async Task<DbValue[]> ReadRow(AsyncWrappingCommonArgs async)
+		protected override async ValueTask<DbValue[]> ReadRow(AsyncWrappingCommonArgs async)
 		{
 			var row = new DbValue[_fields.Count];
 			try

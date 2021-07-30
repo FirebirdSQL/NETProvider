@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Read
 
-		public async Task<byte[]> ReadBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async)
+		public async ValueTask<byte[]> ReadBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async)
 		{
 			if (count > 0)
 			{
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Client.Managed
 			return buffer;
 		}
 
-		public async Task<byte[]> ReadOpaque(int length, AsyncWrappingCommonArgs async)
+		public async ValueTask<byte[]> ReadOpaque(int length, AsyncWrappingCommonArgs async)
 		{
 			var buffer = new byte[length];
 			await ReadBytes(buffer, length, async).ConfigureAwait(false);
@@ -77,70 +77,70 @@ namespace FirebirdSql.Data.Client.Managed
 			return buffer;
 		}
 
-		public async Task<byte[]> ReadBuffer(AsyncWrappingCommonArgs async)
+		public async ValueTask<byte[]> ReadBuffer(AsyncWrappingCommonArgs async)
 		{
 			return await ReadOpaque((ushort)await ReadInt32(async).ConfigureAwait(false), async).ConfigureAwait(false);
 		}
 
-		public Task<string> ReadString(AsyncWrappingCommonArgs async) => ReadString(_charset, async);
-		public Task<string> ReadString(int length, AsyncWrappingCommonArgs async) => ReadString(_charset, length, async);
-		public async Task<string> ReadString(Charset charset, AsyncWrappingCommonArgs async) => await ReadString(charset, await ReadInt32(async).ConfigureAwait(false), async).ConfigureAwait(false);
-		public async Task<string> ReadString(Charset charset, int length, AsyncWrappingCommonArgs async)
+		public ValueTask<string> ReadString(AsyncWrappingCommonArgs async) => ReadString(_charset, async);
+		public ValueTask<string> ReadString(int length, AsyncWrappingCommonArgs async) => ReadString(_charset, length, async);
+		public async ValueTask<string> ReadString(Charset charset, AsyncWrappingCommonArgs async) => await ReadString(charset, await ReadInt32(async).ConfigureAwait(false), async).ConfigureAwait(false);
+		public async ValueTask<string> ReadString(Charset charset, int length, AsyncWrappingCommonArgs async)
 		{
 			var buffer = await ReadOpaque(length, async).ConfigureAwait(false);
 			return charset.GetString(buffer, 0, buffer.Length);
 		}
 
-		public async Task<short> ReadInt16(AsyncWrappingCommonArgs async)
+		public async ValueTask<short> ReadInt16(AsyncWrappingCommonArgs async)
 		{
 			return Convert.ToInt16(await ReadInt32(async).ConfigureAwait(false));
 		}
 
-		public async Task<int> ReadInt32(AsyncWrappingCommonArgs async)
+		public async ValueTask<int> ReadInt32(AsyncWrappingCommonArgs async)
 		{
 			await ReadBytes(_smallBuffer, 4, async).ConfigureAwait(false);
 			return TypeDecoder.DecodeInt32(_smallBuffer);
 		}
 
-		public async Task<long> ReadInt64(AsyncWrappingCommonArgs async)
+		public async ValueTask<long> ReadInt64(AsyncWrappingCommonArgs async)
 		{
 			await ReadBytes(_smallBuffer, 8, async).ConfigureAwait(false);
 			return TypeDecoder.DecodeInt64(_smallBuffer);
 		}
 
-		public async Task<Guid> ReadGuid(AsyncWrappingCommonArgs async)
+		public async ValueTask<Guid> ReadGuid(AsyncWrappingCommonArgs async)
 		{
 			return TypeDecoder.DecodeGuid(await ReadOpaque(16, async).ConfigureAwait(false));
 		}
 
-		public async Task<float> ReadSingle(AsyncWrappingCommonArgs async)
+		public async ValueTask<float> ReadSingle(AsyncWrappingCommonArgs async)
 		{
 			return BitConverter.ToSingle(BitConverter.GetBytes(await ReadInt32(async).ConfigureAwait(false)), 0);
 		}
 
-		public async Task<double> ReadDouble(AsyncWrappingCommonArgs async)
+		public async ValueTask<double> ReadDouble(AsyncWrappingCommonArgs async)
 		{
 			return BitConverter.ToDouble(BitConverter.GetBytes(await ReadInt64(async).ConfigureAwait(false)), 0);
 		}
 
-		public async Task<DateTime> ReadDateTime(AsyncWrappingCommonArgs async)
+		public async ValueTask<DateTime> ReadDateTime(AsyncWrappingCommonArgs async)
 		{
 			var date = await ReadDate(async).ConfigureAwait(false);
 			var time = await ReadTime(async).ConfigureAwait(false);
 			return date.Add(time);
 		}
 
-		public async Task<DateTime> ReadDate(AsyncWrappingCommonArgs async)
+		public async ValueTask<DateTime> ReadDate(AsyncWrappingCommonArgs async)
 		{
 			return TypeDecoder.DecodeDate(await ReadInt32(async).ConfigureAwait(false));
 		}
 
-		public async Task<TimeSpan> ReadTime(AsyncWrappingCommonArgs async)
+		public async ValueTask<TimeSpan> ReadTime(AsyncWrappingCommonArgs async)
 		{
 			return TypeDecoder.DecodeTime(await ReadInt32(async).ConfigureAwait(false));
 		}
 
-		public async Task<decimal> ReadDecimal(int type, int scale, AsyncWrappingCommonArgs async)
+		public async ValueTask<decimal> ReadDecimal(int type, int scale, AsyncWrappingCommonArgs async)
 		{
 			switch (type & ~1)
 			{
@@ -161,39 +161,39 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public async Task<bool> ReadBoolean(AsyncWrappingCommonArgs async)
+		public async ValueTask<bool> ReadBoolean(AsyncWrappingCommonArgs async)
 		{
 			return TypeDecoder.DecodeBoolean(await ReadOpaque(1, async).ConfigureAwait(false));
 		}
 
-		public async Task<FbZonedDateTime> ReadZonedDateTime(bool isExtended, AsyncWrappingCommonArgs async)
+		public async ValueTask<FbZonedDateTime> ReadZonedDateTime(bool isExtended, AsyncWrappingCommonArgs async)
 		{
 			var dt = await ReadDateTime(async).ConfigureAwait(false);
 			dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
 			return TypeHelper.CreateZonedDateTime(dt, (ushort)await ReadInt16(async).ConfigureAwait(false), isExtended ? await ReadInt16(async).ConfigureAwait(false) : (short?)null);
 		}
 
-		public async Task<FbZonedTime> ReadZonedTime(bool isExtended, AsyncWrappingCommonArgs async)
+		public async ValueTask<FbZonedTime> ReadZonedTime(bool isExtended, AsyncWrappingCommonArgs async)
 		{
 			return TypeHelper.CreateZonedTime(await ReadTime(async).ConfigureAwait(false), (ushort)await ReadInt16(async).ConfigureAwait(false), isExtended ? await ReadInt16(async).ConfigureAwait(false) : (short?)null);
 		}
 
-		public async Task<FbDecFloat> ReadDec16(AsyncWrappingCommonArgs async)
+		public async ValueTask<FbDecFloat> ReadDec16(AsyncWrappingCommonArgs async)
 		{
 			return TypeDecoder.DecodeDec16(await ReadOpaque(8, async).ConfigureAwait(false));
 		}
 
-		public async Task<FbDecFloat> ReadDec34(AsyncWrappingCommonArgs async)
+		public async ValueTask<FbDecFloat> ReadDec34(AsyncWrappingCommonArgs async)
 		{
 			return TypeDecoder.DecodeDec34(await ReadOpaque(16, async).ConfigureAwait(false));
 		}
 
-		public async Task<BigInteger> ReadInt128(AsyncWrappingCommonArgs async)
+		public async ValueTask<BigInteger> ReadInt128(AsyncWrappingCommonArgs async)
 		{
 			return TypeDecoder.DecodeInt128(await ReadOpaque(16, async).ConfigureAwait(false));
 		}
 
-		public async Task<IscException> ReadStatusVector(AsyncWrappingCommonArgs async)
+		public async ValueTask<IscException> ReadStatusVector(AsyncWrappingCommonArgs async)
 		{
 			IscException exception = null;
 			var eof = false;
@@ -243,7 +243,7 @@ namespace FirebirdSql.Data.Client.Managed
 		 * this	level rather than try to catch them	in all places where
 		 * this	routine	is called
 		 */
-		public async Task<int> ReadOperation(AsyncWrappingCommonArgs async)
+		public async ValueTask<int> ReadOperation(AsyncWrappingCommonArgs async)
 		{
 			int operation;
 			do
@@ -257,12 +257,12 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Write
 
-		public Task Flush(AsyncWrappingCommonArgs async) => _dataProvider.Flush(async);
+		public ValueTask Flush(AsyncWrappingCommonArgs async) => _dataProvider.Flush(async);
 
-		public Task WriteBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async) => _dataProvider.Write(buffer, 0, count, async);
+		public ValueTask WriteBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async) => _dataProvider.Write(buffer, 0, count, async);
 
-		public Task WriteOpaque(byte[] buffer, AsyncWrappingCommonArgs async) => WriteOpaque(buffer, buffer.Length, async);
-		public async Task WriteOpaque(byte[] buffer, int length, AsyncWrappingCommonArgs async)
+		public ValueTask WriteOpaque(byte[] buffer, AsyncWrappingCommonArgs async) => WriteOpaque(buffer, buffer.Length, async);
+		public async ValueTask WriteOpaque(byte[] buffer, int length, AsyncWrappingCommonArgs async)
 		{
 			if (buffer != null && length > 0)
 			{
@@ -272,8 +272,8 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public Task WriteBuffer(byte[] buffer, AsyncWrappingCommonArgs async) => WriteBuffer(buffer, buffer?.Length ?? 0, async);
-		public async Task WriteBuffer(byte[] buffer, int length, AsyncWrappingCommonArgs async)
+		public ValueTask WriteBuffer(byte[] buffer, AsyncWrappingCommonArgs async) => WriteBuffer(buffer, buffer?.Length ?? 0, async);
+		public async ValueTask WriteBuffer(byte[] buffer, int length, AsyncWrappingCommonArgs async)
 		{
 			await Write(length, async).ConfigureAwait(false);
 			if (buffer != null && length > 0)
@@ -283,7 +283,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public async Task WriteBlobBuffer(byte[] buffer, AsyncWrappingCommonArgs async)
+		public async ValueTask WriteBlobBuffer(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			var length = buffer.Length; // 2 for short for buffer length
 			if (length > short.MaxValue)
@@ -295,7 +295,7 @@ namespace FirebirdSql.Data.Client.Managed
 			await WritePad((4 - length + 2) & 3, async).ConfigureAwait(false);
 		}
 
-		public async Task WriteTyped(int type, byte[] buffer, AsyncWrappingCommonArgs async)
+		public async ValueTask WriteTyped(int type, byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			int length;
 			if (buffer == null)
@@ -314,40 +314,40 @@ namespace FirebirdSql.Data.Client.Managed
 			await WritePad((4 - length) & 3, async).ConfigureAwait(false);
 		}
 
-		public Task Write(string value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(string value, AsyncWrappingCommonArgs async)
 		{
 			var buffer = _charset.GetBytes(value);
 			return WriteBuffer(buffer, buffer.Length, async);
 		}
 
-		public Task Write(short value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(short value, AsyncWrappingCommonArgs async)
 		{
 			return Write((int)value, async);
 		}
 
-		public Task Write(int value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(int value, AsyncWrappingCommonArgs async)
 		{
 			return _dataProvider.Write(TypeEncoder.EncodeInt32(value), 0, 4, async);
 		}
 
-		public Task Write(long value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(long value, AsyncWrappingCommonArgs async)
 		{
 			return _dataProvider.Write(TypeEncoder.EncodeInt64(value), 0, 8, async);
 		}
 
-		public Task Write(float value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(float value, AsyncWrappingCommonArgs async)
 		{
 			var buffer = BitConverter.GetBytes(value);
 			return Write(BitConverter.ToInt32(buffer, 0), async);
 		}
 
-		public Task Write(double value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(double value, AsyncWrappingCommonArgs async)
 		{
 			var buffer = BitConverter.GetBytes(value);
 			return Write(BitConverter.ToInt64(buffer, 0), async);
 		}
 
-		public Task Write(decimal value, int type, int scale, AsyncWrappingCommonArgs async)
+		public ValueTask Write(decimal value, int type, int scale, AsyncWrappingCommonArgs async)
 		{
 			var numeric = TypeEncoder.EncodeDecimal(value, scale, type);
 			switch (type & ~1)
@@ -369,23 +369,23 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public Task Write(bool value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(bool value, AsyncWrappingCommonArgs async)
 		{
 			return WriteOpaque(TypeEncoder.EncodeBoolean(value), async);
 		}
 
-		public async Task Write(DateTime value, AsyncWrappingCommonArgs async)
+		public async ValueTask Write(DateTime value, AsyncWrappingCommonArgs async)
 		{
 			await WriteDate(value, async).ConfigureAwait(false);
 			await WriteTime(TypeHelper.DateTimeToTimeSpan(value), async).ConfigureAwait(false);
 		}
 
-		public Task Write(Guid value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(Guid value, AsyncWrappingCommonArgs async)
 		{
 			return WriteOpaque(TypeEncoder.EncodeGuid(value), async);
 		}
 
-		public Task Write(FbDecFloat value, int size, AsyncWrappingCommonArgs async)
+		public ValueTask Write(FbDecFloat value, int size, AsyncWrappingCommonArgs async)
 		{
 			return WriteOpaque(size switch
 			{
@@ -395,17 +395,17 @@ namespace FirebirdSql.Data.Client.Managed
 			}, async);
 		}
 
-		public Task Write(BigInteger value, AsyncWrappingCommonArgs async)
+		public ValueTask Write(BigInteger value, AsyncWrappingCommonArgs async)
 		{
 			return WriteOpaque(TypeEncoder.EncodeInt128(value), async);
 		}
 
-		public Task WriteDate(DateTime value, AsyncWrappingCommonArgs async)
+		public ValueTask WriteDate(DateTime value, AsyncWrappingCommonArgs async)
 		{
 			return Write(TypeEncoder.EncodeDate(Convert.ToDateTime(value)), async);
 		}
 
-		public Task WriteTime(TimeSpan value, AsyncWrappingCommonArgs async)
+		public ValueTask WriteTime(TimeSpan value, AsyncWrappingCommonArgs async)
 		{
 			return Write(TypeEncoder.EncodeTime(value), async);
 		}
@@ -415,19 +415,19 @@ namespace FirebirdSql.Data.Client.Managed
 		#region Pad + Fill
 
 		readonly static byte[] PadArray = new byte[] { 0, 0, 0, 0 };
-		Task WritePad(int length, AsyncWrappingCommonArgs async)
+		ValueTask WritePad(int length, AsyncWrappingCommonArgs async)
 		{
 			return _dataProvider.Write(PadArray, 0, length, async);
 		}
 
-		Task ReadPad(int length, AsyncWrappingCommonArgs async)
+		async ValueTask ReadPad(int length, AsyncWrappingCommonArgs async)
 		{
 			Debug.Assert(length < _smallBuffer.Length);
-			return ReadBytes(_smallBuffer, length, async);
+			await ReadBytes(_smallBuffer, length, async).ConfigureAwait(false);
 		}
 
 		readonly static byte[] FillArray = Enumerable.Repeat((byte)32, 32767).ToArray();
-		Task WriteFill(int length, AsyncWrappingCommonArgs async)
+		ValueTask WriteFill(int length, AsyncWrappingCommonArgs async)
 		{
 			return _dataProvider.Write(FillArray, 0, length, async);
 		}

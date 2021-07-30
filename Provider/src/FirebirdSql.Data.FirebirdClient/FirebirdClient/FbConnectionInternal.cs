@@ -397,7 +397,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (_db != null && _db.HasRemoteEventSupport)
 			{
-				return _db.CloseEventManager(async);
+				return _db.CloseEventManager(async).AsTask();
 			}
 			return Task.CompletedTask;
 		}
@@ -520,7 +520,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public Task CancelCommand(AsyncWrappingCommonArgs async)
 		{
-			return _db.CancelOperation(IscCodes.fb_cancel_raise, async);
+			return _db.CancelOperation(IscCodes.fb_cancel_raise, async).AsTask();
 		}
 		#endregion
 

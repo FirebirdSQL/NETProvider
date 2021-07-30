@@ -25,27 +25,27 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	interface IXdrWriter
 	{
-		Task Flush(AsyncWrappingCommonArgs async);
-		Task WriteBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async);
-		Task WriteOpaque(byte[] buffer, AsyncWrappingCommonArgs async);
-		Task WriteOpaque(byte[] buffer, int length, AsyncWrappingCommonArgs async);
-		Task WriteBuffer(byte[] buffer, AsyncWrappingCommonArgs async);
-		Task WriteBuffer(byte[] buffer, int length, AsyncWrappingCommonArgs async);
-		Task WriteBlobBuffer(byte[] buffer, AsyncWrappingCommonArgs async);
-		Task WriteTyped(int type, byte[] buffer, AsyncWrappingCommonArgs async);
-		Task Write(string value, AsyncWrappingCommonArgs async);
-		Task Write(short value, AsyncWrappingCommonArgs async);
-		Task Write(int value, AsyncWrappingCommonArgs async);
-		Task Write(long value, AsyncWrappingCommonArgs async);
-		Task Write(float value, AsyncWrappingCommonArgs async);
-		Task Write(double value, AsyncWrappingCommonArgs async);
-		Task Write(decimal value, int type, int scale, AsyncWrappingCommonArgs async);
-		Task Write(bool value, AsyncWrappingCommonArgs async);
-		Task Write(DateTime value, AsyncWrappingCommonArgs async);
-		Task Write(Guid value, AsyncWrappingCommonArgs async);
-		Task Write(FbDecFloat value, int size, AsyncWrappingCommonArgs async);
-		Task Write(BigInteger value, AsyncWrappingCommonArgs async);
-		Task WriteDate(DateTime value, AsyncWrappingCommonArgs async);
-		Task WriteTime(TimeSpan value, AsyncWrappingCommonArgs async);
+		ValueTask Flush(AsyncWrappingCommonArgs async);
+		ValueTask WriteBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async);
+		ValueTask WriteOpaque(byte[] buffer, AsyncWrappingCommonArgs async);
+		ValueTask WriteOpaque(byte[] buffer, int length, AsyncWrappingCommonArgs async);
+		ValueTask WriteBuffer(byte[] buffer, AsyncWrappingCommonArgs async);
+		ValueTask WriteBuffer(byte[] buffer, int length, AsyncWrappingCommonArgs async);
+		ValueTask WriteBlobBuffer(byte[] buffer, AsyncWrappingCommonArgs async);
+		ValueTask WriteTyped(int type, byte[] buffer, AsyncWrappingCommonArgs async);
+		ValueTask Write(string value, AsyncWrappingCommonArgs async);
+		ValueTask Write(short value, AsyncWrappingCommonArgs async);
+		ValueTask Write(int value, AsyncWrappingCommonArgs async);
+		ValueTask Write(long value, AsyncWrappingCommonArgs async);
+		ValueTask Write(float value, AsyncWrappingCommonArgs async);
+		ValueTask Write(double value, AsyncWrappingCommonArgs async);
+		ValueTask Write(decimal value, int type, int scale, AsyncWrappingCommonArgs async);
+		ValueTask Write(bool value, AsyncWrappingCommonArgs async);
+		ValueTask Write(DateTime value, AsyncWrappingCommonArgs async);
+		ValueTask Write(Guid value, AsyncWrappingCommonArgs async);
+		ValueTask Write(FbDecFloat value, int size, AsyncWrappingCommonArgs async);
+		ValueTask Write(BigInteger value, AsyncWrappingCommonArgs async);
+		ValueTask WriteDate(DateTime value, AsyncWrappingCommonArgs async);
+		ValueTask WriteTime(TimeSpan value, AsyncWrappingCommonArgs async);
 	}
 }

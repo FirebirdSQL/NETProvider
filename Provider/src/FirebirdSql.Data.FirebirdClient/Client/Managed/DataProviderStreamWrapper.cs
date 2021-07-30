@@ -30,10 +30,10 @@ namespace FirebirdSql.Data.Client.Managed
 			_stream = stream;
 		}
 
-		public Task<int> Read(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async) => async.AsyncSyncCall(_stream.ReadAsync, _stream.Read, buffer, offset, count);
+		public async ValueTask<int> Read(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async) => await async.AsyncSyncCall(_stream.ReadAsync, _stream.Read, buffer, offset, count).ConfigureAwait(false);
 
-		public Task Write(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async) => async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, offset, count);
+		public async ValueTask Write(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async) => await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, offset, count).ConfigureAwait(false);
 
-		public Task Flush(AsyncWrappingCommonArgs async) => async.AsyncSyncCall(_stream.FlushAsync, _stream.Flush);
+		public async ValueTask Flush(AsyncWrappingCommonArgs async) => await async.AsyncSyncCall(_stream.FlushAsync, _stream.Flush).ConfigureAwait(false);
 	}
 }

@@ -28,10 +28,10 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		public GdsDatabase(GdsConnection connection)
 			: base(connection)
 		{
-			DeferredPackets = new Queue<Func<IResponse, AsyncWrappingCommonArgs, Task>>();
+			DeferredPackets = new Queue<Func<IResponse, AsyncWrappingCommonArgs, ValueTask>>();
 		}
 
-		public Queue<Func<IResponse, AsyncWrappingCommonArgs, Task>> DeferredPackets { get; private set; }
+		public Queue<Func<IResponse, AsyncWrappingCommonArgs, ValueTask>> DeferredPackets { get; private set; }
 
 		public override StatementBase CreateStatement()
 		{
@@ -43,7 +43,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return new GdsStatement(this, transaction);
 		}
 
-		public override async Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -73,13 +73,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			await AfterAttachActions(async).ConfigureAwait(false);
 		}
 
-		protected virtual Task SendTrustedAuthToBuffer(DatabaseParameterBufferBase dpb, byte[] authData, AsyncWrappingCommonArgs async)
+		protected virtual ValueTask SendTrustedAuthToBuffer(DatabaseParameterBufferBase dpb, byte[] authData, AsyncWrappingCommonArgs async)
 		{
 			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		protected async Task<IResponse> ProcessTrustedAuthResponse(SspiHelper sspiHelper, IResponse response, AsyncWrappingCommonArgs async)
+		protected async ValueTask<IResponse> ProcessTrustedAuthResponse(SspiHelper sspiHelper, IResponse response, AsyncWrappingCommonArgs async)
 		{
 			while (response is AuthResponse)
 			{
@@ -92,7 +92,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return response;
 		}
 
-		public override async Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			using (var sspiHelper = new SspiHelper())
 			{
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override async Task ReleaseObject(int op, int id, AsyncWrappingCommonArgs async)
+		public override async ValueTask ReleaseObject(int op, int id, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -120,13 +120,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override async Task<int> ReadOperation(AsyncWrappingCommonArgs async)
+		public override async ValueTask<int> ReadOperation(AsyncWrappingCommonArgs async)
 		{
 			await ProcessDeferredPackets(async).ConfigureAwait(false);
 			return await base.ReadOperation(async).ConfigureAwait(false);
 		}
 
-		private async Task ProcessDeferredPackets(AsyncWrappingCommonArgs async)
+		private async ValueTask ProcessDeferredPackets(AsyncWrappingCommonArgs async)
 		{
 			if (DeferredPackets.Count > 0)
 			{

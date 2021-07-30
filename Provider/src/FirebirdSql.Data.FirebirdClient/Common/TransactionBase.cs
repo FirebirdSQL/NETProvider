@@ -27,15 +27,15 @@ namespace FirebirdSql.Data.Common
 		public TransactionState State { get; protected set; }
 		public event EventHandler Update;
 
-		public abstract Task BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
-		public abstract Task Commit(AsyncWrappingCommonArgs async);
-		public abstract Task CommitRetaining(AsyncWrappingCommonArgs async);
-		public abstract Task Rollback(AsyncWrappingCommonArgs async);
-		public abstract Task RollbackRetaining(AsyncWrappingCommonArgs async);
-		public abstract Task Prepare(AsyncWrappingCommonArgs async);
-		public abstract Task Prepare(byte[] buffer, AsyncWrappingCommonArgs async);
+		public abstract ValueTask BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
+		public abstract ValueTask Commit(AsyncWrappingCommonArgs async);
+		public abstract ValueTask CommitRetaining(AsyncWrappingCommonArgs async);
+		public abstract ValueTask Rollback(AsyncWrappingCommonArgs async);
+		public abstract ValueTask RollbackRetaining(AsyncWrappingCommonArgs async);
+		public abstract ValueTask Prepare(AsyncWrappingCommonArgs async);
+		public abstract ValueTask Prepare(byte[] buffer, AsyncWrappingCommonArgs async);
 
-		public virtual Task Dispose2(AsyncWrappingCommonArgs async) => Task.CompletedTask;
+		public virtual ValueTask Dispose2(AsyncWrappingCommonArgs async) => ValueTask2.CompletedTask;
 
 		protected void EnsureActiveTransactionState()
 		{

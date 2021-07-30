@@ -34,7 +34,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			: base(connection)
 		{ }
 
-		protected override async Task SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected override async ValueTask SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
 			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		protected override async Task SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected override async ValueTask SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
 			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			return new GdsStatement(this, transaction);
 		}
 
-		public override async Task CancelOperation(int kind, AsyncWrappingCommonArgs async)
+		public override async ValueTask CancelOperation(int kind, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -84,7 +84,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			}
 		}
 
-		protected async Task SendCancelOperationToBuffer(int kind, AsyncWrappingCommonArgs async)
+		protected async ValueTask SendCancelOperationToBuffer(int kind, AsyncWrappingCommonArgs async)
 		{
 			await Xdr.Write(IscCodes.op_cancel, async).ConfigureAwait(false);
 			await Xdr.Write(kind, async).ConfigureAwait(false);

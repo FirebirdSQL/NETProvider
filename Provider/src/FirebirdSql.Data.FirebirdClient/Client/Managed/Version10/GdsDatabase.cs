@@ -85,7 +85,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Attach/Detach Methods
 
-		public override async Task Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			await AfterAttachActions(async).ConfigureAwait(false);
 		}
 
-		protected virtual async Task SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected virtual async ValueTask SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
 			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
 			await Xdr.Write(0, async).ConfigureAwait(false);
@@ -119,23 +119,23 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		protected virtual Task ProcessAttachResponse(GenericResponse response, AsyncWrappingCommonArgs async)
+		protected virtual ValueTask ProcessAttachResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			_handle = response.ObjectHandle;
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		protected async Task AfterAttachActions(AsyncWrappingCommonArgs async)
+		protected async ValueTask AfterAttachActions(AsyncWrappingCommonArgs async)
 		{
 			ServerVersion = await GetServerVersion(async).ConfigureAwait(false);
 		}
 
-		public override Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
 
-		public override async Task Detach(AsyncWrappingCommonArgs async)
+		public override async ValueTask Detach(AsyncWrappingCommonArgs async)
 		{
 			if (TransactionCount > 0)
 			{
@@ -185,7 +185,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected internal async Task SafelyDetach(AsyncWrappingCommonArgs async)
+		protected internal async ValueTask SafelyDetach(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Methods
 
-		public override async Task CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -213,7 +213,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected virtual async Task SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected virtual async ValueTask SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
 			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
 			await Xdr.Write(DatabaseObjectId, async).ConfigureAwait(false);
@@ -225,18 +225,18 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		protected Task ProcessCreateResponse(GenericResponse response, AsyncWrappingCommonArgs async)
+		protected ValueTask ProcessCreateResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			_handle = response.ObjectHandle;
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on < FB2.1.");
 		}
 
-		public override async Task DropDatabase(AsyncWrappingCommonArgs async)
+		public override async ValueTask DropDatabase(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -258,7 +258,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Auxiliary Connection Methods
 
-		public virtual async Task<(int auxHandle, string ipAddress, int portNumber, int timeout)> ConnectionRequest(AsyncWrappingCommonArgs async)
+		public virtual async ValueTask<(int auxHandle, string ipAddress, int portNumber, int timeout)> ConnectionRequest(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -313,7 +313,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Connection Methods
 
-		public Task CloseConnection(AsyncWrappingCommonArgs async)
+		public ValueTask CloseConnection(AsyncWrappingCommonArgs async)
 		{
 			return _connection.Disconnect(async);
 		}
@@ -322,7 +322,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Remote Events Methods
 
-		public override async Task CloseEventManager(AsyncWrappingCommonArgs async)
+		public override async ValueTask CloseEventManager(AsyncWrappingCommonArgs async)
 		{
 			if (_eventManager != null)
 			{
@@ -331,7 +331,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task QueueEvents(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
+		public override async ValueTask QueueEvents(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -367,7 +367,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
+		public override async ValueTask CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -389,7 +389,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Transaction Methods
 
-		public override async Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override async ValueTask<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			var transaction = new GdsTransaction(this);
 
@@ -402,7 +402,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Cancel Methods
 
-		public override Task CancelOperation(int kind, AsyncWrappingCommonArgs async)
+		public override ValueTask CancelOperation(int kind, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Cancel Operation isn't supported on < FB2.5.");
 		}
@@ -434,12 +434,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Database Information Methods
 
-		public override Task<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async)
+		public override ValueTask<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async)
 		{
 			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
 		}
 
-		public override async Task<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		public override async ValueTask<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			var buffer = new byte[bufferLength];
 			await DatabaseInfo(items, buffer, buffer.Length, async).ConfigureAwait(false);
@@ -450,7 +450,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Release Object
 
-		public virtual async Task ReleaseObject(int op, int id, AsyncWrappingCommonArgs async)
+		public virtual async ValueTask ReleaseObject(int op, int id, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -464,34 +464,34 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected virtual async Task SendReleaseObjectToBuffer(int op, int id, AsyncWrappingCommonArgs async)
+		protected virtual async ValueTask SendReleaseObjectToBuffer(int op, int id, AsyncWrappingCommonArgs async)
 		{
 			await Xdr.Write(op, async).ConfigureAwait(false);
 			await Xdr.Write(id, async).ConfigureAwait(false);
 		}
 
-		protected virtual Task ProcessReleaseObjectResponse(IResponse response, AsyncWrappingCommonArgs async)
+		protected virtual ValueTask ProcessReleaseObjectResponse(IResponse response, AsyncWrappingCommonArgs async)
 		{
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
 		#endregion
 
 		#region Response Methods
 
-		public virtual Task<int> ReadOperation(AsyncWrappingCommonArgs async)
+		public virtual ValueTask<int> ReadOperation(AsyncWrappingCommonArgs async)
 		{
 			return Xdr.ReadOperation(async);
 		}
 
-		public virtual async Task<IResponse> ReadResponse(AsyncWrappingCommonArgs async)
+		public virtual async ValueTask<IResponse> ReadResponse(AsyncWrappingCommonArgs async)
 		{
 			var response = await ReadSingleResponse(async).ConfigureAwait(false);
 			GdsConnection.ProcessResponse(response);
 			return response;
 		}
 
-		public virtual async Task<IResponse> ReadResponse(int operation, AsyncWrappingCommonArgs async)
+		public virtual async ValueTask<IResponse> ReadResponse(int operation, AsyncWrappingCommonArgs async)
 		{
 			var response = await ReadSingleResponse(operation, async).ConfigureAwait(false);
 			GdsConnection.ProcessResponse(response);
@@ -502,15 +502,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Protected Methods
 
-		protected async Task<IResponse> ReadSingleResponse(AsyncWrappingCommonArgs async) => await ReadSingleResponse(await ReadOperation(async).ConfigureAwait(false), async).ConfigureAwait(false);
-		protected virtual async Task<IResponse> ReadSingleResponse(int operation, AsyncWrappingCommonArgs async)
+		protected async ValueTask<IResponse> ReadSingleResponse(AsyncWrappingCommonArgs async) => await ReadSingleResponse(await ReadOperation(async).ConfigureAwait(false), async).ConfigureAwait(false);
+		protected virtual async ValueTask<IResponse> ReadSingleResponse(int operation, AsyncWrappingCommonArgs async)
 		{
 			var response = await GdsConnection.ProcessOperation(operation, Xdr, async).ConfigureAwait(false);
 			GdsConnection.ProcessResponseWarnings(response, WarningMessage);
 			return response;
 		}
 
-		private async Task DatabaseInfo(byte[] items, byte[] buffer, int bufferLength, AsyncWrappingCommonArgs async)
+		private async ValueTask DatabaseInfo(byte[] items, byte[] buffer, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			try
 			{

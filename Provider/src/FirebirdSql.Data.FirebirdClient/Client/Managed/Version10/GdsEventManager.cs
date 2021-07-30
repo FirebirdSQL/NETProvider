@@ -42,14 +42,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_timeout = timeout;
 		}
 
-		public async Task Open(AsyncWrappingCommonArgs async)
+		public async ValueTask Open(AsyncWrappingCommonArgs async)
 		{
 			var connection = new GdsConnection(_ipAddress, _portNumber, _timeout);
 			await connection.Connect(async).ConfigureAwait(false);
 			_database = new GdsDatabase(connection);
 		}
 
-		public async Task WaitForEvents(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
+		public async ValueTask WaitForEvents(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
 		{
 			while (true)
 			{
@@ -87,7 +87,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public Task Close(AsyncWrappingCommonArgs async)
+		public ValueTask Close(AsyncWrappingCommonArgs async)
 		{
 			Volatile.Write(ref _closing, true);
 			return _database.CloseConnection(async);

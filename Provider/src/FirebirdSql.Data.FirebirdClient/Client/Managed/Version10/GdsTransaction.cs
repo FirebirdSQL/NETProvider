@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Dispose2
 
-		public override async Task Dispose2(AsyncWrappingCommonArgs async)
+		public override async ValueTask Dispose2(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public override async Task BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override async ValueTask BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			if (State != TransactionState.NoTransaction)
 			{
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task Commit(AsyncWrappingCommonArgs async)
+		public override async ValueTask Commit(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -129,7 +129,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task Rollback(AsyncWrappingCommonArgs async)
+		public override async ValueTask Rollback(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task CommitRetaining(AsyncWrappingCommonArgs async)
+		public override async ValueTask CommitRetaining(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -173,7 +173,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task RollbackRetaining(AsyncWrappingCommonArgs async)
+		public override async ValueTask RollbackRetaining(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -197,7 +197,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Two Phase Commit Methods
 
-		public override async Task Prepare(AsyncWrappingCommonArgs async)
+		public override async ValueTask Prepare(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -219,7 +219,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task Prepare(byte[] buffer, AsyncWrappingCommonArgs async)
+		public override async ValueTask Prepare(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 

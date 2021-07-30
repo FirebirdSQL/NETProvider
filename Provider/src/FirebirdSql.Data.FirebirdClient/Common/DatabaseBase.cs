@@ -34,31 +34,31 @@ namespace FirebirdSql.Data.Common
 		public abstract bool HasRemoteEventSupport { get; }
 		public abstract bool ConnectionBroken { get; }
 
-		public abstract Task Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract Task AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract Task Detach(AsyncWrappingCommonArgs async);
+		public abstract ValueTask Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask Detach(AsyncWrappingCommonArgs async);
 
-		public abstract Task CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract Task CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract Task DropDatabase(AsyncWrappingCommonArgs async);
+		public abstract ValueTask CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask DropDatabase(AsyncWrappingCommonArgs async);
 
-		public abstract Task<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
 
 		public abstract StatementBase CreateStatement();
 		public abstract StatementBase CreateStatement(TransactionBase transaction);
 
 		public abstract DatabaseParameterBufferBase CreateDatabaseParameterBuffer();
 
-		public abstract Task<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async);
-		public abstract Task<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
 
-		public abstract Task CloseEventManager(AsyncWrappingCommonArgs async);
-		public abstract Task QueueEvents(RemoteEvent events, AsyncWrappingCommonArgs async);
-		public abstract Task CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async);
+		public abstract ValueTask CloseEventManager(AsyncWrappingCommonArgs async);
+		public abstract ValueTask QueueEvents(RemoteEvent events, AsyncWrappingCommonArgs async);
+		public abstract ValueTask CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async);
 
-		public abstract Task CancelOperation(int kind, AsyncWrappingCommonArgs async);
+		public abstract ValueTask CancelOperation(int kind, AsyncWrappingCommonArgs async);
 
-		public async Task<string> GetServerVersion(AsyncWrappingCommonArgs async)
+		public async ValueTask<string> GetServerVersion(AsyncWrappingCommonArgs async)
 		{
 			var items = new byte[]
 			{

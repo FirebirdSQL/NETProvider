@@ -82,7 +82,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Dispose2
 
-		public override async Task Dispose2(AsyncWrappingCommonArgs async)
+		public override async ValueTask Dispose2(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
@@ -103,7 +103,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override Task BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override ValueTask BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			if (State != TransactionState.NoTransaction)
 			{
@@ -159,10 +159,10 @@ namespace FirebirdSql.Data.Client.Native
 				}
 			}
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task Commit(AsyncWrappingCommonArgs async)
+		public override ValueTask Commit(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -178,10 +178,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			State = TransactionState.NoTransaction;
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task Rollback(AsyncWrappingCommonArgs async)
+		public override ValueTask Rollback(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -197,10 +197,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			State = TransactionState.NoTransaction;
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task CommitRetaining(AsyncWrappingCommonArgs async)
+		public override ValueTask CommitRetaining(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -212,10 +212,10 @@ namespace FirebirdSql.Data.Client.Native
 
 			State = TransactionState.Active;
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task RollbackRetaining(AsyncWrappingCommonArgs async)
+		public override ValueTask RollbackRetaining(AsyncWrappingCommonArgs async)
 		{
 			EnsureActiveTransactionState();
 
@@ -227,21 +227,21 @@ namespace FirebirdSql.Data.Client.Native
 
 			State = TransactionState.Active;
 
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
 		#endregion
 
 		#region Two Phase Commit Methods
 
-		public override Task Prepare(AsyncWrappingCommonArgs async)
+		public override ValueTask Prepare(AsyncWrappingCommonArgs async)
 		{
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task Prepare(byte[] buffer, AsyncWrappingCommonArgs async)
+		public override ValueTask Prepare(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
 		#endregion

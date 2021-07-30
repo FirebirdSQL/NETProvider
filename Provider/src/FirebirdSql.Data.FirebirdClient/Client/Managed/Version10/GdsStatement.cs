@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Dispose2
 
-		public override async Task Dispose2(AsyncWrappingCommonArgs async)
+		public override async ValueTask Dispose2(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
@@ -166,20 +166,20 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Array Creation Methods
 
-		public override Task<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async)
+		public override ValueTask<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async)
 		{
 			var array = new GdsArray(descriptor);
-			return Task.FromResult((ArrayBase)array);
+			return ValueTask2.FromResult((ArrayBase)array);
 		}
 
-		public override async Task<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async)
+		public override async ValueTask<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async)
 		{
 			var array = new GdsArray(_database, _transaction, tableName, fieldName);
 			await array.Initialize(async).ConfigureAwait(false);
 			return array;
 		}
 
-		public override async Task<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async)
+		public override async ValueTask<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async)
 		{
 			var array = new GdsArray(_database, _transaction, handle, tableName, fieldName);
 			await array.Initialize(async).ConfigureAwait(false);
@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public override async Task Prepare(string commandText, AsyncWrappingCommonArgs async)
+		public override async ValueTask Prepare(string commandText, AsyncWrappingCommonArgs async)
 		{
 			ClearAll();
 
@@ -220,7 +220,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task Execute(AsyncWrappingCommonArgs async)
+		public override async ValueTask Execute(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 
@@ -260,7 +260,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task<DbValue[]> Fetch(AsyncWrappingCommonArgs async)
+		public override async ValueTask<DbValue[]> Fetch(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 
@@ -342,16 +342,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override Task Describe(AsyncWrappingCommonArgs async)
+		public override ValueTask Describe(AsyncWrappingCommonArgs async)
 		{
 			// Nothing for Gds, because it's pre-fetched in Prepare.
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override Task DescribeParameters(AsyncWrappingCommonArgs async)
+		public override ValueTask DescribeParameters(AsyncWrappingCommonArgs async)
 		{
 			// Nothing for Gds, because it's pre-fetched in Prepare.
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
 		#endregion
@@ -359,7 +359,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#region Protected Methods
 
 		#region op_prepare methods
-		protected async Task SendPrepareToBuffer(string commandText, AsyncWrappingCommonArgs async)
+		protected async ValueTask SendPrepareToBuffer(string commandText, AsyncWrappingCommonArgs async)
 		{
 			await _database.Xdr.Write(IscCodes.op_prepare_statement, async).ConfigureAwait(false);
 			await _database.Xdr.Write(_transaction.Handle, async).ConfigureAwait(false);
@@ -370,7 +370,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			await _database.Xdr.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE, async).ConfigureAwait(false);
 		}
 
-		protected async Task ProcessPrepareResponse(GenericResponse response, AsyncWrappingCommonArgs async)
+		protected async ValueTask ProcessPrepareResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			var descriptors = await ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, new Descriptor[] { null, null }, async).ConfigureAwait(false);
 			_fields = descriptors[0];
@@ -379,14 +379,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#endregion
 
 		#region op_info_sql methods
-		protected override async Task<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		protected override async ValueTask<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			await DoInfoSqlPacket(items, bufferLength, async).ConfigureAwait(false);
 			await _database.Xdr.Flush(async).ConfigureAwait(false);
 			return await ProcessInfoSqlResponse((GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false), async).ConfigureAwait(false);
 		}
 
-		protected async Task DoInfoSqlPacket(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		protected async ValueTask DoInfoSqlPacket(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -398,7 +398,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected async Task SendInfoSqlToBuffer(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		protected async ValueTask SendInfoSqlToBuffer(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			await _database.Xdr.Write(IscCodes.op_info_sql, async).ConfigureAwait(false);
 			await _database.Xdr.Write(_handle, async).ConfigureAwait(false);
@@ -407,16 +407,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			await _database.Xdr.Write(bufferLength, async).ConfigureAwait(false);
 		}
 
-		protected Task<byte[]> ProcessInfoSqlResponse(GenericResponse response, AsyncWrappingCommonArgs async)
+		protected ValueTask<byte[]> ProcessInfoSqlResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			Debug.Assert(response.Data != null && response.Data.Length > 0);
 
-			return Task.FromResult(response.Data);
+			return ValueTask2.FromResult(response.Data);
 		}
 		#endregion
 
 		#region op_free_statement methods
-		protected override async Task Free(int option, AsyncWrappingCommonArgs async)
+		protected override async ValueTask Free(int option, AsyncWrappingCommonArgs async)
 		{
 			if (FreeNotNeeded(option))
 				return;
@@ -438,7 +438,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected async Task DoFreePacket(int option, AsyncWrappingCommonArgs async)
+		protected async ValueTask DoFreePacket(int option, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -462,31 +462,31 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected Task ProcessFreeResponse(IResponse response, AsyncWrappingCommonArgs async)
+		protected ValueTask ProcessFreeResponse(IResponse response, AsyncWrappingCommonArgs async)
 		{
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 		#endregion
 
 		#region op_allocate_statement methods
-		protected async Task SendAllocateToBuffer(AsyncWrappingCommonArgs async)
+		protected async ValueTask SendAllocateToBuffer(AsyncWrappingCommonArgs async)
 		{
 			await _database.Xdr.Write(IscCodes.op_allocate_statement, async).ConfigureAwait(false);
 			await _database.Xdr.Write(_database.Handle, async).ConfigureAwait(false);
 		}
 
-		protected Task ProcessAllocateResponse(GenericResponse response, AsyncWrappingCommonArgs async)
+		protected ValueTask ProcessAllocateResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			_handle = response.ObjectHandle;
 			_allRowsFetched = false;
 			State = StatementState.Allocated;
 			StatementType = DbStatementType.None;
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 		#endregion
 
 		#region op_execute/op_execute2 methods
-		protected async Task SendExecuteToBuffer(AsyncWrappingCommonArgs async)
+		protected async ValueTask SendExecuteToBuffer(AsyncWrappingCommonArgs async)
 		{
 			// this may throw error, so it needs to be before any writing
 			var descriptor = await WriteParameters(async).ConfigureAwait(false);
@@ -524,13 +524,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected Task ProcessExecuteResponse(GenericResponse response, AsyncWrappingCommonArgs async)
+		protected ValueTask ProcessExecuteResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			// nothing to do here
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		protected async Task ProcessStoredProcedureExecuteResponse(SqlResponse response, AsyncWrappingCommonArgs async)
+		protected async ValueTask ProcessStoredProcedureExecuteResponse(SqlResponse response, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -558,12 +558,12 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_allRowsFetched = false;
 		}
 
-		protected Task<Descriptor[]> ParseSqlInfo(byte[] info, byte[] items, Descriptor[] rowDescs, AsyncWrappingCommonArgs async)
+		protected ValueTask<Descriptor[]> ParseSqlInfo(byte[] info, byte[] items, Descriptor[] rowDescs, AsyncWrappingCommonArgs async)
 		{
 			return ParseTruncSqlInfo(info, items, rowDescs, async);
 		}
 
-		protected async Task<Descriptor[]> ParseTruncSqlInfo(byte[] info, byte[] items, Descriptor[] rowDescs, AsyncWrappingCommonArgs async)
+		protected async ValueTask<Descriptor[]> ParseTruncSqlInfo(byte[] info, byte[] items, Descriptor[] rowDescs, AsyncWrappingCommonArgs async)
 		{
 			var currentPosition = 0;
 			var currentDescriptorIndex = -1;
@@ -701,7 +701,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return rowDescs;
 		}
 
-		protected async Task WriteRawParameter(IXdrWriter xdr, DbField field, AsyncWrappingCommonArgs async)
+		protected async ValueTask WriteRawParameter(IXdrWriter xdr, DbField field, AsyncWrappingCommonArgs async)
 		{
 			if (field.DbDataType != DbDataType.Null)
 			{
@@ -850,7 +850,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected async Task<object> ReadRawValue(IXdrReader xdr, DbField field, AsyncWrappingCommonArgs async)
+		protected async ValueTask<object> ReadRawValue(IXdrReader xdr, DbField field, AsyncWrappingCommonArgs async)
 		{
 			var innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
 
@@ -970,7 +970,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_fields = null;
 		}
 
-		protected virtual async Task<byte[]> WriteParameters(AsyncWrappingCommonArgs async)
+		protected virtual async ValueTask<byte[]> WriteParameters(AsyncWrappingCommonArgs async)
 		{
 			if (_parameters == null)
 				return null;
@@ -996,7 +996,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected virtual async Task<DbValue[]> ReadRow(AsyncWrappingCommonArgs async)
+		protected virtual async ValueTask<DbValue[]> ReadRow(AsyncWrappingCommonArgs async)
 		{
 			var row = new DbValue[_fields.Count];
 			try

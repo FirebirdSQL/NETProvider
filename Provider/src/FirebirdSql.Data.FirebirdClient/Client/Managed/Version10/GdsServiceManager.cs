@@ -58,7 +58,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public override async Task Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -73,7 +73,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected virtual async Task SendAttachToBuffer(ServiceParameterBufferBase spb, string service, AsyncWrappingCommonArgs async)
+		protected virtual async ValueTask SendAttachToBuffer(ServiceParameterBufferBase spb, string service, AsyncWrappingCommonArgs async)
 		{
 			await _database.Xdr.Write(IscCodes.op_service_attach, async).ConfigureAwait(false);
 			await _database.Xdr.Write(0, async).ConfigureAwait(false);
@@ -81,13 +81,13 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			await _database.Xdr.WriteBuffer(spb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		protected virtual Task ProcessAttachResponse(GenericResponse response, AsyncWrappingCommonArgs async)
+		protected virtual ValueTask ProcessAttachResponse(GenericResponse response, AsyncWrappingCommonArgs async)
 		{
 			Handle = response.ObjectHandle;
-			return Task.CompletedTask;
+			return ValueTask2.CompletedTask;
 		}
 
-		public override async Task Detach(AsyncWrappingCommonArgs async)
+		public override async ValueTask Detach(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -120,7 +120,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task Start(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
+		public override async ValueTask Start(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
@@ -145,7 +145,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async Task Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
+		public override async ValueTask Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
