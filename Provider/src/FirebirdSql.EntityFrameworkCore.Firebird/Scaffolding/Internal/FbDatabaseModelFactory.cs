@@ -21,6 +21,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Services;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Scaffolding;
@@ -178,7 +179,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 				ELSE 'RDB$FIELD_TYPE: ' || F.RDB$FIELD_TYPE || '?'
 			   END as STORE_TYPE,
                F.rdb$description as COLUMN_COMMENT,
-               COALESCE(RF.RDB$IDENTITY_TYPE, 0)   as AUTO_GENERATED,
+               COALESCE({1}, 0)   as AUTO_GENERATED,
                ch.RDB$CHARACTER_SET_NAME as CHARACTER_SET_NAME
               FROM
                RDB$RELATION_FIELDS RF
@@ -192,11 +193,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 
 		private void GetColumns(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<string, string, bool> tableFilter)
 		{
+			var identity_type = "null";
+
+			if (connection.State == ConnectionState.Open)
+			{
+				var serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
+				if (serverVersion.Major >= 3)
+					identity_type = "rf.RDB$IDENTITY_TYPE";
+			}
+
 			foreach (var table in tables)
 			{
 				using (var command = connection.CreateCommand())
 				{
-					command.CommandText = string.Format(GetColumnsQuery, table.Name);
+					command.CommandText = string.Format(GetColumnsQuery, table.Name, identity_type);
 					using (var reader = command.ExecuteReader())
 					{
 						while (reader.Read())
