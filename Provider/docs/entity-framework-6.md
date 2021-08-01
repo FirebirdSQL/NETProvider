@@ -26,6 +26,7 @@
 	</entityFramework>
 ```
 * Create your `DbContext`.
+* Firebird 2.5 and up is supported.
 
 ### Code
 
