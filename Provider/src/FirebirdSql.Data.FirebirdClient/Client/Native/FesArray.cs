@@ -91,7 +91,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override ValueTask<byte[]> GetSlice(int sliceLength, AsyncWrappingCommonArgs async)
+		public override ValueTask<byte[]> GetSliceAsync(int sliceLength, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.FromResult(buffer);
 		}
 
-		public override ValueTask PutSlice(Array sourceArray, int sliceLength, AsyncWrappingCommonArgs async)
+		public override ValueTask PutSliceAsync(Array sourceArray, int sliceLength, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -159,7 +159,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override ValueTask<Array> DecodeSlice(byte[] slice, AsyncWrappingCommonArgs async)
+		protected override ValueTask<Array> DecodeSliceAsync(byte[] slice, AsyncWrappingCommonArgs async)
 		{
 			Array sliceData = null;
 			var slicePosition = 0;

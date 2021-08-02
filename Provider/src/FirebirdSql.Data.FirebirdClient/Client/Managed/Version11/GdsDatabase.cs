@@ -43,76 +43,76 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return new GdsStatement(this, transaction);
 		}
 
-		public override async ValueTask AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
 				using (var sspiHelper = new SspiHelper())
 				{
 					var authData = sspiHelper.InitializeClientSecurity();
-					await SendTrustedAuthToBuffer(dpb, authData, async).ConfigureAwait(false);
-					await SendAttachToBuffer(dpb, database, async).ConfigureAwait(false);
-					await Xdr.Flush(async).ConfigureAwait(false);
+					await SendTrustedAuthToBufferAsync(dpb, authData, async).ConfigureAwait(false);
+					await SendAttachToBufferAsync(dpb, database, async).ConfigureAwait(false);
+					await Xdr.FlushAsync(async).ConfigureAwait(false);
 
-					var response = await ReadResponse(async).ConfigureAwait(false);
-					response = await ProcessTrustedAuthResponse(sspiHelper, response, async).ConfigureAwait(false);
-					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+					var response = await ReadResponseAsync(async).ConfigureAwait(false);
+					response = await ProcessTrustedAuthResponseAsync(sspiHelper, response, async).ConfigureAwait(false);
+					await ProcessAttachResponseAsync((GenericResponse)response, async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException)
 			{
-				await SafelyDetach(async).ConfigureAwait(false);
+				await SafelyDetachAsync(async).ConfigureAwait(false);
 				throw;
 			}
 			catch (IOException ex)
 			{
-				await SafelyDetach(async).ConfigureAwait(false);
+				await SafelyDetachAsync(async).ConfigureAwait(false);
 				throw IscException.ForIOException(ex);
 			}
 
-			await AfterAttachActions(async).ConfigureAwait(false);
+			await AfterAttachActionsAsync(async).ConfigureAwait(false);
 		}
 
-		protected virtual ValueTask SendTrustedAuthToBuffer(DatabaseParameterBufferBase dpb, byte[] authData, AsyncWrappingCommonArgs async)
+		protected virtual ValueTask SendTrustedAuthToBufferAsync(DatabaseParameterBufferBase dpb, byte[] authData, AsyncWrappingCommonArgs async)
 		{
 			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
 			return ValueTask2.CompletedTask;
 		}
 
-		protected async ValueTask<IResponse> ProcessTrustedAuthResponse(SspiHelper sspiHelper, IResponse response, AsyncWrappingCommonArgs async)
+		protected async ValueTask<IResponse> ProcessTrustedAuthResponseAsync(SspiHelper sspiHelper, IResponse response, AsyncWrappingCommonArgs async)
 		{
 			while (response is AuthResponse)
 			{
 				var authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
-				await Xdr.Write(IscCodes.op_trusted_auth, async).ConfigureAwait(false);
-				await Xdr.WriteBuffer(authData, async).ConfigureAwait(false);
-				await Xdr.Flush(async).ConfigureAwait(false);
-				response = await ReadResponse(async).ConfigureAwait(false);
+				await Xdr.WriteAsync(IscCodes.op_trusted_auth, async).ConfigureAwait(false);
+				await Xdr.WriteBufferAsync(authData, async).ConfigureAwait(false);
+				await Xdr.FlushAsync(async).ConfigureAwait(false);
+				response = await ReadResponseAsync(async).ConfigureAwait(false);
 			}
 			return response;
 		}
 
-		public override async ValueTask CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			using (var sspiHelper = new SspiHelper())
 			{
 				var authData = sspiHelper.InitializeClientSecurity();
-				await SendTrustedAuthToBuffer(dpb, authData, async).ConfigureAwait(false);
-				await SendCreateToBuffer(dpb, database, async).ConfigureAwait(false);
-				await Xdr.Flush(async).ConfigureAwait(false);
+				await SendTrustedAuthToBufferAsync(dpb, authData, async).ConfigureAwait(false);
+				await SendCreateToBufferAsync(dpb, database, async).ConfigureAwait(false);
+				await Xdr.FlushAsync(async).ConfigureAwait(false);
 
-				var response = await ReadResponse(async).ConfigureAwait(false);
-				response = await ProcessTrustedAuthResponse(sspiHelper, response, async).ConfigureAwait(false);
-				await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
+				var response = await ReadResponseAsync(async).ConfigureAwait(false);
+				response = await ProcessTrustedAuthResponseAsync(sspiHelper, response, async).ConfigureAwait(false);
+				await ProcessCreateResponseAsync((GenericResponse)response, async).ConfigureAwait(false);
 			}
 		}
 
-		public override async ValueTask ReleaseObject(int op, int id, AsyncWrappingCommonArgs async)
+		public override async ValueTask ReleaseObjectAsync(int op, int id, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await SendReleaseObjectToBuffer(op, id, async).ConfigureAwait(false);
-				DeferredPackets.Enqueue(ProcessReleaseObjectResponse);
+				await SendReleaseObjectToBufferAsync(op, id, async).ConfigureAwait(false);
+				DeferredPackets.Enqueue(ProcessReleaseObjectResponseAsync);
 			}
 			catch (IOException ex)
 			{
@@ -120,13 +120,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override async ValueTask<int> ReadOperation(AsyncWrappingCommonArgs async)
+		public override async ValueTask<int> ReadOperationAsync(AsyncWrappingCommonArgs async)
 		{
-			await ProcessDeferredPackets(async).ConfigureAwait(false);
-			return await base.ReadOperation(async).ConfigureAwait(false);
+			await ProcessDeferredPacketsAsync(async).ConfigureAwait(false);
+			return await base.ReadOperationAsync(async).ConfigureAwait(false);
 		}
 
-		private async ValueTask ProcessDeferredPackets(AsyncWrappingCommonArgs async)
+		private async ValueTask ProcessDeferredPacketsAsync(AsyncWrappingCommonArgs async)
 		{
 			if (DeferredPackets.Count > 0)
 			{
@@ -135,7 +135,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				DeferredPackets.Clear();
 				foreach (var method in methods)
 				{
-					var response = await ReadSingleResponse(async).ConfigureAwait(false);
+					var response = await ReadSingleResponseAsync(async).ConfigureAwait(false);
 					await method(response, async).ConfigureAwait(false);
 				}
 			}

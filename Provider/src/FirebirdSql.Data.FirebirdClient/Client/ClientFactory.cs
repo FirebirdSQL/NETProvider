@@ -26,37 +26,37 @@ namespace FirebirdSql.Data.Client
 {
 	internal static class ClientFactory
 	{
-		public static async ValueTask<DatabaseBase> CreateDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
+		public static async ValueTask<DatabaseBase> CreateDatabaseAsync(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			return options.ServerType switch
 			{
-				FbServerType.Default => await CreateManagedDatabase(options, async).ConfigureAwait(false),
+				FbServerType.Default => await CreateManagedDatabaseAsync(options, async).ConfigureAwait(false),
 				FbServerType.Embedded => new Native.FesDatabase(options.ClientLibrary, Charset.GetCharset(options.Charset)),
 				_ => throw IncorrectServerTypeException(),
 			};
 		}
 
-		public static async ValueTask<ServiceManagerBase> CreateServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
+		public static async ValueTask<ServiceManagerBase> CreateServiceManagerAsync(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			return options.ServerType switch
 			{
-				FbServerType.Default => await CreateManagedServiceManager(options, async).ConfigureAwait(false),
+				FbServerType.Default => await CreateManagedServiceManagerAsync(options, async).ConfigureAwait(false),
 				FbServerType.Embedded => new Native.FesServiceManager(options.ClientLibrary, Charset.GetCharset(options.Charset)),
 				_ => throw IncorrectServerTypeException(),
 			};
 		}
 
-		private static async ValueTask<DatabaseBase> CreateManagedDatabase(ConnectionString options, AsyncWrappingCommonArgs async)
+		private static async ValueTask<DatabaseBase> CreateManagedDatabaseAsync(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
-			await connection.Connect(async).ConfigureAwait(false);
+			await connection.ConnectAsync(async).ConfigureAwait(false);
 			try
 			{
-				await connection.Identify(options.Database, async).ConfigureAwait(false);
+				await connection.IdentifyAsync(options.Database, async).ConfigureAwait(false);
 			}
 			catch
 			{
-				await connection.Disconnect(async).ConfigureAwait(false);
+				await connection.DisconnectAsync(async).ConfigureAwait(false);
 				throw;
 			}
 			return connection.ProtocolVersion switch
@@ -69,17 +69,17 @@ namespace FirebirdSql.Data.Client
 			};
 		}
 
-		private static async ValueTask<ServiceManagerBase> CreateManagedServiceManager(ConnectionString options, AsyncWrappingCommonArgs async)
+		private static async ValueTask<ServiceManagerBase> CreateManagedServiceManagerAsync(ConnectionString options, AsyncWrappingCommonArgs async)
 		{
 			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
-			await connection.Connect(async).ConfigureAwait(false);
+			await connection.ConnectAsync(async).ConfigureAwait(false);
 			try
 			{
-				await connection.Identify(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty, async).ConfigureAwait(false);
+				await connection.IdentifyAsync(!string.IsNullOrEmpty(options.Database) ? options.Database : string.Empty, async).ConfigureAwait(false);
 			}
 			catch
 			{
-				await connection.Disconnect(async).ConfigureAwait(false);
+				await connection.DisconnectAsync(async).ConfigureAwait(false);
 				throw;
 			}
 			return connection.ProtocolVersion switch

@@ -67,21 +67,21 @@ namespace FirebirdSql.Data.Common
 
 		#region Methods
 
-		public ValueTask Initialize(AsyncWrappingCommonArgs async)
+		public ValueTask InitializeAsync(AsyncWrappingCommonArgs async)
 		{
-			return LookupBounds(async);
+			return LookupBoundsAsync(async);
 		}
 
-		public async ValueTask<Array> Read(AsyncWrappingCommonArgs async)
+		public async ValueTask<Array> ReadAsync(AsyncWrappingCommonArgs async)
 		{
-			var slice = await GetSlice(GetSliceLength(true), async).ConfigureAwait(false);
-			return await DecodeSlice(slice, async).ConfigureAwait(false);
+			var slice = await GetSliceAsync(GetSliceLength(true), async).ConfigureAwait(false);
+			return await DecodeSliceAsync(slice, async).ConfigureAwait(false);
 		}
 
-		public async ValueTask Write(Array sourceArray, AsyncWrappingCommonArgs async)
+		public async ValueTask WriteAsync(Array sourceArray, AsyncWrappingCommonArgs async)
 		{
 			SetDesc(sourceArray);
-			await PutSlice(sourceArray, GetSliceLength(false), async).ConfigureAwait(false);
+			await PutSliceAsync(sourceArray, GetSliceLength(false), async).ConfigureAwait(false);
 		}
 
 		public void SetDesc(Array sourceArray)
@@ -97,54 +97,54 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		private async ValueTask LookupBounds(AsyncWrappingCommonArgs async)
+		private async ValueTask LookupBoundsAsync(AsyncWrappingCommonArgs async)
 		{
-			await LookupDesc(async).ConfigureAwait(false);
+			await LookupDescAsync(async).ConfigureAwait(false);
 
 			var lookup = Database.CreateStatement(Transaction);
 			try
 			{
-				await lookup.Prepare(GetArrayBounds(), async).ConfigureAwait(false);
-				await lookup.Execute(async).ConfigureAwait(false);
+				await lookup.PrepareAsync(GetArrayBounds(), async).ConfigureAwait(false);
+				await lookup.ExecuteAsync(async).ConfigureAwait(false);
 
 				_descriptor.Bounds = new ArrayBound[16];
 				DbValue[] values;
 				var i = 0;
-				while ((values = await lookup.Fetch(async).ConfigureAwait(false)) != null)
+				while ((values = await lookup.FetchAsync(async).ConfigureAwait(false)) != null)
 				{
-					_descriptor.Bounds[i].LowerBound = await values[0].GetInt32(async).ConfigureAwait(false);
-					_descriptor.Bounds[i].UpperBound = await values[1].GetInt32(async).ConfigureAwait(false);
+					_descriptor.Bounds[i].LowerBound = await values[0].GetInt32Async(async).ConfigureAwait(false);
+					_descriptor.Bounds[i].UpperBound = await values[1].GetInt32Async(async).ConfigureAwait(false);
 
 					i++;
 				}
 			}
 			finally
 			{
-				await lookup.Dispose2(async).ConfigureAwait(false);
+				await lookup.Dispose2Async(async).ConfigureAwait(false);
 			}
 		}
 
-		private async ValueTask LookupDesc(AsyncWrappingCommonArgs async)
+		private async ValueTask LookupDescAsync(AsyncWrappingCommonArgs async)
 		{
 			var lookup = Database.CreateStatement(Transaction);
 			try
 			{
-				await lookup.Prepare(GetArrayDesc(), async).ConfigureAwait(false);
-				await lookup.Execute(async).ConfigureAwait(false);
+				await lookup.PrepareAsync(GetArrayDesc(), async).ConfigureAwait(false);
+				await lookup.ExecuteAsync(async).ConfigureAwait(false);
 
 				_descriptor = new ArrayDesc();
-				var values = await lookup.Fetch(async).ConfigureAwait(false);
+				var values = await lookup.FetchAsync(async).ConfigureAwait(false);
 				if (values != null && values.Length > 0)
 				{
 					_descriptor.RelationName = _tableName;
 					_descriptor.FieldName = _fieldName;
-					_descriptor.DataType = await values[0].GetByte(async).ConfigureAwait(false);
-					_descriptor.Scale = await values[1].GetInt16(async).ConfigureAwait(false);
-					_descriptor.Length = await values[2].GetInt16(async).ConfigureAwait(false);
-					_descriptor.Dimensions = await values[3].GetInt16(async).ConfigureAwait(false);
+					_descriptor.DataType = await values[0].GetByteAsync(async).ConfigureAwait(false);
+					_descriptor.Scale = await values[1].GetInt16Async(async).ConfigureAwait(false);
+					_descriptor.Length = await values[2].GetInt16Async(async).ConfigureAwait(false);
+					_descriptor.Dimensions = await values[3].GetInt16Async(async).ConfigureAwait(false);
 					_descriptor.Flags = 0;
 
-					_rdbFieldName = (await values[4].GetString(async).ConfigureAwait(false)).Trim();
+					_rdbFieldName = (await values[4].GetStringAsync(async).ConfigureAwait(false)).Trim();
 				}
 				else
 				{
@@ -153,7 +153,7 @@ namespace FirebirdSql.Data.Common
 			}
 			finally
 			{
-				await lookup.Dispose2(async).ConfigureAwait(false);
+				await lookup.Dispose2Async(async).ConfigureAwait(false);
 			}
 		}
 
@@ -192,14 +192,14 @@ namespace FirebirdSql.Data.Common
 
 		#region Abstract Methods
 
-		public abstract ValueTask<byte[]> GetSlice(int slice_length, AsyncWrappingCommonArgs async);
-		public abstract ValueTask PutSlice(Array source_array, int slice_length, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<byte[]> GetSliceAsync(int slice_length, AsyncWrappingCommonArgs async);
+		public abstract ValueTask PutSliceAsync(Array source_array, int slice_length, AsyncWrappingCommonArgs async);
 
 		#endregion
 
 		#region Protected Abstract Methods
 
-		protected abstract ValueTask<Array> DecodeSlice(byte[] slice, AsyncWrappingCommonArgs async);
+		protected abstract ValueTask<Array> DecodeSliceAsync(byte[] slice, AsyncWrappingCommonArgs async);
 
 		#endregion
 

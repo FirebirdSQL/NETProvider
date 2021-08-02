@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 			}
 		}
 
-		public static async ValueTask<IntPtr> MarshalManagedToNative(Charset charset, Descriptor descriptor, AsyncWrappingCommonArgs async)
+		public static async ValueTask<IntPtr> MarshalManagedToNativeAsync(Charset charset, Descriptor descriptor, AsyncWrappingCommonArgs async)
 		{
 			var xsqlda = new XSQLDA
 			{
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 				if (descriptor[i].HasDataType() && descriptor[i].DbDataType != DbDataType.Null)
 				{
-					var buffer = await descriptor[i].DbValue.GetBytes(async).ConfigureAwait(false);
+					var buffer = await descriptor[i].DbValue.GetBytesAsync(async).ConfigureAwait(false);
 					xsqlvar[i].sqldata = Marshal.AllocHGlobal(buffer.Length);
 					Marshal.Copy(buffer, 0, xsqlvar[i].sqldata, buffer.Length);
 				}

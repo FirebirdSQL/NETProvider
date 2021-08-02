@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (_commandText != value && _statement != null)
 				{
-					Release(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+					ReleaseAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 				}
 
 				_commandText = value;
@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					_connection != value &&
 					_connection.State == ConnectionState.Open)
 				{
-					Release(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+					ReleaseAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 				}
 
 				_connection = value;
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
 				}
 
-				RollbackImplicitTransaction(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+				RollbackImplicitTransactionAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 
 				_transaction = value;
 
@@ -333,25 +333,25 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (disposing)
 			{
-				DisposeHelper(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+				DisposeHelperAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 			}
 			base.Dispose(disposing);
 		}
 #if !(NET48 || NETSTANDARD2_0)
 		public override async ValueTask DisposeAsync()
 		{
-			await DisposeHelper(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
+			await DisposeHelperAsync(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
 			await base.DisposeAsync().ConfigureAwait(false);
 		}
 #endif
-		private async Task DisposeHelper(AsyncWrappingCommonArgs async)
+		private async Task DisposeHelperAsync(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
 				try
 				{
-					await Release(async).ConfigureAwait(false);
+					await ReleaseAsync(async).ConfigureAwait(false);
 				}
 				catch (IscException ex)
 				{
@@ -433,17 +433,17 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				using (async.EnterExplicitCancel(Cancel))
 				{
-					await Prepare(false, async).ConfigureAwait(false);
+					await PrepareAsync(false, async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
 			{
-				await RollbackImplicitTransaction(async).ConfigureAwait(false);
+				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 				throw FbException.Create(ex);
 			}
 			catch
 			{
-				await RollbackImplicitTransaction(async).ConfigureAwait(false);
+				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 				throw;
 			}
 		}
@@ -458,24 +458,24 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				using (async.EnterExplicitCancel(Cancel))
 				{
-					await ExecuteCommand(CommandBehavior.Default, false, async).ConfigureAwait(false);
+					await ExecuteCommandAsync(CommandBehavior.Default, false, async).ConfigureAwait(false);
 
 					if (_statement.StatementType == DbStatementType.StoredProcedure)
 					{
-						await SetOutputParameters(async).ConfigureAwait(false);
+						await SetOutputParametersAsync(async).ConfigureAwait(false);
 					}
 
-					await CommitImplicitTransaction(async).ConfigureAwait(false);
+					await CommitImplicitTransactionAsync(async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
 			{
-				await RollbackImplicitTransaction(async).ConfigureAwait(false);
+				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 				throw FbException.Create(ex);
 			}
 			catch
 			{
-				await RollbackImplicitTransaction(async).ConfigureAwait(false);
+				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 				throw;
 			}
 
@@ -502,17 +502,17 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				using (async.EnterExplicitCancel(Cancel))
 				{
-					await ExecuteCommand(behavior, true, async).ConfigureAwait(false);
+					await ExecuteCommandAsync(behavior, true, async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
 			{
-				await RollbackImplicitTransaction(async).ConfigureAwait(false);
+				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 				throw FbException.Create(ex);
 			}
 			catch
 			{
-				await RollbackImplicitTransaction(async).ConfigureAwait(false);
+				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 				throw;
 			}
 
@@ -534,37 +534,37 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				using (async.EnterExplicitCancel(Cancel))
 				{
-					await ExecuteCommand(CommandBehavior.Default, false, async).ConfigureAwait(false);
+					await ExecuteCommandAsync(CommandBehavior.Default, false, async).ConfigureAwait(false);
 
 					// Gets	only the values	of the first row or
 					// the output parameters values if command is an Stored Procedure
 					if (_statement.StatementType == DbStatementType.StoredProcedure)
 					{
 						values = _statement.GetOutputParameters();
-						await SetOutputParameters(values, async).ConfigureAwait(false);
+						await SetOutputParametersAsync(values, async).ConfigureAwait(false);
 					}
 					else
 					{
-						values = await _statement.Fetch(async).ConfigureAwait(false);
+						values = await _statement.FetchAsync(async).ConfigureAwait(false);
 					}
 
 					// Get the return value
 					if (values != null && values.Length > 0)
 					{
-						val = await values[0].GetValue(async).ConfigureAwait(false);
+						val = await values[0].GetValueAsync(async).ConfigureAwait(false);
 					}
 
-					await CommitImplicitTransaction(async).ConfigureAwait(false);
+					await CommitImplicitTransactionAsync(async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
 			{
-				await RollbackImplicitTransaction(async).ConfigureAwait(false);
+				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 				throw FbException.Create(ex);
 			}
 			catch
 			{
-				await RollbackImplicitTransaction(async).ConfigureAwait(false);
+				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 				throw;
 			}
 
@@ -579,7 +579,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				return Task.FromResult<string>(null);
 			}
-			return _statement.GetExecutionPlan(async).AsTask();
+			return _statement.GetExecutionPlanAsync(async).AsTask();
 		}
 
 		public string GetCommandExplainedPlan() => GetCommandExplainedPlanImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -590,7 +590,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				return Task.FromResult<string>(null);
 			}
-			return _statement.GetExecutionExplainedPlan(async).AsTask();
+			return _statement.GetExecutionExplainedPlanAsync(async).AsTask();
 		}
 
 		#endregion
@@ -616,7 +616,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Internal Methods
 
-		internal async Task DisposeReader(AsyncWrappingCommonArgs async)
+		internal async Task DisposeReaderAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_activeReader != null)
 			{
@@ -630,14 +630,14 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		internal async Task<DbValue[]> Fetch(AsyncWrappingCommonArgs async)
+		internal async Task<DbValue[]> FetchAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_statement != null)
 			{
 				try
 				{
 					// Fetch the next row
-					return await _statement.Fetch(async).ConfigureAwait(false);
+					return await _statement.FetchAsync(async).ConfigureAwait(false);
 				}
 				catch (IscException ex)
 				{
@@ -656,12 +656,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			return null;
 		}
 
-		internal Task SetOutputParameters(AsyncWrappingCommonArgs async)
+		internal Task SetOutputParametersAsync(AsyncWrappingCommonArgs async)
 		{
-			return SetOutputParameters(null, async);
+			return SetOutputParametersAsync(null, async);
 		}
 
-		internal async Task SetOutputParameters(DbValue[] outputParameterValues, AsyncWrappingCommonArgs async)
+		internal async Task SetOutputParametersAsync(DbValue[] outputParameterValues, AsyncWrappingCommonArgs async)
 		{
 			if (Parameters.Count > 0 && _statement != null)
 			{
@@ -683,7 +683,7 @@ namespace FirebirdSql.Data.FirebirdClient
 								parameter.Direction == ParameterDirection.InputOutput ||
 								parameter.Direction == ParameterDirection.ReturnValue)
 							{
-								parameter.Value = await values[i].GetValue(async).ConfigureAwait(false);
+								parameter.Value = await values[i].GetValueAsync(async).ConfigureAwait(false);
 								i++;
 							}
 						}
@@ -692,7 +692,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		internal async Task CommitImplicitTransaction(AsyncWrappingCommonArgs async)
+		internal async Task CommitImplicitTransactionAsync(AsyncWrappingCommonArgs async)
 		{
 			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
 			{
@@ -702,7 +702,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				catch
 				{
-					await RollbackImplicitTransaction(async).ConfigureAwait(false);
+					await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 
 					throw;
 				}
@@ -727,7 +727,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		internal async Task RollbackImplicitTransaction(AsyncWrappingCommonArgs async)
+		internal async Task RollbackImplicitTransactionAsync(AsyncWrappingCommonArgs async)
 		{
 			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
 			{
@@ -762,20 +762,20 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		internal Task Close(AsyncWrappingCommonArgs async)
+		internal Task CloseAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_statement != null)
 			{
-				return _statement.Close(async).AsTask();
+				return _statement.CloseAsync(async).AsTask();
 			}
 			return Task.CompletedTask;
 		}
 
-		internal async Task Release(AsyncWrappingCommonArgs async)
+		internal async Task ReleaseAsync(AsyncWrappingCommonArgs async)
 		{
-			await RollbackImplicitTransaction(async).ConfigureAwait(false);
+			await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
 
-			await DisposeReader(async).ConfigureAwait(false);
+			await DisposeReaderAsync(async).ConfigureAwait(false);
 
 			if (_connection != null && _connection.State == ConnectionState.Open)
 			{
@@ -784,7 +784,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			if (_statement != null)
 			{
-				await _statement.Dispose2(async).ConfigureAwait(false);
+				await _statement.Dispose2Async(async).ConfigureAwait(false);
 				_statement = null;
 			}
 		}
@@ -793,14 +793,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Input parameter descriptor generation methods
 
-		private async Task DescribeInput(AsyncWrappingCommonArgs async)
+		private async Task DescribeInputAsync(AsyncWrappingCommonArgs async)
 		{
 			if (Parameters.Count > 0)
 			{
 				var descriptor = BuildParametersDescriptor();
 				if (descriptor == null)
 				{
-					await _statement.DescribeParameters(async).ConfigureAwait(false);
+					await _statement.DescribeParametersAsync(async).ConfigureAwait(false);
 				}
 				else
 				{
@@ -976,7 +976,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return count;
 		}
 
-		private async Task UpdateParameterValues(AsyncWrappingCommonArgs async)
+		private async Task UpdateParameterValuesAsync(AsyncWrappingCommonArgs async)
 		{
 			var index = -1;
 
@@ -1016,7 +1016,7 @@ namespace FirebirdSql.Data.FirebirdClient
 							case DbDataType.Binary:
 								{
 									var blob = _statement.CreateBlob();
-									await blob.Write((byte[])commandParameter.InternalValue, async).ConfigureAwait(false);
+									await blob.WriteAsync((byte[])commandParameter.InternalValue, async).ConfigureAwait(false);
 									statementParameter.DbValue.SetValue(blob.Id);
 								}
 								break;
@@ -1026,11 +1026,11 @@ namespace FirebirdSql.Data.FirebirdClient
 									var blob = _statement.CreateBlob();
 									if (commandParameter.InternalValue is byte[])
 									{
-										await blob.Write((byte[])commandParameter.InternalValue, async).ConfigureAwait(false);
+										await blob.WriteAsync((byte[])commandParameter.InternalValue, async).ConfigureAwait(false);
 									}
 									else
 									{
-										await blob.Write((string)commandParameter.InternalValue, async).ConfigureAwait(false);
+										await blob.WriteAsync((string)commandParameter.InternalValue, async).ConfigureAwait(false);
 									}
 									statementParameter.DbValue.SetValue(blob.Id);
 								}
@@ -1041,7 +1041,7 @@ namespace FirebirdSql.Data.FirebirdClient
 									if (statementParameter.ArrayHandle == null)
 									{
 										statementParameter.ArrayHandle =
-										await _statement.CreateArray(statementParameter.Relation, statementParameter.Name, async).ConfigureAwait(false);
+										await _statement.CreateArrayAsync(statementParameter.Relation, statementParameter.Name, async).ConfigureAwait(false);
 									}
 									else
 									{
@@ -1050,7 +1050,7 @@ namespace FirebirdSql.Data.FirebirdClient
 									}
 
 									statementParameter.ArrayHandle.Handle = 0;
-									await statementParameter.ArrayHandle.Write((Array)commandParameter.InternalValue, async).ConfigureAwait(false);
+									await statementParameter.ArrayHandle.WriteAsync((Array)commandParameter.InternalValue, async).ConfigureAwait(false);
 									statementParameter.DbValue.SetValue(statementParameter.ArrayHandle.Handle);
 								}
 								break;
@@ -1076,7 +1076,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Private Methods
 
-		private async Task Prepare(bool returnsSet, AsyncWrappingCommonArgs async)
+		private async Task PrepareAsync(bool returnsSet, AsyncWrappingCommonArgs async)
 		{
 			var innerConn = _connection.InnerConnection;
 
@@ -1091,7 +1091,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					_implicitTransaction = true;
 					_transaction = new FbTransaction(_connection, _connection.ConnectionOptions.IsolationLevel);
-					await _transaction.BeginTransaction(async).ConfigureAwait(false);
+					await _transaction.BeginTransactionAsync(async).ConfigureAwait(false);
 
 					// Update Statement	transaction
 					if (_statement != null)
@@ -1111,7 +1111,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (!_statement.IsPrepared)
 			{
 				// Close the inner DataReader if needed
-				await DisposeReader(async).ConfigureAwait(false);
+				await DisposeReaderAsync(async).ConfigureAwait(false);
 
 				// Reformat the SQL statement if needed
 				var sql = _commandText;
@@ -1124,12 +1124,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				try
 				{
 					// Try to prepare the command
-					await _statement.Prepare(ParseNamedParameters(sql), async).ConfigureAwait(false);
+					await _statement.PrepareAsync(ParseNamedParameters(sql), async).ConfigureAwait(false);
 				}
 				catch
 				{
 					// Release the statement and rethrow the exception
-					await _statement.Release(async).ConfigureAwait(false);
+					await _statement.ReleaseAsync(async).ConfigureAwait(false);
 					_statement = null;
 
 					throw;
@@ -1141,15 +1141,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			else
 			{
 				// Close statement for subsequently	executions
-				await Close(async).ConfigureAwait(false);
+				await CloseAsync(async).ConfigureAwait(false);
 			}
 		}
 
-		private async Task ExecuteCommand(CommandBehavior behavior, bool returnsSet, AsyncWrappingCommonArgs async)
+		private async Task ExecuteCommandAsync(CommandBehavior behavior, bool returnsSet, AsyncWrappingCommonArgs async)
 		{
 			LogCommandExecutionIfEnabled();
 
-			await Prepare(returnsSet, async).ConfigureAwait(false);
+			await PrepareAsync(returnsSet, async).ConfigureAwait(false);
 
 			if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
 				(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
@@ -1174,13 +1174,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					if (_statement.Parameters == null)
 					{
-						await DescribeInput(async).ConfigureAwait(false);
+						await DescribeInputAsync(async).ConfigureAwait(false);
 					}
-					await UpdateParameterValues(async).ConfigureAwait(false);
+					await UpdateParameterValuesAsync(async).ConfigureAwait(false);
 				}
 
 				// Execute statement
-				await _statement.Execute(async).ConfigureAwait(false);
+				await _statement.ExecuteAsync(async).ConfigureAwait(false);
 			}
 		}
 

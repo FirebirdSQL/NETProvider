@@ -29,60 +29,60 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			: base(connection)
 		{ }
 
-		public override async ValueTask Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await SendAttachToBuffer(dpb, database, async).ConfigureAwait(false);
-				await Xdr.Flush(async).ConfigureAwait(false);
-				var response = await ReadResponse(async).ConfigureAwait(false);
+				await SendAttachToBufferAsync(dpb, database, async).ConfigureAwait(false);
+				await Xdr.FlushAsync(async).ConfigureAwait(false);
+				var response = await ReadResponseAsync(async).ConfigureAwait(false);
 				if (response is ContAuthResponse)
 				{
 					while (response is ContAuthResponse contAuthResponse)
 					{
 						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						await AuthBlock.SendContAuthToBuffer(Xdr, async).ConfigureAwait(false);
-						await Xdr.Flush(async).ConfigureAwait(false);
-						response = await AuthBlock.ProcessContAuthResponse(Xdr, async).ConfigureAwait(false);
-						response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
+						await AuthBlock.SendContAuthToBufferAsync(Xdr, async).ConfigureAwait(false);
+						await Xdr.FlushAsync(async).ConfigureAwait(false);
+						response = await AuthBlock.ProcessContAuthResponseAsync(Xdr, async).ConfigureAwait(false);
+						response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, async).ConfigureAwait(false);
 					}
 					var genericResponse = (GenericResponse)response;
-					await base.ProcessAttachResponse(genericResponse, async).ConfigureAwait(false);
+					await base.ProcessAttachResponseAsync(genericResponse, async).ConfigureAwait(false);
 
 					if (genericResponse.Data.Any())
 					{
-						await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
-						await Xdr.Flush(async).ConfigureAwait(false);
-						await AuthBlock.ProcessWireCryptResponse(Xdr, _connection, async).ConfigureAwait(false);
+						await AuthBlock.SendWireCryptToBufferAsync(Xdr, async).ConfigureAwait(false);
+						await Xdr.FlushAsync(async).ConfigureAwait(false);
+						await AuthBlock.ProcessWireCryptResponseAsync(Xdr, _connection, async).ConfigureAwait(false);
 					}
 				}
 				else
 				{
-					response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
-					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+					response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, async).ConfigureAwait(false);
+					await ProcessAttachResponseAsync((GenericResponse)response, async).ConfigureAwait(false);
 					AuthBlock.Complete();
 				}
 				AuthBlock.WireCryptValidate(IscCodes.PROTOCOL_VERSION13);
 			}
 			catch (IscException)
 			{
-				await SafelyDetach(async).ConfigureAwait(false);
+				await SafelyDetachAsync(async).ConfigureAwait(false);
 				throw;
 			}
 			catch (IOException ex)
 			{
-				await SafelyDetach(async).ConfigureAwait(false);
+				await SafelyDetachAsync(async).ConfigureAwait(false);
 				throw IscException.ForIOException(ex);
 			}
 
-			await AfterAttachActions(async).ConfigureAwait(false);
+			await AfterAttachActionsAsync(async).ConfigureAwait(false);
 		}
 
-		protected override async ValueTask SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected override async ValueTask SendAttachToBufferAsync(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
-			await Xdr.Write(IscCodes.op_attach, async).ConfigureAwait(false);
-			await Xdr.Write(0, async).ConfigureAwait(false);
+			await Xdr.WriteAsync(IscCodes.op_attach, async).ConfigureAwait(false);
+			await Xdr.WriteAsync(0, async).ConfigureAwait(false);
 			if (!AuthBlock.HasClientData)
 			{
 				dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
@@ -93,42 +93,42 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
-			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		public override async ValueTask CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await SendCreateToBuffer(dpb, database, async).ConfigureAwait(false);
-				await Xdr.Flush(async).ConfigureAwait(false);
-				var response = await ReadResponse(async).ConfigureAwait(false);
+				await SendCreateToBufferAsync(dpb, database, async).ConfigureAwait(false);
+				await Xdr.FlushAsync(async).ConfigureAwait(false);
+				var response = await ReadResponseAsync(async).ConfigureAwait(false);
 				if (response is ContAuthResponse)
 				{
 					while (response is ContAuthResponse contAuthResponse)
 					{
 						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						await AuthBlock.SendContAuthToBuffer(Xdr, async).ConfigureAwait(false);
-						await Xdr.Flush(async).ConfigureAwait(false);
-						response = await AuthBlock.ProcessContAuthResponse(Xdr, async).ConfigureAwait(false);
-						response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
+						await AuthBlock.SendContAuthToBufferAsync(Xdr, async).ConfigureAwait(false);
+						await Xdr.FlushAsync(async).ConfigureAwait(false);
+						response = await AuthBlock.ProcessContAuthResponseAsync(Xdr, async).ConfigureAwait(false);
+						response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, async).ConfigureAwait(false);
 					}
 					var genericResponse = (GenericResponse)response;
-					await ProcessCreateResponse(genericResponse, async).ConfigureAwait(false);
+					await ProcessCreateResponseAsync(genericResponse, async).ConfigureAwait(false);
 
 					if (genericResponse.Data.Any())
 					{
-						await AuthBlock.SendWireCryptToBuffer(Xdr, async).ConfigureAwait(false);
-						await Xdr.Flush(async).ConfigureAwait(false);
-						await AuthBlock.ProcessWireCryptResponse(Xdr, _connection, async).ConfigureAwait(false);
+						await AuthBlock.SendWireCryptToBufferAsync(Xdr, async).ConfigureAwait(false);
+						await Xdr.FlushAsync(async).ConfigureAwait(false);
+						await AuthBlock.ProcessWireCryptResponseAsync(Xdr, _connection, async).ConfigureAwait(false);
 					}
 				}
 				else
 				{
-					response = await ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
-					await ProcessCreateResponse((GenericResponse)response, async).ConfigureAwait(false);
+					response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, async).ConfigureAwait(false);
+					await ProcessCreateResponseAsync((GenericResponse)response, async).ConfigureAwait(false);
 					AuthBlock.Complete();
 				}
 			}
@@ -138,10 +138,10 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 		}
 
-		protected override async ValueTask SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected override async ValueTask SendCreateToBufferAsync(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
 		{
-			await Xdr.Write(IscCodes.op_create, async).ConfigureAwait(false);
-			await Xdr.Write(0, async).ConfigureAwait(false);
+			await Xdr.WriteAsync(IscCodes.op_create, async).ConfigureAwait(false);
+			await Xdr.WriteAsync(0, async).ConfigureAwait(false);
 			if (!AuthBlock.HasClientData)
 			{
 				dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
@@ -152,28 +152,28 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			await Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
-			await Xdr.WriteBuffer(dpb.ToArray(), async).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(dpb.ToArray(), async).ConfigureAwait(false);
 		}
 
-		public override ValueTask AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
-			return Attach(dpb, database, cryptKey, async);
+			return AttachAsync(dpb, database, cryptKey, async);
 		}
 
-		public override ValueTask CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
-			return CreateDatabase(dpb, database, cryptKey, async);
+			return CreateDatabaseAsync(dpb, database, cryptKey, async);
 		}
 
-		internal async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		internal async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeededAsync(IResponse response, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			while (response is CryptKeyCallbackResponse)
 			{
-				await Xdr.Write(IscCodes.op_crypt_key_callback, async).ConfigureAwait(false);
-				await Xdr.WriteBuffer(cryptKey, async).ConfigureAwait(false);
-				await Xdr.Flush(async).ConfigureAwait(false);
-				response = await ReadResponse(async).ConfigureAwait(false);
+				await Xdr.WriteAsync(IscCodes.op_crypt_key_callback, async).ConfigureAwait(false);
+				await Xdr.WriteBufferAsync(cryptKey, async).ConfigureAwait(false);
+				await Xdr.FlushAsync(async).ConfigureAwait(false);
+				response = await ReadResponseAsync(async).ConfigureAwait(false);
 			}
 			return response;
 		}

@@ -28,53 +28,53 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			: base(connection)
 		{ }
 
-		public override async ValueTask Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask AttachAsync(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await SendAttachToBuffer(spb, service, async).ConfigureAwait(false);
-				await Database.Xdr.Flush(async).ConfigureAwait(false);
-				var response = await Database.ReadResponse(async).ConfigureAwait(false);
+				await SendAttachToBufferAsync(spb, service, async).ConfigureAwait(false);
+				await Database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				var response = await Database.ReadResponseAsync(async).ConfigureAwait(false);
 				if (response is ContAuthResponse)
 				{
 					while (response is ContAuthResponse contAuthResponse)
 					{
 						Connection.AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						await Connection.AuthBlock.SendContAuthToBuffer(Database.Xdr, async).ConfigureAwait(false);
-						await Database.Xdr.Flush(async).ConfigureAwait(false);
-						response = await Connection.AuthBlock.ProcessContAuthResponse(Database.Xdr, async).ConfigureAwait(false);
-						response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
+						await Connection.AuthBlock.SendContAuthToBufferAsync(Database.Xdr, async).ConfigureAwait(false);
+						await Database.Xdr.FlushAsync(async).ConfigureAwait(false);
+						response = await Connection.AuthBlock.ProcessContAuthResponseAsync(Database.Xdr, async).ConfigureAwait(false);
+						response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, async).ConfigureAwait(false);
 					}
 					var genericResponse = (GenericResponse)response;
-					await base.ProcessAttachResponse(genericResponse, async).ConfigureAwait(false);
+					await base.ProcessAttachResponseAsync(genericResponse, async).ConfigureAwait(false);
 
-					await Connection.AuthBlock.SendWireCryptToBuffer(Database.Xdr, async).ConfigureAwait(false);
-					await Database.Xdr.Flush(async).ConfigureAwait(false);
-					await Connection.AuthBlock.ProcessWireCryptResponse(Database.Xdr, Connection, async).ConfigureAwait(false);
+					await Connection.AuthBlock.SendWireCryptToBufferAsync(Database.Xdr, async).ConfigureAwait(false);
+					await Database.Xdr.FlushAsync(async).ConfigureAwait(false);
+					await Connection.AuthBlock.ProcessWireCryptResponseAsync(Database.Xdr, Connection, async).ConfigureAwait(false);
 
 					if (genericResponse.Data.Any())
 					{
-						await Database.AuthBlock.SendWireCryptToBuffer(Database.Xdr, async).ConfigureAwait(false);
-						await Database.Xdr.Flush(async).ConfigureAwait(false);
-						await Database.AuthBlock.ProcessWireCryptResponse(Database.Xdr, Connection, async).ConfigureAwait(false);
+						await Database.AuthBlock.SendWireCryptToBufferAsync(Database.Xdr, async).ConfigureAwait(false);
+						await Database.Xdr.FlushAsync(async).ConfigureAwait(false);
+						await Database.AuthBlock.ProcessWireCryptResponseAsync(Database.Xdr, Connection, async).ConfigureAwait(false);
 					}
 				}
 				else
 				{
-					response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey, async).ConfigureAwait(false);
-					await ProcessAttachResponse((GenericResponse)response, async).ConfigureAwait(false);
+					response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, async).ConfigureAwait(false);
+					await ProcessAttachResponseAsync((GenericResponse)response, async).ConfigureAwait(false);
 					Database.AuthBlock.Complete();
 				}
 			}
 			catch (IscException)
 			{
-				await Database.SafelyDetach(async).ConfigureAwait(false);
+				await Database.SafelyDetachAsync(async).ConfigureAwait(false);
 				throw;
 			}
 			catch (IOException ex)
 			{
-				await Database.SafelyDetach(async).ConfigureAwait(false);
+				await Database.SafelyDetachAsync(async).ConfigureAwait(false);
 				throw IscException.ForIOException(ex);
 			}
 		}

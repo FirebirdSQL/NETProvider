@@ -50,14 +50,14 @@ namespace FirebirdSql.Data.Services
 			{
 				var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
-				await Open(async).ConfigureAwait(false);
+				await OpenAsync(async).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_trace_start);
 				if (!string.IsNullOrEmpty(sessionName))
 					startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
 				startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
-				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -65,7 +65,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await Close(async).ConfigureAwait(false);
+				await CloseAsync(async).ConfigureAwait(false);
 			}
 		}
 
@@ -73,41 +73,41 @@ namespace FirebirdSql.Data.Services
 		public Task StopAsync(int sessionID, CancellationToken cancellationToken = default) => StopImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task StopImpl(int sessionID, AsyncWrappingCommonArgs async)
 		{
-			return DoSimpleAction(IscCodes.isc_action_svc_trace_stop, sessionID, async);
+			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_stop, sessionID, async);
 		}
 
 		public void Suspend(int sessionID) => SuspendImpl(sessionID, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task SuspendAsync(int sessionID, CancellationToken cancellationToken = default) => SuspendImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task SuspendImpl(int sessionID, AsyncWrappingCommonArgs async)
 		{
-			return DoSimpleAction(IscCodes.isc_action_svc_trace_suspend, sessionID, async);
+			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_suspend, sessionID, async);
 		}
 
 		public void Resume(int sessionID) => ResumeImpl(sessionID, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task ResumeAsync(int sessionID, CancellationToken cancellationToken = default) => ResumeImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task ResumeImpl(int sessionID, AsyncWrappingCommonArgs async)
 		{
-			return DoSimpleAction(IscCodes.isc_action_svc_trace_resume, sessionID, async);
+			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_resume, sessionID, async);
 		}
 
 		public void List() => ListImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task ListAsync(CancellationToken cancellationToken = default) => ListImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task ListImpl(AsyncWrappingCommonArgs async)
 		{
-			return DoSimpleAction(IscCodes.isc_action_svc_trace_list, null, async);
+			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_list, null, async);
 		}
 
-		async Task DoSimpleAction(int action, int? sessionID, AsyncWrappingCommonArgs async)
+		async Task DoSimpleActionAsync(int action, int? sessionID, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await Open(async).ConfigureAwait(false);
+				await OpenAsync(async).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(action);
 				if (sessionID.HasValue)
 					startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
-				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await Close(async).ConfigureAwait(false);
+				await CloseAsync(async).ConfigureAwait(false);
 			}
 		}
 

@@ -470,9 +470,9 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public async ValueTask FixNull(AsyncWrappingCommonArgs async)
+		public async ValueTask FixNullAsync(AsyncWrappingCommonArgs async)
 		{
-			if (NullFlag == -1 && await _dbValue.IsDBNull(async).ConfigureAwait(false))
+			if (NullFlag == -1 && await _dbValue.IsDBNullAsync(async).ConfigureAwait(false))
 			{
 				switch (DbDataType)
 				{

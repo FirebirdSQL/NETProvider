@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		#region Overriden Methods
 
-		public override async ValueTask Prepare(string commandText, AsyncWrappingCommonArgs async)
+		public override async ValueTask PrepareAsync(string commandText, AsyncWrappingCommonArgs async)
 		{
 			ClearAll();
 
@@ -46,17 +46,17 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				var numberOfResponses = 0;
 				if (State == StatementState.Deallocated)
 				{
-					await SendAllocateToBuffer(async).ConfigureAwait(false);
+					await SendAllocateToBufferAsync(async).ConfigureAwait(false);
 					numberOfResponses++;
 				}
 
-				await SendPrepareToBuffer(commandText, async).ConfigureAwait(false);
+				await SendPrepareToBufferAsync(commandText, async).ConfigureAwait(false);
 				numberOfResponses++;
 
-				await SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, async).ConfigureAwait(false);
+				await SendInfoSqlToBufferAsync(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, async).ConfigureAwait(false);
 				numberOfResponses++;
 
-				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
 
 				try
 				{
@@ -64,26 +64,26 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					if (State == StatementState.Deallocated)
 					{
 						numberOfResponses--;
-						allocateResponse = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+						allocateResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
 					}
 
 					numberOfResponses--;
-					var prepareResponse = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+					var prepareResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
 					var deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
 
 					numberOfResponses--;
-					var statementTypeResponse = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+					var statementTypeResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
 
 					if (allocateResponse != null)
 					{
-						await ProcessAllocateResponse(allocateResponse, async).ConfigureAwait(false);
+						await ProcessAllocateResponseAsync(allocateResponse, async).ConfigureAwait(false);
 					}
-					await ProcessPrepareResponse(prepareResponse, async).ConfigureAwait(false);
-					StatementType = ProcessStatementTypeInfoBuffer(await ProcessInfoSqlResponse(statementTypeResponse, async).ConfigureAwait(false));
+					await ProcessPrepareResponseAsync(prepareResponse, async).ConfigureAwait(false);
+					StatementType = ProcessStatementTypeInfoBuffer(await ProcessInfoSqlResponseAsync(statementTypeResponse, async).ConfigureAwait(false));
 				}
 				finally
 				{
-					numberOfResponses = await SafeFinishFetching(numberOfResponses, async).ConfigureAwait(false);
+					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, async).ConfigureAwait(false);
 				}
 
 				State = StatementState.Prepared;
@@ -95,7 +95,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override async ValueTask Execute(AsyncWrappingCommonArgs async)
+		public override async ValueTask ExecuteAsync(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 
@@ -105,17 +105,17 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				RecordsAffected = -1;
 
-				await SendExecuteToBuffer(async).ConfigureAwait(false);
+				await SendExecuteToBufferAsync(async).ConfigureAwait(false);
 
 				var readRowsAffectedResponse = false;
 				if (DoRecordsAffected)
 				{
-					await SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, async).ConfigureAwait(false);
+					await SendInfoSqlToBufferAsync(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, async).ConfigureAwait(false);
 
 					readRowsAffectedResponse = true;
 				}
 
-				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
 
 				var numberOfResponses = (StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
 				try
@@ -124,29 +124,29 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					if (StatementType == DbStatementType.StoredProcedure)
 					{
 						numberOfResponses--;
-						sqlStoredProcedureResponse = (SqlResponse)await _database.ReadResponse(async).ConfigureAwait(false);
-						await ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse, async).ConfigureAwait(false);
+						sqlStoredProcedureResponse = (SqlResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+						await ProcessStoredProcedureExecuteResponseAsync(sqlStoredProcedureResponse, async).ConfigureAwait(false);
 					}
 
 					numberOfResponses--;
-					var executeResponse = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+					var executeResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
 
 					GenericResponse rowsAffectedResponse = null;
 					if (readRowsAffectedResponse)
 					{
 						numberOfResponses--;
-						rowsAffectedResponse = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+						rowsAffectedResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
 					}
 
-					await ProcessExecuteResponse(executeResponse, async).ConfigureAwait(false);
+					await ProcessExecuteResponseAsync(executeResponse, async).ConfigureAwait(false);
 					if (readRowsAffectedResponse)
 					{
-						RecordsAffected = ProcessRecordsAffectedBuffer(await ProcessInfoSqlResponse(rowsAffectedResponse, async).ConfigureAwait(false));
+						RecordsAffected = ProcessRecordsAffectedBuffer(await ProcessInfoSqlResponseAsync(rowsAffectedResponse, async).ConfigureAwait(false));
 					}
 				}
 				finally
 				{
-					numberOfResponses = await SafeFinishFetching(numberOfResponses, async).ConfigureAwait(false);
+					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, async).ConfigureAwait(false);
 				}
 
 				State = StatementState.Executed;
@@ -161,14 +161,14 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#endregion
 
 		#region Protected methods
-		protected async ValueTask<int> SafeFinishFetching(int numberOfResponses, AsyncWrappingCommonArgs async)
+		protected async ValueTask<int> SafeFinishFetchingAsync(int numberOfResponses, AsyncWrappingCommonArgs async)
 		{
 			while (numberOfResponses > 0)
 			{
 				numberOfResponses--;
 				try
 				{
-					await _database.ReadResponse(async).ConfigureAwait(false);
+					await _database.ReadResponseAsync(async).ConfigureAwait(false);
 				}
 				catch (IscException)
 				{ }
@@ -176,13 +176,13 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return numberOfResponses;
 		}
 
-		protected override async ValueTask Free(int option, AsyncWrappingCommonArgs async)
+		protected override async ValueTask FreeAsync(int option, AsyncWrappingCommonArgs async)
 		{
 			if (FreeNotNeeded(option))
 				return;
 
-			await DoFreePacket(option, async).ConfigureAwait(false);
-			(Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponse);
+			await DoFreePacketAsync(option, async).ConfigureAwait(false);
+			(Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponseAsync);
 		}
 		#endregion
 	}

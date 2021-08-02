@@ -67,11 +67,11 @@ namespace FirebirdSql.Data.FirebirdClient
 				var db = new FbConnectionInternal(options);
 				try
 				{
-					await db.CreateDatabase(pageSize, forcedWrites, overwrite, async).ConfigureAwait(false);
+					await db.CreateDatabaseAsync(pageSize, forcedWrites, overwrite, async).ConfigureAwait(false);
 				}
 				finally
 				{
-					await db.Disconnect(async).ConfigureAwait(false);
+					await db.DisconnectAsync(async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
@@ -92,11 +92,11 @@ namespace FirebirdSql.Data.FirebirdClient
 				var db = new FbConnectionInternal(options);
 				try
 				{
-					await db.DropDatabase(async).ConfigureAwait(false);
+					await db.DropDatabaseAsync(async).ConfigureAwait(false);
 				}
 				finally
 				{
-					await db.Disconnect(async).ConfigureAwait(false);
+					await db.DisconnectAsync(async).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
@@ -257,18 +257,18 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (disposing)
 			{
-				DisposeHelper(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+				DisposeHelperAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 			}
 			base.Dispose(disposing);
 		}
 #if !(NET48 || NETSTANDARD2_0)
 		public override async ValueTask DisposeAsync()
 		{
-			await DisposeHelper(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
+			await DisposeHelperAsync(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
 			await base.DisposeAsync().ConfigureAwait(false);
 		}
 #endif
-		private async Task DisposeHelper(AsyncWrappingCommonArgs async)
+		private async Task DisposeHelperAsync(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
@@ -315,7 +315,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckClosed();
 
-			return _innerConnection.BeginTransaction(level, transactionName, async);
+			return _innerConnection.BeginTransactionAsync(level, transactionName, async);
 		}
 
 		public FbTransaction BeginTransaction(FbTransactionOptions options) => BeginTransaction(options, null);
@@ -326,7 +326,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckClosed();
 
-			return _innerConnection.BeginTransaction(options, transactionName, async);
+			return _innerConnection.BeginTransactionAsync(options, transactionName, async);
 		}
 
 		protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) => BeginTransaction(isolationLevel);
@@ -386,7 +386,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckClosed();
 
-			return _innerConnection.GetSchema(collectionName, restrictions, async);
+			return _innerConnection.GetSchemaAsync(collectionName, restrictions, async);
 		}
 
 		#endregion
@@ -472,7 +472,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					try
 					{
-						await _innerConnection.Connect(async).ConfigureAwait(false);
+						await _innerConnection.ConnectAsync(async).ConfigureAwait(false);
 					}
 					catch (OperationCanceledException ex)
 					{
@@ -499,7 +499,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					catch
 					{
 						// if enlistment fails clean up innerConnection
-						await _innerConnection.DisposeTransaction(async).ConfigureAwait(false);
+						await _innerConnection.DisposeTransactionAsync(async).ConfigureAwait(false);
 
 						if (_options.Pooling)
 						{
@@ -507,7 +507,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						}
 						else
 						{
-							await _innerConnection.Disconnect(async).ConfigureAwait(false);
+							await _innerConnection.DisconnectAsync(async).ConfigureAwait(false);
 							_innerConnection = null;
 						}
 
@@ -546,22 +546,22 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				try
 				{
-					await _innerConnection.CloseEventManager(async).ConfigureAwait(false);
+					await _innerConnection.CloseEventManagerAsync(async).ConfigureAwait(false);
 
 					if (_innerConnection.Database != null)
 					{
 						_innerConnection.Database.WarningMessage = null;
 					}
 
-					await _innerConnection.DisposeTransaction(async).ConfigureAwait(false);
+					await _innerConnection.DisposeTransactionAsync(async).ConfigureAwait(false);
 
-					await _innerConnection.ReleasePreparedCommands(async).ConfigureAwait(false);
+					await _innerConnection.ReleasePreparedCommandsAsync(async).ConfigureAwait(false);
 
 					if (_options.Pooling)
 					{
 						if (_innerConnection.CancelDisabled)
 						{
-							await _innerConnection.EnableCancel(async).ConfigureAwait(false);
+							await _innerConnection.EnableCancelAsync(async).ConfigureAwait(false);
 						}
 
 						var broken = _innerConnection.Database.ConnectionBroken;
@@ -588,7 +588,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (!_innerConnection.IsEnlisted)
 				{
-					await _innerConnection.Disconnect(async).ConfigureAwait(false);
+					await _innerConnection.DisconnectAsync(async).ConfigureAwait(false);
 				}
 				_innerConnection = null;
 			}
@@ -630,7 +630,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckClosed();
 
-			return _innerConnection.EnableCancel(async);
+			return _innerConnection.EnableCancelAsync(async);
 		}
 
 		public void DisableCancel() => DisableCancelImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -639,7 +639,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckClosed();
 
-			return _innerConnection.DisableCancel(async);
+			return _innerConnection.DisableCancelAsync(async);
 		}
 
 		public void CancelCommand() => CancelCommandImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -648,7 +648,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckClosed();
 
-			return _innerConnection.CancelCommand(async);
+			return _innerConnection.CancelCommandAsync(async);
 		}
 		#endregion
 

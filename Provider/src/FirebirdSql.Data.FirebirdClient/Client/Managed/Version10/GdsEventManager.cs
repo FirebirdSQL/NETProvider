@@ -42,31 +42,31 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_timeout = timeout;
 		}
 
-		public async ValueTask Open(AsyncWrappingCommonArgs async)
+		public async ValueTask OpenAsync(AsyncWrappingCommonArgs async)
 		{
 			var connection = new GdsConnection(_ipAddress, _portNumber, _timeout);
-			await connection.Connect(async).ConfigureAwait(false);
+			await connection.ConnectAsync(async).ConfigureAwait(false);
 			_database = new GdsDatabase(connection);
 		}
 
-		public async ValueTask WaitForEvents(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
+		public async ValueTask WaitForEventsAsync(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
 		{
 			while (true)
 			{
 				try
 				{
-					var operation = await _database.ReadOperation(async).ConfigureAwait(false);
+					var operation = await _database.ReadOperationAsync(async).ConfigureAwait(false);
 
 					switch (operation)
 					{
 						case IscCodes.op_event:
-							var dbHandle = await _database.Xdr.ReadInt32(async).ConfigureAwait(false);
-							var buffer = await _database.Xdr.ReadBuffer(async).ConfigureAwait(false);
+							var dbHandle = await _database.Xdr.ReadInt32Async(async).ConfigureAwait(false);
+							var buffer = await _database.Xdr.ReadBufferAsync(async).ConfigureAwait(false);
 							var ast = new byte[8];
-							await _database.Xdr.ReadBytes(ast, 8, async).ConfigureAwait(false);
-							var eventId = await _database.Xdr.ReadInt32(async).ConfigureAwait(false);
+							await _database.Xdr.ReadBytesAsync(ast, 8, async).ConfigureAwait(false);
+							var eventId = await _database.Xdr.ReadInt32Async(async).ConfigureAwait(false);
 
-							await remoteEvent.EventCounts(buffer, async).ConfigureAwait(false);
+							await remoteEvent.EventCountsAsync(buffer, async).ConfigureAwait(false);
 
 							break;
 
@@ -87,10 +87,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public ValueTask Close(AsyncWrappingCommonArgs async)
+		public ValueTask CloseAsync(AsyncWrappingCommonArgs async)
 		{
 			Volatile.Write(ref _closing, true);
-			return _database.CloseConnection(async);
+			return _database.CloseConnectionAsync(async);
 		}
 	}
 }

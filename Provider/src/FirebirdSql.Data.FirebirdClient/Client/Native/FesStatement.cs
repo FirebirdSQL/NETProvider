@@ -123,12 +123,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Dispose2
 
-		public override async ValueTask Dispose2(AsyncWrappingCommonArgs async)
+		public override async ValueTask Dispose2Async(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
-				await Release(async).ConfigureAwait(false);
+				await ReleaseAsync(async).ConfigureAwait(false);
 				Clear();
 				_db = null;
 				_fields = null;
@@ -139,7 +139,7 @@ namespace FirebirdSql.Data.Client.Native
 				_allRowsFetched = false;
 				_handle.Dispose();
 				FetchSize = 0;
-				await base.Dispose2(async).ConfigureAwait(false);
+				await base.Dispose2Async(async).ConfigureAwait(false);
 			}
 		}
 
@@ -161,23 +161,23 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Array Creation Methods
 
-		public override ValueTask<ArrayBase> CreateArray(ArrayDesc descriptor, AsyncWrappingCommonArgs async)
+		public override ValueTask<ArrayBase> CreateArrayAsync(ArrayDesc descriptor, AsyncWrappingCommonArgs async)
 		{
 			var array = new FesArray(descriptor);
 			return ValueTask2.FromResult((ArrayBase)array);
 		}
 
-		public override async ValueTask<ArrayBase> CreateArray(string tableName, string fieldName, AsyncWrappingCommonArgs async)
+		public override async ValueTask<ArrayBase> CreateArrayAsync(string tableName, string fieldName, AsyncWrappingCommonArgs async)
 		{
 			var array = new FesArray(_db, _transaction, tableName, fieldName);
-			await array.Initialize(async).ConfigureAwait(false);
+			await array.InitializeAsync(async).ConfigureAwait(false);
 			return array;
 		}
 
-		public override async ValueTask<ArrayBase> CreateArray(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async)
+		public override async ValueTask<ArrayBase> CreateArrayAsync(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async)
 		{
 			var array = new FesArray(_db, _transaction, handle, tableName, fieldName);
-			await array.Initialize(async).ConfigureAwait(false);
+			await array.InitializeAsync(async).ConfigureAwait(false);
 			return array;
 		}
 
@@ -185,21 +185,21 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override ValueTask Release(AsyncWrappingCommonArgs async)
+		public override ValueTask ReleaseAsync(AsyncWrappingCommonArgs async)
 		{
 			XsqldaMarshaler.CleanUpNativeData(ref _fetchSqlDa);
 
-			return base.Release(async);
+			return base.ReleaseAsync(async);
 		}
 
-		public override ValueTask Close(AsyncWrappingCommonArgs async)
+		public override ValueTask CloseAsync(AsyncWrappingCommonArgs async)
 		{
 			XsqldaMarshaler.CleanUpNativeData(ref _fetchSqlDa);
 
-			return base.Close(async);
+			return base.CloseAsync(async);
 		}
 
-		public override async ValueTask Prepare(string commandText, AsyncWrappingCommonArgs async)
+		public override async ValueTask PrepareAsync(string commandText, AsyncWrappingCommonArgs async)
 		{
 			ClearAll();
 
@@ -212,7 +212,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fields = new Descriptor(1);
 
-			var sqlda = await XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields, async).ConfigureAwait(false);
+			var sqlda = await XsqldaMarshaler.MarshalManagedToNativeAsync(_db.Charset, _fields, async).ConfigureAwait(false);
 			var trHandle = _transaction.HandlePtr;
 
 			var buffer = _db.Charset.GetBytes(commandText);
@@ -236,7 +236,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			if (_fields.ActualCount > 0 && _fields.ActualCount != _fields.Count)
 			{
-				await Describe(async).ConfigureAwait(false);
+				await DescribeAsync(async).ConfigureAwait(false);
 			}
 			else
 			{
@@ -248,12 +248,12 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fields.ResetValues();
 
-			StatementType = await GetStatementType(async).ConfigureAwait(false);
+			StatementType = await GetStatementTypeAsync(async).ConfigureAwait(false);
 
 			State = StatementState.Prepared;
 		}
 
-		public override async ValueTask Execute(AsyncWrappingCommonArgs async)
+		public override async ValueTask ExecuteAsync(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 
@@ -264,12 +264,12 @@ namespace FirebirdSql.Data.Client.Native
 
 			if (_parameters != null)
 			{
-				inSqlda = await XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _parameters, async).ConfigureAwait(false);
+				inSqlda = await XsqldaMarshaler.MarshalManagedToNativeAsync(_db.Charset, _parameters, async).ConfigureAwait(false);
 			}
 			if (StatementType == DbStatementType.StoredProcedure)
 			{
 				Fields.ResetValues();
-				outSqlda = await XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields, async).ConfigureAwait(false);
+				outSqlda = await XsqldaMarshaler.MarshalManagedToNativeAsync(_db.Charset, _fields, async).ConfigureAwait(false);
 			}
 
 			var trHandle = _transaction.HandlePtr;
@@ -291,7 +291,7 @@ namespace FirebirdSql.Data.Client.Native
 				for (var i = 0; i < values.Length; i++)
 				{
 					var d = descriptor[i];
-					var value = await d.DbValue.GetValue(async).ConfigureAwait(false);
+					var value = await d.DbValue.GetValueAsync(async).ConfigureAwait(false);
 					values[i] = new DbValue(this, d, value);
 				}
 
@@ -305,7 +305,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			if (DoRecordsAffected)
 			{
-				RecordsAffected = await GetRecordsAffected(async).ConfigureAwait(false);
+				RecordsAffected = await GetRecordsAffectedAsync(async).ConfigureAwait(false);
 			}
 			else
 			{
@@ -315,7 +315,7 @@ namespace FirebirdSql.Data.Client.Native
 			State = StatementState.Executed;
 		}
 
-		public override async ValueTask<DbValue[]> Fetch(AsyncWrappingCommonArgs async)
+		public override async ValueTask<DbValue[]> FetchAsync(AsyncWrappingCommonArgs async)
 		{
 			EnsureNotDeallocated();
 
@@ -340,7 +340,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				if (_fetchSqlDa == IntPtr.Zero)
 				{
-					_fetchSqlDa = await XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields, async).ConfigureAwait(false);
+					_fetchSqlDa = await XsqldaMarshaler.MarshalManagedToNativeAsync(_db.Charset, _fields, async).ConfigureAwait(false);
 				}
 
 				ClearStatusVector();
@@ -376,7 +376,7 @@ namespace FirebirdSql.Data.Client.Native
 					for (var i = 0; i < row.Length; i++)
 					{
 						var d = _fields[i];
-						var value = await d.DbValue.GetValue(async).ConfigureAwait(false);
+						var value = await d.DbValue.GetValueAsync(async).ConfigureAwait(false);
 						row[i] = new DbValue(this, d, value);
 					}
 				}
@@ -384,13 +384,13 @@ namespace FirebirdSql.Data.Client.Native
 			return row;
 		}
 
-		public override async ValueTask Describe(AsyncWrappingCommonArgs async)
+		public override async ValueTask DescribeAsync(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
 			_fields = new Descriptor(_fields.ActualCount);
 
-			var sqlda = await XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields, async).ConfigureAwait(false);
+			var sqlda = await XsqldaMarshaler.MarshalManagedToNativeAsync(_db.Charset, _fields, async).ConfigureAwait(false);
 
 
 			_db.FbClient.isc_dsql_describe(
@@ -408,13 +408,13 @@ namespace FirebirdSql.Data.Client.Native
 			_fields = descriptor;
 		}
 
-		public override async ValueTask DescribeParameters(AsyncWrappingCommonArgs async)
+		public override async ValueTask DescribeParametersAsync(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
 			_parameters = new Descriptor(1);
 
-			var sqlda = await XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _parameters, async).ConfigureAwait(false);
+			var sqlda = await XsqldaMarshaler.MarshalManagedToNativeAsync(_db.Charset, _parameters, async).ConfigureAwait(false);
 
 
 			_db.FbClient.isc_dsql_describe_bind(
@@ -434,7 +434,7 @@ namespace FirebirdSql.Data.Client.Native
 
 				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
 
-				sqlda = await XsqldaMarshaler.MarshalManagedToNative(_db.Charset, descriptor, async).ConfigureAwait(false);
+				sqlda = await XsqldaMarshaler.MarshalManagedToNativeAsync(_db.Charset, descriptor, async).ConfigureAwait(false);
 
 				_db.FbClient.isc_dsql_describe_bind(
 					_statusVector,
@@ -468,7 +468,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override ValueTask Free(int option, AsyncWrappingCommonArgs async)
+		protected override ValueTask FreeAsync(int option, AsyncWrappingCommonArgs async)
 		{
 			// Does	not	seem to	be possible	or necessary to	close
 			// an execute procedure	statement.
@@ -510,7 +510,7 @@ namespace FirebirdSql.Data.Client.Native
 			_allRowsFetched = false;
 		}
 
-		protected override ValueTask<byte[]> GetSqlInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		protected override ValueTask<byte[]> GetSqlInfoAsync(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 

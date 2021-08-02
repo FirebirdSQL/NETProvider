@@ -88,17 +88,17 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		protected override void Dispose(bool disposing)
 		{
-			DisposeHelper(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+			DisposeHelperAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 			base.Dispose(disposing);
 		}
 #if !(NET48 || NETSTANDARD2_0)
 		public override async ValueTask DisposeAsync()
 		{
-			await DisposeHelper(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
+			await DisposeHelperAsync(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
 			await base.DisposeAsync().ConfigureAwait(false);
 		}
 #endif
-		private async Task DisposeHelper(AsyncWrappingCommonArgs async)
+		private async Task DisposeHelperAsync(AsyncWrappingCommonArgs async)
 		{
 			if (!_disposed)
 			{
@@ -109,7 +109,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					{
 						try
 						{
-							await _transaction.Dispose2(async).ConfigureAwait(false);
+							await _transaction.Dispose2Async(async).ConfigureAwait(false);
 						}
 						catch (IscException ex)
 						{
@@ -139,8 +139,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			EnsureCompleted();
 			try
 			{
-				await _transaction.Commit(async).ConfigureAwait(false);
-				await CompleteTransaction(async).ConfigureAwait(false);
+				await _transaction.CommitAsync(async).ConfigureAwait(false);
+				await CompleteTransactionAsync(async).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -160,8 +160,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			EnsureCompleted();
 			try
 			{
-				await _transaction.Rollback(async).ConfigureAwait(false);
-				await CompleteTransaction(async).ConfigureAwait(false);
+				await _transaction.RollbackAsync(async).ConfigureAwait(false);
+				await CompleteTransactionAsync(async).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -278,7 +278,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			EnsureCompleted();
 			try
 			{
-				await _transaction.CommitRetaining(async).ConfigureAwait(false);
+				await _transaction.CommitRetainingAsync(async).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -293,7 +293,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			EnsureCompleted();
 			try
 			{
-				await _transaction.RollbackRetaining(async).ConfigureAwait(false);
+				await _transaction.RollbackRetainingAsync(async).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -305,29 +305,29 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Internal Methods
 
-		internal async Task BeginTransaction(AsyncWrappingCommonArgs async)
+		internal async Task BeginTransactionAsync(AsyncWrappingCommonArgs async)
 		{
-			_transaction = await _connection.InnerConnection.Database.BeginTransaction(BuildTpb(), async).ConfigureAwait(false);
+			_transaction = await _connection.InnerConnection.Database.BeginTransactionAsync(BuildTpb(), async).ConfigureAwait(false);
 		}
 
-		internal async Task BeginTransaction(FbTransactionOptions options, AsyncWrappingCommonArgs async)
+		internal async Task BeginTransactionAsync(FbTransactionOptions options, AsyncWrappingCommonArgs async)
 		{
-			_transaction = await _connection.InnerConnection.Database.BeginTransaction(BuildTpb(options), async).ConfigureAwait(false);
+			_transaction = await _connection.InnerConnection.Database.BeginTransactionAsync(BuildTpb(options), async).ConfigureAwait(false);
 		}
 
 		#endregion
 
 		#region Private Methods
 
-		private async Task CompleteTransaction(AsyncWrappingCommonArgs async)
+		private async Task CompleteTransactionAsync(AsyncWrappingCommonArgs async)
 		{
 			var innerConnection = _connection?.InnerConnection;
 			if (innerConnection != null)
 			{
-				await innerConnection.TransactionCompleted(async).ConfigureAwait(false);
+				await innerConnection.TransactionCompletedAsync(async).ConfigureAwait(false);
 			}
 			_connection = null;
-			await _transaction.Dispose2(async).ConfigureAwait(false);
+			await _transaction.Dispose2Async(async).ConfigureAwait(false);
 			_transaction = null;
 			_isCompleted = true;
 		}

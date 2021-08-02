@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (_revent != null)
 				throw new InvalidOperationException($"{nameof(FbRemoteEvent)} already open.");
 
-			await _connection.Connect(async).ConfigureAwait(false);
+			await _connection.ConnectAsync(async).ConfigureAwait(false);
 			_revent = new RemoteEvent(_connection.Database);
 			_revent.EventCountsCallback = OnRemoteEventCounts;
 			_revent.EventErrorCallback = OnRemoteEventError;
@@ -63,7 +63,7 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
 		private Task DisposeImpl(AsyncWrappingCommonArgs async)
 		{
-			return _connection.Disconnect(async);
+			return _connection.DisconnectAsync(async);
 		}
 
 		public void QueueEvents(ICollection<string> events) => QueueEventsImpl(events, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -75,7 +75,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			try
 			{
-				await _revent.QueueEvents(events, async).ConfigureAwait(false);
+				await _revent.QueueEventsAsync(events, async).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -89,7 +89,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			try
 			{
-				await _revent.CancelEvents(async).ConfigureAwait(false);
+				await _revent.CancelEventsAsync(async).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{

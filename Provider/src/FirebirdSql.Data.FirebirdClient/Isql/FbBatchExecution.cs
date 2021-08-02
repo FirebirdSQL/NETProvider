@@ -115,7 +115,7 @@ namespace FirebirdSql.Data.Isql
 					statement.StatementType == SqlStatementType.SetNames ||
 					statement.StatementType == SqlStatementType.SetSQLDialect))
 				{
-					await ProvideCommand(async).ConfigureAwait(false);
+					await ProvideCommandAsync(async).ConfigureAwait(false);
 					_sqlCommand.CommandText = statement.Text;
 					if (_sqlTransaction == null && !(statement.StatementType == SqlStatementType.Commit || statement.StatementType == SqlStatementType.Rollback))
 					{
@@ -204,7 +204,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Whenever:
 							OnCommandExecuting(_sqlCommand, statement.StatementType);
 
-							var rowsAffected = await ExecuteCommand(autoCommit, async).ConfigureAwait(false);
+							var rowsAffected = await ExecuteCommandAsync(autoCommit, async).ConfigureAwait(false);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, rowsAffected);
@@ -212,7 +212,7 @@ namespace FirebirdSql.Data.Isql
 
 						case SqlStatementType.ExecuteBlock:
 						case SqlStatementType.Select:
-							(await ProvideCommand(async).ConfigureAwait(false)).CommandText = statement.Text;
+							(await ProvideCommandAsync(async).ConfigureAwait(false)).CommandText = statement.Text;
 
 							OnCommandExecuting(_sqlCommand, statement.StatementType);
 
@@ -236,7 +236,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Commit:
 							OnCommandExecuting(null, statement.StatementType);
 
-							await CommitTransaction(async).ConfigureAwait(false);
+							await CommitTransactionAsync(async).ConfigureAwait(false);
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
@@ -244,7 +244,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Rollback:
 							OnCommandExecuting(null, statement.StatementType);
 
-							await RollbackTransaction(async).ConfigureAwait(false);
+							await RollbackTransactionAsync(async).ConfigureAwait(false);
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
 							break;
@@ -252,7 +252,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.CreateDatabase:
 							OnCommandExecuting(null, statement.StatementType);
 
-							await CreateDatabase(statement.CleanText, async).ConfigureAwait(false);
+							await CreateDatabaseAsync(statement.CleanText, async).ConfigureAwait(false);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
@@ -270,7 +270,7 @@ namespace FirebirdSql.Data.Isql
 						case SqlStatementType.Connect:
 							OnCommandExecuting(null, statement.StatementType);
 
-							await ConnectToDatabase(statement.CleanText, async).ConfigureAwait(false);
+							await ConnectToDatabaseAsync(statement.CleanText, async).ConfigureAwait(false);
 							_requiresNewConnection = false;
 
 							OnCommandExecuted(null, statement.Text, statement.StatementType, -1);
@@ -326,9 +326,9 @@ namespace FirebirdSql.Data.Isql
 				}
 				catch (Exception ex)
 				{
-					await DisposeCommand(async).ConfigureAwait(false);
-					await RollbackTransaction(async).ConfigureAwait(false);
-					await CloseConnection(async).ConfigureAwait(false);
+					await DisposeCommandAsync(async).ConfigureAwait(false);
+					await RollbackTransactionAsync(async).ConfigureAwait(false);
+					await CloseConnectionAsync(async).ConfigureAwait(false);
 
 					var message = string.Format("An exception was thrown when executing command: {1}.{0}Batch execution aborted.{0}The returned message was: {2}.",
 						Environment.NewLine,
@@ -338,9 +338,9 @@ namespace FirebirdSql.Data.Isql
 				}
 			}
 
-			await DisposeCommand(async).ConfigureAwait(false);
-			await CommitTransaction(async).ConfigureAwait(false);
-			await CloseConnection(async).ConfigureAwait(false);
+			await DisposeCommandAsync(async).ConfigureAwait(false);
+			await CommitTransactionAsync(async).ConfigureAwait(false);
+			await CloseConnectionAsync(async).ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -348,7 +348,7 @@ namespace FirebirdSql.Data.Isql
 		/// to the database.
 		/// </summary>
 		/// <param name="connectDbStatement"></param>
-		private async Task ConnectToDatabase(string connectDbStatement, AsyncWrappingCommonArgs async)
+		private async Task ConnectToDatabaseAsync(string connectDbStatement, AsyncWrappingCommonArgs async)
 		{
 			// CONNECT 'filespec'
 			// [USER 'username']
@@ -396,14 +396,14 @@ namespace FirebirdSql.Data.Isql
 				}
 			}
 			_requiresNewConnection = true;
-			await ProvideConnection(async).ConfigureAwait(false);
+			await ProvideConnectionAsync(async).ConfigureAwait(false);
 		}
 
 		/// <summary>
 		/// Parses the isql statement CREATE DATABASE and creates the database and opens a connection to the recently created database.
 		/// </summary>
 		/// <param name="createDatabaseStatement">The create database statement.</param>
-		private async Task CreateDatabase(string createDatabaseStatement, AsyncWrappingCommonArgs async)
+		private async Task CreateDatabaseAsync(string createDatabaseStatement, AsyncWrappingCommonArgs async)
 		{
 			// CREATE {DATABASE | SCHEMA} 'filespec'
 			// [USER 'username' [PASSWORD 'password']]
@@ -462,7 +462,7 @@ namespace FirebirdSql.Data.Isql
 			}
 			await async.AsyncSyncCall((cs, ps, ct) => FbConnection.CreateDatabaseAsync(cs, pageSize: ps, cancellationToken: ct), (cs, ps) => FbConnection.CreateDatabase(cs, pageSize: ps), _connectionString.ToString(), pageSize).ConfigureAwait(false);
 			_requiresNewConnection = true;
-			await ProvideConnection(async).ConfigureAwait(false);
+			await ProvideConnectionAsync(async).ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -551,25 +551,25 @@ namespace FirebirdSql.Data.Isql
 			}
 		}
 
-		private async Task<FbCommand> ProvideCommand(AsyncWrappingCommonArgs async)
+		private async Task<FbCommand> ProvideCommandAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_sqlCommand == null)
 			{
 				_sqlCommand = new FbCommand();
 			}
 
-			_sqlCommand.Connection = await ProvideConnection(async).ConfigureAwait(false);
+			_sqlCommand.Connection = await ProvideConnectionAsync(async).ConfigureAwait(false);
 
 			return _sqlCommand;
 		}
 
-		private async Task<FbConnection> ProvideConnection(AsyncWrappingCommonArgs async)
+		private async Task<FbConnection> ProvideConnectionAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_requiresNewConnection)
 			{
 				if (_sqlConnection != null && _sqlConnection.State != ConnectionState.Closed)
 				{
-					await CloseConnection(async).ConfigureAwait(false);
+					await CloseConnectionAsync(async).ConfigureAwait(false);
 				}
 				_sqlConnection = new FbConnection(_connectionString.ToString());
 			}
@@ -583,17 +583,17 @@ namespace FirebirdSql.Data.Isql
 			return _sqlConnection;
 		}
 
-		private async Task<int> ExecuteCommand(bool autoCommit, AsyncWrappingCommonArgs async)
+		private async Task<int> ExecuteCommandAsync(bool autoCommit, AsyncWrappingCommonArgs async)
 		{
 			var rowsAffected = await _sqlCommand.ExecuteNonQueryImpl(async).ConfigureAwait(false);
 			if (autoCommit && _sqlCommand.IsDDLCommand)
 			{
-				await CommitTransaction(async).ConfigureAwait(false);
+				await CommitTransactionAsync(async).ConfigureAwait(false);
 			}
 			return rowsAffected;
 		}
 
-		private async Task CommitTransaction(AsyncWrappingCommonArgs async)
+		private async Task CommitTransactionAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_sqlTransaction != null)
 			{
@@ -607,7 +607,7 @@ namespace FirebirdSql.Data.Isql
 			}
 		}
 
-		private async Task RollbackTransaction(AsyncWrappingCommonArgs async)
+		private async Task RollbackTransactionAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_sqlTransaction != null)
 			{
@@ -621,7 +621,7 @@ namespace FirebirdSql.Data.Isql
 			}
 		}
 
-		private async Task CloseConnection(AsyncWrappingCommonArgs async)
+		private async Task CloseConnectionAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_shouldClose)
 			{
@@ -629,7 +629,7 @@ namespace FirebirdSql.Data.Isql
 			}
 		}
 
-		private async Task DisposeCommand(AsyncWrappingCommonArgs async)
+		private async Task DisposeCommandAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_sqlCommand != null)
 			{

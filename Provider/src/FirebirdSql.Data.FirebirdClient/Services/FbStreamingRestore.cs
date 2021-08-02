@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				await Open(async).ConfigureAwait(false);
+				await OpenAsync(async).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_restore);
 				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
@@ -79,8 +79,8 @@ namespace FirebirdSql.Data.Services
 				if (!string.IsNullOrEmpty(SkipData))
 					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ReadInput(async).ConfigureAwait(false);
+				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+				await ReadInputAsync(async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -88,15 +88,15 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await Close(async).ConfigureAwait(false);
+				await CloseAsync(async).ConfigureAwait(false);
 			}
 		}
 
-		async Task ReadInput(AsyncWrappingCommonArgs async)
+		async Task ReadInputAsync(AsyncWrappingCommonArgs async)
 		{
 			var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
 			var spb = ServiceParameterBufferBase.Empty;
-			var response = await Query(items, spb, async).ConfigureAwait(false);
+			var response = await QueryAsync(items, spb, async).ConfigureAwait(false);
 			var requestedLength = GetLength(response);
 			while (true)
 			{
@@ -112,7 +112,7 @@ namespace FirebirdSql.Data.Services
 						spb = dataSpb;
 					}
 				}
-				response = await Query(items, spb, async).ConfigureAwait(false);
+				response = await QueryAsync(items, spb, async).ConfigureAwait(false);
 				if (response.Count == 1)
 				{
 					break;

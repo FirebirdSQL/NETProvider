@@ -123,20 +123,20 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public async ValueTask SendContAuthToBuffer(IXdrWriter xdr, AsyncWrappingCommonArgs async)
+		public async ValueTask SendContAuthToBufferAsync(IXdrWriter xdr, AsyncWrappingCommonArgs async)
 		{
-			await xdr.Write(IscCodes.op_cont_auth, async).ConfigureAwait(false);
-			await xdr.WriteBuffer(ClientData, async).ConfigureAwait(false); // p_data
-			await xdr.Write(AcceptPluginName, async).ConfigureAwait(false); // p_name
-			await xdr.Write(AcceptPluginName, async).ConfigureAwait(false); // p_list
-			await xdr.WriteBuffer(ServerKeys, async).ConfigureAwait(false); // p_keys
+			await xdr.WriteAsync(IscCodes.op_cont_auth, async).ConfigureAwait(false);
+			await xdr.WriteBufferAsync(ClientData, async).ConfigureAwait(false); // p_data
+			await xdr.WriteAsync(AcceptPluginName, async).ConfigureAwait(false); // p_name
+			await xdr.WriteAsync(AcceptPluginName, async).ConfigureAwait(false); // p_list
+			await xdr.WriteBufferAsync(ServerKeys, async).ConfigureAwait(false); // p_keys
 		}
 
 		// TODO: maybe more logic can be pulled up here
-		public async ValueTask<IResponse> ProcessContAuthResponse(IXdrReader xdr, AsyncWrappingCommonArgs async)
+		public async ValueTask<IResponse> ProcessContAuthResponseAsync(IXdrReader xdr, AsyncWrappingCommonArgs async)
 		{
-			var operation = await xdr.ReadOperation(async).ConfigureAwait(false);
-			var response = await GdsConnection.ProcessOperation(operation, xdr, async).ConfigureAwait(false);
+			var operation = await xdr.ReadOperationAsync(async).ConfigureAwait(false);
+			var response = await GdsConnection.ProcessOperationAsync(operation, xdr, async).ConfigureAwait(false);
 			GdsConnection.ProcessResponse(response);
 			if (response is ContAuthResponse)
 			{
@@ -158,17 +158,17 @@ namespace FirebirdSql.Data.Client.Managed
 			return response;
 		}
 
-		public async ValueTask SendWireCryptToBuffer(IXdrWriter xdr, AsyncWrappingCommonArgs async)
+		public async ValueTask SendWireCryptToBufferAsync(IXdrWriter xdr, AsyncWrappingCommonArgs async)
 		{
 			if (WireCrypt == WireCryptOption.Disabled)
 				return;
 
-			await xdr.Write(IscCodes.op_crypt, async).ConfigureAwait(false);
-			await xdr.Write(FirebirdNetworkHandlingWrapper.EncryptionName, async).ConfigureAwait(false);
-			await xdr.Write(SessionKeyName, async).ConfigureAwait(false);
+			await xdr.WriteAsync(IscCodes.op_crypt, async).ConfigureAwait(false);
+			await xdr.WriteAsync(FirebirdNetworkHandlingWrapper.EncryptionName, async).ConfigureAwait(false);
+			await xdr.WriteAsync(SessionKeyName, async).ConfigureAwait(false);
 		}
 
-		public async ValueTask ProcessWireCryptResponse(IXdrReader xdr, GdsConnection connection, AsyncWrappingCommonArgs async)
+		public async ValueTask ProcessWireCryptResponseAsync(IXdrReader xdr, GdsConnection connection, AsyncWrappingCommonArgs async)
 		{
 			if (WireCrypt == WireCryptOption.Disabled)
 				return;
@@ -176,7 +176,7 @@ namespace FirebirdSql.Data.Client.Managed
 			// after writing before reading
 			connection.StartEncryption();
 
-			var response = await GdsConnection.ProcessOperation(await xdr.ReadOperation(async).ConfigureAwait(false), xdr, async).ConfigureAwait(false);
+			var response = await GdsConnection.ProcessOperationAsync(await xdr.ReadOperationAsync(async).ConfigureAwait(false), xdr, async).ConfigureAwait(false);
 			GdsConnection.ProcessResponse(response);
 
 			WireCryptInitialized = true;

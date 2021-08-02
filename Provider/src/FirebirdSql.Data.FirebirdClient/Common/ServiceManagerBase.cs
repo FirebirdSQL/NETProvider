@@ -26,10 +26,10 @@ namespace FirebirdSql.Data.Common
 
 		public int Handle { get; protected set; }
 
-		public abstract ValueTask Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask Detach(AsyncWrappingCommonArgs async);
-		public abstract ValueTask Start(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async);
-		public abstract ValueTask Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async);
+		public abstract ValueTask AttachAsync(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask DetachAsync(AsyncWrappingCommonArgs async);
+		public abstract ValueTask StartAsync(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async);
+		public abstract ValueTask QueryAsync(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async);
 
 		public abstract ServiceParameterBufferBase CreateServiceParameterBuffer();
 	}

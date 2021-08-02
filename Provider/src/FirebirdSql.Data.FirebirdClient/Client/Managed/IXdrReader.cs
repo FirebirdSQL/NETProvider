@@ -25,30 +25,30 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	interface IXdrReader
 	{
-		ValueTask<byte[]> ReadBytes(byte[] buffer, int count, AsyncWrappingCommonArgs async);
-		ValueTask<byte[]> ReadOpaque(int length, AsyncWrappingCommonArgs async);
-		ValueTask<byte[]> ReadBuffer(AsyncWrappingCommonArgs async);
-		ValueTask<string> ReadString(AsyncWrappingCommonArgs async);
-		ValueTask<string> ReadString(int length, AsyncWrappingCommonArgs async);
-		ValueTask<string> ReadString(Charset charset, AsyncWrappingCommonArgs async);
-		ValueTask<string> ReadString(Charset charset, int length, AsyncWrappingCommonArgs async);
-		ValueTask<short> ReadInt16(AsyncWrappingCommonArgs async);
-		ValueTask<int> ReadInt32(AsyncWrappingCommonArgs async);
-		ValueTask<long> ReadInt64(AsyncWrappingCommonArgs async);
-		ValueTask<Guid> ReadGuid(AsyncWrappingCommonArgs async);
-		ValueTask<float> ReadSingle(AsyncWrappingCommonArgs async);
-		ValueTask<double> ReadDouble(AsyncWrappingCommonArgs async);
-		ValueTask<DateTime> ReadDateTime(AsyncWrappingCommonArgs async);
-		ValueTask<DateTime> ReadDate(AsyncWrappingCommonArgs async);
-		ValueTask<TimeSpan> ReadTime(AsyncWrappingCommonArgs async);
-		ValueTask<decimal> ReadDecimal(int type, int scale, AsyncWrappingCommonArgs async);
-		ValueTask<bool> ReadBoolean(AsyncWrappingCommonArgs async);
-		ValueTask<FbZonedDateTime> ReadZonedDateTime(bool isExtended, AsyncWrappingCommonArgs async);
-		ValueTask<FbZonedTime> ReadZonedTime(bool isExtended, AsyncWrappingCommonArgs async);
-		ValueTask<FbDecFloat> ReadDec16(AsyncWrappingCommonArgs async);
-		ValueTask<FbDecFloat> ReadDec34(AsyncWrappingCommonArgs async);
-		ValueTask<BigInteger> ReadInt128(AsyncWrappingCommonArgs async);
-		ValueTask<IscException> ReadStatusVector(AsyncWrappingCommonArgs async);
-		ValueTask<int> ReadOperation(AsyncWrappingCommonArgs async);
+		ValueTask<byte[]> ReadBytesAsync(byte[] buffer, int count, AsyncWrappingCommonArgs async);
+		ValueTask<byte[]> ReadOpaqueAsync(int length, AsyncWrappingCommonArgs async);
+		ValueTask<byte[]> ReadBufferAsync(AsyncWrappingCommonArgs async);
+		ValueTask<string> ReadStringAsync(AsyncWrappingCommonArgs async);
+		ValueTask<string> ReadStringAsync(int length, AsyncWrappingCommonArgs async);
+		ValueTask<string> ReadStringAsync(Charset charset, AsyncWrappingCommonArgs async);
+		ValueTask<string> ReadStringAsync(Charset charset, int length, AsyncWrappingCommonArgs async);
+		ValueTask<short> ReadInt16Async(AsyncWrappingCommonArgs async);
+		ValueTask<int> ReadInt32Async(AsyncWrappingCommonArgs async);
+		ValueTask<long> ReadInt64Async(AsyncWrappingCommonArgs async);
+		ValueTask<Guid> ReadGuidAsync(AsyncWrappingCommonArgs async);
+		ValueTask<float> ReadSingleAsync(AsyncWrappingCommonArgs async);
+		ValueTask<double> ReadDoubleAsync(AsyncWrappingCommonArgs async);
+		ValueTask<DateTime> ReadDateTimeAsync(AsyncWrappingCommonArgs async);
+		ValueTask<DateTime> ReadDateAsync(AsyncWrappingCommonArgs async);
+		ValueTask<TimeSpan> ReadTimeAsync(AsyncWrappingCommonArgs async);
+		ValueTask<decimal> ReadDecimalAsync(int type, int scale, AsyncWrappingCommonArgs async);
+		ValueTask<bool> ReadBooleanAsync(AsyncWrappingCommonArgs async);
+		ValueTask<FbZonedDateTime> ReadZonedDateTimeAsync(bool isExtended, AsyncWrappingCommonArgs async);
+		ValueTask<FbZonedTime> ReadZonedTimeAsync(bool isExtended, AsyncWrappingCommonArgs async);
+		ValueTask<FbDecFloat> ReadDec16Async(AsyncWrappingCommonArgs async);
+		ValueTask<FbDecFloat> ReadDec34Async(AsyncWrappingCommonArgs async);
+		ValueTask<BigInteger> ReadInt128Async(AsyncWrappingCommonArgs async);
+		ValueTask<IscException> ReadStatusVectorAsync(AsyncWrappingCommonArgs async);
+		ValueTask<int> ReadOperationAsync(AsyncWrappingCommonArgs async);
 	}
 }

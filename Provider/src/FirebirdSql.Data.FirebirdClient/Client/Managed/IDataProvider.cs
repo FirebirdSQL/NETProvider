@@ -22,8 +22,8 @@ namespace FirebirdSql.Data.Client.Managed
 {
 	interface IDataProvider
 	{
-		ValueTask<int> Read(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async);
-		ValueTask Write(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async);
-		ValueTask Flush(AsyncWrappingCommonArgs async);
+		ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async);
+		ValueTask WriteAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async);
+		ValueTask FlushAsync(AsyncWrappingCommonArgs async);
 	}
 }

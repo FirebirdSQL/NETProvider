@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public bool IOFailed { get; set; }
 
-		public async ValueTask<int> Read(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
+		public async ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
 		{
 			if (_inputBuffer.Count < count)
 			{
@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Client.Managed
 				int read;
 				try
 				{
-					read = await _dataProvider.Read(readBuffer, 0, readBuffer.Length, async).ConfigureAwait(false);
+					read = await _dataProvider.ReadAsync(readBuffer, 0, readBuffer.Length, async).ConfigureAwait(false);
 				}
 				catch (IOException)
 				{
@@ -87,14 +87,14 @@ namespace FirebirdSql.Data.Client.Managed
 			return dataLength;
 		}
 
-		public ValueTask Write(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
+		public ValueTask WriteAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
 		{
 			for (var i = offset; i < count; i++)
 				_outputBuffer.Enqueue(buffer[offset + i]);
 			return ValueTask2.CompletedTask;
 		}
 
-		public async ValueTask Flush(AsyncWrappingCommonArgs async)
+		public async ValueTask FlushAsync(AsyncWrappingCommonArgs async)
 		{
 			var buffer = _outputBuffer.ToArray();
 			_outputBuffer.Clear();
@@ -110,8 +110,8 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			try
 			{
-				await _dataProvider.Write(buffer, 0, count, async).ConfigureAwait(false);
-				await _dataProvider.Flush(async).ConfigureAwait(false);
+				await _dataProvider.WriteAsync(buffer, 0, count, async).ConfigureAwait(false);
+				await _dataProvider.FlushAsync(async).ConfigureAwait(false);
 			}
 			catch (IOException)
 			{

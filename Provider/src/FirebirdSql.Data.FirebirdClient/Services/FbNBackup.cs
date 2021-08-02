@@ -52,7 +52,7 @@ namespace FirebirdSql.Data.Services
 
 			try
 			{
-				await Open(async).ConfigureAwait(false);
+				await OpenAsync(async).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_nbak);
 				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -60,8 +60,8 @@ namespace FirebirdSql.Data.Services
 				startSpb.Append2(IscCodes.isc_spb_nbk_file, BackupFile, SpbFilenameEncoding);
 				startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await Close(async).ConfigureAwait(false);
+				await CloseAsync(async).ConfigureAwait(false);
 			}
 		}
 	}

@@ -34,38 +34,38 @@ namespace FirebirdSql.Data.Common
 		public abstract bool HasRemoteEventSupport { get; }
 		public abstract bool ConnectionBroken { get; }
 
-		public abstract ValueTask Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask Detach(AsyncWrappingCommonArgs async);
+		public abstract ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask DetachAsync(AsyncWrappingCommonArgs async);
 
-		public abstract ValueTask CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask DropDatabase(AsyncWrappingCommonArgs async);
+		public abstract ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
+		public abstract ValueTask DropDatabaseAsync(AsyncWrappingCommonArgs async);
 
-		public abstract ValueTask<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<TransactionBase> BeginTransactionAsync(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
 
 		public abstract StatementBase CreateStatement();
 		public abstract StatementBase CreateStatement(TransactionBase transaction);
 
 		public abstract DatabaseParameterBufferBase CreateDatabaseParameterBuffer();
 
-		public abstract ValueTask<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async);
-		public abstract ValueTask<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, AsyncWrappingCommonArgs async);
+		public abstract ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
 
-		public abstract ValueTask CloseEventManager(AsyncWrappingCommonArgs async);
-		public abstract ValueTask QueueEvents(RemoteEvent events, AsyncWrappingCommonArgs async);
-		public abstract ValueTask CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async);
+		public abstract ValueTask CloseEventManagerAsync(AsyncWrappingCommonArgs async);
+		public abstract ValueTask QueueEventsAsync(RemoteEvent events, AsyncWrappingCommonArgs async);
+		public abstract ValueTask CancelEventsAsync(RemoteEvent events, AsyncWrappingCommonArgs async);
 
-		public abstract ValueTask CancelOperation(int kind, AsyncWrappingCommonArgs async);
+		public abstract ValueTask CancelOperationAsync(int kind, AsyncWrappingCommonArgs async);
 
-		public async ValueTask<string> GetServerVersion(AsyncWrappingCommonArgs async)
+		public async ValueTask<string> GetServerVersionAsync(AsyncWrappingCommonArgs async)
 		{
 			var items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
-			var info = await GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256, async).ConfigureAwait(false);
+			var info = await GetDatabaseInfoAsync(items, IscCodes.BUFFER_SIZE_256, async).ConfigureAwait(false);
 			return (string)info[info.Count -1];
 		}
 	}

@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Methods
 
-		public override ValueTask CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -101,12 +101,12 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
 
-		public override ValueTask DropDatabase(AsyncWrappingCommonArgs async)
+		public override ValueTask DropDatabaseAsync(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -123,17 +123,17 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Remote Events Methods
 
-		public override ValueTask CloseEventManager(AsyncWrappingCommonArgs async)
+		public override ValueTask CloseEventManagerAsync(AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
 
-		public override ValueTask QueueEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
+		public override ValueTask QueueEventsAsync(RemoteEvent events, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
 
-		public override ValueTask CancelEvents(RemoteEvent events, AsyncWrappingCommonArgs async)
+		public override ValueTask CancelEventsAsync(RemoteEvent events, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
@@ -142,7 +142,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override async ValueTask Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override async ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -160,15 +160,15 @@ namespace FirebirdSql.Data.Client.Native
 
 			ProcessStatusVector(_statusVector);
 
-			ServerVersion = await GetServerVersion(async).ConfigureAwait(false);
+			ServerVersion = await GetServerVersionAsync(async).ConfigureAwait(false);
 		}
 
-		public override ValueTask AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
 
-		public override ValueTask Detach(AsyncWrappingCommonArgs async)
+		public override ValueTask DetachAsync(AsyncWrappingCommonArgs async)
 		{
 			if (TransactionCount > 0)
 			{
@@ -201,10 +201,10 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Transaction Methods
 
-		public override async ValueTask<TransactionBase> BeginTransaction(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override async ValueTask<TransactionBase> BeginTransactionAsync(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
 		{
 			var transaction = new FesTransaction(this);
-			await transaction.BeginTransaction(tpb, async).ConfigureAwait(false);
+			await transaction.BeginTransactionAsync(tpb, async).ConfigureAwait(false);
 			return transaction;
 		}
 
@@ -212,7 +212,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Cancel Methods
 
-		public override ValueTask CancelOperation(int kind, AsyncWrappingCommonArgs async)
+		public override ValueTask CancelOperationAsync(int kind, AsyncWrappingCommonArgs async)
 		{
 			var localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
@@ -255,12 +255,12 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Information Methods
 
-		public override ValueTask<List<object>> GetDatabaseInfo(byte[] items, AsyncWrappingCommonArgs async)
+		public override ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, AsyncWrappingCommonArgs async)
 		{
-			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
+			return GetDatabaseInfoAsync(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
 		}
 
-		public override ValueTask<List<object>> GetDatabaseInfo(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		public override ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
 		{
 			var buffer = new byte[bufferLength];
 

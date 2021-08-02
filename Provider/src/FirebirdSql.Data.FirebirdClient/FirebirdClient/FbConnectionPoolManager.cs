@@ -41,9 +41,9 @@ namespace FirebirdSql.Data.FirebirdClient
 				Connection = connection;
 			}
 
-			public Task Release(AsyncWrappingCommonArgs async)
+			public Task ReleaseAsync(AsyncWrappingCommonArgs async)
 			{
-				return Connection.Disconnect(async);
+				return Connection.DisconnectAsync(async);
 			}
 		}
 
@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						keep = keep.Concat(available.Except(keep).OrderByDescending(x => x.Created).Take(_connectionString.MinPoolSize - keepCount)).ToList();
 					}
 					var release = available.Except(keep).ToList();
-					Parallel.ForEach(release, x => x.Release(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult());
+					Parallel.ForEach(release, x => x.ReleaseAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult());
 					_available = new Stack<Item>(keep);
 				}
 			}
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			void CleanConnectionsImpl()
 			{
-				Parallel.ForEach(_available, x => x.Release(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult());
+				Parallel.ForEach(_available, x => x.ReleaseAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult());
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]

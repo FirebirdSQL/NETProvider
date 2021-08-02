@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.Schema
 
 		#region Methods
 
-		public async Task<DataTable> GetSchema(FbConnection connection, string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
+		public async Task<DataTable> GetSchemaAsync(FbConnection connection, string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
 		{
 			var dataTable = new DataTable(collectionName);
 			var command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions));

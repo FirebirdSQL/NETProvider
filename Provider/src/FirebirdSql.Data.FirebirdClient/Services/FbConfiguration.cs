@@ -34,13 +34,13 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void SetSweepInterval(int sweepInterval) => SetSweepIntervalImpl(sweepInterval, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -49,13 +49,13 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void SetPageBuffers(int pageBuffers) => SetPageBuffersImpl(pageBuffers, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -64,13 +64,13 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void DatabaseShutdown(FbShutdownMode mode, int seconds) => DatabaseShutdownImpl(mode, seconds, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -79,7 +79,7 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -95,8 +95,8 @@ namespace FirebirdSql.Data.Services
 					startSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
 					break;
 			}
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void DatabaseShutdown2(FbShutdownOnlineMode mode, FbShutdownType type, int seconds) => DatabaseShutdown2Impl(mode, type, seconds, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -122,8 +122,8 @@ namespace FirebirdSql.Data.Services
 					startSpb.Append(IscCodes.isc_spb_prp_transactions_shutdown, seconds);
 					break;
 			}
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void DatabaseOnline() => DatabaseOnlineImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -132,13 +132,13 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void DatabaseOnline2(FbShutdownOnlineMode mode) => DatabaseOnline2Impl(mode, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -147,13 +147,13 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void ActivateShadows() => ActivateShadowsImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -162,13 +162,13 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void SetForcedWrites(bool forcedWrites) => SetForcedWritesImpl(forcedWrites, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -177,7 +177,7 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -189,8 +189,8 @@ namespace FirebirdSql.Data.Services
 			{
 				startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_async);
 			}
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void SetReserveSpace(bool reserveSpace) => SetReserveSpaceImpl(reserveSpace, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -199,7 +199,7 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -211,8 +211,8 @@ namespace FirebirdSql.Data.Services
 			{
 				startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res_use_full);
 			}
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void SetAccessMode(bool readOnly) => SetAccessModeImpl(readOnly, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -221,13 +221,13 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		public void NoLinger() => NoLingerImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
@@ -236,13 +236,13 @@ namespace FirebirdSql.Data.Services
 		{
 			EnsureDatabase();
 
-			await Open(async).ConfigureAwait(false);
+			await OpenAsync(async).ConfigureAwait(false);
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_nolinger);
-			await StartTask(startSpb, async).ConfigureAwait(false);
-			await Close(async).ConfigureAwait(false);
+			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+			await CloseAsync(async).ConfigureAwait(false);
 		}
 
 		private static byte FbShutdownOnlineModeToIscCode(FbShutdownOnlineMode mode)

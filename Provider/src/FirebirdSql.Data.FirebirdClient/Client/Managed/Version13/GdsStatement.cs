@@ -39,7 +39,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 		#region Overriden Methods
 
-		protected override async ValueTask<byte[]> WriteParameters(AsyncWrappingCommonArgs async)
+		protected override async ValueTask<byte[]> WriteParametersAsync(AsyncWrappingCommonArgs async)
 		{
 			if (_parameters == null)
 				return null;
@@ -54,7 +54,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					for (var i = 0; i < _parameters.Count; i++)
 					{
 						var field = _parameters[i];
-						bits.Set(i, await field.DbValue.IsDBNull(async).ConfigureAwait(false));
+						bits.Set(i, await field.DbValue.IsDBNullAsync(async).ConfigureAwait(false));
 					}
 					var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
 					for (var i = 0; i < buffer.Length * 8; i++)
@@ -63,19 +63,19 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						// LSB
 						buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
 					}
-					await xdr.WriteOpaque(buffer, async).ConfigureAwait(false);
+					await xdr.WriteOpaqueAsync(buffer, async).ConfigureAwait(false);
 
 					for (var i = 0; i < _parameters.Count; i++)
 					{
 						var field = _parameters[i];
-						if (await field.DbValue.IsDBNull(async).ConfigureAwait(false))
+						if (await field.DbValue.IsDBNullAsync(async).ConfigureAwait(false))
 						{
 							continue;
 						}
-						await WriteRawParameter(xdr, field, async).ConfigureAwait(false);
+						await WriteRawParameterAsync(xdr, field, async).ConfigureAwait(false);
 					}
 
-					await xdr.Flush(async).ConfigureAwait(false);
+					await xdr.FlushAsync(async).ConfigureAwait(false);
 					return ms.ToArray();
 				}
 				catch (IOException ex)
@@ -85,14 +85,14 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 		}
 
-		protected override async ValueTask<DbValue[]> ReadRow(AsyncWrappingCommonArgs async)
+		protected override async ValueTask<DbValue[]> ReadRowAsync(AsyncWrappingCommonArgs async)
 		{
 			var row = new DbValue[_fields.Count];
 			try
 			{
 				if (_fields.Count > 0)
 				{
-					var nullBytes = await _database.Xdr.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d), async).ConfigureAwait(false);
+					var nullBytes = await _database.Xdr.ReadOpaqueAsync((int)Math.Ceiling(_fields.Count / 8d), async).ConfigureAwait(false);
 					var nullBits = new BitArray(nullBytes);
 					for (var i = 0; i < _fields.Count; i++)
 					{
@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 						}
 						else
 						{
-							var value = await ReadRawValue(_database.Xdr, _fields[i], async).ConfigureAwait(false);
+							var value = await ReadRawValueAsync(_database.Xdr, _fields[i], async).ConfigureAwait(false);
 							row[i] = new DbValue(this, _fields[i], value);
 						}
 					}

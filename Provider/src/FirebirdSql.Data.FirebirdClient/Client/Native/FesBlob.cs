@@ -78,7 +78,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override ValueTask Create(AsyncWrappingCommonArgs async)
+		protected override ValueTask CreateAsync(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -100,7 +100,7 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask Open(AsyncWrappingCommonArgs async)
+		protected override ValueTask OpenAsync(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -121,7 +121,7 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask GetSegment(Stream stream, AsyncWrappingCommonArgs async)
+		protected override ValueTask GetSegmentAsync(Stream stream, AsyncWrappingCommonArgs async)
 		{
 			var requested = (short)SegmentSize;
 			short segmentLength = 0;
@@ -162,7 +162,7 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask PutSegment(byte[] buffer, AsyncWrappingCommonArgs async)
+		protected override ValueTask PutSegmentAsync(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -177,12 +177,12 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask Seek(int position, AsyncWrappingCommonArgs async)
+		protected override ValueTask SeekAsync(int position, AsyncWrappingCommonArgs async)
 		{
 			throw new NotSupportedException();
 		}
 
-		protected override ValueTask Close(AsyncWrappingCommonArgs async)
+		protected override ValueTask CloseAsync(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 
@@ -193,7 +193,7 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask Cancel(AsyncWrappingCommonArgs async)
+		protected override ValueTask CancelAsync(AsyncWrappingCommonArgs async)
 		{
 			ClearStatusVector();
 

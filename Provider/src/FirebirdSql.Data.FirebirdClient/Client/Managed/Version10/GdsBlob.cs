@@ -77,11 +77,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Protected Methods
 
-		protected override async ValueTask Create(AsyncWrappingCommonArgs async)
+		protected override async ValueTask CreateAsync(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await CreateOrOpen(IscCodes.op_create_blob, null, async).ConfigureAwait(false);
+				await CreateOrOpenAsync(IscCodes.op_create_blob, null, async).ConfigureAwait(false);
 				RblAddValue(IscCodes.RBL_create);
 			}
 			catch (IscException)
@@ -90,11 +90,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async ValueTask Open(AsyncWrappingCommonArgs async)
+		protected override async ValueTask OpenAsync(AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await CreateOrOpen(IscCodes.op_open_blob, null, async).ConfigureAwait(false);
+				await CreateOrOpenAsync(IscCodes.op_open_blob, null, async).ConfigureAwait(false);
 			}
 			catch (IscException)
 			{
@@ -102,19 +102,19 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async ValueTask GetSegment(Stream stream, AsyncWrappingCommonArgs async)
+		protected override async ValueTask GetSegmentAsync(Stream stream, AsyncWrappingCommonArgs async)
 		{
 			var requested = SegmentSize;
 
 			try
 			{
-				await _database.Xdr.Write(IscCodes.op_get_segment, async).ConfigureAwait(false);
-				await _database.Xdr.Write(_blobHandle, async).ConfigureAwait(false);
-				await _database.Xdr.Write(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12, async).ConfigureAwait(false);
-				await _database.Xdr.Write(DataSegment, async).ConfigureAwait(false);
-				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(IscCodes.op_get_segment, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_blobHandle, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(DataSegment, async).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
 
-				var response = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+				var response = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
 
 				RblRemoveValue(IscCodes.RBL_segment);
 				if (response.ObjectHandle == 1)
@@ -152,16 +152,16 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async ValueTask PutSegment(byte[] buffer, AsyncWrappingCommonArgs async)
+		protected override async ValueTask PutSegmentAsync(byte[] buffer, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await _database.Xdr.Write(IscCodes.op_batch_segments, async).ConfigureAwait(false);
-				await _database.Xdr.Write(_blobHandle, async).ConfigureAwait(false);
-				await _database.Xdr.WriteBlobBuffer(buffer, async).ConfigureAwait(false);
-				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(IscCodes.op_batch_segments, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_blobHandle, async).ConfigureAwait(false);
+				await _database.Xdr.WriteBlobBufferAsync(buffer, async).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
 
-				await _database.ReadResponse(async).ConfigureAwait(false);
+				await _database.ReadResponseAsync(async).ConfigureAwait(false);
 			}
 			catch (IOException ex)
 			{
@@ -169,17 +169,17 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async ValueTask Seek(int position, AsyncWrappingCommonArgs async)
+		protected override async ValueTask SeekAsync(int position, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await _database.Xdr.Write(IscCodes.op_seek_blob, async).ConfigureAwait(false);
-				await _database.Xdr.Write(_blobHandle, async).ConfigureAwait(false);
-				await _database.Xdr.Write(SeekMode, async).ConfigureAwait(false);
-				await _database.Xdr.Write(position, async).ConfigureAwait(false);
-				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(IscCodes.op_seek_blob, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_blobHandle, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(SeekMode, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(position, async).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
 
-				var response = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+				var response = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
 
 				_position = response.ObjectHandle;
 			}
@@ -189,34 +189,34 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override ValueTask Close(AsyncWrappingCommonArgs async)
+		protected override ValueTask CloseAsync(AsyncWrappingCommonArgs async)
 		{
-			return _database.ReleaseObject(IscCodes.op_close_blob, _blobHandle, async);
+			return _database.ReleaseObjectAsync(IscCodes.op_close_blob, _blobHandle, async);
 		}
 
-		protected override ValueTask Cancel(AsyncWrappingCommonArgs async)
+		protected override ValueTask CancelAsync(AsyncWrappingCommonArgs async)
 		{
-			return _database.ReleaseObject(IscCodes.op_cancel_blob, _blobHandle, async);
+			return _database.ReleaseObjectAsync(IscCodes.op_cancel_blob, _blobHandle, async);
 		}
 
 		#endregion
 
 		#region Private API Methods
 
-		private async ValueTask CreateOrOpen(int op, BlobParameterBuffer bpb, AsyncWrappingCommonArgs async)
+		private async ValueTask CreateOrOpenAsync(int op, BlobParameterBuffer bpb, AsyncWrappingCommonArgs async)
 		{
 			try
 			{
-				await _database.Xdr.Write(op, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(op, async).ConfigureAwait(false);
 				if (bpb != null)
 				{
-					await _database.Xdr.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray(), async).ConfigureAwait(false);
+					await _database.Xdr.WriteTypedAsync(IscCodes.isc_bpb_version1, bpb.ToArray(), async).ConfigureAwait(false);
 				}
-				await _database.Xdr.Write(_transaction.Handle, async).ConfigureAwait(false);
-				await _database.Xdr.Write(_blobId, async).ConfigureAwait(false);
-				await _database.Xdr.Flush(async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_transaction.Handle, async).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_blobId, async).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
 
-				var response = (GenericResponse)await _database.ReadResponse(async).ConfigureAwait(false);
+				var response = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
 
 				_blobId = response.BlobId;
 				_blobHandle = response.ObjectHandle;

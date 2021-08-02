@@ -35,11 +35,11 @@ namespace FirebirdSql.Data.Services
 		{
 			try
 			{
-				await Open(async).ConfigureAwait(false);
+				await OpenAsync(async).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer3();
 				startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
-				await StartTask(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutput(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -47,7 +47,7 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await Close(async).ConfigureAwait(false);
+				await CloseAsync(async).ConfigureAwait(false);
 			}
 		}
 	}
