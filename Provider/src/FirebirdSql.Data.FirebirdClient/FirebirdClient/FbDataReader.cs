@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region DbDataReader overriden methods
 
-		public override void Close() => CloseImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public override void Close() => CloseImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 #if NET48 || NETSTANDARD2_0
 		public Task CloseAsync()
 #else
@@ -190,7 +190,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 #endif
 
-		public override bool Read() => ReadImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public override bool Read() => ReadImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public override Task<bool> ReadAsync(CancellationToken cancellationToken) => ReadImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<bool> ReadImpl(AsyncWrappingCommonArgs async)
 		{
@@ -228,7 +228,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return retValue;
 		}
 
-		public override DataTable GetSchemaTable() => GetSchemaTableImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public override DataTable GetSchemaTable() => GetSchemaTableImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 		public Task<DataTable> GetSchemaTableAsync(CancellationToken cancellationToken = default)
 #else
@@ -653,7 +653,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return CheckedGetValue(_row[i].GetDateTime);
 		}
 
-		public override bool IsDBNull(int i) => IsDBNullImpl(i, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public override bool IsDBNull(int i) => IsDBNullImpl(i, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public override Task<bool> IsDBNullAsync(int i, CancellationToken cancellationToken) => IsDBNullImpl(i, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<bool> IsDBNullImpl(int i, AsyncWrappingCommonArgs async)
 		{
@@ -669,7 +669,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new DbEnumerator(this, IsCommandBehavior(CommandBehavior.CloseConnection));
 		}
 
-		public override bool NextResult() => NextResultImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public override bool NextResult() => NextResultImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public override Task<bool> NextResultAsync(CancellationToken cancellationToken) => NextResultImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task<bool> NextResultImpl(AsyncWrappingCommonArgs async)
 		{
@@ -830,7 +830,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			try
 			{
-				return getter(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+				return getter(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 			}
 			catch (IscException ex)
 			{

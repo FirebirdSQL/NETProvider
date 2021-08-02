@@ -26,6 +26,8 @@ namespace FirebirdSql.Data.Common
 	[StructLayout(LayoutKind.Auto)]
 	internal struct AsyncWrappingCommonArgs
 	{
+		public static readonly AsyncWrappingCommonArgs Sync = new AsyncWrappingCommonArgs(false);
+
 		readonly bool _isAsync;
 		readonly CancellationToken _cancellationTokenRaw;
 		int _explicitCancel;

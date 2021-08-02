@@ -118,7 +118,7 @@ namespace FirebirdSql.Data.FirebirdClient
 						keep = keep.Concat(available.Except(keep).OrderByDescending(x => x.Created).Take(_connectionString.MinPoolSize - keepCount)).ToList();
 					}
 					var release = available.Except(keep).ToList();
-					Parallel.ForEach(release, x => x.Release(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult());
+					Parallel.ForEach(release, x => x.Release(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult());
 					_available = new Stack<Item>(keep);
 				}
 			}
@@ -136,7 +136,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			void CleanConnectionsImpl()
 			{
-				Parallel.ForEach(_available, x => x.Release(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult());
+				Parallel.ForEach(_available, x => x.Release(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult());
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]

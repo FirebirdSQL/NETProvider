@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Services
 			: base(connectionString)
 		{ }
 
-		public void AddUser(FbUserData user) => AddUserImpl(user, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void AddUser(FbUserData user) => AddUserImpl(user, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task AddUserAsync(FbUserData user, CancellationToken cancellationToken = default) => AddUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task AddUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
 		{
@@ -59,7 +59,7 @@ namespace FirebirdSql.Data.Services
 			await Close(async).ConfigureAwait(false);
 		}
 
-		public void DeleteUser(FbUserData user) => DeleteUserImpl(user, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void DeleteUser(FbUserData user) => DeleteUserImpl(user, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task DeleteUserAsync(FbUserData user, CancellationToken cancellationToken = default) => DeleteUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task DeleteUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
 		{
@@ -76,7 +76,7 @@ namespace FirebirdSql.Data.Services
 			await Close(async).ConfigureAwait(false);
 		}
 
-		public void ModifyUser(FbUserData user) => ModifyUserImpl(user, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void ModifyUser(FbUserData user) => ModifyUserImpl(user, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task ModifyUserAsync(FbUserData user, CancellationToken cancellationToken = default) => ModifyUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task ModifyUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
 		{
@@ -105,7 +105,7 @@ namespace FirebirdSql.Data.Services
 			await Close(async).ConfigureAwait(false);
 		}
 
-		public FbUserData DisplayUser(string userName) => DisplayUserImpl(userName, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public FbUserData DisplayUser(string userName) => DisplayUserImpl(userName, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<FbUserData> DisplayUserAsync(string userName, CancellationToken cancellationToken = default) => DisplayUserImpl(userName, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<FbUserData> DisplayUserImpl(string userName, AsyncWrappingCommonArgs async)
 		{
@@ -119,7 +119,7 @@ namespace FirebirdSql.Data.Services
 			return ((FbUserData[])info.FirstOrDefault())?.FirstOrDefault();
 		}
 
-		public FbUserData[] DisplayUsers() => DisplayUsersImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public FbUserData[] DisplayUsers() => DisplayUsersImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<FbUserData[]> DisplayUsersAsync(CancellationToken cancellationToken = default) => DisplayUsersImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<FbUserData[]> DisplayUsersImpl(AsyncWrappingCommonArgs async)
 		{
@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.Services
 			return (FbUserData[])info.FirstOrDefault();
 		}
 
-		public string GetUsersDbPath() => GetUsersDbPathImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public string GetUsersDbPath() => GetUsersDbPathImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<string> GetUsersDbPathAsync(CancellationToken cancellationToken = default) => GetUsersDbPathImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<string> GetUsersDbPathImpl(AsyncWrappingCommonArgs async)
 		{

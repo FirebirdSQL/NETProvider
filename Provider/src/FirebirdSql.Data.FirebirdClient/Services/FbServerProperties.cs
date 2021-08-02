@@ -31,56 +31,56 @@ namespace FirebirdSql.Data.Services
 			: base(connectionString)
 		{ }
 
-		public int GetVersion() => GetVersionImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public int GetVersion() => GetVersionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<int> GetVersionAsync(CancellationToken cancellationToken = default) => GetVersionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task<int> GetVersionImpl(AsyncWrappingCommonArgs async)
 		{
 			return GetInt32(IscCodes.isc_info_svc_version, async);
 		}
 
-		public string GetServerVersion() => GetServerVersionImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public string GetServerVersion() => GetServerVersionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<string> GetServerVersionAsync(CancellationToken cancellationToken = default) => GetServerVersionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task<string> GetServerVersionImpl(AsyncWrappingCommonArgs async)
 		{
 			return GetString(IscCodes.isc_info_svc_server_version, async);
 		}
 
-		public string GetImplementation() => GetImplementationImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public string GetImplementation() => GetImplementationImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<string> GetImplementationAsync(CancellationToken cancellationToken = default) => GetImplementationImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task<string> GetImplementationImpl(AsyncWrappingCommonArgs async)
 		{
 			return GetString(IscCodes.isc_info_svc_implementation, async);
 		}
 
-		public string GetRootDirectory() => GetRootDirectoryImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public string GetRootDirectory() => GetRootDirectoryImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<string> GetRootDirectoryAsync(CancellationToken cancellationToken = default) => GetRootDirectoryImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task<string> GetRootDirectoryImpl(AsyncWrappingCommonArgs async)
 		{
 			return GetString(IscCodes.isc_info_svc_get_env, async);
 		}
 
-		public string GetLockManager() => GetLockManagerImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public string GetLockManager() => GetLockManagerImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<string> GetLockManagerAsync(CancellationToken cancellationToken = default) => GetLockManagerImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task<string> GetLockManagerImpl(AsyncWrappingCommonArgs async)
 		{
 			return GetString(IscCodes.isc_info_svc_get_env_lock, async);
 		}
 
-		public string GetMessageFile() => GetMessageFileImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public string GetMessageFile() => GetMessageFileImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<string> GetMessageFileAsync(CancellationToken cancellationToken = default) => GetMessageFileImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task<string> GetMessageFileImpl(AsyncWrappingCommonArgs async)
 		{
 			return GetString(IscCodes.isc_info_svc_get_env_msg, async);
 		}
 
-		public FbDatabasesInfo GetDatabasesInfo() => GetDatabasesInfoImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public FbDatabasesInfo GetDatabasesInfo() => GetDatabasesInfoImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<FbDatabasesInfo> GetDatabasesInfoAsync(CancellationToken cancellationToken = default) => GetDatabasesInfoImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<FbDatabasesInfo> GetDatabasesInfoImpl(AsyncWrappingCommonArgs async)
 		{
 			return (FbDatabasesInfo)(await GetInfo(IscCodes.isc_info_svc_svr_db_info, async).ConfigureAwait(false)).FirstOrDefault() ?? new FbDatabasesInfo();
 		}
 
-		public FbServerConfig GetServerConfig() => GetServerConfigImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public FbServerConfig GetServerConfig() => GetServerConfigImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task<FbServerConfig> GetServerConfigAsync(CancellationToken cancellationToken = default) => GetServerConfigImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task<FbServerConfig> GetServerConfigImpl(AsyncWrappingCommonArgs async)
 		{

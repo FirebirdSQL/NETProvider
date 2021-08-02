@@ -89,7 +89,7 @@ namespace FirebirdSql.Data.Isql
 		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
 		/// </summary>
 		/// <param name="autoCommit">Specifies if the transaction should be committed after a DDL command execution</param>
-		public void Execute(bool autoCommit = true) => ExecuteImpl(autoCommit, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void Execute(bool autoCommit = true) => ExecuteImpl(autoCommit, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		/// <summary>
 		/// Starts the ordered execution of the SQL statements that are in <see cref="SqlStatements"/> collection.
 		/// </summary>

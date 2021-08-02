@@ -37,7 +37,7 @@ namespace FirebirdSql.Data.Services
 			DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
 		}
 
-		public void Start(string sessionName) => StartImpl(sessionName, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void Start(string sessionName) => StartImpl(sessionName, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task StartAsync(string sessionName, CancellationToken cancellationToken = default) => StartImpl(sessionName, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private async Task StartImpl(string sessionName, AsyncWrappingCommonArgs async)
 		{
@@ -69,28 +69,28 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		public void Stop(int sessionID) => StopImpl(sessionID, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void Stop(int sessionID) => StopImpl(sessionID, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task StopAsync(int sessionID, CancellationToken cancellationToken = default) => StopImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task StopImpl(int sessionID, AsyncWrappingCommonArgs async)
 		{
 			return DoSimpleAction(IscCodes.isc_action_svc_trace_stop, sessionID, async);
 		}
 
-		public void Suspend(int sessionID) => SuspendImpl(sessionID, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void Suspend(int sessionID) => SuspendImpl(sessionID, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task SuspendAsync(int sessionID, CancellationToken cancellationToken = default) => SuspendImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task SuspendImpl(int sessionID, AsyncWrappingCommonArgs async)
 		{
 			return DoSimpleAction(IscCodes.isc_action_svc_trace_suspend, sessionID, async);
 		}
 
-		public void Resume(int sessionID) => ResumeImpl(sessionID, new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void Resume(int sessionID) => ResumeImpl(sessionID, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task ResumeAsync(int sessionID, CancellationToken cancellationToken = default) => ResumeImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task ResumeImpl(int sessionID, AsyncWrappingCommonArgs async)
 		{
 			return DoSimpleAction(IscCodes.isc_action_svc_trace_resume, sessionID, async);
 		}
 
-		public void List() => ListImpl(new AsyncWrappingCommonArgs(false)).GetAwaiter().GetResult();
+		public void List() => ListImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public Task ListAsync(CancellationToken cancellationToken = default) => ListImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
 		private Task ListImpl(AsyncWrappingCommonArgs async)
 		{
