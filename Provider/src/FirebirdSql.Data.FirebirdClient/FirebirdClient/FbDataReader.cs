@@ -676,9 +676,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return Task.FromResult(false);
 		}
 
-#endregion
+		#endregion
 
-#region Private Methods
+		#region Private Methods
 
 		private void CheckPosition()
 		{
@@ -746,9 +746,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			return index;
 		}
 
-#endregion
+		#endregion
 
-#region Static Methods
+		#region Static Methods
 
 		private static bool IsReadOnly(FbDataReader r)
 		{
@@ -838,6 +838,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-#endregion
+		#endregion
 	}
 }
