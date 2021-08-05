@@ -14,6 +14,7 @@ jobs:
       matrix:
         FIREBIRD_SELECTION: [FB30, FB40]
         TEST_SUITE: [Tests-FirebirdClient-Default-Compression-CryptRequired, Tests-FirebirdClient-Default-NoCompression-CryptRequired, Tests-FirebirdClient-Default-Compression-CryptDisabled, Tests-FirebirdClient-Default-NoCompression-CryptDisabled, Tests-FirebirdClient-Embedded, Tests-EFCore, Tests-EFCore-Functional, Tests-EF6]
+    timeout-minutes: 120
     steps:
       - name: Checkout
         uses: actions/checkout@v2
