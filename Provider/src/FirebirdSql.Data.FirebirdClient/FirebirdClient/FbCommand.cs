@@ -429,22 +429,22 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckCommand();
 
-			try
+			using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, Cancel))
 			{
-				using (async.EnterExplicitCancel(Cancel))
+				try
 				{
-					await PrepareAsync(false, async).ConfigureAwait(false);
+					await PrepareAsync(false, explicitCancellation.Async).ConfigureAwait(false);
 				}
-			}
-			catch (IscException ex)
-			{
-				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
-				throw FbException.Create(ex);
-			}
-			catch
-			{
-				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
-				throw;
+				catch (IscException ex)
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					throw FbException.Create(ex);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					throw;
+				}
 			}
 		}
 
@@ -454,29 +454,29 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckCommand();
 
-			try
+			using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, Cancel))
 			{
-				using (async.EnterExplicitCancel(Cancel))
+				try
 				{
-					await ExecuteCommandAsync(CommandBehavior.Default, false, async).ConfigureAwait(false);
+					await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.Async).ConfigureAwait(false);
 
 					if (_statement.StatementType == DbStatementType.StoredProcedure)
 					{
-						await SetOutputParametersAsync(async).ConfigureAwait(false);
+						await SetOutputParametersAsync(explicitCancellation.Async).ConfigureAwait(false);
 					}
 
-					await CommitImplicitTransactionAsync(async).ConfigureAwait(false);
+					await CommitImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
 				}
-			}
-			catch (IscException ex)
-			{
-				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
-				throw FbException.Create(ex);
-			}
-			catch
-			{
-				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
-				throw;
+				catch (IscException ex)
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					throw FbException.Create(ex);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					throw;
+				}
 			}
 
 			return _statement.StatementType switch
@@ -498,26 +498,25 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckCommand();
 
-			try
+			using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, Cancel))
 			{
-				using (async.EnterExplicitCancel(Cancel))
+				try
 				{
-					await ExecuteCommandAsync(behavior, true, async).ConfigureAwait(false);
+					await ExecuteCommandAsync(behavior, true, explicitCancellation.Async).ConfigureAwait(false);
 				}
-			}
-			catch (IscException ex)
-			{
-				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
-				throw FbException.Create(ex);
-			}
-			catch
-			{
-				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
-				throw;
+				catch (IscException ex)
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					throw FbException.Create(ex);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					throw;
+				}
 			}
 
 			_activeReader = new FbDataReader(this, _connection, behavior);
-
 			return _activeReader;
 		}
 
@@ -530,42 +529,42 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			CheckCommand();
 
-			try
+			using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, Cancel))
 			{
-				using (async.EnterExplicitCancel(Cancel))
+				try
 				{
-					await ExecuteCommandAsync(CommandBehavior.Default, false, async).ConfigureAwait(false);
+					await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.Async).ConfigureAwait(false);
 
 					// Gets	only the values	of the first row or
 					// the output parameters values if command is an Stored Procedure
 					if (_statement.StatementType == DbStatementType.StoredProcedure)
 					{
 						values = _statement.GetOutputParameters();
-						await SetOutputParametersAsync(values, async).ConfigureAwait(false);
+						await SetOutputParametersAsync(values, explicitCancellation.Async).ConfigureAwait(false);
 					}
 					else
 					{
-						values = await _statement.FetchAsync(async).ConfigureAwait(false);
+						values = await _statement.FetchAsync(explicitCancellation.Async).ConfigureAwait(false);
 					}
 
 					// Get the return value
 					if (values != null && values.Length > 0)
 					{
-						val = await values[0].GetValueAsync(async).ConfigureAwait(false);
+						val = await values[0].GetValueAsync(explicitCancellation.Async).ConfigureAwait(false);
 					}
 
-					await CommitImplicitTransactionAsync(async).ConfigureAwait(false);
+					await CommitImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
 				}
-			}
-			catch (IscException ex)
-			{
-				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
-				throw FbException.Create(ex);
-			}
-			catch
-			{
-				await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
-				throw;
+				catch (IscException ex)
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					throw FbException.Create(ex);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					throw;
+				}
 			}
 
 			return val;

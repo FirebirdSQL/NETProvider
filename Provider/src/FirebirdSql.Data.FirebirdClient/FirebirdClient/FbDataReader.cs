@@ -196,36 +196,31 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			CheckState();
 
-			var retValue = false;
-
-			if (IsCommandBehavior(CommandBehavior.SingleRow) && _position != StartPosition)
+			if (IsCommandBehavior(CommandBehavior.SchemaOnly))
 			{
+				return false;
+			}
+			else if (IsCommandBehavior(CommandBehavior.SingleRow) && _position != StartPosition)
+			{
+				return false;
 			}
 			else
 			{
-				if (IsCommandBehavior(CommandBehavior.SchemaOnly))
+				using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, _command.Cancel))
 				{
-				}
-				else
-				{
-					using (async.EnterExplicitCancel(_command.Cancel))
+					_row = await _command.FetchAsync(explicitCancellation.Async).ConfigureAwait(false);
+					if (_row != null)
 					{
-						_row = await _command.FetchAsync(async).ConfigureAwait(false);
-
-						if (_row != null)
-						{
-							_position++;
-							retValue = true;
-						}
-						else
-						{
-							_eof = true;
-						}
+						_position++;
+						return true;
+					}
+					else
+					{
+						_eof = true;
+						return false;
 					}
 				}
 			}
-
-			return retValue;
 		}
 
 		public override DataTable GetSchemaTable() => GetSchemaTableImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
