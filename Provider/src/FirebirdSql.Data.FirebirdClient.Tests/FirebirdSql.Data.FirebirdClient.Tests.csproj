@@ -12,8 +12,8 @@
 		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="NUnit" Version="3.13.1" />
-		<PackageReference Include="NUnitLite" Version="3.13.1" />
+		<PackageReference Include="NUnit" Version="3.13.2" />
+		<PackageReference Include="NUnitLite" Version="3.13.2" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
