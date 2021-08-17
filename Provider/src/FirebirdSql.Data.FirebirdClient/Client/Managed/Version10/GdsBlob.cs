@@ -30,7 +30,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Fields
 
-		private GdsDatabase _database;
+		private readonly GdsDatabase _database;
 		private int _blobHandle;
 
 		#endregion
