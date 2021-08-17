@@ -778,7 +778,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		#region Pad + Fill
 
-		readonly static byte[] PadArray = new byte[] { 0, 0, 0, 0 };
+		static readonly byte[] PadArray = new byte[] { 0, 0, 0, 0 };
 		void WritePad(int length)
 		{
 			_dataProvider.Write(PadArray, 0, length);
@@ -799,7 +799,7 @@ namespace FirebirdSql.Data.Client.Managed
 			await ReadBytesAsync(_smallBuffer, length, cancellationToken).ConfigureAwait(false);
 		}
 
-		readonly static byte[] FillArray = Enumerable.Repeat((byte)32, 32767).ToArray();
+		static readonly byte[] FillArray = Enumerable.Repeat((byte)32, 32767).ToArray();
 		void WriteFill(int length)
 		{
 			_dataProvider.Write(FillArray, 0, length);
