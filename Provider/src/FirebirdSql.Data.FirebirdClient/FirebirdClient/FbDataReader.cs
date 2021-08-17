@@ -445,9 +445,9 @@ namespace FirebirdSql.Data.FirebirdClient
 					{
 						if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
 						{
-							isReadOnly = (IsReadOnly(reader) || IsExpression(reader)) ? true : false;
-							isKeyColumn = (reader.GetInt32(2) == 1) ? true : false;
-							isUnique = (reader.GetInt32(3) == 1) ? true : false;
+							isReadOnly = IsReadOnly(reader) || IsExpression(reader);
+							isKeyColumn = reader.GetInt32(2) == 1;
+							isUnique = reader.GetInt32(3) == 1;
 							precision = reader.IsDBNull(4) ? -1 : reader.GetInt32(4);
 							isExpression = IsExpression(reader);
 						}
