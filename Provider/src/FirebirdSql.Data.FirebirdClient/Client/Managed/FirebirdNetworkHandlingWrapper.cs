@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
@@ -54,7 +55,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public bool IOFailed { get; set; }
 
-		public async ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
+		public int Read(byte[] buffer, int offset, int count)
 		{
 			if (_inputBuffer.Count < count)
 			{
@@ -62,7 +63,39 @@ namespace FirebirdSql.Data.Client.Managed
 				int read;
 				try
 				{
-					read = await _dataProvider.ReadAsync(readBuffer, 0, readBuffer.Length, async).ConfigureAwait(false);
+					read = _dataProvider.Read(readBuffer, 0, readBuffer.Length);
+				}
+				catch (IOException)
+				{
+					IOFailed = true;
+					throw;
+				}
+				if (read != 0)
+				{
+					if (_decryptor != null)
+					{
+						_decryptor.ProcessBytes(readBuffer, 0, read, readBuffer, 0);
+					}
+					if (_decompressor != null)
+					{
+						read = HandleDecompression(readBuffer, read);
+						readBuffer = _compressionBuffer;
+					}
+					WriteToInputBuffer(readBuffer, read);
+				}
+			}
+			var dataLength = ReadFromInputBuffer(buffer, offset, count);
+			return dataLength;
+		}
+		public async ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+		{
+			if (_inputBuffer.Count < count)
+			{
+				var readBuffer = _readBuffer;
+				int read;
+				try
+				{
+					read = await _dataProvider.ReadAsync(readBuffer, 0, readBuffer.Length, cancellationToken).ConfigureAwait(false);
 				}
 				catch (IOException)
 				{
@@ -87,14 +120,19 @@ namespace FirebirdSql.Data.Client.Managed
 			return dataLength;
 		}
 
-		public ValueTask WriteAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async)
+		public void Write(byte[] buffer, int offset, int count)
+		{
+			for (var i = offset; i < count; i++)
+				_outputBuffer.Enqueue(buffer[offset + i]);
+		}
+		public ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 		{
 			for (var i = offset; i < count; i++)
 				_outputBuffer.Enqueue(buffer[offset + i]);
 			return ValueTask2.CompletedTask;
 		}
 
-		public async ValueTask FlushAsync(AsyncWrappingCommonArgs async)
+		public void Flush()
 		{
 			var buffer = _outputBuffer.ToArray();
 			_outputBuffer.Clear();
@@ -110,8 +148,33 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			try
 			{
-				await _dataProvider.WriteAsync(buffer, 0, count, async).ConfigureAwait(false);
-				await _dataProvider.FlushAsync(async).ConfigureAwait(false);
+				_dataProvider.Write(buffer, 0, count);
+				_dataProvider.Flush();
+			}
+			catch (IOException)
+			{
+				IOFailed = true;
+				throw;
+			}
+		}
+		public async ValueTask FlushAsync(CancellationToken cancellationToken = default)
+		{
+			var buffer = _outputBuffer.ToArray();
+			_outputBuffer.Clear();
+			var count = buffer.Length;
+			if (_compressor != null)
+			{
+				count = HandleCompression(buffer, count);
+				buffer = _compressionBuffer;
+			}
+			if (_encryptor != null)
+			{
+				_encryptor.ProcessBytes(buffer, 0, count, buffer, 0);
+			}
+			try
+			{
+				await _dataProvider.WriteAsync(buffer, 0, count, cancellationToken).ConfigureAwait(false);
+				await _dataProvider.FlushAsync(cancellationToken).ConfigureAwait(false);
 			}
 			catch (IOException)
 			{

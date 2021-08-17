@@ -37,9 +37,7 @@ namespace FirebirdSql.Data.Services
 			DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
 		}
 
-		public void Start(string sessionName) => StartImpl(sessionName, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task StartAsync(string sessionName, CancellationToken cancellationToken = default) => StartImpl(sessionName, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task StartImpl(string sessionName, AsyncWrappingCommonArgs async)
+		public void Start(string sessionName)
 		{
 			var version = _version;
 			if (version == FbTraceVersion.Detect)
@@ -50,14 +48,14 @@ namespace FirebirdSql.Data.Services
 			{
 				var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
-				await OpenAsync(async).ConfigureAwait(false);
+				Open();
 				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_trace_start);
 				if (!string.IsNullOrEmpty(sessionName))
 					startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
 				startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
-				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+				StartTask(startSpb);
+				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -65,49 +63,86 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await CloseAsync(async).ConfigureAwait(false);
+				Close();
+			}
+		}
+		public async Task StartAsync(string sessionName, CancellationToken cancellationToken = default)
+		{
+			var version = _version;
+			if (version == FbTraceVersion.Detect)
+			{
+				version = await DetectVersionAsync(cancellationToken).ConfigureAwait(false);
+			}
+			try
+			{
+				var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
+
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				var startSpb = new ServiceParameterBuffer2();
+				startSpb.Append(IscCodes.isc_action_svc_trace_start);
+				if (!string.IsNullOrEmpty(sessionName))
+					startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
+				startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
+				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				throw FbException.Create(ex);
+			}
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
 
-		public void Stop(int sessionID) => StopImpl(sessionID, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task StopAsync(int sessionID, CancellationToken cancellationToken = default) => StopImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task StopImpl(int sessionID, AsyncWrappingCommonArgs async)
+		public void Stop(int sessionID)
 		{
-			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_stop, sessionID, async);
+			DoSimpleAction(IscCodes.isc_action_svc_trace_stop, sessionID);
+		}
+		public Task StopAsync(int sessionID, CancellationToken cancellationToken = default)
+		{
+			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_stop, sessionID, cancellationToken);
 		}
 
-		public void Suspend(int sessionID) => SuspendImpl(sessionID, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task SuspendAsync(int sessionID, CancellationToken cancellationToken = default) => SuspendImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task SuspendImpl(int sessionID, AsyncWrappingCommonArgs async)
+		public void Suspend(int sessionID)
 		{
-			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_suspend, sessionID, async);
+			DoSimpleAction(IscCodes.isc_action_svc_trace_suspend, sessionID);
+		}
+		public Task SuspendAsync(int sessionID, CancellationToken cancellationToken = default)
+		{
+			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_suspend, sessionID, cancellationToken);
 		}
 
-		public void Resume(int sessionID) => ResumeImpl(sessionID, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task ResumeAsync(int sessionID, CancellationToken cancellationToken = default) => ResumeImpl(sessionID, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task ResumeImpl(int sessionID, AsyncWrappingCommonArgs async)
+		public void Resume(int sessionID)
 		{
-			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_resume, sessionID, async);
+			DoSimpleAction(IscCodes.isc_action_svc_trace_resume, sessionID);
+		}
+		public Task ResumeAsync(int sessionID, CancellationToken cancellationToken = default)
+		{
+			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_resume, sessionID, cancellationToken);
 		}
 
-		public void List() => ListImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task ListAsync(CancellationToken cancellationToken = default) => ListImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task ListImpl(AsyncWrappingCommonArgs async)
+		public void List()
 		{
-			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_list, null, async);
+			DoSimpleAction(IscCodes.isc_action_svc_trace_list, null);
+		}
+		public Task ListAsync(CancellationToken cancellationToken = default)
+		{
+			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_list, null, cancellationToken);
 		}
 
-		async Task DoSimpleActionAsync(int action, int? sessionID, AsyncWrappingCommonArgs async)
+		void DoSimpleAction(int action, int? sessionID)
 		{
 			try
 			{
-				await OpenAsync(async).ConfigureAwait(false);
+				Open();
 				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(action);
 				if (sessionID.HasValue)
 					startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
-				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+				StartTask(startSpb);
+				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -115,7 +150,28 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await CloseAsync(async).ConfigureAwait(false);
+				Close();
+			}
+		}
+		async Task DoSimpleActionAsync(int action, int? sessionID, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				var startSpb = new ServiceParameterBuffer2();
+				startSpb.Append(action);
+				if (sessionID.HasValue)
+					startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
+				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				throw FbException.Create(ex);
+			}
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
 
@@ -123,6 +179,15 @@ namespace FirebirdSql.Data.Services
 		{
 			var serverProperties = new FbServerProperties(ConnectionString);
 			var serverVersion = FbServerProperties.ParseServerVersion(serverProperties.GetServerVersion());
+			if (serverVersion < new Version(3, 0, 0, 0))
+				return FbTraceVersion.Version1;
+			else
+				return FbTraceVersion.Version2;
+		}
+		async Task<FbTraceVersion> DetectVersionAsync(CancellationToken cancellationToken = default)
+		{
+			var serverProperties = new FbServerProperties(ConnectionString);
+			var serverVersion = FbServerProperties.ParseServerVersion(await serverProperties.GetServerVersionAsync(cancellationToken).ConfigureAwait(false));
 			if (serverVersion < new Version(3, 0, 0, 0))
 				return FbTraceVersion.Version1;
 			else

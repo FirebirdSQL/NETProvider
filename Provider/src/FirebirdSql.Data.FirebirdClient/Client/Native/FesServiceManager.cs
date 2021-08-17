@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
@@ -54,7 +55,27 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override ValueTask AttachAsync(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override void Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey)
+		{
+			FesDatabase.CheckCryptKeyForSupport(cryptKey);
+
+			ClearStatusVector();
+
+			var svcHandle = Handle;
+
+			_fbClient.isc_service_attach(
+				_statusVector,
+				(short)service.Length,
+				service,
+				ref svcHandle,
+				spb.Length,
+				spb.ToArray());
+
+			ProcessStatusVector(_statusVector);
+
+			Handle = svcHandle;
+		}
+		public override ValueTask AttachAsync(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, CancellationToken cancellationToken = default)
 		{
 			FesDatabase.CheckCryptKeyForSupport(cryptKey);
 
@@ -77,7 +98,19 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask DetachAsync(AsyncWrappingCommonArgs async)
+		public override void Detach()
+		{
+			ClearStatusVector();
+
+			var svcHandle = Handle;
+
+			_fbClient.isc_service_detach(_statusVector, ref svcHandle);
+
+			ProcessStatusVector(_statusVector);
+
+			Handle = svcHandle;
+		}
+		public override ValueTask DetachAsync(CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 
@@ -92,7 +125,23 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask StartAsync(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
+		public override void Start(ServiceParameterBufferBase spb)
+		{
+			ClearStatusVector();
+
+			var svcHandle = Handle;
+			var reserved = 0;
+
+			_fbClient.isc_service_start(
+				_statusVector,
+				ref svcHandle,
+				ref reserved,
+				spb.Length,
+				spb.ToArray());
+
+			ProcessStatusVector(_statusVector);
+		}
+		public override ValueTask StartAsync(ServiceParameterBufferBase spb, CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 
@@ -111,7 +160,27 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask QueryAsync(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async)
+		public override void Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer)
+		{
+			ClearStatusVector();
+
+			var svcHandle = Handle;
+			var reserved = 0;
+
+			_fbClient.isc_service_query(
+				_statusVector,
+				ref svcHandle,
+				ref reserved,
+				spb.Length,
+				spb.ToArray(),
+				(short)requestLength,
+				requestBuffer,
+				(short)buffer.Length,
+				buffer);
+
+			ProcessStatusVector(_statusVector);
+		}
+		public override ValueTask QueryAsync(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 

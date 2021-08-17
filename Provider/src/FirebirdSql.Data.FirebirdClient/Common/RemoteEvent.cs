@@ -30,8 +30,7 @@ namespace FirebirdSql.Data.Common
 		const int MaxEpbLength = 65535;
 
 		List<string> _events;
-		Charset _charset;
-		DatabaseBase _db;
+		DatabaseBase _database;
 		int[] _previousCounts;
 		int[] _currentCounts;
 		int _running;
@@ -46,49 +45,55 @@ namespace FirebirdSql.Data.Common
 			get { return _events; }
 		}
 
-		public RemoteEvent(DatabaseBase db)
+		public DatabaseBase Database
+		{
+			get { return _database; }
+		}
+
+		public RemoteEvent(DatabaseBase database)
 		{
 			LocalId = 0;
 			RemoteId = 0;
 			_events = new List<string>();
-			_charset = db.Charset;
-			_db = db;
+			_database = database;
 		}
 
-		public ValueTask QueueEventsAsync(ICollection<string> events, AsyncWrappingCommonArgs async)
+		public void QueueEvents(ICollection<string> events)
 		{
-			if (Interlocked.Exchange(ref _running, 1) == 1)
-				throw new InvalidOperationException("Events are already running.");
-			if (events == null)
-				throw new ArgumentNullException(nameof(events));
-			if (events.Count == 0)
-				throw new ArgumentOutOfRangeException(nameof(events), "Need to provide at least one event.");
-			if (events.Any(x => x.Length > MaxEventNameLength))
-				throw new ArgumentOutOfRangeException(nameof(events), $"Some events are longer than {MaxEventNameLength}.");
-			if (BuildEpb(events.ToList(), _ => default).ToArray().Length > MaxEpbLength)
-				throw new ArgumentOutOfRangeException(nameof(events), $"Whole events buffer is bigger than {MaxEpbLength}.");
+			EnsureNotRunning();
+			EnsureEventsCollection(events);
 			_events.AddRange(events);
-			return QueueEventsImpl(async);
+			_database.QueueEvents(this);
+		}
+		public ValueTask QueueEventsAsync(ICollection<string> events, CancellationToken cancellationToken = default)
+		{
+			EnsureNotRunning();
+			EnsureEventsCollection(events);
+			_events.AddRange(events);
+			return _database.QueueEventsAsync(this, cancellationToken);
 		}
 
-		public async ValueTask CancelEventsAsync(AsyncWrappingCommonArgs async)
+		public void CancelEvents()
 		{
-			await _db.CancelEventsAsync(this, async).ConfigureAwait(false);
+			_database.CancelEvents(this);
+			_currentCounts = null;
+			_previousCounts = null;
+			_events.Clear();
+			Volatile.Write(ref _running, 0);
+		}
+		public async ValueTask CancelEventsAsync(CancellationToken cancellationToken = default)
+		{
+			await _database.CancelEventsAsync(this, cancellationToken).ConfigureAwait(false);
 			_currentCounts = null;
 			_previousCounts = null;
 			_events.Clear();
 			Volatile.Write(ref _running, 0);
 		}
 
-		ValueTask QueueEventsImpl(AsyncWrappingCommonArgs async)
-		{
-			return _db.QueueEventsAsync(this, async);
-		}
-
-		internal ValueTask EventCountsAsync(byte[] buffer, AsyncWrappingCommonArgs async)
+		internal void EventCounts(byte[] buffer)
 		{
 			if (Volatile.Read(ref _running) == 0)
-				return ValueTask2.CompletedTask;
+				return;
 
 			_previousCounts = _currentCounts;
 			_currentCounts = new int[_events.Count];
@@ -97,7 +102,7 @@ namespace FirebirdSql.Data.Common
 			while (pos < buffer.Length)
 			{
 				var length = buffer[pos++];
-				var eventName = _charset.GetString(buffer, pos, length);
+				var eventName = _database.Charset.GetString(buffer, pos, length);
 
 				pos += length;
 
@@ -115,8 +120,6 @@ namespace FirebirdSql.Data.Common
 					continue;
 				EventCountsCallback(_events[i], count);
 			}
-
-			return QueueEventsImpl(async);
 		}
 
 		internal void EventError(Exception error)
@@ -126,8 +129,14 @@ namespace FirebirdSql.Data.Common
 
 		internal EventParameterBuffer BuildEpb()
 		{
-			_currentCounts = _currentCounts ?? new int[_events.Count];
+			_currentCounts ??= new int[_events.Count];
 			return BuildEpb(_events, i => _currentCounts[i] + 1);
+		}
+
+		void EnsureNotRunning()
+		{
+			if (Interlocked.Exchange(ref _running, 1) == 1)
+				throw new InvalidOperationException("Events are already running.");
 		}
 
 		static EventParameterBuffer BuildEpb(IList<string> events, Func<int, int> countFactory)
@@ -139,6 +148,18 @@ namespace FirebirdSql.Data.Common
 				epb.Append(events[i], countFactory(i));
 			}
 			return epb;
+		}
+
+		static void EnsureEventsCollection(ICollection<string> events)
+		{
+			if (events == null)
+				throw new ArgumentNullException(nameof(events));
+			if (events.Count == 0)
+				throw new ArgumentOutOfRangeException(nameof(events), "Need to provide at least one event.");
+			if (events.Any(x => x.Length > MaxEventNameLength))
+				throw new ArgumentOutOfRangeException(nameof(events), $"Some events are longer than {MaxEventNameLength}.");
+			if (BuildEpb(events.ToList(), _ => default).ToArray().Length > MaxEpbLength)
+				throw new ArgumentOutOfRangeException(nameof(events), $"Whole events buffer is bigger than {MaxEpbLength}.");
 		}
 	}
 }

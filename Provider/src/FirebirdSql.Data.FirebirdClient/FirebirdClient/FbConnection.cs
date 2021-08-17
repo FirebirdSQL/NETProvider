@@ -55,9 +55,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Static Database Creation/Drop methods
 
-		public static void CreateDatabase(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false) => CreateDatabaseImpl(connectionString, pageSize, forcedWrites, overwrite, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public static Task CreateDatabaseAsync(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false, CancellationToken cancellationToken = default) => CreateDatabaseImpl(connectionString, pageSize, forcedWrites, overwrite, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private static async Task CreateDatabaseImpl(string connectionString, int pageSize, bool forcedWrites, bool overwrite, AsyncWrappingCommonArgs async)
+		public static void CreateDatabase(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false)
 		{
 			var options = new ConnectionString(connectionString);
 			options.Validate();
@@ -67,11 +65,33 @@ namespace FirebirdSql.Data.FirebirdClient
 				var db = new FbConnectionInternal(options);
 				try
 				{
-					await db.CreateDatabaseAsync(pageSize, forcedWrites, overwrite, async).ConfigureAwait(false);
+					db.CreateDatabase(pageSize, forcedWrites, overwrite);
 				}
 				finally
 				{
-					await db.DisconnectAsync(async).ConfigureAwait(false);
+					db.Disconnect();
+				}
+			}
+			catch (IscException ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+		public static async Task CreateDatabaseAsync(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false, CancellationToken cancellationToken = default)
+		{
+			var options = new ConnectionString(connectionString);
+			options.Validate();
+
+			try
+			{
+				var db = new FbConnectionInternal(options);
+				try
+				{
+					await db.CreateDatabaseAsync(pageSize, forcedWrites, overwrite, cancellationToken).ConfigureAwait(false);
+				}
+				finally
+				{
+					await db.DisconnectAsync(cancellationToken).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
@@ -80,9 +100,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public static void DropDatabase(string connectionString) => DropDatabaseImpl(connectionString, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public static Task DropDatabaseAsync(string connectionString, CancellationToken cancellationToken = default) => DropDatabaseImpl(connectionString, new AsyncWrappingCommonArgs(true, cancellationToken));
-		static async Task DropDatabaseImpl(string connectionString, AsyncWrappingCommonArgs async)
+		public static void DropDatabase(string connectionString)
 		{
 			var options = new ConnectionString(connectionString);
 			options.Validate();
@@ -92,11 +110,33 @@ namespace FirebirdSql.Data.FirebirdClient
 				var db = new FbConnectionInternal(options);
 				try
 				{
-					await db.DropDatabaseAsync(async).ConfigureAwait(false);
+					db.DropDatabase();
 				}
 				finally
 				{
-					await db.DisconnectAsync(async).ConfigureAwait(false);
+					db.Disconnect();
+				}
+			}
+			catch (IscException ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+		public static async Task DropDatabaseAsync(string connectionString, CancellationToken cancellationToken = default)
+		{
+			var options = new ConnectionString(connectionString);
+			options.Validate();
+
+			try
+			{
+				var db = new FbConnectionInternal(options);
+				try
+				{
+					await db.DropDatabaseAsync(cancellationToken).ConfigureAwait(false);
+				}
+				finally
+				{
+					await db.DisconnectAsync(cancellationToken).ConfigureAwait(false);
 				}
 			}
 			catch (IscException ex)
@@ -257,28 +297,31 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (disposing)
 			{
-				DisposeHelperAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+				if (!_disposed)
+				{
+					_disposed = true;
+					Close();
+					_innerConnection = null;
+					_options = null;
+					_connectionString = null;
+				}
 			}
 			base.Dispose(disposing);
 		}
 #if !(NET48 || NETSTANDARD2_0)
 		public override async ValueTask DisposeAsync()
 		{
-			await DisposeHelperAsync(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
-			await base.DisposeAsync().ConfigureAwait(false);
-		}
-#endif
-		private async Task DisposeHelperAsync(AsyncWrappingCommonArgs async)
-		{
 			if (!_disposed)
 			{
 				_disposed = true;
-				await CloseImpl(async).ConfigureAwait(false);
+				await CloseAsync().ConfigureAwait(false);
 				_innerConnection = null;
 				_options = null;
 				_connectionString = null;
 			}
+			await base.DisposeAsync().ConfigureAwait(false);
 		}
+#endif
 
 		#endregion
 
@@ -300,6 +343,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		public new Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
 #endif
 			=> BeginTransactionAsync(FbTransaction.DefaultIsolationLevel, null, cancellationToken);
+
 		public new FbTransaction BeginTransaction(IsolationLevel level) => BeginTransaction(level, null);
 #if NET48 || NETSTANDARD2_0
 		public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
@@ -307,26 +351,37 @@ namespace FirebirdSql.Data.FirebirdClient
 		public new Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
 #endif
 			=> BeginTransactionAsync(level, null, cancellationToken);
+
 		public FbTransaction BeginTransaction(string transactionName) => BeginTransaction(FbTransaction.DefaultIsolationLevel, transactionName);
 		public Task<FbTransaction> BeginTransactionAsync(string transactionName, CancellationToken cancellationToken = default) => BeginTransactionAsync(FbTransaction.DefaultIsolationLevel, transactionName, cancellationToken);
-		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName) => BeginTransactionImpl(level, transactionName, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, string transactionName, CancellationToken cancellationToken = default) => BeginTransactionImpl(level, transactionName, new AsyncWrappingCommonArgs(true, cancellationToken));
-		internal Task<FbTransaction> BeginTransactionImpl(IsolationLevel level, string transactionName, AsyncWrappingCommonArgs async)
+
+		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
 		{
 			CheckClosed();
 
-			return _innerConnection.BeginTransactionAsync(level, transactionName, async);
+			return _innerConnection.BeginTransaction(level, transactionName);
+		}
+		public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, string transactionName, CancellationToken cancellationToken = default)
+		{
+			CheckClosed();
+
+			return _innerConnection.BeginTransactionAsync(level, transactionName, cancellationToken);
 		}
 
 		public FbTransaction BeginTransaction(FbTransactionOptions options) => BeginTransaction(options, null);
 		public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, CancellationToken cancellationToken = default) => BeginTransactionAsync(options, null, cancellationToken);
-		public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName) => BeginTransactionImpl(options, transactionName, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, string transactionName, CancellationToken cancellationToken = default) => BeginTransactionImpl(options, transactionName, new AsyncWrappingCommonArgs(true, cancellationToken));
-		internal Task<FbTransaction> BeginTransactionImpl(FbTransactionOptions options, string transactionName, AsyncWrappingCommonArgs async)
+
+		public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
 		{
 			CheckClosed();
 
-			return _innerConnection.BeginTransactionAsync(options, transactionName, async);
+			return _innerConnection.BeginTransaction(options, transactionName);
+		}
+		public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, string transactionName, CancellationToken cancellationToken = default)
+		{
+			CheckClosed();
+
+			return _innerConnection.BeginTransactionAsync(options, transactionName, cancellationToken);
 		}
 
 		protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) => BeginTransaction(isolationLevel);
@@ -352,41 +407,46 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Database Schema Methods
 
-		public override DataTable GetSchema() => GetSchemaImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+		public override DataTable GetSchema()
+		{
+			return GetSchema("MetaDataCollections");
+		}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 		public Task<DataTable> GetSchemaAsync(CancellationToken cancellationToken = default)
 #else
 		public override Task<DataTable> GetSchemaAsync(CancellationToken cancellationToken = default)
 #endif
-			=> GetSchemaImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<DataTable> GetSchemaImpl(AsyncWrappingCommonArgs async)
 		{
-			return GetSchemaImpl("MetaDataCollections", async);
+			return GetSchemaAsync("MetaDataCollections", cancellationToken);
 		}
 
-		public override DataTable GetSchema(string collectionName) => GetSchemaImpl(collectionName, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+		public override DataTable GetSchema(string collectionName)
+		{
+			return GetSchema(collectionName, null);
+		}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 		public Task<DataTable> GetSchemaAsync(string collectionName, CancellationToken cancellationToken = default)
 #else
 		public override Task<DataTable> GetSchemaAsync(string collectionName, CancellationToken cancellationToken = default)
 #endif
-			=> GetSchemaImpl(collectionName, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<DataTable> GetSchemaImpl(string collectionName, AsyncWrappingCommonArgs async)
 		{
-			return GetSchemaImpl(collectionName, null, async);
+			return GetSchemaAsync(collectionName, null, cancellationToken);
 		}
-		public override DataTable GetSchema(string collectionName, string[] restrictions) => GetSchemaImpl(collectionName, restrictions, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+		public override DataTable GetSchema(string collectionName, string[] restrictions)
+		{
+			CheckClosed();
+
+			return _innerConnection.GetSchema(collectionName, restrictions);
+		}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 		public Task<DataTable> GetSchemaAsync(string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
 #else
 		public override Task<DataTable> GetSchemaAsync(string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
 #endif
-			=> GetSchemaImpl(collectionName, restrictions, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<DataTable> GetSchemaImpl(string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
 		{
 			CheckClosed();
 
-			return _innerConnection.GetSchemaAsync(collectionName, restrictions, async);
+			return _innerConnection.GetSchemaAsync(collectionName, restrictions, cancellationToken);
 		}
 
 		#endregion
@@ -403,14 +463,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbCommand(null, this);
 		}
 
-		public override void ChangeDatabase(string db) => ChangeDatabaseImpl(db, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-#if NET48 || NETSTANDARD2_0
-		public Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
-#else
-		public override Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
-#endif
-			=> ChangeDatabaseImpl(db, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task ChangeDatabaseImpl(string db, AsyncWrappingCommonArgs async)
+		public override void ChangeDatabase(string db)
 		{
 			CheckClosed();
 
@@ -425,14 +478,48 @@ namespace FirebirdSql.Data.FirebirdClient
 				var csb = new FbConnectionStringBuilder(_connectionString);
 
 				/* Close current connection	*/
-				await CloseImpl(async).ConfigureAwait(false);
+				Close();
 
 				/* Set up the new Database	*/
 				csb.Database = db;
 				ConnectionString = csb.ToString();
 
 				/* Open	new	connection	*/
-				await OpenImpl(async).ConfigureAwait(false);
+				Open();
+			}
+			catch (IscException ex)
+			{
+				ConnectionString = oldConnectionString;
+				throw FbException.Create(ex);
+			}
+		}
+#if NET48 || NETSTANDARD2_0
+		public async Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
+#else
+		public override async Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
+#endif
+		{
+			CheckClosed();
+
+			if (string.IsNullOrEmpty(db))
+			{
+				throw new InvalidOperationException("Database name is not valid.");
+			}
+
+			var oldConnectionString = _connectionString;
+			try
+			{
+				var csb = new FbConnectionStringBuilder(_connectionString);
+
+				/* Close current connection	*/
+				await CloseAsync().ConfigureAwait(false);
+
+				/* Set up the new Database	*/
+				csb.Database = db;
+				ConnectionString = csb.ToString();
+
+				/* Open	new	connection	*/
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -441,9 +528,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public override void Open() => OpenImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public override Task OpenAsync(CancellationToken cancellationToken) => OpenImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		internal async Task OpenImpl(AsyncWrappingCommonArgs async)
+		public override void Open()
 		{
 			if (string.IsNullOrEmpty(_connectionString))
 			{
@@ -472,11 +557,11 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					try
 					{
-						await _innerConnection.ConnectAsync(async).ConfigureAwait(false);
+						_innerConnection.Connect();
 					}
 					catch (OperationCanceledException ex)
 					{
-						async.CancellationToken.ThrowIfCancellationRequested();
+						//cancellationToken.ThrowIfCancellationRequested();
 						throw new TimeoutException("Timeout while connecting.", ex);
 					}
 					catch
@@ -499,7 +584,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					catch
 					{
 						// if enlistment fails clean up innerConnection
-						await _innerConnection.DisposeTransactionAsync(async).ConfigureAwait(false);
+						_innerConnection.DisposeTransaction();
 
 						if (_options.Pooling)
 						{
@@ -507,7 +592,96 @@ namespace FirebirdSql.Data.FirebirdClient
 						}
 						else
 						{
-							await _innerConnection.DisconnectAsync(async).ConfigureAwait(false);
+							_innerConnection.Disconnect();
+							_innerConnection = null;
+						}
+
+						throw;
+					}
+				}
+
+				// Bind	Warning	messages event
+				_innerConnection.Database.WarningMessage = OnWarningMessage;
+
+				// Update the connection state
+				OnStateChange(_state, ConnectionState.Open);
+			}
+			catch (IscException ex)
+			{
+				OnStateChange(_state, ConnectionState.Closed);
+				throw FbException.Create(ex);
+			}
+			catch
+			{
+				OnStateChange(_state, ConnectionState.Closed);
+				throw;
+			}
+		}
+		public override async Task OpenAsync(CancellationToken cancellationToken)
+		{
+			if (string.IsNullOrEmpty(_connectionString))
+			{
+				throw new InvalidOperationException("Connection String is not initialized.");
+			}
+			if (!IsClosed && _state != ConnectionState.Connecting)
+			{
+				throw new InvalidOperationException("Connection already Open.");
+			}
+
+			try
+			{
+				OnStateChange(_state, ConnectionState.Connecting);
+
+				var createdNew = default(bool);
+				if (_options.Pooling)
+				{
+					_innerConnection = FbConnectionPoolManager.Instance.Get(_options, out createdNew);
+				}
+				else
+				{
+					_innerConnection = new FbConnectionInternal(_options);
+					createdNew = true;
+				}
+				if (createdNew)
+				{
+					try
+					{
+						await _innerConnection.ConnectAsync(cancellationToken).ConfigureAwait(false);
+					}
+					catch (OperationCanceledException ex)
+					{
+						cancellationToken.ThrowIfCancellationRequested();
+						throw new TimeoutException("Timeout while connecting.", ex);
+					}
+					catch
+					{
+						if (_options.Pooling)
+						{
+							FbConnectionPoolManager.Instance.Release(_innerConnection, false);
+						}
+						throw;
+					}
+				}
+				_innerConnection.SetOwningConnection(this);
+
+				if (_options.Enlist)
+				{
+					try
+					{
+						EnlistTransaction(System.Transactions.Transaction.Current);
+					}
+					catch
+					{
+						// if enlistment fails clean up innerConnection
+						await _innerConnection.DisposeTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+						if (_options.Pooling)
+						{
+							FbConnectionPoolManager.Instance.Release(_innerConnection, true);
+						}
+						else
+						{
+							await _innerConnection.DisconnectAsync(cancellationToken).ConfigureAwait(false);
 							_innerConnection = null;
 						}
 
@@ -533,35 +707,85 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public override void Close() => CloseImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-#if NET48 || NETSTANDARD2_0
-		public Task CloseAsync()
-#else
-		public override Task CloseAsync()
-#endif
-			=> CloseImpl(new AsyncWrappingCommonArgs(true));
-		internal async Task CloseImpl(AsyncWrappingCommonArgs async)
+		public override void Close()
 		{
 			if (!IsClosed && _innerConnection != null)
 			{
 				try
 				{
-					await _innerConnection.CloseEventManagerAsync(async).ConfigureAwait(false);
+					_innerConnection.CloseEventManager();
 
 					if (_innerConnection.Database != null)
 					{
 						_innerConnection.Database.WarningMessage = null;
 					}
 
-					await _innerConnection.DisposeTransactionAsync(async).ConfigureAwait(false);
+					_innerConnection.DisposeTransaction();
 
-					await _innerConnection.ReleasePreparedCommandsAsync(async).ConfigureAwait(false);
+					_innerConnection.ReleasePreparedCommands();
 
 					if (_options.Pooling)
 					{
 						if (_innerConnection.CancelDisabled)
 						{
-							await _innerConnection.EnableCancelAsync(async).ConfigureAwait(false);
+							_innerConnection.EnableCancel();
+						}
+
+						var broken = _innerConnection.Database.ConnectionBroken;
+						FbConnectionPoolManager.Instance.Release(_innerConnection, !broken);
+						if (broken)
+						{
+							DisconnectEnlistedHelper();
+						}
+					}
+					else
+					{
+						DisconnectEnlistedHelper();
+					}
+				}
+				catch
+				{ }
+				finally
+				{
+					OnStateChange(_state, ConnectionState.Closed);
+				}
+			}
+
+			void DisconnectEnlistedHelper()
+			{
+				if (!_innerConnection.IsEnlisted)
+				{
+					_innerConnection.Disconnect();
+				}
+				_innerConnection = null;
+			}
+		}
+#if NET48 || NETSTANDARD2_0
+		public async Task CloseAsync()
+#else
+		public override async Task CloseAsync()
+#endif
+		{
+			if (!IsClosed && _innerConnection != null)
+			{
+				try
+				{
+					await _innerConnection.CloseEventManagerAsync(CancellationToken.None).ConfigureAwait(false);
+
+					if (_innerConnection.Database != null)
+					{
+						_innerConnection.Database.WarningMessage = null;
+					}
+
+					await _innerConnection.DisposeTransactionAsync(CancellationToken.None).ConfigureAwait(false);
+
+					await _innerConnection.ReleasePreparedCommandsAsync(CancellationToken.None).ConfigureAwait(false);
+
+					if (_options.Pooling)
+					{
+						if (_innerConnection.CancelDisabled)
+						{
+							await _innerConnection.EnableCancelAsync(CancellationToken.None).ConfigureAwait(false);
 						}
 
 						var broken = _innerConnection.Database.ConnectionBroken;
@@ -588,7 +812,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (!_innerConnection.IsEnlisted)
 				{
-					await _innerConnection.DisconnectAsync(async).ConfigureAwait(false);
+					await _innerConnection.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
 				}
 				_innerConnection = null;
 			}
@@ -624,31 +848,43 @@ namespace FirebirdSql.Data.FirebirdClient
 		#endregion
 
 		#region Cancelation
-		public void EnableCancel() => EnableCancelImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task EnableCancelAsync(CancellationToken cancellationToken = default) => EnableCancelImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task EnableCancelImpl(AsyncWrappingCommonArgs async)
+		public void EnableCancel()
 		{
 			CheckClosed();
 
-			return _innerConnection.EnableCancelAsync(async);
+			_innerConnection.EnableCancel();
+		}
+		public Task EnableCancelAsync(CancellationToken cancellationToken = default)
+		{
+			CheckClosed();
+
+			return _innerConnection.EnableCancelAsync(cancellationToken);
 		}
 
-		public void DisableCancel() => DisableCancelImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task DisableCancelAsync(CancellationToken cancellationToken = default) => DisableCancelImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task DisableCancelImpl(AsyncWrappingCommonArgs async)
+		public void DisableCancel()
 		{
 			CheckClosed();
 
-			return _innerConnection.DisableCancelAsync(async);
+			_innerConnection.DisableCancel();
+		}
+		public Task DisableCancelAsync(CancellationToken cancellationToken = default)
+		{
+			CheckClosed();
+
+			return _innerConnection.DisableCancelAsync(cancellationToken);
 		}
 
-		public void CancelCommand() => CancelCommandImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task CancelCommandAsync(CancellationToken cancellationToken = default) => CancelCommandImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task CancelCommandImpl(AsyncWrappingCommonArgs async)
+		public void CancelCommand()
 		{
 			CheckClosed();
 
-			return _innerConnection.CancelCommandAsync(async);
+			_innerConnection.CancelCommand();
+		}
+		public Task CancelCommandAsync(CancellationToken cancellationToken = default)
+		{
+			CheckClosed();
+
+			return _innerConnection.CancelCommandAsync(cancellationToken);
 		}
 		#endregion
 

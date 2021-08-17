@@ -29,17 +29,15 @@ namespace FirebirdSql.Data.Services
 			: base(connectionString)
 		{ }
 
-		public void Execute() => ExecuteImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task ExecuteAsync(CancellationToken cancellationToken = default) => ExecuteImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task ExecuteImpl(AsyncWrappingCommonArgs async)
+		public void Execute()
 		{
 			try
 			{
-				await OpenAsync(async).ConfigureAwait(false);
+				Open();
 				var startSpb = new ServiceParameterBuffer3();
 				startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
-				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+				StartTask(startSpb);
+				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -47,7 +45,26 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await CloseAsync(async).ConfigureAwait(false);
+				Close();
+			}
+		}
+		public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				var startSpb = new ServiceParameterBuffer3();
+				startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
+				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				throw FbException.Create(ex);
+			}
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
 	}

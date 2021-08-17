@@ -38,15 +38,13 @@ namespace FirebirdSql.Data.Services
 			BackupFiles = new FbBackupFileCollection();
 		}
 
-		public void Execute() => ExecuteImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task ExecuteAsync(CancellationToken cancellationToken = default) => ExecuteImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task ExecuteImpl(AsyncWrappingCommonArgs async)
+		public void Execute()
 		{
 			EnsureDatabase();
 
 			try
 			{
-				await OpenAsync(async).ConfigureAwait(false);
+				Open();
 				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_backup);
 				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -64,10 +62,10 @@ namespace FirebirdSql.Data.Services
 					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 				startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
-				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
+				StartTask(startSpb);
 				if (Verbose)
 				{
-					await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+					ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 				}
 			}
 			catch (Exception ex)
@@ -76,7 +74,46 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await CloseAsync(async).ConfigureAwait(false);
+				Close();
+			}
+		}
+		public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureDatabase();
+
+			try
+			{
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				var startSpb = new ServiceParameterBuffer2();
+				startSpb.Append(IscCodes.isc_action_svc_backup);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				foreach (var file in BackupFiles)
+				{
+					startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile, SpbFilenameEncoding);
+					if (file.BackupLength.HasValue)
+						startSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
+				}
+				if (Verbose)
+					startSpb.Append(IscCodes.isc_spb_verbose);
+				if (Factor > 0)
+					startSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
+				if (!string.IsNullOrEmpty(SkipData))
+					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
+				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+				if (Verbose)
+				{
+					await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+				}
+			}
+			catch (Exception ex)
+			{
+				throw FbException.Create(ex);
+			}
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
 	}

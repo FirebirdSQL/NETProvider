@@ -17,8 +17,6 @@
 
 using System;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Common
@@ -285,7 +283,7 @@ namespace FirebirdSql.Data.Common
 		{
 			if (IsLong())
 			{
-				return System.Int32.MaxValue;
+				return int.MaxValue;
 			}
 			else
 			{
@@ -470,9 +468,9 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public async ValueTask FixNullAsync(AsyncWrappingCommonArgs async)
+		public void FixNull()
 		{
-			if (NullFlag == -1 && await _dbValue.IsDBNullAsync(async).ConfigureAwait(false))
+			if (NullFlag == -1 && _dbValue.IsDBNull())
 			{
 				switch (DbDataType)
 				{

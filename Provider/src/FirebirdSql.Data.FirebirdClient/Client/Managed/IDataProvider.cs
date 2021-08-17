@@ -15,15 +15,20 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Threading;
 using System.Threading.Tasks;
-using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
 	interface IDataProvider
 	{
-		ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async);
-		ValueTask WriteAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async);
-		ValueTask FlushAsync(AsyncWrappingCommonArgs async);
+		int Read(byte[] buffer, int offset, int count);
+		ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default);
+
+		void Write(byte[] buffer, int offset, int count);
+		ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default);
+
+		void Flush();
+		ValueTask FlushAsync(CancellationToken cancellationToken = default);
 	}
 }

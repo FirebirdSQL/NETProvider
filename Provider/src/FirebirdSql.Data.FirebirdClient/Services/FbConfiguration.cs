@@ -28,58 +28,86 @@ namespace FirebirdSql.Data.Services
 			: base(connectionString)
 		{ }
 
-		public void SetSqlDialect(int sqlDialect) => SetSqlDialectImpl(sqlDialect, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task SetSqlDialectAsync(int sqlDialect, CancellationToken cancellationToken = default) => SetSqlDialectImpl(sqlDialect, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task SetSqlDialectImpl(int sqlDialect, AsyncWrappingCommonArgs async)
+		public void SetSqlDialect(int sqlDialect)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void SetSweepInterval(int sweepInterval) => SetSweepIntervalImpl(sweepInterval, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task SetSweepIntervalAsync(int sweepInterval, CancellationToken cancellationToken = default) => SetSweepIntervalImpl(sweepInterval, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task SetSweepIntervalImpl(int sweepInterval, AsyncWrappingCommonArgs async)
+		public async Task SetSqlDialectAsync(int sqlDialect, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void SetSweepInterval(int sweepInterval)
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void SetPageBuffers(int pageBuffers) => SetPageBuffersImpl(pageBuffers, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task SetPageBuffersAsync(int pageBuffers, CancellationToken cancellationToken = default) => SetPageBuffersImpl(pageBuffers, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task SetPageBuffersImpl(int pageBuffers, AsyncWrappingCommonArgs async)
+		public async Task SetSweepIntervalAsync(int sweepInterval, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void SetPageBuffers(int pageBuffers)
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void DatabaseShutdown(FbShutdownMode mode, int seconds) => DatabaseShutdownImpl(mode, seconds, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task DatabaseShutdownAsync(FbShutdownMode mode, int seconds, CancellationToken cancellationToken = default) => DatabaseShutdownImpl(mode, seconds, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task DatabaseShutdownImpl(FbShutdownMode mode, int seconds, AsyncWrappingCommonArgs async)
+		public async Task SetPageBuffersAsync(int pageBuffers, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void DatabaseShutdown(FbShutdownMode mode, int seconds)
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -95,17 +123,38 @@ namespace FirebirdSql.Data.Services
 					startSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
 					break;
 			}
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void DatabaseShutdown2(FbShutdownOnlineMode mode, FbShutdownType type, int seconds) => DatabaseShutdown2Impl(mode, type, seconds, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task DatabaseShutdown2Async(FbShutdownOnlineMode mode, FbShutdownType type, int seconds, CancellationToken cancellationToken = default) => DatabaseShutdown2Impl(mode, type, seconds, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task DatabaseShutdown2Impl(FbShutdownOnlineMode mode, FbShutdownType type, int seconds, AsyncWrappingCommonArgs async)
+		public async Task DatabaseShutdownAsync(FbShutdownMode mode, int seconds, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			switch (mode)
+			{
+				case FbShutdownMode.Forced:
+					startSpb.Append(IscCodes.isc_spb_prp_shutdown_db, seconds);
+					break;
+				case FbShutdownMode.DenyTransaction:
+					startSpb.Append(IscCodes.isc_spb_prp_deny_new_transactions, seconds);
+					break;
+				case FbShutdownMode.DenyConnection:
+					startSpb.Append(IscCodes.isc_spb_prp_deny_new_attachments, seconds);
+					break;
+			}
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void DatabaseShutdown2(FbShutdownOnlineMode mode, FbShutdownType type, int seconds)
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -122,62 +171,114 @@ namespace FirebirdSql.Data.Services
 					startSpb.Append(IscCodes.isc_spb_prp_transactions_shutdown, seconds);
 					break;
 			}
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void DatabaseOnline() => DatabaseOnlineImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task DatabaseOnlineAsync(CancellationToken cancellationToken = default) => DatabaseOnlineImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task DatabaseOnlineImpl(AsyncWrappingCommonArgs async)
+		public async Task DatabaseShutdown2Async(FbShutdownOnlineMode mode, FbShutdownType type, int seconds, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
+			switch (type)
+			{
+				case FbShutdownType.ForceShutdown:
+					startSpb.Append(IscCodes.isc_spb_prp_force_shutdown, seconds);
+					break;
+				case FbShutdownType.AttachmentsShutdown:
+					startSpb.Append(IscCodes.isc_spb_prp_attachments_shutdown, seconds);
+					break;
+				case FbShutdownType.TransactionsShutdown:
+					startSpb.Append(IscCodes.isc_spb_prp_transactions_shutdown, seconds);
+					break;
+			}
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void DatabaseOnline()
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void DatabaseOnline2(FbShutdownOnlineMode mode) => DatabaseOnline2Impl(mode, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task DatabaseOnline2Async(FbShutdownOnlineMode mode, CancellationToken cancellationToken = default) => DatabaseOnline2Impl(mode, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task DatabaseOnline2Impl(FbShutdownOnlineMode mode, AsyncWrappingCommonArgs async)
+		public async Task DatabaseOnlineAsync(CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void DatabaseOnline2(FbShutdownOnlineMode mode)
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void ActivateShadows() => ActivateShadowsImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task ActivateShadowsAsync(CancellationToken cancellationToken = default) => ActivateShadowsImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task ActivateShadowsImpl(AsyncWrappingCommonArgs async)
+		public async Task DatabaseOnline2Async(FbShutdownOnlineMode mode, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void ActivateShadows()
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void SetForcedWrites(bool forcedWrites) => SetForcedWritesImpl(forcedWrites, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task SetForcedWritesAsync(bool forcedWrites, CancellationToken cancellationToken = default) => SetForcedWritesImpl(forcedWrites, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task SetForcedWritesImpl(bool forcedWrites, AsyncWrappingCommonArgs async)
+		public async Task ActivateShadowsAsync(CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void SetForcedWrites(bool forcedWrites)
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -189,17 +290,34 @@ namespace FirebirdSql.Data.Services
 			{
 				startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_async);
 			}
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void SetReserveSpace(bool reserveSpace) => SetReserveSpaceImpl(reserveSpace, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task SetReserveSpaceAsync(bool reserveSpace, CancellationToken cancellationToken = default) => SetReserveSpaceImpl(reserveSpace, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task SetReserveSpaceImpl(bool reserveSpace, AsyncWrappingCommonArgs async)
+		public async Task SetForcedWritesAsync(bool forcedWrites, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			if (forcedWrites)
+			{
+				startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
+			}
+			else
+			{
+				startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_async);
+			}
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void SetReserveSpace(bool reserveSpace)
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
@@ -211,38 +329,77 @@ namespace FirebirdSql.Data.Services
 			{
 				startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res_use_full);
 			}
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void SetAccessMode(bool readOnly) => SetAccessModeImpl(readOnly, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task SetAccessModeAsync(bool readOnly, CancellationToken cancellationToken = default) => SetAccessModeImpl(readOnly, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task SetAccessModeImpl(bool readOnly, AsyncWrappingCommonArgs async)
+		public async Task SetReserveSpaceAsync(bool reserveSpace, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			if (reserveSpace)
+			{
+				startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
+			}
+			else
+			{
+				startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res_use_full);
+			}
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void SetAccessMode(bool readOnly)
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void NoLinger() => NoLingerImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task NoLingerAsync(CancellationToken cancellationToken = default) => NoLingerImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task NoLingerImpl(AsyncWrappingCommonArgs async)
+		public async Task SetAccessModeAsync(bool readOnly, CancellationToken cancellationToken = default)
 		{
 			EnsureDatabase();
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void NoLinger()
+		{
+			EnsureDatabase();
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_properties);
 			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
 			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_nolinger);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
+		}
+		public async Task NoLingerAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureDatabase();
+
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_properties);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_nolinger);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 
 		private static byte FbShutdownOnlineModeToIscCode(FbShutdownOnlineMode mode)

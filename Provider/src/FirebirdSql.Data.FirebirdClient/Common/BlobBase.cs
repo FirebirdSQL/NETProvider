@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
@@ -45,31 +46,62 @@ namespace FirebirdSql.Data.Common
 			_charset = db.Charset;
 		}
 
-		public async ValueTask<string> ReadStringAsync(AsyncWrappingCommonArgs async)
+		public string ReadString()
 		{
-			var buffer = await ReadAsync(async).ConfigureAwait(false);
+			var buffer = Read();
+			return _charset.GetString(buffer, 0, buffer.Length);
+		}
+		public async ValueTask<string> ReadStringAsync(CancellationToken cancellationToken = default)
+		{
+			var buffer = await ReadAsync(cancellationToken).ConfigureAwait(false);
 			return _charset.GetString(buffer, 0, buffer.Length);
 		}
 
-		public async ValueTask<byte[]> ReadAsync(AsyncWrappingCommonArgs async)
+		public byte[] Read()
 		{
 			using (var ms = new MemoryStream())
 			{
 				try
 				{
-					await OpenAsync(async).ConfigureAwait(false);
+					Open();
 
 					while (!EOF)
 					{
-						await GetSegmentAsync(ms, async).ConfigureAwait(false);
+						GetSegment(ms);
 					}
 
-					await CloseAsync(async).ConfigureAwait(false);
+					Close();
 				}
 				catch
 				{
 					// Cancel the blob and rethrow the exception
-					await CancelAsync(async).ConfigureAwait(false);
+					Cancel();
+
+					throw;
+				}
+
+				return ms.ToArray();
+			}
+		}
+		public async ValueTask<byte[]> ReadAsync(CancellationToken cancellationToken = default)
+		{
+			using (var ms = new MemoryStream())
+			{
+				try
+				{
+					await OpenAsync(cancellationToken).ConfigureAwait(false);
+
+					while (!EOF)
+					{
+						await GetSegmentAsync(ms, cancellationToken).ConfigureAwait(false);
+					}
+
+					await CloseAsync(cancellationToken).ConfigureAwait(false);
+				}
+				catch
+				{
+					// Cancel the blob and rethrow the exception
+					await CancelAsync(cancellationToken).ConfigureAwait(false);
 
 					throw;
 				}
@@ -78,21 +110,29 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public ValueTask WriteAsync(string data, AsyncWrappingCommonArgs async)
+		public void Write(string data)
 		{
-			return WriteAsync(_charset.GetBytes(data), async);
+			Write(_charset.GetBytes(data));
+		}
+		public ValueTask WriteAsync(string data, CancellationToken cancellationToken = default)
+		{
+			return WriteAsync(_charset.GetBytes(data), cancellationToken);
 		}
 
-		public ValueTask WriteAsync(byte[] buffer, AsyncWrappingCommonArgs async)
+		public void Write(byte[] buffer)
 		{
-			return WriteAsync(buffer, 0, buffer.Length, async);
+			Write(buffer, 0, buffer.Length);
+		}
+		public ValueTask WriteAsync(byte[] buffer, CancellationToken cancellationToken = default)
+		{
+			return WriteAsync(buffer, 0, buffer.Length, cancellationToken);
 		}
 
-		public async ValueTask WriteAsync(byte[] buffer, int index, int count, AsyncWrappingCommonArgs async)
+		public void Write(byte[] buffer, int index, int count)
 		{
 			try
 			{
-				await CreateAsync(async).ConfigureAwait(false);
+				Create();
 
 				var length = count;
 				var offset = index;
@@ -109,30 +149,80 @@ namespace FirebirdSql.Data.Common
 					}
 
 					Array.Copy(buffer, offset, tmpBuffer, 0, chunk);
-					await PutSegmentAsync(tmpBuffer, async).ConfigureAwait(false);
+					PutSegment(tmpBuffer);
 
 					offset += chunk;
 					length -= chunk;
 				}
 
-				await CloseAsync(async).ConfigureAwait(false);
+				Close();
 			}
 			catch
 			{
 				// Cancel the blob and rethrow the exception
-				await CancelAsync(async).ConfigureAwait(false);
+				Cancel();
+
+				throw;
+			}
+		}
+		public async ValueTask WriteAsync(byte[] buffer, int index, int count, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await CreateAsync(cancellationToken).ConfigureAwait(false);
+
+				var length = count;
+				var offset = index;
+				var chunk = length >= _segmentSize ? _segmentSize : length;
+
+				var tmpBuffer = new byte[chunk];
+
+				while (length > 0)
+				{
+					if (chunk > length)
+					{
+						chunk = length;
+						tmpBuffer = new byte[chunk];
+					}
+
+					Array.Copy(buffer, offset, tmpBuffer, 0, chunk);
+					await PutSegmentAsync(tmpBuffer, cancellationToken).ConfigureAwait(false);
+
+					offset += chunk;
+					length -= chunk;
+				}
+
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
+			}
+			catch
+			{
+				// Cancel the blob and rethrow the exception
+				await CancelAsync(cancellationToken).ConfigureAwait(false);
 
 				throw;
 			}
 		}
 
-		protected abstract ValueTask CreateAsync(AsyncWrappingCommonArgs async);
-		protected abstract ValueTask OpenAsync(AsyncWrappingCommonArgs async);
-		protected abstract ValueTask GetSegmentAsync(Stream stream, AsyncWrappingCommonArgs async);
-		protected abstract ValueTask PutSegmentAsync(byte[] buffer, AsyncWrappingCommonArgs async);
-		protected abstract ValueTask SeekAsync(int position, AsyncWrappingCommonArgs async);
-		protected abstract ValueTask CloseAsync(AsyncWrappingCommonArgs async);
-		protected abstract ValueTask CancelAsync(AsyncWrappingCommonArgs async);
+		protected abstract void Create();
+		protected abstract ValueTask CreateAsync(CancellationToken cancellationToken = default);
+
+		protected abstract void Open();
+		protected abstract ValueTask OpenAsync(CancellationToken cancellationToken = default);
+
+		protected abstract void GetSegment(Stream stream);
+		protected abstract ValueTask GetSegmentAsync(Stream stream, CancellationToken cancellationToken = default);
+
+		protected abstract void PutSegment(byte[] buffer);
+		protected abstract ValueTask PutSegmentAsync(byte[] buffer, CancellationToken cancellationToken = default);
+
+		protected abstract void Seek(int position);
+		protected abstract ValueTask SeekAsync(int position, CancellationToken cancellationToken = default);
+
+		protected abstract void Close();
+		protected abstract ValueTask CloseAsync(CancellationToken cancellationToken = default);
+
+		protected abstract void Cancel();
+		protected abstract ValueTask CancelAsync(CancellationToken cancellationToken = default);
 
 		protected void RblAddValue(int rblValue)
 		{

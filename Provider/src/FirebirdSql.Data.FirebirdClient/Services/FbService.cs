@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client;
 using FirebirdSql.Data.Common;
@@ -111,7 +112,7 @@ namespace FirebirdSql.Data.Services
 			return spb;
 		}
 
-		private protected async Task OpenAsync(AsyncWrappingCommonArgs async)
+		private protected void Open()
 		{
 			if (State != FbServiceState.Closed)
 				throw new InvalidOperationException("Service already Open.");
@@ -124,9 +125,33 @@ namespace FirebirdSql.Data.Services
 			{
 				if (_svc == null)
 				{
-					_svc = await ClientFactory.CreateServiceManagerAsync(_options, async).ConfigureAwait(false);
+					_svc = ClientFactory.CreateServiceManager(_options);
 				}
-				await _svc.AttachAsync(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey, async).ConfigureAwait(false);
+				_svc.Attach(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey);
+				_svc.WarningMessage = OnWarningMessage;
+				State = FbServiceState.Open;
+			}
+			catch (Exception ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+		private protected async Task OpenAsync(CancellationToken cancellationToken = default)
+		{
+			if (State != FbServiceState.Closed)
+				throw new InvalidOperationException("Service already Open.");
+			if (string.IsNullOrEmpty(_options.UserID))
+				throw new InvalidOperationException("No user name was specified.");
+			if (string.IsNullOrEmpty(_options.Password))
+				throw new InvalidOperationException("No user password was specified.");
+
+			try
+			{
+				if (_svc == null)
+				{
+					_svc = await ClientFactory.CreateServiceManagerAsync(_options, cancellationToken).ConfigureAwait(false);
+				}
+				await _svc.AttachAsync(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey, cancellationToken).ConfigureAwait(false);
 				_svc.WarningMessage = OnWarningMessage;
 				State = FbServiceState.Open;
 			}
@@ -136,7 +161,7 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected async Task CloseAsync(AsyncWrappingCommonArgs async)
+		private protected void Close()
 		{
 			if (State != FbServiceState.Open)
 			{
@@ -144,7 +169,24 @@ namespace FirebirdSql.Data.Services
 			}
 			try
 			{
-				await _svc.DetachAsync(async).ConfigureAwait(false);
+				_svc.Detach();
+				_svc = null;
+				State = FbServiceState.Closed;
+			}
+			catch (Exception ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+		private protected async Task CloseAsync(CancellationToken cancellationToken = default)
+		{
+			if (State != FbServiceState.Open)
+			{
+				return;
+			}
+			try
+			{
+				await _svc.DetachAsync(cancellationToken).ConfigureAwait(false);
 				_svc = null;
 				State = FbServiceState.Closed;
 			}
@@ -154,14 +196,28 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected async Task StartTaskAsync(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
+		private protected void StartTask(ServiceParameterBufferBase spb)
 		{
 			if (State == FbServiceState.Closed)
 				throw new InvalidOperationException("Service is Closed.");
 
 			try
 			{
-				await _svc.StartAsync(spb, async).ConfigureAwait(false);
+				_svc.Start(spb);
+			}
+			catch (Exception ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+		private protected async Task StartTaskAsync(ServiceParameterBufferBase spb, CancellationToken cancellationToken = default)
+		{
+			if (State == FbServiceState.Closed)
+				throw new InvalidOperationException("Service is Closed.");
+
+			try
+			{
+				await _svc.StartAsync(spb, cancellationToken).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -169,10 +225,10 @@ namespace FirebirdSql.Data.Services
 			}
 		}
 
-		private protected async Task<List<object>> QueryAsync(byte[] items, ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
+		private protected List<object> Query(byte[] items, ServiceParameterBufferBase spb)
 		{
 			var result = new List<object>();
-			await QueryAsync(items, spb, (truncated, item) =>
+			Query(items, spb, (truncated, item) =>
 			{
 				if (item is string stringItem)
 				{
@@ -205,23 +261,64 @@ namespace FirebirdSql.Data.Services
 				}
 
 				result.Add(item);
-			}, async).ConfigureAwait(false);
+			});
+			return result;
+		}
+		private protected async Task<List<object>> QueryAsync(byte[] items, ServiceParameterBufferBase spb, CancellationToken cancellationToken = default)
+		{
+			var result = new List<object>();
+			await QueryAsync(items, spb, (truncated, item) =>
+			{
+				if (item is string stringItem)
+				{
+					if (!truncated)
+					{
+						result.Add(stringItem);
+					}
+					else
+					{
+						var lastValue = result[result.Count - 1] as string;
+						result[result.Count - 1] = lastValue + stringItem;
+					}
+					return Task.CompletedTask;
+				}
+
+				if (item is byte[] byteArrayItem)
+				{
+					if (!truncated)
+					{
+						result.Add(byteArrayItem);
+					}
+					else
+					{
+						var lastValue = result[result.Count - 1] as byte[];
+						var lastValueLength = lastValue.Length;
+						Array.Resize(ref lastValue, lastValue.Length + byteArrayItem.Length);
+						Array.Copy(byteArrayItem, 0, lastValue, lastValueLength, byteArrayItem.Length);
+					}
+					return Task.CompletedTask;
+				}
+
+				result.Add(item);
+
+				return Task.CompletedTask;
+			}, cancellationToken).ConfigureAwait(false);
 			return result;
 		}
 
-		private protected async Task QueryAsync(byte[] items, ServiceParameterBufferBase spb, Action<bool, object> queryResponseAction, AsyncWrappingCommonArgs async)
+		private protected void Query(byte[] items, ServiceParameterBufferBase spb, Action<bool, object> queryResponseAction)
 		{
 			var pos = 0;
 			var truncated = false;
 			var type = default(int);
 
-			var buffer = await QueryServiceAsync(items, spb, async).ConfigureAwait(false);
+			var buffer = QueryService(items, spb);
 
 			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
 			{
 				if (type == IscCodes.isc_info_truncated)
 				{
-					buffer = await QueryServiceAsync(items, spb, async).ConfigureAwait(false);
+					buffer = QueryService(items, spb);
 					pos = 0;
 					truncated = true;
 					continue;
@@ -319,19 +416,144 @@ namespace FirebirdSql.Data.Services
 				}
 			}
 		}
+		private protected async Task QueryAsync(byte[] items, ServiceParameterBufferBase spb, Func<bool, object, Task> queryResponseAction, CancellationToken cancellationToken = default)
+		{
+			var pos = 0;
+			var truncated = false;
+			var type = default(int);
 
-		private protected async Task ProcessServiceOutputAsync(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
+			var buffer = await QueryServiceAsync(items, spb, cancellationToken).ConfigureAwait(false);
+
+			while ((type = buffer[pos++]) != IscCodes.isc_info_end)
+			{
+				if (type == IscCodes.isc_info_truncated)
+				{
+					buffer = await QueryServiceAsync(items, spb, cancellationToken).ConfigureAwait(false);
+					pos = 0;
+					truncated = true;
+					continue;
+				}
+
+				switch (type)
+				{
+					case IscCodes.isc_info_svc_version:
+					case IscCodes.isc_info_svc_get_license_mask:
+					case IscCodes.isc_info_svc_capabilities:
+					case IscCodes.isc_info_svc_get_licensed_users:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							await queryResponseAction(truncated, (int)IscHelper.VaxInteger(buffer, pos, 4)).ConfigureAwait(false);
+							pos += length;
+							truncated = false;
+							break;
+						}
+
+					case IscCodes.isc_info_svc_server_version:
+					case IscCodes.isc_info_svc_implementation:
+					case IscCodes.isc_info_svc_get_env:
+					case IscCodes.isc_info_svc_get_env_lock:
+					case IscCodes.isc_info_svc_get_env_msg:
+					case IscCodes.isc_info_svc_user_dbpath:
+					case IscCodes.isc_info_svc_line:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							await queryResponseAction(truncated, Encoding2.Default.GetString(buffer, pos, length)).ConfigureAwait(false);
+							pos += length;
+							truncated = false;
+							break;
+						}
+					case IscCodes.isc_info_svc_to_eof:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							var block = new byte[length];
+							Array.Copy(buffer, pos, block, 0, length);
+							await queryResponseAction(truncated, block).ConfigureAwait(false);
+							pos += length;
+							truncated = false;
+							break;
+						}
+
+					case IscCodes.isc_info_svc_svr_db_info:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							await queryResponseAction(truncated, ParseDatabasesInfo(buffer, ref pos)).ConfigureAwait(false);
+							truncated = false;
+							break;
+						}
+
+					case IscCodes.isc_info_svc_get_users:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							await queryResponseAction(truncated, ParseUserData(buffer, ref pos)).ConfigureAwait(false);
+							truncated = false;
+							break;
+						}
+
+					case IscCodes.isc_info_svc_get_config:
+						{
+							var length = GetLength(buffer, 2, ref pos);
+							if (length == 0)
+								continue;
+							await queryResponseAction(truncated, ParseServerConfig(buffer, ref pos)).ConfigureAwait(false);
+							truncated = false;
+							break;
+						}
+
+					case IscCodes.isc_info_svc_stdin:
+						{
+							var length = GetLength(buffer, 4, ref pos);
+							await queryResponseAction(truncated, length).ConfigureAwait(false);
+							truncated = false;
+							break;
+						}
+
+					case IscCodes.isc_info_data_not_ready:
+						{
+							await queryResponseAction(truncated, typeof(void)).ConfigureAwait(false);
+							truncated = false;
+							break;
+						}
+				}
+			}
+		}
+
+		private protected void ProcessServiceOutput(ServiceParameterBufferBase spb)
 		{
 			string line;
-			while ((line = await GetNextLineAsync(spb, async).ConfigureAwait(false)) != null)
+			while ((line = GetNextLine(spb)) != null)
+			{
+				OnServiceOutput(line);
+			}
+		}
+		private protected async Task ProcessServiceOutputAsync(ServiceParameterBufferBase spb, CancellationToken cancellationToken = default)
+		{
+			string line;
+			while ((line = await GetNextLineAsync(spb, cancellationToken).ConfigureAwait(false)) != null)
 			{
 				OnServiceOutput(line);
 			}
 		}
 
-		private protected async Task<string> GetNextLineAsync(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
+		private protected string GetNextLine(ServiceParameterBufferBase spb)
 		{
-			var info = await QueryAsync(new byte[] { IscCodes.isc_info_svc_line }, spb, async).ConfigureAwait(false);
+			var info = Query(new byte[] { IscCodes.isc_info_svc_line }, spb);
+			if (info.Count == 0)
+				return null;
+			return info[0] as string;
+		}
+		private protected async Task<string> GetNextLineAsync(ServiceParameterBufferBase spb, CancellationToken cancellationToken = default)
+		{
+			var info = await QueryAsync(new byte[] { IscCodes.isc_info_svc_line }, spb, cancellationToken).ConfigureAwait(false);
 			if (info.Count == 0)
 				return null;
 			return info[0] as string;
@@ -348,25 +570,47 @@ namespace FirebirdSql.Data.Services
 				throw FbException.Create("Action should be executed against a specific database.");
 		}
 
-		private async Task<byte[]> QueryServiceAsync(byte[] items, ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async)
+		private byte[] QueryService(byte[] items, ServiceParameterBufferBase spb)
 		{
 			var shouldClose = false;
 			if (State == FbServiceState.Closed)
 			{
-				await OpenAsync(async).ConfigureAwait(false);
+				Open();
 				shouldClose = true;
 			}
 			try
 			{
 				var buffer = new byte[QueryBufferSize];
-				await _svc.QueryAsync(spb, items.Length, items, buffer.Length, buffer, async).ConfigureAwait(false);
+				_svc.Query(spb, items.Length, items, buffer.Length, buffer);
 				return buffer;
 			}
 			finally
 			{
 				if (shouldClose)
 				{
-					await CloseAsync(async).ConfigureAwait(false);
+					Close();
+				}
+			}
+		}
+		private async Task<byte[]> QueryServiceAsync(byte[] items, ServiceParameterBufferBase spb, CancellationToken cancellationToken = default)
+		{
+			var shouldClose = false;
+			if (State == FbServiceState.Closed)
+			{
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				shouldClose = true;
+			}
+			try
+			{
+				var buffer = new byte[QueryBufferSize];
+				await _svc.QueryAsync(spb, items.Length, items, buffer.Length, buffer, cancellationToken).ConfigureAwait(false);
+				return buffer;
+			}
+			finally
+			{
+				if (shouldClose)
+				{
+					await CloseAsync(cancellationToken).ConfigureAwait(false);
 				}
 			}
 		}

@@ -35,256 +35,328 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Methods
 
-		public string GetIscVersion() => GetIscVersionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetIscVersionAsync(CancellationToken cancellationToken) => GetIscVersionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<string> GetIscVersionImpl(AsyncWrappingCommonArgs async)
+		public string GetIscVersion()
 		{
-			return GetValueAsync<string>(IscCodes.isc_info_isc_version, async);
+			return GetValue<string>(IscCodes.isc_info_isc_version);
+		}
+		public Task<string> GetIscVersionAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.isc_info_isc_version, cancellationToken);
 		}
 
-		public string GetServerVersion() => GetServerVersionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetServerVersionAsync(CancellationToken cancellationToken) => GetServerVersionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<string> GetServerVersionImpl(AsyncWrappingCommonArgs async)
+		public string GetServerVersion()
 		{
-			return GetValueAsync<string>(IscCodes.isc_info_firebird_version, async);
+			return GetValue<string>(IscCodes.isc_info_firebird_version);
+		}
+		public Task<string> GetServerVersionAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.isc_info_firebird_version, cancellationToken);
 		}
 
-		public string GetServerClass() => GetServerClassImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetServerClassAsync(CancellationToken cancellationToken) => GetServerClassImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<string> GetServerClassImpl(AsyncWrappingCommonArgs async)
+		public string GetServerClass()
 		{
-			return GetValueAsync<string>(IscCodes.isc_info_db_class, async);
+			return GetValue<string>(IscCodes.isc_info_db_class);
+		}
+		public Task<string> GetServerClassAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.isc_info_db_class, cancellationToken);
 		}
 
-		public int GetPageSize() => GetPageSizeImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetPageSizeAsync(CancellationToken cancellationToken) => GetPageSizeImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetPageSizeImpl(AsyncWrappingCommonArgs async)
+		public int GetPageSize()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_page_size, async);
+			return GetValue<int>(IscCodes.isc_info_page_size);
+		}
+		public Task<int> GetPageSizeAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_page_size, cancellationToken);
 		}
 
-		public int GetAllocationPages() => GetAllocationPagesImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetAllocationPagesAsync(CancellationToken cancellationToken) => GetAllocationPagesImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetAllocationPagesImpl(AsyncWrappingCommonArgs async)
+		public int GetAllocationPages()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_allocation, async);
+			return GetValue<int>(IscCodes.isc_info_allocation);
+		}
+		public Task<int> GetAllocationPagesAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_allocation, cancellationToken);
 		}
 
-		public string GetBaseLevel() => GetBaseLevelImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetBaseLevelAsync(CancellationToken cancellationToken) => GetBaseLevelImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<string> GetBaseLevelImpl(AsyncWrappingCommonArgs async)
+		public string GetBaseLevel()
 		{
-			return GetValueAsync<string>(IscCodes.isc_info_base_level, async);
+			return GetValue<string>(IscCodes.isc_info_base_level);
+		}
+		public Task<string> GetBaseLevelAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.isc_info_base_level, cancellationToken);
 		}
 
-		public string GetDbId() => GetDbIdImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetDbIdAsync(CancellationToken cancellationToken) => GetDbIdImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<string> GetDbIdImpl(AsyncWrappingCommonArgs async)
+		public string GetDbId()
 		{
-			return GetValueAsync<string>(IscCodes.isc_info_db_id, async);
+			return GetValue<string>(IscCodes.isc_info_db_id);
+		}
+		public Task<string> GetDbIdAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.isc_info_db_id, cancellationToken);
 		}
 
-		public string GetImplementation() => GetImplementationImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetImplementationAsync(CancellationToken cancellationToken) => GetImplementationImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<string> GetImplementationImpl(AsyncWrappingCommonArgs async)
+		public string GetImplementation()
 		{
-			return GetValueAsync<string>(IscCodes.isc_info_implementation, async);
+			return GetValue<string>(IscCodes.isc_info_implementation);
+		}
+		public Task<string> GetImplementationAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.isc_info_implementation, cancellationToken);
 		}
 
-		public bool GetNoReserve() => GetNoReserveImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<bool> GetNoReserveAsync(CancellationToken cancellationToken) => GetNoReserveImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<bool> GetNoReserveImpl(AsyncWrappingCommonArgs async)
+		public bool GetNoReserve()
 		{
-			return GetValueAsync<bool>(IscCodes.isc_info_no_reserve, async);
+			return GetValue<bool>(IscCodes.isc_info_no_reserve);
+		}
+		public Task<bool> GetNoReserveAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<bool>(IscCodes.isc_info_no_reserve, cancellationToken);
 		}
 
-		public int GetOdsVersion() => GetOdsVersionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetOdsVersionAsync(CancellationToken cancellationToken) => GetOdsVersionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetOdsVersionImpl(AsyncWrappingCommonArgs async)
+		public int GetOdsVersion()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_ods_version, async);
+			return GetValue<int>(IscCodes.isc_info_ods_version);
+		}
+		public Task<int> GetOdsVersionAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_ods_version, cancellationToken);
 		}
 
-		public int GetOdsMinorVersion() => GetOdsMinorVersionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetOdsMinorVersionAsync(CancellationToken cancellationToken) => GetOdsMinorVersionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetOdsMinorVersionImpl(AsyncWrappingCommonArgs async)
+		public int GetOdsMinorVersion()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_ods_minor_version, async);
+			return GetValue<int>(IscCodes.isc_info_ods_minor_version);
+		}
+		public Task<int> GetOdsMinorVersionAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_ods_minor_version, cancellationToken);
 		}
 
-		public int GetMaxMemory() => GetMaxMemoryImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetMaxMemoryAsync(CancellationToken cancellationToken) => GetMaxMemoryImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetMaxMemoryImpl(AsyncWrappingCommonArgs async)
+		public int GetMaxMemory()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_max_memory, async);
+			return GetValue<int>(IscCodes.isc_info_max_memory);
+		}
+		public Task<int> GetMaxMemoryAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_max_memory, cancellationToken);
 		}
 
-		public int GetCurrentMemory() => GetCurrentMemoryImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetCurrentMemoryAsync(CancellationToken cancellationToken) => GetCurrentMemoryImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetCurrentMemoryImpl(AsyncWrappingCommonArgs async)
+		public int GetCurrentMemory()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_current_memory, async);
+			return GetValue<int>(IscCodes.isc_info_current_memory);
+		}
+		public Task<int> GetCurrentMemoryAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_current_memory, cancellationToken);
 		}
 
-		public bool GetForcedWrites() => GetForcedWritesImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<bool> GetForcedWritesAsync(CancellationToken cancellationToken) => GetForcedWritesImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<bool> GetForcedWritesImpl(AsyncWrappingCommonArgs async)
+		public bool GetForcedWrites()
 		{
-			return GetValueAsync<bool>(IscCodes.isc_info_forced_writes, async);
+			return GetValue<bool>(IscCodes.isc_info_forced_writes);
+		}
+		public Task<bool> GetForcedWritesAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<bool>(IscCodes.isc_info_forced_writes, cancellationToken);
 		}
 
-		public int GetNumBuffers() => GetNumBuffersImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetNumBuffersAsync(CancellationToken cancellationToken) => GetNumBuffersImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetNumBuffersImpl(AsyncWrappingCommonArgs async)
+		public int GetNumBuffers()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_num_buffers, async);
+			return GetValue<int>(IscCodes.isc_info_num_buffers);
+		}
+		public Task<int> GetNumBuffersAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_num_buffers, cancellationToken);
 		}
 
-		public int GetSweepInterval() => GetSweepIntervalImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetSweepIntervalAsync(CancellationToken cancellationToken) => GetSweepIntervalImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetSweepIntervalImpl(AsyncWrappingCommonArgs async)
+		public int GetSweepInterval()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_sweep_interval, async);
+			return GetValue<int>(IscCodes.isc_info_sweep_interval);
+		}
+		public Task<int> GetSweepIntervalAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_sweep_interval, cancellationToken);
 		}
 
-		public bool GetReadOnly() => GetReadOnlyImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<bool> GetReadOnlyAsync(CancellationToken cancellationToken) => GetReadOnlyImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<bool> GetReadOnlyImpl(AsyncWrappingCommonArgs async)
+		public bool GetReadOnly()
 		{
-			return GetValueAsync<bool>(IscCodes.isc_info_db_read_only, async);
+			return GetValue<bool>(IscCodes.isc_info_db_read_only);
+		}
+		public Task<bool> GetReadOnlyAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<bool>(IscCodes.isc_info_db_read_only, cancellationToken);
 		}
 
-		public int GetFetches() => GetFetchesImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetFetchesAsync(CancellationToken cancellationToken) => GetFetchesImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetFetchesImpl(AsyncWrappingCommonArgs async)
+		public int GetFetches()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_fetches, async);
+			return GetValue<int>(IscCodes.isc_info_fetches);
+		}
+		public Task<int> GetFetchesAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_fetches, cancellationToken);
 		}
 
-		public int GetMarks() => GetMarksImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetMarksAsync(CancellationToken cancellationToken) => GetMarksImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetMarksImpl(AsyncWrappingCommonArgs async)
+		public int GetMarks()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_marks, async);
+			return GetValue<int>(IscCodes.isc_info_marks);
+		}
+		public Task<int> GetMarksAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_marks, cancellationToken);
 		}
 
-		public int GetReads() => GetReadsImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetReadsAsync(CancellationToken cancellationToken) => GetReadsImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetReadsImpl(AsyncWrappingCommonArgs async)
+		public int GetReads()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_reads, async);
+			return GetValue<int>(IscCodes.isc_info_reads);
+		}
+		public Task<int> GetReadsAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_reads, cancellationToken);
 		}
 
-		public int GetWrites() => GetWritesImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetWritesAsync(CancellationToken cancellationToken) => GetWritesImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetWritesImpl(AsyncWrappingCommonArgs async)
+		public int GetWrites()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_writes, async);
+			return GetValue<int>(IscCodes.isc_info_writes);
+		}
+		public Task<int> GetWritesAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_writes, cancellationToken);
 		}
 
-		public int GetBackoutCount() => GetBackoutCountImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetBackoutCountAsync(CancellationToken cancellationToken) => GetBackoutCountImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetBackoutCountImpl(AsyncWrappingCommonArgs async)
+		public int GetBackoutCount()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_backout_count, async);
+			return GetValue<int>(IscCodes.isc_info_backout_count);
+		}
+		public Task<int> GetBackoutCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_backout_count, cancellationToken);
 		}
 
-		public int GetDeleteCount() => GetDeleteCountImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetDeleteCountAsync(CancellationToken cancellationToken) => GetDeleteCountImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetDeleteCountImpl(AsyncWrappingCommonArgs async)
+		public int GetDeleteCount()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_delete_count, async);
+			return GetValue<int>(IscCodes.isc_info_delete_count);
+		}
+		public Task<int> GetDeleteCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_delete_count, cancellationToken);
 		}
 
-		public int GetExpungeCount() => GetExpungeCountImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetExpungeCountAsync(CancellationToken cancellationToken) => GetExpungeCountImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetExpungeCountImpl(AsyncWrappingCommonArgs async)
+		public int GetExpungeCount()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_expunge_count, async);
+			return GetValue<int>(IscCodes.isc_info_expunge_count);
+		}
+		public Task<int> GetExpungeCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_expunge_count, cancellationToken);
 		}
 
-		public int GetInsertCount() => GetInsertCountImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetInsertCountAsync(CancellationToken cancellationToken) => GetInsertCountImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetInsertCountImpl(AsyncWrappingCommonArgs async)
+		public int GetInsertCount()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_insert_count, async);
+			return GetValue<int>(IscCodes.isc_info_insert_count);
+		}
+		public Task<int> GetInsertCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_insert_count, cancellationToken);
 		}
 
-		public int GetPurgeCount() => GetPurgeCountImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetPurgeCountAsync(CancellationToken cancellationToken) => GetPurgeCountImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetPurgeCountImpl(AsyncWrappingCommonArgs async)
+		public int GetPurgeCount()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_purge_count, async);
+			return GetValue<int>(IscCodes.isc_info_purge_count);
+		}
+		public Task<int> GetPurgeCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_purge_count, cancellationToken);
 		}
 
-		public long GetReadIdxCount() => GetReadIdxCountImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<long> GetReadIdxCountAsync(CancellationToken cancellationToken) => GetReadIdxCountImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<long> GetReadIdxCountImpl(AsyncWrappingCommonArgs async)
+		public long GetReadIdxCount()
 		{
-			return GetValueAsync<long>(IscCodes.isc_info_read_idx_count, async);
+			return GetValue<long>(IscCodes.isc_info_read_idx_count);
+		}
+		public Task<long> GetReadIdxCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.isc_info_read_idx_count, cancellationToken);
 		}
 
-		public long GetReadSeqCount() => GetReadSeqCountImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<long> GetReadSeqCountAsync(CancellationToken cancellationToken) => GetReadSeqCountImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<long> GetReadSeqCountImpl(AsyncWrappingCommonArgs async)
+		public long GetReadSeqCount()
 		{
-			return GetValueAsync<long>(IscCodes.isc_info_read_seq_count, async);
+			return GetValue<long>(IscCodes.isc_info_read_seq_count);
+		}
+		public Task<long> GetReadSeqCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.isc_info_read_seq_count, cancellationToken);
 		}
 
-		public long GetUpdateCount() => GetUpdateCountImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<long> GetUpdateCountAsync(CancellationToken cancellationToken) => GetUpdateCountImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<long> GetUpdateCountImpl(AsyncWrappingCommonArgs async)
+		public long GetUpdateCount()
 		{
-			return GetValueAsync<long>(IscCodes.isc_info_update_count, async);
+			return GetValue<long>(IscCodes.isc_info_update_count);
+		}
+		public Task<long> GetUpdateCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.isc_info_update_count, cancellationToken);
 		}
 
-		public int GetDatabaseSizeInPages() => GetDatabaseSizeInPagesImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetDatabaseSizeInPagesAsync(CancellationToken cancellationToken) => GetDatabaseSizeInPagesImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetDatabaseSizeInPagesImpl(AsyncWrappingCommonArgs async)
+		public int GetDatabaseSizeInPages()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_db_size_in_pages, async);
+			return GetValue<int>(IscCodes.isc_info_db_size_in_pages);
+		}
+		public Task<int> GetDatabaseSizeInPagesAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_db_size_in_pages, cancellationToken);
 		}
 
-		public long GetOldestTransaction() => GetOldestTransactionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<long> GetOldestTransactionAsync(CancellationToken cancellationToken) => GetOldestTransactionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<long> GetOldestTransactionImpl(AsyncWrappingCommonArgs async)
+		public long GetOldestTransaction()
 		{
-			return GetValueAsync<long>(IscCodes.isc_info_oldest_transaction, async);
+			return GetValue<long>(IscCodes.isc_info_oldest_transaction);
+		}
+		public Task<long> GetOldestTransactionAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.isc_info_oldest_transaction, cancellationToken);
 		}
 
-		public long GetOldestActiveTransaction() => GetOldestActiveTransactionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<long> GetOldestActiveTransactionAsync(CancellationToken cancellationToken) => GetOldestActiveTransactionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<long> GetOldestActiveTransactionImpl(AsyncWrappingCommonArgs async)
+		public long GetOldestActiveTransaction()
 		{
-			return GetValueAsync<long>(IscCodes.isc_info_oldest_active, async);
+			return GetValue<long>(IscCodes.isc_info_oldest_active);
+		}
+		public Task<long> GetOldestActiveTransactionAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.isc_info_oldest_active, cancellationToken);
 		}
 
-		public long GetOldestActiveSnapshot() => GetOldestActiveSnapshotImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<long> GetOldestActiveSnapshotAsync(CancellationToken cancellationToken) => GetOldestActiveSnapshotImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<long> GetOldestActiveSnapshotImpl(AsyncWrappingCommonArgs async)
+		public long GetOldestActiveSnapshot()
 		{
-			return GetValueAsync<long>(IscCodes.isc_info_oldest_snapshot, async);
+			return GetValue<long>(IscCodes.isc_info_oldest_snapshot);
+		}
+		public Task<long> GetOldestActiveSnapshotAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.isc_info_oldest_snapshot, cancellationToken);
 		}
 
-		public long GetNextTransaction() => GetNextTransactionImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<long> GetNextTransactionAsync(CancellationToken cancellationToken) => GetNextTransactionImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<long> GetNextTransactionImpl(AsyncWrappingCommonArgs async)
+		public long GetNextTransaction()
 		{
-			return GetValueAsync<long>(IscCodes.isc_info_next_transaction, async);
+			return GetValue<long>(IscCodes.isc_info_next_transaction);
+		}
+		public Task<long> GetNextTransactionAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.isc_info_next_transaction, cancellationToken);
 		}
 
-		public int GetActiveTransactions() => GetActiveTransactionsImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<int> GetActiveTransactionsAsync(CancellationToken cancellationToken) => GetActiveTransactionsImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<int> GetActiveTransactionsImpl(AsyncWrappingCommonArgs async)
+		public int GetActiveTransactions()
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_active_transactions, async);
+			return GetValue<int>(IscCodes.isc_info_active_transactions);
+		}
+		public Task<int> GetActiveTransactionsAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_active_transactions, cancellationToken);
 		}
 
-		public List<string> GetActiveUsers() => GetActiveUsersImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<List<string>> GetActiveUsersAsync(CancellationToken cancellationToken) => GetActiveUsersImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<List<string>> GetActiveUsersImpl(AsyncWrappingCommonArgs async)
+		public List<string> GetActiveUsers()
 		{
-			return GetListAsync<string>(IscCodes.isc_info_user_names, async);
+			return GetList<string>(IscCodes.isc_info_user_names);
+		}
+		public Task<List<string>> GetActiveUsersAsync(CancellationToken cancellationToken = default)
+		{
+			return GetListAsync<string>(IscCodes.isc_info_user_names, cancellationToken);
 		}
 
 		#endregion
@@ -303,7 +375,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Private Methods
 
-		private async Task<T> GetValueAsync<T>(byte item, AsyncWrappingCommonArgs async)
+		private T GetValue<T>(byte item)
 		{
 			FbConnection.EnsureOpen(Connection);
 
@@ -312,11 +384,23 @@ namespace FirebirdSql.Data.FirebirdClient
 				item,
 				IscCodes.isc_info_end
 			};
-			var info = await Connection.InnerConnection.Database.GetDatabaseInfoAsync(items, async).ConfigureAwait(false);
+			var info = Connection.InnerConnection.Database.GetDatabaseInfo(items);
+			return info.Any() ? (T)Convert.ChangeType(info[0], typeof(T)) : default;
+		}
+		private async Task<T> GetValueAsync<T>(byte item, CancellationToken cancellationToken = default)
+		{
+			FbConnection.EnsureOpen(Connection);
+
+			var items = new byte[]
+			{
+				item,
+				IscCodes.isc_info_end
+			};
+			var info = await Connection.InnerConnection.Database.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false);
 			return info.Any() ? (T)Convert.ChangeType(info[0], typeof(T)) : default;
 		}
 
-		private async Task<List<T>> GetListAsync<T>(byte item, AsyncWrappingCommonArgs async)
+		private List<T> GetList<T>(byte item)
 		{
 			FbConnection.EnsureOpen(Connection);
 
@@ -327,7 +411,20 @@ namespace FirebirdSql.Data.FirebirdClient
 					IscCodes.isc_info_end
 				};
 
-			return (await db.GetDatabaseInfoAsync(items, async).ConfigureAwait(false)).Cast<T>().ToList();
+			return (db.GetDatabaseInfo(items)).Cast<T>().ToList();
+		}
+		private async Task<List<T>> GetListAsync<T>(byte item, CancellationToken cancellationToken = default)
+		{
+			FbConnection.EnsureOpen(Connection);
+
+			var db = Connection.InnerConnection.Database;
+			var items = new byte[]
+				{
+					item,
+					IscCodes.isc_info_end
+				};
+
+			return (await db.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false)).Cast<T>().ToList();
 		}
 
 		#endregion

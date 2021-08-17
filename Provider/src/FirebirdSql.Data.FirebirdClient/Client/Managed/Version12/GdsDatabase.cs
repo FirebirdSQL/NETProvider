@@ -15,16 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
-using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Net;
-using System.Collections.Generic;
-
-using FirebirdSql.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version12
 {
@@ -34,30 +29,54 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			: base(connection)
 		{ }
 
-		protected override async ValueTask SendAttachToBufferAsync(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected override void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
 		{
-			await Xdr.WriteAsync(IscCodes.op_attach, async).ConfigureAwait(false);
-			await Xdr.WriteAsync(0, async).ConfigureAwait(false);
+			Xdr.Write(IscCodes.op_attach);
+			Xdr.Write(0);
 			if (!string.IsNullOrEmpty(AuthBlock.Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
-			await Xdr.WriteBufferAsync(dpb.ToArray(), async).ConfigureAwait(false);
+			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			Xdr.WriteBuffer(dpb.ToArray());
+		}
+		protected override async ValueTask SendAttachToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
+		{
+			await Xdr.WriteAsync(IscCodes.op_attach, cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+			if (!string.IsNullOrEmpty(AuthBlock.Password))
+			{
+				dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
+			}
+			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+			await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
 		}
 
-		protected override async ValueTask SendCreateToBufferAsync(DatabaseParameterBufferBase dpb, string database, AsyncWrappingCommonArgs async)
+		protected override void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
 		{
-			await Xdr.WriteAsync(IscCodes.op_create, async).ConfigureAwait(false);
-			await Xdr.WriteAsync(0, async).ConfigureAwait(false);
+			Xdr.Write(IscCodes.op_create);
+			Xdr.Write(0);
 			if (!string.IsNullOrEmpty(AuthBlock.Password))
 			{
 				dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 			}
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), async).ConfigureAwait(false);
-			await Xdr.WriteBufferAsync(dpb.ToArray(), async).ConfigureAwait(false);
+			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+			Xdr.WriteBuffer(dpb.ToArray());
+		}
+		protected override async ValueTask SendCreateToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
+		{
+			await Xdr.WriteAsync(IscCodes.op_create, cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+			if (!string.IsNullOrEmpty(AuthBlock.Password))
+			{
+				dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
+			}
+			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+			await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
 		}
 
 		public override StatementBase CreateStatement()
@@ -70,12 +89,25 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			return new GdsStatement(this, transaction);
 		}
 
-		public override async ValueTask CancelOperationAsync(int kind, AsyncWrappingCommonArgs async)
+		public override void CancelOperation(int kind)
 		{
 			try
 			{
-				await SendCancelOperationToBufferAsync(kind, async).ConfigureAwait(false);
-				await Xdr.FlushAsync(async).ConfigureAwait(false);
+				SendCancelOperationToBuffer(kind);
+				Xdr.Flush();
+				// no response, this is out-of-band
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask CancelOperationAsync(int kind, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await SendCancelOperationToBufferAsync(kind, cancellationToken).ConfigureAwait(false);
+				await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 				// no response, this is out-of-band
 			}
 			catch (IOException ex)
@@ -84,10 +116,15 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			}
 		}
 
-		protected async ValueTask SendCancelOperationToBufferAsync(int kind, AsyncWrappingCommonArgs async)
+		protected void SendCancelOperationToBuffer(int kind)
 		{
-			await Xdr.WriteAsync(IscCodes.op_cancel, async).ConfigureAwait(false);
-			await Xdr.WriteAsync(kind, async).ConfigureAwait(false);
+			Xdr.Write(IscCodes.op_cancel);
+			Xdr.Write(kind);
+		}
+		protected async ValueTask SendCancelOperationToBufferAsync(int kind, CancellationToken cancellationToken = default)
+		{
+			await Xdr.WriteAsync(IscCodes.op_cancel, cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteAsync(kind, cancellationToken).ConfigureAwait(false);
 		}
 	}
 }

@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Native.Handle;
 using FirebirdSql.Data.Common;
@@ -78,7 +79,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override ValueTask CreateAsync(AsyncWrappingCommonArgs async)
+		protected override void Create()
 		{
 			ClearStatusVector();
 
@@ -97,10 +98,49 @@ namespace FirebirdSql.Data.Client.Native
 			_db.ProcessStatusVector(_statusVector);
 
 			RblAddValue(IscCodes.RBL_create);
+		}
+		protected override ValueTask CreateAsync(CancellationToken cancellationToken = default)
+		{
+			ClearStatusVector();
+
+			var dbHandle = _db.HandlePtr;
+			var trHandle = ((FesTransaction)_transaction).HandlePtr;
+
+			_db.FbClient.isc_create_blob2(
+				_statusVector,
+				ref dbHandle,
+				ref trHandle,
+				ref _blobHandle,
+				ref _blobId,
+				0,
+				new byte[0]);
+
+			_db.ProcessStatusVector(_statusVector);
+
+			RblAddValue(IscCodes.RBL_create);
+
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask OpenAsync(AsyncWrappingCommonArgs async)
+		protected override void Open()
+		{
+			ClearStatusVector();
+
+			var dbHandle = _db.HandlePtr;
+			var trHandle = ((FesTransaction)_transaction).HandlePtr;
+
+			_db.FbClient.isc_open_blob2(
+				_statusVector,
+				ref dbHandle,
+				ref trHandle,
+				ref _blobHandle,
+				ref _blobId,
+				0,
+				new byte[0]);
+
+			_db.ProcessStatusVector(_statusVector);
+		}
+		protected override ValueTask OpenAsync(CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 
@@ -121,7 +161,45 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask GetSegmentAsync(Stream stream, AsyncWrappingCommonArgs async)
+		protected override void GetSegment(Stream stream)
+		{
+			var requested = (short)SegmentSize;
+			short segmentLength = 0;
+
+			ClearStatusVector();
+
+			var tmp = new byte[requested];
+
+			var status = _db.FbClient.isc_get_segment(
+				_statusVector,
+				ref _blobHandle,
+				ref segmentLength,
+				requested,
+				tmp);
+
+
+			RblRemoveValue(IscCodes.RBL_segment);
+
+			if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
+			{
+				RblAddValue(IscCodes.RBL_eof_pending);
+				return;
+			}
+			else
+			{
+				if (status == IntPtr.Zero || _statusVector[1] == new IntPtr(IscCodes.isc_segment))
+				{
+					RblAddValue(IscCodes.RBL_segment);
+				}
+				else
+				{
+					_db.ProcessStatusVector(_statusVector);
+				}
+			}
+
+			stream.Write(tmp, 0, segmentLength);
+		}
+		protected override ValueTask GetSegmentAsync(Stream stream, CancellationToken cancellationToken = default)
 		{
 			var requested = (short)SegmentSize;
 			short segmentLength = 0;
@@ -162,7 +240,19 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask PutSegmentAsync(byte[] buffer, AsyncWrappingCommonArgs async)
+		protected override void PutSegment(byte[] buffer)
+		{
+			ClearStatusVector();
+
+			_db.FbClient.isc_put_segment(
+				_statusVector,
+				ref _blobHandle,
+				(short)buffer.Length,
+				buffer);
+
+			_db.ProcessStatusVector(_statusVector);
+		}
+		protected override ValueTask PutSegmentAsync(byte[] buffer, CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 
@@ -177,12 +267,24 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask SeekAsync(int position, AsyncWrappingCommonArgs async)
+		protected override void Seek(int position)
+		{
+			throw new NotSupportedException();
+		}
+		protected override ValueTask SeekAsync(int position, CancellationToken cancellationToken = default)
 		{
 			throw new NotSupportedException();
 		}
 
-		protected override ValueTask CloseAsync(AsyncWrappingCommonArgs async)
+		protected override void Close()
+		{
+			ClearStatusVector();
+
+			_db.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
+
+			_db.ProcessStatusVector(_statusVector);
+		}
+		protected override ValueTask CloseAsync(CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 
@@ -193,7 +295,15 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		protected override ValueTask CancelAsync(AsyncWrappingCommonArgs async)
+		protected override void Cancel()
+		{
+			ClearStatusVector();
+
+			_db.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
+
+			_db.ProcessStatusVector(_statusVector);
+		}
+		protected override ValueTask CancelAsync(CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 

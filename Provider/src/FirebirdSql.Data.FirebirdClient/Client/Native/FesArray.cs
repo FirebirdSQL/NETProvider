@@ -19,6 +19,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Native.Marshalers;
 using FirebirdSql.Data.Common;
@@ -91,7 +92,33 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override ValueTask<byte[]> GetSliceAsync(int sliceLength, AsyncWrappingCommonArgs async)
+		public override byte[] GetSlice(int sliceLength)
+		{
+			ClearStatusVector();
+
+			var dbHandle = _db.HandlePtr;
+			var trHandle = _transaction.HandlePtr;
+
+			var arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
+
+			var buffer = new byte[sliceLength];
+
+			_db.FbClient.isc_array_get_slice(
+				_statusVector,
+				ref dbHandle,
+				ref trHandle,
+				ref _handle,
+				arrayDesc,
+				buffer,
+				ref sliceLength);
+
+			ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
+
+			_db.ProcessStatusVector(_statusVector);
+
+			return buffer;
+		}
+		public override ValueTask<byte[]> GetSliceAsync(int sliceLength, CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 
@@ -118,7 +145,41 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.FromResult(buffer);
 		}
 
-		public override ValueTask PutSliceAsync(Array sourceArray, int sliceLength, AsyncWrappingCommonArgs async)
+		public override void PutSlice(Array sourceArray, int sliceLength)
+		{
+			ClearStatusVector();
+
+			var dbHandle = _db.HandlePtr;
+			var trHandle = _transaction.HandlePtr;
+
+			var arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
+
+			var systemType = GetSystemType();
+
+			var buffer = new byte[sliceLength];
+			if (systemType.GetTypeInfo().IsPrimitive)
+			{
+				Buffer.BlockCopy(sourceArray, 0, buffer, 0, buffer.Length);
+			}
+			else
+			{
+				buffer = EncodeSlice(Descriptor, sourceArray, sliceLength);
+			}
+
+			_db.FbClient.isc_array_put_slice(
+				_statusVector,
+				ref dbHandle,
+				ref trHandle,
+				ref _handle,
+				arrayDesc,
+				buffer,
+				ref sliceLength);
+
+			ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
+
+			_db.ProcessStatusVector(_statusVector);
+		}
+		public override ValueTask PutSliceAsync(Array sourceArray, int sliceLength, CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 
@@ -159,7 +220,162 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Protected Methods
 
-		protected override ValueTask<Array> DecodeSliceAsync(byte[] slice, AsyncWrappingCommonArgs async)
+		protected override Array DecodeSlice(byte[] slice)
+		{
+			Array sliceData = null;
+			var slicePosition = 0;
+			var type = 0;
+			var dbType = DbDataType.Array;
+			var systemType = GetSystemType();
+			var charset = _db.Charset;
+			var lengths = new int[Descriptor.Dimensions];
+			var lowerBounds = new int[Descriptor.Dimensions];
+
+			for (var i = 0; i < Descriptor.Dimensions; i++)
+			{
+				lowerBounds[i] = Descriptor.Bounds[i].LowerBound;
+				lengths[i] = Descriptor.Bounds[i].UpperBound;
+
+				if (lowerBounds[i] == 0)
+				{
+					lengths[i]++;
+				}
+			}
+
+			sliceData = Array.CreateInstance(systemType, lengths, lowerBounds);
+
+			var tempData = Array.CreateInstance(systemType, sliceData.Length);
+
+			type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
+			dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
+
+			int itemLength = Descriptor.Length;
+
+			for (var i = 0; i < tempData.Length; i++)
+			{
+				if (slicePosition >= slice.Length)
+				{
+					break;
+				}
+
+				switch (dbType)
+				{
+					case DbDataType.Char:
+						tempData.SetValue(charset.GetString(slice, slicePosition, itemLength), i);
+						break;
+
+					case DbDataType.VarChar:
+						{
+							var index = slicePosition;
+							var count = 0;
+							while (slice[index++] != 0)
+							{
+								count++;
+							}
+							tempData.SetValue(charset.GetString(slice, slicePosition, count), i);
+
+							slicePosition += 2;
+						}
+						break;
+
+					case DbDataType.SmallInt:
+						tempData.SetValue(BitConverter.ToInt16(slice, slicePosition), i);
+						break;
+
+					case DbDataType.Integer:
+						tempData.SetValue(BitConverter.ToInt32(slice, slicePosition), i);
+						break;
+
+					case DbDataType.BigInt:
+						tempData.SetValue(BitConverter.ToInt64(slice, slicePosition), i);
+						break;
+
+					case DbDataType.Decimal:
+					case DbDataType.Numeric:
+						{
+							object evalue = null;
+
+							switch (type)
+							{
+								case IscCodes.SQL_SHORT:
+									evalue = BitConverter.ToInt16(slice, slicePosition);
+									break;
+
+								case IscCodes.SQL_LONG:
+									evalue = BitConverter.ToInt32(slice, slicePosition);
+									break;
+
+								case IscCodes.SQL_QUAD:
+								case IscCodes.SQL_INT64:
+									evalue = BitConverter.ToInt64(slice, slicePosition);
+									break;
+							}
+
+							var dvalue = TypeDecoder.DecodeDecimal(evalue, Descriptor.Scale, type);
+
+							tempData.SetValue(dvalue, i);
+						}
+						break;
+
+					case DbDataType.Double:
+						tempData.SetValue(BitConverter.ToDouble(slice, slicePosition), i);
+						break;
+
+					case DbDataType.Float:
+						tempData.SetValue(BitConverter.ToSingle(slice, slicePosition), i);
+						break;
+
+					case DbDataType.Date:
+						{
+							var idate = BitConverter.ToInt32(slice, slicePosition);
+
+							var date = TypeDecoder.DecodeDate(idate);
+
+							tempData.SetValue(date, i);
+						}
+						break;
+
+					case DbDataType.Time:
+						{
+							var itime = BitConverter.ToInt32(slice, slicePosition);
+
+							var time = TypeDecoder.DecodeTime(itime);
+
+							tempData.SetValue(time, i);
+						}
+						break;
+
+					case DbDataType.TimeStamp:
+						{
+							var idate = BitConverter.ToInt32(slice, slicePosition);
+							var itime = BitConverter.ToInt32(slice, slicePosition + 4);
+
+							var date = TypeDecoder.DecodeDate(idate);
+							var time = TypeDecoder.DecodeTime(itime);
+
+							var timestamp = date.Add(time);
+
+							tempData.SetValue(timestamp, i);
+						}
+						break;
+				}
+
+				slicePosition += itemLength;
+			}
+
+			if (systemType.GetTypeInfo().IsPrimitive)
+			{
+				// For primitive types we can use System.Buffer	to copy	generated data to destination array
+				Buffer.BlockCopy(tempData, 0, sliceData, 0, Buffer.ByteLength(tempData));
+			}
+			else
+			{
+				sliceData = tempData;
+			}
+
+			return sliceData;
+		}
+		protected override ValueTask<Array> DecodeSliceAsync(byte[] slice, CancellationToken cancellationToken = default)
 		{
 			Array sliceData = null;
 			var slicePosition = 0;

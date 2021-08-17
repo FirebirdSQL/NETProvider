@@ -18,6 +18,7 @@
 using System;
 using System.Globalization;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Types;
 
@@ -47,14 +48,14 @@ namespace FirebirdSql.Data.Common
 			_value = value ?? DBNull.Value;
 		}
 
-		public ValueTask<bool> IsDBNullAsync(AsyncWrappingCommonArgs async)
+		public bool IsDBNull()
 		{
-			return ValueTask2.FromResult(TypeHelper.IsDBNull(_value));
+			return TypeHelper.IsDBNull(_value);
 		}
 
-		public async ValueTask<object> GetValueAsync(AsyncWrappingCommonArgs async)
+		public object GetValue()
 		{
-			if (await IsDBNullAsync(async).ConfigureAwait(false))
+			if (IsDBNull())
 			{
 				return DBNull.Value;
 			}
@@ -64,31 +65,74 @@ namespace FirebirdSql.Data.Common
 				case DbDataType.Text:
 					if (_statement == null)
 					{
-						return await GetInt64Async(async).ConfigureAwait(false);
+						return GetInt64();
 					}
 					else
 					{
-						return await GetStringAsync(async).ConfigureAwait(false);
+						return GetString();
 					}
 
 				case DbDataType.Binary:
 					if (_statement == null)
 					{
-						return await GetInt64Async(async).ConfigureAwait(false);
+						return GetInt64();
 					}
 					else
 					{
-						return await GetBinaryAsync(async).ConfigureAwait(false);
+						return GetBinary();
 					}
 
 				case DbDataType.Array:
 					if (_statement == null)
 					{
-						return await GetInt64Async(async).ConfigureAwait(false);
+						return GetInt64();
 					}
 					else
 					{
-						return await GetArrayAsync(async).ConfigureAwait(false);
+						return GetArray();
+					}
+
+				default:
+					return _value;
+			}
+		}
+		public async ValueTask<object> GetValueAsync(CancellationToken cancellationToken = default)
+		{
+			if (IsDBNull())
+			{
+				return DBNull.Value;
+			}
+
+			switch (_field.DbDataType)
+			{
+				case DbDataType.Text:
+					if (_statement == null)
+					{
+						return GetInt64();
+					}
+					else
+					{
+						return await GetStringAsync(cancellationToken).ConfigureAwait(false);
+					}
+
+				case DbDataType.Binary:
+					if (_statement == null)
+					{
+						return GetInt64();
+					}
+					else
+					{
+						return await GetBinaryAsync(cancellationToken).ConfigureAwait(false);
+					}
+
+				case DbDataType.Array:
+					if (_statement == null)
+					{
+						return GetInt64();
+					}
+					else
+					{
+						return await GetArrayAsync(cancellationToken).ConfigureAwait(false);
 					}
 
 				default:
@@ -101,102 +145,137 @@ namespace FirebirdSql.Data.Common
 			_value = value;
 		}
 
-		public async ValueTask<string> GetStringAsync(AsyncWrappingCommonArgs async)
+		public string GetString()
 		{
 			if (Field.DbDataType == DbDataType.Text && _value is long l)
 			{
-				_value = await GetClobDataAsync(l, async).ConfigureAwait(false);
+				_value = GetClobData(l);
 			}
+
 			if (_value is byte[] bytes)
 			{
 				return Field.Charset.GetString(bytes);
 			}
+			return _value.ToString();
+		}
+		public async ValueTask<string> GetStringAsync(CancellationToken cancellationToken = default)
+		{
+			if (Field.DbDataType == DbDataType.Text && _value is long l)
+			{
+				_value = await GetClobDataAsync(l, cancellationToken).ConfigureAwait(false);
+			}
 
+			if (_value is byte[] bytes)
+			{
+				return Field.Charset.GetString(bytes);
+			}
 			return _value.ToString();
 		}
 
-		public ValueTask<char> GetCharAsync(AsyncWrappingCommonArgs async)
+		public char GetChar()
 		{
-			return ValueTask2.FromResult(Convert.ToChar(_value, CultureInfo.CurrentCulture));
+			return Convert.ToChar(_value, CultureInfo.CurrentCulture);
 		}
 
-		public ValueTask<bool> GetBooleanAsync(AsyncWrappingCommonArgs async)
+		public bool GetBoolean()
 		{
-			return ValueTask2.FromResult(Convert.ToBoolean(_value, CultureInfo.InvariantCulture));
+			return Convert.ToBoolean(_value, CultureInfo.InvariantCulture);
 		}
 
-		public ValueTask<byte> GetByteAsync(AsyncWrappingCommonArgs async)
+		public byte GetByte()
 		{
-			return ValueTask2.FromResult(Convert.ToByte(_value, CultureInfo.InvariantCulture));
+			return Convert.ToByte(_value, CultureInfo.InvariantCulture);
 		}
 
-		public ValueTask<short> GetInt16Async(AsyncWrappingCommonArgs async)
+		public short GetInt16()
 		{
-			return ValueTask2.FromResult(Convert.ToInt16(_value, CultureInfo.InvariantCulture));
+			return Convert.ToInt16(_value, CultureInfo.InvariantCulture);
 		}
 
-		public ValueTask<int> GetInt32Async(AsyncWrappingCommonArgs async)
+		public int GetInt32()
 		{
-			return ValueTask2.FromResult(Convert.ToInt32(_value, CultureInfo.InvariantCulture));
+			return Convert.ToInt32(_value, CultureInfo.InvariantCulture);
 		}
 
-		public ValueTask<long> GetInt64Async(AsyncWrappingCommonArgs async)
+		public long GetInt64()
 		{
-			return ValueTask2.FromResult(Convert.ToInt64(_value, CultureInfo.InvariantCulture));
+			return Convert.ToInt64(_value, CultureInfo.InvariantCulture);
 		}
 
-		public ValueTask<decimal> GetDecimalAsync(AsyncWrappingCommonArgs async)
+		public decimal GetDecimal()
 		{
-			return ValueTask2.FromResult(Convert.ToDecimal(_value, CultureInfo.InvariantCulture));
+			return Convert.ToDecimal(_value, CultureInfo.InvariantCulture);
 		}
 
-		public ValueTask<float> GetFloatAsync(AsyncWrappingCommonArgs async)
+		public float GetFloat()
 		{
-			return ValueTask2.FromResult(Convert.ToSingle(_value, CultureInfo.InvariantCulture));
+			return Convert.ToSingle(_value, CultureInfo.InvariantCulture);
 		}
 
-		public ValueTask<Guid> GetGuidAsync(AsyncWrappingCommonArgs async)
+		public Guid GetGuid()
 		{
-			return ValueTask2.FromResult(_value switch
+			return _value switch
 			{
 				Guid guid => guid,
 				byte[] bytes => TypeDecoder.DecodeGuid(bytes),
 				_ => throw new InvalidOperationException($"Incorrect {nameof(Guid)} value."),
-			});
+			};
 		}
 
-		public ValueTask<double> GetDoubleAsync(AsyncWrappingCommonArgs async)
+		public double GetDouble()
 		{
-			return ValueTask2.FromResult(Convert.ToDouble(_value, CultureInfo.InvariantCulture));
+			return Convert.ToDouble(_value, CultureInfo.InvariantCulture);
 		}
 
-		public ValueTask<DateTime> GetDateTimeAsync(AsyncWrappingCommonArgs async)
+		public DateTime GetDateTime()
 		{
-			return ValueTask2.FromResult(_value switch
+			return _value switch
 			{
 				TimeSpan ts => new DateTime(0 * 10000L + 621355968000000000 + ts.Ticks),
 				DateTimeOffset dto => dto.DateTime,
 				FbZonedDateTime zdt => zdt.DateTime,
 				FbZonedTime zt => new DateTime(0 * 10000L + 621355968000000000 + zt.Time.Ticks),
 				_ => Convert.ToDateTime(_value, CultureInfo.CurrentCulture.DateTimeFormat),
-			});
+			};
 		}
 
-		public async ValueTask<Array> GetArrayAsync(AsyncWrappingCommonArgs async)
+		public Array GetArray()
 		{
 			if (_value is long l)
 			{
-				_value = await GetArrayDataAsync(l, async).ConfigureAwait(false);
+				_value = GetArrayData(l);
+			}
+
+			return (Array)_value;
+		}
+		public async ValueTask<Array> GetArrayAsync(CancellationToken cancellationToken = default)
+		{
+			if (_value is long l)
+			{
+				_value = await GetArrayDataAsync(l, cancellationToken).ConfigureAwait(false);
 			}
 
 			return (Array)_value;
 		}
 
-		public async ValueTask<byte[]> GetBinaryAsync(AsyncWrappingCommonArgs async)
+		public byte[] GetBinary()
 		{
 			if (_value is long l)
 			{
-				_value = await GetBlobDataAsync(l, async).ConfigureAwait(false);
+				_value = GetBlobData(l);
+			}
+			if (_value is Guid guid)
+			{
+				return TypeEncoder.EncodeGuid(guid);
+			}
+
+			return (byte[])_value;
+		}
+		public async ValueTask<byte[]> GetBinaryAsync(CancellationToken cancellationToken = default)
+		{
+			if (_value is long l)
+			{
+				_value = await GetBlobDataAsync(l, cancellationToken).ConfigureAwait(false);
 			}
 			if (_value is Guid guid)
 			{
@@ -206,56 +285,56 @@ namespace FirebirdSql.Data.Common
 			return (byte[])_value;
 		}
 
-		public async ValueTask<int> GetDateAsync(AsyncWrappingCommonArgs async)
+		public int GetDate()
 		{
-			return TypeEncoder.EncodeDate(await GetDateTimeAsync(async).ConfigureAwait(false));
+			return TypeEncoder.EncodeDate(GetDateTime());
 		}
 
-		public async ValueTask<int> GetTimeAsync(AsyncWrappingCommonArgs async)
+		public int GetTime()
 		{
 			return _value switch
 			{
 				TimeSpan ts => TypeEncoder.EncodeTime(ts),
 				FbZonedTime zt => TypeEncoder.EncodeTime(zt.Time),
-				_ => TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(await GetDateTimeAsync(async).ConfigureAwait(false))),
+				_ => TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(GetDateTime())),
 			};
 		}
 
-		public ValueTask<ushort> GetTimeZoneIdAsync(AsyncWrappingCommonArgs async)
+		public ushort GetTimeZoneId()
 		{
 			{
 				if (_value is FbZonedDateTime zdt && TimeZoneMapping.TryGetByName(zdt.TimeZone, out var id))
 				{
-					return ValueTask2.FromResult(id);
+					return id;
 				}
 			}
 			{
 				if (_value is FbZonedTime zt && TimeZoneMapping.TryGetByName(zt.TimeZone, out var id))
 				{
-					return ValueTask2.FromResult(id);
+					return id;
 				}
 			}
 			throw new InvalidOperationException($"Incorrect time zone value.");
 		}
 
-		public ValueTask<FbDecFloat> GetDec16Async(AsyncWrappingCommonArgs async)
+		public FbDecFloat GetDec16()
 		{
-			return ValueTask2.FromResult((FbDecFloat)_value);
+			return (FbDecFloat)_value;
 		}
 
-		public ValueTask<FbDecFloat> GetDec34Async(AsyncWrappingCommonArgs async)
+		public FbDecFloat GetDec34()
 		{
-			return ValueTask2.FromResult((FbDecFloat)_value);
+			return (FbDecFloat)_value;
 		}
 
-		public ValueTask<BigInteger> GetInt128Async(AsyncWrappingCommonArgs async)
+		public BigInteger GetInt128()
 		{
-			return ValueTask2.FromResult((BigInteger)_value);
+			return (BigInteger)_value;
 		}
 
-		public async ValueTask<byte[]> GetBytesAsync(AsyncWrappingCommonArgs async)
+		public byte[] GetBytes()
 		{
-			if (await IsDBNullAsync(async).ConfigureAwait(false))
+			if (IsDBNull())
 			{
 				int length = _field.Length;
 
@@ -278,11 +357,11 @@ namespace FirebirdSql.Data.Common
 
 						if (Field.Charset.IsOctetsCharset)
 						{
-							bytes = await GetBinaryAsync(async).ConfigureAwait(false);
+							bytes = GetBinary();
 						}
 						else if (Field.Charset.IsNoneCharset)
 						{
-							var bvalue = Field.Charset.GetBytes(await GetStringAsync(async).ConfigureAwait(false));
+							var bvalue = Field.Charset.GetBytes(GetString());
 							if (bvalue.Length > Field.Length)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
@@ -291,7 +370,7 @@ namespace FirebirdSql.Data.Common
 						}
 						else
 						{
-							var svalue = await GetStringAsync(async).ConfigureAwait(false);
+							var svalue = GetString();
 							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
@@ -314,11 +393,11 @@ namespace FirebirdSql.Data.Common
 
 						if (Field.Charset.IsOctetsCharset)
 						{
-							bytes = await GetBinaryAsync(async).ConfigureAwait(false);
+							bytes = GetBinary();
 						}
 						else if (Field.Charset.IsNoneCharset)
 						{
-							var bvalue = Field.Charset.GetBytes(await GetStringAsync(async).ConfigureAwait(false));
+							var bvalue = Field.Charset.GetBytes(GetString());
 							if (bvalue.Length > Field.Length)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
@@ -327,7 +406,7 @@ namespace FirebirdSql.Data.Common
 						}
 						else
 						{
-							var svalue = await GetStringAsync(async).ConfigureAwait(false);
+							var svalue = GetString();
 							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
 							{
 								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
@@ -342,35 +421,35 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.Numeric:
 				case DbDataType.Decimal:
-					return await GetNumericBytesAsync(async).ConfigureAwait(false);
+					return GetNumericBytes();
 
 				case DbDataType.SmallInt:
-					return BitConverter.GetBytes(await GetInt16Async(async).ConfigureAwait(false));
+					return BitConverter.GetBytes(GetInt16());
 
 				case DbDataType.Integer:
-					return BitConverter.GetBytes(await GetInt32Async(async).ConfigureAwait(false));
+					return BitConverter.GetBytes(GetInt32());
 
 				case DbDataType.Array:
 				case DbDataType.Binary:
 				case DbDataType.Text:
 				case DbDataType.BigInt:
-					return BitConverter.GetBytes(await GetInt64Async(async).ConfigureAwait(false));
+					return BitConverter.GetBytes(GetInt64());
 
 				case DbDataType.Float:
-					return BitConverter.GetBytes(await GetFloatAsync(async).ConfigureAwait(false));
+					return BitConverter.GetBytes(GetFloat());
 
 				case DbDataType.Double:
-					return BitConverter.GetBytes(await GetDoubleAsync(async).ConfigureAwait(false));
+					return BitConverter.GetBytes(GetDouble());
 
 				case DbDataType.Date:
-					return BitConverter.GetBytes(await GetDateAsync(async).ConfigureAwait(false));
+					return BitConverter.GetBytes(GetDate());
 
 				case DbDataType.Time:
-					return BitConverter.GetBytes(await GetTimeAsync(async).ConfigureAwait(false));
+					return BitConverter.GetBytes(GetTime());
 
 				case DbDataType.TimeStamp:
 					{
-						var dt = await GetDateTimeAsync(async).ConfigureAwait(false);
+						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
 						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
 
@@ -381,17 +460,17 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case DbDataType.Guid:
-					return TypeEncoder.EncodeGuid(await GetGuidAsync(async).ConfigureAwait(false));
+					return TypeEncoder.EncodeGuid(GetGuid());
 
 				case DbDataType.Boolean:
-					return BitConverter.GetBytes(await GetBooleanAsync(async).ConfigureAwait(false));
+					return BitConverter.GetBytes(GetBoolean());
 
 				case DbDataType.TimeStampTZ:
 					{
-						var dt = await GetDateTimeAsync(async).ConfigureAwait(false);
+						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
 						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
-						var tzId = BitConverter.GetBytes(await GetTimeZoneIdAsync(async).ConfigureAwait(false));
+						var tzId = BitConverter.GetBytes(GetTimeZoneId());
 
 						var result = new byte[10];
 						Buffer.BlockCopy(date, 0, result, 0, date.Length);
@@ -402,10 +481,10 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.TimeStampTZEx:
 					{
-						var dt = await GetDateTimeAsync(async).ConfigureAwait(false);
+						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
 						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
-						var tzId = BitConverter.GetBytes(await GetTimeZoneIdAsync(async).ConfigureAwait(false));
+						var tzId = BitConverter.GetBytes(GetTimeZoneId());
 						var offset = new byte[] { 0, 0 };
 
 						var result = new byte[12];
@@ -418,8 +497,8 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.TimeTZ:
 					{
-						var time = BitConverter.GetBytes(await GetTimeAsync(async).ConfigureAwait(false));
-						var tzId = BitConverter.GetBytes(await GetTimeZoneIdAsync(async).ConfigureAwait(false));
+						var time = BitConverter.GetBytes(GetTime());
+						var tzId = BitConverter.GetBytes(GetTimeZoneId());
 
 						var result = new byte[6];
 						Buffer.BlockCopy(time, 0, result, 0, time.Length);
@@ -429,8 +508,8 @@ namespace FirebirdSql.Data.Common
 
 				case DbDataType.TimeTZEx:
 					{
-						var time = BitConverter.GetBytes(await GetTimeAsync(async).ConfigureAwait(false));
-						var tzId = BitConverter.GetBytes(await GetTimeZoneIdAsync(async).ConfigureAwait(false));
+						var time = BitConverter.GetBytes(GetTime());
+						var tzId = BitConverter.GetBytes(GetTimeZoneId());
 						var offset = new byte[] { 0, 0 };
 
 						var result = new byte[8];
@@ -441,22 +520,222 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case DbDataType.Dec16:
-					return DecimalCodec.DecFloat16.EncodeDecimal(await GetDec16Async(async).ConfigureAwait(false));
+					return DecimalCodec.DecFloat16.EncodeDecimal(GetDec16());
 
 				case DbDataType.Dec34:
-					return DecimalCodec.DecFloat34.EncodeDecimal(await GetDec34Async(async).ConfigureAwait(false));
+					return DecimalCodec.DecFloat34.EncodeDecimal(GetDec34());
 
 				case DbDataType.Int128:
-					return Int128Helper.GetBytes(await GetInt128Async(async).ConfigureAwait(false));
+					return Int128Helper.GetBytes(GetInt128());
+
+				default:
+					throw TypeHelper.InvalidDataType((int)Field.DbDataType);
+			}
+		}
+		public async ValueTask<byte[]> GetBytesAsync(CancellationToken cancellationToken = default)
+		{
+			if (IsDBNull())
+			{
+				int length = _field.Length;
+
+				if (Field.SqlType == IscCodes.SQL_VARYING)
+				{
+					// Add two bytes more for store	value length
+					length += 2;
+				}
+
+				return new byte[length];
+			}
+
+
+			switch (Field.DbDataType)
+			{
+				case DbDataType.Char:
+					{
+						var buffer = new byte[Field.Length];
+						byte[] bytes;
+
+						if (Field.Charset.IsOctetsCharset)
+						{
+							bytes = await GetBinaryAsync(cancellationToken).ConfigureAwait(false);
+						}
+						else if (Field.Charset.IsNoneCharset)
+						{
+							var bvalue = Field.Charset.GetBytes(await GetStringAsync(cancellationToken).ConfigureAwait(false));
+							if (bvalue.Length > Field.Length)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+							bytes = bvalue;
+						}
+						else
+						{
+							var svalue = await GetStringAsync(cancellationToken).ConfigureAwait(false);
+							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+							bytes = Field.Charset.GetBytes(svalue);
+						}
+
+						for (var i = 0; i < buffer.Length; i++)
+						{
+							buffer[i] = (byte)' ';
+						}
+						Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
+						return buffer;
+					}
+
+				case DbDataType.VarChar:
+					{
+						var buffer = new byte[Field.Length + 2];
+						byte[] bytes;
+
+						if (Field.Charset.IsOctetsCharset)
+						{
+							bytes = await GetBinaryAsync(cancellationToken).ConfigureAwait(false);
+						}
+						else if (Field.Charset.IsNoneCharset)
+						{
+							var bvalue = Field.Charset.GetBytes(await GetStringAsync(cancellationToken).ConfigureAwait(false));
+							if (bvalue.Length > Field.Length)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+							bytes = bvalue;
+						}
+						else
+						{
+							var svalue = await GetStringAsync(cancellationToken).ConfigureAwait(false);
+							if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
+							{
+								throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							}
+							bytes = Field.Charset.GetBytes(svalue);
+						}
+
+						Buffer.BlockCopy(BitConverter.GetBytes((short)bytes.Length), 0, buffer, 0, 2);
+						Buffer.BlockCopy(bytes, 0, buffer, 2, bytes.Length);
+						return buffer;
+					}
+
+				case DbDataType.Numeric:
+				case DbDataType.Decimal:
+					return GetNumericBytes();
+
+				case DbDataType.SmallInt:
+					return BitConverter.GetBytes(GetInt16());
+
+				case DbDataType.Integer:
+					return BitConverter.GetBytes(GetInt32());
+
+				case DbDataType.Array:
+				case DbDataType.Binary:
+				case DbDataType.Text:
+				case DbDataType.BigInt:
+					return BitConverter.GetBytes(GetInt64());
+
+				case DbDataType.Float:
+					return BitConverter.GetBytes(GetFloat());
+
+				case DbDataType.Double:
+					return BitConverter.GetBytes(GetDouble());
+
+				case DbDataType.Date:
+					return BitConverter.GetBytes(GetDate());
+
+				case DbDataType.Time:
+					return BitConverter.GetBytes(GetTime());
+
+				case DbDataType.TimeStamp:
+					{
+						var dt = GetDateTime();
+						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+
+						var result = new byte[8];
+						Buffer.BlockCopy(date, 0, result, 0, date.Length);
+						Buffer.BlockCopy(time, 0, result, 4, time.Length);
+						return result;
+					}
+
+				case DbDataType.Guid:
+					return TypeEncoder.EncodeGuid(GetGuid());
+
+				case DbDataType.Boolean:
+					return BitConverter.GetBytes(GetBoolean());
+
+				case DbDataType.TimeStampTZ:
+					{
+						var dt = GetDateTime();
+						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+						var tzId = BitConverter.GetBytes(GetTimeZoneId());
+
+						var result = new byte[10];
+						Buffer.BlockCopy(date, 0, result, 0, date.Length);
+						Buffer.BlockCopy(time, 0, result, 4, time.Length);
+						Buffer.BlockCopy(tzId, 0, result, 8, tzId.Length);
+						return result;
+					}
+
+				case DbDataType.TimeStampTZEx:
+					{
+						var dt = GetDateTime();
+						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+						var tzId = BitConverter.GetBytes(GetTimeZoneId());
+						var offset = new byte[] { 0, 0 };
+
+						var result = new byte[12];
+						Buffer.BlockCopy(date, 0, result, 0, date.Length);
+						Buffer.BlockCopy(time, 0, result, 4, time.Length);
+						Buffer.BlockCopy(tzId, 0, result, 8, tzId.Length);
+						Buffer.BlockCopy(offset, 0, result, 10, offset.Length);
+						return result;
+					}
+
+				case DbDataType.TimeTZ:
+					{
+						var time = BitConverter.GetBytes(GetTime());
+						var tzId = BitConverter.GetBytes(GetTimeZoneId());
+
+						var result = new byte[6];
+						Buffer.BlockCopy(time, 0, result, 0, time.Length);
+						Buffer.BlockCopy(tzId, 0, result, 4, tzId.Length);
+						return result;
+					}
+
+				case DbDataType.TimeTZEx:
+					{
+						var time = BitConverter.GetBytes(GetTime());
+						var tzId = BitConverter.GetBytes(GetTimeZoneId());
+						var offset = new byte[] { 0, 0 };
+
+						var result = new byte[8];
+						Buffer.BlockCopy(time, 0, result, 0, time.Length);
+						Buffer.BlockCopy(tzId, 0, result, 4, tzId.Length);
+						Buffer.BlockCopy(offset, 0, result, 6, offset.Length);
+						return result;
+					}
+
+				case DbDataType.Dec16:
+					return DecimalCodec.DecFloat16.EncodeDecimal(GetDec16());
+
+				case DbDataType.Dec34:
+					return DecimalCodec.DecFloat34.EncodeDecimal(GetDec34());
+
+				case DbDataType.Int128:
+					return Int128Helper.GetBytes(GetInt128());
 
 				default:
 					throw TypeHelper.InvalidDataType((int)Field.DbDataType);
 			}
 		}
 
-		private async ValueTask<byte[]> GetNumericBytesAsync(AsyncWrappingCommonArgs async)
+		private byte[] GetNumericBytes()
 		{
-			var value = await GetDecimalAsync(async).ConfigureAwait(false);
+			var value = GetDecimal();
 			var numeric = TypeEncoder.EncodeDecimal(value, Field.NumericScale, Field.DataType);
 
 			switch (_field.SqlType)
@@ -483,34 +762,53 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		private ValueTask<string> GetClobDataAsync(long blobId, AsyncWrappingCommonArgs async)
+		private string GetClobData(long blobId)
 		{
 			var clob = _statement.CreateBlob(blobId);
-
-			return clob.ReadStringAsync(async);
+			return clob.ReadString();
+		}
+		private ValueTask<string> GetClobDataAsync(long blobId, CancellationToken cancellationToken = default)
+		{
+			var clob = _statement.CreateBlob(blobId);
+			return clob.ReadStringAsync(cancellationToken);
 		}
 
-		private ValueTask<byte[]> GetBlobDataAsync(long blobId, AsyncWrappingCommonArgs async)
+		private byte[] GetBlobData(long blobId)
 		{
 			var blob = _statement.CreateBlob(blobId);
-
-			return blob.ReadAsync(async);
+			return blob.Read();
+		}
+		private ValueTask<byte[]> GetBlobDataAsync(long blobId, CancellationToken cancellationToken = default)
+		{
+			var blob = _statement.CreateBlob(blobId);
+			return blob.ReadAsync(cancellationToken);
 		}
 
-		private async ValueTask<Array> GetArrayDataAsync(long handle, AsyncWrappingCommonArgs async)
+		private Array GetArrayData(long handle)
 		{
 			if (_field.ArrayHandle == null)
 			{
-				_field.ArrayHandle = await _statement.CreateArrayAsync(handle, Field.Relation, Field.Name, async).ConfigureAwait(false);
+				_field.ArrayHandle = _statement.CreateArray(handle, Field.Relation, Field.Name);
 			}
 
-			var gdsArray = await _statement.CreateArrayAsync(_field.ArrayHandle.Descriptor, async).ConfigureAwait(false);
-
+			var gdsArray = _statement.CreateArray(_field.ArrayHandle.Descriptor);
 			gdsArray.Handle = handle;
 			gdsArray.Database = _statement.Database;
 			gdsArray.Transaction = _statement.Transaction;
+			return gdsArray.Read();
+		}
+		private async ValueTask<Array> GetArrayDataAsync(long handle, CancellationToken cancellationToken = default)
+		{
+			if (_field.ArrayHandle == null)
+			{
+				_field.ArrayHandle = await _statement.CreateArrayAsync(handle, Field.Relation, Field.Name, cancellationToken).ConfigureAwait(false);
+			}
 
-			return await gdsArray.ReadAsync(async).ConfigureAwait(false);
+			var gdsArray = await _statement.CreateArrayAsync(_field.ArrayHandle.Descriptor, cancellationToken).ConfigureAwait(false);
+			gdsArray.Handle = handle;
+			gdsArray.Database = _statement.Database;
+			gdsArray.Transaction = _statement.Transaction;
+			return await gdsArray.ReadAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 }

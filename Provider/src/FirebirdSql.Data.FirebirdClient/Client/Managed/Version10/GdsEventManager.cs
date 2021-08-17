@@ -42,31 +42,40 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_timeout = timeout;
 		}
 
-		public async ValueTask OpenAsync(AsyncWrappingCommonArgs async)
+		public void Open()
 		{
 			var connection = new GdsConnection(_ipAddress, _portNumber, _timeout);
-			await connection.ConnectAsync(async).ConfigureAwait(false);
+			connection.Connect();
+			_database = new GdsDatabase(connection);
+		}
+		public async ValueTask OpenAsync(CancellationToken cancellationToken = default)
+		{
+			var connection = new GdsConnection(_ipAddress, _portNumber, _timeout);
+			await connection.ConnectAsync(cancellationToken).ConfigureAwait(false);
 			_database = new GdsDatabase(connection);
 		}
 
-		public async ValueTask WaitForEventsAsync(RemoteEvent remoteEvent, AsyncWrappingCommonArgs async)
+		// this is a special method that's not awaited
+		public async Task StartWaitingForEvents(RemoteEvent remoteEvent)
 		{
 			while (true)
 			{
 				try
 				{
-					var operation = await _database.ReadOperationAsync(async).ConfigureAwait(false);
+					var operation = await _database.ReadOperationAsync(CancellationToken.None).ConfigureAwait(false);
 
 					switch (operation)
 					{
 						case IscCodes.op_event:
-							var dbHandle = await _database.Xdr.ReadInt32Async(async).ConfigureAwait(false);
-							var buffer = await _database.Xdr.ReadBufferAsync(async).ConfigureAwait(false);
+							var dbHandle = await _database.Xdr.ReadInt32Async(CancellationToken.None).ConfigureAwait(false);
+							var buffer = await _database.Xdr.ReadBufferAsync(CancellationToken.None).ConfigureAwait(false);
 							var ast = new byte[8];
-							await _database.Xdr.ReadBytesAsync(ast, 8, async).ConfigureAwait(false);
-							var eventId = await _database.Xdr.ReadInt32Async(async).ConfigureAwait(false);
+							await _database.Xdr.ReadBytesAsync(ast, 8, CancellationToken.None).ConfigureAwait(false);
+							var eventId = await _database.Xdr.ReadInt32Async(CancellationToken.None).ConfigureAwait(false);
 
-							await remoteEvent.EventCountsAsync(buffer, async).ConfigureAwait(false);
+							remoteEvent.EventCounts(buffer);
+
+							await remoteEvent.Database.QueueEventsAsync(remoteEvent, CancellationToken.None).ConfigureAwait(false);
 
 							break;
 
@@ -87,10 +96,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public ValueTask CloseAsync(AsyncWrappingCommonArgs async)
+		public void Close()
 		{
 			Volatile.Write(ref _closing, true);
-			return _database.CloseConnectionAsync(async);
+			_database.CloseConnection();
+		}
+		public ValueTask CloseAsync(CancellationToken cancellationToken = default)
+		{
+			Volatile.Write(ref _closing, true);
+			return _database.CloseConnectionAsync(cancellationToken);
 		}
 	}
 }

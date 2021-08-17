@@ -71,11 +71,11 @@ namespace FirebirdSql.Data.Client.Managed
 			WireCrypt = wireCrypt;
 		}
 
-		public async ValueTask ConnectAsync(AsyncWrappingCommonArgs async)
+		public void Connect()
 		{
 			try
 			{
-				IPAddress = await GetIPAddressAsync(DataSource, async).ConfigureAwait(false);
+				IPAddress = GetIPAddress(DataSource);
 				var endPoint = new IPEndPoint(IPAddress, PortNumber);
 
 				var socket = new Socket(IPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -84,24 +84,41 @@ namespace FirebirdSql.Data.Client.Managed
 				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, 1);
 
-				if (async.IsAsync)
+				socket.Connect(endPoint);
+
+				_networkStream = new NetworkStream(socket, true);
+				_firebirdNetworkHandlingWrapper = new FirebirdNetworkHandlingWrapper(new DataProviderStreamWrapper(_networkStream));
+				Xdr = new XdrReaderWriter(_firebirdNetworkHandlingWrapper, Charset);
+			}
+			catch (SocketException ex)
+			{
+				throw IscException.ForTypeErrorCodeStrParam(IscCodes.isc_arg_gds, IscCodes.isc_network_error, DataSource, ex);
+			}
+		}
+		public async ValueTask ConnectAsync(CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				IPAddress = await GetIPAddressAsync(DataSource, cancellationToken).ConfigureAwait(false);
+				var endPoint = new IPEndPoint(IPAddress, PortNumber);
+
+				var socket = new Socket(IPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, PacketSize);
+				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, PacketSize);
+				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, 1);
+				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, 1);
+
+				using (var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(Timeout)))
 				{
-					using (var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(Timeout)))
+					using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, cancellationToken))
 					{
-						using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, async.CancellationToken))
-						{
-							await ConnectAsyncHelper(socket)(endPoint, combinedCts.Token).ConfigureAwait(false);
-						}
-					}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
-					static Func<IPEndPoint, CancellationToken, Task> ConnectAsyncHelper(Socket socket) => (e, ct) => Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, e, null);
+						static Func<IPEndPoint, CancellationToken, Task> ConnectAsyncHelper(Socket socket) => (e, ct) => Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, e, null);
 #else
-					static Func<IPEndPoint, CancellationToken, Task> ConnectAsyncHelper(Socket socket) => (e, ct) => SocketTaskExtensions.ConnectAsync(socket, e, ct).AsTask();
+						static Func<IPEndPoint, CancellationToken, Task> ConnectAsyncHelper(Socket socket) => (e, ct) => SocketTaskExtensions.ConnectAsync(socket, e, ct).AsTask();
 #endif
-				}
-				else
-				{
-					socket.Connect(endPoint);
+						await ConnectAsyncHelper(socket)(endPoint, combinedCts.Token).ConfigureAwait(false);
+					}
 				}
 
 				_networkStream = new NetworkStream(socket, true);
@@ -114,44 +131,44 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public async ValueTask IdentifyAsync(string database, AsyncWrappingCommonArgs async)
+		public void Identify(string database)
 		{
 			try
 			{
-				await Xdr.WriteAsync(IscCodes.op_connect, async).ConfigureAwait(false);
-				await Xdr.WriteAsync(IscCodes.op_attach, async).ConfigureAwait(false);
-				await Xdr.WriteAsync(IscCodes.CONNECT_VERSION3, async).ConfigureAwait(false);
-				await Xdr.WriteAsync(IscCodes.GenericAchitectureClient, async).ConfigureAwait(false);
+				Xdr.Write(IscCodes.op_connect);
+				Xdr.Write(IscCodes.op_attach);
+				Xdr.Write(IscCodes.CONNECT_VERSION3);
+				Xdr.Write(IscCodes.GenericAchitectureClient);
 
-				await Xdr.WriteAsync(database, async).ConfigureAwait(false);
+				Xdr.Write(database);
 
 				var protocols = ProtocolsSupported.Get(Compression);
-				await Xdr.WriteAsync(protocols.Count(), async).ConfigureAwait(false);
+				Xdr.Write(protocols.Count());
 
 				AuthBlock = new AuthBlock(User, Password, WireCrypt);
 
-				await Xdr.WriteBufferAsync(AuthBlock.UserIdentificationData(), async).ConfigureAwait(false);
+				Xdr.WriteBuffer(AuthBlock.UserIdentificationData());
 
 				var priority = 0;
 				foreach (var protocol in protocols)
 				{
-					await Xdr.WriteAsync(protocol.Version, async).ConfigureAwait(false);
-					await Xdr.WriteAsync(IscCodes.GenericAchitectureClient, async).ConfigureAwait(false);
-					await Xdr.WriteAsync(protocol.MinPType, async).ConfigureAwait(false);
-					await Xdr.WriteAsync(protocol.MaxPType, async).ConfigureAwait(false);
-					await Xdr.WriteAsync(priority, async).ConfigureAwait(false);
+					Xdr.Write(protocol.Version);
+					Xdr.Write(IscCodes.GenericAchitectureClient);
+					Xdr.Write(protocol.MinPType);
+					Xdr.Write(protocol.MaxPType);
+					Xdr.Write(priority);
 
 					priority++;
 				}
 
-				await Xdr.FlushAsync(async).ConfigureAwait(false);
+				Xdr.Flush();
 
-				var operation = await Xdr.ReadOperationAsync(async).ConfigureAwait(false);
+				var operation = Xdr.ReadOperation();
 				if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
 				{
-					ProtocolVersion = await Xdr.ReadInt32Async(async).ConfigureAwait(false);
-					ProtocolArchitecture = await Xdr.ReadInt32Async(async).ConfigureAwait(false);
-					ProtocolMinimunType = await Xdr.ReadInt32Async(async).ConfigureAwait(false);
+					ProtocolVersion = Xdr.ReadInt32();
+					ProtocolArchitecture = Xdr.ReadInt32();
+					ProtocolMinimunType = Xdr.ReadInt32();
 
 					if (ProtocolVersion < 0)
 					{
@@ -166,10 +183,10 @@ namespace FirebirdSql.Data.Client.Managed
 					if (operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
 					{
 						AuthBlock.Start(
-							await Xdr.ReadBufferAsync(async).ConfigureAwait(false),
-							await Xdr.ReadStringAsync(async).ConfigureAwait(false),
-							await Xdr.ReadBooleanAsync(async).ConfigureAwait(false),
-							await Xdr.ReadBufferAsync(async).ConfigureAwait(false));
+							Xdr.ReadBuffer(),
+							Xdr.ReadString(),
+							Xdr.ReadBoolean(),
+							Xdr.ReadBuffer());
 
 						if (Compression)
 						{
@@ -181,9 +198,9 @@ namespace FirebirdSql.Data.Client.Managed
 						{
 							while (true)
 							{
-								await AuthBlock.SendContAuthToBufferAsync(Xdr, async).ConfigureAwait(false);
-								await Xdr.FlushAsync(async).ConfigureAwait(false);
-								var response = await AuthBlock.ProcessContAuthResponseAsync(Xdr, async).ConfigureAwait(false);
+								AuthBlock.SendContAuthToBuffer(Xdr);
+								Xdr.Flush();
+								var response = AuthBlock.ProcessContAuthResponse(Xdr);
 								if (response is ContAuthResponse contAuthResponse)
 								{
 									AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
@@ -194,9 +211,9 @@ namespace FirebirdSql.Data.Client.Managed
 
 							if (AuthBlock.ServerKeys.Any())
 							{
-								await AuthBlock.SendWireCryptToBufferAsync(Xdr, async).ConfigureAwait(false);
-								await Xdr.FlushAsync(async).ConfigureAwait(false);
-								await AuthBlock.ProcessWireCryptResponseAsync(Xdr, this, async).ConfigureAwait(false);
+								AuthBlock.SendWireCryptToBuffer(Xdr);
+								Xdr.Flush();
+								AuthBlock.ProcessWireCryptResponse(Xdr, this);
 							}
 						}
 					}
@@ -205,8 +222,112 @@ namespace FirebirdSql.Data.Client.Managed
 				}
 				else if (operation == IscCodes.op_response)
 				{
-					var response = (GenericResponse)await ProcessOperationAsync(operation, Xdr, async).ConfigureAwait(false);
-					ProcessResponse(response);
+					var response = (GenericResponse)ProcessOperation(operation, Xdr);
+					HandleResponseException(response);
+				}
+				else
+				{
+					throw IscException.ForErrorCode(IscCodes.isc_connect_reject);
+				}
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public async ValueTask IdentifyAsync(string database, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await Xdr.WriteAsync(IscCodes.op_connect, cancellationToken).ConfigureAwait(false);
+				await Xdr.WriteAsync(IscCodes.op_attach, cancellationToken).ConfigureAwait(false);
+				await Xdr.WriteAsync(IscCodes.CONNECT_VERSION3, cancellationToken).ConfigureAwait(false);
+				await Xdr.WriteAsync(IscCodes.GenericAchitectureClient, cancellationToken).ConfigureAwait(false);
+
+				await Xdr.WriteAsync(database, cancellationToken).ConfigureAwait(false);
+
+				var protocols = ProtocolsSupported.Get(Compression);
+				await Xdr.WriteAsync(protocols.Count(), cancellationToken).ConfigureAwait(false);
+
+				AuthBlock = new AuthBlock(User, Password, WireCrypt);
+
+				await Xdr.WriteBufferAsync(AuthBlock.UserIdentificationData(), cancellationToken).ConfigureAwait(false);
+
+				var priority = 0;
+				foreach (var protocol in protocols)
+				{
+					await Xdr.WriteAsync(protocol.Version, cancellationToken).ConfigureAwait(false);
+					await Xdr.WriteAsync(IscCodes.GenericAchitectureClient, cancellationToken).ConfigureAwait(false);
+					await Xdr.WriteAsync(protocol.MinPType, cancellationToken).ConfigureAwait(false);
+					await Xdr.WriteAsync(protocol.MaxPType, cancellationToken).ConfigureAwait(false);
+					await Xdr.WriteAsync(priority, cancellationToken).ConfigureAwait(false);
+
+					priority++;
+				}
+
+				await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				var operation = await Xdr.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
+				if (operation == IscCodes.op_accept || operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
+				{
+					ProtocolVersion = await Xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false);
+					ProtocolArchitecture = await Xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false);
+					ProtocolMinimunType = await Xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false);
+
+					if (ProtocolVersion < 0)
+					{
+						ProtocolVersion = (ushort)(ProtocolVersion & IscCodes.FB_PROTOCOL_MASK) | IscCodes.FB_PROTOCOL_FLAG;
+					}
+
+					if (Compression && !((ProtocolMinimunType & IscCodes.pflag_compress) != 0))
+					{
+						Compression = false;
+					}
+
+					if (operation == IscCodes.op_cond_accept || operation == IscCodes.op_accept_data)
+					{
+						AuthBlock.Start(
+							await Xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false),
+							await Xdr.ReadStringAsync(cancellationToken).ConfigureAwait(false),
+							await Xdr.ReadBooleanAsync(cancellationToken).ConfigureAwait(false),
+							await Xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false));
+
+						if (Compression)
+						{
+							// after reading before writing
+							StartCompression();
+						}
+
+						if (operation == IscCodes.op_cond_accept && AuthBlock.HasClientData)
+						{
+							while (true)
+							{
+								await AuthBlock.SendContAuthToBufferAsync(Xdr, cancellationToken).ConfigureAwait(false);
+								await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+								var response = await AuthBlock.ProcessContAuthResponseAsync(Xdr, cancellationToken).ConfigureAwait(false);
+								if (response is ContAuthResponse contAuthResponse)
+								{
+									AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
+									continue;
+								}
+								break;
+							}
+
+							if (AuthBlock.ServerKeys.Any())
+							{
+								await AuthBlock.SendWireCryptToBufferAsync(Xdr, cancellationToken).ConfigureAwait(false);
+								await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+								await AuthBlock.ProcessWireCryptResponseAsync(Xdr, this, cancellationToken).ConfigureAwait(false);
+							}
+						}
+					}
+
+					AuthBlock.WireCryptValidate(ProtocolVersion);
+				}
+				else if (operation == IscCodes.op_response)
+				{
+					var response = (GenericResponse)await ProcessOperationAsync(operation, Xdr, cancellationToken).ConfigureAwait(false);
+					HandleResponseException(response);
 				}
 				else
 				{
@@ -219,7 +340,19 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public async ValueTask DisconnectAsync(AsyncWrappingCommonArgs async)
+		public void Disconnect()
+		{
+			if (_networkStream != null)
+			{
+#if NET48 || NETSTANDARD2_0
+				_networkStream.Dispose();
+#else
+				_networkStream.Dispose();
+#endif
+				_networkStream = null;
+			}
+		}
+		public async ValueTask DisconnectAsync(CancellationToken cancellationToken = default)
 		{
 			if (_networkStream != null)
 			{
@@ -227,7 +360,7 @@ namespace FirebirdSql.Data.Client.Managed
 				_networkStream.Dispose();
 				await ValueTask2.CompletedTask.ConfigureAwait(false);
 #else
-				await async.AsyncSyncCallNoCancellation(_networkStream.DisposeAsync, _networkStream.Dispose).ConfigureAwait(false);
+				await _networkStream.DisposeAsync().ConfigureAwait(false);
 #endif
 				_networkStream = null;
 			}
@@ -243,14 +376,32 @@ namespace FirebirdSql.Data.Client.Managed
 			_firebirdNetworkHandlingWrapper.StartEncryption(AuthBlock.SessionKey);
 		}
 
-		private static async ValueTask<IPAddress> GetIPAddressAsync(string dataSource, AsyncWrappingCommonArgs async)
+		private static IPAddress GetIPAddress(string dataSource)
 		{
 			if (IPAddress.TryParse(dataSource, out var ipaddress))
 			{
 				return ipaddress;
 			}
 
-			var addresses = (await async.AsyncSyncCallNoCancellation(Dns.GetHostEntryAsync, Dns.GetHostEntry, dataSource).ConfigureAwait(false)).AddressList;
+			var addresses = (Dns.GetHostEntry(dataSource)).AddressList;
+			foreach (var address in addresses)
+			{
+				// IPv4 priority
+				if (address.AddressFamily == AddressFamily.InterNetwork)
+				{
+					return address;
+				}
+			}
+			return addresses[0];
+		}
+		private static async ValueTask<IPAddress> GetIPAddressAsync(string dataSource, CancellationToken cancellationToken = default)
+		{
+			if (IPAddress.TryParse(dataSource, out var ipaddress))
+			{
+				return ipaddress;
+			}
+
+			var addresses = (await Dns.GetHostEntryAsync(dataSource).ConfigureAwait(false)).AddressList;
 			foreach (var address in addresses)
 			{
 				// IPv4 priority
@@ -262,47 +413,86 @@ namespace FirebirdSql.Data.Client.Managed
 			return addresses[0];
 		}
 
-		public static async ValueTask<IResponse> ProcessOperationAsync(int operation, IXdrReader xdr, AsyncWrappingCommonArgs async)
+		public static IResponse ProcessOperation(int operation, IXdrReader xdr)
 		{
 			switch (operation)
 			{
 				case IscCodes.op_response:
 					return new GenericResponse(
-						await xdr.ReadInt32Async(async).ConfigureAwait(false),
-						await xdr.ReadInt64Async(async).ConfigureAwait(false),
-						await xdr.ReadBufferAsync(async).ConfigureAwait(false),
-						await xdr.ReadStatusVectorAsync(async).ConfigureAwait(false));
+						xdr.ReadInt32(),
+						xdr.ReadInt64(),
+						xdr.ReadBuffer(),
+						xdr.ReadStatusVector());
 
 				case IscCodes.op_fetch_response:
 					return new FetchResponse(
-						await xdr.ReadInt32Async(async).ConfigureAwait(false),
-						await xdr.ReadInt32Async(async).ConfigureAwait(false));
+						xdr.ReadInt32(),
+						xdr.ReadInt32());
 
 				case IscCodes.op_sql_response:
 					return new SqlResponse(
-						await xdr.ReadInt32Async(async).ConfigureAwait(false));
+						xdr.ReadInt32());
 
 				case IscCodes.op_trusted_auth:
 					return new AuthResponse(
-						await xdr.ReadBufferAsync(async).ConfigureAwait(false));
+						xdr.ReadBuffer());
 
 				case IscCodes.op_crypt_key_callback:
 					return new CryptKeyCallbackResponse(
-						await xdr.ReadBufferAsync(async).ConfigureAwait(false));
+						xdr.ReadBuffer());
 
 				case IscCodes.op_cont_auth:
 					return new ContAuthResponse(
-						await xdr.ReadBufferAsync(async).ConfigureAwait(false),
-						await xdr.ReadStringAsync(async).ConfigureAwait(false),
-						await xdr.ReadBooleanAsync(async).ConfigureAwait(false),
-						await xdr.ReadBufferAsync(async).ConfigureAwait(false));
+						xdr.ReadBuffer(),
+						xdr.ReadString(),
+						xdr.ReadBoolean(),
+						xdr.ReadBuffer());
+
+				default:
+					throw new ArgumentOutOfRangeException(nameof(operation), $"{nameof(operation)}={operation}");
+			}
+		}
+		public static async ValueTask<IResponse> ProcessOperationAsync(int operation, IXdrReader xdr, CancellationToken cancellationToken = default)
+		{
+			switch (operation)
+			{
+				case IscCodes.op_response:
+					return new GenericResponse(
+						await xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false),
+						await xdr.ReadInt64Async(cancellationToken).ConfigureAwait(false),
+						await xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false),
+						await xdr.ReadStatusVectorAsync(cancellationToken).ConfigureAwait(false));
+
+				case IscCodes.op_fetch_response:
+					return new FetchResponse(
+						await xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false),
+						await xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false));
+
+				case IscCodes.op_sql_response:
+					return new SqlResponse(
+						await xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false));
+
+				case IscCodes.op_trusted_auth:
+					return new AuthResponse(
+						await xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false));
+
+				case IscCodes.op_crypt_key_callback:
+					return new CryptKeyCallbackResponse(
+						await xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false));
+
+				case IscCodes.op_cont_auth:
+					return new ContAuthResponse(
+						await xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false),
+						await xdr.ReadStringAsync(cancellationToken).ConfigureAwait(false),
+						await xdr.ReadBooleanAsync(cancellationToken).ConfigureAwait(false),
+						await xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false));
 
 				default:
 					throw new ArgumentOutOfRangeException(nameof(operation), $"{nameof(operation)}={operation}");
 			}
 		}
 
-		public static void ProcessResponse(IResponse response)
+		public static void HandleResponseException(IResponse response)
 		{
 			if (response is GenericResponse genericResponse)
 			{
@@ -313,7 +503,7 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public static void ProcessResponseWarnings(IResponse response, Action<IscException> onWarning)
+		public static void HandleResponseWarning(IResponse response, Action<IscException> onWarning)
 		{
 			if (response is GenericResponse genericResponse)
 			{

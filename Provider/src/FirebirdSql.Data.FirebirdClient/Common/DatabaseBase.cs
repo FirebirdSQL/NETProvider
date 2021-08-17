@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
@@ -34,39 +35,69 @@ namespace FirebirdSql.Data.Common
 		public abstract bool HasRemoteEventSupport { get; }
 		public abstract bool ConnectionBroken { get; }
 
-		public abstract ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask DetachAsync(AsyncWrappingCommonArgs async);
+		public abstract void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey);
+		public abstract ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default);
 
-		public abstract ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask DropDatabaseAsync(AsyncWrappingCommonArgs async);
+		public abstract void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey);
+		public abstract ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default);
 
-		public abstract ValueTask<TransactionBase> BeginTransactionAsync(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async);
+		public abstract void Detach();
+		public abstract ValueTask DetachAsync(CancellationToken cancellationToken = default);
+
+		public abstract void CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey);
+		public abstract ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default);
+
+		public abstract void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey);
+		public abstract ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default);
+
+		public abstract void DropDatabase();
+		public abstract ValueTask DropDatabaseAsync(CancellationToken cancellationToken = default);
+
+		public abstract TransactionBase BeginTransaction(TransactionParameterBuffer tpb);
+		public abstract ValueTask<TransactionBase> BeginTransactionAsync(TransactionParameterBuffer tpb, CancellationToken cancellationToken = default);
 
 		public abstract StatementBase CreateStatement();
 		public abstract StatementBase CreateStatement(TransactionBase transaction);
 
 		public abstract DatabaseParameterBufferBase CreateDatabaseParameterBuffer();
 
-		public abstract ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, AsyncWrappingCommonArgs async);
-		public abstract ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
+		public abstract List<object> GetDatabaseInfo(byte[] items);
+		public abstract ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, CancellationToken cancellationToken = default);
 
-		public abstract ValueTask CloseEventManagerAsync(AsyncWrappingCommonArgs async);
-		public abstract ValueTask QueueEventsAsync(RemoteEvent events, AsyncWrappingCommonArgs async);
-		public abstract ValueTask CancelEventsAsync(RemoteEvent events, AsyncWrappingCommonArgs async);
+		public abstract List<object> GetDatabaseInfo(byte[] items, int bufferLength);
+		public abstract ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default);
 
-		public abstract ValueTask CancelOperationAsync(int kind, AsyncWrappingCommonArgs async);
+		public abstract void CloseEventManager();
+		public abstract ValueTask CloseEventManagerAsync(CancellationToken cancellationToken = default);
 
-		public async ValueTask<string> GetServerVersionAsync(AsyncWrappingCommonArgs async)
+		public abstract void QueueEvents(RemoteEvent events);
+		public abstract ValueTask QueueEventsAsync(RemoteEvent events, CancellationToken cancellationToken = default);
+
+		public abstract void CancelEvents(RemoteEvent events);
+		public abstract ValueTask CancelEventsAsync(RemoteEvent events, CancellationToken cancellationToken = default);
+
+		public abstract void CancelOperation(int kind);
+		public abstract ValueTask CancelOperationAsync(int kind, CancellationToken cancellationToken = default);
+
+		public string GetServerVersion()
 		{
 			var items = new byte[]
 			{
 				IscCodes.isc_info_firebird_version,
 				IscCodes.isc_info_end
 			};
-			var info = await GetDatabaseInfoAsync(items, IscCodes.BUFFER_SIZE_256, async).ConfigureAwait(false);
-			return (string)info[info.Count -1];
+			var info = GetDatabaseInfo(items, IscCodes.BUFFER_SIZE_256);
+			return (string)info[info.Count - 1];
+		}
+		public async ValueTask<string> GetServerVersionAsync(CancellationToken cancellationToken = default)
+		{
+			var items = new byte[]
+			{
+				IscCodes.isc_info_firebird_version,
+				IscCodes.isc_info_end
+			};
+			var info = await GetDatabaseInfoAsync(items, IscCodes.BUFFER_SIZE_256, cancellationToken).ConfigureAwait(false);
+			return (string)info[info.Count - 1];
 		}
 	}
 }

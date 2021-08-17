@@ -29,14 +29,12 @@ namespace FirebirdSql.Data.Services
 			: base(connectionString)
 		{ }
 
-		public void AddUser(FbUserData user) => AddUserImpl(user, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task AddUserAsync(FbUserData user, CancellationToken cancellationToken = default) => AddUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task AddUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
+		public void AddUser(FbUserData user)
 		{
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			await OpenAsync(async).ConfigureAwait(false);
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_add_user);
 			startSpb.Append2(IscCodes.isc_spb_sec_username, user.UserName);
@@ -55,35 +53,72 @@ namespace FirebirdSql.Data.Services
 				startSpb.Append2(IscCodes.isc_spb_sec_groupname, user.GroupName);
 			if ((user.RoleName?.Length ?? 0) != 0)
 				startSpb.Append2(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void DeleteUser(FbUserData user) => DeleteUserImpl(user, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task DeleteUserAsync(FbUserData user, CancellationToken cancellationToken = default) => DeleteUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task DeleteUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
+		public async Task AddUserAsync(FbUserData user, CancellationToken cancellationToken = default)
 		{
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_add_user);
+			startSpb.Append2(IscCodes.isc_spb_sec_username, user.UserName);
+			startSpb.Append2(IscCodes.isc_spb_sec_password, user.UserPassword);
+			if ((user.FirstName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_firstname, user.FirstName);
+			if ((user.MiddleName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_middlename, user.MiddleName);
+			if ((user.LastName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_lastname, user.LastName);
+			if (user.UserID != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
+			if (user.GroupID != 0)
+				startSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
+			if ((user.GroupName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_groupname, user.GroupName);
+			if ((user.RoleName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sql_role_name, user.RoleName);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void DeleteUser(FbUserData user)
+		{
+			if (string.IsNullOrEmpty(user.UserName))
+				throw new InvalidOperationException("Invalid user name.");
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_delete_user);
 			startSpb.Append2(IscCodes.isc_spb_sec_username, user.UserName);
 			if ((user.RoleName?.Length ?? 0) != 0)
 				startSpb.Append2(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
 		}
-
-		public void ModifyUser(FbUserData user) => ModifyUserImpl(user, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task ModifyUserAsync(FbUserData user, CancellationToken cancellationToken = default) => ModifyUserImpl(user, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task ModifyUserImpl(FbUserData user, AsyncWrappingCommonArgs async)
+		public async Task DeleteUserAsync(FbUserData user, CancellationToken cancellationToken = default)
 		{
 			if (string.IsNullOrEmpty(user.UserName))
 				throw new InvalidOperationException("Invalid user name.");
 
-			await OpenAsync(async).ConfigureAwait(false);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_delete_user);
+			startSpb.Append2(IscCodes.isc_spb_sec_username, user.UserName);
+			if ((user.RoleName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sql_role_name, user.RoleName);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+
+		public void ModifyUser(FbUserData user)
+		{
+			if (string.IsNullOrEmpty(user.UserName))
+				throw new InvalidOperationException("Invalid user name.");
+
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_modify_user);
 			startSpb.Append2(IscCodes.isc_spb_sec_username, user.UserName);
@@ -101,42 +136,88 @@ namespace FirebirdSql.Data.Services
 				startSpb.Append2(IscCodes.isc_spb_sec_groupname, user.GroupName);
 			if ((user.RoleName?.Length ?? 0) != 0)
 				startSpb.Append2(IscCodes.isc_spb_sql_role_name, user.RoleName);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			Close();
+		}
+		public async Task ModifyUserAsync(FbUserData user, CancellationToken cancellationToken = default)
+		{
+			if (string.IsNullOrEmpty(user.UserName))
+				throw new InvalidOperationException("Invalid user name.");
+
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_modify_user);
+			startSpb.Append2(IscCodes.isc_spb_sec_username, user.UserName);
+			if ((user.UserPassword?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_password, user.UserPassword);
+			if ((user.FirstName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_firstname, user.FirstName);
+			if ((user.MiddleName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_middlename, user.MiddleName);
+			if ((user.LastName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_lastname, user.LastName);
+			startSpb.Append(IscCodes.isc_spb_sec_userid, user.UserID);
+			startSpb.Append(IscCodes.isc_spb_sec_groupid, user.GroupID);
+			if ((user.GroupName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sec_groupname, user.GroupName);
+			if ((user.RoleName?.Length ?? 0) != 0)
+				startSpb.Append2(IscCodes.isc_spb_sql_role_name, user.RoleName);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 
-		public FbUserData DisplayUser(string userName) => DisplayUserImpl(userName, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<FbUserData> DisplayUserAsync(string userName, CancellationToken cancellationToken = default) => DisplayUserImpl(userName, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task<FbUserData> DisplayUserImpl(string userName, AsyncWrappingCommonArgs async)
+		public FbUserData DisplayUser(string userName)
 		{
-			await OpenAsync(async).ConfigureAwait(false);
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_display_user);
 			startSpb.Append2(IscCodes.isc_spb_sec_username, userName);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			var info = await QueryAsync(new byte[] { IscCodes.isc_info_svc_get_users }, ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users }, ServiceParameterBufferBase.Empty);
+			Close();
+			return ((FbUserData[])info.FirstOrDefault())?.FirstOrDefault();
+		}
+		public async Task<FbUserData> DisplayUserAsync(string userName, CancellationToken cancellationToken = default)
+		{
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_display_user);
+			startSpb.Append2(IscCodes.isc_spb_sec_username, userName);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			var info = await QueryAsync(new byte[] { IscCodes.isc_info_svc_get_users }, ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 			return ((FbUserData[])info.FirstOrDefault())?.FirstOrDefault();
 		}
 
-		public FbUserData[] DisplayUsers() => DisplayUsersImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<FbUserData[]> DisplayUsersAsync(CancellationToken cancellationToken = default) => DisplayUsersImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task<FbUserData[]> DisplayUsersImpl(AsyncWrappingCommonArgs async)
+		public FbUserData[] DisplayUsers()
 		{
-			await OpenAsync(async).ConfigureAwait(false);
+			Open();
 			var startSpb = new ServiceParameterBuffer2();
 			startSpb.Append(IscCodes.isc_action_svc_display_user);
-			await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-			var info = await QueryAsync(new byte[] { IscCodes.isc_info_svc_get_users }, ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
-			await CloseAsync(async).ConfigureAwait(false);
+			StartTask(startSpb);
+			var info = Query(new byte[] { IscCodes.isc_info_svc_get_users }, ServiceParameterBufferBase.Empty);
+			Close();
+			return (FbUserData[])info.FirstOrDefault();
+		}
+		public async Task<FbUserData[]> DisplayUsersAsync(CancellationToken cancellationToken = default)
+		{
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_display_user);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			var info = await QueryAsync(new byte[] { IscCodes.isc_info_svc_get_users }, ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 			return (FbUserData[])info.FirstOrDefault();
 		}
 
-		public string GetUsersDbPath() => GetUsersDbPathImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetUsersDbPathAsync(CancellationToken cancellationToken = default) => GetUsersDbPathImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task<string> GetUsersDbPathImpl(AsyncWrappingCommonArgs async)
+		public string GetUsersDbPath()
 		{
-			var info = await QueryAsync(new byte[] { IscCodes.isc_info_svc_user_dbpath }, ServiceParameterBufferBase.Empty, async).ConfigureAwait(false);
+			var info = Query(new byte[] { IscCodes.isc_info_svc_user_dbpath }, ServiceParameterBufferBase.Empty);
+			return (string)info.FirstOrDefault();
+		}
+		public async Task<string> GetUsersDbPathAsync(CancellationToken cancellationToken = default)
+		{
+			var info = await QueryAsync(new byte[] { IscCodes.isc_info_svc_user_dbpath }, ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
 			return (string)info.FirstOrDefault();
 		}
 	}

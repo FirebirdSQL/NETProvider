@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
@@ -37,7 +38,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 
 		#region Overriden Methods
 
-		public override async ValueTask PrepareAsync(string commandText, AsyncWrappingCommonArgs async)
+		public override void Prepare(string commandText)
 		{
 			ClearAll();
 
@@ -46,17 +47,17 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				var numberOfResponses = 0;
 				if (State == StatementState.Deallocated)
 				{
-					await SendAllocateToBufferAsync(async).ConfigureAwait(false);
+					SendAllocateToBuffer();
 					numberOfResponses++;
 				}
 
-				await SendPrepareToBufferAsync(commandText, async).ConfigureAwait(false);
+				SendPrepareToBuffer(commandText);
 				numberOfResponses++;
 
-				await SendInfoSqlToBufferAsync(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, async).ConfigureAwait(false);
+				SendInfoSqlToBuffer(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
 				numberOfResponses++;
 
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Flush();
 
 				try
 				{
@@ -64,26 +65,83 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					if (State == StatementState.Deallocated)
 					{
 						numberOfResponses--;
-						allocateResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+						allocateResponse = (GenericResponse)_database.ReadResponse();
 					}
 
 					numberOfResponses--;
-					var prepareResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+					var prepareResponse = (GenericResponse)_database.ReadResponse();
 					var deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
 
 					numberOfResponses--;
-					var statementTypeResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+					var statementTypeResponse = (GenericResponse)_database.ReadResponse();
 
 					if (allocateResponse != null)
 					{
-						await ProcessAllocateResponseAsync(allocateResponse, async).ConfigureAwait(false);
+						ProcessAllocateResponse(allocateResponse);
 					}
-					await ProcessPrepareResponseAsync(prepareResponse, async).ConfigureAwait(false);
-					StatementType = ProcessStatementTypeInfoBuffer(await ProcessInfoSqlResponseAsync(statementTypeResponse, async).ConfigureAwait(false));
+					ProcessPrepareResponse(prepareResponse);
+					StatementType = ProcessStatementTypeInfoBuffer(ProcessInfoSqlResponse(statementTypeResponse));
 				}
 				finally
 				{
-					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, async).ConfigureAwait(false);
+					numberOfResponses = SafeFinishFetching(numberOfResponses);
+				}
+
+				State = StatementState.Prepared;
+			}
+			catch (IOException ex)
+			{
+				State = State == StatementState.Allocated ? StatementState.Error : State;
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask PrepareAsync(string commandText, CancellationToken cancellationToken = default)
+		{
+			ClearAll();
+
+			try
+			{
+				var numberOfResponses = 0;
+				if (State == StatementState.Deallocated)
+				{
+					await SendAllocateToBufferAsync(cancellationToken).ConfigureAwait(false);
+					numberOfResponses++;
+				}
+
+				await SendPrepareToBufferAsync(commandText, cancellationToken).ConfigureAwait(false);
+				numberOfResponses++;
+
+				await SendInfoSqlToBufferAsync(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, cancellationToken).ConfigureAwait(false);
+				numberOfResponses++;
+
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				try
+				{
+					GenericResponse allocateResponse = null;
+					if (State == StatementState.Deallocated)
+					{
+						numberOfResponses--;
+						allocateResponse = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+					}
+
+					numberOfResponses--;
+					var prepareResponse = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+					var deferredExecute = ((prepareResponse.ObjectHandle & IscCodes.STMT_DEFER_EXECUTE) == IscCodes.STMT_DEFER_EXECUTE);
+
+					numberOfResponses--;
+					var statementTypeResponse = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+					if (allocateResponse != null)
+					{
+						await ProcessAllocateResponseAsync(allocateResponse, cancellationToken).ConfigureAwait(false);
+					}
+					await ProcessPrepareResponseAsync(prepareResponse, cancellationToken).ConfigureAwait(false);
+					StatementType = ProcessStatementTypeInfoBuffer(await ProcessInfoSqlResponseAsync(statementTypeResponse, cancellationToken).ConfigureAwait(false));
+				}
+				finally
+				{
+					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
 				}
 
 				State = StatementState.Prepared;
@@ -95,7 +153,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override async ValueTask ExecuteAsync(AsyncWrappingCommonArgs async)
+		public override void Execute()
 		{
 			EnsureNotDeallocated();
 
@@ -105,17 +163,17 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				RecordsAffected = -1;
 
-				await SendExecuteToBufferAsync(async).ConfigureAwait(false);
+				SendExecuteToBuffer();
 
 				var readRowsAffectedResponse = false;
 				if (DoRecordsAffected)
 				{
-					await SendInfoSqlToBufferAsync(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, async).ConfigureAwait(false);
+					SendInfoSqlToBuffer(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
 
 					readRowsAffectedResponse = true;
 				}
 
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Flush();
 
 				var numberOfResponses = (StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
 				try
@@ -124,29 +182,91 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 					if (StatementType == DbStatementType.StoredProcedure)
 					{
 						numberOfResponses--;
-						sqlStoredProcedureResponse = (SqlResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
-						await ProcessStoredProcedureExecuteResponseAsync(sqlStoredProcedureResponse, async).ConfigureAwait(false);
+						sqlStoredProcedureResponse = (SqlResponse)_database.ReadResponse();
+						ProcessStoredProcedureExecuteResponse(sqlStoredProcedureResponse);
 					}
 
 					numberOfResponses--;
-					var executeResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+					var executeResponse = (GenericResponse)_database.ReadResponse();
 
 					GenericResponse rowsAffectedResponse = null;
 					if (readRowsAffectedResponse)
 					{
 						numberOfResponses--;
-						rowsAffectedResponse = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+						rowsAffectedResponse = (GenericResponse)_database.ReadResponse();
 					}
 
-					await ProcessExecuteResponseAsync(executeResponse, async).ConfigureAwait(false);
+					ProcessExecuteResponse(executeResponse);
 					if (readRowsAffectedResponse)
 					{
-						RecordsAffected = ProcessRecordsAffectedBuffer(await ProcessInfoSqlResponseAsync(rowsAffectedResponse, async).ConfigureAwait(false));
+						RecordsAffected = ProcessRecordsAffectedBuffer(ProcessInfoSqlResponse(rowsAffectedResponse));
 					}
 				}
 				finally
 				{
-					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, async).ConfigureAwait(false);
+					numberOfResponses = SafeFinishFetching(numberOfResponses);
+				}
+
+				State = StatementState.Executed;
+			}
+			catch (IOException ex)
+			{
+				State = StatementState.Error;
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask ExecuteAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureNotDeallocated();
+
+			Clear();
+
+			try
+			{
+				RecordsAffected = -1;
+
+				await SendExecuteToBufferAsync(cancellationToken).ConfigureAwait(false);
+
+				var readRowsAffectedResponse = false;
+				if (DoRecordsAffected)
+				{
+					await SendInfoSqlToBufferAsync(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, cancellationToken).ConfigureAwait(false);
+
+					readRowsAffectedResponse = true;
+				}
+
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				var numberOfResponses = (StatementType == DbStatementType.StoredProcedure ? 1 : 0) + 1 + (readRowsAffectedResponse ? 1 : 0);
+				try
+				{
+					SqlResponse sqlStoredProcedureResponse = null;
+					if (StatementType == DbStatementType.StoredProcedure)
+					{
+						numberOfResponses--;
+						sqlStoredProcedureResponse = (SqlResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+						await ProcessStoredProcedureExecuteResponseAsync(sqlStoredProcedureResponse, cancellationToken).ConfigureAwait(false);
+					}
+
+					numberOfResponses--;
+					var executeResponse = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+					GenericResponse rowsAffectedResponse = null;
+					if (readRowsAffectedResponse)
+					{
+						numberOfResponses--;
+						rowsAffectedResponse = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+					}
+
+					await ProcessExecuteResponseAsync(executeResponse, cancellationToken).ConfigureAwait(false);
+					if (readRowsAffectedResponse)
+					{
+						RecordsAffected = ProcessRecordsAffectedBuffer(await ProcessInfoSqlResponseAsync(rowsAffectedResponse, cancellationToken).ConfigureAwait(false));
+					}
+				}
+				finally
+				{
+					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
 				}
 
 				State = StatementState.Executed;
@@ -161,14 +281,28 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#endregion
 
 		#region Protected methods
-		protected async ValueTask<int> SafeFinishFetchingAsync(int numberOfResponses, AsyncWrappingCommonArgs async)
+		protected int SafeFinishFetching(int numberOfResponses)
 		{
 			while (numberOfResponses > 0)
 			{
 				numberOfResponses--;
 				try
 				{
-					await _database.ReadResponseAsync(async).ConfigureAwait(false);
+					_database.ReadResponse();
+				}
+				catch (IscException)
+				{ }
+			}
+			return numberOfResponses;
+		}
+		protected async ValueTask<int> SafeFinishFetchingAsync(int numberOfResponses, CancellationToken cancellationToken = default)
+		{
+			while (numberOfResponses > 0)
+			{
+				numberOfResponses--;
+				try
+				{
+					await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 				}
 				catch (IscException)
 				{ }
@@ -176,13 +310,21 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			return numberOfResponses;
 		}
 
-		protected override async ValueTask FreeAsync(int option, AsyncWrappingCommonArgs async)
+		protected override void Free(int option)
 		{
 			if (FreeNotNeeded(option))
 				return;
 
-			await DoFreePacketAsync(option, async).ConfigureAwait(false);
-			(Database as GdsDatabase).DeferredPackets.Enqueue(ProcessFreeResponseAsync);
+			DoFreePacket(option);
+			(Database as GdsDatabase).AppendDeferredPacket(ProcessFreeResponse);
+		}
+		protected override async ValueTask FreeAsync(int option, CancellationToken cancellationToken = default)
+		{
+			if (FreeNotNeeded(option))
+				return;
+
+			await DoFreePacketAsync(option, cancellationToken).ConfigureAwait(false);
+			(Database as GdsDatabase).AppendDeferredPacket(ProcessFreeResponseAsync);
 		}
 		#endregion
 	}

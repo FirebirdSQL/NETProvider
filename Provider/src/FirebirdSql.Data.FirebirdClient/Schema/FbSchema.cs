@@ -19,6 +19,7 @@ using System;
 using System.Data;
 using System.Data.Common;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
@@ -36,7 +37,37 @@ namespace FirebirdSql.Data.Schema
 
 		#region Methods
 
-		public async Task<DataTable> GetSchemaAsync(FbConnection connection, string collectionName, string[] restrictions, AsyncWrappingCommonArgs async)
+		public DataTable GetSchema(FbConnection connection, string collectionName, string[] restrictions)
+		{
+			var dataTable = new DataTable(collectionName);
+			var command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions));
+			try
+			{
+				using (var adapter = new FbDataAdapter(command))
+				{
+					try
+					{
+						adapter.Fill(dataTable);
+					}
+					catch (Exception ex)
+					{
+						throw FbException.Create(ex);
+					}
+				}
+			}
+			finally
+			{
+#if NET48 || NETSTANDARD2_0
+				command.Dispose();
+#else
+				command.Dispose();
+#endif
+			}
+			TrimStringFields(dataTable);
+			ProcessResult(dataTable);
+			return dataTable;
+		}
+		public async Task<DataTable> GetSchemaAsync(FbConnection connection, string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
 		{
 			var dataTable = new DataTable(collectionName);
 			var command = BuildCommand(connection, collectionName, ParseRestrictions(restrictions));
@@ -60,7 +91,7 @@ namespace FirebirdSql.Data.Schema
 				command.Dispose();
 				await Task.CompletedTask.ConfigureAwait(false);
 #else
-				await async.AsyncSyncCallNoCancellation(command.DisposeAsync, command.Dispose).ConfigureAwait(false);
+				await command.DisposeAsync().ConfigureAwait(false);
 #endif
 			}
 			TrimStringFields(dataTable);

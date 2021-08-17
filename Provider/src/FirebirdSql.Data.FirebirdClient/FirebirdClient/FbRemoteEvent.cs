@@ -43,39 +43,62 @@ namespace FirebirdSql.Data.FirebirdClient
 			_connection = new FbConnectionInternal(new ConnectionString(connectionString));
 		}
 
-		public void Open() => OpenImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task OpenAsync(CancellationToken cancellationToken = default) => OpenImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task OpenImpl(AsyncWrappingCommonArgs async)
+		public void Open()
 		{
 			if (_revent != null)
 				throw new InvalidOperationException($"{nameof(FbRemoteEvent)} already open.");
 
-			await _connection.ConnectAsync(async).ConfigureAwait(false);
+			_connection.Connect();
+			_revent = new RemoteEvent(_connection.Database);
+			_revent.EventCountsCallback = OnRemoteEventCounts;
+			_revent.EventErrorCallback = OnRemoteEventError;
+			_synchronizationContext = SynchronizationContext.Current ?? new SynchronizationContext();
+		}
+		public async Task OpenAsync(CancellationToken cancellationToken = default)
+		{
+			if (_revent != null)
+				throw new InvalidOperationException($"{nameof(FbRemoteEvent)} already open.");
+
+			await _connection.ConnectAsync(cancellationToken).ConfigureAwait(false);
 			_revent = new RemoteEvent(_connection.Database);
 			_revent.EventCountsCallback = OnRemoteEventCounts;
 			_revent.EventErrorCallback = OnRemoteEventError;
 			_synchronizationContext = SynchronizationContext.Current ?? new SynchronizationContext();
 		}
 
-		public void Dispose() => DisposeImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-#if !(NET48 || NETSTANDARD2_0)
-		public async ValueTask DisposeAsync() => await DisposeImpl(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
-#endif
-		private Task DisposeImpl(AsyncWrappingCommonArgs async)
+		public void Dispose()
 		{
-			return _connection.DisconnectAsync(async);
+			_connection.Disconnect();
 		}
+#if !(NET48 || NETSTANDARD2_0)
+		public ValueTask DisposeAsync()
+		{
+			return new ValueTask(_connection.DisconnectAsync(CancellationToken.None));
+		}
+#endif
 
-		public void QueueEvents(ICollection<string> events) => QueueEventsImpl(events, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task QueueEventsAsync(ICollection<string> events, CancellationToken cancellationToken = default) => QueueEventsImpl(events, new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task QueueEventsImpl(ICollection<string> events, AsyncWrappingCommonArgs async)
+		public void QueueEvents(ICollection<string> events)
 		{
 			if (_revent == null)
 				throw new InvalidOperationException($"{nameof(FbRemoteEvent)} must be opened.");
 
 			try
 			{
-				await _revent.QueueEventsAsync(events, async).ConfigureAwait(false);
+				_revent.QueueEvents(events);
+			}
+			catch (IscException ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+		public async Task QueueEventsAsync(ICollection<string> events, CancellationToken cancellationToken = default)
+		{
+			if (_revent == null)
+				throw new InvalidOperationException($"{nameof(FbRemoteEvent)} must be opened.");
+
+			try
+			{
+				await _revent.QueueEventsAsync(events, cancellationToken).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
@@ -83,13 +106,22 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		public void CancelEvents() => CancelEventsImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task CancelEventsAsync(CancellationToken cancellationToken = default) => CancelEventsImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task CancelEventsImpl(AsyncWrappingCommonArgs async)
+		public void CancelEvents()
 		{
 			try
 			{
-				await _revent.CancelEventsAsync(async).ConfigureAwait(false);
+				_revent.CancelEvents();
+			}
+			catch (IscException ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+		public async Task CancelEventsAsync(CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await _revent.CancelEventsAsync(cancellationToken).ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{

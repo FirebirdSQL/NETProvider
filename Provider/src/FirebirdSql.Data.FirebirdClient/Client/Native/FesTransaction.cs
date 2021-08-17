@@ -23,6 +23,7 @@ using System.Runtime.InteropServices;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Client.Native.Handle;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace FirebirdSql.Data.Client.Native
 {
@@ -82,20 +83,36 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Dispose2
 
-		public override async ValueTask Dispose2Async(AsyncWrappingCommonArgs async)
+		public override void Dispose2()
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
 				if (State != TransactionState.NoTransaction)
 				{
-					await RollbackAsync(async).ConfigureAwait(false);
+					Rollback();
 				}
 				_db = null;
 				_handle.Dispose();
 				State = TransactionState.NoTransaction;
 				_statusVector = null;
-				await base.Dispose2Async(async).ConfigureAwait(false);
+				base.Dispose2();
+			}
+		}
+		public override async ValueTask Dispose2Async(CancellationToken cancellationToken = default)
+		{
+			if (!_disposed)
+			{
+				_disposed = true;
+				if (State != TransactionState.NoTransaction)
+				{
+					await RollbackAsync(cancellationToken).ConfigureAwait(false);
+				}
+				_db = null;
+				_handle.Dispose();
+				State = TransactionState.NoTransaction;
+				_statusVector = null;
+				await base.Dispose2Async(cancellationToken).ConfigureAwait(false);
 			}
 		}
 
@@ -103,7 +120,63 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override ValueTask BeginTransactionAsync(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override void BeginTransaction(TransactionParameterBuffer tpb)
+		{
+			if (State != TransactionState.NoTransaction)
+			{
+				throw new InvalidOperationException();
+			}
+
+			var teb = new IscTeb();
+			var tebData = IntPtr.Zero;
+
+			try
+			{
+				ClearStatusVector();
+
+				teb.dbb_ptr = Marshal.AllocHGlobal(4);
+				Marshal.WriteInt32(teb.dbb_ptr, _db.Handle);
+
+				teb.tpb_len = tpb.Length;
+
+				teb.tpb_ptr = Marshal.AllocHGlobal(tpb.Length);
+				Marshal.Copy(tpb.ToArray(), 0, teb.tpb_ptr, tpb.Length);
+
+				var size = Marshal.SizeOf<IscTeb>();
+				tebData = Marshal.AllocHGlobal(size);
+
+				Marshal.StructureToPtr(teb, tebData, true);
+
+				_db.FbClient.isc_start_multiple(
+					_statusVector,
+					ref _handle,
+					1,
+					tebData);
+
+				_db.ProcessStatusVector(_statusVector);
+
+				State = TransactionState.Active;
+
+				_db.TransactionCount++;
+			}
+			finally
+			{
+				if (teb.dbb_ptr != IntPtr.Zero)
+				{
+					Marshal.FreeHGlobal(teb.dbb_ptr);
+				}
+				if (teb.tpb_ptr != IntPtr.Zero)
+				{
+					Marshal.FreeHGlobal(teb.tpb_ptr);
+				}
+				if (tebData != IntPtr.Zero)
+				{
+					Marshal.DestroyStructure<IscTeb>(tebData);
+					Marshal.FreeHGlobal(tebData);
+				}
+			}
+		}
+		public override ValueTask BeginTransactionAsync(TransactionParameterBuffer tpb, CancellationToken cancellationToken = default)
 		{
 			if (State != TransactionState.NoTransaction)
 			{
@@ -162,7 +235,23 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask CommitAsync(AsyncWrappingCommonArgs async)
+		public override void Commit()
+		{
+			EnsureActiveTransactionState();
+
+			ClearStatusVector();
+
+			_db.FbClient.isc_commit_transaction(_statusVector, ref _handle);
+
+			_db.ProcessStatusVector(_statusVector);
+
+			_db.TransactionCount--;
+
+			OnUpdate(EventArgs.Empty);
+
+			State = TransactionState.NoTransaction;
+		}
+		public override ValueTask CommitAsync(CancellationToken cancellationToken = default)
 		{
 			EnsureActiveTransactionState();
 
@@ -181,7 +270,23 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask RollbackAsync(AsyncWrappingCommonArgs async)
+		public override void Rollback()
+		{
+			EnsureActiveTransactionState();
+
+			ClearStatusVector();
+
+			_db.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
+
+			_db.ProcessStatusVector(_statusVector);
+
+			_db.TransactionCount--;
+
+			OnUpdate(EventArgs.Empty);
+
+			State = TransactionState.NoTransaction;
+		}
+		public override ValueTask RollbackAsync(CancellationToken cancellationToken = default)
 		{
 			EnsureActiveTransactionState();
 
@@ -200,7 +305,19 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask CommitRetainingAsync(AsyncWrappingCommonArgs async)
+		public override void CommitRetaining()
+		{
+			EnsureActiveTransactionState();
+
+			ClearStatusVector();
+
+			_db.FbClient.isc_commit_retaining(_statusVector, ref _handle);
+
+			_db.ProcessStatusVector(_statusVector);
+
+			State = TransactionState.Active;
+		}
+		public override ValueTask CommitRetainingAsync(CancellationToken cancellationToken = default)
 		{
 			EnsureActiveTransactionState();
 
@@ -215,7 +332,19 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask RollbackRetainingAsync(AsyncWrappingCommonArgs async)
+		public override void RollbackRetaining()
+		{
+			EnsureActiveTransactionState();
+
+			ClearStatusVector();
+
+			_db.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
+
+			_db.ProcessStatusVector(_statusVector);
+
+			State = TransactionState.Active;
+		}
+		public override ValueTask RollbackRetainingAsync(CancellationToken cancellationToken = default)
 		{
 			EnsureActiveTransactionState();
 
@@ -234,12 +363,16 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Two Phase Commit Methods
 
-		public override ValueTask PrepareAsync(AsyncWrappingCommonArgs async)
+		public override void Prepare()
+		{ }
+		public override ValueTask PrepareAsync(CancellationToken cancellationToken = default)
 		{
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask PrepareAsync(byte[] buffer, AsyncWrappingCommonArgs async)
+		public override void Prepare(byte[] buffer)
+		{ }
+		public override ValueTask PrepareAsync(byte[] buffer, CancellationToken cancellationToken = default)
 		{
 			return ValueTask2.CompletedTask;
 		}

@@ -54,15 +54,13 @@ namespace FirebirdSql.Data.Services
 			: base(connectionString)
 		{ }
 
-		public void Execute() => ExecuteImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task ExecuteAsync(CancellationToken cancellationToken = default) => ExecuteImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private async Task ExecuteImpl(AsyncWrappingCommonArgs async)
+		public void Execute()
 		{
 			EnsureDatabase();
 
 			try
 			{
-				await OpenAsync(async).ConfigureAwait(false);
+				Open();
 				var startSpb = new ServiceParameterBuffer2();
 				startSpb.Append(IscCodes.isc_action_svc_restore);
 				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
@@ -79,8 +77,8 @@ namespace FirebirdSql.Data.Services
 				if (!string.IsNullOrEmpty(SkipData))
 					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				await StartTaskAsync(startSpb, async).ConfigureAwait(false);
-				await ReadInputAsync(async).ConfigureAwait(false);
+				StartTask(startSpb);
+				ReadInput();
 			}
 			catch (Exception ex)
 			{
@@ -88,15 +86,50 @@ namespace FirebirdSql.Data.Services
 			}
 			finally
 			{
-				await CloseAsync(async).ConfigureAwait(false);
+				Close();
+			}
+		}
+		public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureDatabase();
+
+			try
+			{
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				var startSpb = new ServiceParameterBuffer2();
+				startSpb.Append(IscCodes.isc_action_svc_restore);
+				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+				if (Verbose)
+				{
+					startSpb.Append(IscCodes.isc_spb_verbose);
+				}
+				if (PageBuffers.HasValue)
+					startSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
+				if (_pageSize.HasValue)
+					startSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
+				startSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
+				if (!string.IsNullOrEmpty(SkipData))
+					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+				await ReadInputAsync(cancellationToken).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				throw FbException.Create(ex);
+			}
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
 
-		async Task ReadInputAsync(AsyncWrappingCommonArgs async)
+		void ReadInput()
 		{
 			var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
 			var spb = ServiceParameterBufferBase.Empty;
-			var response = await QueryAsync(items, spb, async).ConfigureAwait(false);
+			var response = Query(items, spb);
 			var requestedLength = GetLength(response);
 			while (true)
 			{
@@ -112,7 +145,40 @@ namespace FirebirdSql.Data.Services
 						spb = dataSpb;
 					}
 				}
-				response = await QueryAsync(items, spb, async).ConfigureAwait(false);
+				response = Query(items, spb);
+				if (response.Count == 1)
+				{
+					break;
+				}
+				if (response[1] is string message)
+				{
+					OnServiceOutput(message);
+				}
+				requestedLength = GetLength(response);
+				spb = ServiceParameterBufferBase.Empty;
+			}
+		}
+		async Task ReadInputAsync(CancellationToken cancellationToken = default)
+		{
+			var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
+			var spb = ServiceParameterBufferBase.Empty;
+			var response = await QueryAsync(items, spb, cancellationToken).ConfigureAwait(false);
+			var requestedLength = GetLength(response);
+			while (true)
+			{
+				if (requestedLength > 0)
+				{
+					var data = new byte[requestedLength];
+					var read = InputStream.Read(data, 0, requestedLength);
+					if (read > 0)
+					{
+						Array.Resize(ref data, read);
+						var dataSpb = new ServiceParameterBuffer2();
+						dataSpb.Append2(IscCodes.isc_info_svc_line, data);
+						spb = dataSpb;
+					}
+				}
+				response = await QueryAsync(items, spb, cancellationToken).ConfigureAwait(false);
 				if (response.Count == 1)
 				{
 					break;

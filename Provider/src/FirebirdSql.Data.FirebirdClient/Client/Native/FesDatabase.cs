@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Native.Handle;
 using FirebirdSql.Data.Common;
@@ -79,7 +80,26 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Methods
 
-		public override ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override void CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+		{
+			CheckCryptKeyForSupport(cryptKey);
+
+			var databaseBuffer = Encoding2.Default.GetBytes(database);
+
+			ClearStatusVector();
+
+			_fbClient.isc_create_database(
+				_statusVector,
+				(short)databaseBuffer.Length,
+				databaseBuffer,
+				ref _handle,
+				dpb.Length,
+				dpb.ToArray(),
+				0);
+
+			ProcessStatusVector(_statusVector);
+		}
+		public override ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -101,12 +121,26 @@ namespace FirebirdSql.Data.Client.Native
 			return ValueTask2.CompletedTask;
 		}
 
-		public override ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+		{
+			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
+		}
+		public override ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
 
-		public override ValueTask DropDatabaseAsync(AsyncWrappingCommonArgs async)
+		public override void DropDatabase()
+		{
+			ClearStatusVector();
+
+			_fbClient.isc_drop_database(_statusVector, ref _handle);
+
+			ProcessStatusVector(_statusVector);
+
+			_handle.Dispose();
+		}
+		public override ValueTask DropDatabaseAsync(CancellationToken cancellationToken = default)
 		{
 			ClearStatusVector();
 
@@ -123,17 +157,29 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Remote Events Methods
 
-		public override ValueTask CloseEventManagerAsync(AsyncWrappingCommonArgs async)
+		public override void CloseEventManager()
+		{
+			throw new NotSupportedException();
+		}
+		public override ValueTask CloseEventManagerAsync(CancellationToken cancellationToken = default)
 		{
 			throw new NotSupportedException();
 		}
 
-		public override ValueTask QueueEventsAsync(RemoteEvent events, AsyncWrappingCommonArgs async)
+		public override void QueueEvents(RemoteEvent events)
+		{
+			throw new NotSupportedException();
+		}
+		public override ValueTask QueueEventsAsync(RemoteEvent events, CancellationToken cancellationToken = default)
 		{
 			throw new NotSupportedException();
 		}
 
-		public override ValueTask CancelEventsAsync(RemoteEvent events, AsyncWrappingCommonArgs async)
+		public override void CancelEvents(RemoteEvent events)
+		{
+			throw new NotSupportedException();
+		}
+		public override ValueTask CancelEventsAsync(RemoteEvent events, CancellationToken cancellationToken = default)
 		{
 			throw new NotSupportedException();
 		}
@@ -142,7 +188,7 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Methods
 
-		public override async ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
 		{
 			CheckCryptKeyForSupport(cryptKey);
 
@@ -160,15 +206,65 @@ namespace FirebirdSql.Data.Client.Native
 
 			ProcessStatusVector(_statusVector);
 
-			ServerVersion = await GetServerVersionAsync(async).ConfigureAwait(false);
+			ServerVersion = GetServerVersion();
+		}
+		public override async ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+		{
+			CheckCryptKeyForSupport(cryptKey);
+
+			var databaseBuffer = Encoding2.Default.GetBytes(database);
+
+			ClearStatusVector();
+
+			_fbClient.isc_attach_database(
+				_statusVector,
+				(short)databaseBuffer.Length,
+				databaseBuffer,
+				ref _handle,
+				dpb.Length,
+				dpb.ToArray());
+
+			ProcessStatusVector(_statusVector);
+
+			ServerVersion = await GetServerVersionAsync(cancellationToken).ConfigureAwait(false);
 		}
 
-		public override ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, AsyncWrappingCommonArgs async)
+		public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+		{
+			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
+		}
+		public override ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
 		{
 			throw new NotSupportedException("Trusted Auth isn't supported on Firebird Embedded.");
 		}
 
-		public override ValueTask DetachAsync(AsyncWrappingCommonArgs async)
+		public override void Detach()
+		{
+			if (TransactionCount > 0)
+			{
+				throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
+			}
+
+			if (!_handle.IsInvalid)
+			{
+				ClearStatusVector();
+
+				_fbClient.isc_detach_database(_statusVector, ref _handle);
+
+				ProcessStatusVector(_statusVector);
+
+				_handle.Dispose();
+			}
+
+			WarningMessage = null;
+			Charset = null;
+			ServerVersion = null;
+			_statusVector = null;
+			TransactionCount = 0;
+			Dialect = 0;
+			PacketSize = 0;
+		}
+		public override ValueTask DetachAsync(CancellationToken cancellationToken = default)
 		{
 			if (TransactionCount > 0)
 			{
@@ -201,10 +297,16 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Transaction Methods
 
-		public override async ValueTask<TransactionBase> BeginTransactionAsync(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override TransactionBase BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			var transaction = new FesTransaction(this);
-			await transaction.BeginTransactionAsync(tpb, async).ConfigureAwait(false);
+			transaction.BeginTransaction(tpb);
+			return transaction;
+		}
+		public override async ValueTask<TransactionBase> BeginTransactionAsync(TransactionParameterBuffer tpb, CancellationToken cancellationToken = default)
+		{
+			var transaction = new FesTransaction(this);
+			await transaction.BeginTransactionAsync(tpb, cancellationToken).ConfigureAwait(false);
 			return transaction;
 		}
 
@@ -212,7 +314,20 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Cancel Methods
 
-		public override ValueTask CancelOperationAsync(int kind, AsyncWrappingCommonArgs async)
+		public override void CancelOperation(int kind)
+		{
+			var localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+
+			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, kind);
+
+			try
+			{
+				ProcessStatusVector(localStatusVector);
+			}
+			catch (IscException ex) when (ex.ErrorCode == IscCodes.isc_nothing_to_cancel)
+			{ }
+		}
+		public override ValueTask CancelOperationAsync(int kind, CancellationToken cancellationToken = default)
 		{
 			var localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
@@ -255,12 +370,24 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Database Information Methods
 
-		public override ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, AsyncWrappingCommonArgs async)
+		public override List<object> GetDatabaseInfo(byte[] items)
 		{
-			return GetDatabaseInfoAsync(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
+			return GetDatabaseInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+		}
+		public override ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, CancellationToken cancellationToken = default)
+		{
+			return GetDatabaseInfoAsync(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, cancellationToken);
 		}
 
-		public override ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, int bufferLength, AsyncWrappingCommonArgs async)
+		public override List<object> GetDatabaseInfo(byte[] items, int bufferLength)
+		{
+			var buffer = new byte[bufferLength];
+
+			DatabaseInfo(items, buffer, buffer.Length);
+
+			return IscHelper.ParseDatabaseInfo(buffer);
+		}
+		public override ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default)
 		{
 			var buffer = new byte[bufferLength];
 

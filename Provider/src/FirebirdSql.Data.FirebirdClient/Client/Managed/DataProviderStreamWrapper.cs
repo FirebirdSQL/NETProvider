@@ -16,8 +16,9 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
-using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed
 {
@@ -30,10 +31,37 @@ namespace FirebirdSql.Data.Client.Managed
 			_stream = stream;
 		}
 
-		public async ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async) => await async.AsyncSyncCall(_stream.ReadAsync, _stream.Read, buffer, offset, count).ConfigureAwait(false);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public int Read(byte[] buffer, int offset, int count)
+		{
+			return _stream.Read(buffer, offset, count);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+		{
+			return new ValueTask<int>(_stream.ReadAsync(buffer, offset, count));
+		}
 
-		public async ValueTask WriteAsync(byte[] buffer, int offset, int count, AsyncWrappingCommonArgs async) => await async.AsyncSyncCall(_stream.WriteAsync, _stream.Write, buffer, offset, count).ConfigureAwait(false);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Write(byte[] buffer, int offset, int count)
+		{
+			_stream.Write(buffer, offset, count);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+		{
+			return new ValueTask(_stream.WriteAsync(buffer, offset, count));
+		}
 
-		public async ValueTask FlushAsync(AsyncWrappingCommonArgs async) => await async.AsyncSyncCall(_stream.FlushAsync, _stream.Flush).ConfigureAwait(false);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Flush()
+		{
+			_stream.Flush();
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public ValueTask FlushAsync(CancellationToken cancellationToken = default)
+		{
+			return new ValueTask(_stream.FlushAsync());
+		}
 	}
 }

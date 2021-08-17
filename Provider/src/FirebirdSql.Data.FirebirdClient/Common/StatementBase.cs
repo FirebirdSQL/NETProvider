@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
@@ -110,23 +111,36 @@ namespace FirebirdSql.Data.Common
 
 		#region Dispose2
 
-		public virtual ValueTask Dispose2Async(AsyncWrappingCommonArgs async) => ValueTask2.CompletedTask;
+		public virtual void Dispose2()
+		{ }
+		public virtual ValueTask Dispose2Async(CancellationToken cancellationToken = default)
+		{
+			return ValueTask2.CompletedTask;
+		}
 
 		#endregion
 
 		#region Methods
 
-		public ValueTask<string> GetExecutionPlanAsync(AsyncWrappingCommonArgs async)
+		public string GetExecutionPlan()
 		{
-			return GetPlanInfoAsync(DescribePlanInfoItems, async);
+			return GetPlanInfo(DescribePlanInfoItems);
+		}
+		public ValueTask<string> GetExecutionPlanAsync(CancellationToken cancellationToken)
+		{
+			return GetPlanInfoAsync(DescribePlanInfoItems, cancellationToken);
 		}
 
-		public ValueTask<string> GetExecutionExplainedPlanAsync(AsyncWrappingCommonArgs async)
+		public string GetExecutionExplainedPlan()
 		{
-			return GetPlanInfoAsync(DescribeExplaindPlanInfoItems, async);
+			return GetPlanInfo(DescribeExplaindPlanInfoItems);
+		}
+		public ValueTask<string> GetExecutionExplainedPlanAsync(CancellationToken cancellationToken = default)
+		{
+			return GetPlanInfoAsync(DescribeExplaindPlanInfoItems, cancellationToken);
 		}
 
-		public virtual async ValueTask CloseAsync(AsyncWrappingCommonArgs async)
+		public virtual void Close()
 		{
 			if (State == StatementState.Executed ||
 				State == StatementState.Error)
@@ -141,7 +155,32 @@ namespace FirebirdSql.Data.Common
 					{
 						try
 						{
-							await FreeAsync(IscCodes.DSQL_close, async).ConfigureAwait(false);
+							Free(IscCodes.DSQL_close);
+						}
+						catch
+						{ }
+					}
+					ClearArrayHandles();
+					State = StatementState.Closed;
+				}
+			}
+		}
+		public virtual async ValueTask CloseAsync(CancellationToken cancellationToken = default)
+		{
+			if (State == StatementState.Executed ||
+				State == StatementState.Error)
+			{
+				if (StatementType == DbStatementType.Select ||
+					StatementType == DbStatementType.SelectForUpdate ||
+					StatementType == DbStatementType.StoredProcedure)
+				{
+					if (State == StatementState.Allocated ||
+						State == StatementState.Prepared ||
+						State == StatementState.Executed)
+					{
+						try
+						{
+							await FreeAsync(IscCodes.DSQL_close, cancellationToken).ConfigureAwait(false);
 						}
 						catch
 						{ }
@@ -152,7 +191,7 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		public virtual async ValueTask ReleaseAsync(AsyncWrappingCommonArgs async)
+		public virtual void Release()
 		{
 			if (Transaction != null && TransactionUpdate != null)
 			{
@@ -160,7 +199,21 @@ namespace FirebirdSql.Data.Common
 				TransactionUpdate = null;
 			}
 
-			await FreeAsync(IscCodes.DSQL_drop, async).ConfigureAwait(false);
+			Free(IscCodes.DSQL_drop);
+
+			ClearArrayHandles();
+			State = StatementState.Deallocated;
+			StatementType = DbStatementType.None;
+		}
+		public virtual async ValueTask ReleaseAsync(CancellationToken cancellationToken = default)
+		{
+			if (Transaction != null && TransactionUpdate != null)
+			{
+				Transaction.Update -= TransactionUpdate;
+				TransactionUpdate = null;
+			}
+
+			await FreeAsync(IscCodes.DSQL_drop, cancellationToken).ConfigureAwait(false);
 
 			ClearArrayHandles();
 			State = StatementState.Deallocated;
@@ -171,26 +224,44 @@ namespace FirebirdSql.Data.Common
 
 		#region Abstract Methods
 
-		public abstract ValueTask DescribeAsync(AsyncWrappingCommonArgs async);
-		public abstract ValueTask DescribeParametersAsync(AsyncWrappingCommonArgs async);
-		public abstract ValueTask PrepareAsync(string commandText, AsyncWrappingCommonArgs async);
-		public abstract ValueTask ExecuteAsync(AsyncWrappingCommonArgs async);
-		public abstract ValueTask<DbValue[]> FetchAsync(AsyncWrappingCommonArgs async);
+		public abstract void Describe();
+		public abstract ValueTask DescribeAsync(CancellationToken cancellationToken = default);
+
+		public abstract void DescribeParameters();
+		public abstract ValueTask DescribeParametersAsync(CancellationToken cancellationToken = default);
+
+		public abstract void Prepare(string commandText);
+		public abstract ValueTask PrepareAsync(string commandText, CancellationToken cancellationToken = default);
+
+		public abstract void Execute();
+		public abstract ValueTask ExecuteAsync(CancellationToken cancellationToken = default);
+
+		public abstract DbValue[] Fetch();
+		public abstract ValueTask<DbValue[]> FetchAsync(CancellationToken cancellationToken = default);
 
 		public abstract BlobBase CreateBlob();
 		public abstract BlobBase CreateBlob(long handle);
 
-		public abstract ValueTask<ArrayBase> CreateArrayAsync(ArrayDesc descriptor, AsyncWrappingCommonArgs async);
-		public abstract ValueTask<ArrayBase> CreateArrayAsync(string tableName, string fieldName, AsyncWrappingCommonArgs async);
-		public abstract ValueTask<ArrayBase> CreateArrayAsync(long handle, string tableName, string fieldName, AsyncWrappingCommonArgs async);
+		public abstract ArrayBase CreateArray(ArrayDesc descriptor);
+		public abstract ValueTask<ArrayBase> CreateArrayAsync(ArrayDesc descriptor, CancellationToken cancellationToken = default);
+
+		public abstract ArrayBase CreateArray(string tableName, string fieldName);
+		public abstract ValueTask<ArrayBase> CreateArrayAsync(string tableName, string fieldName, CancellationToken cancellationToken = default);
+
+		public abstract ArrayBase CreateArray(long handle, string tableName, string fieldName);
+		public abstract ValueTask<ArrayBase> CreateArrayAsync(long handle, string tableName, string fieldName, CancellationToken cancellationToken = default);
 
 		#endregion
 
 		#region Protected Abstract Methods
 
 		protected abstract void TransactionUpdated(object sender, EventArgs e);
-		protected abstract ValueTask<byte[]> GetSqlInfoAsync(byte[] items, int bufferLength, AsyncWrappingCommonArgs async);
-		protected abstract ValueTask FreeAsync(int option, AsyncWrappingCommonArgs async);
+
+		protected abstract byte[] GetSqlInfo(byte[] items, int bufferLength);
+		protected abstract ValueTask<byte[]> GetSqlInfoAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default);
+
+		protected abstract void Free(int option);
+		protected abstract ValueTask FreeAsync(int option, CancellationToken cancellationToken = default);
 
 		#endregion
 
@@ -205,14 +276,23 @@ namespace FirebirdSql.Data.Common
 			return null;
 		}
 
-		protected ValueTask<byte[]> GetSqlInfoAsync(byte[] items, AsyncWrappingCommonArgs async)
+		protected byte[] GetSqlInfo(byte[] items)
 		{
-			return GetSqlInfoAsync(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, async);
+			return GetSqlInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+		}
+		protected ValueTask<byte[]> GetSqlInfoAsync(byte[] items, CancellationToken cancellationToken = default)
+		{
+			return GetSqlInfoAsync(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, cancellationToken);
 		}
 
-		protected async ValueTask<int> GetRecordsAffectedAsync(AsyncWrappingCommonArgs async)
+		protected int GetRecordsAffected()
 		{
-			var buffer = await GetSqlInfoAsync(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, async).ConfigureAwait(false);
+			var buffer = GetSqlInfo(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE);
+			return ProcessRecordsAffectedBuffer(buffer);
+		}
+		protected async ValueTask<int> GetRecordsAffectedAsync(CancellationToken cancellationToken = default)
+		{
+			var buffer = await GetSqlInfoAsync(RowsAffectedInfoItems, IscCodes.ROWS_AFFECTED_BUFFER_SIZE, cancellationToken).ConfigureAwait(false);
 			return ProcessRecordsAffectedBuffer(buffer);
 		}
 
@@ -264,9 +344,14 @@ namespace FirebirdSql.Data.Common
 			return insertCount + updateCount + deleteCount;
 		}
 
-		protected async ValueTask<DbStatementType> GetStatementTypeAsync(AsyncWrappingCommonArgs async)
+		protected DbStatementType GetStatementType()
 		{
-			var buffer = await GetSqlInfoAsync(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, async).ConfigureAwait(false);
+			var buffer = GetSqlInfo(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE);
+			return ProcessStatementTypeInfoBuffer(buffer);
+		}
+		protected async ValueTask<DbStatementType> GetStatementTypeAsync(CancellationToken cancellationToken = default)
+		{
+			var buffer = await GetSqlInfoAsync(StatementTypeInfoItems, IscCodes.STATEMENT_TYPE_BUFFER_SIZE, cancellationToken).ConfigureAwait(false);
 			return ProcessStatementTypeInfoBuffer(buffer);
 		}
 
@@ -311,11 +396,11 @@ namespace FirebirdSql.Data.Common
 			}
 		}
 
-		protected async ValueTask<string> GetPlanInfoAsync(byte[] planInfoItems, AsyncWrappingCommonArgs async)
+		protected string GetPlanInfo(byte[] planInfoItems)
 		{
 			var count = 0;
 			var bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
-			var buffer = await GetSqlInfoAsync(planInfoItems, bufferSize, async).ConfigureAwait(false);
+			var buffer = GetSqlInfo(planInfoItems, bufferSize);
 
 			if (buffer[0] == IscCodes.isc_info_end)
 			{
@@ -325,7 +410,40 @@ namespace FirebirdSql.Data.Common
 			while (buffer[0] == IscCodes.isc_info_truncated && count < 4)
 			{
 				bufferSize *= 2;
-				buffer = await GetSqlInfoAsync(planInfoItems, bufferSize, async).ConfigureAwait(false);
+				buffer = GetSqlInfo(planInfoItems, bufferSize);
+				count++;
+			}
+			if (count > 3)
+			{
+				return null;
+			}
+
+			int len = buffer[1];
+			len += buffer[2] << 8;
+			if (len > 0)
+			{
+				return Database.Charset.GetString(buffer, 4, --len);
+			}
+			else
+			{
+				return string.Empty;
+			}
+		}
+		protected async ValueTask<string> GetPlanInfoAsync(byte[] planInfoItems, CancellationToken cancellationToken = default)
+		{
+			var count = 0;
+			var bufferSize = IscCodes.DEFAULT_MAX_BUFFER_SIZE;
+			var buffer = await GetSqlInfoAsync(planInfoItems, bufferSize, cancellationToken).ConfigureAwait(false);
+
+			if (buffer[0] == IscCodes.isc_info_end)
+			{
+				return string.Empty;
+			}
+
+			while (buffer[0] == IscCodes.isc_info_truncated && count < 4)
+			{
+				bufferSize *= 2;
+				buffer = await GetSqlInfoAsync(planInfoItems, bufferSize, cancellationToken).ConfigureAwait(false);
 				count++;
 			}
 			if (count > 3)

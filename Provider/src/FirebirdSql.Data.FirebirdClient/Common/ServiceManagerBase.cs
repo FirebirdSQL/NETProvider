@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FirebirdSql.Data.Common
@@ -26,10 +27,17 @@ namespace FirebirdSql.Data.Common
 
 		public int Handle { get; protected set; }
 
-		public abstract ValueTask AttachAsync(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, AsyncWrappingCommonArgs async);
-		public abstract ValueTask DetachAsync(AsyncWrappingCommonArgs async);
-		public abstract ValueTask StartAsync(ServiceParameterBufferBase spb, AsyncWrappingCommonArgs async);
-		public abstract ValueTask QueryAsync(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, AsyncWrappingCommonArgs async);
+		public abstract void Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey);
+		public abstract ValueTask AttachAsync(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey, CancellationToken cancellationToken = default);
+
+		public abstract void Detach();
+		public abstract ValueTask DetachAsync(CancellationToken cancellationToken = default);
+
+		public abstract void Start(ServiceParameterBufferBase spb);
+		public abstract ValueTask StartAsync(ServiceParameterBufferBase spb, CancellationToken cancellationToken = default);
+
+		public abstract void Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer);
+		public abstract ValueTask QueryAsync(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, CancellationToken cancellationToken = default);
 
 		public abstract ServiceParameterBufferBase CreateServiceParameterBuffer();
 	}

@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Managed.Version13;
 using FirebirdSql.Data.Common;
@@ -123,21 +124,53 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public async ValueTask SendContAuthToBufferAsync(IXdrWriter xdr, AsyncWrappingCommonArgs async)
+		public void SendContAuthToBuffer(IXdrWriter xdr)
 		{
-			await xdr.WriteAsync(IscCodes.op_cont_auth, async).ConfigureAwait(false);
-			await xdr.WriteBufferAsync(ClientData, async).ConfigureAwait(false); // p_data
-			await xdr.WriteAsync(AcceptPluginName, async).ConfigureAwait(false); // p_name
-			await xdr.WriteAsync(AcceptPluginName, async).ConfigureAwait(false); // p_list
-			await xdr.WriteBufferAsync(ServerKeys, async).ConfigureAwait(false); // p_keys
+			xdr.Write(IscCodes.op_cont_auth);
+			xdr.WriteBuffer(ClientData); // p_data
+			xdr.Write(AcceptPluginName); // p_name
+			xdr.Write(AcceptPluginName); // p_list
+			xdr.WriteBuffer(ServerKeys); // p_keys
+		}
+		public async ValueTask SendContAuthToBufferAsync(IXdrWriter xdr, CancellationToken cancellationToken = default)
+		{
+			await xdr.WriteAsync(IscCodes.op_cont_auth, cancellationToken).ConfigureAwait(false);
+			await xdr.WriteBufferAsync(ClientData, cancellationToken).ConfigureAwait(false); // p_data
+			await xdr.WriteAsync(AcceptPluginName, cancellationToken).ConfigureAwait(false); // p_name
+			await xdr.WriteAsync(AcceptPluginName, cancellationToken).ConfigureAwait(false); // p_list
+			await xdr.WriteBufferAsync(ServerKeys, cancellationToken).ConfigureAwait(false); // p_keys
 		}
 
 		// TODO: maybe more logic can be pulled up here
-		public async ValueTask<IResponse> ProcessContAuthResponseAsync(IXdrReader xdr, AsyncWrappingCommonArgs async)
+		public IResponse ProcessContAuthResponse(IXdrReader xdr)
 		{
-			var operation = await xdr.ReadOperationAsync(async).ConfigureAwait(false);
-			var response = await GdsConnection.ProcessOperationAsync(operation, xdr, async).ConfigureAwait(false);
-			GdsConnection.ProcessResponse(response);
+			var operation = xdr.ReadOperation();
+			var response = GdsConnection.ProcessOperation(operation, xdr);
+			GdsConnection.HandleResponseException(response);
+			if (response is ContAuthResponse)
+			{
+				return response;
+			}
+			else if (response is CryptKeyCallbackResponse)
+			{
+				return response;
+			}
+			else if (response is GenericResponse genericResponse)
+			{
+				ServerKeys = genericResponse.Data;
+				Complete();
+			}
+			else
+			{
+				throw new InvalidOperationException($"Unexpected response ({operation}).");
+			}
+			return response;
+		}
+		public async ValueTask<IResponse> ProcessContAuthResponseAsync(IXdrReader xdr, CancellationToken cancellationToken = default)
+		{
+			var operation = await xdr.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
+			var response = await GdsConnection.ProcessOperationAsync(operation, xdr, cancellationToken).ConfigureAwait(false);
+			GdsConnection.HandleResponseException(response);
 			if (response is ContAuthResponse)
 			{
 				return response;
@@ -158,17 +191,26 @@ namespace FirebirdSql.Data.Client.Managed
 			return response;
 		}
 
-		public async ValueTask SendWireCryptToBufferAsync(IXdrWriter xdr, AsyncWrappingCommonArgs async)
+		public void SendWireCryptToBuffer(IXdrWriter xdr)
 		{
 			if (WireCrypt == WireCryptOption.Disabled)
 				return;
 
-			await xdr.WriteAsync(IscCodes.op_crypt, async).ConfigureAwait(false);
-			await xdr.WriteAsync(FirebirdNetworkHandlingWrapper.EncryptionName, async).ConfigureAwait(false);
-			await xdr.WriteAsync(SessionKeyName, async).ConfigureAwait(false);
+			xdr.Write(IscCodes.op_crypt);
+			xdr.Write(FirebirdNetworkHandlingWrapper.EncryptionName);
+			xdr.Write(SessionKeyName);
+		}
+		public async ValueTask SendWireCryptToBufferAsync(IXdrWriter xdr, CancellationToken cancellationToken = default)
+		{
+			if (WireCrypt == WireCryptOption.Disabled)
+				return;
+
+			await xdr.WriteAsync(IscCodes.op_crypt, cancellationToken).ConfigureAwait(false);
+			await xdr.WriteAsync(FirebirdNetworkHandlingWrapper.EncryptionName, cancellationToken).ConfigureAwait(false);
+			await xdr.WriteAsync(SessionKeyName, cancellationToken).ConfigureAwait(false);
 		}
 
-		public async ValueTask ProcessWireCryptResponseAsync(IXdrReader xdr, GdsConnection connection, AsyncWrappingCommonArgs async)
+		public void ProcessWireCryptResponse(IXdrReader xdr, GdsConnection connection)
 		{
 			if (WireCrypt == WireCryptOption.Disabled)
 				return;
@@ -176,8 +218,21 @@ namespace FirebirdSql.Data.Client.Managed
 			// after writing before reading
 			connection.StartEncryption();
 
-			var response = await GdsConnection.ProcessOperationAsync(await xdr.ReadOperationAsync(async).ConfigureAwait(false), xdr, async).ConfigureAwait(false);
-			GdsConnection.ProcessResponse(response);
+			var response = GdsConnection.ProcessOperation(xdr.ReadOperation(), xdr);
+			GdsConnection.HandleResponseException(response);
+
+			WireCryptInitialized = true;
+		}
+		public async ValueTask ProcessWireCryptResponseAsync(IXdrReader xdr, GdsConnection connection, CancellationToken cancellationToken = default)
+		{
+			if (WireCrypt == WireCryptOption.Disabled)
+				return;
+
+			// after writing before reading
+			connection.StartEncryption();
+
+			var response = await GdsConnection.ProcessOperationAsync(await xdr.ReadOperationAsync(cancellationToken).ConfigureAwait(false), xdr, cancellationToken).ConfigureAwait(false);
+			GdsConnection.HandleResponseException(response);
 
 			WireCryptInitialized = true;
 		}

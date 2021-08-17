@@ -25,8 +25,8 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 {
 	internal static class XsqldaMarshaler
 	{
-		private static int sizeofXSQLDA = Marshal.SizeOf<XSQLDA>();
-		private static int sizeofXSQLVAR = Marshal.SizeOf<XSQLVAR>();
+		private static int SizeOfXSQLDA = Marshal.SizeOf<XSQLDA>();
+		private static int SizeOfXSQLVAR = Marshal.SizeOf<XSQLVAR>();
 
 		public static void CleanUpNativeData(ref IntPtr pNativeData)
 		{
@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 			}
 		}
 
-		public static async ValueTask<IntPtr> MarshalManagedToNativeAsync(Charset charset, Descriptor descriptor, AsyncWrappingCommonArgs async)
+		public static IntPtr MarshalManagedToNative(Charset charset, Descriptor descriptor)
 		{
 			var xsqlda = new XSQLDA
 			{
@@ -88,7 +88,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 				if (descriptor[i].HasDataType() && descriptor[i].DbDataType != DbDataType.Null)
 				{
-					var buffer = await descriptor[i].DbValue.GetBytesAsync(async).ConfigureAwait(false);
+					var buffer = descriptor[i].DbValue.GetBytes();
 					xsqlvar[i].sqldata = Marshal.AllocHGlobal(buffer.Length);
 					Marshal.Copy(buffer, 0, xsqlvar[i].sqldata, buffer.Length);
 				}
@@ -179,7 +179,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 		{
 			unsafe
 			{
-				using (var reader = new BinaryReader(new UnmanagedMemoryStream((byte*)ptr.ToPointer(), sizeofXSQLVAR)))
+				using (var reader = new BinaryReader(new UnmanagedMemoryStream((byte*)ptr.ToPointer(), SizeOfXSQLVAR)))
 				{
 					if (!onlyPointers) xsqlvar.sqltype = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
 					if (!onlyPointers) xsqlvar.sqlscale = reader.ReadInt16(); else reader.BaseStream.Position += sizeof(short);
@@ -206,7 +206,7 @@ namespace FirebirdSql.Data.Client.Native.Marshalers
 
 		private static int ComputeLength(int n)
 		{
-			var length = (sizeofXSQLDA + n * sizeofXSQLVAR);
+			var length = (SizeOfXSQLDA + n * SizeOfXSQLVAR);
 			if (IntPtr.Size == 8)
 			{
 				length += 4;

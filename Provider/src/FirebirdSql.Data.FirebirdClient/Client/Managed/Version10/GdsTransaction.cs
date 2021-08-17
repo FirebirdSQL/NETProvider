@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
@@ -58,19 +59,34 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Dispose2
 
-		public override async ValueTask Dispose2Async(AsyncWrappingCommonArgs async)
+		public override void Dispose2()
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
 				if (State != TransactionState.NoTransaction)
 				{
-					await RollbackAsync(async).ConfigureAwait(false);
+					Rollback();
 				}
 				_database = null;
 				_handle = 0;
 				State = TransactionState.NoTransaction;
-				await base.Dispose2Async(async).ConfigureAwait(false);
+				base.Dispose2();
+			}
+		}
+		public override async ValueTask Dispose2Async(CancellationToken cancellationToken = default)
+		{
+			if (!_disposed)
+			{
+				_disposed = true;
+				if (State != TransactionState.NoTransaction)
+				{
+					await RollbackAsync(cancellationToken).ConfigureAwait(false);
+				}
+				_database = null;
+				_handle = 0;
+				State = TransactionState.NoTransaction;
+				await base.Dispose2Async(cancellationToken).ConfigureAwait(false);
 			}
 		}
 
@@ -78,7 +94,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Methods
 
-		public override async ValueTask BeginTransactionAsync(TransactionParameterBuffer tpb, AsyncWrappingCommonArgs async)
+		public override void BeginTransaction(TransactionParameterBuffer tpb)
 		{
 			if (State != TransactionState.NoTransaction)
 			{
@@ -87,12 +103,38 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_transaction, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_database.Handle, async).ConfigureAwait(false);
-				await _database.Xdr.WriteBufferAsync(tpb.ToArray(), async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_transaction);
+				_database.Xdr.Write(_database.Handle);
+				_database.Xdr.WriteBuffer(tpb.ToArray());
+				_database.Xdr.Flush();
 
-				var response = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				var response = (GenericResponse)_database.ReadResponse();
+
+				_database.TransactionCount++;
+
+				_handle = response.ObjectHandle;
+				State = TransactionState.Active;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask BeginTransactionAsync(TransactionParameterBuffer tpb, CancellationToken cancellationToken = default)
+		{
+			if (State != TransactionState.NoTransaction)
+			{
+				throw new InvalidOperationException();
+			}
+
+			try
+			{
+				await _database.Xdr.WriteAsync(IscCodes.op_transaction, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_database.Handle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteBufferAsync(tpb.ToArray(), cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				var response = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				_database.TransactionCount++;
 
@@ -105,17 +147,40 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async ValueTask CommitAsync(AsyncWrappingCommonArgs async)
+		public override void Commit()
 		{
 			EnsureActiveTransactionState();
 
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_commit, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_commit);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
-				await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				_database.ReadResponse();
+
+				_database.TransactionCount--;
+
+				OnUpdate(EventArgs.Empty);
+
+				State = TransactionState.NoTransaction;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask CommitAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureActiveTransactionState();
+
+			try
+			{
+				await _database.Xdr.WriteAsync(IscCodes.op_commit, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				_database.TransactionCount--;
 
@@ -129,17 +194,40 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async ValueTask RollbackAsync(AsyncWrappingCommonArgs async)
+		public override void Rollback()
 		{
 			EnsureActiveTransactionState();
 
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_rollback, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_rollback);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
-				await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				_database.ReadResponse();
+
+				_database.TransactionCount--;
+
+				OnUpdate(EventArgs.Empty);
+
+				State = TransactionState.NoTransaction;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask RollbackAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureActiveTransactionState();
+
+			try
+			{
+				await _database.Xdr.WriteAsync(IscCodes.op_rollback, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				_database.TransactionCount--;
 
@@ -153,17 +241,36 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async ValueTask CommitRetainingAsync(AsyncWrappingCommonArgs async)
+		public override void CommitRetaining()
 		{
 			EnsureActiveTransactionState();
 
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_commit_retaining, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_commit_retaining);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
-				await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				_database.ReadResponse();
+
+				State = TransactionState.Active;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask CommitRetainingAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureActiveTransactionState();
+
+			try
+			{
+				await _database.Xdr.WriteAsync(IscCodes.op_commit_retaining, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				State = TransactionState.Active;
 			}
@@ -173,17 +280,36 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async ValueTask RollbackRetainingAsync(AsyncWrappingCommonArgs async)
+		public override void RollbackRetaining()
 		{
 			EnsureActiveTransactionState();
 
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_rollback_retaining, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_rollback_retaining);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
-				await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				_database.ReadResponse();
+
+				State = TransactionState.Active;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask RollbackRetainingAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureActiveTransactionState();
+
+			try
+			{
+				await _database.Xdr.WriteAsync(IscCodes.op_rollback_retaining, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				State = TransactionState.Active;
 			}
@@ -197,7 +323,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Two Phase Commit Methods
 
-		public override async ValueTask PrepareAsync(AsyncWrappingCommonArgs async)
+		public override void Prepare()
 		{
 			EnsureActiveTransactionState();
 
@@ -205,11 +331,32 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				State = TransactionState.NoTransaction;
 
-				await _database.Xdr.WriteAsync(IscCodes.op_prepare, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_prepare);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.Flush();
 
-				await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				_database.ReadResponse();
+
+				State = TransactionState.Prepared;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask PrepareAsync(CancellationToken cancellationToken = default)
+		{
+			EnsureActiveTransactionState();
+
+			try
+			{
+				State = TransactionState.NoTransaction;
+
+				await _database.Xdr.WriteAsync(IscCodes.op_prepare, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				State = TransactionState.Prepared;
 			}
@@ -219,7 +366,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override async ValueTask PrepareAsync(byte[] buffer, AsyncWrappingCommonArgs async)
+		public override void Prepare(byte[] buffer)
 		{
 			EnsureActiveTransactionState();
 
@@ -227,12 +374,34 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			{
 				State = TransactionState.NoTransaction;
 
-				await _database.Xdr.WriteAsync(IscCodes.op_prepare2, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, async).ConfigureAwait(false);
-				await _database.Xdr.WriteBufferAsync(buffer, buffer.Length, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_prepare2);
+				_database.Xdr.Write(_handle);
+				_database.Xdr.WriteBuffer(buffer, buffer.Length);
+				_database.Xdr.Flush();
 
-				await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				_database.ReadResponse();
+
+				State = TransactionState.Prepared;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		public override async ValueTask PrepareAsync(byte[] buffer, CancellationToken cancellationToken = default)
+		{
+			EnsureActiveTransactionState();
+
+			try
+			{
+				State = TransactionState.NoTransaction;
+
+				await _database.Xdr.WriteAsync(IscCodes.op_prepare2, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteBufferAsync(buffer, buffer.Length, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				State = TransactionState.Prepared;
 			}

@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
@@ -77,11 +78,23 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Protected Methods
 
-		protected override async ValueTask CreateAsync(AsyncWrappingCommonArgs async)
+		protected override void Create()
 		{
 			try
 			{
-				await CreateOrOpenAsync(IscCodes.op_create_blob, null, async).ConfigureAwait(false);
+				CreateOrOpen(IscCodes.op_create_blob, null);
+				RblAddValue(IscCodes.RBL_create);
+			}
+			catch (IscException)
+			{
+				throw;
+			}
+		}
+		protected override async ValueTask CreateAsync(CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await CreateOrOpenAsync(IscCodes.op_create_blob, null, cancellationToken).ConfigureAwait(false);
 				RblAddValue(IscCodes.RBL_create);
 			}
 			catch (IscException)
@@ -90,11 +103,22 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async ValueTask OpenAsync(AsyncWrappingCommonArgs async)
+		protected override void Open()
 		{
 			try
 			{
-				await CreateOrOpenAsync(IscCodes.op_open_blob, null, async).ConfigureAwait(false);
+				CreateOrOpen(IscCodes.op_open_blob, null);
+			}
+			catch (IscException)
+			{
+				throw;
+			}
+		}
+		protected override async ValueTask OpenAsync(CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await CreateOrOpenAsync(IscCodes.op_open_blob, null, cancellationToken).ConfigureAwait(false);
 			}
 			catch (IscException)
 			{
@@ -102,19 +126,68 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async ValueTask GetSegmentAsync(Stream stream, AsyncWrappingCommonArgs async)
+		protected override void GetSegment(Stream stream)
 		{
 			var requested = SegmentSize;
 
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_get_segment, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_blobHandle, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(DataSegment, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_get_segment);
+				_database.Xdr.Write(_blobHandle);
+				_database.Xdr.Write(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12);
+				_database.Xdr.Write(DataSegment);
+				_database.Xdr.Flush();
 
-				var response = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				var response = (GenericResponse)_database.ReadResponse();
+
+				RblRemoveValue(IscCodes.RBL_segment);
+				if (response.ObjectHandle == 1)
+				{
+					RblAddValue(IscCodes.RBL_segment);
+				}
+				else if (response.ObjectHandle == 2)
+				{
+					RblAddValue(IscCodes.RBL_eof_pending);
+				}
+
+				var buffer = response.Data;
+
+				if (buffer.Length == 0)
+				{
+					// previous	segment	was	last, this has no data
+					return;
+				}
+
+				var len = 0;
+				var srcpos = 0;
+
+				while (srcpos < buffer.Length)
+				{
+					len = (int)IscHelper.VaxInteger(buffer, srcpos, 2);
+					srcpos += 2;
+
+					stream.Write(buffer, srcpos, len);
+					srcpos += len;
+				}
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		protected override async ValueTask GetSegmentAsync(Stream stream, CancellationToken cancellationToken = default)
+		{
+			var requested = SegmentSize;
+
+			try
+			{
+				await _database.Xdr.WriteAsync(IscCodes.op_get_segment, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(DataSegment, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				var response = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				RblRemoveValue(IscCodes.RBL_segment);
 				if (response.ObjectHandle == 1)
@@ -152,16 +225,32 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async ValueTask PutSegmentAsync(byte[] buffer, AsyncWrappingCommonArgs async)
+		protected override void PutSegment(byte[] buffer)
 		{
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_batch_segments, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_blobHandle, async).ConfigureAwait(false);
-				await _database.Xdr.WriteBlobBufferAsync(buffer, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_batch_segments);
+				_database.Xdr.Write(_blobHandle);
+				_database.Xdr.WriteBlobBuffer(buffer);
+				_database.Xdr.Flush();
 
-				await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				_database.ReadResponse();
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		protected override async ValueTask PutSegmentAsync(byte[] buffer, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await _database.Xdr.WriteAsync(IscCodes.op_batch_segments, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteBlobBufferAsync(buffer, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 			}
 			catch (IOException ex)
 			{
@@ -169,17 +258,36 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override async ValueTask SeekAsync(int position, AsyncWrappingCommonArgs async)
+		protected override void Seek(int position)
 		{
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_seek_blob, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_blobHandle, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(SeekMode, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(position, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(IscCodes.op_seek_blob);
+				_database.Xdr.Write(_blobHandle);
+				_database.Xdr.Write(SeekMode);
+				_database.Xdr.Write(position);
+				_database.Xdr.Flush();
 
-				var response = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				var response = (GenericResponse)_database.ReadResponse();
+
+				_position = response.ObjectHandle;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		protected override async ValueTask SeekAsync(int position, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await _database.Xdr.WriteAsync(IscCodes.op_seek_blob, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(SeekMode, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(position, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				var response = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				_position = response.ObjectHandle;
 			}
@@ -189,34 +297,65 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		protected override ValueTask CloseAsync(AsyncWrappingCommonArgs async)
+		protected override void Close()
 		{
-			return _database.ReleaseObjectAsync(IscCodes.op_close_blob, _blobHandle, async);
+			_database.ReleaseObject(IscCodes.op_close_blob, _blobHandle);
+		}
+		protected override ValueTask CloseAsync(CancellationToken cancellationToken = default)
+		{
+			return _database.ReleaseObjectAsync(IscCodes.op_close_blob, _blobHandle, cancellationToken);
 		}
 
-		protected override ValueTask CancelAsync(AsyncWrappingCommonArgs async)
+		protected override void Cancel()
 		{
-			return _database.ReleaseObjectAsync(IscCodes.op_cancel_blob, _blobHandle, async);
+			_database.ReleaseObject(IscCodes.op_cancel_blob, _blobHandle);
+		}
+		protected override ValueTask CancelAsync(CancellationToken cancellationToken = default)
+		{
+			return _database.ReleaseObjectAsync(IscCodes.op_cancel_blob, _blobHandle, cancellationToken);
 		}
 
 		#endregion
 
 		#region Private API Methods
 
-		private async ValueTask CreateOrOpenAsync(int op, BlobParameterBuffer bpb, AsyncWrappingCommonArgs async)
+		private void CreateOrOpen(int op, BlobParameterBuffer bpb)
 		{
 			try
 			{
-				await _database.Xdr.WriteAsync(op, async).ConfigureAwait(false);
+				_database.Xdr.Write(op);
 				if (bpb != null)
 				{
-					await _database.Xdr.WriteTypedAsync(IscCodes.isc_bpb_version1, bpb.ToArray(), async).ConfigureAwait(false);
+					_database.Xdr.WriteTyped(IscCodes.isc_bpb_version1, bpb.ToArray());
 				}
-				await _database.Xdr.WriteAsync(_transaction.Handle, async).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_blobId, async).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(async).ConfigureAwait(false);
+				_database.Xdr.Write(_transaction.Handle);
+				_database.Xdr.Write(_blobId);
+				_database.Xdr.Flush();
 
-				var response = (GenericResponse)await _database.ReadResponseAsync(async).ConfigureAwait(false);
+				var response = (GenericResponse)_database.ReadResponse();
+
+				_blobId = response.BlobId;
+				_blobHandle = response.ObjectHandle;
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+		private async ValueTask CreateOrOpenAsync(int op, BlobParameterBuffer bpb, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				await _database.Xdr.WriteAsync(op, cancellationToken).ConfigureAwait(false);
+				if (bpb != null)
+				{
+					await _database.Xdr.WriteTypedAsync(IscCodes.isc_bpb_version1, bpb.ToArray(), cancellationToken).ConfigureAwait(false);
+				}
+				await _database.Xdr.WriteAsync(_transaction.Handle, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteAsync(_blobId, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+				var response = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 				_blobId = response.BlobId;
 				_blobHandle = response.ObjectHandle;

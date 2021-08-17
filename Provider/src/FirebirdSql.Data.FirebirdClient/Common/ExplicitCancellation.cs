@@ -24,7 +24,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal static class ExplicitCancellation
 	{
-		public static ExplicitCancel Enter(CancellationToken cancellationToken, AsyncWrappingCommonArgs async, Action explicitCancel)
+		public static ExplicitCancel Enter(CancellationToken cancellationToken, Action explicitCancel)
 		{
 			if (cancellationToken.IsCancellationRequested)
 			{
@@ -32,7 +32,7 @@ namespace FirebirdSql.Data.Common
 				throw new OperationCanceledException(cancellationToken);
 			}
 			var ctr = cancellationToken.Register(explicitCancel);
-			return new ExplicitCancel(ctr, async);
+			return new ExplicitCancel(ctr);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -46,10 +46,9 @@ namespace FirebirdSql.Data.Common
 		{
 			readonly CancellationTokenRegistration _cancellationTokenRegistration;
 
-			public ExplicitCancel(CancellationTokenRegistration cancellationTokenRegistration, AsyncWrappingCommonArgs async)
+			public ExplicitCancel(CancellationTokenRegistration cancellationTokenRegistration)
 			{
 				_cancellationTokenRegistration = cancellationTokenRegistration;
-				Async = new AsyncWrappingCommonArgs(async.IsAsync, CancellationToken.None);
 			}
 
 			public void Dispose()
@@ -57,7 +56,7 @@ namespace FirebirdSql.Data.Common
 				ExitExplicitCancel(_cancellationTokenRegistration);
 			}
 
-			public readonly AsyncWrappingCommonArgs Async { get; }
+			public readonly CancellationToken CancellationToken => CancellationToken.None;
 		}
 	}
 }

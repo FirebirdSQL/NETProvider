@@ -64,7 +64,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				if (_commandText != value && _statement != null)
 				{
-					ReleaseAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+					Release();
 				}
 
 				_commandText = value;
@@ -114,7 +114,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					_connection != value &&
 					_connection.State == ConnectionState.Open)
 				{
-					ReleaseAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+					Release();
 				}
 
 				_connection = value;
@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
 				}
 
-				RollbackImplicitTransactionAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+				RollbackImplicitTransaction();
 
 				_transaction = value;
 
@@ -333,25 +333,44 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			if (disposing)
 			{
-				DisposeHelperAsync(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
+				if (!_disposed)
+				{
+					_disposed = true;
+					try
+					{
+						Release();
+					}
+					catch (IscException ex)
+					{
+						throw FbException.Create(ex);
+					}
+					_commandTimeout = 0;
+					_fetchSize = 0;
+					_implicitTransaction = false;
+					_commandText = null;
+					_connection = null;
+					_transaction = null;
+					_parameters = null;
+					_statement = null;
+					_activeReader = null;
+					if (_namedParameters != null)
+					{
+						_namedParameters.Clear();
+						_namedParameters = null;
+					}
+				}
 			}
 			base.Dispose(disposing);
 		}
 #if !(NET48 || NETSTANDARD2_0)
 		public override async ValueTask DisposeAsync()
 		{
-			await DisposeHelperAsync(new AsyncWrappingCommonArgs(true)).ConfigureAwait(false);
-			await base.DisposeAsync().ConfigureAwait(false);
-		}
-#endif
-		private async Task DisposeHelperAsync(AsyncWrappingCommonArgs async)
-		{
 			if (!_disposed)
 			{
 				_disposed = true;
 				try
 				{
-					await ReleaseAsync(async).ConfigureAwait(false);
+					await ReleaseAsync(CancellationToken.None).ConfigureAwait(false);
 				}
 				catch (IscException ex)
 				{
@@ -372,7 +391,9 @@ namespace FirebirdSql.Data.FirebirdClient
 					_namedParameters = null;
 				}
 			}
+			await base.DisposeAsync().ConfigureAwait(false);
 		}
+#endif
 
 		#endregion
 
@@ -418,63 +439,117 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbParameter();
 		}
 
-		public override void Prepare() => PrepareImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-#if NET48 || NETSTANDARD2_0
-		public Task PrepareAsync(CancellationToken cancellationToken = default)
-#else
-		public override Task PrepareAsync(CancellationToken cancellationToken = default)
-#endif
-			=> PrepareImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		internal async Task PrepareImpl(AsyncWrappingCommonArgs async)
+		public override void Prepare()
 		{
 			CheckCommand();
 
-			using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, Cancel))
+			using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
 			{
 				try
 				{
-					await PrepareAsync(false, explicitCancellation.Async).ConfigureAwait(false);
+					Prepare(false);
 				}
 				catch (IscException ex)
 				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
 					throw FbException.Create(ex);
 				}
 				catch
 				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
+					throw;
+				}
+			}
+		}
+#if NET48 || NETSTANDARD2_0
+		public async Task PrepareAsync(CancellationToken cancellationToken = default)
+#else
+		public override async Task PrepareAsync(CancellationToken cancellationToken = default)
+#endif
+		{
+			CheckCommand();
+
+			using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+			{
+				try
+				{
+					await PrepareAsync(false, explicitCancellation.CancellationToken).ConfigureAwait(false);
+				}
+				catch (IscException ex)
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+					throw FbException.Create(ex);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
 					throw;
 				}
 			}
 		}
 
-		public override int ExecuteNonQuery() => ExecuteNonQueryImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public override Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken) => ExecuteNonQueryImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		internal async Task<int> ExecuteNonQueryImpl(AsyncWrappingCommonArgs async)
+		public override int ExecuteNonQuery()
 		{
 			CheckCommand();
 
-			using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, Cancel))
+			using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
 			{
 				try
 				{
-					await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.Async).ConfigureAwait(false);
+					ExecuteCommand(CommandBehavior.Default, false);
 
 					if (_statement.StatementType == DbStatementType.StoredProcedure)
 					{
-						await SetOutputParametersAsync(explicitCancellation.Async).ConfigureAwait(false);
+						SetOutputParameters();
 					}
 
-					await CommitImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					CommitImplicitTransaction();
 				}
 				catch (IscException ex)
 				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
 					throw FbException.Create(ex);
 				}
 				catch
 				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
+					throw;
+				}
+			}
+
+			return _statement.StatementType switch
+			{
+				DbStatementType.Insert => RecordsAffected,
+				DbStatementType.Update => RecordsAffected,
+				DbStatementType.Delete => RecordsAffected,
+				_ => -1,
+			};
+		}
+		public override async Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)
+		{
+			CheckCommand();
+
+			using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+			{
+				try
+				{
+					await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.CancellationToken).ConfigureAwait(false);
+
+					if (_statement.StatementType == DbStatementType.StoredProcedure)
+					{
+						await SetOutputParametersAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+					}
+
+					await CommitImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				}
+				catch (IscException ex)
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+					throw FbException.Create(ex);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
 					throw;
 				}
 			}
@@ -489,29 +564,53 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		public new FbDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
-		public new FbDataReader ExecuteReader(CommandBehavior behavior) => ExecuteReaderImpl(behavior, AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
 		public new Task<FbDataReader> ExecuteReaderAsync() => ExecuteReaderAsync(CommandBehavior.Default);
-		public new Task<FbDataReader> ExecuteReaderAsync(CommandBehavior behavior) => ExecuteReaderAsync(behavior, CancellationToken.None);
 		public new Task<FbDataReader> ExecuteReaderAsync(CancellationToken cancellationToken) => ExecuteReaderAsync(CommandBehavior.Default, cancellationToken);
-		public new Task<FbDataReader> ExecuteReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken) => ExecuteReaderImpl(behavior, new AsyncWrappingCommonArgs(true, cancellationToken));
-		internal async Task<FbDataReader> ExecuteReaderImpl(CommandBehavior behavior, AsyncWrappingCommonArgs async)
+
+		public new FbDataReader ExecuteReader(CommandBehavior behavior)
 		{
 			CheckCommand();
 
-			using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, Cancel))
+			using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
 			{
 				try
 				{
-					await ExecuteCommandAsync(behavior, true, explicitCancellation.Async).ConfigureAwait(false);
+					ExecuteCommand(behavior, true);
 				}
 				catch (IscException ex)
 				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
 					throw FbException.Create(ex);
 				}
 				catch
 				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
+					throw;
+				}
+			}
+
+			_activeReader = new FbDataReader(this, _connection, behavior);
+			return _activeReader;
+		}
+		public new Task<FbDataReader> ExecuteReaderAsync(CommandBehavior behavior) => ExecuteReaderAsync(behavior, CancellationToken.None);
+		public new async Task<FbDataReader> ExecuteReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+		{
+			CheckCommand();
+
+			using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+			{
+				try
+				{
+					await ExecuteCommandAsync(behavior, true, explicitCancellation.CancellationToken).ConfigureAwait(false);
+				}
+				catch (IscException ex)
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+					throw FbException.Create(ex);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
 					throw;
 				}
 			}
@@ -520,49 +619,94 @@ namespace FirebirdSql.Data.FirebirdClient
 			return _activeReader;
 		}
 
-		public override object ExecuteScalar() => ExecuteScalarImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public override Task<object> ExecuteScalarAsync(CancellationToken cancellationToken) => ExecuteScalarImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		internal async Task<object> ExecuteScalarImpl(AsyncWrappingCommonArgs async)
+		public override object ExecuteScalar()
 		{
 			DbValue[] values = null;
 			object val = null;
 
 			CheckCommand();
 
-			using (var explicitCancellation = ExplicitCancellation.Enter(async.CancellationToken, async, Cancel))
+			using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
 			{
 				try
 				{
-					await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.Async).ConfigureAwait(false);
+					ExecuteCommand(CommandBehavior.Default, false);
 
 					// Gets	only the values	of the first row or
 					// the output parameters values if command is an Stored Procedure
 					if (_statement.StatementType == DbStatementType.StoredProcedure)
 					{
 						values = _statement.GetOutputParameters();
-						await SetOutputParametersAsync(values, explicitCancellation.Async).ConfigureAwait(false);
+						SetOutputParameters(values);
 					}
 					else
 					{
-						values = await _statement.FetchAsync(explicitCancellation.Async).ConfigureAwait(false);
+						values = _statement.Fetch();
 					}
 
 					// Get the return value
 					if (values != null && values.Length > 0)
 					{
-						val = await values[0].GetValueAsync(explicitCancellation.Async).ConfigureAwait(false);
+						val = values[0].GetValue();
 					}
 
-					await CommitImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					CommitImplicitTransaction();
 				}
 				catch (IscException ex)
 				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
 					throw FbException.Create(ex);
 				}
 				catch
 				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.Async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
+					throw;
+				}
+			}
+
+			return val;
+		}
+		public override async Task<object> ExecuteScalarAsync(CancellationToken cancellationToken)
+		{
+			DbValue[] values = null;
+			object val = null;
+
+			CheckCommand();
+
+			using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+			{
+				try
+				{
+					await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.CancellationToken).ConfigureAwait(false);
+
+					// Gets	only the values	of the first row or
+					// the output parameters values if command is an Stored Procedure
+					if (_statement.StatementType == DbStatementType.StoredProcedure)
+					{
+						values = _statement.GetOutputParameters();
+						await SetOutputParametersAsync(values, explicitCancellation.CancellationToken).ConfigureAwait(false);
+					}
+					else
+					{
+						values = await _statement.FetchAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+					}
+
+					// Get the return value
+					if (values != null && values.Length > 0)
+					{
+						val = await values[0].GetValueAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+					}
+
+					await CommitImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				}
+				catch (IscException ex)
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+					throw FbException.Create(ex);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
 					throw;
 				}
 			}
@@ -570,26 +714,38 @@ namespace FirebirdSql.Data.FirebirdClient
 			return val;
 		}
 
-		public string GetCommandPlan() => GetCommandPlanImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetCommandPlanAsync(CancellationToken cancellationToken = default) => GetCommandPlanImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<string> GetCommandPlanImpl(AsyncWrappingCommonArgs async)
+		public string GetCommandPlan()
+		{
+			if (_statement == null)
+			{
+				return null;
+			}
+			return _statement.GetExecutionPlan();
+		}
+		public Task<string> GetCommandPlanAsync(CancellationToken cancellationToken = default)
 		{
 			if (_statement == null)
 			{
 				return Task.FromResult<string>(null);
 			}
-			return _statement.GetExecutionPlanAsync(async).AsTask();
+			return _statement.GetExecutionPlanAsync(cancellationToken).AsTask();
 		}
 
-		public string GetCommandExplainedPlan() => GetCommandExplainedPlanImpl(AsyncWrappingCommonArgs.Sync).GetAwaiter().GetResult();
-		public Task<string> GetCommandExplainedPlanAsync(CancellationToken cancellationToken = default) => GetCommandExplainedPlanImpl(new AsyncWrappingCommonArgs(true, cancellationToken));
-		private Task<string> GetCommandExplainedPlanImpl(AsyncWrappingCommonArgs async)
+		public string GetCommandExplainedPlan()
+		{
+			if (_statement == null)
+			{
+				return null;
+			}
+			return _statement.GetExecutionExplainedPlan();
+		}
+		public Task<string> GetCommandExplainedPlanAsync(CancellationToken cancellationToken = default)
 		{
 			if (_statement == null)
 			{
 				return Task.FromResult<string>(null);
 			}
-			return _statement.GetExecutionExplainedPlanAsync(async).AsTask();
+			return _statement.GetExecutionExplainedPlanAsync(cancellationToken).AsTask();
 		}
 
 		#endregion
@@ -605,7 +761,6 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			return ExecuteReader(behavior);
 		}
-
 		protected override async Task<DbDataReader> ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
 		{
 			return await ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
@@ -615,7 +770,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Internal Methods
 
-		internal async Task DisposeReaderAsync(AsyncWrappingCommonArgs async)
+		internal void DisposeReader()
+		{
+			if (_activeReader != null)
+			{
+#if NET48 || NETSTANDARD2_0
+				_activeReader.Dispose();
+#else
+				_activeReader.Dispose();
+#endif
+				_activeReader = null;
+			}
+		}
+		internal async Task DisposeReaderAsync(CancellationToken cancellationToken = default)
 		{
 			if (_activeReader != null)
 			{
@@ -623,20 +790,36 @@ namespace FirebirdSql.Data.FirebirdClient
 				_activeReader.Dispose();
 				await Task.CompletedTask.ConfigureAwait(false);
 #else
-				await async.AsyncSyncCallNoCancellation(_activeReader.DisposeAsync, _activeReader.Dispose).ConfigureAwait(false);
+				await _activeReader.DisposeAsync().ConfigureAwait(false);
 #endif
 				_activeReader = null;
 			}
 		}
 
-		internal async Task<DbValue[]> FetchAsync(AsyncWrappingCommonArgs async)
+		internal DbValue[] Fetch()
 		{
 			if (_statement != null)
 			{
 				try
 				{
 					// Fetch the next row
-					return await _statement.FetchAsync(async).ConfigureAwait(false);
+					return _statement.Fetch();
+				}
+				catch (IscException ex)
+				{
+					throw FbException.Create(ex);
+				}
+			}
+			return null;
+		}
+		internal async Task<DbValue[]> FetchAsync(CancellationToken cancellationToken = default)
+		{
+			if (_statement != null)
+			{
+				try
+				{
+					// Fetch the next row
+					return await _statement.FetchAsync(cancellationToken).ConfigureAwait(false);
 				}
 				catch (IscException ex)
 				{
@@ -655,12 +838,16 @@ namespace FirebirdSql.Data.FirebirdClient
 			return null;
 		}
 
-		internal Task SetOutputParametersAsync(AsyncWrappingCommonArgs async)
+		internal void SetOutputParameters()
 		{
-			return SetOutputParametersAsync(null, async);
+			SetOutputParameters(null);
+		}
+		internal Task SetOutputParametersAsync(CancellationToken cancellationToken = default)
+		{
+			return SetOutputParametersAsync(null, cancellationToken);
 		}
 
-		internal async Task SetOutputParametersAsync(DbValue[] outputParameterValues, AsyncWrappingCommonArgs async)
+		internal void SetOutputParameters(DbValue[] outputParameterValues)
 		{
 			if (Parameters.Count > 0 && _statement != null)
 			{
@@ -682,7 +869,37 @@ namespace FirebirdSql.Data.FirebirdClient
 								parameter.Direction == ParameterDirection.InputOutput ||
 								parameter.Direction == ParameterDirection.ReturnValue)
 							{
-								parameter.Value = await values[i].GetValueAsync(async).ConfigureAwait(false);
+								parameter.Value = values[i].GetValue();
+								i++;
+							}
+						}
+					}
+				}
+			}
+		}
+		internal async Task SetOutputParametersAsync(DbValue[] outputParameterValues, CancellationToken cancellationToken = default)
+		{
+			if (Parameters.Count > 0 && _statement != null)
+			{
+				if (_statement != null &&
+					_statement.StatementType == DbStatementType.StoredProcedure)
+				{
+					var values = outputParameterValues;
+					if (outputParameterValues == null)
+					{
+						values = _statement.GetOutputParameters();
+					}
+
+					if (values != null && values.Length > 0)
+					{
+						var i = 0;
+						foreach (FbParameter parameter in Parameters)
+						{
+							if (parameter.Direction == ParameterDirection.Output ||
+								parameter.Direction == ParameterDirection.InputOutput ||
+								parameter.Direction == ParameterDirection.ReturnValue)
+							{
+								parameter.Value = await values[i].GetValueAsync(cancellationToken).ConfigureAwait(false);
 								i++;
 							}
 						}
@@ -691,17 +908,17 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		internal async Task CommitImplicitTransactionAsync(AsyncWrappingCommonArgs async)
+		internal void CommitImplicitTransaction()
 		{
 			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
 			{
 				try
 				{
-					await _transaction.CommitImpl(async).ConfigureAwait(false);
+					_transaction.Commit();
 				}
 				catch
 				{
-					await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
+					RollbackImplicitTransaction();
 
 					throw;
 				}
@@ -712,7 +929,41 @@ namespace FirebirdSql.Data.FirebirdClient
 #if NET48 || NETSTANDARD2_0
 						_transaction.Dispose();
 #else
-						await async.AsyncSyncCallNoCancellation(_transaction.DisposeAsync, _transaction.Dispose).ConfigureAwait(false);
+						_transaction.Dispose();
+#endif
+						_transaction = null;
+						_implicitTransaction = false;
+					}
+
+					if (_statement != null)
+					{
+						_statement.Transaction = null;
+					}
+				}
+			}
+		}
+		internal async Task CommitImplicitTransactionAsync(CancellationToken cancellationToken = default)
+		{
+			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
+			{
+				try
+				{
+					await _transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+				}
+				catch
+				{
+					await RollbackImplicitTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+					throw;
+				}
+				finally
+				{
+					if (_transaction != null)
+					{
+#if NET48 || NETSTANDARD2_0
+						_transaction.Dispose();
+#else
+						await _transaction.DisposeAsync().ConfigureAwait(false);
 #endif
 						_transaction = null;
 						_implicitTransaction = false;
@@ -726,7 +977,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		internal async Task RollbackImplicitTransactionAsync(AsyncWrappingCommonArgs async)
+		internal void RollbackImplicitTransaction()
 		{
 			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
 			{
@@ -734,7 +985,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
-					await _transaction.RollbackImpl(async).ConfigureAwait(false);
+					_transaction.Rollback();
 				}
 				catch
 				{
@@ -748,7 +999,41 @@ namespace FirebirdSql.Data.FirebirdClient
 #if NET48 || NETSTANDARD2_0
 					_transaction.Dispose();
 #else
-					await async.AsyncSyncCallNoCancellation(_transaction.DisposeAsync, _transaction.Dispose).ConfigureAwait(false);
+					_transaction.Dispose();
+#endif
+					_transaction = null;
+					_implicitTransaction = false;
+
+					if (_statement != null)
+					{
+						_statement.Transaction = null;
+					}
+				}
+			}
+		}
+		internal async Task RollbackImplicitTransactionAsync(CancellationToken cancellationToken = default)
+		{
+			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
+			{
+				var transactionCount = Connection.InnerConnection.Database.TransactionCount;
+
+				try
+				{
+					await _transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+				}
+				catch
+				{
+					if (Connection.InnerConnection.Database.TransactionCount == transactionCount)
+					{
+						Connection.InnerConnection.Database.TransactionCount--;
+					}
+				}
+				finally
+				{
+#if NET48 || NETSTANDARD2_0
+					_transaction.Dispose();
+#else
+					await _transaction.DisposeAsync().ConfigureAwait(false);
 #endif
 					_transaction = null;
 					_implicitTransaction = false;
@@ -761,20 +1046,27 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		internal Task CloseAsync(AsyncWrappingCommonArgs async)
+		internal void Close()
 		{
 			if (_statement != null)
 			{
-				return _statement.CloseAsync(async).AsTask();
+				_statement.Close();
+			}
+		}
+		internal Task CloseAsync(CancellationToken cancellationToken = default)
+		{
+			if (_statement != null)
+			{
+				return _statement.CloseAsync(cancellationToken).AsTask();
 			}
 			return Task.CompletedTask;
 		}
 
-		internal async Task ReleaseAsync(AsyncWrappingCommonArgs async)
+		internal void Release()
 		{
-			await RollbackImplicitTransactionAsync(async).ConfigureAwait(false);
+			RollbackImplicitTransaction();
 
-			await DisposeReaderAsync(async).ConfigureAwait(false);
+			DisposeReader();
 
 			if (_connection != null && _connection.State == ConnectionState.Open)
 			{
@@ -783,7 +1075,24 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			if (_statement != null)
 			{
-				await _statement.Dispose2Async(async).ConfigureAwait(false);
+				_statement.Dispose2();
+				_statement = null;
+			}
+		}
+		internal async Task ReleaseAsync(CancellationToken cancellationToken = default)
+		{
+			await RollbackImplicitTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+			await DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
+
+			if (_connection != null && _connection.State == ConnectionState.Open)
+			{
+				_connection.InnerConnection.RemovePreparedCommand(this);
+			}
+
+			if (_statement != null)
+			{
+				await _statement.Dispose2Async(cancellationToken).ConfigureAwait(false);
 				_statement = null;
 			}
 		}
@@ -792,14 +1101,29 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Input parameter descriptor generation methods
 
-		private async Task DescribeInputAsync(AsyncWrappingCommonArgs async)
+		private void DescribeInput()
 		{
 			if (Parameters.Count > 0)
 			{
 				var descriptor = BuildParametersDescriptor();
 				if (descriptor == null)
 				{
-					await _statement.DescribeParametersAsync(async).ConfigureAwait(false);
+					_statement.DescribeParameters();
+				}
+				else
+				{
+					_statement.Parameters = descriptor;
+				}
+			}
+		}
+		private async Task DescribeInputAsync(CancellationToken cancellationToken = default)
+		{
+			if (Parameters.Count > 0)
+			{
+				var descriptor = BuildParametersDescriptor();
+				if (descriptor == null)
+				{
+					await _statement.DescribeParametersAsync(cancellationToken).ConfigureAwait(false);
 				}
 				else
 				{
@@ -975,7 +1299,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return count;
 		}
 
-		private async Task UpdateParameterValuesAsync(AsyncWrappingCommonArgs async)
+		private void UpdateParameterValues()
 		{
 			var index = -1;
 
@@ -1015,7 +1339,7 @@ namespace FirebirdSql.Data.FirebirdClient
 							case DbDataType.Binary:
 								{
 									var blob = _statement.CreateBlob();
-									await blob.WriteAsync((byte[])commandParameter.InternalValue, async).ConfigureAwait(false);
+									blob.Write((byte[])commandParameter.InternalValue);
 									statementParameter.DbValue.SetValue(blob.Id);
 								}
 								break;
@@ -1025,11 +1349,11 @@ namespace FirebirdSql.Data.FirebirdClient
 									var blob = _statement.CreateBlob();
 									if (commandParameter.InternalValue is byte[])
 									{
-										await blob.WriteAsync((byte[])commandParameter.InternalValue, async).ConfigureAwait(false);
+										blob.Write((byte[])commandParameter.InternalValue);
 									}
 									else
 									{
-										await blob.WriteAsync((string)commandParameter.InternalValue, async).ConfigureAwait(false);
+										blob.Write((string)commandParameter.InternalValue);
 									}
 									statementParameter.DbValue.SetValue(blob.Id);
 								}
@@ -1040,7 +1364,7 @@ namespace FirebirdSql.Data.FirebirdClient
 									if (statementParameter.ArrayHandle == null)
 									{
 										statementParameter.ArrayHandle =
-										await _statement.CreateArrayAsync(statementParameter.Relation, statementParameter.Name, async).ConfigureAwait(false);
+										_statement.CreateArray(statementParameter.Relation, statementParameter.Name);
 									}
 									else
 									{
@@ -1049,7 +1373,102 @@ namespace FirebirdSql.Data.FirebirdClient
 									}
 
 									statementParameter.ArrayHandle.Handle = 0;
-									await statementParameter.ArrayHandle.WriteAsync((Array)commandParameter.InternalValue, async).ConfigureAwait(false);
+									statementParameter.ArrayHandle.Write((Array)commandParameter.InternalValue);
+									statementParameter.DbValue.SetValue(statementParameter.ArrayHandle.Handle);
+								}
+								break;
+
+							case DbDataType.Guid:
+								if (!(commandParameter.InternalValue is Guid) && !(commandParameter.InternalValue is byte[]))
+								{
+									throw new InvalidOperationException("Incorrect Guid value.");
+								}
+								statementParameter.DbValue.SetValue(commandParameter.InternalValue);
+								break;
+
+							default:
+								statementParameter.DbValue.SetValue(commandParameter.InternalValue);
+								break;
+						}
+					}
+				}
+			}
+		}
+		private async Task UpdateParameterValuesAsync(CancellationToken cancellationToken = default)
+		{
+			var index = -1;
+
+			for (var i = 0; i < _statement.Parameters.Count; i++)
+			{
+				var statementParameter = _statement.Parameters[i];
+				index = i;
+
+				if (_namedParameters.Count > 0)
+				{
+					index = Parameters.IndexOf(_namedParameters[i], i);
+					if (index == -1)
+					{
+						throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
+					}
+				}
+
+				if (index != -1)
+				{
+					var commandParameter = Parameters[index];
+					if (commandParameter.InternalValue == DBNull.Value || commandParameter.InternalValue == null)
+					{
+						statementParameter.NullFlag = -1;
+						statementParameter.DbValue.SetValue(DBNull.Value);
+
+						if (!statementParameter.AllowDBNull())
+						{
+							statementParameter.DataType++;
+						}
+					}
+					else
+					{
+						statementParameter.NullFlag = 0;
+
+						switch (statementParameter.DbDataType)
+						{
+							case DbDataType.Binary:
+								{
+									var blob = _statement.CreateBlob();
+									await blob.WriteAsync((byte[])commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+									statementParameter.DbValue.SetValue(blob.Id);
+								}
+								break;
+
+							case DbDataType.Text:
+								{
+									var blob = _statement.CreateBlob();
+									if (commandParameter.InternalValue is byte[])
+									{
+										await blob.WriteAsync((byte[])commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+									}
+									else
+									{
+										await blob.WriteAsync((string)commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+									}
+									statementParameter.DbValue.SetValue(blob.Id);
+								}
+								break;
+
+							case DbDataType.Array:
+								{
+									if (statementParameter.ArrayHandle == null)
+									{
+										statementParameter.ArrayHandle =
+										await _statement.CreateArrayAsync(statementParameter.Relation, statementParameter.Name, cancellationToken).ConfigureAwait(false);
+									}
+									else
+									{
+										statementParameter.ArrayHandle.Database = _statement.Database;
+										statementParameter.ArrayHandle.Transaction = _statement.Transaction;
+									}
+
+									statementParameter.ArrayHandle.Handle = 0;
+									await statementParameter.ArrayHandle.WriteAsync((Array)commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
 									statementParameter.DbValue.SetValue(statementParameter.ArrayHandle.Handle);
 								}
 								break;
@@ -1075,7 +1494,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Private Methods
 
-		private async Task PrepareAsync(bool returnsSet, AsyncWrappingCommonArgs async)
+		private void Prepare(bool returnsSet)
 		{
 			var innerConn = _connection.InnerConnection;
 
@@ -1090,7 +1509,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					_implicitTransaction = true;
 					_transaction = new FbTransaction(_connection, _connection.ConnectionOptions.IsolationLevel);
-					await _transaction.BeginTransactionAsync(async).ConfigureAwait(false);
+					_transaction.BeginTransaction();
 
 					// Update Statement	transaction
 					if (_statement != null)
@@ -1110,7 +1529,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			if (!_statement.IsPrepared)
 			{
 				// Close the inner DataReader if needed
-				await DisposeReaderAsync(async).ConfigureAwait(false);
+				DisposeReader();
 
 				// Reformat the SQL statement if needed
 				var sql = _commandText;
@@ -1123,12 +1542,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				try
 				{
 					// Try to prepare the command
-					await _statement.PrepareAsync(ParseNamedParameters(sql), async).ConfigureAwait(false);
+					_statement.Prepare(ParseNamedParameters(sql));
 				}
 				catch
 				{
 					// Release the statement and rethrow the exception
-					await _statement.ReleaseAsync(async).ConfigureAwait(false);
+					_statement.Release();
 					_statement = null;
 
 					throw;
@@ -1140,15 +1559,83 @@ namespace FirebirdSql.Data.FirebirdClient
 			else
 			{
 				// Close statement for subsequently	executions
-				await CloseAsync(async).ConfigureAwait(false);
+				Close();
+			}
+		}
+		private async Task PrepareAsync(bool returnsSet, CancellationToken cancellationToken = default)
+		{
+			var innerConn = _connection.InnerConnection;
+
+			// Check if	we have	a valid	transaction
+			if (_transaction == null)
+			{
+				if (innerConn.IsEnlisted)
+				{
+					_transaction = innerConn.ActiveTransaction;
+				}
+				else
+				{
+					_implicitTransaction = true;
+					_transaction = new FbTransaction(_connection, _connection.ConnectionOptions.IsolationLevel);
+					await _transaction.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+					// Update Statement	transaction
+					if (_statement != null)
+					{
+						_statement.Transaction = _transaction.Transaction;
+					}
+				}
+			}
+
+			// Check if	we have	a valid	statement handle
+			if (_statement == null)
+			{
+				_statement = innerConn.Database.CreateStatement(_transaction.Transaction);
+			}
+
+			// Prepare the statement if	needed
+			if (!_statement.IsPrepared)
+			{
+				// Close the inner DataReader if needed
+				await DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
+
+				// Reformat the SQL statement if needed
+				var sql = _commandText;
+
+				if (_commandType == CommandType.StoredProcedure)
+				{
+					sql = BuildStoredProcedureSql(sql, returnsSet);
+				}
+
+				try
+				{
+					// Try to prepare the command
+					await _statement.PrepareAsync(ParseNamedParameters(sql), cancellationToken).ConfigureAwait(false);
+				}
+				catch
+				{
+					// Release the statement and rethrow the exception
+					await _statement.ReleaseAsync(cancellationToken).ConfigureAwait(false);
+					_statement = null;
+
+					throw;
+				}
+
+				// Add this	command	to the active command list
+				innerConn.AddPreparedCommand(this);
+			}
+			else
+			{
+				// Close statement for subsequently	executions
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
 
-		private async Task ExecuteCommandAsync(CommandBehavior behavior, bool returnsSet, AsyncWrappingCommonArgs async)
+		private void ExecuteCommand(CommandBehavior behavior, bool returnsSet)
 		{
 			LogCommandExecutionIfEnabled();
 
-			await PrepareAsync(returnsSet, async).ConfigureAwait(false);
+			Prepare(returnsSet);
 
 			if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
 				(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
@@ -1173,13 +1660,51 @@ namespace FirebirdSql.Data.FirebirdClient
 				{
 					if (_statement.Parameters == null)
 					{
-						await DescribeInputAsync(async).ConfigureAwait(false);
+						DescribeInput();
 					}
-					await UpdateParameterValuesAsync(async).ConfigureAwait(false);
+					UpdateParameterValues();
 				}
 
 				// Execute statement
-				await _statement.ExecuteAsync(async).ConfigureAwait(false);
+				_statement.Execute();
+			}
+		}
+		private async Task ExecuteCommandAsync(CommandBehavior behavior, bool returnsSet, CancellationToken cancellationToken = default)
+		{
+			LogCommandExecutionIfEnabled();
+
+			await PrepareAsync(returnsSet, cancellationToken).ConfigureAwait(false);
+
+			if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
+				(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
+				(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
+				(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
+				behavior == CommandBehavior.Default)
+			{
+				// Set the fetch size
+				_statement.FetchSize = _fetchSize;
+
+				// Set if it's needed the Records Affected information
+				_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
+
+				// Validate input parameter count
+				if (_namedParameters.Count > 0 && Parameters.Count == 0)
+				{
+					throw FbException.Create("Must declare command parameters.");
+				}
+
+				// Update input parameter values
+				if (Parameters.Count > 0)
+				{
+					if (_statement.Parameters == null)
+					{
+						await DescribeInputAsync(cancellationToken).ConfigureAwait(false);
+					}
+					await UpdateParameterValuesAsync(cancellationToken).ConfigureAwait(false);
+				}
+
+				// Execute statement
+				await _statement.ExecuteAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
 
@@ -1188,8 +1713,8 @@ namespace FirebirdSql.Data.FirebirdClient
 			var sql = spName == null ? string.Empty : spName.Trim();
 
 			if (sql.Length > 0 &&
-				!sql.ToUpperInvariant().StartsWith("EXECUTE PROCEDURE ") &&
-				!sql.ToUpperInvariant().StartsWith("SELECT "))
+				!sql.StartsWith("EXECUTE PROCEDURE ", StringComparison.InvariantCultureIgnoreCase) &&
+				!sql.StartsWith("SELECT ", StringComparison.InvariantCultureIgnoreCase))
 			{
 				var paramsText = new StringBuilder();
 
