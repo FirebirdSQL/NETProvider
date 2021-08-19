@@ -297,12 +297,6 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			_securityPackage = securityPackage;
 			_remotePrincipal = remotePrincipal;
-			_clientCredentials = new SecHandle();
-			var resCode = AcquireCredentialsHandle(null, securityPackage, SECPKG_CRED_OUTBOUND,
-				IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero,
-				out _clientCredentials, out var expiry);
-			if (resCode != SEC_E_OK)
-				throw new Exception($"{nameof(AcquireCredentialsHandle)} failed");
 		}
 
 		#endregion
@@ -317,6 +311,7 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			EnsureDisposed();
 			CloseClientContext();
+			InitializeClientCredentials();
 			_clientContext = new SecHandle();
 			var clientTokenBuf = new SecBufferDesc(MAX_TOKEN_SIZE);
 			try
@@ -421,6 +416,16 @@ namespace FirebirdSql.Data.Client.Managed
 				CloseClientContext();
 				CloseClientCredentials();
 			}
+		}
+
+		private void InitializeClientCredentials()
+		{
+			_clientCredentials = new SecHandle();
+			var resCode = AcquireCredentialsHandle(null, _securityPackage, SECPKG_CRED_OUTBOUND,
+				IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero,
+				out _clientCredentials, out var expiry);
+			if (resCode != SEC_E_OK)
+				throw new Exception($"{nameof(AcquireCredentialsHandle)} failed");
 		}
 
 		private void CloseClientContext()
