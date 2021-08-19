@@ -26,7 +26,7 @@ function Clean() {
 
 function Build() {
 	function b($target, $check=$True) {
-		dotnet msbuild /t:$target /p:Configuration=$Configuration "$baseDir\src\NETProvider.sln" /v:m /m
+		dotnet msbuild /t:$target /p:Configuration=$Configuration /p:ContinuousIntegrationBuild=true "$baseDir\src\NETProvider.sln" /v:m /m
 		if ($check) {
 			Check-ExitCode
 		}
