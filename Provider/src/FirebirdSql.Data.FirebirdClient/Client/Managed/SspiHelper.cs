@@ -266,7 +266,7 @@ namespace FirebirdSql.Data.Client.Managed
 		private SecHandle _clientContext;
 		private bool _disposed;
 
-		private string _securPackage;
+		private string _securityPackage;
 		private string _remotePrincipal;
 
 		#endregion
@@ -278,8 +278,7 @@ namespace FirebirdSql.Data.Client.Managed
 		/// </summary>
 		public SspiHelper()
 			: this("NTLM")
-		{
-		}
+		{ }
 
 		/// <summary>
 		/// Creates SSPIHelper with given security package and no remote principal and gets client credentials
@@ -287,8 +286,7 @@ namespace FirebirdSql.Data.Client.Managed
 		/// <param name="securityPackage">Name of security package (e.g. NTLM, Kerberos, ...)</param>
 		public SspiHelper(string securityPackage)
 			: this(securityPackage, null)
-		{
-		}
+		{ }
 
 		/// <summary>
 		/// Creates SSPIHelper with given security package and remote principal and gets client credentials
@@ -297,7 +295,7 @@ namespace FirebirdSql.Data.Client.Managed
 		/// <param name="remotePrincipal">SPN of server (may be necessary for Kerberos</param>
 		public SspiHelper(string securityPackage, string remotePrincipal)
 		{
-			_securPackage = securityPackage;
+			_securityPackage = securityPackage;
 			_remotePrincipal = remotePrincipal;
 			_clientCredentials = new SecHandle();
 			var resCode = AcquireCredentialsHandle(null, securityPackage, SECPKG_CRED_OUTBOUND,
