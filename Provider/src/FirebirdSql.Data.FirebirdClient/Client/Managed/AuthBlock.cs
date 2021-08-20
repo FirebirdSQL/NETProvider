@@ -127,7 +127,7 @@ namespace FirebirdSql.Data.Client.Managed
 		public void SendContAuthToBuffer(IXdrWriter xdr)
 		{
 			xdr.Write(IscCodes.op_cont_auth);
-			xdr.WriteBuffer(ClientData); // p_data
+			xdr.WriteBuffer(HasClientData ? ClientData : PublicClientData); // p_data
 			xdr.Write(AcceptPluginName); // p_name
 			xdr.Write(AcceptPluginName); // p_list
 			xdr.WriteBuffer(ServerKeys); // p_keys
@@ -135,7 +135,7 @@ namespace FirebirdSql.Data.Client.Managed
 		public async ValueTask SendContAuthToBufferAsync(IXdrWriter xdr, CancellationToken cancellationToken = default)
 		{
 			await xdr.WriteAsync(IscCodes.op_cont_auth, cancellationToken).ConfigureAwait(false);
-			await xdr.WriteBufferAsync(ClientData, cancellationToken).ConfigureAwait(false); // p_data
+			await xdr.WriteBufferAsync(HasClientData ? ClientData : PublicClientData, cancellationToken).ConfigureAwait(false); // p_data
 			await xdr.WriteAsync(AcceptPluginName, cancellationToken).ConfigureAwait(false); // p_name
 			await xdr.WriteAsync(AcceptPluginName, cancellationToken).ConfigureAwait(false); // p_list
 			await xdr.WriteBufferAsync(ServerKeys, cancellationToken).ConfigureAwait(false); // p_keys

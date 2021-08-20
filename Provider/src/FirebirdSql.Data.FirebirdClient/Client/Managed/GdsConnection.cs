@@ -194,7 +194,7 @@ namespace FirebirdSql.Data.Client.Managed
 							StartCompression();
 						}
 
-						if (operation == IscCodes.op_cond_accept && AuthBlock.HasClientData)
+						if (operation == IscCodes.op_cond_accept)
 						{
 							while (true)
 							{
@@ -298,7 +298,7 @@ namespace FirebirdSql.Data.Client.Managed
 							StartCompression();
 						}
 
-						if (operation == IscCodes.op_cond_accept && AuthBlock.HasClientData)
+						if (operation == IscCodes.op_cond_accept)
 						{
 							while (true)
 							{
