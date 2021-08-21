@@ -81,7 +81,7 @@ namespace FirebirdSql.Data.Services
 			SpbFilenameEncoding = Encoding2.Default;
 			var spb = _svc.CreateServiceParameterBuffer();
 			spb.AppendPreamble();
-			if (_svc is Client.Managed.Version10.GdsServiceManager gdsSvc && gdsSvc.Connection.AuthBlock != null)
+			if (_svc is Client.Managed.Version13.GdsServiceManager gdsSvc)
 			{
 				if (!gdsSvc.Connection.AuthBlock.HasClientData)
 				{
