@@ -391,7 +391,7 @@ namespace FirebirdSql.Data.Common
 		public const int isc_action_svc_remove_license = 10;    /* Removes a license from the license file */
 		public const int isc_action_svc_db_stats = 11;  /* Retrieves database statistics */
 		public const int isc_action_svc_get_ib_log = 12;    /* Retrieves the InterBase log file	from the server	*/
-		public const int isc_action_svc_get_fb_log = 12;	/* Retrieves the Firebird log file from the server */
+		public const int isc_action_svc_get_fb_log = 12;    /* Retrieves the Firebird log file from the server */
 		public const int isc_action_svc_nbak = 20;  /* Incremental nbackup */
 		public const int isc_action_svc_nrest = 21; /* Incremental database restore */
 		public const int isc_action_svc_trace_start = 22;   // Start trace session
@@ -742,8 +742,6 @@ namespace FirebirdSql.Data.Common
 		public const int isc_info_db_read_only = 63;
 		public const int isc_info_db_size_in_pages = 64;
 
-		/* Values 65 -100 unused to	avoid conflict with	InterBase */
-
 		public const int frb_info_att_charset = 101;
 		public const int isc_info_db_class = 102;
 		public const int isc_info_firebird_version = 103;
@@ -753,6 +751,58 @@ namespace FirebirdSql.Data.Common
 		public const int isc_info_next_transaction = 107;
 		public const int isc_info_db_provider = 108;
 		public const int isc_info_active_transactions = 109;
+
+		public const int isc_info_active_tran_count = 110;
+		public const int isc_info_creation_date = 111;
+		public const int isc_info_db_file_size = 112;
+		public const int fb_info_page_contents = 113;
+
+		public const int fb_info_implementation = 114;
+
+		public const int fb_info_page_warns = 115;
+		public const int fb_info_record_warns = 116;
+		public const int fb_info_bpage_warns = 117;
+		public const int fb_info_dpage_warns = 118;
+		public const int fb_info_ipage_warns = 119;
+		public const int fb_info_ppage_warns = 120;
+		public const int fb_info_tpage_warns = 121;
+		public const int fb_info_pip_errors = 122;
+		public const int fb_info_pip_warns = 123;
+
+		public const int fb_info_pages_used = 124;
+		public const int fb_info_pages_free = 125;
+
+		public const int fb_info_ses_idle_timeout_db = 129;
+		public const int fb_info_ses_idle_timeout_att = 130;
+		public const int fb_info_ses_idle_timeout_run = 131;
+
+		public const int fb_info_conn_flags = 132;
+
+		public const int fb_info_crypt_key = 133;
+		public const int fb_info_crypt_state = 134;
+
+		public const int fb_info_statement_timeout_db = 135;
+		public const int fb_info_statement_timeout_att = 136;
+
+		public const int fb_info_protocol_version = 137;
+		public const int fb_info_crypt_plugin = 138;
+
+		public const int fb_info_creation_timestamp_tz = 139;
+
+		public const int fb_info_wire_crypt = 140;
+
+		public const int fb_info_features = 141;
+
+		public const int fb_info_next_attachment = 142;
+		public const int fb_info_next_statement = 143;
+
+		public const int fb_info_db_guid = 144;
+		public const int fb_info_db_file_id = 145;
+
+		public const int fb_info_replica_mode = 146;
+
+		public const int fb_info_username = 147;
+		public const int fb_info_sqlrole = 148;
 
 		#endregion
 

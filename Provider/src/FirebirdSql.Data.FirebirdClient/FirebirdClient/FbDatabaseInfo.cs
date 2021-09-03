@@ -350,6 +350,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetListAsync<long>(IscCodes.isc_info_active_transactions, cancellationToken);
 		}
 
+		public int GetActiveTransactionsCount()
+		{
+			return GetValue<int>(IscCodes.isc_info_active_tran_count);
+		}
+		public Task<int> GetActiveTransactionsCountAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.isc_info_active_tran_count, cancellationToken);
+		}
+
 		public List<string> GetActiveUsers()
 		{
 			return GetList<string>(IscCodes.isc_info_user_names);
