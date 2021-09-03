@@ -124,6 +124,9 @@ namespace FirebirdSql.Data.Common
 							info.Add("SUPER SERVER");
 						}
 						break;
+
+					default:
+						throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
 				}
 
 				pos += length;
