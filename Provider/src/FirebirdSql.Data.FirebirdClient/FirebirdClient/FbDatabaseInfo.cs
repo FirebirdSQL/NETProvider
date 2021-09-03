@@ -368,6 +368,24 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetListAsync<string>(IscCodes.isc_info_user_names, cancellationToken);
 		}
 
+		public string GetWireCrypt()
+		{
+			return GetValue<string>(IscCodes.fb_info_wire_crypt);
+		}
+		public Task<string> GetWireCryptAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.fb_info_wire_crypt, cancellationToken);
+		}
+
+		public string GetCryptPlugin()
+		{
+			return GetValue<string>(IscCodes.fb_info_crypt_plugin);
+		}
+		public Task<string> GetCryptPluginAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.fb_info_crypt_plugin, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors

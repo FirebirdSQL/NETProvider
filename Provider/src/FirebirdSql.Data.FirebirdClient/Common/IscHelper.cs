@@ -80,6 +80,11 @@ namespace FirebirdSql.Data.Common
 						info.Add(Encoding2.Default.GetString(buffer, pos + 1, buffer[pos]));
 						break;
 
+					case IscCodes.fb_info_wire_crypt:
+					case IscCodes.fb_info_crypt_plugin:
+						info.Add(Encoding2.Default.GetString(buffer, pos, length));
+						break;
+
 					case IscCodes.isc_info_base_level:
 						info.Add(string.Format(CultureInfo.CurrentCulture, "{0}.{1}", buffer[pos], buffer[pos + 1]));
 						break;
