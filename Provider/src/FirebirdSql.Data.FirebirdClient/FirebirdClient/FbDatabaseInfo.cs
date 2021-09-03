@@ -363,10 +363,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Constructors
 
-		public FbDatabaseInfo()
-		{ }
-
-		public FbDatabaseInfo(FbConnection connection)
+		public FbDatabaseInfo(FbConnection connection = null)
 		{
 			Connection = connection;
 		}
