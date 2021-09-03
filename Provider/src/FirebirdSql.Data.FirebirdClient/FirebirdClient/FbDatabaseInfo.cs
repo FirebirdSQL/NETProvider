@@ -341,13 +341,13 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<long>(IscCodes.isc_info_next_transaction, cancellationToken);
 		}
 
-		public int GetActiveTransactions()
+		public List<long> GetActiveTransactions()
 		{
-			return GetValue<int>(IscCodes.isc_info_active_transactions);
+			return GetList<long>(IscCodes.isc_info_active_transactions);
 		}
-		public Task<int> GetActiveTransactionsAsync(CancellationToken cancellationToken = default)
+		public Task<List<long>> GetActiveTransactionsAsync(CancellationToken cancellationToken = default)
 		{
-			return GetValueAsync<int>(IscCodes.isc_info_active_transactions, cancellationToken);
+			return GetListAsync<long>(IscCodes.isc_info_active_transactions, cancellationToken);
 		}
 
 		public List<string> GetActiveUsers()
