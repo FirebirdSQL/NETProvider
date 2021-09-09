@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Resources;
 using System.Text;
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Common
 {
@@ -40,6 +41,9 @@ namespace FirebirdSql.Data.Common
 
 				switch (type)
 				{
+					case IscCodes.isc_info_error:
+						throw FbException.Create("Received error response.");
+
 					case IscCodes.isc_info_allocation:
 					case IscCodes.isc_info_ods_version:
 					case IscCodes.isc_info_ods_minor_version:
