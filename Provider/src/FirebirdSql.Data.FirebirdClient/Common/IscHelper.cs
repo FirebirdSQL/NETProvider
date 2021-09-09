@@ -88,6 +88,7 @@ namespace FirebirdSql.Data.Common
 
 					case IscCodes.fb_info_wire_crypt:
 					case IscCodes.fb_info_crypt_plugin:
+					case IscCodes.fb_info_db_file_id:
 						info.Add(Encoding2.Default.GetString(buffer, pos, length));
 						break;
 

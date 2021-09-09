@@ -422,6 +422,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<string>(IscCodes.fb_info_replica_mode, cancellationToken);
 		}
 
+		public string GetDbFileId()
+		{
+			return GetValue<string>(IscCodes.fb_info_db_file_id);
+		}
+		public Task<string> GetDbFileIdAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.fb_info_db_file_id, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors

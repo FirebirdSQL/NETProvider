@@ -42,7 +42,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				.Where(x => !x.IsSpecialName)
 				.Where(x => x.Name.EndsWith("Async")))
 			{
-				if (ServerVersion < new Version(4, 0, 0, 0) && new[] { "GetWireCryptAsync", "GetCryptPluginAsync", "GetNextAttachmentAsync", "GetNextStatementAsync", "GetReplicaModeAsync" }.Contains(m.Name))
+				if (ServerVersion < new Version(4, 0, 0, 0)
+					 && new[] {
+						nameof(FbDatabaseInfo.GetWireCryptAsync),
+						nameof(FbDatabaseInfo.GetCryptPluginAsync),
+						nameof(FbDatabaseInfo.GetNextAttachmentAsync),
+						nameof(FbDatabaseInfo.GetNextStatementAsync),
+						nameof(FbDatabaseInfo.GetReplicaModeAsync),
+						nameof(FbDatabaseInfo.GetDbFileIdAsync)
+					}.Contains(m.Name))
 					continue;
 
 				Assert.DoesNotThrowAsync(() => (Task)m.Invoke(dbInfo, new object[] { CancellationToken.None }), m.Name);
