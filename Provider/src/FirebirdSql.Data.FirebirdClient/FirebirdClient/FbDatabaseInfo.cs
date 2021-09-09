@@ -395,6 +395,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<DateTime>(IscCodes.isc_info_creation_date, cancellationToken);
 		}
 
+		public long GetNextAttachment()
+		{
+			return GetValue<long>(IscCodes.fb_info_next_attachment);
+		}
+		public Task<long> GetNextAttachmentAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.fb_info_next_attachment, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors

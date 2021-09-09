@@ -71,6 +71,7 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.isc_info_next_transaction:
 					case IscCodes.isc_info_active_transactions:
 					case IscCodes.isc_info_active_tran_count:
+					case IscCodes.fb_info_next_attachment:
 						info.Add(VaxInteger(buffer, pos, length));
 						break;
 
@@ -94,16 +95,18 @@ namespace FirebirdSql.Data.Common
 						break;
 
 					case IscCodes.isc_info_db_id:
-						var dbFile = Encoding2.Default.GetString(buffer, pos + 2, buffer[pos + 1]);
-						var sitePos = pos + 2 + buffer[pos + 1];
-						int siteLength = buffer[sitePos];
-						var siteName = Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
+						{
+							var dbFile = Encoding2.Default.GetString(buffer, pos + 2, buffer[pos + 1]);
+							var sitePos = pos + 2 + buffer[pos + 1];
+							int siteLength = buffer[sitePos];
+							var siteName = Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
 
-						sitePos += siteLength + 1;
-						siteLength = buffer[sitePos];
-						siteName += "." + Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
+							sitePos += siteLength + 1;
+							siteLength = buffer[sitePos];
+							siteName += "." + Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
 
-						info.Add(siteName + ":" + dbFile);
+							info.Add(siteName + ":" + dbFile);
+						}
 						break;
 
 					case IscCodes.isc_info_implementation:
@@ -112,32 +115,38 @@ namespace FirebirdSql.Data.Common
 
 					case IscCodes.isc_info_isc_version:
 					case IscCodes.isc_info_firebird_version:
-						var messagePosition = pos;
-						var count = buffer[messagePosition];
-						for (var i = 0; i < count; i++)
 						{
-							var messageLength = buffer[messagePosition + 1];
-							info.Add(Encoding2.Default.GetString(buffer, messagePosition + 2, messageLength));
-							messagePosition += 1 + messageLength;
+							var messagePosition = pos;
+							var count = buffer[messagePosition];
+							for (var i = 0; i < count; i++)
+							{
+								var messageLength = buffer[messagePosition + 1];
+								info.Add(Encoding2.Default.GetString(buffer, messagePosition + 2, messageLength));
+								messagePosition += 1 + messageLength;
+							}
 						}
 						break;
 
 					case IscCodes.isc_info_db_class:
-						var serverClass = VaxInteger(buffer, pos, length);
-						if (serverClass == IscCodes.isc_info_db_class_classic_access)
 						{
-							info.Add("CLASSIC SERVER");
-						}
-						else
-						{
-							info.Add("SUPER SERVER");
+							var serverClass = VaxInteger(buffer, pos, length);
+							if (serverClass == IscCodes.isc_info_db_class_classic_access)
+							{
+								info.Add("CLASSIC SERVER");
+							}
+							else
+							{
+								info.Add("SUPER SERVER");
+							}
 						}
 						break;
 
 					case IscCodes.isc_info_creation_date:
-						var date = TypeDecoder.DecodeDate((int)VaxInteger(buffer, pos, 4));
-						var time = TypeDecoder.DecodeTime((int)VaxInteger(buffer, pos + 4, 4));
-						info.Add(date.Add(time));
+						{
+							var date = TypeDecoder.DecodeDate((int)VaxInteger(buffer, pos, 4));
+							var time = TypeDecoder.DecodeTime((int)VaxInteger(buffer, pos + 4, 4));
+							info.Add(date.Add(time));
+						}
 						break;
 
 					default:
