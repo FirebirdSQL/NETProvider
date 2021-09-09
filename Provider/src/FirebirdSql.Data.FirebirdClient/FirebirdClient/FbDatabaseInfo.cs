@@ -413,6 +413,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<long>(IscCodes.fb_info_next_statement, cancellationToken);
 		}
 
+		public string GetReplicaMode()
+		{
+			return GetValue<string>(IscCodes.fb_info_replica_mode);
+		}
+		public Task<string> GetReplicaModeAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<string>(IscCodes.fb_info_replica_mode, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors

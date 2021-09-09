@@ -131,14 +131,12 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.isc_info_db_class:
 						{
 							var serverClass = VaxInteger(buffer, pos, length);
-							if (serverClass == IscCodes.isc_info_db_class_classic_access)
+							info.Add(serverClass switch
 							{
-								info.Add("CLASSIC SERVER");
-							}
-							else
-							{
-								info.Add("SUPER SERVER");
-							}
+								IscCodes.isc_info_db_class_classic_access => "CLASSIC SERVER",
+								IscCodes.isc_info_db_class_server_access => "SUPER SERVER",
+								_ => throw new ArgumentOutOfRangeException(nameof(serverClass), $"{nameof(serverClass)}={serverClass}"),
+							});
 						}
 						break;
 
@@ -147,6 +145,19 @@ namespace FirebirdSql.Data.Common
 							var date = TypeDecoder.DecodeDate((int)VaxInteger(buffer, pos, 4));
 							var time = TypeDecoder.DecodeTime((int)VaxInteger(buffer, pos + 4, 4));
 							info.Add(date.Add(time));
+						}
+						break;
+
+					case IscCodes.fb_info_replica_mode:
+						{
+							var mode = VaxInteger(buffer, pos, length);
+							info.Add(mode switch
+							{
+								0 => "NONE",
+								1 => "READ ONLY",
+								2 => "READ WRITE",
+								_ => throw new ArgumentOutOfRangeException(nameof(mode), $"{nameof(mode)}={mode}"),
+							});
 						}
 						break;
 
